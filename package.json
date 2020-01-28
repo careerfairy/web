@@ -1,0 +1,49 @@
+{
+  "name": "nextjs-with-firebase-hosting",
+  "license": "MIT",
+  "version": "1.0.0",
+  "description": "Host Next.js SSR app on Firebase Cloud Functions with Firebase Hosting redirects.",
+  "repository": "https://github.com/jthegedus/firebase-functions-next-example.git",
+  "main": "dist/functions/index.js",
+  "scripts": {
+    "setup": "npm run firebase use --add",
+    "build:app": "next build src/app",
+    "build:functions": "babel src/functions --out-dir dist/functions --source-maps",
+    "build": "npm run build:app && npm run build:functions",
+    "watch:app": "next src/app",
+    "watch:functions": "babel src/functions --out-dir dist/functions --source-maps --watch",
+    "watch": "npm run watch:app & npm run watch:functions",
+    "serve": "firebase serve --only functions,hosting",
+    "predeploy": "rimraf dist/ && npm run build",
+    "deploy": "npm run firebase deploy --only functions,hosting"
+  },
+  "dependencies": {
+    "firebase-admin": "^8.9.2",
+    "firebase-functions": "^3.3.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "axios": "^0.19.0",
+    "html-loader": "^0.5.5",
+    "mailgun-js": "^0.22.0",
+    "next": "^9.2.0",
+    "twilio": "^3.35.0",
+    "url": "^0.11.0",
+    "@fullpage/react-fullpage": "^0.1.17",
+    "firebase": "^7.7.0",
+    "formik": "^2.1.2",
+    "react-player": "^1.14.2",
+    "redux": "^4.0.5",
+    "semantic-ui-react": "^0.88.2"
+  },
+  "engines": {
+    "node": "10"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "cross-env": "^5.2.0",
+    "firebase-functions-test": "^0.1.6",
+    "firebase-tools": "^7.2.1"
+  }
+}

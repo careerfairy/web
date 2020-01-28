@@ -1,0 +1,22 @@
+/*******************************
+     User Global Variables
+*******************************/
+
+@primaryColor   : @teal;
+@secondaryColor : @grey;
+@red            : #DD4B39;
+@orange         : #FE9A76;
+@yellow         : #FFD700;
+@olive          : #32CD32;
+@green          : #016936;
+@teal           : #00D2AA;
+@blue           : #0E6EB8;
+@violet         : #EE82EE;
+@purple         : #B413EC;
+@pink           : #FF1493;
+@brown          : #A52A2A;
+@grey           : #A0A0A0;
+@black          : #000000;
+
+@pageFont: 'Poppins', sans-serif;
+@headerFont: 'Poppins', sans-serif;

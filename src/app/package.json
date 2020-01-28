@@ -1,0 +1,31 @@
+{
+  "name": "careerfairy-ssr-webapp",
+  "version": "1.0.0",
+  "description": "ssr app",
+  "main": "server.js",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fullpage/react-fullpage": "^0.1.17",
+    "firebase": "^7.7.0",
+    "formik": "^2.1.2",
+    "next": "^9.2.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-player": "^1.14.2",
+    "redux": "^4.0.5",
+    "semantic-ui": "^2.4.2",
+    "semantic-ui-react": "^0.88.2"
+  },
+  "browserslist": [
+    "defaults",
+    "not IE 9",
+    "not IE_Mob 11",
+    "maintained node versions"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "default": "careerfairy-e1fd9"
+  },
+  "targets": {
+    "careerfairy-e1fd9": {
+      "hosting": {
+        "testing": [
+          "testing-careerfairy"
+        ],
+        "production": [
+          "careerfairy-e1fd9"
+        ]
+      }
+    }
+  }
+}
