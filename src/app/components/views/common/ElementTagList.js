@@ -7,7 +7,7 @@ function ElementTagList(props) {
 
     let tags = list.map((listElement, index) => {
         return(
-            <Fragment>
+            <div key={index}>
                 <div className='tag' key={listElement} style={{ backgroundColor: colors[index%colors.length], color: 'white'}}>{listElement}</div>
                 <style jsx>{`
                     .tag {
@@ -21,7 +21,7 @@ function ElementTagList(props) {
                         font-weight: 500;
                     }
                 `}</style>
-            </Fragment>
+            </div>
         );  
     })
 

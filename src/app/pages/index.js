@@ -434,4 +434,8 @@ function LandingPage(props) {
     );
 }
 
+LandingPage.getInitialProps = async () => {
+    console.log("LALALALALLALALLAALLLllllllllllllllllllmkjohiugiugyfuLOIIIJ(J)(K)J)IJ)IJ");
+}
+
 export default withFirebase(LandingPage);

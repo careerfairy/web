@@ -1,18 +1,17 @@
 import { Fragment, useState, useEffect, useRef } from 'react';
 
 import { useRouter } from 'next/router';
-import { withFirebase } from '../data/firebase'
+import { withFirebasePage } from '../../data/firebase'
 
-import CompanyLandingPage from '../components/views/company-profile/CompanyLandingPage';
-import CompanyDiscoverPage from '../components/views/company-profile/CompanyDiscoverPage';
-import CompanyWatchPage from '../components/views/company-profile/CompanyWatchPage';
-import CompanyMeetPage from '../components/views/company-profile/CompanyMeetPage';
+import CompanyLandingPage from '../../components/views/company-profile/CompanyLandingPage';
+import CompanyDiscoverPage from '../../components/views/company-profile/CompanyDiscoverPage';
+import CompanyWatchPage from '../../components/views/company-profile/CompanyWatchPage';
+import CompanyMeetPage from '../../components/views/company-profile/CompanyMeetPage';
 
-import Loader from '../components/views/loader/Loader';
+import Loader from '../../components/views/loader/Loader';
 
 function CompanyProfile(props) {    
     const router = useRouter();
-    const { id } = router.query;
     const [company, setCompanyData] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -26,16 +25,16 @@ function CompanyProfile(props) {
     }
 
     useEffect(() => {
-        if (id) {
+        if (props.companyId) {
             setLoading(true);
-            props.firebase.getCompanyById(id).then( querySnapshot => {
+            props.firebase.getCompanyById(props.companyId).then( querySnapshot => {
                 let company = querySnapshot.data();
                 company.id = querySnapshot.id;
                 setCompanyData(company);
                 setLoading(false);
             });
         }
-    }, [id]);
+    }, [props.companyId]);
 
     if (loading) {
         return <Loader/>;
@@ -91,4 +90,8 @@ function CompanyProfile(props) {
     }
 }
 
-export default withFirebase(CompanyProfile);
+CompanyProfile.getInitialProps = ({ query }) => {
+    return { companyId: query.companyId }
+}
+
+export default withFirebasePage(CompanyProfile);

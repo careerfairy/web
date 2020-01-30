@@ -1,6 +1,7 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
+import 'firebase/storage'
 
 const config = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -19,6 +20,7 @@ class Firebase {
         }
         this.auth = firebase.auth();
         this.firestore = firebase.firestore();
+        this.storage = firebase.storage();
     }
 
     // *** Auth API ***
@@ -439,6 +441,10 @@ class Firebase {
             .collection("videos")
             .doc(videoId);
         return videosRef.get();
+    }
+
+    getStorageRef = () => {
+        return this.storage.ref();
     }
 }
 

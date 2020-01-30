@@ -25,7 +25,7 @@ const LandingHeader = (props) => {
                     <li><a href='https://corporate.careerfairy.io/career-center'>For Career Centers</a></li>
                 </ul>
                 <div id='right-menu' className={'float-right white'}>
-                    <Button primary style={{ position: 'relative', zIndex: '1000'}} onClick={() => goToRoute( props.authenticated ? '/profile' : 'signup')}>{ props.authenticated ? 'My Profile' : 'Log in'}</Button>
+                    <Button primary style={{ position: 'relative', zIndex: '1000'}} onClick={() => goToRoute( props.authenticated ? '/profile' : '/signup')}>{ props.authenticated ? 'My Profile' : 'Log in'}</Button>
                 </div> 
             </header>
             <style jsx>{`

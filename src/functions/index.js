@@ -18,15 +18,18 @@
 const functions = require('firebase-functions');
 const next = require('next');
 const path = require('path');
+const routes = require('./routes');
 
 const dev = false;
 const app = next({dev, conf: { distDir: "dist/client" }});
-const handle = app.getRequestHandler();
+const handler = routes.getRequestHandler(app);
+
 
 exports.next = functions.https.onRequest(async (req, res) => {
-  console.log('File: ' + req.originalUrl); // log the page.js file that is being requested
-  await app.prepare();
-  handle(req, res);
+    console.log('File: ' + req.originalUrl); // log the page.js file that is being requested
+    await app.prepare().then(() => {
+        return handler(req, res);
+    });
 });
 
 const fs = require('fs');
@@ -69,7 +72,7 @@ exports.sendSharePollEmail = functions.https.onRequest(async (req, res) => {
     });
   });
 
-  exports.sendShareLivestreamEmail = functions.https.onRequest(async (req, res) => {
+exports.sendShareLivestreamEmail = functions.https.onRequest(async (req, res) => {
 
     res.set('Access-Control-Allow-Origin', 'https://careerfairy.io');
     res.set('Access-Control-Allow-Credentials', 'true');
@@ -100,64 +103,39 @@ exports.sendSharePollEmail = functions.https.onRequest(async (req, res) => {
         }
         res.status(200).send("The email was successfully sent");
     });
-  });
+});
 
 
-  exports.sendShareLivestreamPollEmail = functions.https.onRequest(async (req, res) => {
+exports.sendShareLivestreamPollEmail = functions.https.onRequest(async (req, res) => {
 
-    res.set('Access-Control-Allow-Origin', 'https://careerfairy.io');
-    res.set('Access-Control-Allow-Credentials', 'true');
+res.set('Access-Control-Allow-Origin', 'https://careerfairy.io');
+res.set('Access-Control-Allow-Credentials', 'true');
 
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
-    } 
+if (req.method === 'OPTIONS') {
+    // Send response to OPTIONS requests
+    res.set('Access-Control-Allow-Methods', 'GET');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.set('Access-Control-Max-Age', '3600');
+    res.status(204).send('');
+} 
 
-    const html_email = fs.readFileSync(path.resolve(__dirname, './html_emails/ShareLivestreamPollEmail.html'), 'utf8')
+const html_email = fs.readFileSync(path.resolve(__dirname, './html_emails/ShareLivestreamPollEmail.html'), 'utf8')
 
-    const data = {
-        from: 'CareerFairy <noreply@mg.careerfairy.io>',
-        to: req.body.recipientEmail,
-        subject: 'Decide the topic of ' + req.body.companyName + '\'s next Livestream!',
-        text: 'Welcome to CareerFairy!',
-        html: html_email.replace("COMPANY_NAME", req.body.companyName)
-                        .replace("LIVESTREAM_ID", req.body.livestreamId)
-    };
+const data = {
+    from: 'CareerFairy <noreply@mg.careerfairy.io>',
+    to: req.body.recipientEmail,
+    subject: 'Decide the topic of ' + req.body.companyName + '\'s next Livestream!',
+    text: 'Welcome to CareerFairy!',
+    html: html_email.replace("COMPANY_NAME", req.body.companyName)
+                    .replace("LIVESTREAM_ID", req.body.livestreamId)
+};
 
-    mg.messages().send(data, (error, body) => {
-        if (error) {
-            res.send('Error: ' + error);
-        }
-        res.status(200).send("The email was successfully sent");
-    });
-  });
-
-const accountSid = 'ACb2f21f2bfdfb64f07be8d5d3c4d75481';
-const authToken = '9c8cab4b2fa4bc252461835645b38885';
-
-const twilio_client = require('twilio')(accountSid, authToken);
-
-exports.getTwilioNtsToken = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', 'https://careerfairy.io');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
-    } 
-
-    twilio_client.tokens.create().then( token => {
-        return res.status(200).send(token);
-    }).catch(error => {
-        return res.status(400);
-    })
+mg.messages().send(data, (error, body) => {
+    if (error) {
+        res.send('Error: ' + error);
+    }
+    res.status(200).send("The email was successfully sent");
+});
 });
 
 exports.getXirsysNtsToken = functions.https.onRequest(async (req, res) => {

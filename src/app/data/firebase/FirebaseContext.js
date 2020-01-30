@@ -8,4 +8,18 @@ export const withFirebase = Component => props => (
     </FirebaseContext.Consumer>
 );
 
+export const withFirebasePage = Page => {
+    let element = props => {
+        return(
+            <FirebaseContext.Consumer>
+                {firebase => <Page {...props} firebase={firebase} />}
+            </FirebaseContext.Consumer>
+        );
+    };
+    if  (Page.getInitialProps) {
+        element.getInitialProps = Page.getInitialProps
+    }
+    return element;
+}
+
 export default FirebaseContext;

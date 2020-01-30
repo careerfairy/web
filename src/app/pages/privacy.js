@@ -1,8 +1,9 @@
 import { Container } from 'semantic-ui-react'
 
 import Header from "../components/views/header/Header";
+import { withFirebase } from '../data/firebase';
 
-function PrivacyPolicy(props) {
+const PrivacyPolicy = (props) => {
     return (
         <div>
             <Header color="teal"/>
@@ -93,8 +94,7 @@ function PrivacyPolicy(props) {
                 }
             `}</style>
         </div>
-
     );
 }
 
-export default PrivacyPolicy;
+export default withFirebase(PrivacyPolicy);

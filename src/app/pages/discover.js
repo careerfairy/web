@@ -92,7 +92,7 @@ function LandingPage(props) {
     }
 
     function goToPastLivestream(livestreamId) {
-        router.push(`/past-livestream?id=${livestreamId}`, `/past-livestream/${livestreamId}`);
+        router.push(`/past-livestream/` + livestreamId);
     }
 
     const filterElement = backgroundOptions.map((option, index) => {

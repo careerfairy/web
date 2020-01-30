@@ -1,19 +1,23 @@
-import React, {Fragment} from 'react'
+import {Fragment} from 'react';
 import {Image, Icon, Button} from "semantic-ui-react";
 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-function NonAuthenticatedHeader(props) {
+const NonAuthenticatedHeader = (props) => {
 
     const router = useRouter();
+
+    function goToRoute(route) {
+        router.push(route);
+    }
 
     return (
         <Fragment>
         <header id='main-header'>
             <ul id='left-menu'>
-                <li><Icon id='sidebar-toggle' name='bars' size='big' color={props.color === "white" ? null : 'teal'} onClick={props.toggleSideBar}/></li>
-                <li><Link href='/'><Image src={props.color === "white" ? '/logo_white.png' : '/logo_teal.png'} style={{ width: '150px', display: 'inline-block', marginTop: '10px', marginLeft: '10px'}}/></Link></li>
+                <li><Icon id='sidebar-toggle' style={{ cursor: 'pointer' }} name='bars' size='big' color={props.color === "white" ? null : 'teal'} onClick={props.toggleSideBar}/></li>
+                <li><Link href='/'><a><Image src={props.color === "white" ? '/logo_white.png' : '/logo_teal.png'} style={{ cursor: 'pointer', width: '150px', display: 'inline-block', marginTop: '10px', marginLeft: '10px'}}/></a></Link></li>
             </ul>
             <ul id='middle-menu' className={'centered-menu ' + (props.color === "white" ? 'white' : 'dark')}>
                 <li className={props.page === 'spotlight' ? 'active' : ''}><Link href='/'><a>Livestreams</a></Link></li>
@@ -21,20 +25,18 @@ function NonAuthenticatedHeader(props) {
                 <li className={props.page === 'wishlist' ? 'active' : ''}><Link href='/wishlist'><a>Wishlist</a></Link></li>
             </ul>
             <div id='right-menu' className={'float-right ' + (props.color === "white" ? 'white' : 'dark')}>
-                <Button  style={{ margin: '10px', position: 'relative', zIndex: '1000' }} onClick={() => goToRoute('/signup')} primary>Log in</Button>
+                <Button  style={{ margin: '5px 10px', position: 'relative', zIndex: '1000' }} onClick={() => goToRoute('/signup')} primary>Log in</Button>
             </div>
         </header>
         <style jsx>{`
-
                 #main-header {
                     width: 100%;
                     height: 80px;
                 }
 
-                #left-menu, #right-menu, #right-menu button {
+                #left-menu, #right-menu {
                     text-transform: uppercase;
                     z-index: 1000;
-                    padding: 15px 20px;
                     color: white;
                 }
 
@@ -43,6 +45,7 @@ function NonAuthenticatedHeader(props) {
                     left: 0;
                     top: 0;
                     list-style: none;
+                    padding: 10px 20px;
                     vertical-align: top;
                     margin: 0;
                     display: inline-block;
@@ -100,10 +103,6 @@ function NonAuthenticatedHeader(props) {
                     color: black;
                 }
 
-                #right-menu {
-                    margin-top: 15px;
-                }
-
                 #right-menu-small {
                     display: none;
                     color:white;
@@ -116,8 +115,8 @@ function NonAuthenticatedHeader(props) {
                     right: 0;
                     margin-top: 25px;
                     text-align: center;
-                    padding-inline-start: 0;
                     font-size: 1.1em;
+                    display: inline-block;
                     z-index: 999;
                 }
 

@@ -1,19 +1,15 @@
 import React, {useState, useEffect} from 'react';
 import {Container, Button, Grid, Icon, Header as SemanticHeader} from "semantic-ui-react";
 
-import { withFirebase } from '../data/firebase';
+import { withFirebasePage } from '../../data/firebase';
 import { useRouter } from 'next/router';
-import Header from '../components/views/header/Header';
-import ElementTagList from '../components/views/common/ElementTagList';
+import Header from '../../components/views/header/Header';
+import ElementTagList from '../../components/views/common/ElementTagList';
 import ReactPlayer from 'react-player';
-import JobDescriptions from '../components/views/job-descriptions/JobDescriptions';
-import Footer from '../components/views/footer/Footer';
+import JobDescriptions from '../../components/views/job-descriptions/JobDescriptions';
+import Footer from '../../components/views/footer/Footer';
 
-function PastLivestreamDetail(props) {
-
-    debugger;
-    const router = useRouter()
-    let { id } = router.query
+const PastLivestreamDetail = (props) => {
 
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(-1);
@@ -23,14 +19,14 @@ function PastLivestreamDetail(props) {
     const [showAllQuestions, setShowAllQuestions] = useState(true);
 
     useEffect(() => {
-        if (id) {
-            props.firebase.listenToScheduledLivestreamById(id, querySnapshot => {
+        if (props.id) { 
+            props.firebase.listenToScheduledLivestreamById(props.id, querySnapshot => {
                 let livestream = querySnapshot.data();
                 livestream.id = querySnapshot.id;
                 setCurrentLivestream(livestream);
             })
         }
-    }, [id]);
+    }, [props.id]);
 
     useEffect(() => {
         if (currentLivestream) {
@@ -38,9 +34,10 @@ function PastLivestreamDetail(props) {
         }
     }, [currentLivestream]);
 
+
     useEffect(() => {
-        if (id) {
-            props.firebase.getPastLivestreamsUntreatedQuestions(id, querySnapshot => {
+        if (props.id) {
+            props.firebase.getPastLivestreamsUntreatedQuestions(props.id, querySnapshot => {
                 var questionsList = [];
                 querySnapshot.forEach(doc => {
                     let question = doc.data();
@@ -50,7 +47,7 @@ function PastLivestreamDetail(props) {
                 setUpcomingQuestions(questionsList);
             });
         }
-    }, [id]);
+    }, [props.id]);
 
     function onProgress(data) {
         if (upcomingQuestions && upcomingQuestions.length > 0 && data.loadedSeconds > 2 && data.playedSeconds < upcomingQuestions[0].timecode) {
@@ -394,4 +391,8 @@ function PastLivestreamDetail(props) {
     );
 }
 
-export default withFirebase(PastLivestreamDetail);
+PastLivestreamDetail.getInitialProps = ({ query }) => {
+    return { id: query.livestreamId }
+}
+
+export default withFirebasePage(PastLivestreamDetail);
