@@ -340,6 +340,15 @@ class Firebase {
         return questionsRef.add(question);
     }
 
+    getScheduledLivestreamsComments = (livestreamId, callback) => {
+        let commentRef = this.firestore
+            .collection("scheduledLivestreams")
+            .doc(livestreamId)
+            .collection("comments")
+            .orderBy("date", "asc");
+        return commentRef.onSnapshot(callback);
+    }
+
     upvoteQuestion = (livestreamId, question) => {
         let questionRef = this.firestore
             .collection("scheduledLivestreams")

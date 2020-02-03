@@ -1,12 +1,12 @@
 import React, {useState, useEffect,Fragment} from 'react';
-import {Container, Button, Grid, Icon, Header as SemanticHeader, Input} from "semantic-ui-react";
+import {Container, Button, Grid, Icon, Header as SemanticHeader, Input, Image} from "semantic-ui-react";
 
 import Header from '../../components/views/header/Header';
 import { withFirebasePage } from '../../data/firebase';
 import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor.js';
-import Countdown from 'react-countdown';
-import ElementTagList from '../../components/views/common/ElementTagList';
+import DateUtil from '../../util/DateUtil';
 import ClientFilePicker from '../../components/views/common/ClientFilePicker';
+import Countdown from '../../components/views/common/Countdown';
 import axios from 'axios';
 
 function StreamPlayer(props) {
@@ -22,9 +22,12 @@ function StreamPlayer(props) {
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
     const [currentLivestream, setCurrentLivestream] = useState(null);
     const [connectionSpeed, setConnectionSpeed] = useState(0);
+    const [showNextQuestions, setShowNextQuestions] = useState(false);
     const [nsToken, setNsToken] = useState(null);
 
     const [loading, setLoading] = useState(false);
+    
+    const eth_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media&token=9403f77b-3cb6-496c-a96d-62be1496ae85';
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
@@ -57,6 +60,14 @@ function StreamPlayer(props) {
               setLoading(false);
           }
     }, []);
+
+    useEffect(() => {
+        if (webRTCAdaptor && currentLivestream && currentLivestream.hasStarted) {
+            setTimeout(() => {
+                startPlaying();
+            }, 1000);
+        }
+    }, [currentLivestream, webRTCAdaptor]);
 
     useEffect(() => {
         if (props.firebase.isSignInWithEmailLink(window.location.href)) {
@@ -106,7 +117,6 @@ function StreamPlayer(props) {
     }, [isPlaying]);
 
     useEffect(() => {
-        debugger;
         if (navigator && navigator.connection) {
             setConnectionSpeed(navigator.connection.downlink);
         }
@@ -191,13 +201,6 @@ function StreamPlayer(props) {
         webRTCAdaptor.play(currentLivestream.id);
     }
 
-    function prettyPrintCountdown(props) {
-        return props.days + (props.days === 1 ? ' day ' : ' days ')
-        + props.hours + (props.hours === 1 ? ' hour ' : ' hours ') 
-        + props.minutes + (props.minutes === 1 ? ' minute ' : ' minutes ')
-        + props.seconds + (props.seconds === 1 ? ' second ' : ' seconds ');
-    }
-
     function addNewQuestion() {
         if (!authenticated) {
             return props.history.push('/signup');
@@ -266,7 +269,7 @@ function StreamPlayer(props) {
             });
     }
 
-    let questionElements = upcomingQuestions.map((question, index) => {
+    let questionElementsAlt = upcomingQuestions.map((question, index) => {
         if (!currentQuestion || question.title !== currentQuestion.title) {
             return (
                     <div className='streamNextQuestionContainer' key={index}>
@@ -309,259 +312,455 @@ function StreamPlayer(props) {
         }
     });
 
-    return (
-        <Fragment>
-        <div>
-            <Header color='teal'/>
-            <div className='companies-background'>
-                <Container className='paddingContainer' textAlign='center'>
-                <SemanticHeader as='h3' textAlign='left' color='grey'>Livestream: {currentLivestream ? currentLivestream.speakerName : ''}, {currentLivestream ? currentLivestream.speakerJob : ''} @ {currentLivestream ? currentLivestream.company : ''}</SemanticHeader>
-                <Grid stackable>
-                    <Grid.Row>
-                        <Grid.Column width={10} textAlign='left'>
-                            <div className='video-container'>
-                                <video id="remoteVideo" autoPlay controls width="100%"></video> 
-                                <div className={ currentLivestream && currentLivestream.hasStarted ? 'video-mask hidden' : 'video-mask'} style={{backgroundImage: 'url(' + (currentLivestream ? currentLivestream.backgroundImage : '') + ')'}}>
-                                    <div  className='video-mask-title'>
-                                        <p>This Livestream will start in</p>
-                                        <Countdown date={currentLivestream ? currentLivestream.start.toDate() : null} renderer={(props) => prettyPrintCountdown(props)} />
-                                    </div>
-                                    <div className='video-mask-blur'>
-
-                                    </div>
-                                </div>
-                                <div className={ currentLivestream && currentLivestream.hasStarted && !isPlaying ? 'video-mask' : 'video-mask hidden'} style={{backgroundImage: 'url(' + (currentLivestream ? currentLivestream.backgroundImage : '') + ')'}}>
-                                    <div  className='video-mask-title'>
-                                        <div className='live-now animated flash slower infinite'><Icon name='circle' size='tiny'/><span>Live Now</span></div>
-                                        <Button icon='play' content='Join the Livestream' color='teal' size='huge' onClick={startPlaying} disabled={!isInitialized}/>
-                                    </div>
-                                    <div className='video-mask-blur'>
-
-                                    </div>
-                                </div>
-                            </div>
-                            <Button id='talent-pool' primary onClick={() => openMicrosoftLink()} style={{ margin: '20px 0' }} fluid className={ currentLivestream && currentLivestream.id === 'syEAzC45WXaLa880OXbp' ? '' : 'hidden'} size='large'>Join the Microsoft Talent Pool</Button>
-                            { connectionSpeed }
-                            <div className='questions-container'>
-                                <p>SUBMIT YOUR QUESTION ANONYMOUSLY!</p>
-                                <Input type='text' value={newQuestionTitle} onChange={(event) => setNewQuestionTitle(event.target.value)} fluid placeholder='Your question goes here!' action>
-                                    <input />
-                                    <Button primary onClick={() => addNewQuestion()}>SEND</Button>
-                                </Input>
-                            </div>
-                            <ClientFilePicker onChange={fileObject => {uploadCV(fileObject, "mvoss")}}/>
-                            <div className='speaker-container'>
-                                <SemanticHeader as='h5' textAlign='left' color='grey'>Speaker(s)</SemanticHeader>
-                                <Grid className='middle aligned' textAlign='left'>
-                                    <Grid.Row>
-                                        <Grid.Column width={7}>
-                                            <div className='container-label'>
-                                                Name
-                                            </div>
-                                            <div className='container-text'>
-                                                { currentLivestream ? currentLivestream.speakerName : '' }
-                                            </div>
-                                        </Grid.Column>
-                                        <Grid.Column width={7}>
-                                            <div className='container-label'>
-                                                Position
-                                            </div>
-                                            <div className='container-text'>
-                                                { currentLivestream ? currentLivestream.speakerJob : '' }
-                                            </div>
-                                        </Grid.Column>
-                                        <Grid.Column width={2}>
-                                            <div className='container-text'>
-                                                <a href={'https://www.linkedin.com/' + (currentLivestream ? currentLivestream.linkedinId : '') } target='_blank' rel='noopener noreferrer'><Icon name='linkedin alternate' size='big' color='blue' link/></a>
-                                            </div>
-                                        </Grid.Column>
-                                    </Grid.Row>
-                                </Grid>
-                            </div>
-                            <div className='speaker-container'>
-                                <SemanticHeader as='h5' textAlign='left' color='grey'>What You Should Know</SemanticHeader>
-                                <Grid textAlign='left' columns={1}>
-                                    <Grid.Row>
-                                        <Grid.Column>
-                                            <div className='container-description'>
-                                                { currentLivestream ?  currentLivestream.description : '' }
-                                            </div>
-                                        </Grid.Column>
-                                    </Grid.Row>
-                                </Grid>
-                            </div>
-                            <div className='speaker-container'>
-                                <SemanticHeader as='h5' textAlign='left' color='grey'>Focus Backgrounds</SemanticHeader>
-                                <Grid textAlign='left' columns={1}>
-                                    <Grid.Row>
-                                        <Grid.Column>
-                                            <ElementTagList fields={currentLivestream ? currentLivestream.fieldsHiring : []}/>
-                                        </Grid.Column>
-                                    </Grid.Row>
-                                </Grid>
-                            </div>
-                        </Grid.Column>
-                        <Grid.Column width={6}>
-                            <SemanticHeader as='h3' textAlign='left' color='grey'>Question Stack</SemanticHeader>
-                            <div className='streamQuestionsContainer'>
-                                <div className='streamCurrentQuestionContainer'>
-                                    CURRENT QUESTION:
-                                    <div className='question'>{ currentQuestion ? currentQuestion.title : '' }</div>
-                                    <div className='question-upvotes'><Icon name='thumbs up outline'/> { currentQuestion ? currentQuestion.votes : '' } upvotes</div>
-                                </div>
-                                <div className='streamQuestionsContainer'>
-                                    { questionElements }
-                                </div>
-                            </div>
-                        </Grid.Column>
-                    </Grid.Row>
-                </Grid>
-                </Container>
+return (
+    <div className='topLevelContainer'>
+        <div className='top-menu'>
+            <div style={{ position: 'absolute', top: '50%', left: '20px', transform: 'translateY(-50%)'}}>
+                <Image src='/logo_teal.png' style={{ maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
+                <Image src={ eth_logo } style={{ postion: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block'}}/>
+                <div style={{ position: 'absolute', bottom: '13px', left: '120px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
             </div>
-            <style jsx>{`
-                .hidden {
-                    display: none;
-                }
-
-                .contentElement {
-                    position: relative;
-                }
-
-                .streamQuestionContainer {
-                    border: 1px solid rgb(0, 210, 170);
-                }
-
-                .currentQuestion {
-                    padding: 20px;
-                    font-size: 1.2em;
-                    font-weight: 600;
-                    color: white;
-                    background-color: rgb(0, 210, 170);
-                }
-
-                .transparent {
-                    color: white;
-                }
-
-                .questions-container {
-                    margin-top: 20px;
-                    text-align: left;
-                }
-
-                .questions-container p {
-                    color: black;
-                    font-weight: 600;
-                    font-size: 1.2em;
-                }
-
-                .questions-container input {
-                    height: 60px;
-                    font-size: 1.2em;
-                }
-
-                .video-container {
-                    position: relative;
-                }
-
-                .video-container .video-mask {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgb(230,230,230);
-                    background-size: cover;
-
-                }
-
-                .streamNextQuestionNumberOfVotes {
-                    color: rgb(0, 210, 170);
-                    font-weight: 600;
-                    font-size: 1.3em;
-                    padding: 10px;
-                    border-radius: 5px;
-                    display: inline-block;
-                }
-
-                .video-mask-blur {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(20,20,20,0.6);
-                    filter: blur(2px);
-                    -webkit-filter: blur(2px);
-                    z-index: 30;
-                }
-
-                .video-mask-title {
-                    position: absolute;
-                    width: 100%;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    text-align: center;
-                    font-weight: 600;
-                    font-size: 1.3em;
-                    color: rgb(0, 210, 170);
-                    z-index: 40;
-                }
-
-                .video-mask-title p {
-                    position: relative;
-                    margin: 20px 0;
-                }
-
-                .streamCurrentQuestionContainer {
-                    color: white;
-                    background-color: rgb(0, 210, 170);
-                    padding: 40px 50px 40px 50px;
-                    font-weight: light;
-                    font-size: 1.1em;
-                    box-shadow: 2px 2px 5px grey;
-                }
-
-                .streamCurrentQuestionContainer .question {
-                    margin: 20px;
-                    line-height: 30px;
-                    font-weight: bold;
-                    font-size: 1.3em;
-                }
-
-                .streamCurrentQuestionContainer .question-upvotes {
-                    margin: 20px;
-                    font-size: 0.9em;
-                    font-weight: bold;
-                }
-
-                .live-now {
-                    margin-bottom: 30px;
-                    text-transform: uppercase;
-                    font-size: 1.8em;
-                    vertical-align: middle;
-                    color: red;
-                }
-
-                .live-now span {
-                    margin-left: 10px;
-                }
-
-                .live-now i, .live-now span {
-                    vertical-align: middle;
-                }
-
-                .speaker-container {
-                    background-color: white;
-                    padding: 20px;
-                    border-radius: 5px;
-                    margin: 10px 0 10px 0;
-                    box-shadow: 0 0 10px rgb(220,220,220);
-                }
-            `}</style>
+            <div style={{ float: 'right', display: 'inlineBlock', margin: '0 20px' }}>
+                <Button size='big' onClick={() => setShowNextQuestions(!showNextQuestions)}>{ showNextQuestions ? 'Hide Questions' : 'Show Questions'}</Button>
+            </div>
         </div>
-        </Fragment>   
-    );
+        <div className='streamingContainer'>
+            <video id="remoteVideo" autoPlay muted width="100%"></video> 
+        </div>
+        <div className={ currentLivestream && currentLivestream.hasStarted ? 'video-mask hidden' : 'video-mask'} style={{backgroundImage: 'url(' + (currentLivestream ? currentLivestream.backgroundImage : '') + ')'}}>
+            <div className='mask'>
+                <Container>
+                    <div className='livestream-title'>
+                        { currentLivestream ? currentLivestream.title : 'null' }
+                    </div>
+                    <div className='livestream-date'>
+                        { currentLivestream ? DateUtil.getPrettyDate(currentLivestream.start.toDate()) : 'null' }
+                    </div>
+                    <div>
+                        <Grid className='middle aligned'>
+                            <Grid.Column width={4} textAlign='center'>
+                                <Image style={{ filter: 'brightness(0) invert(1)'}} src={(currentLivestream ? currentLivestream.companyLogoUrl : '')}/>
+                            </Grid.Column>
+                            <Grid.Column width={4} textAlign='center'>
+                                <div className='livestream-speaker-image' style={{ backgroundImage: 'url(' + (currentLivestream ? currentLivestream.speakerImageUrl : '') + ')'}}></div>
+                            </Grid.Column>
+                            <Grid.Column width={4}>
+                                <div style={{ color: 'white'}}>
+                                    <div style={{ fontWeight: '700', fontSize: '1.4em', marginBottom: '10px' }}>{ currentLivestream ? currentLivestream.speakerName : '' }</div>
+                                    <div style={{ fontWeight: '500', fontSize: '1.2em', marginBottom: '10px' }}>{ currentLivestream ? currentLivestream.speakerJob : '' }</div>
+                                </div>
+                            </Grid.Column>
+                        </Grid> 
+                    </div>
+                    <div style={{ margin: '60px 0'}}>
+                        <Button size='huge' content='Register Now' icon='sign-in alternate'/>
+                        <Button size='huge' content='Join Talent Pool' icon='handshake outline' primary/>
+                    </div>
+                 </Container>   
+                 <div className='bottom-icon'>
+                    <div>see more</div>
+                    <Icon style={{ color: 'white' }} name='angle down' size='big'/>
+                 </div>   
+            </div>
+        </div>
+        <div className={ currentLivestream && currentLivestream.hasStarted && !isPlaying ? 'video-mask' : 'video-mask hidden'} style={{backgroundImage: 'url(' + (currentLivestream ? currentLivestream.backgroundImage : '') + ')'}}>
+            <div className='mask'>
+                <div  className='video-mask-title'>
+                    <div className='live-now animated flash slower infinite'><Icon name='circle' size='tiny'/><span>Live Now</span></div>
+                    <Button icon='play' content='Join the Livestream' color='teal' size='huge' onClick={startPlaying} disabled={!isInitialized}/>
+                </div>
+            </div>
+        </div>
+        <div className='video-menu'>
+                <div className='video-menu-poll-buttons'>
+                    <Icon color='teal' style={{ marginRight: '15px', fontSize: '2.5em' }} name='thumbs up' size='big'/>
+                    <Icon color='teal' style={{ fontSize: '2.5em' }}name='heart' size='big'/>
+                </div>
+        </div>
+        <div className='video-menu-right'>
+            <div className={'video-menu-right-content ' + (showNextQuestions ? 'animated slideInRight fast' : 'animated slideOutRight fast')}>
+                <div className='streamCurrentQuestionContainer'>
+                    <div className='content'>
+                        CURRENT QUESTION:
+                        <div className='question'>{ currentQuestion ? currentQuestion.title : '' }</div>
+                        <div className='question-upvotes'><Icon name='thumbs up outline'/> { currentQuestion ? currentQuestion.votes : '' } Upvotes</div>
+                    </div>
+                </div>
+                <div className='video-menu-questions-wrapper' style={{ display: 'none' }}>
+                    <div className='video-menu-questions'>
+                        { questionElementsAlt }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style jsx>{`
+            .hidden {
+                display: none;
+            }
+
+            .topLevelContainer {
+                position: absolute;
+                height:100%;
+                width: 100%;
+            }
+
+            .top-menu {
+                background-color: rgba(245,245,245,1);
+                padding: 15px 0;
+                height: 75px;
+                text-align: center;
+                position: relative;
+            }
+
+            .top-menu div, .top-menu button {
+                display: inline-block;
+                vertical-align: middle;
+            }
+
+            .top-menu #stream-button {
+                margin: 0 50px;
+            }
+
+            .top-menu.active {
+                background-color: rgba(0, 210, 170, 1);
+                color: white;
+            }
+
+            .top-menu h3 {
+                font-weight: 600;
+            }
+
+            .video-menu {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 25px 0;
+                z-index: 1000;
+                text-align: center;
+                display: none;
+            }
+
+            .questions-side-layout {
+                position: absolute;
+                right: 20px;
+                top: 80px;
+                width: 20%;
+                height: 80%;
+                min-width: 200px;
+            }
+
+            #button-group {
+                margin: 0 auto;
+            }
+
+            .streamingContainer {
+                position: absolute;
+                top: 75px;
+                bottom: 0;
+                min-width: 100%;
+                max-height: 100%;
+                height: auto;
+                width: auto;
+                background-color: black;
+                z-index: -2000;
+                cursor: pointer;
+            }
+
+            .speaker-info {
+                background-color: white;
+                border-radius: 10px;
+                margin: 30px 0;
+                padding: 30px 0;
+                box-shadow: 0 0 4px grey;
+            }
+
+            .streamingPlaceholder {
+                position: absolute;
+            }
+
+            #remoteVideo {
+                position: absolute;
+                width: 100%;
+                max-height: 100%;
+                height: auto;
+
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%,-50%);
+                z-index: -1000;
+                background-color: black;
+            }
+
+            .streamCurrentQuestionContainer {
+                color: white;
+                background-color: rgba(0, 210, 170, 0.95);
+                font-size: 1em;
+                box-shadow: 0 0 2px rgb(160,160,160);
+                border-radius: 5px;
+                text-align: center;
+                width: 100%;
+            }
+
+            .streamCurrentQuestionContainerRight {
+                text-align: right;
+            }
+
+            .streamCurrentQuestionContainer .content {
+                padding: 15px 20px 15px 20px;
+            }
+
+            .streamCurrentQuestionContainer .question {
+                line-height: 20px;
+                font-weight: bold;
+                font-size: 1.2em;
+                margin: 25px 0;
+            }
+
+            .streamCurrentQuestionContainer .question-upvotes {
+                margin: 10px 0 10px 0;
+                font-size: 0.9em;
+                font-weight: bold;
+            }
+
+            .video-menu-left {
+                position: absolute;
+                top: 75px;
+                left: 0;
+                bottom: 0;
+                overflow: scroll;
+                overflow-x: hidden;    
+                width: 330px;
+                z-index: 1;
+                background: rgb(2,0,36);
+                background: linear-gradient(270deg, rgba(2,0,36,1) 0%, rgba(84,84,84,0) 0%, rgba(0,0,0,0.8687850140056023) 100%);
+                -ms-overflow-style: none;
+            }
+
+            .video-menu-left::-webkit-scrollbar {
+                display: none;
+            }
+
+            .video-menu-left-content {
+                position: absolute;
+                top: 0;
+                width: 100%;
+                padding: 10px 20px;
+            }
+
+            .video-menu-right {
+                position: absolute;
+                top: 75px;
+                right: 10px;
+                bottom: 60px;
+                overflow: hidden;
+                width: 330px;
+                padding: 10px 0;
+                z-index: 1;
+                padding: 10px 0;
+            }
+
+            .video-menu-right-content {
+                position: absolute;
+                top: 10px;
+                bottom: 0;
+                width: 100%;
+            }
+
+            .video-menu-questions-wrapper {
+                position: absolute;
+                top: 220px;
+                bottom: 0;
+                width: auto;
+                overflow: scroll;
+                overflow-x: hidden;
+                z-index: 9000;
+                width: 100%;
+            }
+
+            .video-menu-questions-wrapper::-webkit-scrollbar {
+                width: 0px;  /* Remove scrollbar space */
+                background: transparent;  /* Optional: just make scrollbar invisible */
+            }
+
+            .video-menu-questions {
+                width: 100%;
+            }
+
+            .video-menu-questions-bottom-hint {
+                position: absolute;
+                bottom: 0;
+                color: white;
+                background-color: rgba(0, 210, 170, 0.95);
+                width: 100%;
+                text-align: center;
+                padding: 10px 0;
+                z-index: 1000;
+            }
+
+            .video-menu-questions-top-hint {
+                position: absolute;
+                top: 0;
+                color: white;
+                background-color: rgba(0, 210, 170, 0.95);
+                width: 100%;
+                text-align: center;
+                padding: 10px 0;
+                z-index: 1000;
+            }
+
+            .streamNextQuestionContainer {
+                margin: 0 0 10px 0;
+                box-shadow: 0 0 2px rgb(160,160,160);
+                border-radius: 10px;
+                color: rgb(50,50,50);
+                background-color: rgba(255,255,255,0.95);
+                padding: 20px 10px 20px 10px;
+                font-weight: 500;
+                font-size: 1.1em;
+                height: 100%;
+                width: 100%;
+                white-space: pre-wrap;
+                text-align: center;
+            }
+
+            .streamNextQuestionContainerTitle {
+                margin: 0 0 20px 0;
+            }
+
+            .streamNextQuestionContainer .question-upvotes {
+                margin: 20px 0;
+                font-size: 0.9em;
+                font-weight: bold;
+            }
+
+            .profile-text {
+                font-size: 1.15em;
+                font-weight: 500;
+            }
+
+            .profile-text.large {
+                font-size: 1.4em;
+                font-weight: 500;
+                margin-top: 20px;
+            }
+
+            .profile-label {
+                font-size: 0.8em;
+                color: grey;
+            }
+
+            #streaming-countdown {
+                font-weight: 300;
+            }
+
+            #stream-button {
+                display: inline-block;
+                float: left;
+            }
+
+            .video-menu-poll-buttons {
+                position: absolute;
+                right: 40px;
+                bottom: 40px;
+            }
+
+            .video-mask {
+                position: absolute;
+                top: 75px;
+                left: 0;
+                width: 100%;
+                min-height: calc(100% - 75px);
+                height: auto;
+                background-color: rgb(230,230,230);
+                background-size: cover;
+            }
+
+            .mask {
+                position: absolute;
+                width: 100%;
+                min-height: 100%;
+                background-color: rgba(0, 210, 170,0.8);
+                padding: 15px 0 80px 0;
+            }
+
+            .livestream-title {
+                font-size: 5em;
+                margin: 40px 0 20px 0;
+                color: white;
+                text-align: let;
+                line-height: 1.4em;
+                font-weight: 700;
+                text-shadow: 2px 2px 0 rgb(40,40,40)
+            }
+
+            .livestream-date {
+                text-align: left;
+                margin: 30px 0 80px 0;
+                color: white;
+                font-weight: 500;
+                font-size: 1.5em;
+            }
+
+            .livestream-speaker-image {
+                display: inline-block;
+                height: 10%;
+                width: 10%;
+                min-height: 120px;
+                min-width: 120px;
+                border-radius: 50%;
+                background-size: cover;
+                background-position: center center;
+                vertical-align: middle;
+                margin: 0 auto;
+            }
+
+            .livestream-speaker-name {
+                display: inline-block;
+                color: white;
+                vertical-align: middle;
+            }
+
+            .livestream-speaker-name div:first-child {
+                font-size: 1.4em;
+                margin: 0 0 5px 0;
+                font-weight: 600;
+            }
+
+            .video-mask-title {
+                width: 100%;
+                text-align: center;
+                font-weight: 600;
+                color: white;
+                z-index: 4000;
+                padding: 15px 0;
+            }
+
+            .live-now {
+                margin-bottom: 30px;
+                text-transform: uppercase;
+                font-size: 1.8em;
+                vertical-align: middle;
+                color: red;
+            }
+            .live-now span {
+                margin-left: 10px;
+            }
+            .live-now i, .live-now span {
+                vertical-align: middle;
+            }
+
+            .bottom-icon {
+                color: white;
+                position: absolute;
+                bottom: 10px;
+                width: 100%;
+                text-align: center;
+                font-size: 1.4em;
+            }
+      `}</style>
+    </div>
+);
 }
 
 StreamPlayer.getInitialProps = ({ query }) => {
