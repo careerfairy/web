@@ -33,6 +33,14 @@ class Firebase {
         return this.auth.signInWithEmailLink(email, link);
     };
 
+    createUserWithEmailAndPassword = (email, password) => {
+        return this.auth.createUserWithEmailAndPassword(email, password);
+    };
+
+    signInWithEmailAndPassword = (email, password) => {
+        return this.auth.signInWithEmailAndPassword(email, password);
+    };
+
     sendSignInLinkToEmail = (email) => {
         let actionCodeSettings = {
             url: 'http://localhost:3000/discover',
@@ -313,13 +321,11 @@ class Firebase {
         return streamRef.onSnapshot(callback);
     }
 
-    getScheduledLivestreamsQuestions = (livestreamId, callback) => {
+    listenToScheduledLivestreamsQuestions = (livestreamId, callback) => {
         let questionsRef = this.firestore
             .collection("scheduledLivestreams")
             .doc(livestreamId)
-            .collection("questions")
-            .where("type", "==", "new")
-            .orderBy("votes", "desc");
+            .collection("questions");
         return questionsRef.onSnapshot(callback);
     }
 
@@ -340,7 +346,7 @@ class Firebase {
         return questionsRef.add(question);
     }
 
-    getScheduledLivestreamsComments = (livestreamId, callback) => {
+    listenToScheduledLivestreamsComments = (livestreamId, callback) => {
         let commentRef = this.firestore
             .collection("scheduledLivestreams")
             .doc(livestreamId)
@@ -428,6 +434,24 @@ class Firebase {
             .where("type", "==", "past")
             .orderBy("rank", "asc");
         return livestreamsRef.get();
+    }
+
+    registerToLivestream = (livestreamId, userId) => {
+        let livestreamRef = this.firestore
+            .collection("scheduledLivestreams")
+            .doc(livestreamId);
+        return livestreamRef.update({
+            registeredUsers: firebase.firestore.FieldValue.arrayUnion(userId)
+        });
+    }
+
+    deregisterFromLivestream = (livestreamId, userId) => {
+        let livestreamRef = this.firestore
+            .collection("scheduledLivestreams")
+            .doc(livestreamId);
+        return livestreamRef.update({
+            registeredUsers: firebase.firestore.FieldValue.arrayRemove(userId)
+        });
     }
 
     // VIDEOS

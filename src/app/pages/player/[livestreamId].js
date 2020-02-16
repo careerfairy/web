@@ -5,8 +5,8 @@ import Header from '../../components/views/header/Header';
 import { withFirebasePage } from '../../data/firebase';
 import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor.js';
 import DateUtil from '../../util/DateUtil';
-import ClientFilePicker from '../../components/views/common/ClientFilePicker';
-import Countdown from '../../components/views/common/Countdown';
+import { useRouter } from 'next/router';
+import Footer from '../../components/views/footer/Footer';
 import axios from 'axios';
 
 function StreamPlayer(props) {
@@ -23,66 +23,65 @@ function StreamPlayer(props) {
     const [currentLivestream, setCurrentLivestream] = useState(null);
     const [connectionSpeed, setConnectionSpeed] = useState(0);
     const [showNextQuestions, setShowNextQuestions] = useState(false);
+    const [companies, setCompanies] = useState([]);
+
     const [nsToken, setNsToken] = useState(null);
 
     const [loading, setLoading] = useState(false);
     
     const eth_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media&token=9403f77b-3cb6-496c-a96d-62be1496ae85';
 
-    useEffect(() => {
-        props.firebase.auth.onAuthStateChanged(user => {
-            if (user !== null && user.emailVerified) {
-                setAuthenticated(true);
-                setLoginModalOpen(false);
-            } else {
-                setAuthenticated(false);
-                setLoginModalOpen(true);
-            }
-        })
-    }, []);
+    // useEffect(() => {
+    //     props.firebase.auth.onAuthStateChanged(user => {
+    //         if (user !== null && user.emailVerified) {
+    //             setAuthenticated(true);
+    //             setLoginModalOpen(false);
+    //         } else {
+    //             setAuthenticated(false);
+    //             setLoginModalOpen(true);
+    //         }
+    //     })
+    // }, []);
 
-    useEffect(() => {
-        setLoading(true);
-        if (props.firebase.isSignInWithEmailLink(window.location.href)) {
-            var email = window.localStorage.getItem('emailForSignIn');
-            if (!email) {
-              email = window.prompt('Please provide your email for confirmation');
-            }
-            props.firebase.signInWithEmailLink(email, window.location.href)
-              .then(function(result) {
-                window.localStorage.removeItem('emailForSignIn');
-                setLoading(false);
-              })
-              .catch(function(error) {
-                setLoading(false);
-              });
-          } else {
-              setLoading(false);
-          }
-    }, []);
+    // useEffect(() => {
+    //     props.firebase.getCompanies().then( querySnapshot => {
+    //         var companyList = [];
+    //         querySnapshot.forEach(doc => {
+    //             let company = doc.data();
+    //             company.id = doc.id;
+    //             companyList.push(company);
+    //         });
+    //         setCompanies(companyList);
+    //     });
+    // }, []);
 
-    useEffect(() => {
-        if (webRTCAdaptor && currentLivestream && currentLivestream.hasStarted) {
-            setTimeout(() => {
-                startPlaying();
-            }, 1000);
-        }
-    }, [currentLivestream, webRTCAdaptor]);
+    // useEffect(() => {
+    //     setLoading(true);
+    //     if (props.firebase.isSignInWithEmailLink(window.location.href)) {
+    //         var email = window.localStorage.getItem('emailForSignIn');
+    //         if (!email) {
+    //           email = window.prompt('Please provide your email for confirmation');
+    //         }
+    //         props.firebase.signInWithEmailLink(email, window.location.href)
+    //           .then(function(result) {
+    //             window.localStorage.removeItem('emailForSignIn');
+    //             setLoading(false);
+    //           })
+    //           .catch(function(error) {
+    //             setLoading(false);
+    //           });
+    //       } else {
+    //           setLoading(false);
+    //       }
+    // }, []);
 
-    useEffect(() => {
-        if (props.firebase.isSignInWithEmailLink(window.location.href)) {
-            var email = window.localStorage.getItem('emailForSignIn');
-            if (!email) {
-              email = window.prompt('Please provide your email for confirmation');
-            }
-            props.firebase.signInWithEmailLink(email, window.location.href)
-              .then(function(result) {
-                window.localStorage.removeItem('emailForSignIn');
-              })
-              .catch(function(error) {
-              });
-          }
-    }, []);
+    // useEffect(() => {
+    //     if (isInitialized && currentLivestream && currentLivestream.hasStarted) {
+    //         setTimeout(() => {
+    //             startPlaying();
+    //         }, 2000);
+    //     }
+    // }, [currentLivestream, isInitialized]);
 
     useEffect(() => {
         if (props.livestreamId) {
@@ -90,37 +89,37 @@ function StreamPlayer(props) {
                 let livestream = querySnapshot.data();
                 livestream.id = querySnapshot.id;
                 setCurrentLivestream(livestream);
-            })
+        })
         }
     }, [props.livestreamId]);
 
-    useEffect(() => {
-        if (props.livestreamId) {
-            props.firebase.getScheduledLivestreamsUntreatedQuestions(props.livestreamId, querySnapshot => {
-                var questionsList = [];
-                querySnapshot.forEach(doc => {
-                    let question = doc.data();
-                    question.id = doc.id;
-                    questionsList.push(question);
-                });
-                setUpcomingQuestions(questionsList);
-            });
-        }
-    }, [props.livestreamId]);
+    // useEffect(() => {
+    //     if (props.livestreamId) {
+    //         props.firebase.getScheduledLivestreamsUntreatedQuestions(props.livestreamId, querySnapshot => {
+    //             var questionsList = [];
+    //             querySnapshot.forEach(doc => {
+    //                 let question = doc.data();
+    //                 question.id = doc.id;
+    //                 questionsList.push(question);
+    //             });
+    //             setUpcomingQuestions(questionsList);
+    //         });
+    //     }
+    // }, [props.livestreamId]);
 
-    useEffect(() => {
-        if (isPlaying && !authenticated) {
-            setTimeout(() => {
-                setLoginModalOpen(true);
-            }, 10000);
-        }
-    }, [isPlaying]);
+    // useEffect(() => {
+    //     if (isPlaying && !authenticated) {
+    //         setTimeout(() => {
+    //             setLoginModalOpen(true);
+    //         }, 10000);
+    //     }
+    // }, [isPlaying]);
 
-    useEffect(() => {
-        if (navigator && navigator.connection) {
-            setConnectionSpeed(navigator.connection.downlink);
-        }
-    }, []);
+    // useEffect(() => {
+    //     if (navigator && navigator.connection) {
+    //         setConnectionSpeed(navigator.connection.downlink);
+    //     }
+    // }, []);
 
     useEffect(() => {
         setCurrentQuestion(upcomingQuestions[0]);
@@ -154,11 +153,7 @@ function StreamPlayer(props) {
             };
             var mediaConstraints = {
                 audio: true,
-                video: {
-                    width: { ideal: 1920, max: 1920 },
-                    height: { ideal: 1080, max: 1080 },
-                    aspectRatio: 1.77
-                }
+                video: true
             };
 
             setWebRTCAdaptor(new WebRTCAdaptor({
@@ -174,9 +169,11 @@ function StreamPlayer(props) {
                         setInitialized(true);            
                     } else if (info === "play_started") {
                         //play_started
+                        console.log("play_started"); 
                         setIsPlaying(true);
                     } else if (info === "play_finished") {
                         // play finished the stream
+                        console.log("play_finished"); 
                         setIsPlaying(false);           
                     }
                 },
@@ -198,88 +195,87 @@ function StreamPlayer(props) {
     }
 
     function startPlaying() {
-        webRTCAdaptor.play(currentLivestream.id);
+        webRTCAdaptor.play(props.livestreamId);
     }
 
-    function addNewQuestion() {
-        if (!authenticated) {
-            return props.history.push('/signup');
-        }
+    // function addNewQuestion() {
+    //     if (!authenticated) {
+    //         return props.history.push('/signup');
+    //     }
         
-        const newQuestion = {
-            title: newQuestionTitle,
-            votes: 0,
-            type: "new"
-        }
+    //     const newQuestion = {
+    //         title: newQuestionTitle,
+    //         votes: 0,
+    //         type: "new"
+    //     }
 
-        props.firebase.putScheduledLivestreamsQuestion(currentLivestream.id, newQuestion)
-            .then(() => {
-                setNewQuestionTitle("");
-            }, () => {
-                console.log("Error");
-            })
-    }
+    //     props.firebase.putScheduledLivestreamsQuestion(currentLivestream.id, newQuestion)
+    //         .then(() => {
+    //             setNewQuestionTitle("");
+    //         }, () => {
+    //             console.log("Error");
+    //         })
+    // }
 
-    function openMicrosoftLink() {
-        var win = window.open('https://aka.ms/CareerFairy-Microsoft', '_blank');
-        win.focus();
-    }
+    // function openMicrosoftLink() {
+    //     var win = window.open('https://aka.ms/CareerFairy-Microsoft', '_blank');
+    //     win.focus();
+    // }
 
-    function uploadCV(logoFile, userName) {
-        var storageRef = props.firebase.getStorageRef();
-        let userCvRef = storageRef.child( 'user_cvs/' + userName  + '.pdf');
+    // function uploadCV(logoFile, userName) {
+    //     var storageRef = props.firebase.getStorageRef();
+    //     let userCvRef = storageRef.child( 'user_cvs/' + userName  + '.pdf');
 
-        var uploadTask = userCvRef.put(logoFile);
+    //     var uploadTask = userCvRef.put(logoFile);
 
-        uploadTask.on('state_changed',
-            function(snapshot) {
-                var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log('Upload is ' + progress + '% done');
-                switch (snapshot.state) {
-                    case 'paused':
-                    console.log('Upload is paused');
-                    break;
-                    case 'running':
-                    console.log('Upload is running');
-                    break;
-                    default:
-                    break;
-                }
-            }, function(error) {    
-                switch (error.code) {
-                    case 'storage/unauthorized':
-                        // User doesn't have permission to access the object
-                        break;
+    //     uploadTask.on('state_changed',
+    //         function(snapshot) {
+    //             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    //             console.log('Upload is ' + progress + '% done');
+    //             switch (snapshot.state) {
+    //                 case 'paused':
+    //                 console.log('Upload is paused');
+    //                 break;
+    //                 case 'running':
+    //                 console.log('Upload is running');
+    //                 break;
+    //                 default:
+    //                 break;
+    //             }
+    //         }, function(error) {    
+    //             switch (error.code) {
+    //                 case 'storage/unauthorized':
+    //                     // User doesn't have permission to access the object
+    //                     break;
                 
-                    case 'storage/canceled':
-                        // User canceled the upload
-                        break;
+    //                 case 'storage/canceled':
+    //                     // User canceled the upload
+    //                     break;
                         
-                    case 'storage/unknown':
-                        // Unknown error occurred, inspect error.serverResponse
-                        break;
-                    default:
-                        break;
-                }
-            }, function() {
-                // Upload completed successfully, now we can get the download URL
-                uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
-                    console.log('File available at', downloadURL);
-                });
-            });
-    }
+    //                 case 'storage/unknown':
+    //                     // Unknown error occurred, inspect error.serverResponse
+    //                     break;
+    //                 default:
+    //                     break;
+    //             }
+    //         }, function() {
+    //             // Upload completed successfully, now we can get the download URL
+    //             uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+    //                 console.log('File available at', downloadURL);
+    //             });
+    //         });
+    // }
 
     let questionElementsAlt = upcomingQuestions.map((question, index) => {
         return (
             <Grid.Column>
                 <div className='streamNextQuestionContainer' key={index}>
-                    <p>{ question.title }</p>
+                    <p style={{ marginBottom: '5px' }}>{ question.title }</p>
+                    <p style={{ fontSize: '0.8em', fontWeight: '300', color: 'rgb(200,200,200)' }}>from @Martin.Kamm</p>
                     <div className='bottom-element'>
-                        <Button id='scheduled-question-thumbs-up' icon='thumbs down' size='big' circular/>
-                        <Button id='scheduled-question-thumbs-up' color='teal' icon='thumbs up' onClick={() => upvoteQuestion(question)} size='big' circular/>
-                        <div className='right-votes'>
-                            <div className='streamNextQuestionNumberOfVotes'>{ question.votes } <Icon name='thumbs up'/></div>
-                        </div>
+                        <Button icon='thumbs down' size='massive' circular/>
+                        <Button icon='thumbs up' onClick={() => upvoteQuestion(question)} size='massive' circular primary/>
+                        <div className='streamNextQuestionNumberOfVotes'>{ question.votes } <Icon name='thumbs up'/></div>
                     </div>
                     <style jsx>{`
                         .streamNextQuestionContainer {
@@ -294,6 +290,7 @@ function StreamPlayer(props) {
                             font-size: 1.3em;
                             height: 100%;
                             min-height: 200px;
+                            text-align: center;
                         }
 
                         .streamNextQuestionContainer .question-upvotes {
@@ -306,21 +303,25 @@ function StreamPlayer(props) {
                             font-weight: 600;
                             font-size: 1.3em;
                             border-radius: 5px;
-                            display: inline-block;
+                            display: block;
+                            color: rgb(210,210,210);
+                            font-size: 0.8em;
+                            margin-top: 10px;
                         }
 
                         .bottom-element {
                             position: absolute;
-                            bottom: 30px;
-                            left: 30px;
-                            right: 30px;
-                            height: 50px;
+                            bottom: 15px;
+                            left: 0;
+                            right: 0;
+                            width: 100%;
+                            text-align: center;
                         }
 
                         .right-votes {
                             position: absolute;
                             right: 0;
-                            bottom: 15px;
+                            top: 15px;
                             color: rgb(130,130,130);
                             font-size: 0.8em;
                         }
@@ -329,6 +330,19 @@ function StreamPlayer(props) {
             </Grid.Column>
     );
 });
+
+// let companyLogos = companies.map((company, index) => {
+//     if (index < 8) {
+//         return (
+//             <Grid.Column width={2}>
+//                 <Image src={company.logoUrl} style={{ margin: '0 auto', maxWidth: '50%', maxHeight: '40px', filter: 'brightness(0)'}}/>
+//             </Grid.Column>
+//         );
+//     } else {
+//         return <div/>;
+//     }
+   
+// });
 
 if (currentLivestream && currentLivestream.hasStarted) {
     return (
@@ -344,7 +358,7 @@ if (currentLivestream && currentLivestream.hasStarted) {
                 </div>
             </div>
             <div className='streamingContainer'>
-                <video id="remoteVideo" autoPlay muted width="100%"></video> 
+                <video id="remoteVideo" autoPlay controls width='100%' style={{ border: '2px solid red'}}></video> 
             </div>
             <div className={ currentLivestream && currentLivestream.hasStarted && !isPlaying ? 'video-mask' : 'video-mask hidden'} style={{backgroundImage: 'url(' + (currentLivestream ? currentLivestream.backgroundImage : '') + ')'}}>
                 <div className='mask'>
@@ -680,9 +694,6 @@ if (currentLivestream && currentLivestream.hasStarted) {
                         <Image src={ eth_logo } style={{ postion: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block'}}/>
                         <div style={{ position: 'absolute', bottom: '13px', left: '120px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
                     </div>
-                    <div style={{ float: 'right', display: 'inlineBlock', margin: '0 20px' }}>
-                        <Button size='big' onClick={() => setShowNextQuestions(!showNextQuestions)}>{ showNextQuestions ? 'Hide Questions' : 'Show Questions'}</Button>
-                    </div>
                 </div>
                 <div className={ currentLivestream && currentLivestream.hasStarted ? 'video-mask hidden' : 'video-mask'} style={{backgroundImage: 'url(' + (currentLivestream ? currentLivestream.backgroundImage : '') + ')'}}>
                     <div className='mask'>
@@ -710,8 +721,8 @@ if (currentLivestream && currentLivestream.hasStarted) {
                                 </Grid> 
                             </div>
                             <div style={{ margin: '60px 0', width: '100%' }}>
-                                <Button size='huge' content='Register Now' icon='sign-in alternate'/>
-                                <Button size='huge' content='Join Talent Pool' icon='handshake outline' primary/>
+                                <Button size='big' content='Register' icon='sign-in alternate' style={{ margin: '5px' }}/>
+                                <Button size='big' content='Apply To Talent Pool' icon='handshake outline' style={{ margin: '5px' }} primary/>
                             </div>
                         </Container>   
                         <div className='bottom-icon'>
@@ -721,22 +732,51 @@ if (currentLivestream && currentLivestream.hasStarted) {
                     </div>
                 </div>
             </div>
-            <div className='pitch-container'>
+            <div className='white-container'>
                 <Container>
-                    <div className='description'>
                         <div className='container-title'>Short summary</div>
-                        { currentLivestream ? currentLivestream.description : 'null' }
+                        <div style={{ fontSize: '1.5em', lineHeight: '1.4em', width: '80%', margin: '0 auto' }}>{ currentLivestream ? currentLivestream.description : 'null' }</div>
+                </Container>
+            </div>
+            <div className='grey-container'>
+                <Container>
+                    <div className='container-title'>Tell us what you want to know</div>
+                    <Grid stackable columns={3} style={{ padding: '0 0 50px 0' }}>
+                        { questionElementsAlt }
+                    </Grid>
+                    <div className='container-title'>Ask Your Question</div>
+                    <div style={{ textAlign: 'center' }}>
+                        <Input size='huge' action={{ content: 'Ask', color:'teal' }} fluid/>
                     </div>
                 </Container>
             </div>
-            <div className='questions-container'>
+            <div className='white-container'>
                 <Container>
-                    <div className='container-title'>Quick pitch</div>
-                    <Grid stackable columns={3}>
-                        { questionElementsAlt }
+                    <div className='container-title'>Are you considering joining?</div>
+                    <Grid style={{ margin: '50px 0 0 0'}}>
+                        <Grid.Column width={8}>
+                            <Image src={ currentLivestream ? currentLivestream.companyLogoUrl : 'null' } style={{ width: '50%', margin: '0 auto' }}/>
+                        </Grid.Column>
+                        <Grid.Column width={8} style={{ textAlign: 'left' }}>
+                            <Button size='big' content='Apply To Talent Pool' icon='handshake outline' primary/> 
+                        </Grid.Column>
+                        <Grid.Column width={16}>
+                            <div style={{ margin: '20px 0' }}>
+                                We want to make it easy for students and young pros to find the right company for them. To help you let companies know that you're interested in potentially joining - now or in the future -, we've invented the Talent Pool. If you're accepted in its Talent Pool, the company can contact you at any time with a relevant opportunity.
+                            </div>
+                        </Grid.Column>
                     </Grid>
                 </Container>
             </div>
+            <div className='grey-container'>
+                <div className='container-title'>We want to hear from you</div>
+                <Container>
+                    <Grid.Column width={16} style={{ textAlign: 'center' }}>
+                        <Button size='big' content='I have an important question' style={{ margin: '30px 0 0 0' }}/> 
+                    </Grid.Column>
+                </Container>
+            </div>
+            <Footer/>
             <style jsx>{`
                 .hidden {
                     display: none;
@@ -748,11 +788,12 @@ if (currentLivestream && currentLivestream.hasStarted) {
                 }
     
                 .top-menu {
-                    background-color: rgba(245,245,245,1);
+                    background-color: rgba(250,250,250,1);
                     padding: 15px 0;
                     height: 75px;
                     text-align: center;
                     position: relative;
+                    box-shadow: 0 0 5px grey;
                 }
     
                 .top-menu div, .top-menu button {
@@ -781,18 +822,19 @@ if (currentLivestream && currentLivestream.hasStarted) {
     
                 .mask {
                     width: 100%;
-                    min-height: calc(100vh - 75px);
+                    min-height: calc(100vh - 155px);
                     padding: 40px 0 40px 0;
                     background-color: rgba(15, 37, 54,0.8);
                 }
     
                 .livestream-title {
-                    font-size: 5em;
+                    font-size: 3.5em;
                     color: white;
                     text-align: let;
                     line-height: 1.4em;
                     font-weight: 700;
                     text-shadow: 3px 3px 0 black;
+                    width: 80%;
                 }
     
                 .livestream-date {
@@ -860,30 +902,30 @@ if (currentLivestream && currentLivestream.hasStarted) {
                     font-size: 1.4em;
                 }
 
-                .pitch-container {
-                    padding: 10px 0 30px 0;
-                }
-
                 .container-title {
                     text-transform: uppercase;
-                    font-size: 0.7em;
+                    text-align: center;
+                    font-size: 1.1em;
                     font-weight: 700;
-                    margin-bottom: 10px;
-                    color: rgb(0, 210, 170);
+                    margin-bottom: 20px;
+                    color: rgb(150,150,150);
+                }
+
+                .white-container {
+                    padding: 40px 0 80px 0;
+                    text-align: center;
                 }
     
-                .questions-container {
+                .grey-container {
                     position: relative;
-                    min-height: 800px;
                     width: 100%;
-                    padding: 30px 0;
-                    background-color: rgb(240,240,240);
+                    padding: 40px 0 80px 0;
+                    background-color: rgb(245,245,245);
                 }
 
                 .description {
                     width: 70%;
                     margin: 30px auto;
-                    font-size: 1.5em;
                     line-height: 1.4em;
                     text-align:center;
                 }

@@ -1,33 +1,38 @@
-import {useState, useEffect} from 'react';
-import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input} from "semantic-ui-react";
+import React, {useState, useEffect,Fragment} from 'react';
+import {Container, Button, Grid, Icon, Header as SemanticHeader, Input, Image} from "semantic-ui-react";
 
 import Header from '../../components/views/header/Header';
+import Loader from '../../components/views/loader/Loader';
 import { withFirebasePage } from '../../data/firebase';
 import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor_new.js';
-import ElementTagList from '../../components/views/common/ElementTagList';
-import Countdown from 'react-countdown';
+import DateUtil from '../../util/DateUtil';
+import { useRouter } from 'next/router';
+import Footer from '../../components/views/footer/Footer';
 import axios from 'axios';
-import ButtonWithConfirm from '../../components/views/common/ButtonWithConfirm';
-0
-function StreamingPage(props) {
+import PlayerPrepare from '../../components/views/player-prepare/PlayerPrepare';
+
+function StreamPlayer(props) {
+
+    const router = useRouter();
+    const eth_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media&token=9403f77b-3cb6-496c-a96d-62be1496ae85';
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
-    const [isStreaming, setIsStreaming] = useState(false);
-    const [isCapturingDesktop, setIsCapturingDesktop] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [isInitialized, setInitialized] = useState(false);
+
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState(null);
+    const [newQuestionTitle, setNewQuestionTitle] = useState("");
+    const [newCommentTitle, setNewCommentTitle] = useState("");
     const [currentLivestream, setCurrentLivestream] = useState(null);
-    const [nsToken, setNsToken] = useState(null);
-    const [numberOfViewers, setNumberOfViewers] = useState(0);
-    const [streamerVerified, setStreamerVerified] = useState(true);
-    const [streamInitialized, setStreamInitialized] = useState(false);
-    const [showNextQuestions, setShowNextQuestions] = useState(false);
+    const [madeAClick, setMadeAClick] = useState(false);
     const [comments, setComments] = useState([]);
+    const [nsToken, setNsToken] = useState(null);
 
 
     useEffect(() => {
         if (props.livestreamId) {
-            props.firebase.getScheduledLivestreamById(props.livestreamId, querySnapshot => {
+            props.firebase.listenToScheduledLivestreamById(props.livestreamId, querySnapshot => {
                 let livestream = querySnapshot.data();
                 livestream.id = querySnapshot.id;
                 setCurrentLivestream(livestream);
@@ -70,6 +75,38 @@ function StreamingPage(props) {
     }, [upcomingQuestions]);
 
     useEffect(() => {
+        if (isInitialized && currentLivestream && currentLivestream.hasStarted) {
+            setTimeout(() => {
+                startPlaying();
+            }, 3000);
+        }
+    }, [currentLivestream, isInitialized]);
+
+    useEffect(() => {
+        setCurrentQuestion(upcomingQuestions[0]);
+    }, [upcomingQuestions]);
+
+    function upvoteQuestion(question) {
+        props.firebase.upvoteQuestion(currentLivestream.id, question);
+    }
+
+    let questionElements = upcomingQuestions.map((question, index) => {
+        if (!currentQuestion || question.title !== currentQuestion.title) {
+            return (
+                    <div className='streamNextQuestionContainer'>
+                        <p>{ question.title }</p>
+                        <div className='streamNextQuestionNumberOfVotes'>{ question.votes } <Icon name='thumbs up' color='teal'/></div>
+                        <Button id='scheduled-question-thumbs-up' color='teal' icon='thumbs up' onClick={() => upvoteQuestion(question)} content={'UPVOTE'}/>
+                    </div>
+            );
+        } else {
+            return (
+                <div></div>
+            );
+        }
+    })
+
+    useEffect(() => {
         axios({
             method: 'get',
             url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getXirsysNtsToken',
@@ -85,100 +122,95 @@ function StreamingPage(props) {
     }, []);
 
     useEffect(() => {
-        if (currentLivestream && currentLivestream.id) {
-            clearInterval();
-            setInterval(() => {
-                axios({
-                    method: 'get',
-                    url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=' + currentLivestream.id,
-                }).then( response => { 
-                        setNumberOfViewers(response.data.totalWebRTCWatchersCount > -1 ? response.data.totalWebRTCWatchersCount : 0);
-                    }).catch(error => {
-                        console.log(error);
-                });
-            }, 10000);
-        }
-    }, [currentLivestream]);
+        if (nsToken && nsToken.iceServers.length > 0) {
+            var pc_config = {
+                'iceServers' : nsToken.iceServers
+            };
 
-    function markQuestionAsDone(question) {
-        props.firebase.markQuestionAsDone(currentLivestream.id, question)
-            .then(() => {
-                setCurrentQuestion(null)
-            }, (error) => {
-                console.log("Error:" + error );
+            var sdpConstraints = {
+                OfferToReceiveAudio : true,
+                OfferToReceiveVideo : true
+        
+            };
+            var mediaConstraints = {
+                audio: true,
+                video: {
+                    width: { ideal: 1920, max: 1920 },
+                    height: { ideal: 1080, max: 1080 },
+                    aspectRatio: 1.77
+                }
+            };
+
+            const newAdaptor = new WebRTCAdaptor({
+                websocket_url : "wss://thrillin.work/WebRTCAppEE/websocket",
+                mediaConstraints : mediaConstraints,
+                peerconnection_config : pc_config,
+                sdp_constraints : sdpConstraints,
+                remoteVideoId : "remoteVideo",
+                isPlayMode: true,
+                callback : function(info) {
+                    if (info === "initialized") {
+                        console.log("initialized"); 
+                        setInitialized(true);            
+                    } else if (info === "play_started") {
+                        //play_started
+                        setIsPlaying(true);
+                    } else if (info === "play_finished") {
+                        // play finishedthe stream
+                        setIsPlaying(false);           
+                    }
+                },
+                callbackError : function(error) {
+                    //some of the possible errors, NotFoundError, SecurityError,PermissionDeniedError
+                    console.log("error callback: " + error);
+                    alert("An unexpected error occured while starting this livestream. Please reload this page and try again.");
+                }
             });
-    }
-
-    function removeQuestion(question) {
-        props.firebase.removeQuestion(currentLivestream.id, question);
-    }
-
-    let questionElements = upcomingQuestions.map((question, index) => {
-        if (!currentQuestion || question.title !== currentQuestion.title) {
-            return (
-                <div className='streamNextQuestionContainer' key={index}>
-                    { question.title }
-                    <div className='question-upvotes'><Icon name='thumbs up outline'/>{question.votes} upvotes</div>
-                    <Button icon='delete' content='Remove' onClick={() => removeQuestion(question)}/>
-                    <style jsx>{`
-                        .streamNextQuestionContainer {
-                            margin: 20px 0;
-                            box-shadow: 0 0 2px rgb(160,160,160);
-                            border-radius: 10px;
-                            color: rgb(50,50,50);
-                            background-color: white;
-                            padding: 30px 50px;
-                            font-weight: 500;
-                            font-size: 1.3em;
-                        }
-
-                        .streamNextQuestionContainer .question-upvotes {
-                            margin: 20px 0;
-                            font-size: 0.9em;
-                            font-weight: bold;
-                        }
-                    `}</style>
-                </div>
-            );
-        } else {
-            return (
-                <div></div>
-            );
+            setWebRTCAdaptor(newAdaptor);
         }
-    });
+    }, [nsToken])
 
-    let questionElementsAlt = comments.map((comment, index) => {
-        return (
-            <div className='streamNextQuestionContainerAlt animated fadeInUp faster'>
-                <div className='streamNextQuestionContainerTitleAlt'>
-                    { comment.title }
-                </div>
-                <div className='streamNextQuestionContainerSubtitleAlt'>
-                    <div className='question-upvotes-alt'><Icon name='thumbs up outline'/>{comment.votes}</div>
-                    <div className='question-author'>@{comment.author}</div>
-                </div>
-                <style jsx>{`
-                    .streamNextQuestionContainerAlt {
-                        font-size: 1em;
-                        margin-bottom: 25px;
-                        line-height: 1.4em;
-                    }
+    function startPlaying() {
+        webRTCAdaptor.play(currentLivestream.id);
+    }
 
-                    .streamNextQuestionContainerTitleAlt {
-                        font-size: 1em;
-                        font-weight: 700;
-                        margin-bottom: 5px;
-                    }
+    function prettyPrintCountdown(props) {
+        return props.days + (props.days === 1 ? ' day ' : ' days ')
+        + props.hours + (props.hours === 1 ? ' hour ' : ' hours ') 
+        + props.minutes + (props.minutes === 1 ? ' minute ' : ' minutes ')
+        + props.seconds + (props.seconds === 1 ? ' second ' : ' seconds ');
+    }
 
-                    .streamNextQuestionContainerSubtitleAlt div {
-                        display: inline-block;
-                        margin-right: 10px;
-                        color: rgb(180,180,180);
-                    }
-                `}</style>
-            </div>
-        );
-    })
+    function addNewQuestion() {
+        const newQuestion = {
+            title: newQuestionTitle,
+            votes: 0,
+            type: "new"
+        }
+        props.firebase.putScheduledLivestreamsQuestion(currentLivestream.id, newQuestion)
+            .then(() => {
+                setNewQuestionTitle("");
+            }, () => {
+                console.log("Error");
+            })
+    }
+
+    function addNewComment(comment) {
+        const newComment = {
+            title: newCommentTitle,
+            votes: 0,
+        }
+        props.firebase.putScheduledLivestreamsComment(currentLivestream.id, newComment)
+            .then(() => {
+                setNewCommentTitle("");
+            }, error => {
+                console.log("Error: " + error);
+            })
+    }
+
+    if (!currentLivestream) {
+        return <Loader/>;
+    }
 
     let CurrentQuestionElement = () => {
         return (
@@ -187,9 +219,6 @@ function StreamingPage(props) {
                     <div className='question-label'>Current Question</div>
                     <div className='question-title'>
                         { currentQuestion ? currentQuestion.title : '' }
-                    </div>
-                    <div className='question-buttons'>
-                        <Button icon='check' content='NEXT QUESTION' size='small'/>
                     </div>
                 </div>
                 <style jsx>{`
@@ -232,102 +261,61 @@ function StreamingPage(props) {
         );
     }
 
-    useEffect(() => {
-        if (currentLivestream && !streamInitialized && nsToken && nsToken.iceServers.length > 0) {
-            var pc_config = {
-                'iceServers' : nsToken.iceServers
-            };
-
-            var sdpConstraints = {
-                OfferToReceiveAudio : false,
-                OfferToReceiveVideo : false
-            };
-
-            var mediaConstraints = {
-                audio: true,
-                video: {
-                    width: { ideal: 1920, max: 1920 },
-                    height: { ideal: 1080, max: 1080 },
-                    aspectRatio: 1.77
-                }
-            };
-
-            const newAdaptor = new WebRTCAdaptor({
-                websocket_url : "wss://thrillin.work/WebRTCAppEE/websocket",
-                mediaConstraints : mediaConstraints,
-                peerconnection_config : pc_config,
-                sdp_constraints : sdpConstraints,
-                localVideoId : "localVideo",
-                callback : function(info) {
-                    if (info === "initialized") {
-                        setStreamInitialized(true);
-                        console.log("initialized");		
-                    } else if (info === "publish_started") {
-                        //stream is being published 
-                        props.firebase.setScheduledLivestreamHasStarted(true, currentLivestream.id);
-                        setIsStreaming(true);
-                        console.log("publish started");	
-                    } else if (info === "publish_finished") {
-                        //stream is finished
-                        setIsStreaming(false);
-                        console.log("publish finished");
-                    } else if (info === "screen_share_extension_available") {
-                        //screen share extension is avaiable
-                        console.log("screen share extension available");
-                    } else if (info === "screen_share_stopped") {
-                        //"Stop Sharing" is clicked in chrome screen share dialog
-                        console.log("screen share stopped");
-                        setIsCapturingDesktop(false);
+    let questionElementsAlt = comments.map((comment, index) => {
+        return (
+            <div className='streamNextQuestionContainerAlt animated fadeInUp faster'>
+                <div className='streamNextQuestionContainerTitleAlt'>
+                    { comment.title }
+                </div>
+                <div className='streamNextQuestionContainerSubtitleAlt'>
+                    <div className='question-upvotes-alt'><Icon name='thumbs up outline'/>{comment.votes}</div>
+                    <div className='question-author'>@{comment.author}</div>
+                </div>
+                <style jsx>{`
+                    .streamNextQuestionContainerAlt {
+                        font-size: 1em;
+                        margin-bottom: 25px;
+                        line-height: 1.4em;
                     }
-                },
-                callbackError : function(error) {
-                    //some of the possible errors, NotFoundError, SecurityError,PermissionDeniedError
-                    console.log("error callback: " + error);
-                    alert("The Following Error Occured: " + error);
-                }
-            });
-            setWebRTCAdaptor(newAdaptor);
-        }
-    }, [currentLivestream, nsToken])
 
-    function startStreaming() {
-        webRTCAdaptor.publish(currentLivestream.id);
-    }
+                    .streamNextQuestionContainerTitleAlt {
+                        font-size: 1em;
+                        font-weight: 700;
+                        margin-bottom: 5px;
+                    }
 
-    function stopStreaming() {
-        webRTCAdaptor.stop(currentLivestream.id);
-        props.firebase.setScheduledLivestreamHasStarted(false, currentLivestream.id);
-    }
+                    .streamNextQuestionContainerSubtitleAlt div {
+                        display: inline-block;
+                        margin-right: 10px;
+                        color: rgb(180,180,180);
+                    }
+                `}</style>
+            </div>
+        );
+    })
 
-    function startDesktopCapture() {
-        webRTCAdaptor.switchDesktopCapture(currentLivestream.id);
-        setIsCapturingDesktop(true);
-    }
-
-    function stopDesktopCapture() {
-        webRTCAdaptor.switchVideoCapture(currentLivestream.id);
-        setIsCapturingDesktop(false);
-    }
+   /*  if (!currentLivestream.hasStarted) {
+        router.replace('/upcoming-livestream/' + currentLivestream.id);
+    } */
 
     return (
         <div className='topLevelContainer'>
-            <div className={'top-menu ' + (isStreaming ? 'active' : '')}>
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
-                    <h3 style={{ color: (isStreaming ?  'white' : 'orange') }}>{ isStreaming ? 'YOU ARE NOW LIVE' : 'YOU ARE NOT LIVE'}</h3>
-                    { isStreaming ? '' : 'Press Start Streaming to begin'}
-                </div>
-                <div style={{ float: 'right', display: 'inlineBlock', margin: '0 20px' }}>
-                    <Button size='big' onClick={ isCapturingDesktop ? () => stopDesktopCapture() : () => startDesktopCapture()}>{ isCapturingDesktop ? 'Stop Screen Sharing' : 'Start Screen Sharing'}</Button>
+            {/* <PlayerPrepare madeAClick={madeAClick} isPlaying={isPlaying} currentLivestream={currentLivestream} setMadeAClick={() => setMadeAClick(true)} upcomingQuestions={upcomingQuestions}/> */}
+            <div className='top-menu'>
+                <div style={{ position: 'absolute', top: '50%', left: '20px', transform: 'translateY(-50%)'}}>
+                    <Image src='/logo_teal.png' style={{ maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
+                    <Image src={ eth_logo } style={{ postion: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block'}}/>
+                    <div style={{ position: 'absolute', bottom: '13px', left: '120px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
                 </div>
             </div>
             <div className='streamingOuterContainer'>
                 <div className='streamingContainer'>
-                    <video id="localVideo" autoPlay muted width="100%"></video> 
+                    <video id="remoteVideo" autoPlay controls width='100%' ></video> 
                 </div>
             </div>
             <div className='video-menu'>
-                <ButtonWithConfirm color='teal' size='huge' buttonAction={isStreaming ? stopStreaming : startStreaming} confirmDescription={isStreaming ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
-                <Button size='huge' onClick={() => {}} primary basic>Interact!</Button>
+                <Button  icon='heart' size='huge' color='pink' circular/>
+                <Button  icon='thumbs down' size='huge' circular/>
             </div>
             <div className='video-menu-left'>
                 <CurrentQuestionElement/>
@@ -356,46 +344,49 @@ function StreamingPage(props) {
                 </div>
             </div>
             <style jsx>{`
-
+                .hidden {
+                    display: none;
+                }
+    
                 .topLevelContainer {
                     position: absolute;
                     height:100%;
                     width: 100%;
                 }
-
+    
                 .top-menu {
-                    position: relative;
                     background-color: rgba(245,245,245,1);
                     padding: 15px 0;
                     height: 75px;
                     text-align: center;
                     position: relative;
                 }
-
+    
                 .top-menu div, .top-menu button {
                     display: inline-block;
                     vertical-align: middle;
                 }
-
+    
                 .top-menu #stream-button {
                     margin: 0 50px;
                 }
-
+    
                 .top-menu.active {
                     background-color: rgba(0, 210, 170, 1);
                     color: white;
                 }
-
+    
                 .top-menu h3 {
                     font-weight: 600;
                 }
-
+    
                 .video-menu {
                     position: absolute;
                     bottom: 0;
                     left: 330px;
                     right: 0;
                     padding: 15px 0;
+                    height: 80px;
                     z-index: 1000;
                     text-align: center;
                     background-color: rgb(240,240,240);
@@ -435,7 +426,7 @@ function StreamingPage(props) {
                     cursor: pointer;
                 }
 
-                #localVideo {
+                #remoteVideo {
                     position: absolute;
                     width: 100%;
                     max-height: 100%;
@@ -662,13 +653,13 @@ function StreamingPage(props) {
                     right: 20px;
                     bottom: 25px;
                 }
-            `}</style>
+          `}</style>
         </div>
     );
 }
 
-StreamingPage.getInitialProps = ({ query }) => {
+StreamPlayer.getInitialProps = ({ query }) => {
     return { livestreamId: query.livestreamId }
 }
 
-export default withFirebasePage(StreamingPage);
+export default withFirebasePage(StreamPlayer);

@@ -45,7 +45,7 @@ const NonAuthenticatedHeader = (props) => {
                     left: 0;
                     top: 0;
                     list-style: none;
-                    padding: 10px 20px;
+                    padding: 15px 20px;
                     vertical-align: top;
                     margin: 0;
                     display: inline-block;
@@ -59,7 +59,7 @@ const NonAuthenticatedHeader = (props) => {
 
                 #right-menu {
                     float: right;
-                    padding: 10px;
+                    padding: 15px;
                     vertical-align: top;
                 }
 
@@ -113,7 +113,7 @@ const NonAuthenticatedHeader = (props) => {
                     top: 0;
                     left: 0;
                     right: 0;
-                    margin-top: 25px;
+                    margin-top: 30px;
                     text-align: center;
                     font-size: 1.1em;
                     display: inline-block;

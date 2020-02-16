@@ -82,6 +82,7 @@ function LandingPage(props) {
     function addField(field) {
         const fieldsCopy = fields.slice(0);
         fieldsCopy.push(field);
+        fieldsCopy.push(field);
         setFields(fieldsCopy);
     }
 

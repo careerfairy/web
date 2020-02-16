@@ -14,9 +14,11 @@ module.exports = routes()
 .add('cookies', '/cookies', 'cookies')
 .add('policy', '/policy', 'policy')
 
+.add('upcoming-livestream', 'upcoming-livestream/:livestreamId', 'upcoming-livestream/[livestreamId]')
 .add('past-livestream', 'past-livestream/:livestreamId', 'past-livestream/[livestreamId]')
 .add('streaming', 'streaming/:livestreamId', 'streaming/[livestreamId]')
 .add('player', 'player/:livestreamId', 'player/[livestreamId]')
+.add('player-alt', 'player-alt/:livestreamId', 'player-alt/[livestreamId]')
 
 .add('profile', '/profile', 'profile')
 .add('signup', '/signup', 'signup');

@@ -12,6 +12,9 @@ function LandingPage(props) {
 
     let videoBackground = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Flanding.mp4?alt=media&token=5d3fd3a3-e164-4006-b1b7-a1df518229cf';
 
+    const [user, setUser] = useState(false);
+    const [userData, setUserData] = useState(null);
+
     const [companies, setCompanies] = useState([]);
     const [mentors, setMentors] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -25,18 +28,50 @@ function LandingPage(props) {
 
     const router = useRouter();
 
+    useEffect(() => {
+        props.firebase.auth.onAuthStateChanged(user => {
+            if (user !== null) {
+                setUser(user);
+            } else {
+                setUser(null);
+            }
+        });
+    },[]);
 
     useEffect(() => {
-        props.firebase.getCompanies().then( querySnapshot => {
-            var companyList = [];
-            querySnapshot.forEach(doc => {
-                let company = doc.data();
-                company.id = doc.id;
-                companyList.push(company);
-            });
-            setCompanies(companyList);
-        });
-    }, []);
+        if (user) {
+            props.firebase.getUserData(user.email)
+                .then(querySnapshot => {
+                    let user = querySnapshot.data();
+                    if (user) {
+                        setUserData(user);
+                    }
+                }).catch(error => {
+                    console.log(error);
+                });
+        }
+    },[user]);
+
+    useEffect(() => {
+        if (user) {
+            props.firebase.getUserData(user.email)
+                .then(querySnapshot => {
+                    let user = querySnapshot.data();
+                    if (!user) {
+                        router.replace('/profile');
+                    }
+                }).catch(error => {
+                    console.log(error);
+                });
+        }
+    },[user]);
+
+
+    useEffect(() => {
+        if (userData) {
+
+        }
+    }, [userData]);
 
     useEffect(() => {
         props.firebase.getMentors().then( querySnapshot => {
@@ -435,7 +470,6 @@ function LandingPage(props) {
 }
 
 LandingPage.getInitialProps = async () => {
-    console.log("LALALALALLALALLAALLLllllllllllllllllllmkjohiugiugyfuLOIIIJ(J)(K)J)IJ)IJ");
 }
 
 export default withFirebase(LandingPage);

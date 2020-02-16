@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+import { Grid } from "semantic-ui-react";
 
 export default function CountdownTimer(props) {
   const calculateTimeLeft = () => {
-    const difference = +new Date(props.date) - +new Date();
+    const difference = new Date(props.date) - new Date();
     let timeLeft = {};
 
     if (difference > 0) {
@@ -31,36 +32,46 @@ export default function CountdownTimer(props) {
   Object.keys(timeLeft).forEach(interval => {
 
     timerComponents.push(
-      <div className='timeElement'>
-        <div className='number'>
-            {timeLeft[interval]}
-        </div>
-        <div className='label'>
-            {interval}
-        </div>
-        <style jsx>{`
-            .timeElement {
-                display: inline-block;
-                margin: 0 10px;
-            }
+      <Grid.Column mobile='4' tablet='3' computer='2' textAlign='center'>
+        <div className='timeElement'>
+            <div className='number'>
+                {timeLeft[interval]}
+            </div>
+            <div className='label'>
+                {interval}
+            </div>
+          <style jsx>{`
+              .timeElement {
+                  display: inline-block;
+                  padding-top: 100%;
+                  width: 50%;
+                  padding: 15px 0 0 0;
+                  text-align: center;
+                  margin: 0 auto;
+              }
 
-            .timeElement .number {
-                font-size: 2em;
-                margin: 10px 0 30px 0;
-                font-weight: 500;
-            }
+              .timeElement .number {
+                  font-size: 2em;
+                  margin: 10px 0 20px 0;
+                  font-weight: 500;
+              }
 
-            .timeElement .label {
-                font-weight: 300;
-            }
-        `}</style>
-      </div>
+              .label {
+                  ont-size: 0.2em;
+                  font-weight: 300;
+                  color: rgb(100,100,100);
+              }
+          `}</style>
+        </div>
+      </Grid.Column>
     );
   });
 
   return (
     <div>
+      <Grid centered>
       {timerComponents.length ? timerComponents : <span>Time's up!</span>}
+      </Grid>
     </div>
   );
 }

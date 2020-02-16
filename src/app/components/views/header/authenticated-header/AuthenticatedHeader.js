@@ -8,6 +8,8 @@ const AuthenticatedHeader = (props) => {
 
     const router = useRouter();
 
+    const eth_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media&token=9403f77b-3cb6-496c-a96d-62be1496ae85';
+
     function goToRoute(route) {
         router.push(route);
     }
@@ -18,6 +20,8 @@ const AuthenticatedHeader = (props) => {
             <ul id='left-menu'>
                 <li><Icon id='sidebar-toggle' style={{ cursor: 'pointer' }} name='bars' size='big' color={props.color === "white" ? null : 'teal'} onClick={props.toggleSideBar}/></li>
                 <li><Link href='/'><a><Image src={props.color === "white" ? '/logo_white.png' : '/logo_teal.png'} style={{ cursor: 'pointer', width: '150px', display: 'inline-block', marginTop: '10px', marginLeft: '10px'}}/></a></Link></li>
+                <Image src={ eth_logo } style={{ postion: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block'}}/>
+                <div style={{ position: 'absolute', bottom: '20px', left: '180px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
             </ul>
             <ul id='middle-menu' className={'centered-menu ' + (props.color === "white" ? 'white' : 'dark')}>
                 <li className={props.page === 'spotlight' ? 'active' : ''}><Link href='/'><a>Livestreams</a></Link></li>
@@ -59,7 +63,7 @@ const AuthenticatedHeader = (props) => {
 
             #right-menu {
                 float: right;
-                padding: 10px;
+                padding: 15px;
                 vertical-align: top;
             }
 
@@ -113,7 +117,7 @@ const AuthenticatedHeader = (props) => {
                 top: 0;
                 left: 0;
                 right: 0;
-                margin-top: 25px;
+                margin-top: 30px;
                 text-align: center;
                 font-size: 1.1em;
                 display: inline-block;

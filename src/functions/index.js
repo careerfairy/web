@@ -16,6 +16,9 @@
 'use strict';
 
 const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+admin.initializeApp();
+
 const next = require('next');
 const path = require('path');
 const routes = require('./routes');
@@ -36,19 +39,53 @@ const fs = require('fs');
 const https = require('https');
 const axios = require('axios');
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
-
-// Mailgun Setup
 const mailgun = require("mailgun-js");
-const DOMAIN = 'mg.careerfairy.io';
+const DOMAIN = 'mail.careerfairy.io';
 const api_key = '13db35c5779d693ddad243d21e9d5cba-e566273b-b2967fc4';
 const host = 'api.eu.mailgun.net';
 const mg = mailgun({apiKey: api_key, domain: DOMAIN, host: host});
+
+exports.sendEmailVerificationEmail = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        res.status(204).send('');
+    }
+
+    const html_email = fs.readFileSync(path.resolve(__dirname, './html_emails/EmailVerificationEmail.html'), 'utf8')
+    const recipient_email = req.body.recipientEmail;
+    const redirect_link = req.body.redirect_link;
+
+    const actionCodeSettings = {
+        url: redirect_link
+    };
+
+    admin.auth().generateEmailVerificationLink(recipient_email, actionCodeSettings)
+        .then((link) => {
+            const data = {
+                from: 'CareerFairy <noreply@mail.careerfairy.io>',
+                to: recipient_email,
+                subject: 'CareerFairy Email Verification',
+                text: 'Welcome to CareerFairy!',
+                html: html_email.replace("__LINK__", link)
+            };
+            return mg.messages().send(data, (error, body) => {
+                if (error) {
+                    res.send('Error: ' + error);
+                }
+                res.send(200);
+            });
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+});
 
 exports.sendSharePollEmail = functions.https.onRequest(async (req, res) => {
 
@@ -70,11 +107,11 @@ exports.sendSharePollEmail = functions.https.onRequest(async (req, res) => {
         }
         res.send(200);
     });
-  });
+});
 
 exports.sendShareLivestreamEmail = functions.https.onRequest(async (req, res) => {
 
-    res.set('Access-Control-Allow-Origin', 'https://careerfairy.io');
+    res.set('Access-Control-Allow-Origin', 'careerfairy.io');
     res.set('Access-Control-Allow-Credentials', 'true');
 
     if (req.method === 'OPTIONS') {
@@ -108,7 +145,7 @@ exports.sendShareLivestreamEmail = functions.https.onRequest(async (req, res) =>
 
 exports.sendShareLivestreamPollEmail = functions.https.onRequest(async (req, res) => {
 
-res.set('Access-Control-Allow-Origin', 'https://careerfairy.io');
+res.set('Access-Control-Allow-Origin', 'careerfairy.io');
 res.set('Access-Control-Allow-Credentials', 'true');
 
 if (req.method === 'OPTIONS') {

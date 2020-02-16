@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Container, Header as SemanticHeader, Button, Dropdown, Form } from 'semantic-ui-react';
 import { Formik } from 'formik';
+import { useRouter } from 'next/router';
 
 import { UNIVERSITY_SUBJECTS } from '../data/StudyFieldData';
 import { UNIVERSITY_NAMES } from '../data/UniversityData';
@@ -9,6 +10,8 @@ import Header from '../components/views/header/Header';
 import Loader from '../components/views/loader/Loader';
 
 const UserProfile = (props) => {
+
+    const router = useRouter();
 
     const [loading, setLoading] = useState(false)
     const [userData, setUserData] = useState(null)
@@ -22,16 +25,16 @@ const UserProfile = (props) => {
        if (userData) {
             setInitialValues({ firstName: userData.firstName, lastName: userData.lastName, university: userData.university, fieldOfStudy: userData.faculty });
        } else {
-            setInitialValues({ firstName: '', lastName: '', university: 'ethz', fieldOfStudy: 'PHYS' });
+            setInitialValues({ firstName: '', lastName: '', university: null, fieldOfStudy: null });
        }
     }, [userData]);
 
     useEffect(() => {
-        debugger
         props.firebase.auth.onAuthStateChanged(user => {
-            debugger;
             if (user !== null) {
                 setUser(user);
+            } else {
+                router.replace('/login');
             }
         })
     }, []);
@@ -54,7 +57,10 @@ const UserProfile = (props) => {
     },[user]);
 
     function logout() {
-        props.firebase.doSignOut();
+        setLoading(true);
+        props.firebase.doSignOut().then(() => {
+            router.replace('/login');
+        });
     }
 
     if (user === null || loading === true) {
@@ -62,11 +68,11 @@ const UserProfile = (props) => {
     }
 
     return (
-        <div>
-            <Header color='teal'/>
-                <Container id='profileContainer' textAlign='center'>
-                    <SemanticHeader as='h1' color='teal' textAlign='left'>Your Profile</SemanticHeader>
-                    <SemanticHeader as='h3' color='grey' textAlign='left'>This data helps us providing you with the best career suggestions!</SemanticHeader>
+            <div className='greyBackground'>
+                <Header classElement='relative white-background'/>
+                <Container textAlign='left'>
+                    <h1 style={{ color: 'rgb(0, 210, 170)', margin: '30px 0 0 0' }}>Your Profile</h1>
+                    <h3 style={{ color: 'rgb(150,150,150)', margin: '20px 0 40px 0' }}>Tell us who you are, we'll introduce to the right people for you!</h3>
                     <Formik
                         initialValues={initialValues}
                         enableReinitialize={true}
@@ -95,9 +101,6 @@ const UserProfile = (props) => {
                             props.firebase.setUserData(user.email, values.firstName, values.lastName, values.university, values.fieldOfStudy)
                             .then(() => {
                                 setSubmitting(false);
-                                if (!props.userData) {
-                                    router.push('/discover');
-                                }
                             }).catch(error => {
                                 setSubmitting(false);
                                 console.log(error);
@@ -115,7 +118,7 @@ const UserProfile = (props) => {
                             isSubmitting,
                             /* and other goodies */
                         }) => (
-                            <Form onSubmit={handleSubmit} style={{ textAlign: 'left'}}>
+                            <Form onSubmit={handleSubmit} style={{ textAlign: 'left'}} size='big'>
                                 <Form.Group widths='equal'>
                                     <Form.Field>
                                         <label>Email</label>
@@ -142,20 +145,30 @@ const UserProfile = (props) => {
                                 </Form.Group>
                                 <Form.Group widths='equal'>
                                     <Form.Field>
-                                        <label>Where are you studying/did you study?</label>
+                                        <label>Select your place of study</label>
                                         <Dropdown placeholder='Select University' value={values.university} onChange={(event, {value}) => { setFieldValue('university', value, true) }} compact selection options={universities}/>
                                     </Form.Field>
                                     <Form.Field>
-                                        <label>What is your field of study?</label>
+                                        <label>Select your field of expertise</label>
                                         <Dropdown placeholder='Select Field of Study' value={values.fieldOfStudy} onChange={(event, {value}) => { setFieldValue('fieldOfStudy', value, true) }} compact selection options={subjects}/>
                                     </Form.Field>
                                 </Form.Group>
-                                <Button id='submitButton' color='teal' type='submit' content={props.user ? 'Save Changes' : 'Create Account'} loading={isSubmitting}/>
+                                <Button id='submitButton' color='teal' type='submit'  size='big' content={ userData ? 'Save Changes' : 'Create Account'} loading={isSubmitting}/>
                             </Form>
                         )}
                         </Formik>
-                    <Button onClick={logout} color='teal' basic content='Logout'/>
+                    <Button onClick={logout} color='teal' basic content='Logout' style={{ margin: '10px 0' }}/>
                 </Container>
+                <style jsx>{`
+                    .greyBackground {
+                        background-color: rgb(250,250,250);
+                        height: 100vh;
+                    }
+
+                    #profileContainer {
+                        padding: '30px 0'
+                    }
+                `}</style>
             </div>
     );
 };

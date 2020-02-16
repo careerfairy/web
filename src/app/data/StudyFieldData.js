@@ -2,7 +2,7 @@ export const UNIVERSITY_SUBJECTS = [
         {
             text: "Chemistry",
             value: "CHEM",
-            color: "	#2d5b6b"
+            color: "#2d5b6b"
         },{
             text: "Civil Engineering",
             value: "CIVI",
@@ -14,7 +14,7 @@ export const UNIVERSITY_SUBJECTS = [
         },{
             text: "Data Science",
             value: "DATA",
-            color: "#00d2aa"
+            color: "#e03e52"
         },{
             text: "Earth Sciences",
             value: "EARTH",
@@ -22,7 +22,7 @@ export const UNIVERSITY_SUBJECTS = [
         },{
             text: "Life Sciences",
             value: "LIFE",
-            color: "#e03e52"
+            color: "#03c03c"
         },{
             text: "Electrical Engineering",
             value: "ELEC",
