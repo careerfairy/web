@@ -16,8 +16,8 @@ function TargetElementList(props) {
         if (selectionMode === true) {
             const selected = props.selectedFields.indexOf(listElement) > -1;
             return (
-                <Fragment>
-                    <div className='tag' key={listElement} style={{ backgroundColor: selected ? targetElement.color : 'white', color: selected ? 'white' : targetElement.color, border: '1px solid ' + targetElement.color}}>
+                <Fragment key={index}>
+                    <div className='tag' style={{ backgroundColor: selected ? targetElement.color : 'white', color: selected ? 'white' : targetElement.color, border: '1px solid ' + targetElement.color}}>
                         {targetElement.text}
                     </div>
                     <style jsx>{`
@@ -36,8 +36,8 @@ function TargetElementList(props) {
             );
         } else {
             return (
-                <Fragment>
-                    <div className='tag' key={listElement} style={{ backgroundColor: targetElement.color, fontSize: props.size === 'large' ? '1.1em' : '0.8em', padding: props.size === 'large' ? '8px 15px' : '2px 10px', borderRadius: props.size === 'large' ? '20px' : '12px' }}>
+                <Fragment key={index}>
+                    <div className='tag' style={{ backgroundColor: targetElement.color, fontSize: props.size === 'large' ? '1.1em' : '0.8em', padding: props.size === 'large' ? '8px 15px' : '2px 10px', borderRadius: props.size === 'large' ? '20px' : '12px' }}>
                         {targetElement.text}
                     </div>
                     <style jsx>{`

@@ -52,6 +52,10 @@ export const UNIVERSITY_SUBJECTS = [
             value: "MECH",
             color: "#808080"
         },{
+            text: "Microengineering",
+            value: "MICRO",
+            color: "#808080"
+        },{
             text: "Physics",
             value: "PHYS",
             color: "#54556c"

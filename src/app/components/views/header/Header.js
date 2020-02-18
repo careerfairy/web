@@ -33,7 +33,7 @@ function Header (props) {
                     <li><Link href='/wishlist'><a>Wishlist</a></Link></li>
                     <li><a href='https://corporate.careerfairy.io/companies'>For Companies</a></li>
                     <li><a href='https://corporate.careerfairy.io/career-center'>For Career Centers</a></li>
-                    <li><Link href={ authenticated  ? '/profile' : '/signup'}><a>{ authenticated  ? 'My Profile' : 'Sign up'}</a></Link></li>
+                    <li><Link href={ authenticated  ? '/profile' : '/login'}><a>{ authenticated  ? 'My Profile' : 'Log in'}</a></Link></li>
                 </ul>
                 <style jsx>{`
                     .sidebar {
@@ -134,7 +134,7 @@ function Header (props) {
                     <li><Link href='/wishlist'><a>Wishlist</a></Link></li>
                     <li><a href='https://corporate.careerfairy.io/companies'>For Companies</a></li>
                     <li><a href='https://corporate.careerfairy.io/career-center'>For Career Centers</a></li>
-                    <li><Link href={ authenticated  ? '/profile' : '/signup'}><a>{ authenticated  ? 'My Profile' : 'Sign up'}</a></Link></li>
+                    <li><Link href={ authenticated  ? '/profile' : '/login'}><a>{ authenticated  ? 'My Profile' : 'Log in'}</a></Link></li>
                 </ul>
             </div>
             <style jsx>{`

@@ -7,6 +7,7 @@ import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor_new.js';
 import ElementTagList from '../../components/views/common/ElementTagList';
 import Countdown from 'react-countdown';
 import axios from 'axios';
+import { animateScroll } from 'react-scroll';
 import ButtonWithConfirm from '../../components/views/common/ButtonWithConfirm';
 0
 function StreamingPage(props) {
@@ -22,6 +23,7 @@ function StreamingPage(props) {
     const [streamerVerified, setStreamerVerified] = useState(true);
     const [streamInitialized, setStreamInitialized] = useState(false);
     const [showNextQuestions, setShowNextQuestions] = useState(false);
+    const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
 
 
@@ -50,8 +52,8 @@ function StreamingPage(props) {
     }, [props.livestreamId]);
 
     useEffect(() => {
-        if (props.livestreamId) {
-            props.firebase.listenToScheduledLivestreamsComments(props.livestreamId, querySnapshot => {
+        if (props.livestreamId && currentQuestion) {
+            props.firebase.listenToScheduledLivestreamQuestionComments(props.livestreamId, currentQuestion.id, querySnapshot => {
                 var commentsList = [];
                 querySnapshot.forEach(doc => {
                     let comment = doc.data();
@@ -61,7 +63,7 @@ function StreamingPage(props) {
                 setComments(commentsList);
             });
         }
-    }, [props.livestreamId]);
+    }, [props.livestreamId, currentQuestion]);
 
     useEffect(() => {
         if (!currentQuestion) {
@@ -100,6 +102,15 @@ function StreamingPage(props) {
         }
     }, [currentLivestream]);
 
+    useEffect(() => {
+        animateScroll.scrollToBottom({
+            containerId: "scrollableLeft",
+            smooth: true,
+            duration: 100
+          });
+          console.log("supposed to have scrolled");
+    }, [comments]);
+
     function markQuestionAsDone(question) {
         props.firebase.markQuestionAsDone(currentLivestream.id, question)
             .then(() => {
@@ -113,39 +124,38 @@ function StreamingPage(props) {
         props.firebase.removeQuestion(currentLivestream.id, question);
     }
 
-    let questionElements = upcomingQuestions.map((question, index) => {
-        if (!currentQuestion || question.title !== currentQuestion.title) {
-            return (
-                <div className='streamNextQuestionContainer' key={index}>
-                    { question.title }
-                    <div className='question-upvotes'><Icon name='thumbs up outline'/>{question.votes} upvotes</div>
-                    <Button icon='delete' content='Remove' onClick={() => removeQuestion(question)}/>
-                    <style jsx>{`
-                        .streamNextQuestionContainer {
-                            margin: 20px 0;
-                            box-shadow: 0 0 2px rgb(160,160,160);
-                            border-radius: 10px;
-                            color: rgb(50,50,50);
-                            background-color: white;
-                            padding: 30px 50px;
-                            font-weight: 500;
-                            font-size: 1.3em;
-                        }
-
-                        .streamNextQuestionContainer .question-upvotes {
-                            margin: 20px 0;
-                            font-size: 0.9em;
-                            font-weight: bold;
-                        }
-                    `}</style>
+    let commentsElements = comments.map((comment, index) => {
+        return (
+            <div className='streamNextQuestionContainerAlt animated fadeInUp faster'>
+                <div className='streamNextQuestionContainerTitleAlt'>
+                    { comment.title }
                 </div>
-            );
-        } else {
-            return (
-                <div></div>
-            );
-        }
-    });
+                <div className='streamNextQuestionContainerSubtitleAlt'>
+                    <div className='question-upvotes-alt'><Icon name='thumbs up outline'/>{comment.votes}</div>
+                    <div className='question-author'>@{comment.author}</div>
+                </div>
+                <style jsx>{`
+                    .streamNextQuestionContainerAlt {
+                        font-size: 1em;
+                        margin-bottom: 25px;
+                        line-height: 1.4em;
+                    }
+
+                    .streamNextQuestionContainerTitleAlt {
+                        font-size: 1em;
+                        font-weight: 700;
+                        margin-bottom: 5px;
+                    }
+
+                    .streamNextQuestionContainerSubtitleAlt div {
+                        display: inline-block;
+                        margin-right: 10px;
+                        color: rgb(180,180,180);
+                    }
+                `}</style>
+            </div>
+        );
+    })
 
     let questionElementsAlt = comments.map((comment, index) => {
         return (
@@ -345,17 +355,23 @@ function StreamingPage(props) {
                             </Grid.Column>
                         </Grid>
                     </div>
-                    <div className='video-menu-left-outer-content'>
-                        <div className='video-menu-left-content'>
-                            { questionElementsAlt }
+                    <div id='scrollableLeft' className='video-menu-left-outer-content'>
+                        <div  className='video-menu-left-content'>
+                            { commentsElements }
+                        </div>
+                        <div className={'no-comment-message ' + (comments.length === 0 ? '' : 'hidden')}>
+                            Be the first to react to this answer!
                         </div>
                     </div>
                     <div className='video-menu-left-input'>
-                        <Input action='Send' fluid placeholder='Send a reaction...' />
+                        <Input action={{ content: 'React', color: 'pink', onClick: () =>  addNewComment(newCommentTitle)}} value={newCommentTitle}  fluid placeholder='Send a reaction...' onChange={(event) => {setNewCommentTitle(event.target.value)}} />
                     </div>
                 </div>
             </div>
             <style jsx>{`
+                .hidden {
+                    display: none;
+                }
 
                 .topLevelContainer {
                     position: absolute;
@@ -513,6 +529,15 @@ function StreamingPage(props) {
                     overflow-x: hidden;    
                     z-index: 3;
                     box-shadow: inset 0 0 5px grey;
+                }
+
+                .no-comment-message {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    text-align: center;
+                    color: rgb(255, 20, 147);
                 }
 
                 .video-menu-left-input {

@@ -8,29 +8,42 @@ import {Formik} from 'formik';
 
 function LogInPage(props) {
 
-    const [authenticated, setAuthenticated] = useState(false);
+    const [user, setUser] = useState(null);
+    const [userEmailNotValidated, setUserEmailNotValidated] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
             if (user !== null) {
-                setAuthenticated(true);
+                setUser(user);
             } else {
-                setAuthenticated(false);
+                setUser(null);
             }
         })
     },[]);
 
-    if (authenticated) {
-        router.replace('/profile');
-    }
+    useEffect(() => {
+        if (user) {
+            if (!user.emailVerified) {
+                setUserEmailNotValidated(true);
+            } else {
+                router.replace('/profile');
+            }
+        }
+    },[user]);
+
+    useEffect(() => {
+        if (userEmailNotValidated) {
+            props.firebase.doSignOut();
+        }
+    },[userEmailNotValidated]);
 
     return (
         <div className='tealBackground'>
             <header>
                 <Link href='/'><a><Image src='/logo_white.png' style={{ width: '150px', margin: '20px', display: 'inline-block' }} /></a></Link>
             </header>
-            <LogInForm/>
+            <LogInForm userEmailNotValidated={userEmailNotValidated} setUserEmailNotValidated={(value) => setUserEmailNotValidated(value)}/>
             <style jsx>{`
                 .tealBackground {
                     height: 100vh;
@@ -48,9 +61,9 @@ const LogInForm = withFirebase(LogInFormBase);
 export function LogInFormBase(props) {
 
     const router = useRouter();
-    const [emailSent, setEmailSent] = useState(false);
     const [successMessageShown, setSuccessMessageShown] = useState(false);
     const [errorMessageShown, setErrorMessageShown] = useState(false);
+    const [noAccountMessageShown, setNoAccountMessageShown] = useState(false);
 
     return (
         <Fragment>
@@ -73,14 +86,19 @@ export function LogInFormBase(props) {
                             }}
                             onSubmit={(values, { setSubmitting }) => {
                                 setErrorMessageShown(false);
+                                props.setUserEmailNotValidated(false);
                                 props.firebase.signInWithEmailAndPassword(values.email, values.password)
-                                    .then(() => { 
-                                        router.replace('/discover');
-                                    }).catch(error => {
+                                    .then(() => {
                                         setSubmitting(false);
-                                        setErrorMessageShown(true);
-                                        console.log(error);
-                                })
+                                    })
+                                    .catch(error => {
+                                        setSubmitting(false);
+                                        if (error.code === 'auth/user-not-found') {
+                                            return setNoAccountMessageShown(true);
+                                        } else {
+                                            return setErrorMessageShown(true);
+                                        }
+                                    })
                             }}
                             >
                             {({
@@ -104,19 +122,19 @@ export function LogInFormBase(props) {
                                     </div>
                                     <Form.Field>
                                         <label style={{ color: 'rgb(120,120,120)' }}>Email</label>
-                                        <input id='emailInput' type='text' name='email' placeholder='Email' onChange={handleChange} onBlur={handleBlur} value={values.email} disabled={isSubmitting || emailSent} />
+                                        <input id='emailInput' type='text' name='email' placeholder='Email' onChange={handleChange} onBlur={handleBlur} value={values.email} disabled={isSubmitting} />
                                         <div className='field-error'>
                                             {errors.email && touched.email && errors.email}
                                         </div>
                                     </Form.Field>
                                     <Form.Field>
                                         <label style={{ color: 'rgb(120,120,120)' }}>Password</label>
-                                        <input id='passwordInput' type='password' name='password' placeholder='Password' onChange={handleChange} onBlur={handleBlur} value={values.password} disabled={isSubmitting || emailSent} />
+                                        <input id='passwordInput' type='password' name='password' placeholder='Password' onChange={handleChange} onBlur={handleBlur} value={values.password} disabled={isSubmitting} />
                                         <div className='field-error'>
                                             {errors.password && touched.password && errors.password}
                                         </div>
                                     </Form.Field>
-                                    <Button id='submitButton' fluid primary size='big' disabled={emailSent} type="submit" loading={isSubmitting}>Log in</Button>
+                                    <Button id='submitButton' fluid primary size='big' type="submit" loading={isSubmitting}>Log in</Button>
                                     <div className='reset-email'>
                                         <Link href='/signup'><a href='#'>Forgot your password?</a></Link>
                                     </div> 
@@ -125,6 +143,13 @@ export function LogInFormBase(props) {
                                         <Link href='/signup'><a href='#'>Sign up</a></Link>
                                     </div> 
                                     <div className={'errorMessage ' + (errorMessageShown ? '' : 'hidden')}>An error occured while logging in to your account</div>
+                                    <div className={'errorMessage ' + (noAccountMessageShown ? '' : 'hidden')}>No account associated with this email address.</div>
+                                    <Message positive hidden={!props.userEmailNotValidated}>
+                                        <Message.Header>Please validate your email</Message.Header>
+                                        <p>
+                                        We sent you an email verification link to this email address. Please click on it to start your journey on CareerFairy.
+                                        </p>
+                                    </Message>
                                 </Form>
                             )}
                             </Formik>

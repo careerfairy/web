@@ -17,15 +17,11 @@ function SignUpPage(props) {
         props.firebase.auth.onAuthStateChanged(user => {
             if (user !== null) {
                 setUser(user);
-            } 
+            } else {
+                setUser(null);
+            }
         })
     },[]);
-
-    useEffect(() => {
-        if (user && !userEmailVerified) {
-            router.replace('/profile');
-        }
-    },[user]);
 
     return (
         <div className='tealBackground'>
@@ -52,20 +48,24 @@ export function SignUpFormBase(props) {
     const [emailSent, setEmailSent] = useState(false);
     const [errorMessageShown, setErrorMessageShown] = useState(false);
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
+    const [generalLoading, setGeneralLoading] = useState(false);
 
     useEffect(() => {
-        if (emailSent && props.user) {
+        if (emailSent && props.user && !emailVerificationSent) {
             axios({
                 method: 'post',
                 url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendEmailVerificationEmail',
                 data: {
                     recipientEmail: props.user.email,
-                    redirect_link: 'http://testing.careerfairy.io'
+                    redirect_link: 'http://testing.careerfairy.io/login'
                 }
             }).then( response => { 
-                    setEmailVerificationSent(true);
+                    props.firebase.auth.signOut().then(() => {
+                        setEmailVerificationSent(true);
+                        setGeneralLoading(false);
+                    })
                 }).catch(error => {
-                    console.log(error);
+                    setGeneralLoading(false);
             });
         }
     },[props.user, emailSent]);
@@ -100,11 +100,11 @@ export function SignUpFormBase(props) {
                             }}
                             onSubmit={(values, { setSubmitting }) => {
                                 setErrorMessageShown(false);
+                                setGeneralLoading(true);
                                 props.firebase.createUserWithEmailAndPassword(values.email, values.password)
                                     .then(() => { 
                                         setSubmitting(false);
                                         setEmailSent(true);
-                                        window.localStorage.setItem('emailForSignIn', values.email);
                                     }).catch(error => {
                                         setErrorMessageShown(false);
                                         console.log(error);
@@ -132,26 +132,26 @@ export function SignUpFormBase(props) {
                                     </div>
                                     <Form.Field>
                                         <label style={{ color: 'rgb(120,120,120)' }}>Email</label>
-                                        <input id='emailInput' type='text' name='email' placeholder='Email' onChange={handleChange} onBlur={handleBlur} value={values.email} disabled={isSubmitting || emailSent} />
+                                        <input id='emailInput' type='text' name='email' placeholder='Email' onChange={handleChange} onBlur={handleBlur} value={values.email} disabled={isSubmitting || emailSent || generalLoading} />
                                         <div className='field-error'>
                                             {errors.email && touched.email && errors.email}
                                         </div>
                                     </Form.Field>
                                     <Form.Field>
                                         <label style={{ color: 'rgb(120,120,120)' }}>Password</label>
-                                        <input id='passwordInput' type='password' name='password' placeholder='Password' onChange={handleChange} onBlur={handleBlur} value={values.password} disabled={isSubmitting || emailSent} />
+                                        <input id='passwordInput' type='password' name='password' placeholder='Password' onChange={handleChange} onBlur={handleBlur} value={values.password} disabled={isSubmitting || emailSent || generalLoading} />
                                         <div className='field-error'>
                                             {errors.password && touched.password && errors.password}
                                         </div>
                                     </Form.Field>
                                     <Form.Field disabled={ !touched.password || errors.password }>
                                         <label style={{ color: 'rgb(120,120,120)' }}>Confirm Password</label>
-                                        <input id='confirmPasswordInput' type='password' name='confirmPassword' placeholder='Confirm Password' onChange={handleChange} onBlur={handleBlur} value={values.confirmPassword} disabled={isSubmitting || emailSent} />
+                                        <input id='confirmPasswordInput' type='password' name='confirmPassword' placeholder='Confirm Password' onChange={handleChange} onBlur={handleBlur} value={values.confirmPassword} disabled={isSubmitting || emailSent || generalLoading} />
                                         <div className='field-error'>
                                             {errors.confirmPassword && touched.confirmPassword && errors.confirmPassword}
                                         </div>
                                     </Form.Field>
-                                    <Button id='submitButton' fluid primary size='big' disabled={emailSent} type="submit" loading={isSubmitting}>Sign up</Button>
+                                    <Button id='submitButton' fluid primary size='big' disabled={emailSent} type="submit" loading={isSubmitting || generalLoading}>Sign up</Button>
                                     <Message positive hidden={!emailVerificationSent}>
                                         <Message.Header>Verification Email Sent</Message.Header>
                                         <p>

@@ -71,8 +71,8 @@ const UserProfile = (props) => {
             <div className='greyBackground'>
                 <Header classElement='relative white-background'/>
                 <Container textAlign='left'>
-                    <h1 style={{ color: 'rgb(0, 210, 170)', margin: '30px 0 0 0' }}>Your Profile</h1>
-                    <h3 style={{ color: 'rgb(150,150,150)', margin: '20px 0 40px 0' }}>Tell us who you are, we'll introduce to the right people for you!</h3>
+                    <h1 style={{ color: 'rgb(0, 210, 170)', margin: '30px 0 20px 0' }}>{ userData ? 'Your Profile' : 'Complete Your Profile'}</h1>
+                    <h3 style={{ color: 'rgb(150,150,150)', margin: '20px 0 40px 0' }} className={userData ? 'hidden' : ''}>so we can show you the jobs and speakers that matter most to you</h3>
                     <Formik
                         initialValues={initialValues}
                         enableReinitialize={true}
@@ -160,6 +160,10 @@ const UserProfile = (props) => {
                     <Button onClick={logout} color='teal' basic content='Logout' style={{ margin: '10px 0' }}/>
                 </Container>
                 <style jsx>{`
+                    .hidden {
+                        display: none;
+                    }
+
                     .greyBackground {
                         background-color: rgb(250,250,250);
                         height: 100vh;

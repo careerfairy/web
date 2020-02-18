@@ -79,6 +79,10 @@ function UpcomingLivestream(props) {
         router.push(route);
     }
 
+    function goToSeparateRoute(route) {
+        window.open('http://testing.careerfairy.io' + route, '_blank');
+    }
+
     function registerToLivestream() {
         if (!user) {
             return router.replace('/signup');
@@ -232,7 +236,7 @@ function UpcomingLivestream(props) {
                             </div>
                             <div style={{ margin: '20px 0 30px 0', width: '100%' }}>
                                 <div className={ registered ? 'hidden' : ''}>
-                                    <Button size='big' content={ user ? ( registered ? 'Registered' : 'Register') : 'Log in to Register' } icon={ user ? (registered ? 'check' : 'plus') : 'sign-in' } style={{ margin: '5px' }} disabled={registered} onClick={user ? (() => registerToLivestream()) : (() => goToRoute('/signup'))} primary/>
+                                    <Button size='big' content={ user ? ( registered ? 'Registered' : 'Register') : 'Log in to Register' } icon={ user ? (registered ? 'check' : 'plus') : 'sign-in' } style={{ margin: '5px' }} disabled={registered} onClick={user ? (() => registerToLivestream()) : (() => goToSeparateRoute('/signup'))} primary/>
                                 </div>
                                 <div className={ registered ? '' : 'hidden'} style={{ color: 'rgb(0, 210,170)', fontSize:'1.4em', margin: '50px 0 100px 0'}}>
                                     <Icon name='check circle outline' style={{ fontSize:'1.2em', verticalAlign: 'middle'}}/><span style={{ verticalAlign: 'middle'}}>Registered</span>                        
@@ -358,7 +362,7 @@ function UpcomingLivestream(props) {
     
                 .mask {
                     width: 100%;
-                    padding: 20px 0;
+                    padding: 20px 0 60px 0;
                     background-color: rgba(15, 37, 54,0.8);
                 }
 

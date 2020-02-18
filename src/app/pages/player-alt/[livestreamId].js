@@ -1,34 +1,44 @@
-import React, {useState, useEffect,Fragment} from 'react';
-import {Container, Button, Grid, Icon, Header as SemanticHeader, Input, Image} from "semantic-ui-react";
+import React, {useState, useEffect} from 'react';
+import {Button, Grid, Icon, Image, Input} from "semantic-ui-react";
 
-import Header from '../../components/views/header/Header';
 import Loader from '../../components/views/loader/Loader';
 import { withFirebasePage } from '../../data/firebase';
 import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor_new.js';
-import DateUtil from '../../util/DateUtil';
 import { useRouter } from 'next/router';
-import Footer from '../../components/views/footer/Footer';
 import axios from 'axios';
-import PlayerPrepare from '../../components/views/player-prepare/PlayerPrepare';
+import { animateScroll } from 'react-scroll';
 
 function StreamPlayer(props) {
 
     const router = useRouter();
     const eth_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media&token=9403f77b-3cb6-496c-a96d-62be1496ae85';
 
+    const [user, setUser] = useState(null);
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [isInitialized, setInitialized] = useState(false);
+    const [nsToken, setNsToken] = useState(null);
 
+    const [isInitialized, setInitialized] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
+    
+    const [allQuestionsShown, setAllQuestionsShown] = useState(false);
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
+    const [voteOnQuestions, setVoteOnQuestions] = useState(null);
     const [currentQuestion, setCurrentQuestion] = useState(null);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [currentLivestream, setCurrentLivestream] = useState(null);
-    const [madeAClick, setMadeAClick] = useState(false);
     const [comments, setComments] = useState([]);
-    const [nsToken, setNsToken] = useState(null);
+    const [buttonClicked, setButtonClicked] = useState(false);
 
+    useEffect(() => {
+        props.firebase.auth.onAuthStateChanged(user => {
+            if (user !== null) {
+                setUser(user);
+            } else {
+                router.replace('/login');
+            }
+        })
+    }, []);
 
     useEffect(() => {
         if (props.livestreamId) {
@@ -55,8 +65,21 @@ function StreamPlayer(props) {
     }, [props.livestreamId]);
 
     useEffect(() => {
-        if (props.livestreamId) {
-            props.firebase.listenToScheduledLivestreamsComments(props.livestreamId, querySnapshot => {
+        if (user && upcomingQuestions && upcomingQuestions.length > 0) {
+            let questionsToBeVoted = upcomingQuestions.filter(question => {
+                if (question.emailOfVoters) {
+                    return question.emailOfVoters.indexOf(user.email) === -1;
+                } else {
+                    return true;
+                }
+            });
+            setVoteOnQuestions(questionsToBeVoted[0]);
+        }
+    }, [upcomingQuestions]);
+
+    useEffect(() => {
+        if (props.livestreamId && currentQuestion) {
+            props.firebase.listenToScheduledLivestreamQuestionComments(props.livestreamId, currentQuestion.id, querySnapshot => {
                 var commentsList = [];
                 querySnapshot.forEach(doc => {
                     let comment = doc.data();
@@ -66,7 +89,16 @@ function StreamPlayer(props) {
                 setComments(commentsList);
             });
         }
-    }, [props.livestreamId]);
+    }, [props.livestreamId, currentQuestion]);
+
+    useEffect(() => {
+        animateScroll.scrollToBottom({
+            containerId: "scrollableLeft",
+            smooth: true,
+            duration: 100
+          });
+          console.log("supposed to have scrolled");
+    }, [comments]);
 
     useEffect(() => {
         if (!currentQuestion) {
@@ -75,35 +107,80 @@ function StreamPlayer(props) {
     }, [upcomingQuestions]);
 
     useEffect(() => {
-        if (isInitialized && currentLivestream && currentLivestream.hasStarted) {
+        if (isInitialized && currentLivestream && currentLivestream.hasStarted && !isPlaying && buttonClicked) {
             setTimeout(() => {
                 startPlaying();
-            }, 3000);
+            }, 1000);
         }
-    }, [currentLivestream, isInitialized]);
-
-    useEffect(() => {
-        setCurrentQuestion(upcomingQuestions[0]);
-    }, [upcomingQuestions]);
+    }, [currentLivestream, isInitialized, buttonClicked]);
 
     function upvoteQuestion(question) {
-        props.firebase.upvoteQuestion(currentLivestream.id, question);
+        props.firebase.upvoteQuestion(currentLivestream.id, question, user.email);
     }
 
     let questionElements = upcomingQuestions.map((question, index) => {
-        if (!currentQuestion || question.title !== currentQuestion.title) {
-            return (
-                    <div className='streamNextQuestionContainer'>
-                        <p>{ question.title }</p>
-                        <div className='streamNextQuestionNumberOfVotes'>{ question.votes } <Icon name='thumbs up' color='teal'/></div>
-                        <Button id='scheduled-question-thumbs-up' color='teal' icon='thumbs up' onClick={() => upvoteQuestion(question)} content={'UPVOTE'}/>
+        return (
+            <Grid.Column width={5}>
+                <div className='streamNextQuestionContainer' key={index}>
+                    <p style={{ marginBottom: '5px' }}>{ question.title }</p>
+                    <p style={{ fontSize: '0.8em', fontWeight: '300', color: 'rgb(200,200,200)' }}>from @Martin.Kamm</p>
+                    <div className='bottom-element'>
+                        <Button icon='thumbs down' size='massive' circular/>
+                        <Button icon='thumbs up' onClick={() => upvoteQuestion(question)} size='massive' circular primary/>
+                        <div className='streamNextQuestionNumberOfVotes'>{ question.votes } <Icon name='thumbs up'/></div>
                     </div>
-            );
-        } else {
-            return (
-                <div></div>
-            );
-        }
+                    <style jsx>{`
+                        .streamNextQuestionContainer {
+                            position: relative;
+                            margin: 20px 0;
+                            box-shadow: 0 0 3px grey;
+                            border-radius: 10px;
+                            color: rgb(50,50,50);
+                            background-color: white;
+                            padding: 30px 30px 50px 30px;
+                            font-weight: 500;
+                            font-size: 1.3em;
+                            height: 100%;
+                            min-height: 200px;
+                            text-align: center;
+                        }
+
+                        .streamNextQuestionContainer .question-upvotes {
+                            margin: 10px 0;
+                            font-size: 0.9em;
+                            font-weight: bold;
+                        }
+
+                        .streamNextQuestionNumberOfVotes {
+                            font-weight: 600;
+                            font-size: 1.3em;
+                            border-radius: 5px;
+                            display: block;
+                            color: rgb(210,210,210);
+                            font-size: 0.8em;
+                            margin-top: 10px;
+                        }
+
+                        .bottom-element {
+                            position: absolute;
+                            bottom: 15px;
+                            left: 0;
+                            right: 0;
+                            width: 100%;
+                            text-align: center;
+                        }
+
+                        .right-votes {
+                            position: absolute;
+                            right: 0;
+                            top: 15px;
+                            color: rgb(130,130,130);
+                            font-size: 0.8em;
+                        }
+                    `}</style>
+                </div>
+            </Grid.Column>
+        );
     })
 
     useEffect(() => {
@@ -122,7 +199,7 @@ function StreamPlayer(props) {
     }, []);
 
     useEffect(() => {
-        if (nsToken && nsToken.iceServers.length > 0) {
+        if (nsToken && nsToken.iceServers.length > 0 && !isPlaying) {
             var pc_config = {
                 'iceServers' : nsToken.iceServers
             };
@@ -168,7 +245,7 @@ function StreamPlayer(props) {
             });
             setWebRTCAdaptor(newAdaptor);
         }
-    }, [nsToken])
+    }, [nsToken, currentLivestream])
 
     function startPlaying() {
         webRTCAdaptor.play(currentLivestream.id);
@@ -200,7 +277,7 @@ function StreamPlayer(props) {
             title: newCommentTitle,
             votes: 0,
         }
-        props.firebase.putScheduledLivestreamsComment(currentLivestream.id, newComment)
+        props.firebase.putScheduledLivestreamQuestionComment(currentLivestream.id, currentQuestion.id, newComment)
             .then(() => {
                 setNewCommentTitle("");
             }, error => {
@@ -219,6 +296,9 @@ function StreamPlayer(props) {
                     <div className='question-label'>Current Question</div>
                     <div className='question-title'>
                         { currentQuestion ? currentQuestion.title : '' }
+                    </div>
+                    <div className='question-buttons'>
+                        <Button content={ allQuestionsShown ? 'Hide All Questions' : 'See All Questions' } size='small' onClick={() => setAllQuestionsShown(true)} primary/>
                     </div>
                 </div>
                 <style jsx>{`
@@ -261,7 +341,7 @@ function StreamPlayer(props) {
         );
     }
 
-    let questionElementsAlt = comments.map((comment, index) => {
+    let commentsElements = comments.map((comment, index) => {
         return (
             <div className='streamNextQuestionContainerAlt animated fadeInUp faster'>
                 <div className='streamNextQuestionContainerTitleAlt'>
@@ -300,7 +380,6 @@ function StreamPlayer(props) {
 
     return (
         <div className='topLevelContainer'>
-            {/* <PlayerPrepare madeAClick={madeAClick} isPlaying={isPlaying} currentLivestream={currentLivestream} setMadeAClick={() => setMadeAClick(true)} upcomingQuestions={upcomingQuestions}/> */}
             <div className='top-menu'>
                 <div style={{ position: 'absolute', top: '50%', left: '20px', transform: 'translateY(-50%)'}}>
                     <Image src='/logo_teal.png' style={{ maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
@@ -312,36 +391,56 @@ function StreamPlayer(props) {
                 <div className='streamingContainer'>
                     <video id="remoteVideo" autoPlay controls width='100%' ></video> 
                 </div>
+                <div className={'newQuestionPopup animated slideInUp ' + (voteOnQuestions ? '' : 'hidden')}>
+                    <div className='streamNextQuestionContainer'>
+                        <p style={{ marginBottom: '5px' }}>{voteOnQuestions ? voteOnQuestions.title : ''}</p>
+                        <p style={{ fontSize: '0.8em', fontWeight: '300', color: 'rgb(200,200,200)' }}>from @Martin.Kamm</p>
+                        <div className='bottom-element'>
+                            <Button icon='thumbs down' size='large' circular/>
+                            <Button icon='thumbs up' onClick={() => upvoteQuestion(voteOnQuestions)} size='large' circular primary/>
+                            <div className='streamNextQuestionNumberOfVotes'>{voteOnQuestions ? voteOnQuestions.votes : ''}<Icon name='thumbs up'/></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div className='video-menu'>
-                <Button  icon='heart' size='huge' color='pink' circular/>
-                <Button  icon='thumbs down' size='huge' circular/>
+                <div className='center'>
+                    <Input action={{ content: 'ASK NOW', color: 'teal', onClick: () =>  addNewQuestion(newQuestionTitle)}} value={newQuestionTitle} onChange={(event) => {setNewQuestionTitle(event.target.value)}} fluid size='large' fluid placeholder='Write your question...' color='teal'/>
+                </div>  
+                <div className='right'>
+                    <Button  icon='thumbs up' size='huge' color='pink' circular/>
+                </div>     
             </div>
             <div className='video-menu-left'>
                 <CurrentQuestionElement/>
                 <div>
                     <div className='video-menu-left-reactions'>
-                        <div style={{ margin: '0 0 5px 0'}}>REACTIONS TO ANSWER</div>
+                        <div style={{ margin: '0 0 5px 0', color: 'rgb(255, 20, 147)'}}>REACTIONS TO ANSWER</div>
                         <Grid centered>
                             <Grid.Column width={5} textAlign='center'>
-                                <Icon name='heart' color='pink' size='large' style={{ margin: '0 10px 0 0' }}/>
+                                <Icon name='thumbs up' color='pink' size='large' style={{ margin: '0 10px 0 0' }}/>
                                 <span style={{ color: 'rgb(255, 20, 147)', fontSize: '1.3em' }}>12</span>
-                            </Grid.Column>
-                            <Grid.Column width={5} textAlign='center'>
-                                <Icon name='thumbs down' color='grey' size='large' style={{ margin: '0 10px 0 0' }}/>
-                                <span style={{ color: 'rgb(160,160,160)', fontSize: '1.3em' }}>4</span>
                             </Grid.Column>
                         </Grid>
                     </div>
-                    <div className='video-menu-left-outer-content'>
-                        <div className='video-menu-left-content'>
-                            { questionElementsAlt }
+                    <div id='scrollableLeft' className='video-menu-left-outer-content'>
+                        <div  className='video-menu-left-content'>
+                            { commentsElements }
+                        </div>
+                        <div className={'no-comment-message ' + (comments.length === 0 ? '' : 'hidden')}>
+                            Be the first to react to this answer!
                         </div>
                     </div>
                     <div className='video-menu-left-input'>
-                        <Input action='Send' fluid placeholder='Send a reaction...' />
+                        <Input action={{ content: 'React', color: 'pink', onClick: () =>  addNewComment(newCommentTitle)}} value={newCommentTitle}  fluid placeholder='Send a reaction...' onChange={(event) => {setNewCommentTitle(event.target.value)}} />
                     </div>
                 </div>
+            </div>
+            <div className={'all-questions-modal ' + (allQuestionsShown ? '' : 'hidden')}>
+                <Icon name='delete' onClick={() => setAllQuestionsShown(false)} size='large' style={{ position: 'absolute', top: '10px', right: '10px', color: 'white', zIndex: '9999', cursor: 'pointer'}}/>
+                <Grid centered>
+                    { questionElements }
+                </Grid>
             </div>
             <style jsx>{`
                 .hidden {
@@ -392,6 +491,17 @@ function StreamPlayer(props) {
                     background-color: rgb(240,240,240);
                 }
 
+                .video-menu .center {
+                    display: inline-block;
+                    width: 600px;
+                    padding: 3px 0 0 0;
+                }
+
+                .video-menu .right {
+                    float: right;
+                    padding: 0 20px 0 0;
+                }
+
                 .questions-side-layout {
                     position: absolute;
                     right: 20px;
@@ -411,6 +521,7 @@ function StreamPlayer(props) {
                     bottom: 80px;
                     left: 330px;
                     right: 0;
+                    min-width: 500px;
                 }
 
                 .streamingContainer {
@@ -422,8 +533,17 @@ function StreamPlayer(props) {
                     height: auto;
                     width: auto;
                     background-color: black;
-                    z-index: -2000;
+                    z-index: -9999;
                     cursor: pointer;
+                }
+
+                .newQuestionPopup {
+                    position: absolute;
+                    bottom: 10px;
+                    right: 10px;
+                    width: 250px;
+                    height: 200px;
+                    border-radius: 5px;
                 }
 
                 #remoteVideo {
@@ -437,6 +557,52 @@ function StreamPlayer(props) {
                     transform: translate(-50%,-50%);
                     z-index: -1000;
                     background-color: black;
+                }
+                .streamNextQuestionContainer {
+                    position: relative;
+                    box-shadow: 0 0 3px grey;
+                    border-radius: 10px;
+                    color: rgb(50,50,50);
+                    background-color: white;
+                    padding: 30px 30px 50px 30px;
+                    font-weight: 500;
+                    font-size: 1.3em;
+                    height: 100%;
+                    min-height: 200px;
+                    text-align: center;
+                }
+
+                .streamNextQuestionContainer .question-upvotes {
+                    margin: 10px 0;
+                    font-size: 0.9em;
+                    font-weight: bold;
+                }
+
+                .streamNextQuestionNumberOfVotes {
+                    font-weight: 600;
+                    font-size: 1.3em;
+                    border-radius: 5px;
+                    display: block;
+                    color: rgb(210,210,210);
+                    font-size: 0.8em;
+                    margin-top: 10px;
+                }
+
+                .bottom-element {
+                    position: absolute;
+                    bottom: 15px;
+                    left: 0;
+                    right: 0;
+                    width: 100%;
+                    text-align: center;
+                }
+
+                .right-votes {
+                    position: absolute;
+                    right: 0;
+                    top: 15px;
+                    color: rgb(130,130,130);
+                    font-size: 0.8em;
                 }
 
                 .streamCurrentQuestionContainer {
@@ -504,6 +670,15 @@ function StreamPlayer(props) {
                     overflow-x: hidden;    
                     z-index: 3;
                     box-shadow: inset 0 0 5px grey;
+                }
+
+                .no-comment-message {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    text-align: center;
+                    color: rgb(255, 20, 147);
                 }
 
                 .video-menu-left-input {
@@ -598,31 +773,6 @@ function StreamPlayer(props) {
                     background-color: rgb(0, 210, 170);
                 }
 
-                .streamNextQuestionContainer {
-                    margin: 0 0 10px 0;
-                    box-shadow: 0 0 2px rgb(160,160,160);
-                    border-radius: 10px;
-                    color: rgb(50,50,50);
-                    background-color: rgba(255,255,255,0.95);
-                    padding: 20px 10px 20px 10px;
-                    font-weight: 500;
-                    font-size: 1.1em;
-                    height: 100%;
-                    width: 100%;
-                    white-space: pre-wrap;
-                    text-align: center;
-                }
-
-                .streamNextQuestionContainerTitle {
-                    margin: 0 0 20px 0;
-                }
-
-                .streamNextQuestionContainer .question-upvotes {
-                    margin: 20px 0;
-                    font-size: 0.9em;
-                    font-weight: bold;
-                }
-
                 .profile-text {
                     font-size: 1.15em;
                     font-weight: 500;
@@ -652,6 +802,23 @@ function StreamPlayer(props) {
                     position: absolute;
                     right: 20px;
                     bottom: 25px;
+                }
+
+                .all-questions-modal {
+                    position: absolute;
+                    top: 75px;
+                    left: 330px;
+                    right: 0;
+                    bottom: 0;
+                    background-color: rgba(0,0,0, 0.8);
+                    z-index: 9000;
+                    overflow-y: scroll;
+                    overflow-x: hidden;
+                    padding: 30px 0;
+                }
+
+                .all-questions-modal::-webkit-scrollbar-thumb {
+                    background-color: rgb(0, 210, 170);
                 }
           `}</style>
         </div>

@@ -329,6 +329,17 @@ class Firebase {
         return questionsRef.onSnapshot(callback);
     }
 
+    listenToScheduledLivestreamQuestionComments = (livestreamId, questionId, callback) => {
+        let questionsRef = this.firestore
+            .collection("scheduledLivestreams")
+            .doc(livestreamId)
+            .collection("questions")
+            .doc(questionId)
+            .collection("comments")
+            .orderBy("timestamp", "asc");
+        return questionsRef.onSnapshot(callback);
+    }
+
     setScheduledLivestreamHasStarted = (hasStarted, livestreamId) => {
         let streamRef = this.firestore
             .collection("scheduledLivestreams")
@@ -339,11 +350,23 @@ class Firebase {
     }
 
     putScheduledLivestreamsQuestion = (livestreamId, question) => {
+        question.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
         let questionsRef = this.firestore
             .collection("scheduledLivestreams")
             .doc(livestreamId)
             .collection("questions");
         return questionsRef.add(question);
+    }
+
+    putScheduledLivestreamQuestionComment = (livestreamId, questionId, comment) => {
+        comment.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
+        let commentsRef = this.firestore
+            .collection("scheduledLivestreams")
+            .doc(livestreamId)
+            .collection("questions")
+            .doc(questionId)
+            .collection("comments");
+        return commentsRef.add(comment);
     }
 
     listenToScheduledLivestreamsComments = (livestreamId, callback) => {
@@ -355,7 +378,7 @@ class Firebase {
         return commentRef.onSnapshot(callback);
     }
 
-    upvoteQuestion = (livestreamId, question) => {
+    upvoteQuestion = (livestreamId, question, userEmail) => {
         let questionRef = this.firestore
             .collection("scheduledLivestreams")
             .doc(livestreamId)
@@ -365,7 +388,8 @@ class Firebase {
             return transaction.get(questionRef).then(question => {
                 const newVoteNumber = question.data().votes + 1;
                 transaction.update(questionRef, { 
-                    votes: newVoteNumber
+                    votes: newVoteNumber,
+                    emailOfVoters: firebase.firestore.FieldValue.arrayUnion(userEmail)
                 });
             });
         });
@@ -433,6 +457,14 @@ class Firebase {
             .collection("livestreams")
             .where("type", "==", "past")
             .orderBy("rank", "asc");
+        return livestreamsRef.get();
+    }
+
+    getUpcomingLivestreams = () => {
+        let livestreamsRef = this.firestore
+            .collection("livestreams")
+            .where("type", "==", "upcoming")
+            .orderBy("start", "asc");
         return livestreamsRef.get();
     }
 
