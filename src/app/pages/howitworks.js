@@ -53,8 +53,8 @@ function HowItWorks(props) {
 
     return (
         <Fragment>
+            <Header color='teal'/>
             <div className='introFullPage' style={{ backgroundImage: 'url(' + topPicture + ')' }}>
-                <Header page='landing'/>
                 <div className='intro-mask'>
                     <Container>
                         <div className='mainTagline'>

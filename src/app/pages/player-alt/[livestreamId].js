@@ -28,7 +28,6 @@ function StreamPlayer(props) {
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [currentLivestream, setCurrentLivestream] = useState(null);
     const [comments, setComments] = useState([]);
-    const [buttonClicked, setButtonClicked] = useState(false);
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
@@ -107,12 +106,12 @@ function StreamPlayer(props) {
     }, [upcomingQuestions]);
 
     useEffect(() => {
-        if (isInitialized && currentLivestream && currentLivestream.hasStarted && !isPlaying && buttonClicked) {
+        if (isInitialized && currentLivestream && currentLivestream.hasStarted && !isPlaying) {
             setTimeout(() => {
                 startPlaying();
-            }, 1000);
+            }, 2000);
         }
-    }, [currentLivestream, isInitialized, buttonClicked]);
+    }, [currentLivestream, isInitialized]);
 
     function upvoteQuestion(question) {
         props.firebase.upvoteQuestion(currentLivestream.id, question, user.email);
@@ -251,18 +250,12 @@ function StreamPlayer(props) {
         webRTCAdaptor.play(currentLivestream.id);
     }
 
-    function prettyPrintCountdown(props) {
-        return props.days + (props.days === 1 ? ' day ' : ' days ')
-        + props.hours + (props.hours === 1 ? ' hour ' : ' hours ') 
-        + props.minutes + (props.minutes === 1 ? ' minute ' : ' minutes ')
-        + props.seconds + (props.seconds === 1 ? ' second ' : ' seconds ');
-    }
-
     function addNewQuestion() {
         const newQuestion = {
             title: newQuestionTitle,
             votes: 0,
-            type: "new"
+            type: "new",
+            author: user.email
         }
         props.firebase.putScheduledLivestreamsQuestion(currentLivestream.id, newQuestion)
             .then(() => {
@@ -389,7 +382,7 @@ function StreamPlayer(props) {
             </div>
             <div className='streamingOuterContainer'>
                 <div className='streamingContainer'>
-                    <video id="remoteVideo" autoPlay controls width='100%' ></video> 
+                    <video id="remoteVideo" autoPlay controls width='100%'></video> 
                 </div>
                 <div className={'newQuestionPopup animated slideInUp ' + (voteOnQuestions ? '' : 'hidden')}>
                     <div className='streamNextQuestionContainer'>
@@ -522,6 +515,7 @@ function StreamPlayer(props) {
                     left: 330px;
                     right: 0;
                     min-width: 500px;
+                    z-index: 8000;
                 }
 
                 .streamingContainer {
@@ -555,7 +549,7 @@ function StreamPlayer(props) {
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%,-50%);
-                    z-index: -1000;
+                    z-index: 9900;
                     background-color: black;
                 }
                 .streamNextQuestionContainer {

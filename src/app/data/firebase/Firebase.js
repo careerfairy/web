@@ -309,12 +309,19 @@ class Firebase {
 
     getScheduledLivestreamById = (livestreamId, callback) => {
         let streamRef = this.firestore
-            .collection("scheduledLivestreams")
+            .collection("livestreams")
             .doc(livestreamId);
         return streamRef.onSnapshot(callback);
     }
 
     listenToScheduledLivestreamById = (livestreamId, callback) => {
+        let streamRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId);
+        return streamRef.onSnapshot(callback);
+    }
+
+    listenToLegacyScheduledLivestreamById = (livestreamId, callback) => {
         let streamRef = this.firestore
             .collection("scheduledLivestreams")
             .doc(livestreamId);
@@ -323,7 +330,7 @@ class Firebase {
 
     listenToScheduledLivestreamsQuestions = (livestreamId, callback) => {
         let questionsRef = this.firestore
-            .collection("scheduledLivestreams")
+            .collection("livestreams")
             .doc(livestreamId)
             .collection("questions");
         return questionsRef.onSnapshot(callback);
@@ -331,7 +338,7 @@ class Firebase {
 
     listenToScheduledLivestreamQuestionComments = (livestreamId, questionId, callback) => {
         let questionsRef = this.firestore
-            .collection("scheduledLivestreams")
+            .collection("livestreams")
             .doc(livestreamId)
             .collection("questions")
             .doc(questionId)
@@ -352,7 +359,7 @@ class Firebase {
     putScheduledLivestreamsQuestion = (livestreamId, question) => {
         question.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
         let questionsRef = this.firestore
-            .collection("scheduledLivestreams")
+            .collection("livestreams")
             .doc(livestreamId)
             .collection("questions");
         return questionsRef.add(question);
@@ -361,7 +368,7 @@ class Firebase {
     putScheduledLivestreamQuestionComment = (livestreamId, questionId, comment) => {
         comment.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
         let commentsRef = this.firestore
-            .collection("scheduledLivestreams")
+            .collection("livestreams")
             .doc(livestreamId)
             .collection("questions")
             .doc(questionId)
@@ -371,7 +378,7 @@ class Firebase {
 
     listenToScheduledLivestreamsComments = (livestreamId, callback) => {
         let commentRef = this.firestore
-            .collection("scheduledLivestreams")
+            .collection("livestreams")
             .doc(livestreamId)
             .collection("comments")
             .orderBy("date", "asc");
@@ -380,7 +387,7 @@ class Firebase {
 
     upvoteQuestion = (livestreamId, question, userEmail) => {
         let questionRef = this.firestore
-            .collection("scheduledLivestreams")
+            .collection("livestreams")
             .doc(livestreamId)
             .collection("questions")
             .doc(question.id);
@@ -395,9 +402,25 @@ class Firebase {
         });
     }
 
+    downvoteQuestion = (livestreamId, question, userEmail) => {
+        let questionRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("questions")
+            .doc(question.id);
+        return this.firestore.runTransaction( transaction => {
+            return transaction.get(questionRef).then(question => {
+                transaction.update(questionRef, { 
+                    emailOfVoters: firebase.firestore.FieldValue.arrayUnion(userEmail)
+                });
+            });
+        });
+    }
+
+
     getScheduledLivestreamsUntreatedQuestions = (livestreamId, callback) => {
         let questionsRef = this.firestore
-            .collection("scheduledLivestreams")
+            .collection("livestreams")
             .doc(livestreamId)
             .collection("questions")
             .where("type", "==", "new")
@@ -406,6 +429,16 @@ class Firebase {
     }
 
     getPastLivestreamsUntreatedQuestions = (livestreamId, callback) => {
+        let questionsRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("questions")
+            .where("type", "==", "done")
+            .orderBy("timecode", "asc");
+        return questionsRef.onSnapshot(callback);
+    }
+
+    getLegacyPastLivestreamsUntreatedQuestions = (livestreamId, callback) => {
         let questionsRef = this.firestore
             .collection("scheduledLivestreams")
             .doc(livestreamId)
@@ -417,7 +450,7 @@ class Firebase {
 
     markQuestionAsDone = (livestreamId, question) => {
         let questionRef = this.firestore
-            .collection("scheduledLivestreams")
+            .collection("livestreams")
             .doc(livestreamId)
             .collection("questions")
             .doc(question.id);
@@ -432,7 +465,7 @@ class Firebase {
 
     removeQuestion = (livestreamId, question) => {
         let questionRef = this.firestore
-            .collection("scheduledLivestreams")
+            .collection("livestreams")
             .doc(livestreamId)
             .collection("questions")
             .doc(question.id);
@@ -460,17 +493,17 @@ class Firebase {
         return livestreamsRef.get();
     }
 
-    getUpcomingLivestreams = () => {
+    listenToUpcomingLivestreams = (callback) => {
         let livestreamsRef = this.firestore
             .collection("livestreams")
             .where("type", "==", "upcoming")
             .orderBy("start", "asc");
-        return livestreamsRef.get();
+        return livestreamsRef.onSnapshot(callback);
     }
 
     registerToLivestream = (livestreamId, userId) => {
         let livestreamRef = this.firestore
-            .collection("scheduledLivestreams")
+            .collection("livestreams")
             .doc(livestreamId);
         return livestreamRef.update({
             registeredUsers: firebase.firestore.FieldValue.arrayUnion(userId)
@@ -479,7 +512,7 @@ class Firebase {
 
     deregisterFromLivestream = (livestreamId, userId) => {
         let livestreamRef = this.firestore
-            .collection("scheduledLivestreams")
+            .collection("livestreams")
             .doc(livestreamId);
         return livestreamRef.update({
             registeredUsers: firebase.firestore.FieldValue.arrayRemove(userId)

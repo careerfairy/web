@@ -8,6 +8,9 @@
         "testing": [
           "testing-careerfairy"
         ],
+        "testing2": [
+          "testing2-careerfairy"
+        ],
         "production": [
           "careerfairy-e1fd9"
         ]

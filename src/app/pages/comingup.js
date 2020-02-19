@@ -18,7 +18,8 @@ function ComingUp(props) {
     const backgroundOptions = UNIVERSITY_SUBJECTS;
     const router = useRouter();
 
-    const [viewDetails, setViewDetails] = useState(false);
+    const [user, setUser] = useState(null);
+    const [viewDetails, setViewDetails] = useState(true);
     const [allLivestreams, setAllLivestreams] = useState([]);
     const [livestreams, setLivestreams] = useState([]);
     const [fields, setFields] = useState([]);
@@ -28,11 +29,24 @@ function ComingUp(props) {
     const myRef = useRef(null);
 
     useEffect(() => {
-        console.log(props.university);
-    }, [props.university]);
+        props.firebase.auth.onAuthStateChanged(user => {
+            if (user !== null && user.emailVerified) {
+                setUser(user);
+            } else {
+                setUser(null);
+            }
+        })
+    }, []);
 
     useEffect(() => {
-        props.firebase.getUpcomingLivestreams().then( querySnapshot => {
+        if (props.filter) {
+            addField(props.filter);
+            setShowAllFields(true);
+        }
+    }, [props.filter]);
+
+    useEffect(() => {
+        props.firebase.listenToUpcomingLivestreams( querySnapshot => {
             var livestreams = [];
             querySnapshot.forEach(doc => {
                 let livestream = doc.data();
@@ -79,6 +93,40 @@ function ComingUp(props) {
         setFields(fieldsCopy);
     }
 
+    function registerToLivestream(livestreamId) {
+        if (!user) {
+            return router.push('/signup');
+        }
+
+        props.firebase.registerToLivestream(livestreamId, user.email);
+    }
+
+    function deregisterFromLivestream(livestreamId) {
+        if (!user) {
+            return router.push('/signup');
+        }
+
+        props.firebase.deregisterFromLivestream(livestreamId, user.email);
+    }
+
+    function getNumberOfRegistrants(livestream) {
+        if (!livestream.registeredUsers) {
+            return 0;
+        }
+        return livestream.registeredUsers.length;
+    }
+
+    function userIsRegistered(user, livestream) {
+        if (!user || !livestream.registeredUsers) {
+            return false;
+        }
+        return livestream.registeredUsers.indexOf(user.email) > -1;
+    }
+
+    function goToUpcomingLivestream(livestreamId) {
+        return router.push('/upcoming-livestream/' + livestreamId);
+    }
+
     const filterElement = backgroundOptions.map((option, index) => {
         const nonSelectedStyle = {
             border: '1px solid rgb(44, 66, 81)', 
@@ -123,47 +171,43 @@ function ComingUp(props) {
 
     const mentorElements = livestreams.map( (mentor, index) => {
         return(
-            <Grid.Column key={index} computer={8} tablet={16} mobile={16} className={'companies-mentor-discriber-content-container'}>
+            <Grid.Column key={index} computer={8} tablet={16} mobile={16}>
+                <div className='date-indicator'>{ DateUtil.getPrettyDate(mentor.start.toDate()) }</div>
                 <div className='companies-mentor-discriber-content'>
-                    <div className='livestream-thumbnail' style={{ backgroundImage: 'url(' + mentor.backgroundImageUrl + ')'}}>
-                        <div className='livestream-thumbnail-banner top'></div>
-                        <div className='livestream-thumbnail-banner bottom'></div>
-                        <div className='livestream-thumbnail-overlay'>
+                    <div className='livestream-thumbnail' style={{ backgroundImage: 'url(' + mentor.backgroundImageUrl + ')' }}>
+                        <div className='livestream-thumbnail-overlay' style={{ border: userIsRegistered(user, mentor) ? '6px solid rgb(0, 210, 170)' : 'none' }}>
+                            <div className='livestream-thumbnail-banner top'></div>
+                            <div className='livestream-thumbnail-banner bottom'></div>
                             <div className='livestream-thumbnail-overlay-content'> 
-                                {/* <div className='top-question-label white'><Icon name='video'/><span>A Livestream about</span></div> */}
-                                <Image style={{ maxWidth: '130px', margin: '15px 0', filter: 'brightness(0) invert(1)'}} src={mentor.companyLogoUrl} />
+                                <Image style={{ maxWidth: '220px', margin: '20px 0'}} src={mentor.companyLogoUrl} />
                                 <div className='livestream-position'>{ mentor.title }</div>          
                                 <div>
-                                    <Button icon='sign-in' primary content='Register' onClick={() => goToPastLivestream(mentor.livestreamId)}/>
-                                    <Button icon='signup' content='More Infos' onClick={() => goToPastLivestream(mentor.livestreamId)}/>
+                                    <Button style={{ margin: '0 5px 0 0' }} icon={ (user && mentor.registeredUsers.indexOf(user.email) > -1) ? 'delete' : 'add' } primary={!(user && mentor.registeredUsers.indexOf(user.email) > -1)} content={ (user && mentor.registeredUsers.indexOf(user.email) > -1) ? 'Cancel Booking' : 'Book a spot' } onClick={(user && mentor.registeredUsers.indexOf(user.email) > -1) ? () => deregisterFromLivestream(mentor.id) : () => registerToLivestream(mentor.id)}/>
+                                    <Button style={{ margin: '0 5px 0 0' }} icon='signup' content='More Infos' onClick={() => goToUpcomingLivestream(mentor.id)}/>
                                 </div>
                                 {/* <div className='livestream-entrants'>
                                     <span>{ 60 - mentor.registeredEmails.length }</span> spots left. Register now!
                                 </div> */}
                             </div>
                         </div>
-                        <div className='coming-icon'>Livestream</div>
-                        <div className='date-icon'>{ DateUtil.getPrettyDate(mentor.start.toDate()) }</div>
-                        <div className='show-details' style={{ color: 'white'}}>
-                            <div>Details</div>
-                            <Icon name='angle down'/>
-                        </div>
+                        <div className={'booked-icon ' + (userIsRegistered(user, mentor) ? '' : 'hidden')}>Your spot is booked</div>
+                        <div className='coming-icon'><Icon name='rss'/>Livestream</div>
+                        {/* <div className='date-icon'><Icon name='calendar outline alternate'/>{ DateUtil.getPrettyDate(mentor.start.toDate()) }</div> */}
+                        {/* <div className='spots-left'>
+                            <div className='spots-left-number'>{ 60 - getNumberOfRegistrants(mentor) }</div>
+                            <div className='spots-left-label'>spots left</div>
+                        </div> */}
                     </div>
-                    <div className={ viewDetails ? 'animated slideInDown fast background' : 'animated slideOutUp fast background hidden'}>
+                    <div className='background'>
                         <Grid centered className='middle aligned' divided>
                             <Grid.Row>
-                                <Grid.Column width={4}>
-                                    <div className='companies-mentor-discriber-content-companylogo' onClick={() => goToRoute('/catalog/' + mentor.companyId)}>
-                                        <Image style={{position: 'absolute', top: '50%', left: '50%', transform: 'translateX(-50%) translateY(-50%)', maxHeight: '100%', maxWidth: '100%', margin: '0 auto'}} src={mentor.companyLogoUrl} />
-                                    </div>
-                                </Grid.Column>
-                                <Grid.Column  width={11}>
+                                <Grid.Column width={14}>
                                     <div className='livestream-streamer-description'>
                                         <div className='livestream-speaker-avatar' style={{ backgroundImage: 'url(' + mentor.mainSpeakerAvatar + ')'}}/>
                                         <div className='livestream-streamer'>
                                             <div className='livestream-streamer-name'>{ mentor.mainSpeakerName }</div>
                                             <div className='livestream-streamer-position'>{ mentor.mainSpeakerPosition }</div>
-                                            <div className='livestream-streamer-position'>{ '@ ' + mentor.company }</div>
+                                            <div className='livestream-streamer-position'>{ mentor.mainSpeakerBackground }</div>
                                         </div>
                                     </div>
                                 </Grid.Column>
@@ -193,6 +237,14 @@ function ComingUp(props) {
                         display: none
                     }
 
+                    .date-indicator {
+                        text-align: center;
+                        margin: 20px;
+                        font-size: 1.7em;
+                        font-weight: 600;
+                        color: rgb(44, 66, 81);
+                    }
+
                     .companies-mentor-discriber-content-companylogo {
                         position: relative;
                         height: 70px;
@@ -204,7 +256,6 @@ function ComingUp(props) {
                     .livestream-thumbnail {
                         position: relative;
                         width: 100%;
-                        padding-top: 58.24%;
                         margin: 0 auto 10px auto;
                         background-size: cover;
                         background-position: center center;
@@ -218,11 +269,11 @@ function ComingUp(props) {
                         background-color: black;
                         position: absolute;
                         left:0;
+                        z-index: -10;
                     }
 
                     .livestream-thumbnail-banner.top {
                         top:0;
-                        border-radius: 5px 5px 0 0;
                     }
 
                     .livestream-thumbnail-banner.bottom {
@@ -230,26 +281,22 @@ function ComingUp(props) {
                     }
 
                     .livestream-thumbnail-overlay {
-                        opacity: 1;
-                        position: absolute;
-                        top: 0;
-                        left: 0;
+                        cursor: pointer;
                         width: 100%;
                         height: 100%;
-                        background-color: rgba(0,0,0,0.6);
+                        min-height: 350px;
+                        padding: 80px 0 80px 30px;
+                        background-color: rgba(255, 255, 255, 1);
+                        transition: background-color 0.5s;
                     }
 
                     .livestream-thumbnail-overlay:hover {
-                        opacity: 1;
-                        transition-duration: 300ms;
+                        background-color: rgba(255, 255, 255, 0.95);
                     }
 
                     .livestream-thumbnail-overlay-content {
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
+                        position: relative;
                         width: 80%;
-                        transform: translate(-50%, -50%);
                         color: white;
                     }
 
@@ -303,12 +350,16 @@ function ComingUp(props) {
                         color: rgb(40,40,40);
                     }
 
+                    .livestream-industry {
+                        text-transform: uppercase;
+                    }
+
                     .livestream-position {
                         font-weight: 500;
-                        color: white;
-                        font-size: 1.5em;
+                        color: rgb(44, 66, 81);
+                        font-size: 1.9em;
                         margin: 10px 0 20px 0;
-                        line-height: 1em;
+                        line-height: 1.2em;
                     }
 
                     .livestream-entrants {
@@ -327,33 +378,33 @@ function ComingUp(props) {
                         width: 75px;
                         padding-top: 75px;
                         border-radius: 50%;
-                        margin: 0 5px 0 0;
+                        margin: 0 15px 0 0;
                         vertical-align: middle;
                         display: inline-block;
-                        box-shadow: 0 0 2px white;
+                        box-shadow: 0 0 2px grey;
                         display: inline-block;
                         background-size: cover;
                     }
 
                     .date-icon {
                         position: absolute;
-                        top: 10px;
-                        right: 10px;
+                        top: 15px;
+                        right: 15px;
                         padding: 4px 6px;
-                        border: 2px solid white;
+                        border: 2px solid rgb(44, 66, 81);
                         text-transform: uppercase;
-                        color: white;
+                        color: rgb(44, 66, 81);
                         font-weight: 700;
                     }
 
                     .coming-icon {
                         position: absolute;
-                        top: 10px;
-                        left: 10px;
+                        top: 15px;
+                        left: 15px;
                         padding: 4px 6px;
-                        border: 2px solid white;
+                        border: 2px solid rgb(44, 66, 81);
                         text-transform: uppercase;
-                        color: white;
+                        color: rgb(44, 66, 81);
                         font-weight: 700;
                     }
 
@@ -362,6 +413,44 @@ function ComingUp(props) {
                         display: inline-block;
                         margin: 0 10px 0 0;
                         vertical-align: middle;
+                    }
+
+                    .booked-icon {
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        right: 0;
+                        padding: 10px;
+                        color: white;
+                        background-color: rgb(0, 210, 170);
+                        text-align: center;
+                        text-transform: uppercase;
+                        font-weight: 700;
+                    }
+
+                    .spots-left {
+                        position: absolute;
+                        right: 20px;
+                        bottom: 20px;
+                        height: 80px;
+                        width: 80px;
+                        border-radius: 50%;
+                        background-color: white;
+                        text-align: center;
+                        padding: 20px 0;
+                    }
+
+                    .spots-left-number {
+                        font-size: 1.8em;
+                        font-weight: 700;
+                        color: rgb(0, 210, 170);
+                    }
+
+                    .spots-left-label {
+                        font-size: 0.8em;
+                        font-weight: 700;
+                        margin: 5px 0;
+                        color: rgb(44, 66, 81);
                     }
 
                     .show-details {
@@ -409,7 +498,6 @@ function ComingUp(props) {
                         <div className='landingPageButtonsLabel'>Select your fields of interest</div>
                         { filterElement }
                         <Button style={{ margin: '5px' }} content={showAllFields ? 'Hide all filters' : 'Show all filters'} color='pink' icon={showAllFields ? 'angle up' : 'angle down'} size='mini' onClick={() => setShowAllFields(!showAllFields)}/>
-                        <Button style={{ margin: '5px' }} content={viewDetails ? 'Hide detailed view' : 'Show detailed view'} color='teal' icon={viewDetails ? 'angle up' : 'angle down'} size='mini' onClick={() => setViewDetails(!viewDetails)}/>
                     </div>
                     <Grid stackable>
                         { mentorElements }
@@ -1260,7 +1348,7 @@ function ComingUp(props) {
 }
 
 ComingUp.getInitialProps = ({ query }) => {
-    return { university: query.university }
+    return { university: query.university, filter: query.filter }
 }
 
 export default withFirebasePage(ComingUp);

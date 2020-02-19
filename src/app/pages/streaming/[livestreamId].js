@@ -25,6 +25,7 @@ function StreamingPage(props) {
     const [showNextQuestions, setShowNextQuestions] = useState(false);
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
+    const [allQuestionsShown, setAllQuestionsShown] = useState(false);
 
 
     useEffect(() => {
@@ -124,6 +125,81 @@ function StreamingPage(props) {
         props.firebase.removeQuestion(currentLivestream.id, question);
     }
 
+    function addNewComment(comment) {
+        const newComment = {
+            title: newCommentTitle,
+            votes: 0,
+        }
+        props.firebase.putScheduledLivestreamQuestionComment(currentLivestream.id, currentQuestion.id, newComment)
+            .then(() => {
+                setNewCommentTitle("");
+            }, error => {
+                console.log("Error: " + error);
+            })
+    }
+
+    let questionElements = upcomingQuestions.map((question, index) => {
+        return (
+            <Grid.Column width={5}>
+                <div className='streamNextQuestionContainer' key={index}>
+                    <p style={{ marginBottom: '5px' }}>{ question.title }</p>
+                    <p style={{ fontSize: '0.8em', fontWeight: '300', color: 'rgb(200,200,200)' }}>from @Martin.Kamm</p>
+                    <div className='bottom-element'>
+                        <div className='streamNextQuestionNumberOfVotes'>{ question.votes } <Icon name='thumbs up'/></div>
+                    </div>
+                    <style jsx>{`
+                        .streamNextQuestionContainer {
+                            position: relative;
+                            margin: 20px 0;
+                            box-shadow: 0 0 3px grey;
+                            border-radius: 10px;
+                            color: rgb(50,50,50);
+                            background-color: white;
+                            padding: 30px 30px 50px 30px;
+                            font-weight: 500;
+                            font-size: 1.3em;
+                            height: 100%;
+                            min-height: 200px;
+                            text-align: center;
+                        }
+
+                        .streamNextQuestionContainer .question-upvotes {
+                            margin: 10px 0;
+                            font-size: 0.9em;
+                            font-weight: bold;
+                        }
+
+                        .streamNextQuestionNumberOfVotes {
+                            font-weight: 600;
+                            border-radius: 5px;
+                            display: block;
+                            color: rgb(0, 210, 170);
+                            font-size: 1.3em;
+                            margin-top: 10px;
+                        }
+
+                        .bottom-element {
+                            position: absolute;
+                            bottom: 30px;
+                            left: 0;
+                            right: 0;
+                            width: 100%;
+                            text-align: center;
+                        }
+
+                        .right-votes {
+                            position: absolute;
+                            right: 0;
+                            top: 15px;
+                            color: rgb(130,130,130);
+                            font-size: 0.8em;
+                        }
+                    `}</style>
+                </div>
+            </Grid.Column>
+        );
+    })
+
     let commentsElements = comments.map((comment, index) => {
         return (
             <div className='streamNextQuestionContainerAlt animated fadeInUp faster'>
@@ -200,6 +276,7 @@ function StreamingPage(props) {
                     </div>
                     <div className='question-buttons'>
                         <Button icon='check' content='NEXT QUESTION' size='small'/>
+                        <Button content={ allQuestionsShown ? 'Hide All Questions' : 'See All Questions' } size='small' onClick={() => setAllQuestionsShown(!allQuestionsShown)} primary/>
                     </div>
                 </div>
                 <style jsx>{`
@@ -337,7 +414,6 @@ function StreamingPage(props) {
             </div>
             <div className='video-menu'>
                 <ButtonWithConfirm color='teal' size='huge' buttonAction={isStreaming ? stopStreaming : startStreaming} confirmDescription={isStreaming ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
-                <Button size='huge' onClick={() => {}} primary basic>Interact!</Button>
             </div>
             <div className='video-menu-left'>
                 <CurrentQuestionElement/>
@@ -367,6 +443,12 @@ function StreamingPage(props) {
                         <Input action={{ content: 'React', color: 'pink', onClick: () =>  addNewComment(newCommentTitle)}} value={newCommentTitle}  fluid placeholder='Send a reaction...' onChange={(event) => {setNewCommentTitle(event.target.value)}} />
                     </div>
                 </div>
+            </div>
+            <div className={'all-questions-modal ' + (allQuestionsShown ? '' : 'hidden')}>
+                <Icon name='delete' onClick={() => setAllQuestionsShown(false)} size='large' style={{ position: 'absolute', top: '10px', right: '10px', color: 'white', zIndex: '9999', cursor: 'pointer'}}/>
+                <Grid centered>
+                    { questionElements }
+                </Grid>
             </div>
             <style jsx>{`
                 .hidden {
@@ -686,6 +768,23 @@ function StreamingPage(props) {
                     position: absolute;
                     right: 20px;
                     bottom: 25px;
+                }
+
+                .all-questions-modal {
+                    position: absolute;
+                    top: 75px;
+                    left: 330px;
+                    right: 0;
+                    bottom: 0;
+                    background-color: rgba(0,0,0, 0.8);
+                    z-index: 9000;
+                    overflow-y: scroll;
+                    overflow-x: hidden;
+                    padding: 30px 0;
+                }
+
+                .all-questions-modal::-webkit-scrollbar-thumb {
+                    background-color: rgb(0, 210, 170);
                 }
             `}</style>
         </div>

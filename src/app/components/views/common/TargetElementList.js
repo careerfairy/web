@@ -17,7 +17,7 @@ function TargetElementList(props) {
             const selected = props.selectedFields.indexOf(listElement) > -1;
             return (
                 <Fragment key={index}>
-                    <div className='tag' style={{ backgroundColor: selected ? targetElement.color : 'white', color: selected ? 'white' : targetElement.color, border: '1px solid ' + targetElement.color}}>
+                    <div className='tag' style={{ backgroundColor: targetElement.color, color: 'white', border: '1px solid ' + targetElement.color}}>
                         {targetElement.text}
                     </div>
                     <style jsx>{`

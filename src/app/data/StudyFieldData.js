@@ -26,7 +26,7 @@ export const UNIVERSITY_SUBJECTS = [
         },{
             text: "Electrical Engineering",
             value: "ELEC",
-            color: "rgb(90, 219,169)"
+            color: "#aa0000"
         },{
             text: "Environmental Sciences",
             value: "ENVSCI",

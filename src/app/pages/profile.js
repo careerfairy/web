@@ -100,6 +100,16 @@ const UserProfile = (props) => {
                             setSubmitting(true);
                             props.firebase.setUserData(user.email, values.firstName, values.lastName, values.university, values.fieldOfStudy)
                             .then(() => {
+                                debugger;
+                                if (!userData) {
+                                    let universityQuery = null;
+                                    if (values.university === 'ethz') {
+                                        universityQuery = 'ethzurich';
+                                    } else if (values.university === 'epfl') {
+                                        universityQuery = 'epflausanne';
+                                    }
+                                    router.push('/comingup' + (universityQuery ? ('?university=' + universityQuery) : ''));
+                                }
                                 setSubmitting(false);
                             }).catch(error => {
                                 setSubmitting(false);

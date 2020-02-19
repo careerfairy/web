@@ -44,13 +44,15 @@ function UpcomingLivestream(props) {
                 var questionsList = [];
                 querySnapshot.forEach(doc => {
                     let question = doc.data();
-                    question.id = doc.id;
-                    questionsList.push(question);
+                    if (!userHasVotedOnQuestion(user, question)) {
+                        question.id = doc.id;
+                        questionsList.push(question);
+                    } 
                 });
                 setUpcomingQuestions(questionsList);
             });
         }
-    }, [props.livestreamId]);
+    }, [props.livestreamId, user]);
 
     useEffect(() => {
         if (props.livestreamId) {
@@ -73,11 +75,6 @@ function UpcomingLivestream(props) {
     useEffect(() => {
         setCurrentQuestion(upcomingQuestions[0]);
     }, [upcomingQuestions]);
-
-
-    function goToRoute(route) {
-        router.push(route);
-    }
 
     function goToSeparateRoute(route) {
         window.open('http://testing.careerfairy.io' + route, '_blank');
@@ -104,10 +101,49 @@ function UpcomingLivestream(props) {
             return router.replace('/signup');
         }
 
-        props.firebase.upvoteQuestion(currentLivestream.id, question);
+        props.firebase.upvoteQuestion(currentLivestream.id, question, user.email);
+    }
+
+    function downvoteQuestion(question) {
+        if (!user) {
+            return router.replace('/signup');
+        }
+
+        props.firebase.downvoteQuestion(currentLivestream.id, question, user.email);
+    }
+
+    function userHasVotedOnQuestion(user, question) {
+        if (!user || !question.emailOfVoters) {
+            return false;
+        }
+        return question.emailOfVoters.indexOf(user.email) > -1;
+    }
+
+    function getNumberOfRegistrants(livestream) {
+        if (!livestream.registeredUsers) {
+            return 0;
+        }
+        return livestream.registeredUsers.length;
+    }
+
+    function registerToLivestream(livestreamId) {
+        if (!user) {
+            return router.push('/signup');
+        }
+
+        props.firebase.registerToLivestream(livestreamId, user.email);
+    }
+
+    function deregisterFromLivestream(livestreamId) {
+        if (!user) {
+            return router.push('/signup');
+        }
+
+        props.firebase.deregisterFromLivestream(livestreamId, user.email);
     }
 
     function addNewQuestion() {
+        debugger;
         if (!user) {
             return router.replace('/signup');
         }
@@ -115,7 +151,8 @@ function UpcomingLivestream(props) {
         const newQuestion = {
             title: newQuestionTitle,
             votes: 0,
-            type: "new"
+            type: "new",
+            author: user.email
         }
 
         props.firebase.putScheduledLivestreamsQuestion(currentLivestream.id, newQuestion)
@@ -131,10 +168,10 @@ function UpcomingLivestream(props) {
             <Grid.Column>
                 <div className='streamNextQuestionContainer' key={index}>
                     <p style={{ marginBottom: '5px' }}>{ question.title }</p>
-                    <p style={{ fontSize: '0.8em', fontWeight: '300', color: 'rgb(200,200,200)' }}>from @Martin.Kamm</p>
+                    <p style={{ fontSize: '0.8em', fontWeight: '300', color: 'rgb(200,200,200)' }}>from { question.author } </p>
                     <div className='bottom-element'>
-                        <Button icon='thumbs down' size='massive' disabled={!user} circular/>
-                        <Button icon='thumbs up' onClick={() => upvoteQuestion(question)} disabled={!user} size='massive' circular primary/>
+                        <Button icon='delete' size='massive' onClick={() => downvoteQuestion(question)}  disabled={userHasVotedOnQuestion(user, question)} circular/>
+                        <Button icon='thumbs up' size='massive' onClick={() => upvoteQuestion(question)} disabled={userHasVotedOnQuestion(user, question)} circular primary/>
                         <div className='streamNextQuestionNumberOfVotes'>{ question.votes } <Icon name='thumbs up'/></div>
                     </div>
                     <style jsx>{`
@@ -203,7 +240,7 @@ function UpcomingLivestream(props) {
         <div>
             <div className='topLevelContainer'>
                 <Header color='teal'/>
-                <div className='video-mask' style={{backgroundImage: 'url(' + (currentLivestream ? currentLivestream.backgroundImage : '') + ')'}}>
+                <div className='video-mask' style={{backgroundImage: 'url(' + (currentLivestream ? currentLivestream.backgroundImageUrl : '') + ')'}}>
                     <div className='mask'>
                         <div className='topDescriptionContainer'>
                             <div>
@@ -219,34 +256,34 @@ function UpcomingLivestream(props) {
                             </div>
                             <div style={{ margin: '30px 0 50px 0'}}>
                                 <Grid className='middle aligned' centered>
-                                    <Grid.Column textAlign='center' mobile='5' computer='3'>
+                                    <Grid.Column textAlign='center' mobile='5' computer='5'>
                                         <Image style={{ filter: 'brightness(0) invert(1)'}} src={(currentLivestream ? currentLivestream.companyLogoUrl : '')}/>
                                     </Grid.Column>
-                                    <Grid.Column textAlign='center' mobile='5' computer='3'>
-                                        <div className='livestream-speaker-image' style={{ backgroundImage: 'url(' + (currentLivestream ? currentLivestream.speakerImageUrl : '') + ')'}}></div>
+                                    <Grid.Column textAlign='center' mobile='5' computer='5'>
+                                        <div className='livestream-speaker-image' style={{ backgroundImage: 'url(' + (currentLivestream ? currentLivestream.mainSpeakerAvatar : '') + ')'}}></div>
                                     </Grid.Column>
-                                    <Grid.Column mobile='5' computer='3'>
-                                        <div style={{ fontWeight: '700', fontSize: '1.4em', marginBottom: '10px', color: 'white' }}>{ currentLivestream ? currentLivestream.speakerName : '' }</div>
-                                        <div style={{ fontWeight: '500', fontSize: '1.2em', marginBottom: '10px', color: 'white' }}>{ currentLivestream ? currentLivestream.speakerJob : '' }</div>
+                                    <Grid.Column mobile='5' computer='5'>
+                                        <div style={{ fontWeight: '700', fontSize: '1.4em', marginBottom: '10px', color: 'white' }}>{ currentLivestream ? currentLivestream.mainSpeakerName : '' }</div>
+                                        <div style={{ fontWeight: '500', fontSize: '1.2em', marginBottom: '10px', color: 'white' }}>{ currentLivestream ? currentLivestream.mainSpeakerPosition : '' }</div>
                                     </Grid.Column>
                                 </Grid> 
                             </div>
                             <div style={{ textAlign: 'center', marginBottom: '20px'}}>
-                                <TargetElementList size='large' fields={ currentLivestream ? currentLivestream.fieldsHiring : [] }/>
+                                <TargetElementList fields={ currentLivestream ? currentLivestream.targetGroups : [] }/>
                             </div>
                             <div style={{ margin: '20px 0 30px 0', width: '100%' }}>
-                                <div className={ registered ? 'hidden' : ''}>
-                                    <Button size='big' content={ user ? ( registered ? 'Registered' : 'Register') : 'Log in to Register' } icon={ user ? (registered ? 'check' : 'plus') : 'sign-in' } style={{ margin: '5px' }} disabled={registered} onClick={user ? (() => registerToLivestream()) : (() => goToSeparateRoute('/signup'))} primary/>
+                                <div>
+                                    <Button size='big' content={ user ? ( registered ? 'Cancel Booking' : 'Book a spot') : 'Log in to Register' } icon={ user ? (registered ? 'delete' : 'plus') : 'sign-in' } style={{ margin: '5px' }} onClick={registered ? () => deregisterFromLivestream(currentLivestream.id) : () => registerToLivestream(currentLivestream.id)} primary={!registered}/>
                                 </div>
-                                <div className={ registered ? '' : 'hidden'} style={{ color: 'rgb(0, 210,170)', fontSize:'1.4em', margin: '50px 0 100px 0'}}>
-                                    <Icon name='check circle outline' style={{ fontSize:'1.2em', verticalAlign: 'middle'}}/><span style={{ verticalAlign: 'middle'}}>Registered</span>                        
-                                </div>
-                                <div className={registered ? 'hidden' : ''} style={{ color: 'white', margin: '20px 0 0 0', fontSize: '1.1em', fontWeight: '500'}}>Register now! There are only <span style={{  fontSize: '1.3em', color: 'rgb(0, 210, 170)'}}>55</span> spots left.</div>
                             </div>
                         </Container>   
                         <div className='bottom-icon'>
                             <div>see more</div>
                             <Icon style={{ color: 'white' }} name='angle down' size='big'/>
+                        </div>
+                        <div className='spots-left'>
+                            <div className='spots-left-number'>{ 60 - getNumberOfRegistrants(currentLivestream) }</div>
+                            <div className='spots-left-label'>spots left</div>
                         </div>   
                     </div>
                 </div>
@@ -273,7 +310,7 @@ function UpcomingLivestream(props) {
                     </Grid>
                     <div className='container-title'>Or ask Your Question</div>
                     <div style={{ textAlign: 'center' }}>
-                        <Input size='huge' action={{ content: 'Ask', color:'teal' }} disabled={!user} fluid/>
+                        <Input size='huge' value={newQuestionTitle} onChange={(event) => setNewQuestionTitle(event.target.value)} action={{ content: 'Ask', color:'teal', onClick: () => addNewQuestion() }} disabled={!user} fluid/>
                     </div>
                 </Container>
             </div>
@@ -481,6 +518,31 @@ function UpcomingLivestream(props) {
                     line-height: 1.4em;
                     text-align:center;
                 }
+
+                .spots-left {
+                        position: absolute;
+                        right: 40px;
+                        bottom: 40px;
+                        height: 100px;
+                        width: 100px;
+                        border-radius: 50%;
+                        background-color: white;
+                        text-align: center;
+                        padding: 28px 0;
+                    }
+
+                    .spots-left-number {
+                        font-size: 1.8em;
+                        font-weight: 700;
+                        color: rgb(0, 210, 170);
+                    }
+
+                    .spots-left-label {
+                        font-size: 1em;
+                        font-weight: 700;
+                        margin: 5px 0;
+                        color: rgb(44, 66, 81);
+                    }
           `}</style>
         </div>
     );

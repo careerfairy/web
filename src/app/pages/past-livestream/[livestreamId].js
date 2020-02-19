@@ -20,7 +20,7 @@ const PastLivestreamDetail = (props) => {
 
     useEffect(() => {
         if (props.id) { 
-            props.firebase.listenToScheduledLivestreamById(props.id, querySnapshot => {
+            props.firebase.listenToLegacyScheduledLivestreamById(props.id, querySnapshot => {
                 let livestream = querySnapshot.data();
                 livestream.id = querySnapshot.id;
                 setCurrentLivestream(livestream);
@@ -37,7 +37,7 @@ const PastLivestreamDetail = (props) => {
 
     useEffect(() => {
         if (props.id) {
-            props.firebase.getPastLivestreamsUntreatedQuestions(props.id, querySnapshot => {
+            props.firebase.getLegacyPastLivestreamsUntreatedQuestions(props.id, querySnapshot => {
                 var questionsList = [];
                 querySnapshot.forEach(doc => {
                     let question = doc.data();
