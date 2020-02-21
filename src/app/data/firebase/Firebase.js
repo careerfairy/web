@@ -502,11 +502,31 @@ class Firebase {
     }
 
     registerToLivestream = (livestreamId, userId) => {
+        debugger;
+        let userRef = this.firestore
+            .collection("userData")
+            .doc(userId);
         let livestreamRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId);
-        return livestreamRef.update({
-            registeredUsers: firebase.firestore.FieldValue.arrayUnion(userId)
+        let registeredUsersRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("registeredStudents")
+            .doc(userId)
+        return this.firestore.runTransaction( transaction => {
+            return transaction.get(userRef).then(userDoc => {
+                const user = userDoc.data();
+                transaction.update(livestreamRef, { 
+                    registeredUsers: firebase.firestore.FieldValue.arrayUnion(userId)
+                });
+                transaction.set(registeredUsersRef, { 
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    university: user.university,
+                    faculty: user.faculty
+                });
+            });
         });
     }
 
@@ -514,9 +534,17 @@ class Firebase {
         let livestreamRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId);
-        return livestreamRef.update({
+        let registeredUsersRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("registeredStudents")
+            .doc(userId)
+        let batch = this.firestore.batch();
+        batch.update(livestreamRef, { 
             registeredUsers: firebase.firestore.FieldValue.arrayRemove(userId)
         });
+        batch.delete(registeredUsersRef);
+        return batch.commit();
     }
 
     // VIDEOS

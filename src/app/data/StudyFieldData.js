@@ -54,10 +54,14 @@ export const UNIVERSITY_SUBJECTS = [
         },{
             text: "Microengineering",
             value: "MICRO",
-            color: "#808080"
+            color: "#CCCCFF"
         },{
             text: "Physics",
             value: "PHYS",
             color: "#54556c"
+        },{
+            text: "Health Sciences",
+            value: "HEALTH",
+            color: "#E6E6FA"
         }
     ];

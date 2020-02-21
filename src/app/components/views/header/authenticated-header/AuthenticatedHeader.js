@@ -20,8 +20,6 @@ const AuthenticatedHeader = (props) => {
             <ul id='left-menu'>
                 <li><Icon id='sidebar-toggle' style={{ cursor: 'pointer' }} name='bars' size='big' color={props.color === "white" ? null : 'teal'} onClick={props.toggleSideBar}/></li>
                 <li><Link href='/'><a><Image src={props.color === "white" ? '/logo_white.png' : '/logo_teal.png'} style={{ cursor: 'pointer', width: '150px', display: 'inline-block', marginTop: '10px', marginLeft: '10px'}}/></a></Link></li>
-                <Image src={ eth_logo } style={{ postion: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block'}}/>
-                <div style={{ position: 'absolute', bottom: '20px', left: '180px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
             </ul>
             <ul id='middle-menu' className={'centered-menu ' + (props.color === "white" ? 'white' : 'dark')}>
                 <li className={props.page === 'spotlight' ? 'active' : ''}><Link href='/'><a>Livestreams</a></Link></li>

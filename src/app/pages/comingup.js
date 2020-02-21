@@ -3,12 +3,17 @@ import { Container, Grid, Image, Button, Icon } from "semantic-ui-react";
 
 import Header from "../components/views/header/Header";
 import Footer from '../components/views/footer/Footer';
+import LivestreamCard from '../components/views/livestream-card/LivestreamCard'
 
 import { useRouter } from 'next/router';
 import { withFirebasePage } from "../data/firebase";
 import DateUtil from '../util/DateUtil';
 import { UNIVERSITY_SUBJECTS } from '../data/StudyFieldData';
 import TargetElementList from '../components/views/common/TargetElementList';
+
+import StackGrid, { transitions } from 'react-stack-grid';
+
+import { SizeMe } from 'react-sizeme';
 
 import Link from 'next/link';
 
@@ -18,7 +23,10 @@ function ComingUp(props) {
     const backgroundOptions = UNIVERSITY_SUBJECTS;
     const router = useRouter();
 
+    const { fade } = transitions;
+
     const [user, setUser] = useState(null);
+    const [grid, setGrid] = useState(null);
     const [viewDetails, setViewDetails] = useState(true);
     const [allLivestreams, setAllLivestreams] = useState([]);
     const [livestreams, setLivestreams] = useState([]);
@@ -69,6 +77,14 @@ function ComingUp(props) {
             setLivestreams(filteredMentors);
         }
     }, [allLivestreams, fields]);
+
+    useEffect(() => {
+        if (grid) {
+            setTimeout(() => {
+                grid.updateLayout();
+            }, 500);
+        }
+    }, [grid,livestreams]);
 
     useEffect(() => {
         if (localStorage.getItem('hideCookieMessage') === 'yes') {
@@ -129,13 +145,13 @@ function ComingUp(props) {
 
     const filterElement = backgroundOptions.map((option, index) => {
         const nonSelectedStyle = {
-            border: '1px solid rgb(44, 66, 81)', 
-            color:  'rgb(44, 66, 81)',
+            border: '1px solid rgb(0, 210, 170)', 
+            color:  'rgb(0, 210, 170)',
         }
         const selectedStyle = {
-            border: '1px solid ' +  option.color, 
+            border: '1px solid rgb(0, 210, 170)', 
             color: 'white',
-            backgroundColor:  option.color,
+            backgroundColor: 'rgb(0, 210, 170)',
             opacity: '1'
         }   
         return(
@@ -170,304 +186,12 @@ function ComingUp(props) {
     })
 
     const mentorElements = livestreams.map( (mentor, index) => {
+
+        const avatar = mentor.mainSpeakerAvatar ? mentor.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
         return(
-            <Grid.Column key={index} computer={8} tablet={16} mobile={16}>
-                <div className='date-indicator'>{ DateUtil.getPrettyDate(mentor.start.toDate()) }</div>
-                <div className='companies-mentor-discriber-content'>
-                    <div className='livestream-thumbnail' style={{ backgroundImage: 'url(' + mentor.backgroundImageUrl + ')' }}>
-                        <div className='livestream-thumbnail-overlay' style={{ border: userIsRegistered(user, mentor) ? '6px solid rgb(0, 210, 170)' : 'none' }}>
-                            <div className='livestream-thumbnail-banner top'></div>
-                            <div className='livestream-thumbnail-banner bottom'></div>
-                            <div className='livestream-thumbnail-overlay-content'> 
-                                <Image style={{ maxWidth: '220px', margin: '20px 0'}} src={mentor.companyLogoUrl} />
-                                <div className='livestream-position'>{ mentor.title }</div>          
-                                <div>
-                                    <Button style={{ margin: '0 5px 0 0' }} icon={ (user && mentor.registeredUsers.indexOf(user.email) > -1) ? 'delete' : 'add' } primary={!(user && mentor.registeredUsers.indexOf(user.email) > -1)} content={ (user && mentor.registeredUsers.indexOf(user.email) > -1) ? 'Cancel Booking' : 'Book a spot' } onClick={(user && mentor.registeredUsers.indexOf(user.email) > -1) ? () => deregisterFromLivestream(mentor.id) : () => registerToLivestream(mentor.id)}/>
-                                    <Button style={{ margin: '0 5px 0 0' }} icon='signup' content='More Infos' onClick={() => goToUpcomingLivestream(mentor.id)}/>
-                                </div>
-                                {/* <div className='livestream-entrants'>
-                                    <span>{ 60 - mentor.registeredEmails.length }</span> spots left. Register now!
-                                </div> */}
-                            </div>
-                        </div>
-                        <div className={'booked-icon ' + (userIsRegistered(user, mentor) ? '' : 'hidden')}>Your spot is booked</div>
-                        <div className='coming-icon'><Icon name='rss'/>Livestream</div>
-                        {/* <div className='date-icon'><Icon name='calendar outline alternate'/>{ DateUtil.getPrettyDate(mentor.start.toDate()) }</div> */}
-                        {/* <div className='spots-left'>
-                            <div className='spots-left-number'>{ 60 - getNumberOfRegistrants(mentor) }</div>
-                            <div className='spots-left-label'>spots left</div>
-                        </div> */}
-                    </div>
-                    <div className='background'>
-                        <Grid centered className='middle aligned' divided>
-                            <Grid.Row>
-                                <Grid.Column width={14}>
-                                    <div className='livestream-streamer-description'>
-                                        <div className='livestream-speaker-avatar' style={{ backgroundImage: 'url(' + mentor.mainSpeakerAvatar + ')'}}/>
-                                        <div className='livestream-streamer'>
-                                            <div className='livestream-streamer-name'>{ mentor.mainSpeakerName }</div>
-                                            <div className='livestream-streamer-position'>{ mentor.mainSpeakerPosition }</div>
-                                            <div className='livestream-streamer-position'>{ mentor.mainSpeakerBackground }</div>
-                                        </div>
-                                    </div>
-                                </Grid.Column>
-                            </Grid.Row>
-                        </Grid>
-                        <Grid centered className='middle aligned' >
-                            <Grid.Row style={{ paddingTop: 0, paddingBottom: '14px' }}>
-                                <Grid.Column width={15}>
-                                    <TargetElementList fields={mentor.targetGroups} selectedFields={fields}/>
-                                </Grid.Column>
-                            </Grid.Row>
-                            <Grid.Row style={{ paddingTop: 0, display: 'none' }}>
-                                <Grid.Column width={15}>
-                                    <div className='university-icon'>
-                                        <Image style={{ maxHeight: '10px'}} src={'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fethz.png?alt=media'}/>
-                                    </div>
-                                    <div className='university-icon'>
-                                        <Image style={{ maxHeight: '10px'}} src={'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fepfl.png?alt=media'}/>
-                                    </div>
-                                </Grid.Column>
-                            </Grid.Row>
-                        </Grid>
-                    </div>
-                </div>
-                <style jsx>{`
-                    .hidden {
-                        display: none
-                    }
-
-                    .date-indicator {
-                        text-align: center;
-                        margin: 20px;
-                        font-size: 1.7em;
-                        font-weight: 600;
-                        color: rgb(44, 66, 81);
-                    }
-
-                    .companies-mentor-discriber-content-companylogo {
-                        position: relative;
-                        height: 70px;
-                        width: 100%;
-                        margin: 0 auto;
-                        text-align: center;
-                    }
-
-                    .livestream-thumbnail {
-                        position: relative;
-                        width: 100%;
-                        margin: 0 auto 10px auto;
-                        background-size: cover;
-                        background-position: center center;
-                        box-shadow: 0 0 5px grey;
-                        z-index: 100;
-                    }
-
-                    .livestream-thumbnail-banner {
-                        width: 100%;
-                        height: 30px;
-                        background-color: black;
-                        position: absolute;
-                        left:0;
-                        z-index: -10;
-                    }
-
-                    .livestream-thumbnail-banner.top {
-                        top:0;
-                    }
-
-                    .livestream-thumbnail-banner.bottom {
-                        bottom:0;
-                    }
-
-                    .livestream-thumbnail-overlay {
-                        cursor: pointer;
-                        width: 100%;
-                        height: 100%;
-                        min-height: 350px;
-                        padding: 80px 0 80px 30px;
-                        background-color: rgba(255, 255, 255, 1);
-                        transition: background-color 0.5s;
-                    }
-
-                    .livestream-thumbnail-overlay:hover {
-                        background-color: rgba(255, 255, 255, 0.95);
-                    }
-
-                    .livestream-thumbnail-overlay-content {
-                        position: relative;
-                        width: 80%;
-                        color: white;
-                    }
-
-                    .top-question-label {
-                        text-align: left;
-                        font-weight: 500;
-                        font-size: 0.8em;
-                        text-transform: uppercase;
-                        color: rgb(180,180,180);
-                        margin: 10px 0 0 0;
-                    }
-
-                    .top-question-label.white {
-                        color: white;
-                    }
-
-                    .top-question-label.margined {
-                        margin: 10px 0 10px 18px;
-                    }
-
-                    .top-question-label span {
-                        margin-left: 3px;
-                    }
-
-                    .livestream-streamer-position {
-                        margin: 0 0 0 0;
-                        font-size: 0.9em;
-                        line-height: 1.2em;
-                        color: grey;
-                    }
-
-                    .livestream-streamer-degree {
-                        font-size: 0.8em;
-                    }
-
-                    .livestream-streamer-name {
-                        font-size: 1.3em;
-                        font-weight:600;
-                        margin-bottom: 5px;
-                    }
-
-                    .livestream-streamer-description {
-                        margin-top: 5px;
-                    }
-
-                    .livestream-streamer {
-                        width: 55%;
-                        margin-left: 5px;
-                        display: inline-block;
-                        vertical-align: middle;
-                        color: rgb(40,40,40);
-                    }
-
-                    .livestream-industry {
-                        text-transform: uppercase;
-                    }
-
-                    .livestream-position {
-                        font-weight: 500;
-                        color: rgb(44, 66, 81);
-                        font-size: 1.9em;
-                        margin: 10px 0 20px 0;
-                        line-height: 1.2em;
-                    }
-
-                    .livestream-entrants {
-                        margin: 10px 0;
-                        font-size: 0.9em;
-                        color: white;
-                    }
-
-                    .livestream-entrants span {
-                        color: rgb(0, 210, 170);
-                        font-size: 1.1em;
-                        font-weight: 700;
-                    }
-
-                    .livestream-speaker-avatar {
-                        width: 75px;
-                        padding-top: 75px;
-                        border-radius: 50%;
-                        margin: 0 15px 0 0;
-                        vertical-align: middle;
-                        display: inline-block;
-                        box-shadow: 0 0 2px grey;
-                        display: inline-block;
-                        background-size: cover;
-                    }
-
-                    .date-icon {
-                        position: absolute;
-                        top: 15px;
-                        right: 15px;
-                        padding: 4px 6px;
-                        border: 2px solid rgb(44, 66, 81);
-                        text-transform: uppercase;
-                        color: rgb(44, 66, 81);
-                        font-weight: 700;
-                    }
-
-                    .coming-icon {
-                        position: absolute;
-                        top: 15px;
-                        left: 15px;
-                        padding: 4px 6px;
-                        border: 2px solid rgb(44, 66, 81);
-                        text-transform: uppercase;
-                        color: rgb(44, 66, 81);
-                        font-weight: 700;
-                    }
-
-                    .university-icon {
-                        max-width: 80px;
-                        display: inline-block;
-                        margin: 0 10px 0 0;
-                        vertical-align: middle;
-                    }
-
-                    .booked-icon {
-                        position: absolute;
-                        bottom: 0;
-                        left: 0;
-                        right: 0;
-                        padding: 10px;
-                        color: white;
-                        background-color: rgb(0, 210, 170);
-                        text-align: center;
-                        text-transform: uppercase;
-                        font-weight: 700;
-                    }
-
-                    .spots-left {
-                        position: absolute;
-                        right: 20px;
-                        bottom: 20px;
-                        height: 80px;
-                        width: 80px;
-                        border-radius: 50%;
-                        background-color: white;
-                        text-align: center;
-                        padding: 20px 0;
-                    }
-
-                    .spots-left-number {
-                        font-size: 1.8em;
-                        font-weight: 700;
-                        color: rgb(0, 210, 170);
-                    }
-
-                    .spots-left-label {
-                        font-size: 0.8em;
-                        font-weight: 700;
-                        margin: 5px 0;
-                        color: rgb(44, 66, 81);
-                    }
-
-                    .show-details {
-                        position: absolute;
-                        width: 100%;
-                        bottom: 5px;
-                        z-index: 1000;
-                        text-align: center;
-                    }
-
-                    .background {
-                        position: relative;
-                        background-color: white;
-                        z-index: 10;
-                    }
-                `}</style>
-            </Grid.Column>
+            <div key={index}>
+                <LivestreamCard livestream={mentor} user={user} fields={fields} grid={grid}/>
+            </div>
         );
     })
 
@@ -492,16 +216,24 @@ function ComingUp(props) {
                 <p>We use cookies to improve your experience. By continuing to use our website, you agree to our <Link href='/cookies'><a>cookies policy</a></Link> and our <Link href='/privacy'><a>privacy policy</a></Link>.</p>
                 <Icon id='cookie-delete' style={{ cursor: 'pointer', verticalAlign: 'top', float: 'right', lineHeight: '30px'}} name='delete' onClick={() => hideCookieMessage()}/>
             </div>
+            <div id='landingPageButtons'>
+                <Container>
+                    <div className='landingPageButtonsLabel'>Select your fields of interest</div>
+                    { filterElement }
+                    <Button style={{ margin: '5px' }} content={showAllFields ? 'Hide all filters' : 'Show all filters'} color='pink' icon={showAllFields ? 'angle up' : 'angle down'} size='mini' onClick={() => setShowAllFields(!showAllFields)}/>
+                </Container>
+            </div>
             <div className='mentor-list'>
                 <Container>
-                    <div id='landingPageButtons'>
-                        <div className='landingPageButtonsLabel'>Select your fields of interest</div>
-                        { filterElement }
-                        <Button style={{ margin: '5px' }} content={showAllFields ? 'Hide all filters' : 'Show all filters'} color='pink' icon={showAllFields ? 'angle up' : 'angle down'} size='mini' onClick={() => setShowAllFields(!showAllFields)}/>
-                    </div>
-                    <Grid stackable>
-                        { mentorElements }
-                    </Grid>
+                    <SizeMe>{ ({ size }) => (
+                        <StackGrid
+                            columnWidth={(size.width <= 768 ? '100%' : 450)}
+                            gutterWidth={20}
+                            gutterHeight={0}
+                            gridRef={ grid  => setGrid(grid) }>
+                            { mentorElements }
+                        </StackGrid>
+                    )}</SizeMe>
                 </Container>
             </div>
             <div className={'HowItWorksContainer ' + ( welcomeSignOpen ? '' : 'hidden')}>
@@ -579,8 +311,12 @@ function ComingUp(props) {
                 }
 
                 #landingPageButtons {
+                    position: relative;
                     text-align: left;
-                    margin-bottom: 20px;
+                    background-color: white;
+                    padding: 20px 0;
+                    box-shadow: 0 0 5px grey;
+                    z-index: 8000;
                 }
 
                 #landingPageButtons button {
@@ -1037,10 +773,6 @@ function ComingUp(props) {
                 @media(max-width: 768px) {
                     #fp-nav {
                         display: none;
-                    }
-
-                    #landingPageButtons {
-                        padding: 0;
                     }
 
                     #landingPageButtons li a {

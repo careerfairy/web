@@ -1,10 +1,19 @@
 export const UNIVERSITY_NAMES = [
     {
         text: "ETH Zurich",
-        value: "ethz"
+        value: "ethzurich"
     },{
         text: "EPF Lausanne",
-        value: "epfl"
+        value: "epflausanne"
+    },{
+        text: "University of Zurich",
+        value: "unizurich"
+    },{
+        text: "Universita della Svizzera Italiana",
+        value: "unilugano"
+    },{
+        text: "Paul Scherrer Institute",
+        value: "paulscherrerinstitute"
     },{
         text: "Other Institution",
         value: "othe"

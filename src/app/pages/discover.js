@@ -82,7 +82,6 @@ function LandingPage(props) {
     function addField(field) {
         const fieldsCopy = fields.slice(0);
         fieldsCopy.push(field);
-        fieldsCopy.push(field);
         setFields(fieldsCopy);
     }
 
@@ -90,10 +89,6 @@ function LandingPage(props) {
         const fieldsCopy = fields.slice(0);
         fieldsCopy.splice(fieldsCopy.indexOf(field), 1);
         setFields(fieldsCopy);
-    }
-
-    function goToPastLivestream(livestreamId) {
-        router.push(`/past-livestream/` + livestreamId);
     }
 
     const filterElement = backgroundOptions.map((option, index) => {
@@ -150,7 +145,7 @@ function LandingPage(props) {
                                 <div className='top-question-label white'><Icon name='briefcase'/><span>Livestreamed Job offer</span></div>
                                 <div className='livestream-position'>{ mentor.jobOffer }</div>          
                                 <div>
-                                    <Button icon='redo' primary content='Rewatch Livestream' onClick={() => goToPastLivestream(mentor.livestreamId)}/>
+                                    <Link href={'/past-livestream/' + mentor.livestreamId}><a><Button icon='redo' primary content='Rewatch Livestream'/></a></Link>
                                 </div>
                             </div>
                         </div>

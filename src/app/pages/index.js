@@ -3,6 +3,7 @@ import {Container, Grid, Image, Button, Icon} from "semantic-ui-react";
 
 import { withFirebase } from '../data/firebase/FirebaseContext';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { compose } from 'redux';
 import { useScrollPosition } from '../components/util/UseScrollPosition';
 import Header from "../components/views/header/Header";
@@ -254,7 +255,7 @@ function LandingPage(props) {
                         {companyElements}
                     </Grid>
                     <div>
-                        <Button primary size='big' onClick={() => goToRoute('/discover')}>Browse Careers</Button>
+                        <Link href='/discover'><a><Button primary size='big'>Browse Careers</Button></a></Link>
                     </div>
                 </Container>     
             </div>
