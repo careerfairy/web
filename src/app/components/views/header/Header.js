@@ -28,7 +28,8 @@ function Header (props) {
             <div className='sidebar'>
                 <Icon name='times circle outline' size='big' onClick={toggleSideBar} style={{ cursor: 'pointer' }}/>
                 <ul>
-                    <li><Link href='/landing'><a>Livestreams</a></Link></li>
+                    <li><Link href='/next-livestreams'><a>Next Live Streams</a></Link></li>
+                    <li><Link href='/discover'><a>Past Live Streams</a></Link></li>
                     <li><Link href='/companies'><a>Companies</a></Link></li>
                     <li><Link href='/wishlist'><a>Wishlist</a></Link></li>
                     <li><a href='https://corporate.careerfairy.io/companies'>For Companies</a></li>
@@ -129,7 +130,8 @@ function Header (props) {
             <div className={sidebarState === "unopened" ? 'sidebar hidden' : sidebarState === "opened" ? 'sidebar animated slideInLeft faster' :'sidebar animated slideOutLeft faster'}>
                 <Icon name='times circle outline' size='big' onClick={toggleSideBar} style={{ cursor: 'pointer' }}/>
                 <ul>
-                    <li><Link href='/landing'><a>Livestreams</a></Link></li>
+                    <li><Link href='/next-livestreams'><a>Next Live Streams</a></Link></li>
+                    <li><Link href='/discover'><a>Past Live Streams</a></Link></li>
                     <li><Link href='/companies'><a>Companies</a></Link></li>
                     <li><Link href='/wishlist'><a>Wishlist</a></Link></li>
                     <li><a href='https://corporate.careerfairy.io/companies'>For Companies</a></li>

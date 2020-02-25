@@ -37,7 +37,7 @@ function TargetElementList(props) {
         } else {
             return (
                 <Fragment key={index}>
-                    <div className='tag' style={{ backgroundColor: targetElement.color, fontSize: props.size === 'large' ? '1.1em' : '0.8em', padding: props.size === 'large' ? '8px 15px' : '2px 10px', borderRadius: props.size === 'large' ? '20px' : '12px' }}>
+                    <div className='tag' style={{ fontSize: props.size === 'large' ? '1.1em' : '0.8em', padding: props.size === 'large' ? '8px 15px' : '2px 10px', borderRadius: props.size === 'large' ? '20px' : '12px' }}>
                         {targetElement.text}
                     </div>
                     <style jsx>{`
@@ -47,7 +47,8 @@ function TargetElementList(props) {
                             margin-right: 5px;
                             margin-bottom: 5px;
                             font-weight: 500;
-                            color: white
+                            border: 1px solid rgb(44, 66, 81);
+                            color: rgb(44, 66, 81);
                         }
                 `}</style>
                 </Fragment>

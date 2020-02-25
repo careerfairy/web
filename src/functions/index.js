@@ -19,20 +19,114 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-const next = require('next');
 const path = require('path');
 const routes = require('./routes');
 
 const dev = false;
-const app = next({dev, conf: { distDir: "dist/client" }});
-const handler = routes.getRequestHandler(app);
 
 
 exports.next = functions.https.onRequest(async (req, res) => {
-    console.log('File: ' + req.originalUrl); // log the page.js file that is being requested
+    const next = require('next');
+
+    const app = next({conf: { distDir: "dist/client" }});
+    const handler = routes.getRequestHandler(app);
     await app.prepare().then(() => {
         return handler(req, res);
     });
+});
+
+exports.next2 = functions.https.onRequest(async (req, res) => {
+    const next = require('next');
+
+    const app = next({conf: { distDir: "dist/client" }});
+    const handler = routes.getRequestHandler(app);
+    await app.prepare().then(() => {
+        return handler(req, res);
+    });
+});
+
+const postmark = require("postmark");
+var serverToken = "3f6d5713-5461-4453-adfd-71f5fdad4e63";
+var client = new postmark.ServerClient(serverToken);
+
+exports.sendPostmarkEmailVerificationEmail = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        res.status(204).send('');
+    }
+
+    const recipient_email = req.body.recipientEmail;
+    const redirect_link = req.body.redirect_link;
+
+    const actionCodeSettings = {
+        url: redirect_link
+    };
+
+    admin.auth().generateEmailVerificationLink(recipient_email, actionCodeSettings)
+        .then((link) => {
+            const email = {
+                "TemplateId": 16531011,
+                "From": 'CareerFairy <noreply@careerfairy.io>',
+                "To": recipient_email,
+                "TemplateModel": { verification_link: link }
+            };
+            return client.sendEmailWithTemplate(email).then(response => {
+                res.send(200);
+            }, error => {
+                res.send('Error: ' + error);
+            });
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+});
+
+exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        res.status(204).send('');
+    }
+
+    const recipient_email = req.body.recipientEmail;
+    const redirect_link = req.body.redirect_link;
+
+    console.log("link: " + redirect_link);
+
+    const actionCodeSettings = {
+        url: redirect_link
+    };
+
+    admin.auth().generatePasswordResetLink(recipient_email, actionCodeSettings)
+        .then((link) => {
+            const email = {
+                "TemplateId": 16531013,
+                "From": 'CareerFairy <noreply@careerfairy.io>',
+                "To": recipient_email,
+                "TemplateModel": { action_url: link }
+            };
+            return client.sendEmailWithTemplate(email).then(response => {
+                res.send(200);
+            }, error => {
+                res.send('Error: ' + error);
+            });
+        })
+        .catch((error) => {
+            console.log(error);
+        });
 });
 
 const fs = require('fs');
@@ -87,21 +181,109 @@ exports.sendEmailVerificationEmail = functions.https.onRequest(async (req, res) 
         });
 });
 
-exports.sendSharePollEmail = functions.https.onRequest(async (req, res) => {
+exports.sendResetPasswordEmail = functions.https.onRequest(async (req, res) => {
 
-    const html_email = fs.readFileSync(path.resolve(__dirname, './html_emails/JoinUsEmail.html'), 'utf8')
-    const sender_email = req.body.senderEmail;
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        res.status(204).send('');
+    }
+
+    const html_email = fs.readFileSync(path.resolve(__dirname, './html_emails/ResetPasswordEmail.html'), 'utf8')
     const recipient_email = req.body.recipientEmail;
+    const redirect_link = req.body.redirect_link;
 
-    const data = {
-        from: 'CareerFairy <noreply@mg.careerfairy.io>',
-        to: recipient_email,
-        subject: 'You\'ve been invited to join CareerFairy! ',
-        text: 'Welcome to CareerFairy!',
-        html: html_email.replace("EMAIL_ADDRESS", sender_email)
+    console.log("link: " + redirect_link);
+
+    const actionCodeSettings = {
+        url: redirect_link
     };
 
-    mg.messages().send(data, (error, body) => {
+    admin.auth().generatePasswordResetLink(recipient_email, actionCodeSettings)
+        .then((link) => {
+            const data = {
+                from: 'CareerFairy <noreply@mail.careerfairy.io>',
+                to: recipient_email,
+                subject: 'CareerFairy Password Reset',
+                text: 'Let us reset your password',
+                html: html_email.replace("__LINK__", link)
+            };
+            return mg.messages().send(data, (error, body) => {
+                if (error) {
+                    res.send('Error: ' + error);
+                }
+                res.send(200);
+            });
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+});
+
+exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    const email = {
+        "TemplateId": 16533319,
+        "From": 'CareerFairy <noreply@careerfairy.io>',
+        "To": req.body.recipientEmail,
+        "TemplateModel": { 
+            user_first_name: req.body.user_first_name,
+            livestream_date: req.body.livestream_date,
+            company_name: req.body.company_name,
+            company_logo_url: req.body.company_logo_url,
+            livestream_title: req.body.livestream_title,
+            livestream_link: req.body.livestream_link
+        }
+    };
+
+    client.sendEmailWithTemplate(email).then(response => {
+        return res.send(200);
+    }, error => {
+        console.log('error:' + error);
+        return res.status(400).send(error);
+    });
+});
+
+exports.sendEmailVerificationEmail = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        res.status(204).send('');
+    }
+
+    const recipient_email = req.body.recipientEmail;
+    const redirect_link = req.body.redirect_link;
+ 
+    const data = {
+        from: 'CareerFairy <noreply@mail.careerfairy.io>',
+        to: recipient_email,
+        subject: 'CareerFairy Email Verification',
+        text: 'Welcome to CareerFairy!',
+        html: html_email.replace("__LINK__", link)
+    };
+    return mg.messages().send(data, (error, body) => {
         if (error) {
             res.send('Error: ' + error);
         }

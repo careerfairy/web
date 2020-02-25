@@ -5,8 +5,9 @@ import { withFirebase} from "../data/firebase";
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import {Formik} from 'formik';
+import axios from 'axios';
 
-function LogInPage(props) {
+function ResetPasswordPage(props) {
 
     const [user, setUser] = useState(null);
     const [userEmailNotValidated, setUserEmailNotValidated] = useState(false);
@@ -27,13 +28,7 @@ function LogInPage(props) {
             if (!user.emailVerified) {
                 setUserEmailNotValidated(true);
             } else {
-                props.firebase.getUserData(user.email).then(querySnapshot => {
-                    if (querySnapshot.exists) {
-                        router.replace('/next-livestreams');
-                    } else {
-                        router.replace('/profile');
-                    }
-                }) 
+                router.replace('/profile');
             }
         }
     },[user]);
@@ -49,49 +44,27 @@ function LogInPage(props) {
             <header>
                 <Link href='/'><a><Image src='/logo_white.png' style={{ width: '150px', margin: '20px', display: 'inline-block' }} /></a></Link>
             </header>
-            <LogInForm userEmailNotValidated={userEmailNotValidated} setUserEmailNotValidated={(value) => setUserEmailNotValidated(value)}/>
+            <ResetPasswordBase user={user}/>
             <style jsx>{`
                 .tealBackground {
-                    min-height: 100vh;
-                    height: 100%;
+                    height: 100vh;
                     background-color: rgb(0, 210, 170);
-                    padding: 0 0 40px 0;
                 }
             `}</style>
         </div>
     )
 }
 
-export default withFirebase(LogInPage);
+export default withFirebase(ResetPasswordPage);
 
-const LogInForm = withFirebase(LogInFormBase);
+const LogInForm = withFirebase(ResetPasswordBase);
 
-export function LogInFormBase(props) {
+export function ResetPasswordBase(props) {
 
     const router = useRouter();
     const [successMessageShown, setSuccessMessageShown] = useState(false);
-    const [errorMessageShown, setErrorMessageShown] = useState(false);
+    const [completed, setCompleted] = useState(false);
     const [noAccountMessageShown, setNoAccountMessageShown] = useState(false);
-    const [generalLoading, setGeneralLoading] = useState(false);
-    const [emailVerificationSent, setEmailVerificationSent] = useState(false);
-
-    function resendEmailVerificationLink(email) {
-        setErrorMessageShown(false);
-        setGeneralLoading(true);
-        axios({
-            method: 'post',
-            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmail',
-            data: {
-                recipientEmail: email,
-                redirect_link: 'https://careerfairy.io/login'
-            }
-        }).then( response => {        
-                setEmailVerificationSent(true);
-                setGeneralLoading(false);
-            }).catch(error => {
-                setGeneralLoading(false);
-        });
-    }
 
     return (
         <Fragment>
@@ -99,34 +72,30 @@ export function LogInFormBase(props) {
                 <Container>
                     <div className='formContainer'>
                         <Formik
-                            initialValues={{ email: '', password: '', }}
+                            initialValues={{ email: '', }}
                             validate={values => {
-                                let errors = {};
+                                let errors = {};         
                                 if (!values.email) {
-                                    errors.email = 'Your email is required';
-                                } else if (!/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i.test(values.email)) {
-                                    errors.email = 'Please enter a valid email address';
-                                }          
-                                if (!values.password) {
-                                    errors.password = 'A password is required';
+                                    errors.email = 'Please enter your email';
                                 } 
                                 return errors;
                             }}
                             onSubmit={(values, { setSubmitting }) => {
-                                setErrorMessageShown(false);
-                                props.setUserEmailNotValidated(false);
-                                props.firebase.signInWithEmailAndPassword(values.email, values.password)
-                                    .then(() => {
+                                setCompleted(false);
+                                axios({
+                                    method: 'post',
+                                    url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkResetPasswordEmail',
+                                    data: {
+                                        recipientEmail: values.email,
+                                        redirect_link: 'https://careerfairy.io/login'
+                                    }
+                                }).then( response => { 
                                         setSubmitting(false);
-                                    })
-                                    .catch(error => {
+                                        setCompleted(true);
+                                    }).catch(error => {
                                         setSubmitting(false);
-                                        if (error.code === 'auth/user-not-found') {
-                                            return setNoAccountMessageShown(true);
-                                        } else {
-                                            return setErrorMessageShown(true);
-                                        }
-                                    })
+                                        setCompleted(true);
+                                });
                             }}
                             >
                             {({
@@ -155,33 +124,11 @@ export function LogInFormBase(props) {
                                             {errors.email && touched.email && errors.email}
                                         </div>
                                     </Form.Field>
-                                    <Form.Field>
-                                        <label style={{ color: 'rgb(120,120,120)' }}>Password</label>
-                                        <input id='passwordInput' type='password' name='password' placeholder='Password' onChange={handleChange} onBlur={handleBlur} value={values.password} disabled={isSubmitting} />
-                                        <div className='field-error'>
-                                            {errors.password && touched.password && errors.password}
-                                        </div>
-                                    </Form.Field>
-                                    <Button id='submitButton' fluid primary size='big' type="submit" loading={isSubmitting}>Log in</Button>
-                                    <div className='reset-email'>
-                                        <Link href='/reset-password'><a href='#'>Forgot your password?</a></Link>
-                                    </div> 
-                                    <div className='reset-email'>
-                                        <div style={{ marginBottom: '5px'}}>New to career streaming?</div>
-                                        <Link href='/signup'><a href='#'>Sign up</a></Link>
-                                    </div> 
-                                    <div className={'errorMessage ' + (errorMessageShown ? '' : 'hidden')}>An error occured while logging in to your account</div>
-                                    <div className={'errorMessage ' + (noAccountMessageShown ? '' : 'hidden')}>No account associated with this email address.</div>
-                                    <Message positive hidden={!props.userEmailNotValidated}>
-                                        <Message.Header>Please validate your email address</Message.Header>
+                                    <Button id='submitButton' fluid primary size='big' type="submit" loading={isSubmitting}>Reset Password</Button> 
+                                    <Message info hidden={!completed}>
+                                        <Message.Header>Done!</Message.Header>
                                         <p>
-                                        We sent you an email verification link to this email address. Please click on it to start your journey on CareerFairy.
-                                        </p>
-                                    </Message>
-                                    <Message positive hidden={!emailVerificationSent}>
-                                        <Message.Header>Verification Email Sent</Message.Header>
-                                        <p>
-                                        We have a just send an email verification link to the address you provided. Please click on it to start your journey on CareerFairy.
+                                        If you're email is registered, you will shortly receive an email to complete your password reset.
                                         </p>
                                     </Message>
                                 </Form>

@@ -355,17 +355,17 @@
 /* Active */
 .ui.steps .step.active {
   cursor: auto;
-  background: #F3F4F5;
+  background: #A0A0A0;
 }
 .ui.steps .step.active:after {
-  background: #F3F4F5;
+  background: #A0A0A0;
 }
 .ui.steps .step.active .title {
-  color: #4183C4;
+  color: #FFFFFF;
 }
 .ui.ordered.steps .step.active:before,
 .ui.steps .active.step .icon {
-  color: rgba(0, 0, 0, 0.85);
+  color: #FFFFFF;
 }
 
 /* Active Arrow */

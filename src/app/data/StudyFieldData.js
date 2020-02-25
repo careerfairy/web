@@ -1,10 +1,14 @@
 export const UNIVERSITY_SUBJECTS = [
         {
-            text: "Chemistry",
+            text: "Chemistry and Applied Bioscience",
             value: "CHEM",
             color: "#2d5b6b"
         },{
-            text: "Civil Engineering",
+            text: "Architecture",
+            value: "ARCH",
+            color: "#836953"
+        },{
+            text: "Civil, Environmental and Geomatic Engineering",
             value: "CIVI",
             color: "#ff6961"
         },{
@@ -12,29 +16,25 @@ export const UNIVERSITY_SUBJECTS = [
             value: "COMP",
             color: "#52494c"
         },{
-            text: "Data Science",
-            value: "DATA",
-            color: "#e03e52"
-        },{
             text: "Earth Sciences",
             value: "EARTH",
             color: "#9a6324"
         },{
-            text: "Life Sciences",
-            value: "LIFE",
+            text: "Biology",
+            value: "BIOL",
+            color: "#9a6324"
+        },{
+            text: "Biosystems Science and Engineering",
+            value: "BIOSYS",
             color: "#03c03c"
         },{
-            text: "Electrical Engineering",
+            text: "Information Technology and Electrical Engineering",
             value: "ELEC",
             color: "#aa0000"
         },{
-            text: "Environmental Sciences",
+            text: "Environmental Systems Sciences",
             value: "ENVSCI",
             color: "#3cb44b"
-        },{
-            text: "Geospatial Engineering",
-            value: "GEOS",
-            color: "#ffe119"
         },{
             text: "Materials Sciences",
             value: "MATE",
@@ -48,20 +48,20 @@ export const UNIVERSITY_SUBJECTS = [
             value: "MTEC",
             color: "#f58231"
         },{
-            text: "Mechanical Engineering",
+            text: "Mechanical and Process Engineering",
             value: "MECH",
             color: "#808080"
-        },{
-            text: "Microengineering",
-            value: "MICRO",
-            color: "#CCCCFF"
         },{
             text: "Physics",
             value: "PHYS",
             color: "#54556c"
         },{
-            text: "Health Sciences",
+            text: "Health Sciences and Technology",
             value: "HEALTH",
             color: "#E6E6FA"
+        },{
+            text: "Humanities, Social and Political Science",
+            value: "HUMAN",
+            color: "#b39eb5"
         }
     ];

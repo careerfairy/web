@@ -20,8 +20,8 @@ const NonAuthenticatedHeader = (props) => {
                 <li><Link href='/'><a><Image src={props.color === "white" ? '/logo_white.png' : '/logo_teal.png'} style={{ cursor: 'pointer', width: '150px', display: 'inline-block', marginTop: '10px', marginLeft: '10px'}}/></a></Link></li>
             </ul>
             <ul id='middle-menu' className={'centered-menu ' + (props.color === "white" ? 'white' : 'dark')}>
-                <li className={props.page === 'spotlight' ? 'active' : ''}><Link href='/'><a>Livestreams</a></Link></li>
-                <li className={props.page === 'companies' ? 'active' : ''}><Link href='/companies'><a>Companies</a></Link></li>
+                <li className={props.page === 'next-livestreams' ? 'active' : ''}><Link href='/next-livestreams'><a>Next Live Streams</a></Link></li>
+                <li className={props.page === 'discover' ? 'active' : ''}><Link href='/discover'><a>Past Live Streams</a></Link></li>
                 <li className={props.page === 'wishlist' ? 'active' : ''}><Link href='/wishlist'><a>Wishlist</a></Link></li>
             </ul>
             <div id='right-menu' className={'float-right ' + (props.color === "white" ? 'white' : 'dark')}>

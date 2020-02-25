@@ -41,6 +41,10 @@ class Firebase {
         return this.auth.signInWithEmailAndPassword(email, password);
     };
 
+    signInWithEmailAndPassword = (email, password) => {
+        return this.auth.signInWithEmailAndPassword(email, password);
+    };
+
     sendSignInLinkToEmail = (email) => {
         let actionCodeSettings = {
             url: 'http://localhost:3000/discover',
@@ -84,7 +88,14 @@ class Firebase {
         return userDataRef.get();
     };
 
-    setUserData = (userEmail, firstName, lastName, university, faculty) => {
+    listenToUserData = (userEmail, callback) => {
+        let userDataRef = this.firestore
+            .collection("userData")
+            .doc(userEmail);
+        return userDataRef.onSnapshot(callback);
+    };
+
+    setUserData = (userEmail, firstName, lastName, university, faculty, levelOfStudy) => {
         let userDataRef = this.firestore
             .collection("userData")
             .doc(userEmail);
@@ -93,7 +104,8 @@ class Firebase {
             firstName: firstName,
             lastName: lastName,
             university: university,
-            faculty: faculty
+            faculty: faculty,
+            levelOfStudy: levelOfStudy
         });
     };
 
@@ -417,14 +429,11 @@ class Firebase {
         });
     }
 
-
     getScheduledLivestreamsUntreatedQuestions = (livestreamId, callback) => {
         let questionsRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
-            .collection("questions")
-            .where("type", "==", "new")
-            .orderBy("votes", "desc");
+            .collection("questions");
         return questionsRef.onSnapshot(callback);
     }
 
@@ -502,7 +511,6 @@ class Firebase {
     }
 
     registerToLivestream = (livestreamId, userId) => {
-        debugger;
         let userRef = this.firestore
             .collection("userData")
             .doc(userId);
@@ -524,6 +532,7 @@ class Firebase {
                     firstName: user.firstName,
                     lastName: user.lastName,
                     university: user.university,
+                    levelOfStudy: user.levelOfStudy,
                     faculty: user.faculty
                 });
             });
@@ -545,6 +554,32 @@ class Firebase {
         });
         batch.delete(registeredUsersRef);
         return batch.commit();
+    }
+
+    joinCompanyTalentPool = (companyId, userId) => {
+        let userRef = this.firestore
+            .collection("userData")
+            .doc(userId)
+        return this.firestore.runTransaction( transaction => {
+            return transaction.get(userRef).then(user => {
+                transaction.update(userRef, { 
+                    talentPools: firebase.firestore.FieldValue.arrayUnion(companyId)
+                });
+            });
+        });
+    }
+
+    leaveCompanyTalentPool = (companyId, userId) => {
+        let userRef = this.firestore
+            .collection("userData")
+            .doc(userId)
+        return this.firestore.runTransaction( transaction => {
+            return transaction.get(userRef).then(company => {
+                transaction.update(userRef, { 
+                    talentPools: firebase.firestore.FieldValue.arrayRemove(companyId)
+                });
+            });
+        });
     }
 
     // VIDEOS

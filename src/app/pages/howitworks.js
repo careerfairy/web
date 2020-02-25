@@ -13,7 +13,7 @@ function HowItWorks(props) {
 
     const [companies, setCompanies] = useState([]);
     const topPicture = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fstream-mobile.png?alt=media";
-    const secondPicture = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flanding1.png?alt=media";
+    const secondPicture = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Finteract.png?alt=media";
 
     useEffect(() => {
         props.firebase.getCompanies().then( querySnapshot => {
@@ -58,8 +58,7 @@ function HowItWorks(props) {
                 <div className='intro-mask'>
                     <Container>
                         <div className='mainTagline'>
-                            <h1>How It Works</h1>
-                            <h3>Live streams on CareerFairy</h3>
+                            <h1>Watch and interact with employees from great companies</h1>
                         </div>
                     </Container>   
                 </div>
@@ -67,8 +66,8 @@ function HowItWorks(props) {
             <div className='top-icons'>
                 <Container>
                     <div className='company-icons-label'>What is CareerFairy?</div>
-                    <div className='company-icons-sublabel'>From your laptop or smartphone, meet employees who share your background and work for some of the best companies out there.</div>
-                    <Image id='meet-companies-image' style={{ width: '80%', maxWidth: '900px', margin: '0 auto 50px auto'}} src='https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Flanding1.png?alt=media'/>
+                    <div className='company-icons-sublabel'>From your laptop or smartphone, meet employees who share your background.<br/> Ask any question and get the answer during the livestream!</div>
+                    <Image id='meet-companies-image' style={{ width: '80%', maxWidth: '900px', margin: '0 auto 50px auto'}} src={secondPicture}/>
                     <div className='company-icons-sublabel'>Discover their work, see their office, get answers to all your questions and find out how you could join them in the future.</div>
                     <Grid centered textAlign='center'>
                     </Grid>
@@ -87,7 +86,7 @@ function HowItWorks(props) {
                             </Grid.Column>
                             <Grid.Column textAlign='center' style={{ padding: '0 25px' }} width={4}>
                                 <h1 style={{ fontSize: '4em', color: 'rgb(0, 210, 170)'}}>2</h1>
-                                <h2 className='careerStep'>Take part in a live stream</h2>
+                                <h2 className='careerStep'>Join live stream & ask questions</h2>
                                 {/* <Image className='stepImage' src={digitalMarketing}  style={{ width: '40%', margin: '30px auto'}}/> */}
                                 <div>Be anonymous or show the company that you’re interested. Ask your written questions or just listen to the speaker. It’s up to you.</div>
                             </Grid.Column>
@@ -105,11 +104,11 @@ function HowItWorks(props) {
                 <Container>
                     <div className='company-icons-label' style={{ margin: '60px 0'}}>FAQ</div>
                     <div className='company-faq-title'>Where the hell will my data go?</div>
-                    <div className='company-faq-answer'>Very good question! We know that you don’t want to be spamed by recruiters. That is why we will only share your data with companies that you explicitelt and we will remind you every time that you are about to do so.</div>
+                    <div className='company-faq-answer'>Very good question! We know that you don’t want to be spamed by recruiters. That is why we will only share your data with companies that you explicitely name us and we will remind you every time that you are about to do so.</div>
                     <div className='company-faq-title'>Will I be filmed during the live stream?</div>
-                    <div className='company-faq-answer'>No, this is not a skype call! Live streams are video broadcast of the employees (generally through their webcam at their office) set in an informal, authentic atmosphere. You can send your written questions  and upvote questions from your peers, before and during the stream. This ensures that the stream is as relevant as possible for the entire community.</div>
+                    <div className='company-faq-answer'>No, this is not a skype call! Live streams are video broadcast of the employees (generally through their webcam at their office) set in an informal and authentic atmosphere. You can send your written questions  and upvote questions from your peers, before and during the stream. This ensures that the stream is as relevant as possible for the entire community.</div>
                     <div className='company-faq-title'>What do I need to take part in the stream?</div>
-                    <div className='company-faq-answer'>Just your laptop! Open the live stream in your browser and start engaging with our streamers. You can also use your smartphone’s mobile browser, but the experience might not be optimal yet. </div>
+                    <div className='company-faq-answer'>Just your laptop! Open the live stream in your browser and start engaging with our streamers. You can also use your smartphone’s browser, but the experience might not be optimal yet. </div>
                 </Container>     
             </div>
             <style jsx>{`
@@ -117,6 +116,7 @@ function HowItWorks(props) {
                     position: relative;
                     width: 100%;
                     padding-top: 40%;
+                    min-height: 400px;
                     box-shadow: 0 0 5px grey;
                     background-size: cover;
                     background-position: center center;
@@ -142,8 +142,10 @@ function HowItWorks(props) {
 
                 .mainTagline h1 {
                     color: white;
-                    font-size: 5em;
+                    font-size: calc(1.2em + 2vw);
                     font-weight: 700;
+                    max-width: 800px;
+                    margin: 0 auto;
                 }
 
                 .mainTagline h3 {
@@ -209,7 +211,8 @@ function HowItWorks(props) {
 
                 .company-icons-label {
                     margin: 80px 0 60px 0;
-                    font-size: 2.2em;
+                    font-size: 2em;
+                    line-height: 1.4em;
                     font-weight: 500;
                     text-align: center;
                     color: rgb(0, 210, 170);

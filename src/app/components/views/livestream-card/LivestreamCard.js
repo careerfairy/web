@@ -1,26 +1,33 @@
-import { Fragment } from 'react';
-import { Grid, Image, Button, Icon } from "semantic-ui-react";
+import { Fragment, useState, useEffect } from 'react';
+import { Grid, Image, Button, Icon, Modal, Step, Input, Checkbox } from "semantic-ui-react";
 
 import { useRouter } from 'next/router';
-import { withFirebasePage } from "../../../data/firebase";
+import { withFirebase } from "../../../data/firebase";
+import QuestionVotingBox from '../question-voting-box/QuestionVotingBox';
 import DateUtil from '../../../util/DateUtil';
-import TargetElementList from '../common/TargetElementList'
+import CommonUtil from '../../../util/CommonUtil';
+import TargetElementList from '../common/TargetElementList';
+import BookingModal from '../booking-modal/BookingModal';
+import axios from 'axios';
 
 import Link from 'next/link';
 
 
 function LivestreamCard(props) {
 
+    const [bookingModalOpen, setBookingModalOpen] = useState(false);
+
     const router = useRouter();
 
     const avatar = props.livestream.mainSpeakerAvatar ? props.livestream.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
 
-    function registerToLivestream() {
-        if (!props.user) {
-            return router.push('/signup');
+    function targetHasClickHandler(event) {
+        let element = event.target;
+        if (element.onclick !== null) {
+            return true;
+        } else {
+            return false;
         }
-
-        props.firebase.registerToLivestream(props.livestream.id, props.user.email);
     }
 
     function deregisterFromLivestream() {
@@ -31,12 +38,27 @@ function LivestreamCard(props) {
         props.firebase.deregisterFromLivestream(props.livestream.id, props.user.email);
     }
 
-    function getNumberOfRegistrants() {
-        if (!props.livestream.registeredUsers) {
-            return 0;
+    function startRegistrationProcess() {
+        if (!props.user) {
+            return router.push('/signup');
         }
-        return props.livestream.registeredUsers.length;
+
+        if (!props.userData) {
+            return router.push('/profile');
+        }
+
+        props.firebase.registerToLivestream(props.livestream.id, props.user.email).then(() => {
+            setBookingModalOpen(true);
+            sendEmailRegistrationConfirmation();
+        })
     }
+
+    // function getNumberOfRegistrants() {
+    //     if (!props.livestream.registeredUsers) {
+    //         return 0;
+    //     }
+    //     return props.livestream.registeredUsers.length;
+    // }
 
     function userIsRegistered() {
         if (!props.user || !props.livestream.registeredUsers) {
@@ -44,19 +66,43 @@ function LivestreamCard(props) {
         }
         return props.livestream.registeredUsers.indexOf(props.user.email) > -1;
     }
+
+    function goToRouteFromParent(event, route) {
+        debugger;
+        if (targetHasClickHandler(event)) {
+            return null;
+        }
+        router.push(route);
+    }
+
+    function sendEmailRegistrationConfirmation() {
+        return axios({
+            method: 'post',
+            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendLivestreamRegistrationConfirmationEmail',
+            data: {
+                recipientEmail: props.user.email,
+                user_first_name: props.userData.firstName,
+                livestream_date: DateUtil.getPrettyDate(props.livestream.start.toDate()),
+                company_name: props.livestream.company,
+                company_logo_url: props.livestream.companyLogoUrl,
+                livestream_title: props.livestream.title,
+                livestream_link: ('https://careerfairy.io/upcoming-livestream/' + props.livestream.id)
+            }
+        })
+    }
         
     return(
         <Fragment>
             <div className='date-indicator'>{ DateUtil.getPrettyDate(props.livestream.start.toDate()) }</div>
-            <div className='companies-mentor-discriber-content'>
+            <div className='companies-mentor-discriber-content' onClick={(event) => goToRouteFromParent(event, '/upcoming-livestream/' + props.livestream.id)}>
                 <div className='livestream-thumbnail' style={{ backgroundImage: 'url(' + props.livestream.backgroundImageUrl + ')' }}>
-                    <div className='livestream-thumbnail-overlay' style={{ backgroundColor: userIsRegistered() ? 'rgba(0, 210, 170, 0.90)' : ''}}>
+                    <div className='livestream-thumbnail-overlay' style={{ backgroundColor: userIsRegistered() ? 'rgba(0, 210, 170, 0.9)' : ''}}>
                         <div className='livestream-thumbnail-overlay-content'> 
-                            <Image style={{ maxWidth: '200px', margin: '20px 0', maxHeight: '120px', filter: userIsRegistered() ? 'brightness(0) invert(1)' : ''}} src={props.livestream.companyLogoUrl} onLoad={() => { props.grid.updateLayout() }}/>
+                            <Image style={{ maxWidth: '180px', margin: '30px 0', maxHeight: '90px', filter: userIsRegistered() ? 'brightness(0) invert(1)' : ''}} src={props.livestream.companyLogoUrl} onLoad={() => { props.grid.updateLayout() }}/>
                             <div className='livestream-position' style={{ color: userIsRegistered() ? 'white' : ''}}>{ props.livestream.title }</div>          
                             <div>
-                                <Button size='large' style={{ margin: '5px 5px 0 0' }} icon={ (props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? 'delete' : 'add' } color={(props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? 'red' : 'teal'} content={ (props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? 'Cancel' : 'Book a spot' } onClick={(props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? () => deregisterFromLivestream() : () => registerToLivestream()}/>
-                                <Link href={'/upcoming-livestream/' + props.livestream.id}><a><Button size='large' style={{ margin: '5px 5px 0 0' }} icon='signup' content='More Infos'/></a></Link>
+                                <Button size='large' style={{ margin: '5px 5px 0 0' }} icon={ (props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? 'delete' : 'add' } color={(props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? '' : 'teal'} content={ (props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? 'Cancel' : 'Book a Spot' } onClick={(props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
+                                <Link href={'/upcoming-livestream/' + props.livestream.id}><a><Button size='large' style={{ margin: '5px 5px 0 0' }} icon='signup' content='Details' color='pink'/></a></Link>
                             </div>
                         </div>
                     </div>
@@ -98,6 +144,7 @@ function LivestreamCard(props) {
                         </Grid.Row>
                     </Grid>
                 </div>
+                <BookingModal livestream={props.livestream} modalOpen={bookingModalOpen} setModalOpen={setBookingModalOpen} user={props.user}/>
             </div>
             <style jsx>{`
                 .hidden {
@@ -159,8 +206,7 @@ function LivestreamCard(props) {
                     cursor: pointer;
                     width: 100%;
                     height: 100%;
-                    min-height: 350px;
-                    padding: 80px 0 80px 30px;
+                    padding: 50px 0 50px 30px;
                     background-color: rgba(255, 255, 255, 0.90);
                     transition: background-color 0.5s;
                 }
@@ -232,7 +278,7 @@ function LivestreamCard(props) {
                 .livestream-position {
                     font-weight: 500;
                     color: rgb(44, 66, 81);
-                    font-size: 1.9em;
+                    font-size: 1.6em;
                     margin: 10px 0 20px 0;
                     line-height: 1.2em;
                 }
@@ -346,9 +392,24 @@ function LivestreamCard(props) {
                     background-color: white;
                     z-index: 10;
                 }
+
+                .modalStep {
+                    padding: 30px 0;
+                }
+
+                .talentPoolMessage {
+                    vertical-align: middle;
+                    margin: 0 10px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                }
+
+                .talentPoolMessage.active {
+                    color: rgb(0, 210, 170);
+                }
             `}</style>
         </Fragment>
     );
 }
 
-export default withFirebasePage(LivestreamCard);
+export default withFirebase(LivestreamCard);

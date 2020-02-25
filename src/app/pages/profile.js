@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 
 import { UNIVERSITY_SUBJECTS } from '../data/StudyFieldData';
 import { UNIVERSITY_NAMES } from '../data/UniversityData';
+import { STUDY_LEVELS } from '../data/StudyLevelData';
 import { withFirebase } from '../data/firebase';
 import Header from '../components/views/header/Header';
 import Loader from '../components/views/loader/Loader';
@@ -20,12 +21,13 @@ const UserProfile = (props) => {
 
     const subjects = UNIVERSITY_SUBJECTS;
     const universities = UNIVERSITY_NAMES;
+    const levels = STUDY_LEVELS;
     
     useEffect(() => {
        if (userData) {
-            setInitialValues({ firstName: userData.firstName, lastName: userData.lastName, university: userData.university, fieldOfStudy: userData.faculty });
+            setInitialValues({ firstName: userData.firstName, lastName: userData.lastName, university: userData.university, fieldOfStudy: userData.faculty, levelOfStudy: userData.levelOfStudy });
        } else {
-            setInitialValues({ firstName: '', lastName: '', university: null, fieldOfStudy: null });
+            setInitialValues({ firstName: '', lastName: '', university: null, fieldOfStudy: null, levelOfStudy: null });
        }
     }, [userData]);
 
@@ -80,35 +82,31 @@ const UserProfile = (props) => {
                             let errors = {};
                             if (!values.firstName) {
                                     errors.firstName = 'Required';
-                            } else if (!/^[a-z ,.'-]+$/i.test(values.firstName)) {
+                            } else if (!/^\D+$/i.test(values.firstName)) {
                                 errors.firstName = 'Please enter a valid first name';
                             }
                             if (!values.lastName) {
                                 errors.lastName = 'Required';
-                            } else if (!/^[a-z ,.'-]+$/i.test(values.lastName)) {
+                            } else if (!/^\D+$/i.test(values.lastName)) {
                                 errors.lastName = 'Please enter a valid last name';
                             }
                             if (!values.university) {
-                                errors.university = 'Required';
+                                errors.university = 'Please select a university';
                             } 
                             if (!values.fieldOfStudy) {
-                                errors.fieldOfStudy = 'Required';
+                                errors.fieldOfStudy = 'Please select a field of study';
+                            }
+                            if (!values.levelOfStudy) {
+                                errors.fieldOfStudy = 'Please select a level of study';
                             }
                             return errors;
                         }}
                         onSubmit={(values, { setSubmitting }) => {
                             setSubmitting(true);
-                            props.firebase.setUserData(user.email, values.firstName, values.lastName, values.university, values.fieldOfStudy)
+                            props.firebase.setUserData(user.email, values.firstName, values.lastName, values.university, values.fieldOfStudy, values.levelOfStudy)
                             .then(() => {
-                                debugger;
                                 if (!userData) {
-                                    let universityQuery = null;
-                                    if (values.university === 'ethz') {
-                                        universityQuery = 'ethzurich';
-                                    } else if (values.university === 'epfl') {
-                                        universityQuery = 'epflausanne';
-                                    }
-                                    router.push('/comingup' + (universityQuery ? ('?university=' + universityQuery) : ''));
+                                    router.push('/next-livestreams' + (values.university ? ('?university=' + values.university) : ''));
                                 }
                                 setSubmitting(false);
                             }).catch(error => {
@@ -157,10 +155,23 @@ const UserProfile = (props) => {
                                     <Form.Field>
                                         <label>Select your place of study</label>
                                         <Dropdown placeholder='Select University' value={values.university} onChange={(event, {value}) => { setFieldValue('university', value, true) }} compact selection options={universities}/>
+                                        <div className='field-error'>
+                                            {errors.university && touched.university && errors.university}
+                                        </div>
                                     </Form.Field>
                                     <Form.Field>
                                         <label>Select your field of expertise</label>
                                         <Dropdown placeholder='Select Field of Study' value={values.fieldOfStudy} onChange={(event, {value}) => { setFieldValue('fieldOfStudy', value, true) }} compact selection options={subjects}/>
+                                        <div className='field-error'>
+                                            {errors.university && touched.university && errors.university}
+                                        </div>
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>Select your level of study</label>
+                                        <Dropdown placeholder='Select Field of Study' value={values.levelOfStudy} onChange={(event, {value}) => { setFieldValue('levelOfStudy', value, true) }} compact selection options={levels}/>
+                                        <div className='field-error'>
+                                            {errors.university && touched.university && errors.university}
+                                        </div>
                                     </Form.Field>
                                 </Form.Group>
                                 <Button id='submitButton' color='teal' type='submit'  size='big' content={ userData ? 'Save Changes' : 'Create Account'} loading={isSubmitting}/>
@@ -177,6 +188,11 @@ const UserProfile = (props) => {
                     .greyBackground {
                         background-color: rgb(250,250,250);
                         height: 100vh;
+                    }
+
+                    .field-error {
+                        margin-top: 10px;
+                        color: red;
                     }
 
                     #profileContainer {

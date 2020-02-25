@@ -18,7 +18,7 @@ import { SizeMe } from 'react-sizeme';
 import Link from 'next/link';
 
 
-function ComingUp(props) {
+function Calendar(props) {
 
     const backgroundOptions = UNIVERSITY_SUBJECTS;
     const router = useRouter();
@@ -26,8 +26,8 @@ function ComingUp(props) {
     const { fade } = transitions;
 
     const [user, setUser] = useState(null);
+    const [userData, setUserData] = useState(null);
     const [grid, setGrid] = useState(null);
-    const [viewDetails, setViewDetails] = useState(true);
     const [allLivestreams, setAllLivestreams] = useState([]);
     const [livestreams, setLivestreams] = useState([]);
     const [fields, setFields] = useState([]);
@@ -45,6 +45,18 @@ function ComingUp(props) {
             }
         })
     }, []);
+
+    useEffect(() => {
+        if (user) {
+            props.firebase.getUserData(user.email)
+            .then(querySnapshot => {
+                let user = querySnapshot.data();
+                if (user) {
+                    setUserData(user);
+                }
+            });
+        }
+    },[user]);
 
     useEffect(() => {
         if (props.filter) {
@@ -109,38 +121,8 @@ function ComingUp(props) {
         setFields(fieldsCopy);
     }
 
-    function registerToLivestream(livestreamId) {
-        if (!user) {
-            return router.push('/signup');
-        }
-
-        props.firebase.registerToLivestream(livestreamId, user.email);
-    }
-
-    function deregisterFromLivestream(livestreamId) {
-        if (!user) {
-            return router.push('/signup');
-        }
-
-        props.firebase.deregisterFromLivestream(livestreamId, user.email);
-    }
-
-    function getNumberOfRegistrants(livestream) {
-        if (!livestream.registeredUsers) {
-            return 0;
-        }
-        return livestream.registeredUsers.length;
-    }
-
-    function userIsRegistered(user, livestream) {
-        if (!user || !livestream.registeredUsers) {
-            return false;
-        }
-        return livestream.registeredUsers.indexOf(user.email) > -1;
-    }
-
-    function goToUpcomingLivestream(livestreamId) {
-        return router.push('/upcoming-livestream/' + livestreamId);
+    function goToSeparateRoute(route) {
+        window.open('http://careerfairy.io' + route, '_blank');
     }
 
     const filterElement = backgroundOptions.map((option, index) => {
@@ -190,7 +172,7 @@ function ComingUp(props) {
         const avatar = mentor.mainSpeakerAvatar ? mentor.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
         return(
             <div key={index}>
-                <LivestreamCard livestream={mentor} user={user} fields={fields} grid={grid}/>
+                <LivestreamCard livestream={mentor} user={user} userData={userData} fields={fields} grid={grid}/>
             </div>
         );
     })
@@ -220,11 +202,14 @@ function ComingUp(props) {
                 <Container>
                     <div className='landingPageButtonsLabel'>Select your fields of interest</div>
                     { filterElement }
-                    <Button style={{ margin: '5px' }} content={showAllFields ? 'Hide all filters' : 'Show all filters'} color='pink' icon={showAllFields ? 'angle up' : 'angle down'} size='mini' onClick={() => setShowAllFields(!showAllFields)}/>
+                    <Button style={{ margin: '5px' }} content={showAllFields ? 'Hide all filters' : 'Show all filters'} icon={showAllFields ? 'angle up' : 'angle down'} size='mini' onClick={() => setShowAllFields(!showAllFields)}/>
                 </Container>
             </div>
             <div className='mentor-list'>
                 <Container>
+                    <div style={{ textAlign: 'center', margin: '10px 0' }}>
+                    <Button size='big' content={ 'How Live Streams Work' } icon={ 'cog' } style={{ margin: '5px auto' }} onClick={() => goToSeparateRoute('/howitworks')} color='pink'/>
+                    </div>
                     <SizeMe>{ ({ size }) => (
                         <StackGrid
                             columnWidth={(size.width <= 768 ? '100%' : 450)}
@@ -236,29 +221,13 @@ function ComingUp(props) {
                     )}</SizeMe>
                 </Container>
             </div>
-            <div className={'HowItWorksContainer ' + ( welcomeSignOpen ? '' : 'hidden')}>
-                <div className='how-it-works' ref={myRef}>
-                    <Container>
-                            <h3>Welcome to CareerFairy</h3>
-                            <Grid columns={3} stackable centered textAlign='center' style={{ marginBottom: '20px'}}>
-                                <Grid.Row>
-                                    <Grid.Column>
-                                        <Image className='stepImage' src='/streamer.png' />
-                                        <h2>1. Browse past & future livestreams</h2>
-                                    </Grid.Column>
-                                    <Grid.Column>
-                                        <Image className='stepImage' src='/faqs.png' />
-                                        <h2>2. Register for future events and ask your questions</h2>
-                                    </Grid.Column>
-                                    <Grid.Column>
-                                        <Image className='stepImage' src='/computer.png' />
-                                        <h2>3. Get hired by your teammates</h2>
-                                    </Grid.Column>
-                                </Grid.Row>
-                            </Grid>
-                            <Button primary size='huge' onClick={() => setWelcomeSignOpen(false)}>Got it!</Button>
-                    </Container>
-                </div>
+            <div className='grey-container'>
+                <div className='container-title'>Any problem or question ? We want to hear from you</div>
+                <Container>
+                    <Grid.Column width={16} style={{ textAlign: 'center' }}>
+                        <a className="aboutContentContactButton" href="mailto:thomas@careerfairy.io"><Button size='big' content='Contact CareerFairy' style={{ margin: '30px 0 0 0' }}/> </a>
+                    </Grid.Column>
+                </Container>
             </div>
             <Footer/>
             <style jsx>{`
@@ -316,7 +285,7 @@ function ComingUp(props) {
                     background-color: white;
                     padding: 20px 0;
                     box-shadow: 0 0 5px grey;
-                    z-index: 8000;
+                    z-index: 1000;
                 }
 
                 #landingPageButtons button {
@@ -346,6 +315,22 @@ function ComingUp(props) {
                     color: black;
                     padding: 20px 40px;
                     height: 280px;
+                }
+
+                .container-title {
+                    text-transform: uppercase;
+                    text-align: center;
+                    font-size: 1.1em;
+                    font-weight: 700;
+                    margin-bottom: 20px;
+                    color: rgb(150,150,150);
+                }
+
+                .grey-container {
+                    position: relative;
+                    width: 100%;
+                    padding: 40px 0 50px 0;
+                    background-color: rgb(245,245,245);
                 }
 
                 .nextEventLabel {
@@ -1034,7 +1019,7 @@ function ComingUp(props) {
                 #preview-video-container .content {
                     padding: 0 !important;
                     background-color: transparent !important;
-                }import DateUtil from '../util/DateUtil';
+                }import BookingModal from '../components/views/booking-modal/BookingModal';
 
 
                 .preview-video-description {
@@ -1079,8 +1064,8 @@ function ComingUp(props) {
     );
 }
 
-ComingUp.getInitialProps = ({ query }) => {
+Calendar.getInitialProps = ({ query }) => {
     return { university: query.university, filter: query.filter }
 }
 
-export default withFirebasePage(ComingUp);
+export default withFirebasePage(Calendar);

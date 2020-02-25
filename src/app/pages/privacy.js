@@ -10,40 +10,49 @@ const PrivacyPolicy = (props) => {
             <div className='cookies-background'>
                 <Container>
                 <h1>Privacy policy</h1> 
-                <p>This privacy policy (&quot;Policy&quot;) describes how CareerFairy GmbH (&quot;CareerFairy&quot;, &quot;we&quot;, &quot;us&quot; or &quot;our&quot;), a Swiss corporation with offices at Zurlindenstrasse 45, Zurich, Switzerland, as the data controller, collects, protects and uses the personally identifiable information (&quot;Personal Information&quot;) you (&quot;User&quot;, &quot;you&quot; or &quot;your&quot;) may provide on the <a target="_blank" rel="noopener noreferrer nofollow" href="https://careerfairy.io">careerfairy.io</a> website and any of its products or services (collectively, &quot;Website&quot; or &quot;Services&quot;).</p>
-                    <p>It also describes the choices available to you regarding our use of your Personal Information and how you can access and update this information. This Policy does not apply to the practices of companies that we do not own or control, or to individuals that we do not employ or manage.</p>
+                <p>Welcome to CareerFairy!  CareerFairy is an online platform that is designed to build a bridge between the new generation of talents and employees at work.  It is owned and operated by CareerFairy GmbH, a Swiss limited liability company, based at Zurlindenstrasse 45, Zurich, Switzerland.  In this Privacy Policy, CareerFairy GmbH will be referred to as “CareerFairy” or “we”, and the user of the website located at <a href='https://careerfairy.io'>https://careerfairy.io</a> (CareerFairy Website) will be referred to as “user” or “you”..</p>
+                    <p>This Privacy Policy explains the choices you have regarding our use of your personal information (<em>personal data</em>) and how you can access and update this information on the CareerFairy Website.  CareerFairy is the data controller for the purposes of this data protection policy.</p>
                     <h2>Automatic collection of information</h2>
                     <p>When you visit the Website our servers automatically record information that your browser sends. This data may include information such as your device's IP address, browser type and version, operating system type and version, language preferences or the webpage you were visiting before you came to our Website, pages of our Website that you visit, the time spent on those pages, information you search for on our Website, access times and dates, and other statistics.</p>
-                    <p>Information collected automatically is used only to identify potential cases of abuse and establish statistical information regarding Website usage. This statistical information is not otherwise aggregated in such a way that would identify any particular user of the system.</p>
-                    <h2>Collection of personal information</h2>
-                    <p>You can visit the Website without telling us who you are or revealing any information by which someone could identify you as a specific, identifiable individual. If, however, you wish to use some of the Website's features, you will be asked to provide certain Personal Information (for example, your name and e-mail address). We receive and store any information you knowingly provide to us when you create an account, publish content,  or fill any online forms on the Website.  When required, this information may include the following:</p>
+                    <p>This information is used only to identify potential abuse and to gather statistical information about usage of the CareerFairy Website. This statistical information is not aggregated in a way that would identify individual visitors to the CareerFairy Website.</p>
+                    <h2>Collection of personal data</h2>
+                    <p>You can visit the CareerFairy Website without revealing any information by which we or anyone else could identify you. If, however, you wish to create or log in to an account on the CareerFairy Website, you will be asked to provide the following personal data:</p>
                     <ul>
-                    <li>Personal details such as name, country of residence, etc.</li>
-                    <li>Contact information such as email address, address, etc.</li>
-                    <li>Account details such as user name, unique user ID, password, etc.</li>
-                    <li>Any other materials you willingly submit to us such as articles, images, feedback, etc.</li>
+                    <li>First name</li>
+                    <li>Family name</li>
+                    <li>Email address</li>
+                    <li>Study subject</li>
+                    <li>Level of qualification you are studying for (BSc / MSc / PhD)</li>
+                    <li>University you are studying at</li>
                     </ul>
-                    <p>You can choose not to provide us with your Personal Information, but then you may not be able to take advantage of some of the Website's features. Users who are uncertain about what information is mandatory are welcome to contact us.</p>
-                    <h2>Managing personal information</h2>
-                    <p>You are able to delete certain Personal Information we have about you. The Personal Information you can delete may change as the Website or Services change. When you delete Personal Information, however, we may maintain a copy of the unrevised Personal Information in our records for the duration necessary to comply with our obligations to our affiliates and partners, and for the purposes described below. If you would like to delete your Personal Information or permanently delete your account, you can do so on the settings page of your account on the Website or simply by contacting us.</p>
-                    <h2>Storing personal information</h2>
-                    <p>We will retain and use your Personal Information for the period necessary to comply with our legal obligations, resolve disputes, and enforce our agreements unless a longer retention period is required or permitted by law. We may use any aggregated data derived from or incorporating your Personal Information after you update or delete it, but not in a manner that would identify you personally. Once the retention period expires, Personal Information shall be deleted. Therefore, the right to access, the right to erasure, the right to rectification and the right to data portability cannot be enforced after the expiration of the retention period.</p>
-                    <h2>Use and processing of collected information</h2>
-                    <p>In order to make our Website and Services available to you, or to meet a legal obligation, we need to collect and use certain Personal Information. If you do not provide the information that we request, we may not be able to provide you with the requested products or services. Some of the information we collect is directly from you via our Website. However, we may also collect Personal Information about you from other sources. Any of the information we collect from you may be used for the following purposes:</p>
+                    <p>You can choose not to provide us with personal data, but then you will not be able to create an account, upload your CV, be notified of scheduled livestreams or rewatch past livestreams.</p>
+                    <h2>Managing personal data</h2>
+                    <p>If you would like to update, amend or delete your personal data or permanently delete your account, you can do so by contacting us by email at privacy@careerfairy.io.</p>
+                    <h2>Storing personal data</h2>
+                    <p>We will keep and use your personal data for as long as we need to for compliance with our legal obligations, to resolve disputes, and enforce our agreements.</p>
+                    <h2>Use and processing of collected data</h2>
+                    <p>The personal data we hold about you is collected directly from you.  We may use it for the following purposes:</p>
                     <ul>
-                    <li>Create and manage user accounts</li>
-                    <li>Send administrative information</li>
-                    <li>Respond to inquiries and offer support</li>
-                    <li>Request user feedback</li>
-                    <li>Improve user experience</li>
-                    <li>Run and operate our Website and Services</li>
+                    <li>To create and manage your account on the CareerFairy Website</li>
+                    <li>To send you information about forthcoming livestream events</li>
+                    <li>To respond to your enquiries and offer support</li>
+                    <li>To request your feedback on our service</li>
+                    <li>To improve your user experience</li>
+                    <li>To ensure that your account is kept up to date</li>
+                    <li>To provide information about you to potential employers, with your permission</li>
                     </ul>
-                    <p>Processing your Personal Information depends on how you interact with our Website, where you are located in the world and if one of the following applies: (i) You have given your consent for one or more specific purposes. This, however, does not apply, whenever the processing of Personal Information is subject to California Consumer Privacy Act or European data protection law; (ii) Provision of information is necessary for the performance of an agreement with you and/or for any pre-contractual obligations thereof; (iii) Processing is necessary for compliance with a legal obligation to which you are subject; (iv) Processing is related to a task that is carried out in the public interest or in the exercise of official authority vested in us; (v) Processing is necessary for the purposes of the legitimate interests pursued by us or by a third party.</p>
-                    <p> Note that under some legislations we may be allowed to process information until you object to such processing (by opting out), without having to rely on consent or any other of the following legal bases below. In any case, we will be happy to clarify the specific legal basis that applies to the processing, and in particular whether the provision of Personal Information is a statutory or contractual requirement, or a requirement necessary to enter into a contract.</p>
-                    <h2>Information transfer and storage</h2>
-                    <p>Depending on your location, data transfers may involve transferring and storing your information in a country other than your own. You are entitled to learn about the legal basis of information transfers to a country outside the European Union or to any international organization governed by public international law or set up by two or more countries, such as the UN, and about the security measures taken by us to safeguard your information. If any such transfer takes place, you can find out more by checking the relevant sections of this document or inquire with us using the information provided in the contact section.</p>
-                    <h2>The rights of users</h2>
-                    <p>You may exercise certain rights regarding your information processed by us. In particular, you have the right to do the following: (i) you have the right to withdraw consent where you have previously given your consent to the processing of your information; (ii) you have the right to object to the processing of your information if the processing is carried out on a legal basis other than consent; (iii) you have the right to learn if information is being processed by us, obtain disclosure regarding certain aspects of the processing and obtain a copy of the information undergoing processing; (iv) you have the right to verify the accuracy of your information and ask for it to be updated or corrected; (v) you have the right, under certain circumstances, to restrict the processing of your information, in which case, we will not process your information for any purpose other than storing it; (vi) you have the right, under certain circumstances, to obtain the erasure of your Personal Information from us; (vii) you have the right to receive your information in a structured, commonly used and machine readable format and, if technically feasible, to have it transmitted to another controller without any hindrance. This provision is applicable provided that your information is processed by automated means and that the processing is based on your consent, on a contract which you are part of or on pre-contractual obligations thereof.</p>
+                    <h2>Transfer and storage of personal data</h2>
+                    <p>Personal data collected by CareerFairy are transferred to and stored on a secure server in Frankfurt am Main, Germany.  The server is hosted by Google Germany GmbH which safeguards personal data in accordance with CareerFairy’s instructions.</p>
+                    <h2>Sharing your data with potential employers</h2>
+                    <p>If you agree to share your personal data with a potential employer, CareerFairy will transfer a copy of your personal data to that employer.</p>
+                    <p>We work with employers both within and outside the European Economic Area, Switzerland and the United Kingdom.  Employers within the European Economic Area, Switzerland and the United Kingdom are subject to the same or similar data protection rules as CareerFairy.  Employers outside these countries, however, may not be subject to data protection rules</p>
+                    <p>Where we work with an employer located outside the European Economic Area, Switzerland and the United Kingdom, we take appropriate steps to ensure that they protect your personal data.  These steps may include: </p>
+                    <ul>
+                    <li>signing a contract which requires the protection of your personal data in accordance with the standards that apply in your home country.</li>
+                    <li>a code of conduct approved by a data protection authority located in the EU.</li>
+                    <li>requiring an approved certification such as the EU-US or Switzerland-US Privacy Shield.</li>
+                    </ul>
+                    <p>If you do not want your personal data to be shared with potential employers outside the European Economic Area, Switzerland and the United Kingdom, please do not sign up for those employers’ talent pools.</p>
                     <h2>The right to object to processing</h2>
                     <p>Where Personal Information is processed for the public interest, in the exercise of an official authority vested in us or for the purposes of the legitimate interests pursued by us, you may object to such processing by providing a ground related to your particular situation to justify the objection. You must know that, however, should your Personal Information be processed for direct marketing purposes, you can object to that processing at any time without providing any justification. To learn, whether we are processing Personal Information for direct marketing purposes, you may refer to the relevant sections of this document.</p>
                     <h2>How to exercise these rights</h2>

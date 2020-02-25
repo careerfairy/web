@@ -29,7 +29,7 @@ function Footer(props) {
                             </Grid.Row>
                             <Grid.Row>
                                 <Grid.Column width={16}>
-                                    <div className='name-container'>LIVESTREAMING CAREER INSPIRATION</div>
+                                    <div className='name-container'>LIVE STREAMING CAREER INSPIRATION</div>
                                 </Grid.Column>
                             </Grid.Row>
                         </Grid>
@@ -71,7 +71,7 @@ function Footer(props) {
                 </Grid.Row>
                 <Grid.Row>
                     <Grid.Column width={16}>
-                        <div>2019 - CareerFairy GmbH - All Rights Reserved - Made in Zurich, Switzerland</div>
+                        <div>2020 - CareerFairy GmbH - All Rights Reserved - Made in Zurich, Switzerland</div>
                     </Grid.Column>
                 </Grid.Row>
             </Grid>

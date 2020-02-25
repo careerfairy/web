@@ -11,6 +11,9 @@ import Footer from '../../components/views/footer/Footer';
 
 const PastLivestreamDetail = (props) => {
 
+    const router = useRouter();
+    const { livestreamId } = router.query;
+
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(-1);
     const [currentLivestream, setCurrentLivestream] = useState(null);
@@ -19,14 +22,14 @@ const PastLivestreamDetail = (props) => {
     const [showAllQuestions, setShowAllQuestions] = useState(true);
 
     useEffect(() => {
-        if (props.id) { 
-            props.firebase.listenToLegacyScheduledLivestreamById(props.id, querySnapshot => {
+        if (livestreamId) { 
+            props.firebase.listenToLegacyScheduledLivestreamById(livestreamId, querySnapshot => {
                 let livestream = querySnapshot.data();
                 livestream.id = querySnapshot.id;
                 setCurrentLivestream(livestream);
             })
         }
-    }, [props.id]);
+    }, [livestreamId]);
 
     useEffect(() => {
         if (currentLivestream) {
@@ -36,8 +39,8 @@ const PastLivestreamDetail = (props) => {
 
 
     useEffect(() => {
-        if (props.id) {
-            props.firebase.getLegacyPastLivestreamsUntreatedQuestions(props.id, querySnapshot => {
+        if (livestreamId) {
+            props.firebase.getLegacyPastLivestreamsUntreatedQuestions(livestreamId, querySnapshot => {
                 var questionsList = [];
                 querySnapshot.forEach(doc => {
                     let question = doc.data();
@@ -47,7 +50,7 @@ const PastLivestreamDetail = (props) => {
                 setUpcomingQuestions(questionsList);
             });
         }
-    }, [props.id]);
+    }, [livestreamId]);
 
     function onProgress(data) {
         if (upcomingQuestions && upcomingQuestions.length > 0 && data.loadedSeconds > 2 && data.playedSeconds < upcomingQuestions[0].timecode) {
@@ -389,10 +392,6 @@ const PastLivestreamDetail = (props) => {
             `}</style>
         </div>
     );
-}
-
-PastLivestreamDetail.getInitialProps = ({ query }) => {
-    return { id: query.livestreamId }
 }
 
 export default withFirebasePage(PastLivestreamDetail);

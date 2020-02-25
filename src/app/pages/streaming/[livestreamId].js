@@ -300,7 +300,8 @@ function StreamingPage(props) {
                     .currentQuestionContainer .question-title {
                         width: 100%;
                         text-align: center;
-                        font-size: 1.2em;
+                        font-size: 1.5em;
+                        line-height: 1.3em;
                         font-weight: 700;
                         color: white;
                         padding: 15px;

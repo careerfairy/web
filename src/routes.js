@@ -4,6 +4,7 @@ module.exports = routes()
 .add('home', '/', 'index')
 
 .add('discover', '/discover', 'discover')
+.add('next-livestreams', '/next-livestreams', 'next-livestreams')
 
 .add('companies', '/companies', 'companies')
 .add('company', '/company/:companyId', 'company/[companyId]')

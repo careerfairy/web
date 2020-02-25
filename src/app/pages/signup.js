@@ -1,5 +1,5 @@
 import React, {Fragment, useState, useEffect} from 'react';
-import {Button, Container, Form, Header, Image, Message, Icon} from "semantic-ui-react";
+import {Button, Container, Form, Header, Image, Message, Icon, Checkbox} from "semantic-ui-react";
 import { withFirebase} from "../data/firebase";
 
 import { useRouter } from 'next/router';
@@ -31,8 +31,10 @@ function SignUpPage(props) {
             <SignUpForm user={user}/>
             <style jsx>{`
                 .tealBackground {
-                    height: 100vh;
+                    min-height: 100vh;
+                    height: 100%;
                     background-color: rgb(0, 210, 170);
+                    padding: 0 0 40px 0;
                 }
             `}</style>
         </div>
@@ -54,10 +56,10 @@ export function SignUpFormBase(props) {
         if (emailSent && props.user && !emailVerificationSent) {
             axios({
                 method: 'post',
-                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendEmailVerificationEmail',
+                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmail',
                 data: {
                     recipientEmail: props.user.email,
-                    redirect_link: 'http://testing.careerfairy.io/login'
+                    redirect_link: 'https://careerfairy.io/login'
                 }
             }).then( response => { 
                     props.firebase.auth.signOut().then(() => {
@@ -76,7 +78,7 @@ export function SignUpFormBase(props) {
                 <Container>
                     <div className='formContainer'>
                         <Formik
-                            initialValues={{ email: '', password: '', confirmPassword: '' }}
+                            initialValues={{ email: '', password: '', confirmPassword: '', agreeTerm: false }}
                             validate={values => {
                                 let errors = {};
                                 if (!values.email) {
@@ -96,17 +98,23 @@ export function SignUpFormBase(props) {
                                 } else if (values.confirmPassword !== values.password) {
                                     errors.confirmPassword = 'Your password was not confirmed correctly';
                                 }
+                                if (!values.agreeTerm) {
+                                    errors.agreeTerm = 'Please agree to our T&C and our Privacy Policy';
+                                }
                                 return errors;
                             }}
                             onSubmit={(values, { setSubmitting }) => {
                                 setErrorMessageShown(false);
+                                setEmailSent(false);
                                 setGeneralLoading(true);
                                 props.firebase.createUserWithEmailAndPassword(values.email, values.password)
                                     .then(() => { 
                                         setSubmitting(false);
                                         setEmailSent(true);
                                     }).catch(error => {
-                                        setErrorMessageShown(false);
+                                        setErrorMessageShown(true);
+                                        setSubmitting(false);
+                                        setGeneralLoading(false);
                                         console.log(error);
                                 })
                             }}
@@ -118,6 +126,7 @@ export function SignUpFormBase(props) {
                                 handleChange,
                                 handleBlur,
                                 handleSubmit,
+                                setFieldValue,
                                 isSubmitting,
                                 /* and other goodies */
                             }) => (
@@ -144,11 +153,18 @@ export function SignUpFormBase(props) {
                                             {errors.password && touched.password && errors.password}
                                         </div>
                                     </Form.Field>
-                                    <Form.Field disabled={ !touched.password || errors.password }>
+                                    <Form.Field>
                                         <label style={{ color: 'rgb(120,120,120)' }}>Confirm Password</label>
                                         <input id='confirmPasswordInput' type='password' name='confirmPassword' placeholder='Confirm Password' onChange={handleChange} onBlur={handleBlur} value={values.confirmPassword} disabled={isSubmitting || emailSent || generalLoading} />
                                         <div className='field-error'>
                                             {errors.confirmPassword && touched.confirmPassword && errors.confirmPassword}
+                                        </div>
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <input id='agreeTerm' type='checkbox' style={{ display: 'inline-block', margin: '0 0 10px 0'}} name='agreeTerm' placeholder='Confirm Password' onChange={handleChange} onBlur={handleBlur} value={values.agreeTerm} disabled={isSubmitting || emailSent || generalLoading} />
+                                        <label style={{ display: 'inline-block', margin: '0 0 3px 10px'}}>I agree to the <Link href='/terms'><a>Terms & Conditions</a></Link> and the <Link href='/privacy'><a>Privacy Policy</a></Link></label>
+                                        <div className='field-error'>
+                                            {errors.agreeTerm && touched.agreeTerm  && errors.agreeTerm}
                                         </div>
                                     </Form.Field>
                                     <Button id='submitButton' fluid primary size='big' disabled={emailSent} type="submit" loading={isSubmitting || generalLoading}>Sign up</Button>
@@ -162,7 +178,10 @@ export function SignUpFormBase(props) {
                                         <div style={{ marginBottom: '5px'}}>Already part of the family?</div>
                                         <Link href='/login'><a href='#'>Log in</a></Link>
                                     </div> 
-                                    <div className={'errorMessage ' + (errorMessageShown ? '' : 'hidden')}>An error occured while logging in to your account</div>
+                                    <div className='reset-email'>
+                                        <div style={{ marginBottom: '5px'}}>Having issues signing up?<a style={{ marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us know</a></div>
+                                    </div> 
+                                    <div className={'errorMessage ' + (errorMessageShown ? '' : 'hidden')}>An error occured while creating to your account</div>
                                 </Form>
                             )}
                             </Formik>
