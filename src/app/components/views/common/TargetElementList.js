@@ -37,7 +37,7 @@ function TargetElementList(props) {
         } else {
             return (
                 <Fragment key={index}>
-                    <div className='tag' style={{ fontSize: props.size === 'large' ? '1.1em' : '0.8em', padding: props.size === 'large' ? '8px 15px' : '2px 10px', borderRadius: props.size === 'large' ? '20px' : '12px' }}>
+                    <div className='tag' style={{ fontSize: props.size === 'large' ? '1em' : '0.8em', padding: props.size === 'large' ? '8px 12px' : '2px 10px', borderRadius: props.size === 'large' ? '20px' : '12px' }}>
                         {targetElement.text}
                     </div>
                     <style jsx>{`

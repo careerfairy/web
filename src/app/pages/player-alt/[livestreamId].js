@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Button, Grid, Icon, Image, Input} from "semantic-ui-react";
+import {Button, Grid, Icon, Image, Input, Modal} from "semantic-ui-react";
 
 import Loader from '../../components/views/loader/Loader';
 import { withFirebasePage } from '../../data/firebase';
@@ -19,10 +19,15 @@ function StreamPlayer(props) {
 
     const [isInitialized, setInitialized] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [playerMuted, setPlayerMuted] = useState(false);
+
+    const [monitorBitrate, setMonitorBitrate] = useState(false);
+    const [currentBitrate, setCurrentBitrate] = useState(null);
     
     const [allQuestionsShown, setAllQuestionsShown] = useState(false);
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [voteOnQuestions, setVoteOnQuestions] = useState(null);
+    const [questionSubmittedModalOpen, setQuestionSubmittedModalOpen] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState(null);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
     const [newCommentTitle, setNewCommentTitle] = useState("");
@@ -64,6 +69,20 @@ function StreamPlayer(props) {
     }, [props.livestreamId]);
 
     useEffect(() => {
+        if (props.livestreamId) {
+            props.firebase.listenToScheduledLivestreamsCurrentQuestion(props.livestreamId, querySnapshot => {
+                if  (querySnapshot.size > 0) {
+                    querySnapshot.forEach(doc => {
+                        let question = doc.data();
+                        question.id = doc.id;
+                        setCurrentQuestion(question);
+                    });
+                }
+            });
+        }
+    }, [props.livestreamId]);
+
+    useEffect(() => {
         if (user && upcomingQuestions && upcomingQuestions.length > 0) {
             let questionsToBeVoted = upcomingQuestions.filter(question => {
                 if (question.emailOfVoters) {
@@ -77,8 +96,8 @@ function StreamPlayer(props) {
     }, [upcomingQuestions]);
 
     useEffect(() => {
-        if (props.livestreamId && currentQuestion) {
-            props.firebase.listenToScheduledLivestreamQuestionComments(props.livestreamId, currentQuestion.id, querySnapshot => {
+        if (props.livestreamId) {
+            props.firebase.listenToScheduledLivestreamComments(props.livestreamId, querySnapshot => {
                 var commentsList = [];
                 querySnapshot.forEach(doc => {
                     let comment = doc.data();
@@ -88,7 +107,7 @@ function StreamPlayer(props) {
                 setComments(commentsList);
             });
         }
-    }, [props.livestreamId, currentQuestion]);
+    }, [props.livestreamId]);
 
     useEffect(() => {
         animateScroll.scrollToBottom({
@@ -100,12 +119,6 @@ function StreamPlayer(props) {
     }, [comments]);
 
     useEffect(() => {
-        if (!currentQuestion) {
-            setCurrentQuestion(upcomingQuestions[0]);
-        }
-    }, [upcomingQuestions]);
-
-    useEffect(() => {
         if (isInitialized && currentLivestream && currentLivestream.hasStarted && !isPlaying) {
             setTimeout(() => {
                 startPlaying();
@@ -114,7 +127,13 @@ function StreamPlayer(props) {
     }, [currentLivestream, isInitialized]);
 
     function upvoteQuestion(question) {
-        props.firebase.upvoteQuestion(currentLivestream.id, question, user.email);
+        props.firebase.upvoteQuestion(currentLivestream.id, question, user.email).then(() => {
+            setVoteOnQuestions(null);
+        });
+    }
+
+    function upvoteQuestionAnswer(question) {
+        props.firebase.upvoteQuestionAnswer(currentLivestream.id, question, user.email);
     }
 
     let questionElements = upcomingQuestions.map((question, index) => {
@@ -124,8 +143,7 @@ function StreamPlayer(props) {
                     <p style={{ marginBottom: '5px' }}>{ question.title }</p>
                     <p style={{ fontSize: '0.8em', fontWeight: '300', color: 'rgb(200,200,200)' }}>from @Martin.Kamm</p>
                     <div className='bottom-element'>
-                        <Button icon='thumbs down' size='massive' circular/>
-                        <Button icon='thumbs up' onClick={() => upvoteQuestion(question)} size='massive' circular primary/>
+                        <Button icon='thumbs up' onClick={() => upvoteQuestion(question)} size='large' content='Upvote' primary/>
                         <div className='streamNextQuestionNumberOfVotes'>{ question.votes } <Icon name='thumbs up'/></div>
                     </div>
                     <style jsx>{`
@@ -180,7 +198,7 @@ function StreamPlayer(props) {
                 </div>
             </Grid.Column>
         );
-    })
+    });
 
     useEffect(() => {
         axios({
@@ -198,7 +216,7 @@ function StreamPlayer(props) {
     }, []);
 
     useEffect(() => {
-        if (nsToken && nsToken.iceServers.length > 0 && !isPlaying) {
+        if (nsToken && nsToken.iceServers.length > 0 && currentLivestream && currentLivestream.hasStarted && !isPlaying) {
             var pc_config = {
                 'iceServers' : nsToken.iceServers
             };
@@ -224,7 +242,7 @@ function StreamPlayer(props) {
                 sdp_constraints : sdpConstraints,
                 remoteVideoId : "remoteVideo",
                 isPlayMode: true,
-                callback : function(info) {
+                callback : function(info, obj) {
                     if (info === "initialized") {
                         console.log("initialized"); 
                         setInitialized(true);            
@@ -234,6 +252,21 @@ function StreamPlayer(props) {
                     } else if (info === "play_finished") {
                         // play finishedthe stream
                         setIsPlaying(false);           
+                    } else if (info == "closed") {
+                        //console.log("Connection closed");
+                        if (typeof obj != "undefined") {
+                            console.log("Connecton closed: " + JSON.stringify(obj));
+                        }
+                    } else if (info == "refreshConnection") {
+                        startStreaming();
+                    } else if (info == "updated_stats") {
+                        //obj is the PeerStats which has fields
+                         //averageOutgoingBitrate - kbits/sec
+                        //currentOutgoingBitrate - kbits/sec
+                        monitorIncomingBitrate(obj.currentIncomingBitrate);
+                        console.log("Average incoming bitrate " + obj.averageIncomingBitrate + " kbits/sec"
+                                + " Current incoming bitrate: " + obj.currentIncomingBitrate + " kbits/sec");
+                         
                     }
                 },
                 callbackError : function(error) {
@@ -244,8 +277,29 @@ function StreamPlayer(props) {
             });
             setWebRTCAdaptor(newAdaptor);
         }
-    }, [nsToken, currentLivestream])
+    }, [nsToken, currentLivestream]);
 
+    useEffect(() => {
+        if (webRTCAdaptor && isPlaying) {
+            webRTCAdaptor.enableStats(currentLivestream.id);
+        }
+    }, [webRTCAdaptor, isPlaying]);
+
+    useEffect(() => {
+        if (webRTCAdaptor && isPlaying) {
+            setTimeout(() => {
+                setMonitorBitrate(true);
+            }, 10000);
+        }
+    }, [webRTCAdaptor, isPlaying]);
+
+    function monitorIncomingBitrate(currentIncomingBitrate) {
+        if (monitorBitrate && currentIncomingBitrate === 0) {
+            setIsPlaying(false);
+        }
+    }
+
+ 
     function startPlaying() {
         webRTCAdaptor.play(currentLivestream.id);
     }
@@ -260,6 +314,7 @@ function StreamPlayer(props) {
         props.firebase.putScheduledLivestreamsQuestion(currentLivestream.id, newQuestion)
             .then(() => {
                 setNewQuestionTitle("");
+                setQuestionSubmittedModalOpen(true);
             }, () => {
                 console.log("Error");
             })
@@ -270,7 +325,7 @@ function StreamPlayer(props) {
             title: newCommentTitle,
             votes: 0,
         }
-        props.firebase.putScheduledLivestreamQuestionComment(currentLivestream.id, currentQuestion.id, newComment)
+        props.firebase.putScheduledLivestreamQuestionComment(currentLivestream.id, newComment)
             .then(() => {
                 setNewCommentTitle("");
             }, error => {
@@ -285,28 +340,41 @@ function StreamPlayer(props) {
     let CurrentQuestionElement = () => {
         return (
             <div>
-                <div className='currentQuestionContainer'>
-                    <div className='question-label'>Current Question</div>
-                    <div className='question-title'>
-                        { currentQuestion ? currentQuestion.title : '' }
-                    </div>
-                    <div className='question-buttons'>
-                        <Button content={ allQuestionsShown ? 'Hide All Questions' : 'See All Questions' } size='small' onClick={() => setAllQuestionsShown(true)} primary/>
+                <div className={'collapsableContainer ' + (currentQuestion ? 'active' : '')}>
+                    <div className='currentQuestionContainer'>
+                        <div className='question-label'>Current Question</div>
+                        <div className='question-title'>
+                            { currentQuestion ? currentQuestion.title : '' }
+                        </div>
+                        <div className='question-buttons'>
+                            <Button content={ allQuestionsShown ? 'Hide All Questions' : 'See All Questions' } onClick={() => setAllQuestionsShown(true)} primary/>
+                        </div>
                     </div>
                 </div>
                 <style jsx>{`
+                    .collapsableContainer {
+                        display: none;
+                        height: 0;
+                        transition: height 2s ease-in-out;
+                    }
+
+                    .collapsableContainer.active {
+                        display: block;
+                        height: 190px;
+                    }
+
                     .currentQuestionContainer {
                         position: relative;
-                        height: 160px;
+                        height: 100%;
                         width: 100%;
                         background-color: rgba(0, 210, 170, 0.7);
-                        padding-top: 5px;
+                        padding-top: 10px;
                     }
 
                     .currentQuestionContainer .question-label {
                         text-transform: uppercase;
                         text-align: center;
-                        font-size: 0.9em;
+                        font-size: 1.1em;
                         font-weight: 700;
                         color: rgba(255,255,255,0.7);
                     }
@@ -315,7 +383,7 @@ function StreamPlayer(props) {
                     .currentQuestionContainer .question-title {
                         width: 100%;
                         text-align: center;
-                        font-size: 1.2em;
+                        font-size: 1.6em;
                         font-weight: 700;
                         color: white;
                         padding: 15px;
@@ -382,50 +450,49 @@ function StreamPlayer(props) {
             </div>
             <div className='streamingOuterContainer'>
                 <div className='streamingContainer'>
-                    <video id="remoteVideo" autoPlay controls width='100%'></video> 
+                    <video id="remoteVideo" autoPlay controls muted width='100%'></video> 
                 </div>
                 <div className={'newQuestionPopup animated slideInUp ' + (voteOnQuestions ? '' : 'hidden')}>
                     <div className='streamNextQuestionContainer'>
+                        <p style={{ fontWeight: '700', fontSize: '0.6em', textTransform: 'uppercase', color: 'rgb(255, 20, 147)' }}>Upvote if you like this question</p>
                         <p style={{ marginBottom: '5px' }}>{voteOnQuestions ? voteOnQuestions.title : ''}</p>
                         <p style={{ fontSize: '0.8em', fontWeight: '300', color: 'rgb(200,200,200)' }}>from @Martin.Kamm</p>
                         <div className='bottom-element'>
-                            <Button icon='thumbs down' size='large' circular/>
-                            <Button icon='thumbs up' onClick={() => upvoteQuestion(voteOnQuestions)} size='large' circular primary/>
-                            <div className='streamNextQuestionNumberOfVotes'>{voteOnQuestions ? voteOnQuestions.votes : ''}<Icon name='thumbs up'/></div>
+                            <Button icon='thumbs up' onClick={() => upvoteQuestion(voteOnQuestions)} size='small' content='upvote' primary/>
                         </div>
+                        <Icon name='delete' style={{ position: 'absolute', top: '5px', right: '0', color: 'grey', cursor: 'pointer'}} onClick={() => setVoteOnQuestions(null)}/>
                     </div>
                 </div>
+                {/* <div className={'connecting-overlay ' + (isPlaying ? 'hidden' : '')} >
+                    <div className='connecting-overlay-content'>
+                        <Image src='/connector.gif' style={{ width: '120px', height: 'auto', margin: '0 auto' }} />
+                        <div>Wait a second, the streamer is about to connect</div>
+                    </div>
+                </div> */}
             </div>
             <div className='video-menu'>
-                <div className='center'>
-                    <Input action={{ content: 'ASK NOW', color: 'teal', onClick: () =>  addNewQuestion(newQuestionTitle)}} value={newQuestionTitle} onChange={(event) => {setNewQuestionTitle(event.target.value)}} fluid size='large' fluid placeholder='Write your question...' color='teal'/>
-                </div>  
-                <div className='right'>
-                    <Button  icon='thumbs up' size='huge' color='pink' circular/>
-                </div>     
+                <div className='video-menu-input'>
+                    <div className='center'>
+                        <Input action={{ content: 'Add Your Question', color: 'teal', onClick: () =>  addNewQuestion()}} value={newQuestionTitle} onChange={(event) => {setNewQuestionTitle(event.target.value)}} fluid size='huge' fluid placeholder='Write your question...' color='teal'/>
+                    </div>      
+                </div>
             </div>
             <div className='video-menu-left'>
                 <CurrentQuestionElement/>
-                <div>
-                    <div className='video-menu-left-reactions'>
-                        <div style={{ margin: '0 0 5px 0', color: 'rgb(255, 20, 147)'}}>REACTIONS TO ANSWER</div>
-                        <Grid centered>
-                            <Grid.Column width={5} textAlign='center'>
-                                <Icon name='thumbs up' color='pink' size='large' style={{ margin: '0 10px 0 0' }}/>
-                                <span style={{ color: 'rgb(255, 20, 147)', fontSize: '1.3em' }}>12</span>
-                            </Grid.Column>
-                        </Grid>
+                <div className={'chat-container ' + (currentQuestion ? 'active' : '')}>
+                    <div className={'video-menu-left-reactions'} style={{ backgroundColor: 'rgb(255, 20, 147)'}}>
+                        <div style={{ margin: '15px 0 0 0', color: 'white', fontSize: '1.3em'}}>OPEN CHAT</div>
                     </div>
                     <div id='scrollableLeft' className='video-menu-left-outer-content'>
                         <div  className='video-menu-left-content'>
                             { commentsElements }
                         </div>
                         <div className={'no-comment-message ' + (comments.length === 0 ? '' : 'hidden')}>
-                            Be the first to react to this answer!
+                            Be the first to chat!
                         </div>
                     </div>
                     <div className='video-menu-left-input'>
-                        <Input action={{ content: 'React', color: 'pink', onClick: () =>  addNewComment(newCommentTitle)}} value={newCommentTitle}  fluid placeholder='Send a reaction...' onChange={(event) => {setNewCommentTitle(event.target.value)}} />
+                        <Input action={{ content: 'React', color: 'pink', onClick: () =>  addNewComment(newCommentTitle)}} value={newCommentTitle}  fluid placeholder='Send your message...' onChange={(event) => {setNewCommentTitle(event.target.value)}} />
                     </div>
                 </div>
             </div>
@@ -435,9 +502,38 @@ function StreamPlayer(props) {
                     { questionElements }
                 </Grid>
             </div>
+            <Modal
+                style={{ zIndex: '9999' }}
+                open={questionSubmittedModalOpen}
+                onClose={() => setQuestionSubmittedModalOpen(false)}>
+                <Modal.Content>
+                    <h3>Thank you! You question has been sumbitted to the vote of the audience!</h3>
+                </Modal.Content>
+                <Modal.Actions>
+                <Button primary onClick={() => setQuestionSubmittedModalOpen(false)}>
+                    <Icon name='checkmark' /> Got it
+                </Button>
+                </Modal.Actions>
+            </Modal>
             <style jsx>{`
                 .hidden {
                     display: none;
+                }
+
+                .connecting-overlay {
+                    position:absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(255,255,255,1);
+                }
+
+                .connecting-overlay-content {
+                    position: absolute;
+                    top:50%;
+                    left:50%;
+                    transform: translate(-50%, -50%);
                 }
     
                 .topLevelContainer {
@@ -475,13 +571,22 @@ function StreamPlayer(props) {
                 .video-menu {
                     position: absolute;
                     bottom: 0;
+                    height: 80px;
                     left: 330px;
                     right: 0;
-                    padding: 15px 0;
-                    height: 80px;
                     z-index: 1000;
                     text-align: center;
                     background-color: rgb(240,240,240);
+                }
+
+                .video-menu-input {
+                    position: absolute;
+                    box-shadow: 0 0 5px grey;
+                    height: 80px;
+                    padding: 8px 0;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
                 }
 
                 .video-menu .center {
@@ -515,7 +620,7 @@ function StreamPlayer(props) {
                     left: 330px;
                     right: 0;
                     min-width: 500px;
-                    z-index: 8000;
+                    z-index: 1000;
                 }
 
                 .streamingContainer {
@@ -639,6 +744,18 @@ function StreamPlayer(props) {
                     z-index: 1;
                 }
 
+                .chat-container {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    bottom: 0;
+                    width: 100%;
+                }
+
+                .chat-container.active {
+                    top: 190px;
+                }
+
                 .video-menu-left-reactions {
                     width: 100%;
                     height: 60px;
@@ -655,11 +772,11 @@ function StreamPlayer(props) {
                 }
 
                 .video-menu-left-outer-content {
-                    position: absolute;
-                    top: 220px;
-                    left: 0;
-                    bottom: 40px;
                     width: 100%;
+                    position: absolute;
+                    top: 60px;
+                    left: 0;
+                    bottom: 40px;                   
                     overflow: scroll;
                     overflow-x: hidden;    
                     z-index: 3;
@@ -684,9 +801,7 @@ function StreamPlayer(props) {
                 }
 
                 .video-menu-left-content {
-                    position: absolute;
-                    top: 0;
-                    bottom: 0;
+                    height: 100%;
                     width: 100%;
                     padding: 10px 20px;
                 }

@@ -11,8 +11,8 @@ export default function CountdownTimer(props) {
       timeLeft = {
         days: Math.floor(difference / (1000 * 60 * 60 * 24)),
         hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60)
+        min: Math.floor((difference / 1000 / 60) % 60),
+        sec: Math.floor((difference / 1000) % 60)
       };
     }
 
@@ -45,21 +45,22 @@ export default function CountdownTimer(props) {
                   display: inline-block;
                   padding-top: 100%;
                   width: 50%;
-                  padding: 15px 0 0 0;
+                  padding: 5px 0 0 0;
                   text-align: center;
                   margin: 0 auto;
               }
 
               .timeElement .number {
-                  font-size: 2em;
-                  margin: 10px 0 20px 0;
+                  font-size: 1.6em;
+                  margin: 15px auto;
                   font-weight: 500;
               }
 
               .label {
-                  ont-size: 0.2em;
+                  font-size: 0.8em;
                   font-weight: 300;
                   color: rgb(100,100,100);
+                  margin: 0 auto;
               }
           `}</style>
         </div>

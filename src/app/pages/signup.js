@@ -7,6 +7,8 @@ import Link from 'next/link';
 import {Formik} from 'formik';
 import axios from 'axios';
 
+import Head from 'next/head';
+
 function SignUpPage(props) {
 
     const [user, setUser] = useState(false);
@@ -74,6 +76,9 @@ export function SignUpFormBase(props) {
 
     return (
         <Fragment>
+            <Head>
+                <title key="title">CareerFairy | Sign up</title>
+            </Head>
             <div className='tealBackground'>
                 <Container>
                     <div className='formContainer'>
@@ -115,7 +120,6 @@ export function SignUpFormBase(props) {
                                         setErrorMessageShown(true);
                                         setSubmitting(false);
                                         setGeneralLoading(false);
-                                        console.log(error);
                                 })
                             }}
                             >

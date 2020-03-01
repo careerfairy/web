@@ -86,7 +86,7 @@ export function WebRTCAdaptor(initialValues)
 	thiz.playStreamId = new Array();
 	thiz.micGainNode = null;
 	thiz.localStream = null;
-	thiz.bandwidth = 900; //default bandwidth kbps
+	thiz.bandwidth = 2000; //default bandwidth kbps
 
 	thiz.isPlayMode = false;
 	thiz.debug = false;
@@ -172,7 +172,7 @@ export function WebRTCAdaptor(initialValues)
 							//var screenVideo = document.getElementById('sourceVideo');
 							var screenVideo = document.createElement('video');
 							//TODO: check audio track
-                            screenVideo.srcObject = stream;
+							screenVideo.srcObject = stream;
 							screenVideo.play();
 							
 
@@ -532,11 +532,7 @@ export function WebRTCAdaptor(initialValues)
 
 	this.switchVideoCapture = function(streamId) {
 		var mediaConstraints = {
-				video : {
-					width: { ideal: 1920, max: 1920 },
-					height: { ideal: 1080, max: 1080 },
-					aspectRatio: 1.77
-				},
+				video : true,
 				audio : false
 		};
 
@@ -601,6 +597,7 @@ export function WebRTCAdaptor(initialValues)
 
 		navigator.mediaDevices.getUserMedia(mediaConstraints)
 		.then(function(stream) {
+
 			if (thiz.remotePeerConnection[streamId] != null) {
 				var videoTrackSender = thiz.remotePeerConnection[streamId].getSenders().find(function(s) {
 					return s.track.kind == "video";
@@ -616,6 +613,7 @@ export function WebRTCAdaptor(initialValues)
 			else {
 				thiz.arrangeStreams(stream, onEndedCallback);	
 			}
+
 		})
 		.catch(function(error) {
 			thiz.callbackError(error.name);

@@ -53,8 +53,22 @@ function StreamingPage(props) {
     }, [props.livestreamId]);
 
     useEffect(() => {
-        if (props.livestreamId && currentQuestion) {
-            props.firebase.listenToScheduledLivestreamQuestionComments(props.livestreamId, currentQuestion.id, querySnapshot => {
+        if (props.livestreamId && upcomingQuestions) {
+            props.firebase.listenToScheduledLivestreamsCurrentQuestion(props.livestreamId, querySnapshot => {
+                if  (querySnapshot.size > 0) {
+                    querySnapshot.forEach(doc => {
+                        let question = doc.data();
+                        question.id = doc.id;
+                        setCurrentQuestion(question);
+                    });
+                }
+            });
+        }
+    }, [props.livestreamId, upcomingQuestions]);
+
+    useEffect(() => {
+        if (props.livestreamId) {
+            props.firebase.listenToScheduledLivestreamComments(props.livestreamId, querySnapshot => {
                 var commentsList = [];
                 querySnapshot.forEach(doc => {
                     let comment = doc.data();
@@ -65,12 +79,6 @@ function StreamingPage(props) {
             });
         }
     }, [props.livestreamId, currentQuestion]);
-
-    useEffect(() => {
-        if (!currentQuestion) {
-            setCurrentQuestion(upcomingQuestions[0]);
-        }
-    }, [upcomingQuestions]);
 
     useEffect(() => {
         axios({
@@ -109,8 +117,23 @@ function StreamingPage(props) {
             smooth: true,
             duration: 100
           });
-          console.log("supposed to have scrolled");
     }, [comments]);
+
+    function setCurrentLivestreamIsLive(isLive) {
+        props.firebase.setScheduledLivestreamHasStarted(isLive, currentLivestream.id);
+    }
+
+    function goToNextQuestion() {
+        if (currentQuestion) {
+            props.firebase.goToNextQuestion(currentQuestion.id, upcomingQuestions[0].id, currentLivestream.id);
+        } else {
+            props.firebase.goToNextQuestion(null, upcomingQuestions[0].id, currentLivestream.id);
+        }
+    }
+
+    function goToThisQuestion(nextQuestionId) {
+        props.firebase.goToNextQuestion(currentQuestion.id, nextQuestionId, currentLivestream.id);
+    }
 
     function markQuestionAsDone(question) {
         props.firebase.markQuestionAsDone(currentLivestream.id, question)
@@ -119,6 +142,10 @@ function StreamingPage(props) {
             }, (error) => {
                 console.log("Error:" + error );
             });
+    }
+
+    function markQuestionAsCurrent(question) {
+        props.firebase.markQuestionAsCurrent(currentLivestream.id, question);
     }
 
     function removeQuestion(question) {
@@ -143,9 +170,13 @@ function StreamingPage(props) {
             <Grid.Column width={5}>
                 <div className='streamNextQuestionContainer' key={index}>
                     <p style={{ marginBottom: '5px' }}>{ question.title }</p>
-                    <p style={{ fontSize: '0.8em', fontWeight: '300', color: 'rgb(200,200,200)' }}>from @Martin.Kamm</p>
+                    <p style={{ fontSize: '0.8em', fontWeight: '300', color: 'rgb(200,200,200)' }}>from @{ question.author }</p>
                     <div className='bottom-element'>
                         <div className='streamNextQuestionNumberOfVotes'>{ question.votes } <Icon name='thumbs up'/></div>
+                    </div>
+                    <div>
+                        <Button content='Remove' onClick={() => removeQuestion(question)}/>
+                        <Button content='Select Question' onClick={() => goToThisQuestion(question.id)} primary/>
                     </div>
                     <style jsx>{`
                         .streamNextQuestionContainer {
@@ -270,22 +301,44 @@ function StreamingPage(props) {
         return (
             <div>
                 <div className='currentQuestionContainer'>
-                    <div className='question-label'>Current Question</div>
-                    <div className='question-title'>
-                        { currentQuestion ? currentQuestion.title : '' }
+                    <div className={currentQuestion ? '' : 'hidden'}>
+                        <div className='question-label'>Current Question</div>
+                        <div className='question-title'>
+                            { currentQuestion ? currentQuestion.title : '' }
+                        </div>
+                        <div className='question-buttons'>
+                            <Button icon='check' content='NEXT QUESTION' size='small' onClick={() => goToNextQuestion()} disabled={upcomingQuestions.length === 0}/>
+                            <Button content={ allQuestionsShown ? 'Hide All Questions' : 'See All Questions' } size='small' onClick={() => setAllQuestionsShown(!allQuestionsShown)} primary/>
+                        </div>
                     </div>
-                    <div className='question-buttons'>
-                        <Button icon='check' content='NEXT QUESTION' size='small'/>
-                        <Button content={ allQuestionsShown ? 'Hide All Questions' : 'See All Questions' } size='small' onClick={() => setAllQuestionsShown(!allQuestionsShown)} primary/>
+                    <div className={currentQuestion ? 'hidden' : ''}>
+                        <div className='question-label'>Q&A Questions</div>
+                        <div className='main-buttons'>
+                            <Button style={{ margin: '5px 0'}} content='Start Q&A' onClick={() => goToNextQuestion()} disabled={upcomingQuestions.length === 0} fluid/>
+                            <Button style={{ margin: '5px 0'}} content={ allQuestionsShown ? 'Hide All Questions' : 'See All Questions' } onClick={() => setAllQuestionsShown(!allQuestionsShown)} primary fluid/>
+                        </div>
                     </div>
                 </div>
+                <div className='video-menu-left-reactions'>
+                    <div style={{ margin: '0 0 5px 0'}}>REACTIONS TO ANSWER</div>
+                    <Grid centered>
+                        <Grid.Column width={5} textAlign='center'>
+                            <Icon name='thumbs up' color='pink' size='large' style={{ margin: '0 10px 0 0' }}/>
+                            <span style={{ color: 'rgb(255, 20, 147)', fontSize: '1.3em' }}>{ currentQuestion && currentQuestion.answerUpvotes ? currentQuestion.votes : 0 }</span>
+                        </Grid.Column>
+                    </Grid>
+                </div>
                 <style jsx>{`
+                    .hidden {
+                        display: none;
+                    }
+
                     .currentQuestionContainer {
                         position: relative;
                         height: 160px;
                         width: 100%;
                         background-color: rgba(0, 210, 170, 0.7);
-                        padding-top: 5px;
+                        padding: 5px 10px;
                     }
 
                     .currentQuestionContainer .question-label {
@@ -314,6 +367,21 @@ function StreamingPage(props) {
                         right: 0;
                         text-align: center;
                         padding: 15px 0;
+                    }
+
+                    .video-menu-left-reactions {
+                        width: 100%;
+                        height: 60px;
+                        text-align: center;
+                        padding: 5px;
+                        font-size: 0.8em;
+                        font-weight: 700;
+                        color: rgba(0, 210, 170, 0.7);
+                    }
+
+                    .main-buttons {
+                        text-align: center;
+                        margin: 30px 0;
                     }
                 `}</style>
             </div>
@@ -346,7 +414,7 @@ function StreamingPage(props) {
                 peerconnection_config : pc_config,
                 sdp_constraints : sdpConstraints,
                 localVideoId : "localVideo",
-                callback : function(info) {
+                callback : function(info, obj) {
                     if (info === "initialized") {
                         setStreamInitialized(true);
                         console.log("initialized");		
@@ -366,17 +434,37 @@ function StreamingPage(props) {
                         //"Stop Sharing" is clicked in chrome screen share dialog
                         console.log("screen share stopped");
                         setIsCapturingDesktop(false);
+                    } else if (info == "closed") {
+                        //console.log("Connection closed");
+                        if (typeof obj != "undefined") {
+                            console.log("Connecton closed: " + JSON.stringify(obj));
+                        }
+                    } else if (info == "refreshConnection") {
+                        startStreaming();
+                    } else if (info == "updated_stats") {
+                        //obj is the PeerStats which has fields
+                         //averageOutgoingBitrate - kbits/sec
+                        //currentOutgoingBitrate - kbits/sec
+                        console.log("Average outgoing bitrate " + obj.averageOutgoingBitrate + " kbits/sec"
+                                + " Current outgoing bitrate: " + obj.currentOutgoingBitrate + " kbits/sec");
+                         
                     }
                 },
                 callbackError : function(error) {
                     //some of the possible errors, NotFoundError, SecurityError,PermissionDeniedError
                     console.log("error callback: " + error);
-                    alert("The Following Error Occured: " + error);
+                    alert("There was an issue establishing the peer-2-peer connection. Please <a>contact us!</a>")
                 }
             });
             setWebRTCAdaptor(newAdaptor);
         }
     }, [currentLivestream, nsToken])
+
+    useEffect(() => {
+        if (webRTCAdaptor && isStreaming) {
+            webRTCAdaptor.enableStats(currentLivestream.id);
+        }
+    }, [webRTCAdaptor, isStreaming]);
 
     function startStreaming() {
         webRTCAdaptor.publish(currentLivestream.id);
@@ -405,7 +493,6 @@ function StreamingPage(props) {
                     { isStreaming ? '' : 'Press Start Streaming to begin'}
                 </div>
                 <div style={{ float: 'right', display: 'inlineBlock', margin: '0 20px' }}>
-                    <Button size='big' onClick={ isCapturingDesktop ? () => stopDesktopCapture() : () => startDesktopCapture()}>{ isCapturingDesktop ? 'Stop Screen Sharing' : 'Start Screen Sharing'}</Button>
                 </div>
             </div>
             <div className='streamingOuterContainer'>
@@ -415,23 +502,11 @@ function StreamingPage(props) {
             </div>
             <div className='video-menu'>
                 <ButtonWithConfirm color='teal' size='huge' buttonAction={isStreaming ? stopStreaming : startStreaming} confirmDescription={isStreaming ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
+                <Button size='big' onClick={ isCapturingDesktop ? () => stopDesktopCapture() : () => startDesktopCapture()}>{ isCapturingDesktop ? 'Stop Screen Sharing' : 'Share Screen'}</Button>
             </div>
             <div className='video-menu-left'>
                 <CurrentQuestionElement/>
                 <div>
-                    <div className='video-menu-left-reactions'>
-                        <div style={{ margin: '0 0 5px 0'}}>REACTIONS TO ANSWER</div>
-                        <Grid centered>
-                            <Grid.Column width={5} textAlign='center'>
-                                <Icon name='heart' color='pink' size='large' style={{ margin: '0 10px 0 0' }}/>
-                                <span style={{ color: 'rgb(255, 20, 147)', fontSize: '1.3em' }}>12</span>
-                            </Grid.Column>
-                            <Grid.Column width={5} textAlign='center'>
-                                <Icon name='thumbs down' color='grey' size='large' style={{ margin: '0 10px 0 0' }}/>
-                                <span style={{ color: 'rgb(160,160,160)', fontSize: '1.3em' }}>4</span>
-                            </Grid.Column>
-                        </Grid>
-                    </div>
                     <div id='scrollableLeft' className='video-menu-left-outer-content'>
                         <div  className='video-menu-left-content'>
                             { commentsElements }
@@ -585,16 +660,6 @@ function StreamingPage(props) {
                     bottom: 0;
                     width: 330px;
                     z-index: 1;
-                }
-
-                .video-menu-left-reactions {
-                    width: 100%;
-                    height: 60px;
-                    text-align: center;
-                    padding: 5px;
-                    font-size: 0.8em;
-                    font-weight: 700;
-                    color: rgba(0, 210, 170, 0.7);
                 }
 
                 .video-menu-left-outer-content::-webkit-scrollbar {

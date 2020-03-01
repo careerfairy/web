@@ -63,5 +63,9 @@ export const UNIVERSITY_SUBJECTS = [
             text: "Humanities, Social and Political Science",
             value: "HUMAN",
             color: "#b39eb5"
+        },{
+            text: "Microengineering",
+            value: "MICRO",
+            color: "#000000"
         }
     ];

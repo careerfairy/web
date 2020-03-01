@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import { withFirebasePage } from "../data/firebase";
 import DateUtil from '../util/DateUtil';
 import { UNIVERSITY_SUBJECTS } from '../data/StudyFieldData';
+import { UNIVERSITY_NAMES } from '../data/UniversityData';
 import TargetElementList from '../components/views/common/TargetElementList';
 
 import StackGrid, { transitions } from 'react-stack-grid';
@@ -16,12 +17,16 @@ import StackGrid, { transitions } from 'react-stack-grid';
 import { SizeMe } from 'react-sizeme';
 
 import Link from 'next/link';
+import Head from 'next/head';
 
 
 function Calendar(props) {
 
     const backgroundOptions = UNIVERSITY_SUBJECTS;
     const router = useRouter();
+
+    const university = router.query.university;
+    const filter = router.query.filter;
 
     const { fade } = transitions;
 
@@ -59,11 +64,11 @@ function Calendar(props) {
     },[user]);
 
     useEffect(() => {
-        if (props.filter) {
-            addField(props.filter);
+        if (filter) {
+            addField(filter);
             setShowAllFields(true);
         }
-    }, [props.filter]);
+    }, [filter]);
 
     useEffect(() => {
         props.firebase.listenToUpcomingLivestreams( querySnapshot => {
@@ -75,18 +80,26 @@ function Calendar(props) {
             });
             setAllLivestreams(livestreams);
         });
-    }, []);
+    }, [university]);
 
     useEffect(() => {
         if (fields.length === 0) {
-            setLivestreams(allLivestreams);
+            if (university) {
+                setLivestreams(filterUniversityLivestreams(allLivestreams, university));
+            } else {
+                setLivestreams(allLivestreams);
+            }
         } else {
             const filteredMentors = allLivestreams.filter(livestream => {
                 return fields.some(field => {
                     return livestream.targetGroups.indexOf(field) > -1;
                 });
             })
-            setLivestreams(filteredMentors);
+            if (university) {
+                setLivestreams(filterUniversityLivestreams(filteredMentors, university));
+            } else {
+                setLivestreams(filteredMentors);
+            }
         }
     }, [allLivestreams, fields]);
 
@@ -103,6 +116,16 @@ function Calendar(props) {
             setCookieMessageVisible(false);
         }
     }, []);
+
+    function filterUniversityLivestreams(livestreams, university) {
+        return livestreams.filter( livestream => {
+            if (livestream.universities) {
+                return livestream.universities.indexOf(university) > -1;
+            } else {
+                return false;
+            }
+        });
+    }
 
     function hideCookieMessage() {
         localStorage.setItem('hideCookieMessage', 'yes');
@@ -123,6 +146,12 @@ function Calendar(props) {
 
     function goToSeparateRoute(route) {
         window.open('http://careerfairy.io' + route, '_blank');
+    }
+
+    function getUniversityName(universityCode) {
+        const uni = UNIVERSITY_NAMES.find(university => university.value === universityCode);
+        if (!uni) return null;
+        return uni.text;
     }
 
     const filterElement = backgroundOptions.map((option, index) => {
@@ -179,23 +208,31 @@ function Calendar(props) {
 
     return (
         <div id='landingPageSection'>
+            <Head>
+                <title key="title">CareerFairy | Next Live Streams</title>
+            </Head>
             <Header color="white"/>
-            <Container className="landingTitleContainer" style={{ paddingBottom: '20px', display: props.university ? 'block' : 'none'}}>
+            <Container className="landingTitleContainer" style={{ paddingBottom: '20px', display: university ? 'block' : 'none'}}>
                 <Grid className='middle aligned' centered> 
                     <Grid.Column width={6}>
-                        <Image src={'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media'} style={{ margin: '10px 0 10px 0', maxHeight: '110px', filter: 'brightness(0) invert(1)'}}/>
+                        <div style={{ display: university === 'ethzurich' ? 'block' : 'none' }}>
+                            <Image src={'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media'} style={{ margin: '10px 0 10px 0', maxHeight: '110px', filter: 'brightness(0) invert(1)'}}/>
+                        </div>
+                        <div style={{ display: university === 'epflausanne' ? 'block' : 'none' }}>
+                            <Image src={'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fepfl-career-center.png?alt=media'} style={{ margin: '10px 0 10px 0', maxHeight: '110px', filter: 'brightness(0) invert(1)'}}/>
+                        </div>
                     </Grid.Column>
                     <Grid.Column width={10}>
                         <div style={{ float: 'right'}}>   
-                            <div style={{ fontSize: '1.4em', color: 'white', fontWeight: '700', textAlign: 'right', lineHeight: '1.4em', margin: '5px'}}>Live streams for students of ETH Zurich.</div>
-                            <Button style={{ float: 'right'}} content='See all Live Streams' size='mini'/>
+                            <div style={{  display: (university ? 'block' : 'none'), fontSize: '1.4em', color: 'white', fontWeight: '700', textAlign: 'right', lineHeight: '1.4em', margin: '5px'}}>Live streams for students of { getUniversityName(university) }.</div>
+                            <Link href='/next-livestreams'><a><Button style={{ float: 'right'}} content='See all Live Streams' size='mini'/></a></Link>
                         </div>
                     </Grid.Column>
                 </Grid>
             </Container>
             <div className={'filterBar ' + (cookieMessageVisible ? '' : 'hidden')}>
                 <Image id='cookie-logo' src='/cookies.png' style={{ display: 'inline-block', margin: '0 20px 0 0', maxHeight: '25px', width: 'auto', verticalAlign: 'top'}}/>
-                <p>We use cookies to improve your experience. By continuing to use our website, you agree to our <Link href='/cookies'><a>cookies policy</a></Link> and our <Link href='/privacy'><a>privacy policy</a></Link>.</p>
+                <p>We use cookies to improve your experience. By continuing to use our website, you agree to our <Link href='/privacy'><a>privacy policy</a></Link>.</p>
                 <Icon id='cookie-delete' style={{ cursor: 'pointer', verticalAlign: 'top', float: 'right', lineHeight: '30px'}} name='delete' onClick={() => hideCookieMessage()}/>
             </div>
             <div id='landingPageButtons'>

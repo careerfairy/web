@@ -9,6 +9,8 @@ import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
 import { urlObjectKeys } from "next/dist/next-server/lib/utils";
 
+import Head from 'next/head';
+
 function HowItWorks(props) {
 
     const [companies, setCompanies] = useState([]);
@@ -53,6 +55,9 @@ function HowItWorks(props) {
 
     return (
         <Fragment>
+            <Head>
+                <title key="title">CareerFairy | How it works</title>
+            </Head>
             <Header color='teal'/>
             <div className='introFullPage' style={{ backgroundImage: 'url(' + topPicture + ')' }}>
                 <div className='intro-mask'>

@@ -333,6 +333,14 @@ class Firebase {
         return streamRef.onSnapshot(callback);
     }
 
+    getLivestreamSpeakers = (livestreamId) => {
+        let streamerRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("speakers");
+        return streamerRef.get();
+    }
+
     listenToLegacyScheduledLivestreamById = (livestreamId, callback) => {
         let streamRef = this.firestore
             .collection("scheduledLivestreams")
@@ -344,16 +352,25 @@ class Firebase {
         let questionsRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
-            .collection("questions");
+            .collection("questions")
+            .where("type", "==", "new")
+            .orderBy("votes", "desc");
         return questionsRef.onSnapshot(callback);
     }
 
-    listenToScheduledLivestreamQuestionComments = (livestreamId, questionId, callback) => {
+    listenToScheduledLivestreamsCurrentQuestion = (livestreamId, callback) => {
         let questionsRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("questions")
-            .doc(questionId)
+            .where("type", "==", "current");
+        return questionsRef.onSnapshot(callback);
+    }
+
+    listenToScheduledLivestreamComments = (livestreamId, callback) => {
+        let questionsRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
             .collection("comments")
             .orderBy("timestamp", "asc");
         return questionsRef.onSnapshot(callback);
@@ -361,7 +378,7 @@ class Firebase {
 
     setScheduledLivestreamHasStarted = (hasStarted, livestreamId) => {
         let streamRef = this.firestore
-            .collection("scheduledLivestreams")
+            .collection("livestreams")
             .doc(livestreamId);
         return streamRef.update({
             hasStarted: hasStarted
@@ -377,24 +394,13 @@ class Firebase {
         return questionsRef.add(question);
     }
 
-    putScheduledLivestreamQuestionComment = (livestreamId, questionId, comment) => {
+    putScheduledLivestreamQuestionComment = (livestreamId, comment) => {
         comment.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
         let commentsRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
-            .collection("questions")
-            .doc(questionId)
             .collection("comments");
         return commentsRef.add(comment);
-    }
-
-    listenToScheduledLivestreamsComments = (livestreamId, callback) => {
-        let commentRef = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
-            .collection("comments")
-            .orderBy("date", "asc");
-        return commentRef.onSnapshot(callback);
     }
 
     upvoteQuestion = (livestreamId, question, userEmail) => {
@@ -457,6 +463,25 @@ class Firebase {
         return questionsRef.onSnapshot(callback);
     }
 
+    goToNextQuestion = (previousCurrentQuestionId, newCurrentQuestionId, livestreamId) => {
+        var batch = this.firestore.batch();
+        if (previousCurrentQuestionId) {
+            let previousCurrentQuestionRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("questions")
+            .doc(previousCurrentQuestionId);
+            batch.update(previousCurrentQuestionRef,  { type: "done" });
+        }
+        let newCurrentQuestionRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("questions")
+            .doc(newCurrentQuestionId)
+        batch.update(newCurrentQuestionRef,  { type: "current" });        
+        batch.commit();
+    }
+
     markQuestionAsDone = (livestreamId, question) => {
         let questionRef = this.firestore
             .collection("livestreams")
@@ -467,6 +492,21 @@ class Firebase {
             return transaction.get(questionRef).then(question => {
                 transaction.update(questionRef, { 
                     type: "done"
+                });
+            });
+        });
+    }
+
+    markQuestionAsCurrent = (livestreamId, question) => {
+        let questionRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("questions")
+            .doc(question.id);
+        return this.firestore.runTransaction( transaction => {
+            return transaction.get(questionRef).then(question => {
+                transaction.update(questionRef, { 
+                    type: "current"
                 });
             });
         });

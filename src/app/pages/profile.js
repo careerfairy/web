@@ -4,28 +4,34 @@ import { Formik } from 'formik';
 import { useRouter } from 'next/router';
 
 import { UNIVERSITY_SUBJECTS } from '../data/StudyFieldData';
+import { UNIVERSITY_SPECIFIC_SUBJECTS } from '../data/UniversitySpecificFieldsData';
 import { UNIVERSITY_NAMES } from '../data/UniversityData';
 import { STUDY_LEVELS } from '../data/StudyLevelData';
 import { withFirebase } from '../data/firebase';
 import Header from '../components/views/header/Header';
 import Loader from '../components/views/loader/Loader';
 
+import Head from 'next/head';
+
 const UserProfile = (props) => {
 
     const router = useRouter();
+
+    const generic_subjects = UNIVERSITY_SUBJECTS;
+    const specific_subjects = UNIVERSITY_SPECIFIC_SUBJECTS;
+    const universities = UNIVERSITY_NAMES;
+    const levels = STUDY_LEVELS;
 
     const [loading, setLoading] = useState(false)
     const [userData, setUserData] = useState(null)
     const [user, setUser] = useState(null);
     const [initialValues, setInitialValues] = useState(null);
-
-    const subjects = UNIVERSITY_SUBJECTS;
-    const universities = UNIVERSITY_NAMES;
-    const levels = STUDY_LEVELS;
+    const [selectField, setSelectField] = useState(generic_subjects);
     
     useEffect(() => {
        if (userData) {
             setInitialValues({ firstName: userData.firstName, lastName: userData.lastName, university: userData.university, fieldOfStudy: userData.faculty, levelOfStudy: userData.levelOfStudy });
+            updateSelectFields(userData.university);
        } else {
             setInitialValues({ firstName: '', lastName: '', university: null, fieldOfStudy: null, levelOfStudy: null });
        }
@@ -58,6 +64,14 @@ const UserProfile = (props) => {
         }
     },[user]);
 
+    function updateSelectFields(university) {
+        if (specific_subjects.hasOwnProperty(university)) {
+            setSelectField(specific_subjects[university]);
+        } else {
+            setSelectField(generic_subjects);
+        }
+    }
+
     function logout() {
         setLoading(true);
         props.firebase.doSignOut().then(() => {
@@ -71,6 +85,9 @@ const UserProfile = (props) => {
 
     return (
             <div className='greyBackground'>
+                <Head>
+                    <title key="title">CareerFairy | My Profile</title>
+                </Head>
                 <Header classElement='relative white-background'/>
                 <Container textAlign='left'>
                     <h1 style={{ color: 'rgb(0, 210, 170)', margin: '30px 0 20px 0' }}>{ userData ? 'Your Profile' : 'Complete Your Profile'}</h1>
@@ -106,7 +123,11 @@ const UserProfile = (props) => {
                             props.firebase.setUserData(user.email, values.firstName, values.lastName, values.university, values.fieldOfStudy, values.levelOfStudy)
                             .then(() => {
                                 if (!userData) {
-                                    router.push('/next-livestreams' + (values.university ? ('?university=' + values.university) : ''));
+                                    if (values.university === 'ethzurich' || values.university === 'epflausanne') {
+                                        router.push('/next-livestreams' + (values.university ? ('?university=' + values.university) : ''));
+                                    } else {
+                                        router.push('/next-livestreams');
+                                    }
                                 }
                                 setSubmitting(false);
                             }).catch(error => {
@@ -154,14 +175,14 @@ const UserProfile = (props) => {
                                 <Form.Group widths='equal'>
                                     <Form.Field>
                                         <label>Select your place of study</label>
-                                        <Dropdown placeholder='Select University' value={values.university} onChange={(event, {value}) => { setFieldValue('university', value, true) }} compact selection options={universities}/>
+                                        <Dropdown placeholder='Select University' value={values.university} onChange={(event, {value}) => { setFieldValue('university', value, true); updateSelectFields(value); setFieldValue('fieldOfStudy', null, false)}} compact selection options={universities}/>
                                         <div className='field-error'>
                                             {errors.university && touched.university && errors.university}
                                         </div>
                                     </Form.Field>
                                     <Form.Field>
                                         <label>Select your field of expertise</label>
-                                        <Dropdown placeholder='Select Field of Study' value={values.fieldOfStudy} onChange={(event, {value}) => { setFieldValue('fieldOfStudy', value, true) }} compact selection options={subjects}/>
+                                        <Dropdown placeholder='Select Field of Study' value={values.fieldOfStudy} onChange={(event, {value}) => { setFieldValue('fieldOfStudy', value, true) }} compact selection options={selectField}/>
                                         <div className='field-error'>
                                             {errors.university && touched.university && errors.university}
                                         </div>

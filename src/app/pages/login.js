@@ -6,6 +6,8 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import {Formik} from 'formik';
 
+import Head from 'next/head';
+
 function LogInPage(props) {
 
     const [user, setUser] = useState(null);
@@ -95,6 +97,9 @@ export function LogInFormBase(props) {
 
     return (
         <Fragment>
+            <Head>
+                <title key="title">CareerFairy | Log in</title>
+            </Head>
             <div className='tealBackground'>
                 <Container>
                     <div className='formContainer'>

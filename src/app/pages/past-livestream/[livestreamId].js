@@ -9,6 +9,8 @@ import ReactPlayer from 'react-player';
 import JobDescriptions from '../../components/views/job-descriptions/JobDescriptions';
 import Footer from '../../components/views/footer/Footer';
 
+import Head from 'next/head';
+
 const PastLivestreamDetail = (props) => {
 
     const router = useRouter();
@@ -146,6 +148,9 @@ const PastLivestreamDetail = (props) => {
 
     return (
         <div>
+            <Head>
+                <title key="title">CareerFairy | Past Live Stream</title>
+            </Head>
             <Header color='teal'/>
             <div className='companies-background'>
                 <div className='widthContainer'>

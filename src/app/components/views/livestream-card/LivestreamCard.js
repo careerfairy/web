@@ -101,13 +101,13 @@ function LivestreamCard(props) {
                             <Image style={{ maxWidth: '180px', margin: '30px 0', maxHeight: '90px', filter: userIsRegistered() ? 'brightness(0) invert(1)' : ''}} src={props.livestream.companyLogoUrl} onLoad={() => { props.grid.updateLayout() }}/>
                             <div className='livestream-position' style={{ color: userIsRegistered() ? 'white' : ''}}>{ props.livestream.title }</div>          
                             <div>
-                                <Button size='large' style={{ margin: '5px 5px 0 0' }} icon={ (props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? 'delete' : 'add' } color={(props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? '' : 'teal'} content={ (props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? 'Cancel' : 'Book a Spot' } onClick={(props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
+                                <Button size='large' style={{ margin: '5px 5px 0 0' }} icon={ (props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? 'delete' : 'add' } color={(props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? '' : 'teal'} content={ props.user ? ((props.livestream.registeredUsers.indexOf(props.user.email) > -1) ? 'Cancel' : 'I\'ll attend') : 'Register to attend'} onClick={(props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
                                 <Link href={'/upcoming-livestream/' + props.livestream.id}><a><Button size='large' style={{ margin: '5px 5px 0 0' }} icon='signup' content='Details' color='pink'/></a></Link>
                             </div>
                         </div>
                     </div>
                     <div className={'booked-icon animated tada delay-1s ' + (userIsRegistered() ? '' : 'hidden')}><Icon name='check circle'/>Booked</div>
-                    <div className='coming-icon' style={{ color: userIsRegistered() ? 'white' : '', border: userIsRegistered() ? '2px solid white' : ''}} ><Icon name='rss'/>Livestream</div>
+                    <div className='coming-icon' style={{ color: userIsRegistered() ? 'white' : '', border: userIsRegistered() ? '2px solid white' : ''}} ><Icon name='rss'/>Live stream</div>
                 </div>
                 <div className='background'>
                     <Grid centered className='middle aligned' divided>
@@ -144,8 +144,8 @@ function LivestreamCard(props) {
                         </Grid.Row>
                     </Grid>
                 </div>
-                <BookingModal livestream={props.livestream} modalOpen={bookingModalOpen} setModalOpen={setBookingModalOpen} user={props.user}/>
             </div>
+            <BookingModal livestream={props.livestream} modalOpen={bookingModalOpen} setModalOpen={setBookingModalOpen} user={props.user}/>
             <style jsx>{`
                 .hidden {
                     display: none

@@ -135,7 +135,7 @@ function LandingPage(props) {
                     <div className='stepImageContainer'>
                         <div className='stepImage circle' style={{ backgroundImage: 'url(' + mentor.imageUrl + ')'}} onClick={() => setSpeakerSelected(mentor)}>
                             <div className='overlay'>
-                                <Icon style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'white', fontSize: '1.5em', opacity: '0.8'}} color='white' name='play'/>
+                                <Icon style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'white', fontSize: '1.5em', opacity: '0.8'}} name='play'/>
                             </div>
                         </div>        
                     </div>

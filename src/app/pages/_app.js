@@ -1,13 +1,21 @@
 // import App from 'next/app'
+import { Fragment } from 'react';
 import '../semantic/dist/semantic.min.css';
 import FirebaseContext from "../data/firebase/FirebaseContext";
 import Firebase from "../data/firebase/Firebase";
 
+import Head from 'next/head';
+
 function MyApp({ Component, pageProps }) {
     return (
-        <FirebaseContext.Provider value={new Firebase()}>
-            <Component {...pageProps} />
-        </FirebaseContext.Provider>
+        <Fragment>
+            <Head>
+                <title>CareerFairy | Watch live streams. Get hired.</title>
+            </Head>
+            <FirebaseContext.Provider value={new Firebase()}>
+                <Component {...pageProps} />
+            </FirebaseContext.Provider>
+        </Fragment>
     );
 }
   

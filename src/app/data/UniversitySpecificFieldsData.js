@@ -1,114 +1,134 @@
-export const UNIVERSITY_SUBJECTS = {
-    ethz: [
+export const UNIVERSITY_SPECIFIC_SUBJECTS = {
+    ethzurich: [
         {
-            text: "Agricultural Science",
-            value: "AGRI",
-            general: ""
-        }, {
+            text: "Chemistry and Applied Bioscience",
+            value: "CHEM",
+            color: "#2d5b6b"
+        },{
             text: "Architecture",
-            value: "ARCH"
+            value: "ARCH",
+            color: "#836953"
         },{
-            text: "Biology",
-            value: "BIOL"
-        },{
-            text: "Chemistry/Chemical and Bioengineering",
-            value: "CHEM"
-        },{
-            text: "Civil Engineering",
-            value: "CIVI"
-        },{
-            text: "Computational Science and Engineering",
-            value: "COMPSCI"
+            text: "Civil, Environmental and Geomatic Engineering",
+            value: "CIVI",
+            color: "#ff6961"
         },{
             text: "Computer Science",
-            value: "COMP"
+            value: "COMP",
+            color: "#52494c"
         },{
             text: "Earth Sciences",
-            value: "EARTH"
+            value: "EARTH",
+            color: "#9a6324"
         },{
-            text: "Electrical Engineering and Information Technology",
-            value: "ELEC"
+            text: "Biology",
+            value: "BIOL",
+            color: "#9a6324"
         },{
-            text: "Environmental Engineering",
-            value: "ENVI"
+            text: "Biosystems Science and Engineering",
+            value: "BIOSYS",
+            color: "#03c03c"
         },{
-            text: "Environmental Sciences",
-            value: "ENVSCI"
+            text: "Information Technology and Electrical Engineering",
+            value: "ELEC",
+            color: "#aa0000"
         },{
-            text: "Food Sciences",
-            value: "FOOD"
-        },{
-            text: "Geospatial Engineering",
-            value: "GEOS"
-        },{
-            text: "Health Sciences",
-            value: "HEALTH"
-        },{
-            text: "Human Medicine",
-            value: "MEDI"
-        },{
-            text: "Interdisciplinary Sciences",
-            value: "INTER"
+            text: "Environmental Systems Sciences",
+            value: "ENVSCI",
+            color: "#3cb44b"
         },{
             text: "Materials Sciences",
-            value: "MATE"
+            value: "MATE",
+            color: "#f032e6"
         },{
             text: "Mathematics",
-            value: "MATH"
+            value: "MATH",
+            color: "#008080"
         },{
-            text: "Mechanical Engineering",
-            value: "MECH"
+            text: "Management, Technology and Economics",
+            value: "MTEC",
+            color: "#f58231"
         },{
-            text: "Pharmaceutical Sciences",
-            value: "PHARMA"
+            text: "Mechanical and Process Engineering",
+            value: "MECH",
+            color: "#808080"
         },{
             text: "Physics",
-            value: "PHYS"
+            value: "PHYS",
+            color: "#54556c"
+        },{
+            text: "Health Sciences and Technology",
+            value: "HEALTH",
+            color: "#E6E6FA"
+        },{
+            text: "Humanities, Social and Political Science",
+            value: "HUMAN",
+            color: "#b39eb5"
         }
     ],
-    epfl: [
+    epflausanne: [
          {
             text: "Architecture",
-            value: "ARCH"
+            value: "ARCH",
+            color: "#836953"
         },{
             text: "Chemistry and Chemical Engineering",
-            value: "CHEM"
+            value: "CHEM",
+            color: "#2d5b6b"
         },{
             text: "Civil Engineering",
-            value: "CIVI"
+            value: "CIVI",
+            color: "#ff6961"
         },{
             text: "Communication Sciences",
             value: "COMPSCI"
         },{
             text: "Computer Science",
-            value: "COMP"
+            value: "COMP",
+            color: "#52494c"
         },{
             text: "Electrical and Electronic Engineering",
-            value: "ELEC"
+            value: "ELEC",
+            color: "#aa0000"
         },{
             text: "Environmental Sciences and Engineering",
-            value: "ENVSCI"
+            value: "ENVSCI",
+            color: "#3cb44b"
         },{
             text: "Life Sciences Engineering",
-            value: "BIOL"
+            value: "BIOL",
+            color: "#9a6324"
         },{
             text: "Materials Sciences and Engineering",
-            value: "MATE"
+            value: "MATE",
+            color: "#f032e6"
         },{
             text: "Mathematics",
-            value: "MATH"
+            value: "MATH",
+            color: "#008080"
         },{
             text: "Mechanical Engineering",
-            value: "MECH"
+            value: "MECH",
+            color: "#808080"
+        },{
+            text: "Management, Technology and Entrepreneurship",
+            value: "MTEC",
+            color: "#f58231"
         },{
             text: "Microengineering",
-            value: "MICRO"
+            value: "MICRO",
+            color: "#000000"
         },{
             text: "Physics",
-            value: "PHYS"
+            value: "PHYS",
+            color: "#54556c"
+        },{
+            text: "Digital Humanities",
+            value: "HUMAN",
+            color: "#b39eb5"
         }
     ],
-    uzh: [
+    uzurich: [
         {
             text: "Law",
             value: "LAW"

@@ -6,6 +6,8 @@ import Header from '../components/views/header/Header';
 import Footer from '../components/views/footer/Footer';
 import { useRouter } from 'next/router';
 
+import Head from 'next/head';
+
 function WishFactoryPlay(props) {
 
     const [newWish, setNewWish] = useState("");
@@ -141,6 +143,9 @@ function WishFactoryPlay(props) {
 
     return (
         <div id='introSection'>
+            <Head>
+                <title key="title">CareerFairy | Wishlist</title>
+            </Head>
             <Header classElement='relative white-background'  page='wishlist'/>
             <Container>
                 <SemanticHeader textAlign='center' as='h1' style={{ margin: '30px 0', fontSize: '2.8em'}}>

@@ -7,6 +7,8 @@ import Link from 'next/link';
 import {Formik} from 'formik';
 import axios from 'axios';
 
+import Head from 'next/head';
+
 function ResetPasswordPage(props) {
 
     const [user, setUser] = useState(null);
@@ -68,6 +70,9 @@ export function ResetPasswordBase(props) {
 
     return (
         <Fragment>
+            <Head>
+                <title key="title">CareerFairy | Reset Password</title>
+            </Head>
             <div className='tealBackground'>
                 <Container>
                     <div className='formContainer'>

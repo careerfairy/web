@@ -4,6 +4,8 @@ import { Icon, Button, Modal, Header, Step, Grid, Input, Image } from "semantic-
 import CommonUtil from '../../../util/CommonUtil';
 import QuestionVotingBox from '../question-voting-box/QuestionVotingBox';
 
+import Link from 'next/link';
+
 import { withFirebase } from "../../../data/firebase";
 
 function BookingModal(props) {
@@ -18,6 +20,10 @@ function BookingModal(props) {
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
 
     const avatar = props.livestream.mainSpeakerAvatar ? props.livestream.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
+
+    useEffect(() => {
+        setModalStep(0);
+    },[props.modalOpen]);
 
     useEffect(() => {
         if (props.livestream.id) {
@@ -57,15 +63,6 @@ function BookingModal(props) {
         }
     }, [upcomingQuestions]);
 
-    useEffect(() => {
-        if (questionsAvailable && !questionsVoted) {
-            setModalStep(0);
-        } else if ((!questionsAvailable || questionsVoted) && !questionAsked) {
-            setModalStep(1);
-        } else if (questionAsked) {
-            setModalStep(2);
-        }
-    }, [questionsAvailable, questionsVoted, questionAsked]);
 
     function performConfirmAction() {
         props.buttonAction();
@@ -75,6 +72,10 @@ function BookingModal(props) {
     function addNewQuestion() {
         if (!props.user) {
             return router.replace('/signup');
+        }
+
+        if (!newQuestionTitle) {
+            return;
         }
         
         const newQuestion = {
@@ -87,7 +88,7 @@ function BookingModal(props) {
         props.firebase.putScheduledLivestreamsQuestion(props.livestream.id, newQuestion)
             .then(() => {
                 setNewQuestionTitle("");
-                setModalStep(2);
+                setModalStep(3);
             }, () => {
                 console.log("Error");
             })
@@ -95,7 +96,7 @@ function BookingModal(props) {
 
     function joinTalentPool() {
         props.firebase.joinCompanyTalentPool(props.livestream.companyId, props.user.email).then(() => {
-            props.setModalOpen(false);
+            setModalStep(4);
         });
     }
 
@@ -111,38 +112,51 @@ function BookingModal(props) {
         <Fragment>
             <Modal style={{ zIndex: '9999' }} open={props.modalOpen} onClose={() => props.setModalOpen(false)}>
                     <Modal.Content>
-                        <Image src={props.livestream.companyLogoUrl} style={{ maxHeight: '120px', maxWidth: '200px', margin: '20px auto'}}/>
-                        <h2 className='booking-modal-title'><Icon name='check circle'/>Your spot is secured!</h2>
-                        <div className={ modalStep !== 0 ? 'hidden' : 'modalStep'}>
-                            <h4 className='booking-modal-subtitle'>Upvote 2 questions from your peers</h4>
-                            <div className={ questionElements.length < 4 ? 'hidden' : ''}>
-                                <Grid stackable columns={3}>
-                                    { questionElements }
-                                </Grid>
-                            </div>
-                            <Button style={{ margin: '50px 0 0 0'}}  fluid content='Skip' onClick={() => setModalStep(1)} size='large'/>
+                        <div style={{ padding: '200px' }} className={props.registration ? '' : 'hidden'}>
+                            <Image src='/loader.gif' style={{ width: '80px', height: 'auto', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}} />
                         </div>
-                        <div className={ modalStep !== 1 ? 'hidden' : 'modalStep'}>
-                            <h4 className='booking-modal-subtitle'>Ask your question to the speaker</h4>
-                            <div className='livestream-streamer-description'>
-                                <div className='livestream-speaker-avatar-capsule'>
-                                    <div className='livestream-speaker-avatar' style={{ backgroundImage: 'url(' + avatar + ')'}}/>
-                                </div>
-                                <div className='livestream-streamer'>
-                                    <div className='livestream-streamer-name'>{ props.livestream.mainSpeakerName }</div>
-                                    <div className='livestream-streamer-position'>{ props.livestream.mainSpeakerPosition }</div>
-                                    <div className='livestream-streamer-position'>{ props.livestream.mainSpeakerBackground }</div>
-                                </div>
+                        <div className={props.registration ? 'hidden' : ''} style={{ textAlign: 'center' }}>
+                            <Image src={props.livestream.companyLogoUrl} style={{ maxHeight: '120px', maxWidth: '200px', margin: '20px auto'}}/>
+                            <div className={ modalStep !== 0 ? 'hidden' : 'modalStep animated fadeIn'}>
+                                <h2 className='booking-modal-title'><Icon name='check circle'/>Your spot is secured!</h2>
+                                <Button style={{ margin: '10px 2px'}} primary content='Next' onClick={() => setModalStep(1)} size='large'/>
                             </div>
-                            <Input size='huge' value={newQuestionTitle} placeholder={'What would like to ask our speaker?'} onChange={(event) => setNewQuestionTitle(event.target.value)} fluid/>
-                            <Button style={{ margin: '20px 0 0 0'}} primary fluid content='Submit' onClick={() => addNewQuestion()} size='large'/>
-                            <Button style={{ margin: '10px 0 0 0'}}  fluid content='Skip' onClick={() => setModalStep(2)} size='large'/>
-                        </div>
-                        <div className={ modalStep !== 2 ? 'hidden' : 'modalStep'}>
-                            <h4 className='booking-modal-subtitle'>Join the { props.livestream.company } Talent Pool</h4>
-                            <div>Join { props.livestream.company }'s Talent Pool and be contacted directly in case any relevant opportunity arises for you at { props.livestream.company } in the future. By joining the Talent Pool, you agree that your profile data will be shared with { props.livestream.company }. Don't worry, you can leave a Talent Pool at any time.</div>
-                            <Button style={{ margin: '20px 0 0 0'}} content='Join Talent Pool' primary fluid size='large' onClick={() => joinTalentPool()}/>
-                            <Button style={{ margin: '10px 0 0 0'}} content='No thanks' fluid size='large' onClick={() => props.setModalOpen(false)}/>
+                            <div className={ modalStep !== 1 ? 'hidden' : 'modalStep'}>
+                                <h4 className='booking-modal-subtitle'>Which Questions Should The Speaker Answer?</h4>
+                                <div style={{ margin: '0 0 50px 0' }}>
+                                    <Grid stackable columns={3}>
+                                        { questionElements }
+                                    </Grid>
+                                </div>
+                                <Button style={{ margin: '10px 2px'}} primary content='Next' onClick={() => setModalStep(2)} size='large'/>
+                            </div>
+                            <div className={ modalStep !== 2 ? 'hidden' : 'modalStep animated fadeIn'}>
+                                <h4 className='booking-modal-subtitle'>Ask your question. Get the answer during the live stream.</h4>
+                                <div className='livestream-streamer-description'>
+                                    <div className='livestream-speaker-avatar-capsule'>
+                                        <div className='livestream-speaker-avatar' style={{ backgroundImage: 'url(' + avatar + ')'}}/>
+                                    </div>
+                                    <div className='livestream-streamer'>
+                                        <div className='livestream-streamer-name'>{ props.livestream.mainSpeakerName }</div>
+                                        <div className='livestream-streamer-position'>{ props.livestream.mainSpeakerPosition }</div>
+                                        <div className='livestream-streamer-position'>{ props.livestream.mainSpeakerBackground }</div>
+                                    </div>
+                                </div>
+                                <Input size='huge' value={newQuestionTitle} placeholder={'What would like to ask our speaker?'} onChange={(event) => setNewQuestionTitle(event.target.value)} fluid/>
+                                <Button style={{ margin: '20px 0 0 0'}} primary content='Submit' onClick={() => addNewQuestion()} size='large'/>
+                                <div style={{ margin: '20px 0 10px 0', textAlign: 'center', color: 'rgb(70,70,200)', cursor: 'pointer' }} onClick={() => setModalStep(3)}>Skip</div>
+                            </div>
+                            <div className={ modalStep !== 3 ? 'hidden' : 'modalStep'}>
+                                <h4 className='booking-modal-subtitle'>Join the { props.livestream.company } Talent Pool</h4>
+                                <div style={{ margin: '0 0 40px 0'}}>Join { props.livestream.company }'s Talent Pool and be contacted directly in case any relevant opportunity arises for you at { props.livestream.company } in the future. By joining the Talent Pool, you agree that your profile data will be shared with { props.livestream.company }. Don't worry, you can leave a Talent Pool at any time.</div>
+                                <Button style={{ margin: '20px 0 0 0'}} content='Join Talent Pool' primary size='large' onClick={() => joinTalentPool()}/>
+                                <div style={{ margin: '20px 0 10px 0', textAlign: 'center', color: 'rgb(70,70,200)', cursor: 'pointer' }} onClick={() => setModalStep(4)}>Skip</div>
+                            </div>
+                            <div className={ modalStep !== 4 ? 'hidden' : 'modalStep animated fadeIn'}>
+                                <h2 className='booking-modal-title'><Icon name='check circle'/>Thank you!</h2>
+                                <Link href='/next-livestreams'><a><Button style={{ margin: '20px 0 0 0'}} primary fluid content='See all our events' size='large' onClick={() => props.setModalOpen(false)}/></a></Link>
+                                <div style={{ margin: '20px 0 10px 0', textAlign: 'center', color: 'rgb(70,70,200)', cursor: 'pointer' }} onClick={() => props.setModalOpen(false)}>Close</div>
+                            </div>
                         </div>
                     </Modal.Content>
                 </Modal>
@@ -153,16 +167,17 @@ function BookingModal(props) {
 
                 .booking-modal-title {
                     color: rgb(0, 210, 170);
-                    margin: 30px;
+                    margin: 30px 0 60px 0;
                     text-align: center;
-                    font-size: 1.3em;
+                    font-size: 1.5em;
                 }
 
                 .booking-modal-subtitle {
                     color: rgb(100,100,100);
                     text-align: center;
                     text-transform: uppercase;
-                    font-size: 1.4em;
+                    font-size: 1.2em;
+                    margin: 30px 0 10px 0;
                 }
 
                 .livestream-speaker-avatar-capsule {

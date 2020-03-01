@@ -3,9 +3,14 @@ import { Container } from 'semantic-ui-react'
 import Header from "../components/views/header/Header";
 import { withFirebase } from '../data/firebase';
 
+import Head from 'next/head';
+
 const PrivacyPolicy = (props) => {
     return (
         <div>
+            <Head>
+                <title key="title">CareerFairy | Privacy Policy</title>
+            </Head>
             <Header color="teal"/>
             <div className='cookies-background'>
                 <Container>

@@ -11,6 +11,7 @@ import { UNIVERSITY_SUBJECTS } from '../data/StudyFieldData';
 import TargetElementList from '../components/views/common/TargetElementList';
 
 import Link from 'next/link';
+import Head from 'next/head';
 
 
 function LandingPage(props) {
@@ -328,6 +329,9 @@ function LandingPage(props) {
 
     return (
         <div id='landingPageSection'>
+            <Head>
+                <title key="title">CareerFairy | Past Live Streams</title>
+            </Head>
             <Header color="white"/>
             <Container textAlign="center" className="landingTitleContainer">
                 <div id='landingPageButtons'>
@@ -338,7 +342,7 @@ function LandingPage(props) {
             </Container>
             <div className={'filterBar ' + (cookieMessageVisible ? '' : 'hidden')}>
                 <Image id='cookie-logo' src='/cookies.png' style={{ display: 'inline-block', margin: '0 20px 0 0', maxHeight: '25px', width: 'auto', verticalAlign: 'top'}}/>
-                <p>We use cookies to improve your experience. By continuing to use our website, you agree to our <Link href='/cookies'><a>cookies policy</a></Link> and our <Link href='/privacy'><a>privacy policy</a></Link>.</p>
+                <p>We use cookies to improve your experience. By continuing to use our website, you agree to our and our <Link href='/privacy'><a>privacy policy</a></Link>.</p>
                 <Icon id='cookie-delete' style={{ cursor: 'pointer', verticalAlign: 'top', float: 'right', lineHeight: '30px'}} name='delete' onClick={() => hideCookieMessage()}/>
             </div>
             <div className='mentor-list'>

@@ -4,9 +4,14 @@ import Header from "../components/views/header/Header";
 import Link from 'next/link';
 import { withFirebase } from '../data/firebase';
 
+import Head from 'next/head';
+
 function TermsAndConditions(props) {
     return (
         <div>
+            <Head>
+                <title key="title">CareerFairy | Terms & Conditions</title>
+            </Head>
             <Header color="teal"/>
             <div className='cookies-background'>
                 <Container>

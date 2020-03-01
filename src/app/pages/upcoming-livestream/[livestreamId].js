@@ -14,8 +14,10 @@ import Countdown from '../../components/views/common/Countdown';
 import axios from 'axios';
 import BookingModal from '../../components/views/booking-modal/BookingModal';
 import QuestionVotingBox from '../../components/views/question-voting-box/QuestionVotingBox';
+import StringUtils from '../../util/StringUtils';
 
 import Link from 'next/link';
+import Head from 'next/head';
 
 function UpcomingLivestream(props) {
 
@@ -23,12 +25,15 @@ function UpcomingLivestream(props) {
     const { livestreamId } = router.query;
 
     const [user, setUser] = useState(null);
+    const [livestreamSpeakers, setLivestreamSpeakers] = useState([]);
     const [userData, setUserData] = useState(null);
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
     const [currentLivestream, setCurrentLivestream] = useState(null);
+    const [registration, setRegistration] = useState(false);
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
+    const [userIsReady, setUserIsReady] = useState(false);
     const [registered, setRegistered] = useState(false);
 
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -95,16 +100,22 @@ function UpcomingLivestream(props) {
         }
     },[user]);
 
+    useEffect(() => {
+        if (livestreamId) {
+            props.firebase.getLivestreamSpeakers(livestreamId).then( querySnapshot => {
+                var speakerList = [];
+                querySnapshot.forEach(doc => {
+                    let speaker = doc.data();
+                    speaker.id = doc.id;
+                    speakerList.push(speaker);
+                });
+                setLivestreamSpeakers(speakerList);
+            });
+        }
+    },[livestreamId]);
+
     function goToSeparateRoute(route) {
         window.open('http://careerfairy.io' + route, '_blank');
-    }
-
-    function registerToLivestream() {
-        if (!user) {
-            return router.replace('/signup');
-        }
-
-        props.firebase.registerToLivestream(currentLivestream.id, user.email);
     }
 
     function deregisterFromLivestream() {
@@ -155,10 +166,11 @@ function UpcomingLivestream(props) {
             return router.push('/profile');
         }
 
-        props.firebase.registerToLivestream(livestreamId, user.email).then(() => {
-            setBookingModalOpen(true);
-            sendEmailRegistrationConfirmation();
-        })
+        setBookingModalOpen(true);
+        setRegistration(true);
+        props.firebase.registerToLivestream(currentLivestream.id, user.email).then(() => {
+            setRegistration(false);
+        });
     }
 
     function deregisterFromLivestream(livestreamId) {
@@ -170,11 +182,12 @@ function UpcomingLivestream(props) {
     }
 
     function addNewQuestion() {
-       if (!user) {
+        debugger;
+        if (!user) {
             return router.replace('/signup');
         }
 
-        if (!newQuestionTitle) {
+        if (StringUtils.isEmpty(newQuestionTitle)) {
             return;
         }
         
@@ -193,21 +206,48 @@ function UpcomingLivestream(props) {
             })
     }
 
-    function sendEmailRegistrationConfirmation() {
-        return axios({
-            method: 'post',
-            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendLivestreamRegistrationConfirmationEmail',
-            data: {
-                recipientEmail: user.email,
-                user_first_name: userData.firstName,
-                livestream_date: DateUtil.getPrettyDate(currentLivestream.start.toDate()),
-                company_name: currentLivestream.company,
-                company_logo_url: currentLivestream.companyLogoUrl,
-                livestream_title: currentLivestream.title,
-                livestream_link: ('https://careerfairy.io/upcoming-livestream/' + currentLivestream.id)
-            }
-        })
-    }
+    let speakerElements = livestreamSpeakers.map((speaker, index) => {
+        return (
+            <Grid.Column textAlign='center' mobile='16' tablet='8' computer='5'>
+                <div className='livestream-speaker-avatar-capsule'>
+                    <div className='livestream-speaker-avatar' style={{ backgroundImage: 'url(' + ( speaker.avatar ? speaker.avatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media' + ')')}}/>
+                </div>
+                <div className='livestream-speaker-description'>
+                    <div style={{ fontWeight: '700', fontSize: '1.2em', marginBottom: '10px', color: userIsRegistered() ? 'white' : 'rgb(44, 66, 81)' }}>{ speaker.firstName + " " + speaker.lastName }</div>
+                    <div style={{ fontWeight: '700', fontSize: '0.9em', marginBottom: '5px', color: userIsRegistered() ? 'white' : 'rgb(44, 66, 81)' }}>{ speaker.position }</div>
+                    <div style={{ fontWeight: '500', fontSize: '0.9em', marginBottom: '5px', color: userIsRegistered() ? 'white' : 'rgb(140,140,140)' }}>{ speaker.background }</div>
+                </div>
+                <style jsx>{`
+                    .livestream-speaker-avatar-capsule {
+                        border: 2px solid rgb(0, 210, 170);
+                        display: inline-block;
+                        margin: 20px auto;
+                        padding 8px;
+                        border-radius: 50%;
+                    }
+
+                    .livestream-speaker-avatar {
+                        width: 110px;
+                        padding-top: 110px;
+                        border-radius: 50%;
+                        vertical-align: middle;
+                        display: inline-block;
+                        box-shadow: 0 0 2px grey;
+                        display: inline-block;
+                        background-size: cover;
+                    }
+
+                    .livestream-speaker-description {
+                        display: inline-block;
+                        vertical-align: middle;
+                        width: 100%;
+                        text-align: center;
+                        margin: 0 0 0 10px;
+                    }
+                `}</style>
+            </Grid.Column>
+        );
+    });
 
     let questionElements = upcomingQuestions.map((question, index) => {
         return (
@@ -221,48 +261,63 @@ function UpcomingLivestream(props) {
         return <Loader/>;
     }
 
-    if (currentLivestream.hasStarted) {
+    if (currentLivestream.hasStarted && userIsReady) {
         router.replace('/player-alt/' + currentLivestream.id);
     }
 
     return (
         <div>
             <div className='topLevelContainer'>
+                <Head>
+                    <title key="title">CareerFairy | Upcoming Live Stream</title>
+                </Head>
                 <Header color='white'/>
                 <div className='video-mask' style={{backgroundImage: 'url(' + currentLivestream.backgroundImageUrl + ')'}}>
                     <div className='mask' style={{ backgroundColor: userIsRegistered() ? 'rgba(0, 210, 170, 0.9)' : ''}}>
-                        <div className='topDescriptionContainer'>
-                            <div className='livestream-label' style={{ color: userIsRegistered() ? 'white' : '', border: userIsRegistered() ? '2px solid white' : ''}}><Icon name='rss'/>Livestream</div>
-                            <div className='livestream-date' style={{ color: userIsRegistered() ? 'white' : '' }}>
-                                <span>{ DateUtil.getPrettyDate(currentLivestream.start.toDate()) }</span>
-                            </div>
-                        </div>
                         <Container>
+                            <div className='livestream-label' style={{ color: userIsRegistered() ? 'white' : '', border: userIsRegistered() ? '2px solid white' : ''}}><Icon name='rss'/>Live stream</div>
                             <div className='livestream-title'  style={{ color: userIsRegistered() ? 'white' : ''}}>
                                 {currentLivestream.title}
                             </div>
-                            <div style={{ margin: '30px 0 50px 0'}}>
+                            <div className='livestream-date' style={{ color: userIsRegistered() ? 'white' : '' }}>
+                                <span><Icon name='calendar outline alternate'/>{ DateUtil.getPrettyDate(currentLivestream.start.toDate()) }</span>
+                            </div>
+                            <div style={{ margin: '30px 0'}}>
                                 <Grid className='middle aligned' centered>
-                                    <Grid.Column textAlign='center' mobile='16' computer='5'>
-                                        <Image src={currentLivestream.companyLogoUrl} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '200px', maxHeight: '120px', margin: '0 auto' }}/>
-                                    </Grid.Column>
-                                    <Grid.Column textAlign='center' mobile='6' computer='5'>
-                                        <div className='livestream-speaker-image' style={{ backgroundImage: 'url(' + ( currentLivestream.mainSpeakerAvatar ? currentLivestream.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media' ) + ')'}}></div>
-                                    </Grid.Column>
-                                    <Grid.Column mobile='10' computer='5'>
-                                        <div style={{ fontWeight: '700', fontSize: '1.4em', marginBottom: '10px', color: userIsRegistered() ? 'white' : 'rgb(44, 66, 81)' }}>{ currentLivestream.mainSpeakerName }</div>
-                                        <div style={{ fontWeight: '500', fontSize: '1.2em', marginBottom: '10px', color: userIsRegistered() ? 'white' : 'rgb(44, 66, 81)' }}>{ currentLivestream.mainSpeakerPosition }</div>
-                                        <div style={{ fontWeight: '500', fontSize: '1.2em', marginBottom: '10px', color: userIsRegistered() ? 'white' : 'rgb(44, 66, 81)' }}>{ currentLivestream.mainSpeakerBackground }</div>
-                                    </Grid.Column>
+                                    <Grid.Row>
+                                        <Grid.Column textAlign='center' mobile='16' computer='5'>
+                                            <Image src={currentLivestream.companyLogoUrl} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '230px', maxHeight: '140px', margin: '10px auto 5px auto' }}/>
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                    <Grid.Row>
+                                        { speakerElements }
+                                    </Grid.Row>
                                 </Grid> 
                             </div>
-                            <div style={{ textAlign: 'center', marginBottom: '20px'}}>
-                                <TargetElementList size='large' fields={ currentLivestream.targetGroups }/>
-                            </div>
-                            <div style={{ margin: '20px 0 30px 0', width: '100%' }}>
+                            <div style={{ margin: '40px 0', width: '100%' }}>
                                 <div>
-                                    <Button size='big' content={ user ? ( registered ? 'Cancel' : 'Book a Spot') : 'Log in to Register' } icon={ user ? (registered ? 'delete' : 'plus') : 'sign-in' } style={{ margin: '5px' }} onClick={registered ? () => deregisterFromLivestream(currentLivestream.id) : () => startRegistrationProcess(currentLivestream.id)} color={ registered ? '' : 'teal'}/>
+                                    {/* <Button size='big' content={ 'Ready To Join' } icon={ 'play' } style={{ margin: '5px' }} onClick={() => setUserIsReady(true)} disabled={!currentLivestream.hasStarted} color='pink'/>  */}
+                                    <Button size='big' content={ user ? (registered ? 'Cancel' : 'I\'ll attend!') : 'Register to attend' } icon={ registered ? 'delete' : 'plus'} style={{ margin: '5px' }} onClick={registered ? () => deregisterFromLivestream(currentLivestream.id) : () => startRegistrationProcess(currentLivestream.id)} color={ registered ? null : 'teal'}/>
                                     <Button size='big' content={ 'How Live Streams Work' } icon={ 'cog' } style={{ margin: '5px' }} onClick={() => goToSeparateRoute('/howitworks')} color='pink'/>
+                                </div>
+                            </div>
+                            <div style={{ textAlign: 'center', marginBottom: '20px'}}>
+                                <TargetElementList fields={ currentLivestream.targetGroups }/>
+                            </div>
+                            <div style={{ textAlign: 'center', marginBottom: '20px'}}>
+                                <Grid centered className='middle aligned'>
+                                    <Grid.Column mobile='5' computer='2' style={{ display: currentLivestream.universities.indexOf('ethzurich') > -1 ? 'block' : 'none' }}>
+                                        <Image src={"https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media"} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '80px', maxHeight: '65px', margin: '10px auto 5px auto' }}/>
+                                    </Grid.Column>
+                                    <Grid.Column mobile='5' computer='2' style={{ display: currentLivestream.universities.indexOf('epflausanne') > -1 ? 'block' : 'none' }}>
+                                        <Image src={"https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fepfl-career-center.png?alt=media"} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '80px', maxHeight: '65px', margin: '10px auto 5px auto' }}/>
+                                    </Grid.Column>
+                                </Grid>
+                            </div>
+                            <div className='topDescriptionContainer' > 
+                                <div className='countdown-title' style={{ textAlign: 'center',  color: registered ? 'white' : 'rgb(255, 20, 147)'}} >This live stream starts here in</div>    
+                                <div  style={{ textAlign: 'center', color: 'rgb(255, 20, 147)'}}>
+                                    <Countdown date={ currentLivestream.start.toDate() }/>
                                 </div>
                             </div>
                         </Container>   
@@ -272,25 +327,18 @@ function UpcomingLivestream(props) {
                     </div>
                 </div>
             </div>
-            <div className='grey-container'>
-                <Container>
-                        <div className='container-title'>Your event starts here in</div>
-                        <div style={{ marginTop: '30px', textAlign: 'center', color: 'rgb(255, 20, 147)'}}>
-                            <Countdown date={ currentLivestream.start.toDate() }/>
-                        </div>
-                </Container>
-            </div>
             <div className='white-container'>
                 <Container>
                         <div className='container-title'>Short summary</div>
-                        <div style={{ fontSize: '1.5em', lineHeight: '1.4em', width: '80%', margin: '0 auto' }}>{ currentLivestream.summary }</div>
+                        <div style={{ fontSize: '1.3em', lineHeight: '1.4em', width: '80%', margin: '0 auto' }}>{ currentLivestream.summary }</div>
                 </Container>
             </div>
             <div className='grey-container'>
                 <Container>
                     <div className='container-title'>Which questions should the speaker answer during the livestream?</div>
                     <div style={{ textAlign: 'center' }}>
-                        <Input size='huge' value={newQuestionTitle} onChange={(event) => setNewQuestionTitle(event.target.value)} action={{ content: 'Submit Your Question', color:'teal', onClick: () => addNewQuestion() }} fluid/>
+                        <Input size='huge' value={newQuestionTitle} onChange={(event) => setNewQuestionTitle(event.target.value)} fluid/>
+                        <Button size='huge' content='Submit Your Question' style={{ margin: '20px 0 0 0'}} onClick={() => addNewQuestion()} primary/>
                     </div>
                     <div className={'container-title ' + ( questionElements.length === 0 ? 'hidden' : '')} style={{ margin: '30px 0 0 0' }}>Upvote questions from your peers</div>
                     <Grid stackable columns={3} style={{ margin: '5px 0 30px 0' }}>
@@ -302,11 +350,11 @@ function UpcomingLivestream(props) {
             <div className='white-container' style={{ backgroundColor: (userIsInTalentPool ? 'rgb(0, 210, 170)' : '')}}>
                 <Container>
                     <div className='container-title' style={{ color: (userIsInTalentPool ? 'white' : '') }}>{ userIsInTalentPool ? 'You are part of the talent pool' : 'Join the Talent Pool and Get Hired' }</div>
-                    <Grid style={{ margin: '50px 0 0 0'}} className='middle aligned'>
-                        <Grid.Column width={8}>
+                    <Grid style={{ margin: '50px 0 0 0'}} className='middle aligned' centered>
+                        <Grid.Column computer='8' mobile='16'>
                             <Image src={ currentLivestream.companyLogoUrl ? currentLivestream.companyLogoUrl : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media' } style={{ margin: '0 auto', maxHeight: '100px', maxWidth: '50%', filter: (userIsInTalentPool ? 'brightness(0) invert(1)' : '')}}/>
                         </Grid.Column>
-                        <Grid.Column width={8} style={{ textAlign: 'left' }}>
+                        <Grid.Column computer='8' mobile='16' style={{ textAlign: 'center' }}>
                             <Button size='big' content={ userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'} icon={ userIsInTalentPool ? 'delete' : 'handshake outline'} onClick={ userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()} primary={!userIsInTalentPool}/> 
                         </Grid.Column>
                         <Grid.Column width={16}>
@@ -326,7 +374,7 @@ function UpcomingLivestream(props) {
                 </Container>
             </div>
             <Footer/>
-            <BookingModal livestream={currentLivestream} modalOpen={bookingModalOpen} setModalOpen={setBookingModalOpen} user={user}/>
+            <BookingModal livestream={currentLivestream} modalOpen={bookingModalOpen} setModalOpen={setBookingModalOpen} registration={registration} setRegistration={(value) => setRegistration(value)} user={user}/>
             <style jsx>{`
                 .hidden {
                     display: none;
@@ -382,7 +430,7 @@ function UpcomingLivestream(props) {
                 .mask {
                     width: 100%;
                     padding: 20px 0 60px 0;
-                    background-color: rgba(255, 255, 255,0.85);
+                    background-color: rgba(255, 255, 255,0.9);
                 }
 
                 .livestream-label {
@@ -394,7 +442,7 @@ function UpcomingLivestream(props) {
                     text-transform: uppercase;
                     padding: 5px 10px;
                     vertical-align: middle;
-                    margin: 3px 10px 10px 0;
+                    margin: 20px 0 20px 0;
                 }
     
                 .livestream-title {
@@ -406,28 +454,59 @@ function UpcomingLivestream(props) {
                     max-width: 800px;
                     margin: 0 auto;
                 }
+
+                .livestream-speaker-avatar-capsule {
+                    border: 2px solid rgb(0, 210, 170);
+                    display: inline-block;
+                    margin: 20px auto;
+                    padding 8px;
+                    border-radius: 50%;
+                }
+
+                .livestream-speaker-avatar {
+                    width: 110px;
+                    padding-top: 110px;
+                    border-radius: 50%;
+                    vertical-align: middle;
+                    display: inline-block;
+                    box-shadow: 0 0 2px grey;
+                    display: inline-block;
+                    background-size: cover;
+                }
     
                 .livestream-date {
                     text-align: center;
-                    font-size: 1.8em;
+                    font-size: 1.3em;
                     font-weight: 700;
                     color: rgb(255, 20, 147);
                     vertical-align: middle;
-                    margin: 10px 0;
+                    margin: 20px 0;
                     width: 100%;
+                    text-transform: uppercase;
+                }
+
+                .livestream-speaker-image-container {
+                    display: inline-block;
+                    border: 2px solid rgb(0, 210, 170);
+                    border-radius: 50%;
                 }
     
-                .livestream-speaker-image {
-                    display: inline-block;
-                    padding-top: 50%;
-                    width: 50%;
-                    min-height: 60px;
-                    min-width: 60px;
-                    border-radius: 50%;
+                .livestream-speaker-image {     
+                    min-height: 100px;
+                    min-width: 100px;
+                    border-radius: 9999px;
                     background-size: cover;
                     background-position: center center;
                     vertical-align: middle;
-                    margin: 0 auto;
+                    margin: 20px auto;
+                }
+
+                .livestream-speaker-description {
+                    display: inline-block;
+                    vertical-align: middle;
+                    width: 100%;
+                    text-align: center;
+                    margin: 0 0 0 10px;
                 }
     
                 .livestream-speaker-name {
@@ -449,6 +528,13 @@ function UpcomingLivestream(props) {
                     color: white;
                     z-index: 4000;
                     padding: 15px 0;
+                }
+
+                .countdown-title {
+                    text-transform: uppercase;
+                    font-weight: 700;
+                    color: rgb(120,120,120);
+                    margin: 40px 0 0 0;
                 }
     
                 .live-now {
