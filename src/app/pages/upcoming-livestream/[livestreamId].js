@@ -261,7 +261,7 @@ function UpcomingLivestream(props) {
         return <Loader/>;
     }
 
-    if (currentLivestream.hasStarted && userIsReady) {
+    if (currentLivestream.hasStarted) {
         router.replace('/player-alt/' + currentLivestream.id);
     }
 
@@ -337,7 +337,7 @@ function UpcomingLivestream(props) {
                 <Container>
                     <div className='container-title'>Which questions should the speaker answer during the livestream?</div>
                     <div style={{ textAlign: 'center' }}>
-                        <Input size='huge' value={newQuestionTitle} onChange={(event) => setNewQuestionTitle(event.target.value)} fluid/>
+                        <Input size='huge' value={newQuestionTitle} onChange={(event) => setNewQuestionTitle(event.target.value)}  maxLength='170' fluid/>
                         <Button size='huge' content='Submit Your Question' style={{ margin: '20px 0 0 0'}} onClick={() => addNewQuestion()} primary/>
                     </div>
                     <div className={'container-title ' + ( questionElements.length === 0 ? 'hidden' : '')} style={{ margin: '30px 0 0 0' }}>Upvote questions from your peers</div>

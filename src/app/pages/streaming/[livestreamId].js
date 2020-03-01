@@ -314,19 +314,10 @@ function StreamingPage(props) {
                     <div className={currentQuestion ? 'hidden' : ''}>
                         <div className='question-label'>Q&A Questions</div>
                         <div className='main-buttons'>
-                            <Button style={{ margin: '5px 0'}} content='Start Q&A' onClick={() => goToNextQuestion()} disabled={upcomingQuestions.length === 0} fluid/>
-                            <Button style={{ margin: '5px 0'}} content={ allQuestionsShown ? 'Hide All Questions' : 'See All Questions' } onClick={() => setAllQuestionsShown(!allQuestionsShown)} primary fluid/>
+                            <Button style={{ margin: '5px 0'}} size='large' content='Start Q&A' onClick={() => goToNextQuestion()} disabled={upcomingQuestions.length === 0} fluid/>
+                            <Button style={{ margin: '5px 0'}} size='large' content={ allQuestionsShown ? 'Hide All Questions' : 'See All Questions' } onClick={() => setAllQuestionsShown(!allQuestionsShown)} primary fluid/>
                         </div>
                     </div>
-                </div>
-                <div className='video-menu-left-reactions'>
-                    <div style={{ margin: '0 0 5px 0'}}>REACTIONS TO ANSWER</div>
-                    <Grid centered>
-                        <Grid.Column width={5} textAlign='center'>
-                            <Icon name='thumbs up' color='pink' size='large' style={{ margin: '0 10px 0 0' }}/>
-                            <span style={{ color: 'rgb(255, 20, 147)', fontSize: '1.3em' }}>{ currentQuestion && currentQuestion.answerUpvotes ? currentQuestion.votes : 0 }</span>
-                        </Grid.Column>
-                    </Grid>
                 </div>
                 <style jsx>{`
                     .hidden {
@@ -335,7 +326,7 @@ function StreamingPage(props) {
 
                     .currentQuestionContainer {
                         position: relative;
-                        height: 160px;
+                        height: 220px;
                         width: 100%;
                         background-color: rgba(0, 210, 170, 0.7);
                         padding: 5px 10px;
@@ -381,7 +372,7 @@ function StreamingPage(props) {
 
                     .main-buttons {
                         text-align: center;
-                        margin: 30px 0;
+                        margin: 50px 0;
                     }
                 `}</style>
             </div>
@@ -492,7 +483,8 @@ function StreamingPage(props) {
                     <h3 style={{ color: (isStreaming ?  'white' : 'orange') }}>{ isStreaming ? 'YOU ARE NOW LIVE' : 'YOU ARE NOT LIVE'}</h3>
                     { isStreaming ? '' : 'Press Start Streaming to begin'}
                 </div>
-                <div style={{ float: 'right', display: 'inlineBlock', margin: '0 20px' }}>
+                <div style={{ float: 'right', display: 'inlineBlock', margin: '0 20px', fontSize: '1.2em', fontWeight: '700', padding: '10px' }}>
+                    Viewers: { numberOfViewers }
                 </div>
             </div>
             <div className='streamingOuterContainer'>

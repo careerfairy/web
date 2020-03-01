@@ -142,7 +142,7 @@ function BookingModal(props) {
                                         <div className='livestream-streamer-position'>{ props.livestream.mainSpeakerBackground }</div>
                                     </div>
                                 </div>
-                                <Input size='huge' value={newQuestionTitle} placeholder={'What would like to ask our speaker?'} onChange={(event) => setNewQuestionTitle(event.target.value)} fluid/>
+                                <Input size='huge' value={newQuestionTitle} placeholder={'What would like to ask our speaker?'}  maxLength='170' onChange={(event) => setNewQuestionTitle(event.target.value)} fluid/>
                                 <Button style={{ margin: '20px 0 0 0'}} primary content='Submit' onClick={() => addNewQuestion()} size='large'/>
                                 <div style={{ margin: '20px 0 10px 0', textAlign: 'center', color: 'rgb(70,70,200)', cursor: 'pointer' }} onClick={() => setModalStep(3)}>Skip</div>
                             </div>
