@@ -181,8 +181,11 @@ function UpcomingLivestream(props) {
         props.firebase.deregisterFromLivestream(livestreamId, user.email);
     }
 
+    function dateIsInUnder24Hours(date) {
+        return new Date(date).getTime() - Date.now() < 1000*60*60*24 || Date.now() > new Date(date).getTime();
+    }
+
     function addNewQuestion() {
-        debugger;
         if (!user) {
             return router.replace('/signup');
         }
@@ -281,6 +284,12 @@ function UpcomingLivestream(props) {
                             </div>
                             <div className='livestream-date' style={{ color: userIsRegistered() ? 'white' : '' }}>
                                 <span><Icon name='calendar outline alternate'/>{ DateUtil.getPrettyDate(currentLivestream.start.toDate()) }</span>
+                            </div>
+                            <div className={'topDescriptionContainer ' + (dateIsInUnder24Hours(currentLivestream.start.toDate()) ? '' : 'hidden')}> 
+                                <div className='countdown-title' style={{ textAlign: 'center',  color: 'rgb(255, 20, 147)', fontSize: '1.4em'}} >Please wait here! You will be redirected when the stream starts.</div>    
+                                <div  style={{ textAlign: 'center', color: 'rgb(255, 20, 147)'}}>
+                                    <Countdown date={ currentLivestream.start.toDate() }/>
+                                </div>
                             </div>
                             <div style={{ margin: '30px 0'}}>
                                 <Grid className='middle aligned' centered>

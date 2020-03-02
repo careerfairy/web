@@ -14,6 +14,9 @@ function StreamPlayer(props) {
     const eth_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media&token=9403f77b-3cb6-496c-a96d-62be1496ae85';
 
     const [user, setUser] = useState(null);
+    const [userData, setUserData] = useState(null);
+    const [showVolumeHint, setShowVolumeHint] = useState(true);
+
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
     const [nsToken, setNsToken] = useState(null);
 
@@ -43,6 +46,17 @@ function StreamPlayer(props) {
             }
         })
     }, []);
+
+    useEffect(() => {
+        if (user) {
+            props.firebase.listenToUserData(user.email, querySnapshot => {
+                let user = querySnapshot.data();
+                if (user) {
+                    setUserData(user);
+                }
+            });
+        }
+    },[user]);
 
     useEffect(() => {
         if (props.livestreamId) {
@@ -330,7 +344,7 @@ function StreamPlayer(props) {
     function addNewComment() {
         const newComment = {
             title: newCommentTitle,
-            votes: 0,
+            author: userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : '',
         }
         props.firebase.putScheduledLivestreamQuestionComment(currentLivestream.id, newComment)
             .then(() => {
@@ -420,7 +434,6 @@ function StreamPlayer(props) {
                     { comment.title }
                 </div>
                 <div className='streamNextQuestionContainerSubtitleAlt'>
-                    <div className='question-upvotes-alt'><Icon name='thumbs up outline'/>{comment.votes}</div>
                     <div className='question-author'>@{comment.author}</div>
                 </div>
                 <style jsx>{`
@@ -446,9 +459,9 @@ function StreamPlayer(props) {
         );
     })
 
-   /*  if (!currentLivestream.hasStarted) {
-        router.replace('/upcoming-livestream/' + currentLivestream.id);
-    } */
+//    /*  if (!currentLivestream.hasStarted) {
+//         router.replace('/upcoming-livestream/' + currentLivestream.id);
+//     } */
 
     return (
         <div className='topLevelContainer'>
@@ -461,25 +474,15 @@ function StreamPlayer(props) {
             </div>
             <div className='streamingOuterContainer'>
                 <div className='streamingContainer'>
+                    <div className={'volume-advice ' + (showVolumeHint ? '' : 'hidden')}><Icon name='volume up' style={{ marginRight: '10px'}}/>Don't forget to turn up the volume!<Icon style={{ position: 'absolute', top: '20px', right:  '10px'}} onClick={() => setShowVolumeHint(false)} name='delete'/></div>
                     <video id="remoteVideo" autoPlay controls muted width='100%'></video> 
                 </div>
-                <div className={'newQuestionPopup animated slideInUp ' + (voteOnQuestions ? '' : 'hidden')}>
-                    <div className='streamNextQuestionContainer'>
-                        <p style={{ fontWeight: '700', fontSize: '0.6em', textTransform: 'uppercase', color: 'rgb(255, 20, 147)' }}>Upvote if you like this question</p>
-                        <p style={{ marginBottom: '5px' }}>{voteOnQuestions ? voteOnQuestions.title : ''}</p>
-                        <p style={{ fontSize: '0.8em', fontWeight: '300', color: 'rgb(200,200,200)' }}>from @Martin.Kamm</p>
-                        <div className='bottom-element'>
-                            <Button icon='thumbs up' onClick={() => upvoteQuestion(voteOnQuestions)} size='small' content='upvote' primary/>
-                        </div>
-                        <Icon name='delete' style={{ position: 'absolute', top: '5px', right: '0', color: 'grey', cursor: 'pointer'}} onClick={() => setVoteOnQuestions(null)}/>
-                    </div>
-                </div>
-                {/* <div className={'connecting-overlay ' + (isPlaying ? 'hidden' : '')} >
+                <div className={'connecting-overlay ' + (isPlaying ? 'hidden' : '')} >
                     <div className='connecting-overlay-content'>
                         <Image src='/connector.gif' style={{ width: '120px', height: 'auto', margin: '0 auto' }} />
                         <div>Wait a second, the streamer is about to connect</div>
                     </div>
-                </div> */}
+                </div>
             </div>
             <div className='video-menu'>
                 <div className='video-menu-input'>
@@ -647,6 +650,18 @@ function StreamPlayer(props) {
                     background-color: black;
                     z-index: -9999;
                     cursor: pointer;
+                }
+
+                .volume-advice {
+                    position: relative;
+                    padding: 20px;
+                    background-color: rgb(0, 210, 170);
+                    z-index: 9901;
+                    color: white;
+                    text-transform: uppercase;
+                    font-weight: 700;
+                    font-size: 1.2em;
+                    text-align: left;
                 }
 
                 .newQuestionPopup {

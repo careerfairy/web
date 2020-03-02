@@ -238,7 +238,6 @@ function StreamingPage(props) {
                     { comment.title }
                 </div>
                 <div className='streamNextQuestionContainerSubtitleAlt'>
-                    <div className='question-upvotes-alt'><Icon name='thumbs up outline'/>{comment.votes}</div>
                     <div className='question-author'>@{comment.author}</div>
                 </div>
                 <style jsx>{`
@@ -344,9 +343,9 @@ function StreamingPage(props) {
                     .currentQuestionContainer .question-title {
                         width: 100%;
                         text-align: center;
-                        font-size: 1.5em;
-                        line-height: 1.3em;
+                        font-size: 1.1em;
                         font-weight: 700;
+                        line-height: 1.3em;
                         color: white;
                         padding: 15px;
                     }
