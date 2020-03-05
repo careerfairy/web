@@ -10,6 +10,7 @@
 @olive          : #32CD32;
 @green          : #016936;
 @teal           : #00D2AA;
+@lightTeal      : #00D2AA;
 @blue           : #0E6EB8;
 @violet         : #EE82EE;
 @purple         : #B413EC;

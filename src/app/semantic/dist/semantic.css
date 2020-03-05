@@ -4046,9 +4046,9 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
 .ui.inverted.teal.buttons .button,
 .ui.inverted.teal.button {
   background-color: transparent;
-  -webkit-box-shadow: 0px 0px 0px 2px #6DFFFF inset !important;
-  box-shadow: 0px 0px 0px 2px #6DFFFF inset !important;
-  color: #6DFFFF;
+  -webkit-box-shadow: 0px 0px 0px 2px #00D2AA inset !important;
+  box-shadow: 0px 0px 0px 2px #00D2AA inset !important;
+  color: #00D2AA;
 }
 
 .ui.inverted.teal.buttons .button:hover,
@@ -4066,22 +4066,22 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
 
 .ui.inverted.teal.buttons .button:hover,
 .ui.inverted.teal.button:hover {
-  background-color: #54ffff;
+  background-color: #00b995;
 }
 
 .ui.inverted.teal.buttons .button:focus,
 .ui.inverted.teal.button:focus {
-  background-color: #44ffff;
+  background-color: #00a989;
 }
 
 .ui.inverted.teal.buttons .active.button,
 .ui.inverted.teal.active.button {
-  background-color: #54ffff;
+  background-color: #00b995;
 }
 
 .ui.inverted.teal.buttons .button:active,
 .ui.inverted.teal.button:active {
-  background-color: #3affff;
+  background-color: #009f81;
 }
 
 /* Inverted Basic */
@@ -4098,33 +4098,33 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
 .ui.inverted.teal.basic.buttons .button:hover,
 .ui.inverted.teal.buttons .basic.button:hover,
 .ui.inverted.teal.basic.button:hover {
-  -webkit-box-shadow: 0px 0px 0px 2px #54ffff inset !important;
-  box-shadow: 0px 0px 0px 2px #54ffff inset !important;
-  color: #6DFFFF !important;
+  -webkit-box-shadow: 0px 0px 0px 2px #00b995 inset !important;
+  box-shadow: 0px 0px 0px 2px #00b995 inset !important;
+  color: #00D2AA !important;
 }
 
 .ui.inverted.teal.basic.buttons .button:focus,
 .ui.inverted.teal.basic.buttons .button:focus,
 .ui.inverted.teal.basic.button:focus {
-  -webkit-box-shadow: 0px 0px 0px 2px #44ffff inset !important;
-  box-shadow: 0px 0px 0px 2px #44ffff inset !important;
-  color: #6DFFFF !important;
+  -webkit-box-shadow: 0px 0px 0px 2px #00a989 inset !important;
+  box-shadow: 0px 0px 0px 2px #00a989 inset !important;
+  color: #00D2AA !important;
 }
 
 .ui.inverted.teal.basic.buttons .active.button,
 .ui.inverted.teal.buttons .basic.active.button,
 .ui.inverted.teal.basic.active.button {
-  -webkit-box-shadow: 0px 0px 0px 2px #54ffff inset !important;
-  box-shadow: 0px 0px 0px 2px #54ffff inset !important;
-  color: #6DFFFF !important;
+  -webkit-box-shadow: 0px 0px 0px 2px #00b995 inset !important;
+  box-shadow: 0px 0px 0px 2px #00b995 inset !important;
+  color: #00D2AA !important;
 }
 
 .ui.inverted.teal.basic.buttons .button:active,
 .ui.inverted.teal.buttons .basic.button:active,
 .ui.inverted.teal.basic.button:active {
-  -webkit-box-shadow: 0px 0px 0px 2px #3affff inset !important;
-  box-shadow: 0px 0px 0px 2px #3affff inset !important;
-  color: #6DFFFF !important;
+  -webkit-box-shadow: 0px 0px 0px 2px #009f81 inset !important;
+  box-shadow: 0px 0px 0px 2px #009f81 inset !important;
+  color: #00D2AA !important;
 }
 
 /*--- Olive ---*/
@@ -7328,11 +7328,11 @@ a.ui.teal.header:hover {
 /* Inverted */
 
 .ui.inverted.teal.header {
-  color: #6DFFFF !important;
+  color: #00D2AA !important;
 }
 
 a.ui.inverted.teal.header:hover {
-  color: #54ffff !important;
+  color: #00b995 !important;
 }
 
 /*--- Blue ---*/
@@ -7974,7 +7974,7 @@ i.teal.icon {
 }
 
 i.inverted.teal.icon {
-  color: #6DFFFF !important;
+  color: #00D2AA !important;
 }
 
 i.inverted.bordered.teal.icon,
