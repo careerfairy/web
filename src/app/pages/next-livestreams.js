@@ -71,7 +71,7 @@ function Calendar(props) {
     }, [filter]);
 
     useEffect(() => {
-        props.firebase.listenToUpcomingLivestreams( querySnapshot => {
+        const unsubscribe = props.firebase.listenToUpcomingLivestreams(querySnapshot => {
             var livestreams = [];
             querySnapshot.forEach(doc => {
                 let livestream = doc.data();
@@ -80,6 +80,7 @@ function Calendar(props) {
             });
             setAllLivestreams(livestreams);
         });
+        return () => unsubscribe();
     }, [university]);
 
     useEffect(() => {

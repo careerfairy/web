@@ -74,6 +74,11 @@ export function SignUpFormBase(props) {
         }
     },[props.user, emailSent]);
 
+    function resendVerificationEmail() {
+        setEmailVerificationSent(false);
+        setEmailSent(true);
+    }
+
     return (
         <Fragment>
             <Head>
@@ -175,7 +180,7 @@ export function SignUpFormBase(props) {
                                     <Message positive hidden={!emailVerificationSent}>
                                         <Message.Header>Verification Email Sent</Message.Header>
                                         <p>
-                                        We have a just send an email verification link to the address you provided. Please click on it to start your journey on CareerFairy.
+                                        We have a just send an email verification link to the address you provided. Please click on it to start your journey on CareerFairy. <span className='resend-link' onClick={() => resendVerificationEmail()}>Resend the email verification link.</span>
                                         </p>
                                     </Message>
                                     <div className='reset-email'>
@@ -291,6 +296,11 @@ export function SignUpFormBase(props) {
                             .reset-email {
                                 margin: 20px auto 0 auto;
                                 text-align: center;
+                            }
+
+                            .resend-link {
+                                text-decoration: underline;
+                                cursor: pointer;
                             }
                         `}</style>
                 </Container>

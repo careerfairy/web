@@ -29,10 +29,9 @@ export default function CountdownTimer(props) {
 
   const timerComponents = [];
 
-  Object.keys(timeLeft).forEach(interval => {
-
+  Object.keys(timeLeft).forEach((interval, index) => {
     timerComponents.push(
-      <Grid.Column mobile='4' tablet='3' computer='2' textAlign='center'>
+      <Grid.Column mobile='4' tablet='3' computer='2' textAlign='center' key={index}>
         <div className='timeElement'>
             <div className='number'>
                 {timeLeft[interval]}

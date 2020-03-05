@@ -1,20 +1,21 @@
 import {useState, useEffect} from 'react';
-import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input} from "semantic-ui-react";
+import {Button, Grid, Header as SemanticHeader, Icon, Image, Input} from "semantic-ui-react";
 
-import Header from '../../components/views/header/Header';
 import { withFirebasePage } from '../../data/firebase';
 import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor_new.js';
-import ElementTagList from '../../components/views/common/ElementTagList';
-import Countdown from 'react-countdown';
 import axios from 'axios';
 import { animateScroll } from 'react-scroll';
 import ButtonWithConfirm from '../../components/views/common/ButtonWithConfirm';
-0
+
+import CommentContainer from '../../components/views/streaming/comment-container/NewCommentContainer';
+import Loader from '../../components/views/loader/Loader';
+
 function StreamingPage(props) {
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
     const [isStreaming, setIsStreaming] = useState(false);
     const [isCapturingDesktop, setIsCapturingDesktop] = useState(false);
+    const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState(null);
     const [currentLivestream, setCurrentLivestream] = useState(null);
@@ -22,25 +23,23 @@ function StreamingPage(props) {
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [streamerVerified, setStreamerVerified] = useState(true);
     const [streamInitialized, setStreamInitialized] = useState(false);
-    const [showNextQuestions, setShowNextQuestions] = useState(false);
-    const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [allQuestionsShown, setAllQuestionsShown] = useState(false);
 
 
     useEffect(() => {
         if (props.livestreamId) {
-            props.firebase.getScheduledLivestreamById(props.livestreamId, querySnapshot => {
+            props.firebase.getScheduledLivestreamById(props.livestreamId).then(querySnapshot => {
                 let livestream = querySnapshot.data();
                 livestream.id = querySnapshot.id;
                 setCurrentLivestream(livestream);
-            })
+            });
         }
     }, [props.livestreamId]);
 
     useEffect(() => {
         if (props.livestreamId) {
-            props.firebase.listenToScheduledLivestreamsQuestions(props.livestreamId, querySnapshot => {
+            const unsubscribe = props.firebase.listenToLivestreamQuestions(props.livestreamId, querySnapshot => {
                 var questionsList = [];
                 querySnapshot.forEach(doc => {
                     let question = doc.data();
@@ -49,12 +48,13 @@ function StreamingPage(props) {
                 });
                 setUpcomingQuestions(questionsList);
             });
+            return () => unsubscribe();
         }
     }, [props.livestreamId]);
 
     useEffect(() => {
         if (props.livestreamId && upcomingQuestions) {
-            props.firebase.listenToScheduledLivestreamsCurrentQuestion(props.livestreamId, querySnapshot => {
+            const unsubscribe = props.firebase.listenToLivestreamCurrentQuestion(props.livestreamId, querySnapshot => {
                 if  (querySnapshot.size > 0) {
                     querySnapshot.forEach(doc => {
                         let question = doc.data();
@@ -63,22 +63,9 @@ function StreamingPage(props) {
                     });
                 }
             });
+            return () => unsubscribe();
         }
     }, [props.livestreamId, upcomingQuestions]);
-
-    useEffect(() => {
-        if (props.livestreamId) {
-            props.firebase.listenToScheduledLivestreamComments(props.livestreamId, querySnapshot => {
-                var commentsList = [];
-                querySnapshot.forEach(doc => {
-                    let comment = doc.data();
-                    comment.id = doc.id;
-                    commentsList.push(comment);
-                });
-                setComments(commentsList);
-            });
-        }
-    }, [props.livestreamId, currentQuestion]);
 
     useEffect(() => {
         axios({
@@ -119,64 +106,25 @@ function StreamingPage(props) {
           });
     }, [comments]);
 
-    function setCurrentLivestreamIsLive(isLive) {
-        props.firebase.setScheduledLivestreamHasStarted(isLive, currentLivestream.id);
-    }
-
-    function goToNextQuestion() {
-        if (currentQuestion) {
-            props.firebase.goToNextQuestion(currentQuestion.id, upcomingQuestions[0].id, currentLivestream.id);
-        } else {
-            props.firebase.goToNextQuestion(null, upcomingQuestions[0].id, currentLivestream.id);
-        }
-    }
-
     function goToThisQuestion(nextQuestionId) {
-        props.firebase.goToNextQuestion(currentQuestion.id, nextQuestionId, currentLivestream.id);
+        props.firebase.goToNextLivestreamQuestion(currentQuestion.id, nextQuestionId, currentLivestream.id);
     }
 
-    function markQuestionAsDone(question) {
-        props.firebase.markQuestionAsDone(currentLivestream.id, question)
-            .then(() => {
-                setCurrentQuestion(null)
-            }, (error) => {
-                console.log("Error:" + error );
-            });
-    }
-
-    function markQuestionAsCurrent(question) {
-        props.firebase.markQuestionAsCurrent(currentLivestream.id, question);
-    }
-
-    function removeQuestion(question) {
-        props.firebase.removeQuestion(currentLivestream.id, question);
-    }
-
-    function addNewComment(comment) {
-        const newComment = {
-            title: newCommentTitle,
-            votes: 0,
-        }
-        props.firebase.putScheduledLivestreamQuestionComment(currentLivestream.id, currentQuestion.id, newComment)
-            .then(() => {
-                setNewCommentTitle("");
-            }, error => {
-                console.log("Error: " + error);
-            })
+    function removeLivestreamQuestion(question) {
+        props.firebase.removeLivestreamQuestion(currentLivestream.id, question);
     }
 
     let questionElements = upcomingQuestions.map((question, index) => {
         return (
-            <Grid.Column width={5}>
-                <div className='streamNextQuestionContainer' key={index}>
+            <Grid.Column width={5} key={index}>
+                <div className='streamNextQuestionContainer'>
                     <p style={{ marginBottom: '5px' }}>{ question.title }</p>
-                    <p style={{ fontSize: '0.8em', fontWeight: '300', color: 'rgb(200,200,200)' }}>from @{ question.author }</p>
                     <div className='bottom-element'>
                         <div className='streamNextQuestionNumberOfVotes'>{ question.votes } <Icon name='thumbs up'/></div>
                     </div>
                     <div>
-                        <Button content='Remove' onClick={() => removeQuestion(question)}/>
-                        <Button content='Select Question' onClick={() => goToThisQuestion(question.id)} primary/>
+                        <Button content='Remove' style={{ margin: '5px'}} onClick={() => removeLivestreamQuestion(question)}/>
+                        <Button content='Select Question' style={{ margin: '5px'}} onClick={() => goToThisQuestion(question.id)} primary/>
                     </div>
                     <style jsx>{`
                         .streamNextQuestionContainer {
@@ -231,153 +179,6 @@ function StreamingPage(props) {
         );
     })
 
-    let commentsElements = comments.map((comment, index) => {
-        return (
-            <div className='streamNextQuestionContainerAlt animated fadeInUp faster'>
-                <div className='streamNextQuestionContainerTitleAlt'>
-                    { comment.title }
-                </div>
-                <div className='streamNextQuestionContainerSubtitleAlt'>
-                    <div className='question-author'>@{comment.author}</div>
-                </div>
-                <style jsx>{`
-                    .streamNextQuestionContainerAlt {
-                        font-size: 1em;
-                        margin-bottom: 25px;
-                        line-height: 1.4em;
-                    }
-
-                    .streamNextQuestionContainerTitleAlt {
-                        font-size: 1em;
-                        font-weight: 700;
-                        margin-bottom: 5px;
-                    }
-
-                    .streamNextQuestionContainerSubtitleAlt div {
-                        display: inline-block;
-                        margin-right: 10px;
-                        color: rgb(180,180,180);
-                    }
-                `}</style>
-            </div>
-        );
-    })
-
-    let questionElementsAlt = comments.map((comment, index) => {
-        return (
-            <div className='streamNextQuestionContainerAlt animated fadeInUp faster'>
-                <div className='streamNextQuestionContainerTitleAlt'>
-                    { comment.title }
-                </div>
-                <div className='streamNextQuestionContainerSubtitleAlt'>
-                    <div className='question-upvotes-alt'><Icon name='thumbs up outline'/>{comment.votes}</div>
-                    <div className='question-author'>@{comment.author}</div>
-                </div>
-                <style jsx>{`
-                    .streamNextQuestionContainerAlt {
-                        font-size: 1em;
-                        margin-bottom: 25px;
-                        line-height: 1.4em;
-                    }
-
-                    .streamNextQuestionContainerTitleAlt {
-                        font-size: 1em;
-                        font-weight: 700;
-                        margin-bottom: 5px;
-                    }
-
-                    .streamNextQuestionContainerSubtitleAlt div {
-                        display: inline-block;
-                        margin-right: 10px;
-                        color: rgb(180,180,180);
-                    }
-                `}</style>
-            </div>
-        );
-    })
-
-    let CurrentQuestionElement = () => {
-        return (
-            <div>
-                <div className='currentQuestionContainer'>
-                    <div className={currentQuestion ? '' : 'hidden'}>
-                        <div className='question-label'>Current Question</div>
-                        <div className='question-title'>
-                            { currentQuestion ? currentQuestion.title : '' }
-                        </div>
-                        <div className='question-buttons'>
-                            <Button icon='check' content='NEXT QUESTION' size='small' onClick={() => goToNextQuestion()} disabled={upcomingQuestions.length === 0}/>
-                            <Button content={ allQuestionsShown ? 'Hide All Questions' : 'See All Questions' } size='small' onClick={() => setAllQuestionsShown(!allQuestionsShown)} primary/>
-                        </div>
-                    </div>
-                    <div className={currentQuestion ? 'hidden' : ''}>
-                        <div className='question-label'>Q&A Questions</div>
-                        <div className='main-buttons'>
-                            <Button style={{ margin: '5px 0'}} size='large' content='Start Q&A' onClick={() => goToNextQuestion()} disabled={upcomingQuestions.length === 0} fluid/>
-                            <Button style={{ margin: '5px 0'}} size='large' content={ allQuestionsShown ? 'Hide All Questions' : 'See All Questions' } onClick={() => setAllQuestionsShown(!allQuestionsShown)} primary fluid/>
-                        </div>
-                    </div>
-                </div>
-                <style jsx>{`
-                    .hidden {
-                        display: none;
-                    }
-
-                    .currentQuestionContainer {
-                        position: relative;
-                        height: 220px;
-                        width: 100%;
-                        background-color: rgba(0, 210, 170, 0.7);
-                        padding: 5px 10px;
-                    }
-
-                    .currentQuestionContainer .question-label {
-                        text-transform: uppercase;
-                        text-align: center;
-                        font-size: 0.9em;
-                        font-weight: 700;
-                        color: rgba(255,255,255,0.7);
-                    }
-
-
-                    .currentQuestionContainer .question-title {
-                        width: 100%;
-                        text-align: center;
-                        font-size: 1.1em;
-                        font-weight: 700;
-                        line-height: 1.3em;
-                        color: white;
-                        padding: 15px;
-                    }
-
-                    .currentQuestionContainer .question-buttons {
-                        position: absolute;
-                        bottom: 0;
-                        left: 0;
-                        right: 0;
-                        text-align: center;
-                        padding: 15px 0;
-                    }
-
-                    .video-menu-left-reactions {
-                        width: 100%;
-                        height: 60px;
-                        text-align: center;
-                        padding: 5px;
-                        font-size: 0.8em;
-                        font-weight: 700;
-                        color: rgba(0, 210, 170, 0.7);
-                    }
-
-                    .main-buttons {
-                        text-align: center;
-                        margin: 50px 0;
-                    }
-                `}</style>
-            </div>
-        );
-    }
-
     useEffect(() => {
         if (currentLivestream && !streamInitialized && nsToken && nsToken.iceServers.length > 0) {
             var pc_config = {
@@ -410,7 +211,7 @@ function StreamingPage(props) {
                         console.log("initialized");		
                     } else if (info === "publish_started") {
                         //stream is being published 
-                        props.firebase.setScheduledLivestreamHasStarted(true, currentLivestream.id);
+                        props.firebase.setLivestreamHasStarted(true, currentLivestream.id);
                         setIsStreaming(true);
                         console.log("publish started");	
                     } else if (info === "publish_finished") {
@@ -462,7 +263,7 @@ function StreamingPage(props) {
 
     function stopStreaming() {
         webRTCAdaptor.stop(currentLivestream.id);
-        props.firebase.setScheduledLivestreamHasStarted(false, currentLivestream.id);
+        props.firebase.setLivestreamHasStarted(false, currentLivestream.id);
     }
 
     function startDesktopCapture() {
@@ -473,6 +274,20 @@ function StreamingPage(props) {
     function stopDesktopCapture() {
         webRTCAdaptor.switchVideoCapture(currentLivestream.id);
         setIsCapturingDesktop(false);
+    }
+
+    function muteLocalMic() {
+        webRTCAdaptor.muteLocalMic();
+        setIsLocalMicMuted(true);
+    }
+
+    function unmuteLocalMic() {
+        webRTCAdaptor.unmuteLocalMic();
+        setIsLocalMicMuted(false);
+    }
+
+    if (!currentLivestream) {
+        return <Loader/>;
     }
 
     return (
@@ -492,24 +307,12 @@ function StreamingPage(props) {
                 </div>
             </div>
             <div className='video-menu'>
-                <ButtonWithConfirm color='teal' size='huge' buttonAction={isStreaming ? stopStreaming : startStreaming} confirmDescription={isStreaming ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
-                <Button size='big' onClick={ isCapturingDesktop ? () => stopDesktopCapture() : () => startDesktopCapture()}>{ isCapturingDesktop ? 'Stop Screen Sharing' : 'Share Screen'}</Button>
+                <ButtonWithConfirm color='teal' size='big' buttonAction={isStreaming ? stopStreaming : startStreaming} confirmDescription={isStreaming ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
+                <Button circular size='big' onClick={ isCapturingDesktop ? () => stopDesktopCapture() : () => startDesktopCapture()} primary={isCapturingDesktop} icon='desktop'/>
+                <Button circular size='big' onClick={ isLocalMicMuted ? () => unmuteLocalMic() : () => muteLocalMic()} primary={isLocalMicMuted} icon='microphone slash'/>
             </div>
             <div className='video-menu-left'>
-                <CurrentQuestionElement/>
-                <div>
-                    <div id='scrollableLeft' className='video-menu-left-outer-content'>
-                        <div  className='video-menu-left-content'>
-                            { commentsElements }
-                        </div>
-                        <div className={'no-comment-message ' + (comments.length === 0 ? '' : 'hidden')}>
-                            Be the first to react to this answer!
-                        </div>
-                    </div>
-                    <div className='video-menu-left-input'>
-                        <Input action={{ content: 'React', color: 'pink', onClick: () =>  addNewComment(newCommentTitle)}} value={newCommentTitle}  fluid placeholder='Send a reaction...' onChange={(event) => {setNewCommentTitle(event.target.value)}} />
-                    </div>
-                </div>
+                <CommentContainer livestream={ currentLivestream }/>
             </div>
             <div className={'all-questions-modal ' + (allQuestionsShown ? '' : 'hidden')}>
                 <Icon name='delete' onClick={() => setAllQuestionsShown(false)} size='large' style={{ position: 'absolute', top: '10px', right: '10px', color: 'white', zIndex: '9999', cursor: 'pointer'}}/>

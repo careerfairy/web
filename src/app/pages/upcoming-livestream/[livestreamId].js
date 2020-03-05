@@ -1,22 +1,18 @@
-import React, {useState, useEffect,Fragment} from 'react';
-import {Container, Button, Grid, Icon, Header as SemanticHeader, Input, Image} from "semantic-ui-react";
+import React, {useState, useEffect} from 'react';
+import {Container, Button, Grid, Icon, Input, Image} from "semantic-ui-react";
 
 import Header from '../../components/views/header/Header';
 import { withFirebasePage } from '../../data/firebase';
-import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor.js';
 import TargetElementList from '../../components/views/common/TargetElementList'
 import Loader from '../../components/views/loader/Loader'
 import DateUtil from '../../util/DateUtil';
-import CommonUtil from '../../util/CommonUtil';
 import { useRouter } from 'next/router';
 import Footer from '../../components/views/footer/Footer';
 import Countdown from '../../components/views/common/Countdown';
-import axios from 'axios';
-import BookingModal from '../../components/views/booking-modal/BookingModal';
+import BookingModal from '../../components/views/common/booking-modal/BookingModal';
 import QuestionVotingBox from '../../components/views/question-voting-box/QuestionVotingBox';
 import StringUtils from '../../util/StringUtils';
 
-import Link from 'next/link';
 import Head from 'next/head';
 
 function UpcomingLivestream(props) {
@@ -33,7 +29,6 @@ function UpcomingLivestream(props) {
     const [registration, setRegistration] = useState(false);
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
-    const [userIsReady, setUserIsReady] = useState(false);
     const [registered, setRegistered] = useState(false);
 
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -51,7 +46,7 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (livestreamId) {
-            props.firebase.getScheduledLivestreamsUntreatedQuestions(livestreamId, querySnapshot => {
+            const unsubscribe = props.firebase.listenToLivestreamQuestions(livestreamId, querySnapshot => {
                 var questionsList = [];
                 querySnapshot.forEach(doc => {
                     let question = doc.data();
@@ -60,16 +55,18 @@ function UpcomingLivestream(props) {
                 });
                 setUpcomingQuestions(questionsList);
             });
+            return () => unsubscribe();
         }
     }, [livestreamId, user]);
 
     useEffect(() => {
         if (livestreamId) {
-            props.firebase.listenToScheduledLivestreamById(livestreamId, querySnapshot => {
+            const unsubscribe = props.firebase.listenToScheduledLivestreamById(livestreamId, querySnapshot => {
                 let livestream = querySnapshot.data();
                 livestream.id = querySnapshot.id;
                 setCurrentLivestream(livestream);
-        })
+            });
+            return () => unsubscribe();
         }
     }, [livestreamId]);
 
@@ -91,7 +88,7 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (user) {
-            props.firebase.listenToUserData(user.email, querySnapshot => {
+            props.firebase.getUserData(user.email).then(querySnapshot => {
                 let user = querySnapshot.data();
                 if (user) {
                     setUserData(user);
@@ -124,13 +121,6 @@ function UpcomingLivestream(props) {
         }
 
         props.firebase.deregisterFromLivestream(currentLivestream.id, user.email);
-    }
-
-    function getNumberOfRegistrants(livestream) {
-        if (!livestream.registeredUsers) {
-            return 0;
-        }
-        return livestream.registeredUsers.length;
     }
 
     function joinTalentPool() {
@@ -201,7 +191,7 @@ function UpcomingLivestream(props) {
             author: user.email
         }
 
-        props.firebase.putScheduledLivestreamsQuestion(currentLivestream.id, newQuestion)
+        props.firebase.putLivestreamQuestion(currentLivestream.id, newQuestion)
             .then(() => {
                 setNewQuestionTitle("");
             }, () => {
@@ -211,7 +201,7 @@ function UpcomingLivestream(props) {
 
     let speakerElements = livestreamSpeakers.map((speaker, index) => {
         return (
-            <Grid.Column textAlign='center' mobile='16' tablet='8' computer='5'>
+            <Grid.Column textAlign='center' mobile='16' tablet='8' computer='5' key={index}>
                 <div className='livestream-speaker-avatar-capsule'>
                     <div className='livestream-speaker-avatar' style={{ backgroundImage: 'url(' + ( speaker.avatar ? speaker.avatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media' + ')')}}/>
                 </div>
@@ -254,7 +244,7 @@ function UpcomingLivestream(props) {
 
     let questionElements = upcomingQuestions.map((question, index) => {
         return (
-            <Grid.Column>
+            <Grid.Column key={index}>
                 <QuestionVotingBox question={question} user={user} livestream={currentLivestream}/>
             </Grid.Column>
         );
@@ -598,29 +588,29 @@ function UpcomingLivestream(props) {
                 }
 
                 .spots-left {
-                        position: absolute;
-                        right: 40px;
-                        bottom: 40px;
-                        height: 100px;
-                        width: 100px;
-                        border-radius: 50%;
-                        background-color: white;
-                        text-align: center;
-                        padding: 28px 0;
-                    }
+                    position: absolute;
+                    right: 40px;
+                    bottom: 40px;
+                    height: 100px;
+                    width: 100px;
+                    border-radius: 50%;
+                    background-color: white;
+                    text-align: center;
+                    padding: 28px 0;
+                }
 
-                    .spots-left-number {
-                        font-size: 1.8em;
-                        font-weight: 700;
-                        color: rgb(0, 210, 170);
-                    }
+                .spots-left-number {
+                    font-size: 1.8em;
+                    font-weight: 700;
+                    color: rgb(0, 210, 170);
+                }
 
-                    .spots-left-label {
-                        font-size: 1em;
-                        font-weight: 700;
-                        margin: 5px 0;
-                        color: rgb(44, 66, 81);
-                    }
+                .spots-left-label {
+                    font-size: 1em;
+                    font-weight: 700;
+                    margin: 5px 0;
+                    color: rgb(44, 66, 81);
+                }
           `}</style>
         </div>
     );

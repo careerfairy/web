@@ -25,11 +25,11 @@ const PastLivestreamDetail = (props) => {
 
     useEffect(() => {
         if (livestreamId) { 
-            props.firebase.listenToLegacyScheduledLivestreamById(livestreamId, querySnapshot => {
+            props.firebase.getLegacyScheduledLivestreamById(livestreamId).then(querySnapshot => {
                 let livestream = querySnapshot.data();
                 livestream.id = querySnapshot.id;
                 setCurrentLivestream(livestream);
-            })
+            });
         }
     }, [livestreamId]);
 
@@ -42,7 +42,7 @@ const PastLivestreamDetail = (props) => {
 
     useEffect(() => {
         if (livestreamId) {
-            props.firebase.getLegacyPastLivestreamsUntreatedQuestions(livestreamId, querySnapshot => {
+            props.firebase.getLegacyPastLivestreamQuestions(livestreamId).then(querySnapshot => {
                 var questionsList = [];
                 querySnapshot.forEach(doc => {
                     let question = doc.data();
@@ -144,7 +144,7 @@ const PastLivestreamDetail = (props) => {
                 `}</style>
             </div>
         );
-    })
+    });
 
     return (
         <div>

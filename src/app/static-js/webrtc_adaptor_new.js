@@ -532,10 +532,13 @@ export function WebRTCAdaptor(initialValues)
 
 	this.switchVideoCapture = function(streamId) {
 		var mediaConstraints = {
-				video : true,
-				audio : false
+			video: {
+				width: { ideal: 1920, max: 1920 },
+				height: { ideal: 1080, max: 1080 },
+				aspectRatio: 1.77
+			},
+			audio : false
 		};
-
 		thiz.switchVideoSource(streamId, mediaConstraints, null);
 	}
 
@@ -558,8 +561,16 @@ export function WebRTCAdaptor(initialValues)
 							mandatory: {
 								chromeMediaSource: 'desktop',
 								chromeMediaSourceId: message.data.sourceId,
+								maxWidth: 1920,
+								maxHeight: 1080,
+								maxAspectRatio: 1.777,
+								minAspectRatio: 1.777
 							},
-							optional: []
+							optional: [{
+								minWidth: 1920
+							},{
+								minHeight: 1080
+							}]
 						}
 				};
 

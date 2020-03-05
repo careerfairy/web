@@ -129,101 +129,7 @@ exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(async (req, r
         });
 });
 
-const fs = require('fs');
-const https = require('https');
 const axios = require('axios');
-
-const mailgun = require("mailgun-js");
-const DOMAIN = 'mail.careerfairy.io';
-const api_key = '13db35c5779d693ddad243d21e9d5cba-e566273b-b2967fc4';
-const host = 'api.eu.mailgun.net';
-const mg = mailgun({apiKey: api_key, domain: DOMAIN, host: host});
-
-exports.sendEmailVerificationEmail = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
-    }
-
-    const html_email = fs.readFileSync(path.resolve(__dirname, './html_emails/EmailVerificationEmail.html'), 'utf8')
-    const recipient_email = req.body.recipientEmail;
-    const redirect_link = req.body.redirect_link;
-
-    const actionCodeSettings = {
-        url: redirect_link
-    };
-
-    admin.auth().generateEmailVerificationLink(recipient_email, actionCodeSettings)
-        .then((link) => {
-            const data = {
-                from: 'CareerFairy <noreply@mail.careerfairy.io>',
-                to: recipient_email,
-                subject: 'CareerFairy Email Verification',
-                text: 'Welcome to CareerFairy!',
-                html: html_email.replace("__LINK__", link)
-            };
-            return mg.messages().send(data, (error, body) => {
-                if (error) {
-                    res.send('Error: ' + error);
-                }
-                res.send(200);
-            });
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-});
-
-exports.sendResetPasswordEmail = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
-    }
-
-    const html_email = fs.readFileSync(path.resolve(__dirname, './html_emails/ResetPasswordEmail.html'), 'utf8')
-    const recipient_email = req.body.recipientEmail;
-    const redirect_link = req.body.redirect_link;
-
-    console.log("link: " + redirect_link);
-
-    const actionCodeSettings = {
-        url: redirect_link
-    };
-
-    admin.auth().generatePasswordResetLink(recipient_email, actionCodeSettings)
-        .then((link) => {
-            const data = {
-                from: 'CareerFairy <noreply@mail.careerfairy.io>',
-                to: recipient_email,
-                subject: 'CareerFairy Password Reset',
-                text: 'Let us reset your password',
-                html: html_email.replace("__LINK__", link)
-            };
-            return mg.messages().send(data, (error, body) => {
-                if (error) {
-                    res.send('Error: ' + error);
-                }
-                res.send(200);
-            });
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-});
 
 exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onRequest(async (req, res) => {
 
@@ -260,7 +166,7 @@ exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onRequest(
     });
 });
 
-exports.sendEmailVerificationEmail = functions.https.onRequest(async (req, res) => {
+exports.sendReminderEmailsToRegistrants = functions.https.onRequest(async (req, res) => {
 
     res.set('Access-Control-Allow-Origin', '*');
     res.set('Access-Control-Allow-Credentials', 'true');
@@ -270,30 +176,29 @@ exports.sendEmailVerificationEmail = functions.https.onRequest(async (req, res) 
         res.set('Access-Control-Allow-Methods', 'GET');
         res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
         res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
+        return res.status(204).send('');
     }
 
-    const recipient_email = req.body.recipientEmail;
-    const redirect_link = req.body.redirect_link;
- 
-    const data = {
-        from: 'CareerFairy <noreply@mail.careerfairy.io>',
-        to: recipient_email,
-        subject: 'CareerFairy Email Verification',
-        text: 'Welcome to CareerFairy!',
-        html: html_email.replace("__LINK__", link)
-    };
-    return mg.messages().send(data, (error, body) => {
-        if (error) {
-            res.send('Error: ' + error);
+    const email = {
+        "TemplateId": 16660117,
+        "From": 'CareerFairy <noreply@careerfairy.io>',
+        "To": req.body.recipientEmail,
+        "TemplateModel": { 
+            
         }
-        res.send(200);
+    };
+
+    client.sendEmailWithTemplate(email).then(response => {
+        return res.send(200);
+    }, error => {
+        console.log('error:' + error);
+        return res.status(400).send(error);
     });
 });
 
-exports.sendShareLivestreamEmail = functions.https.onRequest(async (req, res) => {
+exports.sendEmailsToRegistrants = functions.https.onRequest(async (req, res) => {
 
-    res.set('Access-Control-Allow-Origin', 'careerfairy.io');
+    res.set('Access-Control-Allow-Origin', '*');
     res.set('Access-Control-Allow-Credentials', 'true');
 
     if (req.method === 'OPTIONS') {
@@ -301,63 +206,41 @@ exports.sendShareLivestreamEmail = functions.https.onRequest(async (req, res) =>
         res.set('Access-Control-Allow-Methods', 'GET');
         res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
         res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
-    } 
-
-    const html_email = fs.readFileSync(path.resolve(__dirname, './html_emails/ShareLivestreamEmail.html'), 'utf8')
-
-    const data = {
-        from: 'CareerFairy <noreply@mg.careerfairy.io>',
-        to: req.body.recipientEmail,
-        subject: 'Don\'t miss ' + req.body.companyName + '\'s next Livestream!',
-        text: 'Don\'t miss ' + req.body.companyName + '\'s next Livestream!',
-        html: html_email.replace("COMPANY_NAME", req.body.companyName)
-                        .replace("LIVESTREAM_TITLE", req.body.livestreamTitle)
-                        .replace("LIVESTREAM_ID", req.body.livestreamId)
-    };
-
-    mg.messages().send(data, (error, body) => {
-        if (error) {
-            res.send('Error: ' + error);
-        }
-        res.status(200).send("The email was successfully sent");
-    });
-});
-
-
-exports.sendShareLivestreamPollEmail = functions.https.onRequest(async (req, res) => {
-
-res.set('Access-Control-Allow-Origin', 'careerfairy.io');
-res.set('Access-Control-Allow-Credentials', 'true');
-
-if (req.method === 'OPTIONS') {
-    // Send response to OPTIONS requests
-    res.set('Access-Control-Allow-Methods', 'GET');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.set('Access-Control-Max-Age', '3600');
-    res.status(204).send('');
-} 
-
-const html_email = fs.readFileSync(path.resolve(__dirname, './html_emails/ShareLivestreamPollEmail.html'), 'utf8')
-
-const data = {
-    from: 'CareerFairy <noreply@mg.careerfairy.io>',
-    to: req.body.recipientEmail,
-    subject: 'Decide the topic of ' + req.body.companyName + '\'s next Livestream!',
-    text: 'Welcome to CareerFairy!',
-    html: html_email.replace("COMPANY_NAME", req.body.companyName)
-                    .replace("LIVESTREAM_ID", req.body.livestreamId)
-};
-
-mg.messages().send(data, (error, body) => {
-    if (error) {
-        res.send('Error: ' + error);
+        return res.status(204).send('');
     }
-    res.status(200).send("The email was successfully sent");
-});
+
+    let registeredUsers = [];
+    admin.firestore().collection("livestreams").doc(req.body.livestreamId).get()
+        .then((doc) => {
+            registeredUsers = doc.data().registeredUsers;
+            var itemsProcessed = 0;
+            registeredUsers.forEach( userEmail => {
+                const email = {
+                    "TemplateId": 16660117,
+                    "From": 'CareerFairy <noreply@careerfairy.io>',
+                    "To": userEmail,
+                    "TemplateModel": {       
+                    }
+                };
+                client.sendEmailWithTemplate(email).then(() => {
+                    console.log("email sent to: " + userEmail);
+                    itemsProcessed++;
+                    if(itemsProcessed === registeredUsers.length) {
+                        return res.status(200).send();
+                    }
+                }, error => {
+                    console.log('error:' + error);
+                });
+            });
+        }).catch(() => {
+            return res.status(400).send();
+        })
+    
 });
 
 exports.getXirsysNtsToken = functions.https.onRequest(async (req, res) => {
+
+    const https = require('https');
 
     res.set('Access-Control-Allow-Origin', '*');
     res.set('Access-Control-Allow-Credentials', 'true');
@@ -406,31 +289,6 @@ exports.getXirsysNtsToken = functions.https.onRequest(async (req, res) => {
 exports.getNumberOfViewers = functions.https.onRequest(async (req, res) => {
 
     res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-    res.set('Content-Type', 'application/json');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', '');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
-    } 
-
-    axios({
-        method: 'get',
-        url: 'https://thrillin.work/WebRTCAppEE/rest/v2/broadcasts/' + req.query.livestreamId + '/broadcast-statistics',
-    }).then( response => { 
-            console.log(response.data);
-            return res.status(200).send(response.data);
-        }).catch(error => {
-            console.log(error);
-    });
-});
-
-exports.getLivestreamStatistics = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', 'localhost');
     res.set('Access-Control-Allow-Credentials', 'true');
     res.set('Content-Type', 'application/json');
 

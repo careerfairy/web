@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { withFirebasePage } from "../../../data/firebase";
 import DateUtil from '../../../util/DateUtil';
 import TargetElementList from '../common/TargetElementList';
-import BookingModal from '../booking-modal/BookingModal';
+import BookingModal from '../common/booking-modal/BookingModal';
 
 import Link from 'next/link';
 
@@ -14,12 +14,13 @@ function QuestionVotingBox(props) {
 
     const router = useRouter();
 
-    function upvoteQuestion(user, question) {
+    function upvoteLivestreamQuestion(user, question) {
+
         if (!user) {
             return router.push('/signup');
         }
 
-        props.firebase.upvoteQuestion(props.livestream.id, question, user.email);
+        props.firebase.upvoteLivestreamQuestion(props.livestream.id, question, user.email);
     }
 
     function userHasVotedOnQuestion(user, question) {
@@ -29,11 +30,11 @@ function QuestionVotingBox(props) {
         return question.emailOfVoters.indexOf(user.email) > -1;
     }
 
-    return(
+    return (
         <div className='streamNextQuestionContainer'>
             <p style={{ marginBottom: '5px' }}>{ props.question.title }</p>
             <div className='bottom-element'>
-                <Button icon='thumbs up' size='large' content='Upvote' onClick={() => upvoteQuestion(props.user, props.question)} disabled={userHasVotedOnQuestion(props.user, props.question)} primary/>
+                <Button icon='thumbs up' size='large' content='Upvote' onClick={() => upvoteLivestreamQuestion(props.user, props.question)} disabled={userHasVotedOnQuestion(props.user, props.question)} primary/>
                 <div className='streamNextQuestionNumberOfVotes'>{ props.question.votes } <Icon name='thumbs up'/></div>
             </div>
             <style jsx>{`

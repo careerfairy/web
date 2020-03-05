@@ -1,12 +1,12 @@
 import {Fragment, useState, useEffect} from 'react'
 import { Icon, Button, Modal, Header, Step, Grid, Input, Image } from "semantic-ui-react";
 
-import CommonUtil from '../../../util/CommonUtil';
-import QuestionVotingBox from '../question-voting-box/QuestionVotingBox';
+import CommonUtil from '../../../../util/CommonUtil';
+import QuestionVotingBox from '../../question-voting-box/QuestionVotingBox';
 
 import Link from 'next/link';
 
-import { withFirebase } from "../../../data/firebase";
+import { withFirebase } from "../../../../data/firebase";
 
 function BookingModal(props) {
 
@@ -27,7 +27,7 @@ function BookingModal(props) {
 
     useEffect(() => {
         if (props.livestream.id) {
-            props.firebase.getScheduledLivestreamsUntreatedQuestions(props.livestream.id, querySnapshot => {
+            const unsubscribe = props.firebase.listenToLivestreamQuestions(props.livestream.id, querySnapshot => {
                 var questionsList = [];
                 querySnapshot.forEach(doc => {
                     let question = doc.data();
@@ -36,6 +36,7 @@ function BookingModal(props) {
                 });
                 setUpcomingQuestions(questionsList);
             });
+            return () => unsubscribe();
         }
     }, [props.livestream]);
 
@@ -85,7 +86,7 @@ function BookingModal(props) {
             author: props.user.email
         }
 
-        props.firebase.putScheduledLivestreamsQuestion(props.livestream.id, newQuestion)
+        props.firebase.putLivestreamQuestion(props.livestream.id, newQuestion)
             .then(() => {
                 setNewQuestionTitle("");
                 setModalStep(3);

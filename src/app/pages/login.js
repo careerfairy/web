@@ -5,6 +5,7 @@ import { withFirebase} from "../data/firebase";
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import {Formik} from 'formik';
+import axios from 'axios';
 
 import Head from 'next/head';
 
@@ -12,6 +13,7 @@ function LogInPage(props) {
 
     const [user, setUser] = useState(null);
     const [userEmailNotValidated, setUserEmailNotValidated] = useState(false);
+    const [generalLoading, setGeneralLoading] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -35,6 +37,7 @@ function LogInPage(props) {
                     } else {
                         router.replace('/profile');
                     }
+                    setGeneralLoading(false);
                 }) 
             }
         }
@@ -118,6 +121,7 @@ export function LogInFormBase(props) {
                                 return errors;
                             }}
                             onSubmit={(values, { setSubmitting }) => {
+                                setGeneralLoading(true);
                                 setErrorMessageShown(false);
                                 props.setUserEmailNotValidated(false);
                                 props.firebase.signInWithEmailAndPassword(values.email, values.password)
@@ -167,7 +171,7 @@ export function LogInFormBase(props) {
                                             {errors.password && touched.password && errors.password}
                                         </div>
                                     </Form.Field>
-                                    <Button id='submitButton' fluid primary size='big' type="submit" loading={isSubmitting}>Log in</Button>
+                                    <Button id='submitButton' fluid primary size='big' type="submit" loading={isSubmitting || generalLoading}>Log in</Button>
                                     <div className='reset-email'>
                                         <Link href='/reset-password'><a href='#'>Forgot your password?</a></Link>
                                     </div> 
@@ -180,7 +184,8 @@ export function LogInFormBase(props) {
                                     <Message positive hidden={!props.userEmailNotValidated}>
                                         <Message.Header>Please validate your email address</Message.Header>
                                         <p>
-                                        We sent you an email verification link to this email address. Please click on it to start your journey on CareerFairy.
+                                        We sent you an email verification link to this email address. Please click on it to start your journey on CareerFairy. 
+                                        <p className='resend-link' onClick={() => resendEmailVerificationLink(values.email)}>Resend the email verification link.</p>
                                         </p>
                                     </Message>
                                     <Message positive hidden={!emailVerificationSent}>
@@ -292,6 +297,11 @@ export function LogInFormBase(props) {
                             .reset-email {
                                 margin: 20px auto 0 auto;
                                 text-align: center;
+                            }
+
+                            .resend-link {
+                                text-decoration: underline;
+                                cursor: pointer;
                             }
                         `}</style>
                 </Container>

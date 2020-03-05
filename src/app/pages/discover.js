@@ -28,23 +28,6 @@ function LandingPage(props) {
     const myRef = useRef(null);
 
     useEffect(() => {
-        if (props.firebase.isSignInWithEmailLink(window.location.href)) {
-            var email = window.localStorage.getItem('emailForSignIn');
-            if (!email) {
-              email = window.prompt('Please provide your email for confirmation');
-            }
-            // The client SDK will parse the code from the link for you.
-            props.firebase.signInWithEmailLink(email, window.location.href)
-              .then(function(result) {
-                // Clear email from storage.
-                window.localStorage.removeItem('emailForSignIn');
-              })
-              .catch(function(error) {
-              });
-          }
-    }, []);
-
-    useEffect(() => {
         props.firebase.getPastLivestreams().then( querySnapshot => {
             var mentors = [];
             querySnapshot.forEach(doc => {
