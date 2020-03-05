@@ -53,13 +53,6 @@ function LivestreamCard(props) {
         })
     }
 
-    // function getNumberOfRegistrants() {
-    //     if (!props.livestream.registeredUsers) {
-    //         return 0;
-    //     }
-    //     return props.livestream.registeredUsers.length;
-    // }
-
     function userIsRegistered() {
         if (!props.user || !props.livestream.registeredUsers) {
             return false;
@@ -68,7 +61,6 @@ function LivestreamCard(props) {
     }
 
     function goToRouteFromParent(event, route) {
-        debugger;
         if (targetHasClickHandler(event)) {
             return null;
         }
@@ -88,7 +80,7 @@ function LivestreamCard(props) {
                 livestream_title: props.livestream.title,
                 livestream_link: ('https://careerfairy.io/upcoming-livestream/' + props.livestream.id)
             }
-        })
+        });
     }
         
     return(
@@ -102,7 +94,7 @@ function LivestreamCard(props) {
                             <div className='livestream-position' style={{ color: userIsRegistered() ? 'white' : ''}}>{ props.livestream.title }</div>          
                             <div>
                                 <Button size='large' style={{ margin: '5px 5px 0 0' }} icon={ (props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? 'delete' : 'add' } color={(props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? null : 'teal'} content={ props.user ? ((props.livestream.registeredUsers.indexOf(props.user.email) > -1) ? 'Cancel' : 'I\'ll attend') : 'Register to attend'} onClick={(props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
-                                <Link href={'/upcoming-livestream/' + props.livestream.id}><a><Button size='large' style={{ margin: '5px 5px 0 0' }} icon='signup' content='Details' color='pink'/></a></Link>
+                                <Link href={('/upcoming-livestream/' + props.livestream.id)} prefetch={false}><a><Button size='large' style={{ margin: '5px 5px 0 0' }} icon='signup' content='Details' color='pink'/></a></Link>
                             </div>
                         </div>
                     </div>

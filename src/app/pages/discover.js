@@ -129,7 +129,7 @@ function LandingPage(props) {
                                 <div className='top-question-label white'><Icon name='briefcase'/><span>Livestreamed Job offer</span></div>
                                 <div className='livestream-position'>{ mentor.jobOffer }</div>          
                                 <div>
-                                    <Link href={'/past-livestream/' + mentor.livestreamId}><a><Button icon='redo' primary content='Rewatch Livestream'/></a></Link>
+                                    <Link href={'/past-livestream/' + mentor.livestreamId} prefetch={false}><a><Button icon='redo' primary content='Rewatch Livestream'/></a></Link>
                                 </div>
                             </div>
                         </div>

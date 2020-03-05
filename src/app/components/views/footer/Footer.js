@@ -57,7 +57,7 @@ function Footer(props) {
                     <Grid.Column>
                         <div className='footerListContainer'>
                             <div className='footerList'>
-                                <div><Link href='/past-livestream/r3XszYwUATciI2fc5ZY0'><a>Discover</a></Link></div>
+                                <div><Link href='/discover'><a>Discover</a></Link></div>
                                 <div><Link href='/companies'><a>Companies</a></Link></div>
                                 <div><Link href='/wishlist'><a>Wishlist</a></Link></div>
                             </div>
