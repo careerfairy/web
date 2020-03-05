@@ -9,8 +9,12 @@ import ButtonWithConfirm from '../../components/views/common/ButtonWithConfirm';
 
 import CommentContainer from '../../components/views/streaming/comment-container/NewCommentContainer';
 import Loader from '../../components/views/loader/Loader';
+import { useRouter } from 'next/router';
 
 function StreamingPage(props) {
+
+    const router = useRouter();
+    const streamToken = router.query.streamToken;
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
     const [isStreaming, setIsStreaming] = useState(false);
@@ -21,11 +25,20 @@ function StreamingPage(props) {
     const [currentLivestream, setCurrentLivestream] = useState(null);
     const [nsToken, setNsToken] = useState(null);
     const [numberOfViewers, setNumberOfViewers] = useState(0);
-    const [streamerVerified, setStreamerVerified] = useState(true);
+    const [streamerVerified, setStreamerVerified] = useState(false);
     const [streamInitialized, setStreamInitialized] = useState(false);
     const [comments, setComments] = useState([]);
     const [allQuestionsShown, setAllQuestionsShown] = useState(false);
 
+    useEffect(() => {
+        if (currentLivestream) {
+            if (!streamToken || currentLivestream.streamToken !== streamToken) {
+                router.replace('/');
+            } else {
+                setStreamerVerified(true);
+            }
+        }
+    }, [streamToken, currentLivestream]);
 
     useEffect(() => {
         if (props.livestreamId) {
@@ -180,7 +193,7 @@ function StreamingPage(props) {
     })
 
     useEffect(() => {
-        if (currentLivestream && !streamInitialized && nsToken && nsToken.iceServers.length > 0) {
+        if (currentLivestream && streamerVerified && !streamInitialized && nsToken && nsToken.iceServers.length > 0) {
             var pc_config = {
                 'iceServers' : nsToken.iceServers
             };
@@ -212,6 +225,7 @@ function StreamingPage(props) {
                     } else if (info === "publish_started") {
                         //stream is being published 
                         props.firebase.setLivestreamHasStarted(true, currentLivestream.id);
+                        debugger;
                         setIsStreaming(true);
                         console.log("publish started");	
                     } else if (info === "publish_finished") {
@@ -242,6 +256,7 @@ function StreamingPage(props) {
                     }
                 },
                 callbackError : function(error) {
+                    debugger;
                     //some of the possible errors, NotFoundError, SecurityError,PermissionDeniedError
                     console.log("error callback: " + error);
                     alert("There was an issue establishing the peer-2-peer connection. Please <a>contact us!</a>")
@@ -249,7 +264,7 @@ function StreamingPage(props) {
             });
             setWebRTCAdaptor(newAdaptor);
         }
-    }, [currentLivestream, nsToken])
+    }, [currentLivestream, nsToken, streamerVerified])
 
     useEffect(() => {
         if (webRTCAdaptor && isStreaming) {
@@ -286,7 +301,7 @@ function StreamingPage(props) {
         setIsLocalMicMuted(false);
     }
 
-    if (!currentLivestream) {
+    if (!currentLivestream || !streamerVerified) {
         return <Loader/>;
     }
 
