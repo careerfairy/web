@@ -3,10 +3,14 @@ import { Fragment } from 'react';
 import '../semantic/dist/semantic.min.css';
 import FirebaseContext from "../data/firebase/FirebaseContext";
 import Firebase from "../data/firebase/Firebase";
+import * as Sentry from '@sentry/browser';
 
 import Head from 'next/head';
 
 function MyApp({ Component, pageProps }) {
+
+    Sentry.init({dsn: "https://6852108b71ce4fbab24839792f82fa90@sentry.io/4261031"});
+
     return (
         <Fragment>
             <Head>

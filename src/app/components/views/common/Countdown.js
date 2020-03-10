@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
 import { Grid } from "semantic-ui-react";
 
 export default function CountdownTimer(props) {
