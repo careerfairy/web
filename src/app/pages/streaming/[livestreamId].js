@@ -2,7 +2,7 @@ import {useState, useEffect} from 'react';
 import {Button, Grid, Header as SemanticHeader, Icon, Image, Input} from "semantic-ui-react";
 
 import { withFirebasePage } from '../../data/firebase';
-import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor_new.js';
+import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor.js';
 import axios from 'axios';
 import { animateScroll } from 'react-scroll';
 import ButtonWithConfirm from '../../components/views/common/ButtonWithConfirm';
@@ -10,6 +10,7 @@ import ButtonWithConfirm from '../../components/views/common/ButtonWithConfirm';
 import CommentContainer from '../../components/views/streaming/comment-container/NewCommentContainer';
 import Loader from '../../components/views/loader/Loader';
 import { useRouter } from 'next/router';
+import { WEBRTC_ERRORS } from '../../data/errors/StreamingErrors';
 
 function StreamingPage(props) {
 
@@ -258,8 +259,12 @@ function StreamingPage(props) {
                 callbackError : function(error) {
                     debugger;
                     //some of the possible errors, NotFoundError, SecurityError,PermissionDeniedError
-                    console.log("error callback: " + error);
-                    alert("There was an issue establishing the peer-2-peer connection. Please <a>contact us!</a>")
+                    const currentError = WEBRTC_ERRORS.find( webrtc_error => webrtc_error.value === error);
+                    if (currentError) {
+                        alert(currentError.text);
+                    } else {
+                        alert(error);
+                    }
                 }
             });
             setWebRTCAdaptor(newAdaptor);
@@ -282,7 +287,7 @@ function StreamingPage(props) {
     }
 
     function startDesktopCapture() {
-        webRTCAdaptor.switchDesktopCapture(currentLivestream.id);
+        webRTCAdaptor.switchDesktopCaptureWithCamera(currentLivestream.id);
         setIsCapturingDesktop(true);
     }
 

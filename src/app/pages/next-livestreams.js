@@ -1102,8 +1102,4 @@ function Calendar(props) {
     );
 }
 
-Calendar.getInitialProps = ({ query }) => {
-    return { university: query.university, filter: query.filter }
-}
-
 export default withFirebasePage(Calendar);

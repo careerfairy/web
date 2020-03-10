@@ -55,6 +55,20 @@ function LandingPage(props) {
     },[user]);
 
     useEffect(() => {
+        props.firebase.getStudentsInCompanyTalentPool("RolandBerger").then( querySnapshot => {
+            var mentorsList = [];
+            querySnapshot.forEach(doc => {
+                let mentor = doc.data();
+                mentor.id = doc.id;
+                mentorsList.push(mentor);
+            });
+            console.log(JSON.stringify(mentorsList));
+        }).catch(error => {
+            console.log(error);
+        });
+    }, []);
+
+    useEffect(() => {
         props.firebase.getMentors().then( querySnapshot => {
             var mentorsList = [];
             querySnapshot.forEach(doc => {

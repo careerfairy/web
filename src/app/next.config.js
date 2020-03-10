@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-    distDir: '../../dist/client',
+    //distDir: '../../dist/client',
     env: {
         REACT_APP_FIREBASE_API_KEY: 'AIzaSyAMx1wVVxqo4fooh0OMVSeSTOqNKzMbch0',
         REACT_APP_FIREBASE_AUTH_DOMAIN: 'careerfairy-e1fd9.firebaseapp.com',

@@ -104,8 +104,6 @@ exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(async (req, r
     const recipient_email = req.body.recipientEmail;
     const redirect_link = req.body.redirect_link;
 
-    console.log("link: " + redirect_link);
-
     const actionCodeSettings = {
         url: redirect_link
     };
@@ -232,6 +230,34 @@ exports.sendEmailsToRegistrants = functions.https.onRequest(async (req, res) => 
                     console.log('error:' + error);
                 });
             });
+        }).catch(() => {
+            return res.status(400).send();
+        })
+    
+});
+
+exports.getAuthUsers = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    admin.auth().listUsers()
+        .then((userRecords) => {
+            var emails = [];
+            userRecords.users.forEach(user => {
+                emails.push(user.email);
+                if (emails.length === userRecords.length) {
+                    res.status(200).send(userRecords);
+                }
+            })
         }).catch(() => {
             return res.status(400).send();
         })

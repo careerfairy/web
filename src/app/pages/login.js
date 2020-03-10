@@ -183,10 +183,8 @@ export function LogInFormBase(props) {
                                     <div className={'errorMessage ' + (noAccountMessageShown ? '' : 'hidden')}>No account associated with this email address.</div>
                                     <Message positive hidden={!props.userEmailNotValidated}>
                                         <Message.Header>Please validate your email address</Message.Header>
-                                        <p>
-                                        We sent you an email verification link to this email address. Please click on it to start your journey on CareerFairy. 
+                                        <p>We sent you an email verification link to this email address. Please click on it to start your journey on CareerFairy.</p>
                                         <p className='resend-link' onClick={() => resendEmailVerificationLink(values.email)}>Resend the email verification link.</p>
-                                        </p>
                                     </Message>
                                     <Message positive hidden={!emailVerificationSent}>
                                         <Message.Header>Verification Email Sent</Message.Header>

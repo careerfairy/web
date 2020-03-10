@@ -394,6 +394,21 @@ class Firebase {
             });
         });
     }
+
+    getRegisteredStudentsInLivestream = (livestreamId) => {
+        let studentsRef = this.firestore
+                    .collection("livestreams")
+                    .doc(livestreamId)
+                    .collection("registeredStudents")
+        return studentsRef.get();
+    }
+
+    getStudentsInCompanyTalentPool = (companyId) => {
+        let studentsRef = this.firestore
+                    .collection("userData")
+                    .where("talentPools", "array-contains", companyId);
+        return studentsRef.get();
+    }
 }
 
 export default Firebase;
