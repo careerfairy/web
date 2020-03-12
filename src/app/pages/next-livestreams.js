@@ -7,7 +7,7 @@ import LivestreamCard from '../components/views/livestream-card/LivestreamCard'
 
 import { useRouter } from 'next/router';
 import { withFirebasePage } from "../data/firebase";
-import DateUtil from '../util/DateUtil';
+import axios from "axios";
 import { UNIVERSITY_SUBJECTS } from '../data/StudyFieldData';
 import { UNIVERSITY_NAMES } from '../data/UniversityData';
 import TargetElementList from '../components/views/common/TargetElementList';
@@ -79,6 +79,8 @@ function Calendar(props) {
                 livestreams.push(livestream);
             });
             setAllLivestreams(livestreams);
+        }, error => {
+            console.log(error);
         });
         return () => unsubscribe();
     }, [university]);

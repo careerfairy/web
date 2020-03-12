@@ -48,25 +48,9 @@ function LandingPage(props) {
                     if (!user) {
                         router.replace('/profile');
                     }
-                }).catch(error => {
-                    console.log(error);
                 });
         }
     },[user]);
-
-    useEffect(() => {
-        props.firebase.getStudentsInCompanyTalentPool("RolandBerger").then( querySnapshot => {
-            var mentorsList = [];
-            querySnapshot.forEach(doc => {
-                let mentor = doc.data();
-                mentor.id = doc.id;
-                mentorsList.push(mentor);
-            });
-            console.log(JSON.stringify(mentorsList));
-        }).catch(error => {
-            console.log(error);
-        });
-    }, []);
 
     useEffect(() => {
         props.firebase.getMentors().then( querySnapshot => {
@@ -77,8 +61,6 @@ function LandingPage(props) {
                 mentorsList.push(mentor);
             });
             setMentors(mentorsList);
-        }).catch(error => {
-            console.log(error);
         });
     }, []);
 
@@ -91,8 +73,6 @@ function LandingPage(props) {
                 companiesList.push(company);
             });
             setCompanies(companiesList);
-        }).catch(error => {
-            console.log(error);
         });
     }, []);
 

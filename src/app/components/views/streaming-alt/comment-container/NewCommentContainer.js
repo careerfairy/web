@@ -4,43 +4,51 @@ import {Input, Icon, Button, Label} from "semantic-ui-react";
 import QuestionContainer from './question-container/QuestionContainer';
 
 import { withFirebase } from '../../../../data/firebase';
-import { animateScroll } from 'react-scroll';
+import FirebaseRest from '../../../../data/firebase/FirebaseRest';
+import FireStoreParser from 'firestore-parser';
 
 function CommentContainer(props) {
     
     const [questions, setQuestions] = useState([]);
-    const [currentQuestion, setCurrentQuestion] = useState(null);
-    const [newCommentTitle, setNewCommentTitle] = useState("");
-    const [comments, setComments] = useState([]);
 
     useEffect(() => {
         if (props.livestream.id) {
-            const unsubscribe = props.firebase.listenToLivestreamQuestions(props.livestream.id, querySnapshot => {
-                var questionsList = [];
-                querySnapshot.forEach(doc => {
-                    let question = doc.data();
-                    question.id = doc.id;
-                    if (question.type !== 'done') {
-                        questionsList.push(question);
-                    }
-                });
-                setQuestions(questionsList);
-            });
-            return () => unsubscribe();
+            updateQuestions();
+            const interval = setInterval(() => {
+                updateQuestions();
+            }, 2000);
+            return () => clearInterval(interval);
         }
     }, [props.livestream.id]);
+
+    function updateQuestions() {
+        FirebaseRest.getScheduledLivestreamQuestions(props.livestream.id).then(response => {
+            var questionsList = [];
+            response.data.forEach(doc => {
+                let question = FireStoreParser(doc.document.fields);
+                let nameArray = doc.document.name.split('/');
+                let questionFinal = question;
+                questionFinal.id = nameArray[nameArray.length - 1];
+                questionFinal.timestamp = props.firebase.getFirebaseTimestamp(question.timestamp);
+                if (questionFinal.type !== 'done') {
+                    questionsList.push(questionFinal);
+                }
+            });
+            setQuestions(questionsList);
+        });
+    }
 
     let questionsElements = questions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer livestream={ props.livestream } questions={questions} question={ question } user={props.user} userData={props.userData}/>
+                <QuestionContainer livestream={ props.livestream } questions={questions} question={ question } updateQuestions={() => updateQuestions()} user={props.user} userData={props.userData}/>
             </div>       
         );
     });
 
     return (
         <div>
-            <div className={'chat-container ' + (currentQuestion ? 'active' : '')}>
+            <div className={'chat-container'}>
                 <div className='chat-scrollable'>
                     { questionsElements }
                 </div>

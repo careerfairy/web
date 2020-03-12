@@ -2,15 +2,16 @@ import {useState, useEffect} from 'react';
 import {Button, Grid, Header as SemanticHeader, Icon, Image, Input} from "semantic-ui-react";
 
 import { withFirebasePage } from '../../data/firebase';
+import FireStoreParser from 'firestore-parser';
 import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor.js';
 import axios from 'axios';
-import { animateScroll } from 'react-scroll';
 import ButtonWithConfirm from '../../components/views/common/ButtonWithConfirm';
 
-import CommentContainer from '../../components/views/streaming/comment-container/NewCommentContainer';
+import CommentContainer from '../../components/views/streaming-alt/comment-container/NewCommentContainer';
 import Loader from '../../components/views/loader/Loader';
 import { useRouter } from 'next/router';
 import { WEBRTC_ERRORS } from '../../data/errors/StreamingErrors';
+import FirebaseRest from '../../data/firebase/FirebaseRest';
 
 function StreamingPage(props) {
 
@@ -39,9 +40,12 @@ function StreamingPage(props) {
 
     useEffect(() => {
         if (props.livestreamId) {
-            props.firebase.getScheduledLivestreamById(props.livestreamId).then(querySnapshot => {
-                let livestream = querySnapshot.data();
-                livestream.id = querySnapshot.id;
+            FirebaseRest.getScheduledLivestreamById(props.livestreamId).then(response => {
+                let livestream = FireStoreParser(response.data.fields);
+                let nameArray = response.data.name.split('/');
+                let livestreamFinal = livestream;
+                livestreamFinal.id = nameArray[nameArray.length - 1];
+                livestreamFinal.start = props.firebase.getFirebaseTimestamp(livestream.start);
                 setCurrentLivestream(livestream);
             });
         }

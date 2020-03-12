@@ -12,6 +12,10 @@ const config = {
 };
 
 class Firebase {
+
+    getFirebaseTimestamp = (dateString) => {
+        return firebase.firestore.Timestamp.fromDate(new Date(dateString));
+    }
     
     constructor() {
         if (!firebase.apps.length) {

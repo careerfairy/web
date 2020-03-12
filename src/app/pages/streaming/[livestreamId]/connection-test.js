@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input} from "semantic-ui-react";
+import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal} from "semantic-ui-react";
 
 import { withFirebasePage } from '../../../data/firebase';
 import { WebRTCAdaptor } from '../../../static-js/webrtc_adaptor_new.js';
@@ -28,12 +28,10 @@ function StreamingPage(props) {
     const [isIncomingStreamInitialized, setIsIncomingStreamInitialized] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
 
-    const [isCapturingDesktop, setIsCapturingDesktop] = useState(false);
-    const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
-
     const [outgoingBitrate, setOutgoingBitrate] = useState(false);
 
     const [nsToken, setNsToken] = useState(null);
+    const [helpModalOpen, setHelpModalOpen] = useState(false);
 
     useEffect(() => {
         axios({
@@ -80,6 +78,15 @@ function StreamingPage(props) {
                     if (info === "initialized") {
                         setIsOutgoingStreamInitialized(true);
                         console.log("initialized");		
+                    } else if (info === "media-unreachable") {
+                        //stream is being published   
+                        debugger;
+
+                        setMediaAcquired(false);	
+                    }else if (info === "media-reachable") {
+                        debugger;
+                        //stream is being published   
+                        setMediaAcquired(true);	
                     } else if (info === "publish_started") {
                         //stream is being published 
                         setTimeout(() => { setIsStreaming(true); }, 500);     
@@ -209,6 +216,16 @@ function StreamingPage(props) {
         }
     }, [isIncomingStreamInitialized]);
 
+    function makeid(length) {
+        var result           = '';
+        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for ( var i = 0; i < length; i++ ) {
+           result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+     }
+
     function startStreaming() {
         webRTCAdaptor.publish(livestreamId + 'test');
     }
@@ -250,31 +267,62 @@ function StreamingPage(props) {
                         <div className='video-container'>
                             <video id="localVideo" autoPlay muted width="100%"></video> 
                         </div>
-                        <h2>Local Webcam</h2>
+                        <h2>What you will see</h2>
                         <p>This video feed reflects the quality of the image received from your active webcam.</p>
                     </Grid.Column>
                     <Grid.Column  width={8}>
                         <div className='video-container'>
                             <video id="remoteVideo" autoPlay muted controls width="100%"></video> 
                         </div>
-                        <h2>Streaming Server</h2>
+                        <h2>What your viewers will see</h2>
                         <p>This video feed reflects the quality that your viewers will see when connecting to your stream. You should expect to see a slight delay between this image and the one on the left from your local webcam.</p>
                     </Grid.Column>
                     <Grid.Column  width={16} textAlign='center'>
-                        <ul style={{ listStyleType: 'none' }}>
-                            <li>Webcam & Microphone have been accessed successfully</li>
-                            <li>Peer-to-peer session has been initialized successfully</li>
-                            <li>Stream has been published successfully</li>
-                            <li>Stream is being played successfully</li>
+                        <Button icon='video' content={startTest ? 'Performing test...' : 'Start Test'} primary size='huge' onClick={() => setStartTest(true)} disabled={startTest}/>
+                        <Modal trigger={<Button size='huge'>What if it doesn't work?</Button>}>
+                            <Modal.Header>What if it doesn't work?</Modal.Header>
+                                <Modal.Content>
+                                <Modal.Description>
+                                   <Grid>
+                                       <Grid.Row>
+                                           <Grid.Column width={16}>
+                                                1. If you cannot see yourself in the left video box, check that your browser is authorized to access your webcam & microphone.
+                                            </Grid.Column>
+                                       </Grid.Row>
+                                       <Grid.Row>
+                                           <Grid.Column width={16}>
+                                                2. If you can see yourself in the left video box, but there are issues establishing the peer-to-peer connection, try to connect to a "Guest" or "Public" Wifi at your company, if any of these exist.
+                                            </Grid.Column>
+                                       </Grid.Row>
+                                       <Grid.Row>
+                                           <Grid.Column width={16}>
+                                                3. If Point 2 did not help, try streaming using a tethered ("hotspot") connection established through your smartphone.
+                                            </Grid.Column>
+                                       </Grid.Row>
+                                   </Grid> 
+                                </Modal.Description>
+                            </Modal.Content>
+                        </Modal>
+                        <ul style={{ listStyleType: 'none', fontSize: '1.5em' }}>
+                            <li style={{ margin: '20px 0' }}><Icon name={ isOutgoingStreamInitialized ? 'check' : 'delete'} style={{ color: isOutgoingStreamInitialized ? 'green' : 'grey' }}/>Peer-to-peer session has been initialized successfully</li>
+                            <li style={{ margin: '20px 0' }}><Icon name={ isStreaming ? 'check' : 'delete'} style={{ color: isStreaming ? 'green' : 'grey' }}/>Stream has been published successfully</li>
+                            <li style={{ margin: '20px 0' }}><Icon name={ isPlaying ? 'check' : 'delete'} style={{ color: isPlaying ? 'green' : 'grey' }}/>Stream is being played successfully</li>
                         </ul>
-                        <div>
-                            Outgoing Bitrate: {outgoingBitrate ? outgoingBitrate : 'no info'} kb/s
+                        <div style={{ fontWeight: 'bold'}}>
+                            Outgoing Bitrate: {outgoingBitrate ? (outgoingBitrate + ' kb/s') : '0'} 
                         </div>
-                        <Button icon='video' content='Start Test' onClick={() => setStartTest(true)}/>
+                        <div className={ outgoingBitrate ? '' : 'hidden'}>
+                            Any value above 1500 kb/s will ensure a good streaming experience
+                        </div>
                     </Grid.Column>
                 </Grid>
+
             </Container>
             <style jsx>{`
+                .hidden {
+                    display: none
+                }
+
                 .top-menu {
                     text-align: center;
                     padding: 20px;

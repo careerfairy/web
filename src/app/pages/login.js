@@ -30,6 +30,7 @@ function LogInPage(props) {
         if (user) {
             if (!user.emailVerified) {
                 setUserEmailNotValidated(true);
+                setGeneralLoading(false);
             } else {
                 props.firebase.getUserData(user.email).then(querySnapshot => {
                     if (querySnapshot.exists) {
@@ -54,7 +55,7 @@ function LogInPage(props) {
             <header>
                 <Link href='/'><a><Image src='/logo_white.png' style={{ width: '150px', margin: '20px', display: 'inline-block' }} /></a></Link>
             </header>
-            <LogInForm userEmailNotValidated={userEmailNotValidated} setUserEmailNotValidated={(value) => setUserEmailNotValidated(value)}/>
+            <LogInForm userEmailNotValidated={userEmailNotValidated} setUserEmailNotValidated={(value) => setUserEmailNotValidated(value)} setGeneralLoading={(value) => setGeneralLoading(value)} generalLoading={generalLoading}/>
             <style jsx>{`
                 .tealBackground {
                     min-height: 100vh;
@@ -77,12 +78,11 @@ export function LogInFormBase(props) {
     const [successMessageShown, setSuccessMessageShown] = useState(false);
     const [errorMessageShown, setErrorMessageShown] = useState(false);
     const [noAccountMessageShown, setNoAccountMessageShown] = useState(false);
-    const [generalLoading, setGeneralLoading] = useState(false);
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
 
     function resendEmailVerificationLink(email) {
         setErrorMessageShown(false);
-        setGeneralLoading(true);
+        props.setGeneralLoading(true);
         axios({
             method: 'post',
             url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmail',
@@ -92,9 +92,9 @@ export function LogInFormBase(props) {
             }
         }).then( response => {        
                 setEmailVerificationSent(true);
-                setGeneralLoading(false);
+                props.setGeneralLoading(false);
             }).catch(error => {
-                setGeneralLoading(false);
+                props.setGeneralLoading(false);
         });
     }
 
@@ -121,7 +121,7 @@ export function LogInFormBase(props) {
                                 return errors;
                             }}
                             onSubmit={(values, { setSubmitting }) => {
-                                setGeneralLoading(true);
+                                props.setGeneralLoading(true);
                                 setErrorMessageShown(false);
                                 props.setUserEmailNotValidated(false);
                                 props.firebase.signInWithEmailAndPassword(values.email, values.password)
@@ -130,6 +130,7 @@ export function LogInFormBase(props) {
                                     })
                                     .catch(error => {
                                         setSubmitting(false);
+                                        props.setGeneralLoading(false);
                                         if (error.code === 'auth/user-not-found') {
                                             return setNoAccountMessageShown(true);
                                         } else {
@@ -171,7 +172,7 @@ export function LogInFormBase(props) {
                                             {errors.password && touched.password && errors.password}
                                         </div>
                                     </Form.Field>
-                                    <Button id='submitButton' fluid primary size='big' type="submit" loading={isSubmitting || generalLoading}>Log in</Button>
+                                    <Button id='submitButton' fluid primary size='big' type="submit" loading={isSubmitting || props.generalLoading}>Log in</Button>
                                     <div className='reset-email'>
                                         <Link href='/reset-password'><a href='#'>Forgot your password?</a></Link>
                                     </div> 

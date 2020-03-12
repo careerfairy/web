@@ -36,6 +36,9 @@ export const WEBRTC_ERRORS = [
         text: "While you granted CareerFairy permission to use your webcam and microphone, either the operating system or the browser did not allow this usage. Please check if your browser is allowed to use your webcam and microphone and whether any other application is using them.",
         value: "NotReadableError"
     },{
+        text: "Someone else is currently performing a streaming test at your company. Please try again later.",
+        value: "streamIdInUse"
+    },{
         text: "Some unspecific error occured that we have little experience with. Please contact CareerFairy so we can resolve this together.",
         value: "GenericError"
     }
