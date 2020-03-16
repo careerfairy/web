@@ -67,5 +67,70 @@ export const UNIVERSITY_SUBJECTS = [
             text: "Microengineering",
             value: "MICRO",
             color: "#000000"
+        },{
+            text: "Law",
+            value: "LAW",
+            color: "#E6E6FA"
+        },{
+            text: "Business Administration",
+            value: "BUSI",
+            color: "#E6E6FA"
+        },{
+            text: "Economics",
+            value: "ECON",
+            color: "#E6E6FA"
+        },{
+            text: "Banking & Finance",
+            value: "BANK",
+            color: "#E6E6FA"
+        },{
+            text: "Theology",
+            value: "THEO",
+            color: "#E6E6FA"
+        },{
+            text: "Ethonology",
+            value: "ETHN",
+            color: "#E6E6FA"
+        },{
+            text: "Communication Sciences",
+            value: "COMM",
+            color: "#E6E6FA"
+        },{
+            text: "Political Sciences",
+            value: "POLIT",
+            color: "#E6E6FA"
+        },{
+            text: "Popular Cultures",
+            value: "POPU",
+            color: "#E6E6FA"
+        },{
+            text: "Sociology",
+            value: "SOCIO",
+            color: "#E6E6FA"
+        },{
+            text: "Psychology",
+            value: "PSYCHO",
+            color: "#E6E6FA"
+        },{
+            text: "Dental Medicine",
+            value: "DENT",
+            color: "#E6E6FA"
+        },{
+            text: "Human Medicine",
+            value: "MEDI",
+            color: "#E6E6FA"
+        },{
+            text: "Veterinary Medicine",
+            value: "VETE",
+            color: "#E6E6FA"
+        },{
+            text: "Business Informatics",
+            value: "BUSINF"
+        },{
+            text: "Biomedicine",
+            value: "BIOMED"
+        },{
+            text: "Geography",
+            value: "GEOG"
         }
     ];

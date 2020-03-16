@@ -16,6 +16,7 @@ import FirebaseRest from '../../data/firebase/FirebaseRest';
 function StreamingPage(props) {
 
     const router = useRouter();
+    const livestreamId = router.query.livestreamId;
     const streamToken = router.query.streamToken;
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
@@ -27,29 +28,6 @@ function StreamingPage(props) {
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [streamerVerified, setStreamerVerified] = useState(false);
     const [streamInitialized, setStreamInitialized] = useState(false);
-
-    useEffect(() => {
-        if (currentLivestream) {
-            if (!streamToken || currentLivestream.streamToken !== streamToken) {
-                router.replace('/');
-            } else {
-                setStreamerVerified(true);
-            }
-        }
-    }, [streamToken, currentLivestream]);
-
-    useEffect(() => {
-        if (props.livestreamId) {
-            FirebaseRest.getScheduledLivestreamById(props.livestreamId).then(response => {
-                let livestream = FireStoreParser(response.data.fields);
-                let nameArray = response.data.name.split('/');
-                let livestreamFinal = livestream;
-                livestreamFinal.id = nameArray[nameArray.length - 1];
-                livestreamFinal.start = props.firebase.getFirebaseTimestamp(livestream.start);
-                setCurrentLivestream(livestream);
-            });
-        }
-    }, [props.livestreamId]);
 
     useEffect(() => {
         axios({
@@ -67,12 +45,12 @@ function StreamingPage(props) {
     }, []);
 
     useEffect(() => {
-        if (currentLivestream && currentLivestream.id) {
+        if (true) {
             clearInterval();
             setInterval(() => {
                 axios({
                     method: 'get',
-                    url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=' + currentLivestream.id,
+                    url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=' + livestreamId,
                 }).then( response => { 
                         setNumberOfViewers(response.data.totalWebRTCWatchersCount > -1 ? response.data.totalWebRTCWatchersCount : 0);
                     }).catch(error => {
@@ -80,10 +58,10 @@ function StreamingPage(props) {
                 });
             }, 10000);
         }
-    }, [currentLivestream]);
+    }, [livestreamId]);
 
     useEffect(() => {
-        if (currentLivestream && streamerVerified && !streamInitialized && nsToken && nsToken.iceServers.length > 0) {
+        if (!streamInitialized && nsToken && nsToken.iceServers.length > 0) {
             var pc_config = {
                 'iceServers' : nsToken.iceServers
             };
@@ -114,8 +92,6 @@ function StreamingPage(props) {
                         console.log("initialized");		
                     } else if (info === "publish_started") {
                         //stream is being published 
-                        props.firebase.setLivestreamHasStarted(true, currentLivestream.id);
-                        debugger;
                         setIsStreaming(true);
                         console.log("publish started");	
                     } else if (info === "publish_finished") {
@@ -158,30 +134,29 @@ function StreamingPage(props) {
             });
             setWebRTCAdaptor(newAdaptor);
         }
-    }, [currentLivestream, nsToken, streamerVerified])
+    }, [livestreamId, nsToken, streamerVerified])
 
     useEffect(() => {
         if (webRTCAdaptor && isStreaming) {
-            webRTCAdaptor.enableStats(currentLivestream.id);
+            webRTCAdaptor.enableStats(livestreamId);
         }
     }, [webRTCAdaptor, isStreaming]);
 
     function startStreaming() {
-        webRTCAdaptor.publish(currentLivestream.id);
+        webRTCAdaptor.publish(livestreamId);
     }
 
     function stopStreaming() {
-        webRTCAdaptor.stop(currentLivestream.id);
-        props.firebase.setLivestreamHasStarted(false, currentLivestream.id);
+        webRTCAdaptor.stop(livestreamId);
     }
 
     function startDesktopCapture() {
-        webRTCAdaptor.switchDesktopCaptureWithCamera(currentLivestream.id);
+        webRTCAdaptor.switchDesktopCaptureWithCamera(livestreamId);
         setIsCapturingDesktop(true);
     }
 
     function stopDesktopCapture() {
-        webRTCAdaptor.switchVideoCapture(currentLivestream.id);
+        webRTCAdaptor.switchVideoCapture(livestreamId);
         setIsCapturingDesktop(false);
     }
 
@@ -195,7 +170,7 @@ function StreamingPage(props) {
         setIsLocalMicMuted(false);
     }
 
-    if (!currentLivestream || !streamerVerified) {
+    if (false) {
         return <Loader/>;
     }
 
@@ -216,12 +191,9 @@ function StreamingPage(props) {
                 </div>
             </div>
             <div className='video-menu'>
-                <ButtonWithConfirm color='teal' size='big' buttonAction={isStreaming ? stopStreaming : startStreaming} confirmDescription={isStreaming ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
+                <ButtonWithConfirm color='teal' size='big' buttonAction={isStreaming ? stopStreaming : startStreaming} confirmDescription={isStreaming ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' } disabled={!streamInitialized}/>
                 <Button circular size='big' onClick={ isCapturingDesktop ? () => stopDesktopCapture() : () => startDesktopCapture()} primary={isCapturingDesktop} icon='desktop'/>
                 <Button circular size='big' onClick={ isLocalMicMuted ? () => unmuteLocalMic() : () => muteLocalMic()} primary={isLocalMicMuted} icon='microphone slash'/>
-            </div>
-            <div className='video-menu-left'>
-                <CommentContainer livestream={ currentLivestream }/>
             </div>
             <style jsx>{`
                 .hidden {
@@ -264,7 +236,7 @@ function StreamingPage(props) {
                 .video-menu {
                     position: absolute;
                     bottom: 0;
-                    left: 330px;
+                    left: 0;
                     right: 0;
                     padding: 15px 0;
                     z-index: 1000;
@@ -289,7 +261,7 @@ function StreamingPage(props) {
                     position: absolute;
                     top: 75px;
                     bottom: 80px;
-                    left: 330px;
+                    left: 0;
                     right: 0;
                 }
 
@@ -552,10 +524,6 @@ function StreamingPage(props) {
             `}</style>
         </div>
     );
-}
-
-StreamingPage.getInitialProps = ({ query }) => {
-    return { livestreamId: query.livestreamId }
 }
 
 export default withFirebasePage(StreamingPage);

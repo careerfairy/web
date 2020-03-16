@@ -128,22 +128,40 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
             color: "#b39eb5"
         }
     ],
-    uzurich: [
+    unizurich: [
         {
             text: "Law",
             value: "LAW"
         },{
-            text: "Business and Economics",
+            text: "Business Administration",
             value: "BUSI"
         },{
-            text: "Informatics",
-            value: "INFO"
+            text: "Economics",
+            value: "ECON"
+        },{
+            text: "Banking & Finance",
+            value: "BANK"
         },{
             text: "Theology",
             value: "THEO"
         },{
-            text: "Religion Sciences",
-            value: "RELIG"
+            text: "Ethonology",
+            value: "ETHN"
+        },{
+            text: "Communication Sciences",
+            value: "COMM"
+        },{
+            text: "Political Sciences",
+            value: "POLIT"
+        },{
+            text: "Popular Cultures",
+            value: "POPU"
+        },{
+            text: "Sociology",
+            value: "SOCIO"
+        },{
+            text: "Psychology",
+            value: "PSYCHO"
         },{
             text: "Dental Medicine",
             value: "DENT"
@@ -154,17 +172,29 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
             text: "Veterinary Medicine",
             value: "VETE"
         },{
-            text: "Arts",
-            value: "ART"
+            text: "Computer Science",
+            value: "COMP"
         },{
-            text: "Social Sciences",
-            value: "SOCIAL"
+            text: "Business Informatics",
+            value: "BUSINF"
         },{
-            text: "Psychology",
-            value: "PSYCH"
+            text: "Biology",
+            value: "BIOL"
         },{
-            text: "Science",
-            value: "SCIEN"
-        },
+            text: "Biomedicine",
+            value: "BIOMED"
+        },{
+            text: "Chemistry",
+            value: "CHEM"
+        },{
+            text: "Geography",
+            value: "GEOG"
+        },{
+            text: "Mathematics",
+            value: "MATH"
+        },{
+            text: "Physics",
+            value: "PHYS"
+        }
     ]
 };

@@ -17,7 +17,7 @@ function JobDescription(props) {
                 <p className='past-livestream-job-description' style={ jobPostingOpen ? {} : { height: '60px', overflow: 'hidden' }}>{ props.position.description }</p>
             </div>
             <Button icon='angle up' size='mini' content={jobPostingOpen ? 'Hide Details' : 'See Details'} basic onClick={() => setJobPostingOpen(!jobPostingOpen)}/>
-            <Button size='mini' content='Apply Now' primary nClick={() => openLink(props.position.url)}/>
+            <Button size='mini' content='Apply Now' primary onClick={() => openLink(props.position.url)}/>
             <style jsx>{`
                 .past-livestream-job-label {
                     text-transform: uppercase;
