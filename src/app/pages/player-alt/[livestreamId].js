@@ -20,6 +20,7 @@ function StreamPlayer(props) {
 
     const [user, setUser] = useState(null);
     const [userData, setUserData] = useState(null);
+    const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     
     const [allQuestionsShown, setAllQuestionsShown] = useState(false);
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
@@ -40,7 +41,7 @@ function StreamPlayer(props) {
 
     useEffect(() => {
         if (user) {
-            props.firebase.getUserData(user.email).then(querySnapshot => {
+            props.firebase.listenToUserData(user.email, querySnapshot => {
                 let user = querySnapshot.data();
                 if (user) {
                     setUserData(user);
@@ -89,6 +90,14 @@ function StreamPlayer(props) {
             setVoteOnQuestions(questionsToBeVoted[0]);
         }
     }, [upcomingQuestions]);
+
+    useEffect(() => {
+        if (userData && currentLivestream && userData.talentPools && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
+            setUserIsInTalentPool(true);
+        } else {
+            setUserIsInTalentPool(false);
+        }
+    }, [currentLivestream, userData]);
 
     function upvoteLivestreamQuestion(question) {
         props.firebase.upvoteLivestreamQuestion(currentLivestream.id, question, user.email).then(() => {
@@ -185,6 +194,22 @@ function StreamPlayer(props) {
         } 
     }
 
+    function joinTalentPool() {
+        if (!user) {
+            return router.replace('/signup');
+        }
+
+        props.firebase.joinCompanyTalentPool(currentLivestream.companyId, user.email);
+    }
+
+    function leaveTalentPool() {
+        if (!user) {
+            return router.replace('/signup');
+        }
+
+        props.firebase.leaveCompanyTalentPool(currentLivestream.companyId, user.email);
+    }
+
     if (!currentLivestream) {
         return <Loader/>;
     }
@@ -196,11 +221,15 @@ function StreamPlayer(props) {
     return (
         <div className='topLevelContainer'>
             <div className='top-menu'>
-                <div style={{ position: 'absolute', top: '50%', left: '20px', transform: 'translateY(-50%)'}}>
+                <div className='top-menu-left'>
                     <Image src='/logo_teal.png' style={{ maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
                     <Image src={ eth_logo } style={{ postion: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block'}}/>
                     <Image src={ epfl_logo } style={{ postion: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginLeft: '15px'}}/>
                     <div style={{ position: 'absolute', bottom: '13px', left: '120px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
+                </div>
+                <div className='top-menu-right'>
+                    <Image src={ currentLivestream.companyLogoUrl } style={{ postion: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block', margin: '0 10px'}}/>
+                    <Button size='big' content={ userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'} icon={ userIsInTalentPool ? 'delete' : 'handshake outline'} onClick={ userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()} primary={!userIsInTalentPool}/> 
                 </div>
             </div>
             <div className='streamingOuterContainer'>
@@ -284,6 +313,21 @@ function StreamPlayer(props) {
     
                 .top-menu h3 {
                     font-weight: 600;
+                }
+
+                .top-menu-left {
+                    display: block;
+                    position: absolute;
+                    top: 50%;
+                    left: 20px;
+                    transform: translateY(-50%);
+                }
+
+                .top-menu-right {
+                    position: absolute;
+                    top: 50%;
+                    right: 20px;
+                    transform: translateY(-50%);
                 }
     
                 .video-menu {
@@ -659,6 +703,11 @@ function StreamPlayer(props) {
                         width: 100%;
                         min-width: 0;
                         margin: 0;
+                    }
+
+                    .top-menu-left {
+                        opacity: 0;
+                        border: 2px solid red;
                     }
 
                     .video-menu-left {

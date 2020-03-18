@@ -37,7 +37,6 @@ function Calendar(props) {
     const [livestreams, setLivestreams] = useState([]);
     const [fields, setFields] = useState([]);
     const [showAllFields, setShowAllFields] = useState(false);
-    const [welcomeSignOpen, setWelcomeSignOpen]= useState(false);
     const [cookieMessageVisible, setCookieMessageVisible] = useState(true);
     const myRef = useRef(null);
 
@@ -223,6 +222,9 @@ function Calendar(props) {
                         </div>
                         <div style={{ display: university === 'epflausanne' ? 'block' : 'none' }}>
                             <Image src={'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fepfl-career-center.png?alt=media'} style={{ margin: '10px 0 10px 0', maxHeight: '110px', filter: 'brightness(0) invert(1)'}}/>
+                        </div>
+                        <div style={{ display: university === 'unizurich' ? 'block' : 'none' }}>
+                            <Image src={'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fjobhub.png?alt=media'} style={{ margin: '10px 0 10px 0', maxHeight: '110px', filter: 'brightness(0) invert(1)'}}/>
                         </div>
                     </Grid.Column>
                     <Grid.Column width={10}>

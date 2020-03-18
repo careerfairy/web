@@ -48,6 +48,13 @@ class Firebase {
         return userDataRef.get();
     };
 
+    listenToUserData = (userEmail, callback) => {
+        let userDataRef = this.firestore
+            .collection("userData")
+            .doc(userEmail);
+        return userDataRef.onSnapshot(callback);
+    };
+
     setUserData = (userEmail, firstName, lastName, university, faculty, levelOfStudy) => {
         let userDataRef = this.firestore
             .collection("userData")

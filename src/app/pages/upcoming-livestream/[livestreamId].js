@@ -88,7 +88,7 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (user) {
-            props.firebase.getUserData(user.email).then(querySnapshot => {
+            props.firebase.listenToUserData(user.email, querySnapshot => {
                 let user = querySnapshot.data();
                 if (user) {
                     setUserData(user);

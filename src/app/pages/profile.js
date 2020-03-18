@@ -123,7 +123,7 @@ const UserProfile = (props) => {
                             props.firebase.setUserData(user.email, values.firstName, values.lastName, values.university, values.fieldOfStudy, values.levelOfStudy)
                             .then(() => {
                                 if (!userData) {
-                                    if (values.university === 'ethzurich' || values.university === 'epflausanne') {
+                                    if (values.university === 'ethzurich' || values.university === 'epflausanne' || values.university === 'unizurich') {
                                         router.push('/next-livestreams' + (values.university ? ('?university=' + values.university) : ''));
                                     } else {
                                         router.push('/next-livestreams');
