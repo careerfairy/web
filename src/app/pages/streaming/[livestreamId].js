@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import {Button, Grid, Header as SemanticHeader, Icon, Image, Input} from "semantic-ui-react";
+import {Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal} from "semantic-ui-react";
 
 import { withFirebasePage } from '../../data/firebase';
 import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor.js';
@@ -22,10 +22,17 @@ function StreamingPage(props) {
     const [isCapturingDesktop, setIsCapturingDesktop] = useState(false);
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(null);
+    const [pongArrived, isPongArrived] = useState(false);
+    const [isConnectionAlive, setIsConnectionAlive] = useState(true);
+    const [disconnectModalOpen, setDisconnectModalOpen] = useState(false);
+
     const [nsToken, setNsToken] = useState(null);
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [streamerVerified, setStreamerVerified] = useState(false);
     const [streamInitialized, setStreamInitialized] = useState(false);
+
+    let interval = null;
+    let attemptConnectionInterval = null;
 
     useEffect(() => {
         if (currentLivestream) {
@@ -36,6 +43,25 @@ function StreamingPage(props) {
             }
         }
     }, [streamToken, currentLivestream]);
+
+    useEffect(() => {
+        interval = setInterval(() => {
+            if (!pongArrived && isStreaming) {
+                setIsConnectionAlive(false);
+            } 
+            isPongArrived(false);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [pongArrived]);
+
+    useEffect(() => {
+        if (!isConnectionAlive) {
+            if (isStreaming) {
+                setIsStreaming(false);
+                setDisconnectModalOpen(true);
+            } 
+        }
+    }, [isConnectionAlive]);
 
     useEffect(() => {
         if (props.livestreamId) {
@@ -80,81 +106,96 @@ function StreamingPage(props) {
 
     useEffect(() => {
         if (currentLivestream && streamerVerified && !streamInitialized && nsToken && nsToken.iceServers.length > 0) {
-            var pc_config = {
-                'iceServers' : nsToken.iceServers
-            };
-
-            var sdpConstraints = {
-                OfferToReceiveAudio : false,
-                OfferToReceiveVideo : false
-            };
-
-            var mediaConstraints = {
-                audio: true,
-                video: {
-                    width: { ideal: 1920, max: 1920 },
-                    height: { ideal: 1080, max: 1080 },
-                    aspectRatio: 1.77
-                }
-            };
-
-            const newAdaptor = new WebRTCAdaptor({
-                websocket_url : "wss://thrillin.work/WebRTCAppEE/websocket",
-                mediaConstraints : mediaConstraints,
-                peerconnection_config : pc_config,
-                sdp_constraints : sdpConstraints,
-                localVideoId : "localVideo",
-                callback : function(info, obj) {
-                    if (info === "initialized") {
-                        setStreamInitialized(true);
-                        console.log("initialized");		
-                    } else if (info === "publish_started") {
-                        //stream is being published 
-                        props.firebase.setLivestreamHasStarted(true, currentLivestream.id);
-                        debugger;
-                        setIsStreaming(true);
-                        console.log("publish started");	
-                    } else if (info === "publish_finished") {
-                        //stream is finished
-                        setIsStreaming(false);
-                        console.log("publish finished");
-                    } else if (info === "screen_share_extension_available") {
-                        //screen share extension is avaiable
-                        console.log("screen share extension available");
-                    } else if (info === "screen_share_stopped") {
-                        //"Stop Sharing" is clicked in chrome screen share dialog
-                        console.log("screen share stopped");
-                        setIsCapturingDesktop(false);
-                    } else if (info == "closed") {
-                        //console.log("Connection closed");
-                        if (typeof obj != "undefined") {
-                            console.log("Connecton closed: " + JSON.stringify(obj));
-                        }
-                    } else if (info == "refreshConnection") {
-                        startStreaming();
-                    } else if (info == "updated_stats") {
-                        //obj is the PeerStats which has fields
-                         //averageOutgoingBitrate - kbits/sec
-                        //currentOutgoingBitrate - kbits/sec
-                        console.log("Average outgoing bitrate " + obj.averageOutgoingBitrate + " kbits/sec"
-                                + " Current outgoing bitrate: " + obj.currentOutgoingBitrate + " kbits/sec");
-                         
-                    }
-                },
-                callbackError : function(error) {
-                    debugger;
-                    //some of the possible errors, NotFoundError, SecurityError,PermissionDeniedError
-                    const currentError = WEBRTC_ERRORS.find( webrtc_error => webrtc_error.value === error);
-                    if (currentError) {
-                        alert(currentError.text);
-                    } else {
-                        alert(error);
-                    }
-                }
-            });
-            setWebRTCAdaptor(newAdaptor);
+            setupWebRTCAdaptor();
         }
-    }, [currentLivestream, nsToken, streamerVerified])
+    }, [currentLivestream, nsToken, streamerVerified, isConnectionAlive])
+
+    function setupWebRTCAdaptor() {
+        var pc_config = {
+            'iceServers' : nsToken.iceServers
+        };
+
+        var sdpConstraints = {
+            OfferToReceiveAudio : false,
+            OfferToReceiveVideo : false
+        };
+
+        var mediaConstraints = {
+            audio: true,
+            video: {
+                width: { ideal: 1920, max: 1920 },
+                height: { ideal: 1080, max: 1080 },
+                aspectRatio: 1.77
+            }
+        };
+
+        const newAdaptor = new WebRTCAdaptor({
+            websocket_url : "wss://thrillin.work/WebRTCAppEE/websocket",
+            mediaConstraints : mediaConstraints,
+            peerconnection_config : pc_config,
+            sdp_constraints : sdpConstraints,
+            localVideoId : "localVideo",
+            callback : function(info, obj) {
+                if (info === "initialized") {
+                    setStreamInitialized(true);
+                    props.firebase.setLivestreamHasStarted(false, currentLivestream.id);
+                    console.log("initialized"); 
+                    if (!isConnectionAlive) {
+                        startStreaming();
+                    }    
+                } else if (info === "publish_started") {
+                    //stream is being published 
+                    props.firebase.setLivestreamHasStarted(true, currentLivestream.id);
+                    setIsStreaming(true);
+                    setIsConnectionAlive(true);
+                    console.log("publish started"); 
+                } else if (info === "publish_finished") {
+                    //stream is finished
+                    setIsStreaming(false);
+                    console.log("publish finished");
+                } else if (info === "pong") {
+                    console.log("pong");
+                    //stream is finished
+                    isPongArrived(true);
+                } else if (info === "screen_share_extension_available") {
+                    //screen share extension is avaiable
+                    console.log("screen share extension available");
+                } else if (info === "screen_share_stopped") {
+                    //"Stop Sharing" is clicked in chrome screen share dialog
+                    console.log("screen share stopped");
+                    setIsCapturingDesktop(false);
+                } else if (info == "closed") {
+                    //console.log("Connection closed");
+                    if (typeof obj != "undefined") {
+                        console.log("Connecton closed: " + JSON.stringify(obj));
+                    }
+                } else if (info == "refreshConnection") {
+                    startStreaming();
+                } else if (info == "updated_stats") {
+                    //obj is the PeerStats which has fields
+                     //averageOutgoingBitrate - kbits/sec
+                    //currentOutgoingBitrate - kbits/sec
+                    console.log("Average outgoing bitrate " + obj.averageOutgoingBitrate + " kbits/sec"
+                            + " Current outgoing bitrate: " + obj.currentOutgoingBitrate + " kbits/sec");
+                     
+                }
+            },
+            callbackError : function(error) {
+                if (error === 'ScreenSharePermissionDenied') {
+                    setIsCapturingDesktop(false);
+                    return;
+                }
+                //some of the possible errors, NotFoundError, SecurityError,PermissionDeniedError
+                const currentError = WEBRTC_ERRORS.find( webrtc_error => webrtc_error.value === error);
+                if (currentError) {
+                    alert(currentError.text);
+                } else {
+                    alert(error);
+                }
+            }
+        });
+        setWebRTCAdaptor(newAdaptor);
+    }
 
     useEffect(() => {
         if (webRTCAdaptor && isStreaming) {
@@ -191,6 +232,10 @@ function StreamingPage(props) {
         setIsLocalMicMuted(false);
     }
 
+    function reloadPage() {
+        location.reload();
+    }
+
     if (!currentLivestream || !streamerVerified) {
         return <Loader/>;
     }
@@ -215,7 +260,22 @@ function StreamingPage(props) {
                 <ButtonWithConfirm color='teal' size='big' buttonAction={isStreaming ? stopStreaming : startStreaming} confirmDescription={isStreaming ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
                 <Button circular size='big' onClick={ isCapturingDesktop ? () => stopDesktopCapture() : () => startDesktopCapture()} primary={isCapturingDesktop} icon='desktop'/>
                 <Button circular size='big' onClick={ isLocalMicMuted ? () => unmuteLocalMic() : () => muteLocalMic()} primary={isLocalMicMuted} icon='microphone slash'/>
+                { isConnectionAlive ? 'TRUE' : 'FALSE'}
             </div>
+            <Modal open={disconnectModalOpen}>
+                <Modal.Header>Disconnection</Modal.Header>
+                <Modal.Content image>
+                    <Image wrapped size='medium' src='https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/icons%2Fdisconnect.png?alt=media' />
+                    <Modal.Description>
+                        <h1>You have been disconnected</h1>
+                        <p>Don't panic! Follow these steps to quickly restart the stream:</p>
+                        <p>1. Check your internet connection</p>
+                        <p>2. Reload this page</p> 
+                        <p>3. Restart the stream</p>
+                        <Button icon='undo alternate' content='Reload Page' size='large' primary onClick={() => reloadPage()}/>
+                    </Modal.Description>
+                </Modal.Content>
+            </Modal>
             <div className='video-menu-left'>
                 <CommentContainer livestream={ currentLivestream }/>
             </div>

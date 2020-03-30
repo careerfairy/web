@@ -17,6 +17,7 @@ function StreamPlayer(props) {
     const router = useRouter();
     const eth_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media';
     const epfl_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fepfl-career-center.png?alt=media';
+    const uzh_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fjobhub.png?alt=media';
 
     const [user, setUser] = useState(null);
     const [userData, setUserData] = useState(null);
@@ -194,6 +195,12 @@ function StreamPlayer(props) {
         } 
     }
 
+    function isUniversityLivestream(university) {
+        if (currentLivestream) {
+            return currentLivestream.universities.indexOf(university) > -1;
+        }
+    }
+
     function joinTalentPool() {
         if (!user) {
             return router.replace('/signup');
@@ -222,9 +229,11 @@ function StreamPlayer(props) {
         <div className='topLevelContainer'>
             <div className='top-menu'>
                 <div className='top-menu-left'>
+                    
                     <Image src='/logo_teal.png' style={{ maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
-                    <Image src={ eth_logo } style={{ postion: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block'}}/>
-                    <Image src={ epfl_logo } style={{ postion: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginLeft: '15px'}}/>
+                    <Image src={ eth_logo } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: isUniversityLivestream("ethzurich") ? 'inline-block' : 'none' }}/>
+                    <Image src={ epfl_logo } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: isUniversityLivestream("epflausanne") ? 'inline-block' : 'none' }}/>
+                    <Image src={ uzh_logo } style={{ maxWidth: '150px', maxHeight: '50px', display: isUniversityLivestream("unizurich") ? 'inline-block' : 'none' }}/>
                     <div style={{ position: 'absolute', bottom: '13px', left: '120px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
                 </div>
                 <div className='top-menu-right'>
@@ -265,6 +274,21 @@ function StreamPlayer(props) {
             <style jsx>{`
                 .hidden {
                     display: none;
+                }
+
+                .inline-block {
+                    display: inline-block;
+                }
+
+                .universityLogo {
+                    postion: relative; 
+                    z-index: 100;
+                    max-height: 50px;
+                    max-width: 150px; 
+                }
+
+                .universityLogo.right {
+                   margin-right: 15px; 
                 }
 
                 .connecting-overlay {

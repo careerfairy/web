@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {Input, Icon, Button, Label} from "semantic-ui-react";
+import Linkify from 'react-linkify';
 
 import { withFirebase } from '../../../../../data/firebase';
 
@@ -51,13 +52,21 @@ function QuestionContainer(props) {
         }
     }
 
+    const componentDecorator = (href, text, key) => (
+        <a href={href} key={key} target="_blank">
+          {text}
+        </a>
+    );
+
     
     let commentsElements = comments.map((comment, index) => {
         return (
             <div className='animated fadeInUp faster' key={index}>
                 <div className='questionContainer'>
                     <div className='questionTitle'>
-                        { comment.title }
+                        <Linkify componentDecorator={componentDecorator}>
+                            { comment.title }
+                        </Linkify>
                     </div>
                     <div className='questionAuthor'>
                         @{ comment.author }

@@ -24,6 +24,7 @@ function StreamingPage(props) {
 
     const [isOutgoingStreamInitialized, setIsOutgoingStreamInitialized] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
+    const [isCapturingDesktop, setIsCapturingDesktop] = useState(false);
     
     const [isIncomingStreamInitialized, setIsIncomingStreamInitialized] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -80,8 +81,6 @@ function StreamingPage(props) {
                         console.log("initialized");		
                     } else if (info === "media-unreachable") {
                         //stream is being published   
-                        debugger;
-
                         setMediaAcquired(false);	
                     }else if (info === "media-reachable") {
                         debugger;
@@ -119,6 +118,10 @@ function StreamingPage(props) {
                     }
                 },
                 callbackError : function(error) {
+                    if (error === 'ScreenSharePermissionDenied') {
+                        setIsCapturingDesktop(false);
+                        return;
+                    }
                     //some of the possible errors, NotFoundError, SecurityError,PermissionDeniedError
                     const currentError = WEBRTC_ERRORS.find( webrtc_error => webrtc_error.value === error);
                     if (currentError) {
@@ -216,16 +219,6 @@ function StreamingPage(props) {
         }
     }, [isIncomingStreamInitialized]);
 
-    function makeid(length) {
-        var result           = '';
-        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        var charactersLength = characters.length;
-        for ( var i = 0; i < length; i++ ) {
-           result += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
-        return result;
-     }
-
     function startStreaming() {
         webRTCAdaptor.publish(livestreamId + 'test');
     }
@@ -235,12 +228,12 @@ function StreamingPage(props) {
     }
 
     function startDesktopCapture() {
-        webRTCAdaptor.switchDesktopCapture(livestreamId + 'test');
+        outgoingWebRTCAdaptor.switchDesktopCaptureWithCamera(livestreamId + 'test');
         setIsCapturingDesktop(true);
     }
 
     function stopDesktopCapture() {
-        webRTCAdaptor.switchVideoCapture(livestreamId + 'test');
+        outgoingWebRTCAdaptor.switchVideoCapture(livestreamId + 'test');
         setIsCapturingDesktop(false);
     }
 
@@ -252,6 +245,10 @@ function StreamingPage(props) {
     function unmuteLocalMic() {
         webRTCAdaptor.unmuteLocalMic();
         setIsLocalMicMuted(false);
+    }
+
+    function testLocalMic() {
+
     }
 
     return (
@@ -279,6 +276,7 @@ function StreamingPage(props) {
                     </Grid.Column>
                     <Grid.Column  width={16} textAlign='center'>
                         <Button icon='video' content={startTest ? 'Performing test...' : 'Start Test'} primary size='huge' onClick={() => setStartTest(true)} disabled={startTest}/>
+                        <Button icon='tv' content={isCapturingDesktop ? 'Stop Screen Sharing' : 'Start Screen Sharing'} primary size='huge' onClick={isCapturingDesktop ? () => stopDesktopCapture() : () => startDesktopCapture()} disabled={!startTest}/>
                         <Modal trigger={<Button size='huge'>What if it doesn't work?</Button>}>
                             <Modal.Header>What if it doesn't work?</Modal.Header>
                                 <Modal.Content>
