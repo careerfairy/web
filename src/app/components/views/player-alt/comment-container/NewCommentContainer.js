@@ -32,7 +32,7 @@ function CommentContainer(props) {
     
     let questionsElements = questions.map((question, index) => {
         return (
-            <div key={index}>
+            <div key={question.title}>
                 <QuestionContainer livestream={ props.livestream } question={ question } user={props.user} userData={props.userData}/>
             </div>       
         );
