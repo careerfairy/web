@@ -42,11 +42,17 @@ function PlaybackVideoContainer(props) {
             method: 'get',
             url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getXirsysNtsToken',
         }).then( token => { 
-                let tempToken = token.data.v;
-                tempToken.iceServers.forEach(iceServer => {
-                    iceServer.urls = iceServer.url;
-                });
-                setNsToken(tempToken);
+            let tempToken = token.data.v;
+            let iceServers = [];
+            tempToken.iceServers.urls.forEach(url => {
+                let iceServer = {};
+                iceServer.urls = [ url ];
+                iceServer.username = tempToken.iceServers.username;
+                iceServer.credential = tempToken.iceServers.credential;
+                iceServers.push(iceServer)
+            });
+            tempToken.iceServers = iceServers;
+            setNsToken(tempToken);
             }).catch(error => {
                 console.log(error);
         });

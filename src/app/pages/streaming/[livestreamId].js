@@ -79,9 +79,15 @@ function StreamingPage(props) {
             url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getXirsysNtsToken',
         }).then( token => { 
                 let tempToken = token.data.v;
-                tempToken.iceServers.forEach(iceServer => {
-                    iceServer.urls = iceServer.url;
+                let iceServers = [];
+                tempToken.iceServers.urls.forEach(url => {
+                    let iceServer = {};
+                    iceServer.urls = [ url ];
+                    iceServer.username = tempToken.iceServers.username;
+                    iceServer.credential = tempToken.iceServers.credential;
+                    iceServers.push(iceServer)
                 });
+                tempToken.iceServers = iceServers;
                 setNsToken(tempToken);
             }).catch(error => {
                 console.log(error);
@@ -105,7 +111,7 @@ function StreamingPage(props) {
     }, [currentLivestream]);
 
     useEffect(() => {
-        if (currentLivestream && streamerVerified && !streamInitialized && nsToken && nsToken.iceServers.length > 0) {
+        if (currentLivestream && streamerVerified && !streamInitialized && nsToken && nsToken.iceServers) {
             setupWebRTCAdaptor();
         }
     }, [currentLivestream, nsToken, streamerVerified, isConnectionAlive])
@@ -113,7 +119,7 @@ function StreamingPage(props) {
     function setupWebRTCAdaptor() {
         var pc_config = {
             'iceServers' : nsToken.iceServers
-        };
+        }; 
 
         var sdpConstraints = {
             OfferToReceiveAudio : false,

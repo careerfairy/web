@@ -320,39 +320,22 @@ exports.getXirsysNtsToken = functions.https.onRequest(async (req, res) => {
         res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
         res.set('Access-Control-Max-Age', '3600');
         res.status(204).send('');
-    } 
+    }
 
-    // your JSON object.
-    let o = {};
-    
-    let bodyString = JSON.stringify(o);
-    let options = {
-        host: "global.xirsys.net",
-        path: "/_turn/CareerFairy",
-        method: "PUT",
+    axios({
+        method: 'put',
+        url: 'https://mvoss:a1319174-e353-11e9-b4f0-0242ac110003@global.xirsys.net/_turn/CareerFairy',
+        data: JSON.stringify({ 'format': 'urls' }),
         headers: {
-        "Authorization": "Basic " + Buffer.from("mvoss:a1319174-e353-11e9-b4f0-0242ac110003").toString("base64"),
-        "Content-Type":"application/json",
-        "Content-Length": bodyString.length
+            'Content-Type': 'application/json'
         }
-    };
-
-    let httpreq = https.request(options, httpres => {
-        let str = "";
-        httpres.on("data", chunk =>  {
-            str += chunk.toString('utf8');
-        });
-        httpres.on("error", error => { 
-            console.log("error: ",e); 
-        });
-        httpres.on("end", () => { 
-            console.log("string: ", str);
-            res.status(200).send(str);
-        });
+    }).then( response => { 
+            console.log(response.data);
+            res.status(200).send(response.data);
+        }).catch(error => {
+            console.log(error);
+            res.status(400).send(error);
     });
-      
-    httpreq.on("error", error => console.log("request error: ",error));
-    httpreq.end(bodyString);
 });
 
 exports.getNumberOfViewers = functions.https.onRequest(async (req, res) => {
