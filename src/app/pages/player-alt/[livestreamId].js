@@ -31,14 +31,31 @@ function StreamPlayer(props) {
     const [currentLivestream, setCurrentLivestream] = useState(null);
 
     useEffect(() => {
-        props.firebase.auth.onAuthStateChanged(user => {
-            if (user) {
-                setUser(user);
+        if (currentLivestream) {
+            debugger;
+            if (currentLivestream.test === true) {
+                var testUser = {
+                    firstName: 'Tester',
+                    lastName: 'Tester'
+                };
+                props.firebase.auth.onAuthStateChanged(user => {
+                    if (user) {
+                        setUser(user);
+                    } else {
+                        setUserData(testUser);
+                    }
+                });
             } else {
-                router.replace('/login');
+                props.firebase.auth.onAuthStateChanged(user => {
+                    if (user) {
+                        setUser(user);
+                    } else {
+                        router.replace('/login');
+                    }
+                });
             }
-        })
-    }, []);
+        }
+    }, [currentLivestream]);
 
     useEffect(() => {
         if (user) {
@@ -170,7 +187,7 @@ function StreamPlayer(props) {
     });
 
     function addNewQuestion() {
-        if (!user ||!(newQuestionTitle.trim()) || newQuestionTitle.trim().length < 5) {
+        if (!userData ||!(newQuestionTitle.trim()) || newQuestionTitle.trim().length < 5) {
             return;
         }
 
@@ -178,7 +195,7 @@ function StreamPlayer(props) {
             title: newQuestionTitle,
             votes: 0,
             type: "new",
-            author: user.email
+            author: !currentLivestream.test ? user.email : 'test@careerfairy.io'
         }
         props.firebase.putLivestreamQuestion(currentLivestream.id, newQuestion)
             .then(() => {

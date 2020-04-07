@@ -114,7 +114,7 @@ function StreamingPage(props) {
         if (currentLivestream && streamerVerified && !streamInitialized && nsToken && nsToken.iceServers) {
             setupWebRTCAdaptor();
         }
-    }, [currentLivestream, nsToken, streamerVerified, isConnectionAlive])
+    }, [currentLivestream, nsToken, streamerVerified, isConnectionAlive]);
 
     function setupWebRTCAdaptor() {
         var pc_config = {

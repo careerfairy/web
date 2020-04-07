@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { navigator } from 'global';
+import { isEmptyArray } from 'formik';
 
 export default function useUserMedia() {
 
     const [deviceList, setDeviceList] = useState({ audioInputList: [], audioOutputList: [], videoDeviceList: [] });
 
     function gotDevices(deviceInfos) {
-        debugger;
         // Handles being called several times to update labels. Preserve values.
         let audioInputList = [];
         let audioOutputList = [];
@@ -38,9 +38,14 @@ export default function useUserMedia() {
 
     function handleError(error) {
         console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
-      }
+    }
 
-    if (navigator) {
+    function isEmpty(devicesObject) {
+        return !Object.keys(devicesObject).some(key => {
+            return devicesObject[key].length > 0;
+        });
+    }
+    if (navigator && isEmpty(deviceList)) {
         navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
     }
   
