@@ -1,25 +1,24 @@
 import {useState, useEffect, useRef} from 'react';
 import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Dropdown} from "semantic-ui-react";
+import { Document, Page } from 'react-pdf';
+import * as PDFJS from 'pdfjs-dist/build/pdf';
 
 import { withFirebasePage } from '../../../data/firebase';
-import { WebRTCAdaptor } from '../../../static-js/webrtc_adaptor.js';
-import axios from 'axios';
-import { animateScroll } from 'react-scroll';
 import ButtonWithConfirm from '../../../components/views/common/ButtonWithConfirm';
 
-import CommentContainer from '../../../components/views/streaming/comment-container/NewCommentContainer';
 import Loader from '../../../components/views/loader/Loader';
 import { useRouter } from 'next/router';
-import { WEBRTC_ERRORS } from '../../../data/errors/StreamingErrors';
-import ReactMic from '../../../components/ssr/ReactMic';
 import useUserMedia from '../../../components/custom-hook/useDevices';
 import useWebRTCAdaptor from '../../../components/custom-hook/useWebRTCAdaptor';
+import { useWindowSize } from '../../../components/custom-hook/useWindowSize';
+import LivestreamPdfViewer from '../../../components/util/LivestreamPdfViewer';
 
 function StreamingPage(props) {
 
+    PDFJS.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.worker.min.js'; 
+
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
-    const [currentState, setCurrentState] = useState(2);
 
     const [isInitialized, setIsInitialized] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
@@ -30,9 +29,13 @@ function StreamingPage(props) {
     const [streamId, setStreamId] = useState(null);
 
     const devices = useUserMedia();
+    const windowSize = useWindowSize();
 
     const [audioSource, setAudioSource] = useState(null);
     const [videoSource, setVideoSource] = useState(null);
+
+    const [pdfPageNumber, setPdfPageNumber] = useState(1);
+    const [pdfNumberOfPages, setPdfNumberOfPages] = useState(1);
 
     const [mediaConstraints, setMediaConstraints] = useState({ audio: true, video: true });
 
@@ -75,13 +78,19 @@ function StreamingPage(props) {
         errorCallbacks
     );
 
-    useEffect(() => {
-        if (isInitialized) {
-            setTimeout(() => {
-                webRTCAdaptor.joinRoom(livestreamId, livestreamId + 'mainSpeaker');
-            }, 2000);
+    const pdfObject = {
+        url: 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company_presentations%2FCareerFairy%20-%20Pitchdeck%2C%20Jan%202020.pdf?alt=media&token=75c2050a-e3b8-4fe1-bd68-7c33dcbe8a01',
+        httpHeaders: {
         }
-    },[isInitialized])
+    }
+
+    // useEffect(() => {
+    //     if (isInitialized) {
+    //         setTimeout(() => {
+    //             webRTCAdaptor.joinRoom(livestreamId, livestreamId + 'mainSpeaker');
+    //         }, 2000);
+    //     }
+    // },[isInitialized])
 
     useEffect(() => {
         if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
@@ -148,8 +157,22 @@ function StreamingPage(props) {
 
     return (
         <div className='topLevelContainer'>
-            <div className='black-frame'>
+            {/* <div className='black-frame'>
                 <div className='video-container'>
+                    <video id="localVideo" autoPlay width="100%"></video> 
+                </div>
+            </div> */}
+            <div className='black-frame'>
+                <div style={{ position: 'absolute', top: '40px', left: '50%', transform: 'translateX(-50%)'}}>
+                    <div className='pdfDocument'>
+                        <LivestreamPdfViewer/>
+                    </div>
+                    <div style={{ position: 'absolute', bottom: '-50px', left: '50%', transform: 'translateX(-50%)', zIndex: '9999', width: '80px'}}>
+                        <Button circular icon='angle left' onClick={() => setPdfPageNumber(pdfPageNumber - 1)} disabled={pdfPageNumber === 1}/>
+                        <Button circular icon='angle right' onClick={() => setPdfPageNumber(pdfPageNumber + 1)} disabled={pdfPageNumber === pdfNumberOfPages}/>
+                    </div>
+                </div>
+                <div className='video-container-small'>
                     <video id="localVideo" autoPlay width="100%"></video> 
                 </div>
             </div>
@@ -227,6 +250,11 @@ function StreamingPage(props) {
                     margin: 0 0 30px 0;
                 }
 
+                .pdfContent {
+                    width: 100%;
+                    border: 2px solid red;
+                }
+
                 .video-container {
                     position: relative;
                     background-color: grey;
@@ -273,15 +301,12 @@ function StreamingPage(props) {
 
                 .black-frame {
                     position: absolute;
-                    top: 0;
                     left: 120px;
                     width: calc(100% - 120px);
                     min-width: 700px;
                     height: 100%;
                     min-height: 600px;
-                    z-index: -10;
                     background-color: black;
-                    cursor: pointer;
                 }
 
                 .video-container {
@@ -292,12 +317,20 @@ function StreamingPage(props) {
                     background-color: black;
                 }
 
+                .video-container-small {
+                    width: 300px;
+                    padding-top: 15%;
+                    position: absolute;
+                    top: 20px;
+                    right: 20px;
+                    background-color: black;
+                }
+
                 .button-container {
                     position: absolute;
-                    left: 0;
                     bottom: 0;
-                    width: 100%;
-                    height: 90px;
+                    left: 120px;
+                    width: calc(100% - 120px);                    height: 90px;
                     padding: 17px;
                     cursor:  pointer;
                     z-index: 8000;
@@ -316,7 +349,7 @@ function StreamingPage(props) {
                 .logo-container {
                     position: absolute;
                     bottom: 90px;
-                    left: 0;
+                    left: 120px;
                     right: 0;
                     color: rgb(0, 210, 170);
                     font-size: 1.4em;
