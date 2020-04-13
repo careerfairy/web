@@ -34,9 +34,6 @@ function StreamingPage(props) {
     const [audioSource, setAudioSource] = useState(null);
     const [videoSource, setVideoSource] = useState(null);
 
-    const [pdfPageNumber, setPdfPageNumber] = useState(1);
-    const [pdfNumberOfPages, setPdfNumberOfPages] = useState(1);
-
     const [mediaConstraints, setMediaConstraints] = useState({ audio: true, video: true });
 
     const isPlayMode = false;
@@ -163,17 +160,13 @@ function StreamingPage(props) {
                 </div>
             </div> */}
             <div className='black-frame'>
-                <div style={{ position: 'absolute', top: '40px', left: '50%', transform: 'translateX(-50%)'}}>
-                    <div className='pdfDocument'>
-                        <LivestreamPdfViewer/>
-                    </div>
-                    <div style={{ position: 'absolute', bottom: '-50px', left: '50%', transform: 'translateX(-50%)', zIndex: '9999', width: '80px'}}>
-                        <Button circular icon='angle left' onClick={() => setPdfPageNumber(pdfPageNumber - 1)} disabled={pdfPageNumber === 1}/>
-                        <Button circular icon='angle right' onClick={() => setPdfPageNumber(pdfPageNumber + 1)} disabled={pdfPageNumber === pdfNumberOfPages}/>
+                <div style={{ width: 'calc(100% - 100px)', margin: '20px auto', height: '140px'}}>
+                    <div style={{ position: 'relative', height: '100%' }}>
+                        <video id="localVideo" muted autoPlay></video> 
                     </div>
                 </div>
-                <div className='video-container-small'>
-                    <video id="localVideo" autoPlay width="100%"></video> 
+                <div style={{ position: 'absolute', top: '180px', left: '50%', transform: 'translateX(-50%)', backgroundColor: 'rgb(30,30,30)'}}>
+                        <LivestreamPdfViewer firebase={props.firebase} livestream={{}}/>
                 </div>
             </div>
             <div className='bottom-container'>
@@ -303,7 +296,6 @@ function StreamingPage(props) {
                     position: absolute;
                     left: 120px;
                     width: calc(100% - 120px);
-                    min-width: 700px;
                     height: 100%;
                     min-height: 600px;
                     background-color: black;
@@ -360,4 +352,4 @@ function StreamingPage(props) {
     );
 }
 
-export default StreamingPage;
+export default withFirebasePage(StreamingPage);

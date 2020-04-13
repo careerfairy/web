@@ -4,8 +4,6 @@ import {Container, Grid, Image, Button, Icon} from "semantic-ui-react";
 import { withFirebase } from '../data/firebase/FirebaseContext';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { compose } from 'redux';
-import { useScrollPosition } from '../components/util/UseScrollPosition';
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
 
