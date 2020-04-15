@@ -2,13 +2,21 @@ import {useState, useEffect, useRef, Fragment} from 'react';
 import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Dropdown} from "semantic-ui-react";
 
 import { withFirebasePage } from '../../../data/firebase';
+import { WebRTCAdaptor } from '../../../static-js/webrtc_adaptor.js';
+import axios from 'axios';
+import { animateScroll } from 'react-scroll';
+import ButtonWithConfirm from '../../../components/views/common/ButtonWithConfirm';
 
+import CommentContainer from '../../../components/views/streaming/comment-container/NewCommentContainer';
+import Loader from '../../../components/views/loader/Loader';
 import { useRouter } from 'next/router';
+import { WEBRTC_ERRORS } from '../../../data/errors/StreamingErrors';
+import ReactMic from '../../../components/ssr/ReactMic';
 import useUserMedia from '../../../components/custom-hook/useDevices';
 import useWebRTCAdaptor from '../../../components/custom-hook/useWebRTCAdaptor';
 import RemoteVideoContainer from '../../../components/views/streaming/video-container/RemoteVideoContainer';
 
-function StreamingPage(props) {
+function ViewerPage(props) {
 
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
@@ -22,14 +30,9 @@ function StreamingPage(props) {
 
     const [streamId, setStreamId] = useState(null);
 
-    const devices = useUserMedia();
-
-    const [audioSource, setAudioSource] = useState(null);
-    const [videoSource, setVideoSource] = useState(null);
-
     const [mediaConstraints, setMediaConstraints] = useState(null);
 
-    const isPlayMode = false;
+    const isPlayMode = true;
     const localVideoId = 'localVideo';
 
     let streamingCallbacks = {
@@ -87,29 +90,16 @@ function StreamingPage(props) {
     },[isInitialized])
 
     useEffect(() => {
-        if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
-            setAudioSource(devices.audioInputList[0].value);
-        }
-        if (!videoSource && devices.videoDeviceList && devices.videoDeviceList.length > 0) {
-            setVideoSource(devices.videoDeviceList[0].value);
-        }
-    },[devices]);
-
-    useEffect(() => {
         const constraints = {
-            audio: {deviceId: audioSource ? {exact: audioSource} : undefined },
+            audio: true,
             video: { 
                 width: { ideal: 1920, max: 1920 },
                 height: { ideal: 1080, max: 1080 },
                 aspectRatio: 1.77,   
-                deviceId: videoSource ? {exact: videoSource} : undefined
             }
           };
         setMediaConstraints(constraints);
-    },[audioSource, videoSource]);
-
-    function createNewStreamerLink() {
-    }
+    },[]);
 
     function startStreaming() {
     }
@@ -174,6 +164,7 @@ function StreamingPage(props) {
                 </div>
                 <div className='logo-container'>
                     CareerFairy
+                    <p>{ JSON.stringify(externalMediaStreams) }</p>
                 </div>
             </div>
             <div className='left-container'>
@@ -206,7 +197,7 @@ function StreamingPage(props) {
                             <Grid.Column textAlign='center'>
                                 <div className='side-button' onClick={() => alert("blob")}>
                                     <Icon name='user plus' size='large' style={{ margin: '0 0 5px 0', color: 'white'}}/>
-                                    <p style={{ fontSize: '0.8em', color: 'white' }}>Invite Speaker</p>
+                                    <p style={{ fontSize: '0.8em', color: 'white' }}>Invite Speaker: {externalMediaStreams.length}</p>
                                 </div>
                             </Grid.Column>
                         </Grid.Row>
@@ -332,4 +323,4 @@ function StreamingPage(props) {
     );
 }
 
-export default withFirebasePage(StreamingPage);
+export default ViewerPage;

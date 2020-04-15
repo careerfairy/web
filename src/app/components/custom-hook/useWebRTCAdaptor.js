@@ -8,6 +8,10 @@ import { WEBRTC_ERRORS } from '../../data/errors/StreamingErrors.js';
 export default function useWebRTCAdaptor(isPlayMode, videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject) {
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
+    
+    const [externalMediaStreams, setExternalMediaStreams] = useState([]);
+    const [addedStream, setAddedStream] = useState(null);
+    const [removedStream, setRemovedStream] = useState(null);
 
     const [nsToken, setNsToken] = useState(null);
 
@@ -23,10 +27,35 @@ export default function useWebRTCAdaptor(isPlayMode, videoId, mediaConstraints, 
     }, []);
 
     useEffect(() => {
-        if (document) {
+        if (document && mediaConstraints) {
             setupWebRTCAdaptor();
         }
     }, [mediaConstraints, document]);
+
+    useEffect(() => {
+        if (addedStream) {
+            debugger;
+            let cleanedExternalMediaStreams = removeStreamFromList(addedStream, externalMediaStreams)
+            setExternalMediaStreams([...cleanedExternalMediaStreams, addedStream]);
+        }
+    }, [addedStream]);
+
+    useEffect(() => {
+        if (removedStream) {
+            setExternalMediaStreams(removeStreamFromList(removedStream, externalMediaStreams));
+        }
+    }, [removedStream]);
+
+    function removeStreamFromList(stream, streamList) {
+        const streamListCopy = [...streamList];
+        const streamEntry = streamListCopy.find( entry => {
+            return entry.streamId === stream.streamId;
+        });
+        if (streamEntry) {
+            streamListCopy.splice(streamListCopy.indexOf(streamEntry), 1);
+        }
+        return streamListCopy;
+    }
 
     function convertTokenFromXirsysApi(token) {
         let tempToken = token.data.v;
@@ -42,52 +71,6 @@ export default function useWebRTCAdaptor(isPlayMode, videoId, mediaConstraints, 
         return tempToken;
     }
 
-    function streamingCallback(info, infoObj) {
-        switch(info) {
-            case "initialized": {
-                streamingCallbackObject.onInitialized();
-                break;
-            }
-            case "joinedTheRoom": {
-                console.log(infoObj)
-                streamingCallbackObject.onRoomJoined();
-                break;
-            }
-            case "streamJoined": {
-                console.log(info)
-                console.log(infoObj)
-                break;
-            }
-            case "publish_started": {
-                streamingCallbackObject.onPublishStarted();
-                break;
-            }
-            case "publish_finished": {
-                streamingCallbackObject.onPublishFinished();
-                break;
-            }
-            case "screen_share_stopped": {
-                streamingCallbackObject.onScreenShareStopped();
-                break;
-            }
-            case "closed": {
-                streamingCallbackObject.onClosed();
-                break;
-            }
-            case "updated_stats": {
-                streamingCallbackObject.onUpdatedStats();
-                break;
-            }
-            case "pong": {
-                break;
-            }
-            default: {
-                console.log(info);
-                console.log(infoObj);
-            }
-        }
-    }
-
     function errorCallback(error) {
         if (error === 'ScreenSharePermissionDenied') {
             errorCallbackObject.onScreenSharePermissionDenied();
@@ -99,6 +82,19 @@ export default function useWebRTCAdaptor(isPlayMode, videoId, mediaConstraints, 
                 alert(error);
             }
         }
+    }
+
+    function publishNewStream(adaptorInstance, infoObj) {
+        adaptorInstance.publish(infoObj.streamId, 'null', infoObj.ATTR_ROOM_NAME);
+        if (infoObj.streams && infoObj.streams.length > 0) {
+            infoObj.streams.forEach( streamId => {
+                adaptorInstance.play(streamId, "null", infoObj.ATTR_ROOM_NAME);
+            })
+        }
+    }
+
+    function playNewStream(adaptorInstance, infoObj) {
+        adaptorInstance.play(infoObj.streamId, 'null', infoObj.ATTR_ROOM_NAME);
     }
 
     function setupWebRTCAdaptor() {
@@ -115,12 +111,66 @@ export default function useWebRTCAdaptor(isPlayMode, videoId, mediaConstraints, 
             peerconnection_config : pc_config,
             sdp_constraints : sdpConstraints,
             localVideoId : isPlayMode ? null : videoId,
-            remoteVideoId : isPlayMode ? videoId : null,
-            callback : (info, infoObj) => streamingCallback(info, infoObj),
-            callbackError : (error) => errorCallback(error)
+            remoteVideoId: isPlayMode ? videoId : null,
+            debug: true,
+            callback : function (info, infoObj) {
+                console.log(info);
+                switch(info) {
+                    case "initialized": {
+                        streamingCallbackObject.onInitialized();
+                        break;
+                    }
+                    case "joinedTheRoom": {
+                        publishNewStream(this, infoObj);
+                        break;
+                    }
+                    case "streamJoined": {
+                        playNewStream(this, infoObj);
+                        break;
+                    }
+                    case "streamLeaved": {
+                        setRemovedStream(infoObj);
+                        break;
+                    }
+                    case "newStreamAvailable": {
+                        setAddedStream(infoObj);
+                        break;
+                    }
+                    case "publish_started": {
+                        streamingCallbackObject.onPublishStarted();
+                        break;
+                    }
+                    case "publish_finished": {
+                        streamingCallbackObject.onPublishFinished();
+                        break;
+                    }
+                    case "screen_share_stopped": {
+                        streamingCallbackObject.onScreenShareStopped();
+                        break;
+                    }
+                    case "closed": {
+                        streamingCallbackObject.onClosed();
+                        break;
+                    }
+                    case "updated_stats": {
+                        streamingCallbackObject.onUpdatedStats();
+                        break;
+                    }
+                    case "pong": {
+                        break;
+                    }
+                    default: {
+                        console.log(info);
+                        console.log(infoObj);
+                    }
+                }
+            },
+            callbackError : function(error) {
+                errorCallback(error)
+            }
         });
         setWebRTCAdaptor(newAdaptor);
     }
   
-    return webRTCAdaptor;
+    return { webRTCAdaptor, externalMediaStreams };
 }

@@ -1,24 +1,27 @@
 import {useState, useEffect, useRef} from 'react';
 import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Dropdown} from "semantic-ui-react";
 
-import { withFirebasePage } from '../../../data/firebase';
-import { WebRTCAdaptor } from '../../../static-js/webrtc_adaptor.js';
+import { withFirebasePage } from '../../../../data/firebase';
+import { WebRTCAdaptor } from '../../../../static-js/webrtc_adaptor.js';
 import axios from 'axios';
 import { animateScroll } from 'react-scroll';
-import ButtonWithConfirm from '../../../components/views/common/ButtonWithConfirm';
+import ButtonWithConfirm from '../../../../components/views/common/ButtonWithConfirm';
 
-import CommentContainer from '../../../components/views/streaming/comment-container/NewCommentContainer';
-import Loader from '../../../components/views/loader/Loader';
+import CommentContainer from '../../../../components/views/streaming/comment-container/NewCommentContainer';
+import Loader from '../../../../components/views/loader/Loader';
 import { useRouter } from 'next/router';
-import { WEBRTC_ERRORS } from '../../../data/errors/StreamingErrors';
-import ReactMic from '../../../components/ssr/ReactMic';
-import useUserMedia from '../../../components/custom-hook/useDevices';
-import useWebRTCAdaptor from '../../../components/custom-hook/useWebRTCAdaptor';
+import { WEBRTC_ERRORS } from '../../../../data/errors/StreamingErrors';
+import ReactMic from '../../../../components/ssr/ReactMic';
+import useUserMedia from '../../../../components/custom-hook/useDevices';
+import useWebRTCAdaptor from '../../../../components/custom-hook/useWebRTCAdaptor';
+import RemoteVideoContainer from '../../../../components/views/streaming/video-container/RemoteVideoContainer';
 
 function StreamingPage(props) {
 
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
+    const streamerId = router.query.streamerId;
+
     const [currentState, setCurrentState] = useState(2);
 
     const [isInitialized, setIsInitialized] = useState(false);
@@ -38,16 +41,20 @@ function StreamingPage(props) {
 
     const isPlayMode = false;
     const localVideoId = 'localVideo';
+    const alternateVideoElement = useRef(null);
 
     let streamingCallbacks = {
         onInitialized: () => {
             setIsInitialized(true);
         },
-        onRoomJoined: () => {
-            startStreaming();
-        },
         onPublishStarted: () => {
             setIsStreaming(true);
+        },
+        onJoinedRoom: (infoObj) => {},
+        onStreamJoined: (infoObj) => {},
+        onStreamLeaved: (infoObj) => {},
+        onNewStreamAvailable: (infoObj) => {
+            addStreamToVideo(infoObj);
         },
         onPublishFinished: () => {
             setIsStreaming(false);
@@ -67,7 +74,7 @@ function StreamingPage(props) {
         },
     }
 
-    const webRTCAdaptor = useWebRTCAdaptor(
+    const { webRTCAdaptor, externalMediaStreams } = useWebRTCAdaptor(
         isPlayMode,
         localVideoId,
         mediaConstraints,
@@ -78,7 +85,7 @@ function StreamingPage(props) {
     useEffect(() => {
         if (isInitialized) {
             setTimeout(() => {
-                webRTCAdaptor.joinRoom(livestreamId, livestreamId + 'joiningSpeaker');
+                webRTCAdaptor.joinRoom(livestreamId, streamerId);
             }, 2000);
         }
     },[isInitialized])
@@ -105,27 +112,12 @@ function StreamingPage(props) {
         setMediaConstraints(constraints);
     },[audioSource, videoSource]);
 
-    function getDeviceName(devices, deviceId) {
-        let currentDevice = devices.find(device => {
-            return device.deviceId === deviceId;
-        });
-        if (currentDevice) {
-            return currentDevice.text;
-        } else {
-            return "";
-        }
-    }
-
-    function startStreaming() {
-        webRTCAdaptor.publish(livestreamId + 'joiningSpeaker');
-    }
-
     function stopStreaming() {
         webRTCAdaptor.stop(streamId);
     }
 
-    function joinStream() {
-        webRTCAdaptor.joinRoom('room', streamId);
+    function addStreamToVideo(infoObj) {
+        alternateVideoElement.current.srcObject = infoObj.stream;
     }
 
     function toggleMicrophone() {
@@ -137,12 +129,27 @@ function StreamingPage(props) {
         setIsLocalMicMuted(!isLocalMicMuted);
     }
 
+    let externalVideoElements = externalMediaStreams.map( (streamObject, index) => {
+        return (
+            <Grid.Column width={8} style={{ padding: 0 }} key={streamObject.streamId}>
+                <div className='video-container'>   
+                    <RemoteVideoContainer stream={streamObject} length={externalMediaStreams.length} index={index} />
+                </div>
+            </Grid.Column>
+        );
+    });
+
     return (
         <div className='topLevelContainer'>
             <div className='black-frame'>
-                <div className='video-container'>
-                    <video id="localVideo" autoPlay width="100%"></video> 
-                </div>
+                <Grid style={{ margin: 0 }}>
+                    <Grid.Column width={ externalMediaStreams.length > 0 ? 8 : 16} style={{ padding: 0 }}>
+                        <div className='video-container' style={{ height: externalMediaStreams.length > 1 ? '50vh' : '100vh'}}>
+                            <video id="localVideo" autoPlay width={ externalMediaStreams.length > 1 ? '' : '100%' } style={{ right: (externalMediaStreams.length > 0) ? '0' : '' }}></video> 
+                        </div>
+                    </Grid.Column>
+                    { externalVideoElements }
+                </Grid>
             </div>
             <div className='bottom-container'>
                 <div className='button-container'>         
@@ -152,8 +159,7 @@ function StreamingPage(props) {
                                 fluid
                                 content={ isStreaming ? 'Leave Stream' : 'Join Stream'}
                                 primary
-                                onClick={  isStreaming ? stopStreaming : startStreaming }
-                                disabled={!isInitialized}
+                                onClick={  () => webRTCAdaptor.joinRoom("room1", "joiningSpeakerId") }
                                 size='big'
                             />
                         </Grid.Column>
@@ -194,24 +200,29 @@ function StreamingPage(props) {
                     margin: 0 0 30px 0;
                 }
 
+                .remoteVideoContainer {
+                    position: absolute;
+                    top: 20px;
+                    left: 50%;
+                    transform: translate(-50%);
+                    width: 80%;
+                    height: 200px;
+                }
+
                 .video-container {
                     position: relative;
-                    background-color: grey;
+                    background-color: black;
                     width: 100%;
-                    height: 100%;
                     margin: 0 auto;
                     z-index: -9999;
                 }
 
                 #localVideo {
                     position: absolute;
-                    width: 100%;
+                    top: 50%;
+                    transform: translateY(-50%);
                     max-height: 100%;
                     height: auto;
-
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%,-50%);
                     z-index: 9900;
                     background-color: black;
                 }
@@ -252,11 +263,7 @@ function StreamingPage(props) {
                 }
 
                 .video-container {
-                    width: 100%;
-                    position: absolute;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    background-color: black;
+                    
                 }
 
                 .button-container {
@@ -265,8 +272,8 @@ function StreamingPage(props) {
                     bottom: 0;
                     width: 100%;
                     height: 90px;
-                    padding: 17px;
                     cursor:  pointer;
+                    padding: 17px;
                     z-index: 8000;
                 }
 
