@@ -128,6 +128,83 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
             color: "#b39eb5"
         }
     ],
+    epflausanne: [
+        {
+           text: "Architecture",
+           value: "ARCH",
+           color: "#836953"
+       },{
+           text: "Chemistry and Chemical Engineering",
+           value: "CHEM",
+           color: "#2d5b6b"
+       },{
+           text: "Civil Engineering",
+           value: "CIVI",
+           color: "#ff6961"
+       },{
+           text: "Communication Sciences",
+           value: "COMPSCI"
+       },{
+           text: "Computer Science",
+           value: "COMP",
+           color: "#52494c"
+       },{
+           text: "Electrical and Electronic Engineering",
+           value: "ELEC",
+           color: "#aa0000"
+       },{
+           text: "Environmental Sciences and Engineering",
+           value: "ENVSCI",
+           color: "#3cb44b"
+       },{
+           text: "Life Sciences Engineering",
+           value: "BIOL",
+           color: "#9a6324"
+       },{
+           text: "Materials Sciences and Engineering",
+           value: "MATE",
+           color: "#f032e6"
+       },{
+           text: "Mathematics",
+           value: "MATH",
+           color: "#008080"
+       },{
+           text: "Mechanical Engineering",
+           value: "MECH",
+           color: "#808080"
+       },{
+           text: "Management, Technology and Entrepreneurship",
+           value: "MTEC",
+           color: "#f58231"
+       },{
+           text: "Microengineering",
+           value: "MICRO",
+           color: "#000000"
+       },{
+           text: "Physics",
+           value: "PHYS",
+           color: "#54556c"
+       },{
+           text: "Digital Humanities",
+           value: "HUMAN",
+           color: "#b39eb5"
+       }
+   ],
+   unilausanne: [
+    {
+        text: "Economics",
+        value: "ECON",
+    }, {
+        text: "Finance",
+        value: "BANK",
+    }, {
+        text: "Management",
+        value: "BUSI",
+    }, {
+        text: "Law & Economics",
+        value: "LAW",
+    }
+   ],
     unizurich: [
         {
             text: "Law",

@@ -226,6 +226,9 @@ function Calendar(props) {
                         <div style={{ display: university === 'unizurich' ? 'block' : 'none' }}>
                             <Image src={'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fjobhub.png?alt=media'} style={{ margin: '10px 0 10px 0', maxHeight: '110px', filter: 'brightness(0) invert(1)'}}/>
                         </div>
+                        <div style={{ display: university === 'unilausanne' ? 'block' : 'none' }}>
+                            <Image src={'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2FLogo_HEC_Lausanne.png?alt=media'} style={{ margin: '10px 0 10px 0', maxHeight: '110px', filter: 'brightness(0) invert(1)'}}/>
+                        </div>
                     </Grid.Column>
                     <Grid.Column width={10}>
                         <div style={{ float: 'right'}}>   
