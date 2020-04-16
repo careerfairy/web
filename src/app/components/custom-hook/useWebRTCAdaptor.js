@@ -5,7 +5,7 @@ import axios from 'axios';
 import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor.js';
 import { WEBRTC_ERRORS } from '../../data/errors/StreamingErrors.js';
 
-export default function useWebRTCAdaptor(isPlayMode, videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject) {
+export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject) {
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
     
@@ -34,7 +34,6 @@ export default function useWebRTCAdaptor(isPlayMode, videoId, mediaConstraints, 
 
     useEffect(() => {
         if (addedStream) {
-            debugger;
             let cleanedExternalMediaStreams = removeStreamFromList(addedStream, externalMediaStreams)
             setExternalMediaStreams([...cleanedExternalMediaStreams, addedStream]);
         }
@@ -101,8 +100,8 @@ export default function useWebRTCAdaptor(isPlayMode, videoId, mediaConstraints, 
         var pc_config = nsToken ? { 'iceServers' : nsToken.iceServers } : null; 
 
         var sdpConstraints = {
-            OfferToReceiveAudio : isPlayMode,
-            OfferToReceiveVideo : isPlayMode
+            OfferToReceiveAudio : false,
+            OfferToReceiveVideo : false
         };
 
         const newAdaptor = new WebRTCAdaptor({
@@ -110,50 +109,72 @@ export default function useWebRTCAdaptor(isPlayMode, videoId, mediaConstraints, 
             mediaConstraints : mediaConstraints,
             peerconnection_config : pc_config,
             sdp_constraints : sdpConstraints,
-            localVideoId : isPlayMode ? null : videoId,
-            remoteVideoId: isPlayMode ? videoId : null,
+            localVideoId : videoId,
             debug: true,
             callback : function (info, infoObj) {
-                console.log(info);
                 switch(info) {
                     case "initialized": {
-                        streamingCallbackObject.onInitialized();
+                        if (typeof streamingCallbackObject.onInitialized === 'function') {
+                            streamingCallbackObject.onInitialized(infoObj);
+                        }
                         break;
                     }
                     case "joinedTheRoom": {
+                        if (typeof streamingCallbackObject.onJoinedTheRoom === 'function') {
+                            streamingCallbackObject.onJoinedTheRoom(infoObj);
+                        }
                         publishNewStream(this, infoObj);
                         break;
                     }
                     case "streamJoined": {
+                        if (typeof streamingCallbackObject.onStreamJoined === 'function') {
+                            streamingCallbackObject.onStreamJoined(infoObj);
+                        }
                         playNewStream(this, infoObj);
                         break;
                     }
                     case "streamLeaved": {
+                        if (typeof streamingCallbackObject.onStreamLeaved === 'function') {
+                            streamingCallbackObject.onStreamLeaved(infoObj);
+                        }
                         setRemovedStream(infoObj);
                         break;
                     }
                     case "newStreamAvailable": {
+                        if (typeof streamingCallbackObject.onNewStreamAvailable === 'function') {
+                            streamingCallbackObject.onNewStreamAvailable(infoObj);
+                        }
                         setAddedStream(infoObj);
                         break;
                     }
                     case "publish_started": {
-                        streamingCallbackObject.onPublishStarted();
+                        if (typeof streamingCallbackObject.onPublishStarted === 'function') {
+                            streamingCallbackObject.onPublishStarted(infoObj);
+                        }
                         break;
                     }
                     case "publish_finished": {
-                        streamingCallbackObject.onPublishFinished();
+                        if (typeof streamingCallbackObject.onPublishFinished === 'function') {
+                            streamingCallbackObject.onPublishFinished(infoObj);
+                        }
                         break;
                     }
                     case "screen_share_stopped": {
-                        streamingCallbackObject.onScreenShareStopped();
+                        if (typeof streamingCallbackObject.onScreenShareStopped === 'function') {
+                            streamingCallbackObject.onScreenShareStopped(infoObj);
+                        }
                         break;
                     }
                     case "closed": {
-                        streamingCallbackObject.onClosed();
+                        if (typeof streamingCallbackObject.onClosed === 'function') {
+                            streamingCallbackObject.onClosed(infoObj);
+                        }
                         break;
                     }
                     case "updated_stats": {
-                        streamingCallbackObject.onUpdatedStats();
+                        if (typeof streamingCallbackObject.onUpdatedStats === 'function') {
+                            streamingCallbackObject.onUpdatedStats(infoObj);
+                        }
                         break;
                     }
                     case "pong": {

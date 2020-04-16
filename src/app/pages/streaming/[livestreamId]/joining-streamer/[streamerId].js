@@ -37,9 +37,8 @@ function StreamingPage(props) {
     const [audioSource, setAudioSource] = useState(null);
     const [videoSource, setVideoSource] = useState(null);
 
-    const [mediaConstraints, setMediaConstraints] = useState({ audio: true, video: true });
+    const [mediaConstraints, setMediaConstraints] = useState(null);
 
-    const isPlayMode = false;
     const localVideoId = 'localVideo';
     const alternateVideoElement = useRef(null);
 
@@ -47,25 +46,24 @@ function StreamingPage(props) {
         onInitialized: () => {
             setIsInitialized(true);
         },
-        onPublishStarted: () => {
+        onPublishStarted: (infoObj) => {
             setIsStreaming(true);
         },
         onJoinedRoom: (infoObj) => {},
         onStreamJoined: (infoObj) => {},
         onStreamLeaved: (infoObj) => {},
-        onNewStreamAvailable: (infoObj) => {
-            addStreamToVideo(infoObj);
-        },
-        onPublishFinished: () => {
+        onNewStreamAvailable: (infoObj) => {},
+        onPublishFinished: (infoObj) => {
             setIsStreaming(false);
         },
-        onScreenShareStopped: () => {
+        onPublishFinished: (infoObj) => {},
+        onScreenShareStopped: (infoObj) => {
             setIsCapturingDesktop(false);
         },
-        onClosed: () => {
+        onClosed: (infoObj) => {
             setIsInitialized(false);
         },
-        onUpdatedStats: () => {},
+        onUpdatedStats: (infoObj) => {},
     }
 
     let errorCallbacks = {
@@ -75,7 +73,6 @@ function StreamingPage(props) {
     }
 
     const { webRTCAdaptor, externalMediaStreams } = useWebRTCAdaptor(
-        isPlayMode,
         localVideoId,
         mediaConstraints,
         streamingCallbacks,
@@ -145,13 +142,13 @@ function StreamingPage(props) {
                 <Grid style={{ margin: 0 }}>
                     <Grid.Column width={ externalMediaStreams.length > 0 ? 8 : 16} style={{ padding: 0 }}>
                         <div className='video-container' style={{ height: externalMediaStreams.length > 1 ? '50vh' : '100vh'}}>
-                            <video id="localVideo" autoPlay width={ externalMediaStreams.length > 1 ? '' : '100%' } style={{ right: (externalMediaStreams.length > 0) ? '0' : '' }}></video> 
+                            <video id="localVideo" muted autoPlay width={ externalMediaStreams.length > 1 ? '' : '100%' } style={{ right: (externalMediaStreams.length > 0) ? '0' : '' }}></video> 
                         </div>
                     </Grid.Column>
                     { externalVideoElements }
                 </Grid>
             </div>
-            <div className='bottom-container'>
+            {/* <div className='bottom-container'>
                 <div className='button-container'>         
                     <Grid centered className='middle aligned'>
                         <Grid.Column width={6} textAlign='center'>
@@ -168,7 +165,7 @@ function StreamingPage(props) {
                 <div className='logo-container'>
                     CareerFairy
                 </div>
-            </div>
+            </div> */}
             <div className='left-container'>
                     <Grid columns={1}>
                         <Grid.Row style={{ margin: '10px 0'}}>
@@ -222,6 +219,7 @@ function StreamingPage(props) {
                     top: 50%;
                     transform: translateY(-50%);
                     max-height: 100%;
+                    max-width: 100%;
                     height: auto;
                     z-index: 9900;
                     background-color: black;

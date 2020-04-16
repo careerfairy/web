@@ -12,15 +12,11 @@ function StreamingPage(props) {
 
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
-    const [currentState, setCurrentState] = useState(2);
 
     const [isInitialized, setIsInitialized] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
     const [isCapturingDesktop, setIsCapturingDesktop] = useState(false);
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
-    const [currentLivestream, setCurrentLivestream] = useState(null);
-
-    const [streamId, setStreamId] = useState(null);
 
     const devices = useUserMedia();
 
@@ -29,38 +25,32 @@ function StreamingPage(props) {
 
     const [mediaConstraints, setMediaConstraints] = useState(null);
 
-    const isPlayMode = false;
     const localVideoId = 'localVideo';
 
     let streamingCallbacks = {
-        onInitialized: () => {
+        onInitialized: (infoObj) => {
             setIsInitialized(true);
         },
-        onJoinedRoom: (infoObj) => {
-            //playExisitingStreams(infoObj);
-        },
-        onStreamJoined: (infoObj) => {
-            //playAdditionalStream(infoObj);
-        },
-        onStreamLeaved: (infoObj) => {
-            // removeStream(infoObj);
-        },
-        onNewStreamAvailable: (infoObj) => {
-            //addStreamToVideo(infoObj, externalMediaStreams);
-        },
-        onPublishStarted: () => {
+        onPublishStarted: (infoObj) => {
+            setMainStreamIdToStreamerList(infoObj.streamId);
             setIsStreaming(true);
         },
-        onPublishFinished: () => {
+        onNewStreamAvailable: (infoObj) => {
+            addStreamIdToStreamerList(infoObj.streamId);
+        },
+        onStreamLeaved: (infoObj) => {
+            removeStreamIdFromStreamerList(infoObj.streamId);
+        },
+        onPublishFinished: (infoObj) => {
             setIsStreaming(false);
         },
-        onScreenShareStopped: () => {
+        onScreenShareStopped: (infoObj) => {
             setIsCapturingDesktop(false);
         },
-        onClosed: () => {
+        onClosed: (infoObj) => {
             setIsInitialized(false);
         },
-        onUpdatedStats: () => {},
+        onUpdatedStats: (infoObj) => {},
     }
 
     let errorCallbacks = {
@@ -71,7 +61,6 @@ function StreamingPage(props) {
 
     const { webRTCAdaptor, externalMediaStreams } = 
         useWebRTCAdaptor(
-            isPlayMode,
             localVideoId,
             mediaConstraints,
             streamingCallbacks,
@@ -81,7 +70,7 @@ function StreamingPage(props) {
     useEffect(() => {
         if (isInitialized) {
             setTimeout(() => {
-                webRTCAdaptor.joinRoom(livestreamId, livestreamId + 'mainSpeaker');
+                webRTCAdaptor.joinRoom(livestreamId, 'null');
             }, 2000);
         }
     },[isInitialized])
@@ -117,6 +106,18 @@ function StreamingPage(props) {
     function stopStreaming() {
     }
 
+    function setMainStreamIdToStreamerList (streamId) {
+        props.firebase.setMainStreamIdToLivestreamStreamers(livestreamId, streamId);
+    }
+
+    function addStreamIdToStreamerList(streamId) {
+        props.firebase.addStreamIdToLivestreamStreamers(livestreamId, streamId);
+    }
+
+    function removeStreamIdFromStreamerList(streamId) {
+        props.firebase.removeStreamIdFromLivestreamStreamers(livestreamId, streamId);
+    }
+
     function toggleScreenSharing() {
         if (isCapturingDesktop) {
             webRTCAdaptor.switchVideoCapture(streamId);
@@ -138,9 +139,7 @@ function StreamingPage(props) {
     let externalVideoElements = externalMediaStreams.map( (streamObject, index) => {
         return (
             <Grid.Column width={8} style={{ padding: 0 }} key={streamObject.streamId}>
-                <div className='video-container'>   
-                    <RemoteVideoContainer stream={streamObject} length={externalMediaStreams.length} index={index} />
-                </div>
+                <RemoteVideoContainer stream={streamObject} length={externalMediaStreams.length} index={index} />
             </Grid.Column>
         );
     });
@@ -151,7 +150,7 @@ function StreamingPage(props) {
                 <Grid style={{ margin: 0 }}>
                     <Grid.Column width={ externalMediaStreams.length > 0 ? 8 : 16} style={{ padding: 0 }}>
                         <div className='video-container' style={{ height: externalMediaStreams.length > 1 ? '50vh' : '100vh'}}>
-                            <video id="localVideo" autoPlay width={ externalMediaStreams.length > 1 ? '' : '100%' } style={{ right: (externalMediaStreams.length > 0) ? '0' : '' }}></video> 
+                            <video id="localVideo" muted autoPlay width={ externalMediaStreams.length > 1 ? '' : '100%' } style={{ right: (externalMediaStreams.length > 0) ? '0' : '', bottom: (externalMediaStreams.length > 1) ? '0' : '' }}></video> 
                         </div>
                     </Grid.Column>
                     { externalVideoElements }
@@ -253,6 +252,7 @@ function StreamingPage(props) {
                     top: 50%;
                     transform: translateY(-50%);
                     max-height: 100%;
+                    max-width: 100%;
                     height: auto;
                     z-index: 9900;
                     background-color: black;

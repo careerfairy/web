@@ -28,6 +28,7 @@ function RemoteVideoContainer(props) {
                     top: 50%;
                     transform: translateY(-50%);
                     max-height: 100%;
+                    max-width: 100%;
                     height: auto;
                     z-index: 9900;
                     background-color: black;
