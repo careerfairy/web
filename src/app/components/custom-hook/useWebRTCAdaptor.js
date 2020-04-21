@@ -165,6 +165,20 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
                         this.joinRoom(roomId, streamId);
                         break;
                     }
+                    case "play_started": {
+                        if (typeof streamingCallbackObject.onPublishStarted === 'function') {
+                            streamingCallbackObject.onPublishStarted(infoObj);
+                        }
+                        break;
+                    }
+                    case "play_finished": {
+                        debugger;
+                        if (typeof streamingCallbackObject.onPublishStarted === 'function') {
+                            streamingCallbackObject.onPublishStarted(infoObj);
+                        }
+                        this.play(infoObj.streamId, 'null', roomId);
+                        break;
+                    }
                     case "screen_share_stopped": {
                         if (typeof streamingCallbackObject.onScreenShareStopped === 'function') {
                             streamingCallbackObject.onScreenShareStopped(infoObj);
