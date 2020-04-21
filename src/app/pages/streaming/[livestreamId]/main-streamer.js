@@ -49,12 +49,14 @@ function StreamingPage(props) {
             removeStreamIdFromStreamerList(infoObj.streamId);
         },
         onPublishFinished: (infoObj) => {
+            console.log("publish finiiiished");
             setIsStreaming(false);
         },
         onScreenShareStopped: (infoObj) => {
             setIsCapturingDesktop(false);
         },
         onClosed: (infoObj) => {
+            console.log("clooosed");
             setIsInitialized(false);
         },
         onUpdatedStats: (infoObj) => {},
