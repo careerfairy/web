@@ -15,6 +15,9 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
 
     const [nsToken, setNsToken] = useState(null);
 
+    const [roomId, setRoomId] = useState(null);
+    const [streamId, setStreamId] = useState(null);
+
     useEffect(() => {
         axios({
             method: 'get',
@@ -85,6 +88,8 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
 
     function publishNewStream(adaptorInstance, infoObj) {
         adaptorInstance.publish(infoObj.streamId, 'null', infoObj.ATTR_ROOM_NAME);
+        setStreamId(infoObj.streamId);
+        setRoomId(infoObj.ATTR_ROOM_NAME);
         if (infoObj.streams && infoObj.streams.length > 0) {
             infoObj.streams.forEach( streamId => {
                 adaptorInstance.play(streamId, "null", infoObj.ATTR_ROOM_NAME);
@@ -168,6 +173,15 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
                     case "closed": {
                         if (typeof streamingCallbackObject.onClosed === 'function') {
                             streamingCallbackObject.onClosed(infoObj);
+                        }
+                        break;
+                    }
+                    case "ice_connection_state_changed": {
+                        if (typeof streamingCallbackObject.onIceConnectionState === 'function') {
+                            streamingCallbackObject.onIceConnectionState(infoObj);
+                        }
+                        if (infoObj.state == 'disconnected') {
+                            this.joinRoom(roomId, streamId);
                         }
                         break;
                     }

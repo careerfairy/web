@@ -15,6 +15,8 @@ import ReactMic from '../../../../components/ssr/ReactMic';
 import useUserMedia from '../../../../components/custom-hook/useDevices';
 import useWebRTCAdaptor from '../../../../components/custom-hook/useWebRTCAdaptor';
 import RemoteVideoContainer from '../../../../components/views/streaming/video-container/RemoteVideoContainer';
+import StreamerVideoDisplayer from '../../../../components/views/streaming/video-container/StreamerVideoDisplayer';
+import NewCommentContainer from '../../../../components/views/streaming/comment-container/NewCommentContainer';
 
 function StreamingPage(props) {
 
@@ -28,7 +30,7 @@ function StreamingPage(props) {
     const [isStreaming, setIsStreaming] = useState(false);
     const [isCapturingDesktop, setIsCapturingDesktop] = useState(false);
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
-    const [currentLivestream, setCurrentLivestream] = useState(null);
+    const [currentLivestream, setCurrentLivestream] = useState(false);
 
     const [streamId, setStreamId] = useState(null);
 
@@ -38,6 +40,7 @@ function StreamingPage(props) {
     const [videoSource, setVideoSource] = useState(null);
 
     const [mediaConstraints, setMediaConstraints] = useState(null);
+    const [numberOfViewers, setNumberOfViewers] = useState(0);
 
     const localVideoId = 'localVideo';
     const alternateVideoElement = useRef(null);
@@ -47,7 +50,8 @@ function StreamingPage(props) {
             setIsInitialized(true);
         },
         onPublishStarted: (infoObj) => {
-            setIsStreaming(true);
+            debugger;
+            setStreamId(infoObj.streamId);
         },
         onJoinedRoom: (infoObj) => {},
         onStreamJoined: (infoObj) => {},
@@ -97,6 +101,16 @@ function StreamingPage(props) {
     },[devices]);
 
     useEffect(() => {
+        if (livestreamId) {
+            props.firebase.listenToScheduledLivestreamById(livestreamId, querySnapshot => {
+                let livestream = querySnapshot.data();
+                livestream.id = querySnapshot.id;
+                setCurrentLivestream(livestream);
+            });
+        }
+    }, [livestreamId]);
+
+    useEffect(() => {
         const constraints = {
             audio: {deviceId: audioSource ? {exact: audioSource} : undefined },
             video: { 
@@ -109,13 +123,32 @@ function StreamingPage(props) {
         setMediaConstraints(constraints);
     },[audioSource, videoSource]);
 
-    function stopStreaming() {
-        webRTCAdaptor.stop(streamId);
-    }
+    useEffect(() => {
+        if (currentLivestream && currentLivestream.id) {     
+            clearInterval();
+            if (currentLivestream.hasStarted) {
+                setInterval(() => {
+                    axios({
+                        method: 'get',
+                        url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=' + streamId,
+                    }).then( response => { 
+                            setNumberOfViewers(response.data.totalWebRTCWatchersCount > -1 ? response.data.totalWebRTCWatchersCount : 0);
+                        }).catch(error => {
+                            console.log(error);
+                    });
+                }, 10000);
+            }
+        }
+    }, [currentLivestream, currentLivestream.hasStarted]);
 
-    function addStreamToVideo(infoObj) {
-        alternateVideoElement.current.srcObject = infoObj.stream;
-    }
+    useEffect(() => {
+        if (currentLivestream.hasStarted) {
+            setIsStreaming(true);
+        } else {
+            setIsStreaming(false);
+            setNumberOfViewers(0);
+        }
+    }, [currentLivestream.hasStarted]);
 
     function toggleMicrophone() {
         if (isLocalMicMuted) {
@@ -126,47 +159,24 @@ function StreamingPage(props) {
         setIsLocalMicMuted(!isLocalMicMuted);
     }
 
-    let externalVideoElements = externalMediaStreams.map( (streamObject, index) => {
-        return (
-            <Grid.Column width={8} style={{ padding: 0 }} key={streamObject.streamId}>
-                <div className='video-container'>   
-                    <RemoteVideoContainer stream={streamObject} length={externalMediaStreams.length} index={index} />
-                </div>
-            </Grid.Column>
-        );
-    });
-
     return (
         <div className='topLevelContainer'>
-            <div className='black-frame'>
-                <Grid style={{ margin: 0 }}>
-                    <Grid.Column width={ externalMediaStreams.length > 0 ? 8 : 16} style={{ padding: 0 }}>
-                        <div className='video-container' style={{ height: externalMediaStreams.length > 1 ? '50vh' : '100vh'}}>
-                            <video id="localVideo" muted autoPlay width={ externalMediaStreams.length > 1 ? '' : '100%' } style={{ right: (externalMediaStreams.length > 0) ? '0' : '' }}></video> 
-                        </div>
-                    </Grid.Column>
-                    { externalVideoElements }
-                </Grid>
+             <div className={'top-menu ' + (isStreaming ? 'active' : '')}>
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
+                    <h3 style={{ color: (isStreaming ?  'white' : 'orange') }}>{ isStreaming ? 'YOU ARE NOW LIVE' : 'YOU ARE NOT LIVE'}</h3>
+                    { isStreaming ? '' : 'The Stream will begin when the host presses Start Streaming'}
+                </div>
+                <div style={{ float: 'right', display: 'inlineBlock', margin: '0 20px', fontSize: '1.2em', fontWeight: '700', padding: '10px' }}>
+                    Viewers: { numberOfViewers }
+                </div>
             </div>
-            {/* <div className='bottom-container'>
-                <div className='button-container'>         
-                    <Grid centered className='middle aligned'>
-                        <Grid.Column width={6} textAlign='center'>
-                            <Button
-                                fluid
-                                content={ isStreaming ? 'Leave Stream' : 'Join Stream'}
-                                primary
-                                onClick={  () => webRTCAdaptor.joinRoom("room1", "joiningSpeakerId") }
-                                size='big'
-                            />
-                        </Grid.Column>
-                    </Grid>
-                </div>
-                <div className='logo-container'>
-                    CareerFairy
-                </div>
-            </div> */}
-            <div className='left-container'>
+            <div className='black-frame'>
+                <StreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId}/>
+            </div>
+            <div className='video-menu-left'>
+                <NewCommentContainer livestream={ currentLivestream }/>
+            </div>
+            <div className='right-container'>
                     <Grid columns={1}>
                         <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
@@ -176,25 +186,60 @@ function StreamingPage(props) {
                                 </div>
                             </Grid.Column>
                         </Grid.Row>
-                        <Grid.Row style={{ margin: '10px 0'}}>
+                        {/* <Grid.Row style={{ margin: '10px 0'}}>
+                            <Grid.Column textAlign='center'>
+                                <div className='side-button' onClick={() => alert("blob")}>
+                                    <Icon name='clone outline' size='large' style={{ margin: '0 0 5px 0', color: 'white'}}/>
+                                    <p style={{ fontSize: '0.8em', color: 'white' }}>Share Slides</p>
+                                </div>
+                            </Grid.Column>
+                        </Grid.Row> */}
+                        {/* <Grid.Row style={{ margin: '10px 0'}}>
+                            <Grid.Column textAlign='center'>
+                                <div className='side-button' onClick={() => toggleScreenSharing()}style={{  color: isCapturingDesktop ? 'red' : 'white' }}>
+                                    <Icon name='tv' size='large' style={{ margin: '0 0 5px 0' }}/>
+                                    <p style={{ fontSize: '0.8em' }}>{ isCapturingDesktop ? 'Stop Screen Sharing' : 'Share Screen' }</p>
+                                </div>
+                            </Grid.Column>
+                        </Grid.Row> */}
+                        {/* <Grid.Row style={{ margin: '10px 0'}}>
+                            <Grid.Column textAlign='center'>
+                                <div className='side-button' onClick={() => alert("blob")}>
+                                    <Icon name='user plus' size='large' style={{ margin: '0 0 5px 0', color: 'white'}}/>
+                                    <p style={{ fontSize: '0.8em', color: 'white' }}>Invite Speaker</p>
+                                </div>
+                            </Grid.Column>
+                        </Grid.Row> */}
+                        {/* <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
                                 <div className='side-button' onClick={() => alert("blob")}>
                                     <Icon name='cog' size='large' style={{ margin: '0 0 5px 0', color: 'white'}}/>
                                     <p style={{ fontSize: '0.8em', color: 'white' }}>Settings</p>
                                 </div>
                             </Grid.Column>
-                        </Grid.Row>
+                        </Grid.Row> */}
                     </Grid>
                 </div>
             <style jsx>{`
                 .hidden {
                     display: none
                 }
-
+                
                 .top-menu {
+                    position: relative;
+                    background-color: rgba(245,245,245,1);
+                    padding: 15px 0;
+                    height: 75px;
                     text-align: center;
-                    padding: 20px;
-                    margin: 0 0 30px 0;
+                }
+
+                .top-menu.active {
+                    background-color: rgba(0, 210, 170, 1);
+                    color: white;
+                }
+
+                .top-menu h3 {
+                    font-weight: 600;
                 }
 
                 .remoteVideoContainer {
@@ -225,6 +270,15 @@ function StreamingPage(props) {
                     background-color: black;
                 }
 
+                .video-menu-left {
+                    position: absolute;
+                    top: 75px;
+                    left: 0;
+                    bottom: 0;
+                    width: 330px;
+                    z-index: 1;
+                }
+
                 .side-button {
                     cursor: pointer;
                 }
@@ -249,37 +303,34 @@ function StreamingPage(props) {
 
                 .black-frame {
                     position: absolute;
-                    top: 0;
-                    left: 120px;
-                    width: calc(100% - 120px);
+                    top: 75px;
+                    left: 330px;
+                    right: 120px;
+                    width: calc(100% - 450px);
                     min-width: 700px;
-                    height: 100%;
+                    height: calc(100% - 75px);
                     min-height: 600px;
-                    z-index: -10;
+                    z-index: 10;
                     background-color: black;
                     cursor: pointer;
                 }
 
-                .video-container {
-                    
-                }
-
                 .button-container {
                     position: absolute;
-                    left: 0;
+                    left: 120px;
                     bottom: 0;
-                    width: 100%;
+                    width: calc(100% - 120px);
                     height: 90px;
                     cursor:  pointer;
                     padding: 17px;
                     z-index: 8000;
                 }
 
-                .left-container {
+                .right-container {
                     position: absolute;
-                    left: 0;
-                    top: 0;
-                    height: 100vh;
+                    right: 0;
+                    top: 75px;
+                    height: calc(100% - 75px);
                     width: 120px;
                     padding: 20px;
                     background-color: rgb(80,80,80);
@@ -293,10 +344,10 @@ function StreamingPage(props) {
                     color: rgb(0, 210, 170);
                     font-size: 1.4em;
                     text-align: center;
-\                }
+                }
             `}</style>
         </div>
     );
 }
 
-export default StreamingPage;
+export default withFirebasePage(StreamingPage);

@@ -1,13 +1,19 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, Fragment} from 'react';
 import {Icon, Image} from "semantic-ui-react";
 import axios from 'axios';
 import { document } from 'global';
 import { WebRTCAdaptor } from '../../../../static-js/webrtc_adaptor';
 
-function RemoteVideoContainer(props) {
+function ViewerVideoContainer(props) {
+
+    const isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
     const [nsToken, setNsToken] = useState(null);
+
+    const [showPlayButton, setShowPlayButton] = useState(false);
+
+    const [isPlaying, setIsPlaying] = useState(false);
 
     useEffect(() => {
         axios({
@@ -21,10 +27,25 @@ function RemoteVideoContainer(props) {
     }, []);
 
     useEffect(() => {
+        if (isPlaying) {
+            setTimeout(() => {
+                playVideo().catch( error => {
+                    setShowPlayButton(true);
+                })
+            }, 500);
+        }
+    }, [isPlaying]);
+
+    useEffect(() => {
         if (document) {
             setupWebRTCAdaptor();
         }
-    }, [document]);
+    }, [document, nsToken]);
+
+    function playVideo() {
+        setShowPlayButton(false);
+        return document.getElementById('videoElement' + props.streamId).play();
+    }
 
     function convertTokenFromXirsysApi(token) {
         let tempToken = token.data.v;
@@ -73,10 +94,11 @@ function RemoteVideoContainer(props) {
                     }
                     case "play_started": {
                         console.log(infoObj);
+                        setIsPlaying(true);
                         break;
                     }
                     case "play_finished": {
-                        
+                        setIsPlaying(false);
                         break;
                     }
                     case "closed": {
@@ -94,24 +116,30 @@ function RemoteVideoContainer(props) {
                 }
             },
             callbackError : function(error) {
-                errorCallback(error)
+                console.log(error)
             }
         });
         setWebRTCAdaptor(newAdaptor);
     }
 
     return (
-        <div>
-            <div className='videoContainer' style={{ height: props.length > 2 ? '50vh' : '100vh' }}>
-                <video id={'videoElement' + props.streamId} className='videoElement' width={ props.length > 1 ? '' : '100%' } style={{  left: (props.index % 2 === 0) ? '0' : '', right: (props.index % 2 === 1) ? '0' : '' }} autoPlay/>
+        <Fragment>
+            <div className='videoContainer' style={{ height: '100%' }}>
+                <video id={'videoElement' + props.streamId} className='videoElement' width={ props.length > 1 ? '' : '100%' } style={{  left: (props.index % 2 === 0) ? '0' : '', right: (props.index % 2 === 1) ? '0' : '' }}/>
+                <div className={(showPlayButton ? 'playButton' : 'hidden')}><Icon name='play' onClick={() => playVideo()}/></div>
             </div>           
             <style jsx>{`
+                .hidden {
+                    display: none;
+                }
+
                .videoContainer {
                     position: relative;
                     background-color: black;
                     width: 100%;
                     margin: 0 auto;
-                    z-index: -9999;
+                    z-index: 1000;
+                    border: 2px solid red;
                }
 
                .videoElement {
@@ -121,12 +149,23 @@ function RemoteVideoContainer(props) {
                     max-height: 100%;
                     max-width: 100%;
                     height: auto;
-                    z-index: 9900;
+                    z-index: -9900;
                     background-color: black;
                }
+
+               .playButton {
+                    position: absolute;
+                    font-size: calc(1em + 1.2vw);
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                    color: white;
+                    z-index: 9991;
+                    cursor: pointer !important;
+            }
           `}</style>
-        </div>
+        </Fragment>
     );
 }
 
-export default RemoteVideoContainer;
+export default ViewerVideoContainer;

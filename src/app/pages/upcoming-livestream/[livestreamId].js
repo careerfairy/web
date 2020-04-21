@@ -401,7 +401,7 @@ function UpcomingLivestream(props) {
                 .top-menu {
                     background-color: rgba(250,250,250,1);
                     padding: 15px 0;
-                    height: 75px;
+                    height: 80px;
                     text-align: center;
                     position: relative;
                     box-shadow: 0 0 5px grey;

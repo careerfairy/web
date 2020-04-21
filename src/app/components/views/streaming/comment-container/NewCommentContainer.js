@@ -17,6 +17,7 @@ function CommentContainer(props) {
         if (props.livestream.id) {
             const unsubscribe = props.firebase.listenToLivestreamQuestions(props.livestream.id, querySnapshot => {
                 var questionsList = [];
+                console.log("LALALALALAALALA" + querySnapshot.length);
                 querySnapshot.forEach(doc => {
                     let question = doc.data();
                     question.id = doc.id;
