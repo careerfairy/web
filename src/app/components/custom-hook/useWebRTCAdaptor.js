@@ -162,6 +162,7 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
                         if (typeof streamingCallbackObject.onPublishFinished === 'function') {
                             streamingCallbackObject.onPublishFinished(infoObj);
                         }
+                        this.joinRoom(roomId, streamId);
                         break;
                     }
                     case "screen_share_stopped": {
@@ -179,9 +180,6 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
                     case "ice_connection_state_changed": {
                         if (typeof streamingCallbackObject.onIceConnectionState === 'function') {
                             streamingCallbackObject.onIceConnectionState(infoObj);
-                        }
-                        if (infoObj.state == 'disconnected') {
-                            this.joinRoom(roomId, streamId);
                         }
                         break;
                     }
