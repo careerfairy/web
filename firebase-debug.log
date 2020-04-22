@@ -1,0 +1,729 @@
+[debug] [2020-04-21T15:21:53.961Z] ----------------------------------------------------------------------
+[debug] [2020-04-21T15:21:53.962Z] Command:       /Users/mvoss/.nvm/versions/node/v10.19.0/bin/node /Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/.bin/firebase serve --only functions,hosting
+[debug] [2020-04-21T15:21:53.962Z] CLI Version:   7.12.1
+[debug] [2020-04-21T15:21:53.962Z] Platform:      darwin
+[debug] [2020-04-21T15:21:53.962Z] Node Version:  v10.19.0
+[debug] [2020-04-21T15:21:53.963Z] Time:          Tue Apr 21 2020 17:21:53 GMT+0200 (Central European Summer Time)
+[debug] [2020-04-21T15:21:53.963Z] ----------------------------------------------------------------------
+[debug] [2020-04-21T15:21:53.963Z] 
+[debug] [2020-04-21T15:21:53.974Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2020-04-21T15:21:53.974Z] > authorizing via signed-in user
+[debug] [2020-04-21T15:21:53.975Z] [iam] checking project careerfairy-e1fd9 for permissions ["firebase.projects.get"]
+[debug] [2020-04-21T15:21:53.976Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/careerfairy-e1fd9:testIamPermissions  
+
+[debug] [2020-04-21T15:21:55.752Z] <<< HTTP RESPONSE 200
+[debug] [2020-04-21T15:21:55.754Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/careerfairy-e1fd9  
+ 
+[debug] [2020-04-21T15:21:56.262Z] <<< HTTP RESPONSE 200
+[debug] [2020-04-21T15:21:56.264Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/careerfairy-e1fd9/webApps/-/config  
+ 
+[info] ✔  functions: Using node@10 from host.
+[info] ✔  functions: Emulator started at http://localhost:5001
+[debug] [2020-04-21T15:21:57.169Z] <<< HTTP RESPONSE 200
+[info] i  functions: Watching "/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp" for Cloud Functions...
+[debug] [2020-04-21T15:21:57.199Z] [worker-pool] addWorker(~diagnostic~)
+[debug] [2020-04-21T15:21:57.199Z] [worker-pool] Adding worker with key ~diagnostic~, total=1
+[debug] [2020-04-21T15:21:57.199Z] [worker-pool] submitWork(triggerId=)
+[debug] [2020-04-21T15:21:57.200Z] [worker-~diagnostic~-c6d269ae-c664-4905-9c81-f08e7c766635]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28742.sock
+[debug] [2020-04-21T15:21:57.200Z] [worker-~diagnostic~-c6d269ae-c664-4905-9c81-f08e7c766635]: BUSY
+[info] i  hosting[production]: Serving hosting files from: public
+[info] ✔  hosting[production]: Local server: http://localhost:5000
+[info] i  hosting[testing]: Serving hosting files from: public
+[info] ✔  hosting[testing]: Local server: http://localhost:5005
+[info] i  hosting[testing2]: Serving hosting files from: public
+[info] ✔  hosting[testing2]: Local server: http://localhost:5006
+[debug] [2020-04-21T15:21:57.454Z] [runtime-status] [28742] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
+[debug] [2020-04-21T15:21:57.455Z] [runtime-status] [28742] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
+[debug] [2020-04-21T15:21:57.458Z] [runtime-status] [28742] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.9.2","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
+[debug] [2020-04-21T15:21:57.459Z] [runtime-status] [28742] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2020-04-21T15:21:57.459Z] [runtime-status] [28742] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[info] ✔  functions[next]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/next).
+[info] ✔  functions[next2]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/next2).
+[info] ✔  functions[sendPostmarkEmailVerificationEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendPostmarkEmailVerificationEmail).
+[info] ✔  functions[sendPostmarkResetPasswordEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendPostmarkResetPasswordEmail).
+[info] ✔  functions[sendLivestreamRegistrationConfirmationEmail]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendLivestreamRegistrationConfirmationEmail).
+[info] ✔  functions[updateFakeUser]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/updateFakeUser).
+[info] ✔  functions[sendReminderEmailToRegistrants]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendReminderEmailToRegistrants).
+[info] ✔  functions[sendSpecificEmailsToUsers]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/sendSpecificEmailsToUsers).
+[info] ✔  functions[getAuthUsers]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/getAuthUsers).
+[info] ✔  functions[getXirsysNtsToken]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/getXirsysNtsToken).
+[info] ✔  functions[getNumberOfViewers]: http function initialized (http://localhost:5001/careerfairy-e1fd9/us-central1/getNumberOfViewers).
+[info] i  functions[scheduleReminderEmailSendTestOnRun]: function ignored because the pubsub emulator does not exist or is not running.
+[info] i  functions[scheduleReminderEmailSend]: function ignored because the pubsub emulator does not exist or is not running.
+[debug] [2020-04-21T15:21:57.867Z] [worker-~diagnostic~-c6d269ae-c664-4905-9c81-f08e7c766635]: IDLE
+[info] [hosting] Rewriting / to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:57.934Z] [work-queue] {"queueLength":1,"workRunningCount":0}
+[debug] [2020-04-21T15:21:57.934Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[debug] [2020-04-21T15:21:57.934Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/ --> next2
+[debug] [2020-04-21T15:21:57.939Z] [worker-pool] addWorker(next2)
+[debug] [2020-04-21T15:21:57.939Z] [worker-pool] Adding worker with key next2, total=1
+[debug] [2020-04-21T15:21:57.939Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:57.939Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:57.939Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:21:58.190Z] [runtime-status] [28746] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
+[debug] [2020-04-21T15:21:58.192Z] [runtime-status] [28746] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
+[debug] [2020-04-21T15:21:58.194Z] [runtime-status] [28746] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.9.2","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
+[debug] [2020-04-21T15:21:58.195Z] [runtime-status] [28746] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2020-04-21T15:21:58.196Z] [runtime-status] [28746] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2020-04-21T15:21:58.539Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:58.540Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:58.540Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:58.543Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:58.546Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:58.552Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:58.780Z] [runtime-status] [28746] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:58.788Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:21:58.788Z] [work-queue] {"queueLength":0,"workRunningCount":0}
+[info] [hosting] Rewriting /_next/static/css/9a88a61df1714e84ea51.css to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:58.829Z] [work-queue] {"queueLength":1,"workRunningCount":0}
+[debug] [2020-04-21T15:21:58.829Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[debug] [2020-04-21T15:21:58.830Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/css/9a88a61df1714e84ea51.css --> next2
+[debug] [2020-04-21T15:21:58.830Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:58.830Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:58.830Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:21:58.830Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:58.830Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:58.830Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:58.831Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:58.831Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:58.833Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:58.837Z] [runtime-status] [28746] Ephemeral server survived.
+[info] [hosting] Rewriting /_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/index.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[info] [hosting] Rewriting /_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/_app.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[info] [hosting] Rewriting /_next/static/chunks/framework.0e4aa4b820690daa8d2c.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[info] [hosting] Rewriting /_next/static/chunks/bf6678fe.a7d932ca1abd256d695c.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[info] [hosting] Rewriting /_next/static/chunks/90daeab3.e48fbc0396353e6c9c5b.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:58.859Z] [work-queue] {"queueLength":1,"workRunningCount":1}
+[debug] [2020-04-21T15:21:58.859Z] [work-queue] {"queueLength":0,"workRunningCount":2}
+[debug] [2020-04-21T15:21:58.860Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/index.js --> next2
+[debug] [2020-04-21T15:21:58.864Z] [worker-pool] addWorker(next2)
+[debug] [2020-04-21T15:21:58.864Z] [worker-pool] Adding worker with key next2, total=2
+[debug] [2020-04-21T15:21:58.864Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:58.864Z] [worker-next2-af036c66-6bc3-45f7-b2fe-fdd020e14acb]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28757.sock
+[debug] [2020-04-21T15:21:58.864Z] [worker-next2-af036c66-6bc3-45f7-b2fe-fdd020e14acb]: BUSY
+[debug] [2020-04-21T15:21:58.867Z] [work-queue] {"queueLength":1,"workRunningCount":2}
+[debug] [2020-04-21T15:21:58.867Z] [work-queue] {"queueLength":0,"workRunningCount":3}
+[debug] [2020-04-21T15:21:58.867Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/_app.js --> next2
+[debug] [2020-04-21T15:21:58.871Z] [worker-pool] addWorker(next2)
+[debug] [2020-04-21T15:21:58.871Z] [worker-pool] Adding worker with key next2, total=3
+[debug] [2020-04-21T15:21:58.871Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:58.871Z] [worker-next2-57f22f9c-3263-4ca2-b249-fcfbc008d0bf]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28758.sock
+[debug] [2020-04-21T15:21:58.871Z] [worker-next2-57f22f9c-3263-4ca2-b249-fcfbc008d0bf]: BUSY
+[debug] [2020-04-21T15:21:58.871Z] [work-queue] {"queueLength":1,"workRunningCount":3}
+[debug] [2020-04-21T15:21:58.871Z] [work-queue] {"queueLength":0,"workRunningCount":4}
+[debug] [2020-04-21T15:21:58.871Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/chunks/framework.0e4aa4b820690daa8d2c.js --> next2
+[debug] [2020-04-21T15:21:58.875Z] [worker-pool] addWorker(next2)
+[debug] [2020-04-21T15:21:58.875Z] [worker-pool] Adding worker with key next2, total=4
+[debug] [2020-04-21T15:21:58.875Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:58.875Z] [worker-next2-e746f035-2fcc-45d6-8c7f-ba4a4c03d326]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28759.sock
+[debug] [2020-04-21T15:21:58.875Z] [worker-next2-e746f035-2fcc-45d6-8c7f-ba4a4c03d326]: BUSY
+[debug] [2020-04-21T15:21:58.876Z] [work-queue] {"queueLength":1,"workRunningCount":4}
+[debug] [2020-04-21T15:21:58.877Z] [work-queue] {"queueLength":0,"workRunningCount":5}
+[debug] [2020-04-21T15:21:58.877Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/chunks/bf6678fe.a7d932ca1abd256d695c.js --> next2
+[debug] [2020-04-21T15:21:58.881Z] [worker-pool] addWorker(next2)
+[debug] [2020-04-21T15:21:58.881Z] [worker-pool] Adding worker with key next2, total=5
+[debug] [2020-04-21T15:21:58.881Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:58.881Z] [worker-next2-32a0b205-cdda-49c8-8ea4-51719846eb21]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28760.sock
+[debug] [2020-04-21T15:21:58.881Z] [worker-next2-32a0b205-cdda-49c8-8ea4-51719846eb21]: BUSY
+[debug] [2020-04-21T15:21:58.882Z] [work-queue] {"queueLength":1,"workRunningCount":5}
+[debug] [2020-04-21T15:21:58.882Z] [work-queue] {"queueLength":0,"workRunningCount":6}
+[debug] [2020-04-21T15:21:58.882Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/chunks/90daeab3.e48fbc0396353e6c9c5b.js --> next2
+[debug] [2020-04-21T15:21:58.886Z] [worker-pool] addWorker(next2)
+[debug] [2020-04-21T15:21:58.886Z] [worker-pool] Adding worker with key next2, total=6
+[debug] [2020-04-21T15:21:58.886Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:58.886Z] [worker-next2-94108bc5-6334-4506-bb3b-fd9e0efb8be7]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28761.sock
+[debug] [2020-04-21T15:21:58.886Z] [worker-next2-94108bc5-6334-4506-bb3b-fd9e0efb8be7]: BUSY
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:58.889Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:21:58.889Z] [work-queue] {"queueLength":0,"workRunningCount":5}
+[info] [hosting] Rewriting /_next/static/chunks/9178e747.a7fc5623a449ae3ee6ea.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:58.894Z] [work-queue] {"queueLength":1,"workRunningCount":5}
+[debug] [2020-04-21T15:21:58.894Z] [work-queue] {"queueLength":0,"workRunningCount":6}
+[debug] [2020-04-21T15:21:58.894Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/chunks/9178e747.a7fc5623a449ae3ee6ea.js --> next2
+[debug] [2020-04-21T15:21:58.894Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:58.894Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:58.895Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:21:58.899Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:58.899Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:58.899Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:58.900Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:58.900Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:58.901Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:58.903Z] [runtime-status] [28746] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:58.906Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:21:58.906Z] [work-queue] {"queueLength":0,"workRunningCount":5}
+[info] [hosting] Rewriting /_next/static/chunks/commons.3c16fd7cba542429824d.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:58.910Z] [work-queue] {"queueLength":1,"workRunningCount":5}
+[debug] [2020-04-21T15:21:58.910Z] [work-queue] {"queueLength":0,"workRunningCount":6}
+[debug] [2020-04-21T15:21:58.910Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/chunks/commons.3c16fd7cba542429824d.js --> next2
+[debug] [2020-04-21T15:21:58.910Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:58.910Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:58.910Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:21:58.916Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:58.916Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:58.916Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:58.917Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:58.917Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:58.918Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:58.919Z] [runtime-status] [28746] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:58.925Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:21:58.925Z] [work-queue] {"queueLength":0,"workRunningCount":5}
+[info] [hosting] Rewriting /_next/static/chunks/40121b2b148fa1174495a9c42b411a86cf4d2f20.c5f75371d0b2a3a3a042.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:58.930Z] [work-queue] {"queueLength":1,"workRunningCount":5}
+[debug] [2020-04-21T15:21:58.930Z] [work-queue] {"queueLength":0,"workRunningCount":6}
+[debug] [2020-04-21T15:21:58.930Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/chunks/40121b2b148fa1174495a9c42b411a86cf4d2f20.c5f75371d0b2a3a3a042.js --> next2
+[debug] [2020-04-21T15:21:58.930Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:58.930Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:58.930Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:21:58.935Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:58.935Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:58.935Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:58.935Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:58.936Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:58.937Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:58.938Z] [runtime-status] [28746] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:58.944Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:21:58.944Z] [work-queue] {"queueLength":0,"workRunningCount":5}
+[info] [hosting] Rewriting /_next/static/runtime/main-cc25643e74954a628b0e.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:58.946Z] [work-queue] {"queueLength":1,"workRunningCount":5}
+[debug] [2020-04-21T15:21:58.946Z] [work-queue] {"queueLength":0,"workRunningCount":6}
+[debug] [2020-04-21T15:21:58.946Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/runtime/main-cc25643e74954a628b0e.js --> next2
+[debug] [2020-04-21T15:21:58.947Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:58.947Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:58.947Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:21:58.954Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:58.955Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:58.955Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:58.955Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:58.956Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:58.957Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:58.963Z] [runtime-status] [28746] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:58.966Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:21:58.966Z] [work-queue] {"queueLength":0,"workRunningCount":5}
+[info] [hosting] Rewriting /_next/static/chunks/6d30018ee8f853036e94bd240bf5b42cf1a80456.bfcdced463f3e822da63.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:58.970Z] [work-queue] {"queueLength":1,"workRunningCount":5}
+[debug] [2020-04-21T15:21:58.970Z] [work-queue] {"queueLength":0,"workRunningCount":6}
+[debug] [2020-04-21T15:21:58.970Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/chunks/6d30018ee8f853036e94bd240bf5b42cf1a80456.bfcdced463f3e822da63.js --> next2
+[debug] [2020-04-21T15:21:58.970Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:58.970Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:58.970Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:21:58.977Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:58.977Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:58.978Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:58.978Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:58.978Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:58.979Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:58.980Z] [runtime-status] [28746] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:58.986Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:21:58.986Z] [work-queue] {"queueLength":0,"workRunningCount":5}
+[info] [hosting] Rewriting /_next/static/chunks/be14d3f37a99135db87f9207b16d39d25703752c.712c171a1708f8f94ef6.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:58.989Z] [work-queue] {"queueLength":1,"workRunningCount":5}
+[debug] [2020-04-21T15:21:58.989Z] [work-queue] {"queueLength":0,"workRunningCount":6}
+[debug] [2020-04-21T15:21:58.989Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/chunks/be14d3f37a99135db87f9207b16d39d25703752c.712c171a1708f8f94ef6.js --> next2
+[debug] [2020-04-21T15:21:58.989Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:58.989Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:58.989Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:21:58.997Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:58.997Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:58.998Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:58.998Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:58.998Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:58.999Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:59.001Z] [runtime-status] [28746] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:59.003Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:21:59.003Z] [work-queue] {"queueLength":0,"workRunningCount":5}
+[info] [hosting] Rewriting /_next/static/chunks/4bf0258ca081b49ae21e0b2b1da3d5e2d2eadb14.31e33a01629b1c2b167c.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:59.007Z] [work-queue] {"queueLength":1,"workRunningCount":5}
+[debug] [2020-04-21T15:21:59.007Z] [work-queue] {"queueLength":0,"workRunningCount":6}
+[debug] [2020-04-21T15:21:59.007Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/chunks/4bf0258ca081b49ae21e0b2b1da3d5e2d2eadb14.31e33a01629b1c2b167c.js --> next2
+[debug] [2020-04-21T15:21:59.007Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:59.007Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:59.007Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:21:59.015Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:59.015Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:59.015Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:59.015Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:59.016Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:59.017Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:59.019Z] [runtime-status] [28746] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:59.021Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:21:59.021Z] [work-queue] {"queueLength":0,"workRunningCount":5}
+[info] [hosting] Rewriting /_next/static/media/icons.0ab54153eeeca0ce03978cc463b257f7.woff2 to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:59.026Z] [work-queue] {"queueLength":1,"workRunningCount":5}
+[debug] [2020-04-21T15:21:59.026Z] [work-queue] {"queueLength":0,"workRunningCount":6}
+[debug] [2020-04-21T15:21:59.026Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/media/icons.0ab54153eeeca0ce03978cc463b257f7.woff2 --> next2
+[debug] [2020-04-21T15:21:59.026Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:59.026Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:59.026Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:21:59.032Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:59.032Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:59.032Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:59.032Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:59.033Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:59.033Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:59.035Z] [runtime-status] [28746] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:59.038Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:21:59.038Z] [work-queue] {"queueLength":0,"workRunningCount":5}
+[info] [hosting] Rewriting /_next/static/media/brand-icons.e8c322de9658cbeb8a774b6624167c2c.woff2 to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:59.040Z] [work-queue] {"queueLength":1,"workRunningCount":5}
+[debug] [2020-04-21T15:21:59.040Z] [work-queue] {"queueLength":0,"workRunningCount":6}
+[debug] [2020-04-21T15:21:59.040Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/media/brand-icons.e8c322de9658cbeb8a774b6624167c2c.woff2 --> next2
+[debug] [2020-04-21T15:21:59.040Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:59.041Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:59.041Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:21:59.048Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:59.048Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:59.048Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:59.048Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:59.049Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:59.050Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:59.052Z] [runtime-status] [28746] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:59.055Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:21:59.055Z] [work-queue] {"queueLength":0,"workRunningCount":5}
+[info] [hosting] Rewriting /_next/static/Yw_v49rZSkgTmYwrlC9OV/_buildManifest.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:59.059Z] [work-queue] {"queueLength":1,"workRunningCount":5}
+[debug] [2020-04-21T15:21:59.059Z] [work-queue] {"queueLength":0,"workRunningCount":6}
+[debug] [2020-04-21T15:21:59.059Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/Yw_v49rZSkgTmYwrlC9OV/_buildManifest.js --> next2
+[debug] [2020-04-21T15:21:59.059Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:59.059Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:59.059Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:21:59.064Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:59.065Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:59.065Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:59.065Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:59.065Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:59.068Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:59.070Z] [runtime-status] [28746] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:59.072Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:21:59.072Z] [work-queue] {"queueLength":0,"workRunningCount":5}
+[debug] [2020-04-21T15:21:59.181Z] [runtime-status] [28758] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
+[debug] [2020-04-21T15:21:59.181Z] [runtime-status] [28757] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
+[debug] [2020-04-21T15:21:59.183Z] [runtime-status] [28758] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
+[debug] [2020-04-21T15:21:59.183Z] [runtime-status] [28757] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
+[debug] [2020-04-21T15:21:59.185Z] [runtime-status] [28757] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.9.2","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
+[debug] [2020-04-21T15:21:59.186Z] [runtime-status] [28758] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.9.2","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
+[debug] [2020-04-21T15:21:59.186Z] [runtime-status] [28757] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2020-04-21T15:21:59.187Z] [runtime-status] [28758] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2020-04-21T15:21:59.187Z] [runtime-status] [28757] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2020-04-21T15:21:59.188Z] [runtime-status] [28758] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2020-04-21T15:21:59.197Z] [runtime-status] [28759] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
+[debug] [2020-04-21T15:21:59.200Z] [runtime-status] [28759] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
+[debug] [2020-04-21T15:21:59.202Z] [runtime-status] [28759] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.9.2","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
+[debug] [2020-04-21T15:21:59.203Z] [runtime-status] [28759] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2020-04-21T15:21:59.204Z] [runtime-status] [28759] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2020-04-21T15:21:59.208Z] [runtime-status] [28760] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
+[debug] [2020-04-21T15:21:59.211Z] [runtime-status] [28760] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
+[debug] [2020-04-21T15:21:59.213Z] [runtime-status] [28760] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.9.2","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
+[debug] [2020-04-21T15:21:59.215Z] [runtime-status] [28760] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2020-04-21T15:21:59.216Z] [runtime-status] [28760] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2020-04-21T15:21:59.239Z] [runtime-status] [28761] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
+[debug] [2020-04-21T15:21:59.242Z] [runtime-status] [28761] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
+[debug] [2020-04-21T15:21:59.245Z] [runtime-status] [28761] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.9.2","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
+[debug] [2020-04-21T15:21:59.245Z] [runtime-status] [28761] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2020-04-21T15:21:59.246Z] [runtime-status] [28761] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2020-04-21T15:21:59.619Z] [runtime-status] [28758] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:59.619Z] [runtime-status] [28758] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:59.619Z] [runtime-status] [28758] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:59.620Z] [runtime-status] [28757] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:59.620Z] [runtime-status] [28757] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:59.620Z] [runtime-status] [28757] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:59.625Z] [runtime-status] [28757] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28757.sock
+[debug] [2020-04-21T15:21:59.626Z] [runtime-status] [28758] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28758.sock
+[debug] [2020-04-21T15:21:59.629Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:59.629Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:59.636Z] [runtime-status] [28759] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:59.637Z] [runtime-status] [28759] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:59.637Z] [runtime-status] [28759] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:59.637Z] [runtime-status] [28757] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:59.637Z] [runtime-status] [28758] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:59.641Z] [runtime-status] [28759] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28759.sock
+[debug] [2020-04-21T15:21:59.645Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:59.652Z] [runtime-status] [28759] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:59.658Z] [runtime-status] [28760] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:59.658Z] [runtime-status] [28760] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:59.658Z] [runtime-status] [28760] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:59.664Z] [runtime-status] [28760] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28760.sock
+[debug] [2020-04-21T15:21:59.668Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:59.674Z] [runtime-status] [28761] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:59.674Z] [runtime-status] [28761] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:59.674Z] [runtime-status] [28761] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:59.674Z] [runtime-status] [28760] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:59.678Z] [runtime-status] [28761] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28761.sock
+[debug] [2020-04-21T15:21:59.680Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:59.687Z] [runtime-status] [28761] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:59.692Z] [runtime-status] [28757] Ephemeral server survived.
+[debug] [2020-04-21T15:21:59.695Z] [runtime-status] [28758] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:59.706Z] [worker-next2-af036c66-6bc3-45f7-b2fe-fdd020e14acb]: IDLE
+[debug] [2020-04-21T15:21:59.706Z] [work-queue] {"queueLength":0,"workRunningCount":4}
+[debug] [2020-04-21T15:21:59.709Z] [runtime-status] [28759] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:59.711Z] [worker-next2-57f22f9c-3263-4ca2-b249-fcfbc008d0bf]: IDLE
+[debug] [2020-04-21T15:21:59.711Z] [work-queue] {"queueLength":0,"workRunningCount":3}
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:59.727Z] [worker-next2-e746f035-2fcc-45d6-8c7f-ba4a4c03d326]: IDLE
+[debug] [2020-04-21T15:21:59.727Z] [work-queue] {"queueLength":0,"workRunningCount":2}
+[debug] [2020-04-21T15:21:59.728Z] [runtime-status] [28760] Ephemeral server survived.
+[debug] [2020-04-21T15:21:59.743Z] [runtime-status] [28761] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:59.753Z] [worker-next2-32a0b205-cdda-49c8-8ea4-51719846eb21]: IDLE
+[debug] [2020-04-21T15:21:59.753Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:59.767Z] [worker-next2-94108bc5-6334-4506-bb3b-fd9e0efb8be7]: IDLE
+[debug] [2020-04-21T15:21:59.767Z] [work-queue] {"queueLength":0,"workRunningCount":0}
+[info] [hosting] Rewriting /_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/next-livestreams.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:59.852Z] [work-queue] {"queueLength":1,"workRunningCount":0}
+[debug] [2020-04-21T15:21:59.852Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[debug] [2020-04-21T15:21:59.852Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/next-livestreams.js --> next2
+[debug] [2020-04-21T15:21:59.852Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:59.852Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:59.852Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:21:59.853Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:59.853Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:59.853Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:59.853Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:21:59.854Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:59.855Z] [runtime-status] [28746] Ephemeral server handling GET request
+[info] [hosting] Rewriting /_next/static/chunks/ce29e7ae1284c982ec703f7eda2501f5126d632b.7cf99cfcf613ace397bc.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[info] [hosting] Rewriting /_next/static/chunks/14d7a4af903e4de494cde20b7657e04a522abec7.c9e56dcecfbd66b9c3d8.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:59.861Z] [runtime-status] [28746] Ephemeral server survived.
+[info] [hosting] Rewriting /_next/static/chunks/c35ee66b8bfd68df4c11b85c240d017cb89a245d.ed9d93c721158ccdc6f9.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:21:59.864Z] [work-queue] {"queueLength":1,"workRunningCount":1}
+[debug] [2020-04-21T15:21:59.864Z] [work-queue] {"queueLength":0,"workRunningCount":2}
+[debug] [2020-04-21T15:21:59.864Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/chunks/ce29e7ae1284c982ec703f7eda2501f5126d632b.7cf99cfcf613ace397bc.js --> next2
+[debug] [2020-04-21T15:21:59.864Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:59.864Z] [worker-next2-af036c66-6bc3-45f7-b2fe-fdd020e14acb]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28757.sock
+[debug] [2020-04-21T15:21:59.864Z] [worker-next2-af036c66-6bc3-45f7-b2fe-fdd020e14acb]: BUSY
+[debug] [2020-04-21T15:21:59.865Z] [work-queue] {"queueLength":1,"workRunningCount":2}
+[debug] [2020-04-21T15:21:59.865Z] [work-queue] {"queueLength":0,"workRunningCount":3}
+[debug] [2020-04-21T15:21:59.865Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/chunks/14d7a4af903e4de494cde20b7657e04a522abec7.c9e56dcecfbd66b9c3d8.js --> next2
+[debug] [2020-04-21T15:21:59.865Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:59.865Z] [worker-next2-57f22f9c-3263-4ca2-b249-fcfbc008d0bf]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28758.sock
+[debug] [2020-04-21T15:21:59.865Z] [worker-next2-57f22f9c-3263-4ca2-b249-fcfbc008d0bf]: BUSY
+[debug] [2020-04-21T15:21:59.866Z] [runtime-status] [28757] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:59.866Z] [runtime-status] [28757] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:59.866Z] [runtime-status] [28757] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:59.866Z] [runtime-status] [28757] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28757.sock
+[debug] [2020-04-21T15:21:59.867Z] [work-queue] {"queueLength":1,"workRunningCount":3}
+[debug] [2020-04-21T15:21:59.867Z] [work-queue] {"queueLength":0,"workRunningCount":4}
+[debug] [2020-04-21T15:21:59.867Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/chunks/c35ee66b8bfd68df4c11b85c240d017cb89a245d.ed9d93c721158ccdc6f9.js --> next2
+[debug] [2020-04-21T15:21:59.867Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:21:59.867Z] [worker-next2-e746f035-2fcc-45d6-8c7f-ba4a4c03d326]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28759.sock
+[debug] [2020-04-21T15:21:59.868Z] [worker-next2-e746f035-2fcc-45d6-8c7f-ba4a4c03d326]: BUSY
+[debug] [2020-04-21T15:21:59.868Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:59.869Z] [runtime-status] [28758] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:59.869Z] [runtime-status] [28758] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:59.869Z] [runtime-status] [28758] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:59.869Z] [runtime-status] [28758] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28758.sock
+[debug] [2020-04-21T15:21:59.870Z] [functions] Runtime ready! Sending request!
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:59.870Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:21:59.870Z] [work-queue] {"queueLength":0,"workRunningCount":3}
+[debug] [2020-04-21T15:21:59.871Z] [runtime-status] [28759] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:21:59.871Z] [runtime-status] [28759] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:21:59.871Z] [runtime-status] [28759] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:21:59.871Z] [runtime-status] [28759] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28759.sock
+[debug] [2020-04-21T15:21:59.871Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:21:59.872Z] [runtime-status] [28757] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:59.872Z] [runtime-status] [28759] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:59.872Z] [runtime-status] [28758] Ephemeral server handling GET request
+[debug] [2020-04-21T15:21:59.874Z] [runtime-status] [28759] Ephemeral server survived.
+[debug] [2020-04-21T15:21:59.874Z] [runtime-status] [28757] Ephemeral server survived.
+[debug] [2020-04-21T15:21:59.874Z] [runtime-status] [28758] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:59.878Z] [worker-next2-e746f035-2fcc-45d6-8c7f-ba4a4c03d326]: IDLE
+[debug] [2020-04-21T15:21:59.878Z] [work-queue] {"queueLength":0,"workRunningCount":2}
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:59.879Z] [worker-next2-af036c66-6bc3-45f7-b2fe-fdd020e14acb]: IDLE
+[debug] [2020-04-21T15:21:59.879Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:21:59.880Z] [worker-next2-57f22f9c-3263-4ca2-b249-fcfbc008d0bf]: IDLE
+[debug] [2020-04-21T15:21:59.880Z] [work-queue] {"queueLength":0,"workRunningCount":0}
+[info] [hosting] Rewriting /_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/discover.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[info] [hosting] Rewriting /_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/wishlist.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[info] [hosting] Rewriting /_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/terms.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[info] [hosting] Rewriting /_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/privacy.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[info] [hosting] Rewriting /_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/cookies.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[info] [hosting] Rewriting /_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/companies.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:22:02.434Z] [work-queue] {"queueLength":1,"workRunningCount":0}
+[debug] [2020-04-21T15:22:02.434Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[debug] [2020-04-21T15:22:02.434Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/discover.js --> next2
+[debug] [2020-04-21T15:22:02.435Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:22:02.435Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:22:02.435Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:22:02.435Z] [work-queue] {"queueLength":1,"workRunningCount":1}
+[debug] [2020-04-21T15:22:02.435Z] [work-queue] {"queueLength":0,"workRunningCount":2}
+[debug] [2020-04-21T15:22:02.435Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/wishlist.js --> next2
+[debug] [2020-04-21T15:22:02.435Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:22:02.435Z] [worker-next2-af036c66-6bc3-45f7-b2fe-fdd020e14acb]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28757.sock
+[debug] [2020-04-21T15:22:02.435Z] [worker-next2-af036c66-6bc3-45f7-b2fe-fdd020e14acb]: BUSY
+[debug] [2020-04-21T15:22:02.435Z] [work-queue] {"queueLength":1,"workRunningCount":2}
+[debug] [2020-04-21T15:22:02.435Z] [work-queue] {"queueLength":0,"workRunningCount":3}
+[debug] [2020-04-21T15:22:02.435Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/terms.js --> next2
+[debug] [2020-04-21T15:22:02.436Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:22:02.436Z] [worker-next2-57f22f9c-3263-4ca2-b249-fcfbc008d0bf]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28758.sock
+[debug] [2020-04-21T15:22:02.436Z] [worker-next2-57f22f9c-3263-4ca2-b249-fcfbc008d0bf]: BUSY
+[debug] [2020-04-21T15:22:02.436Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:22:02.436Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:22:02.436Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:22:02.436Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:22:02.436Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:22:02.437Z] [runtime-status] [28757] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:22:02.437Z] [runtime-status] [28757] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:22:02.437Z] [runtime-status] [28757] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:22:02.437Z] [runtime-status] [28757] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28757.sock
+[debug] [2020-04-21T15:22:02.437Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:22:02.438Z] [work-queue] {"queueLength":1,"workRunningCount":3}
+[debug] [2020-04-21T15:22:02.438Z] [work-queue] {"queueLength":0,"workRunningCount":4}
+[debug] [2020-04-21T15:22:02.438Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/privacy.js --> next2
+[debug] [2020-04-21T15:22:02.438Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:22:02.438Z] [worker-next2-e746f035-2fcc-45d6-8c7f-ba4a4c03d326]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28759.sock
+[debug] [2020-04-21T15:22:02.438Z] [worker-next2-e746f035-2fcc-45d6-8c7f-ba4a4c03d326]: BUSY
+[debug] [2020-04-21T15:22:02.438Z] [runtime-status] [28758] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:22:02.438Z] [runtime-status] [28758] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:22:02.438Z] [runtime-status] [28758] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:22:02.438Z] [runtime-status] [28758] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28758.sock
+[debug] [2020-04-21T15:22:02.439Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:22:02.439Z] [work-queue] {"queueLength":1,"workRunningCount":4}
+[debug] [2020-04-21T15:22:02.439Z] [work-queue] {"queueLength":0,"workRunningCount":5}
+[debug] [2020-04-21T15:22:02.439Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/cookies.js --> next2
+[debug] [2020-04-21T15:22:02.439Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:22:02.439Z] [worker-next2-32a0b205-cdda-49c8-8ea4-51719846eb21]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28760.sock
+[debug] [2020-04-21T15:22:02.439Z] [worker-next2-32a0b205-cdda-49c8-8ea4-51719846eb21]: BUSY
+[debug] [2020-04-21T15:22:02.439Z] [work-queue] {"queueLength":1,"workRunningCount":5}
+[debug] [2020-04-21T15:22:02.440Z] [work-queue] {"queueLength":0,"workRunningCount":6}
+[debug] [2020-04-21T15:22:02.440Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/companies.js --> next2
+[debug] [2020-04-21T15:22:02.440Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:22:02.440Z] [worker-next2-94108bc5-6334-4506-bb3b-fd9e0efb8be7]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28761.sock
+[debug] [2020-04-21T15:22:02.440Z] [worker-next2-94108bc5-6334-4506-bb3b-fd9e0efb8be7]: BUSY
+[debug] [2020-04-21T15:22:02.440Z] [runtime-status] [28759] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:22:02.440Z] [runtime-status] [28759] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:22:02.440Z] [runtime-status] [28759] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:22:02.440Z] [runtime-status] [28759] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28759.sock
+[debug] [2020-04-21T15:22:02.441Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:22:02.441Z] [runtime-status] [28760] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:22:02.441Z] [runtime-status] [28760] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:22:02.441Z] [runtime-status] [28760] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:22:02.441Z] [runtime-status] [28760] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28760.sock
+[debug] [2020-04-21T15:22:02.441Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:22:02.442Z] [runtime-status] [28761] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:22:02.442Z] [runtime-status] [28761] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:22:02.442Z] [runtime-status] [28761] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:22:02.442Z] [runtime-status] [28761] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28761.sock
+[debug] [2020-04-21T15:22:02.442Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:22:02.442Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:22:02.443Z] [runtime-status] [28746] Ephemeral server survived.
+[debug] [2020-04-21T15:22:02.443Z] [runtime-status] [28757] Ephemeral server handling GET request
+[debug] [2020-04-21T15:22:02.443Z] [runtime-status] [28757] Ephemeral server survived.
+[debug] [2020-04-21T15:22:02.443Z] [runtime-status] [28758] Ephemeral server handling GET request
+[debug] [2020-04-21T15:22:02.444Z] [runtime-status] [28758] Ephemeral server survived.
+[debug] [2020-04-21T15:22:02.444Z] [runtime-status] [28759] Ephemeral server handling GET request
+[debug] [2020-04-21T15:22:02.445Z] [runtime-status] [28760] Ephemeral server handling GET request
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:22:02.445Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:22:02.445Z] [work-queue] {"queueLength":0,"workRunningCount":5}
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:22:02.446Z] [worker-next2-af036c66-6bc3-45f7-b2fe-fdd020e14acb]: IDLE
+[debug] [2020-04-21T15:22:02.446Z] [work-queue] {"queueLength":0,"workRunningCount":4}
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:22:02.446Z] [runtime-status] [28759] Ephemeral server survived.
+[debug] [2020-04-21T15:22:02.446Z] [runtime-status] [28760] Ephemeral server survived.
+[debug] [2020-04-21T15:22:02.446Z] [runtime-status] [28761] Ephemeral server handling GET request
+[debug] [2020-04-21T15:22:02.448Z] [worker-next2-57f22f9c-3263-4ca2-b249-fcfbc008d0bf]: IDLE
+[debug] [2020-04-21T15:22:02.448Z] [work-queue] {"queueLength":0,"workRunningCount":3}
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:22:02.448Z] [worker-next2-e746f035-2fcc-45d6-8c7f-ba4a4c03d326]: IDLE
+[debug] [2020-04-21T15:22:02.448Z] [work-queue] {"queueLength":0,"workRunningCount":2}
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:22:02.448Z] [worker-next2-32a0b205-cdda-49c8-8ea4-51719846eb21]: IDLE
+[debug] [2020-04-21T15:22:02.448Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[debug] [2020-04-21T15:22:02.449Z] [runtime-status] [28761] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:22:02.451Z] [worker-next2-94108bc5-6334-4506-bb3b-fd9e0efb8be7]: IDLE
+[debug] [2020-04-21T15:22:02.451Z] [work-queue] {"queueLength":0,"workRunningCount":0}
+[info] [hosting] Rewriting /streaming/CkiU337eFDbJp8HBQWC8/viewer to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:22:53.480Z] [work-queue] {"queueLength":1,"workRunningCount":0}
+[debug] [2020-04-21T15:22:53.480Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[debug] [2020-04-21T15:22:53.480Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/streaming/CkiU337eFDbJp8HBQWC8/viewer --> next2
+[debug] [2020-04-21T15:22:53.480Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:22:53.480Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:22:53.480Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:22:53.481Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:22:53.481Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:22:53.481Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:22:53.481Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:22:53.482Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:22:53.483Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:22:53.485Z] [runtime-status] [28746] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:22:53.491Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:22:53.491Z] [work-queue] {"queueLength":0,"workRunningCount":0}
+[info] [hosting] Rewriting /_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/streaming/%5BlivestreamId%5D/viewer.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:22:53.547Z] [work-queue] {"queueLength":1,"workRunningCount":0}
+[debug] [2020-04-21T15:22:53.548Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[debug] [2020-04-21T15:22:53.548Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/Yw_v49rZSkgTmYwrlC9OV/pages/streaming/%5BlivestreamId%5D/viewer.js --> next2
+[debug] [2020-04-21T15:22:53.548Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:22:53.548Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:22:53.548Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:22:53.548Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:22:53.548Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:22:53.549Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:22:53.549Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:22:53.549Z] [functions] Runtime ready! Sending request!
+[info] [hosting] Rewriting /_next/static/chunks/27174b95a3952591bd2cdc78c5e1e7f08fcbb214.730f9f0bad7952ede2fb.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:22:53.551Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:22:53.552Z] [work-queue] {"queueLength":1,"workRunningCount":1}
+[debug] [2020-04-21T15:22:53.552Z] [work-queue] {"queueLength":0,"workRunningCount":2}
+[debug] [2020-04-21T15:22:53.552Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/chunks/27174b95a3952591bd2cdc78c5e1e7f08fcbb214.730f9f0bad7952ede2fb.js --> next2
+[debug] [2020-04-21T15:22:53.552Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:22:53.552Z] [worker-next2-af036c66-6bc3-45f7-b2fe-fdd020e14acb]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28757.sock
+[debug] [2020-04-21T15:22:53.552Z] [worker-next2-af036c66-6bc3-45f7-b2fe-fdd020e14acb]: BUSY
+[debug] [2020-04-21T15:22:53.553Z] [runtime-status] [28746] Ephemeral server survived.
+[info] [hosting] Rewriting /_next/static/chunks/b6761de9ef907ea059d28ded445f0b67166257cf.6178a95fa3b82153c9ad.js to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:22:53.556Z] [runtime-status] [28757] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:22:53.556Z] [runtime-status] [28757] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:22:53.556Z] [runtime-status] [28757] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:22:53.556Z] [runtime-status] [28757] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28757.sock
+[debug] [2020-04-21T15:22:53.557Z] [functions] Runtime ready! Sending request!
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:22:53.558Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:22:53.558Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[debug] [2020-04-21T15:22:53.559Z] [work-queue] {"queueLength":1,"workRunningCount":1}
+[debug] [2020-04-21T15:22:53.559Z] [work-queue] {"queueLength":0,"workRunningCount":2}
+[debug] [2020-04-21T15:22:53.559Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/chunks/b6761de9ef907ea059d28ded445f0b67166257cf.6178a95fa3b82153c9ad.js --> next2
+[debug] [2020-04-21T15:22:53.559Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:22:53.559Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:22:53.559Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:22:53.560Z] [runtime-status] [28757] Ephemeral server handling GET request
+[debug] [2020-04-21T15:22:53.562Z] [runtime-status] [28757] Ephemeral server survived.
+[debug] [2020-04-21T15:22:53.567Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:22:53.567Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:22:53.567Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:22:53.568Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:22:53.568Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:22:53.571Z] [runtime-status] [28746] Ephemeral server handling GET request
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:22:53.571Z] [worker-next2-af036c66-6bc3-45f7-b2fe-fdd020e14acb]: IDLE
+[debug] [2020-04-21T15:22:53.571Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[debug] [2020-04-21T15:22:53.573Z] [runtime-status] [28746] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:22:53.576Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:22:53.576Z] [work-queue] {"queueLength":0,"workRunningCount":0}
+[info] [hosting] Rewriting /_next/static/media/outline-icons.cd6c777f1945164224dee082abaea03a.woff2 to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:22:53.692Z] [work-queue] {"queueLength":1,"workRunningCount":0}
+[debug] [2020-04-21T15:22:53.692Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[debug] [2020-04-21T15:22:53.692Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/_next/static/media/outline-icons.cd6c777f1945164224dee082abaea03a.woff2 --> next2
+[debug] [2020-04-21T15:22:53.692Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:22:53.692Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:22:53.692Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:22:53.693Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:22:53.693Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:22:53.693Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:22:53.693Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:22:53.693Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:22:53.694Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:22:53.695Z] [runtime-status] [28746] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:22:53.697Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:22:53.697Z] [work-queue] {"queueLength":0,"workRunningCount":0}
+[info] [hosting] Rewriting /streaming/CkiU337eFDbJp8HBQWC8/viewer to http://localhost:5001/careerfairy-e1fd9/us-central1/next2 for local Function next2
+[debug] [2020-04-21T15:29:28.590Z] [work-queue] {"queueLength":1,"workRunningCount":0}
+[debug] [2020-04-21T15:29:28.590Z] [work-queue] {"queueLength":0,"workRunningCount":1}
+[debug] [2020-04-21T15:29:28.590Z] Accepted request GET /careerfairy-e1fd9/us-central1/next2/streaming/CkiU337eFDbJp8HBQWC8/viewer --> next2
+[debug] [2020-04-21T15:29:28.590Z] [worker-pool] submitWork(triggerId=next2)
+[debug] [2020-04-21T15:29:28.591Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:29:28.591Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: BUSY
+[debug] [2020-04-21T15:29:28.591Z] [runtime-status] [28746] Trigger "next2" has been found, beginning invocation!
+[info] i  functions: Beginning execution of "next2"
+[debug] [2020-04-21T15:29:28.591Z] [runtime-status] [28746] triggerDefinition {"httpsTrigger":{},"name":"next2","entryPoint":"next2"}
+[debug] [2020-04-21T15:29:28.591Z] [runtime-status] [28746] Running next2 in mode HTTPS
+[debug] [2020-04-21T15:29:28.591Z] [runtime-status] [28746] Attempting to listen to socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_28746.sock
+[debug] [2020-04-21T15:29:28.592Z] [functions] Runtime ready! Sending request!
+[debug] [2020-04-21T15:29:28.592Z] [runtime-status] [28746] Ephemeral server handling GET request
+[debug] [2020-04-21T15:29:28.594Z] [runtime-status] [28746] Ephemeral server survived.
+[info] i  functions: Finished "next2" in ~1s
+[debug] [2020-04-21T15:29:28.597Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: IDLE
+[debug] [2020-04-21T15:29:28.597Z] [work-queue] {"queueLength":0,"workRunningCount":0}
+[debug] [2020-04-21T21:09:24.452Z] File /Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/src/app/components/views/player-alt/video-container/PlaybackVideoContainer.js changed, reloading triggers
+[debug] [2020-04-21T21:09:25.458Z] [worker-pool] Shutting down IDLE worker (~diagnostic~)
+[debug] [2020-04-21T21:09:25.458Z] [worker-~diagnostic~-c6d269ae-c664-4905-9c81-f08e7c766635]: FINISHING
+[debug] [2020-04-21T21:09:25.458Z] [worker-pool] Shutting down IDLE worker (next2)
+[debug] [2020-04-21T21:09:25.458Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: FINISHING
+[debug] [2020-04-21T21:09:25.458Z] [worker-pool] Shutting down IDLE worker (next2)
+[debug] [2020-04-21T21:09:25.458Z] [worker-next2-af036c66-6bc3-45f7-b2fe-fdd020e14acb]: FINISHING
+[debug] [2020-04-21T21:09:25.458Z] [worker-pool] Shutting down IDLE worker (next2)
+[debug] [2020-04-21T21:09:25.459Z] [worker-next2-57f22f9c-3263-4ca2-b249-fcfbc008d0bf]: FINISHING
+[debug] [2020-04-21T21:09:25.459Z] [worker-pool] Shutting down IDLE worker (next2)
+[debug] [2020-04-21T21:09:25.459Z] [worker-next2-e746f035-2fcc-45d6-8c7f-ba4a4c03d326]: FINISHING
+[debug] [2020-04-21T21:09:25.459Z] [worker-pool] Shutting down IDLE worker (next2)
+[debug] [2020-04-21T21:09:25.459Z] [worker-next2-32a0b205-cdda-49c8-8ea4-51719846eb21]: FINISHING
+[debug] [2020-04-21T21:09:25.459Z] [worker-pool] Shutting down IDLE worker (next2)
+[debug] [2020-04-21T21:09:25.459Z] [worker-next2-94108bc5-6334-4506-bb3b-fd9e0efb8be7]: FINISHING
+[debug] [2020-04-21T21:09:25.470Z] [worker-pool] addWorker(~diagnostic~)
+[debug] [2020-04-21T21:09:25.471Z] [worker-pool] Adding worker with key ~diagnostic~, total=2
+[debug] [2020-04-21T21:09:25.471Z] [worker-pool] submitWork(triggerId=)
+[debug] [2020-04-21T21:09:25.471Z] [worker-~diagnostic~-421db79f-ff83-474c-987a-3b5fad9fbfe8]: Assigning socketPath: /var/folders/84/17sgvq7x43j9sb40vw60d4v40000gn/T/fire_emu_32179.sock
+[debug] [2020-04-21T21:09:25.472Z] [worker-~diagnostic~-421db79f-ff83-474c-987a-3b5fad9fbfe8]: BUSY
+[debug] [2020-04-21T21:09:25.478Z] [worker-~diagnostic~-c6d269ae-c664-4905-9c81-f08e7c766635]: exited
+[debug] [2020-04-21T21:09:25.478Z] [worker-~diagnostic~-c6d269ae-c664-4905-9c81-f08e7c766635]: FINISHED
+[debug] [2020-04-21T21:09:25.482Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: exited
+[debug] [2020-04-21T21:09:25.483Z] [worker-next2-0de5854c-d0b1-40fc-b82b-b5d79fc67a40]: FINISHED
+[debug] [2020-04-21T21:09:25.483Z] [worker-next2-af036c66-6bc3-45f7-b2fe-fdd020e14acb]: exited
+[debug] [2020-04-21T21:09:25.483Z] [worker-next2-af036c66-6bc3-45f7-b2fe-fdd020e14acb]: FINISHED
+[debug] [2020-04-21T21:09:25.483Z] [worker-next2-57f22f9c-3263-4ca2-b249-fcfbc008d0bf]: exited
+[debug] [2020-04-21T21:09:25.483Z] [worker-next2-57f22f9c-3263-4ca2-b249-fcfbc008d0bf]: FINISHED
+[debug] [2020-04-21T21:09:25.483Z] [worker-next2-e746f035-2fcc-45d6-8c7f-ba4a4c03d326]: exited
+[debug] [2020-04-21T21:09:25.483Z] [worker-next2-e746f035-2fcc-45d6-8c7f-ba4a4c03d326]: FINISHED
+[debug] [2020-04-21T21:09:25.483Z] [worker-next2-32a0b205-cdda-49c8-8ea4-51719846eb21]: exited
+[debug] [2020-04-21T21:09:25.483Z] [worker-next2-32a0b205-cdda-49c8-8ea4-51719846eb21]: FINISHED
+[debug] [2020-04-21T21:09:25.483Z] [worker-next2-94108bc5-6334-4506-bb3b-fd9e0efb8be7]: exited
+[debug] [2020-04-21T21:09:25.484Z] [worker-next2-94108bc5-6334-4506-bb3b-fd9e0efb8be7]: FINISHED
+[debug] [2020-04-21T21:09:25.900Z] [runtime-status] [32179] Functions runtime initialized. {"cwd":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp","node_version":"10.19.0"}
+[debug] [2020-04-21T21:09:25.903Z] [runtime-status] [32179] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true,"pubsub_emulator":true}
+[debug] [2020-04-21T21:09:25.905Z] [runtime-status] [32179] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.9.2","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-admin/lib/index.js"}
+[debug] [2020-04-21T21:09:25.906Z] [runtime-status] [32179] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2020-04-21T21:09:25.907Z] [runtime-status] [32179] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.3.0","resolution":"/Users/mvoss/Documents/CareerFairy/careerfairy-ssr-webapp/node_modules/firebase-functions/lib/index.js"}
+[debug] [2020-04-21T21:09:26.547Z] [worker-~diagnostic~-421db79f-ff83-474c-987a-3b5fad9fbfe8]: IDLE

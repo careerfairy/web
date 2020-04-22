@@ -7,8 +7,8 @@ export default function useUserMedia() {
     const [deviceList, setDeviceList] = useState({ audioInputList: [], audioOutputList: [], videoDeviceList: [] });
 
     function gotDevices(deviceInfos) {
-        // Handles being called several times to update labels. Preserve values.
-        let audioInputList = [];
+
+        let audioInputList = []; 
         let audioOutputList = [];
         let videoDeviceList = [];
 
@@ -45,6 +45,7 @@ export default function useUserMedia() {
             return devicesObject[key].length > 0;
         });
     }
+
     if (navigator && isEmpty(deviceList)) {
         navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
     }

@@ -12,6 +12,7 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
     const [externalMediaStreams, setExternalMediaStreams] = useState([]);
     const [addedStream, setAddedStream] = useState(null);
     const [removedStream, setRemovedStream] = useState(null);
+    const [playFinishedStream, setPlayFinishedStream] = useState(null);
 
     const [nsToken, setNsToken] = useState(null);
 
@@ -47,6 +48,14 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
             setExternalMediaStreams(removeStreamFromList(removedStream, externalMediaStreams));
         }
     }, [removedStream]);
+
+    useEffect(() => {
+        if (playFinishedStream) {
+            if (externalMediaStreams.some(stream => stream.streamId === playFinishedStream.streamId)) {
+                webRTCAdaptor.play(playFinishedStream.streamId, roomId);
+            }
+        }
+    }, [playFinishedStream]);
 
     function removeStreamFromList(stream, streamList) {
         const streamListCopy = [...streamList];
@@ -166,17 +175,16 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
                         break;
                     }
                     case "play_started": {
-                        if (typeof streamingCallbackObject.onPublishStarted === 'function') {
-                            streamingCallbackObject.onPublishStarted(infoObj);
+                        if (typeof streamingCallbackObject.onPlayStarted === 'function') {
+                            streamingCallbackObject.onPlayStarted(infoObj);
                         }
                         break;
                     }
                     case "play_finished": {
-                        debugger;
-                        if (typeof streamingCallbackObject.onPublishStarted === 'function') {
-                            streamingCallbackObject.onPublishStarted(infoObj);
+                        if (typeof streamingCallbackObject.onPlayFinished === 'function') {
+                            streamingCallbackObject.onPlayFinished(infoObj);
                         }
-                        this.play(infoObj.streamId, 'null', roomId);
+                        setPlayFinishedStream(infoObj);
                         break;
                     }
                     case "screen_share_stopped": {

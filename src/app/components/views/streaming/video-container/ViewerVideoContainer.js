@@ -27,14 +27,14 @@ function ViewerVideoContainer(props) {
     }, []);
 
     useEffect(() => {
-        if (isPlaying) {
+        if (isPlaying && props.isPlaying) {
             setTimeout(() => {
                 playVideo().catch( error => {
                     setShowPlayButton(true);
                 })
             }, 500);
         }
-    }, [isPlaying]);
+    }, [isPlaying, props.isPlaying]);
 
     useEffect(() => {
         if (document) {
@@ -139,7 +139,6 @@ function ViewerVideoContainer(props) {
                     width: 100%;
                     margin: 0 auto;
                     z-index: 1000;
-                    border: 2px solid red;
                }
 
                .videoElement {

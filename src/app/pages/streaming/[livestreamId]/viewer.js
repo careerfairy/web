@@ -18,6 +18,8 @@ function ViewerPage(props) {
     const [user, setUser] = useState(null);
     const [userData, setUserData] = useState(null);
 
+    const [isPlaying, setIsPlaying] = useState(false);
+
     const [questionSubmittedModalOpen, setQuestionSubmittedModalOpen] = useState(false);
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
@@ -91,7 +93,7 @@ function ViewerPage(props) {
         return (
             <Fragment>
                 <Grid.Column width={ streamIds.length > 1 ? 8 : 16} style={{ padding: 0 }} key={streamId}>
-                    <ViewerVideoContainer streamId={streamId} length={streamIds.length} index={index + 1} />
+                    <ViewerVideoContainer streamId={streamId} length={streamIds.length} index={index + 1} isPlaying={isPlaying}/>
                 </Grid.Column>
             </Fragment>
         );
@@ -149,6 +151,11 @@ function ViewerPage(props) {
                     <Grid style={{ margin: 0, height: '100%' }}>
                         { videoElements }
                     </Grid>
+                    <div className='video-box-overlay' style={{ display: isPlaying ? 'none' : 'block'}}>
+                        <div className='video-box-overlay-content'>
+                            <Button content='Click to join' primary onClick={() => setIsPlaying(true)}/>
+                        </div>
+                    </div>
                 </div>
                 <div className='video-menu'>
                     <div  className='video-menu-input'>
@@ -274,8 +281,24 @@ function ViewerPage(props) {
                     position: relative;
                     width: 100%;
                     height: calc(100% - 85px);
-                    border: 2px solid blue;
                     background-color: black;
+                }
+
+                .video-box-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: white;
+                    z-index: 9999;
+                }
+
+                .video-box-overlay-content {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
                 }
 
                 .video-menu {
@@ -288,7 +311,6 @@ function ViewerPage(props) {
                     padding: 12px;
                     text-align: center;
                     width: 100%;
-                    border: 2px solid red;
                 }
 
                 .video-menu .center {
