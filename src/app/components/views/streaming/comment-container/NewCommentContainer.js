@@ -54,7 +54,7 @@ function CommentContainer(props) {
         <div>
             <div className='questionToggle'>
                 <div className='questionToggleTitle'>
-                    Q&A Questions
+                    Questions
                 </div>
                 <div className='questionToggleSwitches'>
                     <div className={'questionToggleSwitch ' + (showNextQuestions ? 'active'  : '')} onClick={() => setShowNextQuestions(true)}>

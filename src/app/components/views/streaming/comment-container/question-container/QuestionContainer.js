@@ -117,7 +117,6 @@ function QuestionContainer(props) {
                             value={newCommentTitle}
                             onChange={(event) => {setNewCommentTitle(event.target.value)}}
                             onKeyPress={addNewCommentOnEnter}
-                            disabled={props.question.type === 'done'}
                             placeholder='Send a comment...'
                             fluid
                         />
