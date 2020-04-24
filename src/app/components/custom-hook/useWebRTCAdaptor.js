@@ -57,6 +57,14 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
         }
     }, [playFinishedStream]);
 
+    useEffect(() => {
+        if (playFinishedStream) {
+            if (externalMediaStreams.some(stream => stream.streamId === playFinishedStream.streamId)) {
+                webRTCAdaptor.play(playFinishedStream.streamId, roomId);
+            }
+        }
+    }, [playFinishedStream]);
+
     function removeStreamFromList(stream, streamList) {
         const streamListCopy = [...streamList];
         const streamEntry = streamListCopy.find( entry => {

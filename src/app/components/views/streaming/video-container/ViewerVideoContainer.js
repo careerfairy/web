@@ -87,6 +87,8 @@ function ViewerVideoContainer(props) {
             isPlayMode: true,
             debug: true,
             callback : function (info, infoObj) {
+                console.log(info);
+                console.log(infoObj);
                 switch(info) {
                     case "initialized": {
                         this.play(props.streamId);
@@ -99,10 +101,19 @@ function ViewerVideoContainer(props) {
                     }
                     case "play_finished": {
                         setIsPlaying(false);
+                        this.play(props.streamId);
                         break;
                     }
                     case "closed": {
                         
+                        break;
+                    }
+                    case "ice_connection_state_changed": {
+                        if (infoObj.state === "connected") {
+                            playVideo().catch( error => {
+                                setShowPlayButton(true);
+                            });
+                        }
                         break;
                     }
                     case "pong": {
@@ -110,8 +121,7 @@ function ViewerVideoContainer(props) {
                         break;
                     }
                     default: {
-                        console.log(info);
-                        console.log(infoObj);
+                        
                     }
                 }
             },
@@ -125,7 +135,7 @@ function ViewerVideoContainer(props) {
     return (
         <Fragment>
             <div className='videoContainer' style={{ height: '100%' }}>
-                <video id={'videoElement' + props.streamId} className='videoElement' width={ props.length > 1 ? '' : '100%' } style={{  left: (props.index % 2 === 0) ? '0' : '', right: (props.index % 2 === 1) ? '0' : '' }}/>
+                <video id={'videoElement' + props.streamId} className='videoElement' width={ props.length > 1 ? '' : '100%' } controls={true} style={{  left: (props.index % 2 === 0) ? '0' : '', right: (props.index % 2 === 1) ? '0' : '', opacity: isPlaying ? 1 : 0}}/>
                 <div className={(showPlayButton ? 'playButton' : 'hidden')}><Icon name='play' onClick={() => playVideo()}/></div>
             </div>           
             <style jsx>{`

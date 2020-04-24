@@ -13,7 +13,7 @@ function StreamerVideoDisplayer(props) {
     }
 
     let localVideoElement =
-        <Grid.Column width={getVideoContainerWidth()} style={{ padding: 0 }}>
+        <Grid.Column width={getVideoContainerWidth()} style={{ padding: 0 }} key={"localVideoId"}>
             <div className='video-container' style={{ height: getVideoContainerHeight() }}>
                 <video id="localVideo" muted autoPlay width={ props.streams.length > 1 ? '' : '100%' } style={{ right: (props.streams.length > 0) ? '0' : '', bottom: (props.streams.length > 1) ? '0' : '' }}></video> 
             </div>

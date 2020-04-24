@@ -9,6 +9,7 @@ import useUserMedia from '../../../components/custom-hook/useDevices';
 import useWebRTCAdaptor from '../../../components/custom-hook/useWebRTCAdaptor';
 import StreamerVideoDisplayer from '../../../components/views/streaming/video-container/StreamerVideoDisplayer';
 import NewCommentContainer from '../../../components/views/streaming/comment-container/NewCommentContainer';
+import ButtonWithConfirm from '../../../components/views/common/ButtonWithConfirm';
 
 function StreamingPage(props) {
 
@@ -202,14 +203,12 @@ function StreamingPage(props) {
                 <div className='button-container'>         
                     <Grid centered className='middle aligned'>
                         <Grid.Column width={6} textAlign='center'>
-                            <Button
-                                fluid
-                                content={ isStreaming ? 'Stop Streaming' : 'Start Streaming'}
-                                primary
-                                onClick={  isStreaming ? stopStreaming : startStreaming }
-                                disabled={!isInitialized}
-                                size='big'
-                            />
+                            <ButtonWithConfirm
+                            color='teal' 
+                            size='big' 
+                            buttonAction={isStreaming ? stopStreaming : startStreaming} 
+                            confirmDescription={isStreaming ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
+                            buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
                         </Grid.Column>
                     </Grid>
                 </div>
