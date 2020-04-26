@@ -12,6 +12,9 @@ export const UNIVERSITY_NAMES = [
         text: "Universita della Svizzera Italiana",
         value: "unilugano"
     },{
+        text: "Université de Lausanne",
+        value: "unilausanne"
+    },{
         text: "Paul Scherrer Institute",
         value: "paulscherrerinstitute"
     },{

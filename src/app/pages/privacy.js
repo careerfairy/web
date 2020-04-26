@@ -15,7 +15,7 @@ const PrivacyPolicy = (props) => {
             <div className='cookies-background'>
                 <Container>
                 <h1>Privacy policy</h1> 
-                <p>Welcome to CareerFairy!  CareerFairy is an online platform that is designed to build a bridge between the new generation of talents and employees at work.  It is owned and operated by CareerFairy GmbH, a Swiss limited liability company, based at Zurlindenstrasse 45, Zurich, Switzerland.  In this Privacy Policy, CareerFairy GmbH will be referred to as “CareerFairy” or “we”, and the user of the website located at <a href='https://careerfairy.io'>https://careerfairy.io</a> (CareerFairy Website) will be referred to as “user” or “you”..</p>
+                <p>Welcome to CareerFairy!  CareerFairy is an online platform that is designed to build a bridge between the new generation of talents and employees at work.  It is owned and operated by CareerFairy GmbH, a Swiss limited liability company, based at Zurlindenstrasse 45, Zurich, Switzerland.  In this Privacy Policy, CareerFairy GmbH will be referred to as “CareerFairy” or “we”, and the user of the website located at <a href='https://careerfairy.io'>https://careerfairy.io</a> (CareerFairy Website) will be referred to as “user” or “you”.</p>
                     <p>This Privacy Policy explains the choices you have regarding our use of your personal information (<em>personal data</em>) and how you can access and update this information on the CareerFairy Website.  CareerFairy is the data controller for the purposes of this data protection policy.</p>
                     <h2>Automatic collection of information</h2>
                     <p>When you visit the Website our servers automatically record information that your browser sends. This data may include information such as your device's IP address, browser type and version, operating system type and version, language preferences or the webpage you were visiting before you came to our Website, pages of our Website that you visit, the time spent on those pages, information you search for on our Website, access times and dates, and other statistics.</p>
@@ -32,9 +32,11 @@ const PrivacyPolicy = (props) => {
                     </ul>
                     <p>You can choose not to provide us with personal data, but then you will not be able to create an account, upload your CV, be notified of scheduled livestreams or rewatch past livestreams.</p>
                     <h2>Managing personal data</h2>
-                    <p>If you would like to update, amend or delete your personal data or permanently delete your account, you can do so by contacting us by email at privacy@careerfairy.io.</p>
+                    <p>If you would like to update or your profile information, you can do so by directly amending the information in the “My Profile” section of your account. If you would like to delete your personal data or permanently delete your account, you can do so by contacting us by email at privacy@careerfairy.io</p>
                     <h2>Storing personal data</h2>
                     <p>We will keep and use your personal data for as long as we need to for compliance with our legal obligations, to resolve disputes, and enforce our agreements.</p>
+                    <p>Any data we do hold onto will be anonymous. Any personally identifiable information such as your name and e-mail address will be deleted after a defined period. The rest of the data is therefore anonymous and will be used to analyse general market and website trends but without an identifiable personal information.</p>
+                    <p>When creating an account on CareerFairy, we will hold on to your personal data for a maximum duration of 36 months after your last participation in a Career Live Stream, as most students will have completed their studies by then. After this period, we will delete your personal data and your personal account.</p>
                     <h2>Use and processing of collected data</h2>
                     <p>The personal data we hold about you is collected directly from you.  We may use it for the following purposes:</p>
                     <ul>
@@ -58,38 +60,67 @@ const PrivacyPolicy = (props) => {
                     <li>requiring an approved certification such as the EU-US or Switzerland-US Privacy Shield.</li>
                     </ul>
                     <p>If you do not want your personal data to be shared with potential employers outside the European Economic Area, Switzerland and the United Kingdom, please do not sign up for those employers’ talent pools.</p>
-                    <h2>The right to object to processing</h2>
-                    <p>Where Personal Information is processed for the public interest, in the exercise of an official authority vested in us or for the purposes of the legitimate interests pursued by us, you may object to such processing by providing a ground related to your particular situation to justify the objection. You must know that, however, should your Personal Information be processed for direct marketing purposes, you can object to that processing at any time without providing any justification. To learn, whether we are processing Personal Information for direct marketing purposes, you may refer to the relevant sections of this document.</p>
-                    <h2>How to exercise these rights</h2>
-                    <p>Any requests to exercise User rights can be directed to the Owner through the contact details provided in this document. These requests can be exercised free of charge and will be addressed by the Owner as early as possible.</p>
-                    <h2>California privacy rights</h2>
-                    <p>In addition to the rights as explained in this Privacy Policy, California residents who provide Personal Information (as defined in the statute) to obtain products or services for personal, family, or household use are entitled to request and obtain from us, once a calendar year, information about the Personal Information we shared, if any, with other businesses for marketing uses. If applicable, this information would include the categories of Personal Information and the names and addresses of those businesses with which we shared such personal information for the immediately prior calendar year (e.g., requests made in the current year will receive information about the prior year). To obtain this information please contact us.</p>
-                    <h2>Privacy of children</h2>
-                    <p>We do not knowingly collect any Personal Information from children under the age of 13. If you are under the age of 13, please do not submit any Personal Information through our Website or Service. We encourage parents and legal guardians to monitor their children's Internet usage and to help enforce this Policy by instructing their children never to provide Personal Information through our Website or Service without their permission.</p>
-                    <p>If you have reason to believe that a child under the age of 13 has provided Personal Information to us through our Website or Service, please contact us. You must also be at least 16 years of age to consent to the processing of your Personal Information in your country (in some countries we may allow your parent or guardian to do so on your behalf).</p>
-                    <h2>Newsletters</h2>
-                    <p>We offer electronic newsletters to which you may voluntarily subscribe at any time. We are committed to keeping your e-mail address confidential and will not disclose your email address to any third parties except as allowed in the information use and processing section or for the purposes of utilizing a third-party provider to send such emails. We will maintain the information sent via e-mail in accordance with applicable laws and regulations.</p>
-                    <p>In compliance with the CAN-SPAM Act, all e-mails sent from us will clearly state who the e-mail is from and provide clear information on how to contact the sender. You may choose to stop receiving our newsletter or marketing emails by following the unsubscribe instructions included in these emails or by contacting us. However, you will continue to receive essential transactional emails.</p>
+                    <p>We will not share your personal data with any potential employer unless you have given your consent by joining the talent pool of a specific company. If you change your mind, you can untick the box at any time.</p>
+                    <p>Once a potential employer has a copy of your personal data, the employer is responsible for its own handling of that personal data.  If you have concerns about the privacy practices of a potential employer, or if you wish to have your personal data deleted from the records of a potential employer, please contact that employer directly.</p>
+                    <h2>Your rights</h2>
+                    <ul style={{ listStyleType: 'none' }}>
+                    <p>You have the following rights over your personal data that we process.  In particular, you have the right to:</p>
+                        <li>(i)	withdraw consent to processing for which you have previously given consent; </li>
+                        <li>(ii)	object to processing which we carry out on a legal basis other than consent; </li>
+                        <li>(iii)	request confirmation of whether we are processing your personal data; </li>
+                        <li>(iv)	receive a  copy of your personal data processed by us;</li>
+                        <li>(v)	ask why we are processing your personal data, to whom we have disclosed it and which countries they are in, </li>
+                        <li>(vi)	know how long we will keep your personal data; </li>
+                        <li>(vii)	check the accuracy of your personal data and ask us to update or correct it; </li>
+                        <li>(viii)	complain to a data protection authority about our data processing;</li>
+                        <li>(ix)	request that we delete your personal data if we are processing it illegally, if we no longer need it, or if you object to us processing it for marketing purposes; and</li>
+                        <li>(x)	ask that we transfer your personal data to another data controller.</li>
+
+                    </ul>
+                    <h2>How to exercise your rights</h2>
+                    <p>If you wish to exercise any of these rights, please notify us at <a href='mailto:privacy@careerfairy.io'>privacy@careerfairy.io</a>. In addition, if you no longer want us to process your personal data, you can delete your account at any time by sending us an e-mail at privacy@careerfairy.io. Deleting your account will erase all copies of your personal data collected via the CareerFairy Website.</p>
+                    <h2>Children</h2>
+                    <p>We do not knowingly collect any personal data from children. If you are under the age of 18, please do not create an account on the CareerFairy Website.</p>
+                    <h2>Aggregated data</h2>
+                    <p>We may use aggregated and anonymous data derived from or incorporating your personal data after you update or delete it, as long as we are no longer able to identify you.</p>
+                    <h2>Mailshots</h2>
+                    <p>We offer mailshots as part of our service.  All e-mails sent from CareerFairy will clearly state who the e-mail is from and provide clear information on how to contact the sender.  You may choose to stop receiving our marketing emails by altering the privacy settings in your account or by contacting us at privacy@careerfairy.io. However, you will continue to receive essential transactional emails unless you delete your account.</p>
                     <h2>Cookies</h2>
-                    <p>The Website uses &quot;cookies&quot; to help personalize your online experience. A cookie is a text file that is placed on your hard disk by a web page server. Cookies cannot be used to run programs or deliver viruses to your computer. Cookies are uniquely assigned to you, and can only be read by a web server in the domain that issued the cookie to you.</p>
-                    <p>We may use cookies to collect, store, and track information for statistical purposes to operate our Website and Services. You have the ability to accept or decline cookies. Most web browsers automatically accept cookies, but you can usually modify your browser setting to decline cookies if you prefer. If you choose to decline cookies, you may not be able to fully experience the features of the Website and Services. To learn more about cookies and how to manage them, visit <a target="_blank" rel="noopener noreferrer" href="https://www.internetcookies.org">internetcookies.org</a></p>
+                    <p>A cookie is a text file that is placed on your computer by a web server.  Cookies cannot be used to run programs or to deliver viruses to your computer. Cookies are uniquely assigned to your computer, and can only be read by a web server in the domain that issued the cookie to your computer.</p>
+                    <p>The CareerFairy Website uses the following cookies:</p>
+                    <h2>The Cookies We Set</h2>
+                    <ul>
+                        <li><h3>Account related cookies</h3></li>
+                        <p>If you create an account with us then we will use cookies for the management of the signup process and general administration. These cookies will usually be deleted when you log out however in some cases they may remain afterwards to remember your site preferences when logged out.</p>
+                        <li><h3>Login related cookies</h3></li>
+                        <p>We use cookies when you are logged in so that we can remember this fact. This prevents you from having to log in every single time you visit a new page. These cookies are typically removed or cleared when you log out to ensure that you can only access restricted features and areas when logged in.</p>
+                        <li><h3>Forms related cookies</h3></li>
+                        <p>When you submit data to through a form such as those found on contact pages or comment forms cookies may be set to remember your user details for future correspondence.</p>
+                        <li><h3>Site preferences cookies</h3></li>
+                        <p>In order to provide you with a great experience on this site we provide the functionality to set your preferences for how this site runs when you use it. In order to remember your preferences we need to set cookies so that this information can be called whenever you interact with a page is affected by your preferences.</p>
+                    </ul>
+                    <h2>Third Party Cookies</h2>
+                    <p>In some special cases we also use cookies provided by trusted third parties. The following section details which third party cookies you might encounter through this site.</p>
+                    <ul>
+                        <li><p>This site uses Google Analytics which is one of the most widespread and trusted analytics solution on the web for helping us to understand how you use the site and ways that we can improve your experience. These cookies may track things such as how long you spend on the site and the pages that you visit so we can continue to produce engaging content.</p></li>        
+                    </ul>
+                    <p>For more information on Google Analytics cookies, see the official Google Analytics page.</p>
+                    <p>You can accept or decline cookies, but if you choose to decline cookies, some parts of the CareerFairy Website may not work properly on your computer. To learn more about cookies and how to manage them, visit <a href='https://www.allaboutcookies.org'>allaboutcookies.org</a>. </p>
                     <h2>Do Not Track signals</h2>
-                    <p>Some browsers incorporate a Do Not Track feature that signals to websites you visit that you do not want to have your online activity tracked. Tracking is not the same as using or collecting information in connection with a website. For these purposes, tracking refers to collecting personally identifiable information from consumers who use or visit a website or online service as they move across different websites over time. Our Website does not track its visitors over time and across third party websites. However, some third party sites may keep track of your browsing activities when they serve you content, which enables them to tailor what they present to you.</p>
+                    <p>Some browsers incorporate a Do Not Track feature that signals to websites you visit that you do not want to have your online activity tracked. The CareerFairy Website does not track its visitors over time or across third party websites.</p>
                     <h2>Links to other websites</h2>
-                    <p>Our Website contains links to other websites that are not owned or controlled by us. Please be aware that we are not responsible for the privacy practices of such other websites or third-parties. We encourage you to be aware when you leave our Website and to read the privacy statements of each and every website that may collect Personal Information.</p>
-                    <h2>Information security</h2>
-                    <p>We secure information you provide on computer servers in a controlled, secure environment, protected from unauthorized access, use, or disclosure. We maintain reasonable administrative, technical, and physical safeguards in an effort to protect against unauthorized access, use, modification, and disclosure of Personal Information in its control and custody. However, no data transmission over the Internet or wireless network can be guaranteed. Therefore, while we strive to protect your Personal Information, you acknowledge that (i) there are security and privacy limitations of the Internet which are beyond our control; (ii) the security, integrity, and privacy of any and all information and data exchanged between you and our Website cannot be guaranteed; and (iii) any such information and data may be viewed or tampered with in transit by a third-party, despite best efforts.</p>
+                    <p>The CareerFairy Website contains links to websites that are not owned or controlled by us. We are not responsible for the privacy practices of third parties’ websites and recommend that you review the privacy policies of those websites before you start to browse them.</p>
+                    <h2>Security and performance</h2>
+                    <p>We use Google Firebase to help maintain the security and performance of the CareerFairy website.</p>
                     <h2>Data breach</h2>
-                    <p>In the event we become aware that the security of the Website has been compromised or users Personal Information has been disclosed to unrelated third parties as a result of external activity, including, but not limited to, security attacks or fraud, we reserve the right to take reasonably appropriate measures, including, but not limited to, investigation and reporting, as well as notification to and cooperation with law enforcement authorities. In the event of a data breach, we will make reasonable efforts to notify affected individuals if we believe that there is a reasonable risk of harm to the user as a result of the breach or if notice is otherwise required by law. When we do, we will send you an email.</p>
-                    <h2>Legal disclosure</h2>
-                    <p>We will disclose any information we collect, use or receive if required or permitted by law, such as to comply with a subpoena, or similar legal process, and when we believe in good faith that disclosure is necessary to protect our rights, protect your safety or the safety of others, investigate fraud, or respond to a government request.</p>
-                    <h2>Changes and amendments</h2>
-                    <p>We may update this Privacy Policy from time to time in our discretion and will notify you of any material changes to the way in which we treat Personal Information. When changes are made, we will send you an email to notify you. We may also provide notice to you in other ways in our discretion, such as through contact information you have provided. Any updated version of this Privacy Policy will be effective immediately upon the posting of the revised Privacy Policy unless otherwise specified. Your continued use of the Website or Services after the effective date of the revised Privacy Policy (or such other act specified at that time) will constitute your consent to those changes. However, we will not, without your consent, use your Personal Data in a manner materially different than what was stated at the time your Personal Data was collected. Policy was created with <a target="_blank"  rel="noopener noreferrer" title="Sample privacy policy template" href="https://www.websitepolicies.com/blog/sample-privacy-policy-template">WebsitePolicies</a>.</p>
-                    <h2>Acceptance of this policy</h2>
-                    <p>You acknowledge that you have read this Policy and agree to all its terms and conditions. By using the Website or its Services you agree to be bound by this Policy. If you do not agree to abide by the terms of this Policy, you are not authorized to use or access the Website and its Services.</p>
+                    <p>If the security of the CareerFairy Website is compromised or your personal data is disclosed to third parties as a result of external activity, including, but not limited to, security attacks or fraud, we will  take appropriate measures including, but not limited to, investigation and reporting, as well as notification to and cooperation with data protection authorities as required by law.  We will notify you by email if we believe that there is a significant risk of harm to you as a result of the breach.</p>
+                    <h2>Disclosure of personal data</h2>
+                    <p>If we are required to disclose your personal data in connection with a request by a government authority we will – provided that we are permitted to do so – notify you first.</p>
+                    <h2>Changes to this Privacy Policy</h2>
+                    <p>We keep this Privacy Policy under regular review to ensure that it is up to date and correct.</p>
+                    <p>This document was last updated on February 22nd, 2020.</p>
                     <h2>Contacting us</h2>
-                    <p>If you would like to contact us to understand more about this Policy or wish to contact us concerning any matter relating to individual rights and your Personal Information, you may send an email to &#116;hom&#97;s&#64;car&#101;e&#114;&#102;&#97;&#105;r&#121;&#46;&#105;o</p>
-                    <p>This document was last updated on January 13, 2020</p>
+                    <p>If you would like to contact us to understand more about this Privacy Policy or to exercise any of the rights described in it, please send an email to privacy@careerfairy.io.  </p>
                 </Container>
             </div>
             <style jsx>{`

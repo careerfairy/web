@@ -28,7 +28,6 @@ function PlaybackVideoContainer(props) {
         if (isPlaying) {
             setTimeout(() => {
                 playVideo().catch( error => {
-                    debugger;
                     if(isChrome) {
                         setShowPlayButton(true);
                     }

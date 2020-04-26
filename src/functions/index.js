@@ -232,8 +232,49 @@ exports.sendReminderEmailToRegistrants = functions.https.onRequest(async (req, r
             });
         }).catch(() => {
             return res.status(400).send();
-        })
-    
+        })  
+});
+
+exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    admin.firestore().collection("userData").where("university", "==", req.body.universityId).get()
+    .then((querySnapshot) => {
+        let counter = 0;
+        console.log("snapshotSize:" + querySnapshot.size);
+        querySnapshot.forEach(doc => {
+            var id = doc.id;
+            const email = {
+                "TemplateId": req.body.templateId,
+                "From": 'CareerFairy <noreply@careerfairy.io>',
+                "To": id,
+                "TemplateModel": {       
+                }
+            };
+            client.sendEmailWithTemplate(email).then(() => {
+                counter++;
+                console.log("email sent to: " + id);
+                if (counter === querySnapshot.size) {
+                    return res.status(200).send();
+                }
+            }, error => {
+                console.log('error:' + error);
+                return res.status(400).send();
+            });
+        });
+    }).catch(() => {
+        return res.status(400).send();
+    })
 });
 
 exports.sendSpecificEmailsToUsers = functions.https.onRequest(async (req, res) => {
@@ -276,7 +317,6 @@ exports.sendSpecificEmailsToUsers = functions.https.onRequest(async (req, res) =
         }).catch(() => {
             return res.status(400).send();
         })
-    
 });
 
 exports.getAuthUsers = functions.https.onRequest(async (req, res) => {

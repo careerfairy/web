@@ -99,7 +99,7 @@ function QuestionContainer(props) {
 
     return (
         <div className='animated fadeInUp faster'>
-                <div className={'questionContainer ' + (props.question.type === 'current' ? 'active' : '')  + (props.question.type === 'done' ? 'past' : '') }>
+                <div className={'questionContainer ' + (props.question.type === 'current' ? 'active' : '') }>
                     <div className='questionTitle'>
                         { props.question.title }
                     </div>

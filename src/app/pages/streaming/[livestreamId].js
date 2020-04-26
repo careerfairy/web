@@ -45,25 +45,6 @@ function StreamingPage(props) {
     }, [streamToken, currentLivestream]);
 
     useEffect(() => {
-        interval = setInterval(() => {
-            if (!pongArrived && isStreaming) {
-                setIsConnectionAlive(false);
-            } 
-            isPongArrived(false);
-        }, 5000);
-        return () => clearInterval(interval);
-    }, [pongArrived]);
-
-    useEffect(() => {
-        if (!isConnectionAlive) {
-            if (isStreaming) {
-                setIsStreaming(false);
-                setDisconnectModalOpen(true);
-            } 
-        }
-    }, [isConnectionAlive]);
-
-    useEffect(() => {
         if (props.livestreamId) {
             props.firebase.getScheduledLivestreamById(props.livestreamId).then(querySnapshot => {
                 let livestream = querySnapshot.data();
@@ -266,7 +247,6 @@ function StreamingPage(props) {
                 <ButtonWithConfirm color='teal' size='big' buttonAction={isStreaming ? stopStreaming : startStreaming} confirmDescription={isStreaming ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
                 <Button circular size='big' onClick={ isCapturingDesktop ? () => stopDesktopCapture() : () => startDesktopCapture()} primary={isCapturingDesktop} icon='desktop'/>
                 <Button circular size='big' onClick={ isLocalMicMuted ? () => unmuteLocalMic() : () => muteLocalMic()} primary={isLocalMicMuted} icon='microphone slash'/>
-                { isConnectionAlive ? 'TRUE' : 'FALSE'}
             </div>
             <Modal open={disconnectModalOpen}>
                 <Modal.Header>Disconnection</Modal.Header>

@@ -167,6 +167,33 @@ class Firebase {
         return streamRef.get();
     }
 
+    setMainStreamIdToLivestreamStreamers = (livestreamId, streamId) => {
+        let livestreamRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId);
+        return livestreamRef.update({
+            streamIds: [streamId]
+        });
+    }
+
+    addStreamIdToLivestreamStreamers = (livestreamId, streamId) => {
+        let livestreamRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId);
+        return livestreamRef.update({
+            streamIds: firebase.firestore.FieldValue.arrayUnion(streamId)
+        });
+    }
+
+    removeStreamIdFromLivestreamStreamers = (livestreamId, streamId) => {
+        let livestreamRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId);
+        return livestreamRef.update({
+            streamIds: firebase.firestore.FieldValue.arrayRemove(streamId)
+        });
+    }
+
     listenToScheduledLivestreamById = (livestreamId, callback) => {
         let streamRef = this.firestore
             .collection("livestreams")

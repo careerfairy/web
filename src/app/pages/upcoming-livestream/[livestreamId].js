@@ -311,6 +311,12 @@ function UpcomingLivestream(props) {
                                     <Grid.Column mobile='5' computer='2' style={{ display: currentLivestream.universities.indexOf('epflausanne') > -1 ? 'block' : 'none' }}>
                                         <Image src={"https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fepfl-career-center.png?alt=media"} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '80px', maxHeight: '65px', margin: '10px auto 5px auto' }}/>
                                     </Grid.Column>
+                                    <Grid.Column mobile='5' computer='2' style={{ display: currentLivestream.universities.indexOf('unizurich') > -1 ? 'block' : 'none' }}>
+                                        <Image src={"https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fuzh.png?alt=media"} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '80px', maxHeight: '65px', margin: '10px auto 5px auto' }}/>
+                                    </Grid.Column>
+                                    <Grid.Column mobile='5' computer='2' style={{ display: currentLivestream.universities.indexOf('unilausanne') > -1 ? 'block' : 'none' }}>
+                                        <Image src={"https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2FLogo_HEC_Lausanne.png?alt=media"} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '80px', maxHeight: '65px', margin: '10px auto 5px auto' }}/>
+                                    </Grid.Column>
                                 </Grid>
                             </div>
                             <div className='topDescriptionContainer' > 
@@ -395,7 +401,7 @@ function UpcomingLivestream(props) {
                 .top-menu {
                     background-color: rgba(250,250,250,1);
                     padding: 15px 0;
-                    height: 75px;
+                    height: 80px;
                     text-align: center;
                     position: relative;
                     box-shadow: 0 0 5px grey;

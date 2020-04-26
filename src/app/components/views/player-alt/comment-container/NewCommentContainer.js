@@ -8,76 +8,120 @@ import { animateScroll } from 'react-scroll';
 
 function CommentContainer(props) {
     
-    const [questions, setQuestions] = useState([]);
-    const [newQuestionTitle, setNewQuestionTitle] = useState("");    
-    const [questionSubmittedModalOpen, setQuestionSubmittedModalOpen] = useState(false);
+    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
+    const [pastQuestions, setPastQuestions] = useState([]);
 
+    const [showNextQuestions, setShowNextQuestions] = useState(true);
 
     useEffect(() => {
         if (props.livestream.id) {
             const unsubscribe = props.firebase.listenToLivestreamQuestions(props.livestream.id, querySnapshot => {
-                var questionsList = [];
+                var upcomingQuestionsList = [];
+                var pastQuestionsList = [];
                 querySnapshot.forEach(doc => {
                     let question = doc.data();
                     question.id = doc.id;
                     if (question.type !== 'done') {
-                        questionsList.push(question);
+                        upcomingQuestionsList.push(question);
+                    } else {
+                        pastQuestionsList.push(question);
                     }
                 });
-                setQuestions(questionsList);
+                setUpcomingQuestions(upcomingQuestionsList);
+                setPastQuestions(pastQuestionsList);
             });
             return () => unsubscribe();
         }
     }, [props.livestream.id]);
-    
-    let questionsElements = questions.map((question, index) => {
+
+    let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
         return (
-            <div key={question.title}>
-                <QuestionContainer livestream={ props.livestream } question={ question } user={props.user} userData={props.userData}/>
+            <div key={index}>
+                <QuestionContainer livestream={ props.livestream } questions={upcomingQuestions} question={ question } user={props.user} userData={props.userData}/>
+            </div>       
+        );
+    });
+
+    let pastQuestionsElements = pastQuestions.map((question, index) => {
+        return (
+            <div key={index}>
+                <QuestionContainer livestream={ props.livestream } questions={pastQuestions} question={ question } user={props.user} userData={props.userData}/>
             </div>       
         );
     });
 
     return (
         <div>
-            <div className={'chat-container'}>  
-                <div  className='chat-hint'>Most upvoted questions will be answered first</div>
-                <div className='chat-scrollable'>
-                    { questionsElements }
+            <div className='questionToggle'>
+                <div className='questionToggleTitle'>
+                    Questions
+                </div>
+                <div className='questionToggleSwitches'>
+                    <div className={'questionToggleSwitch ' + (showNextQuestions ? 'active'  : '')} onClick={() => setShowNextQuestions(true)}>
+                        Upcoming [{ upcomingQuestions.length }]
+                    </div>
+                    <div className={'questionToggleSwitch ' + (showNextQuestions ? ''  : 'active')} onClick={() => setShowNextQuestions(false)}>
+                        Answered [{ pastQuestions.length }]
+                    </div>
+                </div>
+            </div>
+            <div className='chat-container'>
+                <div className={'chat-scrollable ' + (showNextQuestions ? ''  : 'hidden')}>
+                    { upcomingQuestionsElements }
+                </div>
+                <div className={'chat-scrollable ' + (showNextQuestions ? 'hidden'  : '')}>
+                    { pastQuestionsElements }
                 </div>
             </div>
             <style jsx>{`
+                .questionToggle {
+                    position: relative;
+                    height: 100px;
+                    box-shadow: 0 4px 2px -2px rgb(200,200,200);
+                    z-index: 9000;
+                }
+
+                .questionToggleTitle {
+                    position: absolute;
+                    top: 15px;
+                    width: 100%;
+                    font-size: 1.2em;
+                    font-weight: 500;
+                    text-align: center;
+                }
+
+                .questionToggleSwitches {
+                    position: absolute;
+                    bottom: 10px;
+                    width: 100%;
+                    text-align: center;
+                }
+
+                .questionToggleSwitch {
+                    display: inline-block;
+                    padding: 10px 15px;
+                    border-radius: 20px;
+                    margin: 0 15px;
+                    font-weight: 600;
+                    font-size: 0.9em;
+                    color: rgb(120,120,120);
+                    background-color: rgb(240,240,240);
+                    cursor: pointer;
+                }
+
+                .questionToggleSwitch.active {
+                    background-color: rgb(0, 210, 170);
+                    color: white;
+                    cursor: default;
+                }
+
                 .hidden {
                     display: none;
                 }
 
-                .video-menu-left {
-                    position: absolute;
-                    top: 75px;
-                    left: 0;
-                    bottom: 0;
-                    width: 330px;
-                    z-index: 1;
-                }
-
-                .chat-hint {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    background-color: white;
-                    text-align: center;
-                    padding: 15px 0;
-                    text-transform: uppercase;
-                    font-size: 0.9em;
-                    color: white;
-                    background-color: rgb(0, 210, 170);
-                    font-weight:700;
-                }
-
                 .chat-container {
                     position: absolute;
-                    top: 0;
+                    top: 100px;
                     left: 0;
                     bottom: 0;
                     width: 100%;
@@ -86,7 +130,7 @@ function CommentContainer(props) {
 
                 .chat-scrollable {
                     position: absolute;
-                    top: 50px;
+                    top: 0;
                     left: 0;
                     bottom: 0;
                     width: 100%;
@@ -100,71 +144,6 @@ function CommentContainer(props) {
 
                 ::-webkit-scrollbar-thumb {
                     background-color: rgb(130,130,130);
-                }
-
-                .chat-container.active {
-                    top: 190px;
-                }
-
-                .video-menu-left-reactions {
-                    width: 100%;
-                    height: 60px;
-                    text-align: center;
-                    padding: 5px;
-                    font-size: 0.8em;
-                    font-weight: 700;
-                    color: rgba(0, 210, 170, 0.7);
-                }
-
-                .video-menu-left-outer-content::-webkit-scrollbar {
-                    width: 5px;
-                    background-color: white;
-                }
-
-                .video-menu-left-outer-content {
-                    width: 100%;
-                    position: absolute;
-                    top: 60px;
-                    left: 0;
-                    bottom: 40px;                   
-                    overflow: scroll;
-                    overflow-x: hidden;    
-                    z-index: 3;
-                    box-shadow: inset 0 0 5px grey;
-                }
-
-                .no-comment-message {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    text-align: center;
-                    color: rgb(255, 20, 147);
-                }
-
-                .video-menu-left-input {
-                    position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    height: 40px;
-                    width: 100%;
-                }
-
-                .video-menu-left-content {
-                    height: 100%;
-                    width: 100%;
-                    padding: 10px 20px;
-                }
-
-                @media (max-width: 768px) {
-                    .chat-scrollable {
-                        overflow-y: visible;
-                        overflow-x: visible;
-                    } 
-
-                    .chat-container {
-                        background-color: white;
-                    }
                 }
           `}</style>
         </div>

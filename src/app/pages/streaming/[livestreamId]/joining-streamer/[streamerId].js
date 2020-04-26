@@ -1,34 +1,40 @@
-import {useState, useEffect, useRef, Fragment} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Dropdown} from "semantic-ui-react";
 
-import { withFirebasePage } from '../../../data/firebase';
-import ButtonWithConfirm from '../../../components/views/common/ButtonWithConfirm';
+import { withFirebasePage } from '../../../../data/firebase';
+import { WebRTCAdaptor } from '../../../../static-js/webrtc_adaptor.js';
 import axios from 'axios';
+import { animateScroll } from 'react-scroll';
+import ButtonWithConfirm from '../../../../components/views/common/ButtonWithConfirm';
 
-import Loader from '../../../components/views/loader/Loader';
+import CommentContainer from '../../../../components/views/streaming/comment-container/NewCommentContainer';
+import Loader from '../../../../components/views/loader/Loader';
 import { useRouter } from 'next/router';
-import useUserMedia from '../../../components/custom-hook/useDevices';
-import useWebRTCAdaptor from '../../../components/custom-hook/useWebRTCAdaptor';
-import { useWindowSize } from '../../../components/custom-hook/useWindowSize';
-import LivestreamPdfViewer from '../../../components/util/LivestreamPdfViewer';
-import StreamerVideoDisplayer from '../../../components/views/streaming/video-container/StreamerVideoDisplayer';
-import NewCommentContainer from '../../../components/views/streaming/comment-container/NewCommentContainer';
+import { WEBRTC_ERRORS } from '../../../../data/errors/StreamingErrors';
+import ReactMic from '../../../../components/ssr/ReactMic';
+import useUserMedia from '../../../../components/custom-hook/useDevices';
+import useWebRTCAdaptor from '../../../../components/custom-hook/useWebRTCAdaptor';
+import RemoteVideoContainer from '../../../../components/views/streaming/video-container/RemoteVideoContainer';
+import StreamerVideoDisplayer from '../../../../components/views/streaming/video-container/StreamerVideoDisplayer';
+import NewCommentContainer from '../../../../components/views/streaming/comment-container/NewCommentContainer';
 
 function StreamingPage(props) {
 
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
+    const streamerId = router.query.streamerId;
 
-    const [currentLivestream, setCurrentLivestream] = useState(false);
+    const [currentState, setCurrentState] = useState(2);
 
     const [isInitialized, setIsInitialized] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
     const [isCapturingDesktop, setIsCapturingDesktop] = useState(false);
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
-
-    const devices = useUserMedia();
+    const [currentLivestream, setCurrentLivestream] = useState(false);
 
     const [streamId, setStreamId] = useState(null);
+
+    const devices = useUserMedia();
 
     const [audioSource, setAudioSource] = useState(null);
     const [videoSource, setVideoSource] = useState(null);
@@ -37,30 +43,28 @@ function StreamingPage(props) {
     const [numberOfViewers, setNumberOfViewers] = useState(0);
 
     const localVideoId = 'localVideo';
+    const alternateVideoElement = useRef(null);
 
     let streamingCallbacks = {
-        onInitialized: (infoObj) => {
+        onInitialized: () => {
             setIsInitialized(true);
         },
         onPublishStarted: (infoObj) => {
-            setMainStreamIdToStreamerList(infoObj.streamId);
+            debugger;
             setStreamId(infoObj.streamId);
         },
-        onNewStreamAvailable: (infoObj) => {
-            addStreamIdToStreamerList(infoObj.streamId);
-        },
-        onStreamLeaved: (infoObj) => {
-            removeStreamIdFromStreamerList(infoObj.streamId);
-        },
+        onJoinedRoom: (infoObj) => {},
+        onStreamJoined: (infoObj) => {},
+        onStreamLeaved: (infoObj) => {},
+        onNewStreamAvailable: (infoObj) => {},
         onPublishFinished: (infoObj) => {
-            console.log("publish finiiiished");
             setIsStreaming(false);
         },
+        onPublishFinished: (infoObj) => {},
         onScreenShareStopped: (infoObj) => {
             setIsCapturingDesktop(false);
         },
         onClosed: (infoObj) => {
-            console.log("clooosed");
             setIsInitialized(false);
         },
         onUpdatedStats: (infoObj) => {},
@@ -72,27 +76,20 @@ function StreamingPage(props) {
         },
     }
 
-    const { webRTCAdaptor, externalMediaStreams } = 
-        useWebRTCAdaptor(
-            localVideoId,
-            mediaConstraints,
-            streamingCallbacks,
-            errorCallbacks
-        );
-
-    const pdfObject = {
-        url: 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company_presentations%2FCareerFairy%20-%20Pitchdeck%2C%20Jan%202020.pdf?alt=media&token=75c2050a-e3b8-4fe1-bd68-7c33dcbe8a01',
-        httpHeaders: {
-        }
-    }
+    const { webRTCAdaptor, externalMediaStreams } = useWebRTCAdaptor(
+        localVideoId,
+        mediaConstraints,
+        streamingCallbacks,
+        errorCallbacks
+    );
 
     useEffect(() => {
         if (isInitialized) {
             setTimeout(() => {
-                webRTCAdaptor.joinRoom(livestreamId, livestreamId + "12345");
+                webRTCAdaptor.joinRoom(livestreamId, streamerId);
             }, 2000);
         }
-    },[isInitialized]);
+    },[isInitialized])
 
     useEffect(() => {
         if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
@@ -119,7 +116,7 @@ function StreamingPage(props) {
             video: { 
                 width: { ideal: 1920, max: 1920 },
                 height: { ideal: 1080, max: 1080 },
-                aspectRatio: 1.77,   
+                aspectRatio: 1.77,
                 deviceId: videoSource ? {exact: videoSource} : undefined
             }
           };
@@ -153,38 +150,6 @@ function StreamingPage(props) {
         }
     }, [currentLivestream.hasStarted]);
 
-    function createNewStreamerLink() {
-    }
-
-    function startStreaming() {
-        props.firebase.setLivestreamHasStarted(true, currentLivestream.id);
-    }
-
-    function stopStreaming() {
-        props.firebase.setLivestreamHasStarted(false, currentLivestream.id);
-    }
-
-    function setMainStreamIdToStreamerList(streamId) {
-        props.firebase.setMainStreamIdToLivestreamStreamers(livestreamId, streamId);
-    }
-
-    function addStreamIdToStreamerList(streamId) {
-        props.firebase.addStreamIdToLivestreamStreamers(livestreamId, streamId);
-    }
-
-    function removeStreamIdFromStreamerList(streamId) {
-        props.firebase.removeStreamIdFromLivestreamStreamers(livestreamId, streamId);
-    }
-
-    function toggleScreenSharing() {
-        if (isCapturingDesktop) {
-            webRTCAdaptor.switchVideoCapture(streamId);
-        } else {
-            webRTCAdaptor.switchDesktopCaptureWithCamera(streamId);
-        }
-        setIsCapturingDesktop(!isCapturingDesktop);
-    }
-
     function toggleMicrophone() {
         if (isLocalMicMuted) {
             webRTCAdaptor.unmuteLocalMic();
@@ -199,37 +164,15 @@ function StreamingPage(props) {
              <div className={'top-menu ' + (isStreaming ? 'active' : '')}>
                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
                     <h3 style={{ color: (isStreaming ?  'white' : 'orange') }}>{ isStreaming ? 'YOU ARE NOW LIVE' : 'YOU ARE NOT LIVE'}</h3>
-                    { isStreaming ? '' : 'Press Start Streaming to begin'}
+                    { isStreaming ? '' : 'The Stream will begin when the host presses Start Streaming'}
                 </div>
                 <div style={{ float: 'right', display: 'inlineBlock', margin: '0 20px', fontSize: '1.2em', fontWeight: '700', padding: '10px' }}>
                     Viewers: { numberOfViewers }
                 </div>
             </div>
             <div className='black-frame'>
-                <div style={{ width: 'calc(100% - 100px)', margin: '20px auto', height: '140px'}}>
-                    <div style={{ position: 'relative', height: '100%' }}>
-                        <video id="localVideo" muted autoPlay></video> 
-                    </div>
-                </div>
-                <div style={{ position: 'absolute', top: '180px', width: '100%', backgroundColor: 'rgb(30,30,30)'}}>
-                    <LivestreamPdfViewer firebase={props.firebase} livestream={{}}/>
-                </div>
-                <div className='button-container'>         
-                    <Grid centered className='middle aligned'>
-                        <Grid.Column width={6} textAlign='center'>
-                            <ButtonWithConfirm
-                            color='teal' 
-                            size='big' 
-                            buttonAction={isStreaming ? stopStreaming : startStreaming} 
-                            confirmDescription={isStreaming ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
-                            buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
-                        </Grid.Column>
-                    </Grid>
-                </div>
-            </div>
-            {/* <div className='black-frame'>
                 <StreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId}/>
-            </div> */}
+            </div>
             <div className='video-menu-left'>
                 <NewCommentContainer livestream={ currentLivestream }/>
             </div>
@@ -251,14 +194,14 @@ function StreamingPage(props) {
                                 </div>
                             </Grid.Column>
                         </Grid.Row> */}
-                        <Grid.Row style={{ margin: '10px 0'}}>
+                        {/* <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
                                 <div className='side-button' onClick={() => toggleScreenSharing()}style={{  color: isCapturingDesktop ? 'red' : 'white' }}>
                                     <Icon name='tv' size='large' style={{ margin: '0 0 5px 0' }}/>
                                     <p style={{ fontSize: '0.8em' }}>{ isCapturingDesktop ? 'Stop Screen Sharing' : 'Share Screen' }</p>
                                 </div>
                             </Grid.Column>
-                        </Grid.Row>
+                        </Grid.Row> */}
                         {/* <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
                                 <div className='side-button' onClick={() => alert("blob")}>
@@ -306,10 +249,6 @@ function StreamingPage(props) {
                     transform: translate(-50%);
                     width: 80%;
                     height: 200px;
-                }
-
-                .pdfContent {
-                    width: 100%;
                 }
 
                 .video-container {
@@ -373,31 +312,14 @@ function StreamingPage(props) {
                     min-height: 600px;
                     z-index: 10;
                     background-color: black;
-                    border: 2px solid green;
-                }
-
-                .video-container {
-                    width: 100%;
-                    position: absolute;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    background-color: black;
-                }
-
-                .video-container-small {
-                    width: 300px;
-                    padding-top: 15%;
-                    position: absolute;
-                    top: 20px;
-                    right: 20px;
-                    background-color: black;
+                    cursor: pointer;
                 }
 
                 .button-container {
                     position: absolute;
+                    left: 120px;
                     bottom: 0;
-                    left: 0;
-                    width: 100%;                    
+                    width: calc(100% - 120px);
                     height: 90px;
                     cursor:  pointer;
                     padding: 17px;
@@ -417,7 +339,7 @@ function StreamingPage(props) {
                 .logo-container {
                     position: absolute;
                     bottom: 90px;
-                    left: 120px;
+                    left: 0;
                     right: 0;
                     color: rgb(0, 210, 170);
                     font-size: 1.4em;
