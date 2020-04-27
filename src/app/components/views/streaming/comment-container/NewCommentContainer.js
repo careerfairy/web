@@ -99,11 +99,11 @@ function CommentContainer(props) {
 
                 .questionToggleSwitch {
                     display: inline-block;
-                    padding: 10px 15px;
+                    padding: 8px 12px;
                     border-radius: 20px;
-                    margin: 0 15px;
+                    margin: 0 10px;
                     font-weight: 600;
-                    font-size: 0.9em;
+                    font-size: 0.8em;
                     color: rgb(120,120,120);
                     background-color: rgb(240,240,240);
                     cursor: pointer;

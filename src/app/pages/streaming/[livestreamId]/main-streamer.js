@@ -206,15 +206,15 @@ function StreamingPage(props) {
                 </div>
             </div>
             <div className='black-frame'>
-                <div style={{ width: 'calc(100% - 100px)', margin: '20px auto', height: '140px'}}>
+                <div style={{ width: 'calc(100% - 100px)', margin: '20px auto', height: '100px'}}>
                     <div style={{ position: 'relative', height: '100%' }}>
                         <video id="localVideo" muted autoPlay></video> 
                     </div>
                 </div>
-                <div style={{ position: 'absolute', top: '180px', width: '100%', backgroundColor: 'rgb(30,30,30)'}}>
+                <div style={{ position: 'absolute', top: '140px', width: '100%', backgroundColor: 'rgb(30,30,30)'}}>
                     <LivestreamPdfViewer firebase={props.firebase} livestream={{}}/>
                 </div>
-                <div className='button-container'>         
+                {/* <div className='button-container'>         
                     <Grid centered className='middle aligned'>
                         <Grid.Column width={6} textAlign='center'>
                             <ButtonWithConfirm
@@ -225,7 +225,7 @@ function StreamingPage(props) {
                             buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
                         </Grid.Column>
                     </Grid>
-                </div>
+                </div> */}
             </div>
             {/* <div className='black-frame'>
                 <StreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId}/>
@@ -336,7 +336,7 @@ function StreamingPage(props) {
                     top: 75px;
                     left: 0;
                     bottom: 0;
-                    width: 330px;
+                    width: 280px;
                     z-index: 1;
                 }
 
@@ -365,15 +365,14 @@ function StreamingPage(props) {
                 .black-frame {
                     position: absolute;
                     top: 75px;
-                    left: 330px;
+                    left: 280px;
                     right: 120px;
-                    width: calc(100% - 450px);
+                    width: calc(100% - 400px);
                     min-width: 700px;
                     height: calc(100% - 75px);
                     min-height: 600px;
                     z-index: 10;
                     background-color: black;
-                    border: 2px solid green;
                 }
 
                 .video-container {

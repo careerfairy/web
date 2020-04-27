@@ -11,7 +11,6 @@ import CommentContainer from '../../../../components/views/streaming/comment-con
 import Loader from '../../../../components/views/loader/Loader';
 import { useRouter } from 'next/router';
 import { WEBRTC_ERRORS } from '../../../../data/errors/StreamingErrors';
-import ReactMic from '../../../../components/ssr/ReactMic';
 import useUserMedia from '../../../../components/custom-hook/useDevices';
 import useWebRTCAdaptor from '../../../../components/custom-hook/useWebRTCAdaptor';
 import RemoteVideoContainer from '../../../../components/views/streaming/video-container/RemoteVideoContainer';

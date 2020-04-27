@@ -331,7 +331,6 @@ function StreamingPage(props) {
                     background-color: grey;
                 }
 
-
             `}</style>
         </div>
     );
