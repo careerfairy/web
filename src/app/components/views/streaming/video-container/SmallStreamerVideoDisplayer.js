@@ -1,12 +1,13 @@
-import React, {useEffect, Fragment, useRef, useState} from 'react';
+import React, {Fragment, useRef, useState, useEffect} from 'react';
 import {Grid} from "semantic-ui-react";
 import RemoteVideoContainer from './RemoteVideoContainer';
+import LivestreamPdfViewer from '../../../util/LivestreamPdfViewer';
 
-function StreamerVideoDisplayer(props) {
+function SmallStreamerVideoDisplayer(props) {
 
     const localVideoRef = useRef(null);
     const [localStream, setLocalStream] = useState(null);
-    
+
     useEffect(() => {
         if (!localStream && props.mediaConstraints) {
             navigator.mediaDevices.getUserMedia(props.mediaConstraints).then( stream => {
@@ -21,18 +22,10 @@ function StreamerVideoDisplayer(props) {
         }
     },[localStream]);
 
-    function getVideoContainerWidth() {
-        return props.streams.length > 0 ? 8 : 16;
-    }
-
-    function getVideoContainerHeight() {
-        return props.streams.length > 1 ? 'calc(50vh - 37.5px)' : 'calc(100vh - 75px)';
-    }
-
     let localVideoElement =
-        <Grid.Column width={getVideoContainerWidth()} style={{ padding: 0 }} key={"localVideoId"}>
-            <div className='video-container' style={{ height: getVideoContainerHeight() }}>
-                <video id="localVideo" ref={localVideoRef} muted autoPlay width={ props.streams.length > 1 ? '' : '100%' } style={{ right: (props.streams.length > 0) ? '0' : '', bottom: (props.streams.length > 1) ? '0' : '' }}></video> 
+        <Grid.Column width='4' style={{ padding: 0 }} key={"localVideoId"}>
+            <div className='video-container' style={{ height: '150px' }}>
+                <video id="localVideo" ref={localVideoRef} muted autoPlay width={ props.streams.length > 1 ? '' : '100%' }></video> 
             </div>
             <style jsx>{`
                .video-container {
@@ -58,8 +51,8 @@ function StreamerVideoDisplayer(props) {
 
     let externalVideoElements = props.streams.map( (stream, index) => {
         return (
-            <Grid.Column width={getVideoContainerWidth()} style={{ padding: 0 }} key={stream.streamId}>
-                <RemoteVideoContainer stream={stream} length={props.streams.length} height={getVideoContainerHeight()} index={index} />
+            <Grid.Column width='4' style={{ padding: 0 }} key={stream.streamId}>
+                <RemoteVideoContainer stream={stream} length={props.streams.length} height={'150px'} index={index} />
             </Grid.Column>
         );
     });
@@ -68,9 +61,12 @@ function StreamerVideoDisplayer(props) {
 
     return (
         <Fragment>
-            <Grid style={{ margin: 0}}>         
+            <Grid style={{ margin: 0}} centered>         
                 { externalVideoElements }
-            </Grid>          
+            </Grid> 
+            <div style={{ position: 'absolute', top: '150px', width: '100%', backgroundColor: 'rgb(30,30,30)'}}>
+                <LivestreamPdfViewer livestreamId={props.livestreamId}/>
+            </div>         
             <style jsx>{`
                 .hidden {
                     display: none;
@@ -80,4 +76,4 @@ function StreamerVideoDisplayer(props) {
     );
 }
 
-export default StreamerVideoDisplayer;
+export default SmallStreamerVideoDisplayer;

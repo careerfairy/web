@@ -194,6 +194,66 @@ class Firebase {
         });
     }
 
+    setLivestreamMode = (livestreamId, mode) => {
+        let livestreamRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+        return livestreamRef.update({
+            mode: mode
+        });
+    }
+
+    setLivestreamPresentation = (livestreamId, downloadUrl) => {
+        let presentationRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("presentations")
+            .doc("presentation");
+        return presentationRef.set({
+            downloadUrl: downloadUrl,
+            page: 0
+        });
+    }
+
+    increaseLivestreamPresentationPageNumber = (livestreamId) => {
+        let presentationRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("presentations")
+            .doc("presentation");
+            return this.firestore.runTransaction( transaction => {
+                return transaction.get(presentationRef).then(presentation => {
+                    transaction.update(presentationRef, { 
+                        page: presentation.data().page + 1,
+                    });
+                });
+            });
+    }
+
+    decreaseLivestreamPresentationPageNumber = (livestreamId) => {
+        let presentationRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("presentations")
+            .doc("presentation");
+            return this.firestore.runTransaction( transaction => {
+                return transaction.get(presentationRef).then(presentation => {
+                    transaction.update(presentationRef, { 
+                        page: presentation.data().page - 1,
+                    });
+                });
+            });
+    }
+
+    listenToLivestreamPresentation = (livestreamId, callback) => {
+        let presentationRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("presentations")
+            .doc("presentation");
+        return presentationRef.onSnapshot(callback);
+    }
+
     listenToScheduledLivestreamById = (livestreamId, callback) => {
         let streamRef = this.firestore
             .collection("livestreams")

@@ -12,7 +12,9 @@ import useWebRTCAdaptor from '../../../components/custom-hook/useWebRTCAdaptor';
 import { useWindowSize } from '../../../components/custom-hook/useWindowSize';
 import LivestreamPdfViewer from '../../../components/util/LivestreamPdfViewer';
 import StreamerVideoDisplayer from '../../../components/views/streaming/video-container/StreamerVideoDisplayer';
+import SmallStreamerVideoDisplayer from '../../../components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 import NewCommentContainer from '../../../components/views/streaming/comment-container/NewCommentContainer';
+import { functions } from 'firebase';
 
 function StreamingPage(props) {
 
@@ -29,6 +31,7 @@ function StreamingPage(props) {
     const devices = useUserMedia();
 
     const [streamId, setStreamId] = useState(null);
+    const [mode, setMode] = useState('presentation');
 
     const [audioSource, setAudioSource] = useState(null);
     const [videoSource, setVideoSource] = useState(null);
@@ -176,6 +179,10 @@ function StreamingPage(props) {
         props.firebase.removeStreamIdFromLivestreamStreamers(livestreamId, streamId);
     }
 
+    function setLivestreamMode(mode) {
+        props.firebase.setLivestreamMode(livestreamId, mode);
+    }
+
     function toggleScreenSharing() {
         if (isCapturingDesktop) {
             webRTCAdaptor.switchVideoCapture(streamId);
@@ -205,7 +212,7 @@ function StreamingPage(props) {
                     Viewers: { numberOfViewers }
                 </div>
             </div>
-            <div className='black-frame'>
+            {/* <div className='black-frame'>
                 <div style={{ width: 'calc(100% - 100px)', margin: '20px auto', height: '100px'}}>
                     <div style={{ position: 'relative', height: '100%' }}>
                         <video id="localVideo" muted autoPlay></video> 
@@ -214,7 +221,7 @@ function StreamingPage(props) {
                 <div style={{ position: 'absolute', top: '140px', width: '100%', backgroundColor: 'rgb(30,30,30)'}}>
                     <LivestreamPdfViewer firebase={props.firebase} livestream={{}}/>
                 </div>
-                {/* <div className='button-container'>         
+                <div className='button-container'>         
                     <Grid centered className='middle aligned'>
                         <Grid.Column width={6} textAlign='center'>
                             <ButtonWithConfirm
@@ -225,11 +232,16 @@ function StreamingPage(props) {
                             buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
                         </Grid.Column>
                     </Grid>
-                </div> */}
-            </div>
-            {/* <div className='black-frame'>
-                <StreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId}/>
+                </div>
             </div> */}
+            <div className='black-frame'>
+                <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
+                    <StreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints}/>
+                </div>
+                <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
+                    <SmallStreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id}/>
+                </div>
+            </div>
             <div className='video-menu-left'>
                 <NewCommentContainer livestream={ currentLivestream }/>
             </div>
@@ -243,22 +255,22 @@ function StreamingPage(props) {
                                 </div>
                             </Grid.Column>
                         </Grid.Row>
-                        {/* <Grid.Row style={{ margin: '10px 0'}}>
+                        <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
-                                <div className='side-button' onClick={() => alert("blob")}>
+                                <div className='side-button' onClick={() => setLivestreamMode(currentLivestream.mode === "default" ? "presentation" : "default")}>
                                     <Icon name='clone outline' size='large' style={{ margin: '0 0 5px 0', color: 'white'}}/>
                                     <p style={{ fontSize: '0.8em', color: 'white' }}>Share Slides</p>
                                 </div>
                             </Grid.Column>
-                        </Grid.Row> */}
-                        <Grid.Row style={{ margin: '10px 0'}}>
+                        </Grid.Row>
+                        {/* <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
                                 <div className='side-button' onClick={() => toggleScreenSharing()}style={{  color: isCapturingDesktop ? 'red' : 'white' }}>
                                     <Icon name='tv' size='large' style={{ margin: '0 0 5px 0' }}/>
                                     <p style={{ fontSize: '0.8em' }}>{ isCapturingDesktop ? 'Stop Screen Sharing' : 'Share Screen' }</p>
                                 </div>
                             </Grid.Column>
-                        </Grid.Row>
+                        </Grid.Row> */}
                         {/* <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
                                 <div className='side-button' onClick={() => alert("blob")}>
