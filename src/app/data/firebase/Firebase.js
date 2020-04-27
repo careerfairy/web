@@ -108,6 +108,13 @@ class Firebase {
         return userDataRef.get();
     };
 
+    getCareerCenterByUniversityId = (universityId) => {
+        let userDataRef = this.firestore
+            .collection("careerCenterData")
+            .where("universityId", "==", universityId);
+        return userDataRef.get();
+    };
+
     // MENTORS
 
     getMentors = () => {

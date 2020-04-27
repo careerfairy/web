@@ -32,6 +32,8 @@ function Calendar(props) {
 
     const [user, setUser] = useState(null);
     const [userData, setUserData] = useState(null);
+
+    const [universityData, setUniversityData] = useState(null);
     const [grid, setGrid] = useState(null);
     const [allLivestreams, setAllLivestreams] = useState([]);
     const [livestreams, setLivestreams] = useState([]);
@@ -61,6 +63,18 @@ function Calendar(props) {
             });
         }
     },[user]);
+
+    useEffect(() => {
+        if (university) {
+            props.firebase.getCareerCenterByUniversityId(university)
+            .then(querySnapshot => {
+                querySnapshot.forEach(doc => {
+                    let university = doc.data();
+                    setUniversityData(university);
+                });
+            });
+        }
+    },[university]);
 
     useEffect(() => {
         if (filter) {
@@ -217,22 +231,13 @@ function Calendar(props) {
             <Container className="landingTitleContainer" style={{ paddingBottom: '20px', display: university ? 'block' : 'none'}}>
                 <Grid className='middle aligned' centered> 
                     <Grid.Column width={6}>
-                        <div style={{ display: university === 'ethzurich' ? 'block' : 'none' }}>
-                            <Image src={'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media'} style={{ margin: '10px 0 10px 0', maxHeight: '110px', filter: 'brightness(0) invert(1)'}}/>
-                        </div>
-                        <div style={{ display: university === 'epflausanne' ? 'block' : 'none' }}>
-                            <Image src={'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fepfl-career-center.png?alt=media'} style={{ margin: '10px 0 10px 0', maxHeight: '110px', filter: 'brightness(0) invert(1)'}}/>
-                        </div>
-                        <div style={{ display: university === 'unizurich' ? 'block' : 'none' }}>
-                            <Image src={'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fuzh.png?alt=media'} style={{ margin: '10px 0 10px 0', maxHeight: '110px', filter: 'brightness(0) invert(1)'}}/>
-                        </div>
-                        <div style={{ display: university === 'unilausanne' ? 'block' : 'none' }}>
-                            <Image src={'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2FLogo_HEC_Lausanne.png?alt=media'} style={{ margin: '10px 0 10px 0', maxHeight: '110px', filter: 'brightness(0) invert(1)'}}/>
+                        <div style={{ display: universityData ? 'block' : 'none' }}>
+                            <Image src={universityData ? universityData.logoUrl : 'none'} style={{ margin: '10px 0 10px 0', maxHeight: '110px', filter: 'brightness(0) invert(1)'}}/>
                         </div>
                     </Grid.Column>
                     <Grid.Column width={10}>
                         <div style={{ float: 'right'}}>   
-                            <div style={{  display: (university ? 'block' : 'none'), fontSize: '1.4em', color: 'white', fontWeight: '700', textAlign: 'right', lineHeight: '1.4em', margin: '5px'}}>Live streams for students of { getUniversityName(university) }.</div>
+                            <div style={{  display: (universityData ? 'block' : 'none'), fontSize: '1.4em', color: 'white', fontWeight: '700', textAlign: 'right', lineHeight: '1.4em', margin: '5px'}}>Live streams for students of { universityData ? universityData.universityName : '' }.</div>
                             <Link href='/next-livestreams'><a><Button style={{ float: 'right'}} content='See all Live Streams' size='mini'/></a></Link>
                         </div>
                     </Grid.Column>
