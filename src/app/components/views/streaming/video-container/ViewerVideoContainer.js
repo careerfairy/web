@@ -137,10 +137,33 @@ function ViewerVideoContainer(props) {
             <div className='videoContainer' style={{ height: '100%' }}>
                 <video id={'videoElement' + props.streamId} className='videoElement' width={ props.length > 1 ? '' : '100%' } controls={true} style={{  left: (props.index % 2 === 0) ? '0' : '', right: (props.index % 2 === 1) ? '0' : '', opacity: isPlaying ? 1 : 0}}/>
                 <div className={(showPlayButton ? 'playButton' : 'hidden')}><Icon name='play' onClick={() => playVideo()}/></div>
+                <div className={'connecting-overlay ' + (props.hasStarted && isPlaying ? 'hidden' : '')}>
+                    <div className='connecting-overlay-content'>
+                        <Image src='/connector.gif' style={{ width: '120px', height: 'auto', margin: '0 auto' }}/>
+                        <div>Wait a second, the streamer is about to connect</div>
+                    </div>
+                </div>
             </div>           
             <style jsx>{`
                 .hidden {
                     display: none;
+                }
+
+                .connecting-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(255,255,255,1);
+                    z-index: 9999;
+                }
+
+                .connecting-overlay-content {
+                    position: absolute;
+                    top:50%;
+                    left:50%;
+                    transform: translate(-50%, -50%);
                 }
 
                .videoContainer {

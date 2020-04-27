@@ -4,7 +4,7 @@ import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, M
 import { useRouter } from 'next/router';
 import ViewerVideoContainer from '../../../components/views/streaming/video-container/ViewerVideoContainer';
 import { withFirebasePage } from '../../../data/firebase';
-import NewCommentContainer from '../../../components/views/streaming/comment-container/NewCommentContainer';
+import NewCommentContainer from '../../../components/views/player-alt/comment-container/NewCommentContainer';
 
 function ViewerPage(props) {
 
@@ -93,7 +93,7 @@ function ViewerPage(props) {
         return (
             <Fragment>
                 <Grid.Column width={ streamIds.length > 1 ? 8 : 16} style={{ padding: 0 }} key={streamId}>
-                    <ViewerVideoContainer streamId={streamId} length={streamIds.length} index={index + 1} isPlaying={isPlaying}/>
+                    <ViewerVideoContainer streamId={streamId} length={streamIds.length} index={index + 1} isPlaying={isPlaying} hasStarted={currentLivestream.hasStarted}/>
                 </Grid.Column>
             </Fragment>
         );
@@ -151,18 +151,18 @@ function ViewerPage(props) {
                     <Grid style={{ margin: 0, height: '100%' }}>
                         { videoElements }
                     </Grid>
-                    <div className='video-box-overlay' style={{ display: isPlaying ? 'none' : 'block'}}>
+                    {/* <div className='video-box-overlay' style={{ display: isPlaying ? 'none' : 'block'}}>
                         <div className='video-box-overlay-content'>
                             <Button content='Click to join' primary onClick={() => setIsPlaying(true)}/>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <div className='video-menu'>
                     <div  className='video-menu-input'>
                         <Input action={{ content: 'Add a Question', color: 'teal', onClick: () => addNewQuestion() }} size='huge' maxLength='140' onKeyPress={addNewQuestionOnEnter} value={newQuestionTitle} fluid placeholder='Add your question...' onChange={(event) => {setNewQuestionTitle(event.target.value)}} />
                     </div>
                 </div> 
-            </div>
+            </div>   
             <div className='video-menu-left'>
                 <NewCommentContainer livestream={ currentLivestream }/>
             </div>
