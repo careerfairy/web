@@ -97,7 +97,7 @@ function QuestionContainer(props) {
 
     return (
         <div className='animated fadeInUp faster'>
-                <div className={'questionContainer ' + (props.question.type === 'current' ? 'active' : '')}>
+                <div className={'questionContainer ' + (props.question.type === 'current' ? 'active' : '') }>
                     <div className='questionTitle'>
                         { props.question.title }
                     </div>
@@ -115,7 +115,6 @@ function QuestionContainer(props) {
                             value={newCommentTitle}
                             onChange={(event) => {setNewCommentTitle(event.target.value)}}
                             onKeyPress={addNewCommentOnEnter}
-                            disabled={props.question.type === 'done'}
                             maxLength='340'
                             placeholder='Send a reaction...'
                             fluid
