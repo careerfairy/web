@@ -164,7 +164,7 @@ function ViewerPage(props) {
                 </div> 
             </div>   
             <div className='video-menu-left'>
-                <NewCommentContainer livestream={ currentLivestream } userData={userData}/>
+                <NewCommentContainer livestream={ currentLivestream } userData={userData}  user={user}/>
             </div>
             <Modal
                 style={{ zIndex: '9999' }}
