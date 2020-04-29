@@ -41,7 +41,7 @@
     "rewrites": [
       {
         "source": "**/**",
-        "function": "next2"
+        "function": "next3"
       }
     ]
   }]
