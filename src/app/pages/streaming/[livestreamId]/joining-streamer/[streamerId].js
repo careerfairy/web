@@ -80,16 +80,18 @@ function StreamingPage(props) {
         localVideoId,
         mediaConstraints,
         streamingCallbacks,
-        errorCallbacks
+        errorCallbacks,
+        livestreamId,
+        streamId
     );
 
-    useEffect(() => {
-        if (isInitialized) {
-            setTimeout(() => {
-                webRTCAdaptor.joinRoom(livestreamId, streamerId);
-            }, 2000);
-        }
-    },[isInitialized])
+    // useEffect(() => {
+    //     if (isInitialized) {
+    //         setTimeout(() => {
+    //             webRTCAdaptor.joinRoom(livestreamId, streamerId);
+    //         }, 2000);
+    //     }
+    // },[isInitialized])
 
     useEffect(() => {
         if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {

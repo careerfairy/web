@@ -151,11 +151,6 @@ function ViewerPage(props) {
                     <Grid style={{ margin: 0, height: '100%' }}>
                         { videoElements }
                     </Grid>
-                    {/* <div className='video-box-overlay' style={{ display: isPlaying ? 'none' : 'block'}}>
-                        <div className='video-box-overlay-content'>
-                            <Button content='Click to join' primary onClick={() => setIsPlaying(true)}/>
-                        </div>
-                    </div> */}
                 </div>
                 <div className='video-menu'>
                     <div  className='video-menu-input'>
