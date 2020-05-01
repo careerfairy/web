@@ -238,7 +238,12 @@ function Calendar(props) {
                     <Grid.Column width={10}>
                         <div style={{ float: 'right'}}>   
                             <div style={{  display: (universityData ? 'block' : 'none'), fontSize: '1.4em', color: 'white', fontWeight: '700', textAlign: 'right', lineHeight: '1.4em', margin: '5px'}}>Live streams for students @ { universityData ? universityData.universityName : '' }.</div>
-                            <Link href='/next-livestreams'><a><Button style={{ float: 'right'}} content='See all Live Streams' size='mini'/></a></Link>
+                            <div style={{ display: (universityData ? universityData.returnButton : false) ? 'none': 'block' }}>
+                                <Link href='/next-livestreams'><a><Button style={{ float: 'right'}} content='See all Live Streams' size='mini'/></a></Link>
+                            </div>
+                            <div style={{ display: (universityData ? universityData.returnButton : false) ? 'block': 'none' }}>
+                                <a href={universityData ? universityData.returnUrl : ''}><Button style={{ float: 'right'}} content={'To ' + (universityData ? universityData.universityName : '')}  size='mini'/></a>
+                            </div>
                         </div>
                     </Grid.Column>
                 </Grid>
