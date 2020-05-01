@@ -4,6 +4,7 @@ import axios from 'axios';
 
 import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor.js';
 import { WEBRTC_ERRORS } from '../../data/errors/StreamingErrors.js';
+import LivestreamId from '../../pages/upcoming-livestream/[livestreamId].js';
 
 export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId) {
 
@@ -206,8 +207,16 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
                         break;
                     }
                     case "ice_connection_state_changed": {
-                        if (typeof streamingCallbackObject.onIceConnectionState === 'function') {
-                            streamingCallbackObject.onIceConnectionState(infoObj);
+                        debugger;
+                        if (infoObj.state === 'connected') {
+                            if (typeof streamingCallbackObject.onConnected === 'function') {
+                                streamingCallbackObject.onConnected(infoObj);
+                            }
+                        }
+                        if (infoObj.state === 'disconnected') {
+                            if (typeof streamingCallbackObject.onDisconnected === 'function') {
+                                streamingCallbackObject.onDisconnected(infoObj);
+                            }
                         }
                         break;
                     }

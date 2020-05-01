@@ -1,5 +1,5 @@
 import {useState, useEffect, useRef, Fragment} from 'react';
-import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Dropdown} from "semantic-ui-react";
+import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Form} from "semantic-ui-react";
 
 import { withFirebasePage } from '../../../data/firebase';
 import axios from 'axios';
@@ -10,6 +10,7 @@ import useWebRTCAdaptor from '../../../components/custom-hook/useWebRTCAdaptor';
 import StreamerVideoDisplayer from '../../../components/views/streaming/video-container/StreamerVideoDisplayer';
 import NewCommentContainer from '../../../components/views/streaming/comment-container/NewCommentContainer';
 import ButtonWithConfirm from '../../../components/views/common/ButtonWithConfirm';
+import { Formik } from 'formik';
 
 function StreamingPage(props) {
 
@@ -33,6 +34,12 @@ function StreamingPage(props) {
     const [mediaConstraints, setMediaConstraints] = useState(null);
     const [numberOfViewers, setNumberOfViewers] = useState(0);
 
+    const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
+    const [showSpeakersModal, setShowSpeakersModal] = useState(false);
+
+    const [additionalSpeakers, setAdditionalSpeakers] = useState([]);
+    const [newSpeakerName, setNewSpeakerName] = useState("");
+
     const localVideoId = 'localVideo';
 
     let streamingCallbacks = {
@@ -42,6 +49,7 @@ function StreamingPage(props) {
         onPublishStarted: (infoObj) => {
             setMainStreamIdToStreamerList(infoObj.streamId);
             setStreamId(infoObj.streamId);
+            setShowDisconnectionModal(false);
         },
         onNewStreamAvailable: (infoObj) => {
             addStreamIdToStreamerList(infoObj.streamId);
@@ -50,14 +58,18 @@ function StreamingPage(props) {
             removeStreamIdFromStreamerList(infoObj.streamId);
         },
         onPublishFinished: (infoObj) => {
-            console.log("publish finiiiished");
             setIsStreaming(false);
         },
         onScreenShareStopped: (infoObj) => {
             setIsCapturingDesktop(false);
         },
+        onDisconnected: (infoObj) => {
+            setShowDisconnectionModal(true);
+        },
+        onConnected: (infoObj) => {
+            setShowDisconnectionModal(false);
+        },
         onClosed: (infoObj) => {
-            console.log("clooosed");
             setIsInitialized(false);
         },
         onUpdatedStats: (infoObj) => {},
@@ -107,6 +119,21 @@ function StreamingPage(props) {
     }, [livestreamId]);
 
     useEffect(() => {
+        if (livestreamId) {
+            const unsubscribe = props.firebase.listenToLivestreamLiveSpeakers(livestreamId, querySnapshot => {
+                let liveSpeakersList = [];
+                querySnapshot.forEach(doc => {
+                    let speaker = doc.data();
+                    speaker.id = doc.id;
+                    liveSpeakersList.push(speaker);
+                });
+                setAdditionalSpeakers(liveSpeakersList);
+            });
+            return () => unsubscribe();
+        }
+    }, [livestreamId]);
+
+    useEffect(() => {
         const constraints = {
             audio: {deviceId: audioSource ? {exact: audioSource} : undefined },
             video: { 
@@ -128,7 +155,9 @@ function StreamingPage(props) {
                         method: 'get',
                         url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=' + streamId,
                     }).then( response => { 
-                            setNumberOfViewers(response.data.totalWebRTCWatchersCount > -1 ? response.data.totalWebRTCWatchersCount : 0);
+                            if (response.data.totalWebRTCWatchersCount > -1) {
+                                setNumberOfViewers(response.data.totalWebRTCWatchersCount);
+                            }
                         }).catch(error => {
                             console.log(error);
                     });
@@ -186,6 +215,25 @@ function StreamingPage(props) {
         }
         setIsLocalMicMuted(!isLocalMicMuted);
     }
+
+    function addASpeaker(speakerName) {
+        return props.firebase.createNewLivestreamSpeaker(livestreamId, speakerName);
+    }
+
+    function removeSpeaker(speakerId) {
+        return props.firebase.deleteLivestreamSpeaker(livestreamId, speakerId);
+    }
+
+    let speakerElements = additionalSpeakers.map((speaker, index) => {
+        let link = 'https://careerfairy.io/streaming/' + livestreamId + '/joining-streamer/' + speaker.id;
+        return (
+            <div style={{ margin: '0 0 30px 0', border: '2px solid rgb(0, 210, 170)', padding: '20px', borderRadius: '10px', backgroundColor: 'rgb(252,252,252)', boxShadow: '0 0 2px grey' }} className='animated fadeIn'>
+                <h3 style={{ color: 'rgb(0, 210, 170)'}}><Icon name='user' style={{margin: '0 10px 0 0'}}/>{ speaker.name } <Button content={'Remove ' + speaker.name } icon='remove' size='mini' onClick={() => removeSpeaker(speaker.id)} style={{ margin: '0 20px'}}/></h3>
+                <Input type='text' value={link} disabled style={{ margin: '0 0 5px 0', color: 'red'}} fluid />
+                <p style={{ marginBottom: '10px', color: 'rgb(80,80,80)', fontSize: '0.8em'}}>Please send this link to { speaker.name } to allow her/him to join your live stream.</p>
+            </div>
+        )
+    })
 
     return (
         <div className='topLevelContainer'>
@@ -247,14 +295,14 @@ function StreamingPage(props) {
                                 </div>
                             </Grid.Column>
                         </Grid.Row>
-                        {/* <Grid.Row style={{ margin: '10px 0'}}>
+                        <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
-                                <div className='side-button' onClick={() => alert("blob")}>
+                                <div className='side-button' onClick={() => setShowSpeakersModal(true)}>
                                     <Icon name='user plus' size='large' style={{ margin: '0 0 5px 0', color: 'white'}}/>
-                                    <p style={{ fontSize: '0.8em', color: 'white' }}>Invite Speaker</p>
+                                    <p style={{ fontSize: '0.8em', color: 'white' }}>Invite Speakers</p>
                                 </div>
                             </Grid.Column>
-                        </Grid.Row> */}
+                        </Grid.Row>
                         {/* <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
                                 <div className='side-button' onClick={() => alert("blob")}>
@@ -265,6 +313,64 @@ function StreamingPage(props) {
                         </Grid.Row> */}
                     </Grid>
                 </div>
+                <Modal open={showDisconnectionModal}>
+                    <Modal.Header>You have been disconnected</Modal.Header>
+                    <Modal.Content>
+                        <p>No need to panic! To rejoin the stream, simply check your internet connection and reload this page.</p>
+                        <Button content='Reload' primary/>
+                    </Modal.Content>
+                </Modal>
+                <Modal open={showSpeakersModal} onClose={() => setShowSpeakersModal(false)}>
+                    <Modal.Header>Invite speakers</Modal.Header>
+                    <Modal.Content>
+                        <p style={{ fontSize: '0.9em', margin: '0 0 20px 0' }}>You can invite up to 3 speakers to join your stream. You should do this before starting your stream, to ensure that all streamer have joined before the event starts. When an invited speaker has successfully joined, you will be able to see and hear him/her in the stream overview.</p>
+                        { speakerElements }
+                        <div>
+                            <Formik
+                                initialValues={{ newSpeakerName: '' }}
+                                validate={values => {
+                                    let errors = {};
+                                    if (!values.newSpeakerName) {
+                                        errors.newSpeakerName = 'Please provide a name for the new speaker!';
+                                    }
+                                    return errors;
+                                }}
+                                onSubmit={(values, { setSubmitting, resetForm }) => {
+                                    setSubmitting(true);
+                                    addASpeaker(values.newSpeakerName)
+                                    .then(() => {
+                                        setSubmitting(false);
+                                        resetForm({});
+                                    }).catch(error => {
+                                        setSubmitting(false);
+                                        console.log(error);
+                                    });
+                                }}
+                            >
+                                {({
+                                    values,
+                                    errors,
+                                    touched,
+                                    handleChange,
+                                    setFieldValue,
+                                    handleBlur,
+                                    handleSubmit,
+                                    isSubmitting,
+                                }) => (
+                                    <Form onSubmit={handleSubmit} style={{ textAlign: 'left'}} size='big'>
+                                        <Form.Field>
+                                            <label style={{ fontSize: '0.9em', textTransform: 'uppercase', marginBottom: '5px' }}>Add a Speaker</label>
+                                            <Input  type='text' name='newSpeakerName' action={{ type: 'submit', content: 'Add a Speaker', icon: 'add', primary: true }} value={values.newSpeakerName} onChange={handleChange} onBlur={handleBlur} fluid primary style={{ margin: '5px 0 0 0'}} disabled={isSubmitting || additionalSpeakers.length > 2} placeholder="Enter the name of the speaker you want to invite"/>
+                                            <div className='field-error' style={{ color: 'red', fontSize: '0.8em', margin: '10px 0'}}>
+                                                {errors.newSpeakerName && touched.newSpeakerName && errors.newSpeakerName}
+                                            </div>
+                                        </Form.Field>
+                                    </Form>
+                                    )}
+                            </Formik>
+                        </div>
+                    </Modal.Content>
+                </Modal>
             <style jsx>{`
                 .hidden {
                     display: none

@@ -336,7 +336,21 @@ exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(async 
         return res.status(204).send('');
     }
 
-    admin.firestore().collection("userData").where("university", "==", req.body.universityId).get()
+    let university = req.body.universityId;
+    let faculties = req.body.faculties;
+
+    let collectionRef;
+
+    if (faculties && faculties.length > 0) {
+        collectionRef = admin.firestore().collection("userData")
+        .where("university", "==", university)
+        .where("faculty", "in", faculties);
+    } else {
+        collectionRef = admin.firestore().collection("userData")
+        .where("university", "==", university);
+    }
+
+    collectionRef.get()
     .then((querySnapshot) => {
         let counter = 0;
         console.log("snapshotSize:" + querySnapshot.size);
@@ -360,7 +374,57 @@ exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(async 
                 return res.status(400).send();
             });
         });
-    }).catch(() => {
+    }).catch(error => {
+        console.log('error:' + error);
+        return res.status(400).send();
+    })
+});
+
+exports.sendReminderEmailToViewersFromLivestream = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    let livestreamId = req.body.livestreamId;
+    let faculties = req.body.faculties;
+    let university = req.body.university;
+
+    console.log("Hello world");
+    admin.firestore().collection("livestreams").doc(livestreamId).collection("registeredStudents")
+    .where("faculty", "in", faculties).where("university", "==", university).get()
+    .then((querySnapshot) => {
+        let counter = 0;
+        console.log("snapshotSize:" + querySnapshot.size);
+        querySnapshot.forEach(doc => {
+            var id = doc.id;
+            const email = {
+                "TemplateId": req.body.templateId,
+                "From": 'CareerFairy <noreply@careerfairy.io>',
+                "To": id,
+                "TemplateModel": {       
+                }
+            };
+            client.sendEmailWithTemplate(email).then(() => {
+                counter++;
+                console.log("email sent to: " + id);
+                if (counter === querySnapshot.size) {
+                    return res.status(200).send();
+                }
+            }, error => {
+                console.log('error:' + error);
+                return res.status(400).send();
+            });
+        });
+    }).catch(error => {
+        console.log('error:' + error);
         return res.status(400).send();
     })
 });

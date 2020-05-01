@@ -37,7 +37,7 @@ function ViewerVideoContainer(props) {
     }, [isPlaying, props.isPlaying]);
 
     useEffect(() => {
-        if (document) {
+        if (document && nsToken && webRTCAdaptor === null) {
             setupWebRTCAdaptor();
         }
     }, [document, nsToken]);
@@ -87,8 +87,6 @@ function ViewerVideoContainer(props) {
             isPlayMode: true,
             debug: true,
             callback : function (info, infoObj) {
-                console.log(info);
-                console.log(infoObj);
                 switch(info) {
                     case "initialized": {
                         this.play(props.streamId);
@@ -101,11 +99,6 @@ function ViewerVideoContainer(props) {
                     }
                     case "play_finished": {
                         setIsPlaying(false);
-                        this.play(props.streamId);
-                        break;
-                    }
-                    case "closed": {
-                        
                         break;
                     }
                     case "ice_connection_state_changed": {
@@ -114,10 +107,6 @@ function ViewerVideoContainer(props) {
                                 setShowPlayButton(true);
                             });
                         }
-                        break;
-                    }
-                    case "pong": {
-                        
                         break;
                     }
                     default: {
@@ -129,6 +118,7 @@ function ViewerVideoContainer(props) {
                 console.log(error)
             }
         });
+        debugger;
         setWebRTCAdaptor(newAdaptor);
     }
 
