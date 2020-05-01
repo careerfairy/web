@@ -88,16 +88,8 @@ function StreamingPage(props) {
             streamingCallbacks,
             errorCallbacks,
             livestreamId,
-            livestreamId + '12345'
+            livestreamId
         );
-
-    // useEffect(() => {
-    //     if (isInitialized) {
-    //         setTimeout(() => {
-    //             webRTCAdaptor.joinRoom(livestreamId, livestreamId + "12345");
-    //         }, 2000);
-    //     }
-    // },[isInitialized]);
 
     useEffect(() => {
         if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
@@ -132,6 +124,14 @@ function StreamingPage(props) {
             return () => unsubscribe();
         }
     }, [livestreamId]);
+
+    useEffect(() => {
+        if (livestreamId) {
+            if (!additionalSpeakers.some( speaker => speaker.id === (livestreamId))) {
+                addASpeaker("Main Speaker", true);
+            }
+        } 
+    }, [additionalSpeakers,livestreamId]);
 
     useEffect(() => {
         const constraints = {
@@ -216,15 +216,16 @@ function StreamingPage(props) {
         setIsLocalMicMuted(!isLocalMicMuted);
     }
 
-    function addASpeaker(speakerName) {
-        return props.firebase.createNewLivestreamSpeaker(livestreamId, speakerName);
+    function addASpeaker(speakerName, main) {
+        debugger;
+        return props.firebase.createNewLivestreamSpeaker(livestreamId, speakerName, main);
     }
 
     function removeSpeaker(speakerId) {
         return props.firebase.deleteLivestreamSpeaker(livestreamId, speakerId);
     }
 
-    let speakerElements = additionalSpeakers.map((speaker, index) => {
+    let speakerElements = additionalSpeakers.filter(speaker => speaker.id !== livestreamId).map((speaker, index) => {
         let link = 'https://careerfairy.io/streaming/' + livestreamId + '/joining-streamer/' + speaker.id;
         return (
             <div style={{ margin: '0 0 30px 0', border: '2px solid rgb(0, 210, 170)', padding: '20px', borderRadius: '10px', backgroundColor: 'rgb(252,252,252)', boxShadow: '0 0 2px grey' }} className='animated fadeIn'>
@@ -254,11 +255,11 @@ function StreamingPage(props) {
                     <Grid centered className='middle aligned'>
                         <Grid.Column width={6} textAlign='center'>
                             <ButtonWithConfirm
-                            color='teal' 
-                            size='big' 
-                            buttonAction={isStreaming ? stopStreaming : startStreaming} 
-                            confirmDescription={isStreaming ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
-                            buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
+                                color='teal' 
+                                size='big' 
+                                buttonAction={isStreaming ? stopStreaming : startStreaming} 
+                                confirmDescription={isStreaming ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
+                                buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
                         </Grid.Column>
                     </Grid>
                 </div>
@@ -337,7 +338,7 @@ function StreamingPage(props) {
                                 }}
                                 onSubmit={(values, { setSubmitting, resetForm }) => {
                                     setSubmitting(true);
-                                    addASpeaker(values.newSpeakerName)
+                                    addASpeaker(values.newSpeakerName, false)
                                     .then(() => {
                                         setSubmitting(false);
                                         resetForm({});
@@ -501,4 +502,4 @@ function StreamingPage(props) {
     );
 }
 
-export default withFirebasePage(StreamingPage);
+export default withFirebasePage(StreamingPage);4223WW3232

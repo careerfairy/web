@@ -214,17 +214,31 @@ class Firebase {
         return streamerRef.get();
     }
 
-    createNewLivestreamSpeaker = (livestreamId, speakerName) => {
-        let streamerRef = this.firestore
+    createNewLivestreamSpeaker = (livestreamId, speakerName, mainSpeaker) => {
+        if (mainSpeaker) {
+            let streamerRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("liveSpeakers")
+            .doc(livestreamId);
+            return streamerRef.set({
+                counter: 0,
+                name: speakerName,
+                connected: false,
+                timestamp: firebase.firestore.Timestamp.fromDate(new Date())
+            }); 
+        } else {
+            let streamerRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("liveSpeakers");
-        return streamerRef.add({
-            counter: 0,
-            name: speakerName,
-            connected: false,
-            timestamp: firebase.firestore.Timestamp.fromDate(new Date())
-        });
+            return streamerRef.add({
+                counter: 0,
+                name: speakerName,
+                connected: false,
+                timestamp: firebase.firestore.Timestamp.fromDate(new Date())
+            });
+        }     
     }
 
     deleteLivestreamSpeaker = (livestreamId, speakerId) => {
