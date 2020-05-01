@@ -51,6 +51,16 @@ exports.next2 = functions.https.onRequest(async (req, res) => {
     });
 });
 
+exports.next3 = functions.https.onRequest(async (req, res) => {
+    const next = require('next');
+
+    const app = next({conf: { distDir: "dist/client" }});
+    const handler = routes.getRequestHandler(app);
+    await app.prepare().then(() => {
+        return handler(req, res);
+    });
+});
+
 const postmark = require("postmark");
 var serverToken = "3f6d5713-5461-4453-adfd-71f5fdad4e63";
 var client = new postmark.ServerClient(serverToken);
@@ -94,6 +104,84 @@ exports.sendPostmarkEmailVerificationEmail = functions.https.onRequest(async (re
         });
 });
 
+exports.sendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', '');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        res.status(204).send('');
+    }
+
+    const recipient_email = req.body.recipientEmail;
+    const pinCode = getRandomInt(9999);
+
+    await admin.firestore().collection("userData").doc(recipient_email).set({ validationPin: pinCode });
+
+    const email = {
+        "TemplateId": 17669843,
+        "From": 'CareerFairy <noreply@careerfairy.io>',
+        "To": recipient_email,
+        "TemplateModel": { pinCode: pinCode }
+    };
+
+    return client.sendEmailWithTemplate(email).then(response => {
+        res.sendStatus(200);
+    }, error => {
+        res.sendStatus(500);
+    });
+});
+
+function getRandomInt(max) {
+    let variable = Math.floor(Math.random() * Math.floor(max));
+    if (variable < 1000) {
+        return variable + 1000;
+    } else {
+        return variable;
+    }
+}
+
+exports.verifyEmailWithPin = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', '');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        res.status(204).send('');
+    }
+
+    const recipient_email = req.body.recipientEmail;
+    const pinCode = req.body.pinCode;
+
+    admin.firestore().collection("userData").doc(recipient_email).get().then( querySnapshot => {
+        if (!querySnapshot.isEmpty) {
+            let user = querySnapshot.data();
+            if (user.validationPin === pinCode) {
+                admin.auth().getUserByEmail(recipient_email).then( userRecord => {
+                    admin.auth().updateUser(userRecord.uid, {
+                        emailVerified: true
+                    }).then( userRecord => {
+                        console.log(userRecord);
+                        res.sendStatus(200);
+                    })
+                })
+            } else {
+                res.sendStatus(403);
+            }
+        }
+    }).catch( error => {
+        res.sendStatus(500);
+    });
+});
+
 exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(async (req, res) => {
 
     res.set('Access-Control-Allow-Origin', '*');
@@ -128,9 +216,9 @@ exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(async (req, r
                 res.send('Error: ' + error);
             });
         })
-        .catch((error) => {
-            console.log(error);
-        });
+    .catch((error) => {
+        console.log(error);
+    });
 });
 
 const axios = require('axios');
@@ -248,7 +336,21 @@ exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(async 
         return res.status(204).send('');
     }
 
-    admin.firestore().collection("userData").where("university", "==", req.body.universityId).get()
+    let university = req.body.universityId;
+    let faculties = req.body.faculties;
+
+    let collectionRef;
+
+    if (faculties && faculties.length > 0) {
+        collectionRef = admin.firestore().collection("userData")
+        .where("university", "==", university)
+        .where("faculty", "in", faculties);
+    } else {
+        collectionRef = admin.firestore().collection("userData")
+        .where("university", "==", university);
+    }
+
+    collectionRef.get()
     .then((querySnapshot) => {
         let counter = 0;
         console.log("snapshotSize:" + querySnapshot.size);
@@ -272,7 +374,57 @@ exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(async 
                 return res.status(400).send();
             });
         });
-    }).catch(() => {
+    }).catch(error => {
+        console.log('error:' + error);
+        return res.status(400).send();
+    })
+});
+
+exports.sendReminderEmailToViewersFromLivestream = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    let livestreamId = req.body.livestreamId;
+    let faculties = req.body.faculties;
+    let university = req.body.university;
+
+    console.log("Hello world");
+    admin.firestore().collection("livestreams").doc(livestreamId).collection("registeredStudents")
+    .where("faculty", "in", faculties).where("university", "==", university).get()
+    .then((querySnapshot) => {
+        let counter = 0;
+        console.log("snapshotSize:" + querySnapshot.size);
+        querySnapshot.forEach(doc => {
+            var id = doc.id;
+            const email = {
+                "TemplateId": req.body.templateId,
+                "From": 'CareerFairy <noreply@careerfairy.io>',
+                "To": id,
+                "TemplateModel": {       
+                }
+            };
+            client.sendEmailWithTemplate(email).then(() => {
+                counter++;
+                console.log("email sent to: " + id);
+                if (counter === querySnapshot.size) {
+                    return res.status(200).send();
+                }
+            }, error => {
+                console.log('error:' + error);
+                return res.status(400).send();
+            });
+        });
+    }).catch(error => {
+        console.log('error:' + error);
         return res.status(400).send();
     })
 });

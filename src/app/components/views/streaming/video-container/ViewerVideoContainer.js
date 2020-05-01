@@ -37,14 +37,18 @@ function ViewerVideoContainer(props) {
     }, [isPlaying, props.isPlaying]);
 
     useEffect(() => {
-        if (document) {
+        if (document && nsToken && webRTCAdaptor === null) {
             setupWebRTCAdaptor();
         }
-    }, [document, nsToken]);
+    }, [document, nsToken, webRTCAdaptor]);
+
+    useEffect(() => {
+        setWebRTCAdaptor(null);
+    }, [props.streamer.connectionValue]);
 
     function playVideo() {
         setShowPlayButton(false);
-        return document.getElementById('videoElement' + props.streamId).play();
+        return document.getElementById('videoElement' + props.streamer.id).play();
     }
 
     function convertTokenFromXirsysApi(token) {
@@ -83,15 +87,15 @@ function ViewerVideoContainer(props) {
             mediaConstraints : mediaConstraints,
             peerconnection_config : pc_config,
             sdp_constraints : sdpConstraints,
-            remoteVideoId : 'videoElement' + props.streamId,
+            remoteVideoId : 'videoElement' + props.streamer.id,
             isPlayMode: true,
             debug: true,
             callback : function (info, infoObj) {
-                console.log(info);
-                console.log(infoObj);
                 switch(info) {
                     case "initialized": {
-                        this.play(props.streamId);
+                        setTimeout(() => {
+                            this.play(props.streamer.id);
+                        }, 3000);
                         break;
                     }
                     case "play_started": {
@@ -100,11 +104,6 @@ function ViewerVideoContainer(props) {
                     }
                     case "play_finished": {
                         setIsPlaying(false);
-                        this.play(props.streamId);
-                        break;
-                    }
-                    case "closed": {
-                        
                         break;
                     }
                     case "ice_connection_state_changed": {
@@ -113,10 +112,6 @@ function ViewerVideoContainer(props) {
                                 setShowPlayButton(true);
                             });
                         }
-                        break;
-                    }
-                    case "pong": {
-                        
                         break;
                     }
                     default: {
@@ -134,7 +129,7 @@ function ViewerVideoContainer(props) {
     return (
         <Fragment>
             <div className='videoContainer' style={{ height: '100%' }}>
-                <video id={'videoElement' + props.streamId} className='videoElement' width={ props.length > 1 ? '' : '100%' } controls={true} style={{  left: (props.index % 2 === 0) ? '0' : '', right: (props.index % 2 === 1) ? '0' : '', opacity: isPlaying ? 1 : 0}}/>
+                <video id={'videoElement' + props.streamer.id} className='videoElement' width={ props.length > 1 ? '' : '100%' } controls={true} style={{  left: (props.index % 2 === 0) ? '0' : '', right: (props.index % 2 === 1) ? '0' : '', opacity: isPlaying ? 1 : 0}}/>
                 <div className={(showPlayButton ? 'playButton' : 'hidden')}><Icon name='play' onClick={() => playVideo()}/></div>
                 <div className={'connecting-overlay ' + (props.hasStarted && isPlaying ? 'hidden' : '')}>
                     <div className='connecting-overlay-content'>

@@ -13,7 +13,7 @@ function SignUpPage(props) {
 
     const [user, setUser] = useState(false);
     const [userEmailVerified, setUserEmailVerified] = useState(false);
-    const router = useRouter();
+    const [emailVerificationSent, setEmailVerificationSent] = useState(false);
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
@@ -26,20 +26,45 @@ function SignUpPage(props) {
     },[]);
 
     return (
-        <div className='tealBackground'>
-            <header>
-                <Link href='/'><a><Image src='/logo_white.png' style={{ width: '150px', margin: '20px', display: 'inline-block' }} /></a></Link>
-            </header>
-            <SignUpForm user={user}/>
-            <style jsx>{`
-                .tealBackground {
-                    min-height: 100vh;
-                    height: 100%;
-                    background-color: rgb(0, 210, 170);
-                    padding: 0 0 40px 0;
-                }
-            `}</style>
-        </div>
+        <Fragment>
+            <Head>
+                <title key="title">CareerFairy | Sign Up</title>
+            </Head>
+            <div className='tealBackground'>
+                <header>
+                    <Link href='/'><a><Image src='/logo_white.png' style={{ width: '150px', margin: '20px', display: 'inline-block' }} /></a></Link>
+                </header>
+                <div style={{ textAlign: 'center', color: 'rgb(200,200,200)' }}>
+                    <Icon name='film' size='big' style={{ margin: '0 10px', color: 'white'}}/>
+                    <Icon name='arrow right circle alternate' size='big' style={{ margin: '0 10px', color: 'white'}}/>
+                    <Icon name='briefcase' size='big' style={{ margin: '0 10px', color: 'white'}}/>
+                </div>
+                <div style={{ color: 'white', fontWeight: '500', fontSize: '2em', margin: '40px 0 30px 0', textAlign: 'center' }}>
+                    Sign Up
+                </div>
+                <div className={ emailVerificationSent ? 'hidden' : ''}>
+                    <SignUpForm user={user} emailVerificationSent={emailVerificationSent} setEmailVerificationSent={(bool) => setEmailVerificationSent(bool)}/>
+                </div>
+                <div className={ emailVerificationSent ? '' : 'hidden'}>
+                    <SignUpFormSent user={user} emailVerificationSent={emailVerificationSent}/>
+                </div>
+                <div style={{ color: 'white', fontWeight: '700', fontSize: '1.3em', margin: '40px 0 30px 0', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
+                    Meet Your Future
+                </div>
+                <style jsx>{`
+                    .hidden {
+                        display: none
+                    }
+
+                    .tealBackground {
+                        min-height: 100vh;
+                        height: 100%;
+                        background-color: rgb(0, 210, 170);
+                        padding: 0 0 40px 0;
+                    }
+                `}</style>
+            </div>
+        </Fragment>
     )
 }
 
@@ -47,27 +72,25 @@ export default withFirebase(SignUpPage);
 
 const SignUpForm = withFirebase(SignUpFormBase);
 
-export function SignUpFormBase(props) {
+const SignUpFormSent = SignUpFormValidate;
+
+function SignUpFormBase(props) {
 
     const [emailSent, setEmailSent] = useState(false);
     const [errorMessageShown, setErrorMessageShown] = useState(false);
-    const [emailVerificationSent, setEmailVerificationSent] = useState(false);
     const [generalLoading, setGeneralLoading] = useState(false);
 
     useEffect(() => {
-        if (emailSent && props.user && !emailVerificationSent) {
+        if (emailSent && props.user && !props.emailVerificationSent) {
             axios({
                 method: 'post',
-                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmail',
+                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmailWithPin',
                 data: {
                     recipientEmail: props.user.email,
-                    redirect_link: 'https://careerfairy.io/login'
                 }
             }).then( response => { 
-                    props.firebase.auth.signOut().then(() => {
-                        setEmailVerificationSent(true);
-                        setGeneralLoading(false);
-                    })
+                    props.setEmailVerificationSent(true);
+                    setGeneralLoading(false);
                 }).catch(error => {
                     setGeneralLoading(false);
             });
@@ -75,15 +98,12 @@ export function SignUpFormBase(props) {
     },[props.user, emailSent]);
 
     function resendVerificationEmail() {
-        setEmailVerificationSent(false);
+        props.setEmailVerificationSent(false);
         setEmailSent(true);
     }
 
     return (
         <Fragment>
-            <Head>
-                <title key="title">CareerFairy | Sign up</title>
-            </Head>
             <div className='tealBackground'>
                 <Container>
                     <div className='formContainer'>
@@ -140,14 +160,6 @@ export function SignUpFormBase(props) {
                                 /* and other goodies */
                             }) => (
                                 <Form id='signUpForm' onSubmit={handleSubmit}>
-                                    <div style={{ textAlign: 'center', color: 'rgb(200,200,200)' }}>
-                                        <Icon name='film' size='big' style={{ margin: '0 10px'}}/>
-                                        <Icon name='arrow right circle alternate' size='big' style={{ margin: '0 10px'}}/>
-                                        <Icon name='briefcase' size='big' style={{ margin: '0 10px'}}/>
-                                    </div>
-                                    <div style={{ color: 'rgb(0, 210, 170)', fontWeight: '500', fontSize: '2em', margin: '40px 0 30px 0', textAlign: 'center' }}>
-                                        CareerFairy
-                                    </div>
                                     <Form.Field>
                                         <label style={{ color: 'rgb(120,120,120)' }}>Email</label>
                                         <input id='emailInput' type='text' name='email' placeholder='Email' onChange={handleChange} onBlur={handleBlur} value={values.email} disabled={isSubmitting || emailSent || generalLoading} />
@@ -177,12 +189,6 @@ export function SignUpFormBase(props) {
                                         </div>
                                     </Form.Field>
                                     <Button id='submitButton' fluid primary size='big' disabled={emailSent} type="submit" loading={isSubmitting || generalLoading}>Sign up</Button>
-                                    <Message positive hidden={!emailVerificationSent}>
-                                        <Message.Header>Verification Email Sent</Message.Header>
-                                        <p>
-                                        We have a just send an email verification link to the address you provided. Please click on it to start your journey on CareerFairy. <span className='resend-link' onClick={() => resendVerificationEmail()}>Resend the email verification link.</span>
-                                        </p>
-                                    </Message>
                                     <div className='reset-email'>
                                         <div style={{ marginBottom: '5px'}}>Already part of the family?</div>
                                         <Link href='/login'><a href='#'>Log in</a></Link>
@@ -195,8 +201,218 @@ export function SignUpFormBase(props) {
                             )}
                             </Formik>
                         </div>
-                        <div style={{ color: 'white', fontWeight: '700', fontSize: '1.3em', margin: '40px 0 30px 0', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
-                            Meet Your Future
+                        <style jsx>{`
+                                
+                            .hidden {
+                                display: none
+                            }
+
+                            #signingContainer {
+                                width: 55%;
+                                padding: 50px;
+                                height: 100%;
+                                border: 2px solid red;
+                            }
+
+                            #signingContainer h5{
+                                font-weight: 400;
+                            }
+
+                            #signUpForm h1 {
+                                color: rgb(0,212,170);
+                                margin-bottom: 30px;
+                            }
+
+                            #signUpForm label{
+                                font-weight: 400;
+                                font-size: 0.95em;
+                                margin-bottom: 15px;
+                                color: dimgrey;
+                            }
+
+                            .emailSignUpInfo {
+                                margin-top: 10px;
+                                font-size: 1em;
+                                color: white;
+                                margin: 0 auto;
+                                text-align: center;
+                            }
+
+                            .formContainer {
+                                max-width: 500px;
+                                background-color: rgb(240,240,240);
+                                margin: 2% auto 20px auto;
+                                padding: 30px 50px;
+                                border-radius: 5px;
+                                box-shadow: 0 0 5px rgb(150,150,150);
+                            }
+
+                            label {
+                                color: rgb(160,160,160);
+                            }
+
+                            .socialLoginBlock {
+                                margin: 30px 0 0 0;
+                            }
+
+                            .socialLogin {
+                                margin: 15px 0 0 0;
+                            }
+
+                            .field-error {
+                                margin-top: 10px;
+                                color: red;
+                            }
+
+            
+
+                            #loginButton {
+                                margin-top: 40px;
+                            }
+
+                            .errorMessage {
+                                padding: 20px;
+                                text-align: center;
+                                color: red;
+                            }
+
+                            .loginModal {
+                                background-color: rgb(230,230,230);
+                                padding: 60px;
+                                font-weight: 3em;
+                            }
+
+                            #loginModalTitle {
+                                font-size: 4em;
+                                color: rgb(0, 210, 170);
+                            }
+
+                            #loginModalLogo {
+                                margin-top: 50px;
+                                max-height: 150px;
+                            }
+
+                            .loginModalPrivacy {
+                                margin-top: 30px;
+                            }
+
+                            .reset-email {
+                                margin: 20px auto 0 auto;
+                                text-align: center;
+                            }
+
+                            .resend-link {
+                                text-decoration: underline;
+                                cursor: pointer;
+                            }
+                        `}</style>
+                </Container>
+            </div>
+        </Fragment>
+        )
+    }
+
+function SignUpFormValidate(props) {
+
+    const [errorMessageShown, setErrorMessageShown] = useState(false);
+    const [incorrectPin, setIncorrectPin] = useState(false);
+    const [generalLoading, setGeneralLoading] = useState(false);
+    const router = useRouter();
+
+    function resendVerificationEmail() {
+        setGeneralLoading(true);
+        axios({
+            method: 'post',
+            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmailWithPin',
+            data: {
+                recipientEmail: props.user.email,
+            }
+        }).then( response => { 
+                setIncorrectPin(false);
+                props.setEmailVerificationSent(true);
+                setGeneralLoading(false);
+            }).catch(error => {
+                setIncorrectPin(false);
+                setGeneralLoading(false);
+        });
+    }
+
+    return (
+        <Fragment>
+            <div className='tealBackground'>
+                <Container>
+                    <div className='formContainer'>
+                        <Formik
+                            initialValues={{ pinCode: '' }}
+                            validate={values => {
+                                let errors = {};
+                                debugger;
+                                if (!values.pinCode) {
+                                    errors.pinCode = 'A PIN code is required';
+                                } else if (!/^[0-9]{4}$/.test(values.pinCode)) {
+                                    errors.pinCode = 'The PIN code must be number between 0 and 9999';
+                                }       
+                                return errors;
+                            }}
+                            onSubmit={(values, { setSubmitting }) => {
+                                setIncorrectPin(false);
+                                axios({
+                                    method: 'post',
+                                    url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/verifyEmailWithPin',
+                                    data: {
+                                        recipientEmail: props.user.email,
+                                        pinCode: parseInt(values.pinCode)
+                                    }
+                                }).then( response => { 
+                                        console.log("success!");
+                                        return router.push('/profile');
+                                    }).catch(error => {
+                                        setIncorrectPin(true);
+                                        setGeneralLoading(false);
+                                        setSubmitting(false);
+                                        return;
+                                });
+                            }}
+                            >
+                            {({
+                                values,
+                                errors,
+                                touched,
+                                handleChange,
+                                handleBlur,
+                                handleSubmit,
+                                setFieldValue,
+                                isSubmitting,
+                                /* and other goodies */
+                            }) => (
+                                <Form id='signUpForm' onSubmit={handleSubmit}>
+                                    <Message positive hidden={false}>
+                                        <Message.Header>Check your mailbox!</Message.Header>
+                                        <p>
+                                            We have just sent you an email containing a 4-digit PIN code. Please enter this code below to start your journey on CareerFairy. <span className='resend-link' onClick={() => resendVerificationEmail()}>Resend the email verification link.</span>
+                                        </p>
+                                    </Message>
+                                    <Form.Field>
+                                        <label style={{ color: 'rgb(120,120,120)' }}>PIN Code</label>
+                                        <input id='pinCode' type='text' name='pinCode' placeholder='PIN Code' onChange={handleChange} onBlur={handleBlur} value={values.pinCode} disabled={isSubmitting || generalLoading} maxLength='4'/>
+                                        <div className='field-error'>
+                                            {errors.pinCode && touched.pinCode && errors.pinCode}
+                                        </div>
+                                    </Form.Field>
+                                    <Button id='submitButton' fluid primary size='big' type="submit" loading={isSubmitting || generalLoading}>Validate Email</Button>
+                                    <Message negative hidden={!incorrectPin}>
+                                        <Message.Header>Incorrect PIN</Message.Header>
+                                        <p>
+                                            The PIN code you entered appears to be incorrect. <span className='resend-link' onClick={() => resendVerificationEmail()}>Resend the verification email.</span>
+                                        </p>
+                                    </Message>
+                                    <div className='reset-email'>
+                                        <div style={{ marginBottom: '5px'}}>Having issues signing up?<a style={{ marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us know</a></div>
+                                    </div> 
+                                    <div className={'errorMessage ' + (errorMessageShown ? '' : 'hidden')}>An error occured while creating to your account</div>
+                                </Form>
+                            )}
+                            </Formik>
                         </div>
                         <style jsx>{`
                                 

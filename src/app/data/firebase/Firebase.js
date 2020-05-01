@@ -110,6 +110,13 @@ class Firebase {
         return userDataRef.get();
     };
 
+    getCareerCenterByUniversityId = (universityId) => {
+        let userDataRef = this.firestore
+            .collection("careerCenterData")
+            .where("universityId", "==", universityId);
+        return userDataRef.get();
+    };
+
     // MENTORS
 
     getMentors = () => {
@@ -265,8 +272,76 @@ class Firebase {
         let streamerRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
-            .collection("speakers");
+            .collection("speakers")
         return streamerRef.get();
+    }
+
+    createNewLivestreamSpeaker = (livestreamId, speakerName, mainSpeaker) => {
+        if (mainSpeaker) {
+            let streamerRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("liveSpeakers")
+            .doc(livestreamId);
+            return streamerRef.set({
+                counter: 0,
+                name: speakerName,
+                connected: false,
+                timestamp: firebase.firestore.Timestamp.fromDate(new Date())
+            }); 
+        } else {
+            let streamerRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("liveSpeakers");
+            return streamerRef.add({
+                counter: 0,
+                name: speakerName,
+                connected: false,
+                timestamp: firebase.firestore.Timestamp.fromDate(new Date())
+            });
+        }     
+    }
+
+    deleteLivestreamSpeaker = (livestreamId, speakerId) => {
+        let streamerRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("liveSpeakers")
+            .doc(speakerId);
+        return streamerRef.delete();
+    }
+
+    listenToLivestreamLiveSpeakers = (livestreamId, callback) => {
+        let streamerRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("liveSpeakers")
+            .orderBy("timestamp", "asc");;
+        return streamerRef.onSnapshot(callback);
+    }
+
+    setLivestreamLiveSpeakersConnected = (livestreamId, registeredSpeaker) => {
+        let streamerRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("liveSpeakers")
+            .doc(registeredSpeaker.id);
+        return streamerRef.update({
+            connected: true,
+            connectionValue: registeredSpeaker.connectionValue ? (registeredSpeaker.connectionValue + 1) : 1
+        });
+    }
+
+    setLivestreamLiveSpeakersDisconnected = (livestreamId, speakerId) => {
+        let streamerRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("liveSpeakers")
+            .doc(speakerId);
+        return streamerRef.update({
+            connected: false,
+        });
     }
 
     getLegacyScheduledLivestreamById = (livestreamId) => {

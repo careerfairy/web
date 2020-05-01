@@ -4,8 +4,9 @@ import axios from 'axios';
 
 import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor.js';
 import { WEBRTC_ERRORS } from '../../data/errors/StreamingErrors.js';
+import LivestreamId from '../../pages/upcoming-livestream/[livestreamId].js';
 
-export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject) {
+export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId) {
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
     
@@ -15,9 +16,6 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
     const [playFinishedStream, setPlayFinishedStream] = useState(null);
 
     const [nsToken, setNsToken] = useState(null);
-
-    const [roomId, setRoomId] = useState(null);
-    const [streamId, setStreamId] = useState(null);
 
     useEffect(() => {
         axios({
@@ -31,10 +29,10 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
     }, []);
 
     useEffect(() => {
-        if (document && mediaConstraints) {
+        if (document && mediaConstraints && nsToken && nsToken.iceServers) {
             setupWebRTCAdaptor();
         }
-    }, [mediaConstraints, document]);
+    }, [mediaConstraints, document, nsToken]);
 
     useEffect(() => {
         if (addedStream) {
@@ -105,8 +103,6 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
 
     function publishNewStream(adaptorInstance, infoObj) {
         adaptorInstance.publish(infoObj.streamId, 'null', infoObj.ATTR_ROOM_NAME);
-        setStreamId(infoObj.streamId);
-        setRoomId(infoObj.ATTR_ROOM_NAME);
         if (infoObj.streams && infoObj.streams.length > 0) {
             infoObj.streams.forEach( streamId => {
                 adaptorInstance.play(streamId, "null", infoObj.ATTR_ROOM_NAME);
@@ -139,6 +135,9 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
                         if (typeof streamingCallbackObject.onInitialized === 'function') {
                             streamingCallbackObject.onInitialized(infoObj);
                         }
+                        setTimeout(() => {
+                            this.joinRoom(roomId, streamId);
+                        }, 2000);
                         break;
                     }
                     case "joinedTheRoom": {
@@ -208,8 +207,16 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
                         break;
                     }
                     case "ice_connection_state_changed": {
-                        if (typeof streamingCallbackObject.onIceConnectionState === 'function') {
-                            streamingCallbackObject.onIceConnectionState(infoObj);
+                        debugger;
+                        if (infoObj.state === 'connected') {
+                            if (typeof streamingCallbackObject.onConnected === 'function') {
+                                streamingCallbackObject.onConnected(infoObj);
+                            }
+                        }
+                        if (infoObj.state === 'disconnected') {
+                            if (typeof streamingCallbackObject.onDisconnected === 'function') {
+                                streamingCallbackObject.onDisconnected(infoObj);
+                            }
                         }
                         break;
                     }

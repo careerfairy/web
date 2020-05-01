@@ -1,5 +1,5 @@
 import {useState, useEffect, useRef, Fragment} from 'react';
-import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Dropdown} from "semantic-ui-react";
+import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Form} from "semantic-ui-react";
 
 import { withFirebasePage } from '../../../data/firebase';
 import ButtonWithConfirm from '../../../components/views/common/ButtonWithConfirm';
@@ -14,7 +14,9 @@ import LivestreamPdfViewer from '../../../components/util/LivestreamPdfViewer';
 import StreamerVideoDisplayer from '../../../components/views/streaming/video-container/StreamerVideoDisplayer';
 import SmallStreamerVideoDisplayer from '../../../components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 import NewCommentContainer from '../../../components/views/streaming/comment-container/NewCommentContainer';
-import { functions } from 'firebase';
+import ButtonWithConfirm from '../../../components/views/common/ButtonWithConfirm';
+import { Formik } from 'formik';
+import { bool } from 'twilio/lib/base/serialize';
 
 function StreamingPage(props) {
 
@@ -23,7 +25,6 @@ function StreamingPage(props) {
 
     const [currentLivestream, setCurrentLivestream] = useState(false);
 
-    const [isInitialized, setIsInitialized] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
     const [isCapturingDesktop, setIsCapturingDesktop] = useState(false);
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
@@ -39,31 +40,41 @@ function StreamingPage(props) {
     const [mediaConstraints, setMediaConstraints] = useState(null);
     const [numberOfViewers, setNumberOfViewers] = useState(0);
 
+    const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
+    const [showSpeakersModal, setShowSpeakersModal] = useState(false);
+
+    const [additionalSpeakers, setAdditionalSpeakers] = useState(false);
+    const [registeredSpeaker, setRegisteredSpeaker] = useState(false);
+
     const localVideoId = 'localVideo';
 
     let streamingCallbacks = {
-        onInitialized: (infoObj) => {
-            setIsInitialized(true);
-        },
+        onInitialized: (infoObj) => {},
         onPublishStarted: (infoObj) => {
             setMainStreamIdToStreamerList(infoObj.streamId);
-            setStreamId(infoObj.streamId);
+            setShowDisconnectionModal(false);
+            setIsStreaming(true);
         },
         onNewStreamAvailable: (infoObj) => {
             addStreamIdToStreamerList(infoObj.streamId);
         },
         onStreamLeaved: (infoObj) => {
             removeStreamIdFromStreamerList(infoObj.streamId);
+            setLiveSpeakerDisconnected(infoObj.streamId);
         },
         onPublishFinished: (infoObj) => {
-            console.log("publish finiiiished");
             setIsStreaming(false);
         },
         onScreenShareStopped: (infoObj) => {
             setIsCapturingDesktop(false);
         },
+        onDisconnected: (infoObj) => {
+            setShowDisconnectionModal(true);
+        },
+        onConnected: (infoObj) => {
+            setShowDisconnectionModal(false);
+        },
         onClosed: (infoObj) => {
-            console.log("clooosed");
             setIsInitialized(false);
         },
         onUpdatedStats: (infoObj) => {},
@@ -80,7 +91,9 @@ function StreamingPage(props) {
             localVideoId,
             mediaConstraints,
             streamingCallbacks,
-            errorCallbacks
+            errorCallbacks,
+            livestreamId,
+            livestreamId
         );
 
     const pdfObject = {
@@ -88,14 +101,6 @@ function StreamingPage(props) {
         httpHeaders: {
         }
     }
-
-    useEffect(() => {
-        if (isInitialized) {
-            setTimeout(() => {
-                webRTCAdaptor.joinRoom(livestreamId, livestreamId + "12345");
-            }, 2000);
-        }
-    },[isInitialized]);
 
     useEffect(() => {
         if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
@@ -107,6 +112,14 @@ function StreamingPage(props) {
     },[devices]);
 
     useEffect(() => {
+        if (isStreaming) {
+            setLiveSpeakerConnected(registeredSpeaker);
+        } else {
+            setLiveSpeakerDisconnected(registeredSpeaker.id);
+        }
+    },[isStreaming]);
+
+    useEffect(() => {
         if (livestreamId) {
             props.firebase.listenToScheduledLivestreamById(livestreamId, querySnapshot => {
                 let livestream = querySnapshot.data();
@@ -115,6 +128,29 @@ function StreamingPage(props) {
             });
         }
     }, [livestreamId]);
+
+    useEffect(() => {
+        if (livestreamId) {
+            const unsubscribe = props.firebase.listenToLivestreamLiveSpeakers(livestreamId, querySnapshot => {
+                let liveSpeakersList = [];
+                querySnapshot.forEach(doc => {
+                    let speaker = doc.data();
+                    speaker.id = doc.id;
+                    liveSpeakersList.push(speaker);
+                });
+                setAdditionalSpeakers(liveSpeakersList);
+            });
+            return () => unsubscribe();
+        }
+    }, [livestreamId]);
+
+    useEffect(() => {
+        if (livestreamId && Array.isArray(additionalSpeakers)) {
+            if (!additionalSpeakers.some( speaker => speaker.id === (livestreamId))) {
+                addASpeaker("Main Speaker", true);
+            }
+        } 
+    }, [additionalSpeakers,livestreamId]);
 
     useEffect(() => {
         const constraints = {
@@ -136,28 +172,36 @@ function StreamingPage(props) {
                 setInterval(() => {
                     axios({
                         method: 'get',
-                        url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=' + streamId,
+                        url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=' + livestreamId,
                     }).then( response => { 
-                            setNumberOfViewers(response.data.totalWebRTCWatchersCount > -1 ? response.data.totalWebRTCWatchersCount : 0);
+                            if (response.data.totalWebRTCWatchersCount > -1) {
+                                setNumberOfViewers(response.data.totalWebRTCWatchersCount);
+                            }
                         }).catch(error => {
                             console.log(error);
                     });
                 }, 10000);
+            } else {
+                setNumberOfViewers(0);
             }
         }
     }, [currentLivestream, currentLivestream.hasStarted]);
 
     useEffect(() => {
-        if (currentLivestream.hasStarted) {
-            setIsStreaming(true);
-        } else {
-            setIsStreaming(false);
-            setNumberOfViewers(0);
+        if (livestreamId) {
+            const unsubscribe = props.firebase.listenToLivestreamLiveSpeakers(livestreamId, querySnapshot => {
+                let currentSpeaker = null;
+                querySnapshot.forEach(doc => {
+                    if (livestreamId === doc.id) {
+                        currentSpeaker = doc.data();
+                        currentSpeaker.id = doc.id;
+                    }
+                });
+                setRegisteredSpeaker(currentSpeaker);
+            });
+            return () => unsubscribe();
         }
-    }, [currentLivestream.hasStarted]);
-
-    function createNewStreamerLink() {
-    }
+    }, [livestreamId]);
 
     function startStreaming() {
         props.firebase.setLivestreamHasStarted(true, currentLivestream.id);
@@ -185,9 +229,9 @@ function StreamingPage(props) {
 
     function toggleScreenSharing() {
         if (isCapturingDesktop) {
-            webRTCAdaptor.switchVideoCapture(streamId);
+            webRTCAdaptor.switchVideoCapture(livestreamId);
         } else {
-            webRTCAdaptor.switchDesktopCaptureWithCamera(streamId);
+            webRTCAdaptor.switchDesktopCaptureWithCamera(livestreamId);
         }
         setIsCapturingDesktop(!isCapturingDesktop);
     }
@@ -201,12 +245,49 @@ function StreamingPage(props) {
         setIsLocalMicMuted(!isLocalMicMuted);
     }
 
+    function addASpeaker(speakerName, main) {
+        debugger;
+        return props.firebase.createNewLivestreamSpeaker(livestreamId, speakerName, main);
+    }
+
+    function removeSpeaker(speakerId) {
+        return props.firebase.deleteLivestreamSpeaker(livestreamId, speakerId);
+    }
+
+    function setLiveSpeakerConnected(speaker) {
+        if (registeredSpeaker) {
+            props.firebase.setLivestreamLiveSpeakersConnected(livestreamId, speaker);
+        }
+    }
+
+    function setLiveSpeakerDisconnected(speakerId) {
+        debugger;
+        if (registeredSpeaker) {
+            props.firebase.setLivestreamLiveSpeakersDisconnected(livestreamId, speakerId);
+        }
+    }
+
+    let speakerElements = [];
+
+    if (additionalSpeakers && additionalSpeakers.length > 0) {
+        speakerElements = additionalSpeakers.filter(speaker => speaker.id !== livestreamId).map((speaker, index) => {
+            let link = 'https://careerfairy.io/streaming/' + livestreamId + '/joining-streamer/' + speaker.id;
+            return (
+                <div style={{ margin: '0 0 30px 0', border: '2px solid rgb(0, 210, 170)', padding: '20px', borderRadius: '10px', backgroundColor: 'rgb(252,252,252)', boxShadow: '0 0 2px grey' }} className='animated fadeIn'>
+                    <h3 style={{ color: 'rgb(0, 210, 170)'}}><Icon name='user' style={{margin: '0 10px 0 0'}}/>{ speaker.name } <Button content={'Remove ' + speaker.name } icon='remove' size='mini' onClick={() => removeSpeaker(speaker.id)} style={{ margin: '0 20px'}}/></h3>
+                    <Input type='text' value={link} disabled style={{ margin: '0 0 5px 0', color: 'red'}} fluid />
+                    <p style={{ marginBottom: '10px', color: 'rgb(80,80,80)', fontSize: '0.8em'}}>Please send this link to { speaker.name } to allow her/him to join your live stream.</p>
+                </div>
+            )
+        })
+    }
+
     return (
         <div className='topLevelContainer'>
-             <div className={'top-menu ' + (isStreaming ? 'active' : '')}>
+             <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
-                    <h3 style={{ color: (isStreaming ?  'white' : 'orange') }}>{ isStreaming ? 'YOU ARE NOW LIVE' : 'YOU ARE NOT LIVE'}</h3>
-                    { isStreaming ? '' : 'Press Start Streaming to begin'}
+                    <h3 style={{ color: (currentLivestream.hasStarted ?  'white' : 'orange') }}>{ currentLivestream.hasStarted ? 'YOU ARE NOW LIVE' : 'YOU ARE NOT LIVE'}</h3>
+                    { currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
                 </div>
                 <div style={{ float: 'right', display: 'inlineBlock', margin: '0 20px', fontSize: '1.2em', fontWeight: '700', padding: '10px' }}>
                     Viewers: { numberOfViewers }
@@ -225,11 +306,11 @@ function StreamingPage(props) {
                     <Grid centered className='middle aligned'>
                         <Grid.Column width={6} textAlign='center'>
                             <ButtonWithConfirm
-                            color='teal' 
-                            size='big' 
-                            buttonAction={isStreaming ? stopStreaming : startStreaming} 
-                            confirmDescription={isStreaming ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
-                            buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
+                                color='teal' 
+                                size='big' 
+                                buttonAction={currentLivestream.hasStarted ? stopStreaming : startStreaming} 
+                                confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
+                                buttonLabel={ currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming' }/>
                         </Grid.Column>
                     </Grid>
                 </div>
@@ -271,14 +352,14 @@ function StreamingPage(props) {
                                 </div>
                             </Grid.Column>
                         </Grid.Row> */}
-                        {/* <Grid.Row style={{ margin: '10px 0'}}>
+                        <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
-                                <div className='side-button' onClick={() => alert("blob")}>
+                                <div className='side-button' onClick={() => setShowSpeakersModal(true)}>
                                     <Icon name='user plus' size='large' style={{ margin: '0 0 5px 0', color: 'white'}}/>
-                                    <p style={{ fontSize: '0.8em', color: 'white' }}>Invite Speaker</p>
+                                    <p style={{ fontSize: '0.8em', color: 'white' }}>Invite Speakers</p>
                                 </div>
                             </Grid.Column>
-                        </Grid.Row> */}
+                        </Grid.Row>
                         {/* <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
                                 <div className='side-button' onClick={() => alert("blob")}>
@@ -289,6 +370,64 @@ function StreamingPage(props) {
                         </Grid.Row> */}
                     </Grid>
                 </div>
+                <Modal open={showDisconnectionModal}>
+                    <Modal.Header>You have been disconnected</Modal.Header>
+                    <Modal.Content>
+                        <p>No need to panic! To rejoin the stream, simply check your internet connection and reload this page.</p>
+                        <Button content='Reload' primary/>
+                    </Modal.Content>
+                </Modal>
+                <Modal open={showSpeakersModal} onClose={() => setShowSpeakersModal(false)}>
+                    <Modal.Header>Invite speakers</Modal.Header>
+                    <Modal.Content>
+                        <p style={{ fontSize: '0.9em', margin: '0 0 20px 0' }}>You can invite up to 3 speakers to join your stream. You should do this before starting your stream, to ensure that all streamer have joined before the event starts. When an invited speaker has successfully joined, you will be able to see and hear him/her in the stream overview.</p>
+                        { speakerElements }
+                        <div>
+                            <Formik
+                                initialValues={{ newSpeakerName: '' }}
+                                validate={values => {
+                                    let errors = {};
+                                    if (!values.newSpeakerName) {
+                                        errors.newSpeakerName = 'Please provide a name for the new speaker!';
+                                    }
+                                    return errors;
+                                }}
+                                onSubmit={(values, { setSubmitting, resetForm }) => {
+                                    setSubmitting(true);
+                                    addASpeaker(values.newSpeakerName, false)
+                                    .then(() => {
+                                        setSubmitting(false);
+                                        resetForm({});
+                                    }).catch(error => {
+                                        setSubmitting(false);
+                                        console.log(error);
+                                    });
+                                }}
+                            >
+                                {({
+                                    values,
+                                    errors,
+                                    touched,
+                                    handleChange,
+                                    setFieldValue,
+                                    handleBlur,
+                                    handleSubmit,
+                                    isSubmitting,
+                                }) => (
+                                    <Form onSubmit={handleSubmit} style={{ textAlign: 'left'}} size='big'>
+                                        <Form.Field>
+                                            <label style={{ fontSize: '0.9em', textTransform: 'uppercase', marginBottom: '5px' }}>Add a Speaker</label>
+                                            <Input  type='text' name='newSpeakerName' action={{ type: 'submit', content: 'Add a Speaker', icon: 'add', primary: true }} value={values.newSpeakerName} onChange={handleChange} onBlur={handleBlur} fluid primary style={{ margin: '5px 0 0 0'}} disabled={isSubmitting || additionalSpeakers.length > 2} placeholder="Enter the name of the speaker you want to invite"/>
+                                            <div className='field-error' style={{ color: 'red', fontSize: '0.8em', margin: '10px 0'}}>
+                                                {errors.newSpeakerName && touched.newSpeakerName && errors.newSpeakerName}
+                                            </div>
+                                        </Form.Field>
+                                    </Form>
+                                    )}
+                            </Formik>
+                        </div>
+                    </Modal.Content>
+                </Modal>
             <style jsx>{`
                 .hidden {
                     display: none

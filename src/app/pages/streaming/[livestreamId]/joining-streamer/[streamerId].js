@@ -2,18 +2,11 @@ import {useState, useEffect, useRef} from 'react';
 import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Dropdown} from "semantic-ui-react";
 
 import { withFirebasePage } from '../../../../data/firebase';
-import { WebRTCAdaptor } from '../../../../static-js/webrtc_adaptor.js';
 import axios from 'axios';
-import { animateScroll } from 'react-scroll';
-import ButtonWithConfirm from '../../../../components/views/common/ButtonWithConfirm';
 
-import CommentContainer from '../../../../components/views/streaming/comment-container/NewCommentContainer';
-import Loader from '../../../../components/views/loader/Loader';
 import { useRouter } from 'next/router';
-import { WEBRTC_ERRORS } from '../../../../data/errors/StreamingErrors';
 import useUserMedia from '../../../../components/custom-hook/useDevices';
 import useWebRTCAdaptor from '../../../../components/custom-hook/useWebRTCAdaptor';
-import RemoteVideoContainer from '../../../../components/views/streaming/video-container/RemoteVideoContainer';
 import StreamerVideoDisplayer from '../../../../components/views/streaming/video-container/StreamerVideoDisplayer';
 import NewCommentContainer from '../../../../components/views/streaming/comment-container/NewCommentContainer';
 
@@ -23,13 +16,13 @@ function StreamingPage(props) {
     const livestreamId = router.query.livestreamId;
     const streamerId = router.query.streamerId;
 
-    const [currentState, setCurrentState] = useState(2);
-
-    const [isInitialized, setIsInitialized] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
-    const [isCapturingDesktop, setIsCapturingDesktop] = useState(false);
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
+
     const [currentLivestream, setCurrentLivestream] = useState(false);
+
+    const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
+    const [registeredSpeaker, setRegisteredSpeaker] = useState(false);
 
     const [streamId, setStreamId] = useState(null);
 
@@ -42,29 +35,30 @@ function StreamingPage(props) {
     const [numberOfViewers, setNumberOfViewers] = useState(0);
 
     const localVideoId = 'localVideo';
-    const alternateVideoElement = useRef(null);
 
     let streamingCallbacks = {
-        onInitialized: () => {
-            setIsInitialized(true);
-        },
-        onPublishStarted: (infoObj) => {
-            debugger;
-            setStreamId(infoObj.streamId);
-        },
+        onInitialized: () => {},
         onJoinedRoom: (infoObj) => {},
         onStreamJoined: (infoObj) => {},
         onStreamLeaved: (infoObj) => {},
         onNewStreamAvailable: (infoObj) => {},
+        onPublishStarted: (infoObj) => {
+            setIsStreaming(true);
+        },
         onPublishFinished: (infoObj) => {
             setIsStreaming(false);
         },
-        onPublishFinished: (infoObj) => {},
         onScreenShareStopped: (infoObj) => {
             setIsCapturingDesktop(false);
         },
         onClosed: (infoObj) => {
             setIsInitialized(false);
+        },
+        onDisconnected: (infoObj) => {
+            setShowDisconnectionModal(true);
+        },
+        onConnected: (infoObj) => {
+            setShowDisconnectionModal(false);
         },
         onUpdatedStats: (infoObj) => {},
     }
@@ -79,16 +73,19 @@ function StreamingPage(props) {
         localVideoId,
         mediaConstraints,
         streamingCallbacks,
-        errorCallbacks
+        errorCallbacks,
+        livestreamId,
+        streamerId
     );
 
     useEffect(() => {
-        if (isInitialized) {
-            setTimeout(() => {
-                webRTCAdaptor.joinRoom(livestreamId, streamerId);
-            }, 2000);
+        debugger;
+        if (isStreaming) {
+            setLiveSpeakerConnected();
+        } else {
+            setLiveSpeakerDisconnected();
         }
-    },[isInitialized])
+    },[isStreaming, registeredSpeaker.id]);
 
     useEffect(() => {
         if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
@@ -108,6 +105,22 @@ function StreamingPage(props) {
             });
         }
     }, [livestreamId]);
+
+    useEffect(() => {
+        if (streamerId) {
+            const unsubscribe = props.firebase.listenToLivestreamLiveSpeakers(livestreamId, querySnapshot => {
+                let currentSpeaker = null;
+                querySnapshot.forEach(doc => {
+                    if (streamerId === doc.id) {
+                        currentSpeaker = doc.data();
+                        currentSpeaker.id = doc.id;
+                    }
+                });
+                setRegisteredSpeaker(currentSpeaker);
+            });
+            return () => unsubscribe();
+        }
+    }, [streamerId]);
 
     useEffect(() => {
         const constraints = {
@@ -149,6 +162,18 @@ function StreamingPage(props) {
         }
     }, [currentLivestream.hasStarted]);
 
+    function setLiveSpeakerConnected() {
+        if (registeredSpeaker) {
+            props.firebase.setLivestreamLiveSpeakersConnected(livestreamId, registeredSpeaker);
+        }
+    }
+
+    function setLiveSpeakerDisconnected() {
+        if (registeredSpeaker) {
+            props.firebase.setLivestreamLiveSpeakersDisconnected(livestreamId, registeredSpeaker.id);
+        }
+    }
+ 
     function toggleMicrophone() {
         if (isLocalMicMuted) {
             webRTCAdaptor.unmuteLocalMic();
@@ -219,6 +244,20 @@ function StreamingPage(props) {
                         </Grid.Row> */}
                     </Grid>
                 </div>
+                <Modal open={showDisconnectionModal}>
+                    <Modal.Header>You have been disconnected</Modal.Header>
+                    <Modal.Content>
+                        <p>No need to panic! To rejoin the stream, simply check your internet connection and reload this page.</p>
+                        <Button content='Reload' primary/>
+                    </Modal.Content>
+                </Modal>
+                <Modal open={!registeredSpeaker}>
+                    <Modal.Header>You are not registered</Modal.Header>
+                    <Modal.Content>
+                        <p>The link you used to connect to this stream is invalid. Please contact the stream's host to get a valid link.</p>
+                        <Button content='Reload' primary/>
+                    </Modal.Content>
+                </Modal>
             <style jsx>{`
                 .hidden {
                     display: none
