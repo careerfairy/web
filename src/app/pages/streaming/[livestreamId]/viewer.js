@@ -24,6 +24,8 @@ function ViewerPage(props) {
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
+    const [registeredStreamers, setRegisteredStreamers] = useState([]);
+
     const [streamIds, setStreamIds] = useState([]);
 
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
@@ -76,10 +78,19 @@ function ViewerPage(props) {
     }, [livestreamId]);
 
     useEffect(() => {
-        if (currentLivestream && currentLivestream.streamIds) {
-            setStreamIds(currentLivestream.streamIds);
+        if (livestreamId) {
+            const unsubscribe = props.firebase.listenToLivestreamLiveSpeakers(livestreamId, querySnapshot => {
+                let liveSpeakersList = [];
+                querySnapshot.forEach(doc => {
+                    let speaker = doc.data();
+                    speaker.id = doc.id;
+                    liveSpeakersList.push(speaker);
+                });
+                setRegisteredStreamers(liveSpeakersList);
+            });
+            return () => unsubscribe();
         }
-    }, [currentLivestream]);
+    }, [livestreamId]);
 
     useEffect(() => {
         if (userData && currentLivestream && userData.talentPools && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
@@ -89,11 +100,28 @@ function ViewerPage(props) {
         }
     }, [currentLivestream, userData]);
 
-    let videoElements = streamIds.map( (streamId, index) => {
+    function joinTalentPool() {
+        if (!user) {
+            return router.replace('/signup');
+        }
+
+        props.firebase.joinCompanyTalentPool(currentLivestream.companyId, user.email);
+    }
+
+    function leaveTalentPool() {
+        if (!user) {
+            return router.replace('/signup');
+        }
+
+        props.firebase.leaveCompanyTalentPool(currentLivestream.companyId, user.email);
+    }
+
+    let connectedStreamers = registeredStreamers.filter(streamer => streamer.connected);
+    let videoElements = connectedStreamers.map( (streamer, index) => {
         return (
             <Fragment>
-                <Grid.Column width={ streamIds.length > 1 ? 8 : 16} style={{ padding: 0 }} key={streamId}>
-                    <ViewerVideoContainer streamId={streamId} length={streamIds.length} index={index + 1} isPlaying={isPlaying} hasStarted={currentLivestream.hasStarted}/>
+                <Grid.Column width={ connectedStreamers.length > 1 ? 8 : 16} style={{ padding: 0 }} key={connectedStreamers.id}>
+                    <ViewerVideoContainer streamer={streamer} length={connectedStreamers.length} index={index + 1} isPlaying={isPlaying} hasStarted={currentLivestream.hasStarted}/>
                 </Grid.Column>
             </Fragment>
         );

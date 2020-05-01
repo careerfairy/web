@@ -11,6 +11,7 @@ import StreamerVideoDisplayer from '../../../components/views/streaming/video-co
 import NewCommentContainer from '../../../components/views/streaming/comment-container/NewCommentContainer';
 import ButtonWithConfirm from '../../../components/views/common/ButtonWithConfirm';
 import { Formik } from 'formik';
+import { bool } from 'twilio/lib/base/serialize';
 
 function StreamingPage(props) {
 
@@ -19,14 +20,11 @@ function StreamingPage(props) {
 
     const [currentLivestream, setCurrentLivestream] = useState(false);
 
-    const [isInitialized, setIsInitialized] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
     const [isCapturingDesktop, setIsCapturingDesktop] = useState(false);
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
 
     const devices = useUserMedia();
-
-    const [streamId, setStreamId] = useState(null);
 
     const [audioSource, setAudioSource] = useState(null);
     const [videoSource, setVideoSource] = useState(null);
@@ -37,25 +35,24 @@ function StreamingPage(props) {
     const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
     const [showSpeakersModal, setShowSpeakersModal] = useState(false);
 
-    const [additionalSpeakers, setAdditionalSpeakers] = useState([]);
-    const [newSpeakerName, setNewSpeakerName] = useState("");
+    const [additionalSpeakers, setAdditionalSpeakers] = useState(false);
+    const [registeredSpeaker, setRegisteredSpeaker] = useState(false);
 
     const localVideoId = 'localVideo';
 
     let streamingCallbacks = {
-        onInitialized: (infoObj) => {
-            setIsInitialized(true);
-        },
+        onInitialized: (infoObj) => {},
         onPublishStarted: (infoObj) => {
             setMainStreamIdToStreamerList(infoObj.streamId);
-            setStreamId(infoObj.streamId);
             setShowDisconnectionModal(false);
+            setIsStreaming(true);
         },
         onNewStreamAvailable: (infoObj) => {
             addStreamIdToStreamerList(infoObj.streamId);
         },
         onStreamLeaved: (infoObj) => {
             removeStreamIdFromStreamerList(infoObj.streamId);
+            setLiveSpeakerDisconnected(infoObj.streamId);
         },
         onPublishFinished: (infoObj) => {
             setIsStreaming(false);
@@ -101,6 +98,14 @@ function StreamingPage(props) {
     },[devices]);
 
     useEffect(() => {
+        if (isStreaming) {
+            setLiveSpeakerConnected(registeredSpeaker);
+        } else {
+            setLiveSpeakerDisconnected(registeredSpeaker.id);
+        }
+    },[isStreaming]);
+
+    useEffect(() => {
         if (livestreamId) {
             props.firebase.listenToScheduledLivestreamById(livestreamId, querySnapshot => {
                 let livestream = querySnapshot.data();
@@ -126,7 +131,7 @@ function StreamingPage(props) {
     }, [livestreamId]);
 
     useEffect(() => {
-        if (livestreamId) {
+        if (livestreamId && Array.isArray(additionalSpeakers)) {
             if (!additionalSpeakers.some( speaker => speaker.id === (livestreamId))) {
                 addASpeaker("Main Speaker", true);
             }
@@ -153,7 +158,7 @@ function StreamingPage(props) {
                 setInterval(() => {
                     axios({
                         method: 'get',
-                        url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=' + streamId,
+                        url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=' + livestreamId,
                     }).then( response => { 
                             if (response.data.totalWebRTCWatchersCount > -1) {
                                 setNumberOfViewers(response.data.totalWebRTCWatchersCount);
@@ -162,21 +167,27 @@ function StreamingPage(props) {
                             console.log(error);
                     });
                 }, 10000);
+            } else {
+                setNumberOfViewers(0);
             }
         }
     }, [currentLivestream, currentLivestream.hasStarted]);
 
     useEffect(() => {
-        if (currentLivestream.hasStarted) {
-            setIsStreaming(true);
-        } else {
-            setIsStreaming(false);
-            setNumberOfViewers(0);
+        if (livestreamId) {
+            const unsubscribe = props.firebase.listenToLivestreamLiveSpeakers(livestreamId, querySnapshot => {
+                let currentSpeaker = null;
+                querySnapshot.forEach(doc => {
+                    if (livestreamId === doc.id) {
+                        currentSpeaker = doc.data();
+                        currentSpeaker.id = doc.id;
+                    }
+                });
+                setRegisteredSpeaker(currentSpeaker);
+            });
+            return () => unsubscribe();
         }
-    }, [currentLivestream.hasStarted]);
-
-    function createNewStreamerLink() {
-    }
+    }, [livestreamId]);
 
     function startStreaming() {
         props.firebase.setLivestreamHasStarted(true, currentLivestream.id);
@@ -200,9 +211,9 @@ function StreamingPage(props) {
 
     function toggleScreenSharing() {
         if (isCapturingDesktop) {
-            webRTCAdaptor.switchVideoCapture(streamId);
+            webRTCAdaptor.switchVideoCapture(livestreamId);
         } else {
-            webRTCAdaptor.switchDesktopCaptureWithCamera(streamId);
+            webRTCAdaptor.switchDesktopCaptureWithCamera(livestreamId);
         }
         setIsCapturingDesktop(!isCapturingDesktop);
     }
@@ -225,30 +236,47 @@ function StreamingPage(props) {
         return props.firebase.deleteLivestreamSpeaker(livestreamId, speakerId);
     }
 
-    let speakerElements = additionalSpeakers.filter(speaker => speaker.id !== livestreamId).map((speaker, index) => {
-        let link = 'https://careerfairy.io/streaming/' + livestreamId + '/joining-streamer/' + speaker.id;
-        return (
-            <div style={{ margin: '0 0 30px 0', border: '2px solid rgb(0, 210, 170)', padding: '20px', borderRadius: '10px', backgroundColor: 'rgb(252,252,252)', boxShadow: '0 0 2px grey' }} className='animated fadeIn'>
-                <h3 style={{ color: 'rgb(0, 210, 170)'}}><Icon name='user' style={{margin: '0 10px 0 0'}}/>{ speaker.name } <Button content={'Remove ' + speaker.name } icon='remove' size='mini' onClick={() => removeSpeaker(speaker.id)} style={{ margin: '0 20px'}}/></h3>
-                <Input type='text' value={link} disabled style={{ margin: '0 0 5px 0', color: 'red'}} fluid />
-                <p style={{ marginBottom: '10px', color: 'rgb(80,80,80)', fontSize: '0.8em'}}>Please send this link to { speaker.name } to allow her/him to join your live stream.</p>
-            </div>
-        )
-    })
+    function setLiveSpeakerConnected(speaker) {
+        if (registeredSpeaker) {
+            props.firebase.setLivestreamLiveSpeakersConnected(livestreamId, speaker);
+        }
+    }
+
+    function setLiveSpeakerDisconnected(speakerId) {
+        debugger;
+        if (registeredSpeaker) {
+            props.firebase.setLivestreamLiveSpeakersDisconnected(livestreamId, speakerId);
+        }
+    }
+
+    let speakerElements = [];
+
+    if (additionalSpeakers && additionalSpeakers.length > 0) {
+        speakerElements = additionalSpeakers.filter(speaker => speaker.id !== livestreamId).map((speaker, index) => {
+            let link = 'https://careerfairy.io/streaming/' + livestreamId + '/joining-streamer/' + speaker.id;
+            return (
+                <div style={{ margin: '0 0 30px 0', border: '2px solid rgb(0, 210, 170)', padding: '20px', borderRadius: '10px', backgroundColor: 'rgb(252,252,252)', boxShadow: '0 0 2px grey' }} className='animated fadeIn'>
+                    <h3 style={{ color: 'rgb(0, 210, 170)'}}><Icon name='user' style={{margin: '0 10px 0 0'}}/>{ speaker.name } <Button content={'Remove ' + speaker.name } icon='remove' size='mini' onClick={() => removeSpeaker(speaker.id)} style={{ margin: '0 20px'}}/></h3>
+                    <Input type='text' value={link} disabled style={{ margin: '0 0 5px 0', color: 'red'}} fluid />
+                    <p style={{ marginBottom: '10px', color: 'rgb(80,80,80)', fontSize: '0.8em'}}>Please send this link to { speaker.name } to allow her/him to join your live stream.</p>
+                </div>
+            )
+        })
+    }
 
     return (
         <div className='topLevelContainer'>
-             <div className={'top-menu ' + (isStreaming ? 'active' : '')}>
+             <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
-                    <h3 style={{ color: (isStreaming ?  'white' : 'orange') }}>{ isStreaming ? 'YOU ARE NOW LIVE' : 'YOU ARE NOT LIVE'}</h3>
-                    { isStreaming ? '' : 'Press Start Streaming to begin'}
+                    <h3 style={{ color: (currentLivestream.hasStarted ?  'white' : 'orange') }}>{ currentLivestream.hasStarted ? 'YOU ARE NOW LIVE' : 'YOU ARE NOT LIVE'}</h3>
+                    { currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
                 </div>
                 <div style={{ float: 'right', display: 'inlineBlock', margin: '0 20px', fontSize: '1.2em', fontWeight: '700', padding: '10px' }}>
                     Viewers: { numberOfViewers }
                 </div>
             </div>
             <div className='black-frame'>
-                <StreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId}/>
+                <StreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={livestreamId}/>
             </div>
             <div className='bottom-container'>
                 <div className='button-container'>         
@@ -257,9 +285,9 @@ function StreamingPage(props) {
                             <ButtonWithConfirm
                                 color='teal' 
                                 size='big' 
-                                buttonAction={isStreaming ? stopStreaming : startStreaming} 
-                                confirmDescription={isStreaming ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
-                                buttonLabel={ isStreaming ? 'Stop Streaming' : 'Start Streaming' }/>
+                                buttonAction={currentLivestream.hasStarted ? stopStreaming : startStreaming} 
+                                confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
+                                buttonLabel={ currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming' }/>
                         </Grid.Column>
                     </Grid>
                 </div>
@@ -502,4 +530,4 @@ function StreamingPage(props) {
     );
 }
 
-export default withFirebasePage(StreamingPage);4223WW3232
+export default withFirebasePage(StreamingPage);

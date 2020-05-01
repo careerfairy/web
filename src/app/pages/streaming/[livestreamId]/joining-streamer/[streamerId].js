@@ -38,9 +38,6 @@ function StreamingPage(props) {
 
     let streamingCallbacks = {
         onInitialized: () => {},
-        onPublishStarted: (infoObj) => {
-            setStreamId(infoObj.streamId);
-        },
         onJoinedRoom: (infoObj) => {},
         onStreamJoined: (infoObj) => {},
         onStreamLeaved: (infoObj) => {},
@@ -78,16 +75,17 @@ function StreamingPage(props) {
         streamingCallbacks,
         errorCallbacks,
         livestreamId,
-        streamId
+        streamerId
     );
 
     useEffect(() => {
+        debugger;
         if (isStreaming) {
             setLiveSpeakerConnected();
         } else {
             setLiveSpeakerDisconnected();
         }
-    },[isStreaming])
+    },[isStreaming, registeredSpeaker.id]);
 
     useEffect(() => {
         if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
@@ -172,7 +170,7 @@ function StreamingPage(props) {
 
     function setLiveSpeakerDisconnected() {
         if (registeredSpeaker) {
-            props.firebase.setLivestreamLiveSpeakersDisonnected(livestreamId, registeredSpeaker);
+            props.firebase.setLivestreamLiveSpeakersDisconnected(livestreamId, registeredSpeaker.id);
         }
     }
  

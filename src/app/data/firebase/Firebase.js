@@ -271,12 +271,12 @@ class Firebase {
         });
     }
 
-    setLivestreamLiveSpeakersDisconnected = (livestreamId, registeredSpeaker) => {
+    setLivestreamLiveSpeakersDisconnected = (livestreamId, speakerId) => {
         let streamerRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("liveSpeakers")
-            .doc(registeredSpeaker.id);
+            .doc(speakerId);
         return streamerRef.update({
             connected: false,
         });
