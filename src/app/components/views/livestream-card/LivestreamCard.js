@@ -11,6 +11,7 @@ import BookingModal from '../common/booking-modal/BookingModal';
 import axios from 'axios';
 
 import Link from 'next/link';
+import UserUtil from '../../../data/util/UserUtil';
 
 
 function LivestreamCard(props) {
@@ -43,7 +44,7 @@ function LivestreamCard(props) {
             return router.push('/signup');
         }
 
-        if (!props.userData) {
+        if (!props.userData || !UserUtil.userProfileIsComplete(props.userData)) {
             return router.push('/profile');
         }
 

@@ -12,6 +12,7 @@ import Header from '../components/views/header/Header';
 import Loader from '../components/views/loader/Loader';
 
 import Head from 'next/head';
+import UserUtil from '../data/util/UserUtil';
 
 const UserProfile = (props) => {
 
@@ -39,9 +40,10 @@ const UserProfile = (props) => {
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
-            if (user !== null) {
+            debugger;
+            if (user) {
                 setUser(user);
-            } else {
+            }  else {
                 router.replace('/login');
             }
         })
@@ -122,11 +124,14 @@ const UserProfile = (props) => {
                             setSubmitting(true);
                             props.firebase.setUserData(user.email, values.firstName, values.lastName, values.university, values.fieldOfStudy, values.levelOfStudy)
                             .then(() => {
-                                if (!userData) {
+                                if (!userData || !UserUtil.userProfileIsComplete(userData)) {
                                     if (values.university === 'ethzurich' || values.university === 'epflausanne' || values.university === 'unizurich'|| values.university === 'unilausanne') {
-                                        router.push('/next-livestreams' + (values.university ? ('?university=' + values.university) : ''));
+                                        if (values.university === 'ethzurich') {
+                                            return router.push('/next-livestreams?university=polyefair');
+                                        }
+                                        return router.push('/next-livestreams' + (values.university ? ('?university=' + values.university) : ''));
                                     } else {
-                                        router.push('/next-livestreams');
+                                        return router.push('/next-livestreams');
                                     }
                                 }
                                 setSubmitting(false);
@@ -195,7 +200,7 @@ const UserProfile = (props) => {
                                         </div>
                                     </Form.Field>
                                 </Form.Group>
-                                <Button id='submitButton' color='teal' type='submit'  size='big' content={ userData ? 'Save Changes' : 'Create Account'} loading={isSubmitting}/>
+                                <Button id='submitButton' color='teal' type='submit'  size='big' content={ userData && UserUtil.userProfileIsComplete(userData) ? 'Save Changes' : 'Create Account'} loading={isSubmitting}/>
                             </Form>
                         )}
                         </Formik>

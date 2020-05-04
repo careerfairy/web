@@ -27,7 +27,7 @@ function LandingPage(props) {
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
-            if (user !== null) {
+            if (user && user.emailVerified) {
                 setUser(user);
             } else {
                 setUser(null);

@@ -11,13 +11,16 @@ import Head from 'next/head';
 
 function SignUpPage(props) {
 
+    const router = useRouter();
+
     const [user, setUser] = useState(false);
-    const [userEmailVerified, setUserEmailVerified] = useState(false);
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
-            if (user !== null) {
+            if (user && user.emailVerified) {
+                router.push('/profile')
+            } else if (user && !user.emailVerified) {
                 setUser(user);
             } else {
                 setUser(null);
@@ -42,11 +45,11 @@ function SignUpPage(props) {
                 <div style={{ color: 'white', fontWeight: '500', fontSize: '2em', margin: '40px 0 30px 0', textAlign: 'center' }}>
                     Sign Up
                 </div>
-                <div className={ emailVerificationSent ? 'hidden' : ''}>
+                <div className={ user ? 'hidden' : ''}>
                     <SignUpForm user={user} emailVerificationSent={emailVerificationSent} setEmailVerificationSent={(bool) => setEmailVerificationSent(bool)}/>
                 </div>
-                <div className={ emailVerificationSent ? '' : 'hidden'}>
-                    <SignUpFormSent user={user} emailVerificationSent={emailVerificationSent}/>
+                <div className={ user ? '' : 'hidden'}>
+                    <SignUpFormSent user={user} emailVerificationSent={emailVerificationSent} router={router}/>
                 </div>
                 <div style={{ color: 'white', fontWeight: '700', fontSize: '1.3em', margin: '40px 0 30px 0', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
                     Meet Your Future
@@ -96,11 +99,6 @@ function SignUpFormBase(props) {
             });
         }
     },[props.user, emailSent]);
-
-    function resendVerificationEmail() {
-        props.setEmailVerificationSent(false);
-        setEmailSent(true);
-    }
 
     return (
         <Fragment>
@@ -317,7 +315,6 @@ function SignUpFormValidate(props) {
     const [errorMessageShown, setErrorMessageShown] = useState(false);
     const [incorrectPin, setIncorrectPin] = useState(false);
     const [generalLoading, setGeneralLoading] = useState(false);
-    const router = useRouter();
 
     function resendVerificationEmail() {
         setGeneralLoading(true);
@@ -346,7 +343,6 @@ function SignUpFormValidate(props) {
                             initialValues={{ pinCode: '' }}
                             validate={values => {
                                 let errors = {};
-                                debugger;
                                 if (!values.pinCode) {
                                     errors.pinCode = 'A PIN code is required';
                                 } else if (!/^[0-9]{4}$/.test(values.pinCode)) {
@@ -364,8 +360,11 @@ function SignUpFormValidate(props) {
                                         pinCode: parseInt(values.pinCode)
                                     }
                                 }).then( response => { 
-                                        console.log("success!");
-                                        return router.push('/profile');
+                                        debugger;
+                                        props.user.reload().then(() => {
+                                            debugger;
+                                            return props.router.push('/profile');
+                                        });
                                     }).catch(error => {
                                         setIncorrectPin(true);
                                         setGeneralLoading(false);

@@ -23,7 +23,7 @@ function StreamingPage(props) {
     const [currentLivestream, setCurrentLivestream] = useState(false);
 
     const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
-    const [registeredSpeaker, setRegisteredSpeaker] = useState(false);
+    const [registeredSpeaker, setRegisteredSpeaker] = useState({ id: null });
 
     const [streamId, setStreamId] = useState(null);
 
@@ -117,7 +117,9 @@ function StreamingPage(props) {
                         currentSpeaker.id = doc.id;
                     }
                 });
-                setRegisteredSpeaker(currentSpeaker);
+                if (currentSpeaker) {
+                    setRegisteredSpeaker(currentSpeaker);
+                }
             });
             return () => unsubscribe();
         }
@@ -164,13 +166,13 @@ function StreamingPage(props) {
     }, [currentLivestream.hasStarted]);
 
     function setLiveSpeakerConnected() {
-        if (registeredSpeaker) {
+        if (registeredSpeaker && registeredSpeaker.id) {
             props.firebase.setLivestreamLiveSpeakersConnected(livestreamId, registeredSpeaker);
         }
     }
 
     function setLiveSpeakerDisconnected() {
-        if (registeredSpeaker) {
+        if (registeredSpeaker && registeredSpeaker.id) {
             props.firebase.setLivestreamLiveSpeakersDisconnected(livestreamId, registeredSpeaker.id);
         }
     }
@@ -186,10 +188,10 @@ function StreamingPage(props) {
 
     return (
         <div className='topLevelContainer'>
-             <div className={'top-menu ' + (isStreaming ? 'active' : '')}>
+             <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
-                    <h3 style={{ color: (isStreaming ?  'white' : 'orange') }}>{ isStreaming ? 'YOU ARE NOW LIVE' : 'YOU ARE NOT LIVE'}</h3>
-                    { isStreaming ? '' : 'The Stream will begin when the host presses Start Streaming'}
+                    <h3 style={{ color: (currentLivestream.hasStarted ?  'white' : 'orange') }}>{ currentLivestream.hasStarted ? 'YOU ARE NOW LIVE' : 'YOU ARE NOT LIVE'}</h3>
+                    { currentLivestream.hasStarted ? '' : 'The Stream will begin when the host presses Start Streaming'}
                 </div>
                 <div style={{ float: 'right', display: 'inlineBlock', margin: '0 20px', fontSize: '1.2em', fontWeight: '700', padding: '10px' }}>
                     Viewers: { numberOfViewers }

@@ -44,7 +44,7 @@ function Calendar(props) {
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
-            if (user !== null && user.emailVerified) {
+            if (user !== null) {
                 setUser(user);
             } else {
                 setUser(null);

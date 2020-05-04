@@ -14,6 +14,7 @@ function ViewerPage(props) {
     const eth_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media';
     const epfl_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fepfl-career-center.png?alt=media';
     const uzh_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fjobhub.png?alt=media';
+    const polyefair_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fpolyefair_logo.png?alt=media';
 
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
@@ -178,6 +179,7 @@ function ViewerPage(props) {
                     <Image src={ eth_logo } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: isUniversityLivestream("ethzurich") ? 'inline-block' : 'none' }}/>
                     <Image src={ epfl_logo } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: isUniversityLivestream("epflausanne") ? 'inline-block' : 'none' }}/>
                     <Image src={ uzh_logo } style={{ maxWidth: '150px', maxHeight: '50px', display: isUniversityLivestream("unizurich") ? 'inline-block' : 'none' }}/>
+                    <Image src={ polyefair_logo } style={{ maxWidth: '150px', maxHeight: '50px', display: isUniversityLivestream("polyefair") ? 'inline-block' : 'none' }}/>
                     <div style={{ position: 'absolute', bottom: '13px', left: '120px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
                 </div>
                 <div className='top-menu-right'>
@@ -194,12 +196,12 @@ function ViewerPage(props) {
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none'), position: 'absolute', top: '150px', width: '100%', height: 'calc(100% - 235px)', backgroundColor: 'rgb(30,30,30)'}}>
                     <LivestreamPdfViewer livestreamId={currentLivestream.id} presenter={false}/>
                 </div> 
-                <div className='video-menu'>
-                    <div  className='video-menu-input'>
+            </div>  
+            <div className='video-menu'>
+                <div  className='video-menu-input'>
                         <Input action={{ content: 'Add a Question', color: 'teal', onClick: () => addNewQuestion() }} size='huge' maxLength='140' onKeyPress={addNewQuestionOnEnter} value={newQuestionTitle} fluid placeholder='Add your question...' onChange={(event) => {setNewQuestionTitle(event.target.value)}} />
                     </div>
-                </div> 
-            </div>   
+                </div>  
             <div className='video-menu-left'>
                 <NewCommentContainer livestream={ currentLivestream } userData={userData}  user={user}/>
             </div>
@@ -305,11 +307,11 @@ function ViewerPage(props) {
 
                 .black-frame {
                     position: absolute;
-                    top: 75;
+                    top: 75px;
+                    bottom: 85px;
                     left: 330px;
                     width: calc(100% - 330px);
                     min-width: 700px;
-                    height: calc(100% - 75px);
                     min-height: 600px;
                     z-index: 10;
                 }
@@ -341,13 +343,14 @@ function ViewerPage(props) {
                 .video-menu {
                     position: absolute;
                     bottom: 0;
-                    left: 0;
+                    left: 330px;
                     right: 0;
                     height: 85px;
                     z-index: 3000;
                     padding: 12px;
                     text-align: center;
-                    width: 100%;
+                    width: calc(100% - 330px);
+                    background-color: white;
                 }
 
                 .video-menu .center {

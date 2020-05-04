@@ -14,6 +14,7 @@ import QuestionVotingBox from '../../components/views/question-voting-box/Questi
 import StringUtils from '../../util/StringUtils';
 
 import Head from 'next/head';
+import UserUtil from '../../data/util/UserUtil';
 
 function UpcomingLivestream(props) {
 
@@ -116,24 +117,36 @@ function UpcomingLivestream(props) {
     }
 
     function deregisterFromLivestream() {
-        if (!user) {
+        if (!user || !user.emailVerified) {
             return router.replace('/signup');
+        }
+
+        if (!userData) {
+            return router.push('/profile');
         }
 
         props.firebase.deregisterFromLivestream(currentLivestream.id, user.email);
     }
 
     function joinTalentPool() {
-        if (!user) {
+        if (!user || !user.emailVerified) {
             return router.replace('/signup');
+        }
+
+        if (!userData || !UserUtil.userProfileIsComplete(userData)) {
+            return router.push('/profile');
         }
 
         props.firebase.joinCompanyTalentPool(currentLivestream.companyId, user.email);
     }
 
     function leaveTalentPool() {
-        if (!user) {
+        if (!user || !user.emailVerified) {
             return router.replace('/signup');
+        }
+
+        if (!userData || !UserUtil.userProfileIsComplete(userData)) {
+            return router.push('/profile');
         }
 
         props.firebase.leaveCompanyTalentPool(currentLivestream.companyId, user.email);
@@ -148,11 +161,11 @@ function UpcomingLivestream(props) {
     }
 
     function startRegistrationProcess(livestreamId) {
-        if (!user) {
+        if (!user || !user.emailVerified) {
             return router.push('/signup');
         }
 
-        if (!userData) {
+        if (!userData || !UserUtil.userProfileIsComplete(userData)) {
             return router.push('/profile');
         }
 
@@ -164,8 +177,12 @@ function UpcomingLivestream(props) {
     }
 
     function deregisterFromLivestream(livestreamId) {
-        if (!user) {
+        if (!user || !user.emailVerified) {
             return router.push('/signup');
+        }
+
+        if (!userData || !UserUtil.userProfileIsComplete(userData)) {
+            return router.push('/profile');
         }
 
         props.firebase.deregisterFromLivestream(livestreamId, user.email);
@@ -176,7 +193,7 @@ function UpcomingLivestream(props) {
     }
 
     function addNewQuestion() {
-        if (!user) {
+        if (!user || !user.emailVerified) {
             return router.replace('/signup');
         }
 

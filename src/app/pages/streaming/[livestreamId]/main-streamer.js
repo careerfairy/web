@@ -54,11 +54,13 @@ function StreamingPage(props) {
             setShowDisconnectionModal(false);
             setIsStreaming(true);
         },
+        onJoinedTheRoom: (infoObj) => {
+            debugger;
+        },
         onNewStreamAvailable: (infoObj) => {
             addStreamIdToStreamerList(infoObj.streamId);
         },
         onStreamLeaved: (infoObj) => {
-            debugger;
             removeStreamIdFromStreamerList(infoObj.streamId);
             setLiveSpeakerDisconnected(infoObj.streamId);
         },

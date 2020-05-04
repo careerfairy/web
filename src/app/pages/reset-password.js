@@ -28,18 +28,12 @@ function ResetPasswordPage(props) {
     useEffect(() => {
         if (user) {
             if (!user.emailVerified) {
-                setUserEmailNotValidated(true);
+                router.replace('/signup');
             } else {
                 router.replace('/profile');
             }
         }
     },[user]);
-
-    useEffect(() => {
-        if (userEmailNotValidated) {
-            props.firebase.doSignOut();
-        }
-    },[userEmailNotValidated]);
 
     return (
         <div className='tealBackground'>

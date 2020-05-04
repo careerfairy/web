@@ -29,8 +29,7 @@ function LogInPage(props) {
     useEffect(() => {
         if (user) {
             if (!user.emailVerified) {
-                setUserEmailNotValidated(true);
-                setGeneralLoading(false);
+                router.replace('/signup');
             } else {
                 props.firebase.getUserData(user.email).then(querySnapshot => {
                     if (querySnapshot.exists) {
@@ -46,7 +45,7 @@ function LogInPage(props) {
 
     useEffect(() => {
         if (userEmailNotValidated) {
-            props.firebase.doSignOut();
+            router.replace('/signup');
         }
     },[userEmailNotValidated]);
 

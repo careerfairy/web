@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Document, Page } from 'react-pdf';
 import * as PDFJS from 'pdfjs-dist/build/pdf';
 import { useWindowSize } from '../custom-hook/useWindowSize';
-import { Button } from 'semantic-ui-react';
+import { Button, Modal, Progress } from 'semantic-ui-react';
 
 import FilePickerContainer from '../ssr/FilePickerContainer';
 import { withFirebase } from '../../data/firebase';
@@ -16,6 +16,9 @@ function LivestreamPdfViewer (props) {
     const [pdfObject, setPdfObject] = useState(null);
 
     const [pdfNumberOfPages, setPdfNumberOfPages] = useState(1);
+    
+    const [uploadingPresentation, setUploadingPresentation] = useState(false);
+    const [progress, setProgress] = useState(0);
 
     useEffect(() => {
         if (props.livestreamId) {
@@ -29,14 +32,16 @@ function LivestreamPdfViewer (props) {
     },[props.livestreamId]);
 
     function uploadLogo(logoFile) {
+        setUploadingPresentation(true);
         var storageRef = props.firebase.getStorageRef();
-        let companyLogoRef = storageRef.child( 'company_documents/' + '1234' + '.pdf');
+        let presentationRef = storageRef.child( 'company_documents/' + props.livestreamId + '.pdf');
 
-        var uploadTask = companyLogoRef.put(logoFile);
+        var uploadTask = presentationRef.put(logoFile);
 
         uploadTask.on('state_changed',
             function(snapshot) {
                 var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                setProgress(progress);
                 console.log('Upload is ' + progress + '% done');
                 switch (snapshot.state) {
                     case 'paused':
@@ -64,6 +69,7 @@ function LivestreamPdfViewer (props) {
                 uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
                     props.firebase.setLivestreamPresentation(props.livestreamId, downloadURL);
                     console.log('File available at', downloadURL);
+                    setUploadingPresentation(false);
                 });
             });
     }
@@ -94,7 +100,8 @@ function LivestreamPdfViewer (props) {
                         <FilePickerContainer
                             extensions={['pdf']}
                             onChange={fileObject => { uploadLogo(fileObject)}}
-                            onError={errMsg => ( error.log(errMsg) )}>
+                            maxSize={20}
+                            onError={errMsg => ( console.log(errMsg) )}>
                             <Button primary icon='upload' content='Upload Slides [.pdf]' />
                         </FilePickerContainer>
                     </div>
@@ -119,8 +126,9 @@ function LivestreamPdfViewer (props) {
                         <div style={{ color: 'white', marginBottom: '40px'}}>You currently have no slides to share</div>
                         <FilePickerContainer
                             extensions={['pdf']}
+                            maxSize={20}
                             onChange={fileObject => { uploadLogo(fileObject, (newUrl) => { })}}
-                            onError={errMsg => ( error.log(errMsg) )}>
+                            onError={errMsg => ( console.log(errMsg) )}>
                             <Button primary icon='upload' content='Upload Slides [.pdf]' />
                         </FilePickerContainer>
                     </div>
@@ -129,6 +137,12 @@ function LivestreamPdfViewer (props) {
                     </div>
                 </div>
             </div>
+            <Modal open={uploadingPresentation}>
+                <Modal.Content>
+                    <h3>Uploading presentation...</h3>
+                    <Progress percent={progress} indicating/>
+                </Modal.Content>
+            </Modal>
         </div>
     )
 }

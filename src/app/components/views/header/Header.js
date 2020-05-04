@@ -15,7 +15,7 @@ function Header (props) {
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
-            if (user !== null) {
+            if (user && user.emailVerified) {
                 setAuthenticated(true);
             } else {
                 setAuthenticated(false);

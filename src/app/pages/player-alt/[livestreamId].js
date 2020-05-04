@@ -32,7 +32,6 @@ function StreamPlayer(props) {
 
     useEffect(() => {
         if (currentLivestream) {
-            debugger;
             if (currentLivestream.test === true) {
                 var testUser = {
                     firstName: 'Tester',
