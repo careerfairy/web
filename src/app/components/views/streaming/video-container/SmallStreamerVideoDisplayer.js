@@ -65,7 +65,7 @@ function SmallStreamerVideoDisplayer(props) {
                 { externalVideoElements }
             </Grid> 
             <div style={{ position: 'absolute', top: '150px', width: '100%', backgroundColor: 'rgb(30,30,30)'}}>
-                <LivestreamPdfViewer livestreamId={props.livestreamId}/>
+                <LivestreamPdfViewer livestreamId={props.livestreamId} presenter={props.presenter}/>
             </div>         
             <style jsx>{`
                 .hidden {

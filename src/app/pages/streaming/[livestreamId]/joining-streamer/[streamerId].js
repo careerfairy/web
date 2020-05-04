@@ -9,6 +9,7 @@ import useUserMedia from '../../../../components/custom-hook/useDevices';
 import useWebRTCAdaptor from '../../../../components/custom-hook/useWebRTCAdaptor';
 import StreamerVideoDisplayer from '../../../../components/views/streaming/video-container/StreamerVideoDisplayer';
 import NewCommentContainer from '../../../../components/views/streaming/comment-container/NewCommentContainer';
+import SmallStreamerVideoDisplayer from '../../../../components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 
 function StreamingPage(props) {
 
@@ -195,7 +196,12 @@ function StreamingPage(props) {
                 </div>
             </div>
             <div className='black-frame'>
-                <StreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId}/>
+                <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
+                    <StreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints}/>
+                </div>
+                <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
+                    <SmallStreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={false}/>
+                </div>
             </div>
             <div className='video-menu-left'>
                 <NewCommentContainer livestream={ currentLivestream }/>

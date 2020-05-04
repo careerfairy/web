@@ -14,7 +14,6 @@ import LivestreamPdfViewer from '../../../components/util/LivestreamPdfViewer';
 import StreamerVideoDisplayer from '../../../components/views/streaming/video-container/StreamerVideoDisplayer';
 import SmallStreamerVideoDisplayer from '../../../components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 import NewCommentContainer from '../../../components/views/streaming/comment-container/NewCommentContainer';
-import ButtonWithConfirm from '../../../components/views/common/ButtonWithConfirm';
 import { Formik } from 'formik';
 import { bool } from 'twilio/lib/base/serialize';
 
@@ -59,6 +58,7 @@ function StreamingPage(props) {
             addStreamIdToStreamerList(infoObj.streamId);
         },
         onStreamLeaved: (infoObj) => {
+            debugger;
             removeStreamIdFromStreamerList(infoObj.streamId);
             setLiveSpeakerDisconnected(infoObj.streamId);
         },
@@ -74,9 +74,7 @@ function StreamingPage(props) {
         onConnected: (infoObj) => {
             setShowDisconnectionModal(false);
         },
-        onClosed: (infoObj) => {
-            setIsInitialized(false);
-        },
+        onClosed: (infoObj) => {},
         onUpdatedStats: (infoObj) => {},
     }
 
@@ -122,9 +120,11 @@ function StreamingPage(props) {
     useEffect(() => {
         if (livestreamId) {
             props.firebase.listenToScheduledLivestreamById(livestreamId, querySnapshot => {
-                let livestream = querySnapshot.data();
-                livestream.id = querySnapshot.id;
-                setCurrentLivestream(livestream);
+                if (!querySnapshot.isEmpty) {
+                    let livestream = querySnapshot.data();
+                    livestream.id = querySnapshot.id;
+                    setCurrentLivestream(livestream);
+                }   
             });
         }
     }, [livestreamId]);
@@ -197,6 +197,7 @@ function StreamingPage(props) {
                         currentSpeaker.id = doc.id;
                     }
                 });
+                debugger;
                 setRegisteredSpeaker(currentSpeaker);
             });
             return () => unsubscribe();
@@ -320,7 +321,19 @@ function StreamingPage(props) {
                     <StreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
-                    <SmallStreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id}/>
+                    <SmallStreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={true}/>
+                </div>
+                <div className='button-container'>         
+                    <Grid centered className='middle aligned'>
+                        <Grid.Column width={6} textAlign='center'>
+                            <ButtonWithConfirm
+                                color='teal' 
+                                size='big' 
+                                buttonAction={currentLivestream.hasStarted ? stopStreaming : startStreaming} 
+                                confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
+                                buttonLabel={ currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming' }/>
+                        </Grid.Column>
+                    </Grid>
                 </div>
             </div>
             <div className='video-menu-left'>
@@ -338,9 +351,9 @@ function StreamingPage(props) {
                         </Grid.Row>
                         <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
-                                <div className='side-button' onClick={() => setLivestreamMode(currentLivestream.mode === "default" ? "presentation" : "default")}>
-                                    <Icon name='clone outline' size='large' style={{ margin: '0 0 5px 0', color: 'white'}}/>
-                                    <p style={{ fontSize: '0.8em', color: 'white' }}>Share Slides</p>
+                                <div className='side-button' onClick={() => setLivestreamMode(currentLivestream.mode === "default" ? "presentation" : "default")}  style={{  color: currentLivestream.mode === "presentation" ? 'red' : 'white' }}>
+                                    <Icon name='clone outline' size='large' style={{ margin: '0 0 5px 0', color: currentLivestream.mode === "presentation" ? 'red' : 'white'}}/>
+                                    <p style={{ fontSize: '0.8em', color: currentLivestream.mode === "presentation" ? 'red' : 'white' }}>{ currentLivestream.mode === "presentation" ? 'Stop Sharing Slides' : 'Share Slides' }</p>
                                 </div>
                             </Grid.Column>
                         </Grid.Row>
@@ -417,7 +430,7 @@ function StreamingPage(props) {
                                     <Form onSubmit={handleSubmit} style={{ textAlign: 'left'}} size='big'>
                                         <Form.Field>
                                             <label style={{ fontSize: '0.9em', textTransform: 'uppercase', marginBottom: '5px' }}>Add a Speaker</label>
-                                            <Input  type='text' name='newSpeakerName' action={{ type: 'submit', content: 'Add a Speaker', icon: 'add', primary: true }} value={values.newSpeakerName} onChange={handleChange} onBlur={handleBlur} fluid primary style={{ margin: '5px 0 0 0'}} disabled={isSubmitting || additionalSpeakers.length > 2} placeholder="Enter the name of the speaker you want to invite"/>
+                                            <Input  type='text' name='newSpeakerName' action={{ type: 'submit', content: 'Add a Speaker', icon: 'add', primary: true }} value={values.newSpeakerName} onChange={handleChange} onBlur={handleBlur} fluid primary style={{ margin: '5px 0 0 0'}} disabled={isSubmitting || additionalSpeakers.length > 3} placeholder="Enter the name of the speaker you want to invite"/>
                                             <div className='field-error' style={{ color: 'red', fontSize: '0.8em', margin: '10px 0'}}>
                                                 {errors.newSpeakerName && touched.newSpeakerName && errors.newSpeakerName}
                                             </div>

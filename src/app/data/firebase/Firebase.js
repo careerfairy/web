@@ -218,7 +218,7 @@ class Firebase {
             .doc("presentation");
         return presentationRef.set({
             downloadUrl: downloadUrl,
-            page: 0
+            page: 1
         });
     }
 
@@ -317,7 +317,16 @@ class Firebase {
             .collection("livestreams")
             .doc(livestreamId)
             .collection("liveSpeakers")
-            .orderBy("timestamp", "asc");;
+            .orderBy("timestamp", "asc");
+        return streamerRef.onSnapshot(callback);
+    }
+
+    listenToConnectedLivestreamLiveSpeakers = (livestreamId, callback) => {
+        let streamerRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("liveSpeakers")
+            .where("connected", "==", true);
         return streamerRef.onSnapshot(callback);
     }
 

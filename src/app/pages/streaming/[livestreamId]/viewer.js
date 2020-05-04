@@ -5,6 +5,9 @@ import { useRouter } from 'next/router';
 import ViewerVideoContainer from '../../../components/views/streaming/video-container/ViewerVideoContainer';
 import { withFirebasePage } from '../../../data/firebase';
 import NewCommentContainer from '../../../components/views/player-alt/comment-container/NewCommentContainer';
+import SmallViewerVideoDisplayer from '../../../components/views/streaming/video-container/SmallViewerVideoDisplayer';
+import ViewerVideoDisplayer from '../../../components/views/streaming/video-container/ViewerVideoDisplayer';
+import LivestreamPdfViewer from '../../../components/util/LivestreamPdfViewer';
 
 function ViewerPage(props) {
 
@@ -79,7 +82,7 @@ function ViewerPage(props) {
 
     useEffect(() => {
         if (livestreamId) {
-            const unsubscribe = props.firebase.listenToLivestreamLiveSpeakers(livestreamId, querySnapshot => {
+            const unsubscribe = props.firebase.listenToConnectedLivestreamLiveSpeakers(livestreamId, querySnapshot => {
                 let liveSpeakersList = [];
                 querySnapshot.forEach(doc => {
                     let speaker = doc.data();
@@ -116,12 +119,20 @@ function ViewerPage(props) {
         props.firebase.leaveCompanyTalentPool(currentLivestream.companyId, user.email);
     }
 
+    function getContainerWidth(length) {
+        if (currentLivestream.mode === 'presentation') {
+            return 4;
+        } else {
+            return length > 1 ? 8 : 16;
+        }
+    }
+
     let connectedStreamers = registeredStreamers.filter(streamer => streamer.connected);
     let videoElements = connectedStreamers.map( (streamer, index) => {
         return (
             <Fragment>
-                <Grid.Column width={ connectedStreamers.length > 1 ? 8 : 16} style={{ padding: 0 }} key={connectedStreamers.id}>
-                    <ViewerVideoContainer streamer={streamer} length={connectedStreamers.length} index={index + 1} isPlaying={isPlaying} hasStarted={currentLivestream.hasStarted}/>
+                <Grid.Column width={ getContainerWidth(connectedStreamers.length) } style={{ padding: 0 }} key={streamer.id}>
+                    <ViewerVideoContainer streamer={streamer} length={connectedStreamers.length} index={index + 1} isPlaying={isPlaying} height={'100%'} hasStarted={currentLivestream.hasStarted}/>
                 </Grid.Column>
             </Fragment>
         );
@@ -170,16 +181,19 @@ function ViewerPage(props) {
                     <div style={{ position: 'absolute', bottom: '13px', left: '120px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
                 </div>
                 <div className='top-menu-right'>
-                    <Image src={ currentLivestream.companyLogoUrl } style={{ postion: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block', margin: '0 10px'}}/>
+                    <Image src={ currentLivestream.companyLogoUrl } style={{ position: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block', margin: '0 10px'}}/>
                     <Button size='big' content={ userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'} icon={ userIsInTalentPool ? 'delete' : 'handshake outline'} onClick={ userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()} primary={!userIsInTalentPool}/> 
                 </div>
             </div>
             <div className='black-frame'>
-                <div className='video-box'>
-                    <Grid style={{ margin: 0, height: '100%' }}>
+                <div className='video-box' style={{ height: currentLivestream.mode === 'presentation' ? '150px' : '100%' }}>
+                    <Grid style={{ margin: 0, height: '100%' }} centered>
                         { videoElements }
                     </Grid>
                 </div>
+                <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none'), position: 'absolute', top: '150px', width: '100%', height: 'calc(100% - 235px)', backgroundColor: 'rgb(30,30,30)'}}>
+                    <LivestreamPdfViewer livestreamId={currentLivestream.id} presenter={false}/>
+                </div> 
                 <div className='video-menu'>
                     <div  className='video-menu-input'>
                         <Input action={{ content: 'Add a Question', color: 'teal', onClick: () => addNewQuestion() }} size='huge' maxLength='140' onKeyPress={addNewQuestionOnEnter} value={newQuestionTitle} fluid placeholder='Add your question...' onChange={(event) => {setNewQuestionTitle(event.target.value)}} />

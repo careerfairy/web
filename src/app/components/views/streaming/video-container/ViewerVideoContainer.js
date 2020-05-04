@@ -128,7 +128,7 @@ function ViewerVideoContainer(props) {
 
     return (
         <Fragment>
-            <div className='videoContainer' style={{ height: '100%' }}>
+            <div className='videoContainer' style={{ height: props.height }}>
                 <video id={'videoElement' + props.streamer.id} className='videoElement' width={ props.length > 1 ? '' : '100%' } controls={true} style={{  left: (props.index % 2 === 0) ? '0' : '', right: (props.index % 2 === 1) ? '0' : '', opacity: isPlaying ? 1 : 0}}/>
                 <div className={(showPlayButton ? 'playButton' : 'hidden')}><Icon name='play' onClick={() => playVideo()}/></div>
                 <div className={'connecting-overlay ' + (props.hasStarted && isPlaying ? 'hidden' : '')}>

@@ -111,10 +111,10 @@ exports.sendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(as
 
     if (req.method === 'OPTIONS') {
         // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', '');
+        res.set('Access-Control-Allow-Methods', 'GET');
         res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
         res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
+        return res.status(204).send('');
     }
 
     const recipient_email = req.body.recipientEmail;
@@ -152,10 +152,10 @@ exports.verifyEmailWithPin = functions.https.onRequest(async (req, res) => {
 
     if (req.method === 'OPTIONS') {
         // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', '');
+        res.set('Access-Control-Allow-Methods', 'GET');
         res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
         res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
+        return res.status(204).send('');
     }
 
     const recipient_email = req.body.recipientEmail;

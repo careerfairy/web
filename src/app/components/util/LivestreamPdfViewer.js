@@ -20,6 +20,7 @@ function LivestreamPdfViewer (props) {
     useEffect(() => {
         if (props.livestreamId) {
             props.firebase.listenToLivestreamPresentation(props.livestreamId, querySnapshot => {
+                debugger;
                 if (!querySnapshot.isEmpty) {
                     setPdfObject(querySnapshot.data());
                 }
@@ -88,7 +89,7 @@ function LivestreamPdfViewer (props) {
     return (
         <div style={{ position: 'relative', width: '100%'}}>
             <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translate(-50%)', display: ( pdfObject ? 'block' : 'none') }}>
-                <div style={{ marginBottom: '20px', zIndex: '9999', width: '100%', minWidth: '500px'}}>
+                <div style={{ marginBottom: '20px', zIndex: '9999', width: '100%', minWidth: '500px', display: props.presenter ? 'block' : 'none'}}>
                     <div style={{ display: 'inline-block'}}>
                         <FilePickerContainer
                             extensions={['pdf']}
@@ -114,7 +115,7 @@ function LivestreamPdfViewer (props) {
             </div>
             <div style={{ position: 'absolute', top: '150px', left: '50%', transform: 'translate(-50%)', display: ( pdfObject ? 'none' : 'block') }}>
                 <div style={{ marginBottom: '20px', zIndex: '9999'}}>
-                    <div style={{ display: 'inline-block', textAlign: 'center'}}>
+                    <div style={{ display: 'inline-block', textAlign: 'center', display: props.presenter ? 'block' : 'none'}}>
                         <div style={{ color: 'white', marginBottom: '40px'}}>You currently have no slides to share</div>
                         <FilePickerContainer
                             extensions={['pdf']}
@@ -122,6 +123,9 @@ function LivestreamPdfViewer (props) {
                             onError={errMsg => ( error.log(errMsg) )}>
                             <Button primary icon='upload' content='Upload Slides [.pdf]' />
                         </FilePickerContainer>
+                    </div>
+                    <div style={{ display: 'inline-block', textAlign: 'center', display: props.presenter ? 'none' : 'block'}}>
+                        <div style={{ color: 'white', marginBottom: '40px'}}>Please wait for the presenter to upload slides.</div>
                     </div>
                 </div>
             </div>
