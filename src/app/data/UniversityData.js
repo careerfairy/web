@@ -9,6 +9,9 @@ export const UNIVERSITY_NAMES = [
         text: "University of Zurich",
         value: "unizurich"
     },{
+        text: "Hochschule St. Gallen",
+        value: "hochschulestgallen"
+    },{
         text: "Universita della Svizzera Italiana",
         value: "unilugano"
     },{

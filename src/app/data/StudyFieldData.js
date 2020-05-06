@@ -142,6 +142,9 @@ export const UNIVERSITY_SUBJECTS = [
             text: "Digital Business Management",
             value: "DIGI"
         },{
+            text: "Information Science",
+            value: "INFO"
+        },{
             text: "Service Design",
             value: "SERV"
         },{
@@ -153,5 +156,23 @@ export const UNIVERSITY_SUBJECTS = [
         },{
             text: "Mobile Robotics",
             value: "ROBO"
+        },{
+            text: "Law and Economics",
+            value: "LAWECON"
+        },{
+            text: "Business Innovation",
+            value: "BUSINO"
+        },{
+            text: "Quantitative Economics and Finance",
+            value: "QUANT"
+        },{
+            text: "Strategy and International Management",
+            value: "STRAT"
+        },{
+            text: "Business Management",
+            value: "BUSMAN"
+        },{
+            text: "Account and Finance",
+            value: "ACCO"
         }
     ];

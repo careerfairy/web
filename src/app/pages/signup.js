@@ -401,9 +401,7 @@ function SignUpFormValidate(props) {
                                     <Button id='submitButton' fluid primary size='big' type="submit" loading={isSubmitting || generalLoading}>Validate Email</Button>
                                     <Message negative hidden={!incorrectPin}>
                                         <Message.Header>Incorrect PIN</Message.Header>
-                                        <p>
-                                            The PIN code you entered appears to be incorrect. <span className='resend-link' onClick={() => resendVerificationEmail()}>Resend the verification email.</span>
-                                        </p>
+                                        <p>The PIN code you entered appears to be incorrect. <span className='resend-link' onClick={() => resendVerificationEmail()}>Resend the verification email.</span></p>
                                     </Message>
                                     <div className='reset-email'>
                                         <div style={{ marginBottom: '5px'}}>Having issues signing up?<a style={{ marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us know</a></div>
