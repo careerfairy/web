@@ -18,6 +18,9 @@ export const UNIVERSITY_NAMES = [
         text: "Paul Scherrer Institute",
         value: "paulscherrerinstitute"
     },{
+        text: "FH Graubünden",
+        value: "fhgraubuenden"
+    },{
         text: "Other Institution",
         value: "othe"
     }

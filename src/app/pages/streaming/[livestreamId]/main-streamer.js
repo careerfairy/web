@@ -96,12 +96,6 @@ function StreamingPage(props) {
             livestreamId
         );
 
-    const pdfObject = {
-        url: 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company_presentations%2FCareerFairy%20-%20Pitchdeck%2C%20Jan%202020.pdf?alt=media&token=75c2050a-e3b8-4fe1-bd68-7c33dcbe8a01',
-        httpHeaders: {
-        }
-    }
-
     useEffect(() => {
         if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
             setAudioSource(devices.audioInputList[0].value);

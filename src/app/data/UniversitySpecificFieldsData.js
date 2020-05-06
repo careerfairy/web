@@ -273,5 +273,35 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
             text: "Physics",
             value: "PHYS"
         }
+    ],
+    fhgraubuenden: [
+        {
+            text: "Multimedia Production",
+            value: "MULTI"
+        },{
+            text: "Betriebsökonomie",
+            value: "BUSI"
+        },{
+            text: "Digital Business Management",
+            value: "DIGI"
+        },{
+            text: "Information Science",
+            value: "COMP"
+        },{
+            text: "Service Design",
+            value: "SERV"
+        },{
+            text: "Engineering",
+            value: "ENGI"
+        },{
+            text: "Information and Data Management",
+            value: "DATA"
+        },{
+            text: "New Business",
+            value: "NBUS"
+        },{
+            text: "Mobile Robotics",
+            value: "ROBO"
+        }
     ]
 };

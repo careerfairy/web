@@ -341,6 +341,9 @@ function UpcomingLivestream(props) {
                                     <Grid.Column mobile='5' computer='3' style={{ display: currentLivestream.universities.indexOf('unilausanne') > -1 ? 'block' : 'none' }}>
                                         <Image src={"https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2FLogo_HEC_Lausanne.png?alt=media"} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '100px', maxHeight: '80px', margin: '10px auto 5px auto' }}/>
                                     </Grid.Column>
+                                    <Grid.Column mobile='5' computer='3' style={{ display: currentLivestream.universities.indexOf('fhgraubuenden') > -1 ? 'block' : 'none' }}>
+                                        <Image src={"https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Ffhgr%20logo.png?alt=media"} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '200px', maxHeight: '80px', margin: '10px auto 5px auto' }}/>
+                                    </Grid.Column>
                                 </Grid>
                             </div>
                             <div className='topDescriptionContainer' > 

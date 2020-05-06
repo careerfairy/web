@@ -132,5 +132,26 @@ export const UNIVERSITY_SUBJECTS = [
         },{
             text: "Geography",
             value: "GEOG"
+        },{
+            text: "Information and Data Management",
+            value: "DATA"
+        },{
+            text: "Multimedia Production",
+            value: "MULTI"
+        },{
+            text: "Digital Business Management",
+            value: "DIGI"
+        },{
+            text: "Service Design",
+            value: "SERV"
+        },{
+            text: "Engineering",
+            value: "ENGI"
+        },{
+            text: "New Business",
+            value: "NBUS"
+        },{
+            text: "Mobile Robotics",
+            value: "ROBO"
         }
     ];
