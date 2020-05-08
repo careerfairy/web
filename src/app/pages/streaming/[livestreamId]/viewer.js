@@ -11,11 +11,6 @@ import LivestreamPdfViewer from '../../../components/util/LivestreamPdfViewer';
 
 function ViewerPage(props) {
 
-    const eth_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media';
-    const epfl_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fepfl-career-center.png?alt=media';
-    const uzh_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fjobhub.png?alt=media';
-    const polyefair_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fpolyefair_logo.png?alt=media';
-
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
 
@@ -30,6 +25,7 @@ function ViewerPage(props) {
     const [currentLivestream, setCurrentLivestream] = useState(false);
     const [registeredStreamers, setRegisteredStreamers] = useState([]);
 
+    const [careerCenters, setCareerCenters] = useState([]);
     const [streamIds, setStreamIds] = useState([]);
 
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
@@ -82,6 +78,20 @@ function ViewerPage(props) {
     }, [livestreamId]);
 
     useEffect(() => {
+        if (currentLivestream) {
+            props.firebase.getLivestreamCareerCenters(currentLivestream.universities).then( querySnapshot => {
+                let groupList = [];
+                querySnapshot.forEach(doc => {
+                    let group = doc.data();
+                    group.id = doc.id;
+                    groupList.push(group);
+                });
+                setCareerCenters(groupList);
+            });
+        }
+    }, [currentLivestream]);
+
+    useEffect(() => {
         if (livestreamId) {
             const unsubscribe = props.firebase.listenToConnectedLivestreamLiveSpeakers(livestreamId, querySnapshot => {
                 let liveSpeakersList = [];
@@ -128,23 +138,6 @@ function ViewerPage(props) {
         }
     }
 
-    let connectedStreamers = registeredStreamers.filter(streamer => streamer.connected);
-    let videoElements = connectedStreamers.map( (streamer, index) => {
-        return (
-            <Fragment>
-                <Grid.Column width={ getContainerWidth(connectedStreamers.length) } style={{ padding: 0 }} key={streamer.id}>
-                    <ViewerVideoContainer streamer={streamer} length={connectedStreamers.length} index={index + 1} isPlaying={isPlaying} height={'100%'} hasStarted={currentLivestream.hasStarted}/>
-                </Grid.Column>
-            </Fragment>
-        );
-    });
-
-    function isUniversityLivestream(university) {
-        if (currentLivestream) {
-            return currentLivestream.universities.indexOf(university) > -1;
-        }
-    }
-
     function addNewQuestion() {
         if (!userData ||!(newQuestionTitle.trim()) || newQuestionTitle.trim().length < 5) {
             return;
@@ -171,15 +164,31 @@ function ViewerPage(props) {
         } 
     }
 
+    let logoElements = careerCenters.map( (careerCenter, index) => {
+        return (
+            <Fragment>
+                <Image src={ careerCenter.logoUrl } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block' }}/>
+            </Fragment>
+        );
+    });
+
+    let connectedStreamers = registeredStreamers.filter(streamer => streamer.connected);
+    let videoElements = connectedStreamers.map( (streamer, index) => {
+        return (
+            <Fragment>
+                <Grid.Column width={ getContainerWidth(connectedStreamers.length) } style={{ padding: 0 }} key={streamer.id}>
+                    <ViewerVideoContainer streamer={streamer} length={connectedStreamers.length} index={index + 1} isPlaying={isPlaying} height={'100%'} hasStarted={currentLivestream.hasStarted}/>
+                </Grid.Column>
+            </Fragment>
+        );
+    });
+
     return (
         <div className='topLevelContainer'>
             <div className='top-menu'>
                 <div className='top-menu-left'>    
                     <Image src='/logo_teal.png' style={{ maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
-                    <Image src={ eth_logo } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: isUniversityLivestream("ethzurich") ? 'inline-block' : 'none' }}/>
-                    <Image src={ epfl_logo } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: isUniversityLivestream("epflausanne") ? 'inline-block' : 'none' }}/>
-                    <Image src={ uzh_logo } style={{ maxWidth: '150px', maxHeight: '50px', display: isUniversityLivestream("unizurich") ? 'inline-block' : 'none' }}/>
-                    <Image src={ polyefair_logo } style={{ maxWidth: '150px', maxHeight: '50px', display: isUniversityLivestream("polyefair") ? 'inline-block' : 'none' }}/>
+                    { logoElements }
                     <div style={{ position: 'absolute', bottom: '13px', left: '120px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
                 </div>
                 <div className='top-menu-right'>

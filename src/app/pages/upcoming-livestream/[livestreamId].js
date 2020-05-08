@@ -33,7 +33,7 @@ function UpcomingLivestream(props) {
     const [registered, setRegistered] = useState(false);
 
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
-
+    const [careerCenters, setCareerCenters] = useState([]);
     
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
@@ -78,6 +78,20 @@ function UpcomingLivestream(props) {
             setRegistered(false);
         }
     }, [currentLivestream, user]);
+
+    useEffect(() => {
+        if (currentLivestream) {
+            props.firebase.getLivestreamCareerCenters(currentLivestream.universities).then( querySnapshot => {
+                let groupList = [];
+                querySnapshot.forEach(doc => {
+                    let group = doc.data();
+                    group.id = doc.id;
+                    groupList.push(group);
+                });
+                setCareerCenters(groupList);
+            });
+        }
+    }, [currentLivestream]);
 
     useEffect(() => {
         if (userData && currentLivestream && userData.talentPools && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
@@ -267,6 +281,14 @@ function UpcomingLivestream(props) {
         );
     });
 
+    let logoElements = careerCenters.map( (careerCenter, index) => {
+        return (
+            <Grid.Column mobile='5' computer='3'>
+                <Image src={ careerCenter.logoUrl } style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '120px', maxHeight: '60px', margin: '10px auto 5px auto' }}/>
+            </Grid.Column>
+        );
+    });
+
     if (!currentLivestream) {
         return <Loader/>;
     }
@@ -322,27 +344,7 @@ function UpcomingLivestream(props) {
                             </div>
                             <div style={{ textAlign: 'center', marginBottom: '20px'}}>
                                 <Grid centered className='middle aligned'>
-                                    <Grid.Column mobile='5' computer='3' style={{ display: currentLivestream.universities.indexOf('polyefair') > -1 ? 'block' : 'none' }}>
-                                        <Image src={"https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fpolyefair_logo.png?alt=media"} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '100px', maxHeight: '80px', margin: '10px auto 5px auto' }}/>
-                                    </Grid.Column>
-                                    <Grid.Column mobile='5' computer='3' style={{ display: (currentLivestream.universities.indexOf('ethzurich') > -1 && currentLivestream.universities.indexOf('polyefair') === -1) ? 'block' : 'none' }}>
-                                        <Image src={"https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media"} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '100px', maxHeight: '80px', margin: '10px auto 5px auto' }}/>
-                                    </Grid.Column>
-                                    <Grid.Column mobile='5' computer='3' style={{ display: currentLivestream.universities.indexOf('epflausanne') > -1 ? 'block' : 'none' }}>
-                                        <Image src={"https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fepfl-career-center.png?alt=media"} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '100px', maxHeight: '80px', margin: '10px auto 5px auto' }}/>
-                                    </Grid.Column>
-                                    <Grid.Column mobile='5' computer='3' style={{ display: currentLivestream.universities.indexOf('unizurich') > -1 ? 'block' : 'none' }}>
-                                        <Image src={"https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fuzh.png?alt=media"} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '100px', maxHeight: '80px', margin: '10px auto 5px auto' }}/>
-                                    </Grid.Column>
-                                    <Grid.Column mobile='5' computer='3' style={{ display: currentLivestream.universities.indexOf('unilausanne') > -1 ? 'block' : 'none' }}>
-                                        <Image src={"https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2FLogo_HEC_Lausanne.png?alt=media"} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '100px', maxHeight: '80px', margin: '10px auto 5px auto' }}/>
-                                    </Grid.Column>
-                                    <Grid.Column mobile='5' computer='3' style={{ display: currentLivestream.universities.indexOf('fhgraubuenden') > -1 ? 'block' : 'none' }}>
-                                        <Image src={"https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Ffhgr%20logo.png?alt=media"} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '200px', maxHeight: '80px', margin: '10px auto 5px auto' }}/>
-                                    </Grid.Column>
-                                    <Grid.Column mobile='5' computer='3' style={{ display: currentLivestream.universities.indexOf('ethstartupspeeddating') > -1 ? 'block' : 'none' }}>
-                                        <Image src={"https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth%20ec%20logo.png?alt=media"} style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '200px', maxHeight: '80px', margin: '10px auto 5px auto' }}/>
-                                    </Grid.Column>
+                                    { logoElements }
                                 </Grid>
                             </div>
                             <div className='topDescriptionContainer' > 

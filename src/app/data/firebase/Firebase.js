@@ -54,7 +54,7 @@ class Firebase {
         let ref = this.firestore
             .collection("userData")
             .doc(userEmail);
-        return userDataRef.onSnapshot(callback);
+        return ref.onSnapshot(callback);
     };
 
     setUserData = (userEmail, firstName, lastName, university, faculty, levelOfStudy) => {
@@ -113,7 +113,8 @@ class Firebase {
     getCareerCenterByUniversityId = (universityId) => {
         let ref = this.firestore
             .collection("careerCenterData")
-            .where("universityId", "==", universityId);
+            .where("universityId", "==", universityId)
+            .where("test", "==", false);
         return ref.get();
     };
 
@@ -446,8 +447,9 @@ class Firebase {
     getLivestreamCareerCenters = (universityIds) => {
         let ref = this.firestore
             .collection("careerCenterData")
+            .where("test", "==", false)
             .where("universityId", "in", universityIds);
-        return ref.careerCentersRef();
+        return ref.get();
     }
 
     getLegacyPastLivestreamQuestions = (livestreamId) => {
