@@ -272,11 +272,7 @@ function UpcomingLivestream(props) {
     }
 
     if (currentLivestream.hasStarted) {
-        if (currentLivestream.isNewUi) {
-            router.replace('/streaming/' + currentLivestream.id + '/viewer');
-        } else {
-            router.replace('/player-alt/' + currentLivestream.id);
-        }
+        router.replace('/streaming/' + currentLivestream.id + '/viewer');
     }
 
     return (

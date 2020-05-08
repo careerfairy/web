@@ -4,7 +4,7 @@ import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, M
 import { useRouter } from 'next/router';
 import ViewerVideoContainer from '../../../components/views/streaming/video-container/ViewerVideoContainer';
 import { withFirebasePage } from '../../../data/firebase';
-import NewCommentContainer from '../../../components/views/player-alt/comment-container/NewCommentContainer';
+import NewCommentContainer from '../../../components/views/viewer/comment-container/NewCommentContainer';
 import SmallViewerVideoDisplayer from '../../../components/views/streaming/video-container/SmallViewerVideoDisplayer';
 import ViewerVideoDisplayer from '../../../components/views/streaming/video-container/ViewerVideoDisplayer';
 import LivestreamPdfViewer from '../../../components/util/LivestreamPdfViewer';
