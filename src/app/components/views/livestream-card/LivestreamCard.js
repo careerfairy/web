@@ -96,12 +96,12 @@ function LivestreamCard(props) {
         <Fragment>
             <div className='companies-mentor-discriber-content' onClick={(event) => goToRouteFromParent(event, '/upcoming-livestream/' + props.livestream.id)}>
                 <div className='date-indicator'>
-                    {/* <div className='coming-icon-container'>
+                    <div className='coming-icon-container'>
                         <div className='coming-icon' style={{ color: userIsRegistered() ? 'white' : '', border: userIsRegistered() ? '2px solid white' : ''}} ><Icon name='rss'/>Live stream</div>
-                    </div> */}
+                    </div>
                     <div>
-                        <div style={{ display: 'inline-block' }}><Icon name='calendar alternate outline' style={{ color: 'rgb(0, 210, 170)', fontSize: '0.7em', marginRight: '10px' }}/>{ DateUtil.getPrettyDay(props.livestream.start.toDate()) }</div>
-                        <div style={{ display: 'inline-block', float: 'right' }}><Icon name='clock outline' style={{ color: 'rgb(0, 210, 170)', fontSize: '0.7em', marginRight: '10px' }}/>{ DateUtil.getPrettyTime(props.livestream.start.toDate()) }</div>
+                        <div style={{ display: 'inline-block' }}><Icon name='calendar alternate outline' style={{ marginRight: '10px' }}/>{ DateUtil.getPrettyDay(props.livestream.start.toDate()) }</div>
+                        <div style={{ display: 'inline-block', float: 'right' }}><Icon name='clock outline' style={{ marginRight: '10px' }}/>{ DateUtil.getPrettyTime(props.livestream.start.toDate()) }</div>
                     </div>
                 </div>
                 <div className='livestream-thumbnail' style={{ backgroundImage: 'url(' + props.livestream.backgroundImageUrl + ')' }}>
@@ -156,10 +156,10 @@ function LivestreamCard(props) {
 
                 .date-indicator {
                     text-align: left;
-                    padding: 30px 45px 30px 45px;
-                    font-size: 1.6em;
+                    padding: 35px 45px;
+                    font-size: 1.7em;
                     font-weight: 500;
-                    color: white;
+                    color: rgb(0, 210, 170);
                     background-color: rgb(44, 66, 81);
                 }
 
@@ -340,13 +340,13 @@ function LivestreamCard(props) {
 
                 .coming-icon {
                     padding: 6px 8px;
-                    border: 3px solid white;
+                    border: 2px solid rgb(0, 210, 170);
                     text-transform: uppercase;
                     text-align: center;
-                    color: white;
+                    color: rgb(0, 210, 170);
                     font-weight: 700;
                     display: inline-block;
-                    font-size: 0.8em;
+                    font-size: 0.6em;
                     margin: 0 auto;
                 }
 
