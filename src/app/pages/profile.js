@@ -23,8 +23,8 @@ const UserProfile = (props) => {
     const universities = UNIVERSITY_NAMES;
     const levels = STUDY_LEVELS;
 
-    const [loading, setLoading] = useState(false)
-    const [userData, setUserData] = useState(null)
+    const [loading, setLoading] = useState(false);
+    const [userData, setUserData] = useState(null);
     const [user, setUser] = useState(null);
     const [initialValues, setInitialValues] = useState(null);
     const [selectField, setSelectField] = useState(generic_subjects);
