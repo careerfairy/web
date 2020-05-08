@@ -190,41 +190,6 @@ function ViewerPage(props) {
         } 
     }
 
-    function sendInstantReaction(reaction) {
-        const newComment = {
-            title: reaction,
-            author: userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous',
-        }
-        props.firebase.putQuestionComment(currentLivestream.id, upcomingQuestions[0].id, newComment)
-            .then(() => {}, error => {
-                console.log("Error: " + error);
-            })
-    }
-
-    function getInitialReactions() {
-        if (currentLivestream.language === "CH") {
-            return ['Hallo!', 'Hoi zäme', 'Hi! :-)'];
-        } 
-        if (currentLivestream.language === "DE") {
-            return ['Hallo!', 'Guten Tag!', 'Hi! :-)'];
-        }
-        else {
-            return ['Hello!', 'Hi everyone!', 'How do you do?'];
-        }
-    }
-
-    let reactionElements = getInitialReactions().map((reaction, index) => {
-        return (
-            <Grid.Column width={5} key={index}>
-                <div onClick={() => {sendInstantReaction(reaction); setInitialReactionSent(true);}} style={{ cursor: 'pointer', position: 'relative', backgroundColor: 'white', color: 'grey', padding: '20px', borderRadius: '20px', textAlign: 'left' }}>
-                    <div style={{ textTransform: 'capitalize', fontSize: '0.9em', fontWeight: '400', color: 'black', textAlign: 'left', marginBottom: '0', minWidth: '200px'}}>{ reaction }</div>
-                    <div style={{ textTransform: 'capitalize', fontSize: '0.7em', fontWeight: '400', color: 'grey', textAlign: 'left', margin: '0'}}>@{userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous'}</div>
-                    <Button circular icon='chevron right circle' style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)'}} primary/>
-                </div>
-            </Grid.Column>
-        )
-    });
-
     let logoElements = careerCenters.map( (careerCenter, index) => {
         return (
             <Fragment>
