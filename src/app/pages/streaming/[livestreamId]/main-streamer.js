@@ -224,15 +224,6 @@ function StreamingPage(props) {
         props.firebase.setLivestreamMode(livestreamId, mode);
     }
 
-    function toggleScreenSharing() {
-        if (isCapturingDesktop) {
-            webRTCAdaptor.switchVideoCapture(livestreamId);
-        } else {
-            webRTCAdaptor.switchDesktopCaptureWithCamera(livestreamId);
-        }
-        setIsCapturingDesktop(!isCapturingDesktop);
-    }
-
     function toggleMicrophone() {
         if (isLocalMicMuted) {
             webRTCAdaptor.unmuteLocalMic();
@@ -541,6 +532,10 @@ function StreamingPage(props) {
                     top: 50%;
                     transform: translateY(-50%);
                     background-color: black;
+                }
+
+                .countdown {
+                    border: 2px solid red;
                 }
 
                 .video-container-small {

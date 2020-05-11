@@ -125,10 +125,7 @@ const UserProfile = (props) => {
                             props.firebase.setUserData(user.email, values.firstName, values.lastName, values.university, values.fieldOfStudy, values.levelOfStudy)
                             .then(() => {
                                 if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-                                    if (values.university === 'ethzurich' || values.university === 'epflausanne' || values.university === 'unizurich'|| values.university === 'unilausanne'|| values.university === 'fhgraubuenden') {
-                                        if (values.university === 'ethzurich') {
-                                            return router.push('/next-livestreams?university=polyefair');
-                                        }
+                                    if (values.university === 'ethzurich' || values.university === 'epflausanne' || values.university === 'unizurich'|| values.university === 'unilausanne'|| values.university === 'fhgraubuenden'|| values.university === 'hochschulerapperswil') {
                                         return router.push('/next-livestreams' + (values.university ? ('?university=' + values.university) : ''));
                                     } else {
                                         return router.push('/next-livestreams');
