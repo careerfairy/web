@@ -16,12 +16,14 @@ import SmallStreamerVideoDisplayer from '../../../components/views/streaming/vid
 import NewCommentContainer from '../../../components/views/streaming/comment-container/NewCommentContainer';
 import { Formik } from 'formik';
 import { bool } from 'twilio/lib/base/serialize';
+import Countdown from 'react-countdown';
 
 function StreamingPage(props) {
 
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
 
+    const [streamerReady, setStreamerReady] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
 
     const [isStreaming, setIsStreaming] = useState(false);
@@ -55,7 +57,6 @@ function StreamingPage(props) {
             setIsStreaming(true);
         },
         onJoinedTheRoom: (infoObj) => {
-            debugger;
         },
         onNewStreamAvailable: (infoObj) => {
             addStreamIdToStreamerList(infoObj.streamId);
@@ -88,6 +89,7 @@ function StreamingPage(props) {
 
     const { webRTCAdaptor, externalMediaStreams } = 
         useWebRTCAdaptor(
+            streamerReady,
             localVideoId,
             mediaConstraints,
             streamingCallbacks,
@@ -193,7 +195,6 @@ function StreamingPage(props) {
                         currentSpeaker.id = doc.id;
                     }
                 });
-                debugger;
                 setRegisteredSpeaker(currentSpeaker);
             });
             return () => unsubscribe();
@@ -243,7 +244,6 @@ function StreamingPage(props) {
     }
 
     function addASpeaker(speakerName, main) {
-        debugger;
         return props.firebase.createNewLivestreamSpeaker(livestreamId, speakerName, main);
     }
 
@@ -258,7 +258,6 @@ function StreamingPage(props) {
     }
 
     function setLiveSpeakerDisconnected(speakerId) {
-        debugger;
         if (registeredSpeaker) {
             props.firebase.setLivestreamLiveSpeakersDisconnected(livestreamId, speakerId);
         }
@@ -270,7 +269,7 @@ function StreamingPage(props) {
         speakerElements = additionalSpeakers.filter(speaker => speaker.id !== livestreamId).map((speaker, index) => {
             let link = 'https://careerfairy.io/streaming/' + livestreamId + '/joining-streamer/' + speaker.id;
             return (
-                <div style={{ margin: '0 0 30px 0', border: '2px solid rgb(0, 210, 170)', padding: '20px', borderRadius: '10px', backgroundColor: 'rgb(252,252,252)', boxShadow: '0 0 2px grey' }} className='animated fadeIn'>
+                <div key={speaker.id} style={{ margin: '0 0 30px 0', border: '2px solid rgb(0, 210, 170)', padding: '20px', borderRadius: '10px', backgroundColor: 'rgb(252,252,252)', boxShadow: '0 0 2px grey' }} className='animated fadeIn'>
                     <h3 style={{ color: 'rgb(0, 210, 170)'}}><Icon name='user' style={{margin: '0 10px 0 0'}}/>{ speaker.name } <Button content={'Remove ' + speaker.name } icon='remove' size='mini' onClick={() => removeSpeaker(speaker.id)} style={{ margin: '0 20px'}}/></h3>
                     <Input type='text' value={link} disabled style={{ margin: '0 0 5px 0', color: 'red'}} fluid />
                     <p style={{ marginBottom: '10px', color: 'rgb(80,80,80)', fontSize: '0.8em'}}>Please send this link to { speaker.name } to allow her/him to join your live stream.</p>
@@ -290,28 +289,6 @@ function StreamingPage(props) {
                     Viewers: { numberOfViewers }
                 </div>
             </div>
-            {/* <div className='black-frame'>
-                <div style={{ width: 'calc(100% - 100px)', margin: '20px auto', height: '100px'}}>
-                    <div style={{ position: 'relative', height: '100%' }}>
-                        <video id="localVideo" muted autoPlay></video> 
-                    </div>
-                </div>
-                <div style={{ position: 'absolute', top: '140px', width: '100%', backgroundColor: 'rgb(30,30,30)'}}>
-                    <LivestreamPdfViewer firebase={props.firebase} livestream={{}}/>
-                </div>
-                <div className='button-container'>         
-                    <Grid centered className='middle aligned'>
-                        <Grid.Column width={6} textAlign='center'>
-                            <ButtonWithConfirm
-                                color='teal' 
-                                size='big' 
-                                buttonAction={currentLivestream.hasStarted ? stopStreaming : startStreaming} 
-                                confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
-                                buttonLabel={ currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming' }/>
-                        </Grid.Column>
-                    </Grid>
-                </div>
-            </div> */}
             <div className='black-frame'>
                 <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
                     <StreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints}/>
@@ -322,6 +299,7 @@ function StreamingPage(props) {
                 <div className='button-container'>         
                     <Grid centered className='middle aligned'>
                         <Grid.Column width={6} textAlign='center'>
+                            <Countdown date={ currentLivestream.start ? currentLivestream.start.toDate() : null }/>
                             <ButtonWithConfirm
                                 color='teal' 
                                 size='big' 

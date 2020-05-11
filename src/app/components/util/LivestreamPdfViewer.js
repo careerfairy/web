@@ -23,7 +23,6 @@ function LivestreamPdfViewer (props) {
     useEffect(() => {
         if (props.livestreamId) {
             props.firebase.listenToLivestreamPresentation(props.livestreamId, querySnapshot => {
-                debugger;
                 if (!querySnapshot.isEmpty) {
                     setPdfObject(querySnapshot.data());
                 }

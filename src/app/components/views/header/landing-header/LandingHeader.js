@@ -9,7 +9,6 @@ const LandingHeader = (props) => {
     const router = useRouter();
 
     function goToRoute(route) {
-        debugger;
         router.push(route);
     }
 

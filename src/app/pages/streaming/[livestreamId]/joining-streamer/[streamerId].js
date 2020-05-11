@@ -17,6 +17,8 @@ function StreamingPage(props) {
     const livestreamId = router.query.livestreamId;
     const streamerId = router.query.streamerId;
 
+    const [streamerReady, setStreamerReady] = useState(false);
+
     const [isStreaming, setIsStreaming] = useState(false);
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
 
@@ -71,6 +73,7 @@ function StreamingPage(props) {
     }
 
     const { webRTCAdaptor, externalMediaStreams } = useWebRTCAdaptor(
+        streamerReady,
         localVideoId,
         mediaConstraints,
         streamingCallbacks,
@@ -80,7 +83,6 @@ function StreamingPage(props) {
     );
 
     useEffect(() => {
-        debugger;
         if (isStreaming) {
             setLiveSpeakerConnected();
         } else {

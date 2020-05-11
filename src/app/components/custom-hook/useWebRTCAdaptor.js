@@ -6,7 +6,7 @@ import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor.js';
 import { WEBRTC_ERRORS } from '../../data/errors/StreamingErrors.js';
 import LivestreamId from '../../pages/upcoming-livestream/[livestreamId].js';
 
-export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId) {
+export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId) {
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
     
@@ -29,7 +29,7 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
     }, []);
 
     useEffect(() => {
-        if (document && mediaConstraints && nsToken && nsToken.iceServers) {
+        if (streamerReady && document && mediaConstraints && nsToken && nsToken.iceServers) {
             setupWebRTCAdaptor();
         }
     }, [mediaConstraints, document, nsToken]);
@@ -207,7 +207,6 @@ export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCal
                         break;
                     }
                     case "ice_connection_state_changed": {
-                        debugger;
                         if (infoObj.state === 'connected') {
                             if (typeof streamingCallbackObject.onConnected === 'function') {
                                 streamingCallbackObject.onConnected(infoObj);

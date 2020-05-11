@@ -360,9 +360,7 @@ function SignUpFormValidate(props) {
                                         pinCode: parseInt(values.pinCode)
                                     }
                                 }).then( response => { 
-                                        debugger;
                                         props.user.reload().then(() => {
-                                            debugger;
                                             return props.router.push('/profile');
                                         });
                                     }).catch(error => {

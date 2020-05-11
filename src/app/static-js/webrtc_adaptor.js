@@ -556,8 +556,6 @@ export function WebRTCAdaptor(initialValues)
 	}
 
 	this.switchDesktopCapture = function(streamId) {
-		debugger;
-
 		var mediaConstraints = {
 			video : "screen",
 			audio : false
@@ -573,7 +571,6 @@ export function WebRTCAdaptor(initialValues)
 
 
 	this.switchDesktopCaptureWithCamera = function(streamId) {
-		debugger;
 		var mediaConstraints = {
 			video : "screen+camera",
 			audio : true

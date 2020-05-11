@@ -40,7 +40,6 @@ const UserProfile = (props) => {
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
-            debugger;
             if (user) {
                 setUser(user);
             }  else {
