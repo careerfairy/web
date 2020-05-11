@@ -12,6 +12,9 @@ export const UNIVERSITY_NAMES = [
         text: "Hochschule St. Gallen",
         value: "hochschulestgallen"
     },{
+        text: "Hochschule für Technik Rapperswil",
+        value: "hochschulerapperswil"
+    },{
         text: "Universita della Svizzera Italiana",
         value: "unilugano"
     },{

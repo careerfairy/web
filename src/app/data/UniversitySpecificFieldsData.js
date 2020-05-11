@@ -336,5 +336,56 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
             text: "Account and Finance",
             value: "ACCO"
         }
+    ],
+    hochschulerapperswil: [
+        {
+            text: "Renewable Energies and Environmental Engineering",
+            value: "RENEW"
+        },{
+            text: "Mechanical Engineering | Innovation",
+            value: "MECHINO"
+        },{
+            text: "Business Engineering",
+            value: "BUSIENG"
+        },{
+            text: "Civil Engineering",
+            value: "CIVIL"
+        },{
+            text: "Industrial Engineering",
+            value: "INDUST"
+        },{
+            text: "Landscape Architecture",
+            value: "LAND"
+        },{
+            text: "Electrical Engineering",
+            value: "ELECTRI"
+        },{
+            text: "Computer Science",
+            value: "COMP"
+        },{
+            text: "Data Science",
+            value: "DATASCI"
+        },{
+            text: "Energy and Environment",
+            value: "ENER"
+        },{
+            text: "Mechanical Engineering",
+            value: "MECHA"
+        },{
+            text: "Mechatronics and Automation",
+            value: "MECATRO"
+        },{
+            text: "Medical Engineering",
+            value: "MEDENG"
+        },{
+            text: "Photonics",
+            value: "PHOTON"
+        },{
+            text: "Raumentwicklung und Landschaftsarchitektur",
+            value: "RAUM"
+        },{
+            text: "Urban, Transport and Spatial Planning",
+            value: "URBA"
+        }
     ]
 };
