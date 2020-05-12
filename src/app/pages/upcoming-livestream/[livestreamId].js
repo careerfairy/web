@@ -295,7 +295,7 @@ function UpcomingLivestream(props) {
                             <div className={'topDescriptionContainer ' + (dateIsInUnder24Hours(currentLivestream.start.toDate()) ? '' : 'hidden')}> 
                                 <div className='countdown-title' style={{ textAlign: 'center',  color: 'rgb(255, 20, 147)', fontSize: '1.4em'}} >Please wait here! You will be redirected when the stream starts.</div>    
                                 <div  style={{ textAlign: 'center', color: 'rgb(255, 20, 147)'}}>
-                                    <Countdown date={ currentLivestream.start.toDate() }/>
+                                    <Countdown date={ currentLivestream.start.toDate() }><span style={{ margin: '30px' }}>This livestream will start shortly</span></Countdown>
                                 </div>
                             </div>
                             <div style={{ margin: '30px 0'}}>
@@ -348,7 +348,7 @@ function UpcomingLivestream(props) {
                             <div className='topDescriptionContainer' > 
                                 <div className='countdown-title' style={{ textAlign: 'center',  color: registered ? 'white' : 'rgb(255, 20, 147)'}} >This live stream starts here in</div>    
                                 <div  style={{ textAlign: 'center', color: 'rgb(255, 20, 147)'}}>
-                                    <Countdown date={ currentLivestream.start.toDate() }/>
+                                    <Countdown date={ currentLivestream.start.toDate() }><span style={{ margin: '30px' }}>This livestream will start shortly</span></Countdown>
                                 </div>
                             </div>
                         </Container>   

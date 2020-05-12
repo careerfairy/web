@@ -57,7 +57,6 @@ export default function CountdownTimer(props) {
               .label {
                   font-size: 0.8em;
                   font-weight: 300;
-                  color: rgb(100,100,100);
                   margin: 0 auto;
               }
           `}</style>
@@ -69,7 +68,7 @@ export default function CountdownTimer(props) {
   return (
     <div>
       <Grid centered>
-      {timerComponents.length ? timerComponents : <span>Time's up!</span>}
+      {timerComponents.length ? timerComponents : <span style={{ margin: '30px' }}>{ props.children }</span>}
       </Grid>
     </div>
   );

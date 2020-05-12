@@ -16,7 +16,7 @@ import SmallStreamerVideoDisplayer from '../../../components/views/streaming/vid
 import NewCommentContainer from '../../../components/views/streaming/comment-container/NewCommentContainer';
 import { Formik } from 'formik';
 import { bool } from 'twilio/lib/base/serialize';
-import Countdown from 'react-countdown';
+import CountdownTimer from '../../../components/views/common/Countdown';
 
 function StreamingPage(props) {
 
@@ -298,11 +298,15 @@ function StreamingPage(props) {
                 </div>
                 <div className='button-container'>         
                     <Grid centered className='middle aligned'>
-                        <Grid.Column width={6} textAlign='center'>
-                            <Countdown date={ currentLivestream.start ? currentLivestream.start.toDate() : null }/>
+                        <Grid.Column width={10} textAlign='center'>
+                            <div className='countdown'>
+                                <div>Your livestream is scheduled to start in</div>
+                                <CountdownTimer date={ currentLivestream.start ? currentLivestream.start.toDate() : null }><span>Press Start Streaming to start the event</span></CountdownTimer>
+                            </div>
                             <ButtonWithConfirm
                                 color='teal' 
                                 size='big' 
+                                fluid
                                 buttonAction={currentLivestream.hasStarted ? stopStreaming : startStreaming} 
                                 confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
                                 buttonLabel={ currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming' }/>
@@ -535,10 +539,23 @@ function StreamingPage(props) {
                     bottom: 0;
                     left: 0;
                     width: 100%;                    
-                    height: 90px;
                     cursor:  pointer;
                     padding: 17px;
                     z-index: 8000;
+                }
+
+                .countdown {
+                    margin: 0 0 20px 0;
+                    color: white;
+                    padding: 20px 0;
+                    border-radius: 10px;
+                    font-size: 1.2em;
+                    background-color: rgba(0,0,0,0.8);
+                    min-height: 100px;
+                }
+
+                .countdown .label {
+                    color: white;
                 }
 
                 .right-container {
