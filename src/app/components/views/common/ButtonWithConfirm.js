@@ -13,7 +13,7 @@ function ButtonWithConfirm(props) {
 
     return (
         <Fragment>
-            <Button id={props.elementId} color={props.color} onClick={() => setModalOpen(true)} style={props.style} size={props.size}>{ props.buttonLabel }</Button>
+            <Button id={props.elementId} color={props.color} onClick={() => setModalOpen(true)} style={props.style} size={props.size} disabled={props.disabled} fluid={props.fluid}>{ props.buttonLabel }</Button>
             <Modal style={{ zIndex: '9999' }} open={modalOpen} onClose={() => setModalOpen(false)} centered={false}>
                 <Modal.Content>
                     <Header>Just making sure</Header>

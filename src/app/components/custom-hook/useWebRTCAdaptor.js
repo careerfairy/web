@@ -32,7 +32,7 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
         if (streamerReady && document && mediaConstraints && nsToken && nsToken.iceServers) {
             setupWebRTCAdaptor();
         }
-    }, [mediaConstraints, document, nsToken]);
+    }, [streamerReady, mediaConstraints, document, nsToken]);
 
     useEffect(() => {
         if (addedStream) {
@@ -89,14 +89,22 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
     }
 
     function errorCallback(error) {
-        if (error === 'ScreenSharePermissionDenied') {
+        if (error === 'ScreenSharePermissionDenied' && typeof streamingCallbackObject.onScreenSharePermissionDenied === 'function') {
             errorCallbackObject.onScreenSharePermissionDenied();
         } else {
             const currentError = WEBRTC_ERRORS.find( webrtc_error => webrtc_error.value === error);
             if (currentError) {
-                alert(currentError.text);
+                if (typeof errorCallbackObject.onOtherError === 'function') {
+                    errorCallbackObject.onOtherError(currentError.text);
+                } else {
+                    alert(currentError.text);
+                }
             } else {
-                alert(error);
+                if (typeof errorCallbackObject.onOtherError === 'function') {
+                    errorCallbackObject.onOtherError(error);
+                } else {
+                    alert(error);
+                }
             }
         }
     }

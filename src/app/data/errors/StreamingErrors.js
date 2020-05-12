@@ -1,6 +1,6 @@
 export const WEBRTC_ERRORS = [
     {
-        text: "A WebSocket connection could not be established to allow for low-latency streaming on CareerFairy. This is generally caused by restrictive firewall rules that block WebSocket connection. Ask your network administrator for support or switch to a less restrictive network.",
+        text: "A WebSocket connection could not be established to allow for low-latency streaming on CareerFairy. This is generally caused by restrictive firewall rules that block WebSocket connection. Use a less restrictive network or contact CareerFairy.",
         value: "WebSocketNotSupported"
     },{
         text: "Although you and your operating system both granted access to your webcam and microphone, some other error prevented your media devices from being used. Please check with your IT support or contact CareerFairy.",
@@ -39,17 +39,8 @@ export const WEBRTC_ERRORS = [
         text: "Another application is probably currently using your webcam and/or microphone. Please close the corresponding application and try again. If this doesn't help, your operating system is probably blocking access to the webcam and/or microphone.",
         value: "NotReadableError"
     },{
-        text: "Someone else is currently performing a streaming test at your company. Please try again later.",
+        text: "Someone else is currently streaming with this streaming link. Please try again later.",
         value: "streamIdInUse"
-    },{
-        text: "Some unspecific error occured that we have little experience with. Please contact CareerFairy so we can resolve this together.",
-        value: "GenericError"
-    },{
-        text: "Some unspecific error occured that we have little experience with. Please contact CareerFairy so we can resolve this together.",
-        value: "GenericError"
-    },{
-        text: "Some unspecific error occured that we have little experience with. Please contact CareerFairy so we can resolve this together.",
-        value: "GenericError"
     },{
         text: "Some unspecific error occured that we have little experience with. Please contact CareerFairy so we can resolve this together.",
         value: "GenericError"

@@ -24,6 +24,9 @@ function StreamingPage(props) {
     const livestreamId = router.query.livestreamId;
 
     const [streamerReady, setStreamerReady] = useState(false);
+    const [connectionEstablished, setConnectionEstablished] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(null);
+
     const [currentLivestream, setCurrentLivestream] = useState(false);
 
     const [isStreaming, setIsStreaming] = useState(false);
@@ -33,7 +36,7 @@ function StreamingPage(props) {
     const devices = useUserMedia();
 
     const [streamId, setStreamId] = useState(null);
-    const [mode, setMode] = useState('presentation');
+    const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
 
     const [audioSource, setAudioSource] = useState(null);
     const [videoSource, setVideoSource] = useState(null);
@@ -85,6 +88,13 @@ function StreamingPage(props) {
         onScreenSharePermissionDenied: () => {
             setIsCapturingDesktop(false);
         },
+        onOtherError: (error) => {
+            if (typeof error === "string") {
+                setErrorMessage(error);
+            } else {
+                setErrorMessage("A connection error occured");
+            }
+        }
     }
 
     const { webRTCAdaptor, externalMediaStreams } = 
@@ -149,6 +159,17 @@ function StreamingPage(props) {
             }
         } 
     }, [additionalSpeakers,livestreamId]);
+
+    useEffect(() => {
+        if (currentLivestream.start) {
+            let interval = setInterval(() => {
+                if (dateIsInUnder2Minutes(currentLivestream.start.toDate())) {
+                    setStreamStartTimeIsNow(true);
+                    clearInterval(interval);
+                }
+            }, 1000)
+        }
+    }, [currentLivestream.start]);
 
     useEffect(() => {
         const constraints = {
@@ -254,6 +275,10 @@ function StreamingPage(props) {
         }
     }
 
+    function dateIsInUnder2Minutes(date) {
+        return new Date(date).getTime() - Date.now() < 1000*60*2 || Date.now() > new Date(date).getTime();
+    }
+
     let speakerElements = [];
 
     if (additionalSpeakers && additionalSpeakers.length > 0) {
@@ -290,7 +315,7 @@ function StreamingPage(props) {
                 <div className='button-container'>         
                     <Grid centered className='middle aligned'>
                         <Grid.Column width={10} textAlign='center'>
-                            <div className='countdown'>
+                            <div className='countdown' style={{ display: (currentLivestream.hasStarted || !currentLivestream.start) ? 'none' : 'block', backgroundColor: streamStartTimeIsNow ? 'rgba(0, 210, 170, 0.8)' : 'rgba(0,0,0,0.8)'}}>
                                 <div>Your livestream is scheduled to start in</div>
                                 <CountdownTimer date={ currentLivestream.start ? currentLivestream.start.toDate() : null }><span>Press Start Streaming to start the event</span></CountdownTimer>
                             </div>
@@ -298,6 +323,7 @@ function StreamingPage(props) {
                                 color='teal' 
                                 size='big' 
                                 fluid
+                                disabled={!streamStartTimeIsNow}
                                 buttonAction={currentLivestream.hasStarted ? stopStreaming : startStreaming} 
                                 confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
                                 buttonLabel={ currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming' }/>
@@ -410,6 +436,42 @@ function StreamingPage(props) {
                         </div>
                     </Modal.Content>
                 </Modal>
+                <Modal open={!streamerReady}>
+                    <Modal.Header><h3 style={{ color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3></Modal.Header>
+                    <Modal.Content>
+                        <h3>Preparation</h3>
+                        <p>Please follow these couple of instructions to ensure a smooth streaming experience:</p>
+                        <ul className='list'>
+                            <li><Icon name='chrome'/>Use the latest Google Chrome desktop browser (v. 80 and newer).</li>
+                            <li><Icon name='video'/>Make sure that your browser is authorized to access your webcam and microphone.</li>
+                            <li><Icon name='microphone'/>Make sure that your webcam and/or microphone are not currently used by any other application.</li>
+                            <li><Icon name='wifi'/>If possible, avoid connecting through any VPN or corporate network with restrictive firewall rules.</li>
+                        </ul>
+                        <Button content='I got it!' primary fluid style={{ margin: '40px 0 10px 0'}} onClick={() => setStreamerReady(true) }/>
+                        <p>If anything is unclear or not working, please <a href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
+                    </Modal.Content>
+                </Modal>
+                <Modal open={streamerReady && !connectionEstablished} style={{ textAlign: 'center', padding: '40px' }}>
+                    <Modal.Content>
+                        <div style={{ display: (streamerReady && !isStreaming && !errorMessage) ? 'block' : 'none' }}>
+                            <Image src='/loader.gif' style={{ width: '50px', height: 'auto', margin: '0 auto' }} />
+                            <div>Attempting to connect...</div>
+                        </div>
+                        <div  style={{ display: isStreaming ? 'block' : 'none' }}>
+                            <Icon name='check circle outline' style={{ color: 'rgb(0, 210, 170)', fontSize: '3em', margin: '0 auto' }} />
+                            <h3>You are ready to stream!</h3>
+                            <div>Your stream will go live once you press "Start Streaming".</div>
+                            <Button content='Continue' style={{ marginTop: '20px'}} primary onClick={() => setConnectionEstablished(true)}/>
+                        </div>
+                        <div style={{ display: errorMessage ? 'block' : 'none' }}>
+                            <Icon name='frown outline' style={{ color: 'rgb(240, 30, 0)', fontSize: '3em', margin: '0 auto' }} />
+                            <h3>An error occured with the following message:</h3>
+                            <div>{ errorMessage }</div>
+                            <Button content='Try again' style={{ margin: '20px 0'}} primary onClick={() => {  window.location.reload(false) }}/>
+                            <p>If anything is unclear or not working, please <a href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
+                        </div>
+                    </Modal.Content>
+                </Modal>
             <style jsx>{`
                 .hidden {
                     display: none
@@ -421,6 +483,14 @@ function StreamingPage(props) {
                     padding: 15px 0;
                     height: 75px;
                     text-align: center;
+                }
+
+                .list li {
+                    margin: 5px 0;
+                }
+
+                .list li i {
+                    color: rgb(0, 210, 170);
                 }
 
                 .top-menu.active {
@@ -514,10 +584,6 @@ function StreamingPage(props) {
                     top: 50%;
                     transform: translateY(-50%);
                     background-color: black;
-                }
-
-                .countdown {
-                    border: 2px solid red;
                 }
 
                 .video-container-small {

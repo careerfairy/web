@@ -10,6 +10,7 @@ import useWebRTCAdaptor from '../../../../components/custom-hook/useWebRTCAdapto
 import StreamerVideoDisplayer from '../../../../components/views/streaming/video-container/StreamerVideoDisplayer';
 import NewCommentContainer from '../../../../components/views/streaming/comment-container/NewCommentContainer';
 import SmallStreamerVideoDisplayer from '../../../../components/views/streaming/video-container/SmallStreamerVideoDisplayer';
+import CountdownTimer from '../../../../components/views/common/Countdown';
 
 function StreamingPage(props) {
 
@@ -18,6 +19,8 @@ function StreamingPage(props) {
     const streamerId = router.query.streamerId;
 
     const [streamerReady, setStreamerReady] = useState(false);
+    const [connectionEstablished, setConnectionEstablished] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(null);
 
     const [isStreaming, setIsStreaming] = useState(false);
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
@@ -28,6 +31,8 @@ function StreamingPage(props) {
     const [registeredSpeaker, setRegisteredSpeaker] = useState({ id: null });
 
     const [streamId, setStreamId] = useState(null);
+    const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
+
 
     const devices = useUserMedia();
 
@@ -70,25 +75,25 @@ function StreamingPage(props) {
         onScreenSharePermissionDenied: () => {
             setIsCapturingDesktop(false);
         },
+        onOtherError: (error) => {
+            if (typeof error === "string") {
+                setErrorMessage(error);
+            } else {
+                setErrorMessage("A connection error occured");
+            }
+        }
     }
 
-    const { webRTCAdaptor, externalMediaStreams } = useWebRTCAdaptor(
-        streamerReady,
-        localVideoId,
-        mediaConstraints,
-        streamingCallbacks,
-        errorCallbacks,
-        livestreamId,
-        streamerId
-    );
-
-    useEffect(() => {
-        if (isStreaming) {
-            setLiveSpeakerConnected();
-        } else {
-            setLiveSpeakerDisconnected();
-        }
-    },[isStreaming, registeredSpeaker.id]);
+    const { webRTCAdaptor, externalMediaStreams } = 
+        useWebRTCAdaptor(
+            streamerReady,
+            localVideoId,
+            mediaConstraints,
+            streamingCallbacks,
+            errorCallbacks,
+            livestreamId,
+            streamerId
+        );
 
     useEffect(() => {
         if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
@@ -98,6 +103,14 @@ function StreamingPage(props) {
             setVideoSource(devices.videoDeviceList[0].value);
         }
     },[devices]);
+
+    useEffect(() => {
+        if (isStreaming) {
+            setLiveSpeakerConnected();
+        } else {
+            setLiveSpeakerDisconnected();
+        }
+    },[isStreaming, registeredSpeaker.id]);
 
     useEffect(() => {
         if (livestreamId) {
@@ -126,6 +139,16 @@ function StreamingPage(props) {
             return () => unsubscribe();
         }
     }, [streamerId]);
+    useEffect(() => {
+        if (currentLivestream.start) {
+            let interval = setInterval(() => {
+                if (dateIsInUnder2Minutes(currentLivestream.start.toDate())) {
+                    setStreamStartTimeIsNow(true);
+                    clearInterval(interval);
+                }
+            }, 1000)
+        }
+    }, [currentLivestream.start]);
 
     useEffect(() => {
         const constraints = {
@@ -149,11 +172,15 @@ function StreamingPage(props) {
                         method: 'get',
                         url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=' + streamId,
                     }).then( response => { 
-                            setNumberOfViewers(response.data.totalWebRTCWatchersCount > -1 ? response.data.totalWebRTCWatchersCount : 0);
-                        }).catch(error => {
-                            console.log(error);
+                        if (response.data.totalWebRTCWatchersCount > -1) {
+                            setNumberOfViewers(response.data.totalWebRTCWatchersCount);
+                        }                       
+                    }).catch(error => {
+                        console.log(error);
                     });
                 }, 10000);
+            } else {
+                setNumberOfViewers(0);
             }
         }
     }, [currentLivestream, currentLivestream.hasStarted]);
@@ -188,6 +215,10 @@ function StreamingPage(props) {
         setIsLocalMicMuted(!isLocalMicMuted);
     }
 
+    function dateIsInUnder2Minutes(date) {
+        return new Date(date).getTime() - Date.now() < 1000*60*2 || Date.now() > new Date(date).getTime();
+    }
+
     return (
         <div className='topLevelContainer'>
              <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
@@ -206,8 +237,17 @@ function StreamingPage(props) {
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
                     <SmallStreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={false}/>
                 </div>
-            </div>
-            <div className='video-menu-left'>
+                <div className='button-container'>         
+                 <Grid centered className='middle aligned'>
+                        <Grid.Column width={10} textAlign='center'>
+                            <div className='countdown' style={{ display: (currentLivestream.hasStarted || !currentLivestream.start) ? 'none' : 'block', backgroundColor: streamStartTimeIsNow ? 'rgba(0, 210, 170, 0.8)' : 'rgba(0,0,0,0.8)'}}>
+                                <div>Your livestream is scheduled to start in</div>
+                                <CountdownTimer date={ currentLivestream.start ? currentLivestream.start.toDate() : null }><span>The host should press "Start Streaming" to start the event</span></CountdownTimer>
+                            </div>
+                        </Grid.Column>
+                    </Grid>
+                </div>
+            </div>            <div className='video-menu-left'>
                 <NewCommentContainer livestream={ currentLivestream }/>
             </div>
             <div className='right-container'>
@@ -266,6 +306,41 @@ function StreamingPage(props) {
                     <Modal.Content>
                         <p>The link you used to connect to this stream is invalid. Please contact the stream's host to get a valid link.</p>
                         <Button content='Reload' primary/>
+                    </Modal.Content>
+                </Modal>
+                <Modal open={!streamerReady}>
+                    <Modal.Header><h3 style={{ color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3></Modal.Header>
+                    <Modal.Content>
+                        <h3>Preparation</h3>
+                        <p>Please follow these couple of instructions to ensure a smooth streaming experience:</p>
+                        <ul className='list'>
+                            <li><Icon name='chrome'/>Use the latest Google Chrome desktop browser (v. 80 and newer).</li>
+                            <li><Icon name='video'/>Make sure that your browser is authorized to access your webcam and microphone.</li>
+                            <li><Icon name='microphone'/>Make sure that your webcam and/or microphone are not currently used by any other application.</li>
+                            <li><Icon name='wifi'/>If possible, avoid connecting through any VPN or corporate network with restrictive firewall rules.</li>
+                        </ul>
+                        <Button content='I got it!' primary fluid style={{ margin: '40px 0 10px 0'}} onClick={() => setStreamerReady(true) }/>
+                        <p>If anything is unclear or not working, please <a href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
+                    </Modal.Content>
+                </Modal>
+                <Modal open={streamerReady && !connectionEstablished} style={{ textAlign: 'center', padding: '40px' }}>
+                    <Modal.Content>
+                        <div style={{ display: (streamerReady && !isStreaming && !errorMessage) ? 'block' : 'none' }}>
+                            <Image src='/loader.gif' style={{ width: '50px', height: 'auto', margin: '0 auto' }} />
+                            <div>Attempting to connect...</div>
+                        </div>
+                        <div  style={{ display: isStreaming ? 'block' : 'none' }}>
+                            <Icon name='check circle outline' style={{ color: 'rgb(0, 210, 170)', fontSize: '3em', margin: '0 auto' }} />
+                            <h3>You are ready to stream!</h3>
+                            <div>Your stream will go live once the host presses "Start Streaming".</div>
+                            <Button content='Continue' style={{ marginTop: '20px'}} primary onClick={() => setConnectionEstablished(true)}/>
+                        </div>
+                        <div style={{ display: errorMessage ? 'block' : 'none' }}>
+                            <Icon name='frown outline' style={{ color: 'rgb(240, 30, 0)', fontSize: '3em', margin: '0 auto' }} />
+                            <h3>An error occured with the following message:</h3>
+                            <div>{ errorMessage }</div>
+                            <Button content='Try again' style={{ marginTop: '20px'}} primary onClick={() => {  window.location.reload(false) }}/>
+                        </div>
                     </Modal.Content>
                 </Modal>
             <style jsx>{`
@@ -365,13 +440,26 @@ function StreamingPage(props) {
 
                 .button-container {
                     position: absolute;
-                    left: 120px;
                     bottom: 0;
-                    width: calc(100% - 120px);
-                    height: 90px;
+                    left: 0;
+                    width: 100%;                    
                     cursor:  pointer;
                     padding: 17px;
                     z-index: 8000;
+                }
+
+                .countdown {
+                    margin: 0 0 20px 0;
+                    color: white;
+                    padding: 20px 0;
+                    border-radius: 10px;
+                    font-size: 1.2em;
+                    background-color: rgba(0,0,0,0.85);
+                    min-height: 100px;
+                }
+
+                .countdown .label {
+                    color: white;
                 }
 
                 .right-container {
