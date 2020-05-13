@@ -193,7 +193,7 @@ function ViewerPage(props) {
                         { videoElements }
                     </Grid>
                 </div>
-                <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none'), position: 'absolute', top: '150px', width: '100%', height: 'calc(100% - 235px)', backgroundColor: 'rgb(30,30,30)'}}>
+                <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none'), position: 'absolute', top: '150px', width: '100%', height: 'calc(100% - 150px)', backgroundColor: 'rgb(30,30,30)'}}>
                     <LivestreamPdfViewer livestreamId={currentLivestream.id} presenter={false}/>
                 </div> 
             </div>  
