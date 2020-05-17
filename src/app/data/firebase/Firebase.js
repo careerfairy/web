@@ -113,6 +113,7 @@ class Firebase {
     getCareerCenterByUniversityId = (universityId) => {
         let ref = this.firestore
             .collection("careerCenterData")
+            .where("test", "==", false)
             .where("universityId", "==", universityId);
         return ref.get();
     };
@@ -508,7 +509,6 @@ class Firebase {
         let ref = this.firestore
             .collection("livestreams")
             .where("start", ">", new Date(Date.now() - thirtyMinutesInMilliseconds))
-            .where("test", "==", false)
             .orderBy("start", "asc");
         return ref.onSnapshot(callback);
     }
