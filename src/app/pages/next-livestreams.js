@@ -65,10 +65,11 @@ function Calendar(props) {
                 livestreams.push(livestream);
             });
             if (university) {
-                setAllLivestreams(livestreams);
+                setLivestreams(livestreams);
             } else {
-                setAllLivestreams(livestreams.filter( livestream => !livestream.hidden || livestream.hidden === false));
+                setLivestreams(livestreams.filter( livestream => !livestream.hidden || livestream.hidden === false));
             }
+
         }, error => {
             console.log(error);
         });
