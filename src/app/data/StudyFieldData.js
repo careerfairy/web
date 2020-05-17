@@ -93,7 +93,7 @@ export const UNIVERSITY_SUBJECTS = [
             color: "#E6E6FA"
         },{
             text: "Communication Sciences",
-            value: "COMM",
+            value: "COMPSCI",
             color: "#E6E6FA"
         },{
             text: "Political Sciences",

@@ -1,18 +1,15 @@
 import { Fragment,useEffect, useRef, useState } from "react";
 import { Container, Grid, Image, Button, Icon } from "semantic-ui-react";
 
-import Header from "../components/views/header/Header";
-import Footer from '../components/views/footer/Footer';
-import LivestreamCard from '../components/views/livestream-card/LivestreamCard'
+import Header from "../../components/views/header/Header";
+import Footer from '../../components/views/footer/Footer';
+import LivestreamCard from '../../components/views/livestream-card/LivestreamCard'
 
 import { useRouter } from 'next/router';
-import { withFirebasePage } from "../data/firebase";
-import axios from "axios";
-import { UNIVERSITY_SUBJECTS } from '../data/StudyFieldData';
-import { UNIVERSITY_NAMES } from '../data/UniversityData';
-import TargetElementList from '../components/views/common/TargetElementList';
+import { withFirebasePage } from "../../data/firebase";
+import TargetElementList from '../../components/views/common/TargetElementList';
 
-import StackGrid, { transitions } from 'react-stack-grid';
+import StackGrid from 'react-stack-grid';
 
 import { SizeMe } from 'react-sizeme';
 
@@ -24,14 +21,19 @@ function Calendar(props) {
 
     const router = useRouter();
 
-    const university = router.query.university;
+    const { universityId } = router.query;
     const filter = router.query.filter;
 
     const [user, setUser] = useState(null);
     const [userData, setUserData] = useState(null);
 
+    const [universityData, setUniversityData] = useState(null);
+    const [categories, setCategories] = useState([]);
     const [grid, setGrid] = useState(null);
+    const [allLivestreams, setAllLivestreams] = useState([]);
     const [livestreams, setLivestreams] = useState([]);
+    const [fields, setFields] = useState([]);
+    const [showAllFields, setShowAllFields] = useState(false);
     const [cookieMessageVisible, setCookieMessageVisible] = useState(true);
 
     useEffect(() => {
@@ -57,6 +59,41 @@ function Calendar(props) {
     },[user]);
 
     useEffect(() => {
+        if (universityId) {
+            props.firebase.getCareerCenterByUniversityId(universityId)
+            .then(querySnapshot => {
+                querySnapshot.forEach(doc => {
+                    let university = doc.data();
+                    university.id = doc.id;
+                    setUniversityData(university);
+                });
+            });
+        }
+    },[universityId]);
+
+    useEffect(() => {
+        if (universityData) {
+            props.firebase.getCareerCenterCategories(universityData.id)
+            .then(querySnapshot => {
+                let categories = [];
+                querySnapshot.forEach(doc => {
+                    let category = doc.data();
+                    categories.push(category);
+                });
+                console.log(categories);
+                setCategories(categories);
+            });
+        }
+    },[universityData]);
+
+    useEffect(() => {
+        if (filter) {
+            addField(filter);
+            setShowAllFields(true);
+        }
+    }, [filter]);
+
+    useEffect(() => {
         const unsubscribe = props.firebase.listenToUpcomingLivestreams(querySnapshot => {
             var livestreams = [];
             querySnapshot.forEach(doc => {
@@ -64,16 +101,33 @@ function Calendar(props) {
                 livestream.id = doc.id;
                 livestreams.push(livestream);
             });
-            if (university) {
-                setAllLivestreams(livestreams);
-            } else {
-                setAllLivestreams(livestreams.filter( livestream => !livestream.hidden || livestream.hidden === false));
-            }
+            setAllLivestreams(livestreams);
         }, error => {
             console.log(error);
         });
         return () => unsubscribe();
-    }, [university]);
+    }, [universityId]);
+
+    useEffect(() => {
+        if (fields.length === 0) {
+            if (universityId) {
+                setLivestreams(filterUniversityLivestreams(allLivestreams, universityId));
+            } else {
+                setLivestreams(allLivestreams);
+            }
+        } else {
+            const filteredMentors = allLivestreams.filter(livestream => {
+                return fields.some(field => {
+                    return livestream.targetGroups.indexOf(field) > -1;
+                });
+            })
+            if (universityId) {
+                setLivestreams(filterUniversityLivestreams(filteredMentors, universityId));
+            } else {
+                setLivestreams(filteredMentors);
+            }
+        }
+    }, [allLivestreams, fields]);
 
     useEffect(() => {
         if (grid) {
@@ -89,19 +143,83 @@ function Calendar(props) {
         }
     }, []);
 
+    function filterUniversityLivestreams(livestreams, university) {
+        return livestreams.filter( livestream => {
+            if (livestream.universities) {
+                return livestream.universities.indexOf(university) > -1;
+            } else {
+                return false;
+            }
+        });
+    }
+
     function hideCookieMessage() {
         localStorage.setItem('hideCookieMessage', 'yes');
         setCookieMessageVisible(false);
+    }
+
+    function addField(field) {
+        const fieldsCopy = fields.slice(0);
+        fieldsCopy.push(field);
+        setFields(fieldsCopy);
+    }
+
+    function removeField(field) {
+        const fieldsCopy = fields.slice(0);
+        fieldsCopy.splice(fieldsCopy.indexOf(field), 1);
+        setFields(fieldsCopy);
     }
 
     function goToSeparateRoute(route) {
         window.open('http://careerfairy.io' + route, '_blank');
     }
 
+    const filterElement = categories.map((option, index) => {
+        const nonSelectedStyle = {
+            border: '1px solid rgb(0, 210, 170)', 
+            color:  'rgb(0, 210, 170)',
+        }
+        const selectedStyle = {
+            border: '1px solid rgb(0, 210, 170)', 
+            color: 'white',
+            backgroundColor: 'rgb(0, 210, 170)',
+            opacity: '1'
+        }   
+        return(
+            <Fragment key={index}>
+                <div className={'filter-logo-element ' + ( index > 2 && !showAllFields ? 'hidden' : '')} style={ fields.indexOf(option.value) > -1 ? selectedStyle : nonSelectedStyle } onClick={fields.indexOf(option.value) > -1 ? () => removeField(option.value) : () => addField(option.value)}>
+                    {option.name}
+                </div>
+                <style jsx>{`
+                    .filter-logo-element {
+                        cursor: pointer;
+                        display: inline-block;
+                        padding: 6px 10px;
+                        border-radius: 20px;
+                        margin: 4px 8px 4px 0;
+                        font-weight: 500;
+                        opacity: 0.9;
+                        font-size: 0.9em;
+                    }
+
+                    .filter-logo-element:hover {
+                        background-color: rgb(230,230,230,0.8);
+                        transition-duration: 300ms;
+                        opacity: 1;
+                    }
+
+                    .hidden {
+                        display: none;
+                    }
+                `}</style>
+            </Fragment>
+        );
+    })
+
     const mentorElements = livestreams.map( (mentor, index) => {
         return(
             <div key={index}>
-                <LivestreamCard livestream={mentor} user={user} userData={userData} fields={null} grid={grid}/>
+                <LivestreamCard livestream={mentor} user={user} userData={userData} fields={fields} grid={grid}/>
             </div>
         );
     })
@@ -112,10 +230,37 @@ function Calendar(props) {
                 <title key="title">CareerFairy | Next Live Streams</title>
             </Head>
             <Header color="white"/>
+            <Container className="landingTitleContainer" style={{ paddingBottom: '20px', display: universityId ? 'block' : 'none'}}>
+                <Grid className='middle aligned' centered> 
+                    <Grid.Column width={6}>
+                        <div style={{ display: universityData ? 'block' : 'none' }}>
+                            <Image src={universityData ? universityData.logoUrl : 'none'} style={{ margin: '10px 0 10px 0', maxHeight: '110px', filter: 'brightness(0) invert(1)'}}/>
+                        </div>
+                    </Grid.Column>
+                    <Grid.Column width={10}>
+                        <div style={{ float: 'right'}}>   
+                            <div style={{  display: (universityData ? 'block' : 'none'), fontSize: '1.4em', color: 'white', fontWeight: '700', textAlign: 'right', lineHeight: '1.4em', margin: '5px'}}>Live streams for students @ { universityData ? universityData.universityName : '' }.</div>
+                            <div style={{ display: (universityData ? universityData.returnButton : false) ? 'none': 'block' }}>
+                                <Link href='/next-livestreams'><a><Button style={{ float: 'right'}} content='See all Live Streams' size='mini'/></a></Link>
+                            </div>
+                            <div style={{ display: (universityData ? universityData.returnButton : false) ? 'block': 'none' }}>
+                                <a href={universityData ? universityData.returnUrl : ''}><Button style={{ float: 'right'}} content={'To ' + (universityData ? universityData.universityName : '')}  size='mini'/></a>
+                            </div>
+                        </div>
+                    </Grid.Column>
+                </Grid>
+            </Container>
             <div className={'filterBar ' + (cookieMessageVisible ? '' : 'hidden')}>
                 <Image id='cookie-logo' src='/cookies.png' style={{ display: 'inline-block', margin: '0 20px 0 0', maxHeight: '25px', width: 'auto', verticalAlign: 'top'}}/>
                 <p>We use cookies to improve your experience. By continuing to use our website, you agree to our <Link href='/privacy'><a>privacy policy</a></Link>.</p>
                 <Icon id='cookie-delete' style={{ cursor: 'pointer', verticalAlign: 'top', float: 'right', lineHeight: '30px'}} name='delete' onClick={() => hideCookieMessage()}/>
+            </div>
+            <div id='landingPageButtons'>
+                <Container>
+                    <div className='landingPageButtonsLabel'>Select your fields of interest</div>
+                    { filterElement }
+                    <Button style={{ margin: '5px' }} content={showAllFields ? 'Hide all filters' : 'Show all filters'} icon={showAllFields ? 'angle up' : 'angle down'} size='mini' onClick={() => setShowAllFields(!showAllFields)}/>
+                </Container>
             </div>
             <div className='mentor-list'>
                 <Container>
