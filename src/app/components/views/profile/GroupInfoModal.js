@@ -8,6 +8,12 @@ import UserCategorySelector from './UserCategorySelector';
 
 const GroupInfoModal = (props) => {
 
+    const [userCategories, setUserCategories] = useState([]);
+
+    useEffect(() => {
+        setUserCategories(props.userCategories);
+    },[props.userCategories]);
+
     let categorySelectors = props.categoriesWithElements.map( category => {
         return (
             <Grid.Column key={ category.id } width={8}>
