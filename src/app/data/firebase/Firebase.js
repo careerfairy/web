@@ -57,19 +57,48 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    setUserData = (userEmail, firstName, lastName, university, faculty, levelOfStudy) => {
+    setUserData = (userEmail, firstName, lastName) => {
         let ref = this.firestore
             .collection("userData")
             .doc(userEmail);
-        return ref.set({
+        return ref.update({
             userEmail: userEmail,
             firstName: firstName,
-            lastName: lastName,
-            university: university,
-            faculty: faculty,
-            levelOfStudy: levelOfStudy
+            lastName: lastName
         });
     };
+
+    listenToUserGroupCategories = (userEmail, groupId, callback) => {
+        let ref = this.firestore
+            .collection("userData")
+            .doc(userEmail)
+            .collection("registeredGroups")
+            .doc(groupId)
+            .collection("categories");
+        return ref.onSnapshot(callback);
+    }
+
+    listenToUserGroupCategoryValue = (userEmail, groupId, categoryId, callback) => {
+        let ref = this.firestore
+            .collection("userData")
+            .doc(userEmail)
+            .collection("registeredGroups")
+            .doc(groupId)
+            .collection("categories")
+            .doc(categoryId);
+        return ref.onSnapshot(callback);
+    }
+
+    updateUserGroupCategoryValue = (userEmail, groupId, categoryId, value) => {
+        let ref = this.firestore
+            .collection("userData")
+            .doc(userEmail)
+            .collection("registeredGroups")
+            .doc(groupId)
+            .collection("categories")
+            .doc(categoryId);
+        return ref.update({ value: value });
+    }
 
     // COMPANIES
 
@@ -110,6 +139,13 @@ class Firebase {
         return ref.get();
     };
 
+    getCareerCenters = () => {
+        let ref = this.firestore
+            .collection("careerCenterData")
+            .where("test", "==", false);
+        return ref.get();
+    }
+
     getCareerCenterByUniversityId = (universityId) => {
         let ref = this.firestore
             .collection("careerCenterData")
@@ -117,6 +153,24 @@ class Firebase {
             .where("universityId", "==", universityId);
         return ref.get();
     };
+
+    getGroupCategories = (groupId) => {
+        let ref = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("categories");
+        return ref.get();
+    }
+
+    getGroupCategoryElements = (groupId, categoryId) => {
+        let ref = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("categories")
+            .doc(categoryId)
+            .collection("elements");
+        return ref.get();
+    }
 
     // MENTORS
 
