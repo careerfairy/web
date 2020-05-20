@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { withFirebase } from '../../../data/firebase';
 import UserCategorySelector from './UserCategorySelector';
 
-const GroupInfoModal = (props) => {
+const GroupJoinModal = (props) => {
 
     let categorySelectors = props.categoriesWithElements.map( category => {
         return (
@@ -22,7 +22,7 @@ const GroupInfoModal = (props) => {
         <Fragment>
             <Modal open={props.open}>
                 <Modal.Header>
-                    Update group
+                    Join this group
                 </Modal.Header>
                 <Modal.Content>
                     <Image src={props.group.logoUrl} style={{ maxWidth: '200px', margin: '0 auto', maxHeight: '100px' }}/>
@@ -37,4 +37,4 @@ const GroupInfoModal = (props) => {
     );
 };
 
-export default withFirebase(GroupInfoModal);
+export default withFirebase(GroupJoinModal);
