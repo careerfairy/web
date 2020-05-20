@@ -30,9 +30,33 @@ function ViewerPage(props) {
     const [currentLivestream, setCurrentLivestream] = useState(false);
     const [registeredStreamers, setRegisteredStreamers] = useState([]);
 
-    const [streamIds, setStreamIds] = useState([]);
-
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
+
+    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
+    const [pastQuestions, setPastQuestions] = useState([]);
+
+    const [initalReactionSent, setInitialReactionSent] = useState(false);
+
+    useEffect(() => {
+        if (currentLivestream.id) {
+            const unsubscribe = props.firebase.listenToLivestreamQuestions(currentLivestream.id, querySnapshot => {
+                var upcomingQuestionsList = [];
+                var pastQuestionsList = [];
+                querySnapshot.forEach(doc => {
+                    let question = doc.data();
+                    question.id = doc.id;
+                    if (question.type !== 'done') {
+                        upcomingQuestionsList.push(question);
+                    } else {
+                        pastQuestionsList.push(question);
+                    }
+                });
+                setUpcomingQuestions(upcomingQuestionsList);
+                setPastQuestions(pastQuestionsList);
+            });
+            return () => unsubscribe();
+        }
+    }, [currentLivestream.id]);
 
     useEffect(() => {
         if (currentLivestream) {
@@ -171,6 +195,31 @@ function ViewerPage(props) {
         } 
     }
 
+    function sendInstantReaction(reaction) {
+        const newComment = {
+            title: reaction,
+            author: userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous',
+        }
+        props.firebase.putQuestionComment(currentLivestream.id, upcomingQuestions[0].id, newComment)
+            .then(() => {}, error => {
+                console.log("Error: " + error);
+            })
+    }
+
+    let initialReactions = currentLivestream.language === 'DE' ? ['Hallo!', 'Hoi zäme', 'Hi! :-)'] : ['Hello!', 'Hi everyone!', 'How do you do?'];
+
+    let reactionElements = initialReactions.map((reaction, index) => {
+        return (
+            <Grid.Column width={5} key={index}>
+                <div onClick={() => {sendInstantReaction(reaction); setInitialReactionSent(true);}} style={{ cursor: 'pointer', position: 'relative', backgroundColor: 'white', color: 'grey', padding: '20px', borderRadius: '20px', textAlign: 'left' }}>
+                    <div style={{ textTransform: 'capitalize', fontSize: '0.9em', fontWeight: '400', color: 'black', textAlign: 'left', marginBottom: '0', minWidth: '200px'}}>{ reaction }</div>
+                    <div style={{ textTransform: 'capitalize', fontSize: '0.7em', fontWeight: '400', color: 'grey', textAlign: 'left', margin: '0'}}>@{userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous'}</div>
+                    <Button circular icon='chevron right circle' style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)'}} primary/>
+                </div>
+            </Grid.Column>
+        );
+    });
+
     return (
         <div className='topLevelContainer'>
             <div className='top-menu'>
@@ -196,6 +245,14 @@ function ViewerPage(props) {
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none'), position: 'absolute', top: '150px', width: '100%', height: 'calc(100% - 150px)', backgroundColor: 'rgb(30,30,30)'}}>
                     <LivestreamPdfViewer livestreamId={currentLivestream.id} presenter={false}/>
                 </div> 
+                <div className={'reactions-sender ' + (initalReactionSent ? 'animated fadeOut' : '')}>
+                    <div style={{ fontSize: '2em', margin: '0 0 40px 0'}}>How about saying hello?</div>
+                    <Grid textAlign='center'>
+                        { reactionElements }
+                    </Grid>
+                    <div onClick={() => setInitialReactionSent(true)} style={{ margin: '15px 0 0 0', fontSize: '0.9em', fontWeight: '300', textDecoration: 'underline', cursor: 'pointer' }}>No, I am here undercover!</div>
+                    <Icon onClick={() => setInitialReactionSent(true)}  name='delete' size='large' style={{ position: 'absolute', top: '20px', right: '20px', color: 'white', cursor: 'pointer'}} />
+                </div>
             </div>  
             <div className='video-menu'>
                 <div  className='video-menu-input'>
@@ -203,7 +260,7 @@ function ViewerPage(props) {
                     </div>
                 </div>  
             <div className='video-menu-left'>
-                <NewCommentContainer livestream={ currentLivestream } userData={userData}  user={user}/>
+                <NewCommentContainer livestream={ currentLivestream } upcomingQuestions={upcomingQuestions} pastQuestions={pastQuestions} userData={userData}  user={user}/>
             </div>
             <Modal
                 style={{ zIndex: '9999' }}
@@ -338,6 +395,25 @@ function ViewerPage(props) {
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);
+                }
+
+                .reactions-sender {
+                    position: absolute;
+                    padding: 30px 0;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    left: 0;
+                    right: 0;
+                    z-index: 1100;
+                    text-align: center;
+                    background-color: rgba(0,0,0,0.6);
+                }
+
+                .reactions-sender div {
+                    margin-bottom: 20px;
+                    font-weight: 700;
+                    font-size: 1.2em;
+                    color: white;
                 }
 
                 .video-menu {

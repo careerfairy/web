@@ -150,7 +150,7 @@ function ViewerVideoContainer(props) {
                     width: 100%;
                     height: 100%;
                     background-color: rgba(255,255,255,1);
-                    z-index: 9999;
+                    z-index: 9200;
                 }
 
                 .connecting-overlay-content {
@@ -165,7 +165,6 @@ function ViewerVideoContainer(props) {
                     background-color: black;
                     width: 100%;
                     margin: 0 auto;
-                    z-index: 1000;
                }
 
                .videoElement {
@@ -175,7 +174,6 @@ function ViewerVideoContainer(props) {
                     max-height: 100%;
                     max-width: 100%;
                     height: auto;
-                    z-index: -9900;
                     background-color: black;
                }
 

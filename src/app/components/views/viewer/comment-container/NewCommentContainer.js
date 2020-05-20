@@ -7,45 +7,20 @@ import { withFirebase } from '../../../../data/firebase';
 import { animateScroll } from 'react-scroll';
 
 function CommentContainer(props) {
-    
-    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
-    const [pastQuestions, setPastQuestions] = useState([]);
-
     const [showNextQuestions, setShowNextQuestions] = useState(true);
 
-    useEffect(() => {
-        if (props.livestream.id) {
-            const unsubscribe = props.firebase.listenToLivestreamQuestions(props.livestream.id, querySnapshot => {
-                var upcomingQuestionsList = [];
-                var pastQuestionsList = [];
-                querySnapshot.forEach(doc => {
-                    let question = doc.data();
-                    question.id = doc.id;
-                    if (question.type !== 'done') {
-                        upcomingQuestionsList.push(question);
-                    } else {
-                        pastQuestionsList.push(question);
-                    }
-                });
-                setUpcomingQuestions(upcomingQuestionsList);
-                setPastQuestions(pastQuestionsList);
-            });
-            return () => unsubscribe();
-        }
-    }, [props.livestream.id]);
-
-    let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
+    let upcomingQuestionsElements = props.upcomingQuestions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer livestream={ props.livestream } questions={upcomingQuestions} question={ question } user={props.user} userData={props.userData}/>
+                <QuestionContainer livestream={ props.livestream } questions={props.upcomingQuestions} question={ question } user={props.user} userData={props.userData}/>
             </div>       
         );
     });
 
-    let pastQuestionsElements = pastQuestions.map((question, index) => {
+    let pastQuestionsElements = props.pastQuestions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer livestream={ props.livestream } questions={pastQuestions} question={ question } user={props.user} userData={props.userData}/>
+                <QuestionContainer livestream={ props.livestream } questions={props.pastQuestions} question={ question } user={props.user} userData={props.userData}/>
             </div>       
         );
     });
@@ -58,10 +33,10 @@ function CommentContainer(props) {
                 </div>
                 <div className='questionToggleSwitches'>
                     <div className={'questionToggleSwitch ' + (showNextQuestions ? 'active'  : '')} onClick={() => setShowNextQuestions(true)}>
-                        Upcoming [{ upcomingQuestions.length }]
+                        Upcoming [{ props.upcomingQuestions.length }]
                     </div>
                     <div className={'questionToggleSwitch ' + (showNextQuestions ? ''  : 'active')} onClick={() => setShowNextQuestions(false)}>
-                        Answered [{ pastQuestions.length }]
+                        Answered [{ props.pastQuestions.length }]
                     </div>
                 </div>
             </div>
