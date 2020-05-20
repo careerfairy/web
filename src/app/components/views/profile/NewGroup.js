@@ -4,6 +4,7 @@ import { Formik } from 'formik';
 import { useRouter } from 'next/router';
 
 import { withFirebase } from '../../../data/firebase';
+import GroupJoinModal from './GroupJoinModal';
 
 const NewGroup = (props) => {
 
@@ -19,6 +20,7 @@ const NewGroup = (props) => {
                     <div style={{ position: 'absolute', top: '65%', left: '50%', transform: 'translate(-50%, -50%)', width: '80%', textAlign: 'center', fontWeight: '500', color: 'rgb(80,80,80)'}}>{props.group.description}</div>
                     <Button content='Join' icon='add' style={{ position: 'absolute', left: '50%', bottom: '12px', width: '90%', transform: 'translateX(-50%)'}} primary basic/>
                 </div>
+                <GroupJoinModal userData={props.userData} group={props.group} categoriesWithElements={categoriesWithElements} userCategories={userCategories} open={openUpdateModal} closeModal={() => setOpenUpdateModal(false)}/>
             </Grid.Column>
             <style jsx>{`
                 .group-selector {
