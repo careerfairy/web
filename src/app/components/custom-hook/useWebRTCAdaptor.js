@@ -55,14 +55,6 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
         }
     }, [playFinishedStream]);
 
-    useEffect(() => {
-        if (playFinishedStream) {
-            if (externalMediaStreams.some(stream => stream.streamId === playFinishedStream.streamId)) {
-                webRTCAdaptor.play(playFinishedStream.streamId, roomId);
-            }
-        }
-    }, [playFinishedStream]);
-
     function removeStreamFromList(stream, streamList) {
         const streamListCopy = [...streamList];
         const streamEntry = streamListCopy.find( entry => {
@@ -112,7 +104,7 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
     function publishNewStream(adaptorInstance, infoObj) {
         adaptorInstance.publish(infoObj.streamId, 'null', infoObj.ATTR_ROOM_NAME);
         if (infoObj.streams && infoObj.streams.length > 0) {
-            infoObj.streams.forEach( streamId => {
+            infoObj.streams.filter((streamId, index, streams) => streams.indexOf(streamId) === index).forEach( streamId => {
                 adaptorInstance.play(streamId, "null", infoObj.ATTR_ROOM_NAME);
             })
         }
@@ -159,7 +151,9 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
                         if (typeof streamingCallbackObject.onStreamJoined === 'function') {
                             streamingCallbackObject.onStreamJoined(infoObj);
                         }
-                        playNewStream(this, infoObj);
+                        setTimeout(() => {
+                            playNewStream(this, infoObj);
+                        }, 500);                        
                         break;
                     }
                     case "streamLeaved": {
