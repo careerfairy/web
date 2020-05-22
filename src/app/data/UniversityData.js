@@ -27,6 +27,9 @@ export const UNIVERSITY_NAMES = [
         text: "FH Graubünden",
         value: "fhgraubuenden"
     },{
+        text: "TU Wien",
+        value: "technischeuniwien"
+    },{
         text: "Other Institution",
         value: "othe"
     }

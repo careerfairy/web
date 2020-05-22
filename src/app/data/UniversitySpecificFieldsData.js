@@ -302,6 +302,9 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
         },{
             text: "Mobile Robotics",
             value: "ROBO"
+        },{
+            text: "Tourism",
+            value: "TOURI"
         }
     ],
     hochschulestgallen: [
@@ -386,6 +389,65 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
         },{
             text: "Urban, Transport and Spatial Planning",
             value: "URBA"
+        }
+    ], technischeuniwien: [
+        {
+            text: "Architecture",
+            value: "ARCH"
+        },{
+            text: "Biomedical Engineering",
+            value: "BIOMEDENG"
+        },{
+            text: "Civil Engineering",
+            value: "CIVIL"
+        },{
+            text: "Chemical and Process Engineering",
+            value: "CHEMPROC"
+        },{
+            text: "Computer Science",
+            value: "COMP"
+        },{
+            text: "Computer Science and Engineering",
+            value: "COMPBUSI"
+        },{
+            text: "Computer Science and Business Informatics",
+            value: "COMPBUSI"
+        },{
+            text: "Electrical Engineering",
+            value: "ELECTRI"
+        },{
+            text: "Environmental Engineering",
+            value: "ENVENG"
+        },{
+            text: "Geodesy and Geoinformation",
+            value: "GEOD"
+        },{
+            text: "Materials Science",
+            value: "MATE"
+        },{
+            text: "Mechanical Engineering",
+            value: "MECHA"
+        },{
+            text: "Mechanical Engineering - Economics",
+            value: "MECHECO"
+        },{
+            text: "Process Engineering",
+            value: "PROCESS"
+        },{
+            text: "Spatial Planning",
+            value: "SPATIAL"
+        },{
+            text: "Technical Chemistry ",
+            value: "TECHCHEM"
+        },{
+            text: "Technical Mathematics",
+            value: "TECHMATH"
+        },{
+            text: "Technical Physics",
+            value: "TECHPHYS"
+        },{
+            text: "Urban and Regional Planning",
+            value: "URBANA"
         }
     ]
 };

@@ -219,5 +219,47 @@ export const UNIVERSITY_SUBJECTS = [
         },{
             text: "Urban, Transport and Spatial Planning",
             value: "URBA"
+        },{
+            text: "Tourism",
+            value: "TOURI"
+        },{
+            text: "Biomedical Engineering",
+            value: "BIOMEDENG"
+        },{
+            text: "Geodesy and Geoinformation",
+            value: "GEOD"
+        },{
+            text: "Computer Science and Engineering",
+            value: "COMPENG"
+        },{
+            text: "Computer Science and Business Informatics",
+            value: "COMPBUSI"
+        },{
+            text: "Urban and Regional Planning",
+            value: "URBANA"
+        },{
+            text: "Spatial Planning",
+            value: "SPATIAL"
+        },{
+            text: "Process Engineering",
+            value: "PROCESS"
+        },{
+            text: "Technical Chemistry ",
+            value: "TECHCHEM"
+        },{
+            text: "Technical Mathematics",
+            value: "TECHMATH"
+        },{
+            text: "Technical Physics",
+            value: "TECHPHYS"
+        },{
+            text: "Environmental Engineering",
+            value: "ENVENG"
+        },{
+            text: "Chemical and Process Engineering",
+            value: "CHEMPROC"
+        },{
+            text: "Mechanical Engineering - Economics",
+            value: "MECHECO"
         }
     ];
