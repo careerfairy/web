@@ -91,7 +91,12 @@ function Calendar(props) {
                 livestream.id = doc.id;
                 livestreams.push(livestream);
             });
-            setAllLivestreams(livestreams);
+
+            if (university) {
+                setAllLivestreams(livestreams);
+            } else {
+                setAllLivestreams(livestreams.filter( livestream => !livestream.hidden || livestream.hidden === false));
+            }
         }, error => {
             console.log(error);
         });
