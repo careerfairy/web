@@ -97,7 +97,7 @@ function StreamingPage(props) {
         }
     }
 
-    const { webRTCAdaptor, externalMediaStreams } = 
+    const { webRTCAdaptor, externalMediaStreams, audioLevels } = 
         useWebRTCAdaptor(
             streamerReady,
             localVideoId,
@@ -124,6 +124,12 @@ function StreamingPage(props) {
             setLiveSpeakerDisconnected(registeredSpeaker.id);
         }
     },[isStreaming]);
+
+    useEffect(() => {
+        setTimeout(() => {
+            console.log(audioLevels);
+        }, 2000);
+    },[audioLevels]);
 
     useEffect(() => {
         if (livestreamId) {
