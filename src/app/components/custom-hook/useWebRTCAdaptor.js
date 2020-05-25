@@ -106,12 +106,14 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
         if (infoObj.streams && infoObj.streams.length > 0) {
             infoObj.streams.filter((streamId, index, streams) => streams.indexOf(streamId) === index).forEach( streamId => {
                 adaptorInstance.play(streamId, "null", infoObj.ATTR_ROOM_NAME);
+                adaptorInstance.enableStats(streamId);
             })
         }
     }
 
     function playNewStream(adaptorInstance, infoObj) {
         adaptorInstance.play(infoObj.streamId, 'null', infoObj.ATTR_ROOM_NAME);
+        adaptorInstance.enableStats(infoObj.streamId);
     }
 
     function setupWebRTCAdaptor() {
@@ -225,6 +227,7 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
                         if (typeof streamingCallbackObject.onUpdatedStats === 'function') {
                             streamingCallbackObject.onUpdatedStats(infoObj);
                         }
+                        console.log(infoObj);
                         break;
                     }
                     case "pong": {
