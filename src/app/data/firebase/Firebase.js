@@ -146,6 +146,13 @@ class Firebase {
         return ref.get();
     }
 
+    getCareerCenterById = (careerCenterId) => {
+        let ref = this.firestore
+            .collection("careerCenterData")
+            .doc(careerCenterId);
+        return ref.get();
+    }
+
     getCareerCenterByUniversityId = (universityId) => {
         let ref = this.firestore
             .collection("careerCenterData")

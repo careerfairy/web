@@ -32,14 +32,14 @@ const UserProfile = (props) => {
 
     if (props.userData && props.userData.groupIds) {
         existingGroupElements = groups.filter(group => props.userData.groupIds.indexOf(group.id) > -1).map(group => {
-            return <CurrentGroup group={group} userData={props.userData} />
+            return <CurrentGroup group={group} userData={props.userData} key={group.id}/>
         });
         moreGroupElements = groups.filter(group => props.userData.groupIds.indexOf(group.id) == -1).map(group => {
-            return <NewGroup group={group} />
+            return <NewGroup group={group} userData={props.userData} key={group.id} />
         });
     } else {
         moreGroupElements = groups.map(group => {
-            return <NewGroup group={group} />
+            return <NewGroup group={group} userData={props.userData} key={group.id} />
         });
     }
     return (

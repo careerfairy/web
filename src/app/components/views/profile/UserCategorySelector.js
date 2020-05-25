@@ -5,23 +5,27 @@ import { withFirebase } from '../../../data/firebase';
 
 const UserCategorySelector = (props) => {
 
-    const [currentSelection, setCurrentSelection] = useState([]);
-
     useEffect(() => {
         props.firebase.listenToUserGroupCategoryValue(props.userData.userEmail, props.group.id, props.category.id, querySnapshot => {
-            setCurrentSelection(querySnapshot.data().value);
-            console.log(querySnapshot.data().value);
+            let currentElement = querySnapshot.data();
+            if (currentElement) {
+                props.updateValue(currentElement.value);
+            }
         })
     },[props.category]);
 
-    function updateUserCategory(value) {
-        props.firebase.updateUserGroupCategoryValue(props.userData.userEmail, props.group.id, props.category.id, value);
-    }   
+    function getCategoryCurrentValue() {
+        if (props.categoriesWithElements) {
+            let category = props.categoriesWithElements.find( category => category.id === props.category.id );
+            let selectedElement = category.elements.find( element => element.selected === true );
+            return selectedElement ? selectedElement.id : null;
+        }
+    }
 
     return (
         <div>
             <label style={{ marginBottom: '10px', textTransform: "uppercase", fontSize: '0.8em', fontWeight: '700', color: 'rgb(0, 210, 170)'}}>{ props.category.name }</label>
-            <Dropdown value={currentSelection} onChange={(event, {value}) => { updateUserCategory(value) }} options={props.category.elements.map( element => { return { text: element.name, value: element.id }; })} selection fluid/>
+            <Dropdown value={getCategoryCurrentValue()} onChange={(event, {value}) => { props.updateValue(value) }} options={props.category.elements.map( element => { return { text: element.name, value: element.id }; })} selection fluid/>
         </div>
     )
 };
