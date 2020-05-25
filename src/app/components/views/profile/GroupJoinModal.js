@@ -1,18 +1,74 @@
-import { useEffect, useState, Fragment } from 'react'
-import { Container, Header as SemanticHeader, Button, Dropdown, Form, Image, Grid, Modal } from 'semantic-ui-react';
-import { Formik } from 'formik';
-import { useRouter } from 'next/router';
+import { Fragment, useState, useEffect } from 'react'
+import { Button, Image, Grid, Modal } from 'semantic-ui-react';
 
 import { withFirebase } from '../../../data/firebase';
 import UserCategorySelector from './UserCategorySelector';
 
 const GroupJoinModal = (props) => {
 
-    let categorySelectors = props.categoriesWithElements.map( category => {
+    const [categories, setCategories] = useState([]);
+    const [categoriesWithElements, setCategoriesWithElements] = useState([]);
+
+    useEffect(() => {
+        if (props.open) {
+            props.firebase.getGroupCategories(props.group.id).then(querySnapshot => {
+                let categories = [];
+                querySnapshot.forEach( doc => {
+                    let category = doc.data();
+                    category.id = doc.id;
+                    categories.push(category);
+                });
+                setCategories(categories);
+            })
+        }
+    },[props.open]);
+
+    useEffect(() => {
+        if (categories && categories.length > 0) {
+            let categoriesWithElements = [];
+            categories.forEach((category, index) => {
+                props.firebase.getGroupCategoryElements(props.group.id, category.id).then(querySnapshot => {
+                    let elements = [];
+                    querySnapshot.forEach( doc => {
+                        let element = doc.data();
+                        element.id = doc.id;
+                        elements.push(element);
+                    });
+                    category.elements = elements;
+                    categoriesWithElements.push(category);
+                    if (index + 1 === categories.length) {
+                        setCategoriesWithElements(categoriesWithElements);
+                    }
+                });
+            });
+        }
+    },[categories]);
+
+    function setCategoryValue(categoryId, valueId) {
+        let updatedCategories = [];
+        categoriesWithElements.forEach( category => {
+            if (category.id === categoryId) {
+                let elements = [];
+                category.elements.forEach( element => {
+                    if (element.id === valueId) {
+                        element.selected = true;
+                    } else {
+                        element.selected = false;
+                    }
+                    elements.push(element);
+                });
+                category.elements = elements;
+            }
+            updatedCategories.push(category);
+        });
+        setCategoriesWithElements(updatedCategories);
+    }
+
+    let categorySelectors = categoriesWithElements.map( category => {
         return (
             <Grid.Column key={ category.id } width={8}>
                 <div style={{ margin: '15px 0' }}>   
-                    <UserCategorySelector userData={props.userData} group={props.group} category={category}/>
+                    <UserCategorySelector userData={props.userData} group={props.group} category={category} updateValue={(valueId) => setCategoryValue(category.id, valueId)}/>
                 </div>
             </Grid.Column>     
         )

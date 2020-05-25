@@ -32,6 +32,7 @@ function Calendar(props) {
 
     const [grid, setGrid] = useState(null);
     const [livestreams, setLivestreams] = useState([]);
+    const [allLivestreams, setAllLivestreams] = useState([]);
     const [cookieMessageVisible, setCookieMessageVisible] = useState(true);
 
     useEffect(() => {
@@ -82,7 +83,7 @@ function Calendar(props) {
                 grid.updateLayout();
             }, 500);
         }
-    }, [grid,livestreams]);
+    }, [grid,allLivestreams]);
 
     useEffect(() => {
         if (localStorage.getItem('hideCookieMessage') === 'yes') {
@@ -99,7 +100,7 @@ function Calendar(props) {
         window.open('http://careerfairy.io' + route, '_blank');
     }
 
-    const mentorElements = livestreams.map( (mentor, index) => {
+    const mentorElements = allLivestreams.map( (mentor, index) => {
         return(
             <div key={index}>
                 <LivestreamCard livestream={mentor} user={user} userData={userData} fields={null} grid={grid}/>
