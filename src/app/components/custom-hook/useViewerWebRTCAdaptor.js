@@ -6,11 +6,12 @@ import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor.js';
 import { WEBRTC_ERRORS } from '../../data/errors/StreamingErrors.js';
 import LivestreamId from '../../pages/upcoming-livestream/[livestreamId].js';
 
-export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId) {
+export default function useWebRTCAdaptor(videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId) {
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
     
     const [externalMediaStreams, setExternalMediaStreams] = useState([]);
+    
     const [addedStream, setAddedStream] = useState(null);
     const [removedStream, setRemovedStream] = useState(null);
     const [playFinishedStream, setPlayFinishedStream] = useState(null);
@@ -89,37 +90,6 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
         return tempToken;
     }
 
-    function errorCallback(error) {
-        if (error === 'ScreenSharePermissionDenied' && typeof streamingCallbackObject.onScreenSharePermissionDenied === 'function') {
-            errorCallbackObject.onScreenSharePermissionDenied();
-        } else {
-            const currentError = WEBRTC_ERRORS.find( webrtc_error => webrtc_error.value === error);
-            if (currentError) {
-                if (typeof errorCallbackObject.onOtherError === 'function') {
-                    errorCallbackObject.onOtherError(currentError.text);
-                } else {
-                    alert(currentError.text);
-                }
-            } else {
-                if (typeof errorCallbackObject.onOtherError === 'function') {
-                    errorCallbackObject.onOtherError(error);
-                } else {
-                    alert(error);
-                }
-            }
-        }
-    }
-
-    function publishNewStream(adaptorInstance, infoObj) {
-        adaptorInstance.publish(infoObj.streamId, 'null', infoObj.ATTR_ROOM_NAME);
-        if (infoObj.streams && infoObj.streams.length > 0) {
-            infoObj.streams.filter((streamId, index, streams) => streams.indexOf(streamId) === index).forEach( streamId => {
-                adaptorInstance.play(streamId, "null", infoObj.ATTR_ROOM_NAME);
-                adaptorInstance.enableStats(streamId);
-            })
-        }
-    }
-
     function playNewStream(adaptorInstance, infoObj) {
         adaptorInstance.play(infoObj.streamId, 'null', infoObj.ATTR_ROOM_NAME);
         adaptorInstance.enableStats(infoObj.streamId);
@@ -140,8 +110,8 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
         var pc_config = nsToken ? { 'iceServers' : nsToken.iceServers } : null; 
 
         var sdpConstraints = {
-            OfferToReceiveAudio : false,
-            OfferToReceiveVideo : false
+            OfferToReceiveAudio : true,
+            OfferToReceiveVideo : true
         };
 
         const newAdaptor = new WebRTCAdaptor({
@@ -151,6 +121,7 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
             sdp_constraints : sdpConstraints,
             localVideoId : videoId,
             debug: true,
+            isPlayMode: true,
             callback : function (info, infoObj) {
                 switch(info) {
                     case "initialized": {
@@ -166,7 +137,6 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
                         if (typeof streamingCallbackObject.onJoinedTheRoom === 'function') {
                             streamingCallbackObject.onJoinedTheRoom(infoObj);
                         }
-                        publishNewStream(this, infoObj);
                         break;
                     }
                     case "streamJoined": {

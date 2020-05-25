@@ -37,6 +37,21 @@ function ViewerPage(props) {
 
     const [initalReactionSent, setInitialReactionSent] = useState(false);
 
+    const streamerReady = false;
+    const isPlayMode = true;
+
+    const { webRTCAdaptor, externalMediaStreams } = 
+        useWebRTCAdaptor(
+            streamerReady,
+            isPlayMode,
+            localVideoId,
+            mediaConstraints,
+            streamingCallbacks,
+            errorCallbacks,
+            livestreamId,
+            streamerId
+        );
+
     useEffect(() => {
         if (currentLivestream.id) {
             const unsubscribe = props.firebase.listenToLivestreamQuestions(currentLivestream.id, querySnapshot => {
