@@ -89,7 +89,11 @@ function BookingModal(props) {
         props.firebase.putLivestreamQuestion(props.livestream.id, newQuestion)
             .then(() => {
                 setNewQuestionTitle("");
-                setModalStep(3);
+                if (props.livestream.hasNoTalentPool) {
+                    setModalStep(4);
+                } else {
+                    setModalStep(3);
+                }
             }, () => {
                 console.log("Error");
             })
@@ -145,7 +149,7 @@ function BookingModal(props) {
                                 </div>
                                 <Input size='huge' value={newQuestionTitle} placeholder={'What would like to ask our speaker?'}  maxLength='170' onChange={(event) => setNewQuestionTitle(event.target.value)} fluid/>
                                 <Button style={{ margin: '20px 0 0 0'}} primary content='Submit' onClick={() => addNewQuestion()} size='large'/>
-                                <div style={{ margin: '20px 0 10px 0', textAlign: 'center', color: 'rgb(70,70,200)', cursor: 'pointer' }} onClick={() => setModalStep(3)}>Skip</div>
+                                <div style={{ margin: '20px 0 10px 0', textAlign: 'center', color: 'rgb(70,70,200)', cursor: 'pointer' }} onClick={props.livestream.hasNoTalentPool ? () => setModalStep(4) : () => setModalStep(3)}>Skip</div>
                             </div>
                             <div className={ modalStep !== 3 ? 'hidden' : 'modalStep'}>
                                 <h4 className='booking-modal-subtitle'>Join the { props.livestream.company } Talent Pool</h4>

@@ -125,6 +125,9 @@ const UserProfile = (props) => {
                             .then(() => {
                                 if (!userData || !UserUtil.userProfileIsComplete(userData)) {
                                     if (values.university === 'ethzurich' || values.university === 'epflausanne' || values.university === 'unizurich'|| values.university === 'unilausanne'|| values.university === 'fhgraubuenden' || values.university === 'hochschulerapperswil' || values.university === 'technischeuniwien') {
+                                        if (values.university === 'ethzurich') {
+                                            return router.push('/next-livestreams?university=ethanalyticsclub');
+                                        }
                                         return router.push('/next-livestreams' + (values.university ? ('?university=' + values.university) : ''));
                                     } else {
                                         return router.push('/next-livestreams');

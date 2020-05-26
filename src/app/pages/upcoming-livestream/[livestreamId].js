@@ -15,6 +15,7 @@ import StringUtils from '../../util/StringUtils';
 
 import Head from 'next/head';
 import UserUtil from '../../data/util/UserUtil';
+import MulitLineText from '../../components/views/common/MultiLineText';
 
 function UpcomingLivestream(props) {
 
@@ -364,7 +365,7 @@ function UpcomingLivestream(props) {
             <div className='white-container'>
                 <Container>
                         <div className='container-title'>Short summary</div>
-                        <div style={{ fontSize: '1.3em', lineHeight: '1.4em', width: '80%', margin: '0 auto' }}>{ currentLivestream.summary }</div>
+                        <div style={{ fontSize: '1.3em', lineHeight: '1.4em', width: '80%', margin: '0 auto' }}><MulitLineText text={ currentLivestream.summary }/></div>
                 </Container>
             </div>
             <div className='grey-container'>
@@ -381,7 +382,7 @@ function UpcomingLivestream(props) {
                     <div className={( user ? '' : 'hidden')} style={{ textAlign: 'center' }}className={ questionElements.length === 0 ? '' : 'hidden'}>The speaker is eagerly waiting for your input!</div>
                 </Container>
             </div>
-            <div className='white-container' style={{ backgroundColor: (userIsInTalentPool ? 'rgb(0, 210, 170)' : '')}}>
+            <div className={'white-container ' + (currentLivestream.hasNoTalentPool ? 'hidden' : '')} style={{ backgroundColor: (userIsInTalentPool ? 'rgb(0, 210, 170)' : '')}}>
                 <Container>
                     <div className='container-title' style={{ color: (userIsInTalentPool ? 'white' : '') }}>{ userIsInTalentPool ? 'You are part of the talent pool' : 'Join the Talent Pool and Get Hired' }</div>
                     <Grid style={{ margin: '50px 0 0 0'}} className='middle aligned' centered>
@@ -399,7 +400,7 @@ function UpcomingLivestream(props) {
                     </Grid>
                 </Container>
             </div>
-            <div className='grey-container'>
+            <div  className={'grey-container ' + (currentLivestream.hasNoTalentPool ? 'hidden' : '')}>
                 <div className='container-title'>Any problem or question ? We want to hear from you</div>
                 <Container>
                     <Grid.Column width={16} style={{ textAlign: 'center' }}>
