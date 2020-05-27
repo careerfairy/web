@@ -9,7 +9,7 @@ import SmallViewerVideoDisplayer from '../../../components/views/streaming/video
 import ViewerVideoDisplayer from '../../../components/views/streaming/video-container/ViewerVideoDisplayer';
 import LivestreamPdfViewer from '../../../components/util/LivestreamPdfViewer';
 import useWebRTCAdaptor from '../../../components/custom-hook/useWebRTCAdaptor';
-import CurrentSpeakerDisplayer from '../../../components/views/streaming/video-container/StreamerVideoDisplayer';
+import CurrentSpeakerDisplayer from '../../../components/views/streaming/video-container/CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from '../../../components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 
 function ViewerPage(props) {

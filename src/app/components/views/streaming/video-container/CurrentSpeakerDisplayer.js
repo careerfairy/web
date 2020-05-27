@@ -43,7 +43,7 @@ function StreamerVideoDisplayer(props) {
     let externalVideoElements = props.streams.map( (stream, index) => {
         return (
             <div className={ stream.streamId === props.currentSpeaker ? 'speaker-video' : 'four wide column'} width={getVideoContainerWidth(stream.streamId)} style={{ padding: 0, border: index === 0 ? '2px solid blue' : '2px solid red'}} key={stream.streamId}>
-                <RemoteVideoContainer stream={stream} length={props.streams.length} height={'45%'} index={index}/>
+                <RemoteVideoContainer stream={stream} length={props.streams.length} height={stream.streamId === props.currentSpeaker ? 'calc(80vh - 160px)' : '20vh' } index={index}/>
                 <style jsx>{`
                     .speaker-video {
                         position: absolute;
@@ -91,7 +91,7 @@ function StreamerVideoDisplayer(props) {
     return (
         <Fragment>
             <div className='relative-container'>
-                <Grid style={{ margin: '0', border: '2px solid green', height: '20vh' }}>         
+                <Grid style={{ margin: '0', border: '2px solid green', height: '20vh' }} centered>         
                     { externalVideoElements }
                 </Grid> 
             </div>             
