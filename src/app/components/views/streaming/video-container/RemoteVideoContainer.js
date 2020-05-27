@@ -11,16 +11,18 @@ function RemoteVideoContainer(props) {
 
     return (
         <div>
-            <div className='videoContainer'  style={{ height: props.height }}>
+            <div className='videoContainer'>
                 <video id='videoElement' ref={videoElement}  width={ props.length > 1 ? '' : '100%' } autoPlay/>
             </div>           
             <style jsx>{`
                .videoContainer {
                     position: relative;
                     background-color: black;
-                    width: 100%;
+                    width: 100%
                     margin: 0 auto;
                     z-index: -9999;
+                    padding-top: 45%;
+                    border: 2px solid white;
                }
 
                #videoElement {
@@ -29,9 +31,9 @@ function RemoteVideoContainer(props) {
                     transform: translateY(-50%);
                     max-height: 100%;
                     max-width: 100%;
-                    height: auto;
                     z-index: 9900;
                     background-color: black;
+                    border: 2px solid yellow;
                }
           `}</style>
         </div>

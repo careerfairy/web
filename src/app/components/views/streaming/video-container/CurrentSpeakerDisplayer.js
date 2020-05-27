@@ -21,7 +21,10 @@ function StreamerVideoDisplayer(props) {
         }
     },[localStream]);
 
-    function getVideoContainerWidth() {
+    function getVideoContainerWidth(streamId) {
+        if (streamId === props.currentSpeaker) {
+            return 16;
+        }
         if (props.isPlayMode) {
             return props.streams.length > 1 ? 8 : 16;
         } else {
@@ -39,9 +42,18 @@ function StreamerVideoDisplayer(props) {
 
     let externalVideoElements = props.streams.map( (stream, index) => {
         return (
-            <Grid.Column width={getVideoContainerWidth()} style={{ padding: 0 }} key={stream.streamId}>
-                <RemoteVideoContainer stream={stream} length={props.streams.length} height={getVideoContainerHeight()} index={index} />
-            </Grid.Column>
+            <div className={ stream.streamId === props.currentSpeaker ? 'speaker-video' : 'four wide column'} width={getVideoContainerWidth(stream.streamId)} style={{ padding: 0, border: index === 0 ? '2px solid blue' : '2px solid red'}} key={stream.streamId}>
+                <RemoteVideoContainer stream={stream} length={props.streams.length} height={'45%'} index={index}/>
+                <style jsx>{`
+                    .speaker-video {
+                        position: absolute;
+                        top: 20vh;
+                        left: 0;
+                        width: 100%;
+                        height: calc(80vh - 160px);
+                    }       
+                `}</style>
+            </div>
         );
     });
 
@@ -52,7 +64,7 @@ function StreamerVideoDisplayer(props) {
                     <video id="localVideo" ref={localVideoRef} muted autoPlay width={ props.streams.length > 1 ? '' : '100%' } style={{ right: (props.streams.length > 0) ? '0' : '', bottom: (props.streams.length > 1) ? '0' : '' }}></video> 
                 </div>
                 <style jsx>{`
-                .video-container {
+                    .video-container {
                         position: relative;
                         background-color: black;
                         width: 100%; 
@@ -78,10 +90,19 @@ function StreamerVideoDisplayer(props) {
 
     return (
         <Fragment>
-            <Grid style={{ margin: 0 }}>         
-                { externalVideoElements }
-            </Grid>          
+            <div className='relative-container'>
+                <Grid style={{ margin: '0', border: '2px solid green', height: '20vh' }}>         
+                    { externalVideoElements }
+                </Grid> 
+            </div>             
             <style jsx>{`
+                .relative-container {
+                    position: relative;
+                    border: 2px solid pink;
+                    height: 100%;
+                    min-height: calc(100vh - 85px);
+                }
+                
                 .hidden {
                     display: none;
                 }

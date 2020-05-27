@@ -35,7 +35,6 @@ function StreamingPage(props) {
 
     const devices = useUserMedia();
 
-    const [streamId, setStreamId] = useState(null);
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
 
     const [audioSource, setAudioSource] = useState(null);
@@ -51,6 +50,7 @@ function StreamingPage(props) {
     const [registeredSpeaker, setRegisteredSpeaker] = useState(false);
 
     const localVideoId = 'localVideo';
+    const  isPlayMode = false;
 
     let streamingCallbacks = {
         onInitialized: (infoObj) => {},
@@ -100,6 +100,7 @@ function StreamingPage(props) {
     const { webRTCAdaptor, externalMediaStreams, audioLevels } = 
         useWebRTCAdaptor(
             streamerReady,
+            isPlayMode,
             localVideoId,
             mediaConstraints,
             streamingCallbacks,
@@ -313,10 +314,10 @@ function StreamingPage(props) {
             </div>
             <div className='black-frame'>
                 <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
-                    <StreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints}/>
+                    <StreamerVideoDisplayer isPlayMode={false} streams={externalMediaStreams} mediaConstraints={mediaConstraints}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
-                    <SmallStreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={true}/>
+                    <SmallStreamerVideoDisplayer streams={externalMediaStreams} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={true}/>
                 </div>
                 <div className='button-container'>         
                     <Grid centered className='middle aligned'>

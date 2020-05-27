@@ -43,6 +43,7 @@ function StreamingPage(props) {
     const [numberOfViewers, setNumberOfViewers] = useState(0);
 
     const localVideoId = 'localVideo';
+    const isPlayMode = false;
 
     let streamingCallbacks = {
         onInitialized: () => {},
@@ -87,6 +88,7 @@ function StreamingPage(props) {
     const { webRTCAdaptor, externalMediaStreams } = 
         useWebRTCAdaptor(
             streamerReady,
+            isPlayMode,
             localVideoId,
             mediaConstraints,
             streamingCallbacks,
@@ -232,7 +234,7 @@ function StreamingPage(props) {
             </div>
             <div className='black-frame'>
                 <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
-                    <StreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints}/>
+                    <StreamerVideoDisplayer isPlayMode={false} streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
                     <SmallStreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={false}/>

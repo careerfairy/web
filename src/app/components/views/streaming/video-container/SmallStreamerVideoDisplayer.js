@@ -9,7 +9,7 @@ function SmallStreamerVideoDisplayer(props) {
     const [localStream, setLocalStream] = useState(null);
 
     useEffect(() => {
-        if (!localStream && props.mediaConstraints) {
+        if (!props.isPlayMode && !localStream && props.mediaConstraints) {
             navigator.mediaDevices.getUserMedia(props.mediaConstraints).then( stream => {
                 setLocalStream(stream);
             });
@@ -17,18 +17,27 @@ function SmallStreamerVideoDisplayer(props) {
     },[props.mediaConstraints, localVideoRef.current]);
 
     useEffect(() => {
-        if (localStream && !localVideoRef.current.srcObject) {
+        if (!props.isPlayMode && localStream && !localVideoRef.current.srcObject) {
             localVideoRef.current.srcObject = localStream;
         }
     },[localStream]);
 
-    let localVideoElement =
+    let externalVideoElements = props.streams.map( (stream, index) => {
+        return (
+            <Grid.Column width='4' style={{ padding: 0 }} key={stream.streamId}>
+                <RemoteVideoContainer stream={stream} length={props.streams.length} height={'150px'} index={index} />
+            </Grid.Column>
+        );
+    });
+
+    if (!props.isPlayMode) {
+        let localVideoElement =
         <Grid.Column width='4' style={{ padding: 0 }} key={"localVideoId"}>
             <div className='video-container' style={{ height: '150px' }}>
                 <video id="localVideo" ref={localVideoRef} muted autoPlay width={ props.streams.length > 1 ? '' : '100%' }></video> 
             </div>
             <style jsx>{`
-               .video-container {
+            .video-container {
                     position: relative;
                     background-color: black;
                     width: 100%; 
@@ -46,18 +55,11 @@ function SmallStreamerVideoDisplayer(props) {
                     z-index: 9900;
                     background-color: black;
                 }
-          `}</style>
+        `}</style>
         </Grid.Column>;
 
-    let externalVideoElements = props.streams.map( (stream, index) => {
-        return (
-            <Grid.Column width='4' style={{ padding: 0 }} key={stream.streamId}>
-                <RemoteVideoContainer stream={stream} length={props.streams.length} height={'150px'} index={index} />
-            </Grid.Column>
-        );
-    });
-
-    externalVideoElements.unshift(localVideoElement);
+        externalVideoElements.unshift(localVideoElement);
+    }
 
     return (
         <Fragment>

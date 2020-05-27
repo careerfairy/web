@@ -6,7 +6,7 @@ import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor.js';
 import { WEBRTC_ERRORS } from '../../data/errors/StreamingErrors.js';
 import LivestreamId from '../../pages/upcoming-livestream/[livestreamId].js';
 
-export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId) {
+export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId) {
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
     
@@ -112,6 +112,9 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
 
     function publishNewStream(adaptorInstance, infoObj) {
         adaptorInstance.publish(infoObj.streamId, 'null', infoObj.ATTR_ROOM_NAME);
+    }
+
+    function playIncumbentStreams(adaptorInstance, infoObj) {
         if (infoObj.streams && infoObj.streams.length > 0) {
             infoObj.streams.filter((streamId, index, streams) => streams.indexOf(streamId) === index).forEach( streamId => {
                 adaptorInstance.play(streamId, "null", infoObj.ATTR_ROOM_NAME);
@@ -149,6 +152,7 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
             mediaConstraints : mediaConstraints,
             peerconnection_config : pc_config,
             sdp_constraints : sdpConstraints,
+            isPlayMode: isPlayMode,
             localVideoId : videoId,
             debug: true,
             callback : function (info, infoObj) {
@@ -158,7 +162,11 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
                             streamingCallbackObject.onInitialized(infoObj);
                         }
                         setTimeout(() => {
-                            this.joinRoom(roomId, streamId);
+                            if (!isPlayMode) {
+                                this.joinRoom(roomId, streamId);
+                            } else {
+                                this.joinRoom(roomId);
+                            }
                         }, 2000);
                         break;
                     }
@@ -166,7 +174,10 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
                         if (typeof streamingCallbackObject.onJoinedTheRoom === 'function') {
                             streamingCallbackObject.onJoinedTheRoom(infoObj);
                         }
-                        publishNewStream(this, infoObj);
+                        if (!isPlayMode) {
+                            publishNewStream(this, infoObj);
+                        }
+                        playIncumbentStreams(this, infoObj);
                         break;
                     }
                     case "streamJoined": {
@@ -202,7 +213,9 @@ export default function useWebRTCAdaptor(streamerReady, videoId, mediaConstraint
                         if (typeof streamingCallbackObject.onPublishFinished === 'function') {
                             streamingCallbackObject.onPublishFinished(infoObj);
                         }
-                        this.joinRoom(roomId, streamId);
+                        if (!isPlayMode) {
+                            this.joinRoom(roomId, streamId);
+                        }
                         break;
                     }
                     case "play_started": {

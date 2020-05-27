@@ -8,6 +8,9 @@ import NewCommentContainer from '../../../components/views/viewer/comment-contai
 import SmallViewerVideoDisplayer from '../../../components/views/streaming/video-container/SmallViewerVideoDisplayer';
 import ViewerVideoDisplayer from '../../../components/views/streaming/video-container/ViewerVideoDisplayer';
 import LivestreamPdfViewer from '../../../components/util/LivestreamPdfViewer';
+import useWebRTCAdaptor from '../../../components/custom-hook/useWebRTCAdaptor';
+import CurrentSpeakerDisplayer from '../../../components/views/streaming/video-container/StreamerVideoDisplayer';
+import SmallStreamerVideoDisplayer from '../../../components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 
 function ViewerPage(props) {
 
@@ -36,11 +39,17 @@ function ViewerPage(props) {
     const [pastQuestions, setPastQuestions] = useState([]);
 
     const [initalReactionSent, setInitialReactionSent] = useState(false);
+    const [mediaConstraints, setMediaConstraints] = useState({ audio: true, video: true});
+    const [speakingLivestreamId, setSpeakingLivestreamId] = useState(null);
 
-    const streamerReady = false;
+    const streamerReady = true;
     const isPlayMode = true;
+    const localVideoId = null;
+    const streamingCallbacks = {};
+    const errorCallbacks = {};
+    const streamerId = null;
 
-    const { webRTCAdaptor, externalMediaStreams } = 
+    const { webRTCAdaptor, externalMediaStreams, audioLevels } = 
         useWebRTCAdaptor(
             streamerReady,
             isPlayMode,
@@ -119,6 +128,13 @@ function ViewerPage(props) {
             });
         }
     }, [livestreamId]);
+
+    useEffect(() => {
+        if (audioLevels && audioLevels.length > 1) {
+            const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
+            setSpeakingLivestreamId(maxEntry.streamId);
+        }
+    }, [audioLevels]);
 
     useEffect(() => {
         if (livestreamId) {
@@ -252,14 +268,12 @@ function ViewerPage(props) {
                 </div>
             </div>
             <div className='black-frame'>
-                <div className='video-box' style={{ height: currentLivestream.mode === 'presentation' ? '150px' : '100%' }}>
-                    <Grid style={{ margin: 0, height: '100%' }} centered>
-                        { videoElements }
-                    </Grid>
+                <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
+                    <CurrentSpeakerDisplayer isPlayMode={true} streams={externalMediaStreams} currentSpeaker={speakingLivestreamId}/>
                 </div>
-                <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none'), position: 'absolute', top: '150px', width: '100%', height: 'calc(100% - 150px)', backgroundColor: 'rgb(30,30,30)'}}>
-                    <LivestreamPdfViewer livestreamId={currentLivestream.id} presenter={false}/>
-                </div> 
+                <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
+                    <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams} livestreamId={currentLivestream.id} presenter={false}/>
+                </div>
                 <div className={'reactions-sender ' + (initalReactionSent ? 'animated fadeOut' : '')}>
                     <div style={{ fontSize: '2em', margin: '0 0 40px 0'}}>How about saying hello?</div>
                     <Grid textAlign='center'>
@@ -386,6 +400,7 @@ function ViewerPage(props) {
                     min-width: 700px;
                     min-height: 600px;
                     z-index: 10;
+                    background-color: black;
                 }
 
                 .video-box {
