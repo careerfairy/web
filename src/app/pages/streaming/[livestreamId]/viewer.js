@@ -274,7 +274,10 @@ function ViewerPage(props) {
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
                     <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams} livestreamId={currentLivestream.id} presenter={false}/>
                 </div>
-                <div className={'reactions-sender ' + (initalReactionSent ? 'animated fadeOut' : '')}>
+                <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none'), position: 'absolute', top: '150px', width: '100%', height: 'calc(100% - 150px)', backgroundColor: 'rgb(30,30,30)'}}>
+                    <LivestreamPdfViewer livestreamId={currentLivestream.id} presenter={false}/>
+                </div> 
+                <div className={'reactions-sender ' + (initalReactionSent ? 'hidden' : '')}>
                     <div style={{ fontSize: '2em', margin: '0 0 40px 0'}}>How about saying hello?</div>
                     <Grid textAlign='center'>
                         { reactionElements }
