@@ -170,7 +170,7 @@ function StreamingPage(props) {
                 setInterval(() => {
                     axios({
                         method: 'get',
-                        url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=' + streamId,
+                        url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=' + streamerId,
                     }).then( response => { 
                         if (response.data.totalWebRTCWatchersCount > -1) {
                             setNumberOfViewers(response.data.totalWebRTCWatchersCount);
