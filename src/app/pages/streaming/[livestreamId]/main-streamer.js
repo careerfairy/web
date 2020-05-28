@@ -11,7 +11,7 @@ import useUserMedia from '../../../components/custom-hook/useDevices';
 import useWebRTCAdaptor from '../../../components/custom-hook/useWebRTCAdaptor';
 import { useWindowSize } from '../../../components/custom-hook/useWindowSize';
 import LivestreamPdfViewer from '../../../components/util/LivestreamPdfViewer';
-import StreamerVideoDisplayer from '../../../components/views/streaming/video-container/StreamerVideoDisplayer';
+import CurrentSpeakerDisplayer from '../../../components/views/streaming/video-container/CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from '../../../components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 import NewCommentContainer from '../../../components/views/streaming/comment-container/NewCommentContainer';
 import { Formik } from 'formik';
@@ -48,6 +48,8 @@ function StreamingPage(props) {
 
     const [additionalSpeakers, setAdditionalSpeakers] = useState(false);
     const [registeredSpeaker, setRegisteredSpeaker] = useState(false);
+
+    const [speakingLivestreamId, setSpeakingLivestreamId] = useState(null);
 
     const localVideoId = 'localVideo';
     const  isPlayMode = false;
@@ -108,6 +110,13 @@ function StreamingPage(props) {
             livestreamId,
             livestreamId
         );
+
+    useEffect(() => {
+        if (audioLevels && audioLevels.length > 0) {
+            const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
+            setSpeakingLivestreamId(maxEntry.streamId);
+        }
+    }, [audioLevels]);
 
     useEffect(() => {
         if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
@@ -314,7 +323,7 @@ function StreamingPage(props) {
             </div>
             <div className='black-frame'>
                 <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
-                    <StreamerVideoDisplayer isPlayMode={false} streams={externalMediaStreams} mediaConstraints={mediaConstraints}/>
+                    <CurrentSpeakerDisplayer isPlayMode={false} localId={livestreamId} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={speakingLivestreamId}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
                     <SmallStreamerVideoDisplayer streams={externalMediaStreams} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={true}/>

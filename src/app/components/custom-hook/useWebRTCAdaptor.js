@@ -194,6 +194,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onStreamLeaved(infoObj);
                         }
                         setRemovedStream(infoObj);
+                        this.disableStats(infoObj.streamId);
                         break;
                     }
                     case "newStreamAvailable": {
@@ -208,7 +209,6 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onPublishStarted(infoObj);
                         }
                         if (!isPlayMode) {
-                            debugger;
                             this.enableStats(infoObj.streamId);
                         }
                         break;
@@ -264,7 +264,6 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         if (typeof streamingCallbackObject.onUpdatedStats === 'function') {
                             streamingCallbackObject.onUpdatedStats(infoObj);
                         }
-                        debugger;
                         setLatestAudioLevel({ streamId: infoObj.streamId, audioLevel: infoObj.audioLevel });
                         break;
                     }

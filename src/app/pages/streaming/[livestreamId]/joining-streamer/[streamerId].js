@@ -7,7 +7,7 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import useUserMedia from '../../../../components/custom-hook/useDevices';
 import useWebRTCAdaptor from '../../../../components/custom-hook/useWebRTCAdaptor';
-import StreamerVideoDisplayer from '../../../../components/views/streaming/video-container/StreamerVideoDisplayer';
+import CurrentSpeakerDisplayer from '../../../../components/views/streaming/video-container/CurrentSpeakerDisplayer';
 import NewCommentContainer from '../../../../components/views/streaming/comment-container/NewCommentContainer';
 import SmallStreamerVideoDisplayer from '../../../../components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 import CountdownTimer from '../../../../components/views/common/Countdown';
@@ -41,6 +41,8 @@ function StreamingPage(props) {
 
     const [mediaConstraints, setMediaConstraints] = useState(null);
     const [numberOfViewers, setNumberOfViewers] = useState(0);
+
+    const [speakingLivestreamId, setSpeakingLivestreamId] = useState(null);
 
     const localVideoId = 'localVideo';
     const isPlayMode = false;
@@ -85,7 +87,7 @@ function StreamingPage(props) {
         }
     }
 
-    const { webRTCAdaptor, externalMediaStreams } = 
+    const { webRTCAdaptor, externalMediaStreams, audioLevels } = 
         useWebRTCAdaptor(
             streamerReady,
             isPlayMode,
@@ -96,6 +98,13 @@ function StreamingPage(props) {
             livestreamId,
             streamerId
         );
+
+    useEffect(() => {
+        if (audioLevels && audioLevels.length > 0) {
+            const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
+            setSpeakingLivestreamId(maxEntry.streamId);
+        }
+    }, [audioLevels]);
 
     useEffect(() => {
         if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
@@ -172,7 +181,7 @@ function StreamingPage(props) {
                 setInterval(() => {
                     axios({
                         method: 'get',
-                        url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=' + streamId,
+                        url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=' + streamerId,
                     }).then( response => { 
                         if (response.data.totalWebRTCWatchersCount > -1) {
                             setNumberOfViewers(response.data.totalWebRTCWatchersCount);
@@ -234,7 +243,7 @@ function StreamingPage(props) {
             </div>
             <div className='black-frame'>
                 <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
-                    <StreamerVideoDisplayer isPlayMode={false} streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints}/>
+                    <CurrentSpeakerDisplayer isPlayMode={false} localId={streamerId} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={speakingLivestreamId}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
                     <SmallStreamerVideoDisplayer streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={false}/>

@@ -130,7 +130,7 @@ function ViewerPage(props) {
     }, [livestreamId]);
 
     useEffect(() => {
-        if (audioLevels && audioLevels.length > 1) {
+        if (audioLevels && audioLevels.length > 0) {
             const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
             setSpeakingLivestreamId(maxEntry.streamId);
         }

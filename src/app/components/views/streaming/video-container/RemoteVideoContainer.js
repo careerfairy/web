@@ -20,8 +20,7 @@ function RemoteVideoContainer(props) {
                     background-color: black;
                     width: 100%;
                     margin: 0 auto;
-                    z-index: -9999;
-                    border: 2px solid white;
+                    z-index: 2000;
                }
 
                #videoElement {
@@ -33,7 +32,6 @@ function RemoteVideoContainer(props) {
                     max-width: 100%;
                     z-index: 9900;
                     background-color: black;
-                    border: 2px solid yellow;
                }
           `}</style>
         </div>
