@@ -6,21 +6,12 @@ import LivestreamPdfViewer from '../../../util/LivestreamPdfViewer';
 function SmallStreamerVideoDisplayer(props) {
 
     const localVideoRef = useRef(null);
-    const [localStream, setLocalStream] = useState(null);
 
     useEffect(() => {
-        if (!localStream && props.mediaConstraints) {
-            navigator.mediaDevices.getUserMedia(props.mediaConstraints).then( stream => {
-                setLocalStream(stream);
-            });
+        if (props.localStream) {
+            localVideoRef.current.srcObject = props.localStream;
         }
-    },[props.mediaConstraints, localVideoRef.current]);
-
-    useEffect(() => {
-        if (localStream && !localVideoRef.current.srcObject) {
-            localVideoRef.current.srcObject = localStream;
-        }
-    },[localStream]);
+    },[props.localStream]);
 
     let localVideoElement =
         <Grid.Column width='4' style={{ padding: 0 }} key={"localVideoId"}>

@@ -5,21 +5,12 @@ import RemoteVideoContainer from './RemoteVideoContainer';
 function StreamerVideoDisplayer(props) {
 
     const localVideoRef = useRef(null);
-    const [localStream, setLocalStream] = useState(null);
-    
-    useEffect(() => {
-        if (!localStream && props.mediaConstraints) {
-            navigator.mediaDevices.getUserMedia(props.mediaConstraints).then( stream => {
-                setLocalStream(stream);
-            });
-        }
-    },[props.mediaConstraints, localVideoRef.current]);
 
     useEffect(() => {
-        if (localStream && !localVideoRef.current.srcObject) {
-            localVideoRef.current.srcObject = localStream;
+        if (props.localStream) {
+            localVideoRef.current.srcObject = props.localStream;
         }
-    },[localStream]);
+    },[props.localStream]);
 
     function getVideoContainerWidth() {
         return props.streams.length > 0 ? 8 : 16;
@@ -37,7 +28,7 @@ function StreamerVideoDisplayer(props) {
             <style jsx>{`
                .video-container {
                     position: relative;
-                    background-color: black;
+                    background-color: black;    
                     width: 100%; 
                     margin: 0 auto;
                     z-index: -9999;
