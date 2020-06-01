@@ -41,7 +41,7 @@ function StreamingPage(props) {
     const [videoSource, setVideoSource] = useState(null);
 
     const [mediaConstraints, setMediaConstraints] = useState(null);
-    const localStream = useLocalStream(mediaConstraints);
+    const { permissionGranted, userMediaError, localStream } = useLocalStream(mediaConstraints);
 
     const [numberOfViewers, setNumberOfViewers] = useState(0);
 

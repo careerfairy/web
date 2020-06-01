@@ -3,6 +3,8 @@ import { navigator } from 'global';
 
 export function useLocalStream(mediaConstraints) {
 
+    const [permissionGranted, setPermissionGranted] = useState(false);
+    const [userMediaError, setUserMediaError] = useState(null);
     const [localStream, setLocalStream] = useState(null);
 
     useEffect(() => {
@@ -13,13 +15,15 @@ export function useLocalStream(mediaConstraints) {
                 });
               }
             navigator.mediaDevices.getUserMedia(mediaConstraints).then( stream => {
+                setPermissionGranted(true);
                 window.stream = stream;
                 setLocalStream(stream);
             }).catch(error => {
+                setUserMediaError(error);
                 console.log(error);
             });
         }
     },[mediaConstraints]);
   
-    return localStream;
+    return { permissionGranted, userMediaError, localStream };
 }
