@@ -79,6 +79,8 @@ export function useSoundMeter(isShowAudioVideo, localStream) {
     function connectStream(stream) {
         // Put variables in global scope to make them available to the
         // browser console.
+
+        let zeroCounter = 0;
         const soundMeter = new SoundMeter(window.audioContext);
         soundMeter.connectToSource(stream, function(e) {
         if (e) {
@@ -86,7 +88,15 @@ export function useSoundMeter(isShowAudioVideo, localStream) {
             return;
         }
         setInterval(() => {
-            setAudioValue(soundMeter.instant.toFixed(2));           
+            if (soundMeter.instant.toFixed(2) == 0) {
+                zeroCounter += 1;
+                if (zeroCounter === 30) {
+                    setAudioValue(0);    
+                    zeroCounter = 0;
+                }
+            } else {
+                setAudioValue(soundMeter.instant.toFixed(2));           
+            }
         }, 200);
         });
         setSoundMeter(soundMeter);
