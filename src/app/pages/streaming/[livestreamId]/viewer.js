@@ -189,7 +189,6 @@ function ViewerPage(props) {
             addNewQuestion();   
         } 
     }
-
     function sendInstantReaction(reaction) {
         const newComment = {
             title: reaction,
