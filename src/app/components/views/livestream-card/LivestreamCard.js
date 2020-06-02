@@ -86,8 +86,8 @@ function LivestreamCard(props) {
 
     let logoElements = props.careerCenters.map( (careerCenter, index) => {
         return (
-            <Grid.Column width='5' key={index}>
-                <Image src={ careerCenter.logoUrl } style={{ maxHeight: '35px', margin: '0 auto' }}/>
+            <Grid.Column width='8' key={index}>
+                <Image src={ careerCenter.logoUrl } style={{ maxHeight: '45px', margin: '0 auto' }}/>
             </Grid.Column>
         );
     });
