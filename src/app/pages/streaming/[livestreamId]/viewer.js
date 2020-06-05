@@ -255,14 +255,14 @@ function ViewerPage(props) {
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none'), position: 'absolute', top: '150px', width: '100%', height: 'calc(100% - 150px)', backgroundColor: 'rgb(30,30,30)'}}>
                     <LivestreamPdfViewer livestreamId={currentLivestream.id} presenter={false}/>
                 </div> 
-                <div className={'reactions-sender ' + (initalReactionSent ? 'hidden' : '')}>
+                {/* <div className={'reactions-sender ' + (initalReactionSent ? 'hidden' : '')}>
                     <div style={{ fontSize: '2em', margin: '0 0 40px 0'}}>How about saying hello?</div>
                     <Grid textAlign='center'>
                         { reactionElements }
                     </Grid>
                     <div onClick={() => setInitialReactionSent(true)} style={{ margin: '15px 0 0 0', fontSize: '0.9em', fontWeight: '300', textDecoration: 'underline', cursor: 'pointer' }}>No, I am here undercover!</div>
                     <Icon onClick={() => setInitialReactionSent(true)}  name='delete' size='large' style={{ position: 'absolute', top: '20px', right: '20px', color: 'white', cursor: 'pointer'}} />
-                </div>
+                </div> */}
             </div>  
             <div className='video-menu'>
                 <div  className='video-menu-input'>
