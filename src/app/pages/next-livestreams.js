@@ -268,7 +268,7 @@ function Calendar(props) {
             <div className='mentor-list'>
                 <Container>
                     <div style={{ textAlign: 'center', margin: '10px 0' }}>
-                    <Button size='big' content={ 'How Live Streams Work' } icon={ 'cog' } style={{ margin: '5px auto' }} onClick={() => goToSeparateRoute('/howitworks')} color='pink'/>
+                    <Button size='big' content={ 'How Live Streams Work' } icon={ 'cog' } style={{ margin: '5px auto' }} onClick={() => goToSeparateRoute('/howitworks')}/>
                     </div>
                     <SizeMe>{ ({ size }) => (
                         <StackGrid
@@ -279,6 +279,12 @@ function Calendar(props) {
                             { mentorElements }
                         </StackGrid>
                     )}</SizeMe>
+                    <div className={'empty-livestreams-message ' + (livestreams.length > 0 ? 'hidden' : '')}>
+                        <div>
+                            Exciting streams coming&nbsp;soon!
+                        </div>
+                        <Button primary size='huge' content='Check out our past events' onClick={() => router.push('/discover')}/>
+                    </div>
                 </Container>
             </div>
             <div className='grey-container'>
@@ -1052,6 +1058,15 @@ function Calendar(props) {
                     box-shadow: 0 0 2px white;
                     display: inline-block;
                     background-size: cover;
+                }
+
+                .empty-livestreams-message {
+                    text-align: center;
+                    padding: 100px 0;
+                    color: rgb(80,80,80);
+                    font-family: 'Permanent Marker';
+                    font-size: 5em;
+                    line-height: 1em;
                 }
 
                 #preview-button {
