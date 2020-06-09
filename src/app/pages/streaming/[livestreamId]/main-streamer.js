@@ -112,27 +112,12 @@ function StreamingPage(props) {
     }, [audioLevels]);
 
     useEffect(() => {
-        if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
-            setAudioSource(devices.audioInputList[0].value);
-        }
-        if (!videoSource && devices.videoDeviceList && devices.videoDeviceList.length > 0) {
-            setVideoSource(devices.videoDeviceList[0].value);
-        }
-    },[devices]);
-
-    useEffect(() => {
         if (isStreaming) {
             setLiveSpeakerConnected(registeredSpeaker);
         } else {
             setLiveSpeakerDisconnected(registeredSpeaker.id);
         }
     },[isStreaming]);
-
-    useEffect(() => {
-        setTimeout(() => {
-            console.log(audioLevels);
-        }, 2000);
-    },[audioLevels]);
 
     useEffect(() => {
         if (livestreamId) {
@@ -270,10 +255,10 @@ function StreamingPage(props) {
             </div>
             <div className='black-frame'>
                 <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
-                    <CurrentSpeakerDisplayer isPlayMode={false} localId={livestreamId} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={speakingLivestreamId}/>
+                    <CurrentSpeakerDisplayer isPlayMode={false} localId={livestreamId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={speakingLivestreamId}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
-                    <SmallStreamerVideoDisplayer streams={externalMediaStreams} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={true}/>
+                    <SmallStreamerVideoDisplayer localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={true}/>
                 </div>
                 <div className='button-container'>         
                     <Grid centered className='middle aligned'>

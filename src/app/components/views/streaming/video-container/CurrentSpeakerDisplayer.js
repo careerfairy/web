@@ -2,24 +2,15 @@ import React, {useEffect, Fragment, useRef, useState} from 'react';
 import {Grid} from "semantic-ui-react";
 import RemoteVideoContainer from './RemoteVideoContainer';
 
-function StreamerVideoDisplayer(props) {
+function CurrentSpeakerDisplayer(props) {
 
     const localVideoRef = useRef(null);
-    const [localStream, setLocalStream] = useState(null);
-    
-    useEffect(() => {
-        if (!props.isPlayMode && !localStream && props.mediaConstraints) {
-            navigator.mediaDevices.getUserMedia(props.mediaConstraints).then( stream => {
-                setLocalStream(stream);
-            });
-        }
-    },[props.mediaConstraints, localVideoRef.current]);
 
     useEffect(() => {
-        if (!props.isPlayMode && localStream && !localVideoRef.current.srcObject) {
-            localVideoRef.current.srcObject = localStream;
+        if (!props.isPlayMode && props.localStream) {
+            localVideoRef.current.srcObject = props.localStream;
         }
-    },[localStream]);
+    },[props.localStream]);
 
     function getVideoContainerWidth(streamId) {
         if (streamId === props.currentSpeaker) {
@@ -35,13 +26,25 @@ function StreamerVideoDisplayer(props) {
     function getVideoContainerHeight(streamId) {
         if (props.isPlayMode) {
             if (props.streams.length > 1) {
-                return streamId === props.currentSpeaker ? 'calc(80vh - 160px)' : '20vh';
+                if (streamId === props.currentSpeaker) {
+                    return 'calc(80vh - 160px)';
+                } else if (props.streams.length > 5) {
+                    return '10vh';
+                } else {
+                    return '20vh';
+                }
             } else {
                 return 'calc(100vh - 160px)';
             }
         } else {
             if (props.streams.length > 0) {
-                return streamId === props.currentSpeaker ? 'calc(80vh - 75px)' : '20vh';
+                if (streamId === props.currentSpeaker) {
+                    return 'calc(80vh - 75px)';
+                } else if (props.streams.length > 4) {
+                    return '10vh';
+                } else {
+                    return '20vh';
+                }
             } else {
                 return 'calc(100vh - 75px)';
             }
@@ -166,4 +169,4 @@ function StreamerVideoDisplayer(props) {
     );
 }
 
-export default StreamerVideoDisplayer;
+export default CurrentSpeakerDisplayer;

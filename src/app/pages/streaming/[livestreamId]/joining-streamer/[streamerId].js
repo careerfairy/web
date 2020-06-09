@@ -110,15 +110,6 @@ function StreamingPage(props) {
     }, [audioLevels]);
 
     useEffect(() => {
-        if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
-            setAudioSource(devices.audioInputList[0].value);
-        }
-        if (!videoSource && devices.videoDeviceList && devices.videoDeviceList.length > 0) {
-            setVideoSource(devices.videoDeviceList[0].value);
-        }
-    },[devices]);
-
-    useEffect(() => {
         if (isStreaming) {
             setLiveSpeakerConnected();
         } else {
@@ -246,7 +237,7 @@ function StreamingPage(props) {
             </div>
             <div className='black-frame'>
                 <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
-                    <CurrentSpeakerDisplayer isPlayMode={false} localId={streamerId} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={speakingLivestreamId}/>
+                    <CurrentSpeakerDisplayer isPlayMode={false} localId={streamerId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={speakingLivestreamId}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
                     <SmallStreamerVideoDisplayer localStream={localStream} streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={false}/>
