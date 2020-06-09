@@ -237,9 +237,19 @@ function ViewerPage(props) {
             })
     }
 
-    let initialReactions = currentLivestream.language === 'DE' ? ['Hallo!', 'Hoi zäme', 'Hi! :-)'] : ['Hello!', 'Hi everyone!', 'How do you do?'];
+    function getInitialReactions() {
+        if (currentLivestream.language === "CH") {
+            return ['Hallo!', 'Hoi zäme', 'Hi! :-)'];
+        } 
+        if (currentLivestream.language === "DE") {
+            return ['Hallo!', 'Guten Tag!', 'Hi! :-)'];
+        }
+        else {
+            return ['Hello!', 'Hi everyone!', 'How do you do?'];
+        }
+    }
 
-    let reactionElements = initialReactions.map((reaction, index) => {
+    let reactionElements = getInitialReactions().map((reaction, index) => {
         return (
             <Grid.Column width={5} key={index}>
                 <div onClick={() => {sendInstantReaction(reaction); setInitialReactionSent(true);}} style={{ cursor: 'pointer', position: 'relative', backgroundColor: 'white', color: 'grey', padding: '20px', borderRadius: '20px', textAlign: 'left' }}>
@@ -262,9 +272,9 @@ function ViewerPage(props) {
                     <Image src={ polyefair_logo } style={{ maxWidth: '150px', maxHeight: '50px', display: isUniversityLivestream("polyefair") ? 'inline-block' : 'none' }}/>
                     <div style={{ position: 'absolute', bottom: '13px', left: '120px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
                 </div>
-                <div className='top-menu-right'>
+                <div className={'top-menu-right'}>
                     <Image src={ currentLivestream.companyLogoUrl } style={{ position: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block', margin: '0 10px'}}/>
-                    <Button size='big' content={ userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'} icon={ userIsInTalentPool ? 'delete' : 'handshake outline'} onClick={ userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()} primary={!userIsInTalentPool}/> 
+                    <Button style={{ display: currentLivestream.hasNoTalentPool ? 'none' : 'inline-block' }}size='big' content={ userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'} icon={ userIsInTalentPool ? 'delete' : 'handshake outline'} onClick={ userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()} primary={!userIsInTalentPool}/> 
                 </div>
             </div>
             <div className='black-frame'>
@@ -277,14 +287,14 @@ function ViewerPage(props) {
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none'), position: 'absolute', top: '150px', width: '100%', height: 'calc(100% - 150px)', backgroundColor: 'rgb(30,30,30)'}}>
                     <LivestreamPdfViewer livestreamId={currentLivestream.id} presenter={false}/>
                 </div> 
-                <div className={'reactions-sender ' + (initalReactionSent ? 'hidden' : '')}>
+                {/* <div className={'reactions-sender ' + (initalReactionSent ? 'hidden' : '')}>
                     <div style={{ fontSize: '2em', margin: '0 0 40px 0'}}>How about saying hello?</div>
                     <Grid textAlign='center'>
                         { reactionElements }
                     </Grid>
                     <div onClick={() => setInitialReactionSent(true)} style={{ margin: '15px 0 0 0', fontSize: '0.9em', fontWeight: '300', textDecoration: 'underline', cursor: 'pointer' }}>No, I am here undercover!</div>
                     <Icon onClick={() => setInitialReactionSent(true)}  name='delete' size='large' style={{ position: 'absolute', top: '20px', right: '20px', color: 'white', cursor: 'pointer'}} />
-                </div>
+                </div> */}
             </div>  
             <div className='video-menu'>
                 <div  className='video-menu-input'>

@@ -203,7 +203,7 @@ function LandingPage(props) {
                             <h1>Ask questions. Get hired.</h1>
                             <h1></h1>
                             <div className=''>
-                                <Link href='/next-livestreams'><a><Button primary size='big'>See Next Events</Button></a></Link>
+                                <Link href='/discover'><a><Button primary size='big'>See Latest Events</Button></a></Link>
                             </div>
                         </div>
                         <div  className='previewLogos'>

@@ -5,21 +5,12 @@ import RemoteVideoContainer from './RemoteVideoContainer';
 function StreamerVideoDisplayer(props) {
 
     const localVideoRef = useRef(null);
-    const [localStream, setLocalStream] = useState(null);
-    
-    useEffect(() => {
-        if (!props.isPlayMode && !localStream && props.mediaConstraints) {
-            navigator.mediaDevices.getUserMedia(props.mediaConstraints).then( stream => {
-                setLocalStream(stream);
-            });
-        }
-    },[props.mediaConstraints, localVideoRef.current]);
 
     useEffect(() => {
-        if (!props.isPlayMode && localStream && !localVideoRef.current.srcObject) {
-            localVideoRef.current.srcObject = localStream;
+        if (!props.isPlayMode && props.localStream) {
+            localVideoRef.current.srcObject = props.localStream;
         }
-    },[localStream]);
+    },[props.localStream]);
 
     function getVideoContainerWidth() {
         if (props.isPlayMode) {
@@ -36,6 +27,33 @@ function StreamerVideoDisplayer(props) {
             return props.streams.length > 2 ? 'calc(50vh - 80px)' : 'calc(100vh - 160px)';
         }
     } 
+
+    let localVideoElement =
+        <Grid.Column width={getVideoContainerWidth()} style={{ padding: 0 }} key={"localVideoId"}>
+            <div className='video-container' style={{ height: getVideoContainerHeight() }}>
+                <video id="localVideo" ref={localVideoRef} muted autoPlay width={ props.streams.length > 1 ? '' : '100%' } style={{ right: (props.streams.length > 0) ? '0' : '', bottom: (props.streams.length > 1) ? '0' : '' }}></video> 
+            </div>
+            <style jsx>{`
+               .video-container {
+                    position: relative;
+                    background-color: black;    
+                    width: 100%; 
+                    margin: 0 auto;
+                    z-index: -9999;
+                }
+
+                #localVideo {
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    max-height: 100%;
+                    max-width: 100%;
+                    height: auto;
+                    z-index: 9900;
+                    background-color: black;
+                }
+          `}</style>
+        </Grid.Column>;
 
     let externalVideoElements = props.streams.map( (stream, index) => {
         return (
