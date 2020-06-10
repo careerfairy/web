@@ -30,6 +30,9 @@ export const UNIVERSITY_NAMES = [
         text: "TU Wien",
         value: "technischeuniwien"
     },{
+        text: "Schweizerische Eidgenossenschaft",
+        value: "schweizerischeeidgenossenschaft"
+    },{
         text: "Other Institution",
         value: "othe"
     }

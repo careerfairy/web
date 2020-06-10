@@ -8,5 +8,8 @@ export const STUDY_LEVELS = [
     },{
         text: "PhD",
         value: "PHD"
+    },{
+        text: "Other",
+        value: "OTHER"
     }
 ];

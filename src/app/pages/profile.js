@@ -178,21 +178,21 @@ const UserProfile = (props) => {
                                 </Form.Group>
                                 <Form.Group widths='equal'>
                                     <Form.Field>
-                                        <label>Select your place of study</label>
+                                        <label>Organisation</label>
                                         <Dropdown placeholder='Select University' value={values.university} onChange={(event, {value}) => { setFieldValue('university', value, true); updateSelectFields(value); setFieldValue('fieldOfStudy', null, false)}} compact selection options={universities}/>
                                         <div className='field-error'>
                                             {errors.university && touched.university && errors.university}
                                         </div>
                                     </Form.Field>
                                     <Form.Field>
-                                        <label>Select your field of expertise</label>
+                                        <label>Field</label>
                                         <Dropdown placeholder='Select Field of Study' value={values.fieldOfStudy} onChange={(event, {value}) => { setFieldValue('fieldOfStudy', value, true) }} compact selection options={selectField}/>
                                         <div className='field-error'>
                                             {errors.university && touched.university && errors.university}
                                         </div>
                                     </Form.Field>
                                     <Form.Field>
-                                        <label>Select your level of study</label>
+                                        <label>Level of study</label>
                                         <Dropdown placeholder='Select Field of Study' value={values.levelOfStudy} onChange={(event, {value}) => { setFieldValue('levelOfStudy', value, true) }} compact selection options={levels}/>
                                         <div className='field-error'>
                                             {errors.university && touched.university && errors.university}
