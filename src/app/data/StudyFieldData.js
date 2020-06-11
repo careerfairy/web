@@ -261,5 +261,8 @@ export const UNIVERSITY_SUBJECTS = [
         },{
             text: "Mechanical Engineering - Economics",
             value: "MECHECO"
+        },{
+            text: "Hochschulpraktikant",
+            value: "MEMBER"
         }
     ];

@@ -37,6 +37,8 @@ function Calendar(props) {
     const [grid, setGrid] = useState(null);
     const [allLivestreams, setAllLivestreams] = useState([]);
     const [livestreams, setLivestreams] = useState([]);
+    const [noLivestreamsPresent, setNoLivestreamsPresent] = useState(false);
+
     const [fields, setFields] = useState([]);
     const [showAllFields, setShowAllFields] = useState(false);
     const [cookieMessageVisible, setCookieMessageVisible] = useState(true);
@@ -91,11 +93,17 @@ function Calendar(props) {
                 livestream.id = doc.id;
                 livestreams.push(livestream);
             });
-
             if (university) {
+                if (livestreams.length === 0) {
+                    setNoLivestreamsPresent(true);
+                }
                 setAllLivestreams(livestreams);
             } else {
-                setAllLivestreams(livestreams.filter( livestream => !livestream.hidden || livestream.hidden === false));
+                let filteredStreams = livestreams.filter( livestream => !livestream.hidden || livestream.hidden === false);
+                if (filteredStreams.length === 0) {
+                    setNoLivestreamsPresent(true);
+                }
+                setAllLivestreams(filteredStreams);
             }
         }, error => {
             console.log(error);
@@ -279,7 +287,7 @@ function Calendar(props) {
                             { mentorElements }
                         </StackGrid>
                     )}</SizeMe>
-                    <div className={'empty-livestreams-message ' + (livestreams.length > 0 ? 'hidden' : '')}>
+                    <div className={'empty-livestreams-message ' + ( !noLivestreamsPresent ? 'hidden' : '')}>
                         <div>
                             Exciting streams coming&nbsp;soon!
                         </div>

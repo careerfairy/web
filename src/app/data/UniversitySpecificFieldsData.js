@@ -444,9 +444,9 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
             text: "Urban and Regional Planning",
             value: "URBANA"
         }
-    ], schweizerischeeidgenossenschaft: [
+    ], chbundesverwaltung: [
         {
-            text: "Member",
+            text: "Hochschulpraktikant",
             value: "MEMBER"
         }
     ]
