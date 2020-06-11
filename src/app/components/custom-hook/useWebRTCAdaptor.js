@@ -47,6 +47,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
     useEffect(() => {
         if (removedStream) {
             setExternalMediaStreams(removeStreamFromList(removedStream, externalMediaStreams));
+            setAudioLevels(removeStreamFromList(removedStream, audioLevels));
         }
     }, [removedStream]);
 
