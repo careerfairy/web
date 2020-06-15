@@ -264,5 +264,101 @@ export const UNIVERSITY_SUBJECTS = [
         },{
             text: "Hochschulpraktikant",
             value: "MEMBER"
+        },{
+            text: "Architektur",
+            value: "ARCHI"
+        },{
+            text: "Bauingenieurwesen",
+            value: "BAUINGEN"
+        },{
+            text: "Elektrotechnik",
+            value: "ELEKTRO"
+        },{
+            text: "Informatik",
+            value: "INFORMATIK"
+        },{
+            text: "Informatik, Wirtschaftsinformatik",
+            value: "INFORMATIKUNDWIRT"
+        },{
+            text: "Informationssystemtechnik",
+            value: "INFSYSTTECH"
+        },{
+            text: "Maschinenbau",
+            value: "MASCH"
+        },{
+            text: "Mechatronik",
+            value: "MECHATR"
+        },{
+            text: "Regenerative Energiesysteme",
+            value: "REGEN"
+        },{
+            text: "Verfahrenstechnik und Naturstofftechnik",
+            value: "VERFAHR"
+        },{
+            text: "Verkehrsingenieurwesen",
+            value: "VERKEHRSING"
+        },{
+            text: "Werkstoffwissenschaft",
+            value: "WERKSTOFF"
+        },{
+            text: "Wirtschaftsingenieurwesen",
+            value: "WIRTSCHING"
+        },{
+            text: "Chemie, Lebensmittelchemie",
+            value: "CHEMLEBENS"
+        },{
+            text: "Evangelische Theologie",
+            value: "EVANG"
+        },{
+            text: "Geschichte, Kunst- und Musikwissenschaft",
+            value: "GESCHKUNSTMUSIK"
+        },{
+            text: "Hydrowissenschaften",
+            value: "HYDRO"
+        },{
+            text: "Katholische Theologie",
+            value: "KATHO"
+        },{
+            text: "Kommunikationswissenschaft",
+            value: "KOMMU"
+        },{
+            text: "Mathematik",
+            value: "MATHEMATIK"
+        },{
+            text: "Molekulare Biologie und Biotechnologie",
+            value: "MOLEKU"
+        },{
+            text: "Philosophie",
+            value: "PHILO"
+        },{
+            text: "Physik",
+            value: "PHYSIK"
+        },{
+            text: "Politikwissenschaft",
+            value: "POLITIK"
+        },{
+            text: "Psychologie",
+            value: "PSYCHOLO"
+        },{
+            text: "Sozialpädagogik",
+            value: "SOZIAL"
+        },{
+            text: "Soziologie",
+            value: "SOZIOLOGIE"
+        },{
+            text: "Sprach-, Literatur- und Kulturwissenschaften",
+            value: "SPRACHLITKULT"
+        },{
+            text: "Wirtschaftsmathematik",
+            value: "WIRTMAT"
+        },{
+            text: "Wirtschaftspädagogik",
+            value: "WIRTPAED"
+        },{
+            text: "Wirtschaftswissenschaften",
+            value: "WIRTWISS"
+        },{
+            text: "Medieninformatik",
+            value: "MEDINF"
         }
     ];
