@@ -23,9 +23,9 @@ const UserCategorySelector = (props) => {
     }
 
     return (
-        <div>
-            <label style={{ marginBottom: '10px', textTransform: "uppercase", fontSize: '0.8em', fontWeight: '700', color: 'rgb(0, 210, 170)'}}>{ props.category.name }</label>
-            <Dropdown value={getCategoryCurrentValue()} onChange={(event, {value}) => { props.updateValue(value) }} options={props.category.elements.map( element => { return { text: element.name, value: element.id }; })} selection fluid/>
+        <div style={{ textAlign: 'center' }}>
+            <label style={{ display: 'block', marginBottom: '10px', textTransform: "uppercase", fontSize: '0.8em', fontWeight: '700', color: 'rgb(0, 210, 170)'}}>{ props.category.name }</label>
+            <Dropdown value={getCategoryCurrentValue()} style={{ width: '80%' }} onChange={(event, {value}) => { props.updateValue(value) }} options={props.category.elements.map( element => { return { text: element.name, value: element.id }; })} selection/>
         </div>
     )
 };

@@ -67,7 +67,7 @@ const GroupJoinModal = (props) => {
     let categorySelectors = categoriesWithElements.map( category => {
         return (
             <Grid.Column key={ category.id } width={8}>
-                <div style={{ margin: '15px 0' }}>   
+                <div style={{ margin: '15px 0', textAlign: 'left' }}>   
                     <UserCategorySelector userData={props.userData} group={props.group} category={category} updateValue={(valueId) => setCategoryValue(category.id, valueId)}/>
                 </div>
             </Grid.Column>     
@@ -76,18 +76,24 @@ const GroupJoinModal = (props) => {
     
     return (
         <Fragment>
-            <Modal open={props.open}>
-                <Modal.Header>
-                    Join this group
-                </Modal.Header>
+            <Modal open={props.open} style={{ textAlign: 'center'}} onClose={props.closeModal}>
                 <Modal.Content>
-                    <Image src={props.group.logoUrl} style={{ maxWidth: '200px', margin: '0 auto', maxHeight: '100px' }}/>
+                    <h5 className={'header'}>Follow live streams from</h5>
+                    <div style={{ position: 'relative', minHeight: '150px'}}>
+                        <Image src={props.group.logoUrl} style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', maxWidth: '250px', width: '35%', maxHeight: '150px' }}/>
+                    </div>
                     { categorySelectors }
-                    <Button content='Confirm' primary fluid onClick={props.closeModal}/>
+                    <Button content='Join' fluid icon='add' primary size='large' style={{ marginTop: '40px' }} onClick={props.closeModal}/>
+                    <Button content='Cancel' fluid size='small' primary basic style={{ marginTop: '10px' }} onClick={props.closeModal}/>
                 </Modal.Content>
             </Modal>
         <style jsx>{`
-            
+            .header {-
+                text-align: center;
+                margin-bottom: 40px;
+                color: rgb(140,140,140);
+                text-transform: uppercase;
+            }
         `}</style>
         </Fragment>
     );
