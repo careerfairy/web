@@ -15,6 +15,7 @@ function ViewerPage(props) {
     const epfl_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fepfl-career-center.png?alt=media';
     const uzh_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fjobhub.png?alt=media';
     const polyefair_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fpolyefair_logo.png?alt=media';
+    const tuwien_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2FTU%20WIen%20logo.png?alt=media';
 
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
@@ -239,6 +240,7 @@ function ViewerPage(props) {
                     <Image src={ epfl_logo } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: isUniversityLivestream("epflausanne") ? 'inline-block' : 'none' }}/>
                     <Image src={ uzh_logo } style={{ maxWidth: '150px', maxHeight: '50px', display: isUniversityLivestream("unizurich") ? 'inline-block' : 'none' }}/>
                     <Image src={ polyefair_logo } style={{ maxWidth: '150px', maxHeight: '50px', display: isUniversityLivestream("polyefair") ? 'inline-block' : 'none' }}/>
+                    <Image src={ tuwien_logo } style={{ maxWidth: '150px', maxHeight: '50px', display: isUniversityLivestream("technischeuniwien") ? 'inline-block' : 'none' }}/>
                     <div style={{ position: 'absolute', bottom: '13px', left: '120px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
                 </div>
                 <div className={'top-menu-right'}>
