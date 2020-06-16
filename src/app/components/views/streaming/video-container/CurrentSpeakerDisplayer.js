@@ -28,8 +28,6 @@ function CurrentSpeakerDisplayer(props) {
             if (props.streams.length > 1) {
                 if (streamId === props.currentSpeaker) {
                     return 'calc(80vh - 160px)';
-                } else if (props.streams.length > 5) {
-                    return '10vh';
                 } else {
                     return '20vh';
                 }
@@ -40,8 +38,6 @@ function CurrentSpeakerDisplayer(props) {
             if (props.streams.length > 0) {
                 if (streamId === props.currentSpeaker) {
                     return 'calc(80vh - 75px)';
-                } else if (props.streams.length > 4) {
-                    return '10vh';
                 } else {
                     return '20vh';
                 }
@@ -62,13 +58,13 @@ function CurrentSpeakerDisplayer(props) {
     function getVideoContainerClass(streamId) {
         if (props.isPlayMode) {
             if (props.streams.length > 1) {
-                return streamId === props.currentSpeaker ? 'speaker-video' : 'four wide column';
+                return streamId === props.currentSpeaker ? 'speaker-video' : 'quarter-width';
             } else {
                 return 'speaker-video-solo';
             }
         } else {
             if (props.streams.length > 0) {
-                return streamId === props.currentSpeaker ? 'speaker-video' : 'four wide column';
+                return streamId === props.currentSpeaker ? 'speaker-video' : 'quarter-width';
             } else {
                 return 'speaker-video-solo';
             }
@@ -80,6 +76,12 @@ function CurrentSpeakerDisplayer(props) {
             <div className={getVideoContainerClass(stream.streamId)} style={{ padding: 0 }} key={stream.streamId}>
                 <RemoteVideoContainer stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
                 <style jsx>{`
+                    .quarter-width {
+                        width: 25%;
+                        height: 100%;
+                        display: inline-block;
+                    }
+
                     .speaker-video {
                         position: absolute;
                         top: 20vh;
@@ -107,6 +109,12 @@ function CurrentSpeakerDisplayer(props) {
                     <video id="localVideo" ref={localVideoRef} muted autoPlay width={ '100%' } style={{ right: (props.streams.length > 0) ? '0' : '', bottom: (props.streams.length > 1) ? '0' : '' }}></video> 
                 </div>
                 <style jsx>{`
+                    .quarter-width {
+                        width: 25%;
+                        height: 100%;
+                        display: inline-block;
+                    }
+
                     .speaker-video {
                         position: absolute;
                         top: 20vh;
@@ -150,9 +158,9 @@ function CurrentSpeakerDisplayer(props) {
     return (
         <Fragment>
             <div className='relative-container'>
-                <Grid style={{ margin: '0', height: getMinimizedSpeakersGridHeight(), backgroundColor: 'rgb(30,30,30)'}} centered>         
+                <div style={{ margin: '0', height: getMinimizedSpeakersGridHeight(), backgroundColor: 'rgb(30,30,30)', overflow: 'auto' }} centered>         
                     { externalVideoElements }
-                </Grid> 
+                </div> 
             </div>             
             <style jsx>{`
                 .relative-container {
