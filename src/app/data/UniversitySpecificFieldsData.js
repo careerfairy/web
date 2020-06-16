@@ -457,6 +457,9 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
             text: "Bauingenieurwesen",
             value: "BAUINGEN"
         },{
+            text: "Betriebswirtschaftslehre",
+            value: "BETRIEBSWIRT"
+        },{
             text: "Chemie, Lebensmittelchemie",
             value: "CHEMLEBENS"
         },{
@@ -475,7 +478,7 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
             text: "Informatik",
             value: "INFORMATIK"
         },{
-            text: "Informatik, Wirtschaftsinformatik",
+            text: "Wirtschaftsinformatik",
             value: "INFORMATIKUNDWIRT"
         },{
             text: "Informationssystemtechnik",
@@ -531,6 +534,12 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
         },{
             text: "Verkehrsingenieurwesen",
             value: "VERKEHRSING"
+        },{
+            text: "Verkehrswirtschaft",
+            value: "VERKEHRSWIRTSCHAFT"
+        },{
+            text: "Volkswirtschaftslehre",
+            value: "VOLKSWIRTSCHAFTS"
         },{
             text: "Werkstoffwissenschaft",
             value: "WERKSTOFF"
