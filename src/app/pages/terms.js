@@ -15,128 +15,79 @@ function TermsAndConditions(props) {
             <Header color="teal"/>
             <div className='cookies-background'>
                 <Container>
-                <h1>Terms and Conditions</h1>
-                <p>Welcome to CareerFairy!</p>
-
-                <p>These terms and conditions outline the rules and regulations for the use of CareerFairy GmbH's Website, located at https://careerfairy.io.</p>
-
-                <p>By accessing this website we assume you accept these terms and conditions. Do not continue to use CareerFairy if you do not agree to take all of the terms and conditions stated on this page.</p>
-
-                <p>The following terminology applies to these Terms and Conditions, Privacy Statement and Disclaimer Notice and all Agreements: "Client", "You" and "Your" refers to you, the person log on this website and compliant to the Company’s terms and conditions. "The Company", "Ourselves", "We", "Our" and "Us", refers to our Company. "Party", "Parties", or "Us", refers to both the Client and ourselves. All terms refer to the offer, acceptance and consideration of payment necessary to undertake the process of our assistance to the Client in the most appropriate manner for the express purpose of meeting the Client’s needs in respect of provision of the Company’s stated services, in accordance with and subject to, prevailing law of Netherlands. Any use of the above terminology or other words in the singular, plural, capitalization and/or he/she or they, are taken as interchangeable and therefore as referring to same.</p>
-
-                <h3> Cookies </h3>
-
-                <p>We employ the use of cookies. By accessing CareerFairy, you agreed to use cookies in agreement with the CareerFairy GmbH's Privacy Policy.</p>
-
-                <p>Most interactive websites use cookies to let us retrieve the user’s details for each visit. Cookies are used by our website to enable the functionality of certain areas to make it easier for people visiting our website. Some of our affiliate/advertising partners may also use cookies.</p>
-
-                <h3> License  </h3>
-
-                <p>Unless otherwise stated, CareerFairy GmbH and/or its licensors own the intellectual property rights for all material on CareerFairy. All intellectual property rights are reserved. You may access this from CareerFairy for your own personal use subjected to restrictions set in these terms and conditions.</p>
-
-                <p>You must not:</p>
-                <ul>
-                    <li>Republish material from CareerFairy</li>
-                    <li>Sell, rent or sub-license material from CareerFairy</li>
-                    <li>Reproduce, duplicate or copy material from CareerFairy</li>
-                    <li>Redistribute content from CareerFairy</li>
-                </ul>
-
-                <p>This Agreement shall begin on the date hereof.</p>
-
-                <p>Parts of this website offer an opportunity for users to post and exchange opinions and information in certain areas of the website. CareerFairy GmbH does not filter, edit, publish or review Comments prior to their presence on the website. Comments do not reflect the views and opinions of CareerFairy GmbH,its agents and/or affiliates. Comments reflect the views and opinions of the person who post their views and opinions. To the extent permitted by applicable laws, CareerFairy GmbH shall not be liable for the Comments or for any liability, damages or expenses caused and/or suffered as a result of any use of and/or posting of and/or appearance of the Comments on this website.</p>
-
-                <p>CareerFairy GmbH reserves the right to monitor all Comments and to remove any Comments which can be considered inappropriate, offensive or causes breach of these Terms and Conditions.</p>
-
-                <p>You warrant and represent that:</p>
-
-                <ul>
-                    <li>You are entitled to post the Comments on our website and have all necessary licenses and consents to do so;</li>
-                    <li>The Comments do not invade any intellectual property right, including without limitation copyright, patent or trademark of any third party;</li>
-                    <li>The Comments do not contain any defamatory, libelous, offensive, indecent or otherwise unlawful material which is an invasion of privacy</li>
-                    <li>The Comments will not be used to solicit or promote business or custom or present commercial activities or unlawful activity.</li>
-                </ul>
-
-                <p>You hereby grant CareerFairy GmbH a non-exclusive license to use, reproduce, edit and authorize others to use, reproduce and edit any of your Comments in any and all forms, formats or media.</p>
-
-                <h3> Hyperlinking to our Content </h3>
-
-                <p>The following organizations may link to our Website without prior written approval:</p>
-
-                <ul>
-                    <li>Government agencies;</li>
-                    <li>Search engines;</li>
-                    <li>News organizations;</li>
-                    <li>Online directory distributors may link to our Website in the same manner as they hyperlink to the Websites of other listed businesses; and</li>
-                    <li>System wide Accredited Businesses except soliciting non-profit organizations, charity shopping malls, and charity fundraising groups which may not hyperlink to our Web site.</li>
-                </ul>
-
-                <p>These organizations may link to our home page, to publications or to other Website information so long as the link: (a) is not in any way deceptive; (b) does not falsely imply sponsorship, endorsement or approval of the linking party and its products and/or services; and (c) fits within the context of the linking party’s site.</p>
-
-                <p>We may consider and approve other link requests from the following types of organizations:</p>
-
-                <ul>
-                    <li>commonly-known consumer and/or business information sources;</li>
-                    <li>dot.com community sites;</li>
-                    <li>associations or other groups representing charities;</li>
-                    <li>online directory distributors;</li>
-                    <li>internet portals;</li>
-                    <li>accounting, law and consulting firms; and</li>
-                    <li>educational institutions and trade associations.</li>
-                </ul>
-
-                <p>We will approve link requests from these organizations if we decide that: (a) the link would not make us look unfavorably to ourselves or to our accredited businesses; (b) the organization does not have any negative records with us; (c) the benefit to us from the visibility of the hyperlink compensates the absence of CareerFairy GmbH; and (d) the link is in the context of general resource information.</p>
-
-                <p>These organizations may link to our home page so long as the link: (a) is not in any way deceptive; (b) does not falsely imply sponsorship, endorsement or approval of the linking party and its products or services; and (c) fits within the context of the linking party’s site.</p>
-
-                <p>If you are one of the organizations listed in paragraph 2 above and are interested in linking to our website, you must inform us by sending an e-mail to CareerFairy GmbH. Please include your name, your organization name, contact information as well as the URL of your site, a list of any URLs from which you intend to link to our Website, and a list of the URLs on our site to which you would like to link. Wait 2-3 weeks for a response.</p>
-
-                <p>Approved organizations may hyperlink to our Website as follows:</p>
-
-                <ul>
-                    <li>By use of our corporate name; or</li>
-                    <li>By use of the uniform resource locator being linked to; or</li>
-                    <li>By use of any other description of our Website being linked to that makes sense within the context and format of content on the linking party’s site.</li>
-                </ul>
-
-                <p>No use of CareerFairy GmbH's logo or other artwork will be allowed for linking absent a trademark license agreement.</p>
-
-                <h3> iFrames  </h3>
-
-                <p>Without prior approval and written permission, you may not create frames around our Webpages that alter in any way the visual presentation or appearance of our Website.</p>
-
-                <h3> Content Liability  </h3>
-
-                <p>We shall not be hold responsible for any content that appears on your Website. You agree to protect and defend us against all claims that is rising on your Website. No link(s) should appear on any Website that may be interpreted as libelous, obscene or criminal, or which infringes, otherwise violates, or advocates the infringement or other violation of, any third party rights.</p>
-
-                <h3> Your Privacy  </h3>
-
-                <p>Please read <Link href='/privacy'>Privacy Policy</Link></p>
-
-                <h3> Reservation of Rights  </h3>
-
-                <p>We reserve the right to request that you remove all links or any particular link to our Website. You approve to immediately remove all links to our Website upon request. We also reserve the right to amen these terms and conditions and it’s linking policy at any time. By continuously linking to our Website, you agree to be bound to and follow these linking terms and conditions.</p>
-
-                <h3> Removal of links from our website  </h3>
-
-                <p>If you find any link on our Website that is offensive for any reason, you are free to contact and inform us any moment. We will consider requests to remove links but we are not obligated to or so or to respond to you directly.</p>
-
-                <p>We do not ensure that the information on this website is correct, we do not warrant its completeness or accuracy; nor do we promise to ensure that the website remains available or that the material on the website is kept up to date.</p>
-
-                <h3> Disclaimer  </h3>
-
-                <p>To the maximum extent permitted by applicable law, we exclude all representations, warranties and conditions relating to our website and the use of this website. Nothing in this disclaimer will:</p>
-
-                <ul>
-                    <li>limit or exclude our or your liability for death or personal injury;</li>
-                    <li>limit or exclude our or your liability for fraud or fraudulent misrepresentation;</li>
-                    <li>limit any of our or your liabilities in any way that is not permitted under applicable law; or</li>
-                    <li>exclude any of our or your liabilities that may not be excluded under applicable law.</li>
-                </ul>
-
-                <p>The limitations and prohibitions of liability set in this Section and elsewhere in this disclaimer: (a) are subject to the preceding paragraph; and (b) govern all liabilities arising under the disclaimer, including liabilities arising in contract, in tort and for breach of statutory duty.</p>
-
-                <p>As long as the website and the information and services on the website are provided free of charge, we will not be liable for any loss or damage of any nature.</p>
+                    <h1>Terms and Conditions</h1>
+                    <p>Welcome to CareerFairy!  CareerFairy is an online platform that is designed to build a bridge between the new generation of talents and employees at work.  It is owned and operated by CareerFairy GmbH, a Swiss limited liability company, based at Zurlindenstrasse 45, Zurich, Switzerland.  In this Privacy Policy, CareerFairy GmbH will be referred to as “CareerFairy” or “we”, and the user of the website located at <a href='https://careerfairy.io'>https://careerfairy.io</a> (CareerFairy Website) will be referred to as “user” or “you”.</p>
+                    <p>By creating and using an account with us, you are accepting these Terms and Conditions.  Do not continue to use the CareerFairy Website if you do not agree to the Terms and Conditions.</p>
+                    <h2>Age requirement</h2>
+                    <p>You must be at least 18 years old to create an account on the CareerFairy Website.</p>
+                    <h2>Account creation</h2>
+                    <p>To fully use the CareerFairy Website, you will need to create an account by providing your name, password, valid email address, study subject, first name, university. You must have agreed to these Terms and Conditions, including the <a href='https://careerfairy.io/privacy'>privacy policy</a>, before you create an account with us.  You must provide accurate registration information to us and notify us, by updating your account, if your information changes.</p>
+                    <h2>Account security </h2>
+                    <p>You are responsible for all activity that occurs in your account on the CareerFairy Website. You must not allow others to use your account credentials and you must safeguard the confidentiality of those credentials. If you are using a computer that others have access to, you must log out of your account after using the CareerFairy Website. If you become aware of someone gaining unauthorised access to your account, you must change your password and notify us immediately at <a href='mailto:privacy@careerfairy.io'>privacy@careerfairy.io</a>.</p>
+                    <p>If you forget your password and are unable to access your account, please reset your password <a href='https://www.careerfairy.io/reset-password'>here</a>.</p>
+                    <p>For detailed information about the steps we take to keep your account secure, please refer to our <a href='https://careerfairy.io/privacy'>privacy policy</a>.</p>
+                    <h2>Account deletion</h2>
+                    <p>You may request the deletion of your account by contacting us at <a href='mailto:privacy@careerfairy.io'>privacy@careerfairy.io</a> at any time.</p>
+                    <p>If your account is inactive for a period of 24 months we will email you a request to log in.  If you do not respond to the email request within 12 weeks we will delete your account.</p>
+                    <p>If we discover that you have breached these Terms and Conditions in any way, we may delete your account, without incurring any kind of liability to you.</p>
+                    <h2>Cookies</h2>
+                    <p>The CareerFairy Website uses cookies.  For more details about the way we use cookies, please read our <a href='https://careerfairy.io/privacy'>privacy policy</a>.</p>
+                    <h2>Intellectual property</h2>
+                    <p>Unless otherwise stated, CareerFairy and/or its licensors own the intellectual property rights for all material that you will find on the CareerFairy Website. CareerFairy grants you a limited, non-exclusive licence to use the CareerFairy Website, subject to these Terms and Conditions.</p>
+                    <p>You must not:</p>
+                    <ul>
+                        <li>Republish material from the CareerFairy Website</li>
+                        <li>Sell, rent or sub-license material from the CareerFairy Website</li>
+                        <li>Reproduce, redistribute, or create derivative works from the CareerFairy Website</li>
+                        <li>Decompile, reverse engineer or disassemble the CareerFairy Website or its source code</li>
+                        <li>Attempt to circumvent or interfere with any of our technical or security measures</li>
+                    </ul>
+                    <h2>Service modifications</h2>
+                    <p>We reserve the right to modify the CareerFairy Website at any time to make improvements and to comply with applicable laws.  This may include removing recordings of livestreams from the CareerFairy Website, moving recordings to a different part of the CareerFairy Website, and showing only selected parts of a livestream.</p>
+                    <h2>Access to CareerFairy Website</h2>
+                    <p>You are responsible for providing your own access (e.g., computer, mobile device, Internet connection, etc.) to the CareerFairy Website.</p>
+                    <h2>Availability of the CareerFairy Website</h2>
+                    <p>We aim to provide a seamless service, but we cannot guarantee uninterrupted availability of the CareerFairy Website.  In addition, we cannot guarantee any of the following:</p>
+                    <ul>
+                        <li>that the CareerFairy Website will be error-free;</li>
+                        <li>that it will be legal for you to access the CareerFairy Website or to create an account on the CareerFairy Website in your country of residence</li>
+                        <li>that you will be contacted by a recruiter if you join a company’s talent pool on CareerFairy</li>
+                        <li>that the CareerFairy Website will enable you to find a job</li>
+                        <li>that livestreams you have seen on previous visits to the CareerFairy Website will always be available</li>
+                    </ul>
+                    <p>You can choose not to provide us with personal data, but then you will not be able to create an account, upload your CV, be notified of scheduled livestreams or rewatch past livestreams.</p>
+                    <h2>Managing personal data</h2>
+                    <p>If you would like to update or your profile information, you can do so by directly amending the information in the “My Profile” section of your account. If you would like to delete your personal data or permanently delete your account, you can do so by contacting us by email at privacy@careerfairy.io</p>
+                    <h2>Storing personal data</h2>
+                    <p>We will keep and use your personal data for as long as we need to for compliance with our legal obligations, to resolve disputes, and enforce our agreements.</p>
+                    <p>Any data we do hold onto will be anonymous. Any personally identifiable information such as your name and e-mail address will be deleted after a defined period. The rest of the data is therefore anonymous and will be used to analyse general market and website trends but without an identifiable personal information.</p>
+                    <p>When creating an account on CareerFairy, we will hold on to your personal data for a maximum duration of 36 months after your last participation in a Career Live Stream, as most students will have completed their studies by then. After this period, we will delete your personal data and your personal account.</p>
+                    <h2>Use and processing of collected data</h2>
+                    <p>The personal data we hold about you is collected directly from you.  We may use it for the following purposes:</p>
+                    <ul>
+                    <li>To create and manage your account on the CareerFairy Website</li>
+                    <li>To send you information about forthcoming livestream events</li>
+                    <li>To respond to your enquiries and offer support</li>
+                    <li>To request your feedback on our service</li>
+                    <li>To improve your user experience</li>
+                    <li>To ensure that your account is kept up to date</li>
+                    <li>To provide information about you to potential employers, with your permission</li>
+                    </ul>
+                    <h2>Disclaimer</h2>
+                    <p>The services we provide on the CareerFairy Website are free of charge.  You use the CareerFairy Website at your own risk.</p>       
+                    <h2>Your Privacy</h2>
+                    <p>Please read our <a href='https://careerfairy.io/privacy'>privacy policy</a> which explains how we protect your privacy.</p>
+                    <h2>For companies</h2>
+                    <h4>Expiration of booked events</h4>
+                    <p>A Career Live Stream must be carried out within a period of 12 months after the order is placed (date of the acceptance of the offer). After this period has expired, the Career Live Stream can no longer be carried out.</p>       
+                    <h4>Minimum number of participants</h4>
+                    <p>CareerFairy and the university Career Centers can under no circumstances guarantee a minimum number of registered or participating students during the Career Live Stream. The availability of specific dates for the Career Live Stream must be agreed upon with CareerFairy at least 20 days prior to the planned event.</p>       
+                    <h4>Change of dates</h4>
+                    <p>A change of the date of the Career Live Stream is possible and free of charge as long as no notification regarding the date of the event has been sent to the students. As soon as students are made aware of the date of the Career Live Stream, CHF 300 will be charged in addition. </p>       
+                    <h4>Cancellation fees</h4>
+                    <p>If the company cancels the order, the following costs are incurred:</p>       
+                    <p>- Cancellation fees before a nfication from a Career Center regarding the date of the Career Live Stream has been sent to the students: CHF 0.</p>       
+                    <p>- Cancellation costs after a notification from a Career Center regarding the date of the Career Live Stream of the company has been sent to the students: 100% of the price of the selected Career Live Stream.</p>       
                 </Container>
             </div>
             <style jsx>{`
