@@ -77,7 +77,7 @@ function CurrentSpeakerDisplayer(props) {
                 <RemoteVideoContainer stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
                 <style jsx>{`
                     .quarter-width {
-                        width: 25%;
+                        width: 350px;
                         height: 100%;
                         display: inline-block;
                     }
@@ -110,7 +110,7 @@ function CurrentSpeakerDisplayer(props) {
                 </div>
                 <style jsx>{`
                     .quarter-width {
-                        width: 25%;
+                        width: 350px;
                         height: 100%;
                         display: inline-block;
                     }
@@ -158,7 +158,7 @@ function CurrentSpeakerDisplayer(props) {
     return (
         <Fragment>
             <div className='relative-container'>
-                <div style={{ margin: '0', height: getMinimizedSpeakersGridHeight(), backgroundColor: 'rgb(30,30,30)', overflow: 'auto' }} centered>         
+                <div style={{ margin: '0', height: getMinimizedSpeakersGridHeight(), backgroundColor: 'rgb(30,30,30)', overflowX: 'scroll', overflowY: 'hidden', whiteSpace: 'nowrap' }} centered>         
                     { externalVideoElements }
                 </div> 
             </div>             
