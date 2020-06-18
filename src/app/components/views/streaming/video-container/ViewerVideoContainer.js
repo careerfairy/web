@@ -129,7 +129,7 @@ function ViewerVideoContainer(props) {
     return (
         <Fragment>
             <div className='videoContainer' style={{ height: props.height }}>
-                <video id={'videoElement' + props.streamer.id} className='videoElement' width={ props.length > 1 ? '' : '100%' } muted={!props.hasStarted} controls={true} style={{  left: (props.index % 2 === 0) ? '0' : '', right: (props.index % 2 === 1) ? '0' : '', opacity: isPlaying ? 1 : 0}}/>
+                <video id={'videoElement' + props.streamer.id} className='videoElement' width={ props.length > 1 ? '' : '100%' } muted={!props.hasStarted} controls={true} style={{  left: (props.index % 2 === 0) ? '0' : '', right: (props.index % 2 === 1) ? '0' : '', opacity: isPlaying ? 1 : 0}} playsInline/>
                 <div className={(showPlayButton ? 'playButton' : 'hidden')}><Icon name='play' onClick={() => playVideo()}/></div>
                 <div className={'connecting-overlay ' + (props.hasStarted && isPlaying ? 'hidden' : '')}>
                     <div className='connecting-overlay-content'>
@@ -165,16 +165,17 @@ function ViewerVideoContainer(props) {
                     background-color: black;
                     width: 100%;
                     margin: 0 auto;
+                    overflow: hidden;
                }
 
                .videoElement {
                     position: absolute;
                     top: 50%;
+                    left: 0;
                     transform: translateY(-50%);
-                    max-height: 100%;
-                    max-width: 100%;
-                    height: auto;
-                    background-color: black;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
                }
 
                .playButton {

@@ -1,13 +1,37 @@
 import React, {useState, useEffect} from 'react';
-import {Input, Icon, Button, Label, Modal} from "semantic-ui-react";
+import {Input, Icon, Button, Header, Modal} from "semantic-ui-react";
 
 import QuestionContainer from './question-container/QuestionContainer';
 
 import { withFirebase } from '../../../../data/firebase';
 import { animateScroll } from 'react-scroll';
+import { setNestedObjectValues } from 'formik';
 
 function CommentContainer(props) {
     const [showNextQuestions, setShowNextQuestions] = useState(true);
+    const [showQuestionModal, setShowQuestionModal] = useState(false);
+
+    const [newQuestionTitle, setNewQuestionTitle] = useState("");
+
+    function addNewQuestion() {
+        if (!props.userData ||!(newQuestionTitle.trim()) || newQuestionTitle.trim().length < 5) {
+            return;
+        }
+
+        const newQuestion = {
+            title: newQuestionTitle,
+            votes: 0,
+            type: "new",
+            author: !props.livestream.test ? props.user.email : 'test@careerfairy.io'
+        }
+        props.firebase.putLivestreamQuestion(props.livestream.id, newQuestion)
+            .then(() => {
+                setNewQuestionTitle("");
+                setShowQuestionModal(false);
+            }, () => {
+                console.log("Error");
+        })
+    }
 
     let upcomingQuestionsElements = props.upcomingQuestions.map((question, index) => {
         return (
@@ -31,6 +55,7 @@ function CommentContainer(props) {
                 <div className='questionToggleTitle'>
                     Questions
                 </div>
+                <Button content='Add a Question' icon='add' style={{ position: 'absolute', top: '45px', left: '50%', transform: 'translateX(-50%)'}} primary onClick={() => setShowQuestionModal(true)}/> 
                 <div className='questionToggleSwitches'>
                     <div className={'questionToggleSwitch ' + (showNextQuestions ? 'active'  : '')} onClick={() => setShowNextQuestions(true)}>
                         Upcoming [{ props.upcomingQuestions.length }]
@@ -48,10 +73,25 @@ function CommentContainer(props) {
                     { pastQuestionsElements }
                 </div>
             </div>
+            <Modal open={showQuestionModal} basic size='small'>
+                <Header content='Add a Question'/>
+                <Modal.Content>
+                    <Input type='text' size='huge' value={newQuestionTitle} onChange={(event, element) => {setNewQuestionTitle(element.value)}} placeholder='Your question goes here' fluid />
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button primary size='large' onClick={() => addNewQuestion()}>
+                        Submit
+                    </Button>
+                    <Button size='large' onClick={() => setShowQuestionModal(false)}>
+                        Cancel
+                    </Button>
+                </Modal.Actions>
+            </Modal>
             <style jsx>{`
+
                 .questionToggle {
                     position: relative;
-                    height: 100px;
+                    height: 150px;
                     box-shadow: 0 4px 2px -2px rgb(200,200,200);
                     z-index: 9000;
                 }
@@ -84,8 +124,18 @@ function CommentContainer(props) {
                     cursor: pointer;
                 }
 
+                .questionButton {
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    width: 100%;
+                    height: 42px;
+                    box-shadow: 0 -4px 2px -2px rgb(200,200,200);
+                }
+
                 .questionToggleSwitch.active {
-                    background-color: rgb(0, 210, 170);
+                    background-color: rgb(120, 120, 120);
                     color: white;
                     cursor: default;
                 }
@@ -96,7 +146,7 @@ function CommentContainer(props) {
 
                 .chat-container {
                     position: absolute;
-                    top: 100px;
+                    top: 150px;
                     left: 0;
                     bottom: 0;
                     width: 100%;

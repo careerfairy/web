@@ -266,11 +266,6 @@ function ViewerPage(props) {
                     <Icon onClick={() => setInitialReactionSent(true)}  name='delete' size='large' style={{ position: 'absolute', top: '20px', right: '20px', color: 'white', cursor: 'pointer'}} />
                 </div> */}
             </div>  
-            <div className='video-menu'>
-                <div  className='video-menu-input'>
-                        <Input action={{ content: 'Add a Question', color: 'teal', onClick: () => addNewQuestion() }} size='huge' maxLength='140' onKeyPress={addNewQuestionOnEnter} value={newQuestionTitle} fluid placeholder='Add your question...' onChange={(event) => {setNewQuestionTitle(event.target.value)}} />
-                    </div>
-                </div>  
             <div className='video-menu-left'>
                 <NewCommentContainer livestream={ currentLivestream } upcomingQuestions={upcomingQuestions} pastQuestions={pastQuestions} userData={userData}  user={user}/>
             </div>
@@ -292,12 +287,23 @@ function ViewerPage(props) {
                     display: none
                 }
 
+                .topLevelContainer {
+                    position: relative;
+                    min-height: 100vh;
+                }
+
                 .top-menu {
                     background-color: rgba(245,245,245,1);
                     padding: 15px 0;
                     height: 75px;
                     text-align: center;
                     position: relative;
+                }
+
+                @media(max-width: 768px) {
+                    .top-menu {
+                        display: none;
+                    }
                 }
     
                 .top-menu div, .top-menu button {
@@ -375,14 +381,27 @@ function ViewerPage(props) {
                 }
 
                 .black-frame {
-                    position: absolute;
-                    top: 75px;
-                    bottom: 85px;
-                    left: 330px;
-                    width: calc(100% - 330px);
-                    min-width: 700px;
-                    min-height: 600px;
-                    z-index: 10;
+                    z-index: 10;                    
+                }
+
+                @media(max-width: 768px) {
+                    .black-frame {
+                        position: absolute;
+                        width: 100%;
+                        height: 40vh;
+                        top: 0;
+                        left: 0;
+                    }
+                }
+
+                @media(min-width: 768px) {
+                    .black-frame {
+                        position: absolute;
+                        top: 75px;
+                        bottom: 0;
+                        left: 330px;
+                        width: calc(100% - 330px);
+                    }
                 }
 
                 .video-box {
@@ -452,12 +471,27 @@ function ViewerPage(props) {
                 }
 
                 .video-menu-left {
-                    position: absolute;
-                    top: 75px;
-                    left: 0;
-                    bottom: 0;
-                    width: 330px;
                     z-index: 1;
+                }
+
+                @media(max-width: 768px) {
+                    .video-menu-left {
+                        position: absolute;
+                        top: 40vh;
+                        left: 0;
+                        width: 100%;
+                        height: 90vh;
+                    }
+                }
+
+                @media(min-width: 768px) {
+                    .video-menu-left {
+                        position: absolute;
+                        top: 75px;
+                        left: 0;
+                        bottom: 0;
+                        width: 330px;
+                    }
                 }
 
                 .button-container {
