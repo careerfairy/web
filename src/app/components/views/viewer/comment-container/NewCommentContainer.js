@@ -153,14 +153,20 @@ function CommentContainer(props) {
                     background-color: rgb(220,220,220);
                 }
 
-                .chat-scrollable {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    bottom: 0;
-                    width: 100%;
-                    overflow-y: scroll;
-                    overflow-x: hidden;
+                @media(max-width: 768px) {
+
+                }
+
+                @media(min-width: 768px) {
+                    .chat-scrollable {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        bottom: 0;
+                        width: 100%;
+                        overflow-y: scroll;
+                        overflow-x: hidden;
+                    }
                 }
 
                 ::-webkit-scrollbar {

@@ -388,7 +388,7 @@ function ViewerPage(props) {
                     .black-frame {
                         position: absolute;
                         width: 100%;
-                        height: 40vh;
+                        height: 60vh;
                         top: 0;
                         left: 0;
                     }
@@ -477,10 +477,10 @@ function ViewerPage(props) {
                 @media(max-width: 768px) {
                     .video-menu-left {
                         position: absolute;
-                        top: 40vh;
+                        top: 60vh;
                         left: 0;
                         width: 100%;
-                        height: 90vh;
+                        height: 100vh;
                     }
                 }
 
