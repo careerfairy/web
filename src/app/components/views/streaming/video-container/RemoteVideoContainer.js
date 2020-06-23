@@ -26,12 +26,11 @@ function RemoteVideoContainer(props) {
                #videoElement {
                     position: absolute;
                     top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    max-height: 100%;
-                    max-width: 100%;
-                    z-index: 9900;
-                    background-color: black;
+                    left: 0;
+                    transform: translateY(-50%);
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
                }
           `}</style>
         </div>

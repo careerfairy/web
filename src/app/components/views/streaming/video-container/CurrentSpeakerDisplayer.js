@@ -49,9 +49,9 @@ function CurrentSpeakerDisplayer(props) {
 
     function getMinimizedSpeakersGridHeight() {
         if (props.isPlayMode) {
-            return props.streams.length > 1 ? '20vh' : '0';
+            return props.streams.length > 1 ? '21vh' : '0';
         } else {
-            return props.streams.length > 0 ? '20vh' : '0';
+            return props.streams.length > 0 ? '21vh' : '0';
         }
     } 
 
@@ -77,7 +77,7 @@ function CurrentSpeakerDisplayer(props) {
                 <RemoteVideoContainer stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
                 <style jsx>{`
                     .quarter-width {
-                        width: 350px;
+                        width: 250px;
                         height: 100%;
                         display: inline-block;
                     }
@@ -88,6 +88,7 @@ function CurrentSpeakerDisplayer(props) {
                         left: 0;
                         width: 100%;
                         height: calc(80vh - 160px);
+                        z-index: 101;
                     }
 
                     .speaker-video-solo {
@@ -96,6 +97,7 @@ function CurrentSpeakerDisplayer(props) {
                         left: 0;
                         width: 100%;
                         height: calc(100vh - 160px);
+                        z-index: 100;
                     }     
                 `}</style>
             </div>
@@ -104,13 +106,13 @@ function CurrentSpeakerDisplayer(props) {
 
     if (!props.isPlayMode) {
         let localVideoElement =
-            <div className={getVideoContainerClass(props.localId)} style={{ padding: 0 }} key={"localVideoId"}>
+            <div className={getVideoContainerClass(props.localId)} style={{ padding: '0', margin: '0' }} key={"localVideoId"}>
                 <div className='video-container' style={{ height: getVideoContainerHeight(props.localId) }}>
                     <video id="localVideo" ref={localVideoRef} muted autoPlay width={ '100%' } style={{ right: (props.streams.length > 0) ? '0' : '', bottom: (props.streams.length > 1) ? '0' : '' }}></video> 
                 </div>
                 <style jsx>{`
                     .quarter-width {
-                        width: 350px;
+                        width: 250px;
                         height: 100%;
                         display: inline-block;
                     }
@@ -142,12 +144,11 @@ function CurrentSpeakerDisplayer(props) {
                     #localVideo {
                         position: absolute;
                         top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        max-height: 100%;
-                        max-width: 100%;
-                        z-index: 9900;
-                        background-color: black;
+                        left: 0;
+                        transform: translateY(-50%);
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
                     }
             `}</style>
             </div>;
