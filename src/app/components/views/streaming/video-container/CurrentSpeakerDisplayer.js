@@ -74,7 +74,7 @@ function CurrentSpeakerDisplayer(props) {
     let externalVideoElements = props.streams.map( (stream, index) => {
         return (
             <div className={getVideoContainerClass(stream.streamId)} style={{ padding: 0 }} key={stream.streamId}>
-                <RemoteVideoContainer stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
+                <RemoteVideoContainer isPlayMode={props.isPlayMode} stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
                 <style jsx>{`
                     .quarter-width {
                         width: 250px;

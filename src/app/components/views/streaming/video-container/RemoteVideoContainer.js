@@ -12,7 +12,7 @@ function RemoteVideoContainer(props) {
     return (
         <div>
             <div className='videoContainer' style={{ height: props.height }}>
-                <video id='videoElement' ref={videoElement} width={ '100%' } autoPlay/>
+                <video id='videoElement' ref={videoElement} width={ '100%' } controls={props.isPlayMode} autoPlay/>
             </div>           
             <style jsx>{`
                .videoContainer {
