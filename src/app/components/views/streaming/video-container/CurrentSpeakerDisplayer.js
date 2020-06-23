@@ -49,9 +49,9 @@ function CurrentSpeakerDisplayer(props) {
 
     function getMinimizedSpeakersGridHeight() {
         if (props.isPlayMode) {
-            return props.streams.length > 1 ? '21vh' : '0';
+            return props.streams.length > 1 ? '20vh' : '0';
         } else {
-            return props.streams.length > 0 ? '21vh' : '0';
+            return props.streams.length > 0 ? '20vh' : '0';
         }
     } 
 
@@ -159,7 +159,7 @@ function CurrentSpeakerDisplayer(props) {
     return (
         <Fragment>
             <div className='relative-container'>
-                <div style={{ margin: '0', height: getMinimizedSpeakersGridHeight(), backgroundColor: 'rgb(30,30,30)', overflowX: 'scroll', overflowY: 'hidden', whiteSpace: 'nowrap' }} centered>         
+                <div className='relative-container-videos' style={{ height: getMinimizedSpeakersGridHeight() }} centered>
                     { externalVideoElements }
                 </div> 
             </div>             
@@ -168,6 +168,27 @@ function CurrentSpeakerDisplayer(props) {
                     position: relative;
                     height: 100%;
                     min-height: calc(100vh - 85px);
+                }
+
+                .relative-container-videos {
+                    margin: 0;
+                    background-color: rgb(30,30,30);
+                    overflow-x: scroll;
+                    overflow-y: hidden;
+                    white-space: nowrap;
+                    text-align: center;
+                }
+
+                .relative-container-videos::-webkit-scrollbar {
+                    height: 3px;
+                }
+
+                .relative-container-videos::-webkit-scrollbar-track {
+                    background: black;
+                }
+
+                .relative-container-videos::-webkit-scrollbar-thumb {
+                    background: rgba(0, 210, 170, 0.8);
                 }
                 
                 .hidden {
