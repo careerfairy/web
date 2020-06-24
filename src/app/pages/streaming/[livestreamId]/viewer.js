@@ -314,7 +314,6 @@ function ViewerPage(props) {
                 .black-frame {
                     z-index: 10;
                     background-color: black;
-                    border: 2px solid red;                   
                 }
 
                 @media(max-width: 768px) {

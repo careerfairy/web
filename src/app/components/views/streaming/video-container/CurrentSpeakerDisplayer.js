@@ -1,10 +1,12 @@
 import React, {useEffect, Fragment, useRef, useState} from 'react';
 import {Grid} from "semantic-ui-react";
 import RemoteVideoContainer from './RemoteVideoContainer';
+import { useWindowSize } from '../../../custom-hook/useWindowSize';
 
 function CurrentSpeakerDisplayer(props) {
 
     const localVideoRef = useRef(null);
+    const windowSize = useWindowSize();
 
     useEffect(() => {
         if (!props.isPlayMode && props.localStream) {
@@ -13,22 +15,42 @@ function CurrentSpeakerDisplayer(props) {
     },[props.localStream]);
 
     function getVideoContainerHeight(streamId) {
-        if (props.streams.length > 0) {
-            if (streamId === props.currentSpeaker) {
-                return 'calc(80vh - 75px)';
+        if (props.isPlayMode) {
+            if (props.streams.length > 1) {
+                if (streamId === props.currentSpeaker) {
+                    return windowSize.width > 768 ? 'calc(80vh - 75px)' : '45vh';
+                } else {
+                    return windowSize.width > 768 ? '20vh' : '15vh';
+                }
             } else {
-                return '20vh';
+                return windowSize.width > 768 ? 'calc(100vh - 75px)' : '60vh';
             }
         } else {
-            return 'calc(100vh - 75px)';
+            if (props.streams.length > 0) {
+                if (streamId === props.currentSpeaker) {
+                    return 'calc(80vh - 75px)';
+                } else {
+                    return '20vh';
+                }
+            } else {
+                return 'calc(100vh - 75px)';
+            }
         }
     } 
 
     function getMinimizedSpeakersGridHeight() {
         if (props.isPlayMode) {
-            return props.streams.length > 1 ? '20vh' : '0';
+            if (props.streams.length > 1) {
+                return windowSize.width > 768 ? '20vh' : '15vh';
+            } else {
+                return '0';
+            }
         } else {
-            return props.streams.length > 0 ? '20vh' : '0';
+            if (props.streams.length > 0) {
+                return '20vh';
+            } else {
+                return '0';
+            }
         }
     } 
 
@@ -54,17 +76,14 @@ function CurrentSpeakerDisplayer(props) {
                 <RemoteVideoContainer isPlayMode={props.isPlayMode} stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
                 <style jsx>{`
                     .quarter-width {
-                        width: 250px;
                         height: 100%;
                         display: inline-block;
                     }
 
                     .speaker-video {
                         position: absolute;
-                        top: 20vh;
                         left: 0;
                         width: 100%;
-                        height: calc(80vh - 160px);
                         z-index: 101;
                     }
 
@@ -76,6 +95,28 @@ function CurrentSpeakerDisplayer(props) {
                         height: calc(100vh - 160px);
                         z-index: 100;
                     }     
+
+                    @media(max-width: 768px) {
+                        .quarter-width {
+                            width: 150px;
+                        }
+
+                        .speaker-video {
+                            top: 15vh;
+                            height: 45vh;
+                        }
+                    }
+
+                    @media(min-width: 768px) {
+                        .quarter-width {
+                            width: 250px;
+                        }
+
+                        .speaker-video {
+                            top: 20vh;
+                            height: calc(80vh - 160px);
+                        }
+                    }
                 `}</style>
             </div>
         );
