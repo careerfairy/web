@@ -12,38 +12,15 @@ function CurrentSpeakerDisplayer(props) {
         }
     },[props.localStream]);
 
-    function getVideoContainerWidth(streamId) {
-        if (streamId === props.currentSpeaker) {
-            return 16;
-        }
-        if (props.isPlayMode) {
-            return props.streams.length > 1 ? 8 : 16;
-        } else {
-            return props.streams.length > 0 ? 8 : 16;
-        }
-    }
-
     function getVideoContainerHeight(streamId) {
-        if (props.isPlayMode) {
-            if (props.streams.length > 1) {
-                if (streamId === props.currentSpeaker) {
-                    return 'calc(80vh - 160px)';
-                } else {
-                    return '20vh';
-                }
+        if (props.streams.length > 0) {
+            if (streamId === props.currentSpeaker) {
+                return 'calc(80vh - 75px)';
             } else {
-                return 'calc(100vh - 160px)';
+                return '20vh';
             }
         } else {
-            if (props.streams.length > 0) {
-                if (streamId === props.currentSpeaker) {
-                    return 'calc(80vh - 75px)';
-                } else {
-                    return '20vh';
-                }
-            } else {
-                return 'calc(100vh - 75px)';
-            }
+            return 'calc(100vh - 75px)';
         }
     } 
 

@@ -20,25 +20,18 @@ function ViewerPage(props) {
     const [user, setUser] = useState(null);
     const [userData, setUserData] = useState(null);
 
-    const [isPlaying, setIsPlaying] = useState(false);
-
     const [questionSubmittedModalOpen, setQuestionSubmittedModalOpen] = useState(false);
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
-    const [registeredStreamers, setRegisteredStreamers] = useState([]);
 
     const [careerCenters, setCareerCenters] = useState([]);
-    const [streamIds, setStreamIds] = useState([]);
-
-    const [newQuestionTitle, setNewQuestionTitle] = useState("");
 
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [pastQuestions, setPastQuestions] = useState([]);
 
-    const [initalReactionSent, setInitialReactionSent] = useState(false);
     const [mediaConstraints, setMediaConstraints] = useState({ audio: true, video: true});
-    const [speakingLivestreamId, setSpeakingLivestreamId] = useState(null);
+    const [speakingLivestreamId, setSpeakingLivestreamId] = useState(livestreamId);
 
     const streamerReady = true;
     const isPlayMode = true;
@@ -149,21 +142,6 @@ function ViewerPage(props) {
     }, [currentLivestream]);
 
     useEffect(() => {
-        if (livestreamId) {
-            const unsubscribe = props.firebase.listenToConnectedLivestreamLiveSpeakers(livestreamId, querySnapshot => {
-                let liveSpeakersList = [];
-                querySnapshot.forEach(doc => {
-                    let speaker = doc.data();
-                    speaker.id = doc.id;
-                    liveSpeakersList.push(speaker);
-                });
-                setRegisteredStreamers(liveSpeakersList);
-            });
-            return () => unsubscribe();
-        }
-    }, [livestreamId]);
-
-    useEffect(() => {
         if (userData && currentLivestream && userData.talentPools && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
             setUserIsInTalentPool(true);
         } else {
@@ -187,55 +165,10 @@ function ViewerPage(props) {
         props.firebase.leaveCompanyTalentPool(currentLivestream.companyId, user.email);
     }
 
-    function getContainerWidth(length) {
-        if (currentLivestream.mode === 'presentation') {
-            return 4;
-        } else {
-            return length > 1 ? 8 : 16;
-        }
-    }
-
-    function addNewQuestion() {
-        if (!userData ||!(newQuestionTitle.trim()) || newQuestionTitle.trim().length < 5) {
-            return;
-        }
-
-        const newQuestion = {
-            title: newQuestionTitle,
-            votes: 0,
-            type: "new",
-            author: !currentLivestream.test ? user.email : 'test@careerfairy.io'
-        }
-        props.firebase.putLivestreamQuestion(currentLivestream.id, newQuestion)
-            .then(() => {
-                setNewQuestionTitle("");
-                setQuestionSubmittedModalOpen(true);
-            }, () => {
-                console.log("Error");
-        })
-    }
-
-    function addNewQuestionOnEnter(target) {
-        if(target.charCode==13){
-            addNewQuestion();   
-        } 
-    }
-
     let logoElements = careerCenters.map( (careerCenter, index) => {
         return (
             <Fragment>
                 <Image src={ careerCenter.logoUrl } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block' }}/>
-            </Fragment>
-        );
-    });
-
-    let connectedStreamers = registeredStreamers.filter(streamer => streamer.connected);
-    let videoElements = connectedStreamers.map( (streamer, index) => {
-        return (
-            <Fragment>
-                <Grid.Column width={ getContainerWidth(connectedStreamers.length) } style={{ padding: 0 }} key={streamer.id}>
-                    <ViewerVideoContainer streamer={streamer} length={connectedStreamers.length} index={index + 1} isPlaying={isPlaying} height={'100%'} hasStarted={currentLivestream.hasStarted}/>
-                </Grid.Column>
             </Fragment>
         );
     });
@@ -263,14 +196,6 @@ function ViewerPage(props) {
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none'), position: 'absolute', top: '150px', width: '100%', height: 'calc(100% - 150px)', backgroundColor: 'rgb(30,30,30)'}}>
                     <LivestreamPdfViewer livestreamId={currentLivestream.id} presenter={false}/>
                 </div> 
-                {/* <div className={'reactions-sender ' + (initalReactionSent ? 'hidden' : '')}>
-                    <div style={{ fontSize: '2em', margin: '0 0 40px 0'}}>How about saying hello?</div>
-                    <Grid textAlign='center'>
-                        { reactionElements }
-                    </Grid>
-                    <div onClick={() => setInitialReactionSent(true)} style={{ margin: '15px 0 0 0', fontSize: '0.9em', fontWeight: '300', textDecoration: 'underline', cursor: 'pointer' }}>No, I am here undercover!</div>
-                    <Icon onClick={() => setInitialReactionSent(true)}  name='delete' size='large' style={{ position: 'absolute', top: '20px', right: '20px', color: 'white', cursor: 'pointer'}} />
-                </div> */}
             </div>  
             <div className='video-menu-left'>
                 <NewCommentContainer livestream={ currentLivestream } upcomingQuestions={upcomingQuestions} pastQuestions={pastQuestions} userData={userData}  user={user}/>
@@ -387,7 +312,9 @@ function ViewerPage(props) {
                 }
 
                 .black-frame {
-                    z-index: 10;                    
+                    z-index: 10;
+                    background-color: black;
+                    border: 2px solid red;                   
                 }
 
                 @media(max-width: 768px) {

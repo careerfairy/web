@@ -45,7 +45,7 @@ function StreamingPage(props) {
 
     const [numberOfViewers, setNumberOfViewers] = useState(0);
 
-    const [speakingLivestreamId, setSpeakingLivestreamId] = useState(null);
+    const [speakingLivestreamId, setSpeakingLivestreamId] = useState(livestreamId);
 
     const localVideoId = 'localVideo';
     const isPlayMode = false;
