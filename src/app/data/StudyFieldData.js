@@ -261,5 +261,113 @@ export const UNIVERSITY_SUBJECTS = [
         },{
             text: "Mechanical Engineering - Economics",
             value: "MECHECO"
+        },{
+            text: "Hochschulpraktikant",
+            value: "MEMBER"
+        },{
+            text: "Architektur",
+            value: "ARCHI"
+        },{
+            text: "Bauingenieurwesen",
+            value: "BAUINGEN"
+        },{
+            text: "Betriebswirtschaftslehre",
+            value: "BETRIEBSWIRT"
+        },{
+            text: "Chemie, Lebensmittelchemie",
+            value: "CHEMLEBENS"
+        },{
+            text: "Elektrotechnik",
+            value: "ELEKTRO"
+        },{
+            text: "Evangelische Theologie",
+            value: "EVANG"
+        },{
+            text: "Geschichte, Kunst- und Musikwissenschaft",
+            value: "GESCHKUNSTMUSIK"
+        },{
+            text: "Hydrowissenschaften",
+            value: "HYDRO"
+        },{
+            text: "Informatik",
+            value: "INFORMATIK"
+        },{
+            text: "Wirtschaftsinformatik",
+            value: "INFORMATIKUNDWIRT"
+        },{
+            text: "Informationssystemtechnik",
+            value: "INFSYSTTECH"
+        },{
+            text: "Katholische Theologie",
+            value: "KATHO"
+        },{
+            text: "Kommunikationswissenschaft",
+            value: "KOMMU"
+        },{
+            text: "Maschinenbau",
+            value: "MASCH"
+        },{
+            text: "Mathematik",
+            value: "MATHEMATIK"
+        },{
+            text: "Mechatronik",
+            value: "MECHATR"
+        },{
+            text: "Medieninformatik",
+            value: "MEDINF"
+        },{
+            text: "Molekulare Biologie und Biotechnologie",
+            value: "MOLEKU"
+        },{
+            text: "Philosophie",
+            value: "PHILO"
+        },{
+            text: "Physik",
+            value: "PHYSIK"
+        },{
+            text: "Politikwissenschaft",
+            value: "POLITIK"
+        },{
+            text: "Psychologie",
+            value: "PSYCHOLO"
+        },{
+            text: "Regenerative Energiesysteme",
+            value: "REGEN"
+        },{
+            text: "Sozialpädagogik",
+            value: "SOZIAL"
+        },{
+            text: "Soziologie",
+            value: "SOZIOLOGIE"
+        },{
+            text: "Sprach-, Literatur- und Kulturwissenschaften",
+            value: "SPRACHLITKULT"
+        },{
+            text: "Verfahrenstechnik und Naturstofftechnik",
+            value: "VERFAHR"
+        },{
+            text: "Verkehrsingenieurwesen",
+            value: "VERKEHRSING"
+        },{
+            text: "Verkehrswirtschaft",
+            value: "VERKEHRSWIRTSCHAFT"
+        },{
+            text: "Volkswirtschaftslehre",
+            value: "VOLKSWIRTSCHAFTS"
+        },{
+            text: "Werkstoffwissenschaft",
+            value: "WERKSTOFF"
+        },{
+            text: "Wirtschaftsingenieurwesen",
+            value: "WIRTSCHING"
+        },{
+            text: "Wirtschaftsmathematik",
+            value: "WIRTMAT"
+        },{
+            text: "Wirtschaftspädagogik",
+            value: "WIRTPAED"
+        },{
+            text: "Wirtschaftswissenschaften",
+            value: "WIRTWISS"
         }
     ];

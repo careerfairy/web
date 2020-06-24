@@ -20,7 +20,7 @@ import Link from 'next/link';
 import Head from 'next/head';
 
 
-function Calendar(props) {
+function NextLivestreams(props) {
 
     const backgroundOptions = UNIVERSITY_SUBJECTS;
     const router = useRouter();
@@ -37,9 +37,13 @@ function Calendar(props) {
     const [grid, setGrid] = useState(null);
     const [allLivestreams, setAllLivestreams] = useState([]);
     const [livestreams, setLivestreams] = useState([]);
+    const [noLivestreamsPresent, setNoLivestreamsPresent] = useState(false);
+
     const [fields, setFields] = useState([]);
     const [showAllFields, setShowAllFields] = useState(false);
     const [cookieMessageVisible, setCookieMessageVisible] = useState(true);
+    const [careerCenters, setCareerCenters] = useState([]);
+
     const myRef = useRef(null);
 
     useEffect(() => {
@@ -91,11 +95,17 @@ function Calendar(props) {
                 livestream.id = doc.id;
                 livestreams.push(livestream);
             });
-
             if (university) {
+                if (livestreams.length === 0) {
+                    setNoLivestreamsPresent(true);
+                }
                 setAllLivestreams(livestreams);
             } else {
-                setAllLivestreams(livestreams.filter( livestream => !livestream.hidden || livestream.hidden === false));
+                let filteredStreams = livestreams.filter( livestream => !livestream.hidden || livestream.hidden === false);
+                if (filteredStreams.length === 0) {
+                    setNoLivestreamsPresent(true);
+                }
+                setAllLivestreams(filteredStreams);
             }
         }, error => {
             console.log(error);
@@ -125,12 +135,34 @@ function Calendar(props) {
     }, [allLivestreams, fields]);
 
     useEffect(() => {
+        if (allLivestreams && allLivestreams.length > 0) {
+            let allGroups = [];
+            allLivestreams.map(livestream => livestream.universities).forEach(groups => {
+                groups.forEach( group => {
+                    if (!(allGroups.indexOf(group) > -1)) {
+                        allGroups.push(group);
+                    }
+                });
+            });
+            props.firebase.getLivestreamCareerCenters(allGroups).then( querySnapshot => {
+                let groupList = [];
+                querySnapshot.forEach(doc => {
+                    let group = doc.data();
+                    group.id = doc.id;
+                    groupList.push(group);
+                });
+                setCareerCenters(groupList);
+            });
+        }
+    }, [allLivestreams]);
+
+    useEffect(() => {
         if (grid) {
             setTimeout(() => {
                 grid.updateLayout();
             }, 500);
         }
-    }, [grid,livestreams]);
+    }, [grid,livestreams, careerCenters]);
 
     useEffect(() => {
         if (localStorage.getItem('hideCookieMessage') === 'yes') {
@@ -218,11 +250,10 @@ function Calendar(props) {
     })
 
     const mentorElements = livestreams.map( (mentor, index) => {
-
         const avatar = mentor.mainSpeakerAvatar ? mentor.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
         return(
             <div key={index}>
-                <LivestreamCard livestream={mentor} user={user} userData={userData} fields={fields} grid={grid}/>
+                <LivestreamCard livestream={mentor} user={user} userData={userData} fields={fields} grid={grid} careerCenters={ careerCenters.filter( careerCenter => mentor.universities.indexOf(careerCenter.universityId) > -1 )}/>
             </div>
         );
     })
@@ -279,7 +310,7 @@ function Calendar(props) {
                             { mentorElements }
                         </StackGrid>
                     )}</SizeMe>
-                    <div className={'empty-livestreams-message ' + (livestreams.length > 0 ? 'hidden' : '')}>
+                    <div className={'empty-livestreams-message ' + ( !noLivestreamsPresent ? 'hidden' : '')}>
                         <div>
                             Exciting streams coming&nbsp;soon!
                         </div>
@@ -1139,4 +1170,4 @@ function Calendar(props) {
     );
 }
 
-export default withFirebasePage(Calendar);
+export default withFirebasePage(NextLivestreams);

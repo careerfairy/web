@@ -128,68 +128,6 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
             color: "#b39eb5"
         }
     ],
-    epflausanne: [
-        {
-           text: "Architecture",
-           value: "ARCH",
-           color: "#836953"
-       },{
-           text: "Chemistry and Chemical Engineering",
-           value: "CHEM",
-           color: "#2d5b6b"
-       },{
-           text: "Civil Engineering",
-           value: "CIVI",
-           color: "#ff6961"
-       },{
-           text: "Communication Sciences",
-           value: "COMPSCI"
-       },{
-           text: "Computer Science",
-           value: "COMP",
-           color: "#52494c"
-       },{
-           text: "Electrical and Electronic Engineering",
-           value: "ELEC",
-           color: "#aa0000"
-       },{
-           text: "Environmental Sciences and Engineering",
-           value: "ENVSCI",
-           color: "#3cb44b"
-       },{
-           text: "Life Sciences Engineering",
-           value: "BIOL",
-           color: "#9a6324"
-       },{
-           text: "Materials Sciences and Engineering",
-           value: "MATE",
-           color: "#f032e6"
-       },{
-           text: "Mathematics",
-           value: "MATH",
-           color: "#008080"
-       },{
-           text: "Mechanical Engineering",
-           value: "MECH",
-           color: "#808080"
-       },{
-           text: "Management, Technology and Entrepreneurship",
-           value: "MTEC",
-           color: "#f58231"
-       },{
-           text: "Microengineering",
-           value: "MICRO",
-           color: "#000000"
-       },{
-           text: "Physics",
-           value: "PHYS",
-           color: "#54556c"
-       },{
-           text: "Digital Humanities",
-           value: "HUMAN",
-           color: "#b39eb5"
-       }
-   ],
    unilausanne: [
     {
         text: "Economics",
@@ -306,6 +244,63 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
             text: "Tourism",
             value: "TOURI"
         }
+    ],
+    unilugano:[
+        {
+            text: "Architecture",
+            value: "ARCH"
+        },
+        {
+            text: "Italian language, literature and culture"
+        },
+        {
+            text: "Communication",
+            value: "COMM"
+        },
+        {
+            text: "Economics"
+        },
+        {
+            text: "Informatics",
+            value: "COMP"
+        },
+        {
+            text: "Informatics",
+            value: "BUSINF"
+        },
+        {
+            text: "Informatics",
+            value: "ELEC"
+        },
+        {
+            text: "Medicine"
+        },
+        {
+            text: "Humanities"
+        },
+        {
+            text: "Finance",
+            value: "BANK"
+        },
+        {
+            text: "Tourism"
+        },
+        {
+            text: "Political economy"
+        },
+        {
+            text: "Management and marketing",
+            value: "MTEC"
+        },
+        {
+            text: "Health studies"
+        },
+        {
+            text: "Media and Communication"
+        },
+        {
+            text: "Computational Science"
+        },
     ],
     hochschulestgallen: [
         {
@@ -448,6 +443,118 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
         },{
             text: "Urban and Regional Planning",
             value: "URBANA"
+        }
+    ], chbundesverwaltung: [
+        {
+            text: "Hochschulpraktikant",
+            value: "MEMBER"
+        }
+    ], technischeunidresden: [
+        {
+            text: "Architektur",
+            value: "ARCHI"
+        },{
+            text: "Bauingenieurwesen",
+            value: "BAUINGEN"
+        },{
+            text: "Betriebswirtschaftslehre",
+            value: "BETRIEBSWIRT"
+        },{
+            text: "Chemie, Lebensmittelchemie",
+            value: "CHEMLEBENS"
+        },{
+            text: "Elektrotechnik",
+            value: "ELEKTRO"
+        },{
+            text: "Evangelische Theologie",
+            value: "EVANG"
+        },{
+            text: "Geschichte, Kunst- und Musikwissenschaft",
+            value: "GESCHKUNSTMUSIK"
+        },{
+            text: "Hydrowissenschaften",
+            value: "HYDRO"
+        },{
+            text: "Informatik",
+            value: "INFORMATIK"
+        },{
+            text: "Wirtschaftsinformatik",
+            value: "INFORMATIKUNDWIRT"
+        },{
+            text: "Informationssystemtechnik",
+            value: "INFSYSTTECH"
+        },{
+            text: "Katholische Theologie",
+            value: "KATHO"
+        },{
+            text: "Kommunikationswissenschaft",
+            value: "KOMMU"
+        },{
+            text: "Maschinenbau",
+            value: "MASCH"
+        },{
+            text: "Mathematik",
+            value: "MATHEMATIK"
+        },{
+            text: "Mechatronik",
+            value: "MECHATR"
+        },{
+            text: "Medieninformatik",
+            value: "MEDINF"
+        },{
+            text: "Molekulare Biologie und Biotechnologie",
+            value: "MOLEKU"
+        },{
+            text: "Philosophie",
+            value: "PHILO"
+        },{
+            text: "Physik",
+            value: "PHYSIK"
+        },{
+            text: "Politikwissenschaft",
+            value: "POLITIK"
+        },{
+            text: "Psychologie",
+            value: "PSYCHOLO"
+        },{
+            text: "Regenerative Energiesysteme",
+            value: "REGEN"
+        },{
+            text: "Sozialpädagogik",
+            value: "SOZIAL"
+        },{
+            text: "Soziologie",
+            value: "SOZIOLOGIE"
+        },{
+            text: "Sprach-, Literatur- und Kulturwissenschaften",
+            value: "SPRACHLITKULT"
+        },{
+            text: "Verfahrenstechnik und Naturstofftechnik",
+            value: "VERFAHR"
+        },{
+            text: "Verkehrsingenieurwesen",
+            value: "VERKEHRSING"
+        },{
+            text: "Verkehrswirtschaft",
+            value: "VERKEHRSWIRTSCHAFT"
+        },{
+            text: "Volkswirtschaftslehre",
+            value: "VOLKSWIRTSCHAFTS"
+        },{
+            text: "Werkstoffwissenschaft",
+            value: "WERKSTOFF"
+        },{
+            text: "Wirtschaftsingenieurwesen",
+            value: "WIRTSCHING"
+        },{
+            text: "Wirtschaftsmathematik",
+            value: "WIRTMAT"
+        },{
+            text: "Wirtschaftspädagogik",
+            value: "WIRTPAED"
+        },{
+            text: "Wirtschaftswissenschaften",
+            value: "WIRTWISS"
         }
     ]
 };

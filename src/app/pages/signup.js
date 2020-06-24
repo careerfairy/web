@@ -385,9 +385,7 @@ function SignUpFormValidate(props) {
                                 <Form id='signUpForm' onSubmit={handleSubmit}>
                                     <Message positive hidden={false}>
                                         <Message.Header>Check your mailbox!</Message.Header>
-                                        <p>
-                                            We have just sent you an email containing a 4-digit PIN code. Please enter this code below to start your journey on CareerFairy. <span className='resend-link' onClick={() => resendVerificationEmail()}>Resend the email verification link.</span>
-                                        </p>
+                                        <p>We have just sent you an email containing a 4-digit PIN code. Please enter this code below to start your journey on CareerFairy. <span className='resend-link' onClick={() => resendVerificationEmail()}>Resend the email verification link.</span></p>
                                     </Message>
                                     <Form.Field>
                                         <label style={{ color: 'rgb(120,120,120)' }}>PIN Code</label>

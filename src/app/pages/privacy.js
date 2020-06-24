@@ -23,12 +23,12 @@ const PrivacyPolicy = (props) => {
                     <h2>Collection of personal data</h2>
                     <p>You can visit the CareerFairy Website without revealing any information by which we or anyone else could identify you. If, however, you wish to create or log in to an account on the CareerFairy Website, you will be asked to provide the following personal data:</p>
                     <ul>
-                    <li>First name</li>
-                    <li>Family name</li>
-                    <li>Email address</li>
-                    <li>Study subject</li>
-                    <li>Level of qualification you are studying for (BSc / MSc / PhD)</li>
-                    <li>University you are studying at</li>
+                        <li>First name</li>
+                        <li>Family name</li>
+                        <li>Email address</li>
+                        <li>Study subject</li>
+                        <li>Level of qualification you are studying for (BSc / MSc / PhD)</li>
+                        <li>University you are studying at</li>
                     </ul>
                     <p>You can choose not to provide us with personal data, but then you will not be able to create an account, upload your CV, be notified of scheduled livestreams or rewatch past livestreams.</p>
                     <h2>Managing personal data</h2>

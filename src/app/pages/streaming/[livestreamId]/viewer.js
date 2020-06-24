@@ -14,11 +14,6 @@ import SmallStreamerVideoDisplayer from '../../../components/views/streaming/vid
 
 function ViewerPage(props) {
 
-    const eth_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media';
-    const epfl_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fepfl-career-center.png?alt=media';
-    const uzh_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fjobhub.png?alt=media';
-    const polyefair_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fpolyefair_logo.png?alt=media';
-
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
 
@@ -32,6 +27,9 @@ function ViewerPage(props) {
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
     const [registeredStreamers, setRegisteredStreamers] = useState([]);
+
+    const [careerCenters, setCareerCenters] = useState([]);
+    const [streamIds, setStreamIds] = useState([]);
 
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
 
@@ -137,6 +135,20 @@ function ViewerPage(props) {
     }, [audioLevels]);
 
     useEffect(() => {
+        if (currentLivestream) {
+            props.firebase.getLivestreamCareerCenters(currentLivestream.universities).then( querySnapshot => {
+                let groupList = [];
+                querySnapshot.forEach(doc => {
+                    let group = doc.data();
+                    group.id = doc.id;
+                    groupList.push(group);
+                });
+                setCareerCenters(groupList);
+            });
+        }
+    }, [currentLivestream]);
+
+    useEffect(() => {
         if (livestreamId) {
             const unsubscribe = props.firebase.listenToConnectedLivestreamLiveSpeakers(livestreamId, querySnapshot => {
                 let liveSpeakersList = [];
@@ -183,23 +195,6 @@ function ViewerPage(props) {
         }
     }
 
-    let connectedStreamers = registeredStreamers.filter(streamer => streamer.connected);
-    let videoElements = connectedStreamers.map( (streamer, index) => {
-        return (
-            <Fragment>
-                <Grid.Column width={ getContainerWidth(connectedStreamers.length) } style={{ padding: 0 }} key={streamer.id}>
-                    <ViewerVideoContainer streamer={streamer} length={connectedStreamers.length} index={index + 1} isPlaying={isPlaying} height={'100%'} hasStarted={currentLivestream.hasStarted}/>
-                </Grid.Column>
-            </Fragment>
-        );
-    });
-
-    function isUniversityLivestream(university) {
-        if (currentLivestream) {
-            return currentLivestream.universities.indexOf(university) > -1;
-        }
-    }
-
     function addNewQuestion() {
         if (!userData ||!(newQuestionTitle.trim()) || newQuestionTitle.trim().length < 5) {
             return;
@@ -226,38 +221,22 @@ function ViewerPage(props) {
         } 
     }
 
-    function sendInstantReaction(reaction) {
-        const newComment = {
-            title: reaction,
-            author: userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous',
-        }
-        props.firebase.putQuestionComment(currentLivestream.id, upcomingQuestions[0].id, newComment)
-            .then(() => {}, error => {
-                console.log("Error: " + error);
-            })
-    }
-
-    function getInitialReactions() {
-        if (currentLivestream.language === "CH") {
-            return ['Hallo!', 'Hoi zäme', 'Hi! :-)'];
-        } 
-        if (currentLivestream.language === "DE") {
-            return ['Hallo!', 'Guten Tag!', 'Hi! :-)'];
-        }
-        else {
-            return ['Hello!', 'Hi everyone!', 'How do you do?'];
-        }
-    }
-
-    let reactionElements = getInitialReactions().map((reaction, index) => {
+    let logoElements = careerCenters.map( (careerCenter, index) => {
         return (
-            <Grid.Column width={5} key={index}>
-                <div onClick={() => {sendInstantReaction(reaction); setInitialReactionSent(true);}} style={{ cursor: 'pointer', position: 'relative', backgroundColor: 'white', color: 'grey', padding: '20px', borderRadius: '20px', textAlign: 'left' }}>
-                    <div style={{ textTransform: 'capitalize', fontSize: '0.9em', fontWeight: '400', color: 'black', textAlign: 'left', marginBottom: '0', minWidth: '200px'}}>{ reaction }</div>
-                    <div style={{ textTransform: 'capitalize', fontSize: '0.7em', fontWeight: '400', color: 'grey', textAlign: 'left', margin: '0'}}>@{userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous'}</div>
-                    <Button circular icon='chevron right circle' style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)'}} primary/>
-                </div>
-            </Grid.Column>
+            <Fragment>
+                <Image src={ careerCenter.logoUrl } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block' }}/>
+            </Fragment>
+        );
+    });
+
+    let connectedStreamers = registeredStreamers.filter(streamer => streamer.connected);
+    let videoElements = connectedStreamers.map( (streamer, index) => {
+        return (
+            <Fragment>
+                <Grid.Column width={ getContainerWidth(connectedStreamers.length) } style={{ padding: 0 }} key={streamer.id}>
+                    <ViewerVideoContainer streamer={streamer} length={connectedStreamers.length} index={index + 1} isPlaying={isPlaying} height={'100%'} hasStarted={currentLivestream.hasStarted}/>
+                </Grid.Column>
+            </Fragment>
         );
     });
 
@@ -266,10 +245,7 @@ function ViewerPage(props) {
             <div className='top-menu'>
                 <div className='top-menu-left'>    
                     <Image src='/logo_teal.png' style={{ maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
-                    <Image src={ eth_logo } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: isUniversityLivestream("ethzurich") ? 'inline-block' : 'none' }}/>
-                    <Image src={ epfl_logo } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: isUniversityLivestream("epflausanne") ? 'inline-block' : 'none' }}/>
-                    <Image src={ uzh_logo } style={{ maxWidth: '150px', maxHeight: '50px', display: isUniversityLivestream("unizurich") ? 'inline-block' : 'none' }}/>
-                    <Image src={ polyefair_logo } style={{ maxWidth: '150px', maxHeight: '50px', display: isUniversityLivestream("polyefair") ? 'inline-block' : 'none' }}/>
+                    { logoElements }
                     <div style={{ position: 'absolute', bottom: '13px', left: '120px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
                 </div>
                 <div className={'top-menu-right'}>
@@ -296,11 +272,6 @@ function ViewerPage(props) {
                     <Icon onClick={() => setInitialReactionSent(true)}  name='delete' size='large' style={{ position: 'absolute', top: '20px', right: '20px', color: 'white', cursor: 'pointer'}} />
                 </div> */}
             </div>  
-            <div className='video-menu'>
-                <div  className='video-menu-input'>
-                        <Input action={{ content: 'Add a Question', color: 'teal', onClick: () => addNewQuestion() }} size='huge' maxLength='140' onKeyPress={addNewQuestionOnEnter} value={newQuestionTitle} fluid placeholder='Add your question...' onChange={(event) => {setNewQuestionTitle(event.target.value)}} />
-                    </div>
-                </div>  
             <div className='video-menu-left'>
                 <NewCommentContainer livestream={ currentLivestream } upcomingQuestions={upcomingQuestions} pastQuestions={pastQuestions} userData={userData}  user={user}/>
             </div>
@@ -322,12 +293,23 @@ function ViewerPage(props) {
                     display: none
                 }
 
+                .topLevelContainer {
+                    position: relative;
+                    min-height: 100vh;
+                }
+
                 .top-menu {
                     background-color: rgba(245,245,245,1);
                     padding: 15px 0;
                     height: 75px;
                     text-align: center;
                     position: relative;
+                }
+
+                @media(max-width: 768px) {
+                    .top-menu {
+                        display: none;
+                    }
                 }
     
                 .top-menu div, .top-menu button {
@@ -405,15 +387,27 @@ function ViewerPage(props) {
                 }
 
                 .black-frame {
-                    position: absolute;
-                    top: 75px;
-                    bottom: 85px;
-                    left: 330px;
-                    width: calc(100% - 330px);
-                    min-width: 700px;
-                    min-height: 600px;
-                    z-index: 10;
-                    background-color: black;
+                    z-index: 10;                    
+                }
+
+                @media(max-width: 768px) {
+                    .black-frame {
+                        position: absolute;
+                        width: 100%;
+                        height: 60vh;
+                        top: 0;
+                        left: 0;
+                    }
+                }
+
+                @media(min-width: 768px) {
+                    .black-frame {
+                        position: absolute;
+                        top: 75px;
+                        bottom: 0;
+                        left: 330px;
+                        width: calc(100% - 330px);
+                    }
                 }
 
                 .video-box {
@@ -483,12 +477,27 @@ function ViewerPage(props) {
                 }
 
                 .video-menu-left {
-                    position: absolute;
-                    top: 75px;
-                    left: 0;
-                    bottom: 0;
-                    width: 330px;
                     z-index: 1;
+                }
+
+                @media(max-width: 768px) {
+                    .video-menu-left {
+                        position: absolute;
+                        top: 60vh;
+                        left: 0;
+                        width: 100%;
+                        height: 100vh;
+                    }
+                }
+
+                @media(min-width: 768px) {
+                    .video-menu-left {
+                        position: absolute;
+                        top: 75px;
+                        left: 0;
+                        bottom: 0;
+                        width: 330px;
+                    }
                 }
 
                 .button-container {

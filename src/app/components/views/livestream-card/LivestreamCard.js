@@ -83,15 +83,31 @@ function LivestreamCard(props) {
             }
         });
     }
+
+    let logoElements = props.careerCenters.map( (careerCenter, index) => {
+        return (
+            <Grid.Column width='8' key={index}>
+                <Image src={ careerCenter.logoUrl } style={{ maxHeight: '45px', margin: '0 auto' }}/>
+            </Grid.Column>
+        );
+    });
         
     return(
         <Fragment>
-            <div className='date-indicator'>{ DateUtil.getPrettyDate(props.livestream.start.toDate()) }</div>
             <div className='companies-mentor-discriber-content' onClick={(event) => goToRouteFromParent(event, '/upcoming-livestream/' + props.livestream.id)}>
+                <div className='date-indicator'>
+                    {/* <div className='coming-icon-container'>
+                        <div className='coming-icon' style={{ color: userIsRegistered() ? 'white' : '', border: userIsRegistered() ? '2px solid white' : ''}} ><Icon name='rss'/>Live stream</div>
+                    </div> */}
+                    <div>
+                        <div style={{ display: 'inline-block' }}><Icon name='calendar alternate outline' style={{ color: 'rgb(0, 210, 170)', fontSize: '0.7em', marginRight: '10px' }}/>{ DateUtil.getPrettyDay(props.livestream.start.toDate()) }</div>
+                        <div style={{ display: 'inline-block', float: 'right' }}><Icon name='clock outline' style={{ color: 'rgb(0, 210, 170)', fontSize: '0.7em', marginRight: '10px' }}/>{ DateUtil.getPrettyTime(props.livestream.start.toDate()) }</div>
+                    </div>
+                </div>
                 <div className='livestream-thumbnail' style={{ backgroundImage: 'url(' + props.livestream.backgroundImageUrl + ')' }}>
                     <div className='livestream-thumbnail-overlay' style={{ backgroundColor: userIsRegistered() ? 'rgba(0, 210, 170, 0.9)' : ''}}>
                         <div className='livestream-thumbnail-overlay-content'> 
-                            <Image style={{ maxWidth: '180px', margin: '30px 0', maxHeight: '90px', filter: userIsRegistered() ? 'brightness(0) invert(1)' : ''}} src={props.livestream.companyLogoUrl} onLoad={() => { props.grid.updateLayout() }}/>
+                            <Image style={{ maxWidth: '220px', margin: '30px 0', maxHeight: '120px', filter: userIsRegistered() ? 'brightness(0) invert(1)' : ''}} src={props.livestream.companyLogoUrl} onLoad={() => { props.grid.updateLayout() }}/>
                             <div className='livestream-position' style={{ color: userIsRegistered() ? 'white' : ''}}>{ props.livestream.title }</div>          
                             <div>
                                 <Button size='large' style={{ margin: '5px 5px 0 0' }} icon={ (props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? 'delete' : 'add' } color={(props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? null : 'teal'} content={ props.user ? ((props.livestream.registeredUsers.indexOf(props.user.email) > -1) ? 'Cancel' : 'I\'ll attend') : 'Register to attend'} onClick={(props.user && props.livestream.registeredUsers?.indexOf(props.user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
@@ -100,7 +116,6 @@ function LivestreamCard(props) {
                         </div>
                     </div>
                     <div className={'booked-icon animated tada delay-1s ' + (userIsRegistered() ? '' : 'hidden')}><Icon name='check circle'/>Booked</div>
-                    <div className='coming-icon' style={{ color: userIsRegistered() ? 'white' : '', border: userIsRegistered() ? '2px solid white' : ''}} ><Icon name='rss'/>Live stream</div>
                 </div>
                 <div className='background'>
                     <Grid centered className='middle aligned' divided>
@@ -113,28 +128,23 @@ function LivestreamCard(props) {
                                     <div className='livestream-streamer'>
                                         <div className='livestream-streamer-name'>{ props.livestream.mainSpeakerName }</div>
                                         <div className='livestream-streamer-position'>{ props.livestream.mainSpeakerPosition }</div>
-                                        <div className='livestream-streamer-position'>{ props.livestream.mainSpeakerBackground }</div>
+                                        <div className='livestream-streamer-position light'>{ props.livestream.mainSpeakerBackground }</div>
                                     </div>
                                 </div>
                             </Grid.Column>
                         </Grid.Row>
                     </Grid>
-                    <Grid centered className='middle aligned' >
-                        <Grid.Row style={{ paddingTop: 0, paddingBottom: '14px' }}>
+                    <Grid className='middle aligned' centered>
+                        <Grid.Row style={{ paddingTop: 0, paddingBottom: '5px' }}>
                             <Grid.Column width={15}>
                                 <TargetElementList fields={props.livestream.targetGroups} selectedFields={props.fields}/>
                             </Grid.Column>
-                        </Grid.Row>
-                        <Grid.Row style={{ paddingTop: 0, display: 'none' }}>
-                            <Grid.Column width={15}>
-                                <div className='university-icon'>
-                                    <Image style={{ maxHeight: '10px'}} src={'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fethz.png?alt=media'}/>
-                                </div>
-                                <div className='university-icon'>
-                                    <Image style={{ maxHeight: '10px'}} src={'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fepfl.png?alt=media'}/>
-                                </div>
-                            </Grid.Column>
-                        </Grid.Row>
+                        </Grid.Row>   
+                    </Grid>
+                    <div style={{ width: '100%', height: '2px', backgroundColor: 'rgba(0,210,170,0.6)', margin: '30px 0 10px 0'}}></div>
+                    <div style={{ textAlign: 'center', fontSize: '0.8em'}}>created by</div>
+                    <Grid className='middle aligned' centered style={{ padding: '10px' }}>
+                        { logoElements }
                     </Grid>
                 </div>
             </div>
@@ -145,12 +155,12 @@ function LivestreamCard(props) {
                 }
 
                 .date-indicator {
-                    text-align: center;
-                    margin: 20px;
-                    font-size: 1.7em;
-                    font-weight: 600;
-                    color: rgb(44, 66, 81);
-                    filter: drop-shadow(2px 2px 0 white);
+                    text-align: left;
+                    padding: 30px 45px 30px 45px;
+                    font-size: 1.6em;
+                    font-weight: 500;
+                    color: white;
+                    background-color: rgb(44, 66, 81);
                 }
 
                 .companies-mentor-discriber-content-companylogo {
@@ -240,6 +250,12 @@ function LivestreamCard(props) {
                     font-size: 0.9em;
                     line-height: 1.2em;
                     color: grey;
+                    font-weight: 300;
+                }
+
+                .livestream-streamer-position.light {
+                    color: rgb(180,180,180);
+                    font-size: 0.8em;
                 }
 
                 .livestream-streamer-degree {
@@ -318,15 +334,20 @@ function LivestreamCard(props) {
                     font-weight: 700;
                 }
 
+                .coming-icon-container {
+                    margin: 0 0 30px 0;
+                }
+
                 .coming-icon {
-                    position: absolute;
-                    top: 15px;
-                    left: 15px;
-                    padding: 4px 6px;
-                    border: 2px solid rgb(44, 66, 81);
+                    padding: 6px 8px;
+                    border: 3px solid white;
                     text-transform: uppercase;
-                    color: rgb(44, 66, 81);
+                    text-align: center;
+                    color: white;
                     font-weight: 700;
+                    display: inline-block;
+                    font-size: 0.8em;
+                    margin: 0 auto;
                 }
 
                 .university-icon {

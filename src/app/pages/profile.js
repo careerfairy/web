@@ -23,8 +23,8 @@ const UserProfile = (props) => {
     const universities = UNIVERSITY_NAMES;
     const levels = STUDY_LEVELS;
 
-    const [loading, setLoading] = useState(false)
-    const [userData, setUserData] = useState(null)
+    const [loading, setLoading] = useState(false);
+    const [userData, setUserData] = useState(null);
     const [user, setUser] = useState(null);
     const [initialValues, setInitialValues] = useState(null);
     const [selectField, setSelectField] = useState(generic_subjects);
@@ -124,7 +124,7 @@ const UserProfile = (props) => {
                             props.firebase.setUserData(user.email, values.firstName, values.lastName, values.university, values.fieldOfStudy, values.levelOfStudy)
                             .then(() => {
                                 if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-                                    if (values.university === 'ethzurich' || values.university === 'epflausanne' || values.university === 'unizurich'|| values.university === 'unilausanne'|| values.university === 'fhgraubuenden' || values.university === 'hochschulerapperswil' || values.university === 'technischeuniwien') {
+                                    if (values.university === 'ethzurich' || values.university === 'epflausanne' || values.university === 'unizurich'|| values.university === 'unilausanne'|| values.university === 'fhgraubuenden' || values.university === 'hochschulerapperswil' || values.university === 'technischeuniwien'  || values.university === 'technischeunidresden'  || values.university === 'chbundesverwaltung') {
                                         if (values.university === 'ethzurich') {
                                             return router.push('/next-livestreams?university=ethanalyticsclub');
                                         }
@@ -178,21 +178,21 @@ const UserProfile = (props) => {
                                 </Form.Group>
                                 <Form.Group widths='equal'>
                                     <Form.Field>
-                                        <label>Select your place of study</label>
+                                        <label>Organisation</label>
                                         <Dropdown placeholder='Select University' value={values.university} onChange={(event, {value}) => { setFieldValue('university', value, true); updateSelectFields(value); setFieldValue('fieldOfStudy', null, false)}} compact selection options={universities}/>
                                         <div className='field-error'>
                                             {errors.university && touched.university && errors.university}
                                         </div>
                                     </Form.Field>
                                     <Form.Field>
-                                        <label>Select your field of expertise</label>
+                                        <label>Field</label>
                                         <Dropdown placeholder='Select Field of Study' value={values.fieldOfStudy} onChange={(event, {value}) => { setFieldValue('fieldOfStudy', value, true) }} compact selection options={selectField}/>
                                         <div className='field-error'>
                                             {errors.university && touched.university && errors.university}
                                         </div>
                                     </Form.Field>
                                     <Form.Field>
-                                        <label>Select your level of study</label>
+                                        <label>Level of study</label>
                                         <Dropdown placeholder='Select Field of Study' value={values.levelOfStudy} onChange={(event, {value}) => { setFieldValue('levelOfStudy', value, true) }} compact selection options={levels}/>
                                         <div className='field-error'>
                                             {errors.university && touched.university && errors.university}

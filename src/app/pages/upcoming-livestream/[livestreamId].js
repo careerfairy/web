@@ -35,7 +35,6 @@ function UpcomingLivestream(props) {
 
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [careerCenters, setCareerCenters] = useState([]);
-
     
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
