@@ -37,7 +37,9 @@ function ViewerPage(props) {
     const isPlayMode = true;
     const localVideoId = null;
     const streamingCallbacks = {};
-    const errorCallbacks = {};
+    const errorCallbacks = {
+        onOtherError: (error) => {}
+    };
     const streamerId = null;
 
     const { webRTCAdaptor, externalMediaStreams, audioLevels } = 
