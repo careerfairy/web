@@ -45,8 +45,6 @@ function StreamingPage(props) {
 
     const [numberOfViewers, setNumberOfViewers] = useState(0);
 
-    const [speakingLivestreamId, setSpeakingLivestreamId] = useState(livestreamId);
-
     const localVideoId = 'localVideo';
     const isPlayMode = false;
 
@@ -101,13 +99,6 @@ function StreamingPage(props) {
             livestreamId,
             streamerId
         );
-
-    useEffect(() => {
-        if (audioLevels && audioLevels.length > 0) {
-            const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
-            setSpeakingLivestreamId(maxEntry.streamId);
-        }
-    }, [audioLevels]);
 
     useEffect(() => {
         if (isStreaming) {
@@ -237,7 +228,7 @@ function StreamingPage(props) {
             </div>
             <div className='black-frame'>
                 <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
-                    <CurrentSpeakerDisplayer isPlayMode={false} localId={streamerId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={speakingLivestreamId}/>
+                    <CurrentSpeakerDisplayer isPlayMode={false} speakerSwitchModeActive={false} localId={streamerId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={currentLivestream.currentSpeakerId}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
                     <SmallStreamerVideoDisplayer isPlayMode={false} localStream={localStream} streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={false}/>

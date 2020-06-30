@@ -209,6 +209,24 @@ class Firebase {
         });
     }
 
+    setLivestreamSpeakerSwitchMode = (livestreamId, mode) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+        return ref.update({
+            speakerSwitchMode: mode
+        });
+    }
+
+    setLivestreamCurrentSpeakerId = (livestreamId, id) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+        return ref.update({
+            currentSpeakerId: id
+        });
+    }
+
     setLivestreamPresentation = (livestreamId, downloadUrl) => {
         let ref = this.firestore
             .collection("livestreams")

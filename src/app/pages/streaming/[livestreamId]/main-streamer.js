@@ -47,8 +47,6 @@ function StreamingPage(props) {
 
     const [registeredSpeaker, setRegisteredSpeaker] = useState(false);
 
-    const [speakingLivestreamId, setSpeakingLivestreamId] = useState(livestreamId);
-
     const localVideoId = 'localVideo';
     const  isPlayMode = false;
 
@@ -105,10 +103,17 @@ function StreamingPage(props) {
             livestreamId
         );
     useEffect(() => {
-        if (audioLevels && audioLevels.length > 0) {
-            const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
-            setSpeakingLivestreamId(maxEntry.streamId);
+        if (currentLivestream.speakerSwitchMode === 'automatic') {
+            if (audioLevels && audioLevels.length > 0) {
+                const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
+                setLivestreamCurrentSpeakerId(maxEntry.streamId);
+            }
+        } else {
+            if (currentLivestream) {
+                setLivestreamCurrentSpeakerId(currentLivestream.currentSpeakerId);
+            }
         }
+        
     }, [audioLevels]);
 
     useEffect(() => {
@@ -217,6 +222,14 @@ function StreamingPage(props) {
         props.firebase.setLivestreamMode(livestreamId, mode);
     }
 
+    function setLivestreamSpeakerSwitchMode(mode) {
+        props.firebase.setLivestreamSpeakerSwitchMode(livestreamId, mode);
+    }
+
+    function setLivestreamCurrentSpeakerId(id) {
+        props.firebase.setLivestreamCurrentSpeakerId(livestreamId, id);
+    }
+
     function toggleMicrophone() {
         if (isLocalMicMuted) {
             webRTCAdaptor.unmuteLocalMic();
@@ -255,7 +268,7 @@ function StreamingPage(props) {
             </div>
             <div className='black-frame'>
                 <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
-                    <CurrentSpeakerDisplayer isPlayMode={false} localId={livestreamId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={speakingLivestreamId}/>
+                    <CurrentSpeakerDisplayer isPlayMode={false} speakerSwitchModeActive={currentLivestream.speakerSwitchMode === "manual"} setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId} localId={livestreamId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={currentLivestream.currentSpeakerId} muted={false}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
                     <SmallStreamerVideoDisplayer isPlayMode={false} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={true}/>
@@ -300,22 +313,22 @@ function StreamingPage(props) {
                                 </div>
                             </Grid.Column>
                         </Grid.Row>
-                        {/* <Grid.Row style={{ margin: '10px 0'}}>
+                        <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
-                                <div className='side-button' onClick={() => toggleScreenSharing()}style={{  color: isCapturingDesktop ? 'red' : 'white' }}>
-                                    <Icon name='tv' size='large' style={{ margin: '0 0 5px 0' }}/>
-                                    <p style={{ fontSize: '0.8em' }}>{ isCapturingDesktop ? 'Stop Screen Sharing' : 'Share Screen' }</p>
+                                <div className='side-button' onClick={() => setLivestreamSpeakerSwitchMode(currentLivestream.speakerSwitchMode === "automatic" ? "manual" : "automatic")} style={{  color: currentLivestream.speakerSwitchMode === "automatic" ? 'red' : 'white' }}>
+                                    <Icon name='assistive listening systems' size='large' style={{ margin: '0 0 5px 0' }}/>
+                                    <p style={{ fontSize: '0.8em' }}>{ currentLivestream.speakerSwitchMode === "automatic" ? 'Automatic Speaker Switch' : 'Manual Speaker Switch' }</p>
                                 </div>
                             </Grid.Column>
-                        </Grid.Row> */}
-                        <Grid.Row style={{ margin: '10px 0'}}>
+                        </Grid.Row>
+                        {/* <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
                                 <div className='side-button' onClick={() => setShowSpeakersModal(true)}>
                                     <Icon name='user plus' size='large' style={{ margin: '0 0 5px 0', color: 'white'}}/>
                                     <p style={{ fontSize: '0.8em', color: 'white' }}>Invite Speakers</p>
                                 </div>
                             </Grid.Column>
-                        </Grid.Row>
+                        </Grid.Row> */}
                         {/* <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
                                 <div className='side-button' onClick={() => alert("blob")}>

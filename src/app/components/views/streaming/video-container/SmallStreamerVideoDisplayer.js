@@ -16,7 +16,7 @@ function SmallStreamerVideoDisplayer(props) {
     let externalVideoElements = props.streams.map( (stream, index) => {
         return (
             <div style={{ width: '250px', height: '100%', display: 'inline-block'  }} key={stream.streamId}>
-                <RemoteVideoContainer stream={stream} length={props.streams.length} height={'150px'} index={index} />
+                <RemoteVideoContainer stream={stream} length={props.streams.length} height={'150px'} isPlayMode={true} index={index} muted={props.muted}/>
             </div>
         );
     });
@@ -54,7 +54,7 @@ function SmallStreamerVideoDisplayer(props) {
     return (
         <Fragment>
             <div className='relative-container'>
-                <div className='relative-container-videos' style={{ height: '150px' }} centered>
+                <div className='relative-container-videos' style={{ height: '150px' }}>
                     { externalVideoElements }
                 </div> 
             </div>

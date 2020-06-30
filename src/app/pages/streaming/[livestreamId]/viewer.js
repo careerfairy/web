@@ -123,13 +123,6 @@ function ViewerPage(props) {
     }, [livestreamId]);
 
     useEffect(() => {
-        if (audioLevels && audioLevels.length > 0) {
-            const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
-            setSpeakingLivestreamId(maxEntry.streamId);
-        }
-    }, [audioLevels]);
-
-    useEffect(() => {
         if (currentLivestream) {
             props.firebase.getLivestreamCareerCenters(currentLivestream.universities).then( querySnapshot => {
                 let groupList = [];
@@ -190,14 +183,19 @@ function ViewerPage(props) {
             </div>
             <div className='black-frame'>
                 <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
-                    <CurrentSpeakerDisplayer isPlayMode={true} streams={externalMediaStreams} currentSpeaker={speakingLivestreamId}/>
+                    <CurrentSpeakerDisplayer isPlayMode={true} speakerSwitchModeActive={false} streams={externalMediaStreams} currentSpeaker={currentLivestream.currentSpeakerId} muted={!currentLivestream.hasStarted || !(currentLivestream.mode === 'default')}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
-                    <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams} livestreamId={currentLivestream.id} presenter={false}/>
+                    <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams} livestreamId={currentLivestream.id} presenter={false}  muted={!currentLivestream.hasStarted || !(currentLivestream.mode === 'presentation')}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none'), position: 'absolute', top: '150px', width: '100%', height: 'calc(100% - 150px)', backgroundColor: 'rgb(30,30,30)'}}>
                     <LivestreamPdfViewer livestreamId={currentLivestream.id} presenter={false}/>
                 </div> 
+                {/* <div className={ currentLivestream.hasStarted ? 'hidden' : '' }style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'white', zIndex: '9999'}}>
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: '1.4em', fontWeight: '700', color: 'rgb(0, 210, 170)'}}>
+                        Thank you for joining!
+                    </div>
+                </div> */}
             </div>  
             <div className='video-menu-left'>
                 <NewCommentContainer livestream={ currentLivestream } upcomingQuestions={upcomingQuestions} pastQuestions={pastQuestions} userData={userData}  user={user}/>

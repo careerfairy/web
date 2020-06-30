@@ -70,10 +70,16 @@ function CurrentSpeakerDisplayer(props) {
         }
     }
 
+    function updateCurrentStreamId(streamId) {
+        if (props.speakerSwitchModeActive) {
+            props.setLivestreamCurrentSpeakerId(streamId);
+        }
+    }
+
     let externalVideoElements = props.streams.map( (stream, index) => {
         return (
-            <div className={getVideoContainerClass(stream.streamId)} style={{ padding: 0 }} key={stream.streamId}>
-                <RemoteVideoContainer isPlayMode={props.isPlayMode} stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
+            <div className={getVideoContainerClass(stream.streamId)} style={{ padding: 0 }} key={stream.streamId} onClick={() => updateCurrentStreamId(stream.streamId)}>
+                <RemoteVideoContainer isPlayMode={props.isPlayMode} muted={props.muted} stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
                 <style jsx>{`
                     .quarter-width {
                         height: 100%;
@@ -124,9 +130,9 @@ function CurrentSpeakerDisplayer(props) {
 
     if (!props.isPlayMode) {
         let localVideoElement =
-            <div className={getVideoContainerClass(props.localId)} style={{ padding: '0', margin: '0' }} key={"localVideoId"}>
+            <div className={getVideoContainerClass(props.localId)} style={{ padding: '0', margin: '0' }} key={"localVideoId"} onClick={() => updateCurrentStreamId(props.localId)}>
                 <div className='video-container' style={{ height: getVideoContainerHeight(props.localId) }}>
-                    <video id="localVideo" ref={localVideoRef} muted autoPlay width={ '100%' } style={{ right: (props.streams.length > 0) ? '0' : '', bottom: (props.streams.length > 1) ? '0' : '' }}></video> 
+                    <video id="localVideo" ref={localVideoRef} muted autoPlay width={ '100%' }></video> 
                 </div>
                 <style jsx>{`
                     .quarter-width {
@@ -162,11 +168,10 @@ function CurrentSpeakerDisplayer(props) {
                     #localVideo {
                         position: absolute;
                         top: 50%;
-                        left: 0;
-                        transform: translateY(-50%);
-                        width: 100%;
-                        height: 100%;
-                        object-fit: cover;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        max-width: 100%;
+                        max-height: 100%;
                     }
             `}</style>
             </div>;
@@ -177,7 +182,7 @@ function CurrentSpeakerDisplayer(props) {
     return (
         <Fragment>
             <div className='relative-container'>
-                <div className='relative-container-videos' style={{ height: getMinimizedSpeakersGridHeight() }} centered>
+                <div className='relative-container-videos' style={{ height: getMinimizedSpeakersGridHeight() }}>
                     { externalVideoElements }
                 </div> 
             </div>             
@@ -195,10 +200,12 @@ function CurrentSpeakerDisplayer(props) {
                     overflow-y: hidden;
                     white-space: nowrap;
                     text-align: center;
+                    scrollbar-width: 5px;
+                    scollbar-color: black rgba(0, 210, 170, 0.8);
                 }
 
                 .relative-container-videos::-webkit-scrollbar {
-                    height: 3px;
+                    height: 5px;
                 }
 
                 .relative-container-videos::-webkit-scrollbar-track {
