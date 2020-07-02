@@ -124,7 +124,7 @@ function BookingModal(props) {
                             <Image src={props.livestream.companyLogoUrl} style={{ maxHeight: '120px', maxWidth: '200px', margin: '20px auto'}}/>
                             <div className={ modalStep !== 0 ? 'hidden' : 'modalStep animated fadeIn'}>
                                 <h2 className='booking-modal-title'><Icon name='check circle'/>Your spot is secured!</h2>
-                                <Button style={{ margin: '10px 2px'}} primary content='Next' onClick={() => setModalStep(1)} size='large'/>
+                                <Button style={{ margin: '10px 2px'}} primary content='Next' onClick={() => questionElements.length > 0 ? setModalStep(1) : setModalStep(2) } size='large'/>
                             </div>
                             <div className={ modalStep !== 1 ? 'hidden' : 'modalStep'}>
                                 <h4 className='booking-modal-subtitle'>Which Questions Should The Speaker Answer?</h4>

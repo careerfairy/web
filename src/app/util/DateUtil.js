@@ -29,7 +29,7 @@ export default class DateUtil {
 
     static getPrettyDate(JSDate) {
         return DateUtil.getMonth(JSDate.getMonth()) + ' ' 
-                + JSDate.getDate() + DateUtil.getDayExtension(JSDate.getDate()) + ', '
+                + JSDate.getDate() + ', '
                 + JSDate.getHours() + ':'
                 + DateUtil.getTimeMinutes(JSDate.getMinutes()) + ' CET';
     }
@@ -43,7 +43,7 @@ export default class DateUtil {
 
     static getPrettyDay(JSDate) {
         return DateUtil.getMonth(JSDate.getMonth()) + ' ' 
-                + JSDate.getDate() + DateUtil.getDayExtension(JSDate.getDate());
+                + JSDate.getDate();
     }
 
     static getPrettyTime(JSDate) {

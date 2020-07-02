@@ -75,7 +75,7 @@ function LivestreamPdfViewer (props) {
 
     function getPageHeight() {
         var maxHeight = 450;
-        var minHeight = 280;
+        var minHeight = 180;
         var calcHeight = windowSize.height > (windowSize.width / 2.2) ? (windowSize.width / 2 - 200) : (windowSize.height - 250);
 
         if (calcHeight > maxHeight) return maxHeight;
@@ -92,7 +92,7 @@ function LivestreamPdfViewer (props) {
     }
     
     return (
-        <div style={{ position: 'relative', width: '100%'}}>
+        <div style={{ position: 'relative', width: '100%' }}>
             <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translate(-50%)', display: ( pdfObject ? 'block' : 'none') }}>
                 <div style={{ marginBottom: '20px', zIndex: '9999', width: '100%', minWidth: '500px', display: props.presenter ? 'block' : 'none'}}>
                     <div style={{ display: 'inline-block'}}>

@@ -8,13 +8,11 @@ import NewCommentContainer from '../../../components/views/viewer/comment-contai
 import SmallViewerVideoDisplayer from '../../../components/views/streaming/video-container/SmallViewerVideoDisplayer';
 import ViewerVideoDisplayer from '../../../components/views/streaming/video-container/ViewerVideoDisplayer';
 import LivestreamPdfViewer from '../../../components/util/LivestreamPdfViewer';
+import useWebRTCAdaptor from '../../../components/custom-hook/useWebRTCAdaptor';
+import CurrentSpeakerDisplayer from '../../../components/views/streaming/video-container/CurrentSpeakerDisplayer';
+import SmallStreamerVideoDisplayer from '../../../components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 
 function ViewerPage(props) {
-
-    const eth_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Feth-career-center.png?alt=media';
-    const epfl_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fepfl-career-center.png?alt=media';
-    const uzh_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fjobhub.png?alt=media';
-    const polyefair_logo = 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fpolyefair_logo.png?alt=media';
 
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
@@ -22,20 +20,39 @@ function ViewerPage(props) {
     const [user, setUser] = useState(null);
     const [userData, setUserData] = useState(null);
 
-    const [isPlaying, setIsPlaying] = useState(false);
-
     const [questionSubmittedModalOpen, setQuestionSubmittedModalOpen] = useState(false);
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
-    const [registeredStreamers, setRegisteredStreamers] = useState([]);
 
-    const [newQuestionTitle, setNewQuestionTitle] = useState("");
+    const [careerCenters, setCareerCenters] = useState([]);
 
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [pastQuestions, setPastQuestions] = useState([]);
 
-    const [initalReactionSent, setInitialReactionSent] = useState(false);
+    const [mediaConstraints, setMediaConstraints] = useState({ audio: true, video: true});
+    const [speakingLivestreamId, setSpeakingLivestreamId] = useState(livestreamId);
+
+    const streamerReady = true;
+    const isPlayMode = true;
+    const localVideoId = null;
+    const streamingCallbacks = {};
+    const errorCallbacks = {
+        onOtherError: (error) => {}
+    };
+    const streamerId = null;
+
+    const { webRTCAdaptor, externalMediaStreams, audioLevels } = 
+        useWebRTCAdaptor(
+            streamerReady,
+            isPlayMode,
+            localVideoId,
+            mediaConstraints,
+            streamingCallbacks,
+            errorCallbacks,
+            livestreamId,
+            streamerId
+        );
 
     useEffect(() => {
         if (currentLivestream.id) {
@@ -106,19 +123,18 @@ function ViewerPage(props) {
     }, [livestreamId]);
 
     useEffect(() => {
-        if (livestreamId) {
-            const unsubscribe = props.firebase.listenToConnectedLivestreamLiveSpeakers(livestreamId, querySnapshot => {
-                let liveSpeakersList = [];
+        if (currentLivestream) {
+            props.firebase.getLivestreamCareerCenters(currentLivestream.universities).then( querySnapshot => {
+                let groupList = [];
                 querySnapshot.forEach(doc => {
-                    let speaker = doc.data();
-                    speaker.id = doc.id;
-                    liveSpeakersList.push(speaker);
+                    let group = doc.data();
+                    group.id = doc.id;
+                    groupList.push(group);
                 });
-                setRegisteredStreamers(liveSpeakersList);
+                setCareerCenters(groupList);
             });
-            return () => unsubscribe();
         }
-    }, [livestreamId]);
+    }, [currentLivestream]);
 
     useEffect(() => {
         if (userData && currentLivestream && userData.talentPools && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
@@ -144,89 +160,11 @@ function ViewerPage(props) {
         props.firebase.leaveCompanyTalentPool(currentLivestream.companyId, user.email);
     }
 
-    function getContainerWidth(length) {
-        if (currentLivestream.mode === 'presentation') {
-            return 4;
-        } else {
-            return length > 1 ? 8 : 16;
-        }
-    }
-
-    let connectedStreamers = registeredStreamers.filter(streamer => streamer.connected);
-    let videoElements = connectedStreamers.map( (streamer, index) => {
+    let logoElements = careerCenters.map( (careerCenter, index) => {
         return (
             <Fragment>
-                <Grid.Column width={ getContainerWidth(connectedStreamers.length) } style={{ padding: 0 }} key={streamer.id}>
-                    <ViewerVideoContainer streamer={streamer} length={connectedStreamers.length} index={index + 1} isPlaying={isPlaying} height={'100%'} hasStarted={currentLivestream.hasStarted}/>
-                </Grid.Column>
+                <Image src={ careerCenter.logoUrl } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block' }}/>
             </Fragment>
-        );
-    });
-
-    function isUniversityLivestream(university) {
-        if (currentLivestream) {
-            return currentLivestream.universities.indexOf(university) > -1;
-        }
-    }
-
-    function addNewQuestion() {
-        if (!userData ||!(newQuestionTitle.trim()) || newQuestionTitle.trim().length < 5) {
-            return;
-        }
-
-        const newQuestion = {
-            title: newQuestionTitle,
-            votes: 0,
-            type: "new",
-            author: !currentLivestream.test ? user.email : 'test@careerfairy.io'
-        }
-        props.firebase.putLivestreamQuestion(currentLivestream.id, newQuestion)
-            .then(() => {
-                setNewQuestionTitle("");
-                setQuestionSubmittedModalOpen(true);
-            }, () => {
-                console.log("Error");
-        })
-    }
-
-    function addNewQuestionOnEnter(target) {
-        if(target.charCode==13){
-            addNewQuestion();   
-        } 
-    }
-
-    function sendInstantReaction(reaction) {
-        const newComment = {
-            title: reaction,
-            author: userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous',
-        }
-        props.firebase.putQuestionComment(currentLivestream.id, upcomingQuestions[0].id, newComment)
-            .then(() => {}, error => {
-                console.log("Error: " + error);
-            })
-    }
-
-    function getInitialReactions() {
-        if (currentLivestream.language === "CH") {
-            return ['Hallo!', 'Hoi zäme', 'Hi! :-)'];
-        } 
-        if (currentLivestream.language === "DE") {
-            return ['Hallo!', 'Guten Tag!', 'Hi! :-)'];
-        }
-        else {
-            return ['Hello!', 'Hi everyone!', 'How do you do?'];
-        }
-    }
-
-    let reactionElements = getInitialReactions().map((reaction, index) => {
-        return (
-            <Grid.Column width={5} key={index}>
-                <div onClick={() => {sendInstantReaction(reaction); setInitialReactionSent(true);}} style={{ cursor: 'pointer', position: 'relative', backgroundColor: 'white', color: 'grey', padding: '20px', borderRadius: '20px', textAlign: 'left' }}>
-                    <div style={{ textTransform: 'capitalize', fontSize: '0.9em', fontWeight: '400', color: 'black', textAlign: 'left', marginBottom: '0', minWidth: '200px'}}>{ reaction }</div>
-                    <div style={{ textTransform: 'capitalize', fontSize: '0.7em', fontWeight: '400', color: 'grey', textAlign: 'left', margin: '0'}}>@{userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous'}</div>
-                    <Button circular icon='chevron right circle' style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)'}} primary/>
-                </div>
-            </Grid.Column>
         );
     });
 
@@ -235,10 +173,7 @@ function ViewerPage(props) {
             <div className='top-menu'>
                 <div className='top-menu-left'>    
                     <Image src='/logo_teal.png' style={{ maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
-                    <Image src={ eth_logo } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: isUniversityLivestream("ethzurich") ? 'inline-block' : 'none' }}/>
-                    <Image src={ epfl_logo } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: isUniversityLivestream("epflausanne") ? 'inline-block' : 'none' }}/>
-                    <Image src={ uzh_logo } style={{ maxWidth: '150px', maxHeight: '50px', display: isUniversityLivestream("unizurich") ? 'inline-block' : 'none' }}/>
-                    <Image src={ polyefair_logo } style={{ maxWidth: '150px', maxHeight: '50px', display: isUniversityLivestream("polyefair") ? 'inline-block' : 'none' }}/>
+                    { logoElements }
                     <div style={{ position: 'absolute', bottom: '13px', left: '120px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
                 </div>
                 <div className={'top-menu-right'}>
@@ -247,28 +182,21 @@ function ViewerPage(props) {
                 </div>
             </div>
             <div className='black-frame'>
-                <div className='video-box' style={{ height: currentLivestream.mode === 'presentation' ? '150px' : '100%' }}>
-                    <Grid style={{ margin: 0, height: '100%' }} centered>
-                        { videoElements }
-                    </Grid>
+                <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
+                    <CurrentSpeakerDisplayer isPlayMode={true} speakerSwitchModeActive={false} streams={externalMediaStreams} currentSpeaker={currentLivestream.currentSpeakerId} muted={!currentLivestream.hasStarted || !(currentLivestream.mode === 'default')}/>
+                </div>
+                <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
+                    <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams} livestreamId={currentLivestream.id} presenter={false}  muted={!currentLivestream.hasStarted || !(currentLivestream.mode === 'presentation')}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none'), position: 'absolute', top: '150px', width: '100%', height: 'calc(100% - 150px)', backgroundColor: 'rgb(30,30,30)'}}>
                     <LivestreamPdfViewer livestreamId={currentLivestream.id} presenter={false}/>
                 </div> 
-                {/* <div className={'reactions-sender ' + (initalReactionSent ? 'hidden' : '')}>
-                    <div style={{ fontSize: '2em', margin: '0 0 40px 0'}}>How about saying hello?</div>
-                    <Grid textAlign='center'>
-                        { reactionElements }
-                    </Grid>
-                    <div onClick={() => setInitialReactionSent(true)} style={{ margin: '15px 0 0 0', fontSize: '0.9em', fontWeight: '300', textDecoration: 'underline', cursor: 'pointer' }}>No, I am here undercover!</div>
-                    <Icon onClick={() => setInitialReactionSent(true)}  name='delete' size='large' style={{ position: 'absolute', top: '20px', right: '20px', color: 'white', cursor: 'pointer'}} />
+                {/* <div className={ currentLivestream.hasStarted ? 'hidden' : '' }style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'white', zIndex: '9999'}}>
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: '1.4em', fontWeight: '700', color: 'rgb(0, 210, 170)'}}>
+                        Thank you for joining!
+                    </div>
                 </div> */}
             </div>  
-            <div className='video-menu'>
-                <div  className='video-menu-input'>
-                        <Input action={{ content: 'Add a Question', color: 'teal', onClick: () => addNewQuestion() }} size='huge' maxLength='140' onKeyPress={addNewQuestionOnEnter} value={newQuestionTitle} fluid placeholder='Add your question...' onChange={(event) => {setNewQuestionTitle(event.target.value)}} />
-                    </div>
-                </div>  
             <div className='video-menu-left'>
                 <NewCommentContainer livestream={ currentLivestream } upcomingQuestions={upcomingQuestions} pastQuestions={pastQuestions} userData={userData}  user={user}/>
             </div>
@@ -290,12 +218,23 @@ function ViewerPage(props) {
                     display: none
                 }
 
+                .topLevelContainer {
+                    position: relative;
+                    min-height: 100vh;
+                }
+
                 .top-menu {
                     background-color: rgba(245,245,245,1);
                     padding: 15px 0;
                     height: 75px;
                     text-align: center;
                     position: relative;
+                }
+
+                @media(max-width: 768px) {
+                    .top-menu {
+                        display: none;
+                    }
                 }
     
                 .top-menu div, .top-menu button {
@@ -373,14 +312,28 @@ function ViewerPage(props) {
                 }
 
                 .black-frame {
-                    position: absolute;
-                    top: 75px;
-                    bottom: 85px;
-                    left: 330px;
-                    width: calc(100% - 330px);
-                    min-width: 700px;
-                    min-height: 600px;
                     z-index: 10;
+                    background-color: black;
+                }
+
+                @media(max-width: 768px) {
+                    .black-frame {
+                        position: absolute;
+                        width: 100%;
+                        height: 60vh;
+                        top: 0;
+                        left: 0;
+                    }
+                }
+
+                @media(min-width: 768px) {
+                    .black-frame {
+                        position: absolute;
+                        top: 75px;
+                        bottom: 0;
+                        left: 330px;
+                        width: calc(100% - 330px);
+                    }
                 }
 
                 .video-box {
@@ -450,12 +403,27 @@ function ViewerPage(props) {
                 }
 
                 .video-menu-left {
-                    position: absolute;
-                    top: 75px;
-                    left: 0;
-                    bottom: 0;
-                    width: 330px;
                     z-index: 1;
+                }
+
+                @media(max-width: 768px) {
+                    .video-menu-left {
+                        position: absolute;
+                        top: 60vh;
+                        left: 0;
+                        width: 100%;
+                        height: 100vh;
+                    }
+                }
+
+                @media(min-width: 768px) {
+                    .video-menu-left {
+                        position: absolute;
+                        top: 75px;
+                        left: 0;
+                        bottom: 0;
+                        width: 330px;
+                    }
                 }
 
                 .button-container {

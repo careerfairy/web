@@ -20,7 +20,7 @@ import Link from 'next/link';
 import Head from 'next/head';
 
 
-function Calendar(props) {
+function NextLivestreams(props) {
 
     const router = useRouter();
 
@@ -32,8 +32,14 @@ function Calendar(props) {
 
     const [grid, setGrid] = useState(null);
     const [livestreams, setLivestreams] = useState([]);
-    const [allLivestreams, setAllLivestreams] = useState([]);
+    const [noLivestreamsPresent, setNoLivestreamsPresent] = useState(false);
+
+    const [fields, setFields] = useState([]);
+    const [showAllFields, setShowAllFields] = useState(false);
     const [cookieMessageVisible, setCookieMessageVisible] = useState(true);
+    const [careerCenters, setCareerCenters] = useState([]);
+
+    const myRef = useRef(null);
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
@@ -66,11 +72,17 @@ function Calendar(props) {
                 livestreams.push(livestream);
             });
             if (university) {
-                setLivestreams(livestreams);
+                if (livestreams.length === 0) {
+                    setNoLivestreamsPresent(true);
+                }
+                setAllLivestreams(livestreams);
             } else {
-                setLivestreams(livestreams.filter( livestream => !livestream.hidden || livestream.hidden === false));
+                let filteredStreams = livestreams.filter( livestream => !livestream.hidden || livestream.hidden === false);
+                if (filteredStreams.length === 0) {
+                    setNoLivestreamsPresent(true);
+                }
+                setAllLivestreams(filteredStreams);
             }
-
         }, error => {
             console.log(error);
         });
@@ -78,12 +90,55 @@ function Calendar(props) {
     }, [university]);
 
     useEffect(() => {
+        if (fields.length === 0) {
+            if (university) {
+                setLivestreams(filterUniversityLivestreams(allLivestreams, university));
+            } else {
+                setLivestreams(allLivestreams);
+            }
+        } else {
+            const filteredMentors = allLivestreams.filter(livestream => {
+                return fields.some(field => {
+                    return livestream.targetGroups.indexOf(field) > -1;
+                });
+            })
+            if (university) {
+                setLivestreams(filterUniversityLivestreams(filteredMentors, university));
+            } else {
+                setLivestreams(filteredMentors);
+            }
+        }
+    }, [allLivestreams, fields]);
+
+    useEffect(() => {
+        if (allLivestreams && allLivestreams.length > 0) {
+            let allGroups = [];
+            allLivestreams.map(livestream => livestream.universities).forEach(groups => {
+                groups.forEach( group => {
+                    if (!(allGroups.indexOf(group) > -1)) {
+                        allGroups.push(group);
+                    }
+                });
+            });
+            props.firebase.getLivestreamCareerCenters(allGroups).then( querySnapshot => {
+                let groupList = [];
+                querySnapshot.forEach(doc => {
+                    let group = doc.data();
+                    group.id = doc.id;
+                    groupList.push(group);
+                });
+                setCareerCenters(groupList);
+            });
+        }
+    }, [allLivestreams]);
+
+    useEffect(() => {
         if (grid) {
             setTimeout(() => {
                 grid.updateLayout();
             }, 500);
         }
-    }, [grid,allLivestreams]);
+    }, [grid,livestreams, careerCenters]);
 
     useEffect(() => {
         if (localStorage.getItem('hideCookieMessage') === 'yes') {
@@ -100,10 +155,59 @@ function Calendar(props) {
         window.open('http://careerfairy.io' + route, '_blank');
     }
 
-    const mentorElements = allLivestreams.map( (mentor, index) => {
+    function getUniversityName(universityCode) {
+        const uni = UNIVERSITY_NAMES.find(university => university.value === universityCode);
+        if (!uni) return null;
+        return uni.text;
+    }
+
+    const filterElement = backgroundOptions.map((option, index) => {
+        const nonSelectedStyle = {
+            border: '1px solid rgb(0, 210, 170)', 
+            color:  'rgb(0, 210, 170)',
+        }
+        const selectedStyle = {
+            border: '1px solid rgb(0, 210, 170)', 
+            color: 'white',
+            backgroundColor: 'rgb(0, 210, 170)',
+            opacity: '1'
+        }   
+        return(
+            <Fragment key={index}>
+                <div className={'filter-logo-element ' + ( index > 2 && !showAllFields ? 'hidden' : '')} style={ fields.indexOf(option.value) > -1 ? selectedStyle : nonSelectedStyle } onClick={fields.indexOf(option.value) > -1 ? () => removeField(option.value) : () => addField(option.value)}>
+                    {option.text}
+                </div>
+                <style jsx>{`
+                    .filter-logo-element {
+                        cursor: pointer;
+                        display: inline-block;
+                        padding: 6px 10px;
+                        border-radius: 20px;
+                        margin: 4px 8px 4px 0;
+                        font-weight: 500;
+                        opacity: 0.9;
+                        font-size: 0.9em;
+                    }
+
+                    .filter-logo-element:hover {
+                        background-color: rgb(230,230,230,0.8);
+                        transition-duration: 300ms;
+                        opacity: 1;
+                    }
+
+                    .hidden {
+                        display: none;
+                    }
+                `}</style>
+            </Fragment>
+        );
+    })
+
+    const mentorElements = livestreams.map( (mentor, index) => {
+        const avatar = mentor.mainSpeakerAvatar ? mentor.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
         return(
             <div key={index}>
-                <LivestreamCard livestream={mentor} user={user} userData={userData} fields={null} grid={grid}/>
+                <LivestreamCard livestream={mentor} user={user} userData={userData} fields={fields} grid={grid} careerCenters={ careerCenters.filter( careerCenter => mentor.universities.indexOf(careerCenter.universityId) > -1 )}/>
             </div>
         );
     })
@@ -133,7 +237,7 @@ function Calendar(props) {
                             { mentorElements }
                         </StackGrid>
                     )}</SizeMe>
-                    <div className={'empty-livestreams-message ' + (livestreams.length > 0 ? 'hidden' : '')}>
+                    <div className={'empty-livestreams-message ' + ( !noLivestreamsPresent ? 'hidden' : '')}>
                         <div>
                             Exciting streams coming&nbsp;soon!
                         </div>
@@ -993,4 +1097,4 @@ function Calendar(props) {
     );
 }
 
-export default withFirebasePage(Calendar);
+export default withFirebasePage(NextLivestreams);

@@ -1016,10 +1016,10 @@ export function WebRTCAdaptor(initialValues)
 			var packetsLost = 0;
 			var fractionLost = 0;					
 			var currentTime = 0;
-			var bytesSent = 0;		
+			var bytesSent = 0;	
+			var audioLevel = -1;	
 
 			stats.forEach(value => {
-
 				if (value.type == "inbound-rtp") 
 				{
 					bytesReceived += value.bytesReceived;
@@ -1029,8 +1029,14 @@ export function WebRTCAdaptor(initialValues)
 				}
 				else if (value.type == "outbound-rtp") 
 				{
-					bytesSent += value.bytesSent
-					currentTime = value.timestamp
+					bytesSent += value.bytesSent;
+					currentTime = value.timestamp;
+				}
+				else if ((value.type == "track" && value.kind == "audio") || (value.type == "media-source" && value.kind == "audio")) 
+				{
+					if (value.audioLevel) {
+						audioLevel = value.audioLevel;
+					}
 				}
 			});
 
@@ -1039,6 +1045,7 @@ export function WebRTCAdaptor(initialValues)
 			thiz.remotePeerConnectionStats[streamId].fractionLost = fractionLost;					
 			thiz.remotePeerConnectionStats[streamId].currentTime = currentTime;
 			thiz.remotePeerConnectionStats[streamId].totalBytesSent = bytesSent;
+			thiz.remotePeerConnectionStats[streamId].audioLevel = audioLevel;
 
 			thiz.callback("updated_stats", thiz.remotePeerConnectionStats[streamId]);
 
@@ -1053,6 +1060,10 @@ export function WebRTCAdaptor(initialValues)
 			thiz.getStats(streamId);
 
 		}, 5000);
+	}
+
+	this.disableStats = function(streamId) {
+		clearInterval(thiz.remotePeerConnectionStats[streamId].timerId);
 	}
 
 	/**

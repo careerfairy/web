@@ -6,7 +6,7 @@ import axios from 'axios';
 
 import { useRouter } from 'next/router';
 import useWebRTCAdaptor from '../../../../components/custom-hook/useWebRTCAdaptor';
-import StreamerVideoDisplayer from '../../../../components/views/streaming/video-container/StreamerVideoDisplayer';
+import CurrentSpeakerDisplayer from '../../../../components/views/streaming/video-container/CurrentSpeakerDisplayer';
 import NewCommentContainer from '../../../../components/views/streaming/comment-container/NewCommentContainer';
 import SmallStreamerVideoDisplayer from '../../../../components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 import CountdownTimer from '../../../../components/views/common/Countdown';
@@ -46,6 +46,7 @@ function StreamingPage(props) {
     const [numberOfViewers, setNumberOfViewers] = useState(0);
 
     const localVideoId = 'localVideo';
+    const isPlayMode = false;
 
     let streamingCallbacks = {
         onInitialized: () => {},
@@ -87,9 +88,10 @@ function StreamingPage(props) {
         }
     }
 
-    const { webRTCAdaptor, externalMediaStreams } = 
+    const { webRTCAdaptor, externalMediaStreams, audioLevels } = 
         useWebRTCAdaptor(
             streamerReady,
+            isPlayMode,
             localVideoId,
             mediaConstraints,
             streamingCallbacks,
@@ -226,10 +228,10 @@ function StreamingPage(props) {
             </div>
             <div className='black-frame'>
                 <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
-                    <StreamerVideoDisplayer localStream={localStream} streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints}/>
+                    <CurrentSpeakerDisplayer isPlayMode={false} speakerSwitchModeActive={false} localId={streamerId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={currentLivestream.currentSpeakerId}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
-                    <SmallStreamerVideoDisplayer localStream={localStream} streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={false}/>
+                    <SmallStreamerVideoDisplayer isPlayMode={false} localStream={localStream} streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={false}/>
                 </div>
                 <div className='button-container'>         
                  <Grid centered className='middle aligned'>

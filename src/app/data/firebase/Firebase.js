@@ -270,6 +270,24 @@ class Firebase {
         });
     }
 
+    setLivestreamSpeakerSwitchMode = (livestreamId, mode) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+        return ref.update({
+            speakerSwitchMode: mode
+        });
+    }
+
+    setLivestreamCurrentSpeakerId = (livestreamId, id) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+        return ref.update({
+            currentSpeakerId: id
+        });
+    }
+
     setLivestreamPresentation = (livestreamId, downloadUrl) => {
         let ref = this.firestore
             .collection("livestreams")
@@ -508,6 +526,7 @@ class Firebase {
     getLivestreamCareerCenters = (universityIds) => {
         let ref = this.firestore
             .collection("careerCenterData")
+            .where("test", "==", false)
             .where("universityId", "in", universityIds);
         return ref.get();
     }
