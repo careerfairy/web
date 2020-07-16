@@ -1063,7 +1063,9 @@ export function WebRTCAdaptor(initialValues)
 	}
 
 	this.disableStats = function(streamId) {
-		clearInterval(thiz.remotePeerConnectionStats[streamId].timerId);
+		if (thiz.remotePeerConnectionStats[streamId]) {
+			clearInterval(thiz.remotePeerConnectionStats[streamId].timerId);
+		}
 	}
 
 	/**

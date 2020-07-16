@@ -64,7 +64,6 @@ function StreamingPage(props) {
         },
         onStreamLeaved: (infoObj) => {
             removeStreamIdFromStreamerList(infoObj.streamId);
-            setLiveSpeakerDisconnected(infoObj.streamId);
         },
         onPublishFinished: (infoObj) => {
             setIsStreaming(false);
@@ -115,14 +114,6 @@ function StreamingPage(props) {
         }
         
     }, [audioLevels]);
-
-    useEffect(() => {
-        if (isStreaming) {
-            setLiveSpeakerConnected(registeredSpeaker);
-        } else {
-            setLiveSpeakerDisconnected(registeredSpeaker.id);
-        }
-    },[isStreaming]);
 
     useEffect(() => {
         if (livestreamId) {
@@ -239,18 +230,6 @@ function StreamingPage(props) {
         setIsLocalMicMuted(!isLocalMicMuted);
     }
 
-    function setLiveSpeakerConnected(speaker) {
-        if (registeredSpeaker) {
-            props.firebase.setLivestreamLiveSpeakersConnected(livestreamId, speaker);
-        }
-    }
-
-    function setLiveSpeakerDisconnected(speakerId) {
-        if (registeredSpeaker) {
-            props.firebase.setLivestreamLiveSpeakersDisconnected(livestreamId, speakerId);
-        }
-    }
-
     function dateIsInUnder2Minutes(date) {
         return new Date(date).getTime() - Date.now() < 1000*60*2 || Date.now() > new Date(date).getTime();
     }
@@ -267,8 +246,8 @@ function StreamingPage(props) {
                 </div>
             </div>
             <div className='black-frame'>
-                <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
-                    <CurrentSpeakerDisplayer isPlayMode={false} speakerSwitchModeActive={currentLivestream.speakerSwitchMode === "manual"} setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId} localId={livestreamId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={currentLivestream.currentSpeakerId} muted={false}/>
+                <div>
+                    <CurrentSpeakerDisplayer isPlayMode={false} mode={currentLivestream.mode} speakerSwitchModeActive={currentLivestream.speakerSwitchMode === "manual"} setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId} localId={livestreamId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={currentLivestream.currentSpeakerId} muted={false}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
                     <SmallStreamerVideoDisplayer isPlayMode={false} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={true}/>

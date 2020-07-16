@@ -22,15 +22,20 @@ import Head from 'next/head';
 
 function NextLivestreams(props) {
 
+    const backgroundOptions = UNIVERSITY_SUBJECTS;
     const router = useRouter();
 
     const university = router.query.university;
     const filter = router.query.filter;
 
+    const { fade } = transitions;
+
     const [user, setUser] = useState(null);
     const [userData, setUserData] = useState(null);
 
+    const [universityData, setUniversityData] = useState(null);
     const [grid, setGrid] = useState(null);
+    const [allLivestreams, setAllLivestreams] = useState([]);
     const [livestreams, setLivestreams] = useState([]);
     const [noLivestreamsPresent, setNoLivestreamsPresent] = useState(false);
 
@@ -62,6 +67,25 @@ function NextLivestreams(props) {
             });
         }
     },[user]);
+
+    useEffect(() => {
+        if (university) {
+            props.firebase.getCareerCenterByUniversityId(university)
+            .then(querySnapshot => {
+                querySnapshot.forEach(doc => {
+                    let university = doc.data();
+                    setUniversityData(university);
+                });
+            });
+        }
+    },[university]);
+
+    useEffect(() => {
+        if (filter) {
+            addField(filter);
+            setShowAllFields(true);
+        }
+    }, [filter]);
 
     useEffect(() => {
         const unsubscribe = props.firebase.listenToUpcomingLivestreams(querySnapshot => {
@@ -146,9 +170,31 @@ function NextLivestreams(props) {
         }
     }, []);
 
+    function filterUniversityLivestreams(livestreams, university) {
+        return livestreams.filter( livestream => {
+            if (livestream.universities) {
+                return livestream.universities.indexOf(university) > -1;
+            } else {
+                return false;
+            }
+        });
+    }
+
     function hideCookieMessage() {
         localStorage.setItem('hideCookieMessage', 'yes');
         setCookieMessageVisible(false);
+    }
+
+    function addField(field) {
+        const fieldsCopy = fields.slice(0);
+        fieldsCopy.push(field);
+        setFields(fieldsCopy);
+    }
+
+    function removeField(field) {
+        const fieldsCopy = fields.slice(0);
+        fieldsCopy.splice(fieldsCopy.indexOf(field), 1);
+        setFields(fieldsCopy);
     }
 
     function goToSeparateRoute(route) {
@@ -218,10 +264,37 @@ function NextLivestreams(props) {
                 <title key="title">CareerFairy | Next Live Streams</title>
             </Head>
             <Header color="white"/>
+            <Container className="landingTitleContainer" style={{ paddingBottom: '20px', display: university ? 'block' : 'none'}}>
+                <Grid className='middle aligned' centered> 
+                    <Grid.Column width={6}>
+                        <div style={{ display: universityData ? 'block' : 'none' }}>
+                            <Image src={universityData ? universityData.logoUrl : 'none'} style={{ margin: '10px 0 10px 0', maxHeight: '110px', filter: 'brightness(0) invert(1)'}}/>
+                        </div>
+                    </Grid.Column>
+                    <Grid.Column width={10}>
+                        <div style={{ float: 'right'}}>   
+                            <div style={{  display: (universityData ? 'block' : 'none'), fontSize: '1.4em', color: 'white', fontWeight: '700', textAlign: 'right', lineHeight: '1.4em', margin: '5px'}}>Live streams for students @ { universityData ? universityData.universityName : '' }.</div>
+                            <div style={{ display: (universityData ? universityData.returnButton : false) ? 'none': 'block' }}>
+                                <Link href='/next-livestreams'><a><Button style={{ float: 'right'}} content='See all Live Streams' size='mini'/></a></Link>
+                            </div>
+                            <div style={{ display: (universityData ? universityData.returnButton : false) ? 'block': 'none' }}>
+                                <a href={universityData ? universityData.returnUrl : ''}><Button style={{ float: 'right'}} content={'To ' + (universityData ? universityData.universityName : '')}  size='mini'/></a>
+                            </div>
+                        </div>
+                    </Grid.Column>
+                </Grid>
+            </Container>
             <div className={'filterBar ' + (cookieMessageVisible ? '' : 'hidden')}>
                 <Image id='cookie-logo' src='/cookies.png' style={{ display: 'inline-block', margin: '0 20px 0 0', maxHeight: '25px', width: 'auto', verticalAlign: 'top'}}/>
                 <p>We use cookies to improve your experience. By continuing to use our website, you agree to our <Link href='/privacy'><a>privacy policy</a></Link>.</p>
                 <Icon id='cookie-delete' style={{ cursor: 'pointer', verticalAlign: 'top', float: 'right', lineHeight: '30px'}} name='delete' onClick={() => hideCookieMessage()}/>
+            </div>
+            <div id='landingPageButtons'>
+                <Container>
+                    <div className='landingPageButtonsLabel'>Select your fields of interest</div>
+                    { filterElement }
+                    <Button style={{ margin: '5px' }} content={showAllFields ? 'Hide all filters' : 'Show all filters'} icon={showAllFields ? 'angle up' : 'angle down'} size='mini' onClick={() => setShowAllFields(!showAllFields)}/>
+                </Container>
             </div>
             <div className='mentor-list'>
                 <Container>

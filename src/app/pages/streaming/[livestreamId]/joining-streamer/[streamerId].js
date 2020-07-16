@@ -63,9 +63,7 @@ function StreamingPage(props) {
         onScreenShareStopped: (infoObj) => {
             setIsCapturingDesktop(false);
         },
-        onClosed: (infoObj) => {
-            setIsInitialized(false);
-        },
+        onClosed: (infoObj) => {},
         onDisconnected: (infoObj) => {
             setShowDisconnectionModal(true);
         },
@@ -99,14 +97,6 @@ function StreamingPage(props) {
             livestreamId,
             streamerId
         );
-
-    useEffect(() => {
-        if (isStreaming) {
-            setLiveSpeakerConnected();
-        } else {
-            setLiveSpeakerDisconnected();
-        }
-    },[isStreaming, registeredSpeaker.id]);
 
     useEffect(() => {
         if (livestreamId) {
@@ -227,8 +217,8 @@ function StreamingPage(props) {
                 </div>
             </div>
             <div className='black-frame'>
-                <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
-                    <CurrentSpeakerDisplayer isPlayMode={false} speakerSwitchModeActive={false} localId={streamerId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={currentLivestream.currentSpeakerId}/>
+                <div>
+                    <CurrentSpeakerDisplayer isPlayMode={false} mode={currentLivestream.mode} speakerSwitchModeActive={false} localId={streamerId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={currentLivestream.currentSpeakerId}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
                     <SmallStreamerVideoDisplayer isPlayMode={false} localStream={localStream} streams={externalMediaStreams} mainStreamerId={streamId} mediaConstraints={mediaConstraints} livestreamId={currentLivestream.id} presenter={false}/>

@@ -182,15 +182,12 @@ function ViewerPage(props) {
                 </div>
             </div>
             <div className='black-frame'>
-                <div style={{ display: (currentLivestream.mode === 'default' ? 'block' : 'none')}}>
-                    <CurrentSpeakerDisplayer isPlayMode={true} speakerSwitchModeActive={false} streams={externalMediaStreams} currentSpeaker={currentLivestream.currentSpeakerId} muted={!currentLivestream.hasStarted || !(currentLivestream.mode === 'default')}/>
+                <div>
+                    <CurrentSpeakerDisplayer isPlayMode={true} mode={currentLivestream.mode} speakerSwitchModeActive={false} streams={externalMediaStreams} currentSpeaker={currentLivestream.currentSpeakerId} muted={!currentLivestream.hasStarted || !(currentLivestream.mode === 'default')}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
-                    <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams} livestreamId={currentLivestream.id} presenter={false}  muted={!currentLivestream.hasStarted || !(currentLivestream.mode === 'presentation')}/>
+                    <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams} livestreamId={currentLivestream.id} presenter={false} />
                 </div>
-                <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none'), position: 'absolute', top: '150px', width: '100%', height: 'calc(100% - 150px)', backgroundColor: 'rgb(30,30,30)'}}>
-                    <LivestreamPdfViewer livestreamId={currentLivestream.id} presenter={false}/>
-                </div> 
                 {/* <div className={ currentLivestream.hasStarted ? 'hidden' : '' }style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'white', zIndex: '9999'}}>
                     <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: '1.4em', fontWeight: '700', color: 'rgb(0, 210, 170)'}}>
                         Thank you for joining!

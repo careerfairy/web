@@ -17,36 +17,44 @@ function CurrentSpeakerDisplayer(props) {
     function getVideoContainerHeight(streamId) {
         if (props.isPlayMode) {
             if (props.streams.length > 1) {
-                if (streamId === props.currentSpeaker) {
+                if (streamId === props.currentSpeaker && props.mode === 'default') {
                     return windowSize.width > 768 ? 'calc(80vh - 75px)' : '45vh';
                 } else {
                     return windowSize.width > 768 ? '20vh' : '15vh';
                 }
             } else {
-                return windowSize.width > 768 ? 'calc(100vh - 75px)' : '60vh';
+                if (props.mode === 'default') {
+                    return windowSize.width > 768 ? 'calc(100vh - 75px)' : '60vh';
+                } else {
+                    return windowSize.width > 768 ? '20vh' : '15vh';
+                }
             }
         } else {
             if (props.streams.length > 0) {
-                if (streamId === props.currentSpeaker) {
+                if (streamId === props.currentSpeaker && props.mode === 'default') {
                     return 'calc(80vh - 75px)';
                 } else {
                     return '20vh';
                 }
             } else {
-                return 'calc(100vh - 75px)';
+                if (props.mode === 'default') {
+                    return 'calc(100vh - 75px)';
+                } else {
+                    return '20vh';
+                }
             }
         }
     } 
 
     function getMinimizedSpeakersGridHeight() {
         if (props.isPlayMode) {
-            if (props.streams.length > 1) {
+            if (props.streams.length > 1 || props.mode !== 'default') {
                 return windowSize.width > 768 ? '20vh' : '15vh';
             } else {
                 return '0';
             }
         } else {
-            if (props.streams.length > 0) {
+            if (props.streams.length > 0 || props.mode !== 'default') {
                 return '20vh';
             } else {
                 return '0';
@@ -57,15 +65,31 @@ function CurrentSpeakerDisplayer(props) {
     function getVideoContainerClass(streamId) {
         if (props.isPlayMode) {
             if (props.streams.length > 1) {
-                return streamId === props.currentSpeaker ? 'speaker-video' : 'quarter-width';
+                if (props.mode === 'default') {
+                    return streamId === props.currentSpeaker ? 'speaker-video' : 'quarter-width';
+                } else {
+                    return 'quarter-width';
+                }
             } else {
-                return 'speaker-video-solo';
+                if (props.mode === 'default') {
+                    return 'speaker-video-solo';
+                } else {
+                    return 'quarter-width';
+                }
             }
         } else {
             if (props.streams.length > 0) {
-                return streamId === props.currentSpeaker ? 'speaker-video' : 'quarter-width';
+                if (props.mode === 'default') {
+                    return streamId === props.currentSpeaker ? 'speaker-video' : 'quarter-width';
+                } else {
+                    return 'quarter-width';
+                }
             } else {
-                return 'speaker-video-solo';
+                if (props.mode === 'default') {
+                    return 'speaker-video-solo';
+                } else {
+                    return 'quarter-width';
+                }
             }
         }
     }
@@ -200,8 +224,8 @@ function CurrentSpeakerDisplayer(props) {
                     overflow-y: hidden;
                     white-space: nowrap;
                     text-align: center;
-                    scrollbar-width: 5px;
-                    scollbar-color: black rgba(0, 210, 170, 0.8);
+                    scrollbar-width: thin;
+                    scrollbar-color: rgba(0, 210, 170, 0.8) black;
                 }
 
                 .relative-container-videos::-webkit-scrollbar {
