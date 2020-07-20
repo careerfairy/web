@@ -1,20 +1,11 @@
 import { useEffect, useState, Fragment } from 'react'
 import { Container, Header as SemanticHeader, Button, Dropdown, Form, Menu, Grid } from 'semantic-ui-react';
-import { Formik } from 'formik';
 import { useRouter } from 'next/router';
-
-import { UNIVERSITY_SUBJECTS } from '../data/StudyFieldData';
-import { UNIVERSITY_SPECIFIC_SUBJECTS } from '../data/UniversitySpecificFieldsData';
-import { UNIVERSITY_NAMES } from '../data/UniversityData';
-import { STUDY_LEVELS } from '../data/StudyLevelData';
 import { withFirebase } from '../data/firebase';
 import Header from '../components/views/header/Header';
 import Loader from '../components/views/loader/Loader';
 
 import Head from 'next/head';
-import UserUtil from '../data/util/UserUtil';
-import NewGroup from '../components/views/profile/NewGroup';
-import CurrentGroup from '../components/views/profile/CurrentGroup';
 import PersonalInfo from '../components/views/profile/personal-info/PersonalInfo';
 import MyGroups from '../components/views/profile/my-groups/MyGroups';
 
@@ -65,29 +56,32 @@ const UserProfile = (props) => {
                     <title key="title">CareerFairy | My Profile</title>
                 </Head>
                 <Header classElement='relative white-background'/>
-                <Container textAlign='left'>
-                    <h3 style={{ color: 'rgb(80,80,80)', margin: '30px 0 20px 0' }}>{ userData ? 'Your Profile' : 'Complete Your Profile'}</h3>
-                    <h3 style={{ color: 'rgb(150,150,150)', margin: '20px 0 40px 0' }} className={userData ? 'hidden' : ''}>so we can show you the jobs and speakers that matter most to you</h3>
-                    <Menu tabular>
-                        <Menu.Item
-                        name='My Groups'
-                        active={ state === 'groups' }
-                        onClick={() => setState('groups')}
-                        style={{ backgroundColor: 'rgb(250,250,250)'}}
-                        />
-                        <Menu.Item
-                        name='Personal Information'
-                        active={state === 'personal'}
-                        onClick={() => setState('personal')}
-                        style={{ backgroundColor: 'rgb(250,250,250)'}}
-                        />
-                    </Menu>
-                    <div className={ state === 'personal' ? '' : 'hidden' }>
-                        <PersonalInfo userData={userData}/>
-                    </div>
-                    <div className={ state === 'groups' ? '' : 'hidden'} >
-                        <MyGroups userData={userData}/>
-                    </div>
+                <Container textAlign='left' style={{ marginTop: '50px' }}>
+                    <Grid stackable>
+                        <Grid.Column width='4'>
+                            <h3 style={{ color: 'rgb(80,80,80)', margin: '0 0 20px 0', fontWeight: '300', fontSize: '1.7em' }}>{ userData ? 'My Profile' : 'Complete My Profile'}</h3>
+                            <Menu vertical>
+                                <Menu.Item
+                                name='Personal Information'
+                                active={state === 'personal'}
+                                onClick={() => setState('personal')}
+                                />
+                                <Menu.Item
+                                name='My Groups'
+                                active={ state === 'groups' }
+                                onClick={() => setState('groups')}
+                                />
+                            </Menu>
+                        </Grid.Column>
+                        <Grid.Column width='12'>
+                            <div className={ state === 'personal' ? '' : 'hidden' }>
+                                <PersonalInfo userData={userData}/>
+                            </div>
+                            <div className={ state === 'groups' ? '' : 'hidden'} >
+                                <MyGroups userData={userData}/>
+                            </div>
+                        </Grid.Column>
+                    </Grid>          
                 </Container>
                 <style jsx>{`
                     .hidden {

@@ -17,21 +17,20 @@ const NewGroup = (props) => {
 
     return (               
         <Fragment key={props.group.id}>
-            <Grid.Column width={4}>
+            <Grid.Column>
                 <div className='group-selector'>
-                    <Image src={props.group.logoUrl} style={{ position: 'absolute', top: '35%', left: '50%', transform: 'translate(-50%, -50%)', maxWidth: '60%', maxHeight: '85px'}}/>
-                    <div style={{ position: 'absolute', top: '65%', left: '50%', transform: 'translate(-50%, -50%)', width: '80%', textAlign: 'center', fontWeight: '500', color: 'rgb(80,80,80)'}}>{props.group.description}</div>
-                    <Button content='Join' icon='add' style={{ position: 'absolute', left: '50%', bottom: '12px', width: '90%', transform: 'translateX(-50%)'}} onClick={() => setOpenJoinModal(true)} primary basic/>
+                    <Image src={props.group.logoUrl} style={{ position: 'absolute', top: '35%', left: '50%', transform: 'translate(-50%, -50%)', maxWidth: '50%', maxHeight: '70px'}}/>
+                    <div style={{ position: 'absolute', top: '65%', left: '50%', transform: 'translate(-50%, -50%)', width: '80%', textAlign: 'center', fontSize: '1.2em', fontWeight: '300', color: 'rgb(80,80,80)'}}>{props.group.description}</div>
+                    <Button content='Join' icon='add' style={{ position: 'absolute', left: '50%', bottom: '20px', width: '90%', transform: 'translateX(-50%)'}} onClick={() => router.push('/group/' + props.group.id)} primary/>
                 </div>
-                <GroupJoinModal userData={props.userData} group={props.group} open={openJoinModal} closeModal={() => setOpenJoinModal(false)}/>
             </Grid.Column>
             <style jsx>{`
                 .group-selector {
                     position: relative;
-                    height: 250px;
+                    height: 300px;
                     border-radius: 15px;
                     background-color: white;
-                    box-shadow: 0 0 2px lightgrey;
+                    box-shadow: 0 0 5px lightgrey;
                 }
             `}</style>
         </Fragment> 

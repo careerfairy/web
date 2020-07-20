@@ -27,31 +27,23 @@ const UserProfile = (props) => {
         });
     }, []);
 
-    let moreGroupElements = [];
     let existingGroupElements = [];
 
     if (props.userData && props.userData.groupIds) {
         existingGroupElements = groups.filter(group => props.userData.groupIds.indexOf(group.id) > -1).map(group => {
             return <CurrentGroup group={group} userData={props.userData} key={group.id}/>
         });
-        moreGroupElements = groups.filter(group => props.userData.groupIds.indexOf(group.id) == -1).map(group => {
-            return <NewGroup group={group} userData={props.userData} key={group.id} />
-        });
-    } else {
-        moreGroupElements = groups.map(group => {
-            return <NewGroup group={group} userData={props.userData} key={group.id} />
-        });
     }
+
     return (
         <Fragment>
-            <h3 style={{ color: 'rgb(80,80,80)', margin: '50px 0 10px 0' }}>My Groups</h3>
+            <h3 style={{ color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300' }}>My Groups</h3>
             <Grid style={{ padding: '20px 0 0 0' }} stackable>
                 {existingGroupElements}
             </Grid>
-            <h3 style={{ color: 'rgb(80,80,80)', margin: '50px 0 10px 0' }}>Join New Groups</h3>
-            <Grid style={{ padding: '20px 0 120px 0' }} stackable>
-                {moreGroupElements}
-            </Grid>
+            <div className={ existingGroupElements.length > 0 ? 'hidden' : ''} style={{ margin: '30px 0', fontSize: '1.1em' }}>
+                You are currently not a member of any career group.
+            </div>
             <style jsx>{`
                     .hidden {
                         display: none;

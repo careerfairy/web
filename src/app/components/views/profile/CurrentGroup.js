@@ -8,6 +8,8 @@ import GroupInfoModal from './GroupInfoModal';
 
 const CurrentGroup = (props) => {
 
+    const router = useRouter();
+
     const [userCategories, setUserCategories] = useState([]);
     const [categories, setCategories] = useState([]);
     const [categoriesWithElements, setCategoriesWithElements] = useState([]);
@@ -98,12 +100,11 @@ const CurrentGroup = (props) => {
                         </Button.Group>
                         <Dropdown item icon={{name: 'ellipsis vertical', size: 'large', color: 'grey'}} style={{ position: 'absolute', right: '10px', top: '20px'}}>
                             <Dropdown.Menu>
-                                <Dropdown.Item onClick={() => setOpenUpdateModal(true)}>Update my data</Dropdown.Item>
+                                <Dropdown.Item onClick={() => router.push('/group/' + props.group.id)}>Update my data</Dropdown.Item>
                                 <Dropdown.Item>Leave group</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                     </div>
-                    <GroupInfoModal userData={props.userData} group={props.group} categoriesWithElements={categoriesWithElements} userCategories={userCategories} open={openUpdateModal} closeModal={() => setOpenUpdateModal(false)}/>
                 </Grid.Column>
             <style jsx>{`
                 .group-selector {

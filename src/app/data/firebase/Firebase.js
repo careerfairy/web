@@ -68,6 +68,34 @@ class Firebase {
         });
     };
 
+    joinGroup = (userId, groupId, categoriesWithElements) => {
+        let ref = this.firestore
+            .collection("userData")
+            .doc(userId);
+        let registeredGroupsRef = this.firestore
+            .collection("userData")
+            .doc(userId)
+            .collection("registeredGroups")
+            .doc(groupId);
+        let categoriesRef = this.firestore
+            .collection("userData")
+            .doc(userId)
+            .collection("registeredGroups")
+            .doc(groupId)
+            .collection("categories");
+        return this.firestore.runTransaction( transaction => {
+            return transaction.get(ref).then( element => {
+                transaction.update(ref, { groupIds: firebase.firestore.FieldValue.arrayUnion(groupId) })
+                transaction.set(registeredGroupsRef, { groupId: groupId});
+                categoriesWithElements.forEach( category => {
+                    let selectedValue = category.elements.find( element => element.selected === true);
+                    let categoryRef = categoriesRef.doc(category.id);
+                    transaction.set(categoryRef, { categoryId: category.id, value: selectedValue.id });
+                })
+            });
+        });
+    }
+
     listenToUserGroupCategories = (userEmail, groupId, callback) => {
         let ref = this.firestore
             .collection("userData")
@@ -542,7 +570,6 @@ class Firebase {
     }
 
     goToNextLivestreamQuestion = (previousCurrentQuestionId, newCurrentQuestionId, livestreamId) => {
-        var batch = this.firestore.batch();
         if (previousCurrentQuestionId) {
             let ref = this.firestore
             .collection("livestreams")

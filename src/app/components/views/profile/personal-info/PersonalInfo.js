@@ -55,6 +55,7 @@ const PersonalInfo = (props) => {
                     /* and other goodies */
                 }) => (
                     <Form onSubmit={handleSubmit} style={{ textAlign: 'left'}} size='big'>
+                        <h3 style={{ color: 'rgb(160,160,160)', margin: '0 0 30px 0', fontWeight: '300' }}>Personal Infos</h3>
                         <Form.Group widths='equal'>
                             <Form.Field>
                                 <label>Email</label>
@@ -79,7 +80,7 @@ const PersonalInfo = (props) => {
                                 </div>
                             </Form.Field>
                         </Form.Group>
-                        <Button id='submitButton' color='teal' type='submit'  size='big' content={ props.userData ? 'Save Changes' : 'Create Account'} loading={isSubmitting}/>
+                        <Button id='submitButton' color='teal' type='submit'  size='big' content={ props.userData ? 'Update' : 'Create Account'} loading={isSubmitting}/>
                     </Form>
                 )}
             </Formik>
