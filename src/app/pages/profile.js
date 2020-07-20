@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { UNIVERSITY_SUBJECTS } from '../data/StudyFieldData';
 import { UNIVERSITY_SPECIFIC_SUBJECTS } from '../data/UniversitySpecificFieldsData';
 import { UNIVERSITY_NAMES } from '../data/UniversityData';
-import { STUDY_LEVELS } from '../data/StudyLevelData';
+import { STUDY_LEVELS, GENDER } from '../data/StudyLevelData';
 import { withFirebase } from '../data/firebase';
 import Header from '../components/views/header/Header';
 import Loader from '../components/views/loader/Loader';
@@ -21,6 +21,7 @@ const UserProfile = (props) => {
     const generic_subjects = UNIVERSITY_SUBJECTS;
     const specific_subjects = UNIVERSITY_SPECIFIC_SUBJECTS;
     const universities = UNIVERSITY_NAMES;
+    const genders = GENDER;
     const levels = STUDY_LEVELS;
 
     const [loading, setLoading] = useState(false);
@@ -31,10 +32,10 @@ const UserProfile = (props) => {
     
     useEffect(() => {
        if (userData) {
-            setInitialValues({ firstName: userData.firstName, lastName: userData.lastName, university: userData.university, fieldOfStudy: userData.faculty, levelOfStudy: userData.levelOfStudy });
+            setInitialValues({ firstName: userData.firstName, lastName: userData.lastName, gender: userData.gender, university: userData.university, fieldOfStudy: userData.faculty, levelOfStudy: userData.levelOfStudy });
             updateSelectFields(userData.university);
        } else {
-            setInitialValues({ firstName: '', lastName: '', university: null, fieldOfStudy: null, levelOfStudy: null });
+            setInitialValues({ firstName: '', lastName: '', gender: null, university: null, fieldOfStudy: null, levelOfStudy: null });
        }
     }, [userData]);
 
@@ -111,6 +112,9 @@ const UserProfile = (props) => {
                             if (!values.university) {
                                 errors.university = 'Please select a university';
                             } 
+                            if (!values.gender) {
+                                errors.gender = 'Please select a gender';
+                            } 
                             if (!values.fieldOfStudy) {
                                 errors.fieldOfStudy = 'Please select a field of study';
                             }
@@ -121,10 +125,10 @@ const UserProfile = (props) => {
                         }}
                         onSubmit={(values, { setSubmitting }) => {
                             setSubmitting(true);
-                            props.firebase.setUserData(user.email, values.firstName, values.lastName, values.university, values.fieldOfStudy, values.levelOfStudy)
+                            props.firebase.setUserData(user.email, values.firstName, values.lastName, values.gender, values.university, values.fieldOfStudy, values.levelOfStudy)
                             .then(() => {
                                 if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-                                    if (values.university === 'ethzurich' || values.university === 'epflausanne' || values.university === 'unizurich'|| values.university === 'unilausanne'|| values.university === 'fhgraubuenden' || values.university === 'hochschulerapperswil' || values.university === 'technischeuniwien'  || values.university === 'technischeunidresden'  || values.university === 'chbundesverwaltung') {
+                                    if (values.university === 'ethzurich' || values.university === 'epflausanne' || values.university === 'unizurich'|| values.university === 'unilausanne'|| values.university === 'fhgraubuenden' || values.university === 'hochschulerapperswil' || values.university === 'technischeuniwien'  || values.university === 'technischeunidresden'  || values.university === 'chbundesverwaltung'  || values.university === 'fzjuelich') {
                                         if (values.university === 'ethzurich') {
                                             return router.push('/next-livestreams?university=ethanalyticsclub');
                                         }
@@ -173,6 +177,13 @@ const UserProfile = (props) => {
                                         <input type='text' name='lastName' placeholder='Your last name' onChange={handleChange} onBlur={handleBlur} value={values.lastName} disabled={isSubmitting} />
                                         <div className='field-error'>
                                             {errors.lastName && touched.lastName && errors.lastName}
+                                        </div>
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>Gender</label>
+                                        <Dropdown placeholder='Select Gender' value={values.gender} onChange={(event, {value}) => { setFieldValue('gender', value, true)}} compact selection options={genders}/>
+                                        <div className='field-error'>
+                                            {errors.gender && touched.gender && errors.gender}
                                         </div>
                                     </Form.Field>
                                 </Form.Group>

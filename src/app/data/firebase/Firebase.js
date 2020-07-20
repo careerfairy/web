@@ -57,7 +57,7 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    setUserData = (userEmail, firstName, lastName, university, faculty, levelOfStudy) => {
+    setUserData = (userEmail, firstName, lastName, gender, university, faculty, levelOfStudy) => {
         let ref = this.firestore
             .collection("userData")
             .doc(userEmail);
@@ -65,6 +65,7 @@ class Firebase {
             userEmail: userEmail,
             firstName: firstName,
             lastName: lastName,
+            gender: gender,
             university: university,
             faculty: faculty,
             levelOfStudy: levelOfStudy

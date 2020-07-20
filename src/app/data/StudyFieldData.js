@@ -369,5 +369,35 @@ export const UNIVERSITY_SUBJECTS = [
         },{
             text: "Wirtschaftswissenschaften",
             value: "WIRTWISS"
+        },{
+            text: "Ernst Ruska-Centrum für Mikroskopie und Spektroskopie mit Elektronen (ER-C)",
+            value: "MIKROSPEKTRO"
+        },{
+            text: "Institute for Advanced Simulation (IAS)",
+            value: "ADVSIM"
+        },{
+            text: "Institut für Bio- und Geowissenschaften (IBG)",
+            value: "BIOGEOSCI"
+        },{
+            text: "Institut für Biologische Informationsprozesse (IBI)",
+            value: "BIOINFO"
+        },{
+            text: "Institut für Energie- und Klimaforschung (IEK)",
+            value: "ENERCLIMATE"
+        },{
+            text: "Institut für Kernphysik (IKP)",
+            value: "PARTIPHYS"
+        },{
+            text: "Institut für Neurowissenschaften und Medizin (INM)",
+            value: "NEUROSCIMED"
+        },{
+            text: "Jülich Centre for Neutron Science (JCNS)",
+            value: "NEUTRSCI"
+        },{
+            text: "Peter Grünberg Institut (PGI)",
+            value: "PETERGRUEN"
+        },{
+            text: "Zentralinstitut für Engineering, Elektronik und Analytik (ZEA)",
+            value: "ENERGELEKANALYT"
         }
     ];
