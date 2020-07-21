@@ -558,34 +558,34 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
         }
     ], fzjuelich: [
         {
-            text: "Ernst Ruska-Centrum für Mikroskopie und Spektroskopie mit Elektronen (ER-C)",
+            text: "Ernst Ruska-Centre for Microscopy and Spectroscopy with Electrons (ER-C)",
             value: "MIKROSPEKTRO"
         },{
             text: "Institute for Advanced Simulation (IAS)",
             value: "ADVSIM"
         },{
-            text: "Institut für Bio- und Geowissenschaften (IBG)",
+            text: "Institute of Bio- and Geosciences (IBG)",
             value: "BIOGEOSCI"
         },{
-            text: "Institut für Biologische Informationsprozesse (IBI)",
+            text: "Institute of Biological Information Processing (IBI)",
             value: "BIOINFO"
         },{
-            text: "Institut für Energie- und Klimaforschung (IEK)",
+            text: "Institute of Energy and Climate Research (IEK)",
             value: "ENERCLIMATE"
         },{
-            text: "Institut für Kernphysik (IKP)",
+            text: "Nuclear Physics Institute (IKP)",
             value: "PARTIPHYS"
         },{
-            text: "Institut für Neurowissenschaften und Medizin (INM)",
+            text: "Institute of Neuroscience and Medicine (INM)",
             value: "NEUROSCIMED"
         },{
             text: "Jülich Centre for Neutron Science (JCNS)",
             value: "NEUTRSCI"
         },{
-            text: "Peter Grünberg Institut (PGI)",
+            text: "Peter Grünberg Institute (PGI)",
             value: "PETERGRUEN"
         },{
-            text: "Zentralinstitut für Engineering, Elektronik und Analytik (ZEA)",
+            text: "Central Institute of Engineering, Electronics and Analytics (ZEA)",
             value: "ENERGELEKANALYT"
         }
     ]
