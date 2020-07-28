@@ -189,22 +189,51 @@ class Firebase {
         return ref.get();
     };
 
-    getGroupCategories = (groupId) => {
+    listenToGroupCategories = (groupId, callback) => {
         let ref = this.firestore
             .collection("careerCenterData")
             .doc(groupId)
             .collection("categories");
-        return ref.get();
+        return ref.onSnapshot(callback);
     }
 
-    getGroupCategoryElements = (groupId, categoryId) => {
+    listenToGroupCategoryElements = (groupId, categoryId, callback) => {
         let ref = this.firestore
             .collection("careerCenterData")
             .doc(groupId)
             .collection("categories")
             .doc(categoryId)
             .collection("elements");
-        return ref.get();
+        return ref.onSnapshot(callback);
+    }
+
+    updateGroupCategoryElements = (groupId, categoryId, categoryName, newElements, elementsToDelete) => {
+        debugger;
+        let batch = this.firestore.batch();
+        let categoryRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("categories")
+            .doc(categoryId);
+        batch.update(categoryRef, { name: categoryName });
+        let elementsRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("categories")
+            .doc(categoryId)
+            .collection("elements");
+        newElements.forEach( element => { 
+            if (element.id) {
+                batch.update(elementsRef.doc(element.id), { name: element.name });
+            } else {
+                var newElementRef = elementsRef.doc();
+                batch.set(newElementRef, { name: element.name });
+            }
+        });
+        elementsToDelete.forEach( element => { 
+            batch.delete(elementsRef.doc(element.id));
+        });
+        return batch.commit();
     }
 
     // MENTORS
@@ -570,6 +599,7 @@ class Firebase {
     }
 
     goToNextLivestreamQuestion = (previousCurrentQuestionId, newCurrentQuestionId, livestreamId) => {
+        let batch = this.firestore.batch();
         if (previousCurrentQuestionId) {
             let ref = this.firestore
             .collection("livestreams")

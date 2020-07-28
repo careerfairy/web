@@ -141,13 +141,15 @@ function LivestreamCard(props) {
                             </Grid.Column>
                         </Grid.Row>   
                     </Grid>
-                    <div style={{ width: '100%', height: '2px', backgroundColor: 'rgba(0,210,170,0.6)', margin: '30px 0 10px 0'}}></div>
-                    <div style={{ textAlign: 'center', fontSize: '0.8em'}}>created by</div>
-                    <Grid className='middle aligned' centered style={{ padding: '10px' }}>
-                        { logoElements }
-                    </Grid>
+                    <div className={ props.careerCenters.length === 0 ? 'hidden' : ''}>
+                        <div style={{ width: '100%', height: '2px', backgroundColor: 'rgba(0,210,170,0.6)', margin: '30px 0 10px 0'}}></div>
+                        <div style={{ textAlign: 'center', fontSize: '0.8em'}}>created by</div>
+                        <Grid className='middle aligned' centered style={{ padding: '10px' }}>
+                            { logoElements }
+                        </Grid>
+                        </div>
+                    </div>
                 </div>
-            </div>
             <BookingModal livestream={props.livestream} modalOpen={bookingModalOpen} setModalOpen={setBookingModalOpen} user={props.user}/>
             <style jsx>{`
                 .hidden {
@@ -176,7 +178,7 @@ function LivestreamCard(props) {
                     box-shadow: 0 0 5px rgb(180,180,180);
                     overflow: hidden;
                     padding-bottom: 15px;
-                    margin: 10px;
+                    text-align: left;
                 }
 
                 .livestream-thumbnail {

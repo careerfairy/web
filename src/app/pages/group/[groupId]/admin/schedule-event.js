@@ -1,18 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Container, Button, Image, Menu, Grid } from 'semantic-ui-react';
 import { useRouter } from 'next/router';
-import { withFirebase } from '../../../data/firebase';
-import Header from '../../../components/views/header/Header';
-import Loader from '../../../components/views/loader/Loader';
-
+import { withFirebase } from 'data/firebase';
 import Head from 'next/head';
-import Footer from '../../../components/views/footer/Footer';
-import CategoryElement from '../../../components/views/group/admin/CategoryElement';
-import Events from '../../../components/views/group/admin/events/Events';
-import Settings from '../../../components/views/group/admin/settings/Settings';
-import Members from '../../../components/views/group/admin/members/Members';
 
-const JoinGroup = (props) => {
+import Header from 'components/views/header/Header';
+import Footer from 'components/views/footer/Footer';
+import Events from 'components/views/group/admin/events/Events';
+import Settings from 'components/views/group/admin/settings/Settings';
+import Members from 'components/views/group/admin/members/Members';
+
+const ScheduleEvent = (props) => {
     
     const router = useRouter();
     const groupId = router.query.groupId;
@@ -46,7 +44,7 @@ const JoinGroup = (props) => {
     return (
             <div className='greyBackground'>
                 <Head>
-                    <title key="title">CareerFairy | Join Groups</title>
+                    <title key="title">CareerFairy | Schedule Events</title>
                 </Head>
                 <Header classElement='relative white-background'/>
                 <Container style={{ padding: '30px 0'}} textAlign='center'>
@@ -64,38 +62,6 @@ const JoinGroup = (props) => {
                             </Grid.Column>
                         </Grid>  
                     </div>   
-                    <Menu style={{ textAlign: 'center', margin: '0 0 20px 0'}} compact secondary>
-                        <Menu.Item
-                            name="events"
-                            active={menuItem === "events"}
-                            onClick={() => { setMenuItem("events") }}
-                        >
-                        Live Streams
-                        </Menu.Item>
-                        <Menu.Item
-                            name="members"
-                            active={menuItem === "members"}
-                            onClick={() => { setMenuItem("members") }}
-                        >
-                        Members
-                        </Menu.Item>
-                        <Menu.Item
-                            name="settings"
-                            active={menuItem === "settings"}
-                            onClick={() => { setMenuItem("settings") }}
-                        >
-                        Settings
-                        </Menu.Item>
-                    </Menu>
-                    <div className={ menuItem === "events" ? '' : 'hidden' }>
-                        <Events groupId={groupId} user={user} userData={userData} menuItem={menuItem}/>
-                    </div>
-                    <div className={ menuItem === "members" ? '' : 'hidden' }>
-                        <Members groupId={groupId}/>
-                    </div>
-                    <div className={ menuItem === "settings" ? '' : 'hidden' }>
-                        <Settings groupId={groupId} />
-                    </div>
                 </Container>
                 <Footer/>
                 <style jsx>{`
@@ -116,7 +82,7 @@ const JoinGroup = (props) => {
                     }
 
                     .image-outer-container {
-                        max-width: 120px;
+                        max-width: 80px;
                         margin: 0 auto;
                     }
 
@@ -147,7 +113,7 @@ const JoinGroup = (props) => {
                     .group-name {
                         margin: 20px 0 20px 0;
                         font-weight: 500;
-                        font-size: calc(1.1em + 2vw);
+                        font-size: calc(1em + 1.4vw);
                         color: rgb(80,80,80);
                         text-shado
                     }
@@ -165,4 +131,4 @@ const JoinGroup = (props) => {
     );
 };
 
-export default withFirebase(JoinGroup);
+export default withFirebase(ScheduleEvent);

@@ -62,22 +62,6 @@ const JoinGroup = (props) => {
     }, [groupId]);
 
     useEffect(() => {
-        if (groupId) {
-            setLoading(true);
-            props.firebase.getGroupCategories(groupId).then(querySnapshot => {
-                let categories = [];
-                querySnapshot.forEach( doc => {
-                    let category = doc.data();
-                    category.id = doc.id;
-                    categories.push(category);
-                });
-                setCategories(categories);
-                setLoading(false);
-            })
-        }
-    },[groupId]);
-
-    useEffect(() => {
         if (categories && categories.length > 0) {
             setLoading(true);
             let categoriesWithElements = [];
