@@ -1,7 +1,7 @@
 import React, {Fragment, useRef, useState, useEffect} from 'react';
 import {Grid} from "semantic-ui-react";
-import ViewerVideoContainer from './ViewerVideoContainer';
-import LivestreamPdfViewer from '../../../util/LivestreamPdfViewer';
+import ViewerVideoContainer from 'ViewerVideoContainer';
+import LivestreamPdfViewer from 'util/LivestreamPdfViewer';
 
 function SmallViewerVideoDisplayer(props) {
 

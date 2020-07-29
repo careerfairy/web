@@ -1,7 +1,7 @@
 import { useEffect, useState, Fragment } from 'react'
 import { Container, Header as SemanticHeader, Button, Dropdown, Form, Image, Grid, Modal } from 'semantic-ui-react';
 
-import { withFirebase } from '../../../data/firebase';
+import { withFirebase } from 'data/firebase';
 
 const UserCategorySelector = (props) => {
 

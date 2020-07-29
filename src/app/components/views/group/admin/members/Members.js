@@ -1,9 +1,6 @@
 import { Fragment, useState, useEffect } from 'react';
-import { Grid, Image, Button, Icon, Modal, Step, Input, Checkbox } from "semantic-ui-react";
-import { withFirebase } from '../../../../../data/firebase';
-import { SizeMe } from 'react-sizeme';
-import StackGrid from 'react-stack-grid';
-import LivestreamCard from '../../../livestream-card/LivestreamCard';
+import { Grid, Image, Button, Icon, Modal, Step, Input, Checkbox } from 'semantic-ui-react';
+import { withFirebase } from 'data/firebase';
 
 const Members = (props) => {
 

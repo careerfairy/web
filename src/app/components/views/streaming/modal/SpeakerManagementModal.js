@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 
-import { withFirebase } from '../../../../data/firebase';
+import { withFirebase } from 'data/firebase';
 import { Modal, Input, Icon, Button, Form } from 'semantic-ui-react';
 import { Formik } from 'formik';
 

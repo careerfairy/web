@@ -1,9 +1,9 @@
-import { useEffect, useState, Fragment } from 'react'
+import { useEffect, useState, Fragment } from 'react';
 import { Container, Header as SemanticHeader, Button, Dropdown, Form, Image, Grid } from 'semantic-ui-react';
 import { Formik } from 'formik';
 import { useRouter } from 'next/router';
 
-import { withFirebase } from '../../../../data/firebase';
+import { withFirebase } from 'data/firebase';
 
 const PersonalInfo = (props) => {
 

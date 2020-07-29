@@ -1,12 +1,12 @@
 import {Fragment, useState, useEffect} from 'react'
 import { Icon, Button, Modal, Header, Step, Grid, Input, Image } from "semantic-ui-react";
 
-import CommonUtil from '../../../../util/CommonUtil';
-import QuestionVotingBox from '../../question-voting-box/QuestionVotingBox';
+import CommonUtil from 'util/CommonUtil';
+import QuestionVotingBox from 'components/views/question-voting-box/QuestionVotingBox';
 
 import Link from 'next/link';
 
-import { withFirebase } from "../../../../data/firebase";
+import { withFirebase } from "data/firebase";
 
 function BookingModal(props) {
 

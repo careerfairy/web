@@ -1,12 +1,12 @@
 import React, {useState, useEffect, useRef} from 'react';
 
-import { withFirebase } from '../../../../data/firebase';
+import { withFirebase } from 'data/firebase';
 import { Modal, Input, Icon, Button, Form, Image, Grid, Dropdown } from 'semantic-ui-react';
 import { Formik } from 'formik';
 
-import { useSoundMeter } from '../../../custom-hook/useSoundMeter';
-import SoundLevelDisplayer from '../../common/SoundLevelDisplayer';
-import useUserMedia from '../../../custom-hook/useDevices';
+import { useSoundMeter } from 'custom-hook/useSoundMeter';
+import SoundLevelDisplayer from 'common/SoundLevelDisplayer';
+import useUserMedia from 'custom-hook/useDevices';
 
 function StreamPreparationModal(props) {
 

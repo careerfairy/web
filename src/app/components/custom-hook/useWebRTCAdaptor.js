@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { navigator, document } from 'global';
 import axios from 'axios';
 
-import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor.js';
-import { WEBRTC_ERRORS } from '../../data/errors/StreamingErrors.js';
-import LivestreamId from '../../pages/upcoming-livestream/[livestreamId].js';
+import { WebRTCAdaptor } from 'static-js/webrtc_adaptor.js';
+import { WEBRTC_ERRORS } from 'data/errors/StreamingErrors.js';
+import LivestreamId from 'pages/upcoming-livestream/[livestreamId].js';
 
 export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId) {
 

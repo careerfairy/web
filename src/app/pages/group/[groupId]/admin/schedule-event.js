@@ -15,11 +15,9 @@ const ScheduleEvent = (props) => {
     const router = useRouter();
     const groupId = router.query.groupId;
 
-    const [user, setUser] = useState(null);
-    const [userData, setUserData] = useState(null);
-
-    const [group, setGroup] = useState([]);
-    const [menuItem, setMenuItem] = useState("events")
+    const [user, setUser] = useState({});
+    const [group, setGroup] = useState({});
+    const [companies, setCompanies] = useState([]);
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
@@ -41,6 +39,41 @@ const ScheduleEvent = (props) => {
         }        
     }, [groupId]);
 
+    useEffect(() => {
+        props.firebase.getCompanies().then(querySnapshot => {
+                let companies = [];
+                querySnapshot.forEach(doc => {
+                    let company = doc.data();
+                    companies.push(company);
+                });
+                setCompanies(companies);
+            });
+    }, []);
+
+    let companiesElements = companies.map( company => {
+        return(
+            <Grid.Column width={4}>
+                <div className='company-selector'>
+                    <Image src={company.logoUrl} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', maxWidth: '60%', maxHeight: '50%', margin: '0 auto'}}/>
+                </div>
+                <style jsx>{`
+                    .company-selector {
+                        position: relative;
+                        height: 150px;
+                        border-radius: 10px;
+                        background-color: white;
+                        box-shadow: 0 0 2px rgb(200,200,200);
+                        cursor: pointer;
+                    }
+
+                    .company-selector:hover {
+                        box-shadow: 0 0 5px rgb(0, 210, 170);
+                    }
+                `}</style>
+            </Grid.Column>
+        );
+    });
+
     return (
             <div className='greyBackground'>
                 <Head>
@@ -53,7 +86,7 @@ const ScheduleEvent = (props) => {
                             <Grid.Column width={6}>
                                 <div className='image-outer-container'>
                                     <div className='image-container'>
-                                        <Image style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', margin: '0 auto 50px auto', maxHeight: '40%', maxWidth: '70%'}} src={group.logoUrl}/>
+                                        <Image style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', margin: '0 auto 50px auto', maxHeight: '30%', maxWidth: '70%'}} src={group.logoUrl}/>
                                     </div>
                                 </div>
                             </Grid.Column>
@@ -61,7 +94,15 @@ const ScheduleEvent = (props) => {
                                 <h1 className='group-name'>{ group.universityName }</h1>
                             </Grid.Column>
                         </Grid>  
-                    </div>   
+                    </div> 
+                    <div>
+                        <h2 className='schedule-events-label'>Schedule an Event with a Company</h2>
+                        <div className='internal'>
+                            <Grid>
+                                { companiesElements }
+                            </Grid>
+                        </div>
+                    </div>  
                 </Container>
                 <Footer/>
                 <style jsx>{`
@@ -95,6 +136,11 @@ const ScheduleEvent = (props) => {
                         background-color: white;
                         margin: 0 auto;
                         box-shadow: 0 0 5px rgb(200,200,200);
+                    }
+
+                    .schedule-events-label {
+                        font-weight: 300;
+                        margin: 30px 0;
                     }
 
                     .field-error {

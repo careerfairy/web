@@ -3,9 +3,12 @@ import { Grid, Image, Button, Icon, Modal, Step, Input, Checkbox } from "semanti
 import { withFirebase } from 'data/firebase';
 import { SizeMe } from 'react-sizeme';
 import StackGrid from 'react-stack-grid';
-import LivestreamCard from 'livestream-card/LivestreamCard';
+import LivestreamCard from 'components/views/livestream-card/LivestreamCard';
+import { useRouter } from 'next/router';
 
 const Events = (props) => {
+
+    const router = useRouter();
 
     const [grid, setGrid] = useState(null);
     const [showAllLivestreams, setShowAllLivestreams] = useState(false);
@@ -60,7 +63,7 @@ const Events = (props) => {
         <Fragment>
             <div style={{ width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
                 <h3 className='sublabel'>Your Next Live Streams</h3>
-                <Button content='Schedule Live Stream' icon='add' size='large' primary style={{ float: 'right', verticalAlign: 'middle', margin: '0'}}/>       
+                <Button content='Schedule Live Stream' icon='add' size='large' primary onClick={() => router.push('/group/' + props.groupId + '/admin/schedule-event')} style={{ float: 'right', verticalAlign: 'middle', margin: '0'}}/>       
             </div>
             <SizeMe>{ ({ size }) => (
                 <StackGrid

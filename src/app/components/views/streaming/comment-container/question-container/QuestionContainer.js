@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import {Input, Icon, Button, Label} from "semantic-ui-react";
+import {Input, Icon, Button, Label} from 'semantic-ui-react';
 import Linkify from 'react-linkify';
 
-import { withFirebase } from '../../../../../data/firebase';
+import { withFirebase } from 'data/firebase';
 
 function QuestionContainer(props) {
     

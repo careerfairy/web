@@ -1,9 +1,9 @@
 // import App from 'next/app'
 import { Fragment } from 'react';
-import '../semantic/dist/semantic.min.css';
-import '../styles.css';
-import FirebaseContext from "../data/firebase/FirebaseContext";
-import Firebase from "../data/firebase/Firebase";
+import 'semantic/dist/semantic.min.css';
+import 'styles.css';
+import FirebaseContext from 'data/firebase/FirebaseContext';
+import Firebase from 'data/firebase/Firebase';
 import * as Sentry from '@sentry/browser';
 
 import Head from 'next/head';

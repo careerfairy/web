@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { UNIVERSITY_SUBJECTS } from '../../../data/StudyFieldData';
+import { UNIVERSITY_SUBJECTS } from 'data/StudyFieldData';
 
 function TargetElementList(props) {
 

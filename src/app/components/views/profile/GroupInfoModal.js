@@ -3,8 +3,8 @@ import { Container, Header as SemanticHeader, Button, Dropdown, Form, Image, Gri
 import { Formik } from 'formik';
 import { useRouter } from 'next/router';
 
-import { withFirebase } from '../../../data/firebase';
-import UserCategorySelector from './UserCategorySelector';
+import { withFirebase } from 'data/firebase';
+import UserCategorySelector from 'UserCategorySelector';
 
 const GroupInfoModal = (props) => {
 

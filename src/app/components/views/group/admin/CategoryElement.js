@@ -2,7 +2,7 @@ import { Fragment, useState, useEffect } from 'react';
 import { Grid, Image, Button, Icon, Modal, Step, Input, Checkbox } from "semantic-ui-react";
 
 import { useRouter } from 'next/router';
-import { withFirebase } from "../../../../data/firebase";
+import { withFirebase } from 'data/firebase';
 import CategoryEdit from './CategoryEdit';
 
 

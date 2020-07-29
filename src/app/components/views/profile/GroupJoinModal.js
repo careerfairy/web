@@ -1,8 +1,8 @@
 import { Fragment, useState, useEffect } from 'react'
 import { Button, Image, Grid, Modal } from 'semantic-ui-react';
 
-import { withFirebase } from '../../../data/firebase';
-import UserCategorySelector from './UserCategorySelector';
+import { withFirebase } from 'data/firebase';
+import UserCategorySelector from 'UserCategorySelector';
 
 const GroupJoinModal = (props) => {
 

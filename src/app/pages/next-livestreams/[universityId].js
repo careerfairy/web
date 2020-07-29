@@ -80,7 +80,6 @@ function Calendar(props) {
                     let category = doc.data();
                     categories.push(category);
                 });
-                console.log(categories);
                 setCategories(categories);
             });
         }

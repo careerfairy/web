@@ -1,17 +1,15 @@
 import { Fragment, useState, useEffect } from 'react';
-import { Grid, Image, Button, Icon, Modal, Step, Input, Checkbox } from "semantic-ui-react";
+import { Grid, Image, Button, Icon, Modal, Step, Input, Checkbox } from 'semantic-ui-react';
 
 import { useRouter } from 'next/router';
-import { withFirebase } from "../../../data/firebase";
-import QuestionVotingBox from '../question-voting-box/QuestionVotingBox';
-import DateUtil from '../../../util/DateUtil';
-import CommonUtil from '../../../util/CommonUtil';
-import TargetElementList from '../common/TargetElementList';
-import BookingModal from '../common/booking-modal/BookingModal';
+import { withFirebase } from 'data/firebase';
+import DateUtil from 'util/DateUtil';
+import TargetElementList from 'components/views/common/TargetElementList';
+import BookingModal from 'components/views/common/booking-modal/BookingModal';
 import axios from 'axios';
 
 import Link from 'next/link';
-import UserUtil from '../../../data/util/UserUtil';
+import UserUtil from 'data/util/UserUtil';
 
 
 function LivestreamCard(props) {

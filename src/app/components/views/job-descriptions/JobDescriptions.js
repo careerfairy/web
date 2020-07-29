@@ -1,7 +1,7 @@
 import {useState, useEffect, Fragment} from 'react';
 import { Grid } from 'semantic-ui-react';
-import JobDescription from './job-description/JobDescription';
-import { withFirebase } from '../../../data/firebase/FirebaseContext';
+import JobDescription from 'job-description/JobDescription';
+import { withFirebase } from 'data/firebase/FirebaseContext';
 
 function JobDescriptions(props) {
 

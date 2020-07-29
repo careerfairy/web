@@ -3,8 +3,8 @@ import { Container, Header as SemanticHeader, Button, Dropdown, Form, Image, Gri
 import { Formik } from 'formik';
 import { useRouter } from 'next/router';
 
-import { withFirebase } from '../../../data/firebase';
-import GroupJoinModal from './GroupJoinModal';
+import { withFirebase } from 'data/firebase';
+import GroupJoinModal from 'GroupJoinModal';
 
 const NewGroup = (props) => {
 

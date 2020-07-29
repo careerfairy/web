@@ -1,8 +1,8 @@
 import React, {useState, useEffect, useRef, Fragment} from 'react';
-import {Icon, Image} from "semantic-ui-react";
+import {Icon, Image} from 'semantic-ui-react';
 import axios from 'axios';
 import { document } from 'global';
-import { WebRTCAdaptor } from '../../../../static-js/webrtc_adaptor';
+import { WebRTCAdaptor } from 'static-js/webrtc_adaptor';
 
 function ViewerVideoContainer(props) {
 

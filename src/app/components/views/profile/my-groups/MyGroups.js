@@ -2,12 +2,12 @@ import { useEffect, useState, Fragment } from 'react'
 import { Container, Header as SemanticHeader, Button, Dropdown, Form, Menu, Grid } from 'semantic-ui-react';
 import { Formik } from 'formik';
 import { useRouter } from 'next/router';
-import { withFirebase } from '../../../../data/firebase';
+import { withFirebase } from 'data/firebase';
 
 import Head from 'next/head';
-import UserUtil from '../../../../data/util/UserUtil';
-import CurrentGroup from '../CurrentGroup';
-import NewGroup from '../NewGroup';
+import UserUtil from 'data/util/UserUtil';
+import CurrentGroup from 'CurrentGroup';
+import NewGroup from 'NewGroup';
 
 const UserProfile = (props) => {
 

@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import {Container, Header as SemanticHeader, Transition, Button} from "semantic-ui-react";
 
-import Header from "../header/Header";
+import Header from "header/Header";
 
 function CompanyLandingPage(props) {
 

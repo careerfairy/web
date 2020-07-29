@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import {Input, Icon, Button, Header, Modal} from "semantic-ui-react";
 
-import QuestionContainer from './question-container/QuestionContainer';
+import QuestionContainer from 'question-container/QuestionContainer';
 
-import { withFirebase } from '../../../../data/firebase';
+import { withFirebase } from 'data/firebase';
 import { animateScroll } from 'react-scroll';
 import { setNestedObjectValues } from 'formik';
 

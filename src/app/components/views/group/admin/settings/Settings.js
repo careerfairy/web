@@ -1,7 +1,7 @@
 import { Fragment, useState, useEffect } from 'react';
-import { Grid, Image, Button, Icon, Modal, Step, Input, Checkbox } from "semantic-ui-react";
-import { withFirebase } from '../../../../../data/firebase';
-import CategoryElement from '../CategoryElement';
+import { Grid, Image, Button, Icon, Modal, Step, Input, Checkbox } from 'semantic-ui-react';
+import { withFirebase } from 'data/firebase';
+import CategoryElement from 'components/views/group/admin/CategoryElement';
 
 const Settings = (props) => {
 
