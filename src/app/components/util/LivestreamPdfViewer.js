@@ -76,7 +76,7 @@ function LivestreamPdfViewer (props) {
     function getPageHeight() {
         var maxHeight = 450;
         var minHeight = 180;
-        var calcHeight = windowSize.height > (windowSize.width / 2) ? (windowSize.width / 2 - 200) : (windowSize.height - 250);
+        var calcHeight = windowSize.height > (windowSize.width / 2.5) ? (windowSize.width / 2 - 200) : (windowSize.height - 250);
 
         if (calcHeight > maxHeight) return maxHeight;
         if (calcHeight < minHeight) return minHeight;
@@ -101,7 +101,7 @@ function LivestreamPdfViewer (props) {
                             onChange={fileObject => { uploadLogo(fileObject)}}
                             maxSize={20}
                             onError={errMsg => ( console.log(errMsg) )}>
-                            <Icon name='cloud upload' size='large' style={{ color: 'white', cursor: 'pointer' }}/>
+                            <Icon name='upload' size='large' style={{ color: 'white', cursor: 'pointer' }}/>
                         </FilePickerContainer>
                     </div>
                     <div style={{ display: 'inline-block', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>

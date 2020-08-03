@@ -16,6 +16,9 @@ function CurrentSpeakerDisplayer(props) {
 
     function getVideoContainerHeight(streamId) {
         if (props.isPlayMode) {
+            if (props.smallScreenMode) {
+                return windowSize.width > 768 ? '20vh' : '15vh';
+            }
             if (props.streams.length > 1) {
                 if (streamId === props.currentSpeaker) {
                     return windowSize.width > 768 ? 'calc(80vh - 75px)' : '45vh';
@@ -26,6 +29,9 @@ function CurrentSpeakerDisplayer(props) {
                 return windowSize.width > 768 ? 'calc(100vh - 75px)' : '60vh';
             }
         } else {
+            if (props.smallScreenMode) {
+                return '20vh';
+            }
             if (props.streams.length > 0) {
                 if (streamId === props.currentSpeaker) {
                     return 'calc(80vh - 75px)';
@@ -40,13 +46,13 @@ function CurrentSpeakerDisplayer(props) {
 
     function getMinimizedSpeakersGridHeight() {
         if (props.isPlayMode) {
-            if (props.streams.length > 1) {
+            if (props.streams.length > 1 || props.smallScreenMode) {
                 return windowSize.width > 768 ? '20vh' : '15vh';
             } else {
                 return '0';
             }
         } else {
-            if (props.streams.length > 0) {
+            if (props.streams.length > 0 || props.smallScreenMode) {
                 return '20vh';
             } else {
                 return '0';
@@ -55,6 +61,9 @@ function CurrentSpeakerDisplayer(props) {
     } 
 
     function getVideoContainerClass(streamId) {
+        if (props.smallScreenMode) {
+            return 'quarter-width';
+        }
         if (props.isPlayMode) {
             if (props.streams.length > 1) {
                 return streamId === props.currentSpeaker ? 'speaker-video' : 'quarter-width';
@@ -78,7 +87,7 @@ function CurrentSpeakerDisplayer(props) {
 
     let externalVideoElements = props.streams.map( (stream, index) => {
         return (
-            <div className={getVideoContainerClass(stream.streamId)} style={{ padding: 0 }} key={stream.streamId} onClick={() => updateCurrentStreamId(stream.streamId)}>
+            <div key={stream.streamId} className={getVideoContainerClass(stream.streamId)} style={{ padding: 0 }} onClick={() => updateCurrentStreamId(stream.streamId)}>
                 <RemoteVideoContainer isPlayMode={props.isPlayMode} muted={props.muted} stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
                 <style jsx>{`
                     .quarter-width {
