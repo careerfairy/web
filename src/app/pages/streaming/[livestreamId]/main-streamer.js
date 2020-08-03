@@ -258,11 +258,21 @@ function StreamingPage(props) {
     return (
         <div className='topLevelContainer'>
              <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
+                <div style={{ position: 'absolute', top: '50%', left: '20px', transform: 'translateY(-50%)', verticalAlign: 'middle'}}>
+                    <ButtonWithConfirm
+                        color={currentLivestream.hasStarted ? 'red' : 'teal'} 
+                        size='big' 
+                        fluid
+                        disabled={!streamStartTimeIsNow}
+                        buttonAction={currentLivestream.hasStarted ? stopStreaming : startStreaming} 
+                        confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
+                        buttonLabel={ currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming' }/>
+                </div>
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', display: 'inline-block', padding: '10px', verticalAlign: 'middle'}}>
                     <h3 style={{ color: (currentLivestream.hasStarted ?  'white' : 'orange') }}>{ currentLivestream.hasStarted ? 'YOU ARE NOW LIVE' : 'YOU ARE NOT LIVE'}</h3>
                     { currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
                 </div>
-                <div style={{ float: 'right', display: 'inlineBlock', margin: '0 20px', fontSize: '1.2em', fontWeight: '700', padding: '10px' }}>
+                <div style={{ float: 'right', margin: '0 20px', fontSize: '1.2em', fontWeight: '700', padding: '10px', verticalAlign: 'middle'}}>
                     Viewers: { numberOfViewers }
                 </div>
             </div>
@@ -280,14 +290,6 @@ function StreamingPage(props) {
                                 <div>Your livestream is scheduled to start in</div>
                                 <CountdownTimer date={ currentLivestream.start ? currentLivestream.start.toDate() : null }><span>Press Start Streaming to start the event</span></CountdownTimer>
                             </div>
-                            <ButtonWithConfirm
-                                color='teal' 
-                                size='big' 
-                                fluid
-                                disabled={!streamStartTimeIsNow}
-                                buttonAction={currentLivestream.hasStarted ? stopStreaming : startStreaming} 
-                                confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
-                                buttonLabel={ currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming' }/>
                         </Grid.Column>
                     </Grid>
                 </div>
@@ -447,7 +449,7 @@ function StreamingPage(props) {
                     left: 280px;
                     right: 120px;
                     width: calc(100% - 400px);
-                    min-width: 700px;
+                    min-width: 400px;
                     height: calc(100% - 75px);
                     min-height: 600px;
                     z-index: 10;

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Document, Page } from 'react-pdf';
 import * as PDFJS from 'pdfjs-dist/build/pdf';
 import { useWindowSize } from '../custom-hook/useWindowSize';
-import { Button, Modal, Progress } from 'semantic-ui-react';
+import { Button, Modal, Progress, Icon } from 'semantic-ui-react';
 
 import FilePickerContainer from '../ssr/FilePickerContainer';
 import { withFirebase } from '../../data/firebase';
@@ -76,7 +76,7 @@ function LivestreamPdfViewer (props) {
     function getPageHeight() {
         var maxHeight = 450;
         var minHeight = 180;
-        var calcHeight = windowSize.height > (windowSize.width / 2.2) ? (windowSize.width / 2 - 200) : (windowSize.height - 250);
+        var calcHeight = windowSize.height > (windowSize.width / 2) ? (windowSize.width / 2 - 200) : (windowSize.height - 250);
 
         if (calcHeight > maxHeight) return maxHeight;
         if (calcHeight < minHeight) return minHeight;
@@ -93,36 +93,45 @@ function LivestreamPdfViewer (props) {
     
     return (
         <div style={{ position: 'relative', width: '100%' }}>
-            <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translate(-50%)', display: ( pdfObject ? 'block' : 'none') }}>
-                <div style={{ marginBottom: '20px', zIndex: '9999', width: '100%', minWidth: '500px', display: props.presenter ? 'block' : 'none'}}>
+            <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translate(-50%)', display: ( pdfObject ? 'block' : 'none'), borderRadius: '10px', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', bottom: '0', left: '0', zIndex: '9999', width: '100%', padding: '20px', display: props.presenter ? 'block' : 'none', backgroundColor: 'rgba(40,40,40, 0.8)'}}>
                     <div style={{ display: 'inline-block'}}>
                         <FilePickerContainer
                             extensions={['pdf']}
                             onChange={fileObject => { uploadLogo(fileObject)}}
                             maxSize={20}
                             onError={errMsg => ( console.log(errMsg) )}>
-                            <Button primary icon='upload' content='Upload Slides [.pdf]' />
+                            <Icon name='cloud upload' size='large' style={{ color: 'white', cursor: 'pointer' }}/>
                         </FilePickerContainer>
                     </div>
-                    <div style={{ display: 'inline-block', position: 'absolute', left: '50%', transform: 'translateX(-50%)'}}>
+                    <div style={{ display: 'inline-block', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
                         <Button circular icon='angle left' onClick={() => decreasePdfPageNumber()} disabled={pdfObject ? pdfObject.page === 1 : false}/>
                         <Button circular icon='angle right' onClick={() => increasePdfPageNumber()} disabled={pdfObject ? pdfObject.page === pdfNumberOfPages : false}/>
                     </div>
                 </div>
                 <div style={{ position: 'relative', textAlign: 'center'}}>
-                    <div style={{ position: 'relative', display: 'inline-block'}}>
-                        <Document
-                            onLoadSuccess={({ numPages }) => setPdfNumberOfPages(numPages)}
-                            file={ pdfObject ? pdfObject.downloadUrl : ''}>
-                            <Page height={ getPageHeight() } renderTextLayer={false} pageNumber={pdfObject ? pdfObject.page : 1} />
-                        </Document>
-                    </div>
+                    <Document
+                        onLoadSuccess={({ numPages }) => setPdfNumberOfPages(numPages)}
+                        file={ pdfObject ? pdfObject.downloadUrl : ''}>
+                        <Page height={ getPageHeight() } renderTextLayer={false} pageNumber={pdfObject ? pdfObject.page : 1} />
+                    </Document>
                 </div>
             </div>
             <div style={{ position: 'absolute', top: '150px', left: '50%', transform: 'translate(-50%)', display: ( pdfObject ? 'none' : 'block') }}>
                 <div style={{ marginBottom: '20px', zIndex: '9999'}}>
                     <div style={{ display: 'inline-block', textAlign: 'center', display: props.presenter ? 'block' : 'none'}}>
-                        <div style={{ color: 'white', marginBottom: '40px'}}>You currently have no slides to share</div>
+                        <div style={{ color: 'white', marginBottom: '40px'}}>
+                            <p>You currently have no slides to share</p>
+                            <div>
+                                <FilePickerContainer
+                                    extensions={['pdf']}
+                                    onChange={fileObject => { uploadLogo(fileObject)}}
+                                    maxSize={20}
+                                    onError={errMsg => ( console.log(errMsg) )}>
+                                    <Button primary icon='upload' content='Upload Slides [.pdf]' />
+                                </FilePickerContainer>
+                            </div>
+                        </div>
                         <FilePickerContainer
                             extensions={['pdf']}
                             maxSize={20}
