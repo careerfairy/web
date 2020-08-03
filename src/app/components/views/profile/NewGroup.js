@@ -4,7 +4,7 @@ import { Formik } from 'formik';
 import { useRouter } from 'next/router';
 
 import { withFirebase } from 'data/firebase';
-import GroupJoinModal from 'GroupJoinModal';
+import GroupJoinModal from 'components/views/profile/GroupJoinModal';
 
 const NewGroup = (props) => {
 

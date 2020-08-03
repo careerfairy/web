@@ -4,7 +4,6 @@ import { Formik } from 'formik';
 import { useRouter } from 'next/router';
 
 import { withFirebase } from 'data/firebase';
-import GroupInfoModal from 'GroupInfoModal';
 
 const CurrentGroup = (props) => {
 

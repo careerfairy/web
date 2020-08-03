@@ -36,6 +36,7 @@ const UserProfile = (props) => {
             .then(querySnapshot => {
                 setLoading(false);
                 let user = querySnapshot.data();
+                user.id = querySnapshot.id;
                 if (user) {
                     setUserData(user);
                 }

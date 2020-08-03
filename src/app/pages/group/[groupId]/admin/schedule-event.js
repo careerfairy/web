@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Container, Button, Image, Menu, Grid } from 'semantic-ui-react';
+import { Container, Image, Grid } from 'semantic-ui-react';
 import { useRouter } from 'next/router';
 import { withFirebase } from 'data/firebase';
 import Head from 'next/head';
 
 import Header from 'components/views/header/Header';
 import Footer from 'components/views/footer/Footer';
-import Events from 'components/views/group/admin/events/Events';
-import Settings from 'components/views/group/admin/settings/Settings';
-import Members from 'components/views/group/admin/members/Members';
+import SelectCompanyStep from 'components/views/group/admin/schedule-events/select-company-step/SelectCompanyStep';
+import CreateLivestreamProposalStep from 'components/views/group/admin/schedule-events/create-livestream-proposal-step/CreateLivestreamProposalStep';
 
 const ScheduleEvent = (props) => {
     
@@ -17,7 +16,8 @@ const ScheduleEvent = (props) => {
 
     const [user, setUser] = useState({});
     const [group, setGroup] = useState({});
-    const [companies, setCompanies] = useState([]);
+    const [schedulingStep, setSchedulingStep] = useState(0);
+    const [livestreamRequest, setLivestreamRequest] = useState({});
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
@@ -40,39 +40,11 @@ const ScheduleEvent = (props) => {
     }, [groupId]);
 
     useEffect(() => {
-        props.firebase.getCompanies().then(querySnapshot => {
-                let companies = [];
-                querySnapshot.forEach(doc => {
-                    let company = doc.data();
-                    companies.push(company);
-                });
-                setCompanies(companies);
-            });
-    }, []);
-
-    let companiesElements = companies.map( company => {
-        return(
-            <Grid.Column width={4}>
-                <div className='company-selector'>
-                    <Image src={company.logoUrl} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', maxWidth: '60%', maxHeight: '50%', margin: '0 auto'}}/>
-                </div>
-                <style jsx>{`
-                    .company-selector {
-                        position: relative;
-                        height: 150px;
-                        border-radius: 10px;
-                        background-color: white;
-                        box-shadow: 0 0 2px rgb(200,200,200);
-                        cursor: pointer;
-                    }
-
-                    .company-selector:hover {
-                        box-shadow: 0 0 5px rgb(0, 210, 170);
-                    }
-                `}</style>
-            </Grid.Column>
-        );
-    });
+        debugger;
+        if (livestreamRequest.company) {
+            setSchedulingStep(1);
+        }        
+    }, [livestreamRequest]);
 
     return (
             <div className='greyBackground'>
@@ -94,15 +66,13 @@ const ScheduleEvent = (props) => {
                                 <h1 className='group-name'>{ group.universityName }</h1>
                             </Grid.Column>
                         </Grid>  
-                    </div> 
+                    </div>
                     <div>
-                        <h2 className='schedule-events-label'>Schedule an Event with a Company</h2>
-                        <div className='internal'>
-                            <Grid>
-                                { companiesElements }
-                            </Grid>
-                        </div>
-                    </div>  
+                        <SelectCompanyStep schedulingStep={schedulingStep} livestreamRequest={livestreamRequest} setLivestreamRequest={setLivestreamRequest} /> 
+                    </div>   
+                    <div>
+                        <CreateLivestreamProposalStep schedulingStep={schedulingStep} livestreamRequest={livestreamRequest} setLivestreamRequest={setLivestreamRequest} /> 
+                    </div> 
                 </Container>
                 <Footer/>
                 <style jsx>{`
@@ -162,11 +132,6 @@ const ScheduleEvent = (props) => {
                         font-size: calc(1em + 1.4vw);
                         color: rgb(80,80,80);
                         text-shado
-                    }
-
-                    .sublabel {
-                        margin: 40px 0 15px 0;
-                        text-align: center;
                     }
 
                     #profileContainer {

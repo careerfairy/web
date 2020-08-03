@@ -11,13 +11,13 @@ import FilePickerContainer from '../../components/ssr/FilePickerContainer';
 
 const CreateGroup = (props) => {
     
+    const [user, setUser] = useState(null);
     const router = useRouter();
-
-    const [logoUrl, setLogoUrl] = useState('https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266')
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
             if (user) {
+                setUser(user);
             }  else {
                 router.replace('/login');
             }
@@ -64,7 +64,7 @@ const CreateGroup = (props) => {
             }, function() {
                 // Upload completed successfully, now we can get the download URL
                 uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
-                    callback(downloadURL, fullPath);
+                    callback(downloadURL);
                     console.log('File available at', downloadURL);
                 });
             });
@@ -81,7 +81,9 @@ const CreateGroup = (props) => {
                         <h1 className='center thin teal large'>Create a Career Group</h1>
                         <Formik
                             initialValues={{
-                                logoUrl: '', 
+                                logoUrl: 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266',
+                                name: '',
+                                description: '' 
                             }}
                             validate={values => {
                                 let errors = {};
@@ -91,9 +93,19 @@ const CreateGroup = (props) => {
                                 return errors;
                             }}
                             onSubmit={(values, { setSubmitting }) => {
-                                
+                                let careerCenter = {
+                                    adminEmail: user.email,
+                                    logoUrl: values.logoUrl,
+                                    description: values.description,
+                                    test: false,
+                                    universityName: values.name
+                                }
+                                props.firebase.createCareerCenter(careerCenter).then(careerCenterRef => {
+                                    router.push('/group/' + careerCenterRef.id + '/admin');
+                                    setSubmitting(false);
+                                });
                             }}
-                        >
+                         >
                             {({
                                 values,
                                 errors,
@@ -110,15 +122,15 @@ const CreateGroup = (props) => {
                                         <Form.Field>
                                             <div style={{ textAlign: 'center'}}>
                                                 <div className='logo-element'>
-                                                    <Image style={{ margin: '20px auto 20px auto', maxWidth: '100%', maxHeight: '250px'}} src={logoUrl}/>
+                                                    <Image style={{ margin: '20px auto 20px auto', maxWidth: '100%', maxHeight: '250px'}} src={values.logoUrl}/>
                                                 </div>
                                                 <FilePickerContainer
                                                     extensions={['jpg','jpeg','png']}
                                                     maxSize={20}
-                                                    onChange={fileObject => {uploadLogo('group-logos', fileObject, (newUrl, fullPath) => { debugger; setFieldValue('logoUrl', fullPath, true); setLogoUrl(newUrl);})}}
+                                                    onChange={fileObject => {uploadLogo('group-logos', fileObject, (newUrl) => { setFieldValue('logoUrl', newUrl, true); })}}
                                                     onError={errMsg => ( console.log(errMsg) )}
                                                 >
-                                                    <Button size='huge'>Upload Your Logo</Button>
+                                                    <Button type='button' size='large' icon='upload' content='Upload Your Logo'/>
                                                 </FilePickerContainer>
                                             </div>     
                                         </Form.Field>  
@@ -126,20 +138,20 @@ const CreateGroup = (props) => {
                                     <Form.Group widths='equal'>
                                         <Form.Field>
                                             <label className='login-label'>Group Name</label>
-                                            <input id='company' type='text' className='stylish-input' name='company' placeholder='Your Group Name' onChange={handleChange} onBlur={handleBlur} value={values.company} disabled={isSubmitting} />
+                                            <input id='company' type='text' className='stylish-input' name='name' placeholder='Your Group Name' onChange={handleChange} onBlur={handleBlur} value={values.name} disabled={isSubmitting} />
                                             <div className='field-error'>
-                                                {errors.company && touched.company && errors.company}
+                                                {errors.name && touched.name && errors.name}
                                             </div>
                                         </Form.Field>
                                     </Form.Group>     
                                     <Form.Field>
                                         <label className='login-label'>Description</label>
-                                        <textarea id='title' type='textarea' name='title' className='stylish-textarea' placeholder='Describe some characteristics shared by your members' onChange={handleChange} onBlur={handleBlur} value={values.title} disabled={isSubmitting} />
+                                        <textarea id='title' type='textarea' name='description' className='stylish-textarea' placeholder='Describe some characteristics shared by your members' onChange={handleChange} onBlur={handleBlur} value={values.description} disabled={isSubmitting} />
                                         <div className='field-error'>
-                                            {errors.title && touched.title && errors.title}
+                                            {errors.description && touched.description && errors.description}
                                         </div>
                                     </Form.Field>    
-                                    <Button id='submitButton' type="submit" primary size='large' disabled={isSubmitting} loading={isSubmitting} fluid>Create Group</Button>
+                                    <Button id='submitButton' type='submit' primary size='large' disabled={isSubmitting} loading={isSubmitting} fluid>Create Group</Button>
                                 </Form>
                         )}
                         </Formik>

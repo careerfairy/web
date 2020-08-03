@@ -1,4 +1,5 @@
 import { window } from 'global';
+import { Button } from 'semantic-ui-react';
 
 function FilePickerContainer (props) {
     if (window) {
@@ -8,7 +9,8 @@ function FilePickerContainer (props) {
         return ( 
             <div>
                 <input type='file' style={{ display: 'none' }}/>
-                <button className='ui primary button'><i aria-hidden='true' className='upload icon'/>Upload Slides [.pdf]</button>
+                {/* <button className='ui primary button'><i aria-hidden='true' className='upload icon'/>Upload Slides [.pdf]</button> */}
+                { props.children }
             </div>
         );
     }

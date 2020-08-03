@@ -167,6 +167,12 @@ class Firebase {
         return ref.get();
     };
 
+    createCareerCenter(careerCenter) {
+        let ref = this.firestore 
+            .collection("careerCenterData");
+        return ref.add(careerCenter);
+    }
+
     getCareerCenters = () => {
         let ref = this.firestore
             .collection("careerCenterData")
@@ -189,12 +195,37 @@ class Firebase {
         return ref.get();
     };
 
+    getCareerCentersByAdminEmail= (adminEmail) => {
+        let ref = this.firestore
+            .collection("careerCenterData")
+            .where("adminEmail", "==", adminEmail);
+        return ref.get();
+    }
+
+    getGroupCategories = (groupId) => {
+        let ref = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("categories");
+        return ref.get();
+    }
+
     listenToGroupCategories = (groupId, callback) => {
         let ref = this.firestore
             .collection("careerCenterData")
             .doc(groupId)
             .collection("categories");
         return ref.onSnapshot(callback);
+    }
+
+    getGroupCategoryElements = (groupId, categoryId) => {
+        let ref = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("categories")
+            .doc(categoryId)
+            .collection("elements");
+        return ref.get();
     }
 
     listenToGroupCategoryElements = (groupId, categoryId, callback) => {

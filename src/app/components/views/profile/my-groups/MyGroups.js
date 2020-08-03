@@ -4,16 +4,13 @@ import { Formik } from 'formik';
 import { useRouter } from 'next/router';
 import { withFirebase } from 'data/firebase';
 
-import Head from 'next/head';
-import UserUtil from 'data/util/UserUtil';
-import CurrentGroup from 'CurrentGroup';
-import NewGroup from 'NewGroup';
+import CurrentGroup from 'components/views/profile/CurrentGroup';
 
 const UserProfile = (props) => {
 
     const router = useRouter();
-
     const [groups, setGroups] = useState([]);
+    const [adminGroups, setAdminGroups] = useState([]);
 
     useEffect(() => {
         props.firebase.getCareerCenters().then(querySnapshot => {
@@ -27,10 +24,32 @@ const UserProfile = (props) => {
         });
     }, []);
 
+    useEffect(() => {
+        if (props.userData) {
+            props.firebase.getCareerCentersByAdminEmail(props.userData.id).then(querySnapshot => {
+                let careerCenters = [];
+                querySnapshot.forEach(doc => {
+                    let careerCenter = doc.data();
+                    careerCenter.id = doc.id;
+                    careerCenters.push(careerCenter);
+                })
+                setAdminGroups(careerCenters);
+            });
+        }     
+    }, [props.userData]);
+
     let existingGroupElements = [];
 
     if (props.userData && props.userData.groupIds) {
         existingGroupElements = groups.filter(group => props.userData.groupIds.indexOf(group.id) > -1).map(group => {
+            return <CurrentGroup group={group} userData={props.userData} key={group.id}/>
+        });
+    }
+
+    let adminGroupElements = [];
+
+    if (props.userData) {
+        adminGroupElements = adminGroups.map(group => {
             return <CurrentGroup group={group} userData={props.userData} key={group.id}/>
         });
     }
@@ -44,6 +63,14 @@ const UserProfile = (props) => {
             <div className={ existingGroupElements.length > 0 ? 'hidden' : ''} style={{ margin: '30px 0', fontSize: '1.1em' }}>
                 You are currently not a member of any career group.
             </div>
+            <h3 style={{ color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300' }}>Admin Groups</h3>
+            <Grid style={{ padding: '20px 0 0 0' }} stackable>
+                {adminGroupElements}
+            </Grid>
+            <div className={ adminGroupElements.length > 0 ? 'hidden' : ''} style={{ margin: '30px 0', fontSize: '1.1em' }}>
+                You are currently not a member of any career group.
+            </div>
+            <Button content='Create a Career Group' primary size='big' onClick={() => router.push('/group/create')}/>
             <style jsx>{`
                     .hidden {
                         display: none;

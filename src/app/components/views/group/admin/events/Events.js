@@ -1,5 +1,5 @@
 import { Fragment, useState, useEffect } from 'react';
-import { Grid, Image, Button, Icon, Modal, Step, Input, Checkbox } from "semantic-ui-react";
+import { Grid, Image, Button, Icon, Modal, Step, Input, Checkbox, Dropdown, Menu } from "semantic-ui-react";
 import { withFirebase } from 'data/firebase';
 import { SizeMe } from 'react-sizeme';
 import StackGrid from 'react-stack-grid';
@@ -63,7 +63,25 @@ const Events = (props) => {
         <Fragment>
             <div style={{ width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
                 <h3 className='sublabel'>Your Next Live Streams</h3>
-                <Button content='Schedule Live Stream' icon='add' size='large' primary onClick={() => router.push('/group/' + props.groupId + '/admin/schedule-event')} style={{ float: 'right', verticalAlign: 'middle', margin: '0'}}/>       
+                <Dropdown 
+                    text='New Live Stream'
+                    icon='add'
+                    floating
+                    labeled
+                    button
+                    style={{ float: 'right', verticalAlign: 'middle', margin: '0'}}
+                    className='icon'>
+                    <Dropdown.Menu>
+                        <Dropdown.Item
+                            text='Send a Company Request'
+                            onClick={() => router.push('/group/' + props.groupId + '/admin/schedule-event')}
+                        />
+                        <Dropdown.Item
+                            text='Schedule a Live Stream'
+                            onClick={() => {}}
+                        />
+                    </Dropdown.Menu>
+                </Dropdown>
             </div>
             <SizeMe>{ ({ size }) => (
                 <StackGrid
