@@ -76,7 +76,7 @@ function LivestreamPdfViewer (props) {
     function getPageHeight() {
         var maxHeight = 450;
         var minHeight = 180;
-        var calcHeight = windowSize.height > (windowSize.width / 2.5) ? (windowSize.width / 2 - 200) : (windowSize.height - 250);
+        var calcHeight = windowSize.height > (windowSize.width / 2) ? (windowSize.width / 2 - 200) : (windowSize.height - 250);
 
         if (calcHeight > maxHeight) return maxHeight;
         if (calcHeight < minHeight) return minHeight;

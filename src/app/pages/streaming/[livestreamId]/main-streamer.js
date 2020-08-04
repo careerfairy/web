@@ -26,6 +26,7 @@ function StreamingPage(props) {
     const [streamerReady, setStreamerReady] = useState(false);
     const [connectionEstablished, setConnectionEstablished] = useState(false);
     const [errorMessage, setErrorMessage] = useState(null);
+    const [showLivestreamCountdown, setShowLivestreamCountdown] = useState(true);
 
     const [currentLivestream, setCurrentLivestream] = useState(false);
 
@@ -286,7 +287,8 @@ function StreamingPage(props) {
                 <div className='button-container'>         
                     <Grid centered className='middle aligned'>
                         <Grid.Column width={10} textAlign='center'>
-                            <div className='countdown' style={{ display: (currentLivestream.hasStarted || !currentLivestream.start) ? 'none' : 'block', backgroundColor: streamStartTimeIsNow ? 'rgba(0, 210, 170, 0.8)' : 'rgba(0,0,0,0.8)'}}>
+                            <div className='countdown' style={{ display: (currentLivestream.hasStarted || !currentLivestream.start || !showLivestreamCountdown ) ? 'none' : 'block', backgroundColor: streamStartTimeIsNow ? 'rgba(0, 210, 170, 0.8)' : 'rgba(100,100,100,0.8)'}}>
+                                <Icon name='delete' onClick={() => setShowLivestreamCountdown(false)} style={{ position: 'absolute', top: '22px', right: '20px', color: 'white' }}/>
                                 <div>Your livestream is scheduled to start in</div>
                                 <CountdownTimer date={ currentLivestream.start ? currentLivestream.start.toDate() : null }><span>Press Start Streaming to start the event</span></CountdownTimer>
                             </div>
