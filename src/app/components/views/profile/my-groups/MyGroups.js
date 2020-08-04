@@ -70,7 +70,7 @@ const UserProfile = (props) => {
             <div className={ adminGroupElements.length > 0 ? 'hidden' : ''} style={{ margin: '30px 0', fontSize: '1.1em' }}>
                 You are currently not a member of any career group.
             </div>
-            <Button content='Create a Career Group' primary size='big' onClick={() => router.push('/group/create')}/>
+            <Button content='Create a New Career Group' icon='add' size='big' onClick={() => router.push('/group/create')}/>
             <style jsx>{`
                     .hidden {
                         display: none;

@@ -4,17 +4,24 @@ import { withFirebase } from 'data/firebase';
 
 const Members = (props) => {
 
+    const [modalOpened, setModalOpened] = useState(false);
     return(
         <Fragment>
             <div style={{ width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
                 <h3 className='sublabel'>Your Members</h3>
-                <Button content='Invite Members' size='large' icon='add' primary style={{ float: 'right', verticalAlign: 'middle'}}/>       
+                <Button content='Invite Members' size='large' icon='add' primary style={{ float: 'right', verticalAlign: 'middle'}} onClick={() => setModalOpened(true) }/>       
             </div>
             <div style={{ padding: '150px 0'}}>
                 <div>
                     You don't have any members yet.
                 </div>      
             </div>
+            <Modal open={modalOpened} onClose={() => setModalOpened(false) }>
+                <Modal.Header>Invite members</Modal.Header>
+                <Modal.Content>
+                    Invite members by sending them the following link: <a href={'https://careerfairy.io/group/' + props.groupId}>{'https://careerfairy.io/group/' + props.groupId}</a> 
+                </Modal.Content>
+            </Modal>
             <style jsx>{`
                 .hidden {
                     display: none;
