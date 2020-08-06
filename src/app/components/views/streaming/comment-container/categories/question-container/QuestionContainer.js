@@ -1,47 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import {Input, Icon, Button, Label} from "semantic-ui-react";
-import Linkify from 'react-linkify';
 
-import { withFirebase } from '../../../../../data/firebase';
+import { withFirebase } from 'data/firebase';
 
 function QuestionContainer(props) {
-    
-    const [newCommentTitle, setNewCommentTitle] = useState("");
-    const [comments, setComments] = useState([]);
-
-    useEffect(() => {
-        if (props.livestream.id, props.question.id) {
-            const unsubscribe = props.firebase.listenToQuestionComments(props.livestream.id, props.question.id, querySnapshot => {
-                var commentsList = [];
-                querySnapshot.forEach(doc => {
-                    let comment = doc.data();
-                    comment.id = doc.id;
-                    commentsList.push(comment);
-                });
-                setComments(commentsList);
-            });
-            return () => unsubscribe();
-        }
-    }, [props.livestream.id, props.question.id]);
-
-    function addNewComment() {
-        const newComment = {
-            title: newCommentTitle,
-            author: 'STREAMER',
-        }
-        props.firebase.putQuestionComment(props.livestream.id, props.question.id, newComment)
-            .then(() => {
-                setNewCommentTitle("");
-            }, error => {
-                console.log("Error: " + error);
-            })
-    }
-
-    function addNewCommentOnEnter(target) {
-        if(target.charCode==13){
-            addNewComment();   
-        } 
-    }
 
     function goToThisQuestion(nextQuestionId) {
         const currentQuestion = props.questions.find(question => question.type === 'current');
@@ -52,84 +14,27 @@ function QuestionContainer(props) {
         }
     }
 
-    const componentDecorator = (href, text, key) => (
-        <a href={href} key={key} target="_blank">
-          {text}
-        </a>
-    );
-
-    
-    let commentsElements = comments.map((comment, index) => {
-        return (
-            <div className='animated fadeInUp faster' key={index}>
-                <div className='questionContainer'>
-                    <div className='questionTitle'>
-                        <Linkify componentDecorator={componentDecorator}>
-                            { comment.title }
-                        </Linkify>
-                    </div>
-                    <div className='questionAuthor'>
-                        @{ comment.author }
-                    </div>
-                </div>
-                <style jsx>{`
-                    .questionContainer {
-                        position: relative;
-                        padding: 15px;
-                        margin: 10px 0;
-                        background-color: white;
-                        color: black;
-                        border-radius: 20px;
-                        box-shadow: 0 0 5px rgb(180,180,180);
-                        word-break: break-word;
-                    }
-
-                    .questionTitle {
-                        word-break: break-word;
-                    }
-
-                    .questionAuthor {
-                        font-size: 0.8em;
-                        color: rgb(160,160,160);
-                    }
-                `}</style>
-            </div>
-        );
-    });
-
     return (
         <div className='animated fadeInUp faster'>
                 <div className={'questionContainer ' + (props.question.type === 'current' ? 'active' : '') }>
                     <div className='questionTitle'>
                         { props.question.title }
                     </div>
-                    <div className='bottom-element'>
-                        <div className='comments'>
-                            <p className='comments-number'>{ comments.length } comments</p>
-                        </div>
-                    </div>
-                    <div>
-                        { commentsElements }
-                    </div>
-                    <div className='comment-input'>
-                        <Input
-                            icon={<Icon name='chevron circle right' inverted circular link onClick={() => addNewComment()} color='teal'/>}
-                            value={newCommentTitle}
-                            onChange={(event) => {setNewCommentTitle(event.target.value)}}
-                            onKeyPress={addNewCommentOnEnter}
-                            placeholder='Send a comment...'
-                            fluid
-                        />
+                    <div className='questionAuthor'>
+                        by { props.question.author }
                     </div>
                 </div>
-                <div className='upvotes'>
-                    { props.question.votes } <Icon name='thumbs up'/>
+                <div className='upvotes' style={{ color: props.question.type === 'current' ?  'white' : 'rgb(0, 210, 170)'}}>
+                    <div className='number' >
+                        { props.question.votes }
+                    </div>
+                    <Icon name='thumbs up'/>
                 </div>
                 <Button attached='bottom' icon='thumbs up' content={ 'ANSWER THIS QUESTION' } primary onClick={() => goToThisQuestion(props.question.id)} style={{ margin: '0 10px 10px 10px' }} disabled={props.question.type !== 'new'}/>
                 <style jsx>{`
                     .questionContainer {
                         position: relative;
-                        padding: 20px 20px 60px 20px;
+                        padding: 30px 20px 30px 20px;
                         margin: 10px 10px 0 10px;
                         background-color: rgb(250,250,250);
                         border-top-left-radius: 5px;
@@ -152,7 +57,7 @@ function QuestionContainer(props) {
                         line-height: 1.3em;
                         color: rgb(50,50,50);
                         margin: 5px 0;
-                        width: 85%;
+                        width: 90%;
                     }
 
                     .questionContainer.active .questionTitle {
@@ -205,7 +110,12 @@ function QuestionContainer(props) {
                         display: inline-block;
                         margin: 0 0 0 30px;
                         font-weight: 700; 
-                        color: rgba(0, 210, 170, 1);
+                        font-size: 1.2em;
+                    }
+
+                    .upvotes .number {
+                        display: inline-block;
+                        margin: 3px;
                     }
 
                     .comment-input {

@@ -454,6 +454,24 @@ class Firebase {
         return ref.add(comment);
     }
 
+    listenToChatEntries = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("chatEntries")
+            .orderBy("timestamp", "asc");
+        return ref.onSnapshot(callback);
+    }
+
+    putChatEntry = (livestreamId, chatEntry) => {
+        chatEntry.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("chatEntries");
+        return ref.add(chatEntry);
+    }
+
     setLivestreamHasStarted = (hasStarted, livestreamId) => {
         let ref = this.firestore
             .collection("livestreams")
@@ -513,6 +531,77 @@ class Firebase {
                 });
             });
         });
+    }
+
+    createLivestreamPoll = (livestreamId, pollQuestion, pollOptions) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls");
+
+        let pollObject = {
+            timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+            question: pollQuestion,
+            options: []
+        }
+        pollOptions.forEach((option, index) => {
+            pollObject.options.push({
+                name: option,
+                votes: 0,
+                index: index
+            });
+        });         
+        return ref.add(pollObject);
+    }
+
+    updateLivestreamPoll = (livestreamId, pollId, pollQuestion, pollOptions) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId);
+
+        let pollObject = {
+            question: pollQuestion,
+            options: []
+        }
+        pollOptions.forEach((option, index) => {
+            pollObject.options.push({
+                name: option,
+                votes: 0,
+                index: index
+            });
+        });         
+        return ref.update(pollObject);
+    }
+
+    deleteLivestreamPoll(livestreamId, pollId) {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId);
+        return ref.delete();
+    }
+
+    listenToPollEntries = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .orderBy("timestamp", "asc");
+        return ref.onSnapshot(callback);
+    }
+
+    listenToPollOptions = (livestreamId, pollId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId)
+            .collection("options")
+            .orderBy("index", "asc");
+        return ref.onSnapshot(callback);
     }
 
     getPastLivestreams = () => {

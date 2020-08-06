@@ -6,12 +6,6 @@ import ButtonWithConfirm from '../../../components/views/common/ButtonWithConfir
 import axios from 'axios';
 
 import { useRouter } from 'next/router';
-import useWebRTCAdaptor from '../../../components/custom-hook/useWebRTCAdaptor';
-import { useWindowSize } from '../../../components/custom-hook/useWindowSize';
-import LivestreamPdfViewer from '../../../components/util/LivestreamPdfViewer';
-import CurrentSpeakerDisplayer from '../../../components/views/streaming/video-container/CurrentSpeakerDisplayer';
-import StreamerVideoDisplayer from '../../../components/views/streaming/video-container/StreamerVideoDisplayer';
-import SmallStreamerVideoDisplayer from '../../../components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 import NewCommentContainer from '../../../components/views/streaming/comment-container/NewCommentContainer';
 import CountdownTimer from '../../../components/views/common/Countdown';
 import SpeakerManagementModal from '../../../components/views/streaming/modal/SpeakerManagementModal';
@@ -51,71 +45,71 @@ function StreamingPage(props) {
     const localVideoId = 'localVideo';
     const  isPlayMode = false;
 
-    let streamingCallbacks = {
-        onInitialized: (infoObj) => {},
-        onPublishStarted: (infoObj) => {
-            setMainStreamIdToStreamerList(infoObj.streamId);
-            setShowDisconnectionModal(false);
-            setIsStreaming(true);
-        },
-        onJoinedTheRoom: (infoObj) => {
-        },
-        onNewStreamAvailable: (infoObj) => {
-            addStreamIdToStreamerList(infoObj.streamId);
-        },
-        onStreamLeaved: (infoObj) => {
-            removeStreamIdFromStreamerList(infoObj.streamId);
-            setLiveSpeakerDisconnected(infoObj.streamId);
-        },
-        onPublishFinished: (infoObj) => {
-            setIsStreaming(false);
-        },
-        onScreenShareStopped: (infoObj) => {},
-        onDisconnected: (infoObj) => {
-            setShowDisconnectionModal(true);
-        },
-        onConnected: (infoObj) => {
-            setShowDisconnectionModal(false);
-        },
-        onClosed: (infoObj) => {},
-        onUpdatedStats: (infoObj) => {},
-    }
+    // let streamingCallbacks = {
+    //     onInitialized: (infoObj) => {},
+    //     onPublishStarted: (infoObj) => {
+    //         setMainStreamIdToStreamerList(infoObj.streamId);
+    //         setShowDisconnectionModal(false);
+    //         setIsStreaming(true);
+    //     },
+    //     onJoinedTheRoom: (infoObj) => {
+    //     },
+    //     onNewStreamAvailable: (infoObj) => {
+    //         addStreamIdToStreamerList(infoObj.streamId);
+    //     },
+    //     onStreamLeaved: (infoObj) => {
+    //         removeStreamIdFromStreamerList(infoObj.streamId);
+    //         setLiveSpeakerDisconnected(infoObj.streamId);
+    //     },
+    //     onPublishFinished: (infoObj) => {
+    //         setIsStreaming(false);
+    //     },
+    //     onScreenShareStopped: (infoObj) => {},
+    //     onDisconnected: (infoObj) => {
+    //         setShowDisconnectionModal(true);
+    //     },
+    //     onConnected: (infoObj) => {
+    //         setShowDisconnectionModal(false);
+    //     },
+    //     onClosed: (infoObj) => {},
+    //     onUpdatedStats: (infoObj) => {},
+    // }
 
-    let errorCallbacks = {
-        onScreenSharePermissionDenied: () => {},
-        onOtherError: (error) => {
-            if (typeof error === "string") {
-                setErrorMessage(error);
-            } else {
-                setErrorMessage("A connection error occured");
-            }
-        }
-    }
+    // let errorCallbacks = {
+    //     onScreenSharePermissionDenied: () => {},
+    //     onOtherError: (error) => {
+    //         if (typeof error === "string") {
+    //             setErrorMessage(error);
+    //         } else {
+    //             setErrorMessage("A connection error occured");
+    //         }
+    //     }
+    // }
 
-    const { webRTCAdaptor, externalMediaStreams, audioLevels } = 
-        useWebRTCAdaptor(
-            streamerReady,
-            isPlayMode,
-            localVideoId,
-            mediaConstraints,
-            streamingCallbacks,
-            errorCallbacks,
-            livestreamId,
-            livestreamId
-        );
-    useEffect(() => {
-        if (currentLivestream.speakerSwitchMode === 'automatic') {
-            if (audioLevels && audioLevels.length > 0) {
-                const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
-                setLivestreamCurrentSpeakerId(maxEntry.streamId);
-            }
-        } else {
-            if (currentLivestream) {
-                setLivestreamCurrentSpeakerId(currentLivestream.currentSpeakerId);
-            }
-        }
+    // const { webRTCAdaptor, externalMediaStreams, audioLevels } = 
+    //     useWebRTCAdaptor(
+    //         streamerReady,
+    //         isPlayMode,
+    //         localVideoId,
+    //         mediaConstraints,
+    //         streamingCallbacks,
+    //         errorCallbacks,
+    //         livestreamId,
+    //         livestreamId
+    //     );
+    // useEffect(() => {
+    //     if (currentLivestream.speakerSwitchMode === 'automatic') {
+    //         if (audioLevels && audioLevels.length > 0) {
+    //             const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
+    //             setLivestreamCurrentSpeakerId(maxEntry.streamId);
+    //         }
+    //     } else {
+    //         if (currentLivestream) {
+    //             setLivestreamCurrentSpeakerId(currentLivestream.currentSpeakerId);
+    //         }
+    //     }
         
-    }, [audioLevels]);
+    // }, [audioLevels]);
 
     useEffect(() => {
         if (isStreaming) {
@@ -207,18 +201,6 @@ function StreamingPage(props) {
         props.firebase.setLivestreamHasStarted(false, currentLivestream.id);
     }
 
-    function setMainStreamIdToStreamerList(streamId) {
-        props.firebase.setMainStreamIdToLivestreamStreamers(livestreamId, streamId);
-    }
-
-    function addStreamIdToStreamerList(streamId) {
-        props.firebase.addStreamIdToLivestreamStreamers(livestreamId, streamId);
-    }
-
-    function removeStreamIdFromStreamerList(streamId) {
-        props.firebase.removeStreamIdFromLivestreamStreamers(livestreamId, streamId);
-    }
-
     function setLivestreamMode(mode) {
         props.firebase.setLivestreamMode(livestreamId, mode);
     }
@@ -278,7 +260,7 @@ function StreamingPage(props) {
                 </div>
             </div>
             <div className='black-frame'>
-                <div>
+                {/* <div>
                     <CurrentSpeakerDisplayer isPlayMode={false} smallScreenMode={currentLivestream.mode === 'presentation'} speakerSwitchModeActive={currentLivestream.speakerSwitchMode === "manual"} setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId} localId={livestreamId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={currentLivestream.currentSpeakerId} muted={false}/>
                 </div>
                 <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
@@ -294,7 +276,7 @@ function StreamingPage(props) {
                             </div>
                         </Grid.Column>
                     </Grid>
-                </div>
+                </div> */}
             </div>
             <div className='video-menu-left'>
                 <NewCommentContainer livestream={ currentLivestream }/>
@@ -351,7 +333,7 @@ function StreamingPage(props) {
                     </Modal.Content>
                 </Modal>
                 <SpeakerManagementModal livestreamId={livestreamId} open={showSpeakersModal} setOpen={setShowSpeakersModal}/>
-                <StreamPreparationModal streamerReady={streamerReady} setStreamerReady={setStreamerReady} localStream={localStream} mediaConstraints={mediaConstraints} connectionEstablished={connectionEstablished} setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage} isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource} videoSource={videoSource} setVideoSource={setVideoSource}/>
+                {/* <StreamPreparationModal streamerReady={streamerReady} setStreamerReady={setStreamerReady} localStream={localStream} mediaConstraints={mediaConstraints} connectionEstablished={connectionEstablished} setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage} isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource} videoSource={videoSource} setVideoSource={setVideoSource}/> */}
             <style jsx>{`
                 .hidden {
                     display: none
