@@ -2,15 +2,11 @@ import {useState, useEffect, useRef, Fragment} from 'react';
 import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Dropdown} from "semantic-ui-react";
 
 import { useRouter } from 'next/router';
-import ViewerVideoContainer from '../../../components/views/streaming/video-container/ViewerVideoContainer';
 import { withFirebasePage } from '../../../data/firebase';
-import NewCommentContainer from '../../../components/views/viewer/comment-container/NewCommentContainer';
-import SmallViewerVideoDisplayer from '../../../components/views/streaming/video-container/SmallViewerVideoDisplayer';
-import ViewerVideoDisplayer from '../../../components/views/streaming/video-container/ViewerVideoDisplayer';
-import LivestreamPdfViewer from '../../../components/util/LivestreamPdfViewer';
 import useWebRTCAdaptor from '../../../components/custom-hook/useWebRTCAdaptor';
 import CurrentSpeakerDisplayer from '../../../components/views/streaming/video-container/CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from '../../../components/views/streaming/video-container/SmallStreamerVideoDisplayer';
+import NewCommentContainer from 'components/views/streaming/comment-container/NewCommentContainer';
 
 function ViewerPage(props) {
 
@@ -195,7 +191,7 @@ function ViewerPage(props) {
                 </div>
             </div>  
             <div className='video-menu-left'>
-                <NewCommentContainer livestream={ currentLivestream } upcomingQuestions={upcomingQuestions} pastQuestions={pastQuestions} userData={userData}  user={user}/>
+                <NewCommentContainer streamer={false} livestream={ currentLivestream } user={user} userData={userData}/>
             </div>
             <Modal
                 style={{ zIndex: '9999' }}
@@ -328,8 +324,8 @@ function ViewerPage(props) {
                         position: absolute;
                         top: 75px;
                         bottom: 0;
-                        left: 330px;
-                        width: calc(100% - 330px);
+                        left: 280px;
+                        width: calc(100% - 280px);
                     }
                 }
 
@@ -419,7 +415,7 @@ function ViewerPage(props) {
                         top: 75px;
                         left: 0;
                         bottom: 0;
-                        width: 330px;
+                        width: 280px;
                     }
                 }
 

@@ -26,11 +26,12 @@ function ChatEntryContainer(props) {
             </div>
             <style jsx>{`
                 .chat-entry-container {
-                    border-radius: 25px;
+                    border-radius: 10px;
                     box-shadow: 0 0 5px rgb(180,180,180);
-                    margin: 10px 10px 0 10px;
-                    padding: 20px;
+                    margin: 8px 8px 0 8px;
+                    padding: 10px 15px;
                     background-color: white;
+                    width: 85%;
                 }
 
                 .chat-entry-author {

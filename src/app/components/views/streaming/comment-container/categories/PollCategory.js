@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, Fragment} from 'react';
 
 import { withFirebase } from '../../../../../data/firebase';
 import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
@@ -32,7 +32,9 @@ function PollCategory(props) {
 
     const pollElements = pollEntries.map((poll, index) => {
         return (
-            <PollEntryContainer poll={poll} livestream={props.livestream} />
+            <Fragment key={index}>
+                <PollEntryContainer poll={poll} streamer={props.streamer} user={props.user} userData={props.userData} livestream={props.livestream} />
+            </Fragment>
         );
     });
 
@@ -48,7 +50,7 @@ function PollCategory(props) {
                 <div className='chat-scrollable'>
                     { pollElements }
                 </div>
-            </div>
+            </div>  
             <PollCreationModal livestreamId={props.livestream.id} open={addNewPoll} initialPoll={null} initialOptions={null} onClose={() => setAddNewPoll(false)}/>
             <style jsx>{`
                 .questionToggle {

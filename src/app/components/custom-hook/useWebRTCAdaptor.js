@@ -118,7 +118,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
     function playIncumbentStreams(adaptorInstance, infoObj) {
         if (infoObj.streams && infoObj.streams.length > 0) {
             infoObj.streams.filter((streamId, index, streams) => streams.indexOf(streamId) === index).forEach( streamId => {
-                adaptorInstance.play(streamId, "null", infoObj.ATTR_ROOM_NAME);
+                adaptorInstance.play(streamId, 'null', infoObj.ATTR_ROOM_NAME);
                 adaptorInstance.enableStats(streamId);
             })
         }

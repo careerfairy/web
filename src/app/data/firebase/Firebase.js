@@ -604,6 +604,45 @@ class Firebase {
         return ref.onSnapshot(callback);
     }
 
+    voteForPollOption = (livestreamId, pollId, userEmail, optionIndex) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId);
+        return this.firestore.runTransaction( transaction => {
+            return transaction.get(ref).then(pollDoc => {
+                let poll = pollDoc.data();
+                const updatedOptions = poll.options.map((option, index) => {
+                    if (index !== optionIndex) {
+                        return option;
+                    } else {
+                        return {
+                            name: option.name,
+                            votes: option.votes + 1,
+                            index: index,
+                            voters: option.voters ? [...option.voters, userEmail] : [userEmail]
+                        }
+                    }
+                })
+                poll.voters = firebase.firestore.FieldValue.arrayUnion(userEmail),
+                poll.options = updatedOptions;
+                transaction.update(ref, poll);
+            });
+        });
+    }
+
+    setPollState= (livestreamId, pollId, state) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId);
+        return ref.update({ state: state });
+    }
+
+
+
     getPastLivestreams = () => {
         let ref = this.firestore
             .collection("livestreams")

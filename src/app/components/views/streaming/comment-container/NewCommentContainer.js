@@ -8,14 +8,14 @@ import PollCategory from './categories/PollCategory';
 
 function CommentContainer(props) {
 
-    const [selectedState, setSelectedState] = useState("chat");
+    const [selectedState, setSelectedState] = useState("polls");
 
     return (
         <div>
             <div className='interaction-category'>
                 <ChatCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}/>
                 <QuestionCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}/>
-                <PollCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}/>
+                <PollCategory livestream={props.livestream} selectedState={selectedState} streamer={props.streamer} user={props.user} userData={props.userData}/>
             </div>
             <div className='interaction-selector'>
                 <Grid className='middle aligned' textAlign='center' style={{ padding: '0', margin: '0', height: '100%' }}>

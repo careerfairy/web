@@ -244,7 +244,7 @@ function StreamingPage(props) {
                     </Grid>
                 </div>
             </div>            <div className='video-menu-left'>
-                <NewCommentContainer livestream={ currentLivestream }/>
+                <NewCommentContainer streamer={true} livestream={ currentLivestream }/>
             </div>
             <div className='right-container'>
                     <Grid columns={1}>
