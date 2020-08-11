@@ -4,14 +4,13 @@ import { withFirebase } from '../../../../../data/firebase';
 import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
 import { Input, Icon } from 'semantic-ui-react';
 
-function ChatCategory(props) {
+import { css } from 'glamor';
+import ScrollToBottom from 'react-scroll-to-bottom';
 
-    if (props.selectedState !== 'chat') {
-        return null;
-    }
+function ChatCategory(props) {
     
-    const [chatEntries, setChatEntries] = useState([]);
     const [newChatEntry, setNewChatEntry] = useState('');
+    const [chatEntries, setChatEntries] = useState([]);
 
     useEffect(() => {
         if (props.livestream.id) {
@@ -32,7 +31,6 @@ function ChatCategory(props) {
         if (!(newChatEntry.trim())) {
             return;
         }
-        debugger;
 
         const newChatEntryObject = {
             message: newChatEntry,
@@ -55,6 +53,10 @@ function ChatCategory(props) {
         } 
     }
 
+    const ROOT_CSS = css({
+        height: '100%',
+    });
+
     let chatElements = chatEntries.map((chatEntry, index) => {
         return (
             <div key={index}>
@@ -62,6 +64,10 @@ function ChatCategory(props) {
             </div>       
         );
     });
+
+    if (props.selectedState !== 'chat') {
+        return null;
+    }
 
     return (
         <div>
@@ -82,9 +88,9 @@ function ChatCategory(props) {
                 </div>
             </div>
             <div className='chat-container'>
-                <div className='chat-scrollable'>
+                <ScrollToBottom className={ ROOT_CSS }>
                     { chatElements }
-                </div>
+                </ScrollToBottom>          
             </div>
             <style jsx>{`
                 .questionToggle {

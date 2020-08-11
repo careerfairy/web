@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import { Grid, Icon } from "semantic-ui-react";
+import { Grid, Icon, Button } from "semantic-ui-react";
 
 import { withFirebasePage } from 'data/firebase';
 import { useViewerCount } from 'components/custom-hook/useViewerCount';
@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import NewCommentContainer from 'components/views/streaming/comment-container/NewCommentContainer';
 import SpeakerManagementModal from 'components/views/streaming/modal/SpeakerManagementModal';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
+import MiniChatContainer from 'components/views/streaming/comment-container/categories/chat/MiniChatContainer';
 
 function StreamingPage(props) {
 
@@ -19,6 +20,7 @@ function StreamingPage(props) {
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const [showSpeakersModal, setShowSpeakersModal] = useState(false);
+    const [showMenu, setShowMenu] = useState(true);
 
     const numberOfViewers = useViewerCount(currentLivestream);
 
@@ -73,7 +75,7 @@ function StreamingPage(props) {
 
     return (
         <div className='topLevelContainer'>
-             <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
+             {/* <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
                 <div style={{ position: 'absolute', top: '50%', left: '20px', transform: 'translateY(-50%)', verticalAlign: 'middle'}}>
                     <ButtonWithConfirm
                         color={currentLivestream.hasStarted ? 'red' : 'teal'} 
@@ -91,12 +93,15 @@ function StreamingPage(props) {
                 <div style={{ float: 'right', margin: '0 20px', fontSize: '1.2em', fontWeight: '700', padding: '10px', verticalAlign: 'middle'}}>
                     Viewers: { numberOfViewers }
                 </div>
+            </div> */}
+            <div className='black-frame' style={{ left: showMenu ? '280px' : '0'}}>
+                <VideoContainer currentLivestream={ currentLivestream }/>
             </div>
-            <div className='black-frame'>
-                {/* <VideoContainer currentLivestream={ currentLivestream }/> */}
+            <div className='video-menu-left' style={{ width: showMenu ? '280px' : '0'}}>
+                <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={true} livestream={ currentLivestream }/>
             </div>
-            <div className='video-menu-left'>
-                <NewCommentContainer streamer={true} livestream={ currentLivestream }/>
+            <div className='mini-chat-container'>
+                <MiniChatContainer livestream={ currentLivestream }/>
             </div>
             <div className='right-container'>
                     <Grid columns={1}>
@@ -163,10 +168,9 @@ function StreamingPage(props) {
 
                 .video-menu-left {
                     position: absolute;
-                    top: 75px;
+                    top: 0;
                     left: 0;
                     bottom: 0;
-                    width: 280px;
                     z-index: 20;
                 }
 
@@ -176,22 +180,29 @@ function StreamingPage(props) {
 
                 .black-frame {
                     position: absolute;
-                    top: 75px;
-                    left: 280px;
+                    top: 0;
                     right: 120px;
-                    width: calc(100% - 400px);
                     min-width: 400px;
-                    height: calc(100% - 75px);
+                    height: 100%;
                     min-height: 600px;
                     z-index: 10;
                     background-color: black;
                 }
 
+                .mini-chat-container {
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-60%);
+                    right: 130px;
+                    width: 300px;
+                    z-index: 100;
+                }
+
                 .right-container {
                     position: absolute;
                     right: 0;
-                    top: 75px;
-                    height: calc(100% - 75px);
+                    top: 0;
+                    height: 100%;
                     width: 120px;
                     padding: 20px;
                     background-color: rgb(80,80,80);

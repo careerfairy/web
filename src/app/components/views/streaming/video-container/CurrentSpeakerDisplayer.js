@@ -21,12 +21,12 @@ function CurrentSpeakerDisplayer(props) {
             }
             if (props.streams.length > 1) {
                 if (streamId === props.currentSpeaker) {
-                    return windowSize.width > 768 ? 'calc(80vh - 75px)' : '45vh';
+                    return windowSize.width > 768 ? '80vh' : '45vh';
                 } else {
                     return windowSize.width > 768 ? '20vh' : '15vh';
                 }
             } else {
-                return windowSize.width > 768 ? 'calc(100vh - 75px)' : '60vh';
+                return windowSize.width > 768 ? '100vh' : '60vh';
             }
         } else {
             if (props.smallScreenMode) {
@@ -34,12 +34,12 @@ function CurrentSpeakerDisplayer(props) {
             }
             if (props.streams.length > 0) {
                 if (streamId === props.currentSpeaker) {
-                    return 'calc(80vh - 75px)';
+                    return '80vh';
                 } else {
                     return '20vh';
                 }
             } else {
-                return 'calc(100vh - 75px)';
+                return '100vh';
             }
         }
     } 

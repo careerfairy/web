@@ -265,7 +265,7 @@ function VideoContainer(props) {
                     right: 120px;
                     width: calc(100% - 400px);
                     min-width: 400px;
-                    height: calc(100% - 75px);
+                    height: 100%;
                     min-height: 600px;
                     z-index: 10;
                     background-color: black;
@@ -316,7 +316,7 @@ function VideoContainer(props) {
                     position: absolute;
                     right: 0;
                     top: 75px;
-                    height: calc(100% - 75px);
+                    height: 100%;
                     width: 120px;
                     padding: 20px;
                     background-color: rgb(80,80,80);
