@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import { Grid, Icon, Button } from "semantic-ui-react";
 
-import { withFirebasePage } from 'data/firebase';
+import { withFirebasePage } from 'context/firebase';
 import { useViewerCount } from 'components/custom-hook/useViewerCount';
 import ButtonWithConfirm from 'components/views/common/ButtonWithConfirm';
 
@@ -22,7 +22,32 @@ function StreamingPage(props) {
     const [showSpeakersModal, setShowSpeakersModal] = useState(false);
     const [showMenu, setShowMenu] = useState(true);
 
-    const numberOfViewers = useViewerCount(currentLivestream);
+    //const numberOfViewers = useViewerCount(currentLivestream);
+    let streamingCallbacks = {
+        onPublishStarted: (infoObj) => {
+            setShowDisconnectionModal(false);
+            setIsStreaming(true);
+        },
+        onPublishFinished: (infoObj) => {
+            setIsStreaming(false);
+        },
+        onDisconnected: (infoObj) => {
+            setShowDisconnectionModal(true);
+        },
+        onConnected: (infoObj) => {
+            setShowDisconnectionModal(false);
+        },
+    }
+
+    let errorCallbacks = {
+        onOtherError: (error) => {
+            if (typeof error === "string") {
+                setErrorMessage(error);
+            } else {
+                setErrorMessage("A connection error occured");
+            }
+        }
+    }
 
     useEffect(() => {
         if (livestreamId) {
@@ -72,7 +97,6 @@ function StreamingPage(props) {
         setIsLocalMicMuted(!isLocalMicMuted);
     }
 
-
     return (
         <div className='topLevelContainer'>
              {/* <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
@@ -95,7 +119,7 @@ function StreamingPage(props) {
                 </div>
             </div> */}
             <div className='black-frame' style={{ left: showMenu ? '280px' : '0'}}>
-                <VideoContainer currentLivestream={ currentLivestream }/>
+                <VideoContainer currentLivestream={ currentLivestream } streamerId={ currentLivestream.id } streamingCallbacks={streamingCallbacks} errorCallbacks={errorCallbacks}/>
             </div>
             <div className='video-menu-left' style={{ width: showMenu ? '280px' : '0'}}>
                 <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={true} livestream={ currentLivestream }/>
@@ -147,7 +171,6 @@ function StreamingPage(props) {
                         </Grid.Row> */}
                     </Grid>
                 </div>
-                <SpeakerManagementModal livestreamId={livestreamId} open={showSpeakersModal} setOpen={setShowSpeakersModal}/>
             <style jsx>{`
                 .top-menu {
                     position: relative;

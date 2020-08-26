@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import { navigator, document } from 'global';
 import axios from 'axios';
 
-import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor.js';
-import { WEBRTC_ERRORS } from '../../data/errors/StreamingErrors.js';
-import LivestreamId from '../../pages/upcoming-livestream/[livestreamId].js';
+import { WebRTCAdaptor } from 'static-js/webrtc_adaptor_new.js';
+import { WEBRTC_ERRORS } from 'data/errors/StreamingErrors.js';
 
 export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId) {
 
@@ -33,9 +32,10 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
 
     useEffect(() => {
         if (streamerReady && document && mediaConstraints && nsToken && nsToken.iceServers) {
-            setupWebRTCAdaptor();
+            const adaptor = getWebRTCAdaptor();
+            setWebRTCAdaptor(adaptor);
         }
-    }, [streamerReady, mediaConstraints, document, nsToken]);
+    }, [streamerReady, mediaConstraints, document, nsToken, isPlayMode]);
 
     useEffect(() => {
         if (addedStream) {
@@ -112,7 +112,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
     }
 
     function publishNewStream(adaptorInstance, infoObj) {
-        adaptorInstance.publish(infoObj.streamId, 'null', infoObj.ATTR_ROOM_NAME);
+        adaptorInstance.publish(streamId, 'null', infoObj.ATTR_ROOM_NAME);
     }
 
     function playIncumbentStreams(adaptorInstance, infoObj) {
@@ -140,14 +140,13 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         setAudioLevels(newAudioLevels);
     }
 
-    function setupWebRTCAdaptor() {
+    function getWebRTCAdaptor() {
         var pc_config = nsToken ? { 'iceServers' : nsToken.iceServers } : null; 
 
         var sdpConstraints = {
             OfferToReceiveAudio : false,
             OfferToReceiveVideo : false
         };
-
         const newAdaptor = new WebRTCAdaptor({
             websocket_url : "wss://thrillin.work/WebRTCAppEE/websocket",
             mediaConstraints : mediaConstraints,
@@ -168,8 +167,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             } else {
                                 this.joinRoom(roomId);
                             }
-                        }, 2000);
-                        break;
+                        }, 400);                        break;
                     }
                     case "joinedTheRoom": {
                         if (typeof streamingCallbackObject.onJoinedTheRoom === 'function') {
@@ -187,8 +185,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         }
                         setTimeout(() => {
                             playNewStream(this, infoObj);
-                        }, 500);                        
-                        break;
+                        }, 200);                           break;
                     }
                     case "streamLeaved": {
                         if (typeof streamingCallbackObject.onStreamLeaved === 'function') {
@@ -268,9 +265,6 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         setLatestAudioLevel({ streamId: infoObj.streamId, audioLevel: infoObj.audioLevel });
                         break;
                     }
-                    case "pong": {
-                        break;
-                    }
                     default: {
                         console.log(info);
                         console.log(infoObj);
@@ -281,7 +275,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                 errorCallback(error)
             }
         });
-        setWebRTCAdaptor(newAdaptor);
+        return newAdaptor;
     }
   
     return { webRTCAdaptor, externalMediaStreams, audioLevels };

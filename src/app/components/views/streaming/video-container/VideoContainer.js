@@ -1,7 +1,7 @@
 import {useState, useEffect, Fragment} from 'react';
 import {Button, Grid, Icon, Input, Modal} from "semantic-ui-react";
 
-import { withFirebasePage } from 'data/firebase';
+import { withFirebasePage } from 'context/firebase';
 
 import CountdownTimer from 'components/views/common/Countdown';
 import { useLocalStream } from 'components/custom-hook/useLocalStream';
@@ -32,33 +32,75 @@ function VideoContainer(props) {
     const localVideoId = 'localVideo';
     const  isPlayMode = false;
 
+    function isExistingCallback(callbackName) {
+        return props.additionalCallbacks && typeof props.additionalCallbacks[callbackName] === 'function';
+    }
+
     let streamingCallbacks = {
-        onInitialized: (infoObj) => {},
+        onInitialized: (infoObj) => {
+            if (isExistingCallback('onInitialized')) {
+                props.additionalCallbacks.onInitialized(infoObj);
+            }
+        },
         onPublishStarted: (infoObj) => {
+            debugger;
+            if (isExistingCallback('onPublishStarted')) {
+                    props.additionalCallbacks.onPublishStarted(infoObj);
+            }
             setShowDisconnectionModal(false);
             setIsStreaming(true);
         },
         onJoinedTheRoom: (infoObj) => {
+            if (isExistingCallback('onJoinedTheRoom')) {
+                    props.additionalCallbacks.onJoinedTheRoom(infoObj);
+            }
         },
         onStreamLeaved: (infoObj) => {
-            setLiveSpeakerDisconnected(infoObj.streamId);
+            if (isExistingCallback('onStreamLeaved')) {
+                    props.additionalCallbacks.onStreamLeaved(infoObj);
+            }
         },
         onPublishFinished: (infoObj) => {
+            if (isExistingCallback('onPublishFinished')) {
+                    props.additionalCallbacks.onPublishFinished(infoObj);
+            }
             setIsStreaming(false);
         },
-        onScreenShareStopped: (infoObj) => {},
+        onScreenShareStopped: (infoObj) => {
+            if (isExistingCallback('onScreenShareStopped')) {
+                props.additionalCallbacks.onScreenShareStopped(infoObj);
+            }
+        },
         onDisconnected: (infoObj) => {
+            if (isExistingCallback('onDisconnected')) {
+                    props.additionalCallbacks.onDisconnected(infoObj);
+            }
             setShowDisconnectionModal(true);
         },
         onConnected: (infoObj) => {
+            if (isExistingCallback('onConnected')) {
+                props.additionalCallbacks.onConnected(infoObj);
+            }
             setShowDisconnectionModal(false);
         },
-        onClosed: (infoObj) => {},
-        onUpdatedStats: (infoObj) => {},
+        onClosed: (infoObj) => {
+            if (isExistingCallback('onJoinedTheRoom')) {
+                props.additionalCallbacks.onJoinedTheRoom(infoObj);
+            }
+        },
+        onUpdatedStats: (infoObj) => {
+            if (isExistingCallback('onUpdatedStats')) {
+                props.additionalCallbacks.onUpdatedStats(infoObj);
+            }
+        },
     }
 
     let errorCallbacks = {
-        onScreenSharePermissionDenied: () => {},
+        onScreenSharePermissionDenied: () => {
+            if (isExistingCallback('onScreenSharePermissionDenied')) {
+                props.additionalCallbacks.onScreenSharePermissionDenied(infoObj);
+            }
+        },
         onOtherError: (error) => {
             if (typeof error === "string") {
                 setErrorMessage(error);
@@ -77,8 +119,17 @@ function VideoContainer(props) {
             streamingCallbacks,
             errorCallbacks,
             props.currentLivestream.id,
-            props.currentLivestream.id
+            props.streamerId
         );
+
+        useEffect(() => {
+            return () => { 
+                if (webRTCAdaptor) {
+                    webRTCAdaptor.closeWebSocket();
+                }
+            }
+        }, [webRTCAdaptor]);
+
     useEffect(() => {
         if (props.currentLivestream.speakerSwitchMode === 'automatic') {
             if (audioLevels && audioLevels.length > 0) {
@@ -120,24 +171,21 @@ function VideoContainer(props) {
         props.firebase.setLivestreamCurrentSpeakerId(props.currentLivestream.id, id);
     }
 
-    function setLiveSpeakerDisconnected(speakerId) {
-        if (registeredSpeaker) {
-            props.firebase.setLivestreamLiveSpeakersDisconnected(props.currentLivestream.id, speakerId);
-        }
-    }
-
     function dateIsInUnder2Minutes(date) {
         return new Date(date).getTime() - Date.now() < 1000*60*2 || Date.now() > new Date(date).getTime();
     }
 
+    const isMainStreamer = props.streamerId === props.currentLivestream.id;
+
     return (
         <Fragment>
             <div>
-                <CurrentSpeakerDisplayer isPlayMode={false} smallScreenMode={props.currentLivestream.mode === 'presentation'} speakerSwitchModeActive={props.currentLivestream.speakerSwitchMode === "manual"} setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId} localId={props.currentLivestream.id} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={props.currentLivestream.currentSpeakerId} muted={false}/>
+                <CurrentSpeakerDisplayer isPlayMode={false} smallScreenMode={props.currentLivestream.mode === 'presentation'} speakerSwitchModeActive={isMainStreamer} setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId} localId={props.streamerId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={props.currentLivestream.currentSpeakerId} muted={false}/>
             </div>
-            <div style={{ display: (props.currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
+            { props.currentLivestream.mode === 'presentation' ?
                 <SmallStreamerVideoDisplayer isPlayMode={false} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} livestreamId={props.currentLivestream.id} presenter={true}/>
-            </div>
+                : null
+            }
             <div className='button-container'>         
                 <Grid centered className='middle aligned'>
                     <Grid.Column width={10} textAlign='center'>

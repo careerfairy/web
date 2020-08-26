@@ -1,14 +1,15 @@
 import React, {useState, useEffect, Fragment} from 'react';
 import {Input, Icon, Button, Label, Grid} from "semantic-ui-react";
 
-import { withFirebase } from '../../../../data/firebase';
+import { withFirebase } from '../../../../context/firebase';
 import QuestionCategory from './categories/QuestionCategory';
 import ChatCategory from './categories/ChatCategory';
 import PollCategory from './categories/PollCategory';
+import HandRaiseCategory from './categories/HandRaiseCategory';
 
 function CommentContainer(props) {
 
-    const [selectedState, setSelectedState] = useState("polls");
+    const [selectedState, setSelectedState] = useState("hand");
 
     function handleStateChange(state) {
         if (!props.showMenu) {
@@ -38,8 +39,8 @@ function CommentContainer(props) {
                             <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("polls")}>Polls</span>
                         </div>
                         <div>
-                            <Button circular size='big' icon='video' disabled={props.showMenu && selectedState === 'video'} onClick={() => props.handleStateChange("video")} primary/>
-                            <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("video")}>Hand Raise</span>
+                            <Button circular size='big' icon='hand pointer outline' disabled={props.showMenu && selectedState === 'hand'} onClick={() => props.handleStateChange("hand")} primary/>
+                            <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("hand")}>Hand Raise</span>
                         </div>
                         <div>
                             <Button circular size='big' icon='cog' onClick={() => props.setShowMenu(!props.showMenu)} secondary/>
@@ -103,6 +104,7 @@ function CommentContainer(props) {
                 <ChatCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}/>
                 <QuestionCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}/>
                 <PollCategory livestream={props.livestream} selectedState={selectedState} streamer={props.streamer} user={props.user} userData={props.userData}/>
+                <HandRaiseCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}  handRaiseActive={props.handRaiseActive} setHandRaiseActive={props.setHandRaiseActive}/>
             </div>
             <ButtonComponent handleStateChange={handleStateChange} {...props}/>
             <style jsx>{`

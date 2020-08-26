@@ -2,105 +2,57 @@ import {useState, useEffect, useRef, Fragment} from 'react';
 import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Dropdown} from "semantic-ui-react";
 
 import { useRouter } from 'next/router';
-import { withFirebasePage } from '../../../context/firebase';
-import ViewerHandRaiseComponent from 'components/views/viewer/viewer-hand-raise-component/ViewerHandRaiseComponent';
-import ViewerComponent from 'components/views/viewer/viewer-component/ViewerComponent';
-import NewCommentContainer from 'components/views/viewer/comment-container/NewCommentContainer';
-import UserContext from 'context/user/UserContext';
+import { withFirebasePage } from 'context/firebase';
+import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
+import CurrentSpeakerDisplayer from 'components/views/streaming/video-container/CurrentSpeakerDisplayer';
+import SmallStreamerVideoDisplayer from 'components/views/streaming/video-container/SmallStreamerVideoDisplayer';
+import NewCommentContainer from 'components/views/streaming/comment-container/NewCommentContainer';
 
-function ViewerPage(props) {
 
-    const router = useRouter();
-    const livestreamId = router.query.livestreamId;
+function ViewerComponent(props) {
 
-    const { user, userData } = React.useContext(UserContext);
+    const [questionSubmittedModalOpen, setQuestionSubmittedModalOpen] = useState(false);
 
-    const [showMenu, setShowMenu] = useState(true);
-    const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
-    const [currentLivestream, setCurrentLivestream] = useState(false);
+    const [mediaConstraints, setMediaConstraints] = useState({ audio: true, video: true});
 
-    const [careerCenters, setCareerCenters] = useState([]);
-    const [handRaiseActive, setHandRaiseActive] = useState(false);
-    const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
+    const streamerReady = true;
+    const isPlayMode = false;
+    const streamingCallbacks = {};
+    const errorCallbacks = {
+        onOtherError: (error) => {}
+    };
 
-    useEffect(() => {
-        if (livestreamId) {
-            props.firebase.listenToScheduledLivestreamById(livestreamId, querySnapshot => {
-                let livestream = querySnapshot.data();
-                livestream.id = querySnapshot.id;
-                setCurrentLivestream(livestream);
-            });
-        }
-    }, [livestreamId]);
-
-    useEffect(() => {
-        if (currentLivestream) {
-            props.firebase.getLivestreamCareerCenters(currentLivestream.universities).then( querySnapshot => {
-                let groupList = [];
-                querySnapshot.forEach(doc => {
-                    let group = doc.data();
-                    group.id = doc.id;
-                    groupList.push(group);
-                });
-                setCareerCenters(groupList);
-            });
-        }
-    }, [currentLivestream]);
-
-    useEffect(() => {
-        if (userData && currentLivestream && userData.talentPools && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
-            setUserIsInTalentPool(true);
-        } else {
-            setUserIsInTalentPool(false);
-        }
-    }, [currentLivestream, userData]);
-
-    function joinTalentPool() {
-        if (!user) {
-            return router.replace('/signup');
-        }
-
-        props.firebase.joinCompanyTalentPool(currentLivestream.companyId, user.email);
-    }
-
-    function leaveTalentPool() {
-        if (!user) {
-            return router.replace('/signup');
-        }
-
-        props.firebase.leaveCompanyTalentPool(currentLivestream.companyId, user.email);
-    }
-
-    let logoElements = careerCenters.map( (careerCenter, index) => {
-        return (
-            <Fragment>
-                <Image src={ careerCenter.logoUrl } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block' }}/>
-            </Fragment>
+    const { webRTCAdaptor, externalMediaStreams, audioLevels } = 
+        useWebRTCAdaptor(
+            streamerReady,
+            true,
+            'videoElement',
+            mediaConstraints,
+            streamingCallbacks,
+            errorCallbacks,
+            props.livestreamId,
+            props.streamerId
         );
-    });
+
+    if (!props.currentLivestream) {
+        return null;
+    }
 
     return (
         <div className='topLevelContainer'>
-            {/* <div className='top-menu'>
-                <div className='top-menu-left'>    
-                    <Image src='/logo_teal.png' style={{ maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
-                    { logoElements }
-                    <div style={{ position: 'absolute', bottom: '13px', left: '120px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
+            <div className='black-frame'>
+                <div> 
+                    <CurrentSpeakerDisplayer isPlayMode={!props.handRaiseActive} smallScreenMode={props.currentLivestream.mode === 'presentation'} speakerSwitchModeActive={false} localStream={null} streams={externalMediaStreams} localId={props.streamerId} currentSpeaker={props.currentLivestream.currentSpeakerId} muted={!props.currentLivestream.hasStarted }/>
                 </div>
-                <div className={'top-menu-right'}>
-                    <Image src={ currentLivestream.companyLogoUrl } style={{ position: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block', margin: '0 10px'}}/>
-                    <Button style={{ display: currentLivestream.hasNoTalentPool ? 'none' : 'inline-block' }}size='big' content={ userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'} icon={ userIsInTalentPool ? 'delete' : 'handshake outline'} onClick={ userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()} primary={!userIsInTalentPool}/> 
+                <div style={{ display: (props.currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
+                    <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams} livestreamId={props.currentLivestream.id} presenter={false}/>
                 </div>
-            </div> */}
-            <div className='black-frame' style={{ left: showMenu ? '280px' : '0'}}>
-                { handRaiseActive ? 
-                    <ViewerHandRaiseComponent currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive}/> : 
-                    <ViewerComponent livestreamId={livestreamId} streamerId={streamerId}  currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive}/>
-                }
-            </div>
-            <div className='video-menu-left' style={{ width: showMenu ? '280px' : '0'}}>
-                <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={false} livestream={ currentLivestream } handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive} localId/>
-            </div>
+                <div className={ props.currentLivestream.hasStarted ? 'hidden' : '' }style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'white', zIndex: '9999'}}>
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: '1.4em', fontWeight: '700', color: 'rgb(0, 210, 170)'}}>
+                        Thank you for joining!
+                    </div>
+                </div>
+            </div>  
             <style jsx>{`
                 .hidden {
                     display: none
@@ -219,9 +171,9 @@ function ViewerPage(props) {
                     .black-frame {
                         position: absolute;
                         top: 0;
+                        left: 0;
                         bottom: 0;
                         right: 0;
-                        left: 280px;
                     }
                 }
 
@@ -350,4 +302,4 @@ function ViewerPage(props) {
     );
 }
 
-export default withFirebasePage(ViewerPage);
+export default withFirebasePage(ViewerComponent);
