@@ -1,6 +1,6 @@
 import React, {useState, useEffect, Fragment} from 'react';
 import {Input, Icon, Button, Dropdown} from "semantic-ui-react";
-import { withFirebase } from 'data/firebase';
+import { withFirebase } from 'context/firebase';
 
 
 function CurrentPollViewer(props) {

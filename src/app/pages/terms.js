@@ -2,7 +2,7 @@ import { Container } from 'semantic-ui-react'
 
 import Header from "../components/views/header/Header";
 import Link from 'next/link';
-import { withFirebase } from '../data/firebase';
+import { withFirebase } from '../context/firebase';
 
 import Head from 'next/head';
 

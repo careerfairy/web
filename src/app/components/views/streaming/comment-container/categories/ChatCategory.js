@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 
-import { withFirebase } from '../../../../../data/firebase';
+import { withFirebase } from '../../../../../context/firebase';
 import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
 import { Input, Icon } from 'semantic-ui-react';
 

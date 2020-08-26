@@ -6,7 +6,7 @@ import Footer from '../components/views/footer/Footer';
 import LivestreamCard from '../components/views/livestream-card/LivestreamCard'
 
 import { useRouter } from 'next/router';
-import { withFirebasePage } from "../data/firebase";
+import { withFirebasePage } from "../context/firebase";
 import axios from "axios";
 import { UNIVERSITY_SUBJECTS } from '../data/StudyFieldData';
 import { UNIVERSITY_NAMES } from '../data/UniversityData';

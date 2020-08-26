@@ -6,7 +6,7 @@ import { useWindowSize } from '../custom-hook/useWindowSize';
 import { Button, Modal, Progress, Icon } from 'semantic-ui-react';
 
 import FilePickerContainer from '../ssr/FilePickerContainer';
-import { withFirebase } from '../../data/firebase';
+import { withFirebase } from '../../context/firebase';
 
 function LivestreamPdfViewer (props) {
 

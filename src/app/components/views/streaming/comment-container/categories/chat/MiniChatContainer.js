@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 
-import { withFirebase } from 'data/firebase';
+import { withFirebase } from 'context/firebase';
 
 import { css } from 'glamor';
 import ScrollToBottom from 'react-scroll-to-bottom';

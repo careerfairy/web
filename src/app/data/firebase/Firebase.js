@@ -641,7 +641,56 @@ class Firebase {
         return ref.update({ state: state });
     }
 
+    listenToHandRaiseState = (livestreamId, userEmail, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("handRaises")
+            .doc(userEmail);
+        return ref.onSnapshot(callback);
+    }
 
+    listenToHandRaises = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("handRaises");
+        return ref.onSnapshot(callback);
+    }
+
+    setHandRaiseMode = (livestreamId, mode) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+        return ref.update({
+            handRaiseActive: mode
+        });
+    }
+
+    createHandRaiseRequest = (livestreamId, userEmail, userData) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("handRaises")
+            .doc(userEmail);
+        return ref.set({
+            state: 'requested',
+            timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+            name: userData.firstName + ' ' + userData.lastName
+        });
+    }
+
+    updateHandRaiseRequest = (livestreamId, userEmail, state) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("handRaises")
+            .doc(userEmail);
+        return ref.update({
+            state: state,
+            timestamp: firebase.firestore.Timestamp.fromDate(new Date())
+        });
+    }
 
     getPastLivestreams = () => {
         let ref = this.firestore

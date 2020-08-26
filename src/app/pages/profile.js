@@ -7,7 +7,7 @@ import { UNIVERSITY_SUBJECTS } from '../data/StudyFieldData';
 import { UNIVERSITY_SPECIFIC_SUBJECTS } from '../data/UniversitySpecificFieldsData';
 import { UNIVERSITY_NAMES } from '../data/UniversityData';
 import { STUDY_LEVELS, GENDER } from '../data/StudyLevelData';
-import { withFirebase } from '../data/firebase';
+import { withFirebase } from '../context/firebase';
 import Header from '../components/views/header/Header';
 import Loader from '../components/views/loader/Loader';
 

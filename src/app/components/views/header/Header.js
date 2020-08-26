@@ -1,5 +1,5 @@
 import {useEffect, useState, Fragment} from 'react'
-import {withFirebase} from "../../../data/firebase";
+import {withFirebase} from "../../../context/firebase";
 import {Icon} from "semantic-ui-react";
 import AuthenticatedHeader from "./authenticated-header/AuthenticatedHeader";
 import NonAuthenticatedHeader from "./non-authenticated-header/NonAuthenticatedHeader";

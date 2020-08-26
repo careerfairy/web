@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {Container, Button, Grid, Icon, Input, Image} from "semantic-ui-react";
 
 import Header from '../../components/views/header/Header';
-import { withFirebasePage } from '../../data/firebase';
+import { withFirebasePage } from '../../context/firebase';
 import TargetElementList from '../../components/views/common/TargetElementList'
 import Loader from '../../components/views/loader/Loader'
 import DateUtil from '../../util/DateUtil';

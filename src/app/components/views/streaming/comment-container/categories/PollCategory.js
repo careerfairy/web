@@ -1,6 +1,6 @@
 import React, {useState, useEffect, Fragment} from 'react';
 
-import { withFirebase } from '../../../../../data/firebase';
+import { withFirebase } from '../../../../../context/firebase';
 import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
 import { Input, Icon, Button, Modal } from 'semantic-ui-react';
 import PollCreationModal from './polls/poll-creation-modal/PollCreationModal';

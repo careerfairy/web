@@ -5,7 +5,7 @@ import ElementTagList from '../common/ElementTagList';
 import CompanyLocationFlags from '../common/CompanyLocationFlags';
 
 import JobDescriptions from '../job-descriptions/JobDescriptions';
-import { withFirebase } from '../../../data/firebase';
+import { withFirebase } from '../../../context/firebase';
 
 function CompanyDiscoverPage(props) {
 

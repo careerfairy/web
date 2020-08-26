@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import {Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal} from "semantic-ui-react";
 
-import { withFirebasePage } from '../../data/firebase';
+import { withFirebasePage } from '../../context/firebase';
 import { WebRTCAdaptor } from '../../static-js/webrtc_adaptor.js';
 import axios from 'axios';
 import { animateScroll } from 'react-scroll';

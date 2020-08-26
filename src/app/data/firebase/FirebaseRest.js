@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Firebase from './index';
+import Firebase from '../../context/firebase/index';
 
 const PROJECT_ID = process.env.REACT_APP_FIREBASE_PROJECT_ID;
 

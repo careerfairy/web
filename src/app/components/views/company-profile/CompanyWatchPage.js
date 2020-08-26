@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Container, Grid, Modal, Icon } from 'semantic-ui-react';
 
 import ReactPlayer from 'react-player';
-import { withFirebase } from '../../../data/firebase';
+import { withFirebase } from '../../../context/firebase';
 import YoutubePreviewer from '../common/YoutubePreviewer';
 
 function CompanyWatchPage(props) {

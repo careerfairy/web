@@ -6,7 +6,7 @@ import QuestionVotingBox from '../../question-voting-box/QuestionVotingBox';
 
 import Link from 'next/link';
 
-import { withFirebase } from "../../../../data/firebase";
+import { withFirebase } from "../../../../context/firebase";
 
 function BookingModal(props) {
 

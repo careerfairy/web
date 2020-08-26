@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 
 import QuestionContainer from './questions/question-container/QuestionContainer';
 
-import { withFirebase } from '../../../../../data/firebase';
+import { withFirebase } from 'context/firebase';
 import { Icon } from 'semantic-ui-react';
 
 function QuestionCategory(props) {

@@ -1,7 +1,6 @@
 import { Container } from 'semantic-ui-react'
 
 import Header from "../components/views/header/Header";
-import { withFirebase } from '../data/firebase';
 
 function CookiePolicy(props) {
     return (
@@ -86,4 +85,4 @@ function CookiePolicy(props) {
     );
 }
 
-export default withFirebase(CookiePolicy);
+export default CookiePolicy;

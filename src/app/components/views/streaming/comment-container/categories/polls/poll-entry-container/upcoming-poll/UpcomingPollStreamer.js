@@ -1,7 +1,7 @@
 import React, {useState, useEffect, Fragment} from 'react';
 import {Input, Icon, Button, Dropdown} from "semantic-ui-react";
 import Linkify from 'react-linkify';
-import { withFirebase } from 'data/firebase';
+import { withFirebase } from 'context/firebase';
 import PollCreationModal from '../../poll-creation-modal/PollCreationModal';
 
 

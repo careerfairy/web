@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Input, Icon, Button, Label} from "semantic-ui-react";
 
-import { withFirebase } from 'data/firebase';
+import { withFirebase } from 'context/firebase';
 
 function QuestionContainer(props) {
 
