@@ -4,7 +4,7 @@ import {Input, Icon, Button, Label, Grid} from "semantic-ui-react";
 import { withFirebase } from 'context/firebase';
 import ChatCategory from 'components/views/streaming/comment-container/categories/ChatCategory';
 import QuestionCategory from 'components/views/streaming/comment-container/categories/QuestionCategory';
-import PollCategory from 'components/views/streaming/comment-container/categories/PollCategory';
+import PollCategory from './categories/PollCategory';
 import HandRaiseCategory from './categories/HandRaiseCategory';
 
 

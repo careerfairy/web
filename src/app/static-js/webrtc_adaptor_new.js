@@ -226,8 +226,6 @@ export function WebRTCAdaptor(initialValues)
 				}
 				canvasContext.drawImage(cameraVideo, positionX, positionY, cameraWidth, cameraHeight);
 			}, 66);
-
-
 		})
 		.catch(function(error) {
 			thiz.callbackError(error.name, error.message);
@@ -577,7 +575,7 @@ export function WebRTCAdaptor(initialValues)
 				room: roomName,
 		};
 		this.webSocketAdaptor.send(JSON.stringify(jsCmd));
-		}, 5000);
+		}, 15000);
 	}
 
 	this.enableTrack = function(mainTrackId, trackId, enabled) {
@@ -673,8 +671,8 @@ export function WebRTCAdaptor(initialValues)
 	}
 
 	this.switchDesktopCaptureWithCamera = function(streamId) {
-
 		thiz.publishMode = "screen+camera";
+		const mediaConstraints = thiz.mediaConstraints;
 
 		var audioConstraint = false;
 		if (typeof mediaConstraints.audio != "undefined" && mediaConstraints.audio != false) {

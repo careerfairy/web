@@ -8,7 +8,6 @@ import ChatEntryContainer from './chat-entry-container/ChatEntryContainer';
 
 function MiniChatContainer(props) {
     
-    const [newChatEntry, setNewChatEntry] = useState('');
     const [chatEntries, setChatEntries] = useState([]);
 
     useEffect(() => {
@@ -26,34 +25,8 @@ function MiniChatContainer(props) {
         }
     }, [props.livestream.id]);
 
-    function addNewChatEntry() {
-        if (!(newChatEntry.trim())) {
-            return;
-        }
-
-        const newChatEntryObject = {
-            message: newChatEntry,
-            authorName: 'Streamer',
-            authorEmail: 'Streamer',
-            votes: 0
-        }
-
-        props.firebase.putChatEntry(props.livestream.id, newChatEntryObject)
-            .then(() => {
-                setNewChatEntry('');
-            }, error => {
-                console.log("Error: " + error);
-            });
-    }
-
-    function addNewChatEntryOnEnter(target) {
-        if(target.charCode==13){
-            addNewChatEntry();   
-        } 
-    }
-
     const ROOT_CSS = css({
-        height: '100%',
+        height: '100%'
     });
 
     let chatElements = chatEntries.map((chatEntry, index) => {
@@ -63,6 +36,10 @@ function MiniChatContainer(props) {
             </div>       
         );
     });
+
+    if (props.showMenu) {
+        return null;
+    }
 
     return (
         <div>
@@ -76,6 +53,11 @@ function MiniChatContainer(props) {
                 .chat-container {
                     width: 100%;
                     height: 220px;
+                }
+
+                .scroll-to-bottom {
+                    height: 100%;
+                    border: 2px solid red;
                 }
 
                 .chat-container-title {

@@ -1,4 +1,4 @@
-// import App from 'next/app'
+import App from 'next/app';
 import { Fragment, useEffect, useState } from 'react';
 import '../semantic/dist/semantic.min.css';
 import '../styles.css';

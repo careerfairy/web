@@ -111,20 +111,29 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         }
     }
 
+    function certifyExternalMediaStreams(adaptorInstance, infoObj) {
+        infoObj.streams.forEach( streamId => {
+            if (externalMediaStreams.map(stream => stream.streamId).indexOf(streamId) < 0) {
+                adaptorInstance.play(streamId, 'null', infoObj.ATTR_ROOM_NAME);
+                adaptorInstance.enableStats(streamId);
+            }
+         })
+    }
+
     function publishNewStream(adaptorInstance, infoObj) {
         adaptorInstance.publish(streamId, 'null', infoObj.ATTR_ROOM_NAME);
     }
 
     function playIncumbentStreams(adaptorInstance, infoObj) {
         if (infoObj.streams && infoObj.streams.length > 0) {
-            infoObj.streams.filter((streamId, index, streams) => streams.indexOf(streamId) === index).forEach( streamId => {
+            infoObj.streams.forEach( streamId => {
                 adaptorInstance.play(streamId, 'null', infoObj.ATTR_ROOM_NAME);
                 adaptorInstance.enableStats(streamId);
             })
         }
     }
 
-    function playNewStream(adaptorInstance, infoObj) {
+    function playStream(adaptorInstance, infoObj) {
         adaptorInstance.play(infoObj.streamId, 'null', infoObj.ATTR_ROOM_NAME);
         adaptorInstance.enableStats(infoObj.streamId);
     }
@@ -162,12 +171,14 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onInitialized(infoObj);
                         }
                         setTimeout(() => {
+                            debugger;
                             if (!isPlayMode) {
                                 this.joinRoom(roomId, streamId);
                             } else {
                                 this.joinRoom(roomId);
                             }
-                        }, 400);                        break;
+                        }, 400);                        
+                        break;
                     }
                     case "joinedTheRoom": {
                         if (typeof streamingCallbackObject.onJoinedTheRoom === 'function') {
@@ -177,6 +188,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             publishNewStream(this, infoObj);
                         }
                         playIncumbentStreams(this, infoObj);
+                        this.getRoomInfo(infoObj.ATTR_ROOM_NAME, infoObj.streamId);
                         break;
                     }
                     case "streamJoined": {
@@ -184,8 +196,9 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onStreamJoined(infoObj);
                         }
                         setTimeout(() => {
-                            playNewStream(this, infoObj);
-                        }, 200);                           break;
+                            playStream(this, infoObj);
+                        }, 200);                           
+                        break;
                     }
                     case "streamLeaved": {
                         if (typeof streamingCallbackObject.onStreamLeaved === 'function') {
@@ -200,6 +213,14 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onNewStreamAvailable(infoObj);
                         }
                         setAddedStream(infoObj);
+                        break;
+                    }
+                    case "roomInformation": {
+                        if (typeof streamingCallbackObject.onNewStreamAvailable === 'function') {
+                            streamingCallbackObject.onNewStreamAvailable(infoObj);
+                        }
+                        debugger;
+                        certifyExternalMediaStreams(this, infoObj);
                         break;
                     }
                     case "publish_started": {
@@ -243,6 +264,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         if (typeof streamingCallbackObject.onClosed === 'function') {
                             streamingCallbackObject.onClosed(infoObj);
                         }
+                        this.closeWebSocket();
                         break;
                     }
                     case "ice_connection_state_changed": {

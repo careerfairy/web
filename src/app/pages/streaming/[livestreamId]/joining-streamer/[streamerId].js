@@ -1,7 +1,7 @@
 import {useState, useEffect, useRef} from 'react';
 import {Grid, Icon} from "semantic-ui-react";
 
-import { withFirebasePage } from 'data/firebase';
+import { withFirebasePage } from 'context/firebase';
 
 import { useRouter } from 'next/router';
 import NewCommentContainer from 'components/views/streaming/comment-container/NewCommentContainer';

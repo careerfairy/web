@@ -32,6 +32,10 @@ function VideoContainer(props) {
     const localVideoId = 'localVideo';
     const  isPlayMode = false;
 
+    useEffect(() => {
+        return () => console.log('VideoContainer destroyed');
+    },[]);
+
     function isExistingCallback(callbackName) {
         return props.additionalCallbacks && typeof props.additionalCallbacks[callbackName] === 'function';
     }
@@ -43,7 +47,6 @@ function VideoContainer(props) {
             }
         },
         onPublishStarted: (infoObj) => {
-            debugger;
             if (isExistingCallback('onPublishStarted')) {
                     props.additionalCallbacks.onPublishStarted(infoObj);
             }
@@ -122,13 +125,13 @@ function VideoContainer(props) {
             props.streamerId
         );
 
-        useEffect(() => {
-            return () => { 
-                if (webRTCAdaptor) {
-                    webRTCAdaptor.closeWebSocket();
-                }
+    useEffect(() => {
+        return () => { 
+            if (webRTCAdaptor) {
+                webRTCAdaptor.closeWebSocket();
             }
-        }, [webRTCAdaptor]);
+        }
+    }, [webRTCAdaptor]);
 
     useEffect(() => {
         if (props.currentLivestream.speakerSwitchMode === 'automatic') {
@@ -166,6 +169,16 @@ function VideoContainer(props) {
           };
         setMediaConstraints(constraints);
     },[audioSource, videoSource]);
+
+    useEffect(() => {
+        if (webRTCAdaptor) {
+            if (props.currentLivestream.mode === 'desktop') {
+                webRTCAdaptor.switchDesktopCaptureWithCamera(props.streamerId);
+            } else {
+                webRTCAdaptor.switchVideoCameraCapture(props.streamerId);
+            }
+        }
+    },[props.currentLivestream.mode]);
 
     function setLivestreamCurrentSpeakerId(id) {
         props.firebase.setLivestreamCurrentSpeakerId(props.currentLivestream.id, id);

@@ -55,6 +55,11 @@ function ViewerPage(props) {
         }
     }, [currentLivestream, userData]);
 
+
+    useEffect(() => {
+        return () => console.log('Viewer destroyed');
+    },[]);
+
     function joinTalentPool() {
         if (!user) {
             return router.replace('/signup');
@@ -94,7 +99,7 @@ function ViewerPage(props) {
             </div> */}
             <div className='black-frame' style={{ left: showMenu ? '280px' : '0'}}>
                 { handRaiseActive ? 
-                    <ViewerHandRaiseComponent currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive}/> : 
+                    <ViewerHandRaiseComponent currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive}/> :
                     <ViewerComponent livestreamId={livestreamId} streamerId={streamerId}  currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive}/>
                 }
             </div>

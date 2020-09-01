@@ -692,6 +692,14 @@ class Firebase {
         });
     }
 
+    listenToPolls = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls");
+        return ref.onSnapshot(callback);
+    }
+
     getPastLivestreams = () => {
         let ref = this.firestore
             .collection("livestreams")

@@ -74,13 +74,10 @@ function LivestreamPdfViewer (props) {
     }
 
     function getPageHeight() {
-        var maxHeight = 450;
-        var minHeight = 180;
-        var calcHeight = windowSize.height > (windowSize.width / 2) ? (windowSize.width / 2 - 200) : (windowSize.height - 250);
-
-        if (calcHeight > maxHeight) return maxHeight;
-        if (calcHeight < minHeight) return minHeight;
-        return calcHeight;
+        if (windowSize.height > (windowSize.width - 220)) {
+            return windowSize.width * 0.3;
+        }
+        return windowSize.height * 0.8;
     }
 
     function increasePdfPageNumber() {
@@ -92,10 +89,10 @@ function LivestreamPdfViewer (props) {
     }
     
     return (
-        <div style={{ position: 'relative', width: '100%' }}>
-            <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translate(-50%)', display: ( pdfObject ? 'block' : 'none'), borderRadius: '10px', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', bottom: '0', left: '0', zIndex: '9999', width: '100%', padding: '20px', display: props.presenter ? 'block' : 'none', backgroundColor: 'rgba(40,40,40, 0.8)'}}>
-                    <div style={{ display: 'inline-block'}}>
+        <div style={{ position: 'relative', width: '100%', height: '80vh' }}>
+            <div style={{ position: 'absolute', top: '0', left: '50%', transform: 'translate(-50%)', display: ( pdfObject ? 'block' : 'none'), overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', bottom: '0', left: '0', zIndex: '9999', width: '100%', padding: '30px', display: props.presenter ? 'block' : 'none', backgroundColor: 'rgba(110,110,110, 0.8)'}}>
+                    <div style={{ display: 'inline-block', position: 'absolute', top: '50%', right: '15px', transform: 'translateY(-50%)'}}>
                         <FilePickerContainer
                             extensions={['pdf']}
                             onChange={fileObject => { uploadLogo(fileObject)}}
@@ -113,7 +110,11 @@ function LivestreamPdfViewer (props) {
                     <Document
                         onLoadSuccess={({ numPages }) => setPdfNumberOfPages(numPages)}
                         file={ pdfObject ? pdfObject.downloadUrl : ''}>
-                        <Page height={ getPageHeight() } renderTextLayer={false} pageNumber={pdfObject ? pdfObject.page : 1} />
+                        <Page 
+                        height={ getPageHeight() } 
+                        renderTextLayer={false} 
+                        renderAnnotationLayer={false} 
+                        pageNumber={pdfObject ? pdfObject.page : 1} />
                     </Document>
                 </div>
             </div>

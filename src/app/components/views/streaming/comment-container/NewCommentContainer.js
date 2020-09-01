@@ -28,23 +28,23 @@ function CommentContainer(props) {
                     <div className='interaction-selectors'>
                         <div>
                             <Button circular size='big' icon='comments outline' disabled={props.showMenu && selectedState === 'chat'} onClick={() => props.handleStateChange("chat")} primary/>
-                            <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("chat")}>Main Chat</span>
+                            <span style={{ opacity: props.showMenu ? '0' : '1' }} onClick={() => props.handleStateChange("chat")}>Main Chat</span>
                         </div>
                         <div>
                             <Button circular size='big' icon='question circle outline' disabled={props.showMenu && selectedState === 'questions'} onClick={() => props.handleStateChange("questions")} primary/>
-                            <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("questions")}>Q&A</span>
+                            <span style={{ opacity: props.showMenu ? '0' : '1' }} onClick={() => props.handleStateChange("questions")}>Q&A</span>
                         </div>
                         <div>
                             <Button circular size='big' icon='chart bar outline' disabled={props.showMenu && selectedState === 'polls'} onClick={() => props.handleStateChange("polls")} primary/>
-                            <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("polls")}>Polls</span>
+                            <span style={{ opacity: props.showMenu ? '0' : '1' }} onClick={() => props.handleStateChange("polls")}>Polls</span>
                         </div>
                         <div>
                             <Button circular size='big' icon='hand pointer outline' disabled={props.showMenu && selectedState === 'hand'} onClick={() => props.handleStateChange("hand")} primary/>
-                            <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("hand")}>Hand Raise</span>
+                            <span style={{ opacity: props.showMenu ? '0' : '1' }} onClick={() => props.handleStateChange("hand")}>Hand Raise</span>
                         </div>
                         <div>
                             <Button circular size='big' icon='cog' onClick={() => props.setShowMenu(!props.showMenu)} secondary/>
-                            <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("settings")}>Settings</span>
+                            <span style={{ opacity: props.showMenu ? '0' : '1' }} onClick={() => props.handleStateChange("settings")}>Settings</span>
                         </div>
                         <div className={ props.showMenu ? '' : 'hidden' }>
                             <Button circular size='big' icon={'angle left'} onClick={() => props.setShowMenu(!props.showMenu)} color='pink'/>

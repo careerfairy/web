@@ -11,8 +11,6 @@ import NewCommentContainer from 'components/views/streaming/comment-container/Ne
 
 function ViewerComponent(props) {
 
-    const [questionSubmittedModalOpen, setQuestionSubmittedModalOpen] = useState(false);
-
     const [mediaConstraints, setMediaConstraints] = useState({ audio: true, video: true});
 
     const streamerReady = true;
@@ -33,6 +31,14 @@ function ViewerComponent(props) {
             props.livestreamId,
             props.streamerId
         );
+
+    useEffect(() => {
+        return () => { 
+            if (webRTCAdaptor) {
+                webRTCAdaptor.closeWebSocket();
+            }
+        }
+    }, [webRTCAdaptor]);
 
     if (!props.currentLivestream) {
         return null;

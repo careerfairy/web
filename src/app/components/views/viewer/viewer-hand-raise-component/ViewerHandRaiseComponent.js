@@ -15,8 +15,6 @@ function ViewerHandRaiseComponent(props) {
     const router = useRouter();
     const { authenticatedUser, userData } = React.useContext(UserContext);
 
-    const streamerId = authenticatedUser.uid;
-
     function updateHandRaiseRequest(state) {
         props.firebase.updateHandRaiseRequest(props.currentLivestream.id, authenticatedUser.email, state);
     }
@@ -26,12 +24,16 @@ function ViewerHandRaiseComponent(props) {
             updateHandRaiseRequest('connected');
         },
     }
+
+    useEffect(() => {
+        return () => console.log('ViewerHandRaiseComponent destroyed');
+    },[]);
    
     return (
         <div className='topLevelContainer'>
             <div className='black-frame'>
                 <div>
-                    <VideoContainer currentLivestream={ props.currentLivestream } streamerId={ streamerId } additionalCallbacks={streamingCallbacks}/> :     
+                    <VideoContainer currentLivestream={ props.currentLivestream } streamerId={ authenticatedUser ? authenticatedUser.uid : '37218979' } additionalCallbacks={streamingCallbacks}/> :     
                 </div>
                 <div className={ props.currentLivestream.hasStarted ? 'hidden' : '' }style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'white', zIndex: '9999'}}>
                     <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: '1.4em', fontWeight: '700', color: 'rgb(0, 210, 170)'}}>
