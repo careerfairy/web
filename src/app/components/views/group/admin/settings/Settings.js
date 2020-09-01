@@ -1,17 +1,19 @@
-import { Fragment, useState, useEffect } from 'react';
-import { Grid, Image, Button, Icon, Modal, Step, Input, Checkbox } from 'semantic-ui-react';
-import { withFirebase } from 'data/firebase';
+import {Fragment, useState, useEffect} from 'react';
+import {Grid, Image, Button, Icon, Modal, Step, Input, Checkbox} from 'semantic-ui-react';
+import {withFirebase} from 'data/firebase';
 import CategoryElement from 'components/views/group/admin/CategoryElement';
 
 const Settings = (props) => {
 
     const [categories, setCategories] = useState([]);
+    const [createMode, setCreateMode] = useState(false)
+    console.log(createMode);
 
     useEffect(() => {
         if (props.groupId) {
             props.firebase.listenToGroupCategories(props.groupId, querySnapshot => {
                 let categories = [];
-                querySnapshot.forEach( doc => {
+                querySnapshot.forEach(doc => {
                     let category = doc.data();
                     category.id = doc.id;
                     categories.push(category);
@@ -19,23 +21,24 @@ const Settings = (props) => {
                 setCategories(categories);
             })
         }
-    },[props.groupId]);
+    }, [props.groupId]);
 
     const categoryElements = categories.map((category, index) => {
-        return(
+        return (
             <div key={index}>
-                <CategoryElement groupId={props.groupId} category={category} />
+                <CategoryElement groupId={props.groupId} category={category}/>
             </div>
         );
     })
-        
-    return(
+
+    return (
         <Fragment>
-            <div style={{ width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
+            <div style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
                 <h3 className='sublabel'>Settings</h3>
-                <Button content='Add Category' size='large' icon='add' primary style={{ float: 'right', verticalAlign: 'middle'}}/>       
+                <Button className="create-btn" onClick={() => setCreateMode(!createMode)} content='Add Category' size='large' icon='add' primary
+                        style={{float: 'right', verticalAlign: 'middle'}}/>
             </div>
-            { categoryElements }   
+            {categoryElements}
             <style jsx>{`
                 .sublabel {
                     text-align: left;
@@ -43,6 +46,10 @@ const Settings = (props) => {
                     vertical-align: middle;
                     margin: 9px 0;
                     color: rgb(80,80,80);
+                }
+                
+                .create-btn {
+                  cursor: pointer;
                 }
             `}</style>
         </Fragment>
