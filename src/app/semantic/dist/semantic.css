@@ -19703,11 +19703,11 @@ ol.ui.horizontal.list li:before,
 
 .ui.steps .step.active {
   cursor: auto;
-  background: #A0A0A0;
+  background: #DCDDDE;
 }
 
 .ui.steps .step.active:after {
-  background: #A0A0A0;
+  background: #DCDDDE;
 }
 
 .ui.steps .step.active .title {
@@ -30763,7 +30763,7 @@ a.ui.card:hover,
 .ui.inverted.teal.statistics .statistic > .value,
 .ui.statistics .inverted.teal.statistic > .value,
 .ui.inverted.teal.statistic > .value {
-  color: #6DFFFF;
+  color: #00D2AA;
 }
 
 .ui.inverted.blue.statistics .statistic > .value,
@@ -36074,7 +36074,7 @@ a.ui.nag {
 }
 
 .ui.teal.inverted.progress .bar {
-  background-color: #6DFFFF;
+  background-color: #00D2AA;
 }
 
 /* Blue */

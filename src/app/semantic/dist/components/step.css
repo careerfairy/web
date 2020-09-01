@@ -355,10 +355,10 @@
 /* Active */
 .ui.steps .step.active {
   cursor: auto;
-  background: #A0A0A0;
+  background: #DCDDDE;
 }
 .ui.steps .step.active:after {
-  background: #A0A0A0;
+  background: #DCDDDE;
 }
 .ui.steps .step.active .title {
   color: #FFFFFF;

@@ -116,7 +116,7 @@
 @downColor: @pressedTextColor;
 
 /* Active */
-@activeBackground: @darkGrey;
+@activeBackground: @lightGrey;
 @activeColor: @white;
 @activeIconColor: @white;
 
