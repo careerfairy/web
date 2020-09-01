@@ -92,6 +92,10 @@ const PersonalInfo = (props) => {
                     background-color: white;
                     box-shadow: 0 0 2px lightgrey;
                 }
+                .field-error {
+                  color: red;
+                  margin-top: 5px;
+                }
             `}</style>
         </Fragment> 
     );
