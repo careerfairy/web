@@ -267,6 +267,37 @@ class Firebase {
         return batch.commit();
     }
 
+    addGroupCategoryWithElements = (groupId, categoryName, newElements) => {
+        let batch = this.firestore.batch();
+        let categoryId;
+        let categoryRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("categories")
+        categoryRef.add({
+            name: categoryName,
+        }).then(docRef => {
+            categoryId = docRef.id
+
+            let elementsRef = this.firestore
+                .collection("careerCenterData")
+                .doc(groupId)
+                .collection("categories")
+                .doc(categoryId)
+                .collection("elements");
+            newElements.forEach( element => {
+                if (element.id) {
+                    batch.update(elementsRef.doc(element.id), { name: element.name });
+                } else {
+                    var newElementRef = elementsRef.doc();
+                    batch.set(newElementRef, { name: element.name });
+                }
+            });
+            return batch.commit();
+        })
+
+    }
+
     // MENTORS
 
     getMentors = () => {

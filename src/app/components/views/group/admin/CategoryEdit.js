@@ -60,12 +60,18 @@ function CategoryEditModal(props) {
     }
 
     function saveChanges() {
-        let optionsToDelete = props.options.filter( option => {
-            return !editableOptions.find( editableOption => editableOption.id === option.id);
-        })
-        props.firebase.updateGroupCategoryElements(props.groupId, props.category.id, categoryName, editableOptions, optionsToDelete).then(() => {
-            props.setEditMode(false);
-        });
+        if( props.newCategory ) {
+            props.firebase.addGroupCategoryWithElements(props.groupId, categoryName, editableOptions).then(() => {
+                props.setEditMode(false);
+            })
+        } else {
+            let optionsToDelete = props.options.filter( option => {
+                return !editableOptions.find( editableOption => editableOption.id === option.id);
+            })
+            props.firebase.updateGroupCategoryElements(props.groupId, props.category.id, categoryName, editableOptions, optionsToDelete).then(() => {
+                props.setEditMode(false);
+            });
+        }
     }
 
     const optionElements = editableOptions.map((option, index) => {
@@ -136,10 +142,13 @@ function CategoryEditModal(props) {
                 </Grid>  
                 <CategoryEditOption updateMode={updateMode} setUpdateMode={setUpdateMode} handleAdd={handleAdd} handleDelete={handleDelete} handleRename={handleRename}/> 
                 <div className='separator'></div>
-                <div>
-                    <Button content='Save' onClick={() => saveChanges()} primary/>
-                    <Button content='Cancel' onClick={() => props.setEditMode(false)}/>
-                </div> 
+                <div className="button-wrapper">
+                    <div>
+                        <Button content='Save' onClick={() => saveChanges()} primary/>
+                        <Button content='Cancel' onClick={() => props.setEditMode(false)}/>
+                    </div>
+                    {!props.newCategory && <Button inverted color='red' className="red-delete-btn" content='Delete'/>}
+                </div>
             </div>
             <style jsx>{`
                 .hidden {
@@ -151,6 +160,11 @@ function CategoryEditModal(props) {
                     height: 1px;
                     background-color: rgb(230,230,230);
                     margin: 20px 0;
+                }
+                
+                .button-wrapper {
+                    display: flex;
+                    justify-content: space-between;
                 }
                 
                 .white-box {

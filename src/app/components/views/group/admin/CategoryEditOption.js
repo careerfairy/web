@@ -72,6 +72,10 @@ function CategoryEditModalOption(props) {
         );
     }
 
+    if (props.updateMode.mode === 'deleteCategory') {
+
+    }
+
     if (props.updateMode.mode === 'rename') {
         const [ newOptionName, setNewOptionName ] = useState('');
         return(

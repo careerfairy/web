@@ -40,7 +40,7 @@ const Settings = (props) => {
                         style={{float: 'right', verticalAlign: 'middle'}}/>
             </div>
             {createMode ?
-                <CategoryEdit groupId={props.groupId} category={{}} options={[]} setEditMode={setCreateMode}/>: null
+                <CategoryEdit groupId={props.groupId} category={{}} options={[]} newCategory={true} setEditMode={setCreateMode}/>: null
             }
             {categoryElements}
             <style jsx>{`
