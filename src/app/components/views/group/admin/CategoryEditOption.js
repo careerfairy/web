@@ -40,7 +40,6 @@ function CategoryEditModalOption(props) {
                     <div className='action'>
                         Add an option named
                         <Input maxLength="20" type='text' error={touched && !newOptionName.length} onBlur={() => setTouched(true)} placeholder={placeholder} value={ newOptionName } onChange={(event, data) => setNewOptionName(data.value)}  style={{ width: '30%', margin: '0 20px 0 10px' }}/>
-                         {/*{touched && !newOptionName.length && <p className="error-field">Required</p>}*/}
                     </div>
                     <div className='buttons'>
                         <Button type="submit" content={'Confirm'} primary/>
