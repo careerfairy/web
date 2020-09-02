@@ -1,4 +1,4 @@
-import {useState, useEffect, Fragment} from 'react';
+import {useState, useEffect, Fragment, useRef} from 'react';
 import {Button, Grid, Icon, Input, Modal} from "semantic-ui-react";
 
 import { withFirebasePage } from 'context/firebase';
@@ -9,8 +9,11 @@ import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
 import CurrentSpeakerDisplayer from './CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
 import StreamPreparationModal from 'components/views/streaming/modal/StreamPreparationModal';
+import VideoControlsContainer from './VideoControlsContainer';
 
 function VideoContainer(props) {
+
+    const videoContainerRef = useRef();
 
     const [errorMessage, setErrorMessage] = useState(null);
     const [showLivestreamCountdown, setShowLivestreamCountdown] = useState(true);
@@ -192,13 +195,18 @@ function VideoContainer(props) {
 
     return (
         <Fragment>
-            <div>
-                <CurrentSpeakerDisplayer isPlayMode={false} smallScreenMode={props.currentLivestream.mode === 'presentation'} speakerSwitchModeActive={isMainStreamer} setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId} localId={props.streamerId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={props.currentLivestream.currentSpeakerId} muted={false}/>
+            <div className='screen-container'>
+                <div>
+                    <CurrentSpeakerDisplayer isPlayMode={false} smallScreenMode={props.currentLivestream.mode === 'presentation'} speakerSwitchModeActive={isMainStreamer} setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId} localId={props.streamerId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={props.currentLivestream.currentSpeakerId} muted={false}/>
+                </div>
+                { props.currentLivestream.mode === 'presentation' ?
+                    <SmallStreamerVideoDisplayer isPlayMode={false} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} livestreamId={props.currentLivestream.id} presenter={true}/>
+                    : null
+                }
             </div>
-            { props.currentLivestream.mode === 'presentation' ?
-                <SmallStreamerVideoDisplayer isPlayMode={false} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} livestreamId={props.currentLivestream.id} presenter={true}/>
-                : null
-            }
+            <div className='controls-container'>
+                <VideoControlsContainer webRTCAdaptor={webRTCAdaptor} currentLivestream={props.currentLivestream}/>
+            </div>
             <div className='button-container'>         
                 <Grid centered className='middle aligned'>
                     <Grid.Column width={10} textAlign='center'>
@@ -219,134 +227,12 @@ function VideoContainer(props) {
             </Modal>
             <StreamPreparationModal streamerReady={streamerReady} setStreamerReady={setStreamerReady} localStream={localStream} mediaConstraints={mediaConstraints} connectionEstablished={connectionEstablished} setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage} isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource} videoSource={videoSource} setVideoSource={setVideoSource}/>
             <style jsx>{`
-                .hidden {
-                    display: none
-                }
-
-                .fixed {
-                    position: fixed;
+                .screen-container {
+                    position: absolute;                 
                     top: 0;
-                    right: 0;
-                    background-color: red;
-                }
-
-                
-                .top-menu {
-                    position: relative;
-                    background-color: rgba(245,245,245,1);
-                    padding: 15px 0;
-                    height: 75px;
-                    text-align: center;
-                }
-
-                .list li {
-                    margin: 5px 0;
-                }
-
-                .list li i {
-                    color: rgb(0, 210, 170);
-                }
-
-                .top-menu.active {
-                    background-color: rgba(0, 210, 170, 1);
-                    color: white;
-                }
-
-                .top-menu h3 {
-                    font-weight: 600;
-                }
-
-                .remoteVideoContainer {
-                    position: absolute;
-                    top: 20px;
-                    left: 50%;
-                    transform: translate(-50%);
-                    width: 80%;
-                    height: 200px;
-                }
-
-                .pdfContent {
-                    width: 100%;
-                }
-
-                .video-container {
-                    position: relative;
-                    background-color: black;
-                    width: 100%;
-                    margin: 0 auto;
-                    z-index: -9999;
-                }
-
-                #localVideo {
-                    position: absolute;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    max-height: 100%;
-                    max-width: 100%;
-                    height: auto;
-                    z-index: 9900;
-                    background-color: black;
-                }
-
-                .video-menu-left {
-                    position: absolute;
-                    top: 75px;
-                    left: 0;
                     bottom: 0;
-                    width: 280px;
-                    z-index: 1;
-                }
-
-                .side-button {
-                    cursor: pointer;
-                }
-
-                .test-title {
-                    font-size: 2em;
-                    margin: 30px 0;
-                }
-
-                .test-button {
-                    margin: 20px 0;
-                }
-
-                .test-hint {
-                    margin: 20px 0;
-                }
-
-                .teal {
-                    color: rgb(0, 210, 170);
-                    font-weight: 700;
-                }
-
-                .black-frame {
-                    position: absolute;
-                    top: 75px;
-                    left: 280px;
+                    left: 0;
                     right: 120px;
-                    width: calc(100% - 400px);
-                    min-width: 400px;
-                    height: 100%;
-                    min-height: 600px;
-                    z-index: 10;
-                    background-color: black;
-                }
-
-                .video-container {
-                    width: 100%;
-                    position: absolute;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    background-color: black;
-                }
-
-                .video-container-small {
-                    width: 300px;
-                    padding-top: 15%;
-                    position: absolute;
-                    top: 20px;
-                    right: 20px;
-                    background-color: black;
                 }
 
                 .button-container {
@@ -371,26 +257,6 @@ function VideoContainer(props) {
 
                 .countdown .label {
                     color: white;
-                }
-
-                .right-container {
-                    position: absolute;
-                    right: 0;
-                    top: 75px;
-                    height: 100%;
-                    width: 120px;
-                    padding: 20px;
-                    background-color: rgb(80,80,80);
-                }
-
-                .logo-container {
-                    position: absolute;
-                    bottom: 90px;
-                    left: 120px;
-                    right: 0;
-                    color: rgb(0, 210, 170);
-                    font-size: 1.4em;
-                    text-align: center;
                 }
             `}</style>
         </Fragment>

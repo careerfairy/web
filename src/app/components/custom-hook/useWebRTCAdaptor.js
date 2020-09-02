@@ -219,7 +219,6 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         if (typeof streamingCallbackObject.onNewStreamAvailable === 'function') {
                             streamingCallbackObject.onNewStreamAvailable(infoObj);
                         }
-                        debugger;
                         certifyExternalMediaStreams(this, infoObj);
                         break;
                     }
@@ -285,6 +284,9 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onUpdatedStats(infoObj);
                         }
                         setLatestAudioLevel({ streamId: infoObj.streamId, audioLevel: infoObj.audioLevel });
+                        break;
+                    }
+                    case "pong": {
                         break;
                     }
                     default: {

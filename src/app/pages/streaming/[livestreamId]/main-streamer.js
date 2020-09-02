@@ -17,7 +17,6 @@ function StreamingPage(props) {
     const livestreamId = router.query.livestreamId;
 
     const [currentLivestream, setCurrentLivestream] = useState(false);
-    const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const [showSpeakersModal, setShowSpeakersModal] = useState(false);
     const [showMenu, setShowMenu] = useState(true);
@@ -80,23 +79,6 @@ function StreamingPage(props) {
         props.firebase.setLivestreamHasStarted(started, currentLivestream.id);
     }
 
-    function setLivestreamMode(mode) {
-        props.firebase.setLivestreamMode(livestreamId, mode);
-    }
-
-    function setLivestreamSpeakerSwitchMode(mode) {
-        props.firebase.setLivestreamSpeakerSwitchMode(livestreamId, mode);
-    }
-
-    function toggleMicrophone() {
-        if (isLocalMicMuted) {
-            webRTCAdaptor.unmuteLocalMic();
-        } else {
-            webRTCAdaptor.muteLocalMic();
-        }
-        setIsLocalMicMuted(!isLocalMicMuted);
-    }
-
     return (
         <div className='topLevelContainer'>
              {/* <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
@@ -126,50 +108,6 @@ function StreamingPage(props) {
             </div>
             <div className='mini-chat-container'>
                 <MiniChatContainer livestream={ currentLivestream } showMenu={showMenu}/>
-            </div>
-            <div className='right-container'>
-                <Grid columns={1}>
-                    <Grid.Row style={{ margin: '10px 0'}}>
-                        <Grid.Column textAlign='center'>
-                            <div className='side-button' onClick={() => toggleMicrophone()} style={{  color: isLocalMicMuted ? 'red' : 'white' }}>
-                                <Icon name='microphone slash' size='large' style={{ margin: '0 0 5px 0'}}/>
-                                <p style={{ fontSize: '0.8em' }}>{ isLocalMicMuted ? 'Unmute' : 'Mute' }</p>
-                            </div>
-                        </Grid.Column>
-                    </Grid.Row>
-                    <Grid.Row style={{ margin: '10px 0'}}>
-                        <Grid.Column textAlign='center'>
-                            <div className='side-button' onClick={() => setLivestreamMode(currentLivestream.mode === "presentation" ? "default" : "presentation")}  style={{  color: currentLivestream.mode === "presentation" ? 'red' : 'white' }}>
-                                <Icon name='clone outline' size='large' style={{ margin: '0 0 5px 0', color: currentLivestream.mode === "presentation" ? 'red' : 'white'}}/>
-                                <p style={{ fontSize: '0.8em', color: currentLivestream.mode === "presentation" ? 'red' : 'white' }}>{ currentLivestream.mode === "presentation" ? 'Stop Sharing Slides' : 'Share Slides' }</p>
-                            </div>
-                        </Grid.Column>
-                    </Grid.Row>
-                    <Grid.Row style={{ margin: '10px 0'}}>
-                        <Grid.Column textAlign='center'>
-                            <div className='side-button' onClick={() => setLivestreamSpeakerSwitchMode(currentLivestream.speakerSwitchMode === "automatic" ? "manual" : "automatic")} style={{  color: currentLivestream.speakerSwitchMode === "automatic" ? 'red' : 'white' }}>
-                                <Icon name='assistive listening systems' size='large' style={{ margin: '0 0 5px 0' }}/>
-                                <p style={{ fontSize: '0.8em' }}>{ currentLivestream.speakerSwitchMode === "automatic" ? 'Automatic Speaker Switch' : 'Manual Speaker Switch' }</p>
-                            </div>
-                        </Grid.Column>
-                    </Grid.Row>
-                    {/* <Grid.Row style={{ margin: '10px 0'}}>
-                        <Grid.Column textAlign='center'>
-                            <div className='side-button' onClick={() => setShowSpeakersModal(true)}>
-                                <Icon name='user plus' size='large' style={{ margin: '0 0 5px 0', color: 'white'}}/>
-                                <p style={{ fontSize: '0.8em', color: 'white' }}>Invite Speakers</p>
-                            </div>
-                        </Grid.Column>
-                    </Grid.Row> */}
-                    <Grid.Row style={{ margin: '10px 0'}}>
-                        <Grid.Column textAlign='center'>
-                            <div className='side-button' onClick={() => setLivestreamMode(currentLivestream.mode === "desktop" ? "default" : "desktop")}  style={{  color: currentLivestream.mode === "desktop" ? 'red' : 'white' }}>
-                                <Icon name='tv' size='large' style={{ margin: '0 0 5px 0', color: currentLivestream.mode === "desktop" ? 'red' : 'white'}}/>
-                                <p style={{ fontSize: '0.8em', color: currentLivestream.mode === "desktop" ? 'red' : 'white' }}>{ currentLivestream.mode === "desktop" ? 'Stop Sharing Desktop' : 'Share Desktop' }</p>
-                            </div>
-                        </Grid.Column>
-                    </Grid.Row>
-                </Grid>
             </div>
             <style jsx>{`
                 .top-menu {
@@ -204,7 +142,7 @@ function StreamingPage(props) {
                 .black-frame {
                     position: absolute;
                     top: 0;
-                    right: 120px;
+                    right: 0;
                     min-width: 400px;
                     height: 100%;
                     min-height: 600px;
