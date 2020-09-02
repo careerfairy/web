@@ -67,13 +67,13 @@ const CurrentGroup = (props) => {
             return userCategory.categoryId === category.id;
         });
         let value = category.elements.find( element => {
-            return element.id === usersCategory.value;
+            return element.id === usersCategory?.value;
         })
         return (
             <Grid.Column key={ category.id } width={8}>
                 <div style={{ margin: '15px 0' }}>   
                     <label style={{ marginBottom: '10px', textTransform: "uppercase", fontSize: '0.8em', fontWeight: '700', color: 'rgb(0, 210, 170)'}}>{ category.name }</label>
-                    <div style={{ fontSize: '1.2em'}}>{ value.name }</div>
+                    <div style={{ fontSize: '1.2em'}}>{ value?.name }</div>
                 </div>
             </Grid.Column>     
         )

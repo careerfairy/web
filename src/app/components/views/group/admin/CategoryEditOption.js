@@ -1,5 +1,5 @@
 import { Fragment, useState, useEffect } from 'react';
-import { Grid, Image, Button, Icon, Modal, Dropdown, Input, Header } from 'semantic-ui-react';
+import {Grid, Image, Button, Icon, Modal, Dropdown, Input, Header, Form} from 'semantic-ui-react';
 
 import { useRouter } from 'next/router';
 import { withFirebase } from 'data/firebase';
@@ -7,24 +7,46 @@ import { withFirebase } from 'data/firebase';
 
 function CategoryEditModalOption(props) {
 
+
+
+
+
     if (!props.updateMode.mode) {
         return null;
     }
 
     if (props.updateMode.mode === 'add') {
         const [ newOptionName, setNewOptionName ] = useState('');
+        const [touched, setTouched] = useState(false)
+        const [placeholder, setPlaceholder] = useState('Option Name')
+
+        useEffect(() => {
+            if (touched && !newOptionName.length) {
+                setPlaceholder("Please fill this field")
+            }
+        }, [touched, newOptionName.length])
+
+        const handleAddModal = (e) => {
+            e.preventDefault()
+            if (!newOptionName.length) return setTouched(true)
+            props.handleAdd({ name: newOptionName })
+        }
+
         return(
             <Fragment>
                 <div className={ props.updateMode.mode ? 'modal' : ''}></div>   
                 <div className='padding animated fadeIn'>
+                    <Form onSubmit={handleAddModal}>
                     <div className='action'>
-                        Add an option named 
-                        <Input type='text' placeholder='Option Name' value={ newOptionName } onChange={(event, data) => setNewOptionName(data.value)}  style={{ width: '30%', margin: '0 20px 0 10px' }}/>
+                        Add an option named
+                        <Input maxLength="20" type='text' error={touched && !newOptionName.length} onBlur={() => setTouched(true)} placeholder={placeholder} value={ newOptionName } onChange={(event, data) => setNewOptionName(data.value)}  style={{ width: '30%', margin: '0 20px 0 10px' }}/>
+                         {/*{touched && !newOptionName.length && <p className="error-field">Required</p>}*/}
                     </div>
                     <div className='buttons'>
-                        <Button content={'Confirm'} onClick={() => props.handleAdd({ name: newOptionName })} primary/>
+                        <Button type="submit" content={'Confirm'} primary/>
                         <Button content={'Cancel'} onClick={() => props.setUpdateMode({})}/>
                     </div>
+                    </Form>
                 </div>
                 <style jsx>{`
                     .hidden {
@@ -62,6 +84,14 @@ function CategoryEditModalOption(props) {
 
                     .explanation span, .action span {
                         font-weight: 700;
+                    }
+                    
+                    .error-field {
+                      position: absolute;
+                      font-size: 1rem;
+                      font-weight: lighter;
+                      margin-top: 5px;
+                      color: red;
                     }
 
                     .buttons {
