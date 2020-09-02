@@ -1,8 +1,9 @@
 import {Fragment, useState, useEffect} from 'react';
-import {Grid, Image, Button, Icon, Modal, Step, Input, Checkbox} from 'semantic-ui-react';
 import {withFirebase} from 'data/firebase';
 import CategoryElement from 'components/views/group/admin/CategoryElement';
 import CategoryEdit from "../CategoryEdit";
+import {Button} from "@material-ui/core";
+import AddIcon from '@material-ui/icons/Add';
 
 
 const Settings = (props) => {
@@ -35,10 +36,16 @@ const Settings = (props) => {
 
     return (
         <Fragment>
-            <div style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
+            <div className="btn-title-wrapper" style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
                 <h3 className='sublabel'>Settings</h3>
-                <Button color="teal" className="create-btn" onClick={() => setCreateMode(true)} disabled={createMode} content={createMode ?'New Category':'Add Category'} size='large' icon={!createMode && 'add'}
-                        style={{float: 'right', verticalAlign: 'middle'}}/>
+                <Button  variant="contained"
+                         color="primary"
+                         size="large"
+                         onClick={() => setCreateMode(true)}
+                         disabled={createMode}
+                        endIcon={<AddIcon/>}>
+                    Add Category
+                </Button>
             </div>
             {createMode ?
                 <CategoryEdit groupId={props.groupId} category={{}} options={[]} newCategory={true} setEditMode={setCreateMode}/>: null
@@ -51,6 +58,11 @@ const Settings = (props) => {
                     vertical-align: middle;
                     margin: 9px 0;
                     color: rgb(80,80,80);
+                }
+                
+                .btn-title-wrapper{
+                  display: flex;
+                  justify-content: space-between;
                 }
                 
   
