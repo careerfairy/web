@@ -21,7 +21,7 @@ const JoinGroup = (props) => {
     const [userData, setUserData] = useState(null);
 
     const [group, setGroup] = useState([]);
-    const [menuItem, setMenuItem] = useState("events")
+    const [menuItem, setMenuItem] = useState("settings")
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {

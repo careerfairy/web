@@ -62,7 +62,6 @@ function CategoryEditModal(props) {
 
     function handleBlur() {
         setTouched(true)
-        console.log("touched", touched)
     }
 
     function handleRename(newOption) {
