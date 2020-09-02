@@ -13,6 +13,8 @@ function CategoryEditModal(props) {
 
     const [editableOptions, setEditableOptions] = useState([]);
 
+    const [touched, setTouched] = useState(false)
+
     const [selectedOption, setSelectedOption] = useState(null);
     const [updateMode, setUpdateMode] = useState({});
 
@@ -56,6 +58,11 @@ function CategoryEditModal(props) {
         setEditableOptions(newList);
     }
 
+    function handleBlur(){
+        setTouched(true)
+        console.log("touched", touched)
+    }
+
     function handleRename(newOption) {
         const newList = editableOptions.map( option => {
             if (option.id === newOption.id) {
@@ -68,18 +75,20 @@ function CategoryEditModal(props) {
     }
 
     function saveChanges() {
+        if (!categoryName.length) return setTouched(true)
         if( props.newCategory ) {
             props.firebase.addGroupCategoryWithElements(props.groupId, categoryName, editableOptions).then(() => {
                 props.setEditMode(false);
             })
-        } else {
-            let optionsToDelete = props.options.filter( option => {
-                return !editableOptions.find( editableOption => editableOption.id === option.id);
-            })
-            props.firebase.updateGroupCategoryElements(props.groupId, props.category.id, categoryName, editableOptions, optionsToDelete).then(() => {
-                props.setEditMode(false);
-            });
+            return
         }
+        let optionsToDelete = props.options.filter( option => {
+            return !editableOptions.find( editableOption => editableOption.id === option.id);
+        })
+        props.firebase.updateGroupCategoryElements(props.groupId, props.category.id, categoryName, editableOptions, optionsToDelete).then(() => {
+            props.setEditMode(false);
+        });
+
     }
 
     const optionElements = editableOptions.map((option, index) => {
@@ -139,7 +148,8 @@ function CategoryEditModal(props) {
                     <Grid.Column width={5}>
                         <div className='white-box-label'>Category Name</div>
                         <div className='white-box-title'>
-                            <Input error={!categoryName.length} type='text' value={categoryName} onChange={(event, data) => setCategoryName(data.value)} fluid/>
+                            <Input maxLength="40" error={touched && !categoryName.length} onBlur={handleBlur} type='text' value={categoryName} onChange={(event, data) => setCategoryName(data.value)} fluid/>
+                            {touched && !categoryName.length && <p className="error-field">Required</p>}
                         </div>
                     </Grid.Column>
                     <Grid.Column width={11}>
@@ -214,6 +224,11 @@ function CategoryEditModal(props) {
                     color: white;
                     box-shadow: 0 0 2px grey;
                     font-size: 1.2em;
+                }
+                .error-field{
+                  position: absolute;
+                  margin-top: 5px;
+                  color: red;
                 }
             `}</style>
         </Fragment>

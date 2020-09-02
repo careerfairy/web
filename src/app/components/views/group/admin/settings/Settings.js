@@ -4,6 +4,7 @@ import {withFirebase} from 'data/firebase';
 import CategoryElement from 'components/views/group/admin/CategoryElement';
 import CategoryEdit from "../CategoryEdit";
 
+
 const Settings = (props) => {
 
     const [categories, setCategories] = useState([]);
@@ -36,7 +37,7 @@ const Settings = (props) => {
         <Fragment>
             <div style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
                 <h3 className='sublabel'>Settings</h3>
-                <Button className="create-btn" onClick={() => setCreateMode(true)} content='Add Category' size='large' icon='add' primary
+                <Button color="teal" className="create-btn" onClick={() => setCreateMode(true)} content='Add Category' size='large' icon='add'
                         style={{float: 'right', verticalAlign: 'middle'}}/>
             </div>
             {createMode ?
@@ -52,10 +53,7 @@ const Settings = (props) => {
                     color: rgb(80,80,80);
                 }
                 
-                .create-btn {
-                  cursor: pointer;
-                  background-color: #00D2AA;
-                }
+  
             `}</style>
         </Fragment>
     );

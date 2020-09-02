@@ -6,6 +6,8 @@ import FirebaseContext from 'data/firebase/FirebaseContext';
 import Firebase from 'data/firebase/Firebase';
 import * as Sentry from '@sentry/browser';
 
+
+
 import Head from 'next/head';
 
 function MyApp({ Component, pageProps }) {
