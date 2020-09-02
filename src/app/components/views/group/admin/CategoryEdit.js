@@ -13,12 +13,21 @@ function CategoryEditModal(props) {
 
     const [editableOptions, setEditableOptions] = useState([]);
 
-    const [touched, setTouched] = useState(false)
-
-    const [optionsError, setOptionsError] = useState(false)
 
     const [selectedOption, setSelectedOption] = useState(null);
     const [updateMode, setUpdateMode] = useState({});
+
+    const [touched, setTouched] = useState(false)
+    const [errorObj, setErrorObj] = useState({inputError: false, optionError: false})
+
+
+    useEffect(() => {
+        if (editableOptions && editableOptions.length >= 2) {
+            console.log("editableOptions");
+            setErrorObj({...errorObj, optionError: false})
+        }
+    }, [editableOptions.length]);
+
 
     useEffect(() => {
         if (props.category && props.category.name) {
@@ -76,20 +85,25 @@ function CategoryEditModal(props) {
     }
 
     function saveChanges() {
-        if (!categoryName.length) return setTouched(true)
-        if (editableOptions.length < 2) setOptionsError(true)
+        const errors = {
+            inputError: categoryName.length < 1,
+            optionError: editableOptions.length < 2
+        }
+        setErrorObj(errors)
+        setTouched(!categoryName.length > 0)
+        if (errors.inputError || errors.optionError) return
         if (props.newCategory) {
             props.firebase.addGroupCategoryWithElements(props.groupId, categoryName, editableOptions).then(() => {
                 props.setEditMode(false);
             })
-            return
+        } else {
+            let optionsToDelete = props.options.filter(option => {
+                return !editableOptions.find(editableOption => editableOption.id === option.id);
+            })
+            props.firebase.updateGroupCategoryElements(props.groupId, props.category.id, categoryName, editableOptions, optionsToDelete).then(() => {
+                props.setEditMode(false);
+            })
         }
-        let optionsToDelete = props.options.filter(option => {
-            return !editableOptions.find(editableOption => editableOption.id === option.id);
-        })
-        props.firebase.updateGroupCategoryElements(props.groupId, props.category.id, categoryName, editableOptions, optionsToDelete).then(() => {
-            props.setEditMode(false);
-        });
 
     }
 
@@ -161,9 +175,9 @@ function CategoryEditModal(props) {
                     <Grid.Column width={11}>
                         <div className='white-box-label'>Category Options</div>
                         {optionElements}
-                        {}
                         <Button icon='add' size='mini' circular primary onClick={() => setUpdateMode({mode: 'add'})}
                                 style={{margin: '0 0 0 2px', boxShadow: '0 0 2px grey'}}/>
+                        {errorObj.optionError && <p className="error-field">You must add at least 2 options</p>}
                     </Grid.Column>
                 </Grid>
                 <CategoryEditOption categoryName={categoryName} handleDeleteCategory={handleDeleteCategory}
@@ -239,6 +253,8 @@ function CategoryEditModal(props) {
                 }
                 .error-field{
                   position: absolute;
+                  font-size: 1rem;
+                  font-weight: lighter;
                   margin-top: 5px;
                   color: red;
                 }
