@@ -2,6 +2,7 @@ import {Fragment, useState, useEffect} from 'react';
 import {Grid, Image, Button, Icon, Modal, Step, Input, Checkbox} from 'semantic-ui-react';
 import {withFirebase} from 'data/firebase';
 import CategoryElement from 'components/views/group/admin/CategoryElement';
+import CategoryEdit from "../CategoryEdit";
 
 const Settings = (props) => {
 
@@ -35,9 +36,12 @@ const Settings = (props) => {
         <Fragment>
             <div style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
                 <h3 className='sublabel'>Settings</h3>
-                <Button className="create-btn" onClick={() => setCreateMode(!createMode)} content='Add Category' size='large' icon='add' primary
+                <Button className="create-btn" onClick={() => setCreateMode(true)} content='Add Category' size='large' icon='add' primary
                         style={{float: 'right', verticalAlign: 'middle'}}/>
             </div>
+            {createMode ?
+                <CategoryEdit groupId={props.groupId} category={{}} options={[]} setEditMode={setCreateMode}/>: null
+            }
             {categoryElements}
             <style jsx>{`
                 .sublabel {
