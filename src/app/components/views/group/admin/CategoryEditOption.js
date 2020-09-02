@@ -169,19 +169,37 @@ function CategoryEditModalOption(props) {
 
     if (props.updateMode.mode === 'rename') {
         const [ newOptionName, setNewOptionName ] = useState('');
+
+        const [touched, setTouched] = useState(false)
+        const [placeholder, setPlaceholder] = useState('Option Name')
+
+        useEffect(() => {
+            if (touched && !newOptionName.length) {
+                setPlaceholder("Please fill this field")
+            }
+        }, [touched, newOptionName.length])
+
+        const handleRenameModal = (e) => {
+            e.preventDefault()
+            if (!newOptionName.length) return setTouched(true)
+            props.handleRename({ id: props.updateMode.option.id, name: newOptionName })
+        }
+
         return(
             <Fragment>
                 <div className={ props.updateMode.mode ? 'modal' : ''}></div>   
                 <div className='padding animated fadeIn'>
-                    <div className='action'>
-                        Rename the option <span>{ props.updateMode.option.name }</span> to
-                        <Input type='text' placeholder='Option Name' value={ newOptionName } onChange={(event, data) => setNewOptionName(data.value)}  style={{ width: '30%', margin: '0 20px 0 10px' }}/>
-                    </div>
-                    <p className='explanation'>All your members who are currently classified under  <span>{ props.updateMode.option.name }</span> will now be classified under <span>{ newOptionName }</span>.</p>
-                    <div className='buttons'>
-                        <Button content={'Confirm'} onClick={() => props.handleRename({ id: props.updateMode.option.id, name: newOptionName })} primary/>
-                        <Button content={'Cancel'} onClick={() => props.setUpdateMode({})}/>
-                    </div>
+                    <Form onSubmit={handleRenameModal}>
+                        <div className='action'>
+                            Rename the option <span>{ props.updateMode.option.name }</span> to
+                            <Input maxLength="20" type='text' error={touched && !newOptionName.length} onBlur={() => setTouched(true)} placeholder={placeholder} value={ newOptionName } onChange={(event, data) => setNewOptionName(data.value)}  style={{ width: '30%', margin: '0 20px 0 10px' }}/>
+                        </div>
+                        <p className='explanation'>All your members who are currently classified under  <span>{ props.updateMode.option.name }</span> will now be classified under <span>{ newOptionName }</span>.</p>
+                        <div className='buttons'>
+                            <Button content={'Confirm'} type="submit" primary/>
+                            <Button content={'Cancel'} onClick={() => props.setUpdateMode({})}/>
+                        </div>
+                    </Form>
                 </div>
                 <style jsx>{`
                     .hidden {
