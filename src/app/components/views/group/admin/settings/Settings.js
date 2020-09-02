@@ -37,7 +37,7 @@ const Settings = (props) => {
         <Fragment>
             <div style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
                 <h3 className='sublabel'>Settings</h3>
-                <Button color="teal" className="create-btn" onClick={() => setCreateMode(true)} content='Add Category' size='large' icon='add'
+                <Button color="teal" className="create-btn" onClick={() => setCreateMode(true)} disabled={createMode} content='Add Category' size='large' icon='add'
                         style={{float: 'right', verticalAlign: 'middle'}}/>
             </div>
             {createMode ?
