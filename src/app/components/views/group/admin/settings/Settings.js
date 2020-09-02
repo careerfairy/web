@@ -54,6 +54,7 @@ const Settings = (props) => {
                 
                 .create-btn {
                   cursor: pointer;
+                  background-color: #00D2AA;
                 }
             `}</style>
         </Fragment>

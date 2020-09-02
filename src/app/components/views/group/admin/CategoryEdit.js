@@ -17,6 +17,7 @@ function CategoryEditModal(props) {
     const [updateMode, setUpdateMode] = useState({});
 
 
+
     useEffect(() => {
         if (props.category && props.category.name) {
             setCategoryName(props.category.name);
@@ -32,6 +33,8 @@ function CategoryEditModal(props) {
     useEffect(() => {
         setUpdateMode({});
     }, [editableOptions]);
+
+    // const handleBlur = (field) => (evt) => {    this.setState({      touched: { ...this.state.touched, [field]: true },    });  }
 
     function handleDelete(removedOption) {
         let newList = [];
@@ -136,7 +139,7 @@ function CategoryEditModal(props) {
                     <Grid.Column width={5}>
                         <div className='white-box-label'>Category Name</div>
                         <div className='white-box-title'>
-                            <Input type='text' value={categoryName} onChange={(event, data) => setCategoryName(data.value)} fluid/>
+                            <Input error={!categoryName.length} type='text' value={categoryName} onChange={(event, data) => setCategoryName(data.value)} fluid/>
                         </div>
                     </Grid.Column>
                     <Grid.Column width={11}>
