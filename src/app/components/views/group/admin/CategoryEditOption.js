@@ -73,7 +73,68 @@ function CategoryEditModalOption(props) {
     }
 
     if (props.updateMode.mode === 'deleteCategory') {
+        return(
+            <Fragment>
+                <div className={ props.updateMode.mode ? 'modal' : ''}></div>
+                <div className='padding animated fadeIn' style={{ margin: '20px 0'}}>
+                    <div className='action'>
+                        Delete the category <span>{ props.categoryName }</span>
+                    </div>
+                    <p className='explanation'>All your members who are currently classified under  <span>{ props.updateMode.option.name }</span> will not anymore belong to any category until they manually update their categorisation.</p>
+                    <p className='explanation warning'>This operation cannot be reverted!</p>
+                    <div className='buttons'>
+                        <Button content={'Permanently Delete the Category ' + props.categoryName } onClick={props.handleDeleteCategory} primary/>
+                        <Button content={'Cancel'} onClick={() => props.setUpdateMode({})}/>
+                    </div>
+                </div>
+                <style jsx>{`
+                    .hidden {
+                        display: none
+                    }
 
+                    .action {
+                        font-size: 1.1em;
+                    }
+
+                    .modal {
+                        position: absolute;
+                        z-index: 10;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: rgb(30,30,30,0.3);
+                    }
+
+                    .padding {
+                        position: relative;
+                        z-index: 20;
+                        background-color: white;
+                        padding: 20px;
+                        border-radius: 20px;
+                    }
+
+                    .explanation {
+                        font-size: 0.9em;
+                        margin: 10px 0 5px 0;
+                    }
+
+                    .warning {
+                        color: red;
+                        margin: 5px 0 20px 0;
+                        font-weight: 700;
+                    }
+
+                    .explanation span, .action span {
+                        font-weight: 700;
+                    }
+
+                    .buttons {
+                        margin: 20px 0;
+                    }
+                `}</style>
+            </Fragment>
+        );
     }
 
     if (props.updateMode.mode === 'rename') {

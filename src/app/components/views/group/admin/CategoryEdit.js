@@ -43,6 +43,11 @@ function CategoryEditModal(props) {
         setEditableOptions(newList);
     }
 
+    function handleDeleteCategory(){
+        props.firebase.deleteGroupCategoryWithElements(props.groupId, props.category.id, editableOptions)
+            .then(props.setEditMode(false))
+    }
+
     function handleAdd(newOption) {
         const newList = [...editableOptions, newOption];
         setEditableOptions(newList);
@@ -140,14 +145,14 @@ function CategoryEditModal(props) {
                        <Button icon='add' size='mini' circular primary onClick={() => setUpdateMode({ mode: 'add' })} style={{ margin: '0 0 0 2px', boxShadow: '0 0 2px grey'}}/>
                     </Grid.Column>
                 </Grid>  
-                <CategoryEditOption updateMode={updateMode} setUpdateMode={setUpdateMode} handleAdd={handleAdd} handleDelete={handleDelete} handleRename={handleRename}/> 
+                <CategoryEditOption categoryName={categoryName} handleDeleteCategory={handleDeleteCategory} updateMode={updateMode} setUpdateMode={setUpdateMode} handleAdd={handleAdd} handleDelete={handleDelete} handleRename={handleRename}/>
                 <div className='separator'></div>
                 <div className="button-wrapper">
                     <div>
                         <Button content='Save' onClick={() => saveChanges()} primary/>
                         <Button content='Cancel' onClick={() => props.setEditMode(false)}/>
                     </div>
-                    {!props.newCategory && <Button inverted color='red' className="red-delete-btn" content='Delete'/>}
+                    {!props.newCategory && <Button onClick={() => setUpdateMode({ mode: 'deleteCategory', option: {name: categoryName} })} inverted color='red' className="red-delete-btn" content='Delete'/>}
                 </div>
             </div>
             <style jsx>{`

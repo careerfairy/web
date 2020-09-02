@@ -239,7 +239,6 @@ class Firebase {
     }
 
     updateGroupCategoryElements = (groupId, categoryId, categoryName, newElements, elementsToDelete) => {
-        debugger;
         let batch = this.firestore.batch();
         let categoryRef = this.firestore
             .collection("careerCenterData")
@@ -269,32 +268,51 @@ class Firebase {
 
     addGroupCategoryWithElements = (groupId, categoryName, newElements) => {
         let batch = this.firestore.batch();
-        let categoryId;
         let categoryRef = this.firestore
             .collection("careerCenterData")
             .doc(groupId)
             .collection("categories")
-        categoryRef.add({
-            name: categoryName,
-        }).then(docRef => {
-            categoryId = docRef.id
+        var newCategoryRef = categoryRef.doc()
+        batch.set( newCategoryRef, {name: categoryName})
+        let elementsRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("categories")
+            .doc(newCategoryRef.id)
+            .collection("elements");
+        newElements.forEach( element => {
+            if (element.id) {
+                batch.update(elementsRef.doc(element.id), { name: element.name });
+            } else {
+                var newElementRef = elementsRef.doc();
+                batch.set(newElementRef, { name: element.name });
+            }
+        });
+        return batch.commit();
 
-            let elementsRef = this.firestore
-                .collection("careerCenterData")
-                .doc(groupId)
-                .collection("categories")
-                .doc(categoryId)
-                .collection("elements");
-            newElements.forEach( element => {
-                if (element.id) {
-                    batch.update(elementsRef.doc(element.id), { name: element.name });
-                } else {
-                    var newElementRef = elementsRef.doc();
-                    batch.set(newElementRef, { name: element.name });
-                }
-            });
-            return batch.commit();
+    }
+
+        deleteGroupCategoryWithElements = (groupId, categoryId, elementsToDelete) => {
+        let batch = this.firestore.batch();
+
+        let elementsRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("categories")
+            .doc(categoryId)
+            .collection("elements");
+        elementsToDelete.forEach( element => {
+            batch.delete(elementsRef.doc(element.id));
         })
+        let categoryRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("categories")
+            .doc(categoryId)
+
+            batch.delete(categoryRef)
+
+        return batch.commit();
 
     }
 
