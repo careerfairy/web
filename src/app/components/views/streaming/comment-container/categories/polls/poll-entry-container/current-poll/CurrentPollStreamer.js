@@ -30,7 +30,7 @@ function CurrentPollStreamer(props) {
                     </div>
                     { optionElements }
                 </div>           
-                <Button attached='bottom' content={ 'Close Poll' } onClick={() => setPollState('current') } secondary style={{ margin: '0 10px 10px 10px', border: 'none' }}/>
+                <Button attached='bottom' content={ 'Close Poll' } primary onClick={() => setPollState('closed') } style={{ margin: '0 10px 10px 10px', border: 'none' }}/>
             </div>   
             <style jsx>{`
                 .chat-entry-container {
@@ -38,9 +38,9 @@ function CurrentPollStreamer(props) {
                     border-top-right-radius: 5px;
                     box-shadow: 0 0 5px rgb(180,180,180);
                     margin: 10px 10px 0 10px;
-                    padding: 40px 20px 20px 20px;
-                    background-color: rgb(0, 210, 170);
-                    color: white;
+                    padding: 20px 20px 20px 20px;
+                    background-color: white;
+                    border: 10px solid rgb(0, 210, 170);
                 }
 
                 .popup {
@@ -64,7 +64,7 @@ function CurrentPollStreamer(props) {
                 .poll-entry-message {
                     font-weight: 700;
                     font-size: 1.4em;
-                    margin: 10px 0 25px 0;
+                    margin: 5px 0 25px 0;
                 }
 
                 .chat-entry-author {

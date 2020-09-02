@@ -8,6 +8,7 @@ import PollCreationModal from '../../poll-creation-modal/PollCreationModal';
 function UpcomingPollStreamer(props) {
 
     const [editPoll, setEditPoll] = useState(false);
+    const [showNotEditableMessage, setShowNotEditableMessage] = useState(false);
 
     function deletePoll() {
         props.firebase.deleteLivestreamPoll(props.livestream.id, props.poll.id);
@@ -15,6 +16,12 @@ function UpcomingPollStreamer(props) {
 
     function setPollState(state) {
         props.firebase.setPollState(props.livestream.id, props.poll.id, state);
+    }
+
+    function handleSetIsNotEditablePoll() {
+        if (props.somePollIsCurrent) {
+            setShowNotEditableMessage(true);
+        }
     }
 
 
@@ -82,7 +89,7 @@ function UpcomingPollStreamer(props) {
 
     return (
         <Fragment>
-            <div className='animated fadeInUp faster'>
+            <div className='animated fadeInUp faster' onMouseEnter={ handleSetIsNotEditablePoll } onMouseLeave={ () => setShowNotEditableMessage(false) }>
                 <div className='chat-entry-container'>
                     <div className='poll-entry-message'>
                         { props.poll.question }
@@ -103,8 +110,14 @@ function UpcomingPollStreamer(props) {
                         </Dropdown.Menu>
                     </Dropdown>
                     <PollCreationModal livestreamId={props.livestream.id}  initialPoll={props.poll} open={editPoll} onClose={() => setEditPoll(false)}/>
-                </div>           
-                <Button attached='bottom' content={ 'Ask the Audience Now' } onClick={() => setPollState('current') } primary style={{ margin: '0 10px 10px 10px', border: 'none' }}/>
+                    
+                </div> 
+                <div className={'disabled-overlay ' + ( showNotEditableMessage ? '' : 'hidden')}>
+                    <div>
+                        Please close the active poll before activating another one.
+                    </div>
+                </div>          
+                <Button attached='bottom' content={ 'Ask the Audience Now' } disabled={props.somePollIsCurrent} onClick={() => setPollState('current') } primary style={{ margin: '0 10px 10px 10px', border: 'none' }}/>
             </div>   
             <style jsx>{`
                 .chat-entry-container {
@@ -114,6 +127,30 @@ function UpcomingPollStreamer(props) {
                     margin: 10px 10px 0 10px;
                     padding: 40px 20px 20px 20px;
                     background-color: white;
+                }
+
+                .disabled-overlay {
+                    position:absolute;
+                    top: 0;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    margin: 0 10px;
+                    background-color: rgba(100,100,100,0.85);
+                    border-radius: 5px;
+                    z-index: 300;
+                    cursor: pointer;
+                }
+
+                .disabled-overlay div {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    text-align: center;
+                    width: 70%;
+                    color: white;
+                    font-size: 1.2em;
                 }
 
                 .popup {

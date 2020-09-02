@@ -6,10 +6,6 @@ import { withFirebase } from 'context/firebase';
 import { Icon } from 'semantic-ui-react';
 
 function QuestionCategory(props) {
-
-    if (props.selectedState !== 'questions') {
-        return null;
-    }
     
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [pastQuestions, setPastQuestions] = useState([]);
@@ -52,6 +48,10 @@ function QuestionCategory(props) {
             </div>       
         );
     });
+
+    if (props.selectedState !== 'questions') {
+        return null;
+    }
 
     return (
         <div>

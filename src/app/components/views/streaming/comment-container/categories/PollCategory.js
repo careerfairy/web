@@ -30,10 +30,11 @@ function PollCategory(props) {
         }
     }, [props.livestream.id]);
 
-    const pollElements = pollEntries.map((poll, index) => {
+    const somePollIsCurrent = pollEntries.some( poll => poll.state === 'current');
+    const pollElements = pollEntries.filter(poll => poll.state !== 'closed').map((poll, index) => {
         return (
             <Fragment key={index}>
-                <PollEntryContainer poll={poll} streamer={props.streamer} user={props.user} userData={props.userData} livestream={props.livestream} />
+                <PollEntryContainer poll={poll} streamer={props.streamer} user={props.user} userData={props.userData} livestream={props.livestream} somePollIsCurrent={somePollIsCurrent}/>
             </Fragment>
         );
     });
