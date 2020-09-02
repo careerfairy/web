@@ -5,10 +5,12 @@ import 'styles.css';
 import FirebaseContext from 'data/firebase/FirebaseContext';
 import Firebase from 'data/firebase/Firebase';
 import * as Sentry from '@sentry/browser';
+import { ThemeProvider } from '@material-ui/core/styles';
 
 
 
 import Head from 'next/head';
+import {theme} from "../materialUI";
 
 function MyApp({ Component, pageProps }) {
 
@@ -19,9 +21,11 @@ function MyApp({ Component, pageProps }) {
             <Head>
                 <title>CareerFairy | Watch live streams. Get hired.</title>
             </Head>
-            <FirebaseContext.Provider value={new Firebase()}>
-                <Component {...pageProps} />
-            </FirebaseContext.Provider>
+            <ThemeProvider theme={theme}>
+                <FirebaseContext.Provider value={new Firebase()}>
+                    <Component {...pageProps} />
+                </FirebaseContext.Provider>
+            </ThemeProvider>
         </Fragment>
     );
 }
