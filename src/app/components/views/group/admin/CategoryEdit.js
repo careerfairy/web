@@ -1,8 +1,8 @@
-import { Fragment, useState, useEffect } from 'react';
-import { Grid, Image, Button, Icon, Modal, Dropdown, Input, Header } from "semantic-ui-react";
+import {Fragment, useState, useEffect} from 'react';
+import {Grid, Image, Button, Icon, Modal, Dropdown, Input, Header} from "semantic-ui-react";
 
-import { useRouter } from 'next/router';
-import { withFirebase } from "data/firebase";
+import {useRouter} from 'next/router';
+import {withFirebase} from "data/firebase";
 import CategoryElement from './CategoryElement';
 import CategoryEditOption from './CategoryEditOption';
 
@@ -15,10 +15,10 @@ function CategoryEditModal(props) {
 
     const [touched, setTouched] = useState(false)
 
+    const [optionsError, setOptionsError] = useState(false)
+
     const [selectedOption, setSelectedOption] = useState(null);
     const [updateMode, setUpdateMode] = useState({});
-
-
 
     useEffect(() => {
         if (props.category && props.category.name) {
@@ -29,6 +29,8 @@ function CategoryEditModal(props) {
     useEffect(() => {
         if (props.options && props.options.length > 0) {
             setEditableOptions(props.options);
+            console.log("setEditableOptions");
+
         }
     }, [props.options]);
 
@@ -48,7 +50,7 @@ function CategoryEditModal(props) {
         setEditableOptions(newList);
     }
 
-    function handleDeleteCategory(){
+    function handleDeleteCategory() {
         props.firebase.deleteGroupCategoryWithElements(props.groupId, props.category.id, editableOptions)
             .then(props.setEditMode(false))
     }
@@ -58,13 +60,13 @@ function CategoryEditModal(props) {
         setEditableOptions(newList);
     }
 
-    function handleBlur(){
+    function handleBlur() {
         setTouched(true)
         console.log("touched", touched)
     }
 
     function handleRename(newOption) {
-        const newList = editableOptions.map( option => {
+        const newList = editableOptions.map(option => {
             if (option.id === newOption.id) {
                 return newOption;
             } else {
@@ -76,14 +78,15 @@ function CategoryEditModal(props) {
 
     function saveChanges() {
         if (!categoryName.length) return setTouched(true)
-        if( props.newCategory ) {
+        if (editableOptions.length < 2) setOptionsError(true)
+        if (props.newCategory) {
             props.firebase.addGroupCategoryWithElements(props.groupId, categoryName, editableOptions).then(() => {
                 props.setEditMode(false);
             })
             return
         }
-        let optionsToDelete = props.options.filter( option => {
-            return !editableOptions.find( editableOption => editableOption.id === option.id);
+        let optionsToDelete = props.options.filter(option => {
+            return !editableOptions.find(editableOption => editableOption.id === option.id);
         })
         props.firebase.updateGroupCategoryElements(props.groupId, props.category.id, categoryName, editableOptions, optionsToDelete).then(() => {
             props.setEditMode(false);
@@ -94,19 +97,21 @@ function CategoryEditModal(props) {
     const optionElements = editableOptions.map((option, index) => {
         return (
             <Fragment key={index}>
-                <div className={'option-container animated fadeIn'} style={{ zIndex: selectedOption === option ? '10' : '0'}}>
+                <div className={'option-container animated fadeIn'}
+                     style={{zIndex: selectedOption === option ? '10' : '0'}}>
                     <div className='option-name'>
-                        { option.name }
+                        {option.name}
                     </div>
-                    <Dropdown icon={{ name: 'edit', onClick: () => setSelectedOption(option) }} direction='right' style={{ margin: '0 0 0 5px'}}>
+                    <Dropdown icon={{name: 'edit', onClick: () => setSelectedOption(option)}} direction='right'
+                              style={{margin: '0 0 0 5px'}}>
                         <Dropdown.Menu>
                             <Dropdown.Item
                                 text='Rename'
-                                onClick={() => setUpdateMode({ mode: 'rename', option: option })}
+                                onClick={() => setUpdateMode({mode: 'rename', option: option})}
                             />
                             <Dropdown.Item
                                 text='Delete'
-                                onClick={() => setUpdateMode({ mode: 'delete', option: option })}
+                                onClick={() => setUpdateMode({mode: 'delete', option: option})}
                             />
                         </Dropdown.Menu>
                     </Dropdown>
@@ -140,32 +145,40 @@ function CategoryEditModal(props) {
             </Fragment>
         );
     });
-        
-    return(
+
+    return (
         <Fragment>
             <div className='white-box'>
                 <Grid>
                     <Grid.Column width={5}>
                         <div className='white-box-label'>Category Name</div>
                         <div className='white-box-title'>
-                            <Input maxLength="40" error={touched && !categoryName.length} onBlur={handleBlur} type='text' value={categoryName} onChange={(event, data) => setCategoryName(data.value)} fluid/>
+                            <Input maxLength="40" error={touched && !categoryName.length} onBlur={handleBlur}
+                                   type='text' value={categoryName}
+                                   onChange={(event, data) => setCategoryName(data.value)} fluid/>
                             {touched && !categoryName.length && <p className="error-field">Required</p>}
                         </div>
                     </Grid.Column>
                     <Grid.Column width={11}>
                         <div className='white-box-label'>Category Options</div>
-                       { optionElements } 
-                       <Button icon='add' size='mini' circular primary onClick={() => setUpdateMode({ mode: 'add' })} style={{ margin: '0 0 0 2px', boxShadow: '0 0 2px grey'}}/>
+                        {optionElements}
+                        {}
+                        <Button icon='add' size='mini' circular primary onClick={() => setUpdateMode({mode: 'add'})}
+                                style={{margin: '0 0 0 2px', boxShadow: '0 0 2px grey'}}/>
                     </Grid.Column>
-                </Grid>  
-                <CategoryEditOption categoryName={categoryName} handleDeleteCategory={handleDeleteCategory} updateMode={updateMode} setUpdateMode={setUpdateMode} handleAdd={handleAdd} handleDelete={handleDelete} handleRename={handleRename}/>
+                </Grid>
+                <CategoryEditOption categoryName={categoryName} handleDeleteCategory={handleDeleteCategory}
+                                    updateMode={updateMode} setUpdateMode={setUpdateMode} handleAdd={handleAdd}
+                                    handleDelete={handleDelete} handleRename={handleRename}/>
                 <div className='separator'></div>
                 <div className="button-wrapper">
                     <div>
                         <Button content='Save' onClick={() => saveChanges()} primary/>
                         <Button content='Cancel' onClick={() => props.setEditMode(false)}/>
                     </div>
-                    {!props.newCategory && <Button onClick={() => setUpdateMode({ mode: 'deleteCategory', option: {name: categoryName} })} inverted color='red' className="red-delete-btn" content='Delete'/>}
+                    {!props.newCategory &&
+                    <Button onClick={() => setUpdateMode({mode: 'deleteCategory', option: {name: categoryName}})}
+                            inverted color='red' className="red-delete-btn" content='Delete'/>}
                 </div>
             </div>
             <style jsx>{`
