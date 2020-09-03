@@ -5,8 +5,7 @@ import {withFirebase} from "data/firebase";
 import CategoryEditOption from './CategoryEditOption';
 
 
-function CategoryEditModal({category, options, groupId, newCategory, firebase, setEditMode, handleAddTempCategory}) {
-
+function CategoryEditModal({category, options, handleUpdateCategory, groupId, newCategory, firebase, setEditMode, handleAddTempCategory, tempId}) {
     const [categoryName, setCategoryName] = useState('');
 
     const [editableOptions, setEditableOptions] = useState([]);
@@ -21,7 +20,6 @@ function CategoryEditModal({category, options, groupId, newCategory, firebase, s
 
     useEffect(() => {
         if (editableOptions && editableOptions.length >= 2) {
-            console.log("editableOptions");
             setErrorObj({...errorObj, optionError: false})
         }
     }, [editableOptions.length]);
@@ -87,11 +85,17 @@ function CategoryEditModal({category, options, groupId, newCategory, firebase, s
         setTouched(!categoryName.length > 0)
         if (errors.inputError || errors.optionError) return
         if (groupId === "temp") {
-            console.log("in the group ID", groupId)
             const tempCategoryObj = {name: categoryName, options: editableOptions}
-            handleAddTempCategory(tempCategoryObj)
-            setEditMode(false)
-            return
+            if (tempId) {
+                //update temp already created temp category obj
+
+                handleUpdateCategory(tempCategoryObj, tempId)
+            } else {
+                //Add a newly created temp category Obj
+                handleAddTempCategory(tempCategoryObj)
+
+            }
+            return setEditMode(false)
         }
         if (newCategory) {
             firebase.addGroupCategoryWithElements(groupId, categoryName, editableOptions).then(() => {
@@ -187,7 +191,7 @@ function CategoryEditModal({category, options, groupId, newCategory, firebase, s
                 <div className='separator'></div>
                 <div className="button-wrapper">
                     <div>
-                        <Button content='Save' onClick={() => saveChanges()} primary/>
+                        <Button content={newCategory ? 'Create' : 'Update'} onClick={() => saveChanges()} primary/> :
                         <Button content='Cancel' onClick={() => setEditMode(false)}/>
                     </div>
                     {!newCategory &&

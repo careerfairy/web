@@ -6,7 +6,7 @@ import CategoryElement from "../admin/CategoryElement";
 import AddIcon from "@material-ui/icons/Add";
 
 
-const CreateCategories = ({handleBack, handleNext, handleReset, setArrayOfCategories, arrayOfCategories}) => {
+const CreateCategories = ({handleBack, handleNext, handleReset, setArrayOfCategories, arrayOfCategories, tempId}) => {
     const [categories, setCategories] = useState([]);
     const [createMode, setCreateMode] = useState(false)
 
@@ -22,10 +22,18 @@ const CreateCategories = ({handleBack, handleNext, handleReset, setArrayOfCatego
         setCategories([...categories, categoryObj])
     }
 
+    const handleUpdateCategory = (categoryObj, id) => {
+        const newCategories = [...categories]
+        const indexOfOldObj = categories.findIndex(el => id === el.id)
+        newCategories[indexOfOldObj] = categoryObj
+        setCategories(newCategories)
+    }
+
     const categoryElements = categories.map((category, index) => {
+        const tempId = Math.random().toString(36).substr(2, 5)
         return (
             <div key={index}>
-                <CategoryElement groupId={groupId} category={category}/>
+                <CategoryElement handleUpdateCategory={handleUpdateCategory} tempId={tempId} groupId={groupId} category={category}/>
             </div>
         );
     })
