@@ -1,7 +1,6 @@
 import {Fragment, useState, useEffect} from 'react';
 import {Grid, Image, Button, Icon, Modal, Dropdown, Input, Header, Form} from 'semantic-ui-react';
 
-import {useRouter} from 'next/router';
 import {withFirebase} from 'data/firebase';
 
 
@@ -26,7 +25,10 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
         const handleAddModal = (e) => {
             e.preventDefault()
             if (!newOptionName.length) return setTouched(true)
-            if(groupId === "temp") return handleAdd({name: newOptionName, id: Math.random().toString(36).substr(2, 5)})
+            if(groupId === "temp") {
+                const tempId = Math.random().toString(36).substr(2, 5)
+                return handleAdd({name: newOptionName, id: tempId})
+            }
             handleAdd({name: newOptionName})
         }
 
