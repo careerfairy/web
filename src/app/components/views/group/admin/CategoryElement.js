@@ -6,7 +6,7 @@ import {withFirebase} from 'data/firebase';
 import CategoryEdit from './CategoryEdit';
 
 
-function CategoryElement({groupId, handleUpdateCategory, category, firebase, handleAddTempCategory}) {
+function CategoryElement({groupId, handleUpdateCategory, category, firebase, handleAddTempCategory, handleDeleteLocalCategory}) {
 
     const [options, setOptions] = useState([]);
     const [editMode, setEditMode] = useState(false)
@@ -109,8 +109,12 @@ function CategoryElement({groupId, handleUpdateCategory, category, firebase, han
 
     return (
         <Fragment>
-            <CategoryEdit groupId={groupId} handleUpdateCategory={handleUpdateCategory}
-                          handleAddTempCategory={handleAddTempCategory} category={category} options={options}
+            <CategoryEdit groupId={groupId}
+                          handleUpdateCategory={handleUpdateCategory}
+                          handleAddTempCategory={handleAddTempCategory}
+                          handleDeleteLocalCategory={handleDeleteLocalCategory}
+                          category={category}
+                          options={options}
                           setEditMode={setEditMode}/>
         </Fragment>
     );

@@ -6,43 +6,15 @@ import CategoryElement from "../admin/CategoryElement";
 import AddIcon from "@material-ui/icons/Add";
 
 
-const CreateCategories = ({handleBack, handleNext, handleReset, setArrayOfCategories, arrayOfCategories, tempId}) => {
-    const [categories, setCategories] = useState([]);
+const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCategory, handleAddTempCategory, handleNext, handleReset, setArrayOfCategories, arrayOfCategories, tempId}) => {
     const [createMode, setCreateMode] = useState(false)
-
     const groupId = "temp"
 
-    useEffect(() => {
-        if (arrayOfCategories.length) {
-            setCategories(arrayOfCategories);
-        }
-    }, []);
-
-    const handleAddTempCategory = (categoryObj) => {
-        // adds temporary categories locally
-        setCategories([...categories, categoryObj])
-    }
-
-    const handleUpdateCategory = (categoryObj) => {
-        // updates the temporary categories locally
-        const newCategories = [...categories]
-        const indexOfOldObj = categories.findIndex(el => categoryObj.id === el.id)
-        newCategories[indexOfOldObj] = categoryObj
-        setCategories(newCategories)
-    }
-
-    const handleDeleteCategory = (categoryObjId) => {
-        // deletes the temporary categories locally
-        const newCategories = [...categories]
-        const newerCategories = newCategories.filter(el => el.id !== categoryObjId)
-        setCategories(newerCategories)
-    }
-
-    const categoryElements = categories.map((category, index) => {
+    const categoryElements = arrayOfCategories.map((category, index) => {
 
         return (
             <div key={index}>
-                <CategoryElement handleUpdateCategory={handleUpdateCategory} groupId={groupId} category={category}/>
+                <CategoryElement handleDeleteLocalCategory={handleDeleteLocalCategory} handleUpdateCategory={handleUpdateCategory} groupId={groupId} category={category}/>
             </div>
         );
     })

@@ -5,7 +5,7 @@ import {withFirebase} from "data/firebase";
 import CategoryEditOption from './CategoryEditOption';
 
 
-function CategoryEditModal({category, options, handleUpdateCategory, groupId, newCategory, firebase, setEditMode, handleAddTempCategory}) {
+function CategoryEditModal({category, options, handleDeleteLocalCategory, handleUpdateCategory, groupId, newCategory, firebase, setEditMode, handleAddTempCategory}) {
     const [categoryName, setCategoryName] = useState('');
 
     const [editableOptions, setEditableOptions] = useState([]);
@@ -52,6 +52,10 @@ function CategoryEditModal({category, options, handleUpdateCategory, groupId, ne
     }
 
     function handleDeleteCategory() {
+        if (groupId === 'temp') {
+            handleDeleteLocalCategory(category.id)
+            return setEditMode(false)
+        }
         firebase.deleteGroupCategoryWithElements(groupId, category.id, editableOptions)
             .then(setEditMode(false))
     }

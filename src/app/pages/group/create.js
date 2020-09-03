@@ -40,6 +40,26 @@ const CreateGroup = (props) => {
     const [arrayOfCategories, setArrayOfCategories] = useState([])
     const steps = getSteps();
 
+    const handleAddTempCategory = (categoryObj) => {
+        // adds temporary categories locally
+        setArrayOfCategories([...arrayOfCategories, categoryObj])
+    }
+
+    const handleUpdateCategory = (categoryObj) => {
+        // updates the temporary categories locally
+        const newCategories = [...arrayOfCategories]
+        const indexOfOldObj = newCategories.findIndex(el => categoryObj.id === el.id)
+        newCategories[indexOfOldObj] = categoryObj
+        setArrayOfCategories(newCategories)
+    }
+
+    const handleDeleteLocalCategory = (categoryObjId) => {
+        // deletes the temporary categories locally
+        const newCategories = [...arrayOfCategories]
+        const newerCategories = newCategories.filter(el => el.id !== categoryObjId)
+        setArrayOfCategories(newerCategories)
+    }
+
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
     };
@@ -67,6 +87,9 @@ const CreateGroup = (props) => {
                 />;
             case 1:
                 return <CreateCategories
+                    handleDeleteLocalCategory={handleDeleteLocalCategory}
+                    handleUpdateCategory={handleUpdateCategory}
+                    handleAddTempCategory={handleAddTempCategory}
                     setArrayOfCategories={setArrayOfCategories}
                     arrayOfCategories={arrayOfCategories}
                     handleNext={handleNext}
