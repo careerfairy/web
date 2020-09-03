@@ -75,7 +75,7 @@ function LivestreamPdfViewer (props) {
 
     function getPageHeight() {
         if (windowSize.height > (windowSize.width - 220)) {
-            return windowSize.width * 0.3;
+            return windowSize.width * 0.55;
         }
         return windowSize.height * 0.8;
     }
