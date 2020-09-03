@@ -36,6 +36,7 @@ const CreateGroup = (props) => {
     const classes = useStyles();
     const [activeStep, setActiveStep] = React.useState(0);
     const [careerCenterRef, setCareerCenterRef] = useState("")
+    const [baseGroupInfo, setBaseGroupInfo] = useState({})
     const steps = getSteps();
 
     const handleNext = () => {
@@ -54,6 +55,8 @@ const CreateGroup = (props) => {
         switch (stepIndex) {
             case 0:
                 return <CreateBaseGroup
+                    setBaseGroupInfo={setBaseGroupInfo}
+                    baseGroupInfo={baseGroupInfo}
                     handleNext={handleNext}
                     handleBack={handleBack}
                     setCareerCenterRef={setCareerCenterRef}

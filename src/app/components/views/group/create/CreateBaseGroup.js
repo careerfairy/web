@@ -1,18 +1,18 @@
-import {useEffect, useState, Fragment} from 'react'
+import React, {useEffect, useState, Fragment} from 'react'
 import {Image, Form} from 'semantic-ui-react';
 import {useRouter} from 'next/router';
 import {withFirebase} from '../../../../data/firebase';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import PublishIcon from '@material-ui/icons/Publish';
 import TextField from '@material-ui/core/TextField';
-import MuiTextField from '@material-ui/core/TextField';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import {Formik, Field, Form as UiForm} from 'formik';
 import FilePickerContainer from '../../../../components/ssr/FilePickerContainer';
 import {Button, Input} from "@material-ui/core";
 
 const placeholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
 
-const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, firebase, setCareerCenterRef}) => {
+const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, firebase, setCareerCenterRef, setBaseGroupInfo, baseGroupInfo}) => {
 
     const [user, setUser] = useState(null);
     const [filePickerError, setFilePickerError] = useState(null)
@@ -30,12 +30,13 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
 
     const DescriptionField = (props) => {
 
-        return(
+        return (
             <TextField
+                label="Description"
                 name="description"
                 multiline
+                fullWidth
                 rowsMax={10}
-                placeholder='Describe some characteristics shared by your members'
             />
         )
     }
@@ -93,17 +94,17 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
                 <h1 className='center thin teal large'>Create a Career Group</h1>
                 <Formik
                     initialValues={{
-                        logoUrl: '',
-                        groupName: '',
-                        description: ''
+                        logoUrl: baseGroupInfo.logoUrl||'',
+                        universityName: baseGroupInfo.universityName ||'',
+                        description: baseGroupInfo.description ||''
                     }}
                     validate={values => {
                         let errors = {};
                         if (!values.logoUrl) {
                             errors.logoUrl = 'Required';
                         }
-                        if (!values.name) {
-                            errors.groupName = 'Required'
+                        if (!values.universityName) {
+                            errors.universityName = 'Required'
                         }
                         if (!values.description) {
                             errors.description = 'Required'
@@ -116,14 +117,17 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
                             logoUrl: values.logoUrl,
                             description: values.description,
                             test: false,
-                            universityName: values.groupName
+                            universityName: values.universityName
                         }
-                        // firebase.createCareerCenter(careerCenter).then(careerCenterRef => {
+
+                        setBaseGroupInfo(careerCenter)
                         handleNext()
+                        setSubmitting(false);
+
+                        // firebase.createCareerCenter(careerCenter).then(careerCenterRef => {
                         // setCareerCenterRef(careerCenterRef)
                         //     console.log("career center has been asaved in state!", careerCenterRef)
                         //     // router.push('/group/' + careerCenterRef.id + '/admin');
-                        setSubmitting(false);
                         // });
                     }}
                 >
@@ -152,19 +156,24 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
                                         <FilePickerContainer
                                             extensions={['jpg', 'jpeg', 'png']}
                                             maxSize={20}
-                                            onChange={fileObject => {
-                                                uploadLogo('group-logos', fileObject, (newUrl) => {
-                                                    setFieldValue('logoUrl', newUrl, true);
-                                                })
-                                            }}
+                                            onBlur={handleBlur}
+                                            onChange={(fileObject) => setFieldValue('logoUrl', URL.createObjectURL(fileObject), true)
+                                                // fileObject => {
+                                                //     uploadLogo('group-logos', fileObject, (newUrl) => {
+                                                //         setFieldValue('logoUrl', newUrl, true);
+                                                //     })
+                                                // }
+                                            }
+
                                             onError={errMsg => (setFilePickerError(errMsg))}
                                         >
                                             <Button variant="contained" size='large' endIcon={<PublishIcon/>}>
-                                                {"Upload Your Logo"}
+                                                Upload Your Logo
                                             </Button>
                                         </FilePickerContainer>
                                         <div className="field-error">
-                                            {errors.logoUrl && <p className="error-text">Required</p>}
+                                            {touched.logoUrl && errors.logoUrl &&
+                                            <p className="error-text">Logo required</p>}
                                             {filePickerError && <p className="error-text">{filePickerError}</p>}
                                         </div>
                                     </div>
@@ -172,51 +181,48 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
                             </Form.Group>
                             <Form.Group widths='equal'>
                                 <Form.Field>
-                                    <Field
-                                        component={TextField}
-                                        error={errors.groupName}
+                                    <TextField
+                                        id='groupName'
+                                        value={values.universityName}
+                                        onChange={handleChange}
+                                        error={touched.universityName && errors.universityName}
+                                        onBlur={handleBlur}
+                                        disabled={isSubmitting}
+                                        helperText={errors.universityName}
                                         label="Group Name"
-                                        id="standard-error-helper-text"
+                                        name="universityName"
                                         fullWidth
-                                        name="name"
-                                        type="name"
-                                        // helperText="Please fill in"
                                     />
-                                    {/*<input id='company' type='text' className='stylish-input' name='name'*/}
-                                    {/*       placeholder='Your Group Name' onChange={handleChange} onBlur={handleBlur}*/}
-                                    {/*       value={values.name} disabled={isSubmitting}/>*/}
-                                    <div className='field-error'>
-                                        {/*{errors.name && touched.name && errors.name}*/}
-                                    </div>
                                 </Form.Field>
                             </Form.Group>
                             <Form.Field>
-                                <label className='login-label'>Description</label>
-                                {/*<textarea id='title' type='textarea' name='description' className='stylish-textarea'*/}
-                                {/*          placeholder='Describe some characteristics shared by your members'*/}
-                                {/*          onChange={handleChange} onBlur={handleBlur} value={values.description}*/}
-                                {/*          disabled={isSubmitting}/>*/}
-                                          <Field
-                                              component={DescriptionField}
-                                              name="description"
-                                              type="description"
-                                              fullWidth
-                                            />
-                                <div className='field-error'>
-                                    {errors.description && touched.description && errors.description}
-                                </div>
+                                <TextField
+                                    label="Description"
+                                    onChange={handleChange}
+                                    error={touched.description && errors.description}
+                                    value={values.description}
+                                    placeholder="Please describe the purpose of your group"
+                                    style={{height: 50, marginBottom: 30, marginTop: 20}}
+                                    onBlur={handleBlur}
+                                    helperText={errors.description}
+                                    disabled={isSubmitting}
+                                    rowsMax={10}
+                                    name="description"
+                                    multiline
+                                    fullWidth
+                                />
                             </Form.Field>
                             <Button size='large'
                                     variant="contained"
                                     disabled={isSubmitting}
-                                    endIcon={isSubmitting &&
-                                    <CircularProgress color="inherit" size={25} variant="indeterminate"/>}
+                                    endIcon={<ArrowForwardIcon/>}
                                     color="primary"
                                     type="submit"
                                     fullWidth={true}
                             >
                                 Next
                             </Button>
+                            {JSON.stringify(errors)}
                         </UiForm>
                     )}
                 </Formik>
@@ -238,6 +244,10 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
 
                     .thin {
                         font-weight: 300;
+                    }
+                    
+                    .field-error {
+                      margin-top: 10px;
                     }
 
                     .large {
