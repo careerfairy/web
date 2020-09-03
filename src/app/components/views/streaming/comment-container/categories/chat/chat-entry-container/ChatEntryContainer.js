@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {Input, Icon, Button, Label} from "semantic-ui-react";
 import Linkify from 'react-linkify';
-import { withFirebase } from 'context/firebase';
 
 
 function ChatEntryContainer(props) {
@@ -31,6 +30,7 @@ function ChatEntryContainer(props) {
                     margin: 8px;
                     padding: 10px 15px;
                     background-color: rgba(255,255,255,0.90);
+                    overflow-wrap: break-word;
                 }
 
                 .chat-entry-author {
@@ -42,4 +42,4 @@ function ChatEntryContainer(props) {
     );
 }
 
-export default withFirebase(ChatEntryContainer);
+export default ChatEntryContainer;

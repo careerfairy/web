@@ -155,7 +155,8 @@ function StreamingPage(props) {
                     top: 50%;
                     transform: translateY(-60%);
                     right: 130px;
-                    width: 300px;
+                    width: 20%;
+                    min-width: 130px;
                     z-index: 100;
                 }
 
@@ -164,7 +165,7 @@ function StreamingPage(props) {
                     right: 0;
                     top: 0;
                     height: 100%;
-                    width: 120px;
+                    width: 180px;
                     padding: 20px;
                     background-color: rgb(80,80,80);
                 }
