@@ -30,7 +30,7 @@ function ChatEntryContainer(props) {
                     box-shadow: 0 0 5px rgb(180,180,180);
                     margin: 8px;
                     padding: 10px 15px;
-                    background-color: rgba(255,255,255,0.80);
+                    background-color: rgba(255,255,255,0.90);
                 }
 
                 .chat-entry-author {

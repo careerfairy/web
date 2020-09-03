@@ -542,12 +542,15 @@ class Firebase {
         let pollObject = {
             timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
             question: pollQuestion,
-            options: []
+            options: [],
+            voters: [],
+            state: 'upcoming'
         }
         pollOptions.forEach((option, index) => {
             pollObject.options.push({
                 name: option,
                 votes: 0,
+                voters: [],
                 index: index
             });
         });         
@@ -569,6 +572,7 @@ class Firebase {
             pollObject.options.push({
                 name: option,
                 votes: 0,
+                voters: [],
                 index: index
             });
         });         

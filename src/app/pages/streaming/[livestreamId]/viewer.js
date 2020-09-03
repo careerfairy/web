@@ -7,6 +7,7 @@ import ViewerHandRaiseComponent from 'components/views/viewer/viewer-hand-raise-
 import ViewerComponent from 'components/views/viewer/viewer-component/ViewerComponent';
 import NewCommentContainer from 'components/views/viewer/comment-container/NewCommentContainer';
 import UserContext from 'context/user/UserContext';
+import MiniChatContainer from 'components/views/streaming/comment-container/categories/chat/MiniChatContainer';
 
 function ViewerPage(props) {
 
@@ -106,6 +107,9 @@ function ViewerPage(props) {
             <div className='video-menu-left' style={{ width: showMenu ? '280px' : '0'}}>
                 <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={false} livestream={ currentLivestream } handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive} localId/>
             </div>
+            <div className='mini-chat-container'>
+                <MiniChatContainer livestream={ currentLivestream } showMenu={showMenu}/>
+            </div>
             <style jsx>{`
                 .hidden {
                     display: none
@@ -172,36 +176,13 @@ function ViewerPage(props) {
                     height: 200px;
                 }
 
-                #localVideo {
+                .mini-chat-container {
                     position: absolute;
                     top: 50%;
-                    transform: translateY(-50%);
-                    max-height: 100%;
-                    height: auto;
-                    z-index: 9900;
-                    background-color: black;
-                }
-
-                .side-button {
-                    cursor: pointer;
-                }
-
-                .test-title {
-                    font-size: 2em;
-                    margin: 30px 0;
-                }
-
-                .test-button {
-                    margin: 20px 0;
-                }
-
-                .test-hint {
-                    margin: 20px 0;
-                }
-
-                .teal {
-                    color: rgb(0, 210, 170);
-                    font-weight: 700;
+                    transform: translateY(-60%);
+                    right: 20px;
+                    width: 300px;
+                    z-index: 100;
                 }
 
                 .black-frame {
@@ -230,72 +211,6 @@ function ViewerPage(props) {
                     }
                 }
 
-                .video-box {
-                    position: relative;
-                    width: 100%;
-                    height: 100%;
-                    background-color: black;
-                }
-
-                .video-box-overlay {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: white;
-                    z-index: 9999;
-                }
-
-                .video-box-overlay-content {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                }
-
-                .reactions-sender {
-                    position: absolute;
-                    padding: 30px 0;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    left: 0;
-                    right: 0;
-                    z-index: 1100;
-                    text-align: center;
-                    background-color: rgba(0,0,0,0.6);
-                }
-
-                .reactions-sender div {
-                    margin-bottom: 20px;
-                    font-weight: 700;
-                    font-size: 1.2em;
-                    color: white;
-                }
-
-                .video-menu {
-                    position: absolute;
-                    bottom: 0;
-                    left: 330px;
-                    right: 0;
-                    height: 85px;
-                    z-index: 3000;
-                    padding: 12px;
-                    text-align: center;
-                    width: calc(100% - 330px);
-                    background-color: white;
-                }
-
-                .video-menu .center {
-                    display: inline-block;
-                    width: 600px;
-                }
-
-                .video-menu .right {
-                    float: right;
-                    padding: 0 20px 0 0;
-                }
-
                 .video-menu-left {
                     z-index: 15;
                 }
@@ -318,37 +233,6 @@ function ViewerPage(props) {
                         bottom: 0;
                         width: 280px;
                     }
-                }
-
-                .button-container {
-                    position: absolute;
-                    left: 0;
-                    bottom: 0;
-                    width: 100%;
-                    height: 90px;
-                    cursor:  pointer;
-                    padding: 17px;
-                    z-index: 8000;
-                }
-
-                .left-container {
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    height: calc(100% - 75px);
-                    width: 120px;
-                    padding: 20px;
-                    background-color: rgb(80,80,80);
-                }
-
-                .logo-container {
-                    position: absolute;
-                    bottom: 90px;
-                    left: 0;
-                    right: 0;
-                    color: rgb(0, 210, 170);
-                    font-size: 1.4em;
-                    text-align: center;
                 }
             `}</style>
         </div>

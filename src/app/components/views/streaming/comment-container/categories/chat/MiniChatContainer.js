@@ -26,7 +26,7 @@ function MiniChatContainer(props) {
     }, [props.livestream.id]);
 
     const ROOT_CSS = css({
-        height: '100%'
+        height: '80%'
     });
 
     let chatElements = chatEntries.map((chatEntry, index) => {
@@ -53,6 +53,9 @@ function MiniChatContainer(props) {
                 .chat-container {
                     width: 100%;
                     height: 220px;
+                    background-color: rgba(10,10,10,0.6);
+                    padding: 10px;
+                    border-radius: 15px;
                 }
 
                 .scroll-to-bottom {

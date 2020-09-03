@@ -20,9 +20,6 @@ function QuestionContainer(props) {
                     <div className='questionTitle'>
                         { props.question.title }
                     </div>
-                    <div className='questionAuthor'>
-                        by { props.question.author }
-                    </div>
                 </div>
                 <div className='upvotes' style={{ color: props.question.type === 'current' ?  'white' : 'rgb(0, 210, 170)'}}>
                     <div className='number' >
