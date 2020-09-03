@@ -1,25 +1,22 @@
-import { Fragment, useState, useEffect } from 'react';
-import { Grid, Image, Button, Icon, Modal, Step, Input, Checkbox } from "semantic-ui-react";
+import {Fragment, useState, useEffect} from 'react';
+import {Grid, Image, Button, Icon, Modal, Step, Input, Checkbox} from "semantic-ui-react";
 
-import { useRouter } from 'next/router';
-import { withFirebase } from 'data/firebase';
+import {useRouter} from 'next/router';
+import {withFirebase} from 'data/firebase';
 import CategoryEdit from './CategoryEdit';
 
 
-function CategoryElement({groupId, handleUpdateCategory, category, firebase, handleAddTempCategory, tempId}) {
+function CategoryElement({groupId, handleUpdateCategory, category, firebase, handleAddTempCategory}) {
 
-    const [ options, setOptions] = useState([]);
-    const [ editMode, setEditMode ] = useState(false)
+    const [options, setOptions] = useState([]);
+    const [editMode, setEditMode] = useState(false)
 
     useEffect(() => {
-        if(groupId === "temp") {
-            setOptions(category.options)
-            return
-        }
-        if (category) {
+
+        if (groupId !== 'temp' && category) {
             firebase.listenToGroupCategoryElements(groupId, category.id, querySnapshot => {
                 let elements = [];
-                querySnapshot.forEach( doc => {
+                querySnapshot.forEach(doc => {
                     let element = doc.data();
                     element.id = doc.id;
                     elements.push(element);
@@ -27,13 +24,19 @@ function CategoryElement({groupId, handleUpdateCategory, category, firebase, han
                 setOptions(elements);
             });
         }
-    },[category]);
+    }, [category]);
+
+    useEffect(() => {
+        if (groupId === "temp") {
+            setOptions(category.options)
+        }
+    }, [category.options])
 
     const optionElements = options.map((option, index) => {
         return (
             <Fragment key={option.id || index}>
                 <div className='option-container'>
-                    { option.name }
+                    {option.name}
                 </div>
                 <style jsx>{`
                     .hidden {
@@ -55,24 +58,25 @@ function CategoryElement({groupId, handleUpdateCategory, category, firebase, han
     if (editMode === false) {
         return (
             <Fragment>
-            <div className='white-box'>
-                <Grid>
-                    <Grid.Column width={4}>
-                        <div className='white-box-label'>Category Name</div>
-                        <div className='white-box-title'>
-                            { category.name }
-                        </div>
-                    </Grid.Column>
-                    <Grid.Column width={11}>
-                        <div className='white-box-label'>Category Options</div>
-                       { optionElements } 
-                    </Grid.Column>
-                    <Grid.Column width={1}>
-                        <Icon name='edit' style={{ margin: '5px 0', color: 'rgb(0, 210, 170)', cursor: 'pointer' }} onClick={() => setEditMode(true)} size='large'/>
-                    </Grid.Column>
-                </Grid>
-            </div>
-            <style jsx>{`
+                <div className='white-box'>
+                    <Grid>
+                        <Grid.Column width={4}>
+                            <div className='white-box-label'>Category Name</div>
+                            <div className='white-box-title'>
+                                {category.name}
+                            </div>
+                        </Grid.Column>
+                        <Grid.Column width={11}>
+                            <div className='white-box-label'>Category Options</div>
+                            {optionElements}
+                        </Grid.Column>
+                        <Grid.Column width={1}>
+                            <Icon name='edit' style={{margin: '5px 0', color: 'rgb(0, 210, 170)', cursor: 'pointer'}}
+                                  onClick={() => setEditMode(true)} size='large'/>
+                        </Grid.Column>
+                    </Grid>
+                </div>
+                <style jsx>{`
                 .hidden {
                     display: none
                 }
@@ -99,13 +103,15 @@ function CategoryElement({groupId, handleUpdateCategory, category, firebase, han
                     color: rgb(80,80,80);
                 }
             `}</style>
-        </Fragment>
+            </Fragment>
         );
     }
-        
-    return(
+
+    return (
         <Fragment>
-            <CategoryEdit groupId={groupId} tempId={tempId} handleUpdateCategory={handleUpdateCategory} handleAddTempCategory={handleAddTempCategory} category={category} options={options} setEditMode={setEditMode}/>
+            <CategoryEdit groupId={groupId} handleUpdateCategory={handleUpdateCategory}
+                          handleAddTempCategory={handleAddTempCategory} category={category} options={options}
+                          setEditMode={setEditMode}/>
         </Fragment>
     );
 }

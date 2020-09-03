@@ -5,7 +5,7 @@ import {withFirebase} from "data/firebase";
 import CategoryEditOption from './CategoryEditOption';
 
 
-function CategoryEditModal({category, options, handleUpdateCategory, groupId, newCategory, firebase, setEditMode, handleAddTempCategory, tempId}) {
+function CategoryEditModal({category, options, handleUpdateCategory, groupId, newCategory, firebase, setEditMode, handleAddTempCategory}) {
     const [categoryName, setCategoryName] = useState('');
 
     const [editableOptions, setEditableOptions] = useState([]);
@@ -85,15 +85,21 @@ function CategoryEditModal({category, options, handleUpdateCategory, groupId, ne
         setTouched(!categoryName.length > 0)
         if (errors.inputError || errors.optionError) return
         if (groupId === "temp") {
-            const tempCategoryObj = {name: categoryName, options: editableOptions}
-            if (tempId) {
-                //update temp already created temp category obj
-
-                handleUpdateCategory(tempCategoryObj, tempId)
-            } else {
+            if (newCategory) {
                 //Add a newly created temp category Obj
+                const tempId = Math.random().toString(36).substr(2, 5)
+                const tempCategoryObj = {
+                    name: categoryName,
+                    options: editableOptions,
+                    id: tempId
+                }
                 handleAddTempCategory(tempCategoryObj)
-
+            } else {
+                //update an already created temp category obj
+                console.log("editableOptions", editableOptions)
+                category.name = categoryName
+                category.options = editableOptions
+                handleUpdateCategory(category)
             }
             return setEditMode(false)
         }

@@ -22,18 +22,20 @@ const CreateCategories = ({handleBack, handleNext, handleReset, setArrayOfCatego
         setCategories([...categories, categoryObj])
     }
 
-    const handleUpdateCategory = (categoryObj, id) => {
+    const handleUpdateCategory = (categoryObj) => {
         const newCategories = [...categories]
-        const indexOfOldObj = categories.findIndex(el => id === el.id)
+        const indexOfOldObj = categories.findIndex(el => categoryObj.id === el.id)
         newCategories[indexOfOldObj] = categoryObj
+        console.log("updated catgerory obj", newCategories[indexOfOldObj])
         setCategories(newCategories)
+        console.log("updated categoriessss", categories)
     }
 
     const categoryElements = categories.map((category, index) => {
-        const tempId = Math.random().toString(36).substr(2, 5)
+
         return (
             <div key={index}>
-                <CategoryElement handleUpdateCategory={handleUpdateCategory} tempId={tempId} groupId={groupId} category={category}/>
+                <CategoryElement handleUpdateCategory={handleUpdateCategory} groupId={groupId} category={category}/>
             </div>
         );
     })
