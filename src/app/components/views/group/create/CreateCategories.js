@@ -26,9 +26,7 @@ const CreateCategories = ({handleBack, handleNext, handleReset, setArrayOfCatego
         const newCategories = [...categories]
         const indexOfOldObj = categories.findIndex(el => categoryObj.id === el.id)
         newCategories[indexOfOldObj] = categoryObj
-        console.log("updated catgerory obj", newCategories[indexOfOldObj])
         setCategories(newCategories)
-        console.log("updated categoriessss", categories)
     }
 
     const categoryElements = categories.map((category, index) => {
