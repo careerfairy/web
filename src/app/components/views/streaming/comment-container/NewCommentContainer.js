@@ -42,10 +42,10 @@ function CommentContainer(props) {
                             <Button circular size='big' icon='hand pointer outline' disabled={props.showMenu && selectedState === 'hand'} onClick={() => props.handleStateChange("hand")} primary/>
                             <span style={{ opacity: props.showMenu ? '0' : '1' }} onClick={() => props.handleStateChange("hand")}>Hand Raise</span>
                         </div>
-                        <div>
+                        {/* <div>
                             <Button circular size='big' icon='cog' onClick={() => props.setShowMenu(!props.showMenu)} secondary/>
                             <span style={{ opacity: props.showMenu ? '0' : '1' }} onClick={() => props.handleStateChange("settings")}>Settings</span>
-                        </div>
+                        </div> */}
                         <div className={ props.showMenu ? '' : 'hidden' }>
                             <Button circular size='big' icon={'angle left'} onClick={() => props.setShowMenu(!props.showMenu)} color='pink'/>
                         </div>

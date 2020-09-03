@@ -7,10 +7,6 @@ import PollOptionResultViewer from 'components/views/streaming/comment-container
 
 function PollCategory(props) {
 
-    if (props.selectedState !== 'polls') {
-        return null;
-    }
-
     const { authenticatedUser, userData } = React.useContext(UserContext);
     const [currentPoll, setCurrentPoll] = useState(null); 
 
@@ -30,8 +26,19 @@ function PollCategory(props) {
         }
     }, [props.livestream]);
 
+    useEffect(() => {
+        if (currentPoll) {
+            props.setSelectedState("polls");
+            props.setShowMenu(true);
+        }
+    }, [currentPoll]);
+
     function voteForPollOption(index) {
         props.firebase.voteForPollOption(props.livestream.id, currentPoll.id, authenticatedUser.email, index);
+    }
+
+    if (props.selectedState !== 'polls') {
+        return null;
     }
 
     if (currentPoll) {

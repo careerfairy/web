@@ -43,10 +43,10 @@ function CommentContainer(props) {
                             <Button circular size='big' icon='hand pointer outline' disabled={props.showMenu && selectedState === 'hand'} onClick={() => props.handleStateChange("hand")} primary/>
                             <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("hand")}>Hand Raise</span>
                         </div>
-                        <div>
+                        {/* <div>
                             <Button circular size='big' icon='cog' onClick={() => props.setShowMenu(!props.showMenu)} secondary/>
                             <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("settings")}>Settings</span>
-                        </div>
+                        </div> */}
                         <div className={ props.showMenu ? '' : 'hidden' }>
                             <Button circular size='big' icon={'angle left'} onClick={() => props.setShowMenu(!props.showMenu)} color='pink'/>
                         </div>
@@ -104,7 +104,7 @@ function CommentContainer(props) {
             <div className='interaction-category'>
                 <ChatCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}/>
                 <QuestionCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}/>
-                <PollCategory livestream={props.livestream} selectedState={selectedState} streamer={props.streamer} user={props.user} userData={props.userData}/>
+                <PollCategory livestream={props.livestream} selectedState={selectedState} setSelectedState={setSelectedState} setShowMenu={props.setShowMenu} streamer={props.streamer} user={props.user} userData={props.userData}/>
                 <HandRaiseCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}  handRaiseActive={props.handRaiseActive} setHandRaiseActive={props.setHandRaiseActive}/>
             </div>
             <ButtonComponent handleStateChange={handleStateChange} {...props}/>

@@ -25,6 +25,7 @@ function CurrentPollStreamer(props) {
         <Fragment>
             <div className='animated fadeInUp faster'>
                 <div className='chat-entry-container'>
+                    <div className='poll-label'>ACTIVE POLL</div>
                     <div className='poll-entry-message'>
                         { props.poll.question }
                     </div>
@@ -59,6 +60,11 @@ function CurrentPollStreamer(props) {
                     margin: 10px 0 30px 0;
                     font-weight: 700;
                     color: rgb(0, 210, 170);
+                }
+
+                .poll-label {
+                    color: grey;
+                    font-weight: 700;
                 }
 
                 .poll-entry-message {

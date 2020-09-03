@@ -114,7 +114,7 @@ function UpcomingPollStreamer(props) {
                 </div> 
                 <div className={'disabled-overlay ' + ( showNotEditableMessage ? '' : 'hidden')}>
                     <div>
-                        Please close the active poll before activating another one.
+                        Please close the active poll before activating this one.
                     </div>
                 </div>          
                 <Button attached='bottom' content={ 'Ask the Audience Now' } disabled={props.somePollIsCurrent} onClick={() => setPollState('current') } primary style={{ margin: '0 10px 10px 10px', border: 'none' }}/>
