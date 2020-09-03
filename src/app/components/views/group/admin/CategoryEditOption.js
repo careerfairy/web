@@ -1,22 +1,19 @@
-import { Fragment, useState, useEffect } from 'react';
+import {Fragment, useState, useEffect} from 'react';
 import {Grid, Image, Button, Icon, Modal, Dropdown, Input, Header, Form} from 'semantic-ui-react';
 
-import { useRouter } from 'next/router';
-import { withFirebase } from 'data/firebase';
+import {useRouter} from 'next/router';
+import {withFirebase} from 'data/firebase';
 
 
-function CategoryEditModalOption(props) {
+function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryName, handleDeleteCategory, handleRename, handleAdd, handleDelete}) {
 
 
-
-
-
-    if (!props.updateMode.mode) {
+    if (!updateMode.mode) {
         return null;
     }
 
-    if (props.updateMode.mode === 'add') {
-        const [ newOptionName, setNewOptionName ] = useState('');
+    if (updateMode.mode === 'add') {
+        const [newOptionName, setNewOptionName] = useState('');
         const [touched, setTouched] = useState(false)
         const [placeholder, setPlaceholder] = useState('Option Name')
 
@@ -29,22 +26,30 @@ function CategoryEditModalOption(props) {
         const handleAddModal = (e) => {
             e.preventDefault()
             if (!newOptionName.length) return setTouched(true)
-            props.handleAdd({ name: newOptionName })
+            if(groupId === "temp") return handleAdd({name: newOptionName, id: Math.random().toString(36).substr(2, 5)})
+            handleAdd({name: newOptionName})
         }
 
-        return(
+        return (
             <Fragment>
-                <div className={ props.updateMode.mode ? 'modal' : ''}></div>   
+                <div className={updateMode.mode ? 'modal' : ''}/>
                 <div className='padding animated fadeIn'>
                     <Form onSubmit={handleAddModal}>
-                    <div className='action'>
-                        Add an option named
-                        <Input maxLength="20" type='text' error={touched && !newOptionName.length} onBlur={() => setTouched(true)} placeholder={placeholder} value={ newOptionName } onChange={(event, data) => setNewOptionName(data.value)}  style={{ width: '30%', margin: '0 20px 0 10px' }}/>
-                    </div>
-                    <div className='buttons'>
-                        <Button type="submit" content={'Confirm'} primary/>
-                        <Button content={'Cancel'} onClick={() => props.setUpdateMode({})}/>
-                    </div>
+                        <div className='action'>
+                            Add an option named
+                            <Input maxLength="20"
+                                   type='text'
+                                   error={touched && !newOptionName.length}
+                                   onBlur={() => setTouched(true)}
+                                   placeholder={placeholder}
+                                   value={newOptionName}
+                                   onChange={(event, data) => setNewOptionName(data.value)}
+                                   style={{width: '30%', margin: '0 20px 0 10px'}}/>
+                        </div>
+                        <div className='buttons'>
+                            <Button type="submit" content={'Confirm'} primary/>
+                            <Button content={'Cancel'} onClick={() => setUpdateMode({})}/>
+                        </div>
                     </Form>
                 </div>
                 <style jsx>{`
@@ -101,19 +106,22 @@ function CategoryEditModalOption(props) {
         );
     }
 
-    if (props.updateMode.mode === 'deleteCategory') {
-        return(
+    if (updateMode.mode === 'deleteCategory') {
+        return (
             <Fragment>
-                <div className={ props.updateMode.mode ? 'modal' : ''}></div>
-                <div className='padding animated fadeIn' style={{ margin: '20px 0'}}>
+                <div className={updateMode.mode ? 'modal' : ''}></div>
+                <div className='padding animated fadeIn' style={{margin: '20px 0'}}>
                     <div className='action'>
-                        Delete the category <span>{ props.categoryName }</span>
+                        Delete the category <span>{categoryName}</span>
                     </div>
-                    <p className='explanation'>All your members who are currently classified under  <span>{ props.updateMode.option.name }</span> will not anymore belong to any category until they manually update their categorisation.</p>
+                    <p className='explanation'>All your members who are currently classified
+                        under <span>{updateMode.option.name}</span> will not anymore belong to any category until they
+                        manually update their categorisation.</p>
                     <p className='explanation warning'>This operation cannot be reverted!</p>
                     <div className='buttons'>
-                        <Button content={'Permanently Delete the Category ' + props.categoryName } onClick={props.handleDeleteCategory} primary/>
-                        <Button content={'Cancel'} onClick={() => props.setUpdateMode({})}/>
+                        <Button content={'Permanently Delete the Category ' + categoryName}
+                                onClick={handleDeleteCategory} primary/>
+                        <Button content={'Cancel'} onClick={() => setUpdateMode({})}/>
                     </div>
                 </div>
                 <style jsx>{`
@@ -166,8 +174,8 @@ function CategoryEditModalOption(props) {
         );
     }
 
-    if (props.updateMode.mode === 'rename') {
-        const [ newOptionName, setNewOptionName ] = useState('');
+    if (updateMode.mode === 'rename') {
+        const [newOptionName, setNewOptionName] = useState('');
 
         const [touched, setTouched] = useState(false)
         const [placeholder, setPlaceholder] = useState('Option Name')
@@ -181,22 +189,27 @@ function CategoryEditModalOption(props) {
         const handleRenameModal = (e) => {
             e.preventDefault()
             if (!newOptionName.length) return setTouched(true)
-            props.handleRename({ id: props.updateMode.option.id, name: newOptionName })
+           handleRename({id: updateMode.option.id, name: newOptionName})
         }
 
-        return(
+        return (
             <Fragment>
-                <div className={ props.updateMode.mode ? 'modal' : ''}></div>   
+                <div className={updateMode.mode ? 'modal' : ''}></div>
                 <div className='padding animated fadeIn'>
                     <Form onSubmit={handleRenameModal}>
                         <div className='action'>
-                            Rename the option <span>{ props.updateMode.option.name }</span> to
-                            <Input maxLength="20" type='text' error={touched && !newOptionName.length} onBlur={() => setTouched(true)} placeholder={placeholder} value={ newOptionName } onChange={(event, data) => setNewOptionName(data.value)}  style={{ width: '30%', margin: '0 20px 0 10px' }}/>
+                            Rename the option <span>{updateMode.option.name}</span> to
+                            <Input maxLength="20" type='text' error={touched && !newOptionName.length}
+                                   onBlur={() => setTouched(true)} placeholder={placeholder} value={newOptionName}
+                                   onChange={(event, data) => setNewOptionName(data.value)}
+                                   style={{width: '30%', margin: '0 20px 0 10px'}}/>
                         </div>
-                        <p className='explanation'>All your members who are currently classified under  <span>{ props.updateMode.option.name }</span> will now be classified under <span>{ newOptionName }</span>.</p>
+                        <p className='explanation'>All your members who are currently classified
+                            under <span>{updateMode.option.name}</span> will now be classified
+                            under <span>{newOptionName}</span>.</p>
                         <div className='buttons'>
                             <Button content={'Confirm'} type="submit" primary/>
-                            <Button content={'Cancel'} onClick={() => props.setUpdateMode({})}/>
+                            <Button content={'Cancel'} onClick={() => setUpdateMode({})}/>
                         </div>
                     </Form>
                 </div>
@@ -245,20 +258,23 @@ function CategoryEditModalOption(props) {
             </Fragment>
         );
     }
-        
-    if (props.updateMode.mode === 'delete') {
-        return(
+
+    if (updateMode.mode === 'delete') {
+        return (
             <Fragment>
-                <div className={ props.updateMode.mode ? 'modal' : ''}></div>   
-                <div className='padding animated fadeIn' style={{ margin: '20px 0'}}>
+                <div className={updateMode.mode ? 'modal' : ''}></div>
+                <div className='padding animated fadeIn' style={{margin: '20px 0'}}>
                     <div className='action'>
-                        Delete option <span>{ props.updateMode.option.name }</span> 
+                        Delete option <span>{updateMode.option.name}</span>
                     </div>
-                    <p className='explanation'>All your members who are currently classified under  <span>{ props.updateMode.option.name }</span> will not anymore belong to any classification until they manually update their categorisation.</p>
+                    <p className='explanation'>All your members who are currently classified
+                        under <span>{updateMode.option.name}</span> will not anymore belong to any classification
+                        until they manually update their categorisation.</p>
                     <p className='explanation warning'>This operation cannot be reverted!</p>
                     <div className='buttons'>
-                        <Button content={'Permanently Delete the Category ' + props.updateMode.option.name } onClick={() => props.handleDelete(props.updateMode.option)} primary/>
-                        <Button content={'Cancel'} onClick={() => props.setUpdateMode({})}/>
+                        <Button content={'Permanently Delete the Category ' + updateMode.option.name}
+                                onClick={() => handleDelete(updateMode.option)} primary/>
+                        <Button content={'Cancel'} onClick={() => setUpdateMode({})}/>
                     </div>
                 </div>
                 <style jsx>{`

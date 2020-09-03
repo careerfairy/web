@@ -82,6 +82,7 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
                 <Formik
                     initialValues={{
                         logoUrl: baseGroupInfo.logoUrl||'',
+                        logoFile: baseGroupInfo.logoFileObj || null,
                         universityName: baseGroupInfo.universityName ||'',
                         description: baseGroupInfo.description ||''
                     }}
@@ -102,6 +103,7 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
                         let careerCenter = {
                             adminEmail: user.email,
                             logoUrl: values.logoUrl,
+                            logoFileObj: values.logoFileObj,
                             description: values.description,
                             test: false,
                             universityName: values.universityName
@@ -144,7 +146,10 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
                                             extensions={['jpg', 'jpeg', 'png']}
                                             maxSize={20}
                                             onBlur={handleBlur}
-                                            onChange={(fileObject) => setFieldValue('logoUrl', URL.createObjectURL(fileObject), true)
+                                            onChange={(fileObject) => {
+                                                setFieldValue('logoUrl', URL.createObjectURL(fileObject), true)
+                                                setFieldValue('logoFileObj',fileObject, true)
+                                            }
                                                 // fileObject => {
                                                 //     uploadLogo('group-logos', fileObject, (newUrl) => {
                                                 //         setFieldValue('logoUrl', newUrl, true);

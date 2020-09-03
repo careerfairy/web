@@ -75,7 +75,7 @@ const CreateGroup = (props) => {
                     activeStep={activeStep}
                 />;
             case 2:
-                return <h1>Finished!</h1>
+                return <div><h1>Finished!</h1></div>
             default:
                 return 'Unknown stepIndex';
         }

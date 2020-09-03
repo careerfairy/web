@@ -5,7 +5,7 @@ import {withFirebase} from "data/firebase";
 import CategoryEditOption from './CategoryEditOption';
 
 
-function CategoryEditModal({category, options, groupId, newCategory, firebase, setEditMode}) {
+function CategoryEditModal({category, options, groupId, newCategory, firebase, setEditMode, handleAddTempCategory}) {
 
     const [categoryName, setCategoryName] = useState('');
 
@@ -86,6 +86,13 @@ function CategoryEditModal({category, options, groupId, newCategory, firebase, s
         setErrorObj(errors)
         setTouched(!categoryName.length > 0)
         if (errors.inputError || errors.optionError) return
+        if (groupId === "temp") {
+            console.log("in the group ID", groupId)
+            const tempCategoryObj = {name: categoryName, options: editableOptions}
+            handleAddTempCategory(tempCategoryObj)
+            setEditMode(false)
+            return
+        }
         if (newCategory) {
             firebase.addGroupCategoryWithElements(groupId, categoryName, editableOptions).then(() => {
                 setEditMode(false);
@@ -176,7 +183,7 @@ function CategoryEditModal({category, options, groupId, newCategory, firebase, s
                 </Grid>
                 <CategoryEditOption categoryName={categoryName} handleDeleteCategory={handleDeleteCategory}
                                     updateMode={updateMode} setUpdateMode={setUpdateMode} handleAdd={handleAdd}
-                                    handleDelete={handleDelete} handleRename={handleRename}/>
+                                    handleDelete={handleDelete} handleRename={handleRename} groupId={groupId}/>
                 <div className='separator'></div>
                 <div className="button-wrapper">
                     <div>

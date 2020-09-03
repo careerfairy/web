@@ -6,14 +6,18 @@ import { withFirebase } from 'data/firebase';
 import CategoryEdit from './CategoryEdit';
 
 
-function CategoryElement(props) {
+function CategoryElement({groupId, category, firebase}) {
 
     const [ options, setOptions] = useState([]);
     const [ editMode, setEditMode ] = useState(false)
 
     useEffect(() => {
-        if (props.category) {
-            props.firebase.listenToGroupCategoryElements(props.groupId, props.category.id, querySnapshot => {
+        if(groupId === "temp") {
+            setOptions(category.options)
+            return
+        }
+        if (category) {
+            firebase.listenToGroupCategoryElements(groupId, category.id, querySnapshot => {
                 let elements = [];
                 querySnapshot.forEach( doc => {
                     let element = doc.data();
@@ -23,11 +27,11 @@ function CategoryElement(props) {
                 setOptions(elements);
             });
         }
-    },[props.category]);
+    },[category]);
 
     const optionElements = options.map((option, index) => {
         return (
-            <Fragment key={option.id}>
+            <Fragment key={option.id || index}>
                 <div className='option-container'>
                     { option.name }
                 </div>
@@ -56,7 +60,7 @@ function CategoryElement(props) {
                     <Grid.Column width={4}>
                         <div className='white-box-label'>Category Name</div>
                         <div className='white-box-title'>
-                            { props.category.name }
+                            { category.name }
                         </div>
                     </Grid.Column>
                     <Grid.Column width={11}>
@@ -101,7 +105,7 @@ function CategoryElement(props) {
         
     return(
         <Fragment>
-            <CategoryEdit groupId={props.groupId} category={props.category} options={options} setEditMode={setEditMode}/>    
+            <CategoryEdit groupId={groupId} category={category} options={options} setEditMode={setEditMode}/>
         </Fragment>
     );
 }

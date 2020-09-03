@@ -10,13 +10,17 @@ const CreateCategories = ({handleBack, handleNext, handleReset, setArrayOfCatego
     const [categories, setCategories] = useState([]);
     const [createMode, setCreateMode] = useState(false)
 
-    const groupId = "tempId"
+    const groupId = "temp"
 
     useEffect(() => {
         if (arrayOfCategories.length) {
-            setCategories(categories);
+            setCategories(arrayOfCategories);
         }
     }, []);
+
+    const handleAddTempCategory = (categoryObj) => {
+        setCategories([...categories, categoryObj])
+    }
 
     const categoryElements = categories.map((category, index) => {
         return (
@@ -44,10 +48,7 @@ const CreateCategories = ({handleBack, handleNext, handleReset, setArrayOfCatego
                     Add
                 </Button>
             </div>
-            {createMode ?
-                <CategoryEdit groupId={groupId} category={{}} options={[]} newCategory={true}
-                              setEditMode={setCreateMode}/> : null
-            }
+            {createMode && <CategoryEdit handleAddTempCategory={handleAddTempCategory} groupId={groupId} category={{}} options={[]} newCategory={true} setEditMode={setCreateMode}/>}
             {categoryElements}
             <div className="button-wrapper">
                 <Button
