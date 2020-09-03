@@ -113,7 +113,7 @@ function LivestreamPdfViewer (props) {
                     <Document
                         onLoadSuccess={({ numPages }) => setPdfNumberOfPages(numPages)}
                         file={ pdfObject ? pdfObject.downloadUrl : ''}>
-                        <Page height={ getPageHeight() } renderTextLayer={false} pageNumber={pdfObject ? pdfObject.page : 1} />
+                        <Page height={ getPageHeight() } renderTextLayer={false} renderAnnotationLayer={false} pageNumber={pdfObject ? pdfObject.page : 1} />
                     </Document>
                 </div>
             </div>
