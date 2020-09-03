@@ -1,10 +1,14 @@
 import { useEffect, useState, Fragment } from 'react'
-import { Container, Header as SemanticHeader, Button, Dropdown, Form, Menu, Grid } from 'semantic-ui-react';
+import {Button} from "@material-ui/core";
+
 import { Formik } from 'formik';
 import { useRouter } from 'next/router';
 import { withFirebase } from 'data/firebase';
+import AddIcon from '@material-ui/icons/Add';
+
 
 import CurrentGroup from 'components/views/profile/CurrentGroup';
+import {Grid} from "semantic-ui-react";
 
 const UserProfile = (props) => {
 
@@ -56,7 +60,12 @@ const UserProfile = (props) => {
 
     return (
         <Fragment>
-            <h3 style={{ color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300' }}>My Groups</h3>
+            <div className="header-wrapper">
+                <h3 style={{ color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300' }}>My Groups</h3>
+                <Button endIcon={<AddIcon/>} variant="contained" size='large' onClick={() => router.push('/group/create')}>
+                Create a New Career Group
+            </Button>
+            </div>
             <Grid style={{ padding: '20px 0 0 0' }} stackable>
                 {existingGroupElements}
             </Grid>
@@ -70,7 +79,6 @@ const UserProfile = (props) => {
             <div className={ adminGroupElements.length > 0 ? 'hidden' : ''} style={{ margin: '30px 0', fontSize: '1.1em' }}>
                 You are currently not a member of any career group.
             </div>
-            <Button content='Create a New Career Group' icon='add' size='big' onClick={() => router.push('/group/create')}/>
             <style jsx>{`
                     .hidden {
                         display: none;
@@ -84,6 +92,10 @@ const UserProfile = (props) => {
                     .field-error {
                         margin-top: 10px;
                         color: red;
+                    }
+                    .header-wrapper {
+                      display: flex;
+                      justify-content: space-between;
                     }
 
                     #profileContainer {
