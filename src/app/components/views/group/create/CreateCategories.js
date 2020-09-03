@@ -19,14 +19,23 @@ const CreateCategories = ({handleBack, handleNext, handleReset, setArrayOfCatego
     }, []);
 
     const handleAddTempCategory = (categoryObj) => {
+        // adds temporary categories locally
         setCategories([...categories, categoryObj])
     }
 
     const handleUpdateCategory = (categoryObj) => {
+        // updates the temporary categories locally
         const newCategories = [...categories]
         const indexOfOldObj = categories.findIndex(el => categoryObj.id === el.id)
         newCategories[indexOfOldObj] = categoryObj
         setCategories(newCategories)
+    }
+
+    const handleDeleteCategory = (categoryObjId) => {
+        // deletes the temporary categories locally
+        const newCategories = [...categories]
+        const newerCategories = newCategories.filter(el => el.id !== categoryObjId)
+        setCategories(newerCategories)
     }
 
     const categoryElements = categories.map((category, index) => {
@@ -56,7 +65,9 @@ const CreateCategories = ({handleBack, handleNext, handleReset, setArrayOfCatego
                     Add
                 </Button>
             </div>
-            {createMode && <CategoryEdit handleAddTempCategory={handleAddTempCategory} groupId={groupId} category={{}} options={[]} newCategory={true} setEditMode={setCreateMode}/>}
+            {createMode &&
+            <CategoryEdit handleAddTempCategory={handleAddTempCategory} groupId={groupId} category={{}} options={[]}
+                          newCategory={true} setEditMode={setCreateMode}/>}
             {categoryElements}
             <div className="button-wrapper">
                 <Button
