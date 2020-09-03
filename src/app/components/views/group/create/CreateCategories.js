@@ -1,22 +1,88 @@
-import {Fragment} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "@material-ui/core";
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import CategoryEdit from "../admin/CategoryEdit";
+import CategoryElement from "../admin/CategoryElement";
+import AddIcon from "@material-ui/icons/Add";
+import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
+import {ArrowBack} from "@material-ui/icons";
 
-const CreateCategories = ({handleBack, handleNext, handleReset}) => {
+const CreateCategories = ({handleBack, handleNext, handleReset, setArrayOfCategories, arrayOfCategories}) => {
+    const [categories, setCategories] = useState([]);
+    const [createMode, setCreateMode] = useState(false)
+
+    const groupId = "tempId"
+
+    useEffect(() => {
+        if (arrayOfCategories.length) {
+            setCategories(categories);
+        }
+    }, []);
+
+    const categoryElements = categories.map((category, index) => {
+        return (
+            <div key={index}>
+                <CategoryElement groupId={groupId} category={category}/>
+            </div>
+        );
+    })
+
     return (
         <Fragment>
-            <Button
-                color="secondary"
-                variant="contained"
-                onClick={handleBack}
-            >Back</Button>
+            <div className="btn-title-wrapper" style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
+                <h3 className='sublabel'>Add Some Categories</h3>
+                <Button variant="contained"
+                        color="primary"
+                        size="large"
+                        onClick={() => setCreateMode(true)}
+                        disabled={createMode}
+                        endIcon={<AddIcon/>}>
+                    Add
+                </Button>
+            </div>
+            {createMode ?
+                <CategoryEdit groupId={groupId} category={{}} options={[]} newCategory={true}
+                              setEditMode={setCreateMode}/> : null
+            }
+            {categoryElements}
+            <div className="button-wrapper">
+                <Button
+                    color="secondary"
+                    variant="contained"
+                    style={{marginRight: 5}}
+                    startIcon={<ArrowBackIcon/>}
+                    onClick={handleBack}
+                >Back</Button>
 
-            <Button
-                color="primary"
-                variant="contained"
-                onClick={handleNext}
-            >Continue</Button>
+                <Button
+                    color="primary"
+                    variant="contained"
+                    style={{marginLeft: 5}}
+                    onClick={() => console.log("finished!")}
+                >Finalize</Button>
+            </div>
+
+            <style jsx>{`
+                .sublabel {
+                    text-align: left;
+                    display: inline-block;
+                    vertical-align: middle;
+                    margin: 9px 0;
+                    color: rgb(80,80,80);
+                }
+                
+                .button-wrapper {
+                  display: flex;
+                  justify-content: center;
+                }
+                
+                .btn-title-wrapper{
+                  display: flex;
+                  justify-content: space-between;
+                }
+            `}</style>
         </Fragment>
-    );
+    )
 };
 
 export default CreateCategories;

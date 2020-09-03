@@ -1,13 +1,11 @@
 import {Fragment, useState, useEffect} from 'react';
 import {Grid, Image, Button, Icon, Modal, Dropdown, Input, Header} from "semantic-ui-react";
 
-import {useRouter} from 'next/router';
 import {withFirebase} from "data/firebase";
-import CategoryElement from './CategoryElement';
 import CategoryEditOption from './CategoryEditOption';
 
 
-function CategoryEditModal(props) {
+function CategoryEditModal({category, options, groupId, newCategory, firebase, setEditMode}) {
 
     const [categoryName, setCategoryName] = useState('');
 
@@ -30,38 +28,34 @@ function CategoryEditModal(props) {
 
 
     useEffect(() => {
-        if (props.category && props.category.name) {
-            setCategoryName(props.category.name);
+        if (category && category.name) {
+            setCategoryName(category.name);
         }
-    }, [props.category.name]);
+    }, [category.name]);
 
     useEffect(() => {
-        if (props.options && props.options.length > 0) {
-            setEditableOptions(props.options);
-            console.log("setEditableOptions");
-
+        if (options && options.length > 0) {
+            setEditableOptions(options);
         }
-    }, [props.options]);
+    }, [options]);
 
     useEffect(() => {
         setUpdateMode({});
     }, [editableOptions]);
 
-    // const handleBlur = (field) => (evt) => {    this.setState({      touched: { ...this.state.touched, [field]: true },    });  }
-
     function handleDelete(removedOption) {
         let newList = [];
         if (removedOption.id) {
-            newList = editableOptions.filter(option => option.id !== removedOption.id);
+            newList = editableOptions.filter(optionEl => optionEl.id !== removedOption.id);
         } else {
-            newList = editableOptions.filter(option => option.id || option.name !== removedOption.name);
+            newList = editableOptions.filter(optionEl => optionEl.id || optionEl.name !== removedOption.name);
         }
         setEditableOptions(newList);
     }
 
     function handleDeleteCategory() {
-        props.firebase.deleteGroupCategoryWithElements(props.groupId, props.category.id, editableOptions)
-            .then(props.setEditMode(false))
+        firebase.deleteGroupCategoryWithElements(groupId, category.id, editableOptions)
+            .then(setEditMode(false))
     }
 
     function handleAdd(newOption) {
@@ -74,11 +68,11 @@ function CategoryEditModal(props) {
     }
 
     function handleRename(newOption) {
-        const newList = editableOptions.map(option => {
-            if (option.id === newOption.id) {
+        const newList = editableOptions.map(optionEl => {
+            if (optionEl.id === newOption.id) {
                 return newOption;
             } else {
-                return option;
+                return optionEl;
             }
         })
         setEditableOptions(newList);
@@ -92,39 +86,39 @@ function CategoryEditModal(props) {
         setErrorObj(errors)
         setTouched(!categoryName.length > 0)
         if (errors.inputError || errors.optionError) return
-        if (props.newCategory) {
-            props.firebase.addGroupCategoryWithElements(props.groupId, categoryName, editableOptions).then(() => {
-                props.setEditMode(false);
+        if (newCategory) {
+            firebase.addGroupCategoryWithElements(groupId, categoryName, editableOptions).then(() => {
+                setEditMode(false);
             })
         } else {
-            let optionsToDelete = props.options.filter(option => {
-                return !editableOptions.find(editableOption => editableOption.id === option.id);
+            let optionsToDelete = options.filter(optionEl => {
+                return !editableOptions.find(editableOption => editableOption.id === optionEl.id);
             })
-            props.firebase.updateGroupCategoryElements(props.groupId, props.category.id, categoryName, editableOptions, optionsToDelete).then(() => {
-                props.setEditMode(false);
+            firebase.updateGroupCategoryElements(groupId, category.id, categoryName, editableOptions, optionsToDelete).then(() => {
+                setEditMode(false);
             })
         }
 
     }
 
-    const optionElements = editableOptions.map((option, index) => {
+    const optionElements = editableOptions.map((optionEl, index) => {
         return (
             <Fragment key={index}>
                 <div className={'option-container animated fadeIn'}
-                     style={{zIndex: selectedOption === option ? '10' : '0'}}>
+                     style={{zIndex: selectedOption === optionEl ? '10' : '0'}}>
                     <div className='option-name'>
-                        {option.name}
+                        {optionEl.name}
                     </div>
-                    <Dropdown icon={{name: 'edit', onClick: () => setSelectedOption(option)}} direction='right'
+                    <Dropdown icon={{name: 'edit', onClick: () => setSelectedOption(optionEl)}} direction='right'
                               style={{margin: '0 0 0 5px'}}>
                         <Dropdown.Menu>
                             <Dropdown.Item
                                 text='Rename'
-                                onClick={() => setUpdateMode({mode: 'rename', option: option})}
+                                onClick={() => setUpdateMode({mode: 'rename', option: optionEl})}
                             />
                             <Dropdown.Item
                                 text='Delete'
-                                onClick={() => setUpdateMode({mode: 'delete', option: option})}
+                                onClick={() => setUpdateMode({mode: 'delete', option: optionEl})}
                             />
                         </Dropdown.Menu>
                     </Dropdown>
@@ -187,9 +181,9 @@ function CategoryEditModal(props) {
                 <div className="button-wrapper">
                     <div>
                         <Button content='Save' onClick={() => saveChanges()} primary/>
-                        <Button content='Cancel' onClick={() => props.setEditMode(false)}/>
+                        <Button content='Cancel' onClick={() => setEditMode(false)}/>
                     </div>
-                    {!props.newCategory &&
+                    {!newCategory &&
                     <Button onClick={() => setUpdateMode({mode: 'deleteCategory', option: {name: categoryName}})}
                             inverted color='red' className="red-delete-btn" content='Delete'/>}
                 </div>

@@ -28,19 +28,6 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
         })
     }, []);
 
-    const DescriptionField = (props) => {
-
-        return (
-            <TextField
-                label="Description"
-                name="description"
-                multiline
-                fullWidth
-                rowsMax={10}
-            />
-        )
-    }
-
     function uploadLogo(location, fileObject, callback) {
         var storageRef = firebase.getStorageRef();
         let fullPath = location + '/' + fileObject.name;
@@ -222,7 +209,6 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
                             >
                                 Next
                             </Button>
-                            {JSON.stringify(errors)}
                         </UiForm>
                     )}
                 </Formik>

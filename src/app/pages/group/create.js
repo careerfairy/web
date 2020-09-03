@@ -37,6 +37,7 @@ const CreateGroup = (props) => {
     const [activeStep, setActiveStep] = React.useState(0);
     const [careerCenterRef, setCareerCenterRef] = useState("")
     const [baseGroupInfo, setBaseGroupInfo] = useState({})
+    const [arrayOfCategories, setArrayOfCategories] = useState([])
     const steps = getSteps();
 
     const handleNext = () => {
@@ -48,6 +49,7 @@ const CreateGroup = (props) => {
     };
 
     const handleReset = () => {
+        setBaseGroupInfo({})
         setActiveStep(0);
     };
 
@@ -65,6 +67,8 @@ const CreateGroup = (props) => {
                 />;
             case 1:
                 return <CreateCategories
+                    setArrayOfCategories={setArrayOfCategories}
+                    arrayOfCategories={arrayOfCategories}
                     handleNext={handleNext}
                     handleBack={handleBack}
                     handleReset={handleReset}
