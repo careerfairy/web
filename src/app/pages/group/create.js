@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function getSteps() {
-    return ['Create your base group', 'Setup your categories and sub-categories', 'Finalize'];
+    return ['Create your base group', 'Setup your categories and sub-categories', 'Finish'];
 }
 
 
@@ -74,6 +74,8 @@ const CreateGroup = (props) => {
                     handleReset={handleReset}
                     activeStep={activeStep}
                 />;
+            case 2:
+                return <h1>Finished!</h1>
             default:
                 return 'Unknown stepIndex';
         }

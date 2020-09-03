@@ -4,8 +4,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import CategoryEdit from "../admin/CategoryEdit";
 import CategoryElement from "../admin/CategoryElement";
 import AddIcon from "@material-ui/icons/Add";
-import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
-import {ArrowBack} from "@material-ui/icons";
+
 
 const CreateCategories = ({handleBack, handleNext, handleReset, setArrayOfCategories, arrayOfCategories}) => {
     const [categories, setCategories] = useState([]);
@@ -27,6 +26,11 @@ const CreateCategories = ({handleBack, handleNext, handleReset, setArrayOfCatego
         );
     })
 
+    const handleFinish = () => {
+        console.log("finished!")
+        handleNext()
+    }
+
     return (
         <Fragment>
             <div className="btn-title-wrapper" style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
@@ -47,7 +51,6 @@ const CreateCategories = ({handleBack, handleNext, handleReset, setArrayOfCatego
             {categoryElements}
             <div className="button-wrapper">
                 <Button
-                    color="secondary"
                     variant="contained"
                     style={{marginRight: 5}}
                     startIcon={<ArrowBackIcon/>}
@@ -58,8 +61,8 @@ const CreateCategories = ({handleBack, handleNext, handleReset, setArrayOfCatego
                     color="primary"
                     variant="contained"
                     style={{marginLeft: 5}}
-                    onClick={() => console.log("finished!")}
-                >Finalize</Button>
+                    onClick={handleFinish}
+                >Confirm</Button>
             </div>
 
             <style jsx>{`

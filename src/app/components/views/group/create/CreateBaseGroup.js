@@ -175,7 +175,7 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
                                         error={touched.universityName && errors.universityName}
                                         onBlur={handleBlur}
                                         disabled={isSubmitting}
-                                        helperText={errors.universityName}
+                                        helperText={touched.universityName && errors.universityName}
                                         label="Group Name"
                                         name="universityName"
                                         fullWidth
@@ -191,7 +191,7 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
                                     placeholder="Please describe the purpose of your group"
                                     style={{height: 50, marginBottom: 30, marginTop: 20}}
                                     onBlur={handleBlur}
-                                    helperText={errors.description}
+                                    helperText={touched.description && errors.description}
                                     disabled={isSubmitting}
                                     rowsMax={10}
                                     name="description"
