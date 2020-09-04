@@ -14,7 +14,8 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
 
         return (
             <div key={index}>
-                <CategoryElement handleDeleteLocalCategory={handleDeleteLocalCategory} handleUpdateCategory={handleUpdateCategory} groupId={groupId} category={category}/>
+                <CategoryElement handleDeleteLocalCategory={handleDeleteLocalCategory}
+                                 handleUpdateCategory={handleUpdateCategory} groupId={groupId} category={category}/>
             </div>
         );
     })
@@ -26,35 +27,39 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
 
     return (
         <Fragment>
-            <div className="btn-title-wrapper" style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
-                <h3 className='sublabel'>Add Some Categories</h3>
-                <Button variant="contained"
-                        color="primary"
-                        size="large"
-                        onClick={() => setCreateMode(true)}
-                        disabled={createMode}
-                        endIcon={<AddIcon/>}>
-                    Add
-                </Button>
-            </div>
-            {createMode &&
-            <CategoryEdit handleAddTempCategory={handleAddTempCategory} groupId={groupId} category={{}} options={[]}
-                          newCategory={true} setEditMode={setCreateMode}/>}
-            {categoryElements}
-            <div className="button-wrapper">
-                <Button
-                    variant="contained"
-                    style={{marginRight: 5}}
-                    startIcon={<ArrowBackIcon/>}
-                    onClick={handleBack}
-                >Back</Button>
+            <div className="content-wrapper">
+                <div className="btn-title-wrapper" style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
+                    <h3 className='sublabel'>Add Some Categories</h3>
+                    <Button variant="contained"
+                            color="primary"
+                            size="large"
+                            onClick={() => setCreateMode(true)}
+                            disabled={createMode}
+                            endIcon={<AddIcon/>}>
+                        Add
+                    </Button>
+                </div>
+                <div className="categories-wrapper">
+                {createMode &&
+                <CategoryEdit handleAddTempCategory={handleAddTempCategory} groupId={groupId} category={{}} options={[]}
+                              newCategory={true} setEditMode={setCreateMode}/>}
+                {categoryElements}
+                </div>
+                <div className="button-wrapper">
+                    <Button
+                        variant="contained"
+                        style={{marginRight: 5}}
+                        startIcon={<ArrowBackIcon/>}
+                        onClick={handleBack}
+                    >Back</Button>
 
-                <Button
-                    color="primary"
-                    variant="contained"
-                    style={{marginLeft: 5}}
-                    onClick={handleFinish}
-                >Confirm</Button>
+                    <Button
+                        color="primary"
+                        variant="contained"
+                        style={{marginLeft: 5}}
+                        onClick={handleFinish}
+                    >Confirm</Button>
+                </div>
             </div>
 
             <style jsx>{`
@@ -64,6 +69,20 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                     vertical-align: middle;
                     margin: 9px 0;
                     color: rgb(80,80,80);
+                }
+                
+                .categories-wrapper {
+                  display: flex;
+                  flex: 1;
+                  flex-direction: column;
+                }
+                
+                .content-wrapper {
+                  padding: 1rem;
+                  min-height: 60vh;
+                  display: flex;
+                  justify-content: space-between;
+                  flex-direction: column;
                 }
                 
                 .button-wrapper {

@@ -194,10 +194,11 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
                                     error={touched.description && errors.description}
                                     value={values.description}
                                     placeholder="Please describe the purpose of your group"
-                                    style={{height: 50, marginBottom: 30, marginTop: 20}}
+                                    style={{marginBottom: 30, marginTop: 20}}
                                     onBlur={handleBlur}
                                     helperText={touched.description && errors.description}
                                     disabled={isSubmitting}
+                                    rows={2}
                                     rowsMax={10}
                                     name="description"
                                     multiline
