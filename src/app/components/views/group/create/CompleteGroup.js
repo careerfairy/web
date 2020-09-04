@@ -15,8 +15,7 @@ const CompleteGroup = ({ handleBack, baseGroupInfo, createCareerCenter, arrayOfC
         setSubmitting(true)
         const ID = await createCareerCenter()
         setSubmitting(false)
-        console.log("ID in complete async", ID)
-        push('/group/' + ID + '/admin')
+        push(`/group/${ID}/admin`)
     }
 
     const categories = arrayOfCategories.map((category, index) => {

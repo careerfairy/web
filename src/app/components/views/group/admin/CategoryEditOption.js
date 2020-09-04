@@ -6,9 +6,6 @@ import {Button} from "@material-ui/core";
 
 
 function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryName, handleDeleteCategory, handleRename, handleAdd, handleDelete}) {
-    console.log("groupId", groupId);
-    console.log("handleDeleteCategory", handleDeleteCategory);
-
 
     if (!updateMode.mode) {
         return null;
