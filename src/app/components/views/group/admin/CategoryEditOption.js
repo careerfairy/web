@@ -51,7 +51,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                                    style={{width: '30%', margin: '0 20px 0 10px'}}/>
                         </div>
                         <div className='buttons'>
-                            <Button variant="contained" type="submit" color="primary">
+                            <Button style={{marginRight: 10}} variant="contained" type="submit" color="primary">
                                 Confirm
                             </Button>
                             <Button variant="contained" onClick={() => setUpdateMode({})}>
