@@ -11,17 +11,11 @@ import {Button, Input} from "@material-ui/core";
 
 const placeholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
 
-const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, firebase, setCareerCenterRef, setBaseGroupInfo, baseGroupInfo}) => {
+const CreateBaseGroup = ({handleNext, firebase, setBaseGroupInfo, baseGroupInfo}) => {
 
     const [filePickerError, setFilePickerError] = useState(null)
-    const [initialValues, setInitialValues] = useState({
-        logoUrl: '',
-        logoFile: null,
-        universityName: '',
-        description: ''
-    })
-    const router = useRouter();
     const [user, setUser] = useState(null);
+    const router = useRouter();
 
     useEffect(() => {
         firebase.auth.onAuthStateChanged(user => {
@@ -33,25 +27,18 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
         })
     }, []);
 
-    useEffect(() => {
-        if (baseGroupInfo && baseGroupInfo.description) {
-            setInitialValues({
-                logoUrl: baseGroupInfo.logoUrl,
-                logoFile: baseGroupInfo.logoFileObj,
-                universityName: baseGroupInfo.universityName,
-                description: baseGroupInfo.description
-            })
-        }
-    }, [baseGroupInfo])
-
-
     return (
         <Fragment>
 
             <div className='padding-vertical'>
                 <h1 className='content-title'>Create a Career Group</h1>
                 <Formik
-                    initialValues={initialValues}
+                    initialValues={{
+                        logoUrl: baseGroupInfo.logoUrl || "",
+                        logoFile: baseGroupInfo.logoFileObj || null,
+                        universityName: baseGroupInfo.universityName || "",
+                        description: baseGroupInfo.description || ""
+                    }}
                     validate={values => {
                         let errors = {};
                         if (!values.logoUrl) {
@@ -74,16 +61,9 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
                             test: false,
                             universityName: values.universityName
                         }
-
                         setBaseGroupInfo(careerCenter)
-                        handleNext()
                         setSubmitting(false);
-
-                        // firebase.createCareerCenter(careerCenter).then(careerCenterRef => {
-                        // setCareerCenterRef(careerCenterRef)
-                        //     console.log("career center has been asaved in state!", careerCenterRef)
-                        //     // router.push('/group/' + careerCenterRef.id + '/admin');
-                        // });
+                        handleNext()
                     }}
                 >
                     {({

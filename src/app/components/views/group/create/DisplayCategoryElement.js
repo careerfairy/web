@@ -4,10 +4,10 @@ import {Grid, Icon, } from "semantic-ui-react";
 import {withFirebase} from 'data/firebase';
 
 
-const DisplayCategoryElement = ({category, options, setActiveStep}) => {
+const DisplayCategoryElement = ({category, setActiveStep}) => {
 
 
-    const optionElements = options.map((option, index) => {
+    const optionElements = category.options.map((option, index) => {
         return (
             <Fragment key={option.id || index}>
                 <div className='option-container'>
@@ -47,7 +47,7 @@ const DisplayCategoryElement = ({category, options, setActiveStep}) => {
                     </Grid.Column>
                     <Grid.Column width={1}>
                         <Icon name='edit' style={{margin: '5px 0', color: 'rgb(0, 210, 170)', cursor: 'pointer'}}
-                              onClick={setActiveStep(2)} size='large'/>
+                              onClick={() => setActiveStep(1)} size='large'/>
                     </Grid.Column>
                 </Grid>
             </div>

@@ -6,7 +6,7 @@ import CategoryElement from "../admin/CategoryElement";
 import AddIcon from "@material-ui/icons/Add";
 
 
-const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCategory, handleAddTempCategory, handleNext, handleReset, setArrayOfCategories, arrayOfCategories, tempId}) => {
+const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCategory, handleAddTempCategory, handleNext, arrayOfCategories}) => {
     const [createMode, setCreateMode] = useState(false)
 
     useEffect(() => {

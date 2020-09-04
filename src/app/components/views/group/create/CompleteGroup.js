@@ -1,24 +1,23 @@
 import React, {Fragment, useState} from 'react'
 import {Button, Container, Typography} from "@material-ui/core";
-import {FormatBold} from "@material-ui/icons";
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 import DisplayCategoryElement from "./DisplayCategoryElement";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import {useRouter} from "next/router";
 
 
-const CompleteGroup = ({handleBack, baseGroupInfo, createCareerCenter, arrayOfCategories, setActiveStep}) => {
+const CompleteGroup = ({careerCenterId, handleBack, baseGroupInfo, createCareerCenter, arrayOfCategories, setActiveStep}) => {
+    console.log("careerCenterId", careerCenterId);
     const [submitting, setSubmitting] = useState(false)
-
+    const {push} = useRouter()
 
     const handleFinalize = async () => {
-        try {
-            setSubmitting(true)
-            const response = await createCareerCenter()
-            console.log(response)
-            setSubmitting(false)
-        } catch (e) {
-            console.log("error", e)
-            setSubmitting(false)
-        }
+        setSubmitting(true)
+        const ID = await createCareerCenter()
+        setSubmitting(false)
+        console.log("ID in complete async", ID)
+        push('/group/' + ID + '/admin')
     }
 
     const categories = arrayOfCategories.map((category, index) => {
@@ -66,6 +65,7 @@ const CompleteGroup = ({handleBack, baseGroupInfo, createCareerCenter, arrayOfCa
                                     color="primary"
                                     style={{marginLeft: 5}}
                                     disabled={submitting}
+                                    endIcon={submitting && <CircularProgress size={20} color="inherit"/>}
                                     variant="contained"
                                     size="large">
                                 Finish

@@ -33,7 +33,7 @@ function getSteps() {
 
 const CreateGroup = ({firebase}) => {
     const [activeStep, setActiveStep] = useState(0);
-    const [careerCenterRef, setCareerCenterRef] = useState("");
+    const [careerCenterId, setCareerCenterId] = useState("");
     const [baseGroupInfo, setBaseGroupInfo] = useState({});
     const [arrayOfCategories, setArrayOfCategories] = useState([]);
     const [user, setUser] = useState(null);
@@ -89,67 +89,48 @@ const CreateGroup = ({firebase}) => {
         setBaseGroupInfo({...baseGroupInfo, logoUrl: serverUrl})
     }
 
-    function uploadLogo(fileObject) {
-        var storageRef = firebase.getStorageRef();
-        let fullPath = 'group-logos' + '/' + fileObject.name;
-        let companyLogoRef = storageRef.child(fullPath);
+    const uploadLogo = async (fileObject) => {
+        try {
+            var storageRef = firebase.getStorageRef();
+            let fullPath = 'group-logos' + '/' + fileObject.name;
+            let companyLogoRef = storageRef.child(fullPath);
+            var uploadTask = companyLogoRef.put(fileObject);
 
-        var uploadTask = companyLogoRef.put(fileObject);
+            const snapshot = await uploadTask.then()
+            return snapshot.ref.getDownloadURL()
 
-        uploadTask.on('state_changed',
-            function (snapshot) {
-                var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log('Upload is ' + progress + '% done');
-                switch (snapshot.state) {
-                    case 'paused':
-                        console.log('Upload is paused');
-                        break;
-                    case 'running':
-                        console.log('Upload is running');
-                        break;
-                    default:
-                        break;
-                }
-            }, function (error) {
-                switch (error.code) {
-                    case 'storage/unauthorized':
-                        // User doesn't have permission to access the object
-                        break;
+        } catch (e) {
+            console.log("error in async", e)
+        }
 
-                    case 'storage/canceled':
-                        // User canceled the upload
-                        break;
-
-                    case 'storage/unknown':
-                        // Unknown error occurred, inspect error.serverResponse
-                        break;
-                    default:
-                        break;
-                }
-            }, function () {
-                // Upload completed successfully, now we can get the download URL
-                uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
-                    const careerCenter = {
-                        universityName: baseGroupInfo.universityName,
-                        adminEmail: user.email,
-                        logoUrl: downloadURL,
-                        description: baseGroupInfo.description,
-                        test: false,
-                    }
-                    firebase.createCareerCenter(careerCenter).then(careerCenterRef => {
-                        console.log('File available at', downloadURL);
-                        setCareerCenterRef(careerCenterRef)
-                        console.log("career center has been asaved in state!", careerCenterRef)
-                        router.push('/group/' + careerCenterRef.id + '/admin');
-                        return firebase.addMultipleGroupCategoryWithElements(careerCenterRef.id, arrayOfCategories)
-                    });
-                });
-            });
     }
 
-    const createCareerCenter = () => {
-        uploadLogo(baseGroupInfo.logoFileObj)
+    const createCareerCenter = async () => {
+
+        try {
+            const downloadURL = await uploadLogo(baseGroupInfo.logoFileObj)
+            const careerCenter = {
+                universityName: baseGroupInfo.universityName,
+                adminEmail: user.email,
+                logoUrl: downloadURL,
+                description: baseGroupInfo.description,
+                test: false,
+            }
+
+            const careerCenterRef = await firebase.createCareerCenter(careerCenter)
+            const careerCenterId = careerCenterRef.id
+            await firebase.addMultipleGroupCategoryWithElements(careerCenterRef.id, arrayOfCategories)
+            return careerCenterId
+
+        } catch (e) {
+            console.log("error in async 2", e);
+
+        }
     }
+
+    // const createCareerCenter = () => {
+    //     return uploadLogo(baseGroupInfo.logoFileObj)
+    // }
 
     function getStepContent(stepIndex) {
         switch (stepIndex) {
@@ -159,9 +140,6 @@ const CreateGroup = ({firebase}) => {
                     baseGroupInfo={baseGroupInfo}
                     handleNext={handleNext}
                     handleBack={handleBack}
-                    setCareerCenterRef={setCareerCenterRef}
-                    handleReset={handleReset}
-                    activeStep={activeStep}
                 />;
             case 1:
                 return <CreateCategories
@@ -177,6 +155,7 @@ const CreateGroup = ({firebase}) => {
                 />;
             case 2:
                 return <CompleteGroup
+                    careerCenterId={careerCenterId}
                     createCareerCenter={createCareerCenter}
                     baseGroupInfo={baseGroupInfo}
                     setActiveStep={setActiveStep}

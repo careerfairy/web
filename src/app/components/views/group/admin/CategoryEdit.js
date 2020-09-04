@@ -1,8 +1,9 @@
 import {Fragment, useState, useEffect} from 'react';
-import {Grid, Image, Button, Icon, Modal, Dropdown, Input, Header} from "semantic-ui-react";
+import {Grid, Image, Icon, Modal, Dropdown, Input, Header} from "semantic-ui-react";
 
 import {withFirebase} from "data/firebase";
 import CategoryEditOption from './CategoryEditOption';
+import {Button} from "@material-ui/core";
 
 
 function CategoryEditModal({category, options, handleDeleteLocalCategory, handleUpdateCategory, groupId, newCategory, firebase, setEditMode, handleAddTempCategory}) {
@@ -201,12 +202,16 @@ function CategoryEditModal({category, options, handleDeleteLocalCategory, handle
                 <div className='separator'></div>
                 <div className="button-wrapper">
                     <div>
-                        <Button content={newCategory ? 'Create' : 'Update'} onClick={() => saveChanges()} primary/> :
-                        <Button content='Cancel' onClick={() => setEditMode(false)}/>
+                        {/*<Button content={newCategory ? 'Create' : 'Update'} onClick={() => saveChanges()} primary/>*/}
+                        {/*<Button content='Cancel' onClick={() => setEditMode(false)}/>*/}
                     </div>
                     {!newCategory &&
-                    <Button onClick={() => setUpdateMode({mode: 'deleteCategory', option: {name: categoryName}})}
-                            inverted color='red' className="red-delete-btn" content='Delete'/>}
+                        <Button>
+
+                        </Button>
+                    // <Button onClick={() => setUpdateMode({mode: 'deleteCategory', option: {name: categoryName}})}
+                    //         inverted color='red' className="red-delete-btn" content='Delete'/>
+                    }
                 </div>
             </div>
             <style jsx>{`
