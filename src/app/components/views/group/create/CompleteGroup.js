@@ -1,8 +1,11 @@
 import React, {Fragment, useState} from 'react'
 import {Button, Container, Typography} from "@material-ui/core";
+import {FormatBold} from "@material-ui/icons";
+import DisplayCategoryElement from "./DisplayCategoryElement";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 
 
-const CompleteGroup = ({baseGroupInfo, careerCenterRef, createCareerCenter}) => {
+const CompleteGroup = ({handleBack, baseGroupInfo, createCareerCenter, arrayOfCategories, setActiveStep}) => {
     const [submitting, setSubmitting] = useState(false)
 
 
@@ -18,25 +21,56 @@ const CompleteGroup = ({baseGroupInfo, careerCenterRef, createCareerCenter}) => 
         }
     }
 
+    const categories = arrayOfCategories.map((category, index) => {
+        return (
+            <DisplayCategoryElement setActiveStep={setActiveStep} key={index} category={category}/>
+        )
+    })
+
     return (
         <Fragment>
             <Container>
                 <h1 className='content-title'>Last Check</h1>
                 <div>
-                    <Typography align="center">
-                        Your group {baseGroupInfo.universityName} is about to be created
+                    <Typography variant="h2" gutterBottom>
+                        Have one last look before you finalze
                     </Typography>
+                    <Typography variant="h4" gutterBottom>
+                        Group Name: <strong>{baseGroupInfo.universityName}</strong>
+                    </Typography>
+                    <Typography variant="h4" gutterBottom>
+                        About:
+                    </Typography>
+                    <Typography paragraph>
+                        {baseGroupInfo.description}
+                    </Typography>
+                    <Typography variant="h4" gutterBottom>
+                        Categories:
+                    </Typography>
+                    <div className="category-wrapper">
+                        {categories}
+                    </div>
                     <div className="action-wrapper">
                         <Typography align="center">
-                            Click here to Manage you group and setup events
+                            Are you satisfied?
                         </Typography>
-                        <Button onClick={handleFinalize}
-                                color="primary"
-                                disabled={submitting}
-                                variant="contained"
-                                size="large">
-                            Finish
-                        </Button>
+                        <div className="button-wrapper">
+                            <Button variant="contained"
+                                    size='large'
+                                    style={{marginRight: 5}}
+                                    startIcon={<ArrowBackIcon/>}
+                                    onClick={handleBack}>
+                                Back
+                            </Button>
+                            <Button onClick={handleFinalize}
+                                    color="primary"
+                                    style={{marginLeft: 5}}
+                                    disabled={submitting}
+                                    variant="contained"
+                                    size="large">
+                                Finish
+                            </Button>
+                        </div>
                     </div>
 
                 </div>
@@ -54,6 +88,11 @@ const CompleteGroup = ({baseGroupInfo, careerCenterRef, createCareerCenter}) => 
                   flex-direction: column;
                   align-items: center;
                   justify-content: space-between;
+                }
+                
+                .button-wrapper {
+                  display: flex;
+                  justify-content: center;
                 }
             `}</style>
         </Fragment>

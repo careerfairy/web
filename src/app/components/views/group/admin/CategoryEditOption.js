@@ -43,6 +43,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                                    type='text'
                                    error={touched && !newOptionName.length}
                                    onBlur={() => setTouched(true)}
+                                   autoFocus
                                    placeholder={placeholder}
                                    value={newOptionName}
                                    onChange={(event, data) => setNewOptionName(data.value)}

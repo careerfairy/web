@@ -1,6 +1,5 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "@material-ui/core";
-import CircularProgress from '@material-ui/core/CircularProgress';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import CategoryEdit from "../admin/CategoryEdit";
 import CategoryElement from "../admin/CategoryElement";

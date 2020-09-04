@@ -179,7 +179,8 @@ const CreateGroup = ({firebase}) => {
                 return <CompleteGroup
                     createCareerCenter={createCareerCenter}
                     baseGroupInfo={baseGroupInfo}
-                    careerCenterRef={careerCenterRef}
+                    setActiveStep={setActiveStep}
+                    handleBack={handleBack}
                     arrayOfCategories={arrayOfCategories}/>
             default:
                 return 'Unknown stepIndex';
