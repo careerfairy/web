@@ -1,9 +1,10 @@
 import {Fragment, useState, useEffect} from 'react';
 import {Grid, Image, Icon, Modal, Dropdown, Input, Header} from "semantic-ui-react";
+import AddIcon from '@material-ui/icons/Add';
 
 import {withFirebase} from "data/firebase";
 import CategoryEditOption from './CategoryEditOption';
-import {Button} from "@material-ui/core";
+import {Button, IconButton} from "@material-ui/core";
 
 
 function CategoryEditModal({category, options, handleDeleteLocalCategory, handleUpdateCategory, groupId, newCategory, firebase, setEditMode, handleAddTempCategory}) {
@@ -191,8 +192,10 @@ function CategoryEditModal({category, options, handleDeleteLocalCategory, handle
                     <Grid.Column width={11}>
                         <div className='white-box-label'>Category Options</div>
                         {optionElements}
-                        <Button icon='add' size='mini' circular primary onClick={() => setUpdateMode({mode: 'add'})}
-                                style={{margin: '0 0 0 2px', boxShadow: '0 0 2px grey'}}/>
+                        <IconButton size="small" onClick={() => setUpdateMode({mode: 'add'})}>
+                            <AddIcon fontSize="large"
+                                     color="primary"/>
+                        </IconButton>
                         {errorObj.optionError && <p className="error-field">You must add at least 2 options</p>}
                     </Grid.Column>
                 </Grid>
@@ -202,15 +205,28 @@ function CategoryEditModal({category, options, handleDeleteLocalCategory, handle
                 <div className='separator'></div>
                 <div className="button-wrapper">
                     <div>
+                        <Button onClick={() => saveChanges()}
+                                color="primary"
+                                style={{marginRight: 10}}
+                                variant="contained">
+                            {newCategory ? 'Create' : 'Update'}
+                        </Button>
+                        <Button onClick={() => setEditMode(false)}
+                                variant="contained">
+                            Cancel
+                        </Button>
                         {/*<Button content={newCategory ? 'Create' : 'Update'} onClick={() => saveChanges()} primary/>*/}
                         {/*<Button content='Cancel' onClick={() => setEditMode(false)}/>*/}
                     </div>
                     {!newCategory &&
-                        <Button>
-
-                        </Button>
-                    // <Button onClick={() => setUpdateMode({mode: 'deleteCategory', option: {name: categoryName}})}
-                    //         inverted color='red' className="red-delete-btn" content='Delete'/>
+                    <Button onClick={() => setUpdateMode({mode: 'deleteCategory', option: {name: categoryName}})}
+                            color="secondary"
+                            variant="outlined"
+                    >
+                        Delete
+                    </Button>
+                        // <Button onClick={() => setUpdateMode({mode: 'deleteCategory', option: {name: categoryName}})}
+                        //         inverted color='red' className="red-delete-btn" content='Delete'/>
                     }
                 </div>
             </div>
