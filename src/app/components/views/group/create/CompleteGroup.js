@@ -1,32 +1,41 @@
-import React, {Fragment} from 'react'
+import React, {Fragment, useState} from 'react'
 import {Button, Container, Typography} from "@material-ui/core";
-import {useRouter} from "next/router";
 
 
-const CompletedGroup = ({baseGroupInfo: {name},careerCenterRef}) => {
-    const router = useRouter();
+const CompleteGroup = ({baseGroupInfo, careerCenterRef, createCareerCenter}) => {
+    const [submitting, setSubmitting] = useState(false)
 
-    const handleSendToAdmin = () => {
-        router.push('/group/' + careerCenterRef.id + '/admin')
+
+    const handleFinalize = async () => {
+        try {
+            setSubmitting(true)
+            const response = await createCareerCenter()
+            console.log(response)
+            setSubmitting(false)
+        } catch (e) {
+            console.log("error", e)
+            setSubmitting(false)
+        }
     }
 
     return (
         <Fragment>
             <Container>
-                <h1 className='content-title'>Congrats!</h1>
+                <h1 className='content-title'>Last Check</h1>
                 <div>
-                    <Typography>
-                        Your group {name} has now been created
+                    <Typography align="center">
+                        Your group {baseGroupInfo.universityName} is about to be created
                     </Typography>
                     <div className="action-wrapper">
-                        <Typography>
+                        <Typography align="center">
                             Click here to Manage you group and setup events
                         </Typography>
-                        <Button onClick={handleSendToAdmin}
+                        <Button onClick={handleFinalize}
                                 color="primary"
+                                disabled={submitting}
                                 variant="contained"
                                 size="large">
-                            Explore
+                            Finish
                         </Button>
                     </div>
 
@@ -51,4 +60,4 @@ const CompletedGroup = ({baseGroupInfo: {name},careerCenterRef}) => {
     );
 };
 
-export default CompletedGroup;
+export default CompleteGroup;

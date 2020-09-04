@@ -1,21 +1,17 @@
 import {useEffect, useState, Fragment} from 'react'
+import Head from 'next/head';
 import {Container} from 'semantic-ui-react';
-
 import {useRouter} from 'next/router';
 import {withFirebase} from '../../data/firebase';
 import Header from '../../components/views/header/Header';
-
-import Head from 'next/head';
 import Footer from '../../components/views/footer/Footer';
 import CreateBaseGroup from "../../components/views/group/create/CreateBaseGroup";
 import {makeStyles} from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
-import Typography from '@material-ui/core/Typography';
 import CreateCategories from "../../components/views/group/create/CreateCategories";
-import CompletedGroup from "../../components/views/group/create/CompletedGroup";
-// import {Container} from "@material-ui/core";
+import CompleteGroup from "../../components/views/group/create/CompleteGroup";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -36,13 +32,13 @@ function getSteps() {
 
 
 const CreateGroup = ({firebase}) => {
-    const classes = useStyles();
     const [activeStep, setActiveStep] = useState(0);
-    const [submitting, setSubmitting] = useState(false);
     const [careerCenterRef, setCareerCenterRef] = useState("");
     const [baseGroupInfo, setBaseGroupInfo] = useState({});
     const [arrayOfCategories, setArrayOfCategories] = useState([]);
     const [user, setUser] = useState(null);
+
+    const router = useRouter();
 
     useEffect(() => {
         firebase.auth.onAuthStateChanged(user => {
@@ -133,20 +129,19 @@ const CreateGroup = ({firebase}) => {
             }, function () {
                 // Upload completed successfully, now we can get the download URL
                 uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
-                    setServerLogoUrl(downloadURL);
-                    console.log('File available at', downloadURL);
                     const careerCenter = {
                         universityName: baseGroupInfo.universityName,
                         adminEmail: user.email,
-                        logoUrl: baseGroupInfo.logoUrl,
+                        logoUrl: downloadURL,
                         description: baseGroupInfo.description,
                         test: false,
                     }
                     firebase.createCareerCenter(careerCenter).then(careerCenterRef => {
+                        console.log('File available at', downloadURL);
                         setCareerCenterRef(careerCenterRef)
                         console.log("career center has been asaved in state!", careerCenterRef)
+                        router.push('/group/' + careerCenterRef.id + '/admin');
                         return firebase.addMultipleGroupCategoryWithElements(careerCenterRef.id, arrayOfCategories)
-                        // router.push('/group/' + careerCenterRef.id + '/admin');
                     });
                 });
             });
@@ -179,12 +174,13 @@ const CreateGroup = ({firebase}) => {
                     handleBack={handleBack}
                     handleReset={handleReset}
                     activeStep={activeStep}
-                    createCareerCenter={createCareerCenter}
                 />;
             case 2:
-                return <CompletedGroup
+                return <CompleteGroup
+                    createCareerCenter={createCareerCenter}
                     baseGroupInfo={baseGroupInfo}
-                    careerCenterRef={careerCenterRef}/>
+                    careerCenterRef={careerCenterRef}
+                    arrayOfCategories={arrayOfCategories}/>
             default:
                 return 'Unknown stepIndex';
         }

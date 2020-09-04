@@ -7,9 +7,8 @@ import CategoryElement from "../admin/CategoryElement";
 import AddIcon from "@material-ui/icons/Add";
 
 
-const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCategory, handleAddTempCategory, handleNext, handleReset, setArrayOfCategories, arrayOfCategories, tempId, createCareerCenter}) => {
+const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCategory, handleAddTempCategory, handleNext, handleReset, setArrayOfCategories, arrayOfCategories, tempId}) => {
     const [createMode, setCreateMode] = useState(false)
-    const [submitting, setSubmitting] = useState(false)
 
     useEffect(() => {
         if (!arrayOfCategories.length) {
@@ -28,13 +27,7 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
         );
     })
 
-    const handleFinalize = () => {
-        setSubmitting(true)
-        console.log("finished!")
-        createCareerCenter()
-        setSubmitting(false)
-        // handleNext()
-    }
+
 
     return (
         <Fragment>
@@ -70,11 +63,9 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                         color="primary"
                         size='large'
                         variant="contained"
-                        disabled={submitting}
                         style={{marginLeft: 5}}
-                        onClick={handleFinish}
-                        endIcon={ submitting && <CircularProgress color="inherit" size={25}/> }
-                    >Finalize</Button>
+                        onClick={handleNext}
+                    >Next</Button>
                 </div>
             </div>
 
