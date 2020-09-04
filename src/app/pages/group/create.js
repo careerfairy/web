@@ -14,6 +14,7 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Typography from '@material-ui/core/Typography';
 import CreateCategories from "../../components/views/group/create/CreateCategories";
+import CompletedGroup from "../../components/views/group/create/CompletedGroup";
 // import {Container} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
@@ -181,7 +182,8 @@ const CreateGroup = ({firebase}) => {
                     createCareerCenter={createCareerCenter}
                 />;
             case 2:
-                return <div><h1>Finished!</h1></div>
+                return <CompletedGroup
+                    baseGroupInfo={baseGroupInfo}/>
             default:
                 return 'Unknown stepIndex';
         }

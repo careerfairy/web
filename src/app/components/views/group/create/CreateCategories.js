@@ -28,7 +28,7 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
         );
     })
 
-    const handleFinish = () => {
+    const handleFinalize = () => {
         setSubmitting(true)
         console.log("finished!")
         createCareerCenter()
@@ -70,9 +70,10 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                         color="primary"
                         size='large'
                         variant="contained"
+                        disabled={submitting}
                         style={{marginLeft: 5}}
                         onClick={handleFinish}
-                        endIcon={ submitting && <CircularProgress size={25}/> }
+                        endIcon={ submitting && <CircularProgress color="inherit" size={25}/> }
                     >Finalize</Button>
                 </div>
             </div>
