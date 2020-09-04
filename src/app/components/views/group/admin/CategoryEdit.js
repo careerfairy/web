@@ -215,18 +215,13 @@ function CategoryEditModal({category, options, handleDeleteLocalCategory, handle
                                 variant="contained">
                             Cancel
                         </Button>
-                        {/*<Button content={newCategory ? 'Create' : 'Update'} onClick={() => saveChanges()} primary/>*/}
-                        {/*<Button content='Cancel' onClick={() => setEditMode(false)}/>*/}
                     </div>
                     {!newCategory &&
                     <Button onClick={() => setUpdateMode({mode: 'deleteCategory', option: {name: categoryName}})}
                             color="secondary"
-                            variant="outlined"
-                    >
+                            variant="outlined">
                         Delete
                     </Button>
-                        // <Button onClick={() => setUpdateMode({mode: 'deleteCategory', option: {name: categoryName}})}
-                        //         inverted color='red' className="red-delete-btn" content='Delete'/>
                     }
                 </div>
             </div>

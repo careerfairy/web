@@ -1,7 +1,8 @@
-import {Fragment, useState, useEffect} from 'react';
-import {Grid, Image, Button, Icon, Modal, Dropdown, Input, Header, Form} from 'semantic-ui-react';
+import React, {Fragment, useState, useEffect} from 'react';
+import {Input, Form} from 'semantic-ui-react';
 
 import {withFirebase} from 'data/firebase';
+import {Button} from "@material-ui/core";
 
 
 function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryName, handleDeleteCategory, handleRename, handleAdd, handleDelete}) {
@@ -25,7 +26,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
         const handleAddModal = (e) => {
             e.preventDefault()
             if (!newOptionName.length) return setTouched(true)
-            if(groupId === "temp") {
+            if (groupId === "temp") {
                 const tempId = Math.random().toString(36).substr(2, 5)
                 return handleAdd({name: newOptionName, id: tempId})
             }
@@ -50,8 +51,12 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                                    style={{width: '30%', margin: '0 20px 0 10px'}}/>
                         </div>
                         <div className='buttons'>
-                            <Button type="submit" content={'Confirm'} primary/>
-                            <Button content={'Cancel'} onClick={() => setUpdateMode({})}/>
+                            <Button variant="contained" type="submit" color="primary">
+                                Confirm
+                            </Button>
+                            <Button variant="contained" onClick={() => setUpdateMode({})}>
+                                Cancel
+                            </Button>
                         </div>
                     </Form>
                 </div>
@@ -112,7 +117,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
     if (updateMode.mode === 'deleteCategory') {
         return (
             <Fragment>
-                <div className={updateMode.mode ? 'modal' : ''}></div>
+                <div className={updateMode.mode ? 'modal' : ''}/>
                 <div className='padding animated fadeIn' style={{margin: '20px 0'}}>
                     <div className='action'>
                         Delete the category <span>{categoryName}</span>
@@ -122,9 +127,12 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                         manually update their categorisation.</p>
                     <p className='explanation warning'>This operation cannot be reverted!</p>
                     <div className='buttons'>
-                        <Button content={'Permanently Delete the Category ' + categoryName}
-                                onClick={handleDeleteCategory} primary/>
-                        <Button content={'Cancel'} onClick={() => setUpdateMode({})}/>
+                        <Button style={{marginRight: 10}} onClick={handleDeleteCategory} color="primary" variant="contained">
+                            Permanently Delete the Category {categoryName}
+                        </Button>
+                        <Button variant="contained" onClick={() => setUpdateMode({})}>
+                            Cancel
+                        </Button>
                     </div>
                 </div>
                 <style jsx>{`
@@ -192,12 +200,12 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
         const handleRenameModal = (e) => {
             e.preventDefault()
             if (!newOptionName.length) return setTouched(true)
-           handleRename({id: updateMode.option.id, name: newOptionName})
+            handleRename({id: updateMode.option.id, name: newOptionName})
         }
 
         return (
             <Fragment>
-                <div className={updateMode.mode ? 'modal' : ''}></div>
+                <div className={updateMode.mode ? 'modal' : ''}/>
                 <div className='padding animated fadeIn'>
                     <Form onSubmit={handleRenameModal}>
                         <div className='action'>
@@ -211,8 +219,12 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                             under <span>{updateMode.option.name}</span> will now be classified
                             under <span>{newOptionName}</span>.</p>
                         <div className='buttons'>
-                            <Button content={'Confirm'} type="submit" primary/>
-                            <Button content={'Cancel'} onClick={() => setUpdateMode({})}/>
+                            <Button style={{marginRight: 10}} type="submit" color="primary" variant="contained">
+                                Confirm
+                            </Button>
+                            <Button variant="contained" onClick={() => setUpdateMode({})}>
+                                Cancel
+                            </Button>
                         </div>
                     </Form>
                 </div>
@@ -265,7 +277,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
     if (updateMode.mode === 'delete') {
         return (
             <Fragment>
-                <div className={updateMode.mode ? 'modal' : ''}></div>
+                <div className={updateMode.mode ? 'modal' : ''}/>
                 <div className='padding animated fadeIn' style={{margin: '20px 0'}}>
                     <div className='action'>
                         Delete option <span>{updateMode.option.name}</span>
@@ -275,9 +287,15 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                         until they manually update their categorisation.</p>
                     <p className='explanation warning'>This operation cannot be reverted!</p>
                     <div className='buttons'>
-                        <Button content={'Permanently Delete the Category ' + updateMode.option.name}
-                                onClick={() => handleDelete(updateMode.option)} primary/>
-                        <Button content={'Cancel'} onClick={() => setUpdateMode({})}/>
+                        <Button style={{marginRight: 10}}
+                                onClick={() => handleDelete(updateMode.option)}
+                                color="primary"
+                                variant="contained">
+                            Permanently Delete the Category {updateMode.option.name}
+                        </Button>
+                        <Button variant="contained" onClick={() => setUpdateMode({})}>
+                            Cancel
+                        </Button>
                     </div>
                 </div>
                 <style jsx>{`
