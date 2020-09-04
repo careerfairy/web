@@ -6,6 +6,8 @@ import {Button} from "@material-ui/core";
 
 
 function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryName, handleDeleteCategory, handleRename, handleAdd, handleDelete}) {
+    console.log("groupId", groupId);
+    console.log("handleDeleteCategory", handleDeleteCategory);
 
 
     if (!updateMode.mode) {
@@ -127,7 +129,8 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                         manually update their categorisation.</p>
                     <p className='explanation warning'>This operation cannot be reverted!</p>
                     <div className='buttons'>
-                        <Button style={{marginRight: 10}} onClick={handleDeleteCategory} color="primary" variant="contained">
+                        <Button style={{marginRight: 10}} onClick={handleDeleteCategory} color="primary"
+                                variant="contained">
                             Permanently Delete the Category {categoryName}
                         </Button>
                         <Button variant="contained" onClick={() => setUpdateMode({})}>

@@ -7,8 +7,7 @@ import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import {useRouter} from "next/router";
 
 
-const CompleteGroup = ({careerCenterId, handleBack, baseGroupInfo, createCareerCenter, arrayOfCategories, setActiveStep}) => {
-    console.log("careerCenterId", careerCenterId);
+const CompleteGroup = ({ handleBack, baseGroupInfo, createCareerCenter, arrayOfCategories, setActiveStep}) => {
     const [submitting, setSubmitting] = useState(false)
     const {push} = useRouter()
 

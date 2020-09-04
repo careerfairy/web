@@ -33,7 +33,6 @@ function getSteps() {
 
 const CreateGroup = ({firebase}) => {
     const [activeStep, setActiveStep] = useState(0);
-    const [careerCenterId, setCareerCenterId] = useState("");
     const [baseGroupInfo, setBaseGroupInfo] = useState({});
     const [arrayOfCategories, setArrayOfCategories] = useState([]);
     const [user, setUser] = useState(null);
@@ -106,7 +105,6 @@ const CreateGroup = ({firebase}) => {
     }
 
     const createCareerCenter = async () => {
-
         try {
             const downloadURL = await uploadLogo(baseGroupInfo.logoFileObj)
             const careerCenter = {
@@ -116,7 +114,6 @@ const CreateGroup = ({firebase}) => {
                 description: baseGroupInfo.description,
                 test: false,
             }
-
             const careerCenterRef = await firebase.createCareerCenter(careerCenter)
             const careerCenterId = careerCenterRef.id
             await firebase.addMultipleGroupCategoryWithElements(careerCenterRef.id, arrayOfCategories)
@@ -127,10 +124,6 @@ const CreateGroup = ({firebase}) => {
 
         }
     }
-
-    // const createCareerCenter = () => {
-    //     return uploadLogo(baseGroupInfo.logoFileObj)
-    // }
 
     function getStepContent(stepIndex) {
         switch (stepIndex) {
@@ -155,7 +148,6 @@ const CreateGroup = ({firebase}) => {
                 />;
             case 2:
                 return <CompleteGroup
-                    careerCenterId={careerCenterId}
                     createCareerCenter={createCareerCenter}
                     baseGroupInfo={baseGroupInfo}
                     setActiveStep={setActiveStep}
