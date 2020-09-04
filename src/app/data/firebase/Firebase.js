@@ -17,7 +17,7 @@ class Firebase {
     getFirebaseTimestamp = (dateString) => {
         return firebase.firestore.Timestamp.fromDate(new Date(dateString));
     }
-    
+
     constructor() {
         if (!firebase.apps.length) {
             firebase.initializeApp(config);
@@ -168,7 +168,7 @@ class Firebase {
     };
 
     createCareerCenter(careerCenter) {
-        let ref = this.firestore 
+        let ref = this.firestore
             .collection("careerCenterData");
         return ref.add(careerCenter);
     }
@@ -252,7 +252,7 @@ class Firebase {
             .collection("categories")
             .doc(categoryId)
             .collection("elements");
-        newElements.forEach( element => { 
+        newElements.forEach( element => {
             if (element.id) {
                 batch.update(elementsRef.doc(element.id), { name: element.name });
             } else {
@@ -260,7 +260,7 @@ class Firebase {
                 batch.set(newElementRef, { name: element.name });
             }
         });
-        elementsToDelete.forEach( element => { 
+        elementsToDelete.forEach( element => {
             batch.delete(elementsRef.doc(element.id));
         });
         return batch.commit();
@@ -289,7 +289,31 @@ class Firebase {
             }
         });
         return batch.commit();
+    }
 
+    addMultipleGroupCategoryWithElements = (groupId, arrayOfCategories) => {
+        let batch = this.firestore.batch()
+
+        arrayOfCategories.forEach(category => {
+            let categoryRef = this.firestore
+                .collection("careerCenterData")
+                .doc(groupId)
+                .collection("categories")
+            var newCategoryRef = categoryRef.doc()
+            batch.set( newCategoryRef, {name: category.name})
+
+            let elementsRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("categories")
+            .doc(newCategoryRef.id)
+            .collection("elements");
+            category.options.forEach(option => {
+                var newElementRef = elementsRef.doc();
+                batch.set(newElementRef, { name: option.name });
+            })
+        })
+        return batch.commit()
     }
 
         deleteGroupCategoryWithElements = (groupId, categoryId, elementsToDelete) => {
@@ -445,7 +469,7 @@ class Firebase {
             .doc("presentation");
             return this.firestore.runTransaction( transaction => {
                 return transaction.get(ref).then(presentation => {
-                    transaction.update(ref, { 
+                    transaction.update(ref, {
                         page: presentation.data().page + 1,
                     });
                 });
@@ -460,7 +484,7 @@ class Firebase {
             .doc("presentation");
             return this.firestore.runTransaction( transaction => {
                 return transaction.get(ref).then(presentation => {
-                    transaction.update(ref, { 
+                    transaction.update(ref, {
                         page: presentation.data().page - 1,
                     });
                 });
@@ -503,7 +527,7 @@ class Firebase {
                 name: speakerName,
                 connected: false,
                 timestamp: firebase.firestore.Timestamp.fromDate(new Date())
-            }); 
+            });
         } else {
             let ref = this.firestore
             .collection("livestreams")
@@ -515,7 +539,7 @@ class Firebase {
                 connected: false,
                 timestamp: firebase.firestore.Timestamp.fromDate(new Date())
             });
-        }     
+        }
     }
 
     deleteLivestreamSpeaker = (livestreamId, speakerId) => {
@@ -625,7 +649,7 @@ class Firebase {
             .doc(question.id);
         return this.firestore.runTransaction( transaction => {
             return transaction.get(ref).then(question => {
-                transaction.update(ref, { 
+                transaction.update(ref, {
                     votes: question.data().votes + 1,
                     emailOfVoters: firebase.firestore.FieldValue.arrayUnion(userEmail)
                 });
@@ -693,7 +717,7 @@ class Firebase {
             .doc(livestreamId)
             .collection("questions")
             .doc(newCurrentQuestionId)
-        batch.update(ref,  { type: "current" });        
+        batch.update(ref,  { type: "current" });
         batch.commit();
     }
 
@@ -705,7 +729,7 @@ class Firebase {
             .doc(question.id);
         return this.firestore.runTransaction( transaction => {
             return transaction.get(ref).then(question => {
-                transaction.update(ref, { 
+                transaction.update(ref, {
                     type: "removed"
                 });
             });
@@ -745,10 +769,10 @@ class Firebase {
         return this.firestore.runTransaction( transaction => {
             return transaction.get(userRef).then(userDoc => {
                 const user = userDoc.data();
-                transaction.update(livestreamRef, { 
+                transaction.update(livestreamRef, {
                     registeredUsers: firebase.firestore.FieldValue.arrayUnion(userId)
                 });
-                transaction.set(registeredUsersRef, { 
+                transaction.set(registeredUsersRef, {
                     firstName: user.firstName,
                     lastName: user.lastName,
                     university: user.university,
@@ -769,7 +793,7 @@ class Firebase {
             .collection("registeredStudents")
             .doc(userId)
         let batch = this.firestore.batch();
-        batch.update(livestreamRef, { 
+        batch.update(livestreamRef, {
             registeredUsers: firebase.firestore.FieldValue.arrayRemove(userId)
         });
         batch.delete(registeredUsersRef);
@@ -782,7 +806,7 @@ class Firebase {
             .doc(userId)
         return this.firestore.runTransaction( transaction => {
             return transaction.get(ref).then(user => {
-                transaction.update(ref, { 
+                transaction.update(ref, {
                     talentPools: firebase.firestore.FieldValue.arrayUnion(companyId)
                 });
             });
@@ -795,7 +819,7 @@ class Firebase {
             .doc(userId)
         return this.firestore.runTransaction( transaction => {
             return transaction.get(ref).then(company => {
-                transaction.update(ref, { 
+                transaction.update(ref, {
                     talentPools: firebase.firestore.FieldValue.arrayRemove(companyId)
                 });
             });

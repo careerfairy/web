@@ -1,5 +1,6 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useState, Fragment} from 'react'
 import {Container} from 'semantic-ui-react';
+
 import {useRouter} from 'next/router';
 import {withFirebase} from '../../data/firebase';
 import Header from '../../components/views/header/Header';
@@ -13,6 +14,7 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Typography from '@material-ui/core/Typography';
 import CreateCategories from "../../components/views/group/create/CreateCategories";
+// import {Container} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -32,12 +34,25 @@ function getSteps() {
 }
 
 
-const CreateGroup = (props) => {
+const CreateGroup = ({firebase}) => {
     const classes = useStyles();
-    const [activeStep, setActiveStep] = React.useState(0);
-    const [careerCenterRef, setCareerCenterRef] = useState("")
-    const [baseGroupInfo, setBaseGroupInfo] = useState({})
-    const [arrayOfCategories, setArrayOfCategories] = useState([])
+    const [activeStep, setActiveStep] = useState(0);
+    const [submitting, setSubmitting] = useState(false);
+    const [careerCenterRef, setCareerCenterRef] = useState("");
+    const [baseGroupInfo, setBaseGroupInfo] = useState({});
+    const [arrayOfCategories, setArrayOfCategories] = useState([]);
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        firebase.auth.onAuthStateChanged(user => {
+            if (user) {
+                setUser(user);
+            } else {
+                router.replace('/login');
+            }
+        })
+    }, []);
+
     const steps = getSteps();
 
     const handleAddTempCategory = (categoryObj) => {
@@ -73,6 +88,73 @@ const CreateGroup = (props) => {
         setActiveStep(0);
     };
 
+    const setServerLogoUrl = (serverUrl) => {
+        setBaseGroupInfo({...baseGroupInfo, logoUrl: serverUrl})
+    }
+
+    function uploadLogo(fileObject) {
+        var storageRef = firebase.getStorageRef();
+        let fullPath = 'group-logos' + '/' + fileObject.name;
+        let companyLogoRef = storageRef.child(fullPath);
+
+        var uploadTask = companyLogoRef.put(fileObject);
+
+        uploadTask.on('state_changed',
+            function (snapshot) {
+                var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log('Upload is ' + progress + '% done');
+                switch (snapshot.state) {
+                    case 'paused':
+                        console.log('Upload is paused');
+                        break;
+                    case 'running':
+                        console.log('Upload is running');
+                        break;
+                    default:
+                        break;
+                }
+            }, function (error) {
+                switch (error.code) {
+                    case 'storage/unauthorized':
+                        // User doesn't have permission to access the object
+                        break;
+
+                    case 'storage/canceled':
+                        // User canceled the upload
+                        break;
+
+                    case 'storage/unknown':
+                        // Unknown error occurred, inspect error.serverResponse
+                        break;
+                    default:
+                        break;
+                }
+            }, function () {
+                // Upload completed successfully, now we can get the download URL
+                uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
+                    setServerLogoUrl(downloadURL);
+                    console.log('File available at', downloadURL);
+                    const careerCenter = {
+                        universityName: baseGroupInfo.universityName,
+                        adminEmail: user.email,
+                        logoUrl: baseGroupInfo.logoUrl,
+                        description: baseGroupInfo.description,
+                        test: false,
+                    }
+                    firebase.createCareerCenter(careerCenter).then(careerCenterRef => {
+                        setCareerCenterRef(careerCenterRef)
+                        console.log("career center has been asaved in state!", careerCenterRef)
+                        return firebase.addMultipleGroupCategoryWithElements(careerCenterRef.id, arrayOfCategories)
+                        // router.push('/group/' + careerCenterRef.id + '/admin');
+                    });
+                });
+            });
+    }
+
+    const createCareerCenter = () => {
+        uploadLogo(baseGroupInfo.logoFileObj)
+    }
+
     function getStepContent(stepIndex) {
         switch (stepIndex) {
             case 0:
@@ -96,6 +178,7 @@ const CreateGroup = (props) => {
                     handleBack={handleBack}
                     handleReset={handleReset}
                     activeStep={activeStep}
+                    createCareerCenter={createCareerCenter}
                 />;
             case 2:
                 return <div><h1>Finished!</h1></div>
@@ -105,23 +188,30 @@ const CreateGroup = (props) => {
     }
 
     return (
-        <div className='greyBackground'>
-            <Head>
-                <title key="title">CareerFairy | Create a group</title>
-            </Head>
-            <Header classElement='relative white-background'/>
-            <Container textAlign='left'>
-                <Stepper activeStep={activeStep} alternativeLabel>
-                    {steps.map((label) => (
-                        <Step key={label}>
-                            <StepLabel>{label}</StepLabel>
-                        </Step>
-                    ))}
-                </Stepper>
-                {getStepContent(activeStep)}
-            </Container>
-            <Footer/>
-        </div>
+        <Fragment>
+            <div className='greyBackground'>
+                <Head>
+                    <title key="title">CareerFairy | Create a group</title>
+                </Head>
+                <Header classElement='relative white-background'/>
+                <Container textAlign='left'>
+                    <Stepper style={{backgroundColor: '#FAFAFA'}} activeStep={activeStep} alternativeLabel>
+                        {steps.map((label) => (
+                            <Step key={label}>
+                                <StepLabel>{label}</StepLabel>
+                            </Step>
+                        ))}
+                    </Stepper>
+                    {getStepContent(activeStep)}
+                </Container>
+                <Footer/>
+            </div>
+            <style jsx>{`
+                .content-wrapper {
+                  background-color: black;
+                }
+          `}</style>
+        </Fragment>
     );
 };
 

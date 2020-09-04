@@ -1,13 +1,21 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Button} from "@material-ui/core";
+import CircularProgress from '@material-ui/core/CircularProgress';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import CategoryEdit from "../admin/CategoryEdit";
 import CategoryElement from "../admin/CategoryElement";
 import AddIcon from "@material-ui/icons/Add";
 
 
-const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCategory, handleAddTempCategory, handleNext, handleReset, setArrayOfCategories, arrayOfCategories, tempId}) => {
+const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCategory, handleAddTempCategory, handleNext, handleReset, setArrayOfCategories, arrayOfCategories, tempId, createCareerCenter}) => {
     const [createMode, setCreateMode] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
+
+    useEffect(() => {
+        if (!arrayOfCategories.length) {
+            setCreateMode(true)
+        }
+    }, [])
     const groupId = "temp"
 
     const categoryElements = arrayOfCategories.map((category, index) => {
@@ -21,15 +29,18 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
     })
 
     const handleFinish = () => {
+        setSubmitting(true)
         console.log("finished!")
-        handleNext()
+        createCareerCenter()
+        setSubmitting(false)
+        // handleNext()
     }
 
     return (
         <Fragment>
             <div className="content-wrapper">
+                <h1 className='content-title'>Add some Categories</h1>
                 <div className="btn-title-wrapper" style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
-                    <h3 className='sublabel'>Add Some Categories</h3>
                     <Button variant="contained"
                             color="primary"
                             size="large"
@@ -40,14 +51,16 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                     </Button>
                 </div>
                 <div className="categories-wrapper">
-                {createMode &&
-                <CategoryEdit handleAddTempCategory={handleAddTempCategory} groupId={groupId} category={{}} options={[]}
-                              newCategory={true} setEditMode={setCreateMode}/>}
-                {categoryElements}
+                    {createMode &&
+                    <CategoryEdit handleAddTempCategory={handleAddTempCategory} groupId={groupId} category={{}}
+                                  options={[]}
+                                  newCategory={true} setEditMode={setCreateMode}/>}
+                    {categoryElements}
                 </div>
                 <div className="button-wrapper">
                     <Button
                         variant="contained"
+                        size='large'
                         style={{marginRight: 5}}
                         startIcon={<ArrowBackIcon/>}
                         onClick={handleBack}
@@ -55,10 +68,12 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
 
                     <Button
                         color="primary"
+                        size='large'
                         variant="contained"
                         style={{marginLeft: 5}}
                         onClick={handleFinish}
-                    >Confirm</Button>
+                        endIcon={ submitting && <CircularProgress size={25}/> }
+                    >Finalize</Button>
                 </div>
             </div>
 
@@ -69,6 +84,13 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                     vertical-align: middle;
                     margin: 9px 0;
                     color: rgb(80,80,80);
+                }
+                
+                .content-title {
+                  text-align: center;
+                  font-weight: 300;
+                  color: rgb(0, 210, 170);
+                  font-size: calc(1.2em + 1.5vw);
                 }
                 
                 .categories-wrapper {

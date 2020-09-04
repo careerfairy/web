@@ -2,7 +2,6 @@ import React, {useEffect, useState, Fragment} from 'react'
 import {Image, Form} from 'semantic-ui-react';
 import {useRouter} from 'next/router';
 import {withFirebase} from '../../../../data/firebase';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import PublishIcon from '@material-ui/icons/Publish';
 import TextField from '@material-ui/core/TextField';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
@@ -14,9 +13,15 @@ const placeholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1f
 
 const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, firebase, setCareerCenterRef, setBaseGroupInfo, baseGroupInfo}) => {
 
-    const [user, setUser] = useState(null);
     const [filePickerError, setFilePickerError] = useState(null)
+    const [initialValues, setInitialValues] = useState({
+        logoUrl: '',
+        logoFile: null,
+        universityName: '',
+        description: ''
+    })
     const router = useRouter();
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
         firebase.auth.onAuthStateChanged(user => {
@@ -28,64 +33,25 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
         })
     }, []);
 
-    function uploadLogo(location, fileObject, callback) {
-        var storageRef = firebase.getStorageRef();
-        let fullPath = location + '/' + fileObject.name;
-        let companyLogoRef = storageRef.child(fullPath);
+    useEffect(() => {
+        if (baseGroupInfo && baseGroupInfo.description) {
+            setInitialValues({
+                logoUrl: baseGroupInfo.logoUrl,
+                logoFile: baseGroupInfo.logoFileObj,
+                universityName: baseGroupInfo.universityName,
+                description: baseGroupInfo.description
+            })
+        }
+    }, [baseGroupInfo])
 
-        var uploadTask = companyLogoRef.put(fileObject);
-
-        uploadTask.on('state_changed',
-            function (snapshot) {
-                var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log('Upload is ' + progress + '% done');
-                switch (snapshot.state) {
-                    case 'paused':
-                        console.log('Upload is paused');
-                        break;
-                    case 'running':
-                        console.log('Upload is running');
-                        break;
-                    default:
-                        break;
-                }
-            }, function (error) {
-                switch (error.code) {
-                    case 'storage/unauthorized':
-                        // User doesn't have permission to access the object
-                        break;
-
-                    case 'storage/canceled':
-                        // User canceled the upload
-                        break;
-
-                    case 'storage/unknown':
-                        // Unknown error occurred, inspect error.serverResponse
-                        break;
-                    default:
-                        break;
-                }
-            }, function () {
-                // Upload completed successfully, now we can get the download URL
-                uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
-                    callback(downloadURL);
-                    console.log('File available at', downloadURL);
-                });
-            });
-    }
 
     return (
         <Fragment>
 
             <div className='padding-vertical'>
-                <h1 className='center thin teal large'>Create a Career Group</h1>
+                <h1 className='content-title'>Create a Career Group</h1>
                 <Formik
-                    initialValues={{
-                        logoUrl: baseGroupInfo.logoUrl||'',
-                        logoFile: baseGroupInfo.logoFileObj || null,
-                        universityName: baseGroupInfo.universityName ||'',
-                        description: baseGroupInfo.description ||''
-                    }}
+                    initialValues={initialValues}
                     validate={values => {
                         let errors = {};
                         if (!values.logoUrl) {
@@ -148,7 +114,7 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
                                             onBlur={handleBlur}
                                             onChange={(fileObject) => {
                                                 setFieldValue('logoUrl', URL.createObjectURL(fileObject), true)
-                                                setFieldValue('logoFileObj',fileObject, true)
+                                                setFieldValue('logoFileObj', fileObject, true)
                                             }
                                                 // fileObject => {
                                                 //     uploadLogo('group-logos', fileObject, (newUrl) => {
@@ -229,21 +195,16 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
                       font-weight: lighter;
                       font-size: 1rem;
                     }
-
-                    .center {
-                        text-align: center;
-                    }
-
-                    .thin {
-                        font-weight: 300;
+                    
+                    .content-title {
+                      text-align: center;
+                      font-weight: 300;
+                      color: rgb(0, 210, 170);
+                      font-size: calc(1.2em + 1.5vw);
                     }
                     
                     .field-error {
                       margin-top: 10px;
-                    }
-
-                    .large {
-                        font-size: calc(1.2em + 1.5vw);
                     }
 
                     .padding-vertical {
@@ -251,9 +212,6 @@ const CreateBaseGroup = ({handleNext, activeStep, handleBack, handleReset, fireb
                         padding-bottom: 50px;
                         max-width: 600px;
                         margin: 0 auto;
-                    }
-                    .teal {
-                        color: rgb(0, 210, 170);
                     }
 
                     #signUpForm {
