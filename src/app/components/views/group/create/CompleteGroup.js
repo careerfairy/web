@@ -1,14 +1,26 @@
 import React, {Fragment, useState} from 'react'
-import {Button, Container, Typography} from "@material-ui/core";
+import {Button, Card, CardContent, CardMedia, Container, Typography} from "@material-ui/core";
 import CircularProgress from '@material-ui/core/CircularProgress';
-
+import {makeStyles} from '@material-ui/core/styles';
 import DisplayCategoryElement from "./DisplayCategoryElement";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import {useRouter} from "next/router";
 
+const useStyles = makeStyles({
+    root: {
+        maxWidth: 345,
+    },
+    media: {
+        height: 0,
+        paddingTop: '56.25%', // 16:9
+    },
+});
 
-const CompleteGroup = ({ handleBack, baseGroupInfo, createCareerCenter, arrayOfCategories, setActiveStep}) => {
+
+const CompleteGroup = ({handleBack, baseGroupInfo, createCareerCenter, arrayOfCategories, setActiveStep}) => {
     const [submitting, setSubmitting] = useState(false)
+    const classes = useStyles();
+
     const {push} = useRouter()
 
     const handleFinalize = async () => {
@@ -26,29 +38,36 @@ const CompleteGroup = ({ handleBack, baseGroupInfo, createCareerCenter, arrayOfC
 
     return (
         <Fragment>
-            <Container>
+            <Container style={{padding: 20}}>
                 <h1 className='content-title'>Last Check</h1>
                 <div>
-                    <Typography variant="h2" gutterBottom>
-                        Have one last look before you finalze
-                    </Typography>
-                    <Typography variant="h4" gutterBottom>
-                        Group Name: <strong>{baseGroupInfo.universityName}</strong>
-                    </Typography>
-                    <Typography variant="h4" gutterBottom>
+                    <Typography variant="h5" gutterBottom>
                         About:
                     </Typography>
-                    <Typography paragraph>
-                        {baseGroupInfo.description}
-                    </Typography>
-                    <Typography variant="h4" gutterBottom>
+                    <Card>
+                        <CardMedia
+                            component="image"
+                            className={classes.media}
+                            image={baseGroupInfo.logoUrl}
+                            title="Paella dish"
+                        />
+                        <CardContent>
+                            <Typography gutterBottom variant="h5" component="h2">
+                                {baseGroupInfo.universityName}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                {baseGroupInfo.description}
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                    <Typography style={{marginTop: 10}} variant="h5" gutterBottom>
                         Categories:
                     </Typography>
                     <div className="category-wrapper">
                         {categories}
                     </div>
                     <div className="action-wrapper">
-                        <Typography align="center">
+                        <Typography gutterBottom align="center">
                             Are you satisfied?
                         </Typography>
                         <div className="button-wrapper">
@@ -70,7 +89,6 @@ const CompleteGroup = ({ handleBack, baseGroupInfo, createCareerCenter, arrayOfC
                             </Button>
                         </div>
                     </div>
-
                 </div>
             </Container>
             <style jsx>{`

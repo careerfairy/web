@@ -46,8 +46,6 @@ const DisplayCategoryElement = ({category, setActiveStep}) => {
                         {optionElements}
                     </Grid.Column>
                     <Grid.Column width={1}>
-                        <Icon name='edit' style={{margin: '5px 0', color: 'rgb(0, 210, 170)', cursor: 'pointer'}}
-                              onClick={() => setActiveStep(1)} size='large'/>
                     </Grid.Column>
                 </Grid>
             </div>

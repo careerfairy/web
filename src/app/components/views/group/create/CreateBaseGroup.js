@@ -94,17 +94,8 @@ const CreateBaseGroup = ({handleNext, firebase, setBaseGroupInfo, baseGroupInfo}
                                             onBlur={handleBlur}
                                             onChange={(fileObject) => {
                                                 setFieldValue('logoUrl', URL.createObjectURL(fileObject), true)
-                                                setFieldValue('logoFileObj', fileObject, true)
-                                            }
-                                                // fileObject => {
-                                                //     uploadLogo('group-logos', fileObject, (newUrl) => {
-                                                //         setFieldValue('logoUrl', newUrl, true);
-                                                //     })
-                                                // }
-                                            }
-
-                                            onError={errMsg => (setFilePickerError(errMsg))}
-                                        >
+                                                setFieldValue('logoFileObj', fileObject, true)}}
+                                            onError={errMsg => (setFilePickerError(errMsg))}>
                                             <Button variant="contained" size='large' endIcon={<PublishIcon/>}>
                                                 Upload Your Logo
                                             </Button>
