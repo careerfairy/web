@@ -137,7 +137,7 @@ function CategoryEditModal({category, options, handleDeleteLocalCategory, handle
                         <Dropdown.Menu>
                             <Dropdown.Item
                                 text='Rename'
-                                onClick={() => setUpdateMode({mode: 'rename', option: optionEl})}
+                                onClick={() => setUpdateMode({mode: 'rename', option: optionEl, options: editableOptions})}
                             />
                             <Dropdown.Item
                                 text='Delete'

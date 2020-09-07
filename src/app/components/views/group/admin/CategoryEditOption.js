@@ -1,14 +1,14 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Input, Form} from 'semantic-ui-react';
 import TextField from '@material-ui/core/TextField';
-
-
 import {withFirebase} from 'data/firebase';
 import {Button, Typography} from "@material-ui/core";
 
 
 function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryName, handleDeleteCategory, handleRename, handleAdd, handleDelete}) {
 
+    const requiredTxt = "Please fill this field"
+    const duplicateTxt = "Cannot be a duplicate"
     if (!updateMode.mode) {
         return null;
     }
@@ -17,18 +17,16 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
         const [newOptionName, setNewOptionName] = useState('');
         const [touched, setTouched] = useState(false)
         const [error, setError] = useState(false)
-        const duplicateText = "Cannot be a duplicate"
-        const requiredText = "Please fill this field"
 
         useEffect(() => {
             if (!newOptionName.length) {
-                setError(requiredText)
+                setError(requiredTxt)
             }
         }, [touched, newOptionName.length])
 
         useEffect(() => {
             if (newOptionName.length && updateMode.options.some(el => el.name === newOptionName)) {
-                setError(duplicateText)
+                setError(duplicateTxt)
                 setTouched(true)
             } else {
                 setError(false)
@@ -37,7 +35,10 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
 
         const handleAddModal = (e) => {
             e.preventDefault()
-            if (!newOptionName.length) return setTouched(true)
+            if (!newOptionName.length) {
+                setTouched(true)
+                return setError(requiredTxt)
+            }
             if (error) return
             if (groupId === "temp") {
                 const tempId = Math.random().toString(36).substr(2, 5)
@@ -58,6 +59,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                             <TextField
                                 autoFocus
                                 variant="outlined"
+                                maxLength="20"
                                 value={newOptionName}
                                 onChange={(e) => setNewOptionName(e.target.value)}
                                 error={touched && error}
@@ -209,19 +211,37 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
 
     if (updateMode.mode === 'rename') {
         const [newOptionName, setNewOptionName] = useState('');
-
+        const [names, setNames] = useState([])
         const [touched, setTouched] = useState(false)
-        const [placeholder, setPlaceholder] = useState('Option Name')
+        const [error, setError] = useState(false)
 
         useEffect(() => {
-            if (touched && !newOptionName.length) {
-                setPlaceholder("Please fill this field")
+            const filteredNames = updateMode.options.filter(el => el.name !== updateMode.option.name)
+            setNames(filteredNames)
+        }, [])
+
+        useEffect(() => {
+            if (!newOptionName.length) {
+                setError(requiredTxt)
             }
         }, [touched, newOptionName.length])
 
+        useEffect(() => {
+            if (newOptionName.length && names.some(el => el.name === newOptionName)) {
+                setError(duplicateTxt)
+                setTouched(true)
+            } else {
+                setError(false)
+            }
+        }, [newOptionName])
+
         const handleRenameModal = (e) => {
             e.preventDefault()
-            if (!newOptionName.length) return setTouched(true)
+            if (!newOptionName.length) {
+                setTouched(true)
+                return setError(requiredTxt)
+            }
+            if (error) return
             handleRename({id: updateMode.option.id, name: newOptionName})
         }
 
@@ -231,11 +251,21 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                 <div className='padding animated fadeIn'>
                     <Form onSubmit={handleRenameModal}>
                         <div className='action'>
-                            Rename the option <span>{updateMode.option.name}</span> to
-                            <Input maxLength="20" type='text' error={touched && !newOptionName.length}
-                                   onBlur={() => setTouched(true)} placeholder={placeholder} value={newOptionName}
-                                   onChange={(event, data) => setNewOptionName(data.value)}
-                                   style={{width: '30%', margin: '0 20px 0 10px'}}/>
+                            <Typography className="label">
+                                Rename the option <span>{updateMode.option.name}</span> to
+                            </Typography>
+                            <TextField
+                                autoFocus
+                                variant="outlined"
+                                maxLength="20"
+                                value={newOptionName}
+                                onChange={(e) => setNewOptionName(e.target.value)}
+                                error={touched && error}
+                                onBlur={() => setTouched(true)}
+                                helperText={touched && error}
+                                style={{width: '30%', margin: '0 20px 0 0', height: 60}}
+                                name="option-name"
+                            />
                         </div>
                         <p className='explanation'>All your members who are currently classified
                             under <span>{updateMode.option.name}</span> will now be classified
@@ -277,6 +307,9 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
 
                     .action {
                         font-size: 1.1em;
+                        display: flex;
+                        align-items: flex-start;
+                        flex-direction: column;
                     }
     
                     .explanation {
