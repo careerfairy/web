@@ -1,7 +1,6 @@
 import {Fragment, useState, useEffect} from 'react';
-import {Grid, Image, Button, Icon, Modal, Step, Input, Checkbox} from "semantic-ui-react";
+import {Grid, Icon} from "semantic-ui-react";
 
-import {useRouter} from 'next/router';
 import {withFirebase} from 'data/firebase';
 import CategoryEdit from './CategoryEdit';
 
@@ -12,7 +11,6 @@ function CategoryElement({groupId, handleUpdateCategory, category, firebase, han
     const [editMode, setEditMode] = useState(false)
 
     useEffect(() => {
-
         if (groupId !== 'temp' && category) {
             firebase.listenToGroupCategoryElements(groupId, category.id, querySnapshot => {
                 let elements = [];

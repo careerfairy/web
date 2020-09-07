@@ -83,14 +83,14 @@ class Firebase {
             .collection("registeredGroups")
             .doc(groupId)
             .collection("categories");
-        return this.firestore.runTransaction( transaction => {
-            return transaction.get(ref).then( element => {
-                transaction.update(ref, { groupIds: firebase.firestore.FieldValue.arrayUnion(groupId) })
-                transaction.set(registeredGroupsRef, { groupId: groupId});
-                categoriesWithElements.forEach( category => {
-                    let selectedValue = category.elements.find( element => element.selected === true);
+        return this.firestore.runTransaction(transaction => {
+            return transaction.get(ref).then(element => {
+                transaction.update(ref, {groupIds: firebase.firestore.FieldValue.arrayUnion(groupId)})
+                transaction.set(registeredGroupsRef, {groupId: groupId});
+                categoriesWithElements.forEach(category => {
+                    let selectedValue = category.elements.find(element => element.selected === true);
                     let categoryRef = categoriesRef.doc(category.id);
-                    transaction.set(categoryRef, { categoryId: category.id, value: selectedValue.id });
+                    transaction.set(categoryRef, {categoryId: category.id, value: selectedValue.id});
                 })
             });
         });
@@ -125,7 +125,7 @@ class Firebase {
             .doc(groupId)
             .collection("categories")
             .doc(categoryId);
-        return ref.update({ value: value });
+        return ref.update({value: value});
     }
 
     // COMPANIES
@@ -173,6 +173,13 @@ class Firebase {
         return ref.add(careerCenter);
     }
 
+    updateCareerCenter = (groupId, newCareerCenter) => {
+        let ref = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+        return ref.update(newCareerCenter)
+    }
+
     getCareerCenters = () => {
         let ref = this.firestore
             .collection("careerCenterData")
@@ -195,7 +202,7 @@ class Firebase {
         return ref.get();
     };
 
-    getCareerCentersByAdminEmail= (adminEmail) => {
+    getCareerCentersByAdminEmail = (adminEmail) => {
         let ref = this.firestore
             .collection("careerCenterData")
             .where("adminEmail", "==", adminEmail);
@@ -245,22 +252,22 @@ class Firebase {
             .doc(groupId)
             .collection("categories")
             .doc(categoryId);
-        batch.update(categoryRef, { name: categoryName });
+        batch.update(categoryRef, {name: categoryName});
         let elementsRef = this.firestore
             .collection("careerCenterData")
             .doc(groupId)
             .collection("categories")
             .doc(categoryId)
             .collection("elements");
-        newElements.forEach( element => {
+        newElements.forEach(element => {
             if (element.id) {
-                batch.update(elementsRef.doc(element.id), { name: element.name });
+                batch.update(elementsRef.doc(element.id), {name: element.name});
             } else {
                 var newElementRef = elementsRef.doc();
-                batch.set(newElementRef, { name: element.name });
+                batch.set(newElementRef, {name: element.name});
             }
         });
-        elementsToDelete.forEach( element => {
+        elementsToDelete.forEach(element => {
             batch.delete(elementsRef.doc(element.id));
         });
         return batch.commit();
@@ -273,19 +280,19 @@ class Firebase {
             .doc(groupId)
             .collection("categories")
         var newCategoryRef = categoryRef.doc()
-        batch.set( newCategoryRef, {name: categoryName})
+        batch.set(newCategoryRef, {name: categoryName})
         let elementsRef = this.firestore
             .collection("careerCenterData")
             .doc(groupId)
             .collection("categories")
             .doc(newCategoryRef.id)
             .collection("elements");
-        newElements.forEach( element => {
+        newElements.forEach(element => {
             if (element.id) {
-                batch.update(elementsRef.doc(element.id), { name: element.name });
+                batch.update(elementsRef.doc(element.id), {name: element.name});
             } else {
                 var newElementRef = elementsRef.doc();
-                batch.set(newElementRef, { name: element.name });
+                batch.set(newElementRef, {name: element.name});
             }
         });
         return batch.commit();
@@ -300,23 +307,23 @@ class Firebase {
                 .doc(groupId)
                 .collection("categories")
             var newCategoryRef = categoryRef.doc()
-            batch.set( newCategoryRef, {name: category.name})
+            batch.set(newCategoryRef, {name: category.name})
 
             let elementsRef = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("categories")
-            .doc(newCategoryRef.id)
-            .collection("elements");
+                .collection("careerCenterData")
+                .doc(groupId)
+                .collection("categories")
+                .doc(newCategoryRef.id)
+                .collection("elements");
             category.options.forEach(option => {
                 var newElementRef = elementsRef.doc();
-                batch.set(newElementRef, { name: option.name });
+                batch.set(newElementRef, {name: option.name});
             })
         })
         return batch.commit()
     }
 
-        deleteGroupCategoryWithElements = (groupId, categoryId, elementsToDelete) => {
+    deleteGroupCategoryWithElements = (groupId, categoryId, elementsToDelete) => {
         let batch = this.firestore.batch();
 
         let elementsRef = this.firestore
@@ -325,7 +332,7 @@ class Firebase {
             .collection("categories")
             .doc(categoryId)
             .collection("elements");
-        elementsToDelete.forEach( element => {
+        elementsToDelete.forEach(element => {
             batch.delete(elementsRef.doc(element.id));
         })
         let categoryRef = this.firestore
@@ -334,7 +341,7 @@ class Firebase {
             .collection("categories")
             .doc(categoryId)
 
-            batch.delete(categoryRef)
+        batch.delete(categoryRef)
 
         return batch.commit();
 
@@ -467,13 +474,13 @@ class Firebase {
             .doc(livestreamId)
             .collection("presentations")
             .doc("presentation");
-            return this.firestore.runTransaction( transaction => {
-                return transaction.get(ref).then(presentation => {
-                    transaction.update(ref, {
-                        page: presentation.data().page + 1,
-                    });
+        return this.firestore.runTransaction(transaction => {
+            return transaction.get(ref).then(presentation => {
+                transaction.update(ref, {
+                    page: presentation.data().page + 1,
                 });
             });
+        });
     }
 
     decreaseLivestreamPresentationPageNumber = (livestreamId) => {
@@ -482,13 +489,13 @@ class Firebase {
             .doc(livestreamId)
             .collection("presentations")
             .doc("presentation");
-            return this.firestore.runTransaction( transaction => {
-                return transaction.get(ref).then(presentation => {
-                    transaction.update(ref, {
-                        page: presentation.data().page - 1,
-                    });
+        return this.firestore.runTransaction(transaction => {
+            return transaction.get(ref).then(presentation => {
+                transaction.update(ref, {
+                    page: presentation.data().page - 1,
                 });
             });
+        });
     }
 
     listenToLivestreamPresentation = (livestreamId, callback) => {
@@ -518,10 +525,10 @@ class Firebase {
     createNewLivestreamSpeaker = (livestreamId, speakerName, mainSpeaker) => {
         if (mainSpeaker) {
             let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
-            .collection("liveSpeakers")
-            .doc(livestreamId);
+                .collection("livestreams")
+                .doc(livestreamId)
+                .collection("liveSpeakers")
+                .doc(livestreamId);
             return ref.set({
                 counter: 0,
                 name: speakerName,
@@ -530,9 +537,9 @@ class Firebase {
             });
         } else {
             let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
-            .collection("liveSpeakers");
+                .collection("livestreams")
+                .doc(livestreamId)
+                .collection("liveSpeakers");
             return ref.add({
                 counter: 0,
                 name: speakerName,
@@ -647,7 +654,7 @@ class Firebase {
             .doc(livestreamId)
             .collection("questions")
             .doc(question.id);
-        return this.firestore.runTransaction( transaction => {
+        return this.firestore.runTransaction(transaction => {
             return transaction.get(ref).then(question => {
                 transaction.update(ref, {
                     votes: question.data().votes + 1,
@@ -706,18 +713,18 @@ class Firebase {
         let batch = this.firestore.batch();
         if (previousCurrentQuestionId) {
             let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
-            .collection("questions")
-            .doc(previousCurrentQuestionId);
-            batch.update(ref,  { type: "done" });
+                .collection("livestreams")
+                .doc(livestreamId)
+                .collection("questions")
+                .doc(previousCurrentQuestionId);
+            batch.update(ref, {type: "done"});
         }
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("questions")
             .doc(newCurrentQuestionId)
-        batch.update(ref,  { type: "current" });
+        batch.update(ref, {type: "current"});
         batch.commit();
     }
 
@@ -727,7 +734,7 @@ class Firebase {
             .doc(livestreamId)
             .collection("questions")
             .doc(question.id);
-        return this.firestore.runTransaction( transaction => {
+        return this.firestore.runTransaction(transaction => {
             return transaction.get(ref).then(question => {
                 transaction.update(ref, {
                     type: "removed"
@@ -766,7 +773,7 @@ class Firebase {
             .doc(livestreamId)
             .collection("registeredStudents")
             .doc(userId)
-        return this.firestore.runTransaction( transaction => {
+        return this.firestore.runTransaction(transaction => {
             return transaction.get(userRef).then(userDoc => {
                 const user = userDoc.data();
                 transaction.update(livestreamRef, {
@@ -804,7 +811,7 @@ class Firebase {
         let ref = this.firestore
             .collection("userData")
             .doc(userId)
-        return this.firestore.runTransaction( transaction => {
+        return this.firestore.runTransaction(transaction => {
             return transaction.get(ref).then(user => {
                 transaction.update(ref, {
                     talentPools: firebase.firestore.FieldValue.arrayUnion(companyId)
@@ -817,7 +824,7 @@ class Firebase {
         let ref = this.firestore
             .collection("userData")
             .doc(userId)
-        return this.firestore.runTransaction( transaction => {
+        return this.firestore.runTransaction(transaction => {
             return transaction.get(ref).then(company => {
                 transaction.update(ref, {
                     talentPools: firebase.firestore.FieldValue.arrayRemove(companyId)
@@ -828,16 +835,16 @@ class Firebase {
 
     getRegisteredStudentsInLivestream = (livestreamId) => {
         let ref = this.firestore
-                    .collection("livestreams")
-                    .doc(livestreamId)
-                    .collection("registeredStudents")
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("registeredStudents")
         return ref.get();
     }
 
     getStudentsInCompanyTalentPool = (companyId) => {
         let ref = this.firestore
-                    .collection("userData")
-                    .where("talentPools", "array-contains", companyId);
+            .collection("userData")
+            .where("talentPools", "array-contains", companyId);
         return ref.get();
     }
 

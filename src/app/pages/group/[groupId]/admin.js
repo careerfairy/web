@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react'
-import { Container, Button, Image, Menu, Grid } from 'semantic-ui-react';
-import { useRouter } from 'next/router';
-import { withFirebase } from '../../../data/firebase';
+import React, {useEffect, useState} from 'react'
+import {Container, Button, Image, Menu} from 'semantic-ui-react';
+import {useRouter} from 'next/router';
+import {withFirebase} from '../../../data/firebase';
 import Header from '../../../components/views/header/Header';
+import EditIcon from '@material-ui/icons/Edit';
+import SaveIcon from '@material-ui/icons/Save';
 import Loader from '../../../components/views/loader/Loader';
+
 
 import Head from 'next/head';
 import Footer from '../../../components/views/footer/Footer';
@@ -11,23 +14,48 @@ import CategoryElement from '../../../components/views/group/admin/CategoryEleme
 import Events from '../../../components/views/group/admin/events/Events';
 import Settings from '../../../components/views/group/admin/settings/Settings';
 import Members from '../../../components/views/group/admin/members/Members';
+import {Avatar, Card, CardMedia, Grid, IconButton, TextField} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
+import {TextFields} from "@material-ui/icons";
+
+const useStyles = makeStyles({
+    root: {
+        maxWidth: 345,
+    },
+    logo: {
+        fontSize: '180px',
+        width: 'auto',
+        height: 'auto',
+        boxShadow: '0 0 5px rgb(200,200,200)',
+        border: '2px solid rgb(0, 210, 170)'
+    }
+});
 
 const JoinGroup = (props) => {
-    
+
+    const classes = useStyles()
+
     const router = useRouter();
     const groupId = router.query.groupId;
 
     const [user, setUser] = useState(null);
+
+
     const [userData, setUserData] = useState(null);
+    const [editMode, setEditMode] = useState(false)
 
     const [group, setGroup] = useState([]);
+
+    const [editData, setEditData] = useState({logoUrl: "", fileObj: "", universityName: ""})
+    console.log(editData);
+
     const [menuItem, setMenuItem] = useState("settings")
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
             if (user) {
                 setUser(user);
-            }  else {
+            } else {
                 router.replace('/login');
             }
         })
@@ -40,65 +68,102 @@ const JoinGroup = (props) => {
                 careerCenter.id = querySnapshot.id;
                 setGroup(careerCenter);
             });
-        }        
+        }
     }, [groupId]);
 
+    const handleChangeName = (e) => {
+        const value = e.target.value
+        setEditData({...editData, universityName: value})
+    }
+
+    const handleSubmitName = async (e) => {
+        e.preventDefault()
+        const response = await props.firebase.updateCareerCenter(careerCenter.id, {universityName: editData.universityName})
+        console.log("response", response)
+    }
+
     return (
-            <div className='greyBackground'>
-                <Head>
-                    <title key="title">CareerFairy | Join Groups</title>
-                </Head>
-                <Header classElement='relative white-background'/>
-                <Container style={{ padding: '30px 0'}} textAlign='center'>
-                    <div className='white-box'>
-                        <Grid>
-                            <Grid.Column width={6}>
-                                <div className='image-outer-container'>
-                                    <div className='image-container'>
-                                        <Image style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', margin: '0 auto 50px auto', maxHeight: '40%', maxWidth: '70%'}} src={group.logoUrl}/>
-                                    </div>
-                                </div>
-                            </Grid.Column>
-                            <Grid.Column width={10} textAlign='left'>
-                                <h1 className='group-name'>{ group.universityName }</h1>
-                            </Grid.Column>
-                        </Grid>  
-                    </div>   
-                    <Menu style={{ textAlign: 'center', margin: '0 0 20px 0'}} compact secondary>
-                        <Menu.Item
-                            name="events"
-                            active={menuItem === "events"}
-                            onClick={() => { setMenuItem("events") }}
-                        >
+        <div className='greyBackground'>
+            <Head>
+                <title key="title">CareerFairy | Join Groups</title>
+            </Head>
+            <Header classElement='relative white-background'/>
+            <Container style={{padding: '30px 0'}} textAlign='center'>
+                <div className='white-box'>
+                    <Grid container>
+                        <Grid item xs={6}>
+                            <div className='image-outer-container'>
+                                <Avatar src={group.logoUrl}
+                                        className={classes.logo}
+                                        title="Group logo"/>
+                            </div>
+                        </Grid>
+                        <Grid item xs={6} direction="row"
+                              container
+                              alignItems="center">
+                            {editMode ?
+                                <>
+                                    <TextField style={{width: '70%'}}
+                                               inputProps={{style: {fontSize: 'calc(1.1em + 2vw)'}}}
+                                               defaultValue={group.universityName}
+                                               onChange={handleChangeName}
+                                    />
+                                    <IconButton onClick={() => setEditMode(false)}>
+                                        <SaveIcon color="primary"/>
+                                    </IconButton>
+                                </>
+                                :
+                                <>
+                                    <h1 className='group-name'>{group.universityName}</h1>
+                                    <IconButton onClick={() => setEditMode(true)}>
+                                        {menuItem === 'settings' && <EditIcon color="primary"/>}
+                                    </IconButton>
+                                </>
+                            }
+                        </Grid>
+                    </Grid>
+                </div>
+                <Menu style={{textAlign: 'center', margin: '0 0 20px 0'}} compact secondary>
+                    <Menu.Item
+                        name="events"
+                        active={menuItem === "events"}
+                        onClick={() => {
+                            setMenuItem("events")
+                        }}
+                    >
                         Live Streams
-                        </Menu.Item>
-                        <Menu.Item
-                            name="members"
-                            active={menuItem === "members"}
-                            onClick={() => { setMenuItem("members") }}
-                        >
+                    </Menu.Item>
+                    <Menu.Item
+                        name="members"
+                        active={menuItem === "members"}
+                        onClick={() => {
+                            setMenuItem("members")
+                        }}
+                    >
                         Members
-                        </Menu.Item>
-                        <Menu.Item
-                            name="settings"
-                            active={menuItem === "settings"}
-                            onClick={() => { setMenuItem("settings") }}
-                        >
+                    </Menu.Item>
+                    <Menu.Item
+                        name="settings"
+                        active={menuItem === "settings"}
+                        onClick={() => {
+                            setMenuItem("settings")
+                        }}
+                    >
                         Settings
-                        </Menu.Item>
-                    </Menu>
-                    <div className={ menuItem === "events" ? '' : 'hidden' }>
-                        <Events groupId={groupId} user={user} userData={userData} menuItem={menuItem}/>
-                    </div>
-                    <div className={ menuItem === "members" ? '' : 'hidden' }>
-                        <Members groupId={groupId}/>
-                    </div>
-                    <div className={ menuItem === "settings" ? '' : 'hidden' }>
-                        <Settings groupId={groupId} />
-                    </div>
-                </Container>
-                <Footer/>
-                <style jsx>{`
+                    </Menu.Item>
+                </Menu>
+                <div className={menuItem === "events" ? '' : 'hidden'}>
+                    <Events groupId={groupId} user={user} userData={userData} menuItem={menuItem}/>
+                </div>
+                <div className={menuItem === "members" ? '' : 'hidden'}>
+                    <Members groupId={groupId}/>
+                </div>
+                <div className={menuItem === "settings" ? '' : 'hidden'}>
+                    <Settings groupId={groupId}/>
+                </div>
+            </Container>
+            <Footer/>
+            <style jsx>{`
                     .hidden {
                         display: none;
                     }
@@ -113,6 +178,11 @@ const JoinGroup = (props) => {
                         padding: 10px;
                         margin: 10px 0 10px 0;
                         text-align: left;
+                    }
+                    
+                    .title-container {
+                      display: flex;
+                      align-items: center;
                     }
 
                     .image-outer-container {
@@ -149,7 +219,6 @@ const JoinGroup = (props) => {
                         font-weight: 500;
                         font-size: calc(1.1em + 2vw);
                         color: rgb(80,80,80);
-                        text-shado
                     }
 
                     .sublabel {
@@ -161,7 +230,7 @@ const JoinGroup = (props) => {
                         padding: 30px 0;
                     }
                 `}</style>
-            </div>
+        </div>
     );
 };
 
