@@ -56,7 +56,7 @@ const CreateBaseGroup = ({handleNext, firebase, setBaseGroupInfo, baseGroupInfo}
                         let careerCenter = {
                             adminEmail: user.email,
                             logoUrl: values.logoUrl,
-                            logoFileObj: values.logoFileObj,
+                            logoFileObj: values.logoFileObj || baseGroupInfo.logoFileObj,
                             description: values.description,
                             test: false,
                             universityName: values.universityName

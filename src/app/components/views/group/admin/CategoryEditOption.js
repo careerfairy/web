@@ -252,7 +252,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                     <Form onSubmit={handleRenameModal}>
                         <div className='action'>
                             <Typography className="label">
-                                Rename the option <span>{updateMode.option.name}</span> to
+                                Rename the option <span>{updateMode.option.name}</span> to:
                             </Typography>
                             <TextField
                                 autoFocus
@@ -314,7 +314,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
     
                     .explanation {
                         font-size: 0.9em;
-                        margin: 10px 0 20px 0;
+                        margin: 0 0 20px 0;
                     }
 
                     .explanation span, .action span {

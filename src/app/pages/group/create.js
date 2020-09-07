@@ -89,6 +89,7 @@ const CreateGroup = ({firebase}) => {
     }
 
     const uploadLogo = async (fileObject) => {
+        console.log("fileObject", fileObject);
         try {
             var storageRef = firebase.getStorageRef();
             let fullPath = 'group-logos' + '/' + fileObject.name;

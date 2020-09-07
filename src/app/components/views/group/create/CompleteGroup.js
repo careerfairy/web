@@ -24,7 +24,6 @@ const CompleteGroup = ({handleBack, baseGroupInfo, createCareerCenter, arrayOfCa
     const {push} = useRouter()
 
     const handleFinalize = async () => {
-        debugger
         setSubmitting(true)
         const ID = await createCareerCenter()
         setSubmitting(false)
