@@ -1,8 +1,10 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Input, Form} from 'semantic-ui-react';
+import TextField from '@material-ui/core/TextField';
+
 
 import {withFirebase} from 'data/firebase';
-import {Button} from "@material-ui/core";
+import {Button, Typography} from "@material-ui/core";
 
 
 function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryName, handleDeleteCategory, handleRename, handleAdd, handleDelete}) {
@@ -14,17 +16,31 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
     if (updateMode.mode === 'add') {
         const [newOptionName, setNewOptionName] = useState('');
         const [touched, setTouched] = useState(false)
-        const [placeholder, setPlaceholder] = useState('Option Name')
+        const [error, setError] = useState(false)
+        console.log("error", error)
 
         useEffect(() => {
             if (touched && !newOptionName.length) {
-                setPlaceholder("Please fill this field")
+                setError("Please fill this field")
             }
         }, [touched, newOptionName.length])
 
+        useEffect(() => {
+            if (newOptionName.length && updateMode.options.some(el => el.name === newOptionName)) {
+                setError("cannot be a duplicate")
+                setTouched(true)
+            } else {
+                setError(false)
+            }
+        }, [newOptionName])
+
         const handleAddModal = (e) => {
             e.preventDefault()
-            if (!newOptionName.length) return setTouched(true)
+            if (!newOptionName.length) {
+                setTouched(true)
+                return setError("Please fill this field")
+            }
+            if (error) return
             if (groupId === "temp") {
                 const tempId = Math.random().toString(36).substr(2, 5)
                 return handleAdd({name: newOptionName, id: tempId})
@@ -38,16 +54,20 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                 <div className='padding animated fadeIn'>
                     <Form onSubmit={handleAddModal}>
                         <div className='action'>
-                            Add an option named
-                            <Input maxLength="20"
-                                   type='text'
-                                   error={touched && !newOptionName.length}
-                                   onBlur={() => setTouched(true)}
-                                   autoFocus
-                                   placeholder={placeholder}
-                                   value={newOptionName}
-                                   onChange={(event, data) => setNewOptionName(data.value)}
-                                   style={{width: '30%', margin: '0 20px 0 10px'}}/>
+                            <Typography className="label">
+                                Add an option named:
+                            </Typography>
+                            <TextField
+                                autoFocus
+                                variant="outlined"
+                                value={newOptionName}
+                                onChange={(e) => setNewOptionName(e.target.value)}
+                                error={touched && error}
+                                onBlur={() => setTouched(true)}
+                                helperText={touched && error}
+                                style={{width: '30%', margin: '0 20px 0 0', position: 'absolute'}}
+                                name="option-name"
+                            />
                         </div>
                         <div className='buttons'>
                             <Button style={{marginRight: 10}} variant="contained" type="submit" color="primary">
@@ -63,6 +83,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                     .hidden {
                         display: none
                     }
+                    
     
                     .padding {
                         position: relative;
@@ -86,6 +107,9 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
 
                     .action {
                         font-size: 1.1em;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-start;
                     }
     
                     .explanation {

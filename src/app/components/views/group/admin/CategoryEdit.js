@@ -1,5 +1,5 @@
 import {Fragment, useState, useEffect} from 'react';
-import {Grid, Image, Icon, Modal, Dropdown, Input, Header} from "semantic-ui-react";
+import {Grid, Dropdown, Input} from "semantic-ui-react";
 import AddIcon from '@material-ui/icons/Add';
 
 import {withFirebase} from "data/firebase";
@@ -192,7 +192,7 @@ function CategoryEditModal({category, options, handleDeleteLocalCategory, handle
                     <Grid.Column width={11}>
                         <div className='white-box-label'>Category Options</div>
                         {optionElements}
-                        <IconButton size="small" onClick={() => setUpdateMode({mode: 'add'})}>
+                        <IconButton size="small" onClick={() => setUpdateMode({mode: 'add', options: editableOptions})}>
                             <AddIcon fontSize="large"
                                      color="primary"/>
                         </IconButton>
@@ -202,7 +202,7 @@ function CategoryEditModal({category, options, handleDeleteLocalCategory, handle
                 <CategoryEditOption categoryName={categoryName} handleDeleteCategory={handleDeleteCategory}
                                     updateMode={updateMode} setUpdateMode={setUpdateMode} handleAdd={handleAdd}
                                     handleDelete={handleDelete} handleRename={handleRename} groupId={groupId}/>
-                <div className='separator'></div>
+                <div className='separator'/>
                 <div className="button-wrapper">
                     <div>
                         <Button onClick={() => saveChanges()}
