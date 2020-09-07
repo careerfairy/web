@@ -24,6 +24,7 @@ const CompleteGroup = ({handleBack, baseGroupInfo, createCareerCenter, arrayOfCa
     const {push} = useRouter()
 
     const handleFinalize = async () => {
+        debugger
         setSubmitting(true)
         const ID = await createCareerCenter()
         setSubmitting(false)
@@ -42,7 +43,7 @@ const CompleteGroup = ({handleBack, baseGroupInfo, createCareerCenter, arrayOfCa
                 <h1 className='content-title'>Last Check</h1>
                 <div>
                     <Typography variant="h5" gutterBottom>
-                        About:
+                        Details:
                     </Typography>
                     <Card>
                         <CardMedia

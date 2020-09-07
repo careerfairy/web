@@ -8,12 +8,18 @@ import AddIcon from "@material-ui/icons/Add";
 
 const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCategory, handleAddTempCategory, handleNext, arrayOfCategories}) => {
     const [createMode, setCreateMode] = useState(false)
+    const [notEnoughCategories, setNotEnoughCategories] = useState(false)
+    console.log("notEnoughCategories",notEnoughCategories);
 
     useEffect(() => {
         if (!arrayOfCategories.length) {
             setCreateMode(true)
         }
     }, [])
+
+    useEffect(() => {
+        if (notEnoughCategories && arrayOfCategories.length > 0) setNotEnoughCategories(false)
+    }, [arrayOfCategories.length])
     const groupId = "temp"
 
     const categoryElements = arrayOfCategories.map((category, index) => {
@@ -26,6 +32,10 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
         );
     })
 
+    const verifyNext = () => {
+        if (arrayOfCategories.length < 1) return setNotEnoughCategories(true)
+        handleNext()
+    }
 
 
     return (
@@ -48,6 +58,7 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                                   options={[]}
                                   newCategory={true} setEditMode={setCreateMode}/>}
                     {categoryElements}
+                    {notEnoughCategories && <p className="error-text">You need at least one category</p>}
                 </div>
                 <div className="button-wrapper">
                     <Button
@@ -63,7 +74,7 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                         size='large'
                         variant="contained"
                         style={{marginLeft: 5}}
-                        onClick={handleNext}
+                        onClick={verifyNext}
                     >Next</Button>
                 </div>
             </div>
@@ -96,6 +107,12 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                   display: flex;
                   justify-content: space-between;
                   flex-direction: column;
+                }
+                
+                .error-text {
+                  color: red;
+                  font-weight: lighter;
+                  font-size: 1rem;
                 }
                 
                 .button-wrapper {

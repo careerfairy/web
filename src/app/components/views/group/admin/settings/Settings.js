@@ -10,7 +10,6 @@ const Settings = (props) => {
 
     const [categories, setCategories] = useState([]);
     const [createMode, setCreateMode] = useState(false)
-    console.log(createMode);
 
     useEffect(() => {
         if (props.groupId) {

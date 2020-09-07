@@ -139,7 +139,6 @@ const CreateGroup = ({firebase}) => {
                     handleDeleteLocalCategory={handleDeleteLocalCategory}
                     handleUpdateCategory={handleUpdateCategory}
                     handleAddTempCategory={handleAddTempCategory}
-                    setArrayOfCategories={setArrayOfCategories}
                     arrayOfCategories={arrayOfCategories}
                     handleNext={handleNext}
                     handleBack={handleBack}
