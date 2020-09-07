@@ -17,17 +17,18 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
         const [newOptionName, setNewOptionName] = useState('');
         const [touched, setTouched] = useState(false)
         const [error, setError] = useState(false)
-        console.log("error", error)
+        const duplicateText = "Cannot be a duplicate"
+        const requiredText = "Please fill this field"
 
         useEffect(() => {
-            if (touched && !newOptionName.length) {
-                setError("Please fill this field")
+            if (!newOptionName.length) {
+                setError(requiredText)
             }
         }, [touched, newOptionName.length])
 
         useEffect(() => {
             if (newOptionName.length && updateMode.options.some(el => el.name === newOptionName)) {
-                setError("cannot be a duplicate")
+                setError(duplicateText)
                 setTouched(true)
             } else {
                 setError(false)
@@ -36,10 +37,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
 
         const handleAddModal = (e) => {
             e.preventDefault()
-            if (!newOptionName.length) {
-                setTouched(true)
-                return setError("Please fill this field")
-            }
+            if (!newOptionName.length) return setTouched(true)
             if (error) return
             if (groupId === "temp") {
                 const tempId = Math.random().toString(36).substr(2, 5)
@@ -65,7 +63,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                                 error={touched && error}
                                 onBlur={() => setTouched(true)}
                                 helperText={touched && error}
-                                style={{width: '30%', margin: '0 20px 0 0', position: 'absolute'}}
+                                style={{width: '30%', margin: '0 20px 0 0', height: 60}}
                                 name="option-name"
                             />
                         </div>
