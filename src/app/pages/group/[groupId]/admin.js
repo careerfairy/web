@@ -101,7 +101,7 @@ const JoinGroup = (props) => {
                     <Members groupId={groupId}/>
                 </div>
                 <div className={menuItem === "settings" ? '' : 'hidden'}>
-                    <Settings groupId={groupId}/>
+                    <Settings getCareerCenter={getCareerCenter} group={group} groupId={groupId}/>
                 </div>
             </Container>
             <Footer/>
