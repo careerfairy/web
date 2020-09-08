@@ -8,7 +8,7 @@ import Footer from '../../../components/views/footer/Footer';
 import Events from '../../../components/views/group/admin/events/Events';
 import Settings from '../../../components/views/group/admin/settings/Settings';
 import Members from '../../../components/views/group/admin/members/Members';
-import GroupTitle from "../../../components/views/group/admin/settings/GroupTitle";
+import AdminHeader from "../../../components/views/group/admin/AdminHeader";
 
 
 
@@ -64,7 +64,7 @@ const JoinGroup = (props) => {
             </Head>
             <Header classElement='relative white-background'/>
             <Container style={{padding: '30px 0'}} textAlign='center'>
-                 <GroupTitle getCareerCenter={getCareerCenter} group={group} menuItem={menuItem}/>
+                 <AdminHeader getCareerCenter={getCareerCenter} group={group} menuItem={menuItem}/>
                 <Menu style={{textAlign: 'center', margin: '0 0 20px 0'}} compact secondary>
                     <Menu.Item
                         name="events"

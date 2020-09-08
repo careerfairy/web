@@ -3,10 +3,10 @@ import {Avatar, Button, Grid, IconButton, TextField} from "@material-ui/core";
 import CheckIcon from "@material-ui/icons/Check";
 import ClearIcon from "@material-ui/icons/Clear";
 import EditIcon from "@material-ui/icons/Edit";
-import {withFirebase} from "../../../../../data/firebase";
+import {withFirebase} from "../../../../data/firebase";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {makeStyles} from "@material-ui/core/styles";
-import FilePickerContainer from "../../../../ssr/FilePickerContainer";
+import FilePickerContainer from "../../../ssr/FilePickerContainer";
 import PublishIcon from "@material-ui/icons/Publish";
 
 const useStyles = makeStyles({
@@ -22,19 +22,14 @@ const useStyles = makeStyles({
     }
 });
 
-const GroupTitle = ({group, menuItem, getCareerCenter, firebase}) => {
+const AdminHeader = ({group, menuItem, getCareerCenter, firebase}) => {
     const classes = useStyles()
 
     const [editTitle, setEditTitle] = useState(false)
     const [editLogo, setEditLogo] = useState(false)
-
     const [filePickerError, setFilePickerError] = useState(null)
-    console.log(filePickerError);
-
     const [submittingLogo, setSubmittingLogo] = useState(false)
-
     const [error, setError] = useState(null)
-
     const [editData, setEditData] = useState(
         {
             universityName: "",
@@ -42,17 +37,35 @@ const GroupTitle = ({group, menuItem, getCareerCenter, firebase}) => {
             logoUrl: ""
         })
 
+    useEffect(() => {
+        if (group) {
+            setEditData(group)
+        }
+    }, [group])
+
+
+    useEffect(() => {
+        if (error && editData.universityName.length > 3) {
+            setError(null)
+        }
+    }, [error, editData])
+
+
     const handleChangeName = (e) => {
         const value = e.target.value
         setEditData({...editData, universityName: value})
     }
 
     const handleSubmitName = async (e) => {
-        e.preventDefault()
-        if (editData.universityName.length < 3) return setError("Not long enough")
-        await firebase.updateCareerCenter(group.id, {universityName: editData.universityName})
-        await getCareerCenter()
-        setEditTitle(false)
+        try {
+            e.preventDefault()
+            if (editData.universityName.length < 3) return setError("Not long enough")
+            await firebase.updateCareerCenter(group.id, {universityName: editData.universityName})
+            await getCareerCenter()
+            setEditTitle(false)
+        } catch (e) {
+            console.log("error", e)
+        }
     }
 
     const uploadLogo = async (fileObject) => {
@@ -85,18 +98,6 @@ const GroupTitle = ({group, menuItem, getCareerCenter, firebase}) => {
         }
     }
 
-    useEffect(() => {
-        if (group) {
-            setEditData(group)
-        }
-    }, [group])
-
-
-    useEffect(() => {
-        if (error && editData.universityName.length > 3) {
-            setError(null)
-        }
-    }, [error, editData])
 
     return (
         <>
@@ -145,7 +146,6 @@ const GroupTitle = ({group, menuItem, getCareerCenter, firebase}) => {
                                 <TextField style={{flex: 0.7}}
                                            value={editData.universityName}
                                            inputProps={{style: {fontSize: 'calc(1.1em + 2vw)'}}}
-                                           defaultValue={group.universityName}
                                            onChange={handleChangeName}
                                            error={error}
                                            helperText={error}
@@ -200,9 +200,9 @@ const GroupTitle = ({group, menuItem, getCareerCenter, firebase}) => {
                          flex-direction: column;
                          align-items: center;
                          }
-                                    `}</style>
+          `}</style>
         </>
     );
 };
 
-export default withFirebase(GroupTitle);
+export default withFirebase(AdminHeader);
