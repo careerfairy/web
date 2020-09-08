@@ -3,37 +3,17 @@ import {Container, Button, Image, Menu} from 'semantic-ui-react';
 import {useRouter} from 'next/router';
 import {withFirebase} from '../../../data/firebase';
 import Header from '../../../components/views/header/Header';
-import EditIcon from '@material-ui/icons/Edit';
-import CheckIcon from '@material-ui/icons/Check';
-import Loader from '../../../components/views/loader/Loader';
-import ClearIcon from '@material-ui/icons/Clear';
-
 import Head from 'next/head';
 import Footer from '../../../components/views/footer/Footer';
-import CategoryElement from '../../../components/views/group/admin/CategoryElement';
 import Events from '../../../components/views/group/admin/events/Events';
 import Settings from '../../../components/views/group/admin/settings/Settings';
 import Members from '../../../components/views/group/admin/members/Members';
-import {Avatar, Card, CardMedia, Grid, IconButton, TextField} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
 import GroupTitle from "../../../components/views/group/admin/settings/GroupTitle";
 
-const useStyles = makeStyles({
-    root: {
-        maxWidth: 345,
-    },
-    logo: {
-        fontSize: '180px',
-        width: 'auto',
-        height: 'auto',
-        boxShadow: '0 0 5px rgb(200,200,200)',
-        border: '2px solid rgb(0, 210, 170)'
-    }
-});
+
 
 const JoinGroup = (props) => {
 
-    const classes = useStyles()
 
     const router = useRouter();
     const groupId = router.query.groupId;
@@ -84,22 +64,7 @@ const JoinGroup = (props) => {
             </Head>
             <Header classElement='relative white-background'/>
             <Container style={{padding: '30px 0'}} textAlign='center'>
-                <div className='white-box'>
-                    <Grid container>
-                        <Grid item xs={6}>
-                            <div className='image-outer-container'>
-                                <Avatar src={group.logoUrl}
-                                        className={classes.logo}
-                                        title="Group logo"/>
-                            </div>
-                        </Grid>
-                        <Grid item xs={6} direction="row"
-                              container
-                              alignItems="center">
-                            <GroupTitle getCareerCenter={getCareerCenter} group={group} menuItem={menuItem}/>
-                        </Grid>
-                    </Grid>
-                </div>
+                 <GroupTitle getCareerCenter={getCareerCenter} group={group} menuItem={menuItem}/>
                 <Menu style={{textAlign: 'center', margin: '0 0 20px 0'}} compact secondary>
                     <Menu.Item
                         name="events"
@@ -160,11 +125,6 @@ const JoinGroup = (props) => {
                     .title-container {
                       display: flex;
                       align-items: center;
-                    }
-
-                    .image-outer-container {
-                        max-width: 120px;
-                        margin: 0 auto;
                     }
 
                     .image-container {
