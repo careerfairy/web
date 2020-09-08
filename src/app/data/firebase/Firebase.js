@@ -181,9 +181,27 @@ class Firebase {
     }
 
     deleteCareerCenterFromExistence = (userId, careerCenterId) => {
-        // get the user document
-        // remove the careerCenterId from the groupIds Array in the userData field
-        // remove the careerCenterId from the registeredGroups collection
+        let batch = this.firestore.batch();
+        // get all relevant users
+        this.firestore
+            .collection('userData')
+            .where("groupIds", "array-contains", `${careerCenterId}`)
+            .get().then(querySnapshot => {
+            querySnapshot.forEach(userDoc => {
+                // get the user document
+                let userRef = this.firestore
+                    .collection('userData')
+                    .doc(userDoc.id)
+                // remove the careerCenterId from the groupIds Array in the userData field
+                batch.update(userRef, {
+                    "groupIds": this.firestore.FieldValue.arrayRemove([careerCenterId])
+                })
+                // remove the careerCenterId from the registeredGroups collection
+                let registeredGroupsRef = userRef.collection('registeredGroups')
+                batch.delete(registeredGroupsRef.doc(careerCenterId));
+
+            })
+        })
     }
 
     deleteCareerCenter = (groupId) => {
