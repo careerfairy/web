@@ -6,6 +6,8 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import {withFirebase} from 'data/firebase';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 import {Card, CardContent, CardMedia, Typography, Button} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 
@@ -40,6 +42,7 @@ const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
     const [userCategories, setUserCategories] = useState([]);
     const [categories, setCategories] = useState([]);
     const [categoriesWithElements, setCategoriesWithElements] = useState([]);
+    const [deleting, setDeleting] = useState(false)
 
     const [openUpdateModal, setOpenUpdateModal] = useState(false);
 
@@ -92,9 +95,16 @@ const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
         }
     }, [categories]);
 
-    const handleDeleteCareerCenter = () => {
-        firebase.deleteCareerCenterFromAllUsers(group.id)
-        firebase.deleteAllCareerCenterCategories(group.id)
+    const handleDeleteCareerCenter = async () => {
+        try {
+            setDeleting(true)
+            await firebase.deleteCareerCenter(group.id)
+            await firebase.deleteCareerCenterFromAllUsers(group.id)
+            setDeleting(false)
+        } catch (e) {
+            console.log("error in career center deletion", e)
+            setDeleting(false)
+        }
     }
 
     let categorySelectors = categoriesWithElements.map(category => {
@@ -123,6 +133,7 @@ const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
     return (
         <Fragment key={group.id}>
             {material ? <Card>
+                {deleting && <CircularProgress/>}
                 <CardMedia
                     component="image"
                     className={classes.media}

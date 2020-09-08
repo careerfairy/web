@@ -187,32 +187,32 @@ class Firebase {
             .collection('userData')
             .where("groupIds", "array-contains", `${careerCenterId}`)
             .get().then(querySnapshot => {
-            querySnapshot.docs.forEach((userDoc, index) => {
-                // get the user document
-                let userRef = this.firestore
-                    .collection('userData')
-                    .doc(userDoc.id)
-                // remove the careerCenterId from the groupIds Array in the userData field
-                batch.update(userRef, {
-                    "groupIds": this.firestore.FieldValue.arrayRemove([careerCenterId])
+                querySnapshot.docs.forEach((userDoc, index) => {
+                    // get the user document
+                    let userRef = this.firestore
+                        .collection('userData')
+                        .doc(userDoc.id)
+                    // remove the careerCenterId from the groupIds Array in the userData field
+                    batch.update(userRef, {
+                        "groupIds": this.firestore.FieldValue.arrayRemove([careerCenterId])
+                    })
+                    // remove the careerCenterId from the registeredGroups collection
+                    let registeredGroupsRef = userRef.collection('registeredGroups')
+                    batch.delete(registeredGroupsRef.doc(careerCenterId));
+                    if (index === querySnapshot.size - 1) {// Once done looping, return the batch commit
+                        return batch.commit()
+                    }
                 })
-                // remove the careerCenterId from the registeredGroups collection
-                let registeredGroupsRef = userRef.collection('registeredGroups')
-                batch.delete(registeredGroupsRef.doc(careerCenterId));
-                if (index === querySnapshot.size - 1) {// Once done looping, return the batch commit
-                    return batch.commit()
-                }
             })
-        })
     }
 
-    deleteAllCareerCenter = (careerCenterId) => {
+    deleteCareerCenter = (careerCenterId) => {
         let batch = this.firestore.batch();
         let careerCenterRef = this.firestore
             .collection("careerCenterData")
             .doc(careerCenterId)
         let categoriesRef = careerCenterRef.collection("categories")
-        categoriesRef.get().then(querySnapshot => {
+        return categoriesRef.get().then(querySnapshot => {
             querySnapshot.docs.forEach((category, catIndex) => {
                 let categoryId = category.id
                 let elementsRef = categoriesRef.doc(categoryId).collection("elements")
@@ -280,6 +280,20 @@ class Firebase {
             .collection("careerCenterData")
             .doc(groupId)
             .collection("categories");
+        return ref.onSnapshot(callback);
+    }
+
+    listenCareerCentersByAdminEmail = (email, callback) => {
+        let ref = this.firestore
+            .collection("careerCenterData")
+            .where("adminEmail", "==", email)
+        return ref.onSnapshot(callback);
+    }
+
+    listenToJoinedGroups = (groupIds, callback) => {
+        let ref = this.firestore
+            .collection("careerCenterData")
+            .where("groupId", 'in', groupIds)
         return ref.onSnapshot(callback);
     }
 
