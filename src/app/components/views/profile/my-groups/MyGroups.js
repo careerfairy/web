@@ -66,7 +66,7 @@ const UserProfile = (props) => {
 
     if (props.userData) {
         adminGroupElements = adminGroups.map(group => {
-            return <CurrentGroup group={group} userData={props.userData} key={group.id} grid={grid}/>
+            return <CurrentGroup isAdmin={true} group={group} userData={props.userData} key={group.id} grid={grid}/>
         });
     }
 

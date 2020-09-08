@@ -3,6 +3,7 @@ import {Input, Form} from 'semantic-ui-react';
 import TextField from '@material-ui/core/TextField';
 import {withFirebase} from 'data/firebase';
 import {Button, Typography} from "@material-ui/core";
+import {bool} from "twilio/lib/base/serialize";
 
 
 function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryName, handleDeleteCategory, handleRename, handleAdd, handleDelete}) {
@@ -62,7 +63,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                                 maxLength="20"
                                 value={newOptionName}
                                 onChange={(e) => setNewOptionName(e.target.value)}
-                                error={touched && error}
+                                error={touched && bool(error)}
                                 onBlur={() => setTouched(true)}
                                 helperText={touched && error}
                                 style={{width: '30%', margin: '0 20px 0 0', height: 60}}

@@ -183,7 +183,7 @@ function CategoryEditModal({category, options, handleDeleteLocalCategory, handle
                     <Grid.Column width={5}>
                         <div className='white-box-label'>Category Name</div>
                         <div className='white-box-title'>
-                            <Input maxLength="40" error={touched && !categoryName.length} onBlur={handleBlur}
+                            <Input autoFocus maxLength="40" error={touched && !categoryName.length} onBlur={handleBlur}
                                    type='text' value={categoryName}
                                    onChange={(event, data) => setCategoryName(data.value)} fluid/>
                             {touched && !categoryName.length && <p className="error-field">Required</p>}

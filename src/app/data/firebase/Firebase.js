@@ -180,6 +180,40 @@ class Firebase {
         return ref.update(newCareerCenter)
     }
 
+    deleteCareerCenterFromExistence = (userId, careerCenterId) => {
+        // get the user document
+        // remove the careerCenterId from the groupIds Array in the userData field
+        // remove the careerCenterId from the registeredGroups collection
+    }
+
+    deleteCareerCenter = (groupId) => {
+        let batch = this.firestore.batch();
+        let careerCenterRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+        let categoriesRef = careerCenterRef.collection("categories")
+        categoriesRef.get().then(querySnapshot => {
+            querySnapshot.docs.forEach((category, catIndex) => {
+                let categoryId = category.id
+                let elementsRef = categoriesRef.doc(categoryId).collection("elements")
+                elementsRef.get().then(subQuerySnapshot => {
+                    subQuerySnapshot.docs.forEach((element, elIndex) => {
+                        batch.delete(element.ref)
+                        if (elIndex === subQuerySnapshot.size - 1) {
+                            batch.delete(category.ref)
+                            if (catIndex === querySnapshot.size - 1) {
+                                return batch.commit()
+                            }
+                        }
+                    })
+                })
+
+            })
+        })
+
+
+    }
+
     getCareerCenters = () => {
         let ref = this.firestore
             .collection("careerCenterData")

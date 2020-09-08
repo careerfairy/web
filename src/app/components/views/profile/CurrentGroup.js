@@ -22,7 +22,8 @@ const useStyles = makeStyles({
     }
 });
 
-const CurrentGroup = ({firebase, userData, group}) => {
+const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
+    const {push} = useRouter()
 
     const [anchorEl, setAnchorEl] = useState(null);
     const handleClick = (event) => {
@@ -91,6 +92,10 @@ const CurrentGroup = ({firebase, userData, group}) => {
         }
     }, [categories]);
 
+    const handleDeleteCareerCenter = () => {
+        firebase.deleteCareerCenter(group.id)
+    }
+
     let categorySelectors = categoriesWithElements.map(category => {
         let usersCategory = userCategories.find(userCategory => {
             return userCategory.categoryId === category.id;
@@ -116,7 +121,7 @@ const CurrentGroup = ({firebase, userData, group}) => {
 
     return (
         <Fragment key={group.id}>
-            {material ? <Card >
+            {material ? <Card>
                 <CardMedia
                     component="image"
                     className={classes.media}
@@ -145,8 +150,9 @@ const CurrentGroup = ({firebase, userData, group}) => {
                         open={Boolean(anchorEl)}
                         onClose={handleClose}
                     >
-                        <MenuItem onClick={handleClose}>Update my data</MenuItem>
-                        <MenuItem onClick={handleClose}>Leave group</MenuItem>
+                        <MenuItem onClick={() => push(`/group/${group.id}/admin`)}>Update my data</MenuItem>
+                        {isAdmin ? <MenuItem onClick={handleDeleteCareerCenter}>Delete group</MenuItem> :
+                            <MenuItem onClick={handleClose}>Leave group</MenuItem>}
                     </Menu>
                 </CardActions>
             </Card> : <Grid.Column width={8}>
