@@ -86,6 +86,10 @@ const UserProfile = (props) => {
                 You are currently not a member of any career group.
             </div>
             <h3 style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}}>Admin Groups</h3>
+            <div className={adminGroupElements.length > 0 ? 'hidden' : ''}
+                 style={{margin: '30px 0', fontSize: '1.1em'}}>
+                You are currently not a member of any career group.
+            </div>
             <SizeMe>{({size}) => (
                 <StackGrid
                     columnWidth={(size.width <= 768 ? '100%' : '33.33%')}
@@ -95,10 +99,6 @@ const UserProfile = (props) => {
                     {adminGroupElements}
                 </StackGrid>
             )}</SizeMe>
-            <div className={adminGroupElements.length > 0 ? 'hidden' : ''}
-                 style={{margin: '30px 0', fontSize: '1.1em'}}>
-                You are currently not a member of any career group.
-            </div>
             <style jsx>{`
                     .hidden {
                     display: none;

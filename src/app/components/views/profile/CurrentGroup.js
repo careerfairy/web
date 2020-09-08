@@ -10,6 +10,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 import {Card, CardContent, CardMedia, Typography, Button} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
+import AreYouSureModal from "../../../materialUI/GlobalModals";
 
 const useStyles = makeStyles({
     root: {
@@ -26,6 +27,16 @@ const useStyles = makeStyles({
 
 const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
     const {push} = useRouter()
+
+    const [open, setOpen] = useState(false);
+
+    const handleOpenModal = () => {
+        setOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setOpen(false);
+    };
 
     const [anchorEl, setAnchorEl] = useState(null);
     const handleClick = (event) => {
@@ -133,7 +144,6 @@ const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
     return (
         <Fragment key={group.id}>
             {material ? <Card>
-                {deleting && <CircularProgress/>}
                 <CardMedia
                     component="image"
                     className={classes.media}
@@ -163,8 +173,17 @@ const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
                         onClose={handleClose}
                     >
                         <MenuItem onClick={() => push(`/group/${group.id}/admin`)}>Update my data</MenuItem>
-                        {isAdmin ? <MenuItem onClick={handleDeleteCareerCenter}>Delete group</MenuItem> :
+                        <MenuItem onClick={() => router.push('/group/' + group.id)}>Group Page</MenuItem>
+                        {isAdmin ? <MenuItem onClick={() => setOpen(true)}>
+                                {deleting ? <CircularProgress color="inherit" size={15}/> : "Delete group"}
+                            </MenuItem> :
                             <MenuItem onClick={handleClose}>Leave group</MenuItem>}
+                            <AreYouSureModal
+                                handleClose={() => setOpen(false)}
+                                title={"are you sure?!"}
+                                message={"lorem ipsum"}
+                                handleCancel={() => setOpen(false)}
+                            />
                     </Menu>
                 </CardActions>
             </Card> : <Grid.Column width={8}>
