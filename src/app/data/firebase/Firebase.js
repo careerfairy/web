@@ -180,14 +180,14 @@ class Firebase {
         return ref.update(newCareerCenter)
     }
 
-    deleteCareerCenterFromExistence = (userId, careerCenterId) => {
+    deleteCareerCenterFromAllUsers = (careerCenterId) => {
         let batch = this.firestore.batch();
         // get all relevant users
-        this.firestore
+        return this.firestore
             .collection('userData')
             .where("groupIds", "array-contains", `${careerCenterId}`)
             .get().then(querySnapshot => {
-            querySnapshot.forEach(userDoc => {
+            querySnapshot.docs.forEach((userDoc, index) => {
                 // get the user document
                 let userRef = this.firestore
                     .collection('userData')
@@ -199,16 +199,18 @@ class Firebase {
                 // remove the careerCenterId from the registeredGroups collection
                 let registeredGroupsRef = userRef.collection('registeredGroups')
                 batch.delete(registeredGroupsRef.doc(careerCenterId));
-
+                if (index === querySnapshot.size - 1) {// Once done looping, return the batch commit
+                    return batch.commit()
+                }
             })
         })
     }
 
-    deleteCareerCenter = (groupId) => {
+    deleteAllCareerCenter = (careerCenterId) => {
         let batch = this.firestore.batch();
         let careerCenterRef = this.firestore
             .collection("careerCenterData")
-            .doc(groupId)
+            .doc(careerCenterId)
         let categoriesRef = careerCenterRef.collection("categories")
         categoriesRef.get().then(querySnapshot => {
             querySnapshot.docs.forEach((category, catIndex) => {
@@ -220,6 +222,7 @@ class Firebase {
                         if (elIndex === subQuerySnapshot.size - 1) {
                             batch.delete(category.ref)
                             if (catIndex === querySnapshot.size - 1) {
+                                batch.delete(careerCenterRef)
                                 return batch.commit()
                             }
                         }
@@ -228,8 +231,6 @@ class Firebase {
 
             })
         })
-
-
     }
 
     getCareerCenters = () => {

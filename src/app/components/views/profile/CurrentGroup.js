@@ -93,7 +93,8 @@ const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
     }, [categories]);
 
     const handleDeleteCareerCenter = () => {
-        firebase.deleteCareerCenter(group.id)
+        firebase.deleteCareerCenterFromAllUsers(group.id)
+        firebase.deleteAllCareerCenterCategories(group.id)
     }
 
     let categorySelectors = categoriesWithElements.map(category => {

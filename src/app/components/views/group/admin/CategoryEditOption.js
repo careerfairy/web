@@ -63,7 +63,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                                 maxLength="20"
                                 value={newOptionName}
                                 onChange={(e) => setNewOptionName(e.target.value)}
-                                error={touched && bool(error)}
+                                error={touched && error.length > 0}
                                 onBlur={() => setTouched(true)}
                                 helperText={touched && error}
                                 style={{width: '30%', margin: '0 20px 0 0', height: 60}}
@@ -261,7 +261,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                                 maxLength="20"
                                 value={newOptionName}
                                 onChange={(e) => setNewOptionName(e.target.value)}
-                                error={touched && error}
+                                error={touched && error.length > 0}
                                 onBlur={() => setTouched(true)}
                                 helperText={touched && error}
                                 style={{width: '30%', margin: '0 20px 0 0', height: 60}}
