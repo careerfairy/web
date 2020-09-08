@@ -116,7 +116,7 @@ const CurrentGroup = ({firebase, userData, group}) => {
 
     return (
         <Fragment key={group.id}>
-            {material ? <Card className={classes.card}>
+            {material ? <Card >
                 <CardMedia
                     component="image"
                     className={classes.media}

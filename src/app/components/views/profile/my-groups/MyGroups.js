@@ -90,10 +90,10 @@ const UserProfile = (props) => {
             {/*<Grid style={{padding: '20px 0 0 0'}} stackable>*/}
             <SizeMe>{({size}) => (
                 <StackGrid
-                    columnWidth={(size.width <= 768 ? '100%' : 400)}
+                    columnWidth={(size.width <= 768 ? '100%' : '33.33%')}
                     // columnWidth={size.width <= 768 ? '100%' : '33.33%'}
                     gutterWidth={20}
-                    gutterHeight={0}
+                    gutterHeight={20}
                     gridRef={grid => setGrid(grid)}>
                     {adminGroupElements}
                 </StackGrid>
@@ -123,7 +123,6 @@ const UserProfile = (props) => {
                     }
 
                     #profileContainer {
-                    padding: '30px 0'
                     }
                     `}</style>
         </Fragment>
