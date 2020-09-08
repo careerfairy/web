@@ -4,9 +4,9 @@ import {useRouter} from 'next/router';
 import {withFirebase} from '../../../data/firebase';
 import Header from '../../../components/views/header/Header';
 import EditIcon from '@material-ui/icons/Edit';
-import SaveIcon from '@material-ui/icons/Save';
+import CheckIcon from '@material-ui/icons/Check';
 import Loader from '../../../components/views/loader/Loader';
-
+import ClearIcon from '@material-ui/icons/Clear';
 
 import Head from 'next/head';
 import Footer from '../../../components/views/footer/Footer';
@@ -16,6 +16,7 @@ import Settings from '../../../components/views/group/admin/settings/Settings';
 import Members from '../../../components/views/group/admin/members/Members';
 import {Avatar, Card, CardMedia, Grid, IconButton, TextField} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
+import GroupTitle from "../../../components/views/group/admin/settings/GroupTitle";
 
 const useStyles = makeStyles({
     root: {
@@ -39,15 +40,12 @@ const JoinGroup = (props) => {
 
     const [user, setUser] = useState(null);
 
-
     const [userData, setUserData] = useState(null);
 
-    const [error, setError] = useState(null)
-    const [editMode, setEditMode] = useState(false)
 
-    const [group, setGroup] = useState([]);
+    const [group, setGroup] = useState({});
 
-    const [editData, setEditData] = useState({logoUrl: "", fileObj: "", universityName: ""})
+
 
     const [menuItem, setMenuItem] = useState("settings")
 
@@ -67,11 +65,7 @@ const JoinGroup = (props) => {
         }
     }, [groupId]);
 
-    useEffect(() => {
-        if (editData.universityName.length && error) {
-            setError(null)
-        }
-    }, [])
+
 
     const getCareerCenter = () => {
         return props.firebase.getCareerCenterById(groupId).then(querySnapshot => {
@@ -81,18 +75,7 @@ const JoinGroup = (props) => {
         });
     }
 
-    const handleChangeName = (e) => {
-        const value = e.target.value
-        setEditData({...editData, universityName: value})
-    }
 
-    const handleSubmitName = async (e) => {
-        e.preventDefault()
-        if (!editData.universityName.length) return setError("Required")
-        await props.firebase.updateCareerCenter(group.id, {universityName: editData.universityName})
-        await getCareerCenter()
-        setEditMode(false)
-    }
 
     return (
         <div className='greyBackground'>
@@ -113,27 +96,7 @@ const JoinGroup = (props) => {
                         <Grid item xs={6} direction="row"
                               container
                               alignItems="center">
-                            {editMode ?
-                                <form onSubmit={handleSubmitName}>
-                                    <TextField style={{width: '70%'}}
-
-                                               inputProps={{style: {fontSize: 'calc(1.1em + 2vw)'}}}
-                                               defaultValue={group.universityName}
-                                               onChange={handleChangeName}
-                                               error={error}
-                                    />
-                                    <IconButton type="submit">
-                                        <SaveIcon color="primary"/>
-                                    </IconButton>
-                                </form>
-                                :
-                                <>
-                                    <h1 className='group-name'>{group.universityName}</h1>
-                                    <IconButton onClick={() => setEditMode(true)}>
-                                        {menuItem === 'settings' && <EditIcon color="primary"/>}
-                                    </IconButton>
-                                </>
-                            }
+                            <GroupTitle getCareerCenter={getCareerCenter} group={group} menuItem={menuItem}/>
                         </Grid>
                     </Grid>
                 </div>
@@ -227,14 +190,7 @@ const JoinGroup = (props) => {
                         font-size: 1.3em;
                         color: rgb(80,80,80);
                     }
-
-                    .group-name {
-                        margin: 20px 0 20px 0;
-                        font-weight: 500;
-                        font-size: calc(1.1em + 2vw);
-                        color: rgb(80,80,80);
-                    }
-
+                    
                     .sublabel {
                         margin: 40px 0 15px 0;
                         text-align: center;
