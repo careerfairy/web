@@ -17,7 +17,7 @@ const UserProfile = (props) => {
     const [userData, setUserData] = useState(null)
     const [user, setUser] = useState(null);
 
-    const [state, setState] = useState('personal');
+    const [state, setState] = useState('groups');
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {

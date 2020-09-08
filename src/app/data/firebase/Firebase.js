@@ -209,6 +209,11 @@ class Firebase {
         return ref.get();
     }
 
+    getCareerCentersByGroupId = (arrayOfIds) => {
+        const refs = arrayOfIds.map(id => this.firestore.collection('careerCenterData').doc(id))
+        return this.firestore.getAll(...refs)
+    }
+
     getGroupCategories = (groupId) => {
         let ref = this.firestore
             .collection("careerCenterData")
