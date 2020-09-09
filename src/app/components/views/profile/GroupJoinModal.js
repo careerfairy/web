@@ -42,6 +42,14 @@ const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
         setCategories(updatedCategories);
     }
 
+    const renderCategories = categories.map(category => {
+        return (
+            <Fragment>
+                <UserCategorySelector/>
+            </Fragment>
+        )
+    })
+
     return (
         <Fragment>
             <Dialog
@@ -65,22 +73,19 @@ const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
                         {group.description}
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions   style={{display: 'flex', flexFlow: 'column'}}>
-                    {categories.length ? categories.map(category => {
-                            return (
-                                <Fragment>
-                                    <UserCategorySelector/>
-                                    {<Button onClick={closeModal} color="primary">
-                                        Join
-                                    </Button>}
-                                </Fragment>
-                            )
-                        }) :
-                        null
+                <DialogActions style={{display: 'flex', flexFlow: 'column'}}>
+                    {categories.length ?
+                        <div>
+                            {renderCategories}
+                            {"has selected?" && <Button onClick={closeModal} color="primary" autoFocus>
+                                Join
+                            </Button>}
+                        </div>
+                        :
+                        <Button onClick={closeModal} color="primary" autoFocus>
+                            Join
+                        </Button>
                     }
-                    <Button onClick={closeModal} color="primary" autoFocus>
-                        Agree
-                    </Button>
                 </DialogActions>
             </Dialog>
             <style jsx>{`
