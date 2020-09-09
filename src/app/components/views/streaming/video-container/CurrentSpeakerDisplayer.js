@@ -1,7 +1,7 @@
 import React, {useEffect, Fragment, useRef, useState} from 'react';
 import {Grid} from 'semantic-ui-react';
-import RemoteVideoContainer from 'RemoteVideoContainer';
-import { useWindowSize } from 'custom-hook/useWindowSize';
+import RemoteVideoContainer from './RemoteVideoContainer';
+import { useWindowSize } from 'components/custom-hook/useWindowSize';
 
 function CurrentSpeakerDisplayer(props) {
 

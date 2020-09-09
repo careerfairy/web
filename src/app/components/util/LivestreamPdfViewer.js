@@ -2,10 +2,10 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { Document, Page } from 'react-pdf';
 import * as PDFJS from 'pdfjs-dist/build/pdf';
-import { useWindowSize } from 'custom-hook/useWindowSize';
+import { useWindowSize } from 'components/custom-hook/useWindowSize';
 import { Button, Modal, Progress } from 'semantic-ui-react';
 
-import FilePickerContainer from 'ssr/FilePickerContainer';
+import FilePickerContainer from 'components/ssr/FilePickerContainer';
 import { withFirebase } from 'data/firebase';
 
 function LivestreamPdfViewer (props) {

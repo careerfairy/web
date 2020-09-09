@@ -1,10 +1,10 @@
 import React from 'react';
 
 import { Container, Image, Grid, Header, Icon } from 'semantic-ui-react';
-import ElementTagList from 'common/ElementTagList';
-import CompanyLocationFlags from 'common/CompanyLocationFlags';
+import ElementTagList from '../common/ElementTagList';
+import CompanyLocationFlags from '../common/CompanyLocationFlags';
 
-import JobDescriptions from 'job-descriptions/JobDescriptions';
+import JobDescriptions from '../job-descriptions/JobDescriptions';
 import { withFirebase } from 'data/firebase';
 
 function CompanyDiscoverPage(props) {

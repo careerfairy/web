@@ -4,7 +4,7 @@ import { Container, Grid, Modal, Icon } from 'semantic-ui-react';
 
 import ReactPlayer from 'react-player';
 import { withFirebase } from 'data/firebase';
-import YoutubePreviewer from 'common/YoutubePreviewer';
+import YoutubePreviewer from 'components/views/common/YoutubePreviewer';
 
 function CompanyWatchPage(props) {
     const [videos, setVideos] = useState([]);
