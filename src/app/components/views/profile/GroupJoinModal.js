@@ -14,13 +14,18 @@ import Select from "@material-ui/core/Select";
 const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
 
     const [categories, setCategories] = useState([]);
+    const [selectedOptions, setSelectedOptions] = useState({});
     console.log("categories", categories);
 
     useEffect(() => {
         if (group.categories) {
             setCategories(group.categories)
+
+            setSelectedOptions()
+
         }
     }, [group])
+
 
     function setCategoryValue(categoryId, valueId) {
         let updatedCategories = [];
@@ -45,7 +50,7 @@ const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
     const renderCategories = categories.map(category => {
         return (
             <Fragment>
-                <UserCategorySelector/>
+                <UserCategorySelector category={category}/>
             </Fragment>
         )
     })

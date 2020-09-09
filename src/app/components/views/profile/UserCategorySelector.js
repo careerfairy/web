@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const UserCategorySelector = ({}) => {
+const UserCategorySelector = ({category}) => {
     const classes = useStyles();
     const [age, setAge] = React.useState('');
     const [open, setOpen] = React.useState(false);
@@ -37,10 +37,10 @@ const UserCategorySelector = ({}) => {
     return (
         <div>
             <Button className={classes.button} onClick={handleOpen}>
-                Open the select
+                {category.name}
             </Button>
             <FormControl className={classes.formControl}>
-                <InputLabel id="demo-controlled-open-select-label">Age</InputLabel>
+                <InputLabel id="demo-controlled-open-select-label">{category.name}</InputLabel>
                 <Select
                     labelId="demo-controlled-open-select-label"
                     id="demo-controlled-open-select"
@@ -53,9 +53,9 @@ const UserCategorySelector = ({}) => {
                     <MenuItem value="">
                         <em>None</em>
                     </MenuItem>
-                    <MenuItem value={10}>Ten</MenuItem>
-                    <MenuItem value={20}>TwentyTwentyTwentyTwentyTwentyTwentyTwentyTwentyTwentyTwentyTwentyTwentyTwenty</MenuItem>
-                    <MenuItem value={30}>Thirty</MenuItem>
+                    {category.options.map(option => {
+                        return <MenuItem value={option.id}>{option.name}</MenuItem>
+                    })}
                 </Select>
             </FormControl>
         </div>
