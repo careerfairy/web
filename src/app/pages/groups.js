@@ -80,7 +80,7 @@ const JoinGroup = (props) => {
             <Header classElement='relative white-background'/>
             <Container>
                 <h1 className='join-group-title'>Join A New Career Group</h1>
-                <Grid container spacing={3}>
+                <Grid style={{marginBottom: 50}} container spacing={3}>
                     {moreGroupElements}
                 </Grid>
             </Container>

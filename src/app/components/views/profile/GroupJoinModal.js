@@ -1,27 +1,33 @@
-import { Fragment, useState, useEffect } from 'react'
-import { Button, Image, Grid, Modal } from 'semantic-ui-react';
-
-import { withFirebase } from 'data/firebase';
+import {Fragment, useState, useEffect} from 'react'
+import React from 'react';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import {withFirebase} from 'data/firebase';
 import UserCategorySelector from 'components/views/profile/UserCategorySelector';
+import {CardMedia, Grid} from "@material-ui/core";
+import Select from "@material-ui/core/Select";
 
 const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
 
     const [categories, setCategories] = useState([]);
+    console.log("categories", categories);
 
     useEffect(() => {
-        if(group) {
+        if (group.categories) {
             setCategories(group.categories)
         }
     }, [group])
 
-
-
     function setCategoryValue(categoryId, valueId) {
         let updatedCategories = [];
-        categories.forEach( category => {
+        categories.forEach(category => {
             if (category.id === categoryId) {
                 let elements = [];
-                category.elements.forEach( element => {
+                category.elements.forEach(element => {
                     if (element.id === valueId) {
                         element.selected = true;
                     } else {
@@ -36,30 +42,48 @@ const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
         setCategories(updatedCategories);
     }
 
-    let categorySelectors = categories.map( category => {
-        return (
-            <Grid.Column key={ category.id } width={8}>
-                <div style={{ margin: '15px 0', textAlign: 'left' }}>
-                    <UserCategorySelector userData={userData} group={group} category={category} updateValue={(valueId) => setCategoryValue(category.id, valueId)}/>
-                </div>
-            </Grid.Column>
-        )
-    });
-
     return (
         <Fragment>
-            <Modal open={open} style={{ textAlign: 'center'}} onClose={closeModal}>
-                <Modal.Content>
-                    <h5 className={'header'}>Follow live streams from</h5>
-                    <div style={{ position: 'relative', minHeight: '150px'}}>
-                        <Image src={group.logoUrl} style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', maxWidth: '250px', width: '35%', maxHeight: '150px' }}/>
-                    </div>
-                    { categorySelectors }
-                    <Button content='Join' fluid icon='add' primary size='large' style={{ marginTop: '40px' }} onClick={closeModal}/>
-                    <Button content='Cancel' fluid size='small' primary basic style={{ marginTop: '10px' }} onClick={closeModal}/>
-                </Modal.Content>
-            </Modal>
-        <style jsx>{`
+            <Dialog
+                open={open}
+                onClose={closeModal}
+                maxWidth="xl"
+                // fullWidth
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">Follow live streams from</DialogTitle>
+                <CardMedia style={{display: 'flex', justifyContent: 'center', padding: '1em'}}>
+                    <img src={group.logoUrl} style={{
+                        maxWidth: '250px',
+                        width: '35%',
+                        maxHeight: '150px'
+                    }} alt=""/>
+                </CardMedia>
+                <DialogContent>
+                    <DialogContentText align="center" id="alert-dialog-description">
+                        {group.description}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions   style={{display: 'flex', flexFlow: 'column'}}>
+                    {categories.length ? categories.map(category => {
+                            return (
+                                <Fragment>
+                                    <UserCategorySelector/>
+                                    {<Button onClick={closeModal} color="primary">
+                                        Join
+                                    </Button>}
+                                </Fragment>
+                            )
+                        }) :
+                        null
+                    }
+                    <Button onClick={closeModal} color="primary" autoFocus>
+                        Agree
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <style jsx>{`
             .header {
                 text-align: center;
                 margin-bottom: 40px;

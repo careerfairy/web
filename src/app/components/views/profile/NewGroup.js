@@ -18,24 +18,26 @@ const NewGroup = ({firebase, group, categories, userData}) => {
         firebase.joinGroup(userData.userEmail, group.id, categories);
     }
 
-    const closeJoinModal = () => {
+    const handleCloseJoinModal = () => {
         setOpenJoinModal(false)
     }
+    const handleOpenJoinModal = () => {
+        setOpenJoinModal(true)
+    }
 
-    const material = true
 
 
     return (
         <Fragment key={group.id}>
             <Card>
-                <CardMedia style={{display: 'flex', justifyContent: 'center', padding: '1em'}}>
+                <CardMedia style={{display: 'flex', justifyContent: 'center', padding: '1.5em 1em 1em 1em', height: '90px'}}>
                     <img src={group.logoUrl} style={{
-                        maxWidth: '50%',
-                        maxHeight: '70px'
+                        objectFit: 'contain',
+                        maxWidth: '80%'
                     }} alt=""/>
                 </CardMedia>
-                <CardContent>
-                    <Typography align="center" gutterBottom variant="h5" noWrap component="h2">
+                <CardContent style={{height: '115px'}}>
+                    <Typography align="center" gutterBottom variant="h5" component="h2">
                         {group.universityName}
                     </Typography>
                     <Typography variant="body2" align="center" color="textSecondary" component="p">
@@ -43,13 +45,17 @@ const NewGroup = ({firebase, group, categories, userData}) => {
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    <Button fullWidth size="small" variant="contained" color="primary"
+                    <Button fullWidth
+                            size="small"
+                            variant="contained"
+                            color="primary"
+                            onClick={handleOpenJoinModal}
                             endIcon={<GroupAddIcon size={20} color="inherit"/>}>
                         Join
                     </Button>
                 </CardActions>
             </Card>
-            <GroupJoinModal open={openJoinModal} group={group} userData={userData} closeModal={closeJoinModal}/>
+            <GroupJoinModal open={openJoinModal} group={group} userData={userData} closeModal={handleCloseJoinModal}/>
             <style jsx>{`
                 .group-selector {
                     position: relative;

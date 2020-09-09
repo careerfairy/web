@@ -1,57 +1,64 @@
-import { useEffect, useState, Fragment } from 'react'
-import { Container, Header as SemanticHeader, Button, Dropdown, Form, Image, Grid, Modal } from 'semantic-ui-react';
+import React from 'react';
+import {makeStyles} from '@material-ui/core/styles';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import Button from '@material-ui/core/Button';
 
-import { withFirebase } from 'data/firebase';
+const useStyles = makeStyles((theme) => ({
+    button: {
+        display: 'block',
+        marginTop: theme.spacing(2),
+    },
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 120,
+    },
+}));
 
-const UserCategorySelector = (props) => {
+const UserCategorySelector = ({}) => {
+    const classes = useStyles();
+    const [age, setAge] = React.useState('');
+    const [open, setOpen] = React.useState(false);
 
-    const [hasError, setHasError] = useState(false);
-    const [value, setValue] = useState(null);
+    const handleChange = (event) => {
+        setAge(event.target.value);
+    };
 
-    useEffect(() => {
-        if (props.categoriesWithElements && props.checkError > 0) {
-            let category = props.categoriesWithElements.find( category => category.id === props.category.id );
-            let selectedElement = category.elements.find( element => element.selected === true );
-            if (!selectedElement) {
-                setHasError(true);
-            }
-        }
-    }, [props.checkError]);
+    const handleClose = () => {
+        setOpen(false);
+    };
 
-    useEffect(() => {
-        props.firebase.listenToUserGroupCategoryValue(props.userData.userEmail, props.groupId, props.category.id, querySnapshot => {
-            let currentElement = querySnapshot.data();
-            if (currentElement) {
-                props.updateValue(currentElement.value);
-            }
-        })
-    },[props.category]);
-
-    useEffect(() => {
-        debugger;
-        if (props.categoriesWithElements) {
-            let category = props.categoriesWithElements.find( category => category.id === props.category.id );
-            let selectedElement = category.elements.find( element => element.selected === true );
-            if (selectedElement) {
-                setValue(selectedElement.id);
-            }
-        }
-    },[props.categoriesWithElements]);
+    const handleOpen = () => {
+        setOpen(true);
+    };
 
     return (
-        <Fragment>
-            <div style={{ textAlign: 'center' }}>
-                <label style={{ display: 'block', marginBottom: '10px', textTransform: "uppercase", fontSize: '0.9em', fontWeight: '700', color: 'rgb(100,100,100)'}}>{ props.category.name }</label>
-                <Dropdown value={value} error={hasError} size='big' onChange={(event, {value}) => { props.updateValue(value) }} options={props.category.elements.map( element => { return { text: element.name, value: element.id }; })} selection fluid/>
-                <div className={ hasError ? '' : 'hidden'} style={{ textAlign: 'left', margin: '5px 0', color: 'red'}}>Please select a value</div>
-            </div>
-            <style jsx>{`
-                .hidden {
-                    display: none;
-                }
-            `}</style>
-        </Fragment>
-    )
-};
-
-export default withFirebase(UserCategorySelector);
+        <div>
+            <Button className={classes.button} onClick={handleOpen}>
+                Open the select
+            </Button>
+            <FormControl className={classes.formControl}>
+                <InputLabel id="demo-controlled-open-select-label">Age</InputLabel>
+                <Select
+                    labelId="demo-controlled-open-select-label"
+                    id="demo-controlled-open-select"
+                    open={open}
+                    onClose={handleClose}
+                    onOpen={handleOpen}
+                    value={age}
+                    onChange={handleChange}
+                >
+                    <MenuItem value="">
+                        <em>None</em>
+                    </MenuItem>
+                    <MenuItem value={10}>Ten</MenuItem>
+                    <MenuItem value={20}>TwentyTwentyTwentyTwentyTwentyTwentyTwentyTwentyTwentyTwentyTwentyTwentyTwenty</MenuItem>
+                    <MenuItem value={30}>Thirty</MenuItem>
+                </Select>
+            </FormControl>
+        </div>
+    );
+}
+export default UserCategorySelector;
