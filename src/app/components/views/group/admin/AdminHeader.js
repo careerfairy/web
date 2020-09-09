@@ -22,7 +22,7 @@ const useStyles = makeStyles({
     }
 });
 
-const AdminHeader = ({group, menuItem, getCareerCenter, firebase}) => {
+const AdminHeader = ({group, menuItem, firebase}) => {
     const classes = useStyles()
 
     const [editTitle, setEditTitle] = useState(false)
@@ -61,7 +61,6 @@ const AdminHeader = ({group, menuItem, getCareerCenter, firebase}) => {
             e.preventDefault()
             if (editData.universityName.length < 3) return setError("Not long enough")
             await firebase.updateCareerCenter(group.id, {universityName: editData.universityName})
-            await getCareerCenter()
             setEditTitle(false)
         } catch (e) {
             console.log("error", e)
@@ -90,7 +89,6 @@ const AdminHeader = ({group, menuItem, getCareerCenter, firebase}) => {
             setSubmittingLogo(true)
             const downloadUrl = await uploadLogo(editData.fileObj)
             await firebase.updateCareerCenter(group.id, {logoUrl: downloadUrl})
-            await getCareerCenter()
             setEditLogo(false)
             setSubmittingLogo(false)
         } catch (e) {

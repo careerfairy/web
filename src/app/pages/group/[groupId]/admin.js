@@ -16,6 +16,7 @@ const JoinGroup = (props) => {
 
     const router = useRouter();
     const groupId = router.query.groupId;
+    console.log("groupId", groupId)
 
     const [user, setUser] = useState(null);
 
@@ -39,18 +40,14 @@ const JoinGroup = (props) => {
 
     useEffect(() => {
         if (groupId) {
-            getCareerCenter()
+            const unsubscribe = props.firebase.listenToCareerCenterById(groupId, querySnapshot => {
+                let careerCenter = querySnapshot.data();
+                careerCenter.id = querySnapshot.id;
+                setGroup(careerCenter);
+            })
+        return () => unsubscribe()
         }
     }, [groupId]);
-
-
-    const getCareerCenter = () => {
-        return props.firebase.listenToCareerCenterById(groupId, querySnapshot => {
-            let careerCenter = querySnapshot.data();
-            careerCenter.id = querySnapshot.id;
-            setGroup(careerCenter);
-        })
-    }
 
 
     return (
@@ -60,7 +57,7 @@ const JoinGroup = (props) => {
             </Head>
             <Header classElement='relative white-background'/>
             <Container style={{padding: '30px 0'}} textAlign='center'>
-                <AdminHeader getCareerCenter={getCareerCenter} group={group} menuItem={menuItem}/>
+                <AdminHeader group={group} menuItem={menuItem}/>
                 <Menu style={{textAlign: 'center', margin: '0 0 20px 0'}} compact secondary>
                     <Menu.Item
                         name="events"

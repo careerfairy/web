@@ -9,7 +9,6 @@ import AddIcon from "@material-ui/icons/Add";
 const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCategory, handleAddTempCategory, handleNext, arrayOfCategories}) => {
     const [createMode, setCreateMode] = useState(false)
     const [notEnoughCategories, setNotEnoughCategories] = useState(false)
-    console.log("notEnoughCategories",notEnoughCategories);
 
     useEffect(() => {
         if (!arrayOfCategories.length) {
@@ -54,9 +53,13 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                 </div>
                 <div className="categories-wrapper">
                     {createMode &&
-                    <CategoryEdit handleAddTempCategory={handleAddTempCategory} groupId={groupId} category={{}}
+                    <CategoryEdit handleAddTempCategory={handleAddTempCategory}
+                                  groupId={groupId}
+                                  isLocal={true}
+                                  category={{}}
                                   options={[]}
-                                  newCategory={true} setEditMode={setCreateMode}/>}
+                                  newCategory={true}
+                                  setEditMode={setCreateMode}/>}
                     {categoryElements}
                     {notEnoughCategories && <p className="error-text">You need at least one category</p>}
                 </div>

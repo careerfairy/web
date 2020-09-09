@@ -54,7 +54,6 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
     }
 
     function handleDeleteCategory() {
-        console.log("groupId in local", groupId);
         if (isLocal) {
             handleDeleteLocalCategory(category.id)
             return setEditMode(false)
@@ -106,7 +105,7 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
     }
 
     function saveChanges() {
-        if(handleErrors()) return
+        if (handleErrors()) return
         if (isLocal) {
             if (newCategory) {
                 //Add a newly created temp category Obj
@@ -119,7 +118,7 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
             }
             return setEditMode(false)
         }
-        if (newCategory) {
+        if (newCategory && !isLocal) {
             firebase.addGroupCategoryWithElements(group.id, buildCategory()).then(() => {
                 setEditMode(false);
             })

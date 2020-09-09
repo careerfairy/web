@@ -30,14 +30,6 @@ const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
 
     const [open, setOpen] = useState(false);
 
-    const handleOpenModal = () => {
-        setOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setOpen(false);
-    };
-
     const [anchorEl, setAnchorEl] = useState(null);
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -176,7 +168,10 @@ const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
                         <MenuItem onClick={() => push(`/group/${group.id}/admin`)}>Update my data</MenuItem>
                         <MenuItem onClick={() => router.push('/group/' + group.id)}>Group Page</MenuItem>
                         {isAdmin ?
-                            <MenuItem onClick={() => setOpen(true)}>Delete group</MenuItem>
+                            <MenuItem onClick={() => {
+                                setOpen(true)
+                                handleClose()
+                            }}>Delete group</MenuItem>
                             :
                             <MenuItem onClick={handleClose}>Leave group</MenuItem>}
                         <AreYouSureModal
