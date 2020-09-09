@@ -1,24 +1,25 @@
 import React, {useEffect, useState, Fragment} from 'react'
-import {Container, Header as SemanticHeader, Dropdown, Form, Image, Grid} from 'semantic-ui-react';
-import {Formik} from 'formik';
 import {useRouter} from 'next/router';
+import GroupAddIcon from '@material-ui/icons/GroupAdd';
 
 import {withFirebase} from 'data/firebase';
-import GroupJoinModal from 'components/views/profile/GroupJoinModal';
 import {Button, Card, CardContent, CardMedia, Typography} from "@material-ui/core";
 import CardActions from "@material-ui/core/CardActions";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal";
+import GroupJoinModal from "./GroupJoinModal";
+
 
 const NewGroup = ({firebase, group, categories, userData}) => {
 
     const [openJoinModal, setOpenJoinModal] = useState(false);
+
     const router = useRouter();
 
     function joinGroup(group) {
         firebase.joinGroup(userData.userEmail, group.id, categories);
+    }
+
+    const closeJoinModal = () => {
+        setOpenJoinModal(false)
     }
 
     const material = true
@@ -26,52 +27,29 @@ const NewGroup = ({firebase, group, categories, userData}) => {
 
     return (
         <Fragment key={group.id}>
-            {material ? <Card >
-                <CardMedia
-                    style={{paddingTop: '100%'}}
-                    image={group.logoUrl}
-                    title={`${group.universityName} logo`}
-                />
+            <Card>
+                <CardMedia style={{display: 'flex', justifyContent: 'center', padding: '1em'}}>
+                    <img src={group.logoUrl} style={{
+                        maxWidth: '50%',
+                        maxHeight: '70px'
+                    }} alt=""/>
+                </CardMedia>
                 <CardContent>
-                    <Typography gutterBottom variant="h5" component="h2">
+                    <Typography align="center" gutterBottom variant="h5" noWrap component="h2">
                         {group.universityName}
+                    </Typography>
+                    <Typography variant="body2" align="center" color="textSecondary" component="p">
+                        {group.description}
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    <Button fullWidth size="small" variant="contained" color="primary" endIcon>
+                    <Button fullWidth size="small" variant="contained" color="primary"
+                            endIcon={<GroupAddIcon size={20} color="inherit"/>}>
                         Join
                     </Button>
                 </CardActions>
-            </Card> : <Grid.Column>
-                <div className='group-selector'>
-                    <Image src={group.logoUrl} style={{
-                        position: 'absolute',
-                        top: '35%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        maxWidth: '50%',
-                        maxHeight: '70px'
-                    }}/>
-                    <div style={{
-                        position: 'absolute',
-                        top: '65%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: '80%',
-                        textAlign: 'center',
-                        fontSize: '1.2em',
-                        fontWeight: '300',
-                        color: 'rgb(80,80,80)'
-                    }}>{group.description}</div>
-                    <Button content='Join' icon='add' style={{
-                        position: 'absolute',
-                        left: '50%',
-                        bottom: '20px',
-                        width: '90%',
-                        transform: 'translateX(-50%)'
-                    }} onClick={() => router.push('/group/' + group.id)} primary/>
-                </div>
-            </Grid.Column>}
+            </Card>
+            <GroupJoinModal open={openJoinModal} group={group} userData={userData} closeModal={closeJoinModal}/>
             <style jsx>{`
                 .group-selector {
                     position: relative;
