@@ -10,7 +10,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 import {Card, CardContent, CardMedia, Typography, Button} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import AreYouSureModal from "../../../materialUI/GlobalModals";
+import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal";
 
 const useStyles = makeStyles({
     root: {
@@ -112,6 +112,7 @@ const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
             await firebase.deleteCareerCenter(group.id)
             await firebase.deleteCareerCenterFromAllUsers(group.id)
             setDeleting(false)
+            setOpen(false)
         } catch (e) {
             console.log("error in career center deletion", e)
             setDeleting(false)
@@ -174,16 +175,17 @@ const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
                     >
                         <MenuItem onClick={() => push(`/group/${group.id}/admin`)}>Update my data</MenuItem>
                         <MenuItem onClick={() => router.push('/group/' + group.id)}>Group Page</MenuItem>
-                        {isAdmin ? <MenuItem onClick={() => setOpen(true)}>
-                                {deleting ? <CircularProgress color="inherit" size={15}/> : "Delete group"}
-                            </MenuItem> :
+                        {isAdmin ?
+                            <MenuItem onClick={() => setOpen(true)}>Delete group</MenuItem>
+                            :
                             <MenuItem onClick={handleClose}>Leave group</MenuItem>}
-                            <AreYouSureModal
-                                handleClose={() => setOpen(false)}
-                                title={"are you sure?!"}
-                                message={"lorem ipsum"}
-                                handleCancel={() => setOpen(false)}
-                            />
+                        <AreYouSureModal
+                            open={open}
+                            handleClose={() => setOpen(false)}
+                            handleConfirm={handleDeleteCareerCenter}
+                            title="Warning"
+                            message={`Are you sure you want to delete ${group.universityName}? You wont be able to revert changes`}
+                        />
                     </Menu>
                 </CardActions>
             </Card> : <Grid.Column width={8}>
