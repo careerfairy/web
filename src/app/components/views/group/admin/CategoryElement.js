@@ -5,32 +5,12 @@ import {withFirebase} from 'data/firebase';
 import CategoryEdit from './CategoryEdit';
 
 
-function CategoryElement({groupId, handleUpdateCategory, category, firebase, handleAddTempCategory, handleDeleteLocalCategory}) {
+function CategoryElement({handleUpdateCategory, category, firebase, handleAddTempCategory, handleDeleteLocalCategory, group, isLocal}) {
 
-    const [options, setOptions] = useState([]);
     const [editMode, setEditMode] = useState(false)
 
-    useEffect(() => {
-        if (groupId !== 'temp' && category) {
-            firebase.listenToGroupCategoryElements(groupId, category.id, querySnapshot => {
-                let elements = [];
-                querySnapshot.forEach(doc => {
-                    let element = doc.data();
-                    element.id = doc.id;
-                    elements.push(element);
-                });
-                setOptions(elements);
-            });
-        }
-    }, [category]);
 
-    useEffect(() => {
-        if (groupId === "temp") {
-            setOptions(category.options)
-        }
-    }, [category.options])
-
-    const optionElements = options.map((option, index) => {
+    const optionElements = category.options?.map((option, index) => {
         return (
             <Fragment key={option.id || index}>
                 <div className='option-container'>
@@ -107,12 +87,12 @@ function CategoryElement({groupId, handleUpdateCategory, category, firebase, han
 
     return (
         <Fragment>
-            <CategoryEdit groupId={groupId}
+            <CategoryEdit group={group}
+                          isLocal={isLocal}
                           handleUpdateCategory={handleUpdateCategory}
                           handleAddTempCategory={handleAddTempCategory}
                           handleDeleteLocalCategory={handleDeleteLocalCategory}
                           category={category}
-                          options={options}
                           setEditMode={setEditMode}/>
         </Fragment>
     );

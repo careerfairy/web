@@ -11,7 +11,6 @@ import Members from '../../../components/views/group/admin/members/Members';
 import AdminHeader from "../../../components/views/group/admin/AdminHeader";
 
 
-
 const JoinGroup = (props) => {
 
 
@@ -24,7 +23,6 @@ const JoinGroup = (props) => {
 
 
     const [group, setGroup] = useState({});
-
 
 
     const [menuItem, setMenuItem] = useState("settings")
@@ -46,15 +44,13 @@ const JoinGroup = (props) => {
     }, [groupId]);
 
 
-
     const getCareerCenter = () => {
-        return props.firebase.getCareerCenterById(groupId).then(querySnapshot => {
+        return props.firebase.listenToCareerCenterById(groupId, querySnapshot => {
             let careerCenter = querySnapshot.data();
             careerCenter.id = querySnapshot.id;
             setGroup(careerCenter);
-        });
+        })
     }
-
 
 
     return (
@@ -64,7 +60,7 @@ const JoinGroup = (props) => {
             </Head>
             <Header classElement='relative white-background'/>
             <Container style={{padding: '30px 0'}} textAlign='center'>
-                 <AdminHeader getCareerCenter={getCareerCenter} group={group} menuItem={menuItem}/>
+                <AdminHeader getCareerCenter={getCareerCenter} group={group} menuItem={menuItem}/>
                 <Menu style={{textAlign: 'center', margin: '0 0 20px 0'}} compact secondary>
                     <Menu.Item
                         name="events"
@@ -101,7 +97,7 @@ const JoinGroup = (props) => {
                     <Members groupId={groupId}/>
                 </div>
                 <div className={menuItem === "settings" ? '' : 'hidden'}>
-                    <Settings getCareerCenter={getCareerCenter} group={group} groupId={groupId}/>
+                    <Settings group={group} groupId={groupId}/>
                 </div>
             </Container>
             <Footer/>

@@ -9,28 +9,13 @@ import AddIcon from '@material-ui/icons/Add';
 import TextField from "@material-ui/core/TextField";
 
 
-const Settings = ({groupId, group, firebase, getCareerCenter}) => {
+const Settings = ({group, firebase}) => {
 
-    const [categories, setCategories] = useState([]);
     const [createMode, setCreateMode] = useState(false)
     const [description, setDescription] = useState("")
     const [descriptionError, setDescriptionError] = useState(null)
     const [editDescription, setEditDescription] = useState(false)
     const [submitting, setSubmitting] = useState(false)
-
-    useEffect(() => {
-        if (groupId) {
-            firebase.listenToGroupCategories(groupId, querySnapshot => {
-                let categories = [];
-                querySnapshot.forEach(doc => {
-                    let category = doc.data();
-                    category.id = doc.id;
-                    categories.push(category);
-                });
-                setCategories(categories);
-            })
-        }
-    }, [groupId]);
 
     useEffect(() => {
         if (group) {
@@ -49,7 +34,6 @@ const Settings = ({groupId, group, firebase, getCareerCenter}) => {
         try {
             setSubmitting(true)
             await firebase.updateCareerCenter(group.id, {description: description})
-            await getCareerCenter()
             setEditDescription(false)
             setSubmitting(false)
         } catch (e) {
@@ -59,10 +43,10 @@ const Settings = ({groupId, group, firebase, getCareerCenter}) => {
     }
 
 
-    const categoryElements = categories.map((category, index) => {
+    const categoryElements = group.categories?.map((category, index) => {
         return (
             <div key={index}>
-                <CategoryElement groupId={groupId} category={category}/>
+                <CategoryElement group={group} category={category}/>
             </div>
         );
     })
@@ -128,7 +112,7 @@ const Settings = ({groupId, group, firebase, getCareerCenter}) => {
                 </Button>
             </div>
             {createMode ?
-                <CategoryEdit groupId={groupId} category={{}} options={[]} newCategory={true}
+                <CategoryEdit group={group} category={{}} options={[]} newCategory={true}
                               setEditMode={setCreateMode}/> : null
             }
             {categoryElements}

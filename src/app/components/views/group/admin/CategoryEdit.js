@@ -5,9 +5,9 @@ import AddIcon from '@material-ui/icons/Add';
 import {withFirebase} from "data/firebase";
 import CategoryEditOption from './CategoryEditOption';
 import {Button, IconButton} from "@material-ui/core";
+import {v4 as uuidv4} from 'uuid'
 
-
-function CategoryEditModal({category, options, handleDeleteLocalCategory, handleUpdateCategory, groupId, newCategory, firebase, setEditMode, handleAddTempCategory}) {
+function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCategory, newCategory, firebase, setEditMode, handleAddTempCategory, group, groupId, isLocal}) {
     const [categoryName, setCategoryName] = useState('');
 
     const [editableOptions, setEditableOptions] = useState([]);
@@ -34,10 +34,10 @@ function CategoryEditModal({category, options, handleDeleteLocalCategory, handle
     }, [category.name]);
 
     useEffect(() => {
-        if (options && options.length > 0) {
-            setEditableOptions(options);
+        if (category.options && category.options.length > 0) {
+            setEditableOptions(category.options);
         }
-    }, [options]);
+    }, [category.options]);
 
     useEffect(() => {
         setUpdateMode({});
@@ -54,12 +54,16 @@ function CategoryEditModal({category, options, handleDeleteLocalCategory, handle
     }
 
     function handleDeleteCategory() {
-        if (groupId === 'temp') {
+        console.log("groupId in local", groupId);
+        if (isLocal) {
             handleDeleteLocalCategory(category.id)
             return setEditMode(false)
         }
-        firebase.deleteGroupCategoryWithElements(groupId, category.id, editableOptions)
-            .then(setEditMode(false))
+        const existingCategories = [...group.categories]
+        const newCategories = existingCategories.filter(el => el.id !== category.id)
+        firebase.updateGroupCategoryElements(group.id, newCategories).then(() => {
+            setEditMode(false);
+        })
     }
 
     function handleAdd(newOption) {
@@ -90,14 +94,15 @@ function CategoryEditModal({category, options, handleDeleteLocalCategory, handle
         setErrorObj(errors)
         setTouched(!categoryName.length > 0)
         if (errors.inputError || errors.optionError) return
-        if (groupId === "temp") {
+        if (isLocal) {
             if (newCategory) {
                 //Add a newly created temp category Obj
-                const tempId = Math.random().toString(36).substr(2, 5)
+                // const tempId = Math.random().toString(36).substr(2, 5)
+                const newId = uuidv4()
                 const tempCategoryObj = {
                     name: categoryName,
                     options: editableOptions,
-                    id: tempId
+                    id: newId
                 }
                 handleAddTempCategory(tempCategoryObj)
             } else {
@@ -110,14 +115,21 @@ function CategoryEditModal({category, options, handleDeleteLocalCategory, handle
             return setEditMode(false)
         }
         if (newCategory) {
-            firebase.addGroupCategoryWithElements(groupId, categoryName, editableOptions).then(() => {
+            const newId = uuidv4()
+            const newCategoryObj = {
+                name: categoryName,
+                options: editableOptions,
+                id: newId
+            }
+            firebase.addGroupCategoryWithElements(group.id, newCategoryObj).then(() => {
                 setEditMode(false);
             })
         } else {
-            let optionsToDelete = options.filter(optionEl => {
-                return !editableOptions.find(editableOption => editableOption.id === optionEl.id);
-            })
-            firebase.updateGroupCategoryElements(groupId, category.id, categoryName, editableOptions, optionsToDelete).then(() => {
+            const newCategories = [...group.categories]
+            const index = newCategories.findIndex(el => el.id === category.id)
+            newCategories[index].name = categoryName
+            newCategories[index].options = editableOptions
+            firebase.updateGroupCategoryElements(group.id, newCategories).then(() => {
                 setEditMode(false);
             })
         }
@@ -137,7 +149,11 @@ function CategoryEditModal({category, options, handleDeleteLocalCategory, handle
                         <Dropdown.Menu>
                             <Dropdown.Item
                                 text='Rename'
-                                onClick={() => setUpdateMode({mode: 'rename', option: optionEl, options: editableOptions})}
+                                onClick={() => setUpdateMode({
+                                    mode: 'rename',
+                                    option: optionEl,
+                                    options: editableOptions
+                                })}
                             />
                             <Dropdown.Item
                                 text='Delete'

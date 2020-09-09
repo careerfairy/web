@@ -1,13 +1,15 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Input, Form} from 'semantic-ui-react';
+
 import TextField from '@material-ui/core/TextField';
 import {withFirebase} from 'data/firebase';
 import {Button, Typography} from "@material-ui/core";
-import {bool} from "twilio/lib/base/serialize";
+import {v4 as uuidv4} from 'uuid'
 
 
 function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryName, handleDeleteCategory, handleRename, handleAdd, handleDelete}) {
 
+    // const uuidv4 = require("uuid/v4")
     const requiredTxt = "Please fill this field"
     const duplicateTxt = "Cannot be a duplicate"
     if (!updateMode.mode) {
@@ -41,11 +43,8 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                 return setError(requiredTxt)
             }
             if (error) return
-            if (groupId === "temp") {
-                const tempId = Math.random().toString(36).substr(2, 5)
-                return handleAdd({name: newOptionName, id: tempId})
-            }
-            handleAdd({name: newOptionName})
+            const tempId = uuidv4()
+            handleAdd({name: newOptionName, id: tempId})
         }
 
         return (

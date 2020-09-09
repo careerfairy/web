@@ -194,7 +194,7 @@ class Firebase {
                         .doc(userDoc.id)
                     // remove the careerCenterId from the groupIds Array in the userData field
                     batch.update(userRef, {
-                        "groupIds": this.firestore.FieldValue.arrayRemove([careerCenterId])
+                        groupIds: firebase.firestore.FieldValue.arrayRemove(careerCenterId)
                     })
                     // remove the careerCenterId from the registeredGroups collection
                     let registeredGroupsRef = userRef.collection('registeredGroups')
@@ -207,30 +207,10 @@ class Firebase {
     }
 
     deleteCareerCenter = (careerCenterId) => {
-        let batch = this.firestore.batch();
         let careerCenterRef = this.firestore
             .collection("careerCenterData")
             .doc(careerCenterId)
-        let categoriesRef = careerCenterRef.collection("categories")
-        return categoriesRef.get().then(querySnapshot => {
-            querySnapshot.docs.forEach((category, catIndex) => {
-                let categoryId = category.id
-                let elementsRef = categoriesRef.doc(categoryId).collection("elements")
-                elementsRef.get().then(subQuerySnapshot => {
-                    subQuerySnapshot.docs.forEach((element, elIndex) => {
-                        batch.delete(element.ref)
-                        if (elIndex === subQuerySnapshot.size - 1) {
-                            batch.delete(category.ref)
-                            if (catIndex === querySnapshot.size - 1) {
-                                batch.delete(careerCenterRef)
-                                return batch.commit()
-                            }
-                        }
-                    })
-                })
-
-            })
-        })
+        return careerCenterRef.delete()
     }
 
     getCareerCenters = () => {
@@ -283,6 +263,13 @@ class Firebase {
         return ref.onSnapshot(callback);
     }
 
+    listenToCareerCenterById = (groupId, callback) => {
+        let ref = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+        return ref.onSnapshot(callback);
+    }
+
     listenCareerCentersByAdminEmail = (email, callback) => {
         let ref = this.firestore
             .collection("careerCenterData")
@@ -317,56 +304,28 @@ class Firebase {
         return ref.onSnapshot(callback);
     }
 
-    updateGroupCategoryElements = (groupId, categoryId, categoryName, newElements, elementsToDelete) => {
-        let batch = this.firestore.batch();
-        let categoryRef = this.firestore
+    updateGroupCategoryElements = (groupId, newCategories) => {
+        let groupRef = this.firestore
             .collection("careerCenterData")
             .doc(groupId)
-            .collection("categories")
-            .doc(categoryId);
-        batch.update(categoryRef, {name: categoryName});
-        let elementsRef = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("categories")
-            .doc(categoryId)
-            .collection("elements");
-        newElements.forEach(element => {
-            if (element.id) {
-                batch.update(elementsRef.doc(element.id), {name: element.name});
-            } else {
-                var newElementRef = elementsRef.doc();
-                batch.set(newElementRef, {name: element.name});
-            }
-        });
-        elementsToDelete.forEach(element => {
-            batch.delete(elementsRef.doc(element.id));
-        });
-        return batch.commit();
+        return groupRef.update({categories: newCategories})
     }
 
-    addGroupCategoryWithElements = (groupId, categoryName, newElements) => {
-        let batch = this.firestore.batch();
-        let categoryRef = this.firestore
+    addGroupCategoryWithElements = (groupId, newCategoryObj) => {
+        let groupRef = this.firestore
             .collection("careerCenterData")
             .doc(groupId)
-            .collection("categories")
-        var newCategoryRef = categoryRef.doc()
-        batch.set(newCategoryRef, {name: categoryName})
-        let elementsRef = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("categories")
-            .doc(newCategoryRef.id)
-            .collection("elements");
-        newElements.forEach(element => {
-            if (element.id) {
-                batch.update(elementsRef.doc(element.id), {name: element.name});
-            } else {
-                var newElementRef = elementsRef.doc();
-                batch.set(newElementRef, {name: element.name});
-            }
+
+        return groupRef.update({
+            categories: firebase.firestore.FieldValue.arrayUnion(newCategoryObj)
         });
+    }
+
+    addNewCategory = (groupId, categoryName, newElements) => {
+        let groupRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+        const categoryObj = {}
         return batch.commit();
     }
 
@@ -393,30 +352,6 @@ class Firebase {
             })
         })
         return batch.commit()
-    }
-
-    deleteGroupCategoryWithElements = (groupId, categoryId, elementsToDelete) => {
-        let batch = this.firestore.batch();
-
-        let elementsRef = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("categories")
-            .doc(categoryId)
-            .collection("elements");
-        elementsToDelete.forEach(element => {
-            batch.delete(elementsRef.doc(element.id));
-        })
-        let categoryRef = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("categories")
-            .doc(categoryId)
-
-        batch.delete(categoryRef)
-
-        return batch.commit();
-
     }
 
     // MENTORS

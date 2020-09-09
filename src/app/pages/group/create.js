@@ -114,11 +114,12 @@ const CreateGroup = ({firebase}) => {
                 logoUrl: downloadURL,
                 description: baseGroupInfo.description,
                 test: false,
+                categories: arrayOfCategories
             }
-            const careerCenterRef = await firebase.createCareerCenter(careerCenter)
-            const careerCenterId = careerCenterRef.id
-            await firebase.addMultipleGroupCategoryWithElements(careerCenterRef.id, arrayOfCategories)
-            return careerCenterId
+            return firebase.createCareerCenter(careerCenter)
+            // const careerCenterId = careerCenterRef.id
+            // await firebase.addMultipleGroupCategoryWithElements(careerCenterRef.id, arrayOfCategories)
+            // return careerCenterId
 
         } catch (e) {
             console.log("error in async 2", e);

@@ -25,9 +25,11 @@ const CompleteGroup = ({handleBack, baseGroupInfo, createCareerCenter, arrayOfCa
 
     const handleFinalize = async () => {
         setSubmitting(true)
-        const ID = await createCareerCenter()
-        setSubmitting(false)
-        push(`/group/${ID}/admin`)
+        createCareerCenter().then(careerCenterRef => {
+            const ID = careerCenterRef.id
+            setSubmitting(false)
+            push(`/group/${ID}/admin`)
+        })
     }
 
     const categories = arrayOfCategories.map((category, index) => {

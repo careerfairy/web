@@ -26,8 +26,8 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
 
         return (
             <div key={index}>
-                <CategoryElement handleDeleteLocalCategory={handleDeleteLocalCategory}
-                                 handleUpdateCategory={handleUpdateCategory} groupId={groupId} category={category}/>
+                <CategoryElement handleDeleteLocalCategory={handleDeleteLocalCategory} isLocal={true}
+                                 handleUpdateCategory={handleUpdateCategory} category={category}/>
             </div>
         );
     })
