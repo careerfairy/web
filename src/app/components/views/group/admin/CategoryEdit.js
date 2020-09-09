@@ -86,28 +86,33 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
         setEditableOptions(newList);
     }
 
-    function saveChanges() {
+    function buildCategory() {
+        const newId = uuidv4()
+        return {
+            name: categoryName,
+            options: editableOptions,
+            id: newId
+        }
+    }
+
+    function handleErrors() {
         const errors = {
             inputError: categoryName.length < 1,
             optionError: editableOptions.length < 2
         }
         setErrorObj(errors)
         setTouched(!categoryName.length > 0)
-        if (errors.inputError || errors.optionError) return
+        return (errors.inputError || errors.optionError)
+    }
+
+    function saveChanges() {
+        if(handleErrors()) return
         if (isLocal) {
             if (newCategory) {
                 //Add a newly created temp category Obj
-                // const tempId = Math.random().toString(36).substr(2, 5)
-                const newId = uuidv4()
-                const tempCategoryObj = {
-                    name: categoryName,
-                    options: editableOptions,
-                    id: newId
-                }
-                handleAddTempCategory(tempCategoryObj)
+                handleAddTempCategory(buildCategory())
             } else {
                 //update an already created temp category obj
-                console.log("editableOptions", editableOptions)
                 category.name = categoryName
                 category.options = editableOptions
                 handleUpdateCategory(category)
@@ -115,13 +120,7 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
             return setEditMode(false)
         }
         if (newCategory) {
-            const newId = uuidv4()
-            const newCategoryObj = {
-                name: categoryName,
-                options: editableOptions,
-                id: newId
-            }
-            firebase.addGroupCategoryWithElements(group.id, newCategoryObj).then(() => {
+            firebase.addGroupCategoryWithElements(group.id, buildCategory()).then(() => {
                 setEditMode(false);
             })
         } else {

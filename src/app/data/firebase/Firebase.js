@@ -321,14 +321,6 @@ class Firebase {
         });
     }
 
-    addNewCategory = (groupId, categoryName, newElements) => {
-        let groupRef = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-        const categoryObj = {}
-        return batch.commit();
-    }
-
     addMultipleGroupCategoryWithElements = (groupId, arrayOfCategories) => {
         let batch = this.firestore.batch()
 
