@@ -17,8 +17,7 @@ const useStyles = makeStyles({
         maxWidth: 345,
     },
     media: {
-        height: 0,
-        paddingTop: '56.25%', // 16:9
+        paddingTop: '100%',
     },
     card: {
         flex: 1
@@ -49,7 +48,6 @@ const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
 
     const [openUpdateModal, setOpenUpdateModal] = useState(false);
 
-    const material = true
 
     useEffect(() => {
         if (userData) {
@@ -136,12 +134,11 @@ const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
 
     return (
         <Fragment key={group.id}>
-            {material ? <Card>
+            <Card>
                 <CardMedia
-                    component="image"
                     className={classes.media}
                     image={group.logoUrl}
-                    title="Paella dish"
+                    title={`${group.universityName} logo`}
                 />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="h2">
@@ -183,38 +180,7 @@ const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
                         />
                     </Menu>
                 </CardActions>
-            </Card> : <Grid.Column width={8}>
-                <div className='group-selector'>
-                    <Grid className='middle aligned' stackable>
-                        <Grid.Column width={8}>
-                            <Image src={group.logoUrl} style={{maxHeight: '80px'}}/>
-                        </Grid.Column>
-                        <Grid.Column width={8}>
-                            <div style={{fontWeight: '500', color: 'rgb(80,80,80)'}}>{group.description}</div>
-                        </Grid.Column>
-                    </Grid>
-                    <Grid>
-                        {categorySelectors}
-                    </Grid>
-                    <Button.Group style={{
-                        position: 'absolute',
-                        left: '50%',
-                        bottom: '25px',
-                        width: '90%',
-                        transform: 'translateX(-50%)'
-                    }}>
-                        <Button icon='calendar alternate outline' content='View Calendar' primary/>
-                    </Button.Group>
-                    <Dropdown item icon={{name: 'ellipsis vertical', size: 'large', color: 'grey'}}
-                              style={{position: 'absolute', right: '10px', top: '20px'}}>
-                        <Dropdown.Menu>
-                            <Dropdown.Item onClick={() => router.push('/group/' + group.id)}>Update my
-                                data</Dropdown.Item>
-                            <Dropdown.Item>Leave group</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </div>
-            </Grid.Column>}
+            </Card>
             <style jsx>{`
                 .group-selector {
                     position: relative;

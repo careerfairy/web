@@ -71,34 +71,37 @@ const UserProfile = (props) => {
 
     return (
         <Fragment>
-            <div className="header-wrapper">
-                <h3 style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}}>My Groups</h3>
-                <Button endIcon={<AddIcon/>} variant="contained" size='large'
-                        onClick={() => router.push('/group/create')}>
-                    Create a New Career Group
-                </Button>
+            <div>
+                <div className="header-wrapper">
+                    <h3 style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}}>My Groups</h3>
+                    <Button endIcon={<AddIcon/>} variant="contained" size='large'
+                            onClick={() => router.push('/group/create')}>
+                        Create a New Career Group
+                    </Button>
+                </div>
+                <Grid style={{padding: '20px 0 0 0', flexWrap: 'wrap'}} stackable>
+                    {existingGroupElements}
+                </Grid>
+                <div className={existingGroupElements.length > 0 ? 'hidden' : ''}
+                     style={{margin: '30px 0', fontSize: '1.1em'}}>
+                    You are currently not a member of any career group.
+                </div>
+                <h3 style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}}>Admin Groups</h3>
+                <div className={adminGroupElements.length > 0 ? 'hidden' : ''}
+                     style={{margin: '30px 0', fontSize: '1.1em'}}>
+                    You are currently not a member of any career group.
+                </div>
+                <SizeMe>{({size}) => (
+                    <StackGrid
+                        columnWidth={(size.width <= 768 ? '100%' : '33.33%')}
+                        gutterWidth={20}
+                        gutterHeight={20}
+                        gridRef={grid => setGrid(grid)}>
+                        {adminGroupElements}
+                    </StackGrid>
+                )}
+                </SizeMe>
             </div>
-            <Grid style={{padding: '20px 0 0 0', flexWrap: 'wrap'}} stackable>
-                {existingGroupElements}
-            </Grid>
-            <div className={existingGroupElements.length > 0 ? 'hidden' : ''}
-                 style={{margin: '30px 0', fontSize: '1.1em'}}>
-                You are currently not a member of any career group.
-            </div>
-            <h3 style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}}>Admin Groups</h3>
-            <div className={adminGroupElements.length > 0 ? 'hidden' : ''}
-                 style={{margin: '30px 0', fontSize: '1.1em'}}>
-                You are currently not a member of any career group.
-            </div>
-            <SizeMe>{({size}) => (
-                <StackGrid
-                    columnWidth={(size.width <= 768 ? '100%' : '33.33%')}
-                    gutterWidth={20}
-                    gutterHeight={20}
-                    gridRef={grid => setGrid(grid)}>
-                    {adminGroupElements}
-                </StackGrid>
-            )}</SizeMe>
             <style jsx>{`
                     .hidden {
                     display: none;

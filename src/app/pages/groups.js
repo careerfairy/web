@@ -1,13 +1,14 @@
-import { useEffect, useState, Fragment } from 'react'
-import { Container, Header as SemanticHeader, Button, Dropdown, Form, Menu, Grid } from 'semantic-ui-react';
-import { useRouter } from 'next/router';
-import { withFirebase } from '../data/firebase';
+import {useEffect, useState} from 'react'
+import Grid from '@material-ui/core/Grid';
+import {useRouter} from 'next/router';
+import {withFirebase} from '../data/firebase';
 import Header from '../components/views/header/Header';
 import Loader from '../components/views/loader/Loader';
 
 import Head from 'next/head';
 import NewGroup from '../components/views/profile/NewGroup';
 import Footer from '../components/views/footer/Footer';
+import {Container} from "@material-ui/core";
 
 const JoinGroup = (props) => {
 
@@ -22,7 +23,7 @@ const JoinGroup = (props) => {
         props.firebase.auth.onAuthStateChanged(user => {
             if (user) {
                 setUser(user);
-            }  else {
+            } else {
                 router.replace('/login');
             }
         })
@@ -32,18 +33,18 @@ const JoinGroup = (props) => {
         setLoading(true);
         if (user) {
             props.firebase.getUserData(user.email)
-            .then(querySnapshot => {
-                setLoading(false);
-                let user = querySnapshot.data();
-                if (user) {
-                    setUserData(user);
-                }
-            }).catch(error => {
+                .then(querySnapshot => {
+                    setLoading(false);
+                    let user = querySnapshot.data();
+                    if (user) {
+                        setUserData(user);
+                    }
+                }).catch(error => {
                 setLoading(false);
                 console.log(error);
             });
         }
-    },[user]);
+    }, [user]);
 
     useEffect(() => {
         props.firebase.getCareerCenters().then(querySnapshot => {
@@ -57,30 +58,34 @@ const JoinGroup = (props) => {
         });
     }, []);
 
-    if (user === null || userData === null ||loading === true) {
+    if (user === null || userData === null || loading === true) {
         return <Loader/>;
     }
 
     let moreGroupElements = [];
 
     moreGroupElements = groups.filter(group => !userData.groupIds || userData.groupIds.indexOf(group.id) == -1).map(group => {
-        return <NewGroup group={group} userData={userData} key={group.id} />
+        return (
+            <Grid key={group.id} item xs={12} sm={6} md={4} lg={4}>
+                <NewGroup group={group} userData={userData} />
+            </Grid>
+        )
     });
 
     return (
-            <div className='greyBackground'>
-                <Head>
-                    <title key="title">CareerFairy | Join Groups</title>
-                </Head>
-                <Header classElement='relative white-background'/>
-                <Container textAlign='left' style={{ margin: '50px 0' }}>
-                    <h1 className='join-group-title'>Join A New Career Group</h1>
-                    <Grid stackable columns='3'>
-                        { moreGroupElements }
-                    </Grid>
-                </Container>
-                <Footer/>
-                <style jsx>{`
+        <div className='greyBackground'>
+            <Head>
+                <title key="title">CareerFairy | Join Groups</title>
+            </Head>
+            <Header classElement='relative white-background'/>
+            <Container>
+                <h1 className='join-group-title'>Join A New Career Group</h1>
+                <Grid container spacing={3}>
+                    {moreGroupElements}
+                </Grid>
+            </Container>
+            <Footer/>
+            <style jsx>{`
                     .hidden {
                         display: none;
                     }
@@ -108,7 +113,7 @@ const JoinGroup = (props) => {
                         padding: 30px 0;
                     }
                 `}</style>
-            </div>
+        </div>
     );
 };
 
