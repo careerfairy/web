@@ -14,8 +14,6 @@ function ViewerPage(props) {
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
 
-    const { user, userData } = React.useContext(UserContext);
-
     const [showMenu, setShowMenu] = useState(true);
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
@@ -23,6 +21,13 @@ function ViewerPage(props) {
     const [careerCenters, setCareerCenters] = useState([]);
     const [handRaiseActive, setHandRaiseActive] = useState(false);
     const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
+
+
+    const { authenticatedUser, userData } = React.useContext(UserContext);
+
+    if (authenticatedUser === null) {
+        router.replace('/login');
+    }
 
     useEffect(() => {
         if (livestreamId) {
@@ -62,19 +67,20 @@ function ViewerPage(props) {
     },[]);
 
     function joinTalentPool() {
-        if (!user) {
+        debugger;
+        if (!authenticatedUser) {
             return router.replace('/signup');
         }
 
-        props.firebase.joinCompanyTalentPool(currentLivestream.companyId, user.email);
+        props.firebase.joinCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email);
     }
 
     function leaveTalentPool() {
-        if (!user) {
+        if (!authenticatedUser) {
             return router.replace('/signup');
         }
 
-        props.firebase.leaveCompanyTalentPool(currentLivestream.companyId, user.email);
+        props.firebase.leaveCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email);
     }
 
     let logoElements = careerCenters.map( (careerCenter, index) => {
@@ -87,7 +93,7 @@ function ViewerPage(props) {
 
     return (
         <div className='topLevelContainer'>
-            {/* <div className='top-menu'>
+            <div className='top-menu'>
                 <div className='top-menu-left'>    
                     <Image src='/logo_teal.png' style={{ maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
                     { logoElements }
@@ -95,9 +101,9 @@ function ViewerPage(props) {
                 </div>
                 <div className={'top-menu-right'}>
                     <Image src={ currentLivestream.companyLogoUrl } style={{ position: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block', margin: '0 10px'}}/>
-                    <Button style={{ display: currentLivestream.hasNoTalentPool ? 'none' : 'inline-block' }}size='big' content={ userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'} icon={ userIsInTalentPool ? 'delete' : 'handshake outline'} onClick={ userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()} primary={!userIsInTalentPool}/> 
+                    <Button style={{ display: currentLivestream.hasNoTalentPool ? 'none' : 'inline-block' }} content={ userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'} icon={ userIsInTalentPool ? 'delete' : 'handshake outline'} onClick={ userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()} primary={!userIsInTalentPool}/> 
                 </div>
-            </div> */}
+            </div>
             <div className='black-frame' style={{ left: showMenu ? '280px' : '0'}}>
                 { handRaiseActive ? 
                     <ViewerHandRaiseComponent currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive}/> :
@@ -109,6 +115,23 @@ function ViewerPage(props) {
             </div>
             <div className='mini-chat-container'>
                 <MiniChatContainer livestream={ currentLivestream } showMenu={showMenu}/>
+            </div>
+            <div className='action-buttons'>
+                <div className='action-container'>
+                    <div className='action-button red'>
+                        <Image src='/like.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '35px'}}/>
+                    </div>
+                </div>
+                <div className='action-container'>
+                    <div className='action-button orange'>
+                        <Image src='/clapping.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '35px'}}/>
+                    </div>
+                </div>
+                <div className='action-container'>
+                    <div className='action-button yellow'>
+                        <Image src='/heart.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '35px'}}/>
+                    </div>
+                </div>            
             </div>
             <style jsx>{`
                 .hidden {
@@ -123,7 +146,7 @@ function ViewerPage(props) {
                 .top-menu {
                     background-color: rgba(245,245,245,1);
                     padding: 15px 0;
-                    height: 75px;
+                    height: 55px;
                     text-align: center;
                     position: relative;
                 }
@@ -167,15 +190,64 @@ function ViewerPage(props) {
                     transform: translateY(-50%);
                 }
 
-                .remoteVideoContainer {
+                .action-buttons {
                     position: absolute;
-                    top: 20px;
+                    bottom: 30px;
                     left: 50%;
-                    transform: translate(-50%);
-                    width: 80%;
-                    height: 200px;
+                    transform: translateX(-50%);
+                    z-index: 100;
                 }
 
+                .action-container {
+                    display: inline-block;
+                }
+
+                .action-button {
+                    position: relative;
+                    border-radius: 50%;
+                    background-color: rgb(0, 210, 170);
+                    width: 70px;
+                    height: 70px;
+                    margin: 15px;
+                    cursor: pointer;
+                    box-shadow: 0 0 8px rgb(120,120,120);
+                }
+
+                .action-button.red {
+                    background-color: #e01a4f;
+                }
+                .action-button.red:hover {
+                    background-color: #c91847;
+                    transition: all ease-in-out 0.2s;
+                }
+                .action-button.red:active {
+                    background-color: #a4133a;
+                    transition: all ease-in-out 0.2s;
+                }
+
+                .action-button.orange {
+                    background-color: #f15946;
+                }
+                .action-button.orange:hover {
+                    background-color: #ef452e;
+                    transition: all ease-in-out 0.2s;
+                }
+                .action-button.orange:active {
+                    background-color: #e42a11;
+                    transition: all ease-in-out 0.2s;
+                }
+
+                .action-button.yellow {
+                    background-color: #f9c22e;
+                }
+                .action-button.yellow:hover {
+                    background-color: #f8ba12;
+                    transition: all ease-in-out 0.2s;
+                }
+                .action-button.yellow:active {
+                    background-color: #daa107;
+                    transition: all ease-in-out 0.2s;
+                }
                 .mini-chat-container {
                     position: absolute;
                     top: 50%;
@@ -204,7 +276,7 @@ function ViewerPage(props) {
                 @media(min-width: 768px) {
                     .black-frame {
                         position: absolute;
-                        top: 0;
+                        top: 55px;
                         bottom: 0;
                         right: 0;
                         left: 280px;
@@ -228,7 +300,7 @@ function ViewerPage(props) {
                 @media(min-width: 768px) {
                     .video-menu-left {
                         position: absolute;
-                        top: 0;
+                        top: 55px;
                         left: 0;
                         bottom: 0;
                         width: 280px;

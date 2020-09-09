@@ -21,12 +21,12 @@ function CurrentSpeakerDisplayer(props) {
             }
             if (props.streams.length > 1) {
                 if (streamId === props.currentSpeaker) {
-                    return windowSize.width > 768 ? '80vh' : '45vh';
+                    return windowSize.width > 768 ? 'calc(80vh - 55px)' : '45vh';
                 } else {
                     return windowSize.width > 768 ? '20vh' : '15vh';
                 }
             } else {
-                return windowSize.width > 768 ? '100vh' : '60vh';
+                return windowSize.width > 768 ? 'calc(100vh - 55px)' : '60vh';
             }
         } else {
             if (props.smallScreenMode) {
@@ -34,12 +34,12 @@ function CurrentSpeakerDisplayer(props) {
             }
             if (props.streams.length > 0) {
                 if (streamId === props.currentSpeaker) {
-                    return '80vh';
+                    return 'calc(80vh - 55px)';
                 } else {
                     return '20vh';
                 }
             } else {
-                return '100vh';
+                return 'calc(100vh - 55px)';
             }
         }
     } 
@@ -84,7 +84,6 @@ function CurrentSpeakerDisplayer(props) {
             props.setLivestreamCurrentSpeakerId(streamId);
         }
     }
-
     let externalVideoElements = props.streams.map( (stream, index) => {
         return (
             <div key={stream.streamId} className={getVideoContainerClass(stream.streamId)} style={{ padding: 0 }} onClick={() => updateCurrentStreamId(stream.streamId)}>
@@ -172,6 +171,7 @@ function CurrentSpeakerDisplayer(props) {
                         width: 100%; 
                         margin: 0 auto;
                         z-index: 2000;
+                        bo
                     }
 
                     #localVideo {

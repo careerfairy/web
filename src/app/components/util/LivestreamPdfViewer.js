@@ -74,10 +74,24 @@ function LivestreamPdfViewer (props) {
     }
 
     function getPageHeight() {
-        if (windowSize.height > (windowSize.width - 220)) {
-            return windowSize.width * 0.55;
-        }
-        return windowSize.height * 0.8;
+        if (props.presenter) {
+            if (props.showMenu) {
+                if (windowSize.height > (windowSize.width - 480)) {
+                    return windowSize.width * 0.30;
+                }
+                return (windowSize.height * 0.8 - 55);
+            } else {
+                if (windowSize.height > (windowSize.width - 220)) {
+                    return windowSize.width * 0.55;
+                }
+                return (windowSize.height * 0.8 - 55);
+            }     
+        } else {
+            if (windowSize.height > (windowSize.width - 220)) {
+                return windowSize.width * 0.55;
+            }
+            return (windowSize.height * 0.8 - 55);
+        }      
     }
 
     function increasePdfPageNumber() {

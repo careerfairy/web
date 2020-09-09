@@ -9,7 +9,7 @@ function SmallStreamerVideoDisplayer(props) {
     return (
         <Fragment>
             <div style={{ position: 'absolute', top: '20vh', width: '100%', backgroundColor: 'rgb(30,30,30)'}}>
-                <LivestreamPdfViewer livestreamId={props.livestreamId} presenter={props.presenter}/>
+                <LivestreamPdfViewer livestreamId={props.livestreamId} presenter={props.presenter} showMenu={props.showMenu}/>
             </div>         
             <style jsx>{`
                 .hidden {

@@ -197,10 +197,26 @@ function VideoContainer(props) {
         <Fragment>
             <div className='screen-container'>
                 <div>
-                    <CurrentSpeakerDisplayer isPlayMode={false} smallScreenMode={props.currentLivestream.mode === 'presentation'} speakerSwitchModeActive={isMainStreamer} setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId} localId={props.streamerId} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} currentSpeaker={props.currentLivestream.currentSpeakerId} muted={false}/>
+                    <CurrentSpeakerDisplayer isPlayMode={false} 
+                        smallScreenMode={props.currentLivestream.mode === 'presentation'} 
+                        speakerSwitchModeActive={isMainStreamer} 
+                        setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId} 
+                        localId={props.streamerId} 
+                        localStream={localStream} 
+                        streams={externalMediaStreams} 
+                        mediaConstraints={mediaConstraints} 
+                        currentSpeaker={props.currentLivestream.currentSpeakerId} 
+                        muted={false}/>
                 </div>
                 { props.currentLivestream.mode === 'presentation' ?
-                    <SmallStreamerVideoDisplayer isPlayMode={false} localStream={localStream} streams={externalMediaStreams} mediaConstraints={mediaConstraints} livestreamId={props.currentLivestream.id} presenter={true}/>
+                    <SmallStreamerVideoDisplayer 
+                        isPlayMode={false} 
+                        localStream={localStream} 
+                        streams={externalMediaStreams} 
+                        mediaConstraints={mediaConstraints} 
+                        livestreamId={props.currentLivestream.id} 
+                        showMenu={props.showMenu}
+                        presenter={true}/>
                     : null
                 }
             </div>

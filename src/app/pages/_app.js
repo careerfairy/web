@@ -15,29 +15,31 @@ function MyApp({ Component, pageProps }) {
 
     const firebase = new Firebase();
 
-    const [authenticatedUser, setAuthenticatedUser] = useState(null);
-    const [userData, setUserData] = useState(null);
+    const [authenticatedUser, setAuthenticatedUser] = useState({});
+    const [userData, setUserData] = useState({});
 
     useEffect(() => {
         firebase.auth.onAuthStateChanged(user => {
+            debugger;
             if (user) {
                 setAuthenticatedUser(user);
-            } 
+            } else {
+                setAuthenticatedUser(null);
+            }
         })
     }, []);
 
     useEffect(() => {
-        if (authenticatedUser) {
-           firebase.getUserData(authenticatedUser.email).then(querySnapshot => {
+        if (authenticatedUser && authenticatedUser.email) {
+           const unsubscribe = firebase.listenToUserData(authenticatedUser.email, querySnapshot => {
                 if (querySnapshot.exists) {
                     let user = querySnapshot.data();
                     setUserData(user);
                 } else {
                     setUserData(null);
                 }              
-            }).catch(error => {
-                console.log(error);
             });
+            return () => unsubscribe();
         }
     }, [authenticatedUser]);
 

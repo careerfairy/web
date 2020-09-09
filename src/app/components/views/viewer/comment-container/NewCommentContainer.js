@@ -3,7 +3,7 @@ import {Input, Icon, Button, Label, Grid} from "semantic-ui-react";
 
 import { withFirebase } from 'context/firebase';
 import ChatCategory from 'components/views/streaming/comment-container/categories/ChatCategory';
-import QuestionCategory from 'components/views/streaming/comment-container/categories/QuestionCategory';
+import QuestionCategory from './categories/QuestionCategory';
 import PollCategory from './categories/PollCategory';
 import HandRaiseCategory from './categories/HandRaiseCategory';
 
@@ -28,19 +28,19 @@ function CommentContainer(props) {
                 <div className='interaction-selector' onMouseEnter={() => setShowLabels(true)}>
                     <div className='interaction-selectors'>
                         <div>
-                            <Button circular size='big' icon='comments outline' disabled={props.showMenu && selectedState === 'chat'} onClick={() => props.handleStateChange("chat")} primary/>
+                            <Button circular size='big' icon='comments outline' disabled={props.showMenu && selectedState === 'chat'} onClick={() => props.handleStateChange("chat")} color='teal'/>
                             <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("chat")}>Main Chat</span>
                         </div>
                         <div>
-                            <Button circular size='big' icon='question circle outline' disabled={props.showMenu && selectedState === 'questions'} onClick={() => props.handleStateChange("questions")} primary/>
+                            <Button circular size='big' icon='question circle outline' disabled={props.showMenu && selectedState === 'questions'} onClick={() => props.handleStateChange("questions")} color='teal'/>
                             <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("questions")}>Q&A</span>
                         </div>
                         <div>
-                            <Button circular size='big' icon='chart bar outline' disabled={props.showMenu && selectedState === 'polls'} onClick={() => props.handleStateChange("polls")} primary/>
+                            <Button circular size='big' icon='chart bar outline' disabled={props.showMenu && selectedState === 'polls'} onClick={() => props.handleStateChange("polls")} color='teal'/>
                             <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("polls")}>Polls</span>
                         </div>
                         <div>
-                            <Button circular size='big' icon='hand pointer outline' disabled={props.showMenu && selectedState === 'hand'} onClick={() => props.handleStateChange("hand")} primary/>
+                            <Button circular size='big' icon='hand pointer outline' disabled={props.showMenu && selectedState === 'hand'} onClick={() => props.handleStateChange("hand")} color='teal'/>
                             <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("hand")}>Hand Raise</span>
                         </div>
                         {/* <div>
@@ -48,7 +48,7 @@ function CommentContainer(props) {
                             <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("settings")}>Settings</span>
                         </div> */}
                         <div className={ props.showMenu ? '' : 'hidden' }>
-                            <Button circular size='big' icon={'angle left'} onClick={() => props.setShowMenu(!props.showMenu)} color='pink'/>
+                            <Button circular size='big' icon={'angle left'} onClick={() => props.setShowMenu(!props.showMenu)}/>
                         </div>
                     </div>
                 </div>
@@ -102,7 +102,7 @@ function CommentContainer(props) {
     return (
         <div className='interaction-container'>
             <div className='interaction-category'>
-                <ChatCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}/>
+                <ChatCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData} isStreamer={false}/>
                 <QuestionCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}/>
                 <PollCategory livestream={props.livestream} selectedState={selectedState} setSelectedState={setSelectedState} setShowMenu={props.setShowMenu} streamer={props.streamer} user={props.user} userData={props.userData}/>
                 <HandRaiseCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}  handRaiseActive={props.handRaiseActive} setHandRaiseActive={props.setHandRaiseActive}/>

@@ -101,7 +101,7 @@ function CommentContainer(props) {
     return (
         <div className='interaction-container'>
             <div className='interaction-category'>
-                <ChatCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}/>
+                <ChatCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData} isStreamer={true}/>
                 <QuestionCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}/>
                 <PollCategory livestream={props.livestream} selectedState={selectedState} streamer={props.streamer} user={props.user} userData={props.userData}/>
                 <HandRaiseCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}  handRaiseActive={props.handRaiseActive} setHandRaiseActive={props.setHandRaiseActive}/>

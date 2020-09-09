@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 
 import { withFirebase } from '../../../../../context/firebase';
 import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
@@ -6,8 +6,11 @@ import { Input, Icon } from 'semantic-ui-react';
 
 import { css } from 'glamor';
 import ScrollToBottom from 'react-scroll-to-bottom';
+import UserContext from 'context/user/UserContext';
 
 function ChatCategory(props) {
+
+    const { authenticatedUser, userData } = useContext(UserContext);
     
     const [newChatEntry, setNewChatEntry] = useState('');
     const [chatEntries, setChatEntries] = useState([]);
@@ -34,8 +37,8 @@ function ChatCategory(props) {
 
         const newChatEntryObject = {
             message: newChatEntry,
-            authorName: 'Streamer',
-            authorEmail: 'Streamer',
+            authorName: props.isStreamer ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
+            authorEmail: props.isStreamer ? 'Streamer' : authenticatedUser.email,
             votes: 0
         }
 

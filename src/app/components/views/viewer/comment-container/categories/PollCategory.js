@@ -41,7 +41,7 @@ function PollCategory(props) {
         return null;
     }
 
-    if (currentPoll) {
+    if (currentPoll && authenticatedUser) {
         if (currentPoll.voters.indexOf(authenticatedUser.email) === -1) {
             const colors = ['red', 'orange', 'pink', 'olive'];
             let optionElementsLarge = currentPoll.options.map((option, index) => {

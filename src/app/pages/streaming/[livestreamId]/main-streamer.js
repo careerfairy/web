@@ -10,6 +10,7 @@ import NewCommentContainer from 'components/views/streaming/comment-container/Ne
 import SpeakerManagementModal from 'components/views/streaming/modal/SpeakerManagementModal';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
 import MiniChatContainer from 'components/views/streaming/comment-container/categories/chat/MiniChatContainer';
+import { useNumberOfViewers } from 'components/custom-hook/useNumberOfViewers';
 
 function StreamingPage(props) {
 
@@ -18,10 +19,10 @@ function StreamingPage(props) {
 
     const [currentLivestream, setCurrentLivestream] = useState(false);
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
-    const [showSpeakersModal, setShowSpeakersModal] = useState(false);
     const [showMenu, setShowMenu] = useState(true);
 
-    //const numberOfViewers = useViewerCount(currentLivestream);
+    const numberOfViewers = useNumberOfViewers(currentLivestream);
+    
     let streamingCallbacks = {
         onPublishStarted: (infoObj) => {
             setShowDisconnectionModal(false);
@@ -81,27 +82,26 @@ function StreamingPage(props) {
 
     return (
         <div className='topLevelContainer'>
-             {/* <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
+             <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
                 <div style={{ position: 'absolute', top: '50%', left: '20px', transform: 'translateY(-50%)', verticalAlign: 'middle'}}>
                     <ButtonWithConfirm
-                        color={currentLivestream.hasStarted ? 'red' : 'teal'} 
-                        size='big' 
+                        color={currentLivestream.hasStarted ? 'red' : 'teal'}  
                         fluid
                         disabled={!streamStartTimeIsNow}
                         buttonAction={() => setStreamingStarted(!currentLivestream.hasStarted)} 
                         confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
                         buttonLabel={ currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming' }/>
                 </div>
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', display: 'inline-block', padding: '10px', verticalAlign: 'middle'}}>
-                    <h3 style={{ color: (currentLivestream.hasStarted ?  'white' : 'orange') }}>{ currentLivestream.hasStarted ? 'YOU ARE NOW LIVE' : 'YOU ARE NOT LIVE'}</h3>
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', display: 'inline-block', padding: '10px', verticalAlign: 'middle', fontSize: '0.8em'}}>
+                    <h3 style={{ color: (currentLivestream.hasStarted ?  'teal' : 'orange') }}>{ currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}</h3>
                     { currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
                 </div>
-                <div style={{ float: 'right', margin: '0 20px', fontSize: '1.2em', fontWeight: '700', padding: '10px', verticalAlign: 'middle'}}>
+                <div style={{ float: 'right', margin: '0 20px', fontSize: '1em', padding: '3px', verticalAlign: 'middle'}}>
                     Viewers: { numberOfViewers }
                 </div>
-            </div> */}
+            </div>
             <div className='black-frame' style={{ left: showMenu ? '280px' : '0'}}>
-                <VideoContainer currentLivestream={ currentLivestream } streamerId={ currentLivestream.id } streamingCallbacks={streamingCallbacks} errorCallbacks={errorCallbacks}/>
+                <VideoContainer currentLivestream={ currentLivestream } streamerId={ currentLivestream.id } streamingCallbacks={streamingCallbacks} errorCallbacks={errorCallbacks} showMenu={showMenu}/>
             </div>
             <div className='video-menu-left' style={{ width: showMenu ? '280px' : '0'}}>
                 <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={true} livestream={ currentLivestream }/>
@@ -114,13 +114,12 @@ function StreamingPage(props) {
                     position: relative;
                     background-color: rgba(245,245,245,1);
                     padding: 15px 0;
-                    height: 75px;
+                    height: 55px;
                     text-align: center;
                 }
 
                 .top-menu.active {
-                    background-color: rgba(0, 210, 170, 1);
-                    color: white;
+                    color: rgba(0, 210, 170, 1);
                 }
 
                 .top-menu h3 {
@@ -129,7 +128,7 @@ function StreamingPage(props) {
 
                 .video-menu-left {
                     position: absolute;
-                    top: 0;
+                    top: 55px;
                     left: 0;
                     bottom: 0;
                     z-index: 20;
@@ -141,10 +140,10 @@ function StreamingPage(props) {
 
                 .black-frame {
                     position: absolute;
-                    top: 0;
+                    top: 55px;
                     right: 0;
                     min-width: 400px;
-                    height: 100%;
+                    height: calc(100% - 55px);
                     min-height: 600px;
                     z-index: 10;
                     background-color: black;
@@ -158,16 +157,6 @@ function StreamingPage(props) {
                     width: 20%;
                     min-width: 130px;
                     z-index: 100;
-                }
-
-                .right-container {
-                    position: absolute;
-                    right: 0;
-                    top: 0;
-                    height: 100%;
-                    width: 180px;
-                    padding: 20px;
-                    background-color: rgb(80,80,80);
                 }
             `}</style>
         </div>
