@@ -32,22 +32,18 @@ const JoinGroup = (props) => {
     useEffect(() => {
         setLoading(true);
         if (user) {
-            props.firebase.getUserData(user.email)
-                .then(querySnapshot => {
+            props.firebase.listenToUserData(user.email, querySnapshot => {
                     setLoading(false);
                     let user = querySnapshot.data();
                     if (user) {
                         setUserData(user);
                     }
-                }).catch(error => {
-                setLoading(false);
-                console.log(error);
-            });
+                });
         }
     }, [user]);
 
     useEffect(() => {
-        props.firebase.getCareerCenters().then(querySnapshot => {
+        props.firebase.listenToGroups(querySnapshot => {
             let careerCenters = [];
             querySnapshot.forEach(doc => {
                 let careerCenter = doc.data();
@@ -64,7 +60,7 @@ const JoinGroup = (props) => {
 
     let moreGroupElements = [];
 
-    moreGroupElements = groups.filter(group => !userData.groupIds || userData.groupIds.indexOf(group.id) == -1).map(group => {
+    moreGroupElements = groups.map(group => {
         return (
             <Grow key={group.id} in={Boolean(group)} timeout={600}>
                 <Grid item xs={12} sm={6} md={4} lg={4}>

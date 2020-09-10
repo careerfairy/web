@@ -28,27 +28,24 @@ const UserCategorySelector = ({category, handleSetSelected}) => {
         setOpen(true);
     };
 
-    const renderOptions = () => {
+    const renderOptions = category.options?.map(option => {
         if (native) {
-            return category.options?.map(option => {
-                return <option key={option.id} value={option.id}>
-                    {option.name}
-                </option>
-            })
+            return <option key={option.id} value={option.id}>
+                {option.name}
+            </option>
         } else {
-            return category.options?.map(option => {
-                return <MenuItem key={option.id} value={option.id}>
-                    <Typography variant="inherit" noWrap>
-                        {option.name}
-                    </Typography>
-                </MenuItem>
-            })
+            return <MenuItem key={option.id} value={option.id}>
+                <Typography variant="inherit" noWrap>
+                    {option.name}
+                </Typography>
+            </MenuItem>
         }
-    }
+    })
+
 
     return (
         <Fragment>
-            <FormControl style={{width: native ? '100%' : '80%'}} className={classes.formControl}>
+            <FormControl style={{width: native ? '100%' : '80%' }} className={classes.formControl}>
                 <InputLabel id="demo-controlled-open-select-label">{category.name}</InputLabel>
                 <Select
                     open={open}
@@ -59,8 +56,8 @@ const UserCategorySelector = ({category, handleSetSelected}) => {
                     value={category.selected}
                     onChange={(e) => handleSetSelected(category.id, e)}
                 >
-                    {native  && <option disabled hidden value=""/>}
-                    {renderOptions()}
+                    {native && <option disabled hidden value=""/>}
+                    {renderOptions}
                 </Select>
             </FormControl>
         </Fragment>

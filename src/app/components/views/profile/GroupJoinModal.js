@@ -51,7 +51,7 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
                 groupId: group.id,
                 categories: newCategories
             }
-            await firebase.joinGroupWithCategories(userData.id, group.id, groupObj)
+            await firebase.joinGroup(userData.id, group.id, groupObj)
             setSubmitting(false)
             closeModal()
         } catch (e) {
@@ -73,7 +73,7 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
             open={open}
             onClose={closeModal}
             fullWidth
-            maxWidth="md"
+            maxWidth="sm"
         >
             <DialogTitle align="center">Follow live streams from</DialogTitle>
             <CardMedia
@@ -90,15 +90,25 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
             </DialogContent>
             <DialogActions style={{display: 'flex', flexFlow: 'column', alignItems: 'center'}}>
                 {!!categories.length && renderCategories}
-                <Button fullWidth
-                        disabled={!allSelected || submitting}
-                        variant="contained"
-                        size="large"
-                        style={{margin: '10px 0 0 0'}}
-                        endIcon={submitting && <CircularProgress size={20} color="inherit"/>}
-                        onClick={handleJoinGroup} color="primary" autoFocus>
-                    Join
-                </Button>
+                <div style={{display: 'flex', width: '100%', margin: 0}}>
+                    <Button fullWidth
+                            // variant="contained"
+                            size="large"
+                            style={{margin: '10px 5px 0 0'}}
+                            endIcon={submitting && <CircularProgress size={20} color="inherit"/>}
+                            onClick={closeModal}>
+                        Cancel
+                    </Button>
+                    <Button fullWidth
+                            disabled={!allSelected || submitting}
+                            variant="contained"
+                            size="large"
+                            style={{margin: '10px 0 0 5px'}}
+                            endIcon={submitting && <CircularProgress size={20} color="inherit"/>}
+                            onClick={handleJoinGroup} color="primary" autoFocus>
+                        Join
+                    </Button>
+                </div>
             </DialogActions>
         </Dialog>
     );

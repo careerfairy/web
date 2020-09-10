@@ -1,7 +1,7 @@
-import { useEffect, useState, Fragment } from 'react'
-import { Container, Header as SemanticHeader, Button, Dropdown, Form, Menu, Grid } from 'semantic-ui-react';
-import { useRouter } from 'next/router';
-import { withFirebase } from '../data/firebase';
+import {useEffect, useState, Fragment} from 'react'
+import {Container, Header as SemanticHeader, Button, Dropdown, Form, Menu, Grid} from 'semantic-ui-react';
+import {useRouter} from 'next/router';
+import {withFirebase} from '../data/firebase';
 import Header from '../components/views/header/Header';
 import Loader from '../components/views/loader/Loader';
 
@@ -23,7 +23,7 @@ const UserProfile = (props) => {
         props.firebase.auth.onAuthStateChanged(user => {
             if (user) {
                 setUser(user);
-            }  else {
+            } else {
                 router.replace('/login');
             }
         })
@@ -32,59 +32,60 @@ const UserProfile = (props) => {
     useEffect(() => {
         setLoading(true);
         if (user) {
-            props.firebase.getUserData(user.email)
-            .then(querySnapshot => {
+            props.firebase.listenToUserData(user.email, querySnapshot => {
                 setLoading(false);
                 let user = querySnapshot.data();
                 user.id = querySnapshot.id;
                 if (user) {
                     setUserData(user);
                 }
-            }).catch(error => {
-                setLoading(false);
-                console.log(error);
-            });
+            })
         }
-    },[user]);
+    }, [user]);
 
     if (user === null || userData == null || loading === true) {
         return <Loader/>;
     }
 
     return (
-            <div className='greyBackground'>
-                <Head>
-                    <title key="title">CareerFairy | My Profile</title>
-                </Head>
-                <Header classElement='relative white-background'/>
-                <Container textAlign='left' style={{ marginTop: '50px' }}>
-                    <Grid stackable>
-                        <Grid.Column width='4'>
-                            <h3 style={{ color: 'rgb(80,80,80)', margin: '0 0 20px 0', fontWeight: '300', fontSize: '1.7em' }}>{ userData ? 'My Profile' : 'Complete My Profile'}</h3>
-                            <Menu vertical>
-                                <Menu.Item
+        <div className='greyBackground'>
+            <Head>
+                <title key="title">CareerFairy | My Profile</title>
+            </Head>
+            <Header classElement='relative white-background'/>
+            <Container textAlign='left' style={{marginTop: '50px'}}>
+                <Grid stackable>
+                    <Grid.Column width='4'>
+                        <h3 style={{
+                            color: 'rgb(80,80,80)',
+                            margin: '0 0 20px 0',
+                            fontWeight: '300',
+                            fontSize: '1.7em'
+                        }}>{userData ? 'My Profile' : 'Complete My Profile'}</h3>
+                        <Menu vertical>
+                            <Menu.Item
                                 name='Personal Information'
                                 active={state === 'personal'}
                                 onClick={() => setState('personal')}
-                                />
-                                <Menu.Item
+                            />
+                            <Menu.Item
                                 name='My Groups'
-                                active={ state === 'groups' }
+                                active={state === 'groups'}
                                 onClick={() => setState('groups')}
-                                />
-                            </Menu>
-                        </Grid.Column>
-                        <Grid.Column width='12'>
-                            <div className={ state === 'personal' ? '' : 'hidden' }>
-                                <PersonalInfo userData={userData}/>
-                            </div>
-                            <div className={ state === 'groups' ? '' : 'hidden'} >
-                                <MyGroups userData={userData}/>
-                            </div>
-                        </Grid.Column>
-                    </Grid>          
-                </Container>
-                <style jsx>{`
+                            />
+                        </Menu>
+                    </Grid.Column>
+                    <Grid.Column width='12'>
+                        <div className={state === 'personal' ? '' : 'hidden'}>
+                            <PersonalInfo userData={userData}/>
+                        </div>
+                        <div className={state === 'groups' ? '' : 'hidden'}>
+                            <MyGroups userData={userData}/>
+                        </div>
+                    </Grid.Column>
+                </Grid>
+            </Container>
+            <style jsx>{`
                     .hidden {
                         display: none;
                     }
@@ -104,7 +105,7 @@ const UserProfile = (props) => {
                         padding: '30px 0'
                     }
                 `}</style>
-            </div>
+        </div>
     );
 };
 

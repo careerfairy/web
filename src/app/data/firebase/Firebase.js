@@ -68,7 +68,7 @@ class Firebase {
         });
     };
 
-    joinGroupWithCategories = (userId, groupId, groupObj) => {
+    joinGroup = (userId, groupId, groupObj) => {
         let userRef = this.firestore
             .collection("userData")
             .doc(userId)
@@ -78,14 +78,10 @@ class Firebase {
         })
     }
 
-    joinGroupWithoutCategories = (userId, groupId, groupObj) => {
-        let userRef = this.firestore
-            .collection("userData")
-            .doc(userId)
-        return userRef.update({
-            groupIds: firebase.firestore.FieldValue.arrayUnion(groupId),
-            registeredGroups: firebase.firestore.FieldValue.arrayUnion(groupObj)
-        })
+    listenToGroups = (callback) => {
+        let groupRefs = this.firestore
+            .collection("careerCenterData")
+        return groupRefs.onSnapshot(callback)
     }
 
     listenToUserGroupCategoryValue = (userEmail, groupId, categoryId, callback) => {
@@ -227,14 +223,6 @@ class Firebase {
     getCareerCentersByGroupId = (arrayOfIds) => {
         const refs = arrayOfIds.map(id => this.firestore.collection('careerCenterData').doc(id))
         return this.firestore.getAll(...refs)
-    }
-
-    listenToGroupCategories = (groupId, callback) => {
-        let ref = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("categories");
-        return ref.onSnapshot(callback);
     }
 
     listenToCareerCenterById = (groupId, callback) => {

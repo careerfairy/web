@@ -9,11 +9,10 @@ import {Grid} from "semantic-ui-react";
 import StackGrid from "react-stack-grid";
 
 
-const UserProfile = (props) => {
+const UserProfile = ({userData, firebase}) => {
 
 
     const router = useRouter();
-    const [groups, setGroups] = useState([]);
     const [adminGroups, setAdminGroups] = useState([]);
     const [grid, setGrid] = useState(null);
 
@@ -23,25 +22,12 @@ const UserProfile = (props) => {
                 grid.updateLayout();
             }, 500);
         }
-    }, [grid, groups]);
+    }, [grid, userData.groupIds]);
+
 
     useEffect(() => {
-        if (props.userData.groupIds) {
-            props.firebase.listenToJoinedGroups(props.userData.groupIds, querySnapshot => {
-                let careerCenters = [];
-                querySnapshot.forEach(doc => {
-                    let careerCenter = doc.data();
-                    careerCenter.id = doc.id;
-                    careerCenters.push(careerCenter);
-                })
-                setGroups(careerCenters);
-            })
-        }
-    }, [props.userData])
-
-    useEffect(() => {
-        if (props.userData) {
-            props.firebase.listenCareerCentersByAdminEmail(props.userData.id, querySnapshot => {
+        if (userData) {
+            firebase.listenCareerCentersByAdminEmail(userData.id, querySnapshot => {
                 let careerCenters = [];
                 querySnapshot.forEach(doc => {
                     let careerCenter = doc.data();
@@ -51,21 +37,21 @@ const UserProfile = (props) => {
                 setAdminGroups(careerCenters);
             })
         }
-    }, [props.userData])
+    }, [userData])
 
     let existingGroupElements = [];
 
-    if (props.userData && props.userData.groupIds) {
-        existingGroupElements = groups.map(group => {
-            return <CurrentGroup group={group} userData={props.userData} key={group.id}/>
+    if (userData && userData.groupIds) {
+        existingGroupElements = userData.groupIds.map(groupId => {
+            return <CurrentGroup groupId={groupId} userData={userData} key={groupId}/>
         });
     }
 
     let adminGroupElements = [];
 
-    if (props.userData) {
+    if (userData) {
         adminGroupElements = adminGroups.map(group => {
-            return <CurrentGroup isAdmin={true} group={group} userData={props.userData} key={group.id} grid={grid}/>
+            return <CurrentGroup isAdmin={true} group={group} userData={userData} key={group.id} grid={grid}/>
         });
     }
 
@@ -79,9 +65,16 @@ const UserProfile = (props) => {
                         Create a New Career Group
                     </Button>
                 </div>
-                <Grid style={{padding: '20px 0 0 0', flexWrap: 'wrap'}} stackable>
-                    {existingGroupElements}
-                </Grid>
+                <SizeMe>{({size}) => (
+                    <StackGrid
+                        columnWidth={(size.width <= 768 ? '100%' : '33.33%')}
+                        gutterWidth={20}
+                        gutterHeight={20}
+                        gridRef={grid => setGrid(grid)}>
+                        {existingGroupElements}
+                    </StackGrid>
+                )}
+                </SizeMe>
                 <div className={existingGroupElements.length > 0 ? 'hidden' : ''}
                      style={{margin: '30px 0', fontSize: '1.1em'}}>
                     You are currently not a member of any career group.
