@@ -1,4 +1,4 @@
-import {useEffect, useState, Fragment} from 'react'
+import React, {useEffect, useState, Fragment} from 'react'
 import {Button, Container, Grid, Grow, Typography} from "@material-ui/core";
 import {useRouter} from 'next/router';
 import {withFirebase} from 'data/firebase';
@@ -67,14 +67,16 @@ const UserProfile = ({userData, firebase}) => {
         <Fragment>
             <div>
                 <div className="header-wrapper">
-                    <h3 style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}}>My
-                        Groups</h3>
+                    <Typography style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}}
+                                variant="h4">
+                        My Groups
+                    </Typography>
                     <Button endIcon={<AddIcon/>} variant="contained" size='large'
                             onClick={() => router.push('/group/create')}>
                         Create a New Career Group
                     </Button>
                 </div>
-                {adminGroupElements.length ?
+                {existingGroupElements.length ?
                     <Grid style={{marginBottom: 50}} container spacing={3}>
                         {existingGroupElements}
                     </Grid>
@@ -82,10 +84,9 @@ const UserProfile = ({userData, firebase}) => {
                     <Typography gutterBottom>
                         You are currently not a member of any career group.
                     </Typography>}
-                    <Typography variant="h3">
-                        Admin Groups
-                    </Typography>
-                <h3 style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}}>Admin Groups</h3>
+                <Typography style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}} variant="h4">
+                    Admin Groups
+                </Typography>
                 {adminGroupElements.length ?
                     <Grid style={{marginBottom: 50}} container spacing={3}>
                         {adminGroupElements}
