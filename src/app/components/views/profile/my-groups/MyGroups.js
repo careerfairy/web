@@ -96,23 +96,6 @@ const UserProfile = ({userData, firebase}) => {
                         You are currently not a member of any career group.
                     </Typography>}
             </div>
-            <style jsx>{`
-                    .hidden {
-                    display: none;
-                    }
-
-                    .greyBackground {
-                    background-color: rgb(250,250,250);
-                    height: 100%;
-                    }
-
-                    .field-error {
-                    margin-top: 10px;
-                    color: red;
-                    }
-                    #profileContainer {
-                    }
-                    `}</style>
         </Fragment>
     );
 };
