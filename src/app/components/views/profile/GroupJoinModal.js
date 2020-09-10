@@ -8,15 +8,13 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {withFirebase} from 'data/firebase';
 import UserCategorySelector from 'components/views/profile/UserCategorySelector';
-import {CardMedia, useTheme} from "@material-ui/core";
+import {CardMedia} from "@material-ui/core";
 
 
 const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
 
-    const theme = useTheme();
     const [categories, setCategories] = useState([]);
     const [allSelected, setAllSelected] = useState(false)
-    const [selectedOptions, setSelectedOptions] = useState({});
 
     useEffect(() => {
         if (group.categories) {
@@ -28,7 +26,6 @@ const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
     useEffect(() => {
         if (categories && open) {
             const notAllSelected = !categories.some(category => category.selected === "")
-            console.log("notAllSelected", notAllSelected);
             setAllSelected(notAllSelected)
         }
     }, [categories, open])

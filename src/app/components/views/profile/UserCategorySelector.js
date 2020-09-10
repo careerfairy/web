@@ -5,14 +5,9 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
-import Button from '@material-ui/core/Button';
 import {Typography, useMediaQuery, useTheme} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
-    button: {
-        display: 'block',
-        marginTop: theme.spacing(2),
-    },
     formControl: {
         margin: theme.spacing(1),
         minWidth: 120,
@@ -53,9 +48,6 @@ const UserCategorySelector = ({category, handleSetSelected}) => {
 
     return (
         <Fragment>
-            <Button className={classes.button} onClick={handleOpen}>
-                {category.name}
-            </Button>
             <FormControl style={{width: native ? '100%' : '80%'}} className={classes.formControl}>
                 <InputLabel id="demo-controlled-open-select-label">{category.name}</InputLabel>
                 <Select
@@ -67,10 +59,6 @@ const UserCategorySelector = ({category, handleSetSelected}) => {
                     value={category.selected}
                     onChange={(e) => handleSetSelected(category.id, e)}
                 >
-                    {native ? <option disabled hidden value=""/> :
-                        <MenuItem value="">
-                            <em>None</em>
-                        </MenuItem>}
                     {renderOptions()}
                 </Select>
             </FormControl>
