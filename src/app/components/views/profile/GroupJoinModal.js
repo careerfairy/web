@@ -8,7 +8,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {withFirebase} from 'data/firebase';
 import UserCategorySelector from 'components/views/profile/UserCategorySelector';
-import {CardMedia, CircularProgress } from "@material-ui/core";
+import {Card, CardMedia, CircularProgress} from "@material-ui/core";
 
 
 const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
@@ -51,7 +51,7 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
                 groupId: group.id,
                 categories: newCategories
             }
-            await firebase.joinGroupNew(userData.id, group.id, groupObj)
+            await firebase.joinGroupWithCategories(userData.id, group.id, groupObj)
             setSubmitting(false)
             closeModal()
         } catch (e) {
@@ -69,53 +69,38 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
     })
 
     return (
-        <Fragment>
-            <Dialog
-                open={open}
-                onClose={closeModal}
-                fullWidth
-                maxWidth="md"
-            >
-                <DialogTitle align="center">Follow live streams from</DialogTitle>
-                <CardMedia style={{display: 'flex', justifyContent: 'center', padding: '1em'}}>
-                    <img src={group.logoUrl} style={{
-                        maxWidth: '250px',
-                        width: '35%',
-                        maxHeight: '150px'
-                    }} alt=""/>
-                </CardMedia>
-                <DialogContent>
-                    <DialogContentText align="center" noWrap id="alert-dialog-description">
-                        {group.description}
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions style={{display: 'flex', flexFlow: 'column', alignItems: 'center'}}>
-                    {categories.length ?
-                        <Fragment>
-                            {renderCategories}
-                            <Button fullWidth disabled={!allSelected || submitting} variant="contained" size="large"
-                                    style={{margin: '10px 0 0 0'}}
-                                    endIcon={submitting && <CircularProgress size={20} color="inherit"/>}
-                                    onClick={handleJoinGroup} color="primary" autoFocus>
-                                Join
-                            </Button>
-                        </Fragment>
-                        :
-                        <Button onClick={closeModal} color="primary" autoFocus>
-                            Join
-                        </Button>
-                    }
-                </DialogActions>
-            </Dialog>
-            <style jsx>{`
-            .header {
-                text-align: center;
-                margin-bottom: 40px;
-                color: rgb(140,140,140);
-                text-transform: uppercase;
-            }
-        `}</style>
-        </Fragment>
+        <Dialog
+            open={open}
+            onClose={closeModal}
+            fullWidth
+            maxWidth="md"
+        >
+            <DialogTitle align="center">Follow live streams from</DialogTitle>
+            <CardMedia
+                style={{display: 'flex', justifyContent: 'center', padding: '1.5em 1em 1em 1em', height: '120px'}}>
+                <img src={group.logoUrl} style={{
+                    objectFit: 'contain',
+                    maxWidth: '80%'
+                }} alt=""/>
+            </CardMedia>
+            <DialogContent>
+                <DialogContentText align="center" noWrap id="alert-dialog-description">
+                    {group.description}
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions style={{display: 'flex', flexFlow: 'column', alignItems: 'center'}}>
+                {!!categories.length && renderCategories}
+                <Button fullWidth
+                        disabled={!allSelected || submitting}
+                        variant="contained"
+                        size="large"
+                        style={{margin: '10px 0 0 0'}}
+                        endIcon={submitting && <CircularProgress size={20} color="inherit"/>}
+                        onClick={handleJoinGroup} color="primary" autoFocus>
+                    Join
+                </Button>
+            </DialogActions>
+        </Dialog>
     );
 };
 
