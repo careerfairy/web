@@ -15,19 +15,27 @@ const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
 
     const theme = useTheme();
     const [categories, setCategories] = useState([]);
+    const [allSelected, setAllSelected] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState({});
 
     useEffect(() => {
         if (group.categories) {
-            const newCategories = group.categories.map(obj => ({...obj, selected: ""}))
+            const newCategories = group.categories.map(obj => ({...obj, selected: undefined}))
             setCategories(newCategories)
         }
     }, [group])
 
+    useEffect(() => {
+        if (categories) {
+            const selected = categories.some(category => category.selected)
+            console.log("selected", selected);
+            setAllSelected(selected)
+        }
+    }, [categories])
+
     const handleSetSelected = (categoryId, event) => {
         const newCategories = [...categories]
         const index = newCategories.findIndex(el => el.id === categoryId)
-        console.log("event.target.value in func", event.target.value);
         newCategories[index].selected = event.target.value
         setCategories(newCategories)
     }
@@ -65,10 +73,12 @@ const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
                     {categories.length ?
                         <Fragment>
                             {renderCategories}
-                            {"has selected?" &&
-                            <Button fullWidth variant="contained" size="large"  style={{margin: '10px 0 0 0'}} onClick={closeModal} color="primary" autoFocus>
+
+                            <Button fullWidth disabled={!allSelected} variant="contained" size="large"
+                                    style={{margin: '10px 0 0 0'}}
+                                    onClick={closeModal} color="primary" autoFocus>
                                 Join
-                            </Button>}
+                            </Button>
                         </Fragment>
                         :
                         <Button onClick={closeModal} color="primary" autoFocus>

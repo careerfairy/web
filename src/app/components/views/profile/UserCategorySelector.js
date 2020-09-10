@@ -22,15 +22,8 @@ const useStyles = makeStyles((theme) => ({
 const UserCategorySelector = ({category, handleSetSelected}) => {
     const theme = useTheme();
     const native = useMediaQuery(theme.breakpoints.down('xs'));
-
     const classes = useStyles();
-    const [age, setAge] = React.useState('');
     const [open, setOpen] = React.useState(false);
-
-
-    const handleChange = (event) => {
-        setAge(event.target.value);
-    };
 
     const handleClose = () => {
         setOpen(false);
@@ -66,7 +59,6 @@ const UserCategorySelector = ({category, handleSetSelected}) => {
             <FormControl style={{width: native ? '100%' : '80%'}} className={classes.formControl}>
                 <InputLabel id="demo-controlled-open-select-label">{category.name}</InputLabel>
                 <Select
-                    labelWidth="600"
                     open={open}
                     fullWidth
                     native={native}

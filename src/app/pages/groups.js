@@ -8,7 +8,7 @@ import Loader from '../components/views/loader/Loader';
 import Head from 'next/head';
 import NewGroup from '../components/views/profile/NewGroup';
 import Footer from '../components/views/footer/Footer';
-import {Container} from "@material-ui/core";
+import {Container, Grow} from "@material-ui/core";
 
 const JoinGroup = (props) => {
 
@@ -66,9 +66,14 @@ const JoinGroup = (props) => {
 
     moreGroupElements = groups.filter(group => !userData.groupIds || userData.groupIds.indexOf(group.id) == -1).map(group => {
         return (
-            <Grid key={group.id} item xs={12} sm={6} md={4} lg={4}>
-                <NewGroup group={group} userData={userData} />
-            </Grid>
+            <Grow key={group.id}
+                in={Boolean(group)}
+                timeout={400}
+            >
+                <Grid item xs={12} sm={6} md={4} lg={4}>
+                    <NewGroup group={group} userData={userData}/>
+                </Grid>
+            </Grow>
         )
     });
 

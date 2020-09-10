@@ -8,7 +8,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import {withFirebase} from 'data/firebase';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-import {Card, CardContent, CardMedia, Typography, Button} from "@material-ui/core";
+import {Card, CardContent, CardMedia, Typography, Button, Grow} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal";
 
@@ -109,78 +109,55 @@ const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
         }
     }
 
-    let categorySelectors = categoriesWithElements.map(category => {
-        let usersCategory = userCategories.find(userCategory => {
-            return userCategory.categoryId === category.id;
-        });
-        let value = category.elements.find(element => {
-            return element.id === usersCategory?.value;
-        })
-        return (
-            <Grid.Column key={category.id} width={8}>
-                <div style={{margin: '15px 0'}}>
-                    <label style={{
-                        marginBottom: '10px',
-                        textTransform: "uppercase",
-                        fontSize: '0.8em',
-                        fontWeight: '700',
-                        color: 'rgb(0, 210, 170)'
-                    }}>{category.name}</label>
-                    <div style={{fontSize: '1.2em'}}>{value?.name}</div>
-                </div>
-            </Grid.Column>
-        )
-    });
-
     return (
         <Fragment key={group.id}>
-            <Card>
-                <CardMedia
-                    className={classes.media}
-                    image={group.logoUrl}
-                    title={`${group.universityName} logo`}
-                />
-                <CardContent>
-                    <Typography gutterBottom variant="h5" component="h2">
-                        {group.universityName}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
-                        {group.description}
-                    </Typography>
-                </CardContent>
-                <CardActions>
-                    <Button fullWidth size="small" color="primary">
-                        View Calendar
-                    </Button>
-                    <Button onClick={handleClick} size="small" color="primary">
-                        <MoreVertIcon/>
-                    </Button>
-                    <Menu
-                        id="simple-menu"
-                        anchorEl={anchorEl}
-                        keepMounted
-                        open={Boolean(anchorEl)}
-                        onClose={handleClose}
-                    >
-                        <MenuItem onClick={() => push(`/group/${group.id}/admin`)}>Update my data</MenuItem>
-                        <MenuItem onClick={() => router.push('/group/' + group.id)}>Group Page</MenuItem>
-                        {isAdmin ?
-                            <MenuItem onClick={() => {
-                                setOpen(true)
-                                handleClose()
-                            }}>Delete group</MenuItem>
-                            :
-                            <MenuItem onClick={handleClose}>Leave group</MenuItem>}
-                        <AreYouSureModal
-                            open={open}
-                            handleClose={() => setOpen(false)}
-                            handleConfirm={handleDeleteCareerCenter}
-                            title="Warning"
-                            message={`Are you sure you want to delete ${group.universityName}? You wont be able to revert changes`}
-                        />
-                    </Menu>
-                </CardActions>
-            </Card>
+                <Card>
+                    <CardMedia
+                        className={classes.media}
+                        image={group.logoUrl}
+                        title={`${group.universityName} logo`}
+                    />
+                    <CardContent>
+                        <Typography gutterBottom variant="h5" component="h2">
+                            {group.universityName}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary" component="p">
+                            {group.description}
+                        </Typography>
+                    </CardContent>
+                    <CardActions>
+                        <Button fullWidth size="small" color="primary">
+                            View Calendar
+                        </Button>
+                        <Button onClick={handleClick} size="small" color="primary">
+                            <MoreVertIcon/>
+                        </Button>
+                        <Menu
+                            id="simple-menu"
+                            anchorEl={anchorEl}
+                            keepMounted
+                            open={Boolean(anchorEl)}
+                            onClose={handleClose}
+                        >
+                            <MenuItem onClick={() => push(`/group/${group.id}/admin`)}>Update my data</MenuItem>
+                            <MenuItem onClick={() => router.push('/group/' + group.id)}>Group Page</MenuItem>
+                            {isAdmin ?
+                                <MenuItem onClick={() => {
+                                    setOpen(true)
+                                    handleClose()
+                                }}>Delete group</MenuItem>
+                                :
+                                <MenuItem onClick={handleClose}>Leave group</MenuItem>}
+                            <AreYouSureModal
+                                open={open}
+                                handleClose={() => setOpen(false)}
+                                handleConfirm={handleDeleteCareerCenter}
+                                title="Warning"
+                                message={`Are you sure you want to delete ${group.universityName}? You wont be able to revert changes`}
+                            />
+                        </Menu>
+                    </CardActions>
+                </Card>
             <style jsx>{`
                 .group-selector {
                     position: relative;
