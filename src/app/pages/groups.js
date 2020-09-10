@@ -15,6 +15,7 @@ const JoinGroup = (props) => {
     const router = useRouter();
     const [user, setUser] = useState(null);
     const [userData, setUserData] = useState(null);
+    console.log(userData);
     const [loading, setLoading] = useState(false);
 
     const [groups, setGroups] = useState([]);
@@ -67,8 +68,8 @@ const JoinGroup = (props) => {
     moreGroupElements = groups.filter(group => !userData.groupIds || userData.groupIds.indexOf(group.id) == -1).map(group => {
         return (
             <Grow key={group.id}
-                in={Boolean(group)}
-                timeout={400}
+                  in={Boolean(group)}
+                  timeout={400}
             >
                 <Grid item xs={12} sm={6} md={4} lg={4}>
                     <NewGroup group={group} userData={userData}/>

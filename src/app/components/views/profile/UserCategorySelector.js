@@ -59,6 +59,7 @@ const UserCategorySelector = ({category, handleSetSelected}) => {
                     value={category.selected}
                     onChange={(e) => handleSetSelected(category.id, e)}
                 >
+                    {native  && <option disabled hidden value=""/>}
                     {renderOptions()}
                 </Select>
             </FormControl>
