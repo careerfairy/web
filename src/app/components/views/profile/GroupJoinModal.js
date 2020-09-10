@@ -8,13 +8,12 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {withFirebase} from 'data/firebase';
 import UserCategorySelector from 'components/views/profile/UserCategorySelector';
-import {CardMedia, Fade, Grid, useMediaQuery, useTheme} from "@material-ui/core";
+import {CardMedia, useTheme} from "@material-ui/core";
 
 
 const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
 
     const theme = useTheme();
-    const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
     const [categories, setCategories] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState({});
 
@@ -31,27 +30,6 @@ const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
         console.log("event.target.value in func", event.target.value);
         newCategories[index].selected = event.target.value
         setCategories(newCategories)
-    }
-
-
-    function setCategoryValue(categoryId, valueId) {
-        let updatedCategories = [];
-        categories.forEach(category => {
-            if (category.id === categoryId) {
-                let elements = [];
-                category.elements.forEach(element => {
-                    if (element.id === valueId) {
-                        element.selected = true;
-                    } else {
-                        element.selected = false;
-                    }
-                    elements.push(element);
-                });
-                category.elements = elements;
-            }
-            updatedCategories.push(category);
-        });
-        setCategories(updatedCategories);
     }
 
     const renderCategories = categories.map((category, index) => {
