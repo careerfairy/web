@@ -41,71 +41,13 @@ const CurrentGroup = ({firebase, userData, group, isAdmin}) => {
     const classes = useStyles()
     const router = useRouter();
 
-    const [userCategories, setUserCategories] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [categoriesWithElements, setCategoriesWithElements] = useState([]);
-    const [deleting, setDeleting] = useState(false)
-
-    const [openUpdateModal, setOpenUpdateModal] = useState(false);
-
-
-    useEffect(() => {
-        if (userData) {
-            firebase.listenToUserGroupCategories(userData.userEmail, group.id, querySnapshot => {
-                let userCategories = [];
-                querySnapshot.forEach(doc => {
-                    let category = doc.data();
-                    category.id = doc.id;
-                    userCategories.push(category);
-                });
-                setUserCategories(userCategories);
-            })
-        }
-    }, [userData]);
-
-    useEffect(() => {
-        firebase.getGroupCategories(group.id).then(querySnapshot => {
-            let categories = [];
-            querySnapshot.forEach(doc => {
-                let category = doc.data();
-                category.id = doc.id;
-                categories.push(category);
-            });
-            setCategories(categories);
-        })
-    }, []);
-
-    useEffect(() => {
-        if (categories && categories.length > 0) {
-            let categoriesWithElements = [];
-            categories.forEach((category, index) => {
-                firebase.getGroupCategoryElements(group.id, category.id).then(querySnapshot => {
-                    let elements = [];
-                    querySnapshot.forEach(doc => {
-                        let element = doc.data();
-                        element.id = doc.id;
-                        elements.push(element);
-                    });
-                    category.elements = elements;
-                    categoriesWithElements.push(category);
-                    if (index + 1 === categories.length) {
-                        setCategoriesWithElements(categoriesWithElements);
-                    }
-                });
-            });
-        }
-    }, [categories]);
-
     const handleDeleteCareerCenter = async () => {
         try {
-            setDeleting(true)
             await firebase.deleteCareerCenter(group.id)
             await firebase.deleteCareerCenterFromAllUsers(group.id)
-            setDeleting(false)
             setOpen(false)
         } catch (e) {
             console.log("error in career center deletion", e)
-            setDeleting(false)
         }
     }
 

@@ -66,10 +66,7 @@ const JoinGroup = (props) => {
 
     moreGroupElements = groups.filter(group => !userData.groupIds || userData.groupIds.indexOf(group.id) == -1).map(group => {
         return (
-            <Grow key={group.id}
-                  in={Boolean(group)}
-                  timeout={400}
-            >
+            <Grow key={group.id} in={Boolean(group)} timeout={600}>
                 <Grid item xs={12} sm={6} md={4} lg={4}>
                     <NewGroup group={group} userData={userData}/>
                 </Grid>

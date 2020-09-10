@@ -88,16 +88,6 @@ class Firebase {
         })
     }
 
-    listenToUserGroupCategories = (userEmail, groupId, callback) => {
-        let ref = this.firestore
-            .collection("userData")
-            .doc(userEmail)
-            .collection("registeredGroups")
-            .doc(groupId)
-            .collection("categories");
-        return ref.onSnapshot(callback);
-    }
-
     listenToUserGroupCategoryValue = (userEmail, groupId, categoryId, callback) => {
         let ref = this.firestore
             .collection("userData")
@@ -237,14 +227,6 @@ class Firebase {
     getCareerCentersByGroupId = (arrayOfIds) => {
         const refs = arrayOfIds.map(id => this.firestore.collection('careerCenterData').doc(id))
         return this.firestore.getAll(...refs)
-    }
-
-    getGroupCategories = (groupId) => {
-        let ref = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("categories");
-        return ref.get();
     }
 
     listenToGroupCategories = (groupId, callback) => {
