@@ -1,23 +1,25 @@
 import React, {useEffect, useState, Fragment} from 'react'
 import CardActions from '@material-ui/core/CardActions';
-import {Dropdown, Image, Grid} from 'semantic-ui-react';
 import {useRouter} from 'next/router';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import {withFirebase} from 'data/firebase';
-import CircularProgress from '@material-ui/core/CircularProgress';
-
 import {Card, CardContent, CardMedia, Typography, Button, Grow} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal";
+import Skeleton from '@material-ui/lab/Skeleton';
+
 
 const useStyles = makeStyles({
     root: {
         maxWidth: 345,
     },
     media: {
-        paddingTop: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '1.5em 1em 1em 1em',
+        height: '120px'
     },
     card: {
         flex: 1
@@ -43,7 +45,6 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
             const unsubscribe = firebase.listenToCareerCenterById(groupId, querySnapshot => {
                 if (querySnapshot) {
                     let careerCenter = querySnapshot.data();
-                    console.log("careerCenter in snapshot", careerCenter);
                     careerCenter.id = querySnapshot.id;
                     setLocalGroup(careerCenter);
                 }
@@ -69,6 +70,7 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
             await firebase.deleteCareerCenter(group.id)
             await firebase.deleteCareerCenterFromAllUsers(group.id)
             setOpen(false)
+
         } catch (e) {
             console.log("error in career center deletion", e)
         }
@@ -77,11 +79,15 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
     return (
         <Fragment key={localGroup.id}>
             <Card>
-                <CardMedia
-                    className={classes.media}
-                    image={localGroup.logoUrl}
-                    title={`${localGroup.universityName} logo`}
-                />
+                {!localGroup.logoUrl ?
+                    <Skeleton className={classes.media} animation="wave" variant="rect"/>
+                    :
+                    <CardMedia className={classes.media}>
+                        <img src={localGroup.logoUrl} style={{
+                            objectFit: 'contain',
+                            maxWidth: '80%'
+                        }} alt={`${localGroup.universityName} logo`}/>
+                    </CardMedia>}
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="h2">
                         {localGroup.universityName}

@@ -1,12 +1,9 @@
 import {useEffect, useState, Fragment} from 'react'
-import {Button} from "@material-ui/core";
+import {Button, Container, Grid, Grow} from "@material-ui/core";
 import {useRouter} from 'next/router';
 import {withFirebase} from 'data/firebase';
 import AddIcon from '@material-ui/icons/Add';
-import {SizeMe} from 'react-sizeme';
 import CurrentGroup from 'components/views/profile/CurrentGroup';
-import {Grid} from "semantic-ui-react";
-import StackGrid from "react-stack-grid";
 
 
 const UserProfile = ({userData, firebase}) => {
@@ -43,7 +40,12 @@ const UserProfile = ({userData, firebase}) => {
 
     if (userData && userData.groupIds) {
         existingGroupElements = userData.groupIds.map(groupId => {
-            return <CurrentGroup groupId={groupId} userData={userData} key={groupId}/>
+            return (
+                <Grow key={groupId} in={Boolean(groupId)} timeout={600}>
+                    <Grid item xs={12} sm={6} md={4} lg={4}>
+                        <CurrentGroup groupId={groupId} userData={userData}/>
+                    </Grid>
+                </Grow>)
         });
     }
 
@@ -51,7 +53,13 @@ const UserProfile = ({userData, firebase}) => {
 
     if (userData) {
         adminGroupElements = adminGroups.map(group => {
-            return <CurrentGroup isAdmin={true} group={group} userData={userData} key={group.id} grid={grid}/>
+            return (
+                <Grow key={group.id} in={Boolean(group)} timeout={600}>
+                    <Grid item xs={12} sm={6} md={4} lg={4}>
+                        <CurrentGroup isAdmin={true} group={group} userData={userData}/>
+                    </Grid>
+                </Grow>
+            )
         });
     }
 
@@ -59,41 +67,31 @@ const UserProfile = ({userData, firebase}) => {
         <Fragment>
             <div>
                 <div className="header-wrapper">
-                    <h3 style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}}>My Groups</h3>
+                    <h3 style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}}>My
+                        Groups</h3>
                     <Button endIcon={<AddIcon/>} variant="contained" size='large'
                             onClick={() => router.push('/group/create')}>
                         Create a New Career Group
                     </Button>
                 </div>
-                <SizeMe>{({size}) => (
-                    <StackGrid
-                        columnWidth={(size.width <= 768 ? '100%' : '33.33%')}
-                        gutterWidth={20}
-                        gutterHeight={20}
-                        gridRef={grid => setGrid(grid)}>
+                <Container>
+                    <Grid style={{marginBottom: 50}} container spacing={3}>
                         {existingGroupElements}
-                    </StackGrid>
-                )}
-                </SizeMe>
+                    </Grid>
+                </Container>
                 <div className={existingGroupElements.length > 0 ? 'hidden' : ''}
                      style={{margin: '30px 0', fontSize: '1.1em'}}>
                     You are currently not a member of any career group.
                 </div>
-                <h3 style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}}>Admin Groups</h3>
+                <h3 style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}}>Admin
+                    Groups</h3>
                 <div className={adminGroupElements.length > 0 ? 'hidden' : ''}
                      style={{margin: '30px 0', fontSize: '1.1em'}}>
                     You are currently not a member of any career group.
                 </div>
-                <SizeMe>{({size}) => (
-                    <StackGrid
-                        columnWidth={(size.width <= 768 ? '100%' : '33.33%')}
-                        gutterWidth={20}
-                        gutterHeight={20}
-                        gridRef={grid => setGrid(grid)}>
-                        {adminGroupElements}
-                    </StackGrid>
-                )}
-                </SizeMe>
+                <Grid style={{marginBottom: 50}} container spacing={3}>
+                    {adminGroupElements}
+                </Grid>
             </div>
             <style jsx>{`
                     .hidden {
