@@ -8,23 +8,30 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {withFirebase} from 'data/firebase';
 import UserCategorySelector from 'components/views/profile/UserCategorySelector';
-import {CardMedia, Grid} from "@material-ui/core";
-import Select from "@material-ui/core/Select";
+import {CardMedia, Fade, Grid, useMediaQuery, useTheme} from "@material-ui/core";
+
 
 const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
 
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
     const [categories, setCategories] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState({});
-    console.log("categories", categories);
 
     useEffect(() => {
         if (group.categories) {
-            setCategories(group.categories)
-
-            setSelectedOptions()
-
+            const newCategories = group.categories.map(obj => ({...obj, selected: ""}))
+            setCategories(newCategories)
         }
     }, [group])
+
+    const handleSetSelected = (categoryId, event) => {
+        const newCategories = [...categories]
+        const index = newCategories.findIndex(el => el.id === categoryId)
+        console.log("event.target.value in func", event.target.value);
+        newCategories[index].selected = event.target.value
+        setCategories(newCategories)
+    }
 
 
     function setCategoryValue(categoryId, valueId) {
@@ -47,10 +54,10 @@ const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
         setCategories(updatedCategories);
     }
 
-    const renderCategories = categories.map(category => {
+    const renderCategories = categories.map((category, index) => {
         return (
-            <Fragment>
-                <UserCategorySelector category={category}/>
+            <Fragment key={category.id}>
+                <UserCategorySelector handleSetSelected={handleSetSelected} index={index} category={category}/>
             </Fragment>
         )
     })
@@ -60,12 +67,10 @@ const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
             <Dialog
                 open={open}
                 onClose={closeModal}
-                maxWidth="xl"
-                // fullWidth
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
+                fullWidth
+                maxWidth="md"
             >
-                <DialogTitle id="alert-dialog-title">Follow live streams from</DialogTitle>
+                <DialogTitle align="center">Follow live streams from</DialogTitle>
                 <CardMedia style={{display: 'flex', justifyContent: 'center', padding: '1em'}}>
                     <img src={group.logoUrl} style={{
                         maxWidth: '250px',
@@ -74,18 +79,19 @@ const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
                     }} alt=""/>
                 </CardMedia>
                 <DialogContent>
-                    <DialogContentText align="center" id="alert-dialog-description">
+                    <DialogContentText align="center" noWrap id="alert-dialog-description">
                         {group.description}
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions style={{display: 'flex', flexFlow: 'column'}}>
+                <DialogActions style={{display: 'flex', flexFlow: 'column', alignItems: 'center'}}>
                     {categories.length ?
-                        <div>
+                        <Fragment>
                             {renderCategories}
-                            {"has selected?" && <Button onClick={closeModal} color="primary" autoFocus>
+                            {"has selected?" &&
+                            <Button fullWidth variant="contained" size="large"  style={{margin: '10px 0 0 0'}} onClick={closeModal} color="primary" autoFocus>
                                 Join
                             </Button>}
-                        </div>
+                        </Fragment>
                         :
                         <Button onClick={closeModal} color="primary" autoFocus>
                             Join
