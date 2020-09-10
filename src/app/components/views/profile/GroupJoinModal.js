@@ -40,12 +40,10 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
 
     const handleJoinGroup = async () => {
         try {
-            console.log("in the handle join group!")
             setSubmitting(true)
             const newCategories = categories.map(categoryObj => {
                 return {
                     id: categoryObj.id,
-                    name: categoryObj.name,
                     selectedValueId: categoryObj.selected
                 }
             })
