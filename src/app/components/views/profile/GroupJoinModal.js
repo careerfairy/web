@@ -8,13 +8,14 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {withFirebase} from 'data/firebase';
 import UserCategorySelector from 'components/views/profile/UserCategorySelector';
-import {CardMedia} from "@material-ui/core";
+import {CardMedia, CircularProgress } from "@material-ui/core";
 
 
-const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
+const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
 
     const [categories, setCategories] = useState([]);
     const [allSelected, setAllSelected] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
 
     useEffect(() => {
         if (group.categories) {
@@ -35,6 +36,30 @@ const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
         const index = newCategories.findIndex(el => el.id === categoryId)
         newCategories[index].selected = event.target.value
         setCategories(newCategories)
+    }
+
+    const handleJoinGroup = async () => {
+        try {
+            console.log("in the handle join group!")
+            setSubmitting(true)
+            const newCategories = categories.map(categoryObj => {
+                return {
+                    id: categoryObj.id,
+                    name: categoryObj.name,
+                    selectedValueId: categoryObj.selected
+                }
+            })
+            const groupObj = {
+                groupId: group.id,
+                categories: newCategories
+            }
+            await firebase.joinGroupNew(userData.id, group.id, groupObj)
+            setSubmitting(false)
+            closeModal()
+        } catch (e) {
+            console.log("error in handle join", e)
+            setSubmitting(false)
+        }
     }
 
     const renderCategories = categories.map((category, index) => {
@@ -70,10 +95,10 @@ const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
                     {categories.length ?
                         <Fragment>
                             {renderCategories}
-
-                            <Button fullWidth disabled={!allSelected} variant="contained" size="large"
+                            <Button fullWidth disabled={!allSelected || submitting} variant="contained" size="large"
                                     style={{margin: '10px 0 0 0'}}
-                                    onClick={closeModal} color="primary" autoFocus>
+                                    endIcon={submitting && <CircularProgress size={20} color="inherit"/>}
+                                    onClick={handleJoinGroup} color="primary" autoFocus>
                                 Join
                             </Button>
                         </Fragment>

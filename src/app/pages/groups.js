@@ -15,7 +15,6 @@ const JoinGroup = (props) => {
     const router = useRouter();
     const [user, setUser] = useState(null);
     const [userData, setUserData] = useState(null);
-    console.log(userData);
     const [loading, setLoading] = useState(false);
 
     const [groups, setGroups] = useState([]);

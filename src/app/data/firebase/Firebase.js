@@ -96,6 +96,16 @@ class Firebase {
         });
     }
 
+    joinGroupNew = (userId, groupId, groupObj) => {
+        let userRef = this.firestore
+            .collection("userData")
+            .doc(userId)
+        return userRef.update({
+            groupIds: firebase.firestore.FieldValue.arrayUnion(groupId),
+            registeredGroups: firebase.firestore.FieldValue.arrayUnion(groupObj)
+        })
+    }
+
     listenToUserGroupCategories = (userEmail, groupId, callback) => {
         let ref = this.firestore
             .collection("userData")

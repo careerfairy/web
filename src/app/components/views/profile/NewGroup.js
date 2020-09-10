@@ -1,6 +1,7 @@
 import React, {useEffect, useState, Fragment} from 'react'
 import {useRouter} from 'next/router';
 import GroupAddIcon from '@material-ui/icons/GroupAdd';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 import {withFirebase} from 'data/firebase';
 import {Button, Card, CardContent, CardMedia, Typography} from "@material-ui/core";
@@ -14,10 +15,6 @@ const NewGroup = ({firebase, group, categories, userData}) => {
 
     const router = useRouter();
 
-    function joinGroup(group) {
-        firebase.joinGroup(userData.userEmail, group.id, categories);
-    }
-
     const handleCloseJoinModal = () => {
         setOpenJoinModal(false)
     }
@@ -27,10 +24,12 @@ const NewGroup = ({firebase, group, categories, userData}) => {
 
 
 
+
     return (
         <Fragment key={group.id}>
             <Card>
-                <CardMedia style={{display: 'flex', justifyContent: 'center', padding: '1.5em 1em 1em 1em', height: '90px'}}>
+                <CardMedia
+                    style={{display: 'flex', justifyContent: 'center', padding: '1.5em 1em 1em 1em', height: '90px'}}>
                     <img src={group.logoUrl} style={{
                         objectFit: 'contain',
                         maxWidth: '80%'
@@ -45,14 +44,22 @@ const NewGroup = ({firebase, group, categories, userData}) => {
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    <Button fullWidth
-                            size="small"
-                            variant="contained"
-                            color="primary"
-                            onClick={handleOpenJoinModal}
-                            endIcon={<GroupAddIcon size={20} color="inherit"/>}>
-                        Join
-                    </Button>
+                    {userData.groupIds.includes(group.id) ?
+                        <Button fullWidth
+                                size="small"
+                                variant="contained"
+                                endIcon={<ExitToAppIcon size={20} color="inherit"/>}>
+                            Leave
+                        </Button>
+                        :
+                        < Button fullWidth
+                                 size="small"
+                                 variant="contained"
+                                 color="primary"
+                                 onClick={handleOpenJoinModal}
+                                 endIcon={<GroupAddIcon size={20} color="inherit"/>}>
+                            Join
+                        </Button>}
                 </CardActions>
             </Card>
             <GroupJoinModal open={openJoinModal} group={group} userData={userData} closeModal={handleCloseJoinModal}/>
