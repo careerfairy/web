@@ -67,7 +67,7 @@ const UserCategorySelector = ({category, handleSetSelected}) => {
                     value={category.selected}
                     onChange={(e) => handleSetSelected(category.id, e)}
                 >
-                    {native ? <option selected disabled hidden value=""/> :
+                    {native ? <option disabled hidden value=""/> :
                         <MenuItem value="">
                             <em>None</em>
                         </MenuItem>}
