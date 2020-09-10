@@ -20,16 +20,16 @@ const GroupJoinModal = ({group, firebase, open, userData, closeModal}) => {
 
     useEffect(() => {
         if (group.categories) {
-            const newCategories = group.categories.map(obj => ({...obj, selected: undefined}))
+            const newCategories = group.categories.map(obj => ({...obj, selected: ""}))
             setCategories(newCategories)
         }
     }, [group])
 
     useEffect(() => {
         if (categories) {
-            const selected = categories.some(category => category.selected)
-            console.log("selected", selected);
-            setAllSelected(selected)
+            const notAllSelected = !categories.some(category => category.selected === "")
+            console.log("notAllSelected", notAllSelected);
+            setAllSelected(notAllSelected)
         }
     }, [categories])
 
