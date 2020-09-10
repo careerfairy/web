@@ -78,66 +78,59 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
 
     return (
         <Fragment key={localGroup.id}>
-            <Card>
-                {!localGroup.logoUrl ?
-                    <Skeleton className={classes.media} animation="wave" variant="rect"/>
-                    :
-                    <CardMedia className={classes.media}>
-                        <img src={localGroup.logoUrl} style={{
-                            objectFit: 'contain',
-                            maxWidth: '80%'
-                        }} alt={`${localGroup.universityName} logo`}/>
-                    </CardMedia>}
-                <CardContent>
-                    <Typography gutterBottom variant="h5" component="h2">
-                        {localGroup.universityName}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
-                        {localGroup.description}
-                    </Typography>
-                </CardContent>
-                <CardActions>
-                    <Button fullWidth size="small" color="primary">
-                        View Calendar
-                    </Button>
-                    <Button onClick={handleClick} size="small" color="primary">
-                        <MoreVertIcon/>
-                    </Button>
-                    <Menu
-                        id="simple-menu"
-                        anchorEl={anchorEl}
-                        keepMounted
-                        open={Boolean(anchorEl)}
-                        onClose={handleClose}
-                    >
-                        <MenuItem onClick={() => push(`/group/${localGroup.id}/admin`)}>Update my data</MenuItem>
-                        <MenuItem onClick={() => router.push('/group/' + localGroup.id)}>Group Page</MenuItem>
-                        {isAdmin ?
-                            <MenuItem onClick={() => {
-                                setOpen(true)
-                                handleClose()
-                            }}>Delete group</MenuItem>
-                            :
-                            <MenuItem onClick={handleClose}>Leave group</MenuItem>}
-                        <AreYouSureModal
-                            open={open}
-                            handleClose={() => setOpen(false)}
-                            handleConfirm={handleDeleteCareerCenter}
-                            title="Warning"
-                            message={`Are you sure you want to delete ${localGroup.universityName}? You wont be able to revert changes`}
-                        />
-                    </Menu>
-                </CardActions>
-            </Card>
-            <style jsx>{`
-                .group-selector {
-                    position: relative;
-                    border-radius: 15px;
-                    background-color: white;
-                    box-shadow: 0 0 2px lightgrey;
-                    padding: 30px 30px 100px 30px;
-                }
-            `}</style>
+            <Grow in={Boolean(localGroup.id)} timeout={600}>
+                <Card>
+                    {!localGroup.logoUrl ?
+                        <Skeleton className={classes.media} animation="wave" variant="rect"/>
+                        :
+                        <CardMedia className={classes.media}>
+                            <img src={localGroup.logoUrl} style={{
+                                objectFit: 'contain',
+                                maxWidth: '80%'
+                            }} alt={`${localGroup.universityName} logo`}/>
+                        </CardMedia>}
+                    <CardContent style={{height: '115px'}}>
+                        <Typography align="center" gutterBottom variant="h5" component="h2">
+                            {localGroup.universityName}
+                        </Typography>
+                        <Typography align="center" variant="body2" color="textSecondary" component="p">
+                            {localGroup.description}
+                        </Typography>
+                    </CardContent>
+                    <CardActions>
+                        <Button fullWidth size="small" color="primary">
+                            View Calendar
+                        </Button>
+                        <Button onClick={handleClick} size="small" color="primary">
+                            <MoreVertIcon/>
+                        </Button>
+                        <Menu
+                            id="simple-menu"
+                            anchorEl={anchorEl}
+                            keepMounted
+                            open={Boolean(anchorEl)}
+                            onClose={handleClose}
+                        >
+                            <MenuItem onClick={() => push(`/group/${localGroup.id}/admin`)}>Update my data</MenuItem>
+                            <MenuItem onClick={() => router.push('/group/' + localGroup.id)}>Group Page</MenuItem>
+                            {isAdmin ?
+                                <MenuItem onClick={() => {
+                                    setOpen(true)
+                                    handleClose()
+                                }}>Delete group</MenuItem>
+                                :
+                                <MenuItem onClick={handleClose}>Leave group</MenuItem>}
+                            <AreYouSureModal
+                                open={open}
+                                handleClose={() => setOpen(false)}
+                                handleConfirm={handleDeleteCareerCenter}
+                                title="Warning"
+                                message={`Are you sure you want to delete ${localGroup.universityName}? You wont be able to revert changes`}
+                            />
+                        </Menu>
+                    </CardActions>
+                </Card>
+            </Grow>
         </Fragment>
     );
 };

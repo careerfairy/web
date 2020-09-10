@@ -1,5 +1,5 @@
 import {useEffect, useState, Fragment} from 'react'
-import {Button, Container, Grid, Grow} from "@material-ui/core";
+import {Button, Container, Grid, Grow, Typography} from "@material-ui/core";
 import {useRouter} from 'next/router';
 import {withFirebase} from 'data/firebase';
 import AddIcon from '@material-ui/icons/Add';
@@ -54,11 +54,11 @@ const UserProfile = ({userData, firebase}) => {
     if (userData) {
         adminGroupElements = adminGroups.map(group => {
             return (
-                <Grow key={group.id} in={Boolean(group)} timeout={600}>
-                    <Grid item xs={12} sm={6} md={4} lg={4}>
+                <Fragment key={group.id}>
+                    <Grid item xs={12} sm={6} md={6} lg={6} xl={4}>
                         <CurrentGroup isAdmin={true} group={group} userData={userData}/>
                     </Grid>
-                </Grow>
+                </Fragment>
             )
         });
     }
@@ -74,24 +74,26 @@ const UserProfile = ({userData, firebase}) => {
                         Create a New Career Group
                     </Button>
                 </div>
-                <Container>
+                {adminGroupElements.length ?
                     <Grid style={{marginBottom: 50}} container spacing={3}>
                         {existingGroupElements}
                     </Grid>
-                </Container>
-                <div className={existingGroupElements.length > 0 ? 'hidden' : ''}
-                     style={{margin: '30px 0', fontSize: '1.1em'}}>
-                    You are currently not a member of any career group.
-                </div>
-                <h3 style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}}>Admin
-                    Groups</h3>
-                <div className={adminGroupElements.length > 0 ? 'hidden' : ''}
-                     style={{margin: '30px 0', fontSize: '1.1em'}}>
-                    You are currently not a member of any career group.
-                </div>
-                <Grid style={{marginBottom: 50}} container spacing={3}>
-                    {adminGroupElements}
-                </Grid>
+                    :
+                    <Typography gutterBottom>
+                        You are currently not a member of any career group.
+                    </Typography>}
+                    <Typography variant="h3">
+                        Admin Groups
+                    </Typography>
+                <h3 style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}}>Admin Groups</h3>
+                {adminGroupElements.length ?
+                    <Grid style={{marginBottom: 50}} container spacing={3}>
+                        {adminGroupElements}
+                    </Grid>
+                    :
+                    <Typography gutterBottom>
+                        You are currently not a member of any career group.
+                    </Typography>}
             </div>
             <style jsx>{`
                     .hidden {
