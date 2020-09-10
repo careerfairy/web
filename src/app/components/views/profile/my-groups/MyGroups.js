@@ -66,7 +66,7 @@ const UserProfile = ({userData, firebase}) => {
     return (
         <Fragment>
             <div>
-                <div className="header-wrapper">
+                <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap'}} className="header-wrapper">
                     <Typography style={{color: 'rgb(160,160,160)', margin: '0 0 10px 0', fontWeight: '300'}}
                                 variant="h4">
                         My Groups
@@ -110,11 +110,6 @@ const UserProfile = ({userData, firebase}) => {
                     margin-top: 10px;
                     color: red;
                     }
-                    .header-wrapper {
-                    display: flex;
-                    justify-content: space-between;
-                    }
-
                     #profileContainer {
                     }
                     `}</style>
