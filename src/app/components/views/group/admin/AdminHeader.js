@@ -1,5 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {Avatar, Button, Grid, IconButton, TextField} from "@material-ui/core";
+import {
+    Button,
+    CardMedia, Container,
+    FormControl,
+    FormHelperText,
+    Grid,
+    IconButton,
+    TextField,
+    Typography
+} from "@material-ui/core";
 import CheckIcon from "@material-ui/icons/Check";
 import ClearIcon from "@material-ui/icons/Clear";
 import EditIcon from "@material-ui/icons/Edit";
@@ -14,11 +23,28 @@ const useStyles = makeStyles({
         maxWidth: 345,
     },
     logo: {
-        fontSize: '180px',
-        width: 'auto',
-        height: 'auto',
+        objectFit: 'contain',
         boxShadow: '0 0 5px rgb(200,200,200)',
-        border: '2px solid rgb(0, 210, 170)'
+    },
+    name: {
+        margin: "20px 0 0 0",
+        fontWeight: "500",
+        fontSize: "calc(1.1em + 2vw)",
+        color: "rgb(80,80,80)"
+    },
+    media: {
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '1.5em 1em 1em 1em',
+        maxHeight: '240px',
+    },
+    imageForm: {
+        maxWidth: "120px",
+        margin: "0 auto",
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
     }
 });
 
@@ -98,108 +124,71 @@ const AdminHeader = ({group, menuItem, firebase}) => {
 
 
     return (
-        <>
-            <div className='white-box'>
-                <Grid container>
-                    <Grid item xs={6}>
-                        <div className='image-outer-container'>
-                            <Avatar src={editData.logoUrl || group.logoUrl}
-                                    className={classes.logo}
-                                    title="Group logo"/>
-                            {menuItem === 'settings' && <>
-                                <FilePickerContainer
-                                    extensions={['jpg', 'jpeg', 'png']}
-                                    maxSize={20}
-                                    onChange={(fileObject) => {
-                                        setFilePickerError(null)
-                                        setEditData({
-                                            ...editData,
-                                            fileObj: fileObject,
-                                            logoUrl: URL.createObjectURL(fileObject)
-                                        })
-                                    }}
-                                    onError={errMsg => (setFilePickerError(errMsg))}>
-                                    <Button style={{marginTop: '10px'}} color="primary" size='large'
-                                            endIcon={<PublishIcon/>}>
-                                        {editData.fileObj ? "Change" : "Upload"}
-                                    </Button>
-                                </FilePickerContainer>
-                                <div className="field-error">
-                                    {filePickerError && <p className="error-text">{filePickerError}</p>}
-                                </div>
-                                {editData.fileObj &&
-                                <Button color="primary" onClick={handleSubmitLogo} size='large'
-                                        disabled={submittingLogo}
-                                        endIcon={submittingLogo &&
-                                        <CircularProgress size={20} color="inherit"/>}>
-                                    save
-                                </Button>}
-
-                            </>}
-                        </div>
-                    </Grid>
-                    <Grid item xs={6}>
-                        {editTitle ?
-                            <form style={{display: 'flex'}} onSubmit={handleSubmitName}>
-                                <TextField style={{flex: 0.7}}
-                                           value={editData.universityName}
-                                           inputProps={{style: {fontSize: 'calc(1.1em + 2vw)'}}}
-                                           onChange={handleChangeName}
-                                           error={error}
-                                           helperText={error}
-                                />
-                                <div className="edit-btn-wrapper">
-                                    <IconButton type="submit">
-                                        <CheckIcon color="primary"/>
-                                    </IconButton>
-                                    <IconButton onClick={() => setEditTitle(false)}>
-                                        <ClearIcon color="primary"/>
-                                    </IconButton>
-                                </div>
-                            </form>
-                            :
-                            <div style={{display: 'flex', alignItems: 'center'}}>
-                                <h1 className='group-name'>{group.universityName}</h1>
-                                <IconButton onClick={() => setEditTitle(true)}>
-                                    {menuItem === 'settings' && <EditIcon color="primary"/>}
-                                </IconButton>
-                            </div>}
-                    </Grid>
+        <Container>
+            <Grid container>
+                <Grid item xs={6}>
+                    <FormControl error={Boolean(filePickerError)} className={classes.imageForm}>
+                        <CardMedia className={classes.media}>
+                            <img src={editData.logoUrl || group.logoUrl}
+                                 className={classes.logo}
+                                 alt="Group logo"/>
+                        </CardMedia>
+                        <FilePickerContainer
+                            extensions={['jpg', 'jpeg', 'png']}
+                            maxSize={20}
+                            onChange={(fileObject) => {
+                                setFilePickerError(null)
+                                setEditData({
+                                    ...editData,
+                                    fileObj: fileObject,
+                                    logoUrl: URL.createObjectURL(fileObject)
+                                })
+                            }}
+                            onError={errMsg => (setFilePickerError(errMsg))}>
+                            <Button style={{marginTop: '10px'}} color="primary" size='large'
+                                    endIcon={<PublishIcon/>}>
+                                Change
+                            </Button>
+                        </FilePickerContainer>
+                        <FormHelperText>{filePickerError}</FormHelperText>
+                        {editData.fileObj &&
+                        <Button color="primary" onClick={handleSubmitLogo} size='large'
+                                disabled={submittingLogo}
+                                endIcon={submittingLogo &&
+                                <CircularProgress size={20} color="inherit"/>}>
+                            save
+                        </Button>}
+                    </FormControl>
                 </Grid>
-            </div>
-            <style jsx>{`
-                         .group-name {
-                         margin: 20px 0 20px 0;
-                         font-weight: 500;
-                         font-size: calc(1.1em + 2vw);
-                         color: rgb(80,80,80);
-                         }
-                         
-                         .field-error {
-                          margin-top: 10px;
-                          }
-                          
-                          .error-text {
-                          color: red;
-                          font-weight: lighter;
-                          font-size: 1rem;
-                          }
-                    
-                         .edit-btn-wrapper {
-                         display: flex;
-                         align-items: center;
-                         flex: 0.3;
-                         }
-                         .image-outer-container {
-                         max-width: 120px;
-                         margin: 0 auto;
-                         position: relative;
-                         display: flex;
-                         flex-direction: column;
-                         align-items: center;
-                         }
-          `}</style>
-        </>
+                <Grid item xs={6}>
+                    {editTitle ?
+                        <FormControl style={{display: 'flex'}} onSubmit={handleSubmitName}>
+                            <TextField style={{flex: 0.7}}
+                                       value={editData.universityName}
+                                       inputProps={{style: {fontSize: 'calc(1.1em + 2vw)'}}}
+                                       onChange={handleChangeName}
+                                       error={error}
+                                       helperText={error}
+                            />
+                            <div style={{display: 'flex', alignItems: 'center', flex: 0.3}}>
+                                <IconButton type="submit">
+                                    <CheckIcon color="primary"/>
+                                </IconButton>
+                                <IconButton onClick={() => setEditTitle(false)}>
+                                    <ClearIcon color="primary"/>
+                                </IconButton>
+                            </div>
+                        </FormControl>
+                        :
+                        <div style={{display: 'flex', alignItems: 'center'}}>
+                            <Typography className={classes.name}>{group.universityName}</Typography>
+                            <IconButton onClick={() => setEditTitle(true)}>
+                                <EditIcon color="primary"/>
+                            </IconButton>
+                        </div>}
+                </Grid>
+            </Grid>
+        </Container>
     );
 };
 

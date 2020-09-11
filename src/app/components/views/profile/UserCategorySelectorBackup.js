@@ -1,5 +1,5 @@
 import {useEffect, useState, Fragment} from 'react'
-import {Container, Header as SemanticHeader, Button, Dropdown, Form, Image, Grid, Modal} from 'semantic-ui-react';
+import { Dropdown} from 'semantic-ui-react';
 
 import {withFirebase} from 'data/firebase';
 
@@ -55,7 +55,8 @@ const UserCategorySelector = (props) => {
                     return {text: element.name, value: element.id};
                 })} selection fluid/>
                 <div className={hasError ? '' : 'hidden'}
-                     style={{textAlign: 'left', margin: '5px 0', color: 'red'}}>Please select a value
+                     style={{textAlign: 'left', margin: '5px 0', color: 'red'}}>
+                    Please select a value
                 </div>
             </div>
             <style jsx>{`
