@@ -7,7 +7,7 @@ import Loader from '../../../components/views/loader/Loader';
 
 import Head from 'next/head';
 import Footer from '../../../components/views/footer/Footer';
-import CategoryElement from '../../../components/views/group/admin/CategoryElement';
+import CategoryElement from '../../../components/views/group/admin/settings/Category/CategoryElement';
 import Events from '../../../components/views/group/admin/events/Events';
 import Settings from '../../../components/views/group/admin/settings/Settings';
 import Members from '../../../components/views/group/admin/members/Members';

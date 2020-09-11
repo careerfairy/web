@@ -1,7 +1,7 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {withFirebase} from 'data/firebase';
-import CategoryElement from 'components/views/group/admin/CategoryElement';
-import CategoryEdit from "../CategoryEdit";
+import CategoryElement from 'components/views/group/admin/settings/Category/CategoryElement';
+import CategoryEdit from "./Category/CategoryEdit";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import EditIcon from '@material-ui/icons/Edit';
 import {Button, Typography} from "@material-ui/core";

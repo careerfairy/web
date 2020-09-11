@@ -9,7 +9,6 @@ import {v4 as uuidv4} from 'uuid'
 
 function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryName, handleDeleteCategory, handleRename, handleAdd, handleDelete}) {
 
-    // const uuidv4 = require("uuid/v4")
     const requiredTxt = "Please fill this field"
     const duplicateTxt = "Cannot be a duplicate"
     if (!updateMode.mode) {

@@ -1,4 +1,4 @@
-import {Fragment, useState, useEffect} from 'react';
+import React, {Fragment, useState, useEffect} from 'react';
 import {Grid, Icon} from "semantic-ui-react";
 
 import {withFirebase} from 'data/firebase';

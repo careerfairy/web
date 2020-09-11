@@ -1,8 +1,8 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Box, Button, Container, Typography} from "@material-ui/core";
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import CategoryEdit from "../admin/CategoryEdit";
-import CategoryElement from "../admin/CategoryElement";
+import CategoryEdit from "../admin/settings/Category/CategoryEdit";
+import CategoryElement from "../admin/settings/Category/CategoryElement";
 import AddIcon from "@material-ui/icons/Add";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import {makeStyles} from "@material-ui/core/styles";
