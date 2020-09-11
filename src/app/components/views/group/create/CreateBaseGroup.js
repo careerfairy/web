@@ -1,13 +1,12 @@
-import React, {useEffect, useState, Fragment} from 'react'
-import {Image, Form} from 'semantic-ui-react';
+import React, {useEffect, useState} from 'react'
 import {useRouter} from 'next/router';
 import {withFirebase} from '../../../../data/firebase';
 import PublishIcon from '@material-ui/icons/Publish';
 import TextField from '@material-ui/core/TextField';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-import {Formik, Field, Form as UiForm} from 'formik';
+import {Formik, Form as UiForm} from 'formik';
 import FilePickerContainer from '../../../../components/ssr/FilePickerContainer';
-import {Box, Button, Container, FormControl, Input, Typography} from "@material-ui/core";
+import {Box, Button, Container, FormControl, FormHelperText, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 
 const placeholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
@@ -26,12 +25,18 @@ const useStyles = makeStyles((theme) => ({
         margin: '20px auto 20px auto',
         maxWidth: '100%',
         maxHeight: '250px'
+    },
+    form: {
+        display: "flex",
+        flexFlow: "column",
+        alignItems: "center",
+        width: "100%"
     }
 }));
 
 const CreateBaseGroup = ({handleNext, firebase, setBaseGroupInfo, baseGroupInfo}) => {
     const classes = useStyles()
-    const [filePickerError, setFilePickerError] = useState(null)
+    const [filePickerError, setFilePickerError] = useState("")
     const [user, setUser] = useState(null);
     const router = useRouter();
 
@@ -46,176 +51,129 @@ const CreateBaseGroup = ({handleNext, firebase, setBaseGroupInfo, baseGroupInfo}
     }, []);
 
     return (
-        <Fragment>
-            <Container className={classes.root}>
-                <Typography align="center" className={classes.title} variant="h1">
-                    Create a Career Group
-                </Typography>
-                <Formik
-                    initialValues={{
-                        logoUrl: baseGroupInfo.logoUrl || "",
-                        logoFileObj: baseGroupInfo.logoFileObj || null,
-                        universityName: baseGroupInfo.universityName || "",
-                        description: baseGroupInfo.description || ""
-                    }}
-                    validate={values => {
-                        let errors = {};
-                        if (!values.logoFileObj) {
-                            errors.logoUrl = 'Required';
-                        }
-                        if (!values.universityName) {
-                            errors.universityName = 'Required'
-                        }
-                        if (!values.description) {
-                            errors.description = 'Required'
-                        }
-                        return errors;
-                    }}
-                    onSubmit={(values, {setSubmitting}) => {
-                        let careerCenter = {
-                            adminEmail: user.email,
-                            logoUrl: values.logoUrl,
-                            logoFileObj: values.logoFileObj || baseGroupInfo.logoFileObj,
-                            description: values.description,
-                            test: false,
-                            universityName: values.universityName
-                        }
-                        setBaseGroupInfo(careerCenter)
-                        setSubmitting(false);
-                        handleNext()
-                    }}
-                >
-                    {({
-                          values,
-                          errors,
-                          touched,
-                          handleChange,
-                          handleBlur,
-                          handleSubmit,
-                          isSubmitting,
-                          setFieldValue
-                          /* and other goodies */
-                      }) => (
-                        <UiForm id='signUpForm' onSubmit={handleSubmit}>
-                            <div style={{textAlign: 'center'}}>
-                                <Box>
-                                    <Image className={classes.image}
-                                           src={values.logoUrl.length ? values.logoUrl : placeholder}/>
-                                </Box>
-                                <FilePickerContainer
-                                    extensions={['jpg', 'jpeg', 'png']}
-                                    maxSize={20}
-                                    onBlur={handleBlur}
-                                    onChange={(fileObject) => {
-                                        setFieldValue('logoUrl', URL.createObjectURL(fileObject), true)
-                                        setFieldValue('logoFileObj', fileObject, true)
-                                    }}
-                                    onError={errMsg => (setFilePickerError(errMsg))}>
-                                    <Button variant="contained" size='large' endIcon={<PublishIcon/>}>
-                                        {values.logoFileObj || baseGroupInfo.logoFileObj ? "Change" : "Upload Your Logo"}
-                                    </Button>
-                                </FilePickerContainer>
-                                <div className="field-error">
-                                    {touched.logoUrl && errors.logoUrl &&
-                                    <p className="error-text">Logo required</p>}
-                                    {filePickerError && <p className="error-text">{filePickerError}</p>}
-                                </div>
-                            </div>
-                            <Form.Group widths='equal'>
-                                <Form.Field>
-                                    <TextField
-                                        id='groupName'
-                                        value={values.universityName}
-                                        onChange={handleChange}
-                                        error={touched.universityName && errors.universityName}
-                                        onBlur={handleBlur}
-                                        disabled={isSubmitting}
-                                        helperText={touched.universityName && errors.universityName}
-                                        label="Group Name"
-                                        name="universityName"
-                                        fullWidth
-                                    />
-                                </Form.Field>
-                            </Form.Group>
-                            <Form.Field>
-                                <TextField
-                                    label="Description"
-                                    onChange={handleChange}
-                                    error={touched.description && errors.description}
-                                    value={values.description}
-                                    placeholder="Please describe the purpose of your group"
-                                    style={{marginBottom: 30, marginTop: 20}}
-                                    onBlur={handleBlur}
-                                    helperText={touched.description && errors.description}
-                                    disabled={isSubmitting}
-                                    rows={2}
-                                    rowsMax={10}
-                                    name="description"
-                                    multiline
-                                    fullWidth
-                                />
-                            </Form.Field>
-                            <Button size='large'
-                                    variant="contained"
-                                    disabled={isSubmitting}
-                                    endIcon={<ArrowForwardIcon/>}
-                                    color="primary"
-                                    type="submit"
-                                    fullWidth={true}
-                            >
-                                Next
-                            </Button>
-                        </UiForm>
-                    )}
-                </Formik>
-            </Container>
-            <style jsx>{`
-                    .hidden {
-                        display: none;
+        <Container className={classes.root}>
+            <Typography align="center" className={classes.title} variant="h1">
+                Create a Career Group
+            </Typography>
+            <Formik
+                initialValues={{
+                    logoUrl: baseGroupInfo.logoUrl || "",
+                    logoFileObj: baseGroupInfo.logoFileObj || null,
+                    universityName: baseGroupInfo.universityName || "",
+                    description: baseGroupInfo.description || ""
+                }}
+                validate={values => {
+                    let errors = {};
+                    if (!values.logoFileObj) {
+                        errors.logoUrl = 'Required';
                     }
-                    
-                    .error-text {
-                      color: red;
-                      font-weight: lighter;
-                      font-size: 1rem;
+                    if (!values.universityName) {
+                        errors.universityName = 'Required'
+                    } else if (values.universityName.length > 30) {
+                        errors.universityName = 'Must be 30 characters or less'
                     }
-                    
-                    .field-error {
-                      margin-top: 10px;
+                    if (!values.description) {
+                        errors.description = 'Required'
+                    } else if (values.description.length > 60) {
+                        errors.description = 'Must be 60 characters or less'
                     }
-
-                    .padding-vertical {
-                        padding-top: 50px;
-                        padding-bottom: 50px;
-                        max-width: 600px;
-                        margin: 0 auto;
+                    return errors;
+                }}
+                onSubmit={(values, {setSubmitting}) => {
+                    let careerCenter = {
+                        adminEmail: user.email,
+                        logoUrl: values.logoUrl,
+                        logoFileObj: values.logoFileObj || baseGroupInfo.logoFileObj,
+                        description: values.description,
+                        test: false,
+                        universityName: values.universityName
                     }
-
-                    #signUpForm {
-                        text-align: center;
-                    }
-
-                    .logo-element {
-                        margin: 0 auto;
-                    }
-
-                    .login-label {
-                        text-align: left;
-                        color: rgb(80,80,80);
-                        font-size: 1.2em;
-                    }
-
-                    .stylish-input {
-                        font-size: 1.4em;
-                        height: 50px;
-                    }
-
-                    .stylish-textarea {
-                        font-family: 'Poppins';
-                    }
-                `}</style>
-        </Fragment>
-
+                    setBaseGroupInfo(careerCenter)
+                    setSubmitting(false);
+                    handleNext()
+                }}
+            >
+                {({
+                      values,
+                      errors,
+                      touched,
+                      handleChange,
+                      handleBlur,
+                      handleSubmit,
+                      isSubmitting,
+                      setFieldValue
+                      /* and other goodies */
+                  }) => (
+                    <UiForm className={classes.form} onSubmit={handleSubmit}>
+                        <FormControl className={classes.form}
+                                     error={Boolean(touched.logoUrl && errors.logoUrl || filePickerError)}>
+                            <Box>
+                                <img className={classes.image}
+                                     alt="logo"
+                                     src={values.logoUrl.length ? values.logoUrl : placeholder}/>
+                            </Box>
+                            <FilePickerContainer
+                                extensions={['jpg', 'jpeg', 'png']}
+                                maxSize={20}
+                                onBlur={handleBlur}
+                                onChange={(fileObject) => {
+                                    setFilePickerError(null)
+                                    setFieldValue('logoUrl', URL.createObjectURL(fileObject), true)
+                                    setFieldValue('logoFileObj', fileObject, true)
+                                }}
+                                onError={errMsg => (setFilePickerError(errMsg))}>
+                                <Button variant="contained" size='large' endIcon={<PublishIcon/>}>
+                                    {values.logoFileObj || baseGroupInfo.logoFileObj ? "Change" : "Upload Your Logo"}
+                                </Button>
+                            </FilePickerContainer>
+                            <FormHelperText>{touched.logoUrl && errors.logoUrl && "Logo required"}</FormHelperText>
+                            <FormHelperText>{filePickerError}</FormHelperText>
+                        </FormControl>
+                        <FormControl className={classes.form}>
+                            <TextField
+                                id='groupName'
+                                value={values.universityName}
+                                onChange={handleChange}
+                                inputProps={{maxLength: 30}}
+                                error={Boolean(touched.universityName && errors.universityName)}
+                                onBlur={handleBlur}
+                                disabled={isSubmitting}
+                                style={{maxWidth: 500}}
+                                helperText={touched.universityName && errors.universityName}
+                                label="Group Name"
+                                name="universityName"
+                                fullWidth
+                            />
+                        </FormControl>
+                        <FormControl className={classes.form}>
+                            <TextField
+                                label="Description"
+                                onChange={handleChange}
+                                error={Boolean(touched.description && errors.description)}
+                                value={values.description}
+                                inputProps={{maxLength: 60}}
+                                style={{maxWidth: 500, marginBottom: 30, marginTop: 20}}
+                                placeholder="Please describe the purpose of your group"
+                                onBlur={handleBlur}
+                                helperText={touched.description && errors.description}
+                                disabled={isSubmitting}
+                                name="description"
+                                fullWidth
+                            />
+                        </FormControl>
+                        <Button size='large'
+                                variant="contained"
+                                fullWidth
+                                disabled={isSubmitting}
+                                endIcon={<ArrowForwardIcon/>}
+                                color="primary"
+                                type="submit">
+                            Next
+                        </Button>
+                    </UiForm>
+                )}
+            </Formik>
+        </Container>
     );
 };
 
