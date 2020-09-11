@@ -4,13 +4,12 @@ import AddIcon from '@material-ui/icons/Add';
 
 import {withFirebase} from "data/firebase";
 import CategoryEditOption from './CategoryEditOption';
-import {Box, Button, FormControl, FormHelperText, IconButton, Paper, Typography} from "@material-ui/core";
+import {Box, Button, FormControl, FormHelperText, IconButton, Paper, Typography, TextField} from "@material-ui/core";
 import {v4 as uuidv4} from 'uuid'
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
     whiteBox: {
-        backgroundColor: "white",
         padding: "30px",
         margin: "10px 0",
         display: "flex",
@@ -228,29 +227,22 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
     return (
         <Fragment>
             <Paper className={classes.whiteBox}>
-                <div style={{display: "flex"}}>
-                    <FormControl error={Boolean(touched && !categoryName.length)} style={{flex: 0.3}}>
-                        <Typography align="left" className={classes.label}>Category Name</Typography>
-                        <div className={classes.title}>
-                            <Input autoFocus maxLength="40" error={touched && !categoryName.length} onBlur={handleBlur}
-                                   type='text' value={categoryName}
-                                   onChange={(event, data) => setCategoryName(data.value)} fluid/>
-                            <FormHelperText>{touched && !categoryName.length && "Required"}</FormHelperText>
-                        </div>
-                    </FormControl>
-                    <FormControl style={{flex: 0.7}} error={Boolean(errorObj.optionError)}>
-                        <Typography align="left" className={classes.label}>Category Options</Typography>
-                        <Box display="flex">
-                            {optionElements}
-                        </Box>
-                        <div>
-                        <IconButton size="small"
-                                    onClick={() => setUpdateMode({mode: 'add', options: editableOptions})}>
-                            <AddIcon fontSize="large" color="primary"/>
-                        </IconButton>
-                        </div>
-                        <FormHelperText>{errorObj.optionError && "You must add at least 2 options"}</FormHelperText>
-                    </FormControl>
+                <div>
+                    <TextField autoFocus
+                               label={<Typography align="left" className={classes.label}>Category Name</Typography>}
+                               inputProps={{maxLength: 40}}
+                               error={Boolean(touched && !categoryName.length)}
+                               onBlur={handleBlur}
+                               helperText={touched && !categoryName.length && "Required"}
+                               value={categoryName}
+                               onChange={(e) => setCategoryName(e.currentTarget.value)}/>
+                    <Typography align="left" className={classes.label}>Category Options</Typography>
+                    {optionElements}
+                    <IconButton size="small"
+                                onClick={() => setUpdateMode({mode: 'add', options: editableOptions})}>
+                        <AddIcon fontSize="large" color="primary"/>
+                    </IconButton>
+                    <FormHelperText error>{errorObj.optionError && "You must add at least 2 options"}</FormHelperText>
                 </div>
                 <CategoryEditOption categoryName={categoryName} handleDeleteCategory={handleDeleteCategory}
                                     updateMode={updateMode} setUpdateMode={setUpdateMode} handleAdd={handleAdd}
