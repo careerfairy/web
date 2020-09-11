@@ -7,12 +7,26 @@ import TextField from '@material-ui/core/TextField';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import {Formik, Field, Form as UiForm} from 'formik';
 import FilePickerContainer from '../../../../components/ssr/FilePickerContainer';
-import {Button, Input} from "@material-ui/core";
+import {Button, Container, Input, Typography} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
 
 const placeholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
 
-const CreateBaseGroup = ({handleNext, firebase, setBaseGroupInfo, baseGroupInfo}) => {
+const useStyles = makeStyles((theme) => ({
+    root: {
+        paddingTop: "50px",
+        paddingBottom: "50px"
+    },
+    title: {
+        textAlign: "center",
+        fontWeight: "300",
+        color: "rgb(0, 210, 170)",
+        fontSize: "calc(1.2em + 1.5vw)"
+    }
+}));
 
+const CreateBaseGroup = ({handleNext, firebase, setBaseGroupInfo, baseGroupInfo}) => {
+    const classes = useStyles()
     const [filePickerError, setFilePickerError] = useState(null)
     const [user, setUser] = useState(null);
     const router = useRouter();
@@ -29,9 +43,10 @@ const CreateBaseGroup = ({handleNext, firebase, setBaseGroupInfo, baseGroupInfo}
 
     return (
         <Fragment>
-
-            <div className='padding-vertical'>
-                <h1 className='content-title'>Create a Career Group</h1>
+            <Container className={classes.root}>
+                <Typography className={classes.title} variant="h1">
+                    Create a Career Group
+                </Typography>
                 <Formik
                     initialValues={{
                         logoUrl: baseGroupInfo.logoUrl || "",
@@ -94,7 +109,8 @@ const CreateBaseGroup = ({handleNext, firebase, setBaseGroupInfo, baseGroupInfo}
                                             onBlur={handleBlur}
                                             onChange={(fileObject) => {
                                                 setFieldValue('logoUrl', URL.createObjectURL(fileObject), true)
-                                                setFieldValue('logoFileObj', fileObject, true)}}
+                                                setFieldValue('logoFileObj', fileObject, true)
+                                            }}
                                             onError={errMsg => (setFilePickerError(errMsg))}>
                                             <Button variant="contained" size='large' endIcon={<PublishIcon/>}>
                                                 Upload Your Logo
@@ -155,7 +171,7 @@ const CreateBaseGroup = ({handleNext, firebase, setBaseGroupInfo, baseGroupInfo}
                         </UiForm>
                     )}
                 </Formik>
-            </div>
+            </Container>
             <style jsx>{`
                     .hidden {
                         display: none;

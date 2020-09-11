@@ -21,6 +21,11 @@ const useStyles = makeStyles((theme) => ({
     image: {
         objectFit: 'contain',
         maxWidth: '80%'
+    },
+    actions: {
+        display: 'flex',
+        flexFlow: 'column',
+        alignItems: 'center'
     }
 }));
 
@@ -97,9 +102,8 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
                     {group.description}
                 </DialogContentText>
             </DialogContent>
-            <DialogActions style={{display: 'flex', flexFlow: 'column', alignItems: 'center'}}>
+            <DialogActions className={classes.actions}>
                 {!!categories.length && renderCategories}
-
                 <Box display="flex">
                     <Button fullWidth
                             size="large"

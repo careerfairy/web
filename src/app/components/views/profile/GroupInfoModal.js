@@ -1,7 +1,6 @@
-import { useEffect, useState, Fragment } from 'react'
-import { Container, Header as SemanticHeader, Button, Dropdown, Form, Image, Grid, Modal } from 'semantic-ui-react';
-import { Formik } from 'formik';
-import { useRouter } from 'next/router';
+import React, {Fragment } from 'react'
+import { Button, Image, Grid, Modal } from 'semantic-ui-react';
+
 
 import { withFirebase } from 'data/firebase';
 import UserCategorySelector from 'UserCategorySelector';
