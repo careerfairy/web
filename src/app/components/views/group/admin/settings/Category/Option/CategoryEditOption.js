@@ -1,5 +1,4 @@
 import React, {Fragment, useState, useEffect} from 'react';
-import {Input, Form} from 'semantic-ui-react';
 
 import TextField from '@material-ui/core/TextField';
 import {withFirebase} from 'data/firebase';
@@ -50,7 +49,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
             <Fragment>
                 <div className={updateMode.mode ? 'modal' : ''}/>
                 <div className='padding animated fadeIn'>
-                    <Form onSubmit={handleAddModal}>
+                    <form onSubmit={handleAddModal}>
                         <div className='action'>
                             <Typography className="label">
                                 Add an option named:
@@ -61,7 +60,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                                 maxLength="20"
                                 value={newOptionName}
                                 onChange={(e) => setNewOptionName(e.target.value)}
-                                error={touched && error.length > 0}
+                                error={Boolean(touched && error.length > 0)}
                                 onBlur={() => setTouched(true)}
                                 helperText={touched && error}
                                 style={{width: '30%', margin: '0 20px 0 0', height: 60}}
@@ -76,7 +75,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                                 Cancel
                             </Button>
                         </div>
-                    </Form>
+                    </form>
                 </div>
                 <style jsx>{`
                     .hidden {
@@ -248,7 +247,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
             <Fragment>
                 <div className={updateMode.mode ? 'modal' : ''}/>
                 <div className='padding animated fadeIn'>
-                    <Form onSubmit={handleRenameModal}>
+                    <form onSubmit={handleRenameModal}>
                         <div className='action'>
                             <Typography className="label">
                                 Rename the option <span>{updateMode.option.name}</span> to:
@@ -277,7 +276,7 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                                 Cancel
                             </Button>
                         </div>
-                    </Form>
+                    </form>
                 </div>
                 <style jsx>{`
                     .hidden {

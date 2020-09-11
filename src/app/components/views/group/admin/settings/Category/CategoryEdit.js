@@ -210,12 +210,14 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
         return (
             <Chip style={{margin: "0.5em"}}
                   label={el.name}
+                  key={el.id}
                   deleteIcon={<EditIcon/>}
+                  color="primary"
                   onDelete={(e) => {
                       setSelectedOption(el)
                       handleOpenDropDown(e)
                   }}
-                  color="primary"/>
+            />
         )
     })
 
@@ -235,12 +237,7 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                     <Typography align="left" className={classes.label}>Category Options</Typography>
                     <div style={{display: "flex", flexWrap: "wrap"}}>
                         {optionElements}
-                        <Menu anchorEl={anchorEl}
-                              open={Boolean(anchorEl)}
-                              onClose={handleClose}>
-                            <MenuItem onClick={handleDropDownDel}>Delete</MenuItem>
-                            <MenuItem onClick={handleDropDownRename}>Rename</MenuItem>
-                        </Menu>
+
                         <IconButton size="small"
                                     onClick={() => setUpdateMode({mode: 'add', options: editableOptions})}>
                             <AddIcon fontSize="large" color="primary"/>
@@ -277,6 +274,12 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                     Delete
                 </Button>}
             </Box>
+            <Menu anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}>
+                <MenuItem onClick={handleDropDownDel}>Delete</MenuItem>
+                <MenuItem onClick={handleDropDownRename}>Rename</MenuItem>
+            </Menu>
         </Paper>
     );
 }
