@@ -1,20 +1,43 @@
 import React, {Fragment, useState} from 'react'
-import {Button, Card, CardContent, CardMedia, Container, Typography} from "@material-ui/core";
+import {Box, Button, Card, CardContent, CardMedia, Container, Typography} from "@material-ui/core";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {makeStyles} from '@material-ui/core/styles';
 import DisplayCategoryElement from "./DisplayCategoryElement";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import {useRouter} from "next/router";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
     root: {
-        maxWidth: 345,
+        paddingTop: "50px",
+        paddingBottom: "50px"
+    },
+    title: {
+        fontWeight: "300",
+        color: "rgb(0, 210, 170)",
+        fontSize: "calc(1.2em + 1.5vw)"
+    },
+    actions: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "space-between"
+    },
+    buttons: {
+        display: "flex",
+        justifyContent: "space-between",
+        marginTop: "15px",
     },
     media: {
-        height: 0,
-        paddingTop: '56.25%', // 16:9
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '1.5em 1em 1em 1em',
+        height: '120px'
     },
-});
+    image: {
+        objectFit: 'contain',
+        maxWidth: '80%'
+    },
+}));
 
 
 const CompleteGroup = ({handleBack, baseGroupInfo, createCareerCenter, arrayOfCategories, setActiveStep}) => {
@@ -39,20 +62,20 @@ const CompleteGroup = ({handleBack, baseGroupInfo, createCareerCenter, arrayOfCa
     })
 
     return (
-        <Fragment>
-            <Container style={{padding: 20}}>
-                <h1 className='content-title'>Last Check</h1>
+            <Container className={classes.root}>
+                <Typography align="center" className={classes.title}>
+                    Last Check
+                </Typography>
                 <div>
                     <Typography variant="h5" gutterBottom>
                         Details:
                     </Typography>
                     <Card>
-                        <CardMedia
-                            component="image"
-                            className={classes.media}
-                            image={baseGroupInfo.logoUrl}
-                            title="Paella dish"
-                        />
+                        <CardMedia className={classes.media}>
+                            <img className={classes.image}
+                                 alt={`${baseGroupInfo.universityName} logo`}
+                                 src={baseGroupInfo.logoUrl}/>
+                        </CardMedia>
                         <CardContent>
                             <Typography gutterBottom variant="h5" component="h2">
                                 {baseGroupInfo.universityName}
@@ -68,11 +91,11 @@ const CompleteGroup = ({handleBack, baseGroupInfo, createCareerCenter, arrayOfCa
                     <div className="category-wrapper">
                         {categories}
                     </div>
-                    <div className="action-wrapper">
+                    <div className={classes.actions}>
                         <Typography gutterBottom align="center">
                             Are you satisfied?
                         </Typography>
-                        <div className="button-wrapper">
+                        <Box className={classes.buttons}>
                             <Button variant="contained"
                                     size='large'
                                     style={{marginRight: 5}}
@@ -89,31 +112,10 @@ const CompleteGroup = ({handleBack, baseGroupInfo, createCareerCenter, arrayOfCa
                                     size="large">
                                 Finish
                             </Button>
-                        </div>
+                        </Box>
                     </div>
                 </div>
             </Container>
-            <style jsx>{`
-                .content-title {
-                    text-align: center;
-                    font-weight: 300;
-                    color: rgb(0, 210, 170);
-                    font-size: calc(1.2em + 1.5vw);
-                }
-                
-                .action-wrapper {
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                  justify-content: space-between;
-                }
-                
-                .button-wrapper {
-                  display: flex;
-                  justify-content: center;
-                }
-            `}</style>
-        </Fragment>
     );
 };
 

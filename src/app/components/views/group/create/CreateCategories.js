@@ -53,6 +53,12 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
     }, [])
 
     useEffect(() => {
+        if (!createMode && !arrayOfCategories.length) {
+            setCreateMode(true)
+        }
+    })
+
+    useEffect(() => {
         if (notEnoughCategories && arrayOfCategories.length > 0) setNotEnoughCategories(false)
     }, [arrayOfCategories.length])
     const groupId = "temp"
@@ -79,7 +85,7 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                 <Typography className={classes.title}>
                     Add some Categories
                 </Typography>
-                <div>
+                <Box>
                     <Button variant="contained"
                             color="primary"
                             size="large"
@@ -88,7 +94,7 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                             endIcon={<AddIcon/>}>
                         Add
                     </Button>
-                </div>
+                </Box>
             </div>
             <Box className={classes.categories}>
                 {createMode &&

@@ -89,13 +89,11 @@ const CreateGroup = ({firebase}) => {
     }
 
     const uploadLogo = async (fileObject) => {
-        console.log("fileObject", fileObject);
         try {
             var storageRef = firebase.getStorageRef();
             let fullPath = 'group-logos' + '/' + fileObject.name;
             let companyLogoRef = storageRef.child(fullPath);
             var uploadTask = companyLogoRef.put(fileObject);
-
             const snapshot = await uploadTask.then()
             return snapshot.ref.getDownloadURL()
 
