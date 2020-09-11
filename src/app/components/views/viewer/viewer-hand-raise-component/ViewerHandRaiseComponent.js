@@ -30,8 +30,8 @@ function ViewerHandRaiseComponent(props) {
     },[]);
    
     return (
-        <div className='topLevelContainer'>
-            <div className='black-frame'>
+        <div>
+            <div>
                 <div>
                     <VideoContainer currentLivestream={ props.currentLivestream } streamerId={ authenticatedUser ? authenticatedUser.uid : '37218979' } additionalCallbacks={streamingCallbacks}/> :     
                 </div>

@@ -114,9 +114,9 @@ function ViewerPage(props) {
                 <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={false} livestream={ currentLivestream } handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive} localId/>
             </div>
             <div className='mini-chat-container'>
-                <MiniChatContainer livestream={ currentLivestream } showMenu={showMenu}/>
+                <MiniChatContainer livestream={ currentLivestream }  isStreamer={false}/>
             </div>
-            <div className='action-buttons'>
+            {/* <div className='action-buttons'>
                 <div className='action-container'>
                     <div className='action-button red'>
                         <Image src='/like.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '35px'}}/>
@@ -132,7 +132,7 @@ function ViewerPage(props) {
                         <Image src='/heart.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '35px'}}/>
                     </div>
                 </div>            
-            </div>
+            </div> */}
             <style jsx>{`
                 .hidden {
                     display: none
@@ -248,12 +248,13 @@ function ViewerPage(props) {
                     background-color: #daa107;
                     transition: all ease-in-out 0.2s;
                 }
+
                 .mini-chat-container {
                     position: absolute;
-                    top: 50%;
-                    transform: translateY(-60%);
+                    bottom: 0;
                     right: 20px;
-                    width: 300px;
+                    width: 20%;
+                    min-width: 250px;
                     z-index: 100;
                 }
 

@@ -60,14 +60,14 @@ function VideoControlsContainer(props) {
                                 </div>
                             </Grid.Column>
                         </Grid.Row> */}
-                        <Grid.Row style={{ margin: '10px 0'}}>
+                        {/* <Grid.Row style={{ margin: '10px 0'}}>
                             <Grid.Column textAlign='center'>
                                 <div className='side-button' onClick={() => setLivestreamMode(props.currentLivestream.mode === "desktop" ? "default" : "desktop")}  style={{  color: props.currentLivestream.mode === "desktop" ? 'red' : 'white' }}>
                                     <Icon name='tv' size='large' style={{ margin: '0 0 5px 0', color: props.currentLivestream.mode === "desktop" ? 'red' : 'white'}}/>
                                     <p style={{ fontSize: '0.8em', color: props.currentLivestream.mode === "desktop" ? 'red' : 'white' }}>{ props.currentLivestream.mode === "desktop" ? 'Stop Sharing Desktop' : 'Share Desktop' }</p>
                                 </div>
                             </Grid.Column>
-                        </Grid.Row>
+                        </Grid.Row> */}
                     </Grid>
                 </div>
                 <style jsx>{`

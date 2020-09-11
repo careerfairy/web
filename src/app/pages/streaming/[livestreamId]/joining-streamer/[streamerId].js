@@ -101,7 +101,7 @@ function StreamingPage(props) {
                 <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={true} livestream={ currentLivestream }/>
             </div>
             <div className='mini-chat-container'>
-                <MiniChatContainer livestream={ currentLivestream }/>
+                <MiniChatContainer livestream={ currentLivestream } isStreamer={true}/>
             </div>
             <style jsx>{`
                  .top-menu {
@@ -145,11 +145,10 @@ function StreamingPage(props) {
 
                 .mini-chat-container {
                     position: absolute;
-                    top: 50%;
-                    transform: translateY(-60%);
-                    right: 130px;
+                    bottom: 0;
+                    right: 120px;
                     width: 20%;
-                    min-width: 130px;
+                    min-width: 250px;
                     z-index: 100;
                 }
             `}</style>

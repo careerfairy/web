@@ -223,7 +223,7 @@ function VideoContainer(props) {
             <div className='controls-container'>
                 <VideoControlsContainer webRTCAdaptor={webRTCAdaptor} currentLivestream={props.currentLivestream}/>
             </div>
-            <div className='button-container'>         
+            {/* <div className='button-container'>         
                 <Grid centered className='middle aligned'>
                     <Grid.Column width={10} textAlign='center'>
                         <div className='countdown' style={{ display: (props.currentLivestream.hasStarted || !props.currentLivestream.start || !showLivestreamCountdown ) ? 'none' : 'block', backgroundColor: streamStartTimeIsNow ? 'rgba(0, 210, 170, 0.8)' : 'rgba(100,100,100,0.8)'}}>
@@ -233,7 +233,7 @@ function VideoContainer(props) {
                         </div>
                     </Grid.Column>
                 </Grid>
-            </div> 
+            </div>  */}
             <Modal open={showDisconnectionModal}>
                 <Modal.Header>You have been disconnected</Modal.Header>
                 <Modal.Content>

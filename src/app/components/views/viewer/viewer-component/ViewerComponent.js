@@ -45,20 +45,18 @@ function ViewerComponent(props) {
     }
 
     return (
-        <div className='topLevelContainer'>
-            <div className='black-frame'>
-                <div> 
-                    <CurrentSpeakerDisplayer isPlayMode={!props.handRaiseActive} smallScreenMode={props.currentLivestream.mode === 'presentation'} speakerSwitchModeActive={false} localStream={null} streams={externalMediaStreams} localId={props.streamerId} currentSpeaker={props.currentLivestream.currentSpeakerId} muted={!props.currentLivestream.hasStarted }/>
+        <div>
+            <div> 
+                <CurrentSpeakerDisplayer isPlayMode={!props.handRaiseActive} smallScreenMode={props.currentLivestream.mode === 'presentation'} speakerSwitchModeActive={false} localStream={null} streams={externalMediaStreams} localId={props.streamerId} currentSpeaker={props.currentLivestream.currentSpeakerId} muted={!props.currentLivestream.hasStarted }/>
+            </div>
+            <div style={{ display: (props.currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
+                <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams} livestreamId={props.currentLivestream.id} presenter={false}/>
+            </div>
+            <div className={ props.currentLivestream.hasStarted ? 'hidden' : '' }style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'white', zIndex: '9999'}}>
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: '1.4em', fontWeight: '700', color: 'rgb(0, 210, 170)'}}>
+                    Thank you for joining!
                 </div>
-                <div style={{ display: (props.currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
-                    <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams} livestreamId={props.currentLivestream.id} presenter={false}/>
-                </div>
-                <div className={ props.currentLivestream.hasStarted ? 'hidden' : '' }style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'white', zIndex: '9999'}}>
-                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: '1.4em', fontWeight: '700', color: 'rgb(0, 210, 170)'}}>
-                        Thank you for joining!
-                    </div>
-                </div>
-            </div>  
+            </div>
             <style jsx>{`
                 .hidden {
                     display: none

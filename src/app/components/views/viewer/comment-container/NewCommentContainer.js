@@ -27,10 +27,10 @@ function CommentContainer(props) {
             <Fragment>
                 <div className='interaction-selector' onMouseEnter={() => setShowLabels(true)}>
                     <div className='interaction-selectors'>
-                        <div>
+                        {/* <div>
                             <Button circular size='big' icon='comments outline' disabled={props.showMenu && selectedState === 'chat'} onClick={() => props.handleStateChange("chat")} color='teal'/>
                             <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("chat")}>Main Chat</span>
-                        </div>
+                        </div> */}
                         <div>
                             <Button circular size='big' icon='question circle outline' disabled={props.showMenu && selectedState === 'questions'} onClick={() => props.handleStateChange("questions")} color='teal'/>
                             <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("questions")}>Q&A</span>
@@ -102,7 +102,7 @@ function CommentContainer(props) {
     return (
         <div className='interaction-container'>
             <div className='interaction-category'>
-                <ChatCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData} isStreamer={false}/>
+                {/* <ChatCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData} isStreamer={false}/> */}
                 <QuestionCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}/>
                 <PollCategory livestream={props.livestream} selectedState={selectedState} setSelectedState={setSelectedState} setShowMenu={props.setShowMenu} streamer={props.streamer} user={props.user} userData={props.userData}/>
                 <HandRaiseCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}  handRaiseActive={props.handRaiseActive} setHandRaiseActive={props.setHandRaiseActive}/>

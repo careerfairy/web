@@ -103,22 +103,22 @@ function LivestreamPdfViewer (props) {
     }
     
     return (
-        <div style={{ position: 'relative', width: '100%', height: '80vh' }}>
+        <div style={{ position: 'relative', width: '100%', height: 'calc(80vh - 55px)' }}>
             <div style={{ position: 'absolute', top: '0', left: '50%', transform: 'translate(-50%)', display: ( pdfObject ? 'block' : 'none'), overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', bottom: '0', left: '0', zIndex: '9999', width: '100%', padding: '30px', display: props.presenter ? 'block' : 'none', backgroundColor: 'rgba(110,110,110, 0.8)'}}>
-                    <div style={{ display: 'inline-block', position: 'absolute', top: '50%', right: '15px', transform: 'translateY(-50%)'}}>
-                        <FilePickerContainer
-                            extensions={['pdf']}
-                            onChange={fileObject => { uploadLogo(fileObject)}}
-                            maxSize={20}
-                            onError={errMsg => ( console.log(errMsg) )}>
-                            <Icon name='upload' size='large' style={{ color: 'white', cursor: 'pointer' }}/>
-                        </FilePickerContainer>
-                    </div>
+                <div style={{ position: 'absolute', bottom: '0', left: '0', zIndex: '1000', width: '100%', padding: '30px', display: props.presenter ? 'block' : 'none', backgroundColor: 'rgba(110,110,110, 0.8)'}}>
                     <div style={{ display: 'inline-block', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
                         <Button circular icon='angle left' onClick={() => decreasePdfPageNumber()} disabled={pdfObject ? pdfObject.page === 1 : false}/>
                         <Button circular icon='angle right' onClick={() => increasePdfPageNumber()} disabled={pdfObject ? pdfObject.page === pdfNumberOfPages : false}/>
                     </div>
+                </div>
+                <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: '1000', display: props.presenter ? 'block' : 'none'}}>
+                    <FilePickerContainer
+                        extensions={['pdf']}
+                        onChange={fileObject => { uploadLogo(fileObject)}}
+                        maxSize={20}
+                        onError={errMsg => ( console.log(errMsg) )}>
+                        <Button primary icon='upload' size='mini' content='Upload Slides [.pdf]' />
+                    </FilePickerContainer>
                 </div>
                 <div style={{ position: 'relative', textAlign: 'center'}}>
                     <Document
@@ -147,13 +147,6 @@ function LivestreamPdfViewer (props) {
                                 </FilePickerContainer>
                             </div>
                         </div>
-                        <FilePickerContainer
-                            extensions={['pdf']}
-                            maxSize={20}
-                            onChange={fileObject => { uploadLogo(fileObject, (newUrl) => { })}}
-                            onError={errMsg => ( console.log(errMsg) )}>
-                            <Button primary icon='upload' content='Upload Slides [.pdf]' />
-                        </FilePickerContainer>
                     </div>
                     <div style={{ display: 'inline-block', textAlign: 'center', display: props.presenter ? 'none' : 'block'}}>
                         <div style={{ color: 'white', marginBottom: '40px'}}>Please wait for the presenter to upload slides.</div>
