@@ -7,7 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import {Formik, Field, Form as UiForm} from 'formik';
 import FilePickerContainer from '../../../../components/ssr/FilePickerContainer';
-import {Button, Container, Input, Typography} from "@material-ui/core";
+import {Box, Button, Container, FormControl, Input, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 
 const placeholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
@@ -18,10 +18,14 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: "50px"
     },
     title: {
-        textAlign: "center",
         fontWeight: "300",
         color: "rgb(0, 210, 170)",
         fontSize: "calc(1.2em + 1.5vw)"
+    },
+    image: {
+        margin: '20px auto 20px auto',
+        maxWidth: '100%',
+        maxHeight: '250px'
     }
 }));
 
@@ -44,19 +48,19 @@ const CreateBaseGroup = ({handleNext, firebase, setBaseGroupInfo, baseGroupInfo}
     return (
         <Fragment>
             <Container className={classes.root}>
-                <Typography className={classes.title} variant="h1">
+                <Typography align="center" className={classes.title} variant="h1">
                     Create a Career Group
                 </Typography>
                 <Formik
                     initialValues={{
                         logoUrl: baseGroupInfo.logoUrl || "",
-                        logoFile: baseGroupInfo.logoFileObj || null,
+                        logoFileObj: baseGroupInfo.logoFileObj || null,
                         universityName: baseGroupInfo.universityName || "",
                         description: baseGroupInfo.description || ""
                     }}
                     validate={values => {
                         let errors = {};
-                        if (!values.logoUrl) {
+                        if (!values.logoFileObj) {
                             errors.logoUrl = 'Required';
                         }
                         if (!values.universityName) {
@@ -93,37 +97,30 @@ const CreateBaseGroup = ({handleNext, firebase, setBaseGroupInfo, baseGroupInfo}
                           /* and other goodies */
                       }) => (
                         <UiForm id='signUpForm' onSubmit={handleSubmit}>
-                            <Form.Group widths='equal'>
-                                <Form.Field>
-                                    <div style={{textAlign: 'center'}}>
-                                        <div className='logo-element'>
-                                            <Image style={{
-                                                margin: '20px auto 20px auto',
-                                                maxWidth: '100%',
-                                                maxHeight: '250px'
-                                            }} src={values.logoUrl.length ? values.logoUrl : placeholder}/>
-                                        </div>
-                                        <FilePickerContainer
-                                            extensions={['jpg', 'jpeg', 'png']}
-                                            maxSize={20}
-                                            onBlur={handleBlur}
-                                            onChange={(fileObject) => {
-                                                setFieldValue('logoUrl', URL.createObjectURL(fileObject), true)
-                                                setFieldValue('logoFileObj', fileObject, true)
-                                            }}
-                                            onError={errMsg => (setFilePickerError(errMsg))}>
-                                            <Button variant="contained" size='large' endIcon={<PublishIcon/>}>
-                                                Upload Your Logo
-                                            </Button>
-                                        </FilePickerContainer>
-                                        <div className="field-error">
-                                            {touched.logoUrl && errors.logoUrl &&
-                                            <p className="error-text">Logo required</p>}
-                                            {filePickerError && <p className="error-text">{filePickerError}</p>}
-                                        </div>
-                                    </div>
-                                </Form.Field>
-                            </Form.Group>
+                            <div style={{textAlign: 'center'}}>
+                                <Box>
+                                    <Image className={classes.image}
+                                           src={values.logoUrl.length ? values.logoUrl : placeholder}/>
+                                </Box>
+                                <FilePickerContainer
+                                    extensions={['jpg', 'jpeg', 'png']}
+                                    maxSize={20}
+                                    onBlur={handleBlur}
+                                    onChange={(fileObject) => {
+                                        setFieldValue('logoUrl', URL.createObjectURL(fileObject), true)
+                                        setFieldValue('logoFileObj', fileObject, true)
+                                    }}
+                                    onError={errMsg => (setFilePickerError(errMsg))}>
+                                    <Button variant="contained" size='large' endIcon={<PublishIcon/>}>
+                                        {values.logoFileObj || baseGroupInfo.logoFileObj ? "Change" : "Upload Your Logo"}
+                                    </Button>
+                                </FilePickerContainer>
+                                <div className="field-error">
+                                    {touched.logoUrl && errors.logoUrl &&
+                                    <p className="error-text">Logo required</p>}
+                                    {filePickerError && <p className="error-text">{filePickerError}</p>}
+                                </div>
+                            </div>
                             <Form.Group widths='equal'>
                                 <Form.Field>
                                     <TextField
@@ -181,13 +178,6 @@ const CreateBaseGroup = ({handleNext, firebase, setBaseGroupInfo, baseGroupInfo}
                       color: red;
                       font-weight: lighter;
                       font-size: 1rem;
-                    }
-                    
-                    .content-title {
-                      text-align: center;
-                      font-weight: 300;
-                      color: rgb(0, 210, 170);
-                      font-size: calc(1.2em + 1.5vw);
                     }
                     
                     .field-error {
