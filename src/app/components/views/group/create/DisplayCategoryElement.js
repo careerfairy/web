@@ -1,82 +1,71 @@
-import React, {Fragment} from 'react';
-import {Grid, Icon, } from "semantic-ui-react";
-
+import React from 'react';
+import Paper from '@material-ui/core/Paper';
 import {withFirebase} from 'data/firebase';
+import {makeStyles} from "@material-ui/core/styles";
+import {Box, Chip} from "@material-ui/core";
 
+const useStyles = makeStyles((theme) => ({
+    option: {
+        display: "inline-block",
+        border: "1px solid black",
+        borderRadius: "20px",
+        padding: "5px 10px",
+        margin: "2px",
+    },
+    whiteBox: {
+        backgroundColor: "white",
+        borderRadius: "5px",
+        padding: "20px",
+        margin: "10px 0",
+        textAlign: "left",
+        display: "flex"
+    },
+    label: {
+        fontSize: "0.8em",
+        fontWeight: "700",
+        color: "rgb(160,160,160)",
+        margin: "0 0 5px 0",
+    },
+    title: {
+        fontSize: "1.2em",
+        fontWeight: "700",
+        color: "rgb(80,80,80)",
+    },
+    chip: {
+        margin: theme.spacing(0.5),
+        border: "1px solid black"
+    }
+}));
 
-const DisplayCategoryElement = ({category, setActiveStep}) => {
+const DisplayCategoryElement = ({category}) => {
 
+    const classes = useStyles()
 
     const optionElements = category.options.map((option, index) => {
         return (
-            <Fragment key={option.id || index}>
-                <div className='option-container'>
-                    {option.name}
-                </div>
-                <style jsx>{`
-                    .hidden {
-                        display: none
-                    }
-
-                    .option-container {
-                        display: inline-block;
-                        border: 1px solid black;
-                        border-radius: 20px;
-                        padding: 5px 10px;
-                        margin: 2px;
-                    }
-                `}</style>
-            </Fragment>
+            <Chip key={option.id || index}
+                  label={option.name}
+                  className={classes.chip}
+                // color="primary"
+                  variant="outlined"
+            />
         );
     });
 
 
     return (
-        <Fragment>
-            <div className='white-box'>
-                <Grid>
-                    <Grid.Column width={4}>
-                        <div className='white-box-label'>Category Name</div>
-                        <div className='white-box-title'>
-                            {category.name}
-                        </div>
-                    </Grid.Column>
-                    <Grid.Column width={11}>
-                        <div className='white-box-label'>Category Options</div>
-                        {optionElements}
-                    </Grid.Column>
-                    <Grid.Column width={1}>
-                    </Grid.Column>
-                </Grid>
-            </div>
-            <style jsx>{`
-                .hidden {
-                    display: none
-                }
-                
-                .white-box {
-                    background-color: white;
-                    box-shadow: 0 0 5px rgb(190,190,190);
-                    border-radius: 5px;
-                    padding: 20px;
-                    margin: 10px 0;
-                    text-align: left;
-                }
-
-                .white-box-label {
-                    font-size: 0.8em;
-                    font-weight: 700;
-                    color: rgb(160,160,160);
-                    margin: 0 0 5px 0; 
-                }
-
-                .white-box-title {
-                    font-size: 1.2em;
-                    font-weight: 700;
-                    color: rgb(80,80,80);
-                }
-            `}</style>
-        </Fragment>
+        <Paper className={classes.whiteBox}>
+            <Box flex="0.3">
+                <div className={classes.label}>Category Name</div>
+                <div className='white-box-title'>
+                    {category.name}
+                </div>
+            </Box>
+            <Box flex="0.7">
+                <div className={classes.label}>Category Options</div>
+                {optionElements}
+            </Box>
+        </Paper>
     );
 
 }
