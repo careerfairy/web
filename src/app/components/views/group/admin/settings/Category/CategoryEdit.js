@@ -186,20 +186,24 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
     }
 
     const handleDropDownDel = () => {
-        setUpdateMode({mode: 'delete', option: selectedOption})
         setAnchorEl(null)
+        setUpdateMode({mode: 'delete', option: selectedOption})
     }
     const handleDropDownRename = () => {
+        setAnchorEl(null)
         setUpdateMode({
             mode: 'rename',
             option: selectedOption,
             options: editableOptions
         })
-        setAnchorEl(null)
     }
 
     const handleOpenDropDown = (event) => {
         setAnchorEl(event.currentTarget)
+    }
+
+    const handleClose = () => {
+        setAnchorEl(null)
     }
 
     const optionElements = editableOptions.map(el => {
@@ -233,7 +237,7 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                         {optionElements}
                         <Menu anchorEl={anchorEl}
                               open={Boolean(anchorEl)}
-                              onClose={setAnchorEl(null)}>
+                              onClose={handleClose}>
                             <MenuItem onClick={handleDropDownDel}>Delete</MenuItem>
                             <MenuItem onClick={handleDropDownRename}>Rename</MenuItem>
                         </Menu>
