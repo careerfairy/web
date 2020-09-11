@@ -1,12 +1,37 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import {Button} from "@material-ui/core";
+import {Box, Button, Container} from "@material-ui/core";
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import CategoryEdit from "../admin/CategoryEdit";
 import CategoryElement from "../admin/CategoryElement";
 import AddIcon from "@material-ui/icons/Add";
+import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
+import {makeStyles} from "@material-ui/core/styles";
 
+const useStyles = makeStyles((theme) => ({
+    root: {
+        paddingTop: "50px",
+        paddingBottom: "50px"
+    },
+    title: {
+        fontWeight: "300",
+        color: "rgb(0, 210, 170)",
+        fontSize: "calc(1.2em + 1.5vw)"
+    },
+    image: {
+        margin: '20px auto 20px auto',
+        maxWidth: '100%',
+        maxHeight: '250px'
+    },
+    form: {
+        display: "flex",
+        flexFlow: "column",
+        alignItems: "center",
+        width: "100%"
+    }
+}));
 
 const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCategory, handleAddTempCategory, handleNext, arrayOfCategories}) => {
+    const classes = useStyles()
     const [createMode, setCreateMode] = useState(false)
     const [notEnoughCategories, setNotEnoughCategories] = useState(false)
 
@@ -39,7 +64,7 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
 
     return (
         <Fragment>
-            <div className="content-wrapper">
+            <Container className={classes.root}>
                 <h1 className='content-title'>Add some Categories</h1>
                 <div className="btn-title-wrapper" style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
                     <Button variant="contained"
@@ -63,7 +88,7 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                     {categoryElements}
                     {notEnoughCategories && <p className="error-text">You need at least one category</p>}
                 </div>
-                <div className="button-wrapper">
+                <Box style={{marginTop: 15}} display="flex" justifyContent="space-between">
                     <Button
                         variant="contained"
                         size='large'
@@ -77,10 +102,11 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                         size='large'
                         variant="contained"
                         style={{marginLeft: 5}}
+                        endIcon={<ArrowForwardIcon/>}
                         onClick={verifyNext}
                     >Next</Button>
-                </div>
-            </div>
+                </Box>
+            </Container>
 
             <style jsx>{`
                 .sublabel {

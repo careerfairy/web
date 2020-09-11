@@ -163,6 +163,7 @@ const CreateBaseGroup = ({handleNext, firebase, setBaseGroupInfo, baseGroupInfo}
                         </FormControl>
                         <Button size='large'
                                 variant="contained"
+                                style={{maxWidth: 500}}
                                 fullWidth
                                 disabled={isSubmitting}
                                 endIcon={<ArrowForwardIcon/>}
