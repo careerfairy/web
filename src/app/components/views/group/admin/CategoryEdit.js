@@ -1,13 +1,48 @@
-import {Fragment, useState, useEffect} from 'react';
+import React, {Fragment, useState, useEffect} from 'react';
 import {Grid, Dropdown, Input} from "semantic-ui-react";
 import AddIcon from '@material-ui/icons/Add';
 
 import {withFirebase} from "data/firebase";
 import CategoryEditOption from './CategoryEditOption';
-import {Button, IconButton} from "@material-ui/core";
+import {Box, Button, IconButton, Paper, Typography} from "@material-ui/core";
 import {v4 as uuidv4} from 'uuid'
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme) => ({
+    option: {
+        display: "inline-block",
+        border: "1px solid black",
+        borderRadius: "20px",
+        padding: "5px 10px",
+        margin: "2px",
+    },
+    whiteBox: {
+        backgroundColor: "white",
+        padding: "20px",
+        margin: "10px 0",
+        display: "flex",
+        flexDirection: "column",
+    },
+    label: {
+        fontSize: "0.8em",
+        fontWeight: "700",
+        color: "rgb(160,160,160)",
+        margin: "0 0 5px 0",
+    },
+    title: {
+        fontSize: "1.2em",
+        fontWeight: "700",
+        color: "rgb(80,80,80)",
+    },
+    chip: {
+        margin: theme.spacing(0.5),
+        border: "1px solid black"
+    }
+}));
 
 function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCategory, newCategory, firebase, setEditMode, handleAddTempCategory, group, groupId, isLocal}) {
+    const classes = useStyles()
+
     const [categoryName, setCategoryName] = useState('');
 
     const [editableOptions, setEditableOptions] = useState([]);
@@ -192,26 +227,25 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
 
     return (
         <Fragment>
-            <div className='white-box'>
+            <Paper className={classes.whiteBox}>
                 <Grid>
-                    <Grid.Column width={5}>
-                        <div className='white-box-label'>Category Name</div>
+                    <Box flex="0.3">
+                        <Typography align="left" className={classes.label}>Category Name</Typography>
                         <div className='white-box-title'>
                             <Input autoFocus maxLength="40" error={touched && !categoryName.length} onBlur={handleBlur}
                                    type='text' value={categoryName}
                                    onChange={(event, data) => setCategoryName(data.value)} fluid/>
                             {touched && !categoryName.length && <p className="error-field">Required</p>}
                         </div>
-                    </Grid.Column>
-                    <Grid.Column width={11}>
-                        <div className='white-box-label'>Category Options</div>
+                    </Box>
+                    <Box flex="0.7">
+                        <Typography align="left" className={classes.label}>Category Options</Typography>
                         {optionElements}
                         <IconButton size="small" onClick={() => setUpdateMode({mode: 'add', options: editableOptions})}>
-                            <AddIcon fontSize="large"
-                                     color="primary"/>
+                            <AddIcon fontSize="large" color="primary"/>
                         </IconButton>
                         {errorObj.optionError && <p className="error-field">You must add at least 2 options</p>}
-                    </Grid.Column>
+                    </Box>
                 </Grid>
                 <CategoryEditOption categoryName={categoryName} handleDeleteCategory={handleDeleteCategory}
                                     updateMode={updateMode} setUpdateMode={setUpdateMode} handleAdd={handleAdd}
@@ -238,7 +272,7 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                     </Button>
                     }
                 </div>
-            </div>
+            </Paper>
             <style jsx>{`
                 .hidden {
                     display: none

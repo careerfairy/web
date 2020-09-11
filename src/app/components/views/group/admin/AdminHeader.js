@@ -53,11 +53,10 @@ const useStyles = makeStyles({
     }
 });
 
-const AdminHeader = ({group, menuItem, firebase}) => {
+const AdminHeader = ({group, firebase}) => {
     const classes = useStyles()
 
     const [editTitle, setEditTitle] = useState(false)
-    const [editLogo, setEditLogo] = useState(false)
     const [filePickerError, setFilePickerError] = useState(null)
     const [submittingLogo, setSubmittingLogo] = useState(false)
     const [error, setError] = useState(null)
@@ -120,7 +119,6 @@ const AdminHeader = ({group, menuItem, firebase}) => {
             setSubmittingLogo(true)
             const downloadUrl = await uploadLogo(editData.fileObj)
             await firebase.updateCareerCenter(group.id, {logoUrl: downloadUrl})
-            setEditLogo(false)
             setSubmittingLogo(false)
         } catch (e) {
             setSubmittingLogo(false)
