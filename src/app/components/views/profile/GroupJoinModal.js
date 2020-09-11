@@ -100,7 +100,7 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
             <DialogActions style={{display: 'flex', flexFlow: 'column', alignItems: 'center'}}>
                 {!!categories.length && renderCategories}
 
-                <Box>
+                <Box display="flex">
                     <Button fullWidth
                             size="large"
                             style={{margin: '10px 5px 0 0'}}
