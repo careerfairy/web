@@ -4,21 +4,14 @@ import AddIcon from '@material-ui/icons/Add';
 
 import {withFirebase} from "data/firebase";
 import CategoryEditOption from './CategoryEditOption';
-import {Box, Button, IconButton, Paper, Typography} from "@material-ui/core";
+import {Box, Button, FormControl, FormHelperText, IconButton, Paper, Typography} from "@material-ui/core";
 import {v4 as uuidv4} from 'uuid'
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
-    option: {
-        display: "inline-block",
-        border: "1px solid black",
-        borderRadius: "20px",
-        padding: "5px 10px",
-        margin: "2px",
-    },
     whiteBox: {
         backgroundColor: "white",
-        padding: "20px",
+        padding: "30px",
         margin: "10px 0",
         display: "flex",
         flexDirection: "column",
@@ -37,6 +30,13 @@ const useStyles = makeStyles((theme) => ({
     chip: {
         margin: theme.spacing(0.5),
         border: "1px solid black"
+    },
+    error: {
+        position: "absolute",
+        fontSize: "1rem",
+        fontWeight: "lighter",
+        marginTop: "5px",
+        color: "red",
     }
 }));
 
@@ -228,30 +228,35 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
     return (
         <Fragment>
             <Paper className={classes.whiteBox}>
-                <Grid>
-                    <Box flex="0.3">
+                <div style={{display: "flex"}}>
+                    <FormControl error={Boolean(touched && !categoryName.length)} style={{flex: 0.3}}>
                         <Typography align="left" className={classes.label}>Category Name</Typography>
-                        <div className='white-box-title'>
+                        <div className={classes.title}>
                             <Input autoFocus maxLength="40" error={touched && !categoryName.length} onBlur={handleBlur}
                                    type='text' value={categoryName}
                                    onChange={(event, data) => setCategoryName(data.value)} fluid/>
-                            {touched && !categoryName.length && <p className="error-field">Required</p>}
+                            <FormHelperText>{touched && !categoryName.length && "Required"}</FormHelperText>
                         </div>
-                    </Box>
-                    <Box flex="0.7">
+                    </FormControl>
+                    <FormControl style={{flex: 0.7}} error={Boolean(errorObj.optionError)}>
                         <Typography align="left" className={classes.label}>Category Options</Typography>
-                        {optionElements}
-                        <IconButton size="small" onClick={() => setUpdateMode({mode: 'add', options: editableOptions})}>
+                        <Box display="flex">
+                            {optionElements}
+                        </Box>
+                        <div>
+                        <IconButton size="small"
+                                    onClick={() => setUpdateMode({mode: 'add', options: editableOptions})}>
                             <AddIcon fontSize="large" color="primary"/>
                         </IconButton>
-                        {errorObj.optionError && <p className="error-field">You must add at least 2 options</p>}
-                    </Box>
-                </Grid>
+                        </div>
+                        <FormHelperText>{errorObj.optionError && "You must add at least 2 options"}</FormHelperText>
+                    </FormControl>
+                </div>
                 <CategoryEditOption categoryName={categoryName} handleDeleteCategory={handleDeleteCategory}
                                     updateMode={updateMode} setUpdateMode={setUpdateMode} handleAdd={handleAdd}
                                     handleDelete={handleDelete} handleRename={handleRename} groupId={groupId}/>
                 <div className='separator'/>
-                <div className="button-wrapper">
+                <Box display="flex" justifyContent="space-between">
                     <div>
                         <Button onClick={() => saveChanges()}
                                 color="primary"
@@ -271,12 +276,10 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                         Delete
                     </Button>
                     }
-                </div>
+                </Box>
             </Paper>
             <style jsx>{`
-                .hidden {
-                    display: none
-                }
+    
 
                 .separator {
                     width: 100%;
@@ -290,30 +293,6 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                     justify-content: space-between;
                 }
                 
-                .white-box {
-                    position: relative;
-                    background-color: white;
-                    box-shadow: 0 0 5px rgb(190,190,190);
-                    border-radius: 5px;
-                    padding: 20px;
-                    margin: 10px 0;
-                    text-align: left;
-                    overflow: hidden;
-                }
-
-                .white-box-label {
-                    font-size: 0.8em;
-                    font-weight: 700;
-                    color: rgb(160,160,160);
-                    margin: 20px 0 10px 0; 
-                }
-
-                .white-box-title {
-                    font-size: 1.2em;
-                    font-weight: 700;
-                    color: rgb(80,80,80);
-                    margin: 10px 0 20px 0;
-                }
 
                 .secondary-input {
                     margin: 20px 0 30px 0;
@@ -330,13 +309,7 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                     box-shadow: 0 0 2px grey;
                     font-size: 1.2em;
                 }
-                .error-field{
-                  position: absolute;
-                  font-size: 1rem;
-                  font-weight: lighter;
-                  margin-top: 5px;
-                  color: red;
-                }
+
             `}</style>
         </Fragment>
     );
