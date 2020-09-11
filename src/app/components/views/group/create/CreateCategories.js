@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import {Box, Button, Container} from "@material-ui/core";
+import {Box, Button, Container, Typography} from "@material-ui/core";
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import CategoryEdit from "../admin/CategoryEdit";
 import CategoryElement from "../admin/CategoryElement";
@@ -17,16 +17,26 @@ const useStyles = makeStyles((theme) => ({
         color: "rgb(0, 210, 170)",
         fontSize: "calc(1.2em + 1.5vw)"
     },
-    image: {
-        margin: '20px auto 20px auto',
-        maxWidth: '100%',
-        maxHeight: '250px'
-    },
-    form: {
+    categories: {
         display: "flex",
-        flexFlow: "column",
-        alignItems: "center",
-        width: "100%"
+        flexDirection: "column",
+        flex: 1
+    },
+    error: {
+        color: "red",
+        fontWeight: "lighter",
+        fontSize: "1rem"
+    },
+    header: {
+        width: '100%',
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "space-between",
+    },
+    buttons: {
+        display: "flex",
+        justifyContent: "space-between",
+        marginTop: "15px"
     }
 }));
 
@@ -65,8 +75,10 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
     return (
         <Fragment>
             <Container className={classes.root}>
-                <h1 className='content-title'>Add some Categories</h1>
-                <div className="btn-title-wrapper" style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
+                <div className={classes.header}>
+                    <Typography className={classes.title}>
+                        Add some Categories
+                    </Typography>
                     <Button variant="contained"
                             color="primary"
                             size="large"
@@ -76,7 +88,7 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                         Add
                     </Button>
                 </div>
-                <div className="categories-wrapper">
+                <Box className={classes.categories}>
                     {createMode &&
                     <CategoryEdit handleAddTempCategory={handleAddTempCategory}
                                   groupId={groupId}
@@ -86,9 +98,11 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                                   newCategory={true}
                                   setEditMode={setCreateMode}/>}
                     {categoryElements}
-                    {notEnoughCategories && <p className="error-text">You need at least one category</p>}
-                </div>
-                <Box style={{marginTop: 15}} display="flex" justifyContent="space-between">
+                    {notEnoughCategories && <Typography className={classes.error}>
+                        You need at least one category
+                    </Typography>}
+                </Box>
+                <Box className={classes.buttons}>
                     <Button
                         variant="contained"
                         size='large'
