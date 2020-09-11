@@ -23,7 +23,7 @@ function TabPanel(props) {
             {...other}
         >
             {value === index && (
-                <Box p={3}>
+                <Box p={1}>
                     {children}
                 </Box>
             )}
@@ -47,8 +47,7 @@ const useStyles = makeStyles((theme) => ({
 const GroupNav = ({userData, user, groupId, group}) => {
     const classes = useStyles();
     const theme = useTheme();
-    const native = useMediaQuery(theme.breakpoints.down('xs'));
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = React.useState(2);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);

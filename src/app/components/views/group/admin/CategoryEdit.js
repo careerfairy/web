@@ -1,20 +1,31 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Grid, Dropdown, Input} from "semantic-ui-react";
 import AddIcon from '@material-ui/icons/Add';
-
+import EditIcon from '@material-ui/icons/Edit';
 import {withFirebase} from "data/firebase";
 import CategoryEditOption from './CategoryEditOption';
-import {Box, Button, FormControl, FormHelperText, IconButton, Paper, Typography, TextField} from "@material-ui/core";
+import {
+    Box,
+    Button,
+    FormControl,
+    FormHelperText,
+    IconButton,
+    Paper,
+    Typography,
+    TextField,
+    Chip
+} from "@material-ui/core";
 import {v4 as uuidv4} from 'uuid'
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
-    whiteBox: {
+    root: {
         backgroundColor: "white",
         borderRadius: "5px",
         padding: "20px",
         margin: "10px 0",
-        display: "flex"
+        display: "flex",
+        flexDirection: "column"
     },
     label: {
         fontSize: "0.8em",
@@ -29,7 +40,6 @@ const useStyles = makeStyles((theme) => ({
     },
     chip: {
         margin: theme.spacing(0.5),
-        border: "1px solid black"
     },
     error: {
         position: "absolute",
@@ -172,7 +182,10 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
     const optionElements = editableOptions.map((optionEl, index) => {
         return (
             <Fragment key={index}>
-                <div className={'option-container animated fadeIn'}
+                <Chip className={classes.chip}
+                    label={optionEl.name}
+                      icon={<EditIcon/>}
+                    color={"primary"}
                      style={{zIndex: selectedOption === optionEl ? '10' : '0'}}>
                     <div className='option-name'>
                         {optionEl.name}
@@ -194,7 +207,7 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                             />
                         </Dropdown.Menu>
                     </Dropdown>
-                </div>
+                </Chip>
                 <style jsx>{`
                     .hidden {
                         display: none
@@ -227,7 +240,7 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
 
     return (
         <Fragment>
-            <Paper className={classes.whiteBox}>
+            <Paper className={classes.root}>
                 <Box display="flex" flexDirection="column">
                     <TextField autoFocus
                                style={{marginBottom: "10px"}}
@@ -240,12 +253,12 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                                onChange={(e) => setCategoryName(e.currentTarget.value)}/>
                     <Box>
                         <Typography align="left" className={classes.label}>Category Options</Typography>
-                        <div style={{display: "flex"}}>
+                        <div style={{display: "flex", flexWrap:"wrap"}}>
                             {optionElements}
-                        <IconButton size="small"
-                                    onClick={() => setUpdateMode({mode: 'add', options: editableOptions})}>
-                            <AddIcon fontSize="large" color="primary"/>
-                        </IconButton>
+                            <IconButton size="small"
+                                        onClick={() => setUpdateMode({mode: 'add', options: editableOptions})}>
+                                <AddIcon fontSize="large" color="primary"/>
+                            </IconButton>
                         </div>
                         <FormHelperText
                             error>{errorObj.optionError && "You must add at least 2 options"}</FormHelperText>
@@ -259,11 +272,13 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                     <div>
                         <Button onClick={() => saveChanges()}
                                 color="primary"
+                                size="small"
                                 style={{marginRight: 10}}
                                 variant="contained">
                             {newCategory ? 'Create' : 'Update'}
                         </Button>
                         <Button onClick={() => setEditMode(false)}
+                                size="small"
                                 variant="contained">
                             Cancel
                         </Button>
@@ -271,6 +286,7 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                     {!newCategory &&
                     <Button onClick={() => setUpdateMode({mode: 'deleteCategory', option: {name: categoryName}})}
                             color="secondary"
+                            size="small"
                             variant="outlined">
                         Delete
                     </Button>

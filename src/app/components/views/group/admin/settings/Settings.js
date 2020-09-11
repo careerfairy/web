@@ -60,14 +60,14 @@ const Settings = ({group, firebase}) => {
                         {editDescription ?
                             <Button variant="contained"
                                     color="primary"
-                                    size="large"
+                                    size="medium"
                                     onClick={handleSaveDesc}
                                     endIcon={submitting && <CircularProgress size={20} color="inherit"/>}>
                                 Save
                             </Button> :
                             <Button variant="contained"
                                     color="primary"
-                                    size="large"
+                                    size="medium"
                                     onClick={() => setEditDescription(true)}
                                     endIcon={<EditIcon/>}>
                                 Edit
@@ -75,7 +75,7 @@ const Settings = ({group, firebase}) => {
                         {editDescription &&
                         <Button variant="contained"
                                 style={{marginLeft: 10}}
-                                size="large"
+                                size="medium"
                                 onClick={() => {
                                     setEditDescription(false)
                                     setDescription(group.description)
@@ -104,7 +104,7 @@ const Settings = ({group, firebase}) => {
                 <h3 className='sublabel'>Settings</h3>
                 <Button variant="contained"
                         color="primary"
-                        size="large"
+                        size="medium"
                         onClick={() => setCreateMode(true)}
                         disabled={createMode}
                         endIcon={<AddIcon/>}>
@@ -134,10 +134,7 @@ const Settings = ({group, firebase}) => {
                   margin: 0 0 20px 0;
                 }
                 
-                .about-wrapper {
-                  display: flex;
-                  flex-direction: column;
-                }
+   
                 
   
             `}</style>
