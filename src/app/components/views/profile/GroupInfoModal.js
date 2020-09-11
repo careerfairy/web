@@ -30,9 +30,6 @@ const GroupInfoModal = (props) => {
                     <Button content='Confirm' primary fluid onClick={props.closeModal}/>
                 </Modal.Content>
             </Modal>
-        <style jsx>{`
-            
-        `}</style>
         </Fragment>
     );
 };

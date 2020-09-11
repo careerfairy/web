@@ -8,11 +8,24 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {withFirebase} from 'data/firebase';
 import UserCategorySelector from 'components/views/profile/UserCategorySelector';
-import {Card, CardMedia, CircularProgress} from "@material-ui/core";
+import {Box, CardMedia, CircularProgress} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
 
+const useStyles = makeStyles((theme) => ({
+    media: {
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '1.5em 1em 1em 1em',
+        height: '120px'
+    },
+    image: {
+        objectFit: 'contain',
+        maxWidth: '80%'
+    }
+}));
 
 const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
-
+    const classes = useStyles()
     const [categories, setCategories] = useState([]);
     const [allSelected, setAllSelected] = useState(false)
     const [submitting, setSubmitting] = useState(false)
@@ -76,23 +89,19 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
             maxWidth="sm"
         >
             <DialogTitle align="center">Follow live streams from</DialogTitle>
-            <CardMedia
-                style={{display: 'flex', justifyContent: 'center', padding: '1.5em 1em 1em 1em', height: '120px'}}>
-                <img src={group.logoUrl} style={{
-                    objectFit: 'contain',
-                    maxWidth: '80%'
-                }} alt=""/>
+            <CardMedia className={classes.media}>
+                <img src={group.logoUrl} className={classes.image} alt=""/>
             </CardMedia>
             <DialogContent>
-                <DialogContentText align="center" noWrap id="alert-dialog-description">
+                <DialogContentText align="center" noWrap>
                     {group.description}
                 </DialogContentText>
             </DialogContent>
             <DialogActions style={{display: 'flex', flexFlow: 'column', alignItems: 'center'}}>
                 {!!categories.length && renderCategories}
-                <div style={{display: 'flex', width: '100%', margin: 0}}>
+
+                <Box>
                     <Button fullWidth
-                            // variant="contained"
                             size="large"
                             style={{margin: '10px 5px 0 0'}}
                             endIcon={submitting && <CircularProgress size={20} color="inherit"/>}
@@ -108,7 +117,7 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
                             onClick={handleJoinGroup} color="primary" autoFocus>
                         Join
                     </Button>
-                </div>
+                </Box>
             </DialogActions>
         </Dialog>
     );

@@ -12,6 +12,7 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(1),
         minWidth: 120,
     },
+
 }));
 
 const UserCategorySelector = ({category, handleSetSelected}) => {

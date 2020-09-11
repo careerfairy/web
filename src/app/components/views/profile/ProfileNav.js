@@ -6,10 +6,11 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
 
-import {Container} from "@material-ui/core";
+import {Container, useMediaQuery} from "@material-ui/core";
 import PersonalInfo from "./personal-info/PersonalInfo";
-import MyGroups from "./my-groups/MyGroups";
 import {withFirebase} from "../../../data/firebase";
+import JoinedGroups from "./my-groups/JoinedGroups";
+import AdminGroups from "./my-groups/AdminGroups";
 
 function TabPanel(props) {
     const {children, value, index, ...other} = props;
@@ -35,16 +36,18 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: "rgb(250,250,250)",
         height: "100%",
         minHeight: "100vh",
+        width: "100%"
     },
     bar: {
         backgroundColor: "transparent",
-        boxShadow: "none"
+        boxShadow: "none",
     }
 }));
 
 const ProfileNav = ({userData}) => {
     const classes = useStyles();
     const theme = useTheme();
+    const native = useMediaQuery(theme.breakpoints.down('xs'));
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
@@ -63,9 +66,12 @@ const ProfileNav = ({userData}) => {
                     onChange={handleChange}
                     indicatorColor="primary"
                     textColor="primary"
+                    selectionFollowsFocus
+                    centered
                 >
-                    <Tab label="Personal Information"/>
-                    <Tab label="My Groups"/>
+                    <Tab wrapped fullWidth label={`${native ? "Personal" :"Personal Information"}`}/>
+                    <Tab wrapped fullWidth label={`${native ? "Joined" :"Joined Groups"}`}/>
+                    <Tab wrapped fullWidth label={`${native ? "Admin" :"Admin Groups"}`}/>
                 </Tabs>
             </AppBar>
             <SwipeableViews
@@ -77,7 +83,10 @@ const ProfileNav = ({userData}) => {
                     <PersonalInfo userData={userData}/>
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
-                    <MyGroups userData={userData}/>
+                    <JoinedGroups userData={userData}/>
+                </TabPanel>
+                <TabPanel value={value} index={2} dir={theme.direction}>
+                    <AdminGroups userData={userData}/>
                 </TabPanel>
             </SwipeableViews>
         </Container>
