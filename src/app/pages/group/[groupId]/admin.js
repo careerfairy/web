@@ -1,14 +1,12 @@
 import React, {useEffect, useState} from 'react'
 import {Container, Button, Image, Menu} from 'semantic-ui-react';
 import {useRouter} from 'next/router';
-import {withFirebase} from '../../../data/firebase';
 import Header from '../../../components/views/header/Header';
 import Head from 'next/head';
 import Footer from '../../../components/views/footer/Footer';
-import Events from '../../../components/views/group/admin/events/Events';
-import Settings from '../../../components/views/group/admin/settings/Settings';
-import Members from '../../../components/views/group/admin/members/Members';
 import AdminHeader from "../../../components/views/group/admin/AdminHeader";
+import GroupNav from "../../../components/views/group/admin/GroupNav";
+import {withFirebase} from "../../../data/firebase";
 
 
 const JoinGroup = (props) => {
@@ -45,7 +43,7 @@ const JoinGroup = (props) => {
                 careerCenter.id = querySnapshot.id;
                 setGroup(careerCenter);
             })
-        return () => unsubscribe()
+            return () => unsubscribe()
         }
     }, [groupId]);
 
@@ -56,47 +54,8 @@ const JoinGroup = (props) => {
                 <title key="title">CareerFairy | Join Groups</title>
             </Head>
             <Header classElement='relative white-background'/>
-            <Container style={{padding: '30px 0'}} textAlign='center'>
-                <AdminHeader group={group} menuItem={menuItem}/>
-                <Menu style={{textAlign: 'center', margin: '0 0 20px 0'}} compact secondary>
-                    <Menu.Item
-                        name="events"
-                        active={menuItem === "events"}
-                        onClick={() => {
-                            setMenuItem("events")
-                        }}
-                    >
-                        Live Streams
-                    </Menu.Item>
-                    <Menu.Item
-                        name="members"
-                        active={menuItem === "members"}
-                        onClick={() => {
-                            setMenuItem("members")
-                        }}
-                    >
-                        Members
-                    </Menu.Item>
-                    <Menu.Item
-                        name="settings"
-                        active={menuItem === "settings"}
-                        onClick={() => {
-                            setMenuItem("settings")
-                        }}
-                    >
-                        Settings
-                    </Menu.Item>
-                </Menu>
-                <div className={menuItem === "events" ? '' : 'hidden'}>
-                    <Events groupId={groupId} user={user} userData={userData} menuItem={menuItem}/>
-                </div>
-                <div className={menuItem === "members" ? '' : 'hidden'}>
-                    <Members groupId={groupId}/>
-                </div>
-                <div className={menuItem === "settings" ? '' : 'hidden'}>
-                    <Settings group={group} groupId={groupId}/>
-                </div>
-            </Container>
+            <AdminHeader group={group} menuItem={menuItem}/>
+            <GroupNav group={group} groupId={groupId} userData={userData} user={user}/>
             <Footer/>
             <style jsx>{`
                     .hidden {

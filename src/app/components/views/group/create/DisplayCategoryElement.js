@@ -5,6 +5,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {Box, Chip} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
+
     whiteBox: {
         backgroundColor: "white",
         borderRadius: "5px",

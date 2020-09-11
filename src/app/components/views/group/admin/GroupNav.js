@@ -7,10 +7,10 @@ import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
 
 import {Container, useMediaQuery} from "@material-ui/core";
-import PersonalInfo from "./personal-info/PersonalInfo";
-import {withFirebase} from "../../../data/firebase";
-import JoinedGroups from "./my-groups/JoinedGroups";
-import AdminGroups from "./my-groups/AdminGroups";
+import Events from "./events/Events";
+import Members from "./members/Members";
+import Settings from "./settings/Settings";
+import {withFirebase} from "../../../../data/firebase";
 
 function TabPanel(props) {
     const {children, value, index, ...other} = props;
@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const GroupNav = ({userData}) => {
+const GroupNav = ({userData, user, groupId, group}) => {
     const classes = useStyles();
     const theme = useTheme();
     const native = useMediaQuery(theme.breakpoints.down('xs'));
@@ -59,7 +59,7 @@ const GroupNav = ({userData}) => {
     };
 
     return (
-        <Container style={{marginTop: '50px'}}>
+        <Container>
             <AppBar className={classes.bar} position="static" color="default">
                 <Tabs
                     value={value}
@@ -69,9 +69,9 @@ const GroupNav = ({userData}) => {
                     selectionFollowsFocus
                     centered
                 >
-                    <Tab wrapped fullWidth label={`${native ? "Personal" :"Personal Information"}`}/>
-                    <Tab wrapped fullWidth label={`${native ? "Joined" :"Joined Groups"}`}/>
-                    <Tab wrapped fullWidth label={`${native ? "Admin" :"Admin Groups"}`}/>
+                    <Tab wrapped fullWidth label={`Events`}/>
+                    <Tab wrapped fullWidth label={`Members`}/>
+                    <Tab wrapped fullWidth label={`Settings`}/>
                 </Tabs>
             </AppBar>
             <SwipeableViews
@@ -80,13 +80,13 @@ const GroupNav = ({userData}) => {
                 onChangeIndex={handleChangeIndex}
             >
                 <TabPanel value={value} index={0} dir={theme.direction}>
-                    <PersonalInfo userData={userData}/>
+                    <Events groupId={groupId} user={user} userData={userData} menuItem={"events"}/>
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
-                    <JoinedGroups userData={userData}/>
+                    <Members groupId={groupId}/>
                 </TabPanel>
                 <TabPanel value={value} index={2} dir={theme.direction}>
-                    <AdminGroups userData={userData}/>
+                    <Settings group={group} groupId={groupId}/>
                 </TabPanel>
             </SwipeableViews>
         </Container>

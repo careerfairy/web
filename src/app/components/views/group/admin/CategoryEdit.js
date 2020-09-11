@@ -10,10 +10,11 @@ import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
     whiteBox: {
-        padding: "30px",
+        backgroundColor: "white",
+        borderRadius: "5px",
+        padding: "20px",
         margin: "10px 0",
-        display: "flex",
-        flexDirection: "column",
+        display: "flex"
     },
     label: {
         fontSize: "0.8em",
@@ -227,8 +228,9 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
     return (
         <Fragment>
             <Paper className={classes.whiteBox}>
-                <div>
+                <Box display="flex" flexDirection="column">
                     <TextField autoFocus
+                               style={{marginBottom: "10px"}}
                                label={<Typography align="left" className={classes.label}>Category Name</Typography>}
                                inputProps={{maxLength: 40}}
                                error={Boolean(touched && !categoryName.length)}
@@ -236,14 +238,19 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                                helperText={touched && !categoryName.length && "Required"}
                                value={categoryName}
                                onChange={(e) => setCategoryName(e.currentTarget.value)}/>
-                    <Typography align="left" className={classes.label}>Category Options</Typography>
-                    {optionElements}
-                    <IconButton size="small"
-                                onClick={() => setUpdateMode({mode: 'add', options: editableOptions})}>
-                        <AddIcon fontSize="large" color="primary"/>
-                    </IconButton>
-                    <FormHelperText error>{errorObj.optionError && "You must add at least 2 options"}</FormHelperText>
-                </div>
+                    <Box>
+                        <Typography align="left" className={classes.label}>Category Options</Typography>
+                        <div style={{display: "flex"}}>
+                            {optionElements}
+                        <IconButton size="small"
+                                    onClick={() => setUpdateMode({mode: 'add', options: editableOptions})}>
+                            <AddIcon fontSize="large" color="primary"/>
+                        </IconButton>
+                        </div>
+                        <FormHelperText
+                            error>{errorObj.optionError && "You must add at least 2 options"}</FormHelperText>
+                    </Box>
+                </Box>
                 <CategoryEditOption categoryName={categoryName} handleDeleteCategory={handleDeleteCategory}
                                     updateMode={updateMode} setUpdateMode={setUpdateMode} handleAdd={handleAdd}
                                     handleDelete={handleDelete} handleRename={handleRename} groupId={groupId}/>

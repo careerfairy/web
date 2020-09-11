@@ -5,7 +5,6 @@ import {
     CardMedia, Container,
     FormControl,
     FormHelperText,
-    Grid,
     IconButton,
     TextField,
     Typography
@@ -127,7 +126,7 @@ const AdminHeader = ({group, firebase}) => {
 
 
     return (
-        <Box className={classes.root}>
+        <Container className={classes.root}>
             <Box>
                 <FormControl error={Boolean(filePickerError)} className={classes.imageForm}>
                     <CardMedia className={classes.media}>
@@ -189,7 +188,7 @@ const AdminHeader = ({group, firebase}) => {
                         </IconButton>
                     </div>}
             </Box>
-        </Box>
+        </Container>
     );
 };
 
