@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         flexWrap: "wrap",
         justifyContent: "space-between",
+        alignItems: "flex-end"
     },
     buttons: {
         display: "flex",
@@ -73,12 +74,12 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
 
 
     return (
-        <Fragment>
-            <Container className={classes.root}>
-                <div className={classes.header}>
-                    <Typography className={classes.title}>
-                        Add some Categories
-                    </Typography>
+        <Container className={classes.root}>
+            <div className={classes.header}>
+                <Typography className={classes.title}>
+                    Add some Categories
+                </Typography>
+                <div>
                     <Button variant="contained"
                             color="primary"
                             size="large"
@@ -88,87 +89,40 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                         Add
                     </Button>
                 </div>
-                <Box className={classes.categories}>
-                    {createMode &&
-                    <CategoryEdit handleAddTempCategory={handleAddTempCategory}
-                                  groupId={groupId}
-                                  isLocal={true}
-                                  category={{}}
-                                  options={[]}
-                                  newCategory={true}
-                                  setEditMode={setCreateMode}/>}
-                    {categoryElements}
-                    {notEnoughCategories && <Typography className={classes.error}>
-                        You need at least one category
-                    </Typography>}
-                </Box>
-                <Box className={classes.buttons}>
-                    <Button
-                        variant="contained"
-                        size='large'
-                        style={{marginRight: 5}}
-                        startIcon={<ArrowBackIcon/>}
-                        onClick={handleBack}
-                    >Back</Button>
+            </div>
+            <Box className={classes.categories}>
+                {createMode &&
+                <CategoryEdit handleAddTempCategory={handleAddTempCategory}
+                              groupId={groupId}
+                              isLocal={true}
+                              category={{}}
+                              options={[]}
+                              newCategory={true}
+                              setEditMode={setCreateMode}/>}
+                {categoryElements}
+                {notEnoughCategories && <Typography className={classes.error}>
+                    You need at least one category
+                </Typography>}
+            </Box>
+            <Box className={classes.buttons}>
+                <Button
+                    variant="contained"
+                    size='large'
+                    style={{marginRight: 5}}
+                    startIcon={<ArrowBackIcon/>}
+                    onClick={handleBack}
+                >Back</Button>
 
-                    <Button
-                        color="primary"
-                        size='large'
-                        variant="contained"
-                        style={{marginLeft: 5}}
-                        endIcon={<ArrowForwardIcon/>}
-                        onClick={verifyNext}
-                    >Next</Button>
-                </Box>
-            </Container>
-
-            <style jsx>{`
-                .sublabel {
-                    text-align: left;
-                    display: inline-block;
-                    vertical-align: middle;
-                    margin: 9px 0;
-                    color: rgb(80,80,80);
-                }
-                
-                .content-title {
-                  text-align: center;
-                  font-weight: 300;
-                  color: rgb(0, 210, 170);
-                  font-size: calc(1.2em + 1.5vw);
-                }
-                
-                .categories-wrapper {
-                  display: flex;
-                  flex: 1;
-                  flex-direction: column;
-                }
-                
-                .content-wrapper {
-                  padding: 1rem;
-                  min-height: 60vh;
-                  display: flex;
-                  justify-content: space-between;
-                  flex-direction: column;
-                }
-                
-                .error-text {
-                  color: red;
-                  font-weight: lighter;
-                  font-size: 1rem;
-                }
-                
-                .button-wrapper {
-                  display: flex;
-                  justify-content: center;
-                }
-                
-                .btn-title-wrapper{
-                  display: flex;
-                  justify-content: space-between;
-                }
-            `}</style>
-        </Fragment>
+                <Button
+                    color="primary"
+                    size='large'
+                    variant="contained"
+                    style={{marginLeft: 5}}
+                    endIcon={<ArrowForwardIcon/>}
+                    onClick={verifyNext}
+                >Next</Button>
+            </Box>
+        </Container>
     )
 };
 
