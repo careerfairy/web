@@ -1,5 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, Fragment} from 'react';
 import {
+    Box,
     Button,
     CardMedia, Container,
     FormControl,
@@ -20,11 +21,10 @@ import PublishIcon from "@material-ui/icons/Publish";
 
 const useStyles = makeStyles({
     root: {
-        maxWidth: 345,
+        marginBottom: "20px"
     },
     logo: {
-        objectFit: 'contain',
-        boxShadow: '0 0 5px rgb(200,200,200)',
+        objectFit: "contain",
     },
     name: {
         margin: "20px 0 0 0",
@@ -36,7 +36,7 @@ const useStyles = makeStyles({
         display: 'flex',
         justifyContent: 'center',
         padding: '1.5em 1em 1em 1em',
-        maxHeight: '240px',
+        maxHeight: '190px',
     },
     imageForm: {
         maxWidth: "120px",
@@ -45,6 +45,11 @@ const useStyles = makeStyles({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+    },
+    buttons: {
+        display: 'flex',
+        alignItems: 'center',
+        flex: 0.3,
     }
 });
 
@@ -124,71 +129,69 @@ const AdminHeader = ({group, menuItem, firebase}) => {
 
 
     return (
-        <Container>
-            <Grid container>
-                <Grid item xs={6}>
-                    <FormControl error={Boolean(filePickerError)} className={classes.imageForm}>
-                        <CardMedia className={classes.media}>
-                            <img src={editData.logoUrl || group.logoUrl}
-                                 className={classes.logo}
-                                 alt="Group logo"/>
-                        </CardMedia>
-                        <FilePickerContainer
-                            extensions={['jpg', 'jpeg', 'png']}
-                            maxSize={20}
-                            onChange={(fileObject) => {
-                                setFilePickerError(null)
-                                setEditData({
-                                    ...editData,
-                                    fileObj: fileObject,
-                                    logoUrl: URL.createObjectURL(fileObject)
-                                })
-                            }}
-                            onError={errMsg => (setFilePickerError(errMsg))}>
-                            <Button style={{marginTop: '10px'}} color="primary" size='large'
-                                    endIcon={<PublishIcon/>}>
-                                Change
-                            </Button>
-                        </FilePickerContainer>
-                        <FormHelperText>{filePickerError}</FormHelperText>
-                        {editData.fileObj &&
-                        <Button color="primary" onClick={handleSubmitLogo} size='large'
-                                disabled={submittingLogo}
-                                endIcon={submittingLogo &&
-                                <CircularProgress size={20} color="inherit"/>}>
-                            save
-                        </Button>}
-                    </FormControl>
-                </Grid>
-                <Grid item xs={6}>
-                    {editTitle ?
-                        <FormControl style={{display: 'flex'}} onSubmit={handleSubmitName}>
-                            <TextField style={{flex: 0.7}}
-                                       value={editData.universityName}
-                                       inputProps={{style: {fontSize: 'calc(1.1em + 2vw)'}}}
-                                       onChange={handleChangeName}
-                                       error={error}
-                                       helperText={error}
-                            />
-                            <div style={{display: 'flex', alignItems: 'center', flex: 0.3}}>
-                                <IconButton type="submit">
-                                    <CheckIcon color="primary"/>
-                                </IconButton>
-                                <IconButton onClick={() => setEditTitle(false)}>
-                                    <ClearIcon color="primary"/>
-                                </IconButton>
-                            </div>
-                        </FormControl>
-                        :
-                        <div style={{display: 'flex', alignItems: 'center'}}>
-                            <Typography className={classes.name}>{group.universityName}</Typography>
-                            <IconButton onClick={() => setEditTitle(true)}>
-                                <EditIcon color="primary"/>
+        <Box className={classes.root}>
+            <Box>
+                <FormControl error={Boolean(filePickerError)} className={classes.imageForm}>
+                    <CardMedia className={classes.media}>
+                        <img src={editData.logoUrl || group.logoUrl}
+                             className={classes.logo}
+                             alt="Group logo"/>
+                    </CardMedia>
+                    <FilePickerContainer
+                        extensions={['jpg', 'jpeg', 'png']}
+                        maxSize={20}
+                        onChange={(fileObject) => {
+                            setFilePickerError(null)
+                            setEditData({
+                                ...editData,
+                                fileObj: fileObject,
+                                logoUrl: URL.createObjectURL(fileObject)
+                            })
+                        }}
+                        onError={errMsg => (setFilePickerError(errMsg))}>
+                        <Button style={{marginTop: '10px'}} color="primary" size='large'
+                                endIcon={<PublishIcon/>}>
+                            Change
+                        </Button>
+                    </FilePickerContainer>
+                    <FormHelperText>{filePickerError}</FormHelperText>
+                    {editData.fileObj &&
+                    <Button color="primary" onClick={handleSubmitLogo} size='large'
+                            disabled={submittingLogo}
+                            endIcon={submittingLogo &&
+                            <CircularProgress size={20} color="inherit"/>}>
+                        save
+                    </Button>}
+                </FormControl>
+            </Box>
+            <Box>
+                {editTitle ?
+                    <form style={{display: 'flex', maxWidth: 500}} onSubmit={handleSubmitName}>
+                        <TextField style={{flex: 0.7}}
+                                   value={editData.universityName}
+                                   inputProps={{style: {fontSize: 'calc(1.1em + 2vw)'}}}
+                                   onChange={handleChangeName}
+                                   error={error}
+                                   helperText={error}
+                        />
+                        <div className={classes.buttons}>
+                            <IconButton type="submit">
+                                <CheckIcon color="primary"/>
                             </IconButton>
-                        </div>}
-                </Grid>
-            </Grid>
-        </Container>
+                            <IconButton onClick={() => setEditTitle(false)}>
+                                <ClearIcon color="primary"/>
+                            </IconButton>
+                        </div>
+                    </form>
+                    :
+                    <div style={{display: 'flex', alignItems: 'center'}}>
+                        <Typography className={classes.name}>{group.universityName}</Typography>
+                        <IconButton onClick={() => setEditTitle(true)}>
+                            <EditIcon color="primary"/>
+                        </IconButton>
+                    </div>}
+            </Box>
+        </Box>
     );
 };
 
