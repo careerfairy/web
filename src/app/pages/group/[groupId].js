@@ -8,6 +8,7 @@ import Loader from '../../components/views/loader/Loader';
 import Head from 'next/head';
 import Footer from '../../components/views/footer/Footer';
 import UserCategorySelector from '../../components/views/profile/UserCategorySelector';
+import {GlobalBackground} from "../../materialUI/GlobalBackground/GlobalBackGround";
 
 const JoinGroup = (props) => {
     
@@ -121,7 +122,7 @@ const JoinGroup = (props) => {
     });
 
     return (
-            <div className='greyBackground'>
+            <GlobalBackground>
                 <Head>
                     <title key="title">CareerFairy | Join Groups</title>
                 </Head>
@@ -139,13 +140,6 @@ const JoinGroup = (props) => {
                     .hidden {
                         display: none;
                     }
-
-                    .greyBackground {
-                        background-color: rgb(250,250,250);
-                        height: 100%;
-                        min-height: 100vh;
-                    }
-
                     .field-error {
                         margin-top: 10px;
                         color: red;
@@ -163,7 +157,7 @@ const JoinGroup = (props) => {
                         padding: 30px 0;
                     }
                 `}</style>
-            </div>
+            </GlobalBackground>
     );
 };
 

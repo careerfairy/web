@@ -1,16 +1,18 @@
-import { Fragment, useState, useEffect } from 'react';
-import { Grid, Image, Button, Icon, Modal, Step, Input, Checkbox, Dropdown, Menu } from "semantic-ui-react";
-import { withFirebase } from 'data/firebase';
-import { SizeMe } from 'react-sizeme';
+import React, {Fragment, useState, useEffect} from 'react';
+import {withFirebase} from 'data/firebase';
+import {SizeMe} from 'react-sizeme';
 import StackGrid from 'react-stack-grid';
 import LivestreamCard from 'components/views/livestream-card/LivestreamCard';
-import { useRouter } from 'next/router';
+import {useRouter} from 'next/router';
+import AddIcon from "@material-ui/icons/Add";
+import {Button, Menu, MenuItem, Typography} from "@material-ui/core";
 
 const Events = (props) => {
 
     const router = useRouter();
 
     const [grid, setGrid] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
     const [showAllLivestreams, setShowAllLivestreams] = useState(false);
     const [livestreams, setLivestreams] = useState([]);
 
@@ -29,7 +31,7 @@ const Events = (props) => {
             });
             return () => unsubscribe();
         }
-    },[props.groupId]);
+    }, [props.groupId]);
 
     useEffect(() => {
         if (grid) {
@@ -39,58 +41,68 @@ const Events = (props) => {
         }
     }, [grid, livestreams, props.menuItem]);
 
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
     let livestreamElements = [];
 
     if (showAllLivestreams) {
-        livestreamElements = livestreams.map( (livestream, index) => {
-            return(
+        livestreamElements = livestreams.map((livestream, index) => {
+            return (
                 <div key={index}>
-                    <LivestreamCard livestream={livestream} user={props.user} userData={props.userData} fields={null} grid={grid} careerCenters={[]}/>
+                    <LivestreamCard livestream={livestream} user={props.user} userData={props.userData} fields={null}
+                                    grid={grid} careerCenters={[]}/>
                 </div>
             );
         });
     } else {
-        livestreamElements = livestreams.slice(0,2).map( (livestream, index) => {
-            return(
+        livestreamElements = livestreams.slice(0, 2).map((livestream, index) => {
+            return (
                 <div key={index}>
-                    <LivestreamCard livestream={livestream} user={props.user} userData={props.userData} fields={null} grid={grid} careerCenters={[]}/>
+                    <LivestreamCard livestream={livestream} user={props.user} userData={props.userData} fields={null}
+                                    grid={grid} careerCenters={[]}/>
                 </div>
             );
         });
     }
-        
-    return(
+
+    return (
         <Fragment>
-            <div style={{ width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
-                <h3 className='sublabel'>Your Next Live Streams</h3>
-                <Dropdown 
-                    text='New Live Stream'
-                    icon='add'
-                    floating
-                    labeled
-                    button
-                    style={{ float: 'right', verticalAlign: 'middle', margin: '0'}}
-                    className='icon'>
-                    <Dropdown.Menu>
-                        <Dropdown.Item
-                            text='Send a Company Request'
-                            onClick={() => router.push('/group/' + props.groupId + '/admin/schedule-event')}
-                        />
-                        <Dropdown.Item
-                            text='Schedule a Live Stream'
-                            onClick={() => {}}
-                        />
-                    </Dropdown.Menu>
-                </Dropdown>
+            <div style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
+                <Typography variant="h4">Your Next Live Streams</Typography>
+                <Button variant="contained"
+                        color="primary"
+                        size="medium"
+                        style={{float: 'right', verticalAlign: 'middle', margin: '0'}}
+                        onClick={handleClick}
+                        endIcon={<AddIcon/>}>
+                    New Live Stream
+                </Button>
+                <Menu
+                    anchorEl={anchorEl}
+                    keepMounted
+                    open={Boolean(anchorEl)}
+                    onClose={handleClose}
+                >
+                    <MenuItem onClick={() => router.push('/group/' + props.groupId + '/admin/schedule-event')}>Send a
+                        Company Request</MenuItem>
+                    <MenuItem onClick={handleClose}>Schedule a Live Stream</MenuItem>
+                </Menu>
             </div>
-            <SizeMe>{ ({ size }) => (
+            <SizeMe>{({size}) => (
                 <StackGrid
+                    style={{marginTop: 20}}
                     duration={0}
                     columnWidth={(size.width <= 768 ? '100%' : '50%')}
                     gutterWidth={20}
                     gutterHeight={20}
-                    gridRef={ grid  => setGrid(grid) }>
-                    { livestreamElements }
+                    gridRef={grid => setGrid(grid)}>
+                    {livestreamElements}
                 </StackGrid>
             )}</SizeMe>
             <style jsx>{`

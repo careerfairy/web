@@ -1,25 +1,36 @@
-import { Fragment, useState, useEffect } from 'react';
-import { Grid, Image, Button, Icon, Modal, Step, Input, Checkbox } from 'semantic-ui-react';
-import { withFirebase } from 'data/firebase';
+import React, {Fragment, useState, useEffect} from 'react';
+import {Grid, Image, Icon, Modal, Step, Input, Checkbox} from 'semantic-ui-react';
+import {withFirebase} from 'data/firebase';
+import AddIcon from "@material-ui/icons/Add";
+import {Button} from "@material-ui/core";
 
 const Members = (props) => {
 
     const [modalOpened, setModalOpened] = useState(false);
-    return(
+    return (
         <Fragment>
-            <div style={{ width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
+            <div style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
                 <h3 className='sublabel'>Your Members</h3>
-                <Button content='Invite Members' size='large' icon='add' primary style={{ float: 'right', verticalAlign: 'middle'}} onClick={() => setModalOpened(true) }/>       
+                <Button variant="contained"
+                        color="primary"
+                        size="medium"
+                        style={{float: 'right', verticalAlign: 'middle'}}
+                        onClick={() => setModalOpened(true)}
+                        disabled={modalOpened}
+                        endIcon={<AddIcon/>}>
+                    Invite Members
+                </Button>
             </div>
-            <div style={{ padding: '150px 0'}}>
+            <div style={{padding: '150px 0'}}>
                 <div>
                     You don't have any members yet.
-                </div>      
+                </div>
             </div>
-            <Modal open={modalOpened} onClose={() => setModalOpened(false) }>
+            <Modal open={modalOpened} onClose={() => setModalOpened(false)}>
                 <Modal.Header>Invite members</Modal.Header>
                 <Modal.Content>
-                    Invite members by sending them the following link: <a href={'https://careerfairy.io/group/' + props.groupId}>{'https://careerfairy.io/group/' + props.groupId}</a> 
+                    Invite members by sending them the following link: <a
+                    href={'https://careerfairy.io/group/' + props.groupId}>{'https://careerfairy.io/group/' + props.groupId}</a>
                 </Modal.Content>
             </Modal>
             <style jsx>{`
