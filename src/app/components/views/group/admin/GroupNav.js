@@ -6,7 +6,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
 
-import {Container, useMediaQuery} from "@material-ui/core";
+import {Container, Typography, useMediaQuery} from "@material-ui/core";
 import Events from "./events/Events";
 import Members from "./members/Members";
 import Settings from "./settings/Settings";
@@ -68,9 +68,9 @@ const GroupNav = ({userData, user, groupId, group}) => {
                     selectionFollowsFocus
                     centered
                 >
-                    <Tab wrapped fullWidth label={`Events`}/>
-                    <Tab wrapped fullWidth label={`Members`}/>
-                    <Tab wrapped fullWidth label={`Settings`}/>
+                    <Tab wrapped fullWidth label={<Typography variant="h5">Events</Typography>}/>
+                    <Tab wrapped fullWidth label={<Typography variant="h5">Members</Typography>}/>
+                    <Tab wrapped fullWidth label={<Typography variant="h5">Settings</Typography>}/>
                 </Tabs>
             </AppBar>
             <SwipeableViews

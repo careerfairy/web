@@ -89,9 +89,9 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
         }
     }, [category.options]);
 
-    useEffect(() => {
-        setUpdateMode({});
-    }, [editableOptions]);
+    // useEffect(() => {
+    //     setUpdateMode({});
+    // }, [editableOptions]);
 
     function handleDelete(removedOption) {
         let newList = [];
@@ -237,7 +237,6 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                     <Typography align="left" className={classes.label}>Category Options</Typography>
                     <div style={{display: "flex", flexWrap: "wrap"}}>
                         {optionElements}
-
                         <IconButton size="small"
                                     onClick={() => setUpdateMode({mode: 'add', options: editableOptions})}>
                             <AddIcon fontSize="large" color="primary"/>

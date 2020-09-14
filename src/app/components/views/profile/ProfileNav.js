@@ -6,7 +6,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
 
-import {Container, useMediaQuery} from "@material-ui/core";
+import {Container, Typography, useMediaQuery} from "@material-ui/core";
 import PersonalInfo from "./personal-info/PersonalInfo";
 import {withFirebase} from "../../../data/firebase";
 import JoinedGroups from "./my-groups/JoinedGroups";
@@ -69,9 +69,12 @@ const ProfileNav = ({userData}) => {
                     selectionFollowsFocus
                     centered
                 >
-                    <Tab wrapped fullWidth label={`${native ? "Personal" :"Personal Information"}`}/>
-                    <Tab wrapped fullWidth label={`${native ? "Joined" :"Joined Groups"}`}/>
-                    <Tab wrapped fullWidth label={`${native ? "Admin" :"Admin Groups"}`}/>
+                    <Tab wrapped fullWidth
+                         label={<Typography noWrap variant="h5">{native ? "Personal" : "Personal Information"}</Typography>}/>
+                    <Tab wrapped fullWidth
+                         label={<Typography variant="h5">{native ? "Groups" : "Joined Groups"}</Typography>}/>
+                    {!"isAdmin?"?<Tab wrapped fullWidth
+                          label={<Typography variant="h5">{native ? "Admin" : "Admin Groups"}</Typography>}/> : null}
                 </Tabs>
             </AppBar>
             <SwipeableViews

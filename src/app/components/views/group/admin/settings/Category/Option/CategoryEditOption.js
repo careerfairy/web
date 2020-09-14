@@ -1,9 +1,12 @@
 import React, {Fragment, useState, useEffect} from 'react';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
 
 import TextField from '@material-ui/core/TextField';
 import {withFirebase} from 'data/firebase';
-import {Button, Typography} from "@material-ui/core";
+import {Button, Modal, Typography, DialogActions, DialogTitle, FormHelperText, Box} from "@material-ui/core";
 import {v4 as uuidv4} from 'uuid'
+import {Warning} from "@material-ui/icons";
 
 
 function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryName, handleDeleteCategory, handleRename, handleAdd, handleDelete}) {
@@ -43,167 +46,73 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
             if (error) return
             const tempId = uuidv4()
             handleAdd({name: newOptionName, id: tempId})
+            setUpdateMode({})
         }
 
         return (
-            <Fragment>
-                <div className={updateMode.mode ? 'modal' : ''}/>
-                <div className='padding animated fadeIn'>
-                    <form onSubmit={handleAddModal}>
-                        <div className='action'>
-                            <Typography className="label">
-                                Add an option named:
-                            </Typography>
-                            <TextField
-                                autoFocus
-                                variant="outlined"
-                                maxLength="20"
-                                value={newOptionName}
-                                onChange={(e) => setNewOptionName(e.target.value)}
-                                error={Boolean(touched && error.length > 0)}
-                                onBlur={() => setTouched(true)}
-                                helperText={touched && error}
-                                style={{width: '30%', margin: '0 20px 0 0', height: 60}}
-                                name="option-name"
-                            />
-                        </div>
-                        <div className='buttons'>
-                            <Button style={{marginRight: 10}} variant="contained" type="submit" color="primary">
-                                Confirm
-                            </Button>
-                            <Button variant="contained" onClick={() => setUpdateMode({})}>
-                                Cancel
-                            </Button>
-                        </div>
-                    </form>
-                </div>
-                <style jsx>{`
-                    .hidden {
-                        display: none
-                    }
-                    
-    
-                    .padding {
-                        position: relative;
-                        z-index: 20;
-                        background-color: white;
-                        padding: 20px;
-                        border-radius: 10px;
-                        box-shadow: 0 0 5px black;
-                        margin: 20px 0;
-                    }
-
-                    .modal {
-                        position: absolute;
-                        z-index: 10;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background-color: rgb(30,30,30,0.3);
-                    }
-
-                    .action {
-                        font-size: 1.1em;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: flex-start;
-                    }
-    
-                    .explanation {
-                        font-size: 0.9em;
-                        margin: 10px 0 20px 0;
-                    }
-
-                    .explanation span, .action span {
-                        font-weight: 700;
-                    }
-                    
-                    .error-field {
-                      position: absolute;
-                      font-size: 1rem;
-                      font-weight: lighter;
-                      margin-top: 5px;
-                      color: red;
-                    }
-
-                    .buttons {
-                        margin: 20px 0 0 0;
-                    }
-                `}</style>
-            </Fragment>
+            <Dialog onClose={() => setUpdateMode({})}
+                    fullWidth
+                    maxWidth="xs"
+                    open={updateMode.mode === 'add'}>
+                <form onSubmit={handleAddModal}>
+                    <DialogContent>
+                        <TextField
+                            autoFocus
+                            label="Add an option"
+                            maxLength="20"
+                            fullWidth
+                            value={newOptionName}
+                            onChange={(e) => setNewOptionName(e.target.value)}
+                            error={Boolean(touched && error.length > 0)}
+                            onBlur={() => setTouched(true)}
+                            helperText={touched && error}
+                            name="option-name"
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button variant="contained" onClick={() => setUpdateMode({})}>
+                            Cancel
+                        </Button>
+                        <Button variant="contained" type="submit" color="primary">
+                            Confirm
+                        </Button>
+                    </DialogActions>
+                </form>
+            </Dialog>
         );
     }
 
     if (updateMode.mode === 'deleteCategory') {
         return (
-            <Fragment>
-                <div className={updateMode.mode ? 'modal' : ''}/>
-                <div className='padding animated fadeIn' style={{margin: '20px 0'}}>
-                    <div className='action'>
-                        Delete the category <span>{categoryName}</span>
-                    </div>
-                    <p className='explanation'>All your members who are currently classified
-                        under <span>{updateMode.option.name}</span> will not anymore belong to any category until they
-                        manually update their categorisation.</p>
-                    <p className='explanation warning'>This operation cannot be reverted!</p>
-                    <div className='buttons'>
-                        <Button style={{marginRight: 10}} onClick={handleDeleteCategory} color="primary"
-                                variant="contained">
-                            Permanently Delete the Category {categoryName}
-                        </Button>
-                        <Button variant="contained" onClick={() => setUpdateMode({})}>
-                            Cancel
-                        </Button>
-                    </div>
-                </div>
-                <style jsx>{`
-                    .hidden {
-                        display: none
-                    }
-
-                    .action {
-                        font-size: 1.1em;
-                    }
-
-                    .modal {
-                        position: absolute;
-                        z-index: 10;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background-color: rgb(30,30,30,0.3);
-                    }
-
-                    .padding {
-                        position: relative;
-                        z-index: 20;
-                        background-color: white;
-                        padding: 20px;
-                        border-radius: 20px;
-                    }
-
-                    .explanation {
-                        font-size: 0.9em;
-                        margin: 10px 0 5px 0;
-                    }
-
-                    .warning {
-                        color: red;
-                        margin: 5px 0 20px 0;
-                        font-weight: 700;
-                    }
-
-                    .explanation span, .action span {
-                        font-weight: 700;
-                    }
-
-                    .buttons {
-                        margin: 20px 0;
-                    }
-                `}</style>
-            </Fragment>
+            <Dialog
+                onClose={() => setUpdateMode({})}
+                fullWidth
+                maxWidth="md"
+                open={updateMode.mode === 'deleteCategory'}
+            >
+                <DialogTitle>
+                    Delete the category <span>{categoryName}</span>
+                </DialogTitle>
+                <DialogContent>
+                    <Typography>All your members who are currently classified
+                        under <span>{updateMode.option.name}</span> will not anymore belong to any category until
+                        they
+                        manually update their categorisation.</Typography>
+                    <Box display="flex" alignItems="center">
+                        <Warning color="secondary"/><FormHelperText error>This operation cannot be
+                        reverted!</FormHelperText><Warning color="secondary"/>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="contained" onClick={() => setUpdateMode({})}>
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDeleteCategory} color="primary"
+                            variant="contained">
+                        Permanently Delete the Category {categoryName}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         );
     }
 
@@ -241,89 +150,44 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
             }
             if (error) return
             handleRename({id: updateMode.option.id, name: newOptionName})
+            setUpdateMode({})
         }
 
         return (
-            <Fragment>
-                <div className={updateMode.mode ? 'modal' : ''}/>
-                <div className='padding animated fadeIn'>
-                    <form onSubmit={handleRenameModal}>
-                        <div className='action'>
-                            <Typography className="label">
-                                Rename the option <span>{updateMode.option.name}</span> to:
-                            </Typography>
-                            <TextField
-                                autoFocus
-                                variant="outlined"
-                                maxLength="20"
-                                value={newOptionName}
-                                onChange={(e) => setNewOptionName(e.target.value)}
-                                error={touched && error.length > 0}
-                                onBlur={() => setTouched(true)}
-                                helperText={touched && error}
-                                style={{width: '30%', margin: '0 20px 0 0', height: 60}}
-                                name="option-name"
-                            />
-                        </div>
-                        <p className='explanation'>All your members who are currently classified
-                            under <span>{updateMode.option.name}</span> will now be classified
-                            under <span>{newOptionName}</span>.</p>
-                        <div className='buttons'>
-                            <Button style={{marginRight: 10}} type="submit" color="primary" variant="contained">
-                                Confirm
-                            </Button>
-                            <Button variant="contained" onClick={() => setUpdateMode({})}>
-                                Cancel
-                            </Button>
-                        </div>
-                    </form>
-                </div>
-                <style jsx>{`
-                    .hidden {
-                        display: none
-                    }
-    
-                    .padding {
-                        position: relative;
-                        z-index: 20;
-                        background-color: white;
-                        padding: 20px;
-                        border-radius: 10px;
-                        box-shadow: 0 0 5px black;
-                        margin: 20px 0;
-                    }
-
-                    .modal {
-                        position: absolute;
-                        z-index: 10;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background-color: rgb(30,30,30,0.3);
-                    }
-
-                    .action {
-                        font-size: 1.1em;
-                        display: flex;
-                        align-items: flex-start;
-                        flex-direction: column;
-                    }
-    
-                    .explanation {
-                        font-size: 0.9em;
-                        margin: 0 0 20px 0;
-                    }
-
-                    .explanation span, .action span {
-                        font-weight: 700;
-                    }
-
-                    .buttons {
-                        margin: 20px 0 0 0;
-                    }
-                `}</style>
-            </Fragment>
+            <Dialog
+                open={updateMode.mode === 'rename'}
+                onClose={() => setUpdateMode({})}
+                fullWidth
+                maxWidth="md"
+            >
+                <form onSubmit={handleRenameModal}>
+                    <DialogContent>
+                        <TextField
+                            label={`Rename the option ${updateMode.option.name} to:`}
+                            autoFocus
+                            fullWidth
+                            maxLength="20"
+                            value={newOptionName}
+                            onChange={(e) => setNewOptionName(e.target.value)}
+                            error={touched && error.length > 0}
+                            onBlur={() => setTouched(true)}
+                            helperText={touched && error}
+                            name="option-name"
+                        />
+                        <Typography>All your members who are currently classified
+                            under <strong>{updateMode.option.name}</strong> will now be classified
+                            under <strong>{newOptionName}</strong>.</Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button variant="contained" onClick={() => setUpdateMode({})}>
+                            Cancel
+                        </Button>
+                        <Button type="submit" color="primary" variant="contained">
+                            Confirm
+                        </Button>
+                    </DialogActions>
+                </form>
+            </Dialog>
         );
     }
 
@@ -352,51 +216,51 @@ function CategoryEditModalOption({updateMode, groupId, setUpdateMode, categoryNa
                     </div>
                 </div>
                 <style jsx>{`
-                    .hidden {
-                        display: none
-                    }
+    .hidden {
+    display: none
+    }
 
-                    .action {
-                        font-size: 1.1em;
-                    }
+    .action {
+    font-size: 1.1em;
+    }
 
-                    .modal {
-                        position: absolute;
-                        z-index: 10;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background-color: rgb(30,30,30,0.3);
-                    }
+    .modal {
+    position: absolute;
+    z-index: 10;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(30,30,30,0.3);
+    }
 
-                    .padding {
-                        position: relative;
-                        z-index: 20;
-                        background-color: white;
-                        padding: 20px;
-                        border-radius: 20px;
-                    }
+    .padding {
+    position: relative;
+    z-index: 20;
+    background-color: white;
+    padding: 20px;
+    border-radius: 20px;
+    }
 
-                    .explanation {
-                        font-size: 0.9em;
-                        margin: 10px 0 5px 0;
-                    }
+    .explanation {
+    font-size: 0.9em;
+    margin: 10px 0 5px 0;
+    }
 
-                    .warning {
-                        color: red;
-                        margin: 5px 0 20px 0;
-                        font-weight: 700;
-                    }
+    .warning {
+    color: red;
+    margin: 5px 0 20px 0;
+    font-weight: 700;
+    }
 
-                    .explanation span, .action span {
-                        font-weight: 700;
-                    }
+    .explanation span, .action span {
+    font-weight: 700;
+    }
 
-                    .buttons {
-                        margin: 20px 0;
-                    }
-                `}</style>
+    .buttons {
+    margin: 20px 0;
+    }
+    `}</style>
             </Fragment>
         );
     }

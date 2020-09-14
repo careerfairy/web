@@ -193,7 +193,7 @@ const AdminHeader = ({group, firebase}) => {
                     </form>
                 ) : (
                     <div style={{display: "flex", alignItems: "center"}}>
-                        <Typography className={classes.name}>
+                        <Typography variant="h2">
                             {group.universityName}
                         </Typography>
                         <IconButton onClick={handleOpenEditTitle}>

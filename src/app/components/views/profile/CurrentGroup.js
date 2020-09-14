@@ -5,7 +5,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import {withFirebase} from 'data/firebase';
-import {Card, CardContent, CardMedia, Typography, Button, Grow} from "@material-ui/core";
+import {Card, CardContent, CardMedia, Typography, Button, Grow, IconButton} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal";
 import Skeleton from '@material-ui/lab/Skeleton';
@@ -79,7 +79,7 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
     return (
         <Fragment key={localGroup.id}>
             <Grow in={Boolean(localGroup.id)} timeout={600}>
-                <Card>
+                <Card style={{position: "relative"}}>
                     {!localGroup.logoUrl ?
                         <Skeleton className={classes.media} animation="wave" variant="rect"/>
                         :
@@ -97,12 +97,12 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                             {localGroup.description}
                         </Typography>
                     </CardContent>
-                    <CardActions>
-                        <Button fullWidth size="small" color="primary">
-                            View Calendar
-                        </Button>
-                        <Button onClick={handleClick} size="small" color="primary">
+                        <IconButton style={{position: "absolute", top: 10, right: 10}} onClick={handleClick} size="small">
                             <MoreVertIcon/>
+                        </IconButton>
+                    <CardActions>
+                        <Button fullWidth size="large" color="primary">
+                            View Calendar
                         </Button>
                         <Menu
                             id="simple-menu"
