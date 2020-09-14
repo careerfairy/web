@@ -23,56 +23,43 @@ const NewGroup = ({firebase, group, categories, userData}) => {
     }
 
 
-
-
     return (
-        <Fragment key={group.id}>
-            <Card>
-                <CardMedia
-                    style={{display: 'flex', justifyContent: 'center', padding: '1.5em 1em 1em 1em', height: '90px'}}>
-                    <img src={group.logoUrl} style={{
-                        objectFit: 'contain',
-                        maxWidth: '80%'
-                    }} alt=""/>
-                </CardMedia>
-                <CardContent style={{height: '115px'}}>
-                    <Typography align="center" gutterBottom variant="h5" component="h2">
-                        {group.universityName}
-                    </Typography>
-                    <Typography variant="body2" align="center" color="textSecondary" component="p">
-                        {group.description}
-                    </Typography>
-                </CardContent>
-                <CardActions>
-                    {userData.groupIds.includes(group.id) ?
-                        <Button fullWidth
-                                size="small"
-                                variant="contained"
-                                endIcon={<ExitToAppIcon size={20} color="inherit"/>}>
-                            Leave
-                        </Button>
-                        :
-                        < Button fullWidth
-                                 size="small"
-                                 variant="contained"
-                                 color="primary"
-                                 onClick={handleOpenJoinModal}
-                                 endIcon={<GroupAddIcon size={20} color="inherit"/>}>
-                            Join
-                        </Button>}
-                </CardActions>
-            </Card>
+        <Card>
+            <CardMedia
+                style={{display: 'flex', justifyContent: 'center', padding: '1.5em 1em 1em 1em', height: '90px'}}>
+                <img src={group.logoUrl} style={{
+                    objectFit: 'contain',
+                    maxWidth: '80%'
+                }} alt=""/>
+            </CardMedia>
+            <CardContent style={{height: '115px'}}>
+                <Typography align="center" gutterBottom variant="h5" component="h2">
+                    {group.universityName}
+                </Typography>
+                <Typography variant="body2" align="center" color="textSecondary" component="p">
+                    {group.description}
+                </Typography>
+            </CardContent>
+            <CardActions>
+                {userData.groupIds.includes(group.id) ?
+                    <Button fullWidth
+                            size="small"
+                            variant="contained"
+                            endIcon={<ExitToAppIcon size={20} color="inherit"/>}>
+                        Leave
+                    </Button>
+                    :
+                    < Button fullWidth
+                             size="small"
+                             variant="contained"
+                             color="primary"
+                             onClick={handleOpenJoinModal}
+                             endIcon={<GroupAddIcon size={20} color="inherit"/>}>
+                        Join
+                    </Button>}
+            </CardActions>
             <GroupJoinModal open={openJoinModal} group={group} userData={userData} closeModal={handleCloseJoinModal}/>
-            <style jsx>{`
-                .group-selector {
-                    position: relative;
-                    height: 300px;
-                    border-radius: 15px;
-                    background-color: white;
-                    box-shadow: 0 0 5px lightgrey;
-                }
-            `}</style>
-        </Fragment>
+        </Card>
     );
 };
 
