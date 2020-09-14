@@ -1,87 +1,71 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Grid, Icon} from "semantic-ui-react";
-
+import EditIcon from '@material-ui/icons/Edit';
 import {withFirebase} from 'data/firebase';
 import CategoryEdit from './CategoryEdit';
+import {Box, Chip, IconButton, Typography} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
+import Paper from "@material-ui/core/Paper";
 
+const useStyles = makeStyles((theme) => ({
+    whiteBox: {
+        backgroundColor: "white",
+        borderRadius: "5px",
+        padding: "20px",
+        margin: "10px 0",
+        textAlign: "left",
+        display: "flex",
+        position: "relative",
+    },
+    icon: {
+        position: "absolute",
+        top: 10,
+        right: 10
+    },
+    label: {
+        fontSize: "0.8em",
+        fontWeight: "700",
+        color: "rgb(160,160,160)",
+        margin: "0 0 5px 0",
+    },
+    title: {
+        fontSize: "1.2em",
+        fontWeight: "700",
+        color: "rgb(80,80,80)",
+    },
+}));
 
 function CategoryElement({handleUpdateCategory, category, firebase, handleAddTempCategory, handleDeleteLocalCategory, group, isLocal}) {
-
+    const classes = useStyles()
     const [editMode, setEditMode] = useState(false)
 
 
     const optionElements = category.options?.map((option, index) => {
         return (
-            <Fragment key={option.id || index}>
-                <div className='option-container'>
-                    {option.name}
-                </div>
-                <style jsx>{`
-                    .hidden {
-                        display: none
-                    }
-
-                    .option-container {
-                        display: inline-block;
-                        border: 1px solid black;
-                        border-radius: 20px;
-                        padding: 5px 10px;
-                        margin: 2px;
-                    }
-                `}</style>
-            </Fragment>
+            <Chip
+                key={option.id || index}
+                label={option.name}
+                variant="outlined"
+            />
         );
     });
 
     if (editMode === false) {
         return (
-            <Fragment>
-                <div className='white-box'>
-                    <Grid>
-                        <Grid.Column width={4}>
-                            <div className='white-box-label'>Category Name</div>
-                            <div className='white-box-title'>
-                                {category.name}
-                            </div>
-                        </Grid.Column>
-                        <Grid.Column width={11}>
-                            <div className='white-box-label'>Category Options</div>
-                            {optionElements}
-                        </Grid.Column>
-                        <Grid.Column width={1}>
-                            <Icon name='edit' style={{margin: '5px 0', color: 'rgb(0, 210, 170)', cursor: 'pointer'}}
-                                  onClick={() => setEditMode(true)} size='large'/>
-                        </Grid.Column>
-                    </Grid>
-                </div>
-                <style jsx>{`
-                .hidden {
-                    display: none
-                }
-                
-                .white-box {
-                    background-color: white;
-                    box-shadow: 0 0 5px rgb(190,190,190);
-                    border-radius: 5px;
-                    padding: 20px;
-                    margin: 10px 0;
-                    text-align: left;
-                }
-
-                .white-box-label {
-                    font-size: 0.8em;
-                    font-weight: 700;
-                    color: rgb(160,160,160);
-                    margin: 0 0 5px 0; 
-                }
-
-                .white-box-title {
-                    font-size: 1.2em;
-                    font-weight: 700;
-                    color: rgb(80,80,80);
-                }
-            `}</style>
-            </Fragment>
+            <Paper className={classes.whiteBox}>
+                <Box flex="0.3">
+                    <div className={classes.label}>Category Name</div>
+                    <div className="white-box-title">{category.name}</div>
+                </Box>
+                <Box flex="0.7">
+                    <div className={classes.label}>Category Options</div>
+                    {optionElements}
+                </Box>
+                <IconButton className={classes.icon}
+                            onClick={() => setEditMode(true)}>
+                    <EditIcon color="primary"/>
+                </IconButton>
+            </Paper>
         );
     }
 

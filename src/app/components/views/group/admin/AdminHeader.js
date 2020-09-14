@@ -128,8 +128,7 @@ const AdminHeader = ({group, firebase}) => {
                     <img
                         src={editData.logoUrl || group.logoUrl}
                         className={classes.logo}
-                        alt="Group logo"
-                    />
+                        alt="Group logo"/>
                 </CardMedia>
                 <FilePickerContainer
                     extensions={["jpg", "jpeg", "png"]}
@@ -142,16 +141,16 @@ const AdminHeader = ({group, firebase}) => {
                             logoUrl: URL.createObjectURL(fileObject),
                         });
                     }}
-                    onError={(errMsg) => setFilePickerError(errMsg)}
-                >
-                    <Button
-                        style={{marginTop: "10px"}}
-                        color="primary"
-                        size="large"
-                        endIcon={<PublishIcon/>}
-                    >
-                        Change
-                    </Button>
+                    onError={(errMsg) => setFilePickerError(errMsg)}>
+                    <Box display="flex" justifyContent="center">
+                        <Button
+                            style={{margin: "10px"}}
+                            color="primary"
+                            size="large"
+                            endIcon={<PublishIcon/>}>
+                            Change
+                        </Button>
+                    </Box>
                 </FilePickerContainer>
                 <FormHelperText error>{filePickerError}</FormHelperText>
                 {editData.fileObj && (

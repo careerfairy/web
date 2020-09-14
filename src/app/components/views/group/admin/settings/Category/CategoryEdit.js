@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import AddIcon from '@material-ui/icons/Add';
 import {withFirebase} from "data/firebase";
-import CategoryEditOption from './Option/CategoryEditOption';
+import CategoryEditOption, {AddCategory, DeleteCategory, DeleteOption, RenameOption} from './Option/CategoryEditOption';
 import {
     Box,
     Button,
@@ -89,10 +89,6 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
         }
     }, [category.options]);
 
-    // useEffect(() => {
-    //     setUpdateMode({});
-    // }, [editableOptions]);
-
     function handleDelete(removedOption) {
         let newList = [];
         if (removedOption.id) {
@@ -101,6 +97,7 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
             newList = editableOptions.filter(optionEl => optionEl.id || optionEl.name !== removedOption.name);
         }
         setEditableOptions(newList);
+        setUpdateMode({})
     }
 
 
@@ -208,11 +205,10 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
 
     const optionElements = editableOptions.map(el => {
         return (
-            <Chip style={{margin: "0.5em"}}
-                  label={el.name}
+            <Chip label={el.name}
                   key={el.id}
+                  variant="outlined"
                   deleteIcon={<EditIcon/>}
-                  color="primary"
                   onDelete={(e) => {
                       setSelectedOption(el)
                       handleOpenDropDown(e)
@@ -246,9 +242,6 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                         error>{errorObj.optionError && "You must add at least 2 options"}</FormHelperText>
                 </Box>
             </Box>
-            <CategoryEditOption categoryName={categoryName} handleDeleteCategory={handleDeleteCategory}
-                                updateMode={updateMode} setUpdateMode={setUpdateMode} handleAdd={handleAdd}
-                                handleDelete={handleDelete} handleRename={handleRename} groupId={groupId}/>
             <div className={classes.separate}/>
             <Box display="flex" justifyContent="space-between">
                 <div>
@@ -279,6 +272,19 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                 <MenuItem onClick={handleDropDownDel}>Delete</MenuItem>
                 <MenuItem onClick={handleDropDownRename}>Rename</MenuItem>
             </Menu>
+            {<AddCategory open={updateMode.mode === 'add'} handleAdd={handleAdd} updateMode={updateMode}
+                          setUpdateMode={setUpdateMode}/>}
+            {updateMode.mode === 'delete' &&
+            <DeleteOption open={updateMode.mode === 'delete'} handleDelete={handleDelete} setUpdateMode={setUpdateMode}
+                          updateMode={updateMode}/>}
+            {updateMode.mode === "rename" &&
+            <RenameOption open={updateMode.mode === "rename"} handleRename={handleRename} updateMode={updateMode}
+                          setUpdateMode={setUpdateMode}/>}
+            {updateMode.mode === "deleteCategory" &&
+            <DeleteCategory open={updateMode.mode === "deleteCategory"}
+                            handleDeleteCategory={handleDeleteCategory}
+                            categoryName={categoryName}
+                            updateMode={updateMode} setUpdateMode={setUpdateMode}/>}
         </Paper>
     );
 }

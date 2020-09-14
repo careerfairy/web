@@ -10,6 +10,16 @@ let baseTheme = createMuiTheme({
   overrides: {
     MuiButton: {
 
+    },
+    MuiChip: {
+      label: {
+        fontWeight: 500,
+        fontSize: "1rem",
+        textTransform: "lowercase",
+      },
+      root: {
+        margin: "0.5em"
+      }
     }
   },
 
