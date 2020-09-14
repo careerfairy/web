@@ -24,6 +24,7 @@ const JoinGroup = (props) => {
         props.firebase.auth.onAuthStateChanged(user => {
             if (user) {
                 setUser(user);
+                console.log(user);
             } else {
                 router.replace('/login');
             }
@@ -34,12 +35,12 @@ const JoinGroup = (props) => {
         setLoading(true);
         if (user) {
             props.firebase.listenToUserData(user.email, querySnapshot => {
-                    setLoading(false);
-                    let user = querySnapshot.data();
-                    if (user) {
-                        setUserData(user);
-                    }
-                });
+                setLoading(false);
+                let user = querySnapshot.data();
+                if (user) {
+                    setUserData(user);
+                }
+            });
         }
     }, [user]);
 

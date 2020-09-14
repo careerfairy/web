@@ -59,7 +59,7 @@ const UserProfile = ({firebase}) => {
                 <title key="title">CareerFairy | My Profile</title>
             </Head>
             <Header classElement='relative white-background'/>
-            <ProfileNav userData={userData}/>
+            <ProfileNav user={user} userData={userData}/>
             <Footer/>
         </div>
     );

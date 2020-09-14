@@ -2,7 +2,7 @@ import React, {useEffect, useState, Fragment} from 'react'
 import {useRouter} from 'next/router';
 import GroupAddIcon from '@material-ui/icons/GroupAdd';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-
+import EditIcon from '@material-ui/icons/Edit';
 import {withFirebase} from 'data/firebase';
 import {Button, Card, CardContent, CardMedia, Typography} from "@material-ui/core";
 import CardActions from "@material-ui/core/CardActions";
@@ -42,12 +42,22 @@ const NewGroup = ({firebase, group, categories, userData}) => {
             </CardContent>
             <CardActions>
                 {userData.groupIds.includes(group.id) ?
-                    <Button fullWidth
-                            size="small"
-                            variant="contained"
-                            endIcon={<ExitToAppIcon size={20} color="inherit"/>}>
-                        Leave
-                    </Button>
+                    <>
+                        <Button fullWidth
+                                size="small"
+                                variant="contained"
+                                endIcon={<ExitToAppIcon size={20} color="inherit"/>}>
+                            Leave
+                        </Button>
+                        {group.categories && <Button fullWidth
+                                 size="small"
+                                 color="primary"
+                                 variant="contained"
+                                 onClick={handleOpenJoinModal}
+                                 endIcon={<EditIcon size={20} color="inherit"/>}>
+                            Change
+                        </Button>}
+                    </>
                     :
                     < Button fullWidth
                              size="small"
@@ -58,7 +68,8 @@ const NewGroup = ({firebase, group, categories, userData}) => {
                         Join
                     </Button>}
             </CardActions>
-            <GroupJoinModal open={openJoinModal} group={group} userData={userData} closeModal={handleCloseJoinModal}/>
+            <GroupJoinModal open={openJoinModal} group={group} alreadyJoined={userData.groupIds.includes(group.id)}
+                            userData={userData} closeModal={handleCloseJoinModal}/>
         </Card>
     );
 };

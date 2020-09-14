@@ -29,22 +29,39 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
+const GroupJoinModal = ({group, firebase, open, closeModal, userData, alreadyJoined}) => {
+
     const classes = useStyles()
     const [categories, setCategories] = useState([]);
+    console.log("alreadyJoined", alreadyJoined);
     const [allSelected, setAllSelected] = useState(false)
     const [submitting, setSubmitting] = useState(false)
 
     useEffect(() => {
         if (group.categories) {
-            const newCategories = group.categories.map(obj => ({...obj, selected: ""}))
+            const newCategories = group.categories.map(obj => ({...obj, selectedValueId: ""}))
             setCategories(newCategories)
         }
     }, [group])
 
     useEffect(() => {
+        if (alreadyJoined && group.categories) {
+            const targetGroup = userData.registeredGroups.filter(el => el.groupId === group.id)[0]
+            targetGroup.categories.sort(dynamicSort("id"))
+            const localCategories = [...group.categories].sort(dynamicSort("id"))
+            localCategories.forEach((group, index) => {
+                if (targetGroup.categories[index]) {
+                    group.selectedValueId = targetGroup.categories[index].selectedValueId
+                }
+            })
+            console.log("localCategories", localCategories);
+            setCategories(localCategories)
+        }
+    }, [alreadyJoined, group])
+
+    useEffect(() => {
         if (categories && open) {
-            const notAllSelected = !categories.some(category => category.selected === "")
+            const notAllSelected = !categories.some(category => category.selectedValueId === "")
             setAllSelected(notAllSelected)
         }
     }, [categories, open])
@@ -52,8 +69,23 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
     const handleSetSelected = (categoryId, event) => {
         const newCategories = [...categories]
         const index = newCategories.findIndex(el => el.id === categoryId)
-        newCategories[index].selected = event.target.value
+        newCategories[index].selectedValueId = event.target.value
         setCategories(newCategories)
+    }
+
+    const dynamicSort = (property) => {
+        let sortOrder = 1;
+        if (property[0] === "-") {
+            sortOrder = -1;
+            property = property.substr(1);
+        }
+        return function (a, b) {
+            /* next line works with strings and numbers,
+             * and you may want to customize it to your needs
+             */
+            const result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+            return result * sortOrder;
+        }
     }
 
     const handleJoinGroup = async () => {
@@ -62,14 +94,16 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData}) => {
             const newCategories = categories.map(categoryObj => {
                 return {
                     id: categoryObj.id,
-                    selectedValueId: categoryObj.selected
+                    selectedValueId: categoryObj.selectedValueId
                 }
             })
             const groupObj = {
                 groupId: group.id,
                 categories: newCategories
             }
-            await firebase.joinGroup(userData.id, group.id, groupObj)
+            const arrayOfGroupObjects = [...userData.registeredGroups, groupObj]
+            const arrayOfGroupIds = userData.registeredGroups.map(obj => obj.groupId)
+            await firebase.joinGroup(userData.id, arrayOfGroupIds, arrayOfGroupObjects)
             setSubmitting(false)
             closeModal()
         } catch (e) {

@@ -5,7 +5,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import {withFirebase} from 'data/firebase';
-import {Card, CardContent, CardMedia, Typography, Button, Grow, IconButton} from "@material-ui/core";
+import {Card, CardContent, CardMedia, Typography, Button, Grow, IconButton, Grid} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal";
 import Skeleton from '@material-ui/lab/Skeleton';
@@ -31,7 +31,7 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
 
     const [open, setOpen] = useState(false);
     const [localGroup, setLocalGroup] = useState({})
-
+    const [noGroup, setNoGroup] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null);
 
     useEffect(() => {
@@ -44,15 +44,18 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
         if (!group) {
             const unsubscribe = firebase.listenToCareerCenterById(groupId, querySnapshot => {
                 if (querySnapshot) {
-                    let careerCenter = querySnapshot.data();
-                    careerCenter.id = querySnapshot.id;
-                    setLocalGroup(careerCenter);
+                    if (querySnapshot.data()) {
+                        let careerCenter = querySnapshot.data();
+                        careerCenter.id = querySnapshot.id;
+                        setLocalGroup(careerCenter);
+                    } else {
+                        setNoGroup(true)
+                    }
                 }
             })
             return () => unsubscribe()
         }
     }, [])
-
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -76,60 +79,68 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
         }
     }
 
+    if (noGroup) {
+        return null
+    }
+
     return (
         <Fragment key={localGroup.id}>
             <Grow in={Boolean(localGroup.id)} timeout={600}>
-                <Card style={{position: "relative"}}>
-                    {!localGroup.logoUrl ?
-                        <Skeleton className={classes.media} animation="wave" variant="rect"/>
-                        :
-                        <CardMedia className={classes.media}>
-                            <img src={localGroup.logoUrl} style={{
-                                objectFit: 'contain',
-                                maxWidth: '80%'
-                            }} alt={`${localGroup.universityName} logo`}/>
-                        </CardMedia>}
-                    <CardContent style={{height: '115px'}}>
-                        <Typography align="center" gutterBottom variant="h5" component="h2">
-                            {localGroup.universityName}
-                        </Typography>
-                        <Typography align="center" variant="body2" color="textSecondary" component="p">
-                            {localGroup.description}
-                        </Typography>
-                    </CardContent>
-                        <IconButton style={{position: "absolute", top: 10, right: 10}} onClick={handleClick} size="small">
+                <Grid item xs={12} sm={6} md={4} lg={4}>
+                    <Card style={{position: "relative"}}>
+                        {!localGroup.logoUrl ?
+                            <Skeleton className={classes.media} animation="wave" variant="rect"/>
+                            :
+                            <CardMedia className={classes.media}>
+                                <img src={localGroup.logoUrl} style={{
+                                    objectFit: 'contain',
+                                    maxWidth: '80%'
+                                }} alt={`${localGroup.universityName} logo`}/>
+                            </CardMedia>}
+                        <CardContent style={{height: '115px'}}>
+                            <Typography align="center" gutterBottom variant="h5" component="h2">
+                                {localGroup.universityName}
+                            </Typography>
+                            <Typography align="center" variant="body2" color="textSecondary" component="p">
+                                {localGroup.description}
+                            </Typography>
+                        </CardContent>
+                        <IconButton style={{position: "absolute", top: 10, right: 10}} onClick={handleClick}
+                                    size="small">
                             <MoreVertIcon/>
                         </IconButton>
-                    <CardActions>
-                        <Button fullWidth size="large" color="primary">
-                            View Calendar
-                        </Button>
-                        <Menu
-                            id="simple-menu"
-                            anchorEl={anchorEl}
-                            keepMounted
-                            open={Boolean(anchorEl)}
-                            onClose={handleClose}
-                        >
-                            <MenuItem onClick={() => push(`/group/${localGroup.id}/admin`)}>Update my data</MenuItem>
-                            <MenuItem onClick={() => router.push('/group/' + localGroup.id)}>Group Page</MenuItem>
-                            {isAdmin ?
-                                <MenuItem onClick={() => {
-                                    setOpen(true)
-                                    handleClose()
-                                }}>Delete group</MenuItem>
-                                :
-                                <MenuItem onClick={handleClose}>Leave group</MenuItem>}
-                            <AreYouSureModal
-                                open={open}
-                                handleClose={() => setOpen(false)}
-                                handleConfirm={handleDeleteCareerCenter}
-                                title="Warning"
-                                message={`Are you sure you want to delete ${localGroup.universityName}? You wont be able to revert changes`}
-                            />
-                        </Menu>
-                    </CardActions>
-                </Card>
+                        <CardActions>
+                            <Button fullWidth size="large" color="primary">
+                                View Calendar
+                            </Button>
+                            <Menu
+                                id="simple-menu"
+                                anchorEl={anchorEl}
+                                keepMounted
+                                open={Boolean(anchorEl)}
+                                onClose={handleClose}
+                            >
+                                <MenuItem onClick={() => push(`/group/${localGroup.id}/admin`)}>Update my
+                                    data</MenuItem>
+                                <MenuItem onClick={() => router.push('/group/' + localGroup.id)}>Group Page</MenuItem>
+                                {isAdmin ?
+                                    <MenuItem onClick={() => {
+                                        setOpen(true)
+                                        handleClose()
+                                    }}>Delete group</MenuItem>
+                                    :
+                                    <MenuItem onClick={handleClose}>Leave group</MenuItem>}
+                                <AreYouSureModal
+                                    open={open}
+                                    handleClose={() => setOpen(false)}
+                                    handleConfirm={handleDeleteCareerCenter}
+                                    title="Warning"
+                                    message={`Are you sure you want to delete ${localGroup.universityName}? You wont be able to revert changes`}
+                                />
+                            </Menu>
+                        </CardActions>
+                    </Card>
+                </Grid>
             </Grow>
         </Fragment>
     );

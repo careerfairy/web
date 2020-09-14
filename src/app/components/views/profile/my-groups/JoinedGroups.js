@@ -1,5 +1,5 @@
 import React from 'react'
-import {Button, Grid, Grow, Typography} from "@material-ui/core";
+import {Button, Grid, Typography} from "@material-ui/core";
 import {useRouter} from 'next/router';
 import {withFirebase} from 'data/firebase';
 import AddIcon from '@material-ui/icons/Add';
@@ -29,12 +29,7 @@ const JoinedGroups = ({userData}) => {
 
     if (userData && userData.groupIds) {
         existingGroupElements = userData.groupIds.map(groupId => {
-            return (
-                <Grow key={groupId} in={Boolean(groupId)} timeout={600}>
-                    <Grid item xs={12} sm={6} md={4} lg={4}>
-                        <CurrentGroup groupId={groupId} userData={userData}/>
-                    </Grid>
-                </Grow>)
+            return <CurrentGroup key={groupId} groupId={groupId} userData={userData}/>
         });
     }
 
@@ -55,7 +50,7 @@ const JoinedGroups = ({userData}) => {
                 </Button>
             </div>
             {existingGroupElements.length ?
-                <Grid style={{marginBottom: 50}}  container spacing={3}>
+                <Grid style={{marginBottom: 50}} container spacing={3}>
                     {existingGroupElements}
                 </Grid>
                 :
