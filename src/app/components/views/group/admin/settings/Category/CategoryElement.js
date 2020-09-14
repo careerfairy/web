@@ -15,6 +15,7 @@ const useStyles = makeStyles((theme) => ({
         margin: "10px 0",
         textAlign: "left",
         display: "flex",
+        flexWrap: "wrap",
         position: "relative",
     },
     icon: {
@@ -53,11 +54,11 @@ function CategoryElement({handleUpdateCategory, category, firebase, handleAddTem
     if (editMode === false) {
         return (
             <Paper className={classes.whiteBox}>
-                <Box flex="0.3">
+                <Box style={{minWidth: "30%"}} >
                     <div className={classes.label}>Category Name</div>
                     <div className="white-box-title">{category.name}</div>
                 </Box>
-                <Box flex="0.7">
+                <Box style={{minWidth: "70%"}} >
                     <div className={classes.label}>Category Options</div>
                     {optionElements}
                 </Box>
