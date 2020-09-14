@@ -39,26 +39,21 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData, alreadyJoi
 
     useEffect(() => {
         if (group.categories) {
-            const newCategories = group.categories.map(obj => ({...obj, selectedValueId: ""}))
-            setCategories(newCategories)
+            const groupCategories = group.categories.map(obj => ({...obj, selectedValueId: ""}))
+            console.log(groupCategories);
+            if (alreadyJoined) {
+                const userCategories = userData.registeredGroups.find(el => el.groupId === group.id).categories
+                userCategories.forEach((category, index) => {
+                    const matchedIndex = groupCategories.options.findIndex(option => option.id === category.selectedValueId)
+                    if (matchedIndex) {
+                        groupCategories[matchedIndex].selectedValueId = category.selectedValueId
+                    }
+                })
+            }
+            setCategories(groupCategories)
         }
     }, [group])
 
-    useEffect(() => {
-        if (alreadyJoined && categories.length) {
-            const userCategories = userData.registeredGroups.find(el => el.groupId === group.id).categories
-            const trueCategories = [...group.categories]
-            userCategories.forEach((category, index) => {
-                const matchedIndex = trueCategories.findIndex(trueCat => trueCat.id === category.id)
-                if (matchedIndex) {
-                    trueCategories[matchedIndex].selectedValueId = category.selectedValueId
-                }
-            })
-            console.log("trueCategories", trueCategories);
-            setCategories(trueCategories)
-
-        }
-    }, [])
 
     useEffect(() => {
         if (categories && open) {
