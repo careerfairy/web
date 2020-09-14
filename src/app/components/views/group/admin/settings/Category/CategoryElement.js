@@ -3,7 +3,7 @@ import {Grid, Icon} from "semantic-ui-react";
 import EditIcon from '@material-ui/icons/Edit';
 import {withFirebase} from 'data/firebase';
 import CategoryEdit from './CategoryEdit';
-import {Box, Chip, IconButton, Typography} from "@material-ui/core";
+import {Box, Chip, IconButton, Zoom} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 
@@ -53,20 +53,22 @@ function CategoryElement({handleUpdateCategory, category, firebase, handleAddTem
 
     if (editMode === false) {
         return (
-            <Paper className={classes.whiteBox}>
-                <Box style={{minWidth: "120px"}} >
-                    <div className={classes.label}>Category Name</div>
-                    <div className="white-box-title">{category.name}</div>
-                </Box>
-                <Box style={{minWidth: "240px"}} >
-                    <div className={classes.label}>Category Options</div>
-                    {optionElements}
-                </Box>
-                <IconButton className={classes.icon}
-                            onClick={() => setEditMode(true)}>
-                    <EditIcon color="primary"/>
-                </IconButton>
-            </Paper>
+            <Zoom in={category.id}>
+                <Paper className={classes.whiteBox}>
+                    <Box style={{minWidth: "120px"}}>
+                        <div className={classes.label}>Category Name</div>
+                        <div className="white-box-title">{category.name}</div>
+                    </Box>
+                    <Box style={{minWidth: "240px"}}>
+                        <div className={classes.label}>Category Options</div>
+                        {optionElements}
+                    </Box>
+                    <IconButton className={classes.icon}
+                                onClick={() => setEditMode(true)}>
+                        <EditIcon color="primary"/>
+                    </IconButton>
+                </Paper>
+            </Zoom>
         );
     }
 

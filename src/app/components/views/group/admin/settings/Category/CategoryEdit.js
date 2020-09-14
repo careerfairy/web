@@ -1,8 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import AddIcon from '@material-ui/icons/Add';
 import {withFirebase} from "data/firebase";
-import CategoryEditOption, {AddCategory, DeleteCategory, DeleteOption, RenameOption} from './Option/CategoryEditOption';
+import {AddCategory, DeleteCategory, DeleteOption, RenameOption} from './Option/CategoryEditOption';
 import {
+    Zoom,
     Box,
     Button,
     FormHelperText,
@@ -205,15 +206,15 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
 
     const optionElements = editableOptions.map(el => {
         return (
-            <Chip label={el.name}
-                  key={el.id}
-                  variant="outlined"
-                  deleteIcon={<EditIcon/>}
-                  onDelete={(e) => {
-                      setSelectedOption(el)
-                      handleOpenDropDown(e)
-                  }}
-            />
+            <Zoom in={el.id}>
+                <Chip label={el.name}
+                      variant="outlined"
+                      deleteIcon={<EditIcon/>}
+                      onDelete={(e) => {
+                          setSelectedOption(el)
+                          handleOpenDropDown(e)
+                      }}/>
+            </Zoom>
         )
     })
 
