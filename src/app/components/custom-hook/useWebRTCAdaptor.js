@@ -171,7 +171,6 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onInitialized(infoObj);
                         }
                         setTimeout(() => {
-                            debugger;
                             if (!isPlayMode) {
                                 this.joinRoom(roomId, streamId);
                             } else {

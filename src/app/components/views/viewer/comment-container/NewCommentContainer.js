@@ -10,7 +10,7 @@ import HandRaiseCategory from './categories/HandRaiseCategory';
 
 function CommentContainer(props) {
 
-    const [selectedState, setSelectedState] = useState("hand");
+    const [selectedState, setSelectedState] = useState("questions");
 
     function handleStateChange(state) {
         if (!props.showMenu) {

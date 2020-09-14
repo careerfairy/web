@@ -165,6 +165,49 @@ class Firebase {
         })
     };
 
+    //TEST_LIVESTREAMS
+
+    createTestLivestream = () => {
+        let livestreamCollRef = this.firestore
+            .collection("livestreams");
+
+        return livestreamCollRef.add({
+            companyId: 'CareerFairy',
+            test: true,
+            universities: ['ethzurich'],
+            start: firebase.firestore.Timestamp.fromDate(new Date('March 17, 2020 03:24:00'))
+        });
+    }
+
+    setupTestLivestream = (livestreamId, testChats, testQuestions, testPolls) => {
+        var batch = this.firestore.batch();
+        let livestreamRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId);
+        batch.update(livestreamRef, {
+            currentSpeakerId: livestreamId
+        });
+        let chatsRef = livestreamRef
+            .collection("chatEntries");
+        testChats.forEach( chat => {
+            let docRef = chatsRef.doc();
+            batch.set(docRef, chat);
+        });
+        let questionsRef = livestreamRef
+            .collection("questions");
+        testQuestions.forEach( question => {
+            let docRef = questionsRef.doc();
+            batch.set(docRef, question);
+        });
+        let pollsRef = livestreamRef
+            .collection("polls");
+        testPolls.forEach( poll => {
+            let docRef = pollsRef.doc();
+            batch.set(docRef, poll);
+        });
+        return batch.commit();
+    }
+
     //SCHEDULED_LIVESTREAMS
 
     getScheduledLivestreamById = (livestreamId) => {
@@ -808,6 +851,26 @@ class Firebase {
                     .collection("userData")
                     .where("talentPools", "array-contains", companyId);
         return ref.get();
+    }
+
+    postIcon = (livestreamId, iconName) => {
+        let ref = this.firestore
+                    .collection("livestreams")
+                    .doc(livestreamId);
+        return this.firestore.runTransaction( transaction => {
+            return transaction.get(ref).then(livestreamDoc => {
+                let livestreamData = livestreamDoc.data();
+                let icons = livestreamData.icons || {};
+                if (icons[iconName]) {
+                    icons[iconName] = icons[iconName] + 1;
+                } else {
+                    icons[iconName] = 1;
+                }
+                transaction.update(ref, {
+                    icons: icons
+                });
+            });
+        });
     }
 
     getStorageRef() {

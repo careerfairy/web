@@ -17,6 +17,7 @@ function ViewerPage(props) {
     const [showMenu, setShowMenu] = useState(true);
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
+    const [postedIcons, setPostedIcons] = useState([]);
 
     const [careerCenters, setCareerCenters] = useState([]);
     const [handRaiseActive, setHandRaiseActive] = useState(false);
@@ -83,11 +84,51 @@ function ViewerPage(props) {
         props.firebase.leaveCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email);
     }
 
+    function postIcon(iconName) {
+        props.firebase.postIcon(currentLivestream.id, iconName);
+    }
+
     let logoElements = careerCenters.map( (careerCenter, index) => {
         return (
-            <Fragment>
+            <Fragment key={index}>
                 <Image src={ careerCenter.logoUrl } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block' }}/>
             </Fragment>
+        );
+    });
+
+    let postedIconsElements = postedIcons.map( (icon, index) => {
+        return (
+            <div>
+                <div className='action-container animate__animated animate__fadeOutLeft'>
+                    <div className={'button action-button red'}>
+                        <Image src={'/like.png'}/>
+                    </div>
+                </div>
+                <style jsx>{`
+                    .action-button {
+                        position: relative;
+                        border-radius: 50%;
+                        background-color: rgb(0, 210, 170);
+                        width: 70px;
+                        height: 70px;
+                        margin: 15px;
+                        cursor: pointer;
+                        box-shadow: 0 0 8px rgb(120,120,120);
+                    }
+
+                    .action-button.red {
+                        background-color: #e01a4f;
+                    }
+
+                    .action-button.orange {
+                        background-color: #f15946;
+                    }
+
+                    .action-button.yellow {
+                        background-color: #f9c22e;
+                    }
+                `}</style>
+            </div>
         );
     });
 
@@ -116,23 +157,26 @@ function ViewerPage(props) {
             <div className='mini-chat-container'>
                 <MiniChatContainer livestream={ currentLivestream }  isStreamer={false}/>
             </div>
-            {/* <div className='action-buttons'>
+            <div className='icons-container'>
+                { }
+            </div>
+            <div className='action-buttons'>
                 <div className='action-container'>
-                    <div className='action-button red'>
+                    <div className='button action-button red' onClick={() => postIcon('like')}>
                         <Image src='/like.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '35px'}}/>
                     </div>
                 </div>
                 <div className='action-container'>
-                    <div className='action-button orange'>
+                    <div className='button action-button orange' onClick={() => postIcon('clap')}>
                         <Image src='/clapping.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '35px'}}/>
                     </div>
                 </div>
                 <div className='action-container'>
-                    <div className='action-button yellow'>
+                    <div className='button action-button yellow' onClick={() => postIcon('heart')}>
                         <Image src='/heart.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '35px'}}/>
                     </div>
                 </div>            
-            </div> */}
+            </div>
             <style jsx>{`
                 .hidden {
                     display: none
@@ -216,11 +260,11 @@ function ViewerPage(props) {
                 .action-button.red {
                     background-color: #e01a4f;
                 }
-                .action-button.red:hover {
+                .button.action-button.red:hover {
                     background-color: #c91847;
                     transition: all ease-in-out 0.2s;
                 }
-                .action-button.red:active {
+                .button.action-button.red:active {
                     background-color: #a4133a;
                     transition: all ease-in-out 0.2s;
                 }
@@ -228,11 +272,11 @@ function ViewerPage(props) {
                 .action-button.orange {
                     background-color: #f15946;
                 }
-                .action-button.orange:hover {
+                .button.action-button.orange:hover {
                     background-color: #ef452e;
                     transition: all ease-in-out 0.2s;
                 }
-                .action-button.orange:active {
+                .button.action-button.orange:active {
                     background-color: #e42a11;
                     transition: all ease-in-out 0.2s;
                 }
@@ -240,11 +284,11 @@ function ViewerPage(props) {
                 .action-button.yellow {
                     background-color: #f9c22e;
                 }
-                .action-button.yellow:hover {
+                .button.action-button.yellow:hover {
                     background-color: #f8ba12;
                     transition: all ease-in-out 0.2s;
                 }
-                .action-button.yellow:active {
+                .button.action-button.yellow:active {
                     background-color: #daa107;
                     transition: all ease-in-out 0.2s;
                 }
