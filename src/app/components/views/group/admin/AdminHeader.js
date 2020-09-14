@@ -142,7 +142,7 @@ const AdminHeader = ({group, firebase}) => {
                         });
                     }}
                     onError={(errMsg) => setFilePickerError(errMsg)}>
-                    <Box display="flex" justifyContent="center">
+                    <Box flexDirection="column" display="flex" alignItems="center">
                         <Button
                             style={{margin: "10px"}}
                             color="primary"
@@ -154,17 +154,19 @@ const AdminHeader = ({group, firebase}) => {
                 </FilePickerContainer>
                 <FormHelperText error>{filePickerError}</FormHelperText>
                 {editData.fileObj && (
-                    <Button
-                        color="primary"
-                        onClick={handleSubmitLogo}
-                        size="large"
-                        disabled={submittingLogo}
-                        endIcon={
-                            submittingLogo && <CircularProgress size={20} color="inherit"/>
-                        }
-                    >
-                        save
-                    </Button>
+                    <Box flexDirection="column" display="flex" alignItems="center">
+                        <Button
+                            color="primary"
+                            onClick={handleSubmitLogo}
+                            size="large"
+                            disabled={submittingLogo}
+                            endIcon={
+                                submittingLogo && <CircularProgress size={20} color="inherit"/>
+                            }
+                        >
+                            save
+                        </Button>
+                    </Box>
                 )}
             </Box>
             <Box>

@@ -18,7 +18,8 @@ let baseTheme = createMuiTheme({
         textTransform: "lowercase",
       },
       root: {
-        margin: "0.5em"
+        margin: "0.5em",
+        marginLeft: 0,
       }
     }
   },

@@ -54,11 +54,11 @@ function CategoryElement({handleUpdateCategory, category, firebase, handleAddTem
     if (editMode === false) {
         return (
             <Paper className={classes.whiteBox}>
-                <Box style={{minWidth: "30%"}} >
+                <Box style={{minWidth: "120px"}} >
                     <div className={classes.label}>Category Name</div>
                     <div className="white-box-title">{category.name}</div>
                 </Box>
-                <Box style={{minWidth: "70%"}} >
+                <Box style={{minWidth: "240px"}} >
                     <div className={classes.label}>Category Options</div>
                     {optionElements}
                 </Box>

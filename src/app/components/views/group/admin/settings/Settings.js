@@ -7,9 +7,20 @@ import EditIcon from '@material-ui/icons/Edit';
 import {Button, Typography} from "@material-ui/core";
 import AddIcon from '@material-ui/icons/Add';
 import TextField from "@material-ui/core/TextField";
+import {makeStyles} from "@material-ui/core/styles";
 
+const useStyles = makeStyles((theme) => ({
+    buttonTitle: {
+        display: "flex",
+        alignItems: "flex-end",
+        justifyContent: "space-between",
+        margin: "0 0 20px 0",
+        width: "100%"
+    }
+}));
 
 const Settings = ({group, firebase}) => {
+    const classes = useStyles()
 
     const [createMode, setCreateMode] = useState(false)
     const [description, setDescription] = useState("")
@@ -53,9 +64,9 @@ const Settings = ({group, firebase}) => {
 
     return (
         <Fragment>
-            <div className="about-wrapper">
-                <div className="btn-title-wrapper">
-                    <h3 className='sublabel'>About</h3>
+            <div style={{marginBottom: 10}}>
+                <div className={classes.buttonTitle}>
+                    <Typography  variant="h5">About</Typography>
                     <div>
                         {editDescription ?
                             <Button variant="contained"
@@ -100,8 +111,8 @@ const Settings = ({group, firebase}) => {
                     {group.description}
                 </Typography>}
             </div>
-            <div style={{marginTop: 10}} className="btn-title-wrapper">
-                <h3 className='sublabel'>Settings</h3>
+            <div className={classes.buttonTitle}>
+                <Typography variant="h5">Categories</Typography>
                 <Button variant="contained"
                         color="primary"
                         size="medium"
@@ -116,28 +127,6 @@ const Settings = ({group, firebase}) => {
                               setEditMode={setCreateMode}/> : null
             }
             {categoryElements}
-            <style jsx>{`
-                .sublabel {
-                    text-align: left;
-                    display: inline-block;
-                    vertical-align: middle;
-                    margin: 9px 0 0 0;
-                    color: rgb(80,80,80);
-                }
-                
-                .btn-title-wrapper{
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: flex-end;
-                  width: 100%;
-                  text-align: left;
-                  margin: 0 0 20px 0;
-                }
-                
-   
-                
-  
-            `}</style>
         </Fragment>
     );
 }
