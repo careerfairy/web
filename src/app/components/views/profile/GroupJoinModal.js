@@ -33,22 +33,23 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData, alreadyJoi
 
     const classes = useStyles()
     const [categories, setCategories] = useState([]);
-    console.log("alreadyJoined", alreadyJoined);
     const [allSelected, setAllSelected] = useState(false)
     const [submitting, setSubmitting] = useState(false)
 
     useEffect(() => {
         if (group.categories) {
             const groupCategories = group.categories.map(obj => ({...obj, selectedValueId: ""}))
-            console.log(groupCategories);
             if (alreadyJoined) {
                 const userCategories = userData.registeredGroups.find(el => el.groupId === group.id).categories
                 userCategories.forEach((category, index) => {
-                    const matchedIndex = groupCategories.options.findIndex(option => option.id === category.selectedValueId)
-                    if (matchedIndex) {
-                        groupCategories[matchedIndex].selectedValueId = category.selectedValueId
-                    }
+                    groupCategories.forEach(groupCategory => {
+                        const exists = groupCategory.options.some(option => option.id === category.selectedValueId)
+                        if (exists) {
+                            groupCategory.selectedValueId = category.selectedValueId
+                        }
+                    })
                 })
+                console.log("groupCategories in joined", groupCategories);
             }
             setCategories(groupCategories)
         }
@@ -69,22 +70,8 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData, alreadyJoi
         setCategories(newCategories)
     }
 
-    const dynamicSort = (property) => {
-        let sortOrder = 1;
-        if (property[0] === "-") {
-            sortOrder = -1;
-            property = property.substr(1);
-        }
-        return function (a, b) {
-            /* next line works with strings and numbers,
-             * and you may want to customize it to your needs
-             */
-            const result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-            return result * sortOrder;
-        }
-    }
-
     const handleJoinGroup = async () => {
+        console.log(userData);
         try {
             setSubmitting(true)
             const newCategories = categories.map(categoryObj => {
@@ -97,8 +84,22 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData, alreadyJoi
                 groupId: group.id,
                 categories: newCategories
             }
-            const arrayOfGroupObjects = [...userData.registeredGroups, groupObj]
-            const arrayOfGroupIds = userData.registeredGroups.map(obj => obj.groupId)
+            let arrayOfGroupObjects = []
+            let arrayOfGroupIds = []
+            if (userData.groupIds && userData.registeredGroups) {
+                if (alreadyJoined) {
+                    arrayOfGroupIds = [...userData.groupIds]
+                    const index = userData.registeredGroups.findIndex(group => group.groupId === groupObj.groupId)
+                    arrayOfGroupObjects = [...userData.registeredGroups]
+                    arrayOfGroupObjects[index] = groupObj
+                } else {
+                    arrayOfGroupObjects = [...userData.registeredGroups, groupObj]
+                    arrayOfGroupIds = userData.registeredGroups.map(obj => obj.groupId)
+                }
+            } else {
+                arrayOfGroupObjects.push(groupObj)
+                arrayOfGroupIds.push(groupObj.groupId)
+            }
             await firebase.joinGroup(userData.id, arrayOfGroupIds, arrayOfGroupObjects)
             setSubmitting(false)
             closeModal()

@@ -41,7 +41,7 @@ const NewGroup = ({firebase, group, categories, userData}) => {
                 </Typography>
             </CardContent>
             <CardActions>
-                {userData.groupIds.includes(group.id) ?
+                {userData.groupIds?.includes(group.id) ?
                     <>
                         <Button fullWidth
                                 size="small"
@@ -68,7 +68,7 @@ const NewGroup = ({firebase, group, categories, userData}) => {
                         Join
                     </Button>}
             </CardActions>
-            <GroupJoinModal open={openJoinModal} group={group} alreadyJoined={userData.groupIds.includes(group.id)}
+            <GroupJoinModal open={openJoinModal} group={group} alreadyJoined={userData.groupIds?.includes(group.id)}
                             userData={userData} closeModal={handleCloseJoinModal}/>
         </Card>
     );
