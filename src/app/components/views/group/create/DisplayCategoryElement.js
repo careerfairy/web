@@ -12,6 +12,7 @@ const useStyles = makeStyles((theme) => ({
         margin: "10px 0",
         textAlign: "left",
         display: "flex",
+        flexWrap: "wrap",
     },
     label: {
         fontSize: "0.8em",
@@ -23,9 +24,6 @@ const useStyles = makeStyles((theme) => ({
         fontSize: "1.2em",
         fontWeight: "700",
         color: "rgb(80,80,80)",
-    },
-    chip: {
-        margin: theme.spacing(0.5),
     },
 }));
 
@@ -45,11 +43,11 @@ const DisplayCategoryElement = ({category}) => {
 
     return (
         <Paper className={classes.whiteBox}>
-            <Box flex="0.3">
+            <Box style={{minWidth: "120px"}}>
                 <div className={classes.label}>Category Name</div>
-                <div className="white-box-title">{category.name}</div>
+                <div>{category.name}</div>
             </Box>
-            <Box flex="0.7">
+            <Box style={{minWidth: "240px"}}>
                 <div className={classes.label}>Category Options</div>
                 {optionElements}
             </Box>

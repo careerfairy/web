@@ -12,6 +12,7 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import CreateCategories from "../../components/views/group/create/CreateCategories";
 import CompleteGroup from "../../components/views/group/create/CompleteGroup";
+import {GlobalBackground} from "../../materialUI/GlobalBackground/GlobalBackGround";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -158,30 +159,23 @@ const CreateGroup = ({firebase}) => {
     }
 
     return (
-        <Fragment>
-            <div className='greyBackground'>
-                <Head>
-                    <title key="title">CareerFairy | Create a group</title>
-                </Head>
-                <Header classElement='relative white-background'/>
-                <Container textAlign='left'>
-                    <Stepper style={{backgroundColor: '#FAFAFA'}} activeStep={activeStep} alternativeLabel>
-                        {steps.map((label) => (
-                            <Step key={label}>
-                                <StepLabel>{label}</StepLabel>
-                            </Step>
-                        ))}
-                    </Stepper>
-                    {getStepContent(activeStep)}
-                </Container>
-                <Footer/>
-            </div>
-            <style jsx>{`
-                .content-wrapper {
-                  background-color: black;
-                }
-          `}</style>
-        </Fragment>
+        <GlobalBackground>
+            <Head>
+                <title key="title">CareerFairy | Create a group</title>
+            </Head>
+            <Header classElement='relative white-background'/>
+            <Container textAlign='left'>
+                <Stepper style={{backgroundColor: '#FAFAFA'}} activeStep={activeStep} alternativeLabel>
+                    {steps.map((label) => (
+                        <Step key={label}>
+                            <StepLabel>{label}</StepLabel>
+                        </Step>
+                    ))}
+                </Stepper>
+                {getStepContent(activeStep)}
+            </Container>
+            <Footer/>
+        </GlobalBackground>
     );
 };
 

@@ -8,7 +8,8 @@ import Loader from '../components/views/loader/Loader';
 import Head from 'next/head';
 import NewGroup from '../components/views/profile/NewGroup';
 import Footer from '../components/views/footer/Footer';
-import {Container, Grow} from "@material-ui/core";
+import {Container, Grow, Typography} from "@material-ui/core";
+import {GlobalBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 
 const JoinGroup = (props) => {
 
@@ -71,47 +72,19 @@ const JoinGroup = (props) => {
     });
 
     return (
-        <div className='greyBackground'>
+        <GlobalBackground>
             <Head>
                 <title key="title">CareerFairy | Join Groups</title>
             </Head>
             <Header classElement='relative white-background'/>
             <Container>
-                <h1 className='join-group-title'>Join A New Career Group</h1>
+                <Typography align="center" variant="h3" gutterBottom>Join A New Career Group</Typography>
                 <Grid style={{marginBottom: 50}} container spacing={3}>
                     {moreGroupElements}
                 </Grid>
             </Container>
             <Footer/>
-            <style jsx>{`
-                    .hidden {
-                        display: none;
-                    }
-
-                    .greyBackground {
-                        background-color: rgb(250,250,250);
-                        height: 100%;
-                        min-height: 100vh;
-                    }
-
-                    .field-error {
-                        margin-top: 10px;
-                        color: red;
-                    }
-
-                    .join-group-title {
-                        text-align: left;
-                        margin: 0 0 30px 0;
-                        font-weight: 700;
-                        font-size: 1.3em;
-                        color: rgb(80,80,80);
-                    }
-
-                    #profileContainer {
-                        padding: 30px 0;
-                    }
-                `}</style>
-        </div>
+        </GlobalBackground>
     );
 };
 
