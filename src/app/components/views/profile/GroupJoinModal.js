@@ -49,7 +49,6 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData, alreadyJoi
                         }
                     })
                 })
-                console.log("groupCategories in joined", groupCategories);
             }
             setCategories(groupCategories)
         }
@@ -88,13 +87,14 @@ const GroupJoinModal = ({group, firebase, open, closeModal, userData, alreadyJoi
             let arrayOfGroupIds = []
             if (userData.groupIds && userData.registeredGroups) {
                 if (alreadyJoined) {
+                    console.log(alreadyJoined);
                     arrayOfGroupIds = [...userData.groupIds]
                     const index = userData.registeredGroups.findIndex(group => group.groupId === groupObj.groupId)
                     arrayOfGroupObjects = [...userData.registeredGroups]
                     arrayOfGroupObjects[index] = groupObj
                 } else {
                     arrayOfGroupObjects = [...userData.registeredGroups, groupObj]
-                    arrayOfGroupIds = userData.registeredGroups.map(obj => obj.groupId)
+                    arrayOfGroupIds = arrayOfGroupObjects.map(obj => obj.groupId)
                 }
             } else {
                 arrayOfGroupObjects.push(groupObj)

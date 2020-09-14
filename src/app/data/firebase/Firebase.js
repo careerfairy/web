@@ -72,6 +72,7 @@ class Firebase {
         let userRef = this.firestore
             .collection("userData")
             .doc(userId)
+        console.log("in the join group")
         return userRef.update({
             groupIds: arrayOfIds,
             registeredGroups: arrayOfGroupObjects
