@@ -1,5 +1,5 @@
 import React, {Fragment, useState, useEffect} from 'react';
-import {Button, Container, Form, Header, Image, Message, Icon, Checkbox} from "semantic-ui-react";
+import {Form, Header, Image, Message, Icon} from "semantic-ui-react";
 import {withFirebase} from "../data/firebase";
 
 import {useRouter} from 'next/router';
@@ -15,18 +15,58 @@ import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
 import StepLabel from "@material-ui/core/StepLabel";
 import {GlobalBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
+import {
+    Box,
+    CircularProgress,
+    Grid,
+    TextField,
+    FormControlLabel,
+    Container,
+    Button,
+    Checkbox,
+    FormHelperText
+} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme) => ({
+    paper: {
+        marginTop: theme.spacing(8),
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
+    avatar: {
+        margin: theme.spacing(1),
+        backgroundColor: theme.palette.secondary.main,
+    },
+    box: {
+        width: '100%', // Fix IE 11 issue.
+        backgroundColor: "white",
+        marginTop: theme.spacing(3),
+        borderRadius: 5
+    },
+    submit: {
+        margin: theme.spacing(3, 0, 2),
+    },
+
+    resetEmail: {
+        margin: "20px auto 0 auto",
+        textAlign: "center"
+    }
+}));
 
 function getSteps() {
     return ['Credentials', 'Email Verification'];
 }
 
 function SignUpPage(props) {
-
+    const classes = useStyles()
     const router = useRouter();
 
     const [user, setUser] = useState(false);
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
     const [activeStep, setActiveStep] = useState(0);
+    console.log("emailVerificationSent", emailVerificationSent);
 
 
     useEffect(() => {
@@ -35,6 +75,7 @@ function SignUpPage(props) {
                 router.push('/profile')
             } else if (user && !user.emailVerified) {
                 setUser(user);
+                setActiveStep(1)
             } else {
                 setUser(null);
             }
@@ -107,16 +148,14 @@ function SignUpPage(props) {
                 }}>
                     Sign Up
                 </div>
-                <Container textAlign='left'>
-                    <Stepper style={{backgroundColor: '#FAFAFA'}} activeStep={activeStep} alternativeLabel>
-                        {steps.map((label) => (
-                            <Step key={label}>
-                                <StepLabel color="primary">{label}</StepLabel>
-                            </Step>
-                        ))}
-                    </Stepper>
-                    {getStepContent(activeStep)}
-                </Container>
+                <Stepper style={{backgroundColor: '#FAFAFA'}} activeStep={activeStep} alternativeLabel>
+                    {steps.map((label) => (
+                        <Step key={label}>
+                            <StepLabel color="primary">{label}</StepLabel>
+                        </Step>
+                    ))}
+                </Stepper>
+                {getStepContent(activeStep)}
                 {/*<div className={user ? 'hidden' : ''}>*/}
                 {/*    <SignUpForm user={user} emailVerificationSent={emailVerificationSent}*/}
                 {/*                setEmailVerificationSent={(bool) => setEmailVerificationSent(bool)}/>*/}
@@ -159,6 +198,7 @@ const SignUpForm = withFirebase(SignUpFormBase);
 const SignUpFormSent = SignUpFormValidate;
 
 function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerificationSent, handleNext}) {
+    const classes = useStyles()
 
     const [emailSent, setEmailSent] = useState(false);
     const [errorMessageShown, setErrorMessageShown] = useState(false);
@@ -184,234 +224,222 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
 
     return (
         <Fragment>
-            <div className='tealBackground'>
-                <Container>
-                    <div className='formContainer'>
-                        <Formik
-                            initialValues={{email: '', password: '', confirmPassword: '', agreeTerm: false}}
-                            validate={values => {
-                                let errors = {};
-                                if (!values.email) {
-                                    errors.email = 'Your email is required';
-                                } else if (!/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i.test(values.email)) {
-                                    errors.email = 'Please enter a valid email address';
-                                }
 
-                                if (!values.password) {
-                                    errors.password = 'A password is required';
-                                } else if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/i.test(values.password)) {
-                                    errors.password = 'Your password needs to be at least 6 characters long and contain at least one uppercase character, one lowercase character and one number';
-                                }
+            <Formik
+                initialValues={{
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: '',
+                    agreeTerm: false
+                }}
+                validate={values => {
+                    let errors = {};
+                    if (!values.email) {
+                        errors.email = 'Your email is required';
+                    } else if (!/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i.test(values.email)) {
+                        errors.email = 'Please enter a valid email address';
+                    }
+                    if (!values.firstName) {
+                        errors.firstName = 'Your first name is required';
+                    } else if (values.firstName.length > 50) {
+                        errors.firstName = 'Cannot be longer than 50 characters';
+                    }
+                    if (!values.lastName) {
+                        errors.lastName = 'Your last name is required';
+                    } else if (values.lastName.length > 50) {
+                        errors.lastName = 'Cannot be longer than 50 characters';
+                    }
+                    if (!values.password) {
+                        errors.password = 'A password is required';
+                    } else if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/i.test(values.password)) {
+                        errors.password = 'Your password needs to be at least 6 characters long and contain at least one uppercase character, one lowercase character and one number';
+                    }
 
-                                if (!values.confirmPassword) {
-                                    errors.confirmPassword = 'You need to confirm your password';
-                                } else if (values.confirmPassword !== values.password) {
-                                    errors.confirmPassword = 'Your password was not confirmed correctly';
-                                }
-                                if (!values.agreeTerm) {
-                                    errors.agreeTerm = 'Please agree to our T&C and our Privacy Policy';
-                                }
-                                return errors;
-                            }}
-                            onSubmit={(values, {setSubmitting}) => {
-                                setErrorMessageShown(false);
-                                setEmailSent(false);
-                                setGeneralLoading(true);
-                                firebase.createUserWithEmailAndPassword(values.email, values.password)
-                                    .then(() => {
-                                        setSubmitting(false);
-                                        setEmailSent(true);
-                                        handleNext()
-                                    }).catch(error => {
-                                    setErrorMessageShown(true);
-                                    setSubmitting(false);
-                                    setGeneralLoading(false);
-                                })
-                            }}
-                        >
-                            {({
-                                  values,
-                                  errors,
-                                  touched,
-                                  handleChange,
-                                  handleBlur,
-                                  handleSubmit,
-                                  setFieldValue,
-                                  isSubmitting,
-                                  /* and other goodies */
-                              }) => (
-                                <Form id='signUpForm' onSubmit={handleSubmit}>
-                                    <Form.Field>
-                                        <label style={{color: 'rgb(120,120,120)'}}>Email</label>
-                                        <input id='emailInput' type='text' name='email' placeholder='Email'
-                                               onChange={handleChange} onBlur={handleBlur} value={values.email}
-                                               disabled={isSubmitting || emailSent || generalLoading}/>
-                                        <div className='field-error'>
-                                            {errors.email && touched.email && errors.email}
-                                        </div>
-                                    </Form.Field>
-                                    <Form.Field>
-                                        <label style={{color: 'rgb(120,120,120)'}}>Password</label>
-                                        <input id='passwordInput' type='password' name='password' placeholder='Password'
-                                               onChange={handleChange} onBlur={handleBlur} value={values.password}
-                                               disabled={isSubmitting || emailSent || generalLoading}/>
-                                        <div className='field-error'>
-                                            {errors.password && touched.password && errors.password}
-                                        </div>
-                                    </Form.Field>
-                                    <Form.Field>
-                                        <label style={{color: 'rgb(120,120,120)'}}>Confirm Password</label>
-                                        <input id='confirmPasswordInput' type='password' name='confirmPassword'
-                                               placeholder='Confirm Password' onChange={handleChange}
-                                               onBlur={handleBlur} value={values.confirmPassword}
-                                               disabled={isSubmitting || emailSent || generalLoading}/>
-                                        <div className='field-error'>
-                                            {errors.confirmPassword && touched.confirmPassword && errors.confirmPassword}
-                                        </div>
-                                    </Form.Field>
-                                    <Form.Field>
-                                        <input id='agreeTerm' type='checkbox'
-                                               style={{display: 'inline-block', margin: '0 0 10px 0'}} name='agreeTerm'
-                                               placeholder='Confirm Password' onChange={handleChange}
-                                               onBlur={handleBlur} value={values.agreeTerm}
-                                               disabled={isSubmitting || emailSent || generalLoading}/>
-                                        <label style={{display: 'inline-block', margin: '0 0 3px 10px'}}>I agree to
-                                            the <Link href='/terms'><a>Terms & Conditions</a></Link> and the <Link
-                                                href='/privacy'><a>Privacy Policy</a></Link></label>
-                                        <div className='field-error'>
+                    if (!values.confirmPassword) {
+                        errors.confirmPassword = 'You need to confirm your password';
+                    } else if (values.confirmPassword !== values.password) {
+                        errors.confirmPassword = 'Your password was not confirmed correctly';
+                    }
+                    if (!values.agreeTerm) {
+                        errors.agreeTerm = 'Please agree to our T&C and our Privacy Policy';
+                    }
+                    return errors;
+                }}
+                onSubmit={(values, {setSubmitting}) => {
+                    setErrorMessageShown(false);
+                    setEmailSent(false);
+                    setGeneralLoading(true);
+                    firebase.createUserWithEmailAndPassword(values.email, values.password)
+                        .then(() => {
+                            setSubmitting(false);
+                            setEmailSent(true);
+                            handleNext()
+                        }).catch(error => {
+                        setErrorMessageShown(true);
+                        setSubmitting(false);
+                        setGeneralLoading(false);
+                    })
+                }}
+            >
+                {({
+                      values,
+                      errors,
+                      touched,
+                      handleChange,
+                      handleBlur,
+                      handleSubmit,
+                      setFieldValue,
+                      isSubmitting,
+                      /* and other goodies */
+                  }) => (
+                    <form id='signUpForm' onSubmit={handleSubmit}>
+                        <Container maxWidth="sm">
+                            <Box boxShadow={1} p={3} className={classes.box}>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            autoComplete="fname"
+                                            name="firstName"
+                                            variant="outlined"
+                                            required
+                                            fullWidth
+                                            id="firstName"
+                                            label="First Name"
+                                            autoFocus
+                                            onBlur={handleBlur}
+                                            value={values.firstName}
+                                            disabled={isSubmitting || emailSent || generalLoading}
+                                            error={Boolean(errors.firstName && touched.firstName && errors.firstName)}
+                                            onChange={handleChange}
+                                            helperText={errors.firstName && touched.firstName && errors.firstName}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            variant="outlined"
+                                            required
+                                            fullWidth
+                                            id="lastName"
+                                            label="Last Name"
+                                            name="lastName"
+                                            autoComplete="lname"
+                                            onBlur={handleBlur}
+                                            disabled={isSubmitting || emailSent || generalLoading}
+                                            value={values.lastName}
+                                            error={Boolean(errors.lastName && touched.lastName && errors.lastName)}
+                                            onChange={handleChange}
+                                            helperText={errors.lastName && touched.lastName && errors.lastName}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            variant="outlined"
+                                            fullWidth
+                                            helperText={errors.email && touched.email && errors.email}
+                                            error={Boolean(errors.email && touched.email && errors.email)}
+                                            autoComplete="email"
+                                            id='emailInput'
+                                            name='email'
+                                            placeholder='Email'
+                                            onChange={handleChange} onBlur={handleBlur} value={values.email}
+                                            disabled={isSubmitting || emailSent || generalLoading}
+                                            label="Email Address"
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            variant="outlined"
+                                            required
+                                            fullWidth
+                                            label="Password"
+                                            id="password"
+                                            autoComplete="current-password"
+                                            type='password'
+                                            name='password'
+                                            error={Boolean(errors.password && touched.password && errors.password)}
+                                            helperText={errors.password && touched.password && errors.password}
+                                            placeholder='Password'
+                                            onChange={handleChange} onBlur={handleBlur}
+                                            value={values.password}
+                                            disabled={isSubmitting || emailSent || generalLoading}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            variant="outlined"
+                                            required
+                                            fullWidth
+                                            label="Confirm Password"
+                                            autoComplete="current-password"
+                                            error={Boolean(errors.confirmPassword && touched.confirmPassword && errors.confirmPassword)}
+                                            helperText={errors.confirmPassword && touched.confirmPassword && errors.confirmPassword}
+                                            id='confirmPasswordInput'
+                                            type='password'
+                                            name='confirmPassword'
+                                            placeholder='Confirm Password'
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            value={values.confirmPassword}
+                                            disabled={isSubmitting || emailSent || generalLoading}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <FormControlLabel
+                                            control={<Checkbox
+                                                name='agreeTerm'
+                                                placeholder='Confirm Password'
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                value={values.agreeTerm}
+                                                disabled={isSubmitting || emailSent || generalLoading}
+                                                color="primary"
+                                            />}
+                                            label={<>I agree to
+                                                the <Link href='/terms'><a>Terms & Conditions</a></Link> and the <Link
+                                                    href='/privacy'><a>Privacy Policy</a></Link></>}
+                                        />
+                                        <FormHelperText
+                                            error={errors.agreeTerm && touched.agreeTerm && errors.agreeTerm}>
                                             {errors.agreeTerm && touched.agreeTerm && errors.agreeTerm}
-                                        </div>
-                                    </Form.Field>
-                                    <Button id='submitButton' fluid primary size='big' disabled={emailSent}
-                                            type="submit" loading={isSubmitting || generalLoading}>Sign up</Button>
-                                    <div className='reset-email'>
-                                        <div style={{marginBottom: '5px'}}>Already part of the family?</div>
-                                        <Link href='/login'><a href='#'>Log in</a></Link>
-                                    </div>
-                                    <div className='reset-email'>
-                                        <div style={{marginBottom: '5px'}}>Having issues signing up?<a
-                                            style={{marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us
-                                            know</a></div>
-                                    </div>
-                                    <div className={'errorMessage ' + (errorMessageShown ? '' : 'hidden')}>An error
-                                        occured while creating to your account
-                                    </div>
-                                </Form>
-                            )}
-                        </Formik>
-                    </div>
-                    <style jsx>{`
-                                
-                            .hidden {
-                                display: none
-                            }
-
-                            #signingContainer {
-                                width: 55%;
-                                padding: 50px;
-                                height: 100%;
-                                border: 2px solid red;
-                            }
-
-                            #signingContainer h5{
-                                font-weight: 400;
-                            }
-
-                            #signUpForm h1 {
-                                color: rgb(0,212,170);
-                                margin-bottom: 30px;
-                            }
-
-                            #signUpForm label{
-                                font-weight: 400;
-                                font-size: 0.95em;
-                                margin-bottom: 15px;
-                                color: dimgrey;
-                            }
-
-                            .emailSignUpInfo {
-                                margin-top: 10px;
-                                font-size: 1em;
-                                color: white;
-                                margin: 0 auto;
-                                text-align: center;
-                            }
-
-                            .formContainer {
-                                max-width: 500px;
-                                background-color: rgb(240,240,240);
-                                margin: 2% auto 20px auto;
-                                padding: 30px 50px;
-                                border-radius: 5px;
-                                box-shadow: 0 0 5px rgb(150,150,150);
-                            }
-
-                            label {
-                                color: rgb(160,160,160);
-                            }
-
-                            .socialLoginBlock {
-                                margin: 30px 0 0 0;
-                            }
-
-                            .socialLogin {
-                                margin: 15px 0 0 0;
-                            }
-
-                            .field-error {
-                                margin-top: 10px;
-                                color: red;
-                            }
-
-            
-
-                            #loginButton {
-                                margin-top: 40px;
-                            }
-
-                            .errorMessage {
-                                padding: 20px;
-                                text-align: center;
-                                color: red;
-                            }
-
-                            .loginModal {
-                                background-color: rgb(230,230,230);
-                                padding: 60px;
-                                font-weight: 3em;
-                            }
-
-                            #loginModalTitle {
-                                font-size: 4em;
-                                color: rgb(0, 210, 170);
-                            }
-
-                            #loginModalLogo {
-                                margin-top: 50px;
-                                max-height: 150px;
-                            }
-
-                            .loginModalPrivacy {
-                                margin-top: 30px;
-                            }
-
-                            .reset-email {
-                                margin: 20px auto 0 auto;
-                                text-align: center;
-                            }
-
-                            .resend-link {
-                                text-decoration: underline;
-                                cursor: pointer;
-                            }
-                        `}</style>
-                </Container>
-            </div>
+                                        </FormHelperText>
+                                    </Grid>
+                                </Grid>
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    variant="contained"
+                                    color="primary"
+                                    disabled={emailSent}
+                                    endIcon={(isSubmitting || generalLoading) &&
+                                    <CircularProgress size={20} color="inherit"/>}
+                                    className={classes.submit}
+                                >
+                                    Sign up
+                                </Button>
+                                <div className={classes.resetEmail}>
+                                    <div style={{marginBottom: '5px'}}>Already part of the family?</div>
+                                    <Link href='/login'><a href='#'>Log in</a></Link>
+                                </div>
+                                <div className={classes.resetEmail}>
+                                    <div style={{marginBottom: '5px'}}>Having issues signing up?<a
+                                        style={{marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us
+                                        know</a></div>
+                                </div>
+                                {errorMessageShown && <FormHelperText error>An error
+                                    occured while creating to your account</FormHelperText>}
+                            </Box>
+                        </Container>
+                    </form>
+                )}
+            </Formik>
         </Fragment>
     )
 }
 
-function SignUpFormValidate(props) {
+function SignUpFormValidate({user, router, setEmailVerificationSent}) {
+    const classes = useStyles()
 
     const [errorMessageShown, setErrorMessageShown] = useState(false);
     const [incorrectPin, setIncorrectPin] = useState(false);
@@ -423,11 +451,11 @@ function SignUpFormValidate(props) {
             method: 'post',
             url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmailWithPin',
             data: {
-                recipientEmail: props.user.email,
+                recipientEmail: user.email,
             }
         }).then(response => {
             setIncorrectPin(false);
-            props.setEmailVerificationSent(true);
+            setEmailVerificationSent(true);
             setGeneralLoading(false);
         }).catch(error => {
             setIncorrectPin(false);
@@ -457,12 +485,12 @@ function SignUpFormValidate(props) {
                                     method: 'post',
                                     url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/verifyEmailWithPin',
                                     data: {
-                                        recipientEmail: props.user.email,
+                                        recipientEmail: user.email,
                                         pinCode: parseInt(values.pinCode)
                                     }
                                 }).then(response => {
-                                    props.user.reload().then(() => {
-                                        return props.router.push('/profile');
+                                    user.reload().then(() => {
+                                        return router.push('/profile');
                                     });
                                 }).catch(error => {
                                     setIncorrectPin(true);

@@ -37,7 +37,6 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
     const [leaving, setLeaving] = useState(false);
     const [openJoinModal, setOpenJoinModal] = useState(false);
     const [leaveGroup, setLeaveGroup] = useState(false)
-    console.log(leaveGroup);
 
     useEffect(() => {
         if (group) {
