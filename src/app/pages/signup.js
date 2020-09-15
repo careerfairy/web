@@ -1,13 +1,24 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Button, Container, Form, Header, Image, Message, Icon, Checkbox} from "semantic-ui-react";
-import { withFirebase} from "../data/firebase";
+import {withFirebase} from "../data/firebase";
 
-import { useRouter } from 'next/router';
+import {useRouter} from 'next/router';
 import Link from 'next/link';
 import {Formik} from 'formik';
 import axios from 'axios';
 
 import Head from 'next/head';
+import CreateBaseGroup from "../components/views/group/create/CreateBaseGroup";
+import CreateCategories from "../components/views/group/create/CreateCategories";
+import CompleteGroup from "../components/views/group/create/CompleteGroup";
+import Stepper from "@material-ui/core/Stepper";
+import Step from "@material-ui/core/Step";
+import StepLabel from "@material-ui/core/StepLabel";
+import {GlobalBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
+
+function getSteps() {
+    return ['Credentials', 'Email Verification'];
+}
 
 function SignUpPage(props) {
 
@@ -15,6 +26,8 @@ function SignUpPage(props) {
 
     const [user, setUser] = useState(false);
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
+    const [activeStep, setActiveStep] = useState(0);
+
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
@@ -26,7 +39,46 @@ function SignUpPage(props) {
                 setUser(null);
             }
         })
-    },[]);
+    }, []);
+        const steps = getSteps();
+
+
+    const handleNext = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    };
+
+    const handleBack = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    };
+
+    const handleReset = () => {
+        setActiveStep(0);
+    };
+
+    function getStepContent(stepIndex) {
+        switch (stepIndex) {
+            case 0:
+                return <SignUpForm
+                    user={user}
+                    emailVerificationSent={emailVerificationSent}
+                    handleNext={handleNext}
+                    handleBack={handleBack}
+                    setEmailVerificationSent={(bool) => setEmailVerificationSent(bool)}/>
+                    ;
+            case 1:
+                return <SignUpFormSent
+                    user={user}
+                    handleNext={handleNext}
+                    handleBack={handleBack}
+                    handleReset={handleReset}
+                    activeStep={activeStep}
+                    emailVerificationSent={emailVerificationSent}
+                    router={router}/>
+            default:
+                return 'Unknown stepIndex';
+        }
+    }
+
 
     return (
         <Fragment>
@@ -35,23 +87,52 @@ function SignUpPage(props) {
             </Head>
             <div className='tealBackground'>
                 <header>
-                    <Link href='/'><a><Image src='/logo_white.png' style={{ width: '150px', margin: '20px', display: 'inline-block' }} /></a></Link>
+                    <Link href='/'><a><Image src='/logo_white.png' style={{
+                        width: '150px',
+                        margin: '20px',
+                        display: 'inline-block'
+                    }}/></a></Link>
                 </header>
-                <div style={{ textAlign: 'center', color: 'rgb(200,200,200)' }}>
-                    <Icon name='film' size='big' style={{ margin: '0 10px', color: 'white'}}/>
-                    <Icon name='arrow right circle alternate' size='big' style={{ margin: '0 10px', color: 'white'}}/>
-                    <Icon name='briefcase' size='big' style={{ margin: '0 10px', color: 'white'}}/>
+                <div style={{textAlign: 'center', color: 'rgb(200,200,200)'}}>
+                    <Icon name='film' size='big' style={{margin: '0 10px', color: 'white'}}/>
+                    <Icon name='arrow right circle alternate' size='big' style={{margin: '0 10px', color: 'white'}}/>
+                    <Icon name='briefcase' size='big' style={{margin: '0 10px', color: 'white'}}/>
                 </div>
-                <div style={{ color: 'white', fontWeight: '500', fontSize: '2em', margin: '40px 0 30px 0', textAlign: 'center' }}>
+                <div style={{
+                    color: 'white',
+                    fontWeight: '500',
+                    fontSize: '2em',
+                    margin: '40px 0 30px 0',
+                    textAlign: 'center'
+                }}>
                     Sign Up
                 </div>
-                <div className={ user ? 'hidden' : ''}>
-                    <SignUpForm user={user} emailVerificationSent={emailVerificationSent} setEmailVerificationSent={(bool) => setEmailVerificationSent(bool)}/>
-                </div>
-                <div className={ user ? '' : 'hidden'}>
-                    <SignUpFormSent user={user} emailVerificationSent={emailVerificationSent} router={router}/>
-                </div>
-                <div style={{ color: 'white', fontWeight: '700', fontSize: '1.3em', margin: '40px 0 30px 0', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
+                <Container textAlign='left'>
+                    <Stepper style={{backgroundColor: '#FAFAFA'}} activeStep={activeStep} alternativeLabel>
+                        {steps.map((label) => (
+                            <Step key={label}>
+                                <StepLabel color="primary">{label}</StepLabel>
+                            </Step>
+                        ))}
+                    </Stepper>
+                    {getStepContent(activeStep)}
+                </Container>
+                {/*<div className={user ? 'hidden' : ''}>*/}
+                {/*    <SignUpForm user={user} emailVerificationSent={emailVerificationSent}*/}
+                {/*                setEmailVerificationSent={(bool) => setEmailVerificationSent(bool)}/>*/}
+                {/*</div>*/}
+                {/*<div className={user ? '' : 'hidden'}>*/}
+                {/*    <SignUpFormSent user={user} emailVerificationSent={emailVerificationSent} router={router}/>*/}
+                {/*</div>*/}
+                <div style={{
+                    color: 'white',
+                    fontWeight: '700',
+                    fontSize: '1.3em',
+                    margin: '40px 0 30px 0',
+                    textAlign: 'center',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.4em'
+                }}>
                     Meet Your Future
                 </div>
                 <style jsx>{`
@@ -77,28 +158,28 @@ const SignUpForm = withFirebase(SignUpFormBase);
 
 const SignUpFormSent = SignUpFormValidate;
 
-function SignUpFormBase(props) {
+function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerificationSent, handleNext}) {
 
     const [emailSent, setEmailSent] = useState(false);
     const [errorMessageShown, setErrorMessageShown] = useState(false);
     const [generalLoading, setGeneralLoading] = useState(false);
 
     useEffect(() => {
-        if (emailSent && props.user && !props.emailVerificationSent) {
+        if (emailSent && user && !emailVerificationSent) {
             axios({
                 method: 'post',
                 url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmailWithPin',
                 data: {
-                    recipientEmail: props.user.email,
+                    recipientEmail: user.email,
                 }
-            }).then( response => { 
-                    props.setEmailVerificationSent(true);
-                    setGeneralLoading(false);
-                }).catch(error => {
-                    setGeneralLoading(false);
+            }).then(response => {
+                setEmailVerificationSent(true);
+                setGeneralLoading(false);
+            }).catch(error => {
+                setGeneralLoading(false);
             });
         }
-    },[props.user, emailSent]);
+    }, [user, emailSent]);
 
     return (
         <Fragment>
@@ -106,21 +187,21 @@ function SignUpFormBase(props) {
                 <Container>
                     <div className='formContainer'>
                         <Formik
-                            initialValues={{ email: '', password: '', confirmPassword: '', agreeTerm: false }}
+                            initialValues={{email: '', password: '', confirmPassword: '', agreeTerm: false}}
                             validate={values => {
                                 let errors = {};
                                 if (!values.email) {
                                     errors.email = 'Your email is required';
                                 } else if (!/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i.test(values.email)) {
                                     errors.email = 'Please enter a valid email address';
-                                }       
-                                
+                                }
+
                                 if (!values.password) {
                                     errors.password = 'A password is required';
-                                }  else if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/i.test(values.password)) {
+                                } else if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/i.test(values.password)) {
                                     errors.password = 'Your password needs to be at least 6 characters long and contain at least one uppercase character, one lowercase character and one number';
-                                }                           
-                                
+                                }
+
                                 if (!values.confirmPassword) {
                                     errors.confirmPassword = 'You need to confirm your password';
                                 } else if (values.confirmPassword !== values.password) {
@@ -131,75 +212,94 @@ function SignUpFormBase(props) {
                                 }
                                 return errors;
                             }}
-                            onSubmit={(values, { setSubmitting }) => {
+                            onSubmit={(values, {setSubmitting}) => {
                                 setErrorMessageShown(false);
                                 setEmailSent(false);
                                 setGeneralLoading(true);
-                                props.firebase.createUserWithEmailAndPassword(values.email, values.password)
-                                    .then(() => { 
+                                firebase.createUserWithEmailAndPassword(values.email, values.password)
+                                    .then(() => {
                                         setSubmitting(false);
                                         setEmailSent(true);
+                                        handleNext()
                                     }).catch(error => {
-                                        setErrorMessageShown(true);
-                                        setSubmitting(false);
-                                        setGeneralLoading(false);
+                                    setErrorMessageShown(true);
+                                    setSubmitting(false);
+                                    setGeneralLoading(false);
                                 })
                             }}
-                            >
+                        >
                             {({
-                                values,
-                                errors,
-                                touched,
-                                handleChange,
-                                handleBlur,
-                                handleSubmit,
-                                setFieldValue,
-                                isSubmitting,
-                                /* and other goodies */
-                            }) => (
+                                  values,
+                                  errors,
+                                  touched,
+                                  handleChange,
+                                  handleBlur,
+                                  handleSubmit,
+                                  setFieldValue,
+                                  isSubmitting,
+                                  /* and other goodies */
+                              }) => (
                                 <Form id='signUpForm' onSubmit={handleSubmit}>
                                     <Form.Field>
-                                        <label style={{ color: 'rgb(120,120,120)' }}>Email</label>
-                                        <input id='emailInput' type='text' name='email' placeholder='Email' onChange={handleChange} onBlur={handleBlur} value={values.email} disabled={isSubmitting || emailSent || generalLoading} />
+                                        <label style={{color: 'rgb(120,120,120)'}}>Email</label>
+                                        <input id='emailInput' type='text' name='email' placeholder='Email'
+                                               onChange={handleChange} onBlur={handleBlur} value={values.email}
+                                               disabled={isSubmitting || emailSent || generalLoading}/>
                                         <div className='field-error'>
                                             {errors.email && touched.email && errors.email}
                                         </div>
                                     </Form.Field>
                                     <Form.Field>
-                                        <label style={{ color: 'rgb(120,120,120)' }}>Password</label>
-                                        <input id='passwordInput' type='password' name='password' placeholder='Password' onChange={handleChange} onBlur={handleBlur} value={values.password} disabled={isSubmitting || emailSent || generalLoading} />
+                                        <label style={{color: 'rgb(120,120,120)'}}>Password</label>
+                                        <input id='passwordInput' type='password' name='password' placeholder='Password'
+                                               onChange={handleChange} onBlur={handleBlur} value={values.password}
+                                               disabled={isSubmitting || emailSent || generalLoading}/>
                                         <div className='field-error'>
                                             {errors.password && touched.password && errors.password}
                                         </div>
                                     </Form.Field>
                                     <Form.Field>
-                                        <label style={{ color: 'rgb(120,120,120)' }}>Confirm Password</label>
-                                        <input id='confirmPasswordInput' type='password' name='confirmPassword' placeholder='Confirm Password' onChange={handleChange} onBlur={handleBlur} value={values.confirmPassword} disabled={isSubmitting || emailSent || generalLoading} />
+                                        <label style={{color: 'rgb(120,120,120)'}}>Confirm Password</label>
+                                        <input id='confirmPasswordInput' type='password' name='confirmPassword'
+                                               placeholder='Confirm Password' onChange={handleChange}
+                                               onBlur={handleBlur} value={values.confirmPassword}
+                                               disabled={isSubmitting || emailSent || generalLoading}/>
                                         <div className='field-error'>
                                             {errors.confirmPassword && touched.confirmPassword && errors.confirmPassword}
                                         </div>
                                     </Form.Field>
                                     <Form.Field>
-                                        <input id='agreeTerm' type='checkbox' style={{ display: 'inline-block', margin: '0 0 10px 0'}} name='agreeTerm' placeholder='Confirm Password' onChange={handleChange} onBlur={handleBlur} value={values.agreeTerm} disabled={isSubmitting || emailSent || generalLoading} />
-                                        <label style={{ display: 'inline-block', margin: '0 0 3px 10px'}}>I agree to the <Link href='/terms'><a>Terms & Conditions</a></Link> and the <Link href='/privacy'><a>Privacy Policy</a></Link></label>
+                                        <input id='agreeTerm' type='checkbox'
+                                               style={{display: 'inline-block', margin: '0 0 10px 0'}} name='agreeTerm'
+                                               placeholder='Confirm Password' onChange={handleChange}
+                                               onBlur={handleBlur} value={values.agreeTerm}
+                                               disabled={isSubmitting || emailSent || generalLoading}/>
+                                        <label style={{display: 'inline-block', margin: '0 0 3px 10px'}}>I agree to
+                                            the <Link href='/terms'><a>Terms & Conditions</a></Link> and the <Link
+                                                href='/privacy'><a>Privacy Policy</a></Link></label>
                                         <div className='field-error'>
-                                            {errors.agreeTerm && touched.agreeTerm  && errors.agreeTerm}
+                                            {errors.agreeTerm && touched.agreeTerm && errors.agreeTerm}
                                         </div>
                                     </Form.Field>
-                                    <Button id='submitButton' fluid primary size='big' disabled={emailSent} type="submit" loading={isSubmitting || generalLoading}>Sign up</Button>
+                                    <Button id='submitButton' fluid primary size='big' disabled={emailSent}
+                                            type="submit" loading={isSubmitting || generalLoading}>Sign up</Button>
                                     <div className='reset-email'>
-                                        <div style={{ marginBottom: '5px'}}>Already part of the family?</div>
+                                        <div style={{marginBottom: '5px'}}>Already part of the family?</div>
                                         <Link href='/login'><a href='#'>Log in</a></Link>
-                                    </div> 
+                                    </div>
                                     <div className='reset-email'>
-                                        <div style={{ marginBottom: '5px'}}>Having issues signing up?<a style={{ marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us know</a></div>
-                                    </div> 
-                                    <div className={'errorMessage ' + (errorMessageShown ? '' : 'hidden')}>An error occured while creating to your account</div>
+                                        <div style={{marginBottom: '5px'}}>Having issues signing up?<a
+                                            style={{marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us
+                                            know</a></div>
+                                    </div>
+                                    <div className={'errorMessage ' + (errorMessageShown ? '' : 'hidden')}>An error
+                                        occured while creating to your account
+                                    </div>
                                 </Form>
                             )}
-                            </Formik>
-                        </div>
-                        <style jsx>{`
+                        </Formik>
+                    </div>
+                    <style jsx>{`
                                 
                             .hidden {
                                 display: none
@@ -307,8 +407,8 @@ function SignUpFormBase(props) {
                 </Container>
             </div>
         </Fragment>
-        )
-    }
+    )
+}
 
 function SignUpFormValidate(props) {
 
@@ -324,13 +424,13 @@ function SignUpFormValidate(props) {
             data: {
                 recipientEmail: props.user.email,
             }
-        }).then( response => { 
-                setIncorrectPin(false);
-                props.setEmailVerificationSent(true);
-                setGeneralLoading(false);
-            }).catch(error => {
-                setIncorrectPin(false);
-                setGeneralLoading(false);
+        }).then(response => {
+            setIncorrectPin(false);
+            props.setEmailVerificationSent(true);
+            setGeneralLoading(false);
+        }).catch(error => {
+            setIncorrectPin(false);
+            setGeneralLoading(false);
         });
     }
 
@@ -340,17 +440,17 @@ function SignUpFormValidate(props) {
                 <Container>
                     <div className='formContainer'>
                         <Formik
-                            initialValues={{ pinCode: '' }}
+                            initialValues={{pinCode: ''}}
                             validate={values => {
                                 let errors = {};
                                 if (!values.pinCode) {
                                     errors.pinCode = 'A PIN code is required';
                                 } else if (!/^[0-9]{4}$/.test(values.pinCode)) {
                                     errors.pinCode = 'The PIN code must be number between 0 and 9999';
-                                }       
+                                }
                                 return errors;
                             }}
-                            onSubmit={(values, { setSubmitting }) => {
+                            onSubmit={(values, {setSubmitting}) => {
                                 setIncorrectPin(false);
                                 axios({
                                     method: 'post',
@@ -359,55 +459,67 @@ function SignUpFormValidate(props) {
                                         recipientEmail: props.user.email,
                                         pinCode: parseInt(values.pinCode)
                                     }
-                                }).then( response => { 
-                                        props.user.reload().then(() => {
-                                            return props.router.push('/profile');
-                                        });
-                                    }).catch(error => {
-                                        setIncorrectPin(true);
-                                        setGeneralLoading(false);
-                                        setSubmitting(false);
-                                        return;
+                                }).then(response => {
+                                    props.user.reload().then(() => {
+                                        return props.router.push('/profile');
+                                    });
+                                }).catch(error => {
+                                    setIncorrectPin(true);
+                                    setGeneralLoading(false);
+                                    setSubmitting(false);
+                                    return;
                                 });
                             }}
-                            >
+                        >
                             {({
-                                values,
-                                errors,
-                                touched,
-                                handleChange,
-                                handleBlur,
-                                handleSubmit,
-                                setFieldValue,
-                                isSubmitting,
-                                /* and other goodies */
-                            }) => (
+                                  values,
+                                  errors,
+                                  touched,
+                                  handleChange,
+                                  handleBlur,
+                                  handleSubmit,
+                                  setFieldValue,
+                                  isSubmitting,
+                                  /* and other goodies */
+                              }) => (
                                 <Form id='signUpForm' onSubmit={handleSubmit}>
                                     <Message positive hidden={false}>
                                         <Message.Header>Check your mailbox!</Message.Header>
-                                        <p>We have just sent you an email containing a 4-digit PIN code. Please enter this code below to start your journey on CareerFairy. <span className='resend-link' onClick={() => resendVerificationEmail()}>Resend the email verification link.</span></p>
+                                        <p>We have just sent you an email containing a 4-digit PIN code. Please enter
+                                            this code below to start your journey on CareerFairy. <span
+                                                className='resend-link' onClick={() => resendVerificationEmail()}>Resend the email verification link.</span>
+                                        </p>
                                     </Message>
                                     <Form.Field>
-                                        <label style={{ color: 'rgb(120,120,120)' }}>PIN Code</label>
-                                        <input id='pinCode' type='text' name='pinCode' placeholder='PIN Code' onChange={handleChange} onBlur={handleBlur} value={values.pinCode} disabled={isSubmitting || generalLoading} maxLength='4'/>
+                                        <label style={{color: 'rgb(120,120,120)'}}>PIN Code</label>
+                                        <input id='pinCode' type='text' name='pinCode' placeholder='PIN Code'
+                                               onChange={handleChange} onBlur={handleBlur} value={values.pinCode}
+                                               disabled={isSubmitting || generalLoading} maxLength='4'/>
                                         <div className='field-error'>
                                             {errors.pinCode && touched.pinCode && errors.pinCode}
                                         </div>
                                     </Form.Field>
-                                    <Button id='submitButton' fluid primary size='big' type="submit" loading={isSubmitting || generalLoading}>Validate Email</Button>
+                                    <Button id='submitButton' fluid primary size='big' type="submit"
+                                            loading={isSubmitting || generalLoading}>Validate Email</Button>
                                     <Message negative hidden={!incorrectPin}>
                                         <Message.Header>Incorrect PIN</Message.Header>
-                                        <p>The PIN code you entered appears to be incorrect. <span className='resend-link' onClick={() => resendVerificationEmail()}>Resend the verification email.</span></p>
+                                        <p>The PIN code you entered appears to be incorrect. <span
+                                            className='resend-link' onClick={() => resendVerificationEmail()}>Resend the verification email.</span>
+                                        </p>
                                     </Message>
                                     <div className='reset-email'>
-                                        <div style={{ marginBottom: '5px'}}>Having issues signing up?<a style={{ marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us know</a></div>
-                                    </div> 
-                                    <div className={'errorMessage ' + (errorMessageShown ? '' : 'hidden')}>An error occured while creating to your account</div>
+                                        <div style={{marginBottom: '5px'}}>Having issues signing up?<a
+                                            style={{marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us
+                                            know</a></div>
+                                    </div>
+                                    <div className={'errorMessage ' + (errorMessageShown ? '' : 'hidden')}>An error
+                                        occured while creating to your account
+                                    </div>
                                 </Form>
                             )}
-                            </Formik>
-                        </div>
-                        <style jsx>{`
+                        </Formik>
+                    </div>
+                    <style jsx>{`
                                 
                             .hidden {
                                 display: none

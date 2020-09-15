@@ -3,15 +3,17 @@ import {withFirebase} from 'data/firebase';
 import {Icon} from 'semantic-ui-react';
 import AuthenticatedHeader from './authenticated-header/AuthenticatedHeader';
 import NonAuthenticatedHeader from './non-authenticated-header/NonAuthenticatedHeader';
-import { compose } from 'redux';
+import {compose} from 'redux';
 
 import Link from 'next/link';
-import { withRouter } from 'next/router';
+import {useRouter, withRouter} from 'next/router';
 import LandingHeader from './landing-header/LandingHeader';
+import {Button} from "@material-ui/core";
 
-function Header (props) {
+function Header(props) {
     const [authenticated, setAuthenticated] = useState(false);
     const [sidebarState, setSidebarState] = useState("unopened");
+    const {push} = useRouter()
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
@@ -23,10 +25,16 @@ function Header (props) {
         })
     }, []);
 
+    const handleLogout = () => {
+        props.firebase.doSignOut().then(
+            push("/login")
+        )
+    }
+
     const ConstantSideHeader = () => {
         return (
             <div className='sidebar'>
-                <Icon name='times circle outline' size='big' onClick={toggleSideBar} style={{ cursor: 'pointer' }}/>
+                <Icon name='times circle outline' size='big' onClick={toggleSideBar} style={{cursor: 'pointer'}}/>
                 <ul>
                     <li><Link href='/next-livestreams'><a>Next Live Streams</a></Link></li>
                     <li><Link href='/discover'><a>Past Live Streams</a></Link></li>
@@ -34,7 +42,9 @@ function Header (props) {
                     <li><Link href='/wishlist'><a>Wishlist</a></Link></li>
                     <li><a href='https://corporate.careerfairy.io/companies'>For Companies</a></li>
                     <li><a href='https://corporate.careerfairy.io/career-center'>For Career Centers</a></li>
-                    <li><Link href={ authenticated  ? '/profile' : '/login'}><a>{ authenticated  ? 'My Profile' : 'Log in'}</a></Link></li>
+                    <li><Link href={authenticated ? '/profile' : '/login'}><a>{authenticated ? 'My Profile' : 'Log in'}</a></Link></li>
+                    {authenticated && <li><Button onClick={handleLogout} variant="contained" color="primary">Logout</Button></li>}
+
                 </ul>
                 <style jsx>{`
                     .sidebar {
@@ -88,7 +98,7 @@ function Header (props) {
                         }
                     }
                 `}</style>
-            </div>       
+            </div>
         );
     }
 
@@ -107,7 +117,7 @@ function Header (props) {
             return (
                 <LandingHeader {...props} toggleSideBar={toggleSideBar} authenticated={authenticated}/>
             );
-        } 
+        }
     } else if (authenticated) {
         TopHeader = (props) => {
             return (
@@ -127,8 +137,9 @@ function Header (props) {
             <div id="mainHeader" className={props.classElement}>
                 <TopHeader {...props}/>
             </div>
-            <div className={sidebarState === "unopened" ? 'sidebar hidden' : sidebarState === "opened" ? 'sidebar animated slideInLeft faster' :'sidebar animated slideOutLeft faster'}>
-                <Icon name='times circle outline' size='big' onClick={toggleSideBar} style={{ cursor: 'pointer' }}/>
+            <div
+                className={sidebarState === "unopened" ? 'sidebar hidden' : sidebarState === "opened" ? 'sidebar animated slideInLeft faster' : 'sidebar animated slideOutLeft faster'}>
+                <Icon name='times circle outline' size='big' onClick={toggleSideBar} style={{cursor: 'pointer'}}/>
                 <ul>
                     <li><Link href='/next-livestreams'><a>Next Live Streams</a></Link></li>
                     <li><Link href='/discover'><a>Past Live Streams</a></Link></li>
@@ -136,7 +147,10 @@ function Header (props) {
                     <li><Link href='/wishlist'><a>Wishlist</a></Link></li>
                     <li><a href='https://corporate.careerfairy.io/companies'>For Companies</a></li>
                     <li><a href='https://corporate.careerfairy.io/career-center'>For Career Centers</a></li>
-                    <li><Link href={ authenticated  ? '/profile' : '/login'}><a>{ authenticated  ? 'My Profile' : 'Log in'}</a></Link></li>
+                    <li><Link
+                        href={authenticated ? '/profile' : '/login'}><a>{authenticated ? 'My Profile' : 'Log in'}</a></Link>
+                    </li>
+                    {authenticated && <li><Button onClick={handleLogout} color="primary">Logout</Button></li>}
                 </ul>
             </div>
             <style jsx>{`
