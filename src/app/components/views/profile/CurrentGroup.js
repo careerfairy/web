@@ -119,13 +119,6 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
 
     return (
         <Fragment key={localGroup.id}>
-            <GroupJoinModal
-                open={openJoinModal}
-                group={localGroup}
-                alreadyJoined={userData.groupIds?.includes(localGroup.id)}
-                userData={userData}
-                closeModal={handleCloseJoinModal}
-            />
             <Grow in={Boolean(localGroup.id)} timeout={600}>
                 <Grid item xs={12} sm={6} md={4} lg={4}>
                     <Card style={{position: "relative"}}>
@@ -177,21 +170,28 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                                               onMouseEnter={() => setLeaveGroup(false)}
                                     >Delete group</MenuItem>
                                 </>}
-                                <AreYouSureModal
-                                    open={open}
-                                    handleClose={() => setOpen(false)}
-                                    handleConfirm={leaveGroup ? handleLeaveGroup : handleDeleteCareerCenter}
-                                    title="Warning"
-                                    message={leaveGroup ?
-                                        `Are you sure you want to leave ${localGroup.universityName}'s group?`
-                                        :
-                                        `Are you sure you want to delete ${localGroup.universityName}? You wont be able to revert changes`}
-                                />
                             </Menu>
                         </CardActions>
                     </Card>
                 </Grid>
             </Grow>
+            <GroupJoinModal
+                open={openJoinModal}
+                group={localGroup}
+                alreadyJoined={userData.groupIds?.includes(localGroup.id)}
+                userData={userData}
+                closeModal={handleCloseJoinModal}
+            />
+            <AreYouSureModal
+                open={open}
+                handleClose={() => setOpen(false)}
+                handleConfirm={leaveGroup ? handleLeaveGroup : handleDeleteCareerCenter}
+                title="Warning"
+                message={leaveGroup ?
+                    `Are you sure you want to leave ${localGroup.universityName}'s group?`
+                    :
+                    `Are you sure you want to delete ${localGroup.universityName}? You wont be able to revert changes`}
+            />
         </Fragment>
     );
 };

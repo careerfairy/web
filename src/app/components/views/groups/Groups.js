@@ -1,7 +1,8 @@
 import React, {Fragment} from 'react';
-import { Grow, Typography} from "@material-ui/core";
+import {Grow, Typography} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import NewGroup from "../profile/NewGroup";
+import {Slide} from 'react-reveal';
 
 const Groups = ({groups, userData}) => {
 
@@ -9,11 +10,11 @@ const Groups = ({groups, userData}) => {
 
     moreGroupElements = groups.map(group => {
         return (
-            <Grow key={group.id} in={Boolean(group)} timeout={600}>
-                <Grid item xs={12} sm={6} md={4} lg={4}>
+            <Grid item xs={12} sm={6} md={4} lg={4}>
+                <Slide left appear={Boolean(group)} key={group.id}>
                     <NewGroup group={group} userData={userData}/>
-                </Grid>
-            </Grow>
+                </Slide>
+            </Grid>
         )
     });
     return (
