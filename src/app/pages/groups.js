@@ -46,16 +46,22 @@ const JoinGroup = (props) => {
     }, [user]);
 
     useEffect(() => {
-        props.firebase.listenToGroups(querySnapshot => {
-            let careerCenters = [];
-            querySnapshot.forEach(doc => {
-                let careerCenter = doc.data();
-                careerCenter.id = doc.id;
-                careerCenters.push(careerCenter);
-            })
-            setGroups(careerCenters);
-        });
-    }, []);
+        if (userData) {
+            const unsubscribe = props.firebase.listenToGroups(querySnapshot => {
+                let careerCenters = [];
+                querySnapshot.forEach(doc => {
+                    let careerCenter = doc.data();
+                    careerCenter.id = doc.id;
+                    console.log(userData);
+                    if (!userData.groupIds.includes(careerCenter.id)) {
+                        careerCenters.push(careerCenter);
+                    }
+                })
+                setGroups(careerCenters);
+            });
+            return () => unsubscribe();
+        }
+    }, [userData]);
 
     if (user === null || userData === null || loading === true) {
         return <Loader/>;

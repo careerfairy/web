@@ -9,6 +9,7 @@ import {Card, CardContent, CardMedia, Typography, Button, Grow, IconButton, Grid
 import {makeStyles} from "@material-ui/core/styles";
 import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal";
 import Skeleton from '@material-ui/lab/Skeleton';
+import GroupJoinModal from "./GroupJoinModal";
 
 
 const useStyles = makeStyles({
@@ -33,6 +34,10 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
     const [localGroup, setLocalGroup] = useState({})
     const [noGroup, setNoGroup] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null);
+    const [leaving, setLeaving] = useState(false);
+    const [openJoinModal, setOpenJoinModal] = useState(false);
+    const [leaveGroup, setLeaveGroup] = useState(false)
+    console.log(leaveGroup);
 
     useEffect(() => {
         if (group) {
@@ -57,6 +62,14 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
         }
     }, [])
 
+    const handleCloseJoinModal = () => {
+        setOpenJoinModal(false);
+    };
+    const handleOpenJoinModal = () => {
+        setOpenJoinModal(true);
+        setAnchorEl(null)
+    };
+
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -78,6 +91,27 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
             console.log("error in career center deletion", e)
         }
     }
+    const handleLeaveGroup = async () => {
+        try {
+            setLeaving(true);
+            const targetGroupId = localGroup.id;
+            const filteredArrayOfGroups = userData.registeredGroups.filter(
+                (group) => group.groupId !== targetGroupId
+            );
+            const arrayOfGroupIds = filteredArrayOfGroups.map((obj) => obj.groupId);
+            const userId = userData.id || userData.userEmail
+            await firebase.setgroups(
+                userId,
+                arrayOfGroupIds,
+                filteredArrayOfGroups
+            );
+            setLeaving(false);
+            setOpen(false)
+        } catch (e) {
+            setLeaving(false);
+            console.log("error in leaving", e);
+        }
+    };
 
     if (noGroup) {
         return null
@@ -85,6 +119,13 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
 
     return (
         <Fragment key={localGroup.id}>
+            <GroupJoinModal
+                open={openJoinModal}
+                group={localGroup}
+                alreadyJoined={userData.groupIds?.includes(localGroup.id)}
+                userData={userData}
+                closeModal={handleCloseJoinModal}
+            />
             <Grow in={Boolean(localGroup.id)} timeout={600}>
                 <Grid item xs={12} sm={6} md={4} lg={4}>
                     <Card style={{position: "relative"}}>
@@ -120,22 +161,31 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                                 open={Boolean(anchorEl)}
                                 onClose={handleClose}
                             >
-                                <MenuItem onClick={() => push(`/group/${localGroup.id}/admin`)}>Update my
-                                    data</MenuItem>
                                 <MenuItem onClick={() => router.push('/group/' + localGroup.id)}>Group Page</MenuItem>
-                                {isAdmin ?
+                                <MenuItem onMouseEnter={() => setLeaveGroup(true)} onClick={() => setOpen(true)}>Leave
+                                    Group</MenuItem>
+                                {localGroup.categories && <MenuItem onClick={handleOpenJoinModal}>Update</MenuItem>}
+                                {isAdmin &&
+                                <>
+                                    <MenuItem onClick={() => push(`/group/${localGroup.id}/admin`)}>
+                                        Settings
+                                    </MenuItem>
                                     <MenuItem onClick={() => {
                                         setOpen(true)
                                         handleClose()
-                                    }}>Delete group</MenuItem>
-                                    :
-                                    <MenuItem onClick={handleClose}>Leave group</MenuItem>}
+                                    }}
+                                              onMouseEnter={() => setLeaveGroup(false)}
+                                    >Delete group</MenuItem>
+                                </>}
                                 <AreYouSureModal
                                     open={open}
                                     handleClose={() => setOpen(false)}
-                                    handleConfirm={handleDeleteCareerCenter}
+                                    handleConfirm={leaveGroup ? handleLeaveGroup : handleDeleteCareerCenter}
                                     title="Warning"
-                                    message={`Are you sure you want to delete ${localGroup.universityName}? You wont be able to revert changes`}
+                                    message={leaveGroup ?
+                                        `Are you sure you want to leave ${localGroup.universityName}'s group?`
+                                        :
+                                        `Are you sure you want to delete ${localGroup.universityName}? You wont be able to revert changes`}
                                 />
                             </Menu>
                         </CardActions>

@@ -24,11 +24,11 @@ const AreYouSureModal = ({title, message, handleConfirm, open, handleClose}) => 
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} variant="contained" color="secondary">
-                        Cancel
-                    </Button>
                     <Button onClick={handleConfirm} variant="contained" color="primary">
                         Confirm
+                    </Button>
+                    <Button onClick={handleClose}  color="secondary">
+                        Cancel
                     </Button>
                 </DialogActions>
             </Dialog>

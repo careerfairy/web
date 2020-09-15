@@ -55,6 +55,7 @@ class Firebase {
   setUserData = (userEmail, firstName, lastName) => {
     let ref = this.firestore.collection("userData").doc(userEmail);
     return ref.update({
+      id: userEmail,
       userEmail: userEmail,
       firstName: firstName,
       lastName: lastName,

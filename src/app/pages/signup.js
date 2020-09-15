@@ -40,7 +40,7 @@ function SignUpPage(props) {
             }
         })
     }, []);
-        const steps = getSteps();
+    const steps = getSteps();
 
 
     const handleNext = () => {
@@ -176,6 +176,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                 setEmailVerificationSent(true);
                 setGeneralLoading(false);
             }).catch(error => {
+                console.log("error in signup base", error);
                 setGeneralLoading(false);
             });
         }
