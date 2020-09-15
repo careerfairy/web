@@ -152,39 +152,27 @@ const GroupJoinModal = ({
                 <DialogContentText align="center" noWrap>
                     {group.description}
                 </DialogContentText>
-            </DialogContent>
-            <DialogActions className={classes.actions}>
-                {!!categories.length && renderCategories}
-                <Box justifyContent="flex-end" display="flex">
-                    {(alreadyJoined && group.categories) || !alreadyJoined ? (
-                        <Button
-                            fullWidth
-                            disabled={!allSelected || submitting}
-                            variant="contained"
-                            size="large"
-                            style={{margin: "10px 0 0 5px"}}
-                            endIcon={
-                                submitting && <CircularProgress size={20} color="inherit"/>
-                            }
-                            onClick={handleJoinGroup}
-                            color="primary"
-                            autoFocus
-                        >
-                            Confirm
-                        </Button>
-                    ) : null}
-                    <Button
-                        fullWidth
-                        size="large"
-                        style={{margin: "10px 5px 0 0"}}
-                        endIcon={
-                            submitting && <CircularProgress size={20} color="inherit"/>
-                        }
-                        onClick={closeModal}
-                    >
-                        Cancel
-                    </Button>
+                <Box className={classes.actions}>
+                    {!!categories.length && renderCategories}
                 </Box>
+            </DialogContent>
+            <DialogActions>
+                {((alreadyJoined && group.categories) || !alreadyJoined) &&
+                <Button
+                    disabled={!allSelected || submitting}
+                    variant="contained"
+                    size="large"
+                    endIcon={submitting && <CircularProgress size={20} color="inherit"/>}
+                    onClick={handleJoinGroup}
+                    color="primary"
+                    autoFocus>
+                    Confirm
+                </Button>}
+                <Button
+                    size="large"
+                    onClick={closeModal}>
+                    Cancel
+                </Button>
             </DialogActions>
         </Dialog>
     );

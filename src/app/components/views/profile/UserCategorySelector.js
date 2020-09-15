@@ -45,7 +45,7 @@ const UserCategorySelector = ({category, handleSetSelected}) => {
 
     return (
         <Fragment>
-            <FormControl style={{width: native ? '100%' : '80%' }} className={classes.formControl}>
+            <FormControl style={{width: native ? '100%' : '100%' }} className={classes.formControl}>
                 <InputLabel id="demo-controlled-open-select-label">{category.name}</InputLabel>
                 <Select
                     open={open}
