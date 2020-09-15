@@ -29,6 +29,15 @@ import {
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
+    root: {
+        backgroundColor: "transparent",
+        "& .MuiStepLabel-active": {
+            color: "#000"
+        },
+        "&.Mui-disabled .MuiStepLabel-label": {
+            color: "red"
+        }
+    },
     paper: {
         marginTop: theme.spacing(8),
         display: 'flex',
@@ -48,11 +57,26 @@ const useStyles = makeStyles((theme) => ({
     submit: {
         margin: theme.spacing(3, 0, 2),
     },
-
     resetEmail: {
         margin: "20px auto 0 auto",
         textAlign: "center"
-    }
+    },
+    stepper: {
+        color: "white"
+    },
+    icon: {
+        color: theme.palette.secondary.main,
+        "&$activeIcon": {
+            color: "white"
+        },
+        "&$completedIcon": {
+            // color: theme.palette.secondary.main
+        }
+    },
+    activeIcon: {
+        color: "black"
+    },
+    completedIcon: {}
 }));
 
 function getSteps() {
@@ -148,10 +172,19 @@ function SignUpPage(props) {
                 }}>
                     Sign Up
                 </div>
-                <Stepper style={{backgroundColor: '#FAFAFA'}} activeStep={activeStep} alternativeLabel>
+                <Stepper className={classes.root} activeStep={activeStep} alternativeLabel>
                     {steps.map((label) => (
                         <Step key={label}>
-                            <StepLabel color="primary">{label}</StepLabel>
+                            <StepLabel className={classes.root}
+
+                                       StepIconProps={{
+                                           classes: {
+                                               root: classes.icon,
+                                               active: classes.activeIcon,
+                                               completed: classes.completedIcon
+                                           }
+                                       }}
+                                       color="secondary">{label}</StepLabel>
                         </Step>
                     ))}
                 </Stepper>
