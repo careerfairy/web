@@ -179,7 +179,7 @@ export function LogInFormBase(props) {
                                         <div style={{ marginBottom: '5px'}}>New to career streaming?</div>
                                         <Link href='/signup'><a href='#'>Sign up</a></Link>
                                     </div> 
-                                    <div className={'errorMessage ' + (errorMessageShown ? '' : 'hidden')}>An error occured while logging in to your account</div>
+                                    <div className={'errorMessage ' + (errorMessageShown ? '' : 'hidden')}>An error occurred while logging in to your account</div>
                                     <div className={'errorMessage ' + (noAccountMessageShown ? '' : 'hidden')}>No account associated with this email address.</div>
                                     <Message positive hidden={!props.userEmailNotValidated}>
                                         <Message.Header>Please validate your email address</Message.Header>
@@ -229,7 +229,7 @@ export function LogInFormBase(props) {
                             }
 
                             .emailSignUpInfo {
-                                margin-top: 10px;
+                                //margin-top: 10px;
                                 font-size: 1em;
                                 color: white;
                                 margin: 0 auto;
@@ -275,7 +275,6 @@ export function LogInFormBase(props) {
                             .loginModal {
                                 background-color: rgb(230,230,230);
                                 padding: 60px;
-                                font-weight: 3em;
                             }
 
                             #loginModalTitle {

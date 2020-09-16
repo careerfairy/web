@@ -11,7 +11,6 @@ import match from 'autosuggest-highlight/match';
 const Highlights = ({groups, handleSelectGroup}) => {
     return (
         <Autocomplete
-            id="highlights-demo"
             style={{width: 300}}
             options={groups}
             selectOnFocus
@@ -19,7 +18,7 @@ const Highlights = ({groups, handleSelectGroup}) => {
             onChange={handleSelectGroup}
             getOptionLabel={(option) => option.universityName ? option.universityName : ""}
             renderInput={(params) => (
-                <TextField {...params} label="Highlights" variant="outlined" margin="normal"/>
+                <TextField {...params} placeholder="Join some groups" label="Groups" fullWidth variant="outlined" margin="normal"/>
             )}
             renderOption={(option, {inputValue}) => {
                 const matches = match(option.universityName, inputValue);

@@ -1,6 +1,9 @@
 import React, {Fragment, useState, useEffect} from 'react';
-import {Form, Header, Image, Message, Icon} from "semantic-ui-react";
+import {Form, Image, Message} from "semantic-ui-react";
 import {withFirebase} from "../data/firebase";
+import TheatersRoundedIcon from '@material-ui/icons/TheatersRounded';
+import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
+import BusinessCenterRoundedIcon from '@material-ui/icons/BusinessCenterRounded';
 
 import {useRouter} from 'next/router';
 import Link from 'next/link';
@@ -8,13 +11,9 @@ import {Formik} from 'formik';
 import axios from 'axios';
 
 import Head from 'next/head';
-import CreateBaseGroup from "../components/views/group/create/CreateBaseGroup";
-import CreateCategories from "../components/views/group/create/CreateCategories";
-import CompleteGroup from "../components/views/group/create/CompleteGroup";
 import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
 import StepLabel from "@material-ui/core/StepLabel";
-import {GlobalBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import {
     Box,
     CircularProgress,
@@ -24,20 +23,13 @@ import {
     Container,
     Button,
     Checkbox,
-    FormHelperText
+    FormHelperText, Typography
 } from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
+import {TealBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
+import GroupProvider from "../components/views/signup/GroupProvider";
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        backgroundColor: "transparent",
-        "& .MuiStepLabel-active": {
-            color: "#000"
-        },
-        "&.Mui-disabled .MuiStepLabel-label": {
-            color: "red"
-        }
-    },
     paper: {
         marginTop: theme.spacing(8),
         display: 'flex',
@@ -61,40 +53,43 @@ const useStyles = makeStyles((theme) => ({
         margin: "20px auto 0 auto",
         textAlign: "center"
     },
-    stepper: {
-        color: "white"
+    footer: {
+        color: 'white',
+        fontWeight: '700',
+        fontSize: '1.3em',
+        margin: '40px 0 30px 0',
+        textAlign: 'center',
+        textTransform: 'uppercase',
+        letterSpacing: '0.4em'
+    },
+    title: {
+        color: 'white',
+        fontWeight: '500',
+        fontSize: '2em',
+        margin: '40px 0 30px 0',
+        textAlign: 'center'
     },
     icon: {
-        color: theme.palette.secondary.main,
-        "&$activeIcon": {
-            color: "white"
-        },
-        "&$completedIcon": {
-            // color: theme.palette.secondary.main
-        }
-    },
-    activeIcon: {
-        color: "black"
-    },
-    completedIcon: {}
+        margin: '0 10px',
+        color: 'white'
+    }
 }));
 
 function getSteps() {
-    return ['Credentials', 'Email Verification'];
+    return ['Credentials', 'Email Verification', 'Join Groups'];
 }
 
-function SignUpPage(props) {
+function SignUpPage({firebase}) {
     const classes = useStyles()
     const router = useRouter();
 
     const [user, setUser] = useState(false);
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
     const [activeStep, setActiveStep] = useState(0);
-    console.log("emailVerificationSent", emailVerificationSent);
 
 
     useEffect(() => {
-        props.firebase.auth.onAuthStateChanged(user => {
+        firebase.auth.onAuthStateChanged(user => {
             if (user && user.emailVerified) {
                 router.push('/profile')
             } else if (user && !user.emailVerified) {
@@ -139,6 +134,14 @@ function SignUpPage(props) {
                     activeStep={activeStep}
                     emailVerificationSent={emailVerificationSent}
                     router={router}/>
+            case 2:
+                return <GroupProvider
+                    user={user}
+                    handleNext={handleNext}
+                    handleBack={handleBack}
+                    handleReset={handleReset}
+                    activeStep={activeStep}
+                    router={router}/>
             default:
                 return 'Unknown stepIndex';
         }
@@ -150,7 +153,7 @@ function SignUpPage(props) {
             <Head>
                 <title key="title">CareerFairy | Sign Up</title>
             </Head>
-            <div className='tealBackground'>
+            <TealBackground>
                 <header>
                     <Link href='/'><a><Image src='/logo_white.png' style={{
                         width: '150px',
@@ -158,68 +161,30 @@ function SignUpPage(props) {
                         display: 'inline-block'
                     }}/></a></Link>
                 </header>
-                <div style={{textAlign: 'center', color: 'rgb(200,200,200)'}}>
-                    <Icon name='film' size='big' style={{margin: '0 10px', color: 'white'}}/>
-                    <Icon name='arrow right circle alternate' size='big' style={{margin: '0 10px', color: 'white'}}/>
-                    <Icon name='briefcase' size='big' style={{margin: '0 10px', color: 'white'}}/>
-                </div>
-                <div style={{
-                    color: 'white',
-                    fontWeight: '500',
-                    fontSize: '2em',
-                    margin: '40px 0 30px 0',
-                    textAlign: 'center'
-                }}>
+                <Box display="flex" justifyContent="center">
+                    <TheatersRoundedIcon className={classes.icon} fontSize="large"/>
+                    <ArrowForwardIosRoundedIcon className={classes.icon} fontSize="large"/>
+                    <BusinessCenterRoundedIcon className={classes.icon} fontSize="large"/>
+                </Box>
+                <Typography className={classes.title}>
                     Sign Up
-                </div>
-                <Stepper className={classes.root} activeStep={activeStep} alternativeLabel>
-                    {steps.map((label) => (
-                        <Step key={label}>
-                            <StepLabel className={classes.root}
-
-                                       StepIconProps={{
-                                           classes: {
-                                               root: classes.icon,
-                                               active: classes.activeIcon,
-                                               completed: classes.completedIcon
-                                           }
-                                       }}
-                                       color="secondary">{label}</StepLabel>
-                        </Step>
-                    ))}
-                </Stepper>
-                {getStepContent(activeStep)}
-                {/*<div className={user ? 'hidden' : ''}>*/}
-                {/*    <SignUpForm user={user} emailVerificationSent={emailVerificationSent}*/}
-                {/*                setEmailVerificationSent={(bool) => setEmailVerificationSent(bool)}/>*/}
-                {/*</div>*/}
-                {/*<div className={user ? '' : 'hidden'}>*/}
-                {/*    <SignUpFormSent user={user} emailVerificationSent={emailVerificationSent} router={router}/>*/}
-                {/*</div>*/}
-                <div style={{
-                    color: 'white',
-                    fontWeight: '700',
-                    fontSize: '1.3em',
-                    margin: '40px 0 30px 0',
-                    textAlign: 'center',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.4em'
-                }}>
+                </Typography>
+                <Container maxWidth="sm">
+                    <Box boxShadow={1} p={3} className={classes.box}>
+                        <Stepper activeStep={activeStep} alternativeLabel>
+                            {steps.map((label) => (
+                                <Step key={label}>
+                                    <StepLabel color="secondary">{label}</StepLabel>
+                                </Step>
+                            ))}
+                        </Stepper>
+                        {getStepContent(activeStep)}
+                    </Box>
+                </Container>
+                <Typography className={classes.footer}>
                     Meet Your Future
-                </div>
-                <style jsx>{`
-                    .hidden {
-                        display: none
-                    }
-
-                    .tealBackground {
-                        min-height: 100vh;
-                        height: 100%;
-                        background-color: rgb(0, 210, 170);
-                        padding: 0 0 40px 0;
-                    }
-                `}</style>
-            </div>
+                </Typography>
+            </TealBackground>
         </Fragment>
     )
 }
@@ -236,6 +201,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
     const [emailSent, setEmailSent] = useState(false);
     const [errorMessageShown, setErrorMessageShown] = useState(false);
     const [generalLoading, setGeneralLoading] = useState(false);
+    const [formData, setFormData] = useState({})
 
     useEffect(() => {
         if (emailSent && user && !emailVerificationSent) {
@@ -244,6 +210,8 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                 url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmailWithPin',
                 data: {
                     recipientEmail: user.email,
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
                 }
             }).then(response => {
                 setEmailVerificationSent(true);
@@ -301,6 +269,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     return errors;
                 }}
                 onSubmit={(values, {setSubmitting}) => {
+                    setFormData(values)
                     setErrorMessageShown(false);
                     setEmailSent(false);
                     setGeneralLoading(true);
@@ -328,142 +297,139 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                       /* and other goodies */
                   }) => (
                     <form id='signUpForm' onSubmit={handleSubmit}>
-                        <Container maxWidth="sm">
-                            <Box boxShadow={1} p={3} className={classes.box}>
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            autoComplete="fname"
-                                            name="firstName"
-                                            variant="outlined"
-                                            required
-                                            fullWidth
-                                            id="firstName"
-                                            label="First Name"
-                                            autoFocus
-                                            onBlur={handleBlur}
-                                            value={values.firstName}
-                                            disabled={isSubmitting || emailSent || generalLoading}
-                                            error={Boolean(errors.firstName && touched.firstName && errors.firstName)}
-                                            onChange={handleChange}
-                                            helperText={errors.firstName && touched.firstName && errors.firstName}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            variant="outlined"
-                                            required
-                                            fullWidth
-                                            id="lastName"
-                                            label="Last Name"
-                                            name="lastName"
-                                            autoComplete="lname"
-                                            onBlur={handleBlur}
-                                            disabled={isSubmitting || emailSent || generalLoading}
-                                            value={values.lastName}
-                                            error={Boolean(errors.lastName && touched.lastName && errors.lastName)}
-                                            onChange={handleChange}
-                                            helperText={errors.lastName && touched.lastName && errors.lastName}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            variant="outlined"
-                                            fullWidth
-                                            helperText={errors.email && touched.email && errors.email}
-                                            error={Boolean(errors.email && touched.email && errors.email)}
-                                            autoComplete="email"
-                                            id='emailInput'
-                                            name='email'
-                                            placeholder='Email'
-                                            onChange={handleChange} onBlur={handleBlur} value={values.email}
-                                            disabled={isSubmitting || emailSent || generalLoading}
-                                            label="Email Address"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            variant="outlined"
-                                            required
-                                            fullWidth
-                                            label="Password"
-                                            id="password"
-                                            autoComplete="current-password"
-                                            type='password'
-                                            name='password'
-                                            error={Boolean(errors.password && touched.password && errors.password)}
-                                            helperText={errors.password && touched.password && errors.password}
-                                            placeholder='Password'
-                                            onChange={handleChange} onBlur={handleBlur}
-                                            value={values.password}
-                                            disabled={isSubmitting || emailSent || generalLoading}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            variant="outlined"
-                                            required
-                                            fullWidth
-                                            label="Confirm Password"
-                                            autoComplete="current-password"
-                                            error={Boolean(errors.confirmPassword && touched.confirmPassword && errors.confirmPassword)}
-                                            helperText={errors.confirmPassword && touched.confirmPassword && errors.confirmPassword}
-                                            id='confirmPasswordInput'
-                                            type='password'
-                                            name='confirmPassword'
-                                            placeholder='Confirm Password'
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            value={values.confirmPassword}
-                                            disabled={isSubmitting || emailSent || generalLoading}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <FormControlLabel
-                                            control={<Checkbox
-                                                name='agreeTerm'
-                                                placeholder='Confirm Password'
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                value={values.agreeTerm}
-                                                disabled={isSubmitting || emailSent || generalLoading}
-                                                color="primary"
-                                            />}
-                                            label={<>I agree to
-                                                the <Link href='/terms'><a>Terms & Conditions</a></Link> and the <Link
-                                                    href='/privacy'><a>Privacy Policy</a></Link></>}
-                                        />
-                                        <FormHelperText
-                                            error={errors.agreeTerm && touched.agreeTerm && errors.agreeTerm}>
-                                            {errors.agreeTerm && touched.agreeTerm && errors.agreeTerm}
-                                        </FormHelperText>
-                                    </Grid>
-                                </Grid>
-                                <Button
-                                    type="submit"
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    autoComplete="fname"
+                                    name="firstName"
+                                    variant="outlined"
                                     fullWidth
-                                    variant="contained"
-                                    color="primary"
-                                    disabled={emailSent}
-                                    endIcon={(isSubmitting || generalLoading) &&
-                                    <CircularProgress size={20} color="inherit"/>}
-                                    className={classes.submit}
-                                >
-                                    Sign up
-                                </Button>
-                                <div className={classes.resetEmail}>
-                                    <div style={{marginBottom: '5px'}}>Already part of the family?</div>
-                                    <Link href='/login'><a href='#'>Log in</a></Link>
-                                </div>
-                                <div className={classes.resetEmail}>
-                                    <div style={{marginBottom: '5px'}}>Having issues signing up?<a
-                                        style={{marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us
-                                        know</a></div>
-                                </div>
-                                {errorMessageShown && <FormHelperText error>An error
-                                    occured while creating to your account</FormHelperText>}
-                            </Box>
-                        </Container>
+                                    id="firstName"
+                                    label="First Name"
+                                    autoFocus
+                                    inputProps={{maxLength: 50}}
+                                    onBlur={handleBlur}
+                                    value={values.firstName}
+                                    disabled={isSubmitting || emailSent || generalLoading}
+                                    error={Boolean(errors.firstName && touched.firstName && errors.firstName)}
+                                    onChange={handleChange}
+                                    helperText={errors.firstName && touched.firstName && errors.firstName}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    variant="outlined"
+                                    fullWidth
+                                    id="lastName"
+                                    inputProps={{maxLength: 50}}
+                                    maxLength="50"
+                                    label="Last Name"
+                                    name="lastName"
+                                    autoComplete="lname"
+                                    onBlur={handleBlur}
+                                    disabled={isSubmitting || emailSent || generalLoading}
+                                    value={values.lastName}
+                                    error={Boolean(errors.lastName && touched.lastName && errors.lastName)}
+                                    onChange={handleChange}
+                                    helperText={errors.lastName && touched.lastName && errors.lastName}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    variant="outlined"
+                                    fullWidth
+                                    helperText={errors.email && touched.email && errors.email}
+                                    error={Boolean(errors.email && touched.email && errors.email)}
+                                    autoComplete="email"
+                                    id='emailInput'
+                                    name='email'
+                                    placeholder='Email'
+                                    onChange={handleChange} onBlur={handleBlur} value={values.email}
+                                    disabled={isSubmitting || emailSent || generalLoading}
+                                    label="Email Address"
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    variant="outlined"
+                                    required
+                                    fullWidth
+                                    label="Password"
+                                    id="password"
+                                    autoComplete="current-password"
+                                    type='password'
+                                    name='password'
+                                    error={Boolean(errors.password && touched.password && errors.password)}
+                                    helperText={errors.password && touched.password && errors.password}
+                                    placeholder='Password'
+                                    onChange={handleChange} onBlur={handleBlur}
+                                    value={values.password}
+                                    disabled={isSubmitting || emailSent || generalLoading}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    variant="outlined"
+                                    required
+                                    fullWidth
+                                    label="Confirm Password"
+                                    autoComplete="current-password"
+                                    error={Boolean(errors.confirmPassword && touched.confirmPassword && errors.confirmPassword)}
+                                    helperText={errors.confirmPassword && touched.confirmPassword && errors.confirmPassword}
+                                    id='confirmPasswordInput'
+                                    type='password'
+                                    name='confirmPassword'
+                                    placeholder='Confirm Password'
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.confirmPassword}
+                                    disabled={isSubmitting || emailSent || generalLoading}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <FormControlLabel
+                                    control={<Checkbox
+                                        name='agreeTerm'
+                                        placeholder='Confirm Password'
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        value={values.agreeTerm}
+                                        disabled={isSubmitting || emailSent || generalLoading}
+                                        color="primary"
+                                    />}
+                                    label={<>I agree to
+                                        the <Link href='/terms'><a>Terms & Conditions</a></Link> and the <Link
+                                            href='/privacy'><a>Privacy Policy</a></Link></>}
+                                />
+                                <FormHelperText
+                                    error={errors.agreeTerm && touched.agreeTerm && errors.agreeTerm}>
+                                    {errors.agreeTerm && touched.agreeTerm && errors.agreeTerm}
+                                </FormHelperText>
+                            </Grid>
+                        </Grid>
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            disabled={emailSent}
+                            endIcon={(isSubmitting || generalLoading) &&
+                            <CircularProgress size={20} color="inherit"/>}
+                            className={classes.submit}
+                        >
+                            Sign up
+                        </Button>
+                        <div className={classes.resetEmail}>
+                            <div style={{marginBottom: '5px'}}>Already part of the family?</div>
+                            <Link href='/login'><a href='#'>Log in</a></Link>
+                        </div>
+                        <div className={classes.resetEmail}>
+                            <div style={{marginBottom: '5px'}}>Having issues signing up?<a
+                                style={{marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us
+                                know</a></div>
+                        </div>
+                        {errorMessageShown && <FormHelperText error>An error
+                            occurred while creating to your account</FormHelperText>}
                     </form>
                 )}
             </Formik>
@@ -471,7 +437,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
     )
 }
 
-function SignUpFormValidate({user, router, setEmailVerificationSent}) {
+function SignUpFormValidate({user, router, setEmailVerificationSent, handleNext}) {
     const classes = useStyles()
 
     const [errorMessageShown, setErrorMessageShown] = useState(false);
@@ -522,9 +488,10 @@ function SignUpFormValidate({user, router, setEmailVerificationSent}) {
                                         pinCode: parseInt(values.pinCode)
                                     }
                                 }).then(response => {
-                                    user.reload().then(() => {
-                                        return router.push('/profile');
-                                    });
+                                    handleNext()
+                                    // user.reload().then(() => {
+                                    //     return router.push('/profile');
+                                    // });
                                 }).catch(error => {
                                     setIncorrectPin(true);
                                     setGeneralLoading(false);

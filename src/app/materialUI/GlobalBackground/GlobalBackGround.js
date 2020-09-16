@@ -11,9 +11,10 @@ export const GlobalBackground = withStyles({
 
 export const TealBackground = withStyles({
     root: {
-        backgroundColor: "rgb(250,250,250)",
+        backgroundColor: "rgb(0, 210, 170)",
         height: "100%",
         minHeight: "100vh",
+        padding: "0 0 40px 0"
     },
 })(Box);
 

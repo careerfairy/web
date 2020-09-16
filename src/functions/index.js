@@ -118,9 +118,16 @@ exports.sendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(as
     }
 
     const recipient_email = req.body.recipientEmail;
+    const recipient_first_name = req.body.firstName;
+    const recipient_last_name = req.body.lastName;
     const pinCode = getRandomInt(9999);
 
-    await admin.firestore().collection("userData").doc(recipient_email).set({ validationPin: pinCode });
+    await admin.firestore().collection("userData").doc(recipient_email).set(
+        {
+            validationPin: pinCode,
+            firstName: recipient_first_name,
+            lastName: recipient_last_name
+        });
 
     const email = {
         "TemplateId": 17669843,
