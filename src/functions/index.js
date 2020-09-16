@@ -118,6 +118,38 @@ exports.sendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(as
     }
 
     const recipient_email = req.body.recipientEmail;
+    const pinCode = getRandomInt(9999);
+
+    await admin.firestore().collection("userData").doc(recipient_email).set({ validationPin: pinCode });
+
+    const email = {
+        "TemplateId": 17669843,
+        "From": 'CareerFairy <noreply@careerfairy.io>',
+        "To": recipient_email,
+        "TemplateModel": { pinCode: pinCode }
+    };
+
+    return client.sendEmailWithTemplate(email).then(response => {
+        res.sendStatus(200);
+    }, error => {
+        res.sendStatus(500);
+    });
+});
+
+exports.sendPostmarkEmailVerificationEmailWithPinAndUpdateUserData = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    const recipient_email = req.body.recipientEmail;
     const recipient_first_name = req.body.firstName;
     const recipient_last_name = req.body.lastName;
     const pinCode = getRandomInt(9999);
@@ -126,7 +158,8 @@ exports.sendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(as
         {
             validationPin: pinCode,
             firstName: recipient_first_name,
-            lastName: recipient_last_name
+            lastName: recipient_last_name,
+            userEmail: recipient_email,
         });
 
     const email = {

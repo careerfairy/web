@@ -26,7 +26,7 @@ const GroupProvider = ({firebase, user, handleNext, handleBack, handleReset}) =>
                     let careerCenter = doc.data();
                     careerCenter.id = doc.id;
                     console.log(userData);
-                    if (!userData.groupIds.includes(careerCenter.id)) {
+                    if (!userData.groupIds?.includes(careerCenter.id)) {
                         careerCenters.push(careerCenter);
                     }
                 })

@@ -53,7 +53,7 @@ const JoinGroup = (props) => {
                     let careerCenter = doc.data();
                     careerCenter.id = doc.id;
                     console.log(userData);
-                    if (!userData.groupIds.includes(careerCenter.id)) {
+                    if (!userData.groupIds?.includes(careerCenter.id)) {
                         careerCenters.push(careerCenter);
                     }
                 })

@@ -143,7 +143,12 @@ function SignUpPage({firebase}) {
                     activeStep={activeStep}
                     router={router}/>
             default:
-                return 'Unknown stepIndex';
+                return <SignUpForm
+                    user={user}
+                    emailVerificationSent={emailVerificationSent}
+                    handleNext={handleNext}
+                    handleBack={handleBack}
+                    setEmailVerificationSent={(bool) => setEmailVerificationSent(bool)}/>;
         }
     }
 
@@ -171,7 +176,7 @@ function SignUpPage({firebase}) {
                 </Typography>
                 <Container maxWidth="sm">
                     <Box boxShadow={1} p={3} className={classes.box}>
-                        <Stepper activeStep={activeStep} alternativeLabel>
+                        <Stepper style={{padding: "0 0 24px 0"}} activeStep={activeStep} alternativeLabel>
                             {steps.map((label) => (
                                 <Step key={label}>
                                     <StepLabel color="secondary">{label}</StepLabel>
@@ -204,19 +209,24 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
     const [formData, setFormData] = useState({})
 
     useEffect(() => {
+
         if (emailSent && user && !emailVerificationSent) {
+            debugger
             axios({
                 method: 'post',
-                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmailWithPin',
+                url: 'http://localhost:5001/careerfairy-e1fd9/us-central1/sendPostmarkEmailVerificationEmailWithPinAndUpdateUserData',
                 data: {
                     recipientEmail: user.email,
                     firstName: formData.firstName,
                     lastName: formData.lastName,
                 }
             }).then(response => {
+                debugger
                 setEmailVerificationSent(true);
                 setGeneralLoading(false);
+                handleNext()
             }).catch(error => {
+                debugger
                 console.log("error in signup base", error);
                 setGeneralLoading(false);
             });
@@ -277,7 +287,6 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                         .then(() => {
                             setSubmitting(false);
                             setEmailSent(true);
-                            handleNext()
                         }).catch(error => {
                         setErrorMessageShown(true);
                         setSubmitting(false);
