@@ -490,10 +490,6 @@ function SignUpFormValidate({user, router, setEmailVerificationSent, setActiveSt
                                     }
                                 }).then(response => {
                                     setActiveStep(2)
-                                    // user.reload().then(() => {
-                                    // handleNext()
-                                    // return router.push('/profile');
-                                    // });
                                 }).catch(error => {
                                     setIncorrectPin(true);
                                     setGeneralLoading(false);
