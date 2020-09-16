@@ -18,12 +18,13 @@ import {
     Box,
     CircularProgress,
     Grid,
+    Paper,
     TextField,
     FormControlLabel,
     Container,
     Button,
     Checkbox,
-    FormHelperText, Typography
+    FormHelperText, Typography, Card
 } from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {TealBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
@@ -86,7 +87,7 @@ function SignUpPage({firebase}) {
 
     const [user, setUser] = useState(false);
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
-    const [activeStep, setActiveStep] = useState(0);
+    const [activeStep, setActiveStep] = useState(1);
 
 
     useEffect(() => {
@@ -509,14 +510,15 @@ function SignUpFormValidate({user, router, setEmailVerificationSent, setActiveSt
                                   isSubmitting,
                                   /* and other goodies */
                               }) => (
-                                <Form id='signUpForm' onSubmit={handleSubmit}>
-                                    <Message positive hidden={false}>
-                                        <Message.Header>Check your mailbox!</Message.Header>
-                                        <p>We have just sent you an email containing a 4-digit PIN code. Please enter
-                                            this code below to start your journey on CareerFairy. <span
-                                                className='resend-link' onClick={() => resendVerificationEmail()}>Resend the email verification link. to <strong>{user.email}</strong></span>
-                                        </p>
-                                    </Message>
+                                <form id='signUpForm' onSubmit={handleSubmit}>
+                                        <Paper elevation={2} style={{color: "#2c662d", padding: "1rem", backgroundColor: "#fcfff5"}} >
+                                            <Typography variant="h6" gutterBottom>Check your mailbox!</Typography>
+                                            <p>We have just sent you an email containing a 4-digit PIN code. Please
+                                                enter
+                                                this code below to start your journey on CareerFairy. <span
+                                                    className='resend-link' onClick={() => resendVerificationEmail()}>Resend the email verification link. to <strong>{user.email}</strong></span>
+                                            </p>
+                                        </Paper>
                                     <Form.Field>
                                         <label style={{color: 'rgb(120,120,120)'}}>PIN Code</label>
                                         <input id='pinCode' type='text' name='pinCode' placeholder='PIN Code'
@@ -542,7 +544,7 @@ function SignUpFormValidate({user, router, setEmailVerificationSent, setActiveSt
                                     <div className={'errorMessage ' + (errorMessageShown ? '' : 'hidden')}>An error
                                         occured while creating to your account
                                     </div>
-                                </Form>
+                                </form>
                             )}
                         </Formik>
                     </div>
