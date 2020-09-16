@@ -1338,7 +1338,7 @@ export function WebRTCAdaptor(initialValues)
 						framesEncoded += value.framesEncoded;
 					}
 				}
-				else if (value.type == "track" && typeof value.kind != "undefined" && value.kind == "audio") {
+				else if ((value.type == "track" && typeof value.kind != "undefined" && value.kind == "audio") || (value.type == "media-source" && typeof value.kind != "undefined" && value.kind == "audio")) {
 					if (typeof value.audioLevel != "undefined") {
 						audioLevel = value.audioLevel;
 					}

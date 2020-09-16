@@ -853,24 +853,26 @@ class Firebase {
         return ref.get();
     }
 
-    postIcon = (livestreamId, iconName) => {
+    postIcon = (livestreamId, iconName, authorEmail) => {
         let ref = this.firestore
                     .collection("livestreams")
-                    .doc(livestreamId);
-        return this.firestore.runTransaction( transaction => {
-            return transaction.get(ref).then(livestreamDoc => {
-                let livestreamData = livestreamDoc.data();
-                let icons = livestreamData.icons || {};
-                if (icons[iconName]) {
-                    icons[iconName] = icons[iconName] + 1;
-                } else {
-                    icons[iconName] = 1;
-                }
-                transaction.update(ref, {
-                    icons: icons
-                });
-            });
-        });
+                    .doc(livestreamId)
+                    .collection("icons");
+        return ref.add({
+            iconName: iconName,
+            timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+            authorEmail: authorEmail,
+            randomPosition: Math.random()
+        })
+    }
+
+    listenToLivestreamIcons = (livestreamId, callback) => {
+        let ref = this.firestore
+                    .collection("livestreams")
+                    .doc(livestreamId)
+                    .collection("icons")
+                    .orderBy("timestamp", "asc");
+        return ref.onSnapshot(callback);
     }
 
     getStorageRef() {
