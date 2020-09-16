@@ -102,7 +102,7 @@ function StreamingPage(props) {
                     </div>
                 </div>
                 <div className='black-frame' style={{ left: showMenu ? '280px' : '0'}}>
-                    <VideoContainer currentLivestream={ currentLivestream } streamerId={ streamerId }/>
+                    <VideoContainer currentLivestream={ currentLivestream } streamerId={ streamerId } viewer={false}/>
                 </div>
                 <div className='video-menu-left' style={{ width: showMenu ? '280px' : '0'}}> 
                     <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={true} livestream={ currentLivestream }/>
