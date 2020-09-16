@@ -11,6 +11,7 @@ import SpeakerManagementModal from 'components/views/streaming/modal/SpeakerMana
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
 import MiniChatContainer from 'components/views/streaming/comment-container/categories/chat/MiniChatContainer';
 import { useNumberOfViewers } from 'components/custom-hook/useNumberOfViewers';
+import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 
 function StreamingPage(props) {
 
@@ -109,6 +110,9 @@ function StreamingPage(props) {
             <div className='mini-chat-container'>
                 <MiniChatContainer livestream={ currentLivestream } isStreamer={true}/>
             </div>
+            <div className='icons-container'>
+                <IconsContainer livestreamId={ currentLivestream.id } />
+            </div>
             <style jsx>{`
                 .top-menu {
                     position: relative;
@@ -157,6 +161,14 @@ function StreamingPage(props) {
                     width: 20%;
                     min-width: 250px;
                     z-index: 100;
+                }
+
+                .icons-container {
+                    position: absolute;
+                    bottom: 0;
+                    right: 130px;
+                    z-index: 100;
+                    width: 80px;
                 }
             `}</style>
         </div>

@@ -8,6 +8,7 @@ import ViewerComponent from 'components/views/viewer/viewer-component/ViewerComp
 import NewCommentContainer from 'components/views/viewer/comment-container/NewCommentContainer';
 import UserContext from 'context/user/UserContext';
 import MiniChatContainer from 'components/views/streaming/comment-container/categories/chat/MiniChatContainer';
+import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 
 function ViewerPage(props) {
 
@@ -17,8 +18,7 @@ function ViewerPage(props) {
     const [showMenu, setShowMenu] = useState(true);
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
-    const [postedIcons, setPostedIcons] = useState([]);
-
+    
     const [careerCenters, setCareerCenters] = useState([]);
     const [handRaiseActive, setHandRaiseActive] = useState(false);
     const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
@@ -62,13 +62,7 @@ function ViewerPage(props) {
         }
     }, [currentLivestream, userData]);
 
-
-    useEffect(() => {
-        return () => console.log('Viewer destroyed');
-    },[]);
-
     function joinTalentPool() {
-        debugger;
         if (!authenticatedUser) {
             return router.replace('/signup');
         }
@@ -85,7 +79,7 @@ function ViewerPage(props) {
     }
 
     function postIcon(iconName) {
-        props.firebase.postIcon(currentLivestream.id, iconName);
+        props.firebase.postIcon(currentLivestream.id, iconName, authenticatedUser.email);
     }
 
     let logoElements = careerCenters.map( (careerCenter, index) => {
@@ -93,42 +87,6 @@ function ViewerPage(props) {
             <Fragment key={index}>
                 <Image src={ careerCenter.logoUrl } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block' }}/>
             </Fragment>
-        );
-    });
-
-    let postedIconsElements = postedIcons.map( (icon, index) => {
-        return (
-            <div>
-                <div className='action-container animate__animated animate__fadeOutLeft'>
-                    <div className={'button action-button red'}>
-                        <Image src={'/like.png'}/>
-                    </div>
-                </div>
-                <style jsx>{`
-                    .action-button {
-                        position: relative;
-                        border-radius: 50%;
-                        background-color: rgb(0, 210, 170);
-                        width: 70px;
-                        height: 70px;
-                        margin: 15px;
-                        cursor: pointer;
-                        box-shadow: 0 0 8px rgb(120,120,120);
-                    }
-
-                    .action-button.red {
-                        background-color: #e01a4f;
-                    }
-
-                    .action-button.orange {
-                        background-color: #f15946;
-                    }
-
-                    .action-button.yellow {
-                        background-color: #f9c22e;
-                    }
-                `}</style>
-            </div>
         );
     });
 
@@ -158,7 +116,7 @@ function ViewerPage(props) {
                 <MiniChatContainer livestream={ currentLivestream }  isStreamer={false}/>
             </div>
             <div className='icons-container'>
-                { }
+                <IconsContainer livestreamId={ currentLivestream.id } />
             </div>
             <div className='action-buttons'>
                 <div className='action-container'>
@@ -167,7 +125,7 @@ function ViewerPage(props) {
                     </div>
                 </div>
                 <div className='action-container'>
-                    <div className='button action-button orange' onClick={() => postIcon('clap')}>
+                    <div className='button action-button orange' onClick={() => postIcon('clapping')}>
                         <Image src='/clapping.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '35px'}}/>
                     </div>
                 </div>
@@ -300,6 +258,14 @@ function ViewerPage(props) {
                     width: 20%;
                     min-width: 250px;
                     z-index: 100;
+                }
+
+                .icons-container {
+                    position: absolute;
+                    bottom: 0;
+                    right: 20px;
+                    z-index: 100;
+                    width: 80px;
                 }
 
                 .black-frame {
