@@ -80,11 +80,15 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
             value: "CIVI",
             color: "#ff6961"
         },{
-            text: "Communication Sciences",
+            text: "Communication Systems",
             value: "COMPSCI"
         },{
             text: "Computer Science",
             value: "COMP",
+            color: "#52494c"
+        },{
+            text: "Computational Science and Engineering",
+            value: "COMPSCIENG",
             color: "#52494c"
         },{
             text: "Electrical and Electronic Engineering",
@@ -126,6 +130,14 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
             text: "Digital Humanities",
             value: "HUMAN",
             color: "#b39eb5"
+        },{
+            text: "Financial Engineering",
+            value: "FINENG",
+            color: "#b39eb5"
+        },{
+            text: "Robotics",
+            value: "ROBOT",
+            color: "#52494c"
         }
     ],
    unilausanne: [
