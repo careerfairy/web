@@ -5,11 +5,20 @@ import { withFirebase } from 'context/firebase';
 
 function PollOptionResultViewer(props) {
     const colors = ['red', 'orange', 'pink', 'olive'];
+
+    function getBarWidth(votes) {
+        if (!votes || votes === 0) {
+            return '5px';
+        } else {
+            return (votes / props.totalVotes) * 100 + '%';
+        }
+    }
+    
     return (
         <Fragment key={props.index}>
             <div className='option-container'>
                 <div>
-                    <div className='option-container-bar-element' style={{ backgroundColor: colors[props.index], width: (( props.option.votes / props.totalVotes) * 100 + '%') }}></div>
+                    <div className='option-container-bar-element' style={{ backgroundColor: colors[props.index], width: getBarWidth(props.option.votes) }}></div>
                 </div>
                 <div className='option-container-label'>
                     <div className='option-container-index' style={{ backgroundColor: colors[props.index] }}>

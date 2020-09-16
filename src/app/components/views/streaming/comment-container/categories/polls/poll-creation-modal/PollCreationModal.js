@@ -51,12 +51,16 @@ function PollCreationModal(props) {
             props.firebase.updateLivestreamPoll(props.livestreamId, props.initialPoll.id, question, options).then(() => {
                 props.onClose();
                 setError(false);
+                setQuestion('');
+                setOptions(['','']);
                 return setLoading(false);
             });
         } else {
             props.firebase.createLivestreamPoll(props.livestreamId, question, options).then(() => {
                 props.onClose();
                 setError(false);
+                setQuestion('');
+                setOptions(['','']);
                 return setLoading(false);
             });
         }

@@ -11,7 +11,7 @@ function HandRaiseRequested(props) {
         <div className='animated fadeIn'>
             <div className='handraise-container'>
                 <div className='central-container'>
-                    <h2>Your hand raise has been denied.</h2>
+                    <h2>Sorry we can't answer your question right now.</h2>
                     <Button size='large' icon='delete' content='Cancel' onClick={() => props.updateHandRaiseRequest("unrequested")} />
                 </div>
             </div>  

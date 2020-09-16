@@ -165,7 +165,7 @@ function QuestionContainer(props) {
                     primary 
                     onClick={() => upvoteLivestreamQuestion()} 
                     style={{ margin: '0 10px 10px 10px' }} 
-                    disabled={!props.livestream.test ? (props.question.type !== 'new' || !props.user || (props.question.emailOfVoters ? props.question.emailOfVoters.indexOf(props.user.email) > -1 : false)) : false}/>
+                    disabled={(props.question.type !== 'new' || !props.user || (props.question.emailOfVoters ? props.question.emailOfVoters.indexOf(props.user.email) > -1 : false))}/>
                 <style jsx>{`
                     .questionContainer {
                         position: relative;

@@ -25,10 +25,6 @@ function ViewerHandRaiseComponent(props) {
         },
     }
 
-    useEffect(() => {
-        return () => console.log('ViewerHandRaiseComponent destroyed');
-    },[]);
-   
     return (
         <div>
             <div>

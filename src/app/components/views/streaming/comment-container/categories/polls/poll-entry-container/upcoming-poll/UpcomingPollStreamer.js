@@ -89,7 +89,7 @@ function UpcomingPollStreamer(props) {
 
     return (
         <Fragment>
-            <div className='animated fadeInUp faster' onMouseEnter={ handleSetIsNotEditablePoll } onMouseLeave={ () => setShowNotEditableMessage(false) }>
+            <div className='animated fadeInUp faster overall' onMouseEnter={ handleSetIsNotEditablePoll } onMouseLeave={ () => setShowNotEditableMessage(false) }>
                 <div className='chat-entry-container'>
                     <div className='poll-entry-message'>
                         { props.poll.question }
@@ -129,8 +129,12 @@ function UpcomingPollStreamer(props) {
                     background-color: white;
                 }
 
+                .overall {
+                    position: relative;
+                }
+
                 .disabled-overlay {
-                    position:absolute;
+                    position: absolute;
                     top: 0;
                     bottom: 0;
                     left: 0;
