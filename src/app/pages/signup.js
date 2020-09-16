@@ -86,16 +86,16 @@ function SignUpPage({firebase}) {
 
     const [user, setUser] = useState(false);
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
-    const [activeStep, setActiveStep] = useState(0);
+    const [activeStep, setActiveStep] = useState(2);
 
 
     useEffect(() => {
         firebase.auth.onAuthStateChanged(user => {
             if (user && user.emailVerified) {
-                router.push('/profile')
+                // router.push('/profile')
             } else if (user && !user.emailVerified) {
                 setUser(user);
-                setActiveStep(1)
+                // setActiveStep(1)
             } else {
                 setUser(null);
             }
@@ -180,6 +180,7 @@ function SignUpPage({firebase}) {
                             ))}
                         </Stepper>
                         {getStepContent(activeStep)}
+
                     </Box>
                 </Container>
                 <Typography className={classes.footer}>
@@ -560,7 +561,7 @@ function SignUpFormValidate({user, router, setEmailVerificationSent, setActiveSt
                         <div style={{margin: "20px auto 0 auto", textAlign: "center"}}>
                             <div style={{marginBottom: '5px'}}>Having issues signing up?<MuiLink
                                 style={{cursor: "pointer"}}
-                                style={{marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us
+                                href="mailto:maximilian@careerfairy.io">Let us
                                 know</MuiLink></div>
                         </div>
                         <FormHelperText error hidden={!errorMessageShown}>

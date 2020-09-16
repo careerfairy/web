@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import Groups from "../groups/Groups";
 import {withFirebase} from "../../../data/firebase";
+import {Button} from "@material-ui/core";
+import Link from "@material-ui/core/Link";
 
 const GroupProvider = ({firebase, user}) => {
     const [userData, setUserData] = useState(null);
@@ -38,7 +40,14 @@ const GroupProvider = ({firebase, user}) => {
 
 
     return (userData ?
-        <Groups makeSix={6} userData={userData} groups={groups}/>
+        <>
+            <Groups makeSix={6} userData={userData} groups={groups}/>
+            <Link href="/profile" underline="none">
+                <Button color="primary" style={{position: "sticky", bottom: 10}} variant="contained" fullWidth>
+                    Finish
+                </Button>
+            </Link>
+        </>
         : null);
 };
 
