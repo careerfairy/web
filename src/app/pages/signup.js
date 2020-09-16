@@ -1,5 +1,5 @@
 import React, {Fragment, useState, useEffect} from 'react';
-import {Form, Image, Message} from "semantic-ui-react";
+import { Image} from "semantic-ui-react";
 import {withFirebase} from "../data/firebase";
 import TheatersRoundedIcon from '@material-ui/icons/TheatersRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
@@ -9,6 +9,7 @@ import {useRouter} from 'next/router';
 import Link from 'next/link';
 import {Formik} from 'formik';
 import axios from 'axios';
+import { Link as MuiLink} from '@material-ui/core';
 
 import Head from 'next/head';
 import Stepper from "@material-ui/core/Stepper";
@@ -157,7 +158,7 @@ function SignUpPage({firebase}) {
             </Head>
             <TealBackground>
                 <header>
-                    <Link href='/'><a><Image src='/logo_white.png' style={{
+                    <Link href='/'><a><img alt="logo" src='/logo_white.png' style={{
                         width: '150px',
                         margin: '20px',
                         display: 'inline-block'
@@ -466,195 +467,106 @@ function SignUpFormValidate({user, router, setEmailVerificationSent, setActiveSt
 
     return (
         <Fragment>
-            <div className='tealBackground'>
-                <Container>
-                    <div className='formContainer'>
-                        <Formik
-                            initialValues={{pinCode: ''}}
-                            validate={values => {
-                                let errors = {};
-                                if (!values.pinCode) {
-                                    errors.pinCode = 'A PIN code is required';
-                                } else if (!/^[0-9]{4}$/.test(values.pinCode)) {
-                                    errors.pinCode = 'The PIN code must be number between 0 and 9999';
-                                }
-                                return errors;
-                            }}
-                            onSubmit={(values, {setSubmitting}) => {
-                                setIncorrectPin(false);
-                                axios({
-                                    method: 'post',
-                                    url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/verifyEmailWithPin',
-                                    data: {
-                                        recipientEmail: user.email,
-                                        pinCode: parseInt(values.pinCode)
-                                    }
-                                }).then(response => {
-                                    setActiveStep(2)
-                                }).catch(error => {
-                                    setIncorrectPin(true);
-                                    setGeneralLoading(false);
-                                    setSubmitting(false);
-                                    return;
-                                });
-                            }}
+            <Formik
+                initialValues={{pinCode: ''}}
+                validate={values => {
+                    let errors = {};
+                    if (!values.pinCode) {
+                        errors.pinCode = 'A PIN code is required';
+                    } else if (!/^[0-9]{4}$/.test(values.pinCode)) {
+                        errors.pinCode = 'The PIN code must be number between 0 and 9999';
+                    }
+                    return errors;
+                }}
+                onSubmit={(values, {setSubmitting}) => {
+                    setIncorrectPin(false);
+                    axios({
+                        method: 'post',
+                        url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/verifyEmailWithPin',
+                        data: {
+                            recipientEmail: user.email,
+                            pinCode: parseInt(values.pinCode)
+                        }
+                    }).then(response => {
+                        setActiveStep(2)
+                    }).catch(error => {
+                        setIncorrectPin(true);
+                        setGeneralLoading(false);
+                        setSubmitting(false);
+                        return;
+                    });
+                }}
+            >
+                {({
+                      values,
+                      errors,
+                      touched,
+                      handleChange,
+                      handleBlur,
+                      handleSubmit,
+                      setFieldValue,
+                      isSubmitting,
+                      /* and other goodies */
+                  }) => (
+                    <form id='signUpForm' onSubmit={handleSubmit}>
+                        <Paper elevation={3}
+                               style={{color: "#2c662d", padding: "1rem", backgroundColor: "#fcfff5", marginBottom: "0.5rem"}}>
+                            <Typography variant="h6" gutterBottom>Check your mailbox!</Typography>
+                            <p>We have just sent you an email containing a 4-digit PIN code. Please
+                                enter
+                                this code below to start your journey on CareerFairy. <MuiLink
+                                    style={{cursor: "pointer"}} underline="always"
+                                    onClick={() => resendVerificationEmail()}>Resend the email verification
+                                    link. to <strong>{user.email}</strong></MuiLink>
+                            </p>
+                        </Paper>
+                        <Box style={{margin: "1rem 0"}}>
+                            <TextField
+                                label="PIN Code"
+                                placeholder='Enter the pin code'
+                                variant="outlined"
+                                id='pinCode'
+                                name='pinCode'
+                                fullWidth
+                                inputProps={{maxLength: 4}}
+                                disabled={isSubmitting || generalLoading}
+                                value={values.pinCode}
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                error={Boolean(errors.pinCode && touched.pinCode && errors.pinCode)}
+                                helperText={errors.pinCode && touched.pinCode && errors.pinCode}
+                            />
+                        </Box>
+                        <Button size='large' type="submit" fullWidth
+                                color="primary"
+                                variant="contained"
+                                disabled={isSubmitting || generalLoading}
+                                endIcon={(isSubmitting || generalLoading) &&
+                                <CircularProgress color="inherit" size={20}/>}
                         >
-                            {({
-                                  values,
-                                  errors,
-                                  touched,
-                                  handleChange,
-                                  handleBlur,
-                                  handleSubmit,
-                                  setFieldValue,
-                                  isSubmitting,
-                                  /* and other goodies */
-                              }) => (
-                                <form id='signUpForm' onSubmit={handleSubmit}>
-                                        <Paper elevation={2} style={{color: "#2c662d", padding: "1rem", backgroundColor: "#fcfff5"}} >
-                                            <Typography variant="h6" gutterBottom>Check your mailbox!</Typography>
-                                            <p>We have just sent you an email containing a 4-digit PIN code. Please
-                                                enter
-                                                this code below to start your journey on CareerFairy. <span
-                                                    className='resend-link' onClick={() => resendVerificationEmail()}>Resend the email verification link. to <strong>{user.email}</strong></span>
-                                            </p>
-                                        </Paper>
-                                    <Form.Field>
-                                        <label style={{color: 'rgb(120,120,120)'}}>PIN Code</label>
-                                        <input id='pinCode' type='text' name='pinCode' placeholder='PIN Code'
-                                               onChange={handleChange} onBlur={handleBlur} value={values.pinCode}
-                                               disabled={isSubmitting || generalLoading} maxLength='4'/>
-                                        <div className='field-error'>
-                                            {errors.pinCode && touched.pinCode && errors.pinCode}
-                                        </div>
-                                    </Form.Field>
-                                    <Button id='submitButton' fluid primary size='big' type="submit"
-                                            loading={isSubmitting || generalLoading}>Validate Email</Button>
-                                    <Message negative hidden={!incorrectPin}>
-                                        <Message.Header>Incorrect PIN</Message.Header>
-                                        <p>The PIN code you entered appears to be incorrect. <span
-                                            className='resend-link' onClick={() => resendVerificationEmail()}>Resend the verification email.</span>
-                                        </p>
-                                    </Message>
-                                    <div className='reset-email'>
-                                        <div style={{marginBottom: '5px'}}>Having issues signing up?<a
-                                            style={{marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us
-                                            know</a></div>
-                                    </div>
-                                    <div className={'errorMessage ' + (errorMessageShown ? '' : 'hidden')}>An error
-                                        occured while creating to your account
-                                    </div>
-                                </form>
-                            )}
-                        </Formik>
-                    </div>
-                    <style jsx>{`
-                                
-                            .hidden {
-                                display: none
-                            }
+                            Validate Email
+                        </Button>
+                        <FormHelperText hidden={!incorrectPin} error margin="dense">
+                            <Typography variant="subtitle2">Incorrect PIN</Typography>
+                            The PIN code you entered appears to be incorrect. <MuiLink
+                                style={{cursor: "pointer"}} underline="always"
+                                className='resend-link' onClick={() => resendVerificationEmail()}>Resend the
+                                verification email.</MuiLink>
 
-                            #signingContainer {
-                                width: 55%;
-                                padding: 50px;
-                                height: 100%;
-                                border: 2px solid red;
-                            }
-
-                            #signingContainer h5{
-                                font-weight: 400;
-                            }
-
-                            #signUpForm h1 {
-                                color: rgb(0,212,170);
-                                margin-bottom: 30px;
-                            }
-
-                            #signUpForm label{
-                                font-weight: 400;
-                                font-size: 0.95em;
-                                margin-bottom: 15px;
-                                color: dimgrey;
-                            }
-
-                            .emailSignUpInfo {
-                                margin-top: 10px;
-                                font-size: 1em;
-                                color: white;
-                                margin: 0 auto;
-                                text-align: center;
-                            }
-
-                            .formContainer {
-                                max-width: 500px;
-                                background-color: rgb(240,240,240);
-                                margin: 2% auto 20px auto;
-                                padding: 30px 50px;
-                                border-radius: 5px;
-                                box-shadow: 0 0 5px rgb(150,150,150);
-                            }
-
-                            label {
-                                color: rgb(160,160,160);
-                            }
-
-                            .socialLoginBlock {
-                                margin: 30px 0 0 0;
-                            }
-
-                            .socialLogin {
-                                margin: 15px 0 0 0;
-                            }
-
-                            .field-error {
-                                margin-top: 10px;
-                                color: red;
-                            }
-
-            
-
-                            #loginButton {
-                                margin-top: 40px;
-                            }
-
-                            .errorMessage {
-                                padding: 20px;
-                                text-align: center;
-                                color: red;
-                            }
-
-                            .loginModal {
-                                background-color: rgb(230,230,230);
-                                padding: 60px;
-                                font-weight: 3em;
-                            }
-
-                            #loginModalTitle {
-                                font-size: 4em;
-                                color: rgb(0, 210, 170);
-                            }
-
-                            #loginModalLogo {
-                                margin-top: 50px;
-                                max-height: 150px;
-                            }
-
-                            .loginModalPrivacy {
-                                margin-top: 30px;
-                            }
-
-                            .reset-email {
-                                margin: 20px auto 0 auto;
-                                text-align: center;
-                            }
-
-                            .resend-link {
-                                text-decoration: underline;
-                                cursor: pointer;
-                            }
-                        `}</style>
-                </Container>
-            </div>
+                        </FormHelperText>
+                        <div style={{margin: "20px auto 0 auto", textAlign: "center"}}>
+                            <div style={{marginBottom: '5px'}}>Having issues signing up?<MuiLink
+                                style={{cursor: "pointer"}}
+                                style={{marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us
+                                know</MuiLink></div>
+                        </div>
+                        <FormHelperText error hidden={!errorMessageShown}>
+                                An error
+                                occurred while creating to your account
+                        </FormHelperText>
+                    </form>
+                )}
+            </Formik>
         </Fragment>
     )
 }
