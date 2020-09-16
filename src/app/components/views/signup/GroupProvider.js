@@ -27,7 +27,6 @@ const GroupProvider = ({firebase, user}) => {
                 querySnapshot.forEach(doc => {
                     let careerCenter = doc.data();
                     careerCenter.id = doc.id;
-                    console.log(userData);
                     if (!userData.groupIds?.includes(careerCenter.id)) {
                         careerCenters.push(careerCenter);
                     }

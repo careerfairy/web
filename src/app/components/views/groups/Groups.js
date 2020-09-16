@@ -1,9 +1,8 @@
 import React, {Fragment, useState} from 'react';
-import {Grow, Typography} from "@material-ui/core";
-import AppBar from '@material-ui/core/AppBar';
+import { Typography} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import NewGroup from "../profile/NewGroup";
-import {Slide, Zoom} from 'react-reveal';
+import {Fade} from 'react-reveal';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import parse from 'autosuggest-highlight/parse';
@@ -61,9 +60,9 @@ const Groups = ({groups, userData, makeSix}) => {
     moreGroupElements = groups.map(group => {
         return (
             <Grid key={group.id} item xs={12} sm={6} md={makeSix || 4} lg={makeSix || 4}>
-                <Slide bottom duration={600}>
+                <Fade  bottom duration={600}>
                     <NewGroup group={group} userData={userData}/>
-                </Slide>
+                </Fade>
             </Grid>
         )
     });
@@ -75,9 +74,9 @@ const Groups = ({groups, userData, makeSix}) => {
             <Grid style={{marginBottom: makeSix ? 0 : 50}} container spacing={3}>
                 {selectedGroup ?
                     <Grid item xs={12} sm={12} md={makeSix ? 12 : 4} lg={makeSix ? 12 : 4}>
-                        <Slide bottom duration={600}>
+                        <Fade bottom duration={600}>
                             <NewGroup group={selectedGroup} userData={userData}/>
-                        </Slide>
+                        </Fade>
                     </Grid>
                     : moreGroupElements}
             </Grid>

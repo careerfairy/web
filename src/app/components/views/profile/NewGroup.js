@@ -1,4 +1,4 @@
-import React, {useEffect, useState, Fragment} from "react";
+import React, { useState} from "react";
 import {useRouter} from "next/router";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 import EditIcon from "@material-ui/icons/Edit";
@@ -13,10 +13,9 @@ import {
 import CardActions from "@material-ui/core/CardActions";
 import GroupJoinModal from "./GroupJoinModal";
 
-const NewGroup = ({firebase, group, categories, userData}) => {
+const NewGroup = ({group, userData}) => {
     const [openJoinModal, setOpenJoinModal] = useState(false);
 
-    const router = useRouter();
 
     const handleCloseJoinModal = () => {
         setOpenJoinModal(false);

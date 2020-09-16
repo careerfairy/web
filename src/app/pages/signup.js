@@ -86,34 +86,21 @@ function SignUpPage({firebase}) {
 
     const [user, setUser] = useState(false);
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
-    const [activeStep, setActiveStep] = useState(2);
+    const [activeStep, setActiveStep] = useState(0);
 
 
     useEffect(() => {
         firebase.auth.onAuthStateChanged(user => {
             if (user && user.emailVerified) {
-                // router.push('/profile')
+                router.push('/profile')
             } else if (user && !user.emailVerified) {
                 setUser(user);
-                // setActiveStep(1)
+                setActiveStep(1)
             } else {
                 setUser(null);
             }
         })
     }, []);
-
-
-    const handleNext = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    };
-
-    const handleBack = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep - 1);
-    };
-
-    const handleReset = () => {
-        setActiveStep(0);
-    };
 
     function getStepContent(stepIndex) {
         switch (stepIndex) {
@@ -121,28 +108,15 @@ function SignUpPage({firebase}) {
                 return <SignUpForm
                     user={user}
                     emailVerificationSent={emailVerificationSent}
-                    handleNext={handleNext}
-                    handleBack={handleBack}
                     setActiveStep={setActiveStep}
-                    setEmailVerificationSent={(bool) => setEmailVerificationSent(bool)}/>
-                    ;
+                    setEmailVerificationSent={(bool) => setEmailVerificationSent(bool)}/>;
             case 1:
                 return <SignUpFormSent
                     user={user}
-                    handleNext={handleNext}
-                    handleBack={handleBack}
-                    handleReset={handleReset}
                     setActiveStep={setActiveStep}
-                    activeStep={activeStep}
-                    emailVerificationSent={emailVerificationSent}
-                    router={router}/>
+                    emailVerificationSent={emailVerificationSent}/>
             case 2:
-                return <GroupProvider
-                    user={user}
-                    handleBack={handleBack}
-                    handleReset={handleReset}
-                    activeStep={activeStep}
-                    router={router}/>
+                return <GroupProvider user={user}/>
             default:
                 return setActiveStep(0);
         }
@@ -439,7 +413,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
     )
 }
 
-function SignUpFormValidate({user, router, setEmailVerificationSent, setActiveStep}) {
+function SignUpFormValidate({user, setEmailVerificationSent, setActiveStep}) {
     const classes = useStyles()
 
     const [errorMessageShown, setErrorMessageShown] = useState(false);
