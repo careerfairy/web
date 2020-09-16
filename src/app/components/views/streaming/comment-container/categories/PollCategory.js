@@ -7,10 +7,6 @@ import PollCreationModal from './polls/poll-creation-modal/PollCreationModal';
 import PollEntryContainer from './polls/poll-entry-container/PollEntryContainer';
 
 function PollCategory(props) {
-
-    if (props.selectedState !== 'polls') {
-        return null;
-    }
     
     const [addNewPoll, setAddNewPoll] = useState(false);
     const [pollEntries, setPollEntries] = useState([]);
@@ -31,6 +27,7 @@ function PollCategory(props) {
     }, [props.livestream.id]);
 
     const somePollIsCurrent = pollEntries.some( poll => poll.state === 'current');
+
     const pollElements = pollEntries.filter(poll => poll.state !== 'closed').map((poll, index) => {
         return (
             <Fragment key={index}>
@@ -40,7 +37,7 @@ function PollCategory(props) {
     });
 
     return (
-        <div>
+        <div style={{ display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
             <div className='questionToggle'>
                 <div className='questionToggleTitle'>
                     <Icon name='chart bar outline' color='teal'/> Polls

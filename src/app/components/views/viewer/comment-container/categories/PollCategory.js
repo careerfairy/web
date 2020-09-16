@@ -37,10 +37,6 @@ function PollCategory(props) {
         props.firebase.voteForPollOption(props.livestream.id, currentPoll.id, authenticatedUser.email, index);
     }
 
-    if (props.selectedState !== 'polls') {
-        return null;
-    }
-
     if (currentPoll && authenticatedUser) {
         if (currentPoll.voters.indexOf(authenticatedUser.email) === -1) {
             const colors = ['red', 'orange', 'pink', 'olive'];
@@ -59,7 +55,7 @@ function PollCategory(props) {
                 );
             });
             return (
-                <div className='animated fadeIn'>
+                <div   style={{ display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
                     <div className='handraise-container'>
                         <div className='central-container'>
                             <h2>{ currentPoll.question }</h2>
@@ -107,7 +103,7 @@ function PollCategory(props) {
                 );
             });
             return (
-                <div className='animated fadeIn'>
+                <div  style={{ display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
                     <div className='handraise-container'>
                         <div className='central-container'>
                             <h2>{ currentPoll.question }</h2>
@@ -147,7 +143,7 @@ function PollCategory(props) {
         }
     } else {
         return (
-            <div className='animated fadeIn'>
+            <div  style={{ display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
                 <div className='handraise-container'>
                     <div className='central-container'>
                         <h2>No current poll</h2>

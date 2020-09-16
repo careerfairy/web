@@ -12,10 +12,6 @@ import HandRaiseInactive from './hand-raise/inactive/HandRaiseInactive';
 
 function HandRaiseCategory(props) {
 
-    if (props.selectedState !== 'hand') {
-        return null;
-    }
-
     if (!props.livestream.handRaiseActive) {
         return <HandRaiseInactive/>;
     }
@@ -51,7 +47,7 @@ function HandRaiseCategory(props) {
     }
 
     return (
-        <div>
+        <div  style={{ display: (props.selectedState !== 'hand' ? 'none' : 'block')}}>
             <HandRaisePriorRequest handRaiseState={handRaiseState} updateHandRaiseRequest={updateHandRaiseRequest}/>
             <HandRaiseRequested handRaiseState={handRaiseState} updateHandRaiseRequest={updateHandRaiseRequest}/>
             <HandRaiseDenied handRaiseState={handRaiseState} updateHandRaiseRequest={updateHandRaiseRequest}/>

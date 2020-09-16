@@ -136,17 +136,18 @@ function VideoContainer(props) {
         }
     }, [webRTCAdaptor]);
 
+    const isMainStreamer = props.streamerId === props.currentLivestream.id;
+
     useEffect(() => {
-        if (props.currentLivestream.speakerSwitchMode === 'automatic') {
+        if (isMainStreamer && props.currentLivestream.speakerSwitchMode === 'automatic') {
             if (audioLevels && audioLevels.length > 0) {
+                console.log(audioLevels);
                 const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
-                setLivestreamCurrentSpeakerId(maxEntry.streamId);
+                if (maxEntry.audioLevel > 0.1) {
+                    setLivestreamCurrentSpeakerId(maxEntry.streamId);
+                }
             }
-        } else {
-            if (props.currentLivestream) {
-                setLivestreamCurrentSpeakerId(props.currentLivestream.currentSpeakerId);
-            }
-        }       
+        }    
     }, [audioLevels]);
 
     useEffect(() => {
@@ -190,8 +191,6 @@ function VideoContainer(props) {
     function dateIsInUnder2Minutes(date) {
         return new Date(date).getTime() - Date.now() < 1000*60*2 || Date.now() > new Date(date).getTime();
     }
-
-    const isMainStreamer = props.streamerId === props.currentLivestream.id;
 
     return (
         <Fragment>

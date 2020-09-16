@@ -1,8 +1,18 @@
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {useState, useEffect, Fragment, useContext} from 'react';
 import { Input, Icon, Button, Modal } from 'semantic-ui-react';
-import { withFirebase } from 'context/firebase';
 
 function RequestedHandRaiseElement(props) {
+
+    useEffect(() => {
+        props.setNewNotification({
+            message: props.request.name + ' has haised a hand and requested to join the stream',
+            confirmMessage: 'Invite',
+            confirm: ()  =>  props.updateHandRaiseRequest(props.request.id, 'invited'),
+            cancelMessage: 'Deny',
+            cancel: () =>  props.updateHandRaiseRequest(props.request.id, 'denied')  
+        });
+    },[])
+
     return (
         <div>
             <div className='handraise-container'>
@@ -73,6 +83,17 @@ function InvitedHandRaiseElement(props) {
 }
 
 function ConnectingHandRaiseElement(props) {
+
+    useEffect(() => {
+        props.setNewNotification({
+            message: props.request.name + ' is now connecting to the stream',
+            confirmMessage: 'OK',
+            confirm: ()  =>  {},
+            cancelMessage: 'Stop Connection',
+            cancel: () =>  props.updateHandRaiseRequest(props.request.id, 'denied')  
+        });
+    },[])
+
     return (
         <div>
             <div className='handraise-container'>
@@ -108,6 +129,17 @@ function ConnectingHandRaiseElement(props) {
 }
 
 function ConnectedHandRaiseElement(props) {
+
+    useEffect(() => {
+        props.setNewNotification({
+            message: props.request.name + ' is now connectied to the stream',
+            confirmMessage: 'OK',
+            confirm: ()  =>  {},
+            cancelMessage: 'Remove from Stream',
+            cancel: () =>  props.updateHandRaiseRequest(props.request.id, 'denied')  
+        });
+    },[])
+
     return (
         <div>
             <div className='handraise-container'>

@@ -1,9 +1,12 @@
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {useState, useEffect, Fragment, useContext} from 'react';
 import { Input, Icon, Button, Modal } from 'semantic-ui-react';
 import { withFirebase } from 'context/firebase';
 import HandRaiseElement from './hand-raise-element/HandRaiseElement';
+import NotificationsContext from 'context/notifications/NotificationsContext';
 
 function HandRaiseActive(props) {
+
+    const { setNewNotification } = useContext(NotificationsContext);
 
     if (!props.livestream.handRaiseActive) {
         return null;
@@ -35,7 +38,7 @@ function HandRaiseActive(props) {
 
     let handRaiseElements = handRaises.filter( handRaise => (handRaise.state !== 'unrequested' && handRaise.state !== 'denied')).map( handRaise => {
         return (
-            <HandRaiseElement request={handRaise} updateHandRaiseRequest={updateHandRaiseRequest}/>
+            <HandRaiseElement request={handRaise} updateHandRaiseRequest={updateHandRaiseRequest} setNewNotification={setNewNotification} />
         );
     })
 

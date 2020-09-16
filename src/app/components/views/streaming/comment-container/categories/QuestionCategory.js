@@ -49,12 +49,8 @@ function QuestionCategory(props) {
         );
     });
 
-    if (props.selectedState !== 'questions') {
-        return null;
-    }
-
     return (
-        <div>
+        <div style={{ display: (props.selectedState !== 'questions' ? 'none' : 'block')}}>
             <div className='questionToggle'>
                 <div className='questionToggleTitle'>
                     <Icon name='question circle outline' color='teal'/> Q&A
