@@ -18,7 +18,8 @@ const Highlights = ({groups, handleSelectGroup}) => {
             onChange={handleSelectGroup}
             getOptionLabel={(option) => option.universityName ? option.universityName : ""}
             renderInput={(params) => (
-                <TextField {...params} placeholder="Join some groups" label="Groups" fullWidth variant="outlined" margin="normal"/>
+                <TextField {...params} placeholder="Join some groups" label="Groups" fullWidth variant="outlined"
+                           margin="normal"/>
             )}
             renderOption={(option, {inputValue}) => {
                 const matches = match(option.universityName, inputValue);
@@ -39,7 +40,7 @@ const Highlights = ({groups, handleSelectGroup}) => {
 }
 
 
-const Groups = ({groups, userData}) => {
+const Groups = ({groups, userData, makeSix}) => {
     const [selectedGroup, setSelectedGroup] = useState(null)
 
     const handleSelectGroup = (event, value) => {
@@ -50,8 +51,8 @@ const Groups = ({groups, userData}) => {
 
     moreGroupElements = groups.map(group => {
         return (
-            <Grid key={group.id} item xs={12} sm={6} md={4} lg={4}>
-                <Slide left duration={600}>
+            <Grid key={group.id} item xs={12} sm={6} md={makeSix || 4} lg={makeSix || 4}>
+                <Slide bottom duration={600}>
                     <NewGroup group={group} userData={userData}/>
                 </Slide>
             </Grid>
@@ -64,7 +65,7 @@ const Groups = ({groups, userData}) => {
                         groups={groups}/>
             <Grid style={{marginBottom: 50}} container spacing={3}>
                 {selectedGroup ?
-                    <Grid item xs={12} sm={6} md={4} lg={4}>
+                    <Grid item xs={12} sm={6} md={makeSix || 4} lg={makeSix || 4}>
                         <Slide bottom duration={600}>
                             <NewGroup group={selectedGroup} userData={userData}/>
                         </Slide>

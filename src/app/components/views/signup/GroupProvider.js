@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Groups from "../groups/Groups";
 import {withFirebase} from "../../../data/firebase";
 
-const GroupProvider = ({firebase, user, handleBack, handleReset}) => {
+const GroupProvider = ({firebase, user}) => {
     const [userData, setUserData] = useState(null);
     const [groups, setGroups] = useState([]);
 
@@ -37,7 +37,9 @@ const GroupProvider = ({firebase, user, handleBack, handleReset}) => {
     }, [userData]);
 
 
-    return (userData ? <Groups userData={userData} groups={groups}/> : null);
+    return (userData ?
+        <Groups makeSix={6} userData={userData} groups={groups}/>
+        : null);
 };
 
 export default withFirebase(GroupProvider);

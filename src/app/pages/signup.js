@@ -449,7 +449,7 @@ function SignUpFormValidate({user, router, setEmailVerificationSent, setActiveSt
         setGeneralLoading(true);
         axios({
             method: 'post',
-            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmailWithPin',
+            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/resendPostmarkEmailVerificationEmailWithPin',
             data: {
                 recipientEmail: user.email,
             }
@@ -518,7 +518,7 @@ function SignUpFormValidate({user, router, setEmailVerificationSent, setActiveSt
                                         <Message.Header>Check your mailbox!</Message.Header>
                                         <p>We have just sent you an email containing a 4-digit PIN code. Please enter
                                             this code below to start your journey on CareerFairy. <span
-                                                className='resend-link' onClick={() => resendVerificationEmail()}>Resend the email verification link.</span>
+                                                className='resend-link' onClick={() => resendVerificationEmail()}>Resend the email verification link. to <strong>{user.email}</strong></span>
                                         </p>
                                     </Message>
                                     <Form.Field>
