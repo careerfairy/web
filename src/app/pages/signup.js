@@ -1,15 +1,13 @@
 import React, {Fragment, useState, useEffect} from 'react';
-import { Image} from "semantic-ui-react";
 import {withFirebase} from "../data/firebase";
 import TheatersRoundedIcon from '@material-ui/icons/TheatersRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
 import BusinessCenterRoundedIcon from '@material-ui/icons/BusinessCenterRounded';
-
 import {useRouter} from 'next/router';
 import Link from 'next/link';
 import {Formik} from 'formik';
 import axios from 'axios';
-import { Link as MuiLink} from '@material-ui/core';
+import {Link as MuiLink} from '@material-ui/core';
 
 import Head from 'next/head';
 import Stepper from "@material-ui/core/Stepper";
@@ -25,7 +23,7 @@ import {
     Container,
     Button,
     Checkbox,
-    FormHelperText, Typography, Card
+    FormHelperText, Typography
 } from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {TealBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
@@ -88,7 +86,7 @@ function SignUpPage({firebase}) {
 
     const [user, setUser] = useState(false);
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
-    const [activeStep, setActiveStep] = useState(1);
+    const [activeStep, setActiveStep] = useState(0);
 
 
     useEffect(() => {
@@ -146,7 +144,7 @@ function SignUpPage({firebase}) {
                     activeStep={activeStep}
                     router={router}/>
             default:
-                return null;
+                return setActiveStep(0);
         }
     }
 
@@ -510,7 +508,12 @@ function SignUpFormValidate({user, router, setEmailVerificationSent, setActiveSt
                   }) => (
                     <form id='signUpForm' onSubmit={handleSubmit}>
                         <Paper elevation={3}
-                               style={{color: "#2c662d", padding: "1rem", backgroundColor: "#fcfff5", marginBottom: "0.5rem"}}>
+                               style={{
+                                   color: "#2c662d",
+                                   padding: "1rem",
+                                   backgroundColor: "#fcfff5",
+                                   marginBottom: "0.5rem"
+                               }}>
                             <Typography variant="h6" gutterBottom>Check your mailbox!</Typography>
                             <p>We have just sent you an email containing a 4-digit PIN code. Please
                                 enter
@@ -544,14 +547,14 @@ function SignUpFormValidate({user, router, setEmailVerificationSent, setActiveSt
                                 endIcon={(isSubmitting || generalLoading) &&
                                 <CircularProgress color="inherit" size={20}/>}
                         >
-                            Validate Email
+                            {isSubmitting ? "Checking" : (generalLoading ? "Resending" : "Validate Email")}
                         </Button>
                         <FormHelperText hidden={!incorrectPin} error margin="dense">
-                            <Typography variant="subtitle2">Incorrect PIN</Typography>
+                            <strong>Incorrect PIN</strong> <br/>
                             The PIN code you entered appears to be incorrect. <MuiLink
-                                style={{cursor: "pointer"}} underline="always"
-                                className='resend-link' onClick={() => resendVerificationEmail()}>Resend the
-                                verification email.</MuiLink>
+                            style={{cursor: "pointer"}} underline="always"
+                            className='resend-link' onClick={() => resendVerificationEmail()}>Resend the
+                            verification email.</MuiLink>
 
                         </FormHelperText>
                         <div style={{margin: "20px auto 0 auto", textAlign: "center"}}>
@@ -561,8 +564,7 @@ function SignUpFormValidate({user, router, setEmailVerificationSent, setActiveSt
                                 know</MuiLink></div>
                         </div>
                         <FormHelperText error hidden={!errorMessageShown}>
-                                An error
-                                occurred while creating to your account
+                            An error occurred while creating to your account
                         </FormHelperText>
                     </form>
                 )}
