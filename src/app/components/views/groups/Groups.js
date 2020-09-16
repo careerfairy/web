@@ -65,7 +65,7 @@ const Groups = ({groups, userData}) => {
             <Grid style={{marginBottom: 50}} container spacing={3}>
                 {selectedGroup ?
                     <Grid item xs={12} sm={6} md={4} lg={4}>
-                        <Slide left duration={600}>
+                        <Slide bottom duration={600}>
                             <NewGroup group={selectedGroup} userData={userData}/>
                         </Slide>
                     </Grid>

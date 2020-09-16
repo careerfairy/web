@@ -81,6 +81,7 @@ function getSteps() {
 
 function SignUpPage({firebase}) {
     const classes = useStyles()
+    const steps = getSteps();
     const router = useRouter();
 
     const [user, setUser] = useState(false);
@@ -100,7 +101,6 @@ function SignUpPage({firebase}) {
             }
         })
     }, []);
-    const steps = getSteps();
 
 
     const handleNext = () => {
@@ -123,6 +123,7 @@ function SignUpPage({firebase}) {
                     emailVerificationSent={emailVerificationSent}
                     handleNext={handleNext}
                     handleBack={handleBack}
+                    setActiveStep={setActiveStep}
                     setEmailVerificationSent={(bool) => setEmailVerificationSent(bool)}/>
                     ;
             case 1:
@@ -131,24 +132,19 @@ function SignUpPage({firebase}) {
                     handleNext={handleNext}
                     handleBack={handleBack}
                     handleReset={handleReset}
+                    setActiveStep={setActiveStep}
                     activeStep={activeStep}
                     emailVerificationSent={emailVerificationSent}
                     router={router}/>
             case 2:
                 return <GroupProvider
                     user={user}
-                    handleNext={handleNext}
                     handleBack={handleBack}
                     handleReset={handleReset}
                     activeStep={activeStep}
                     router={router}/>
             default:
-                return <SignUpForm
-                    user={user}
-                    emailVerificationSent={emailVerificationSent}
-                    handleNext={handleNext}
-                    handleBack={handleBack}
-                    setEmailVerificationSent={(bool) => setEmailVerificationSent(bool)}/>;
+                return null;
         }
     }
 
@@ -200,7 +196,7 @@ const SignUpForm = withFirebase(SignUpFormBase);
 
 const SignUpFormSent = SignUpFormValidate;
 
-function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerificationSent, handleNext}) {
+function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerificationSent, setActiveStep}) {
     const classes = useStyles()
 
     const [emailSent, setEmailSent] = useState(false);
@@ -209,9 +205,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
     const [formData, setFormData] = useState({})
 
     useEffect(() => {
-
         if (emailSent && user && !emailVerificationSent) {
-            debugger
             axios({
                 method: 'post',
                 url: 'http://localhost:5001/careerfairy-e1fd9/us-central1/sendPostmarkEmailVerificationEmailWithPinAndUpdateUserData',
@@ -221,12 +215,10 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     lastName: formData.lastName,
                 }
             }).then(response => {
-                debugger
                 setEmailVerificationSent(true);
                 setGeneralLoading(false);
-                handleNext()
+                setActiveStep(1)
             }).catch(error => {
-                debugger
                 console.log("error in signup base", error);
                 setGeneralLoading(false);
             });
@@ -446,7 +438,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
     )
 }
 
-function SignUpFormValidate({user, router, setEmailVerificationSent, handleNext}) {
+function SignUpFormValidate({user, router, setEmailVerificationSent, setActiveStep}) {
     const classes = useStyles()
 
     const [errorMessageShown, setErrorMessageShown] = useState(false);
@@ -497,9 +489,10 @@ function SignUpFormValidate({user, router, setEmailVerificationSent, handleNext}
                                         pinCode: parseInt(values.pinCode)
                                     }
                                 }).then(response => {
-                                    handleNext()
+                                    setActiveStep(2)
                                     // user.reload().then(() => {
-                                    //     return router.push('/profile');
+                                    // handleNext()
+                                    // return router.push('/profile');
                                     // });
                                 }).catch(error => {
                                     setIncorrectPin(true);
