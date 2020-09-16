@@ -68,7 +68,7 @@ const Groups = ({groups, userData, makeSix}) => {
     });
     return (
         <Fragment>
-            <Typography align="center" variant="h3" gutterBottom>Join A New Career Group</Typography>
+            <Typography align="center" variant="h3" gutterBottom>Join A New Career&nbsp;Group</Typography>
             <Highlights handleSelectGroup={handleSelectGroup}
                         groups={groups}/>
             <Grid style={{marginBottom: makeSix ? 0 : 50}} container spacing={3}>
