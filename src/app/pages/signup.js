@@ -214,7 +214,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
             debugger
             axios({
                 method: 'post',
-                url: 'http://localhost:5001/careerfairy-e1fd9/us-central1/sendPostmarkEmailVerificationEmailWithPinAndUpdateUserData',
+                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmailWithPinAndUpdateUserData',
                 data: {
                     recipientEmail: user.email,
                     firstName: formData.firstName,
