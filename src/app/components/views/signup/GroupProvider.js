@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Groups from "../groups/Groups";
 import {withFirebase} from "../../../data/firebase";
 
-const GroupProvider = ({firebase, user, handleNext, handleBack, handleReset}) => {
+const GroupProvider = ({firebase, user, handleBack, handleReset}) => {
     const [userData, setUserData] = useState(null);
     const [groups, setGroups] = useState([]);
 
