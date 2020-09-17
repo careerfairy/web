@@ -83,6 +83,7 @@ function SignUpPage({firebase}) {
     const classes = useStyles()
     const steps = getSteps();
     const router = useRouter();
+    const {absolutePath} = router.query
 
     const [user, setUser] = useState(false);
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
@@ -116,7 +117,7 @@ function SignUpPage({firebase}) {
                     setActiveStep={setActiveStep}
                     emailVerificationSent={emailVerificationSent}/>
             case 2:
-                return <GroupProvider user={user}/>
+                return <GroupProvider absolutePath={absolutePath} user={user}/>
             default:
                 return setActiveStep(0);
         }
@@ -402,9 +403,9 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                 style={{marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us
                                 know</a></div>
                         </div>
-                       <FormHelperText error hidden={!errorMessageShown}>
-                           An error occurred while creating to your account
-                       </FormHelperText>
+                        <FormHelperText error hidden={!errorMessageShown}>
+                            An error occurred while creating to your account
+                        </FormHelperText>
                     </form>
                 )}
             </Formik>
@@ -523,10 +524,12 @@ function SignUpFormValidate({user, setEmailVerificationSent, setActiveStep}) {
                         >
                             {isSubmitting ? "Checking" : (generalLoading ? "Resending" : "Validate Email")}
                         </Button>
-                        <Typography style={{marginTop: "0.5rem"}} align="center" hidden={!incorrectPin} color="secondary" margin="dense">
+                        <Typography style={{marginTop: "0.5rem"}} align="center" hidden={!incorrectPin}
+                                    color="secondary" margin="dense">
                             <strong>Incorrect PIN</strong> <br/>
                             The PIN code you entered appears to be incorrect. <MuiLink href="#"
-                            onClick={() => resendVerificationEmail()}><br/>Resend the
+                                                                                       onClick={() => resendVerificationEmail()}><br/>Resend
+                            the
                             verification email.</MuiLink>
                         </Typography>
                         <div style={{margin: "20px auto 0 auto", textAlign: "center"}}>

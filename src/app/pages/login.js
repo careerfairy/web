@@ -70,15 +70,15 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function LogInPage(props) {
-
+function LogInPage({firebase}) {
     const [user, setUser] = useState(null);
     const [userEmailNotValidated, setUserEmailNotValidated] = useState(false);
     const [generalLoading, setGeneralLoading] = useState(false);
     const router = useRouter();
+    const {absolutePath} = router.query
 
     useEffect(() => {
-        props.firebase.auth.onAuthStateChanged(user => {
+        firebase.auth.onAuthStateChanged(user => {
             if (user !== null) {
                 setUser(user);
             } else {
@@ -88,11 +88,20 @@ function LogInPage(props) {
     }, []);
 
     useEffect(() => {
+        if (user && user.emailVerified && absolutePath) {
+            router.replace(`${absolutePath}`)
+        }
+    }, [user, absolutePath])
+
+    useEffect(() => {
         if (user) {
             if (!user.emailVerified) {
-                router.replace('/signup');
+                router.replace(absolutePath ? {
+                    pathname: '/signup',
+                    query: {absolutePath}
+                } : '/signup');
             } else {
-                props.firebase.getUserData(user.email).then(querySnapshot => {
+                firebase.getUserData(user.email).then(querySnapshot => {
                     if (querySnapshot.exists) {
                         router.replace('/next-livestreams');
                     } else {
@@ -114,9 +123,9 @@ function LogInPage(props) {
         <TealBackground>
             <header>
                 <Link href='/'><a><img alt="logo" src='/logo_white.png'
-                                         style={{width: '150px', margin: '20px', display: 'inline-block'}}/></a></Link>
+                                       style={{width: '150px', margin: '20px', display: 'inline-block'}}/></a></Link>
             </header>
-            <LogInForm userEmailNotValidated={userEmailNotValidated}
+            <LogInForm userEmailNotValidated={userEmailNotValidated} absolutePath={absolutePath}
                        setUserEmailNotValidated={(value) => setUserEmailNotValidated(value)}
                        setGeneralLoading={(value) => setGeneralLoading(value)} generalLoading={generalLoading}/>
         </TealBackground>
@@ -127,7 +136,7 @@ export default withFirebase(LogInPage);
 
 const LogInForm = withFirebase(LogInFormBase);
 
-export function LogInFormBase(props) {
+export function LogInFormBase({userEmailNotValidated, absolutePath, setGeneralLoading, setUserEmailNotValidated, firebase, generalLoading}) {
     const classes = useStyles()
 
     const [errorMessageShown, setErrorMessageShown] = useState(false);
@@ -136,7 +145,7 @@ export function LogInFormBase(props) {
 
     function resendEmailVerificationLink(email) {
         setErrorMessageShown(false);
-        props.setGeneralLoading(true);
+        setGeneralLoading(true);
         axios({
             method: 'post',
             url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmail',
@@ -146,9 +155,9 @@ export function LogInFormBase(props) {
             }
         }).then(response => {
             setEmailVerificationSent(true);
-            props.setGeneralLoading(false);
+            setGeneralLoading(false);
         }).catch(error => {
-            props.setGeneralLoading(false);
+            setGeneralLoading(false);
         });
     }
 
@@ -172,16 +181,16 @@ export function LogInFormBase(props) {
                     return errors;
                 }}
                 onSubmit={(values, {setSubmitting}) => {
-                    props.setGeneralLoading(true);
+                    setGeneralLoading(true);
                     setErrorMessageShown(false);
-                    props.setUserEmailNotValidated(false);
-                    props.firebase.signInWithEmailAndPassword(values.email, values.password)
+                    setUserEmailNotValidated(false);
+                    firebase.signInWithEmailAndPassword(values.email, values.password)
                         .then(() => {
                             setSubmitting(false);
                         })
                         .catch(error => {
                             setSubmitting(false);
-                            props.setGeneralLoading(false);
+                            setGeneralLoading(false);
                             if (error.code === 'auth/user-not-found') {
                                 return setNoAccountMessageShown(true);
                             } else {
@@ -251,18 +260,21 @@ export function LogInFormBase(props) {
                                         variant="contained"
                                         type="submit"
                                         fullWidth
-                                        disabled={isSubmitting || props.generalLoading}
-                                        endIcon={(isSubmitting || props.generalLoading) &&
+                                        disabled={isSubmitting || generalLoading}
+                                        endIcon={(isSubmitting || generalLoading) &&
                                         <CircularProgress size={20} color="inherit"/>}>
                                     Log in
                                 </Button>
                                 <Grid style={{marginBottom: "1rem"}} container>
                                     <Grid item xs>
-                                        <MuiLink href='/reset-password'>Forgot password?</MuiLink>
+                                        <Link href='/reset-password'><a>Forgot password?</a></Link>
                                     </Grid>
                                     <Grid item>
                                         New to career streaming?
-                                        <MuiLink href='/signup'> Sign Up</MuiLink>
+                                        <Link href={absolutePath ? {
+                                            pathname: '/signup',
+                                            query: {absolutePath}
+                                        } : '/signup'}><a> Sign up</a></Link>
                                     </Grid>
                                 </Grid>
                                 <Typography gutterBottom variant="subtitle1" align="center" color="secondary"
@@ -273,7 +285,7 @@ export function LogInFormBase(props) {
                                             hidden={!noAccountMessageShown}>
                                     No account associated with this email address.
                                 </Typography>
-                                <Paper hidden={!props.userEmailNotValidated}
+                                <Paper hidden={!userEmailNotValidated}
                                        className={classes.message}
                                        elevation={3}>
                                     <Typography variant="h6" gutterBottom>Please validate your email

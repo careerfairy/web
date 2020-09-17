@@ -2,9 +2,9 @@ import React, {useEffect, useState} from 'react';
 import Groups from "../groups/Groups";
 import {withFirebase} from "../../../data/firebase";
 import {Button} from "@material-ui/core";
-import Link from "@material-ui/core/Link";
+import Link from "next/link";
 
-const GroupProvider = ({firebase, user}) => {
+const GroupProvider = ({firebase, user, absolutePath}) => {
     const [userData, setUserData] = useState(null);
     const [groups, setGroups] = useState([]);
 
@@ -41,7 +41,7 @@ const GroupProvider = ({firebase, user}) => {
     return (userData ?
         <>
             <Groups makeSix={6} userData={userData} groups={groups}/>
-            <Link href="/profile" underline="none">
+            <Link href={absolutePath || "/profile"} underline="none">
                 <Button color="primary" style={{position: "sticky", bottom: 10}} variant="contained" fullWidth>
                     Finish
                 </Button>
