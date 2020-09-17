@@ -1,5 +1,4 @@
 import React, { useState} from "react";
-import {useRouter} from "next/router";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 import EditIcon from "@material-ui/icons/Edit";
 import {withFirebase} from "data/firebase";
@@ -71,7 +70,7 @@ const NewGroup = ({group, userData}) => {
                     <Button
                         fullWidth
                         size="small"
-                        variant="contained"
+                        variant="outlined"
                         color="primary"
                         onClick={handleOpenJoinModal}
                         endIcon={<GroupAddIcon size={20} color="inherit"/>}
