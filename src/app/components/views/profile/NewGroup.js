@@ -48,7 +48,7 @@ const NewGroup = ({group, userData, makeSix, selected}) => {
                         />
                     </CardMedia>
                     <CardContent style={{height: "115px"}}>
-                        <Typography align="center" gutterBottom variant="h5" component="h2">
+                        <Typography style={{fontSize: 18}} align="center" gutterBottom variant="h5" component="h2">
                             {group.universityName}
                         </Typography>
                         <Typography
