@@ -154,7 +154,6 @@ function SignUpPage({firebase}) {
                             ))}
                         </Stepper>
                         {getStepContent(activeStep)}
-
                     </Box>
                 </Container>
                 <Typography className={classes.footer}>
@@ -202,7 +201,6 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
 
     return (
         <Fragment>
-
             <Formik
                 initialValues={{
                     firstName: '',
@@ -315,7 +313,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     variant="outlined"
                                     fullWidth
                                     helperText={errors.email && touched.email && errors.email}
-                                    error={Boolean(errors.email && touched.email && errors.email)}
+                                    error={Boolean(errors.email && touched.email)}
                                     autoComplete="email"
                                     id='emailInput'
                                     name='email'
@@ -404,8 +402,9 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                 style={{marginLeft: '5px'}} href="mailto:maximilian@careerfairy.io">Let us
                                 know</a></div>
                         </div>
-                        {errorMessageShown && <FormHelperText error>An error
-                            occurred while creating to your account</FormHelperText>}
+                       <FormHelperText error hidden={!errorMessageShown}>
+                           An error occurred while creating to your account
+                       </FormHelperText>
                     </form>
                 )}
             </Formik>
@@ -524,18 +523,16 @@ function SignUpFormValidate({user, setEmailVerificationSent, setActiveStep}) {
                         >
                             {isSubmitting ? "Checking" : (generalLoading ? "Resending" : "Validate Email")}
                         </Button>
-                        <FormHelperText hidden={!incorrectPin} error margin="dense">
+                        <Typography style={{marginTop: "0.5rem"}} align="center" hidden={!incorrectPin} color="secondary" margin="dense">
                             <strong>Incorrect PIN</strong> <br/>
-                            The PIN code you entered appears to be incorrect. <MuiLink
-                            style={{cursor: "pointer"}} underline="always"
-                            className='resend-link' onClick={() => resendVerificationEmail()}>Resend the
+                            The PIN code you entered appears to be incorrect. <MuiLink href="#"
+                            onClick={() => resendVerificationEmail()}><br/>Resend the
                             verification email.</MuiLink>
-
-                        </FormHelperText>
+                        </Typography>
                         <div style={{margin: "20px auto 0 auto", textAlign: "center"}}>
-                            <div style={{marginBottom: '5px'}}>Having issues signing up?<MuiLink
+                            <div style={{marginBottom: '5px'}}>Having issues signing up? <MuiLink
                                 style={{cursor: "pointer"}}
-                                href="mailto:maximilian@careerfairy.io">Let us
+                                href="mailto:maximilian@careerfairy.io"> Let us
                                 know</MuiLink></div>
                         </div>
                         <FormHelperText error hidden={!errorMessageShown}>
