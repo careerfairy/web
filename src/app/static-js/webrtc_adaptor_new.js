@@ -1377,7 +1377,7 @@ export function WebRTCAdaptor(initialValues)
 		{
 			thiz.getStats(streamId);
 
-		}, 5000);
+		}, 3000);
 	}
 	
 	this.disableStats = function(streamId) {

@@ -29,6 +29,7 @@ function VideoContainer(props) {
 
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const { permissionGranted, userMediaError, localStream } = useLocalStream(mediaConstraints);
+    const [audioCounter, setAudioCounter] = useState(0);
 
     const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
 
@@ -139,16 +140,20 @@ function VideoContainer(props) {
     const isMainStreamer = props.streamerId === props.currentLivestream.id;
 
     useEffect(() => {
-        if (isMainStreamer && props.currentLivestream.speakerSwitchMode === 'automatic') {
-            if (audioLevels && audioLevels.length > 0) {
+        if (isMainStreamer && props.currentLivestream.speakerSwitchMode === 'automatic') { 
+            let timeout = setTimeout(() => {
                 console.log(audioLevels);
-                const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
-                if (maxEntry.audioLevel > 0.1) {
-                    setLivestreamCurrentSpeakerId(maxEntry.streamId);
+                if (audioLevels && audioLevels.length > 0) {
+                    const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
+                    if (maxEntry.audioLevel > 0.05) {
+                        setLivestreamCurrentSpeakerId(maxEntry.streamId);
+                    }
                 }
-            }
-        }    
-    }, [audioLevels]);
+                setAudioCounter(audioCounter + 1);
+            }, 500); 
+            return () => clearTimeout(timeout);
+        }
+    }, [audioCounter, props.currentLivestream.speakerSwitchMode]);
 
     useEffect(() => {
         if (props.currentLivestream.start) {
