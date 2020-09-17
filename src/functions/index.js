@@ -188,6 +188,7 @@ exports.sendPostmarkEmailVerificationEmailWithPinAndUpdateUserData = functions.h
 
     await admin.firestore().collection("userData").doc(recipient_email).set(
         {
+            id: recipient_email,
             validationPin: pinCode,
             firstName: recipient_first_name,
             lastName: recipient_last_name,
