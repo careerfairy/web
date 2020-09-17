@@ -56,6 +56,7 @@
     "react-sizeme": "^2.6.12",
     "react-stack-grid": "^0.7.1",
     "react-swipeable-views": "^0.13.9",
+    "react-window": "^1.8.5",
     "redux": "^4.0.5",
     "semantic-ui-react": "^0.88.2",
     "twilio": "^3.35.0",
