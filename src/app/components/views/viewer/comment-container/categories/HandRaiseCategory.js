@@ -13,7 +13,7 @@ import HandRaiseInactive from './hand-raise/inactive/HandRaiseInactive';
 function HandRaiseCategory(props) {
 
     if (!props.livestream.handRaiseActive) {
-        return <HandRaiseInactive/>;
+        return <HandRaiseInactive selectedState={props.selectedState}/>;
     }
 
     const { authenticatedUser, userData } = React.useContext(UserContext);
@@ -47,7 +47,7 @@ function HandRaiseCategory(props) {
     }
 
     return (
-        <div  style={{ display: (props.selectedState !== 'hand' ? 'none' : 'block')}}>
+        <div style={{ display: (props.selectedState !== 'hand' ? 'none' : 'block')}}>
             <HandRaisePriorRequest handRaiseState={handRaiseState} updateHandRaiseRequest={updateHandRaiseRequest}/>
             <HandRaiseRequested handRaiseState={handRaiseState} updateHandRaiseRequest={updateHandRaiseRequest}/>
             <HandRaiseDenied handRaiseState={handRaiseState} updateHandRaiseRequest={updateHandRaiseRequest}/>

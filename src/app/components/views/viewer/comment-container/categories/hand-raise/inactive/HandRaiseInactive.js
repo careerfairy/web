@@ -4,7 +4,7 @@ import { Input, Icon, Button, Modal } from 'semantic-ui-react';
 function HandRaiseInactive(props) {
 
     return (
-        <div className='animated fadeIn'>
+        <div className='animated fadeIn' style={{ display: (props.selectedState !== 'hand' ? 'none' : 'block')}}>
             <div className='handraise-container'>
                 <div className='central-container'>
                     <h2>Hand Raise is not active</h2>
