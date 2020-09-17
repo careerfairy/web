@@ -7,6 +7,9 @@ import Firebase from 'data/firebase/Firebase';
 import * as Sentry from '@sentry/browser';
 import {ThemeProvider} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import config from 'react-reveal/globals';
+
+config({ ssrFadeout: true });
 
 
 
