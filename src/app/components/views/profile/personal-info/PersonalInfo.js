@@ -40,7 +40,6 @@ const PersonalInfo = (props) => {
         });
     }
 
-    console.log("props.userData", props.userData);
     return (
         <Formik
             initialValues={props.userData.firstName ? {
@@ -66,7 +65,8 @@ const PersonalInfo = (props) => {
                 setSubmitting(true);
                 props.firebase.setUserData(props.userData.id, values.firstName, values.lastName)
                     .then(() => {
-                        return push('/next-livestreams');
+                        // return push('/next-livestreams');
+                        setSubmitting(false);
                     }).catch(error => {
                     setSubmitting(false);
                     console.log(error);
@@ -145,7 +145,8 @@ const PersonalInfo = (props) => {
                                 endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
                                 className={classes.submit}
                             >
-                                {props.userData ? 'Update' : 'Create Account'}
+                                {/*{props.userData ? 'Update' : 'Create Account'}*/}
+                                {isSubmitting ? "Updating" : "Update"}
                             </Button>
                         </Box>
                     </Container>

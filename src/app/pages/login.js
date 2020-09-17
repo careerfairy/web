@@ -103,7 +103,7 @@ function LogInPage({firebase}) {
             } else {
                 firebase.getUserData(user.email).then(querySnapshot => {
                     if (querySnapshot.exists) {
-                        router.replace('/next-livestreams');
+                        router.replace('/profile');
                     } else {
                         router.replace('/profile');
                     }
