@@ -76,7 +76,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile}) => {
         <div>
             <Slider className={classes.root} {...settings}>
                 {renderGroupCards}
-                <Button className={classes.button} variant="contained" color="primary" >
+                <Button className={classes.button}  color="primary" >
                     Follow more
                 </Button>
             </Slider>

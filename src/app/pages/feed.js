@@ -55,7 +55,10 @@ const feed = ({firebase}) => {
     }
 
     const handleSetGroup = (groupObj) => {
-        setGroupData(groupObj)
+        setGroupData({
+            ...groupObj,
+            alreadyJoined: userData.groupIds?.includes(groupObj.id)
+        })
     }
 
     return (
