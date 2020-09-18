@@ -1,5 +1,5 @@
-import { Fragment } from 'react';
-import { UNIVERSITY_SUBJECTS } from 'data/StudyFieldData';
+import {Fragment} from 'react';
+import {UNIVERSITY_SUBJECTS} from 'data/StudyFieldData';
 
 function TargetElementList(props) {
 
@@ -8,7 +8,9 @@ function TargetElementList(props) {
     let tags = list.map((listElement, index) => {
         const selectionMode = props.selectedFields ? true : false;
         const targetElement = UNIVERSITY_SUBJECTS.find(subject => {
-            return subject.value === listElement;
+            if (subject.value === listElement) {
+                return subject.value === listElement;
+            }
         });
         if (!targetElement) {
             console.error(listElement);
@@ -17,8 +19,12 @@ function TargetElementList(props) {
             const selected = props.selectedFields.indexOf(listElement) > -1;
             return (
                 <Fragment key={index}>
-                    <div className='tag' style={{ backgroundColor: selected ? 'rgb(44, 66, 81)' : 'white', color: selected ? 'white' : 'rgb(44, 66, 81)', border: '1px solid rgb(44, 66, 81)'}}>
-                        {targetElement.text}
+                    <div className='tag' style={{
+                        backgroundColor: selected ? 'rgb(44, 66, 81)' : 'white',
+                        color: selected ? 'white' : 'rgb(44, 66, 81)',
+                        border: '1px solid rgb(44, 66, 81)'
+                    }}>
+                        {targetElement?.text}
                     </div>
                     <style jsx>{`
                         .tag {
@@ -37,7 +43,11 @@ function TargetElementList(props) {
         } else {
             return (
                 <Fragment key={index}>
-                    <div className='tag' style={{ fontSize: props.size === 'large' ? '1em' : '0.8em', padding: props.size === 'large' ? '8px 12px' : '2px 10px', borderRadius: props.size === 'large' ? '20px' : '12px' }}>
+                    <div className='tag' style={{
+                        fontSize: props.size === 'large' ? '1em' : '0.8em',
+                        padding: props.size === 'large' ? '8px 12px' : '2px 10px',
+                        borderRadius: props.size === 'large' ? '20px' : '12px'
+                    }}>
                         {targetElement.text}
                     </div>
                     <style jsx>{`
@@ -54,13 +64,13 @@ function TargetElementList(props) {
                 </Fragment>
             );
         }
-        
+
     })
 
     return (
         <Fragment>
             <div className='tag-container'>
-                { tags }
+                {tags}
             </div>
             <style jsx>{`
                 .tag-container {

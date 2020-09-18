@@ -1,11 +1,10 @@
-import React, {useEffect, useState, Fragment} from 'react';
+import React from 'react';
 import {Formik} from 'formik';
 import {useRouter} from 'next/router';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 import {withFirebase} from 'data/firebase';
 import {makeStyles} from "@material-ui/core/styles";
-import {Typography, TextField, Button, Grid, Paper, CircularProgress, Box, Container} from "@material-ui/core";
+import {Typography, TextField, Button, Grid, CircularProgress, Box, Container} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -145,7 +144,6 @@ const PersonalInfo = (props) => {
                                 endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
                                 className={classes.submit}
                             >
-                                {/*{props.userData ? 'Update' : 'Create Account'}*/}
                                 {isSubmitting ? "Updating" : "Update"}
                             </Button>
                         </Box>

@@ -1,8 +1,10 @@
 import React, {useEffect, useState, Fragment} from 'react'
-import {Grid, Typography} from "@material-ui/core";
+import {Button, Grid, Typography} from "@material-ui/core";
 import {withFirebase} from 'data/firebase';
 import CurrentGroup from 'components/views/profile/CurrentGroup';
 import {makeStyles} from "@material-ui/core/styles";
+import AddIcon from "@material-ui/icons/Add";
+import {useRouter} from "next/router";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -20,6 +22,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const AdminGroups = ({userData, firebase}) => {
+    const router = useRouter()
     const classes = useStyles()
     const [adminGroups, setAdminGroups] = useState([]);
 
@@ -58,6 +61,12 @@ const AdminGroups = ({userData, firebase}) => {
                     <Typography className={classes.title} variant="h5">
                         Admin Groups
                     </Typography>
+                    <Button endIcon={<AddIcon/>}
+                        variant="contained"
+                        color="primary"
+                        onClick={() => router.push('/group/create')}>
+                    Create a group
+                </Button>
                 </div>
                 {adminGroupElements.length ?
                     <Grid style={{marginBottom: 50}} container spacing={3}>

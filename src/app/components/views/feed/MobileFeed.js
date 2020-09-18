@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import SwipeableViews from 'react-swipeable-views';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -6,11 +6,9 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
 
-import {Container, Typography, useMediaQuery} from "@material-ui/core";
-import PersonalInfo from "./personal-info/PersonalInfo";
+import {Container, Typography,} from "@material-ui/core";
 import {withFirebase} from "../../../data/firebase";
-import JoinedGroups from "./my-groups/JoinedGroups";
-import AdminGroups from "./my-groups/AdminGroups";
+
 
 function TabPanel(props) {
     const {children, value, index, ...other} = props;
@@ -23,7 +21,7 @@ function TabPanel(props) {
             {...other}
         >
             {value === index && (
-                <Box p={3}>
+                <Box p={1}>
                     {children}
                 </Box>
             )}
@@ -44,11 +42,10 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const ProfileNav = ({userData}) => {
+const MobileFeed = ({userData, user, groupId, group, children}) => {
     const classes = useStyles();
     const theme = useTheme();
-    const native = useMediaQuery(theme.breakpoints.down('xs'));
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = useState(0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -59,7 +56,19 @@ const ProfileNav = ({userData}) => {
     };
 
     return (
-        <Container style={{marginTop: '50px'}}>
+        <Container>
+            <SwipeableViews
+                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                index={value}
+                onChangeIndex={handleChangeIndex}
+            >
+                <TabPanel value={value} index={0} dir={theme.direction}>
+                    <div style={{backgroundColor: "pink", flex: 1, border: "1px solid pink", height: "80vh"}}/>
+                </TabPanel>
+                <TabPanel value={value} index={1} dir={theme.direction}>
+                    <div style={{backgroundColor: "blue", flex: 1, border: "1px solid blue", height: "80vh"}}/>
+                </TabPanel>
+            </SwipeableViews>
             <AppBar className={classes.bar} position="static" color="default">
                 <Tabs
                     value={value}
@@ -69,31 +78,12 @@ const ProfileNav = ({userData}) => {
                     selectionFollowsFocus
                     centered
                 >
-                    <Tab wrapped fullWidth
-                         label={<Typography noWrap variant="h5">{native ? "Personal" : "Personal Information"}</Typography>}/>
-                    <Tab wrapped fullWidth
-                         label={<Typography variant="h5">{native ? "Groups" : "Joined Groups"}</Typography>}/>
-                    {"isAdmin?"?<Tab wrapped fullWidth
-                          label={<Typography variant="h5">{native ? "Admin" : "Admin Groups"}</Typography>}/> : null}
+                    <Tab wrapped fullWidth label={<Typography variant="h5">Categories</Typography>}/>
+                    <Tab wrapped fullWidth label={<Typography variant="h5">Events</Typography>}/>
                 </Tabs>
             </AppBar>
-            <SwipeableViews
-                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                index={value}
-                onChangeIndex={handleChangeIndex}
-            >
-                <TabPanel value={value} index={0} dir={theme.direction}>
-                    <PersonalInfo userData={userData}/>
-                </TabPanel>
-                <TabPanel value={value} index={1} dir={theme.direction}>
-                    <JoinedGroups userData={userData}/>
-                </TabPanel>
-                <TabPanel value={value} index={2} dir={theme.direction}>
-                    <AdminGroups userData={userData}/>
-                </TabPanel>
-            </SwipeableViews>
         </Container>
     );
 }
 
-export default withFirebase(ProfileNav)
+export default withFirebase(MobileFeed)
