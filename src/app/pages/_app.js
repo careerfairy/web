@@ -8,9 +8,9 @@ import * as Sentry from '@sentry/browser';
 import {ThemeProvider} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import config from 'react-reveal/globals';
-
 config({ ssrFadeout: true });
-
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 
 import Head from 'next/head';

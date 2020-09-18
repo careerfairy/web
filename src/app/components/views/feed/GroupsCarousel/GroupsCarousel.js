@@ -1,111 +1,86 @@
-import React, {Fragment} from 'react';
-import "./index.css";
-import "slick-carousel/slick/slick.css";
+import React, {useEffect, useRef} from 'react';
+import {makeStyles} from "@material-ui/core/styles";
+import GroupCarouselCard from "./GroupCarouselCard";
+import Slider from "react-slick";
+import {Button} from "@material-ui/core";
 
-import "slick-carousel/slick/slick-theme.css";
-import Slider from "react-slick"
 
-
-const GroupsCarousel = () => {
-
-    const settings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 1,
-        slidesToScroll: 1
+const useStyles = makeStyles((theme) => ({
+    root: {
+        marginTop: theme.spacing(1),
+        marginBottom: theme.spacing(1),
+        border: "1px solid red",
+        "& .slick-track": {
+            marginLeft: 0
+        },
+    },
+    button: {
+        height: 90,
+        borderRadius: 20,
+        marginTop: 3,
     }
+}));
+
+function NextArrow(props) {
+    const {className, style, onClick} = props;
+    return (
+        <div
+            className={className}
+            style={{...style, display: "block", background: "red", position: "absolute", right: 0}}
+            onClick={onClick}
+        />
+    );
+}
+
+function PrevArrow(props) {
+    const {className, style, onClick} = props;
+    return (
+        <div
+            className={className}
+            style={{...style, display: "block", background: "red", position: "absolute", left: 0, zIndex: 10}}
+            onClick={onClick}
+        />
+    );
+}
+
+const GroupsCarousel = ({groupIds, handleSetGroup, mobile}) => {
+
+    const classes = useStyles()
+
+
+    const renderGroupCards = groupIds.map(id => {
+        return <GroupCarouselCard handleSetGroup={handleSetGroup} groupId={id}/>
+    })
+    const handleHowMany = (defaultNum) => {
+        let num = defaultNum
+        if (renderGroupCards.length < defaultNum){
+            num = renderGroupCards.length + 1
+        }
+        return num
+    }
+    const settings = {
+        centerMode: true,
+        centerPadding: "60px",
+        infinite: true,
+        slidesToShow: mobile ? 2 : handleHowMany(4),
+        speed: 500,
+        nextArrow: <NextArrow/>,
+        prevArrow: <PrevArrow/>
+    };
+
+
+    const onlyOne = renderGroupCards.length < 2
+    console.log("onlyOne", onlyOne);
 
     return (
-        <Fragment>
-            <Slider {...settings}>
-                <div>
-                    <h3>1</h3>
-                </div>
-                <div>
-                    <h3>2</h3>
-                </div>
-                <div>
-                    <h3>3</h3>
-                </div>
-                <div>
-                    <h3>4</h3>
-                </div>
-                <div>
-                    <h3>5</h3>
-                </div>
-                <div>
-                    <h3>6</h3>
-                </div>
+        <div>
+            <Slider className={classes.root} {...settings}>
+                {renderGroupCards}
+                <Button className={classes.button} variant="contained" color="primary" >
+                    Follow more
+                </Button>
             </Slider>
-            <style jsx>{`
-                  .App {
-                     text-align: center;
-                     min-width: 375px;
-                     max-width: 100%;
-                 
-                 }
-                 
-                 .App-logo {
-                     height: 40vmin;
-                 }
-                 
-                 .slick-current.slick-active.slick-center {
-                     opacity: 1;
-                     filter: brightness(1) !important;
-                 }
-                 
-                 
-                 .App-header {
-                 
-                     min-height: 100vh;
-                     display: flex;
-                     flex-direction: column;
-                     align-items: center;
-                     justify-content: center;
-                     font-size: calc(10px + 2vmin);
-                 }
-                 
-                 .App-link {
-                     color: #222222;
-                 }
-                 
-                 .slides .slick-prev,
-                 .slides .slick-next {
-                 
-                     position: absolute;
-                     top: 50%;
-                     z-index: 2;
-                 }
-                 
-                 .slick-arrow {
-                     filter: invert(0%) sepia(21%) saturate(1636%) hue-rotate(31deg) brightness(107%) contrast(73%) !important;
-                 }
-                 
-                 .slides {
-                     position: relative;
-                 }
-                 
-                 
-                 
-                 .slides .slick-prev,
-                 .slides .slick-next {
-                 
-                     position: absolute;
-                     top: 50%;
-                     z-index: 2;
-                 }
-                 
-                 .slides .slick-prev {
-                     left: 5%;
-                 }
-                 
-                 .slides .slick-next {
-                     right: 5%;
-                 }
-                        
-            `}</style>
-        </Fragment>
+        </div>
     )
 
 };

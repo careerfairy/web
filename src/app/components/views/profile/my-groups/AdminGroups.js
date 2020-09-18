@@ -46,9 +46,9 @@ const AdminGroups = ({userData, firebase}) => {
         adminGroupElements = adminGroups.map(group => {
             return (
                 <Fragment key={group.id}>
-                    <Grid item xs={12} sm={6} md={6} lg={6} xl={4}>
+
                         <CurrentGroup isAdmin={true} group={group} userData={userData}/>
-                    </Grid>
+
                 </Fragment>
             )
         });

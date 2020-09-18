@@ -38,7 +38,7 @@ const UserProfile = ({firebase}) => {
     useEffect(() => {
         setLoading(true);
         if (user) {
-            firebase.listenToUserData(user.email, querySnapshot => {
+            const unsubscribe = firebase.listenToUserData(user.email, querySnapshot => {
                 setLoading(false);
                 let user = querySnapshot.data();
                 user.id = querySnapshot.id;
@@ -46,6 +46,7 @@ const UserProfile = ({firebase}) => {
                     setUserData(user);
                 }
             })
+            return () => unsubscribe
         }
     }, [user]);
 
