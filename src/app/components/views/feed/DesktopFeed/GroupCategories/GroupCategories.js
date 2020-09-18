@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import UserCategorySelector from "../../profile/UserCategorySelector";
+import UserCategorySelector from "../../../profile/UserCategorySelector";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import {Box, Card, CardActionArea, CardContent, CardMedia, CircularProgress, Typography} from "@material-ui/core";
