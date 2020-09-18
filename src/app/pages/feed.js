@@ -70,7 +70,7 @@ const feed = ({firebase}) => {
             <Container disableGutters>
                 <GroupsCarousel mobile={mobile} handleSetGroup={handleSetGroup} groupIds={userData.groupIds}/>
                 <Box className={classes.content}>
-                    {mobile ? <MobileFeed groupData={groupData}/> : <DesktopFeed groupData={groupData}/>}
+                    {mobile ? <MobileFeed groupData={groupData}/> : <DesktopFeed alreadyJoined={groupData.alreadyJoined} userData={userData} groupData={groupData}/>}
                 </Box>
             </Container>
             <Footer/>

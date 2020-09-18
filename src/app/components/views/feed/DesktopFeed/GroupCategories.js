@@ -11,6 +11,11 @@ import {makeStyles} from "@material-ui/core/styles";
 
 
 const useStyles = makeStyles((theme) => ({
+    root: {
+        padding: theme.spacing(2),
+        width: "30%",
+        height: "80vh"
+    },
     media: {
         display: "flex",
         justifyContent: "center",
@@ -28,8 +33,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const GroupCategories = ({group, firebase, userData, alreadyJoined,}) => {
-
+const GroupCategories = ({group, firebase, userData, alreadyJoined}) => {
+    
     const classes = useStyles();
     const [categories, setCategories] = useState([]);
     const [allSelected, setAllSelected] = useState(false);
@@ -57,17 +62,19 @@ const GroupCategories = ({group, firebase, userData, alreadyJoined,}) => {
                 });
             }
             setCategories(groupCategories);
+        } else {
+            setCategories([])
         }
     }, [group]);
 
     useEffect(() => {
-        if (categories && open) {
+        if (categories) {
             const notAllSelected = !categories.some(
                 (category) => category.selectedValueId === ""
             );
             setAllSelected(notAllSelected);
         }
-    }, [categories, open]);
+    }, [categories]);
 
     const handleSetSelected = (categoryId, event) => {
         const newCategories = [...categories];
@@ -133,9 +140,11 @@ const GroupCategories = ({group, firebase, userData, alreadyJoined,}) => {
         );
     });
 
+
     return (
-        <Card>
-            <Typography variant="h5" align="center">Follow live streams from</Typography>
+        <Card className={classes.root}>
+            {!alreadyJoined &&<Typography variant="h5" align="center">Follow live streams from:</Typography>}
+            <Typography variant="h6" align="center"><strong>{group.universityName}</strong></Typography>
             <CardMedia className={classes.media}>
                 <img src={group.logoUrl} className={classes.image} alt=""/>
             </CardMedia>
@@ -144,27 +153,24 @@ const GroupCategories = ({group, firebase, userData, alreadyJoined,}) => {
                     {group.description}
                 </Typography>
                 <Box className={classes.actions}>
-                    {!!categories.length && renderCategories}
+                    {categories.length > 1 ? renderCategories : null}
+                </Box>
+                <Box mt={2} display="flex" justifyContent="center">
+                    <Button
+                        disabled={!allSelected || submitting}
+                        variant="contained"
+                        size="large"
+                        endIcon={submitting && <CircularProgress size={20} color="inherit"/>}
+                        onClick={handleJoinGroup}
+                        color="primary"
+                        autoFocus>
+                        {alreadyJoined ? "Update" : "Follow"}
+                    </Button>
+                    <Button style={{marginLeft: 5}} size="large">
+                        Unfollow
+                    </Button>
                 </Box>
             </CardContent>
-            <CardActionArea>
-                {((alreadyJoined && group.categories) || !alreadyJoined) &&
-                <Button
-                    disabled={!allSelected || submitting}
-                    variant="contained"
-                    size="large"
-                    endIcon={submitting && <CircularProgress size={20} color="inherit"/>}
-                    onClick={handleJoinGroup}
-                    color="primary"
-                    autoFocus>
-                    Confirm
-                </Button>}
-                <Button
-                    size="large"
-                    onClick={closeModal}>
-                    Cancel
-                </Button>
-            </CardActionArea>
         </Card>
     )
 };

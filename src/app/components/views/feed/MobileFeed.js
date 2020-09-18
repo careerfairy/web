@@ -63,10 +63,10 @@ const MobileFeed = ({userData, user, groupId, group, children}) => {
                 onChangeIndex={handleChangeIndex}
             >
                 <TabPanel value={value} index={0} dir={theme.direction}>
-                    <div style={{backgroundColor: "pink", flex: 1, border: "1px solid pink", height: "80vh"}}/>
+                    <div style={{backgroundColor: "orange", flex: 1, border: "1px solid pink", height: "80vh"}}/>
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
-                    <div style={{backgroundColor: "blue", flex: 1, border: "1px solid blue", height: "80vh"}}/>
+                    <div style={{backgroundColor: "purple", flex: 1, border: "1px solid blue", height: "80vh"}}/>
                 </TabPanel>
             </SwipeableViews>
             <AppBar className={classes.bar} position="static" color="default">
