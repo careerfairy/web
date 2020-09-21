@@ -9,6 +9,13 @@ export const GlobalBackground = withStyles({
     },
 })(Box);
 
+export const DarkBackground = withStyles({
+    root: {
+        backgroundColor: "rgb(44, 66, 81)",
+        minHeight: "100%",
+    },
+})(Box);
+
 export const MobileBackground = withStyles({
     root: {
         backgroundColor: "rgb(250,250,250)",

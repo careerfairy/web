@@ -1,4 +1,4 @@
-import {GlobalBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
+import {DarkBackground, GlobalBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import Head from "next/head";
 import Header from "../components/views/header/Header";
 import {Container, useMediaQuery, useTheme} from "@material-ui/core";
@@ -10,7 +10,6 @@ import Loader from "../components/views/loader/Loader";
 import {withFirebase} from "../data/firebase";
 import DesktopFeed from "../components/views/feed/DesktopFeed/DesktopFeed";
 import GroupBanner from "../components/views/feed/GroupBanner";
-
 
 
 const feed = ({firebase}) => {
@@ -76,9 +75,12 @@ const feed = ({firebase}) => {
             <Head>
                 <title key="title">CareerFairy | Feed</title>
             </Head>
-            <Header classElement='relative white-background'/>
+            <div style={{background: "rgb(44, 66, 81)"}}>
+                <Header color="white"/>
+            </div>
+            <GroupsCarousel groupData={groupData} mobile={mobile} handleSetGroup={handleSetGroup}
+                            groupIds={userData.groupIds}/>
             <Container disableGutters>
-                <GroupsCarousel mobile={mobile} handleSetGroup={handleSetGroup} groupIds={userData.groupIds}/>
                 <GroupBanner description={groupData.description} logoUrl={groupData.logoUrl}/>
                 {mobile ?
                     <MobileFeed groupData={groupData}

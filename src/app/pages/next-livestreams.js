@@ -1,20 +1,20 @@
-import { Fragment,useEffect, useRef, useState } from "react";
-import { Container, Grid, Image, Button, Icon } from "semantic-ui-react";
+import {Fragment, useEffect, useRef, useState} from "react";
+import {Container, Grid, Image, Button, Icon} from "semantic-ui-react";
 
 import Header from "../components/views/header/Header";
 import Footer from '../components/views/footer/Footer';
 import LivestreamCard from '../components/views/livestream-card/LivestreamCard'
 
-import { useRouter } from 'next/router';
-import { withFirebasePage } from "../data/firebase";
+import {useRouter} from 'next/router';
+import {withFirebasePage} from "../data/firebase";
 import axios from "axios";
-import { UNIVERSITY_SUBJECTS } from '../data/StudyFieldData';
-import { UNIVERSITY_NAMES } from '../data/UniversityData';
+import {UNIVERSITY_SUBJECTS} from '../data/StudyFieldData';
+import {UNIVERSITY_NAMES} from '../data/UniversityData';
 import TargetElementList from '../components/views/common/TargetElementList';
 
-import StackGrid, { transitions } from 'react-stack-grid';
+import StackGrid, {transitions} from 'react-stack-grid';
 
-import { SizeMe } from 'react-sizeme';
+import {SizeMe} from 'react-sizeme';
 
 import Link from 'next/link';
 import Head from 'next/head';
@@ -28,7 +28,7 @@ function NextLivestreams(props) {
     const university = router.query.university;
     const filter = router.query.filter;
 
-    const { fade } = transitions;
+    const {fade} = transitions;
 
     const [user, setUser] = useState(null);
     const [userData, setUserData] = useState(null);
@@ -59,26 +59,26 @@ function NextLivestreams(props) {
     useEffect(() => {
         if (user) {
             props.firebase.getUserData(user.email)
-            .then(querySnapshot => {
-                let user = querySnapshot.data();
-                if (user) {
-                    setUserData(user);
-                }
-            });
+                .then(querySnapshot => {
+                    let user = querySnapshot.data();
+                    if (user) {
+                        setUserData(user);
+                    }
+                });
         }
-    },[user]);
+    }, [user]);
 
     useEffect(() => {
         if (university) {
             props.firebase.getCareerCenterByUniversityId(university)
-            .then(querySnapshot => {
-                querySnapshot.forEach(doc => {
-                    let university = doc.data();
-                    setUniversityData(university);
+                .then(querySnapshot => {
+                    querySnapshot.forEach(doc => {
+                        let university = doc.data();
+                        setUniversityData(university);
+                    });
                 });
-            });
         }
-    },[university]);
+    }, [university]);
 
     useEffect(() => {
         if (filter) {
@@ -101,7 +101,7 @@ function NextLivestreams(props) {
                 }
                 setAllLivestreams(livestreams);
             } else {
-                let filteredStreams = livestreams.filter( livestream => !livestream.hidden || livestream.hidden === false);
+                let filteredStreams = livestreams.filter(livestream => !livestream.hidden || livestream.hidden === false);
                 if (filteredStreams.length === 0) {
                     setNoLivestreamsPresent(true);
                 }
@@ -138,13 +138,13 @@ function NextLivestreams(props) {
         if (allLivestreams && allLivestreams.length > 0) {
             let allGroups = [];
             allLivestreams.map(livestream => livestream.universities).forEach(groups => {
-                groups.forEach( group => {
+                groups.forEach(group => {
                     if (!(allGroups.indexOf(group) > -1)) {
                         allGroups.push(group);
                     }
                 });
             });
-            props.firebase.getLivestreamCareerCenters(allGroups).then( querySnapshot => {
+            props.firebase.getLivestreamCareerCenters(allGroups).then(querySnapshot => {
                 let groupList = [];
                 querySnapshot.forEach(doc => {
                     let group = doc.data();
@@ -162,7 +162,7 @@ function NextLivestreams(props) {
                 grid.updateLayout();
             }, 500);
         }
-    }, [grid,livestreams, careerCenters]);
+    }, [grid, livestreams, careerCenters]);
 
     useEffect(() => {
         if (localStorage.getItem('hideCookieMessage') === 'yes') {
@@ -171,7 +171,7 @@ function NextLivestreams(props) {
     }, []);
 
     function filterUniversityLivestreams(livestreams, university) {
-        return livestreams.filter( livestream => {
+        return livestreams.filter(livestream => {
             if (livestream.universities) {
                 return livestream.universities.indexOf(university) > -1;
             } else {
@@ -209,18 +209,20 @@ function NextLivestreams(props) {
 
     const filterElement = backgroundOptions.map((option, index) => {
         const nonSelectedStyle = {
-            border: '1px solid rgb(0, 210, 170)', 
-            color:  'rgb(0, 210, 170)',
+            border: '1px solid rgb(0, 210, 170)',
+            color: 'rgb(0, 210, 170)',
         }
         const selectedStyle = {
-            border: '1px solid rgb(0, 210, 170)', 
+            border: '1px solid rgb(0, 210, 170)',
             color: 'white',
             backgroundColor: 'rgb(0, 210, 170)',
             opacity: '1'
-        }   
-        return(
+        }
+        return (
             <Fragment key={index}>
-                <div className={'filter-logo-element ' + ( index > 2 && !showAllFields ? 'hidden' : '')} style={ fields.indexOf(option.value) > -1 ? selectedStyle : nonSelectedStyle } onClick={fields.indexOf(option.value) > -1 ? () => removeField(option.value) : () => addField(option.value)}>
+                <div className={'filter-logo-element ' + (index > 2 && !showAllFields ? 'hidden' : '')}
+                     style={fields.indexOf(option.value) > -1 ? selectedStyle : nonSelectedStyle}
+                     onClick={fields.indexOf(option.value) > -1 ? () => removeField(option.value) : () => addField(option.value)}>
                     {option.text}
                 </div>
                 <style jsx>{`
@@ -249,11 +251,12 @@ function NextLivestreams(props) {
         );
     })
 
-    const mentorElements = livestreams.map( (mentor, index) => {
+    const mentorElements = livestreams.map((mentor, index) => {
         const avatar = mentor.mainSpeakerAvatar ? mentor.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
-        return(
+        return (
             <div key={index}>
-                <LivestreamCard livestream={mentor} user={user} userData={userData} fields={fields} grid={grid} careerCenters={ careerCenters.filter( careerCenter => mentor.universities.indexOf(careerCenter.universityId) > -1 )}/>
+                <LivestreamCard livestream={mentor} user={user} userData={userData} fields={fields} grid={grid}
+                                careerCenters={careerCenters.filter(careerCenter => mentor.universities.indexOf(careerCenter.universityId) > -1)}/>
             </div>
         );
     })
@@ -264,65 +267,102 @@ function NextLivestreams(props) {
                 <title key="title">CareerFairy | Next Live Streams</title>
             </Head>
             <Header color="white"/>
-            <Container className="landingTitleContainer" style={{ paddingBottom: '20px', display: university ? 'block' : 'none'}}>
-                <Grid className='middle aligned' centered> 
+            <Container className="landingTitleContainer"
+                       style={{paddingBottom: '20px', display: university ? 'block' : 'none'}}>
+                <Grid className='middle aligned' centered>
                     <Grid.Column width={6}>
-                        <div style={{ display: universityData ? 'block' : 'none' }}>
-                            <Image src={universityData ? universityData.logoUrl : 'none'} style={{ margin: '10px 0 10px 0', maxHeight: '110px', filter: 'brightness(0) invert(1)'}}/>
+                        <div style={{display: universityData ? 'block' : 'none'}}>
+                            <Image src={universityData ? universityData.logoUrl : 'none'} style={{
+                                margin: '10px 0 10px 0',
+                                maxHeight: '110px',
+                                filter: 'brightness(0) invert(1)'
+                            }}/>
                         </div>
                     </Grid.Column>
                     <Grid.Column width={10}>
-                        <div style={{ float: 'right'}}>   
-                            <div style={{  display: (universityData ? 'block' : 'none'), fontSize: '1.4em', color: 'white', fontWeight: '700', textAlign: 'right', lineHeight: '1.4em', margin: '5px'}}>Live streams for students @ { universityData ? universityData.universityName : '' }.</div>
-                            <div style={{ display: (universityData ? universityData.returnButton : false) ? 'none': 'block' }}>
-                                <Link href='/next-livestreams'><a><Button style={{ float: 'right'}} content='See all Live Streams' size='mini'/></a></Link>
+                        <div style={{float: 'right'}}>
+                            <div style={{
+                                display: (universityData ? 'block' : 'none'),
+                                fontSize: '1.4em',
+                                color: 'white',
+                                fontWeight: '700',
+                                textAlign: 'right',
+                                lineHeight: '1.4em',
+                                margin: '5px'
+                            }}>Live streams for students @ {universityData ? universityData.universityName : ''}.
                             </div>
-                            <div style={{ display: (universityData ? universityData.returnButton : false) ? 'block': 'none' }}>
-                                <a href={universityData ? universityData.returnUrl : ''}><Button style={{ float: 'right'}} content={'To ' + (universityData ? universityData.universityName : '')}  size='mini'/></a>
+                            <div
+                                style={{display: (universityData ? universityData.returnButton : false) ? 'none' : 'block'}}>
+                                <Link href='/next-livestreams'><a><Button style={{float: 'right'}}
+                                                                          content='See all Live Streams'
+                                                                          size='mini'/></a></Link>
+                            </div>
+                            <div
+                                style={{display: (universityData ? universityData.returnButton : false) ? 'block' : 'none'}}>
+                                <a href={universityData ? universityData.returnUrl : ''}><Button
+                                    style={{float: 'right'}}
+                                    content={'To ' + (universityData ? universityData.universityName : '')}
+                                    size='mini'/></a>
                             </div>
                         </div>
                     </Grid.Column>
                 </Grid>
             </Container>
             <div className={'filterBar ' + (cookieMessageVisible ? '' : 'hidden')}>
-                <Image id='cookie-logo' src='/cookies.png' style={{ display: 'inline-block', margin: '0 20px 0 0', maxHeight: '25px', width: 'auto', verticalAlign: 'top'}}/>
-                <p>We use cookies to improve your experience. By continuing to use our website, you agree to our <Link href='/privacy'><a>privacy policy</a></Link>.</p>
-                <Icon id='cookie-delete' style={{ cursor: 'pointer', verticalAlign: 'top', float: 'right', lineHeight: '30px'}} name='delete' onClick={() => hideCookieMessage()}/>
+                <Image id='cookie-logo' src='/cookies.png' style={{
+                    display: 'inline-block',
+                    margin: '0 20px 0 0',
+                    maxHeight: '25px',
+                    width: 'auto',
+                    verticalAlign: 'top'
+                }}/>
+                <p>We use cookies to improve your experience. By continuing to use our website, you agree to our <Link
+                    href='/privacy'><a>privacy policy</a></Link>.</p>
+                <Icon id='cookie-delete'
+                      style={{cursor: 'pointer', verticalAlign: 'top', float: 'right', lineHeight: '30px'}}
+                      name='delete' onClick={() => hideCookieMessage()}/>
             </div>
             <div id='landingPageButtons'>
                 <Container>
                     <div className='landingPageButtonsLabel'>Select your fields of interest</div>
-                    { filterElement }
-                    <Button style={{ margin: '5px' }} content={showAllFields ? 'Hide all filters' : 'Show all filters'} icon={showAllFields ? 'angle up' : 'angle down'} size='mini' onClick={() => setShowAllFields(!showAllFields)}/>
+                    {filterElement}
+                    <Button style={{margin: '5px'}} content={showAllFields ? 'Hide all filters' : 'Show all filters'}
+                            icon={showAllFields ? 'angle up' : 'angle down'} size='mini'
+                            onClick={() => setShowAllFields(!showAllFields)}/>
                 </Container>
             </div>
             <div className='mentor-list'>
                 <Container>
-                    <div style={{ textAlign: 'center', margin: '10px 0' }}>
-                    <Button size='big' content={ 'How Live Streams Work' } icon={ 'cog' } style={{ margin: '5px auto' }} onClick={() => goToSeparateRoute('/howitworks')}/>
+                    <div style={{textAlign: 'center', margin: '10px 0'}}>
+                        <Button size='big' content={'How Live Streams Work'} icon={'cog'} style={{margin: '5px auto'}}
+                                onClick={() => goToSeparateRoute('/howitworks')}/>
                     </div>
-                    <SizeMe>{ ({ size }) => (
+                    <SizeMe>{({size}) => (
                         <StackGrid
                             columnWidth={(size.width <= 768 ? '100%' : 450)}
                             gutterWidth={20}
                             gutterHeight={0}
-                            gridRef={ grid  => setGrid(grid) }>
-                            { mentorElements }
+                            gridRef={grid => setGrid(grid)}>
+                            {mentorElements}
                         </StackGrid>
                     )}</SizeMe>
-                    <div className={'empty-livestreams-message ' + ( !noLivestreamsPresent ? 'hidden' : '')}>
+                    <div className={'empty-livestreams-message ' + (!noLivestreamsPresent ? 'hidden' : '')}>
                         <div>
                             Exciting streams coming&nbsp;soon!
                         </div>
-                        <Button primary size='huge' content='Check out our past events' onClick={() => router.push('/discover')}/>
+                        <Button primary size='huge' content='Check out our past events'
+                                onClick={() => router.push('/discover')}/>
                     </div>
                 </Container>
             </div>
             <div className='grey-container'>
                 <div className='container-title'>Any problem or question ? We want to hear from you</div>
                 <Container>
-                    <Grid.Column width={16} style={{ textAlign: 'center' }}>
-                        <a className="aboutContentContactButton" href="mailto:thomas@careerfairy.io"><Button size='big' content='Contact CareerFairy' style={{ margin: '30px 0 0 0' }}/> </a>
+                    <Grid.Column width={16} style={{textAlign: 'center'}}>
+                        <a className="aboutContentContactButton" href="mailto:thomas@careerfairy.io"><Button size='big'
+                                                                                                             content='Contact CareerFairy'
+                                                                                                             style={{margin: '30px 0 0 0'}}/>
+                        </a>
                     </Grid.Column>
                 </Container>
             </div>
