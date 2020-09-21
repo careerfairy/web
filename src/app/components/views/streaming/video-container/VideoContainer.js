@@ -142,7 +142,6 @@ function VideoContainer(props) {
     useEffect(() => {
         if (isMainStreamer && props.currentLivestream.speakerSwitchMode === 'automatic') { 
             let timeout = setTimeout(() => {
-                console.log(audioLevels);
                 if (audioLevels && audioLevels.length > 0) {
                     const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
                     if (maxEntry.audioLevel > 0.05) {
