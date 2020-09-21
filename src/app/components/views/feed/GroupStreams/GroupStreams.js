@@ -21,7 +21,7 @@ const GroupStreams = ({groupData, firebase}) => {
         console.log("groupData", groupData);
 
         useEffect(() => {
-            if (groupData) {
+            if (groupData  && groupData.universityId) {
                 const unsubscribe = firebase.listenToLiveStreamsByUniversityId(groupData.universityId, querySnapshot => {
                     setSearching(false);
                     let livestreams = [];
