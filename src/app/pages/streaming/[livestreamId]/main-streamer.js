@@ -27,6 +27,8 @@ function StreamingPage(props) {
     const [newNotification, setNewNotification] = useState(null);
     const [notifications, setNotifications] = useState([]);
 
+    const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
+
     const numberOfViewers = useNumberOfViewers(currentLivestream);
     
     let streamingCallbacks = {
@@ -92,6 +94,11 @@ function StreamingPage(props) {
         props.firebase.setLivestreamHasStarted(started, currentLivestream.id);
     }
 
+    function openStudentView() {
+        const studentLink = `https://testing.careerfairy.io/streaming/${currentLivestream.id}/viewer`
+        window.open(studentLink, '_blank');
+    }
+
     return (
         <NotificationsContext.Provider value={{ setNewNotification: setNewNotification }}>
             <div className='topLevelContainer'>
@@ -105,9 +112,21 @@ function StreamingPage(props) {
                             confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
                             buttonLabel={ currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming' }/>
                     </div>
+                    <div style={{ position: 'absolute', top: '50%', left: '220px', transform: 'translateY(-50%)', verticalAlign: 'middle', cursor: 'pointer', color: 'rgb(80,80,80)', cursor: 'pointer', color: 'rgb(80,80,80)'}} onClick={() => {setSpeakerManagementOpen(true)}}>
+                        <Icon name='user plus' color='darkgrey' size='large' />
+                        <div style={{ fontSize: '0.7em'}}>
+                            Invite additional streamer
+                        </div>
+                    </div>
                     <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', display: 'inline-block', padding: '10px', verticalAlign: 'middle', fontSize: '0.9em'}}>
                         <h3 style={{ color: (currentLivestream.hasStarted ?  'rgb(0, 210, 170)' : 'orange') }}>{ currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}</h3>
                         { currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
+                    </div>
+                    <div style={{ position: 'absolute', top: '50%', right: '130px', transform: 'translateY(-50%)', verticalAlign: 'middle', cursor: 'pointer', color: 'rgb(80,80,80)'}} onClick={openStudentView}>
+                        <Icon name='film' color='darkgrey' size='large' />
+                        <div style={{ fontSize: '0.7em'}}>
+                            Open Student View
+                        </div>
                     </div>
                     <div style={{ float: 'right', margin: '0 20px', fontSize: '1em', padding: '3px', verticalAlign: 'middle', fontWeight: '700'}}>
                         Viewers: { numberOfViewers }
@@ -128,6 +147,7 @@ function StreamingPage(props) {
                 <div className='notifications-container'>
                     <NotificationsContainer notifications={notifications} />
                 </div>
+                <SpeakerManagementModal livestreamId={ currentLivestream.id } open={speakerManagementOpen} setOpen={setSpeakerManagementOpen}/>
                 <style jsx>{`
                     .top-menu {
                         position: relative;
@@ -180,7 +200,7 @@ function StreamingPage(props) {
 
                     .icons-container {
                         position: absolute;
-                        bottom: 0;
+                        bottom: 50px;
                         right: 130px;
                         z-index: 100;
                         width: 80px;
