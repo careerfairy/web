@@ -9,16 +9,18 @@ import GroupsCarousel from "../components/views/feed/GroupsCarousel/GroupsCarous
 import Loader from "../components/views/loader/Loader";
 import {withFirebase} from "../data/firebase";
 import DesktopFeed from "../components/views/feed/DesktopFeed/DesktopFeed";
+import {useRouter} from "next/router";
 
 
 const feed = ({firebase}) => {
     const theme = useTheme()
+    const router = useRouter();
     const [loading, setLoading] = useState(false)
     const [groupData, setGroupData] = useState({})
     const [userData, setUserData] = useState(null)
     const [user, setUser] = useState(null);
+    const [value, setValue] = useState(0);
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
-        const [value, setValue] = useState(0);
 
     useEffect(() => {
         firebase.auth.onAuthStateChanged(user => {
@@ -45,16 +47,16 @@ const feed = ({firebase}) => {
         }
     }, [user]);
 
+    if (user === null || userData == null || loading === true) {
+        return <Loader/>;
+    }
+
 
     const scrollToTop = () => {
         window.scrollTo(0, 0);
     }
 
-    if (user === null || userData == null || loading === true) {
-        return <Loader/>;
-    }
-
-        const handleChange = (event, newValue) => {
+    const handleChange = (event, newValue) => {
         setValue(newValue);
     };
 
