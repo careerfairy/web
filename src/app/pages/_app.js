@@ -15,8 +15,8 @@ function MyApp({ Component, pageProps }) {
 
     const firebase = new Firebase();
 
-    const [authenticatedUser, setAuthenticatedUser] = useState({});
-    const [userData, setUserData] = useState({});
+    const [authenticatedUser, setAuthenticatedUser] = useState(null);
+    const [userData, setUserData] = useState(null);
 
     useEffect(() => {
         firebase.auth.onAuthStateChanged(user => {
