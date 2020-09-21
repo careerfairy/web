@@ -72,8 +72,8 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData}) => {
     const classes = useStyles()
 
 
-    const renderGroupCards = groupIds?.map(id => {
-        return <GroupCarouselCard mobile={mobile} groupData={groupData} key={id} handleSetGroup={handleSetGroup} groupId={id}/>
+    const renderGroupCards = groupIds?.map((id, index) => {
+        return <GroupCarouselCard index={index} mobile={mobile} groupData={groupData} key={id} handleSetGroup={handleSetGroup} groupId={id}/>
     })
     const handleHowMany = (defaultNum) => {
         let num = defaultNum

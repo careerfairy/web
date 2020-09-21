@@ -28,6 +28,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile}) => {
+    const [cachedCategories, setCachedCategories] = useState([])
+
+    useEffect(() => {
+        if(groupData && groupData.categories && groupData.categories.length) {
+            setCachedCategories(groupData.categories)
+        }
+    }, [groupData])
 
     const classes = useStyles();
     const [grid, setGrid] = useState(null);
@@ -60,7 +67,7 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile})
                                 gutterWidth={20}
                                 gutterHeight={20}
                                 gridRef={grid => setGrid(grid)}>
-                                {groupData.categories?.map(category => {
+                                {cachedCategories.map(category => {
                                     return (
                                         <CategoryCard width={size.width} mobile={mobile} key={category.id}
                                                       category={category}

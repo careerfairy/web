@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
 const placeholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
 
 
-const GroupCarouselCard = ({group, groupId, firebase, handleSetGroup, groupData, mobile}) => {
+const GroupCarouselCard = ({group, groupId, firebase, handleSetGroup, groupData, mobile, index}) => {
     const classes = useStyles()
     const [localGroup, setLocalGroup] = useState({})
     const [noGroup, setNoGroup] = useState(false)
@@ -38,8 +38,15 @@ const GroupCarouselCard = ({group, groupId, firebase, handleSetGroup, groupData,
     useEffect(() => {
         if (group) {
             setLocalGroup(group)
+
         }
     }, [group])
+
+    useEffect(() => {
+        if (localGroup && index === 0) {
+            handleSetGroup(localGroup)
+        }
+    }, [localGroup])
 
     useEffect(() => {
         if (!group) {

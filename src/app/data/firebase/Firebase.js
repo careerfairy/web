@@ -443,6 +443,7 @@ class Firebase {
     let ref = this.firestore
         .collection("livestreams")
         .where("universities", "array-contains", universityId)
+        .orderBy("start", "asc")
     return ref.onSnapshot(callback)
   }
 

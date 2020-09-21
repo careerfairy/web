@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../data/firebase";
 import GroupStreamCard from "./GroupStreamCard";
@@ -15,14 +15,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const GroupStreams = ({groupData, firebase, userData, user}) => {
+const GroupStreams = ({groupData, firebase, userData, user, mobile, setCachedStreams, cachedStreams}) => {
 
         const classes = useStyles()
         const [livestreams, setLivestreams] = useState([])
         const [searching, setSearching] = useState(false)
         const [selectedOptions, setSelectedOptions] = useState([])
         const [grid, setGrid] = useState(null);
-        console.log("selectedOptions", selectedOptions);
 
 
         useEffect(() => {
@@ -32,6 +31,12 @@ const GroupStreams = ({groupData, firebase, userData, user}) => {
                 }, 10);
             }
         }, [grid, livestreams]);
+
+        useEffect(() => {
+            if (cachedStreams && cachedStreams.length) {
+                setLivestreams(cachedStreams)
+            }
+        }, [cachedStreams])
 
         useEffect(() => {
             if (groupData && groupData.universityId) {
@@ -52,6 +57,9 @@ const GroupStreams = ({groupData, firebase, userData, user}) => {
                         }
                     })
                     setLivestreams(livestreams);
+                    if (mobile) {
+                        setCachedStreams(livestreams)
+                    }
                     setSearching(false)
                 })
                 return () => unsubscribe()

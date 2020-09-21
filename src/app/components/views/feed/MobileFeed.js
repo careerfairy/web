@@ -44,6 +44,7 @@ const useStyles = makeStyles((theme) => ({
 const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user, value, handleChange, handleChangeIndex}) => {
     const classes = useStyles();
     const theme = useTheme();
+    const [cachedStreams, setCachedStreams] = useState([])
 
 
     return (
@@ -69,6 +70,9 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
             >
                 <TabPanel id="panel-category" value={value} index={0} dir={theme.direction}>
                     <GroupStreams user={user}
+                                  mobile={true}
+                                  cachedStreams={cachedStreams}
+                                  setCachedStreams={setCachedStreams}
                                   userData={userData}
                                   groupData={groupData}/>
                 </TabPanel>
