@@ -20,8 +20,9 @@ function HandRaiseCategory(props) {
     const [handRaiseState, setHandRaiseState] = useState(null); 
 
     useEffect(() => {
-        if (props.livestream && authenticatedUser) {
-            props.firebase.listenToHandRaiseState(props.livestream.id, authenticatedUser.email, querySnapshot => {
+        let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
+        if (props.livestream && authEmail) {
+            props.firebase.listenToHandRaiseState(props.livestream.id, authEmail, querySnapshot => {
                 if (querySnapshot.exists) {
                     let request = querySnapshot.data();
                     setHandRaiseState(request);
@@ -39,10 +40,13 @@ function HandRaiseCategory(props) {
     },[handRaiseState]);
 
     function updateHandRaiseRequest(state) {
+        let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
+        let checkedUserData = props.livestream.test ? { firstName: 'Test', lastName: 'Streamer' } : userData;
+        debugger;
         if (handRaiseState) {
-            props.firebase.updateHandRaiseRequest(props.livestream.id, authenticatedUser.email, state);
+            props.firebase.updateHandRaiseRequest(props.livestream.id, authEmail, state);
         } else {
-            props.firebase.createHandRaiseRequest(props.livestream.id, authenticatedUser.email, userData);
+            props.firebase.createHandRaiseRequest(props.livestream.id, authEmail, checkedUserData);
         }
     }
 

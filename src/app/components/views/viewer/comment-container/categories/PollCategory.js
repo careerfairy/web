@@ -34,11 +34,14 @@ function PollCategory(props) {
     }, [currentPoll]);
 
     function voteForPollOption(index) {
-        props.firebase.voteForPollOption(props.livestream.id, currentPoll.id, authenticatedUser.email, index);
+        let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
+        props.firebase.voteForPollOption(props.livestream.id, currentPoll.id, authEmail, index);
     }
 
-    if (currentPoll && authenticatedUser) {
-        if (currentPoll.voters.indexOf(authenticatedUser.email) === -1) {
+    let authEmail = (authenticatedUser && authenticatedUser.email && !props.livestream.test) ? authenticatedUser.email : 'streamerEmail';
+
+    if (currentPoll && authEmail) {
+        if (currentPoll.voters.indexOf(authEmail) === -1) {
             const colors = ['red', 'orange', 'pink', 'olive'];
             let optionElementsLarge = currentPoll.options.map((option, index) => {
                 return (

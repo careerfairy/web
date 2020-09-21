@@ -59,14 +59,14 @@ function MiniChatContainer(props) {
     }, [open])
 
     function addNewChatEntry() {
-        if (!(newChatEntry.trim())) {
+        if (!(newChatEntry.trim()) || (!userData && !props.livestream.test)) {
             return;
         }
 
         const newChatEntryObject = {
             message: newChatEntry,
-            authorName: props.isStreamer ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
-            authorEmail: props.isStreamer ? 'Streamer' : authenticatedUser.email,
+            authorName: props.isStreamer || props.livestream.test ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
+            authorEmail: props.isStreamer || props.livestream.test? 'Streamer' : authenticatedUser.email,
             votes: 0
         }
 

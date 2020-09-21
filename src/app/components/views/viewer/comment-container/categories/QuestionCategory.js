@@ -39,7 +39,7 @@ function QuestionCategory(props) {
     }, [props.livestream.id]);
 
     function addNewQuestion() {
-        if (!userData ||!(newQuestionTitle.trim()) || newQuestionTitle.trim().length < 5) {
+        if ( (!userData && !props.livestream.test) || !(newQuestionTitle.trim()) || newQuestionTitle.trim().length < 5) {
             return;
         }
 
@@ -119,6 +119,7 @@ function QuestionCategory(props) {
                     height: 150px;
                     box-shadow: 0 4px 2px -2px rgb(200,200,200);
                     z-index: 9000;
+                    background-color: white;
                 }
 
                 .questionToggleTitle {

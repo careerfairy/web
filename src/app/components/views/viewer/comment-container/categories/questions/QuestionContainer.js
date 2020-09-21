@@ -29,7 +29,7 @@ function QuestionContainer(props) {
     }, [props.livestream.id, props.question.id]);
 
     function addNewComment() {
-        if (!userData || !(newCommentTitle.trim())) {
+        if (!(newCommentTitle.trim()) || (!userData && !props.livestream.test)) {
             return;
         }
 
@@ -53,7 +53,8 @@ function QuestionContainer(props) {
     }
 
     function upvoteLivestreamQuestion() {
-        props.firebase.upvoteLivestreamQuestion(props.livestream.id, props.question, authenticatedUser.email);
+        let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
+        props.firebase.upvoteLivestreamQuestion(props.livestream.id, props.question, authEmail);
     }
 
     const componentDecorator = (href, text, key) => (
@@ -165,7 +166,7 @@ function QuestionContainer(props) {
                     primary 
                     onClick={() => upvoteLivestreamQuestion()} 
                     style={{ margin: '0 10px 10px 10px' }} 
-                    disabled={(props.question.type !== 'new' || !props.user || (props.question.emailOfVoters ? props.question.emailOfVoters.indexOf(props.user.email) > -1 : false))}/>
+                    disabled={(props.question.type !== 'new' || (!props.user && !props.livestream.test) || (props.question.emailOfVoters ? props.question.emailOfVoters.indexOf(props.livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false))}/>
                 <style jsx>{`
                     .questionContainer {
                         position: relative;
