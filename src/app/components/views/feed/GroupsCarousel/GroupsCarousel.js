@@ -1,15 +1,15 @@
 import React, {useEffect, useRef} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import GroupCarouselCard from "./GroupCarouselCard";
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import Slider from "react-slick";
-import {Button} from "@material-ui/core";
+import {Button, IconButton} from "@material-ui/core";
 
 
 const useStyles = makeStyles((theme) => ({
     root: {
         marginTop: theme.spacing(1),
         marginBottom: theme.spacing(1),
-        border: "1px solid red",
         "& .slick-track": {
             marginLeft: 0
         },
@@ -18,17 +18,21 @@ const useStyles = makeStyles((theme) => ({
         height: 90,
         borderRadius: 20,
         marginTop: 3,
-    }
+    },
+
 }));
 
 function NextArrow(props) {
     const {className, style, onClick} = props;
     return (
-        <div
-            className={className}
-            style={{...style, display: "block", background: "red", position: "absolute", right: 0}}
-            onClick={onClick}
-        />
+        <IconButton className="slick-arrow"
+                    style={{...style,
+                        display: 'block',
+                        position: "absolute",
+                        right: 0}}
+                    onClick={onClick}>
+            <NavigateNextIcon/>
+        </IconButton>
     );
 }
 
@@ -53,7 +57,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile}) => {
     })
     const handleHowMany = (defaultNum) => {
         let num = defaultNum
-        if (renderGroupCards.length < defaultNum){
+        if (renderGroupCards.length < defaultNum) {
             num = renderGroupCards.length + 1
         }
         return num
@@ -76,7 +80,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile}) => {
         <div>
             <Slider className={classes.root} {...settings}>
                 {renderGroupCards}
-                <Button className={classes.button}  color="primary" >
+                <Button className={classes.button} color="primary">
                     Follow more
                 </Button>
             </Slider>

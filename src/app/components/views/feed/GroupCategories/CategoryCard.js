@@ -3,7 +3,6 @@ import {Box, Chip, Typography, Tooltip} from "@material-ui/core";
 import {useWindowSize} from "../../../custom-hook/useWindowSize";
 
 const CategoryCard = ({category, handleToggleActive, mobile, width}) => {
-    console.log("width", width);
 
     const renderOptions = category.options.map(option => {
         return (

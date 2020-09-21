@@ -18,7 +18,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile}) => {
-    console.log(groupData);
 
     const classes = useStyles();
     const [grid, setGrid] = useState(null);
