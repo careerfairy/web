@@ -46,16 +46,18 @@ function TestStreamingPage(props) {
         const testPolls = [{
             question: 'What should we discuss next?',
             state: 'upcoming',
-            question: 'What is your interview process like?',
             options: [{
                 index: 0,
-                name: 'Our next product'
+                name: 'Our next product',
+                votes: 0
             }, {
                 index: 1,
-                name: 'What our internships look like'
+                name: 'What our internships look like',
+                votes: 0
             }, {
                 index: 2,
-                name: 'Our personal story'
+                name: 'Our personal story',
+                votes: 0
             }],
             timestamp: props.firebase.getFirebaseTimestamp('March 17, 2020 03:24:00'),
             voters: []
