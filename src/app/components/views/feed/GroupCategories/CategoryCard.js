@@ -2,8 +2,8 @@ import React from 'react';
 import {Box, Chip, Typography, Tooltip} from "@material-ui/core";
 import {useWindowSize} from "../../../custom-hook/useWindowSize";
 
-const CategoryCard = ({category, handleToggleActive, mobile}) => {
-    const {width} = useWindowSize()
+const CategoryCard = ({category, handleToggleActive, mobile, width}) => {
+    console.log("width", width);
 
     const renderOptions = category.options.map(option => {
         return (
@@ -16,7 +16,7 @@ const CategoryCard = ({category, handleToggleActive, mobile}) => {
                     color={option.active ? "primary" : "default"}
                     variant={option.active ? "default" : "outlined"}
                     size={mobile ? "small" : "medium"}
-                    style={{maxWidth: mobile ? width * 0.7 : width * 0.28}}
+                    style={{maxWidth: width}}
                     label={option.name}
                     onClick={() => handleToggleActive(category.id, option.id)}/>
             </Tooltip>

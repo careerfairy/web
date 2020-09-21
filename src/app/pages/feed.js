@@ -9,6 +9,8 @@ import GroupsCarousel from "../components/views/feed/GroupsCarousel/GroupsCarous
 import Loader from "../components/views/loader/Loader";
 import {withFirebase} from "../data/firebase";
 import DesktopFeed from "../components/views/feed/DesktopFeed/DesktopFeed";
+import GroupBanner from "../components/views/feed/GroupBanner";
+
 
 
 const feed = ({firebase}) => {
@@ -77,8 +79,10 @@ const feed = ({firebase}) => {
             <Header classElement='relative white-background'/>
             <Container disableGutters>
                 <GroupsCarousel mobile={mobile} handleSetGroup={handleSetGroup} groupIds={userData.groupIds}/>
+                <GroupBanner description={groupData.description} logoUrl={groupData.logoUrl}/>
                 {mobile ?
                     <MobileFeed groupData={groupData}
+                                user={user}
                                 alreadyJoined={groupData.alreadyJoined}
                                 handleToggleActive={handleToggleActive}
                                 userData={userData}/>
@@ -86,6 +90,7 @@ const feed = ({firebase}) => {
                     <DesktopFeed alreadyJoined={groupData.alreadyJoined}
                                  handleToggleActive={handleToggleActive}
                                  userData={userData}
+                                 user={user}
                                  mobile={mobile}
                                  groupData={groupData}/>}
             </Container>

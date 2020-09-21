@@ -33,16 +33,15 @@ function TabPanel(props) {
 }
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        flex: 1
-    },
+
     bar: {
-        backgroundColor: "transparent",
         boxShadow: "none",
+        position: "sticky",
+        top: 120
     }
 }));
 
-const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined}) => {
+const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user}) => {
     const classes = useStyles();
     const theme = useTheme();
     const [value, setValue] = useState(0);
@@ -56,7 +55,7 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined}) =>
     };
 
     return (
-        <Container id="view" className={classes.root} disableGutters>
+        <>
             <AppBar className={classes.bar} position="static" color="default">
                 <Tabs
                     value={value}
@@ -66,8 +65,9 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined}) =>
                     selectionFollowsFocus
                     centered
                 >
-                    <Tab wrapped fullWidth label={<Typography variant="h5">Categories</Typography>}/>
                     <Tab wrapped fullWidth label={<Typography variant="h5">Events</Typography>}/>
+                    {groupData.categories && <Tab wrapped fullWidth disabled={!groupData.categories}
+                          label={<Typography variant="h5">Filter</Typography>}/>}
                 </Tabs>
             </AppBar>
             <SwipeableViews
@@ -76,16 +76,18 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined}) =>
                 onChangeIndex={handleChangeIndex}
             >
                 <TabPanel id="panel-category" value={value} index={0} dir={theme.direction}>
+                    <GroupStreams user={user}
+                                  userData={userData}
+                                  groupData={groupData}/>
+                </TabPanel>
+                <TabPanel id="panel-streams" value={value} index={1} dir={theme.direction}>
                     <GroupCategories alreadyJoined={alreadyJoined}
                                      groupData={groupData}
                                      handleToggleActive={handleToggleActive}
                                      mobile={true}/>
                 </TabPanel>
-                <TabPanel id="panel-streams" value={value} index={1} dir={theme.direction}>
-                    <GroupStreams groupData={groupData}/>
-                </TabPanel>
             </SwipeableViews>
-        </Container>
+        </>
     );
 }
 

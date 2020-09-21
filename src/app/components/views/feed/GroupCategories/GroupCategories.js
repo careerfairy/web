@@ -1,7 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Box, Card, CardContent, CardMedia, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import CategoryCard from "./CategoryCard";
+import {SizeMe} from "react-sizeme";
+import StackGrid from "react-stack-grid";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -9,49 +11,54 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(2),
         paddingBottom: 0
     },
-    media: {
-        display: "flex",
-        justifyContent: "center",
-        padding: "1.5em 1em 1em 1em",
-        height: "120px",
-    },
-    image: {
-        objectFit: "contain",
-        maxWidth: "80%",
-    },
     actions: {
         display: "flex",
         flexFlow: "column",
-        overflow: "auto"
     },
 }));
 
-const GroupCategories = ({groupData, alreadyJoined,handleToggleActive, mobile}) => {
+const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile}) => {
+    console.log(groupData);
 
     const classes = useStyles();
+    const [grid, setGrid] = useState(null);
 
-    const renderCategoryCards = groupData.categories?.map(category => {
-        return(
-            <CategoryCard mobile={mobile} key={category.id} category={category} handleToggleActive={handleToggleActive}/>
-        )
-    })
+
+    useEffect(() => {
+        if (grid) {
+            setTimeout(() => {
+                grid.updateLayout();
+            }, 10);
+        }
+    }, [grid, groupData]);
 
     return (
-        <Card style={{width: mobile ? "100%": "40%"}} className={classes.root}>
-            {!alreadyJoined && <Typography variant="h5" align="center">Follow live streams from:</Typography>}
-            <Typography variant="h6" align="center"><strong>{groupData?.universityName}</strong></Typography>
-            <CardMedia className={classes.media}>
-                <img src={groupData?.logoUrl} className={classes.image} alt=""/>
-            </CardMedia>
+        <div style={{width: mobile ? "100%" : "40%"}} className={classes.root}>
+            {!alreadyJoined &&
+            <Typography variant="h5" align="center">Start Following {groupData.universityName}:</Typography>}
             <CardContent>
-                <Typography align="center" noWrap>
-                    {groupData?.description}
-                </Typography>
+                <Typography variant="h4" hidden={mobile || !groupData.categories}>Filter events by:</Typography>
                 <Box className={classes.actions}>
-                    {renderCategoryCards}
+                    <SizeMe>{({size}) => (
+                        <StackGrid
+                            style={{marginTop: 20}}
+                            duration={0}
+                            columnWidth={"100%"}
+                            gutterWidth={20}
+                            gutterHeight={20}
+                            gridRef={grid => setGrid(grid)}>
+                            {groupData.categories?.map(category => {
+                                return (
+                                    <CategoryCard width={size.width} mobile={mobile} key={category.id}
+                                                  category={category}
+                                                  handleToggleActive={handleToggleActive}/>
+                                )
+                            })}
+                        </StackGrid>
+                    )}</SizeMe>
                 </Box>
             </CardContent>
-        </Card>
+        </div>
     )
 };
 
