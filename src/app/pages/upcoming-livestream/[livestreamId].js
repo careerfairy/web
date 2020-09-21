@@ -82,7 +82,7 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (currentLivestream) {
-            props.firebase.getDetailLivestreamCareerCentersc(currentLivestream.universities).then( querySnapshot => {
+            props.firebase.getDetailLivestreamCareerCenters(currentLivestream.universities).then( querySnapshot => {
                 let groupList = [];
                 querySnapshot.forEach(doc => {
                     let group = doc.data();
