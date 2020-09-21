@@ -25,7 +25,7 @@ function PollOptionResultViewer(props) {
                         <div>{ props.index + 1 }</div>       
                     </div>
                     <div className='option-container-name'>
-                        { props.option.name }
+                        { props.option.name } <span className='option-container-name-votes'>[{ props.option.votes } { props.option.votes === 1 ? 'vote' : 'votes' }]</span>
                     </div>
                 </div>     
             </div>
@@ -76,6 +76,10 @@ function PollOptionResultViewer(props) {
                     display: inline-block;
                     margin: 0 0 0 5px;
                     color: black;
+                }
+
+                .option-container-name-votes {
+                    font-weight: 700;
                 }
             `}</style>
         </Fragment>
