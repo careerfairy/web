@@ -105,7 +105,7 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, key, us
                             <Image style={{ maxWidth: '220px', margin: '30px 0', maxHeight: '120px', filter: userIsRegistered() ? 'brightness(0) invert(1)' : ''}} src={livestream.companyLogoUrl} onLoad={() => { grid.updateLayout() }}/>
                             <div className='livestream-position' style={{ color: userIsRegistered() ? 'white' : ''}}>{ livestream.title }</div>
                             <div>
-                                <Button size='large' style={{ margin: '5px 5px 0 0' }} icon={ (user && livestream.registeredUsers?.indexOf(user.email) > -1) ? 'delete' : 'add' } color={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? null : 'teal'} content={ user ? ((livestream.registeredUsers.indexOf(user.email) > -1) ? 'Cancel' : 'I\'ll attend') : 'Register to attend'} onClick={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
+                                <Button size='large' style={{ margin: '5px 5px 0 0' }} icon={ (user && livestream.registeredUsers?.indexOf(user.email) > -1) ? 'delete' : 'add' } color={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? null : 'teal'} content={ user ? ((livestream.registeredUsers?.indexOf(user.email) > -1) ? 'Cancel' : 'I\'ll attend') : 'Register to attend'} onClick={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
                                 <Link href={('/upcoming-livestream/' + livestream.id)} prefetch={false}><a><Button size='large' style={{ margin: '5px 5px 0 0' }} icon='signup' content='Details' color='pink'/></a></Link>
                             </div>
                         </div>
@@ -132,7 +132,7 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, key, us
                     <Grid className='middle aligned' centered>
                         <Grid.Row style={{ paddingTop: 0, paddingBottom: '5px' }}>
                             <Grid.Column width={15}>
-                                <TargetElementList fields={livestream.targetGroups} selectedFields={fields}/>
+                                <TargetElementList fields={livestream.targetGroups|| []} selectedFields={fields}/>
                             </Grid.Column>
                         </Grid.Row>
                     </Grid>

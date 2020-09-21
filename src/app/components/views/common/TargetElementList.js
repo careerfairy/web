@@ -5,7 +5,7 @@ function TargetElementList(props) {
 
     let list = props.fields;
 
-    let tags = list.map((listElement, index) => {
+    let tags = list?.map((listElement, index) => {
         const selectionMode = props.selectedFields ? true : false;
         const targetElement = UNIVERSITY_SUBJECTS.find(subject => {
             if (subject.value === listElement) {
