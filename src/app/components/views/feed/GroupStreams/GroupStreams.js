@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../data/firebase";
+import GroupStreamCard from "./GroupStreamCard";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -35,9 +36,13 @@ const GroupStreams = ({groupData, firebase}) => {
             }
         }, [groupData])
 
+    const renderStreamCards = livestreams.map(livestream => {
+        return <GroupStreamCard key={livestream.id} livestream={livestream} />
+    })
+
         return (
             <div className={classes.root}>
-                {groupData.universityId}
+                {renderStreamCards}
             </div>
         );
     }
