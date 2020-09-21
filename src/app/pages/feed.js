@@ -89,7 +89,9 @@ const feed = ({firebase}) => {
         const targetOption = targetCategory.options.find(option => option.id === optionId)
         targetOption.active = !targetOption.active
         setGroupData(newGroupData)
-        scrollToTop()
+        if (!mobile) {
+            scrollToTop()
+        }
     }
 
     return (
