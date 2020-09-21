@@ -1,4 +1,4 @@
-import {DarkBackground, GlobalBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
+import {GreyBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import Head from "next/head";
 import Header from "../components/views/header/Header";
 import {Container, useMediaQuery, useTheme} from "@material-ui/core";
@@ -9,7 +9,6 @@ import GroupsCarousel from "../components/views/feed/GroupsCarousel/GroupsCarous
 import Loader from "../components/views/loader/Loader";
 import {withFirebase} from "../data/firebase";
 import DesktopFeed from "../components/views/feed/DesktopFeed/DesktopFeed";
-import GroupBanner from "../components/views/feed/GroupBanner";
 
 
 const feed = ({firebase}) => {
@@ -19,6 +18,7 @@ const feed = ({firebase}) => {
     const [userData, setUserData] = useState(null)
     const [user, setUser] = useState(null);
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
+        const [value, setValue] = useState(0);
 
     useEffect(() => {
         firebase.auth.onAuthStateChanged(user => {
@@ -45,9 +45,26 @@ const feed = ({firebase}) => {
         }
     }, [user]);
 
+
+    const scrollToTop = () => {
+        window.scrollTo(0, 0);
+    }
+
     if (user === null || userData == null || loading === true) {
         return <Loader/>;
     }
+
+        const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
+
+    const handleResetView = () => {
+        setValue(0)
+    }
+
+    const handleChangeIndex = (index) => {
+        setValue(index);
+    };
 
     const handleSetGroup = (groupObj) => {
         const newGroupObj = {
@@ -60,6 +77,8 @@ const feed = ({firebase}) => {
             })
         }
         setGroupData(newGroupObj)
+        handleResetView()
+        scrollToTop()
     }
 
     const handleToggleActive = (categoryId, optionId) => {
@@ -68,10 +87,11 @@ const feed = ({firebase}) => {
         const targetOption = targetCategory.options.find(option => option.id === optionId)
         targetOption.active = !targetOption.active
         setGroupData(newGroupData)
+        scrollToTop()
     }
 
     return (
-        <GlobalBackground>
+        <GreyBackground>
             <Head>
                 <title key="title">CareerFairy | Feed</title>
             </Head>
@@ -80,24 +100,30 @@ const feed = ({firebase}) => {
             </div>
             <GroupsCarousel groupData={groupData} mobile={mobile} handleSetGroup={handleSetGroup}
                             groupIds={userData.groupIds}/>
+            {/*<GroupBanner description={groupData.description} logoUrl={groupData.logoUrl}/>*/}
             <Container disableGutters>
-                <GroupBanner description={groupData.description} logoUrl={groupData.logoUrl}/>
-                {mobile ?
-                    <MobileFeed groupData={groupData}
-                                user={user}
-                                alreadyJoined={groupData.alreadyJoined}
-                                handleToggleActive={handleToggleActive}
-                                userData={userData}/>
-                    :
-                    <DesktopFeed alreadyJoined={groupData.alreadyJoined}
-                                 handleToggleActive={handleToggleActive}
-                                 userData={userData}
-                                 user={user}
-                                 mobile={mobile}
-                                 groupData={groupData}/>}
+                {!mobile &&
+                <DesktopFeed alreadyJoined={groupData.alreadyJoined}
+                             handleToggleActive={handleToggleActive}
+                             userData={userData}
+                             user={user}
+                             mobile={mobile}
+                             groupData={groupData}/>}
             </Container>
+            {mobile &&
+
+            <MobileFeed groupData={groupData}
+                        user={user}
+                        value={value}
+                        handleChangeIndex={handleChangeIndex}
+                        handleResetView={handleResetView}
+                        handleChange={handleChange}
+                        alreadyJoined={groupData.alreadyJoined}
+                        handleToggleActive={handleToggleActive}
+                        userData={userData}/>
+            }
             <Footer/>
-        </GlobalBackground>
+        </GreyBackground>
     );
 };
 

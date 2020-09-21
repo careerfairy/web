@@ -6,7 +6,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
 
-import {Container, Typography,} from "@material-ui/core";
+import { Typography,} from "@material-ui/core";
 import {withFirebase} from "../../../data/firebase";
 import GroupCategories from "./GroupCategories/GroupCategories";
 import GroupStreams from "./GroupStreams/GroupStreams";
@@ -37,22 +37,14 @@ const useStyles = makeStyles((theme) => ({
     bar: {
         boxShadow: "none",
         position: "sticky",
-        top: 120
+        top: 154
     }
 }));
 
-const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user}) => {
+const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user, value, handleChange, handleChangeIndex}) => {
     const classes = useStyles();
     const theme = useTheme();
-    const [value, setValue] = useState(0);
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
-
-    const handleChangeIndex = (index) => {
-        setValue(index);
-    };
 
     return (
         <>

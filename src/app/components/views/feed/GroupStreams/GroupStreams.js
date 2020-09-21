@@ -1,9 +1,8 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, { useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../data/firebase";
 import GroupStreamCard from "./GroupStreamCard";
 import {Typography} from "@material-ui/core";
-import LivestreamCard from "../../livestream-card/LivestreamCard";
 import {SizeMe} from "react-sizeme";
 import StackGrid from "react-stack-grid";
 
@@ -11,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
     root: {
         flex: 1,
         padding: theme.spacing(2),
-        border: "1px solid blue",
+        paddingTop: 0,
         height: "100%",
     },
 }));

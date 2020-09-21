@@ -5,11 +5,12 @@ import {withFirebase} from "../../../../data/firebase";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        margin: theme.spacing(0.5),
+        margin: theme.spacing(1.5),
+        padding: theme.spacing(1),
         cursor: "pointer",
-        borderRadius: "20px",
+        borderRadius: "5px",
         maxHeight: 200,
-        transition: "background 1s, color 1s",
+        transition: "all 1s, all 1s",
         "&:hover": {
             backgroundColor: "rgba(233,233,233,0.5)",
         }
@@ -17,12 +18,12 @@ const useStyles = makeStyles((theme) => ({
     media: {
         display: "flex",
         justifyContent: "center",
-        padding: "1.5em 1em 1em 1em",
+        padding: "0 1em 1em 1em",
         height: "90px",
     },
     image: {
         objectFit: "contain",
-        maxWidth: "80%",
+        maxWidth: "70%",
     }
 }));
 
@@ -70,6 +71,7 @@ const GroupCarouselCard = ({group, groupId, firebase, handleSetGroup, groupData}
                     <img src={localGroup.logoUrl || placeholder} className={classes.image}
                          alt={`${localGroup.universityName} Logo`}/>
                 </CardMedia>
+                <Typography align="center" noWrap>{localGroup.universityName}</Typography>
             </Card>
         </Grow>
     );

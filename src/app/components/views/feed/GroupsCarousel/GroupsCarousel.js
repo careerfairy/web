@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import GroupCarouselCard from "./GroupCarouselCard";
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
@@ -8,20 +8,20 @@ import {Button, IconButton} from "@material-ui/core";
 
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        marginTop: theme.spacing(1),
-        marginBottom: theme.spacing(1),
-        "& .slick-track": {
-            marginLeft: 0
-        },
+    slider: {
+        boxShadow: "0 0 5px grey",
         "& .slick-next:before, .slick-prev:before": {
             content: "'' !important"
-        }
+        },
+        background: "rgb(250, 250, 250)",
+        zIndex: 1000,
+        position: "sticky",
+        top: 0
     },
     button: {
         height: 90,
         borderRadius: 20,
-        marginTop: 3,
+        marginTop: "auto",
     },
 }));
 
@@ -34,7 +34,7 @@ function NextArrow({className, style, onClick}) {
                 display: 'block',
                 position: "absolute",
                 zIndex: 20,
-                right: 20,
+                right: 33,
                 top: 34
             }}
             onClick={onClick}
@@ -45,6 +45,7 @@ function NextArrow({className, style, onClick}) {
         </div>
     );
 }
+
 function PrevArrow({className, style, onClick}) {
     return (
         <div
@@ -66,17 +67,6 @@ function PrevArrow({className, style, onClick}) {
     );
 }
 
-// function PrevArrow(props) {
-//     const {className, style, onClick} = props;
-//     return (
-//         <div
-//             className={className}
-//             style={{...style, display: "block", background: "red", position: "absolute", left: 0, zIndex: 10}}
-//             onClick={onClick}
-//         />
-//     );
-// }
-
 const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData}) => {
 
     const classes = useStyles()
@@ -88,7 +78,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData}) => {
     const handleHowMany = (defaultNum) => {
         let num = defaultNum
         if (renderGroupCards.length < defaultNum) {
-            num = renderGroupCards.length + 1
+            num = renderGroupCards.length
         }
         return num
     }
@@ -96,26 +86,24 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData}) => {
         centerMode: true,
         centerPadding: "60px",
         infinite: true,
+        focusOnSelect:true,
         slidesToScroll: 2,
-        slidesToShow: mobile ? 2 : handleHowMany(4),
+        slidesToShow: mobile ? 1 : handleHowMany(6),
         speed: 500,
         nextArrow: <NextArrow/>,
-        prevArrow: <PrevArrow/>
+        prevArrow: <PrevArrow/>,
+
     };
 
-
     const onlyOne = renderGroupCards.length < 2
-    console.log("onlyOne", onlyOne);
 
     return (
-        <div>
-            <Slider className={classes.root} {...settings}>
+            <Slider className={classes.slider} {...settings}>
                 {renderGroupCards}
-                <Button className={classes.button} color="primary">
-                    Follow more
-                </Button>
+                {/*<Button className={classes.button} color="primary">*/}
+                {/*    Follow more*/}
+                {/*</Button>*/}
             </Slider>
-        </div>
     )
 
 };

@@ -9,6 +9,14 @@ export const GlobalBackground = withStyles({
     },
 })(Box);
 
+export const GreyBackground = withStyles({
+    root: {
+        backgroundColor: "rgb(230,230,230)",
+        height: "100%",
+        minHeight: "100vh",
+    },
+})(Box);
+
 export const DarkBackground = withStyles({
     root: {
         backgroundColor: "rgb(44, 66, 81)",
