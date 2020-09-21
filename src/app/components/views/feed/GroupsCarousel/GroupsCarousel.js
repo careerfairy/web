@@ -49,7 +49,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile}) => {
 
 
     const renderGroupCards = groupIds.map(id => {
-        return <GroupCarouselCard handleSetGroup={handleSetGroup} groupId={id}/>
+        return <GroupCarouselCard key={id} handleSetGroup={handleSetGroup} groupId={id}/>
     })
     const handleHowMany = (defaultNum) => {
         let num = defaultNum

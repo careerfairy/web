@@ -1,14 +1,14 @@
 import React from 'react';
 import {Box} from "@material-ui/core";
 import GroupStreams from "./GroupStreams";
-import GroupCategories from "./GroupCategories";
+import GroupCategories from "./GroupCategories/GroupCategories";
 
 
-const DesktopFeed = ({groupData, userData, alreadyJoined}) => {
+const DesktopFeed = ({groupData, userData, alreadyJoined, handleToggleActive}) => {
     return (
         <Box style={{border: "2px solid orange"}} display="flex" flexDirection="row">
-            <GroupCategories  userData={userData} alreadyJoined={alreadyJoined} group={groupData}/>
-            <GroupStreams groupId={groupData.groupId}/>
+          <GroupCategories handleToggleActive={handleToggleActive} userData={userData} alreadyJoined={alreadyJoined} groupData={groupData}/>
+          <GroupStreams groupId={groupData.groupId}/>
         </Box>
     );
 };

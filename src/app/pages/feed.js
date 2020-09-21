@@ -20,7 +20,7 @@ const feed = ({firebase}) => {
     const theme = useTheme()
     const [loading, setLoading] = useState(false)
     const [groupData, setGroupData] = useState({})
-    const [userGroups, setUserGroups] = useState([])
+    const [categories, setCategories] = useState([])
     const [userData, setUserData] = useState(null)
     const [user, setUser] = useState(null);
     const mobile = useMediaQuery(theme.breakpoints.down('xs'));
@@ -34,6 +34,10 @@ const feed = ({firebase}) => {
             }
         })
     }, []);
+
+    useEffect(() => {
+
+    }, [])
 
     useEffect(() => {
         setLoading(true);
@@ -55,10 +59,25 @@ const feed = ({firebase}) => {
     }
 
     const handleSetGroup = (groupObj) => {
-        setGroupData({
+        const newGroupObj = {
             ...groupObj,
             alreadyJoined: userData.groupIds?.includes(groupObj.id)
-        })
+        }
+        if (newGroupObj.categories) {
+            newGroupObj.categories.forEach(category => {
+                category.options.forEach(option => (option.active = false))
+            })
+        }
+        setGroupData(newGroupObj)
+    }
+
+    const handleToggleActive = (categoryId, optionId) => {
+        const newGroupData = {...groupData}
+        const targetCategory = newGroupData.categories.find(category => category.id === categoryId)
+        const targetOption = targetCategory.options.find(option => option.id === optionId)
+        targetOption.active = !targetOption.active
+        setGroupData(newGroupData)
+        console.log(newGroupData);
     }
 
     return (
@@ -70,7 +89,13 @@ const feed = ({firebase}) => {
             <Container disableGutters>
                 <GroupsCarousel mobile={mobile} handleSetGroup={handleSetGroup} groupIds={userData.groupIds}/>
                 <Box className={classes.content}>
-                    {mobile ? <MobileFeed groupData={groupData}/> : <DesktopFeed alreadyJoined={groupData.alreadyJoined} userData={userData} groupData={groupData}/>}
+                    {mobile ?
+                        <MobileFeed groupData={groupData}/>
+                        :
+                        <DesktopFeed alreadyJoined={groupData.alreadyJoined}
+                                     handleToggleActive={handleToggleActive}
+                                     userData={userData}
+                                     groupData={groupData}/>}
                 </Box>
             </Container>
             <Footer/>
