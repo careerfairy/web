@@ -23,7 +23,7 @@ const feed = ({firebase}) => {
     const [categories, setCategories] = useState([])
     const [userData, setUserData] = useState(null)
     const [user, setUser] = useState(null);
-    const mobile = useMediaQuery(theme.breakpoints.down('xs'));
+    const mobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     useEffect(() => {
         firebase.auth.onAuthStateChanged(user => {
@@ -95,6 +95,7 @@ const feed = ({firebase}) => {
                         <DesktopFeed alreadyJoined={groupData.alreadyJoined}
                                      handleToggleActive={handleToggleActive}
                                      userData={userData}
+                                     mobile={mobile}
                                      groupData={groupData}/>}
                 </Box>
             </Container>

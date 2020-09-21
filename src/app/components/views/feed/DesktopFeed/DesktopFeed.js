@@ -4,10 +4,10 @@ import GroupStreams from "./GroupStreams";
 import GroupCategories from "./GroupCategories/GroupCategories";
 
 
-const DesktopFeed = ({groupData, userData, alreadyJoined, handleToggleActive}) => {
+const DesktopFeed = ({groupData, userData, alreadyJoined, handleToggleActive, mobile}) => {
     return (
         <Box style={{border: "2px solid orange"}} display="flex" flexDirection="row">
-          <GroupCategories handleToggleActive={handleToggleActive} userData={userData} alreadyJoined={alreadyJoined} groupData={groupData}/>
+          <GroupCategories mobile={mobile} handleToggleActive={handleToggleActive} userData={userData} alreadyJoined={alreadyJoined} groupData={groupData}/>
           <GroupStreams groupId={groupData.groupId}/>
         </Box>
     );

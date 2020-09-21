@@ -9,8 +9,9 @@ import CategoryCard from "./CategoryCard";
 const useStyles = makeStyles((theme) => ({
     root: {
         padding: theme.spacing(2),
-        width: "30%",
-        height: "80vh"
+        width: "40%",
+        height: "80vh",
+        overflow: "auto"
     },
     media: {
         display: "flex",
@@ -25,11 +26,10 @@ const useStyles = makeStyles((theme) => ({
     actions: {
         display: "flex",
         flexFlow: "column",
-        alignItems: "center",
     },
 }));
 
-const GroupCategories = ({groupData, alreadyJoined,handleToggleActive}) => {
+const GroupCategories = ({groupData, alreadyJoined,handleToggleActive, mobile}) => {
 
     const classes = useStyles();
     const [allSelected, setAllSelected] = useState(false);
@@ -37,7 +37,7 @@ const GroupCategories = ({groupData, alreadyJoined,handleToggleActive}) => {
 
     const renderCategoryCards = groupData.categories?.map(category => {
         return(
-            <CategoryCard key={category.id} category={category} handleToggleActive={handleToggleActive}/>
+            <CategoryCard mobile={mobile} key={category.id} category={category} handleToggleActive={handleToggleActive}/>
         )
     })
 
