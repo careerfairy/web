@@ -26,10 +26,6 @@ function ViewerPage(props) {
 
     const { authenticatedUser, userData } = React.useContext(UserContext);
 
-    if (authenticatedUser === null) {
-        router.replace('/login');
-    }
-
     useEffect(() => {
         if (livestreamId) {
             props.firebase.listenToScheduledLivestreamById(livestreamId, querySnapshot => {
@@ -79,7 +75,8 @@ function ViewerPage(props) {
     }
 
     function postIcon(iconName) {
-        props.firebase.postIcon(currentLivestream.id, iconName, authenticatedUser.email);
+        let email = currentLivestream.test ? 'streamerEmail' : authenticatedUser.email;
+        props.firebase.postIcon(currentLivestream.id, iconName, email);
     }
 
     let logoElements = careerCenters.map( (careerCenter, index) => {
@@ -89,6 +86,10 @@ function ViewerPage(props) {
             </Fragment>
         );
     });
+
+    if (currentLivestream && !currentLivestream.test && authenticatedUser === null) {
+        router.push('/login');
+    }
 
     return (
         <div className='topLevelContainer'>
@@ -103,37 +104,37 @@ function ViewerPage(props) {
                     <Button style={{ display: currentLivestream.hasNoTalentPool ? 'none' : 'inline-block' }} content={ userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'} icon={ userIsInTalentPool ? 'delete' : 'handshake outline'} onClick={ userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()} primary={!userIsInTalentPool}/> 
                 </div>
             </div>
-            <div className='black-frame' style={{ left: showMenu ? '280px' : '0'}}>
+            <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
                 { handRaiseActive ? 
                     <ViewerHandRaiseComponent currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive}/> :
                     <ViewerComponent livestreamId={livestreamId} streamerId={streamerId}  currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive}/>
                 }
+                <div className='mini-chat-container'>
+                    <MiniChatContainer livestream={ currentLivestream }  isStreamer={false}/>
+                </div>
+                <div className='action-buttons'>
+                    <div className='action-container'>
+                        <div className='button action-button red' onClick={() => postIcon('like')}>
+                            <Image src='/like.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
+                        </div>
+                    </div>
+                    <div className='action-container'>
+                        <div className='button action-button orange' onClick={() => postIcon('clapping')}>
+                            <Image src='/clapping.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
+                        </div>
+                    </div>
+                    <div className='action-container'>
+                        <div className='button action-button yellow' onClick={() => postIcon('heart')}>
+                            <Image src='/heart.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
+                        </div>
+                    </div>            
+                </div>
             </div>
-            <div className='video-menu-left' style={{ width: showMenu ? '280px' : '0'}}>
+            <div className={'video-menu-left ' + (showMenu ? 'withMenu' : '')}>
                 <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={false} livestream={ currentLivestream } handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive} localId/>
-            </div>
-            <div className='mini-chat-container'>
-                <MiniChatContainer livestream={ currentLivestream }  isStreamer={false}/>
             </div>
             <div className='icons-container'>
                 <IconsContainer livestreamId={ currentLivestream.id } />
-            </div>
-            <div className='action-buttons'>
-                <div className='action-container'>
-                    <div className='button action-button red' onClick={() => postIcon('like')}>
-                        <Image src='/like.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '35px'}}/>
-                    </div>
-                </div>
-                <div className='action-container'>
-                    <div className='button action-button orange' onClick={() => postIcon('clapping')}>
-                        <Image src='/clapping.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '35px'}}/>
-                    </div>
-                </div>
-                <div className='action-container'>
-                    <div className='button action-button yellow' onClick={() => postIcon('heart')}>
-                        <Image src='/heart.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '35px'}}/>
-                    </div>
-                </div>            
             </div>
             <style jsx>{`
                 .hidden {
@@ -143,6 +144,8 @@ function ViewerPage(props) {
                 .topLevelContainer {
                     position: relative;
                     min-height: 100vh;
+                    height: 100%;
+                    width: 100%;
                 }
 
                 .top-menu {
@@ -192,27 +195,50 @@ function ViewerPage(props) {
                     transform: translateY(-50%);
                 }
 
-                .action-buttons {
-                    position: absolute;
-                    bottom: 30px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    z-index: 100;
+                @media(max-width: 768px) {
+                    .action-buttons {
+                        position: absolute;
+                        right: 10px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        z-index: 100;
+                    }
+    
+                    .action-button {
+                        position: relative;
+                        border-radius: 50%;
+                        background-color: rgb(0, 210, 170);
+                        width: 50px;
+                        height: 50px;
+                        margin: 15px;
+                        cursor: pointer;
+                        box-shadow: 0 0 8px rgb(120,120,120);
+                    }
                 }
 
-                .action-container {
-                    display: inline-block;
-                }
+                @media(min-width: 768px) {
+                    .action-buttons {
+                        position: absolute;
+                        bottom: 30px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        z-index: 100;
+                    }
 
-                .action-button {
-                    position: relative;
-                    border-radius: 50%;
-                    background-color: rgb(0, 210, 170);
-                    width: 70px;
-                    height: 70px;
-                    margin: 15px;
-                    cursor: pointer;
-                    box-shadow: 0 0 8px rgb(120,120,120);
+                    .action-container {
+                        display: inline-block;
+                    }
+    
+                    .action-button {
+                        position: relative;
+                        border-radius: 50%;
+                        background-color: rgb(0, 210, 170);
+                        width: 70px;
+                        height: 70px;
+                        margin: 15px;
+                        cursor: pointer;
+                        box-shadow: 0 0 8px rgb(120,120,120);
+                    }
                 }
 
                 .action-button.red {
@@ -257,12 +283,12 @@ function ViewerPage(props) {
                     right: 20px;
                     width: 20%;
                     min-width: 250px;
-                    z-index: 100;
+                    z-index: 150;
                 }
 
                 .icons-container {
                     position: absolute;
-                    bottom: 0;
+                    bottom: 50px;
                     right: 20px;
                     z-index: 100;
                     width: 80px;
@@ -277,15 +303,23 @@ function ViewerPage(props) {
                     .black-frame {
                         position: absolute;
                         width: 100%;
-                        height: 60vh;
                         top: 0;
                         left: 0;
                         right: 0;
+                        bottom: 0;
                     }
                 }
 
                 @media(min-width: 768px) {
                     .black-frame {
+                        position: absolute;
+                        top: 55px;
+                        bottom: 0;
+                        right: 0;
+                        left: 0;
+                    }
+
+                    .black-frame.withMenu {
                         position: absolute;
                         top: 55px;
                         bottom: 0;
@@ -301,10 +335,14 @@ function ViewerPage(props) {
                 @media(max-width: 768px) {
                     .video-menu-left {
                         position: absolute;
-                        top: 60vh;
+                        top: 0;
                         left: 0;
+                        width: 0;
+                        bottom 0;
+                    }
+
+                    .video-menu-left.withMenu {
                         width: 100%;
-                        height: 100vh;
                     }
                 }
 
@@ -314,6 +352,10 @@ function ViewerPage(props) {
                         top: 55px;
                         left: 0;
                         bottom: 0;
+                        width: 0;
+                    }
+
+                    .video-menu-left.withMenu {
                         width: 280px;
                     }
                 }
