@@ -1,7 +1,5 @@
-import React, {Fragment, useEffect, useState} from 'react';
-import UserCategorySelector from "../../../profile/UserCategorySelector";
-import {Box, Card, CardActionArea, CardContent, CardMedia, CircularProgress, Typography} from "@material-ui/core";
-import Button from "@material-ui/core/Button";
+import React from 'react';
+import {Box, Card, CardContent, CardMedia, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import CategoryCard from "./CategoryCard";
 
@@ -9,9 +7,7 @@ import CategoryCard from "./CategoryCard";
 const useStyles = makeStyles((theme) => ({
     root: {
         padding: theme.spacing(2),
-        width: "40%",
-        height: "80vh",
-        overflow: "auto"
+        paddingBottom: 0
     },
     media: {
         display: "flex",
@@ -26,14 +22,13 @@ const useStyles = makeStyles((theme) => ({
     actions: {
         display: "flex",
         flexFlow: "column",
+        overflow: "auto"
     },
 }));
 
 const GroupCategories = ({groupData, alreadyJoined,handleToggleActive, mobile}) => {
 
     const classes = useStyles();
-    const [allSelected, setAllSelected] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
 
     const renderCategoryCards = groupData.categories?.map(category => {
         return(
@@ -41,11 +36,8 @@ const GroupCategories = ({groupData, alreadyJoined,handleToggleActive, mobile}) 
         )
     })
 
-
-
-
     return (
-        <Card className={classes.root}>
+        <Card style={{width: mobile ? "100%": "40%"}} className={classes.root}>
             {!alreadyJoined && <Typography variant="h5" align="center">Follow live streams from:</Typography>}
             <Typography variant="h6" align="center"><strong>{groupData?.universityName}</strong></Typography>
             <CardMedia className={classes.media}>

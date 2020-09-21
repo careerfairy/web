@@ -8,6 +8,9 @@ import Box from '@material-ui/core/Box';
 
 import {Container, Typography,} from "@material-ui/core";
 import {withFirebase} from "../../../data/firebase";
+import GroupCategories from "./GroupCategories/GroupCategories";
+import GroupStreams from "./GroupStreams/GroupStreams";
+
 
 
 function TabPanel(props) {
@@ -31,10 +34,7 @@ function TabPanel(props) {
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        backgroundColor: "rgb(250,250,250)",
-        height: "100%",
-        minHeight: "100vh",
-        width: "100%"
+        flex: 1
     },
     bar: {
         backgroundColor: "transparent",
@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const MobileFeed = ({userData, user, groupId, group, children}) => {
+const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined}) => {
     const classes = useStyles();
     const theme = useTheme();
     const [value, setValue] = useState(0);
@@ -56,19 +56,7 @@ const MobileFeed = ({userData, user, groupId, group, children}) => {
     };
 
     return (
-        <Container>
-            <SwipeableViews
-                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                index={value}
-                onChangeIndex={handleChangeIndex}
-            >
-                <TabPanel value={value} index={0} dir={theme.direction}>
-                    <div style={{backgroundColor: "orange", flex: 1, border: "1px solid pink", height: "80vh"}}/>
-                </TabPanel>
-                <TabPanel value={value} index={1} dir={theme.direction}>
-                    <div style={{backgroundColor: "purple", flex: 1, border: "1px solid blue", height: "80vh"}}/>
-                </TabPanel>
-            </SwipeableViews>
+        <Container id="view" className={classes.root} disableGutters>
             <AppBar className={classes.bar} position="static" color="default">
                 <Tabs
                     value={value}
@@ -82,6 +70,21 @@ const MobileFeed = ({userData, user, groupId, group, children}) => {
                     <Tab wrapped fullWidth label={<Typography variant="h5">Events</Typography>}/>
                 </Tabs>
             </AppBar>
+            <SwipeableViews
+                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                index={value}
+                onChangeIndex={handleChangeIndex}
+            >
+                <TabPanel id="panel-category" value={value} index={0} dir={theme.direction}>
+                    <GroupCategories alreadyJoined={alreadyJoined}
+                                     groupData={groupData}
+                                     handleToggleActive={handleToggleActive}
+                                     mobile={true}/>
+                </TabPanel>
+                <TabPanel id="panel-streams" value={value} index={1} dir={theme.direction}>
+                    <GroupStreams groupData={groupData}/>
+                </TabPanel>
+            </SwipeableViews>
         </Container>
     );
 }

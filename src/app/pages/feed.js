@@ -1,26 +1,20 @@
 import {GlobalBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import Head from "next/head";
 import Header from "../components/views/header/Header";
-import {Box, Container, useMediaQuery, useTheme} from "@material-ui/core";
+import {Container, useMediaQuery, useTheme} from "@material-ui/core";
 import Footer from "../components/views/footer/Footer";
 import {useEffect, useState} from "react";
 import MobileFeed from "../components/views/feed/MobileFeed";
-import {makeStyles} from "@material-ui/core/styles";
 import GroupsCarousel from "../components/views/feed/GroupsCarousel/GroupsCarousel";
 import Loader from "../components/views/loader/Loader";
 import {withFirebase} from "../data/firebase";
 import DesktopFeed from "../components/views/feed/DesktopFeed/DesktopFeed";
 
-const useStyles = makeStyles((theme) => ({
-    content: {}
-}));
 
 const feed = ({firebase}) => {
-    const classes = useStyles()
     const theme = useTheme()
     const [loading, setLoading] = useState(false)
     const [groupData, setGroupData] = useState({})
-    const [categories, setCategories] = useState([])
     const [userData, setUserData] = useState(null)
     const [user, setUser] = useState(null);
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -34,10 +28,6 @@ const feed = ({firebase}) => {
             }
         })
     }, []);
-
-    useEffect(() => {
-
-    }, [])
 
     useEffect(() => {
         setLoading(true);
@@ -77,7 +67,6 @@ const feed = ({firebase}) => {
         const targetOption = targetCategory.options.find(option => option.id === optionId)
         targetOption.active = !targetOption.active
         setGroupData(newGroupData)
-        console.log(newGroupData);
     }
 
     return (
@@ -88,16 +77,17 @@ const feed = ({firebase}) => {
             <Header classElement='relative white-background'/>
             <Container disableGutters>
                 <GroupsCarousel mobile={mobile} handleSetGroup={handleSetGroup} groupIds={userData.groupIds}/>
-                <Box className={classes.content}>
-                    {mobile ?
-                        <MobileFeed groupData={groupData}/>
-                        :
-                        <DesktopFeed alreadyJoined={groupData.alreadyJoined}
-                                     handleToggleActive={handleToggleActive}
-                                     userData={userData}
-                                     mobile={mobile}
-                                     groupData={groupData}/>}
-                </Box>
+                {mobile ?
+                    <MobileFeed groupData={groupData}
+                                alreadyJoined={groupData.alreadyJoined}
+                                handleToggleActive={handleToggleActive}
+                                userData={userData}/>
+                    :
+                    <DesktopFeed alreadyJoined={groupData.alreadyJoined}
+                                 handleToggleActive={handleToggleActive}
+                                 userData={userData}
+                                 mobile={mobile}
+                                 groupData={groupData}/>}
             </Container>
             <Footer/>
         </GlobalBackground>

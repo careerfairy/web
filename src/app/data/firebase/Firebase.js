@@ -439,6 +439,13 @@ class Firebase {
     return ref.onSnapshot(callback);
   };
 
+  listenToLiveStreamsByUniversityId = (universityId, callback) => {
+    let ref = this.firestore
+        .collection("livestreams")
+        .where("universities", "array-contains", universityId)
+    return ref.onSnapshot(callback)
+  }
+
   getLivestreamSpeakers = (livestreamId) => {
     let ref = this.firestore
       .collection("livestreams")
