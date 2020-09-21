@@ -16,6 +16,13 @@ export const UNIVERSITY_SUBJECTS = [
             value: "COMP",
             color: "#52494c"
         },{
+            text: "Communication Systems",
+            value: "COMPSCI"
+        },{
+            text: "Computational Science and Engineering",
+            value: "COMPSCIENG",
+            color: "#52494c"
+        },{
             text: "Earth Sciences",
             value: "EARTH",
             color: "#9a6324"
@@ -55,6 +62,14 @@ export const UNIVERSITY_SUBJECTS = [
             text: "Physics",
             value: "PHYS",
             color: "#54556c"
+        },{
+            text: "Financial Engineering",
+            value: "FINENG",
+            color: "#b39eb5"
+        },{
+            text: "Robotics",
+            value: "ROBOT",
+            color: "#52494c"
         },{
             text: "Health Sciences and Technology",
             value: "HEALTH",

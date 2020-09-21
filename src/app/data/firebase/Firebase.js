@@ -527,9 +527,16 @@ class Firebase {
     getLivestreamCareerCenters = (universityIds) => {
         let ref = this.firestore
             .collection("careerCenterData")
+            .where("test", "==", false);
+            return ref.get();
+    }
+
+    getDetailLivestreamCareerCenters = (universityIds) => {
+        let ref = this.firestore
+            .collection("careerCenterData")
             .where("test", "==", false)
             .where("universityId", "in", universityIds);
-        return ref.get();
+            return ref.get();
     }
 
     getLegacyPastLivestreamQuestions = (livestreamId) => {
