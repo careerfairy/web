@@ -666,7 +666,7 @@ class Firebase {
                     } else {
                         return {
                             name: option.name,
-                            votes: option.votes + 1,
+                            votes: option.votes ? option.votes + 1 : 1,
                             index: index,
                             voters: option.voters ? [...option.voters, userEmail] : [userEmail]
                         }
