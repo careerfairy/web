@@ -21,11 +21,9 @@ function CommentContainer(props) {
 
     const ButtonComponent = (props) => {
 
-        const [showLabels, setShowLabels] = useState(true);
-
         return (
             <Fragment>
-                <div className='interaction-selector' onMouseEnter={() => setShowLabels(true)}>
+                <div className='interaction-selector'>
                     <div className='interaction-selectors'>
                         {/* <div>
                             <Button circular size='big' icon='comments outline' disabled={props.showMenu && selectedState === 'chat'} onClick={() => props.handleStateChange("chat")} color='teal'/>
@@ -33,15 +31,15 @@ function CommentContainer(props) {
                         </div> */}
                         <div>
                             <Button circular size='big' icon='question circle outline' disabled={props.showMenu && selectedState === 'questions'} onClick={() => props.handleStateChange("questions")} color='teal'/>
-                            <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("questions")}>Q&A</span>
+                            <span onClick={() => props.handleStateChange("questions")}>Q&A</span>
                         </div>
                         <div>
                             <Button circular size='big' icon='chart bar outline' disabled={props.showMenu && selectedState === 'polls'} onClick={() => props.handleStateChange("polls")} color='teal'/>
-                            <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("polls")}>Polls</span>
+                            <span onClick={() => props.handleStateChange("polls")}>Polls</span>
                         </div>
                         <div>
                             <Button circular size='big' icon='hand pointer outline' disabled={props.showMenu && selectedState === 'hand'} onClick={() => props.handleStateChange("hand")} color='teal'/>
-                            <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("hand")}>Hand Raise</span>
+                            <span onClick={() => props.handleStateChange("hand")}>Hand Raise</span>
                         </div>
                         {/* <div>
                             <Button circular size='big' icon='cog' onClick={() => props.setShowMenu(!props.showMenu)} secondary/>
@@ -101,6 +99,9 @@ function CommentContainer(props) {
 
     return (
         <div className='interaction-container'>
+            <div className='close-menu'>
+                <Button circular size='big' icon='angle left' color='pink' onClick={() => {props.setShowMenu(!props.showMenu)}}/>
+            </div>
             <div className='interaction-category'>
                 {/* <ChatCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData} isStreamer={false}/> */}
                 <QuestionCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}/>
@@ -109,12 +110,32 @@ function CommentContainer(props) {
             </div>
             <ButtonComponent handleStateChange={handleStateChange} {...props}/>
             <style jsx>{`
+                .interaction-container {
+                    position: relative;
+                    height: 100%;
+                    width: 100%;
+                }
+
                 .interaction-category {
                     position: absolute;
                     left: 0;
                     right: 0;
                     top: 0;
                     bottom: 0;
+                }
+
+                .close-menu {
+                    position: absolute;
+                    top: 10px;
+                    left: 10px;
+                    text-align: center;
+                    z-index: 9100;
+                }
+
+                @media(min-width: 768px) {
+                    .close-menu {
+                        display: none;
+                    }
                 }
           `}</style>
         </div>
