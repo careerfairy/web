@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import SwipeableViews from 'react-swipeable-views';
 import {virtualize} from 'react-swipeable-views-utils';
 
@@ -16,8 +16,8 @@ import GroupStreams from "./GroupStreams/GroupStreams";
 const VirtualizeSwipeableViews = virtualize(SwipeableViews);
 
 
-function TabPanel(props) {
-    const {children, value, index, ...other} = props;
+function TabPanel({children, value, index, ...other}) {
+
     return (
         <div
             role="tabpanel"
@@ -27,12 +27,19 @@ function TabPanel(props) {
             {...other}
         >
             {value === index && (
-                <Box p={1}>
+                <Box p={2}>
                     {children}
                 </Box>
             )}
         </div>
     );
+}
+
+function a11yProps(index) {
+    return {
+        id: `full-width-tab-${index}`,
+        'aria-controls': `full-width-tabpanel-${index}`,
+    };
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -52,41 +59,53 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
     const classes = useStyles();
     const theme = useTheme();
     const [value, setValue] = useState(0);
+    useEffect(() => {
+        if (groupData) {
+            handleResetView()
+        }
+    }, [groupData.universityName])
 
 
     const handleChange = (event, newValue) => {
-        scrollToTop()
-        setValue(newValue);
-    };
+        if (newValue === 0 || newValue === 1) {
+            scrollToTop()
+            setValue(newValue);
+        }
+    }
 
     const handleResetView = () => {
         setValue(0)
     }
 
     const handleChangeIndex = (index) => {
-        setValue(index);
+        if (index === 0 || index === 1) {
+            setValue(index);
+        }
     };
 
-    const slideRenderer = ({index, key}) => {
+    const slideRenderer = ({index, key}) => {// TODO prevent user from swiping out
 
         switch (index) {
             case 0:
-                return <GroupStreams user={user}
-                                     key={key}
-                                     mobile={true}
-                                     searching={searching}
-                                     livestreams={livestreams}
-                                     userData={userData}
-                                     groupData={groupData}/>
-
+                return <TabPanel value={0} index={index} key={key} dir={theme.direction}>
+                    <GroupStreams user={user}
+                                  key={key}
+                                  mobile={true}
+                                  searching={searching}
+                                  livestreams={livestreams}
+                                  userData={userData}
+                                  groupData={groupData}/>
+                </TabPanel>
             case 1:
-                return <GroupCategories alreadyJoined={alreadyJoined}
-                                        key={key}
-                                        groupData={groupData}
-                                        handleToggleActive={handleToggleActive}
-                                        mobile={true}/>
+                return <TabPanel value={1} index={index} key={key} dir={theme.direction}>
+                    <GroupCategories alreadyJoined={alreadyJoined}
+                                     key={key}
+                                     groupData={groupData}
+                                     handleToggleActive={handleToggleActive}
+                                     mobile={true}/>
+                </TabPanel>
             default:
-                return <div key={key}/>
+                return null
         }
     }
 
@@ -99,10 +118,9 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                     onChange={handleChange}
                     indicatorColor="primary"
                     textColor="primary"
-                    selectionFollowsFocus
                     centered
                 >
-                    <Tab wrapped fullWidth label={<Typography variant="h5">Events</Typography>}/>
+                    <Tab wrapped  {...a11yProps(0)} fullWidth label={<Typography variant="h5">Events</Typography>}/>
                     {groupData.categories ?
                         <Tab wrapped fullWidth disabled={!groupData.categories}
                              label={<Typography variant="h5">Filter</Typography>}/>
@@ -111,6 +129,9 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                 </Tabs>
             </AppBar>
             <VirtualizeSwipeableViews slideRenderer={slideRenderer}
+                                      style={{minHeight: 200}}
+                                      {...a11yProps(1)}
+                                      disabled //TODO annoyingly allows you to swipe past the available indexes so had to disable
                                       containerStyle={{WebkitOverflowScrolling: 'touch'}}
                                       axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                                       index={value}

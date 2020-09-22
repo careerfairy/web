@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../data/firebase";
 import GroupStreamCard from "./GroupStreamCard";
-import {Typography, LinearProgress} from "@material-ui/core";
+import {Typography, LinearProgress, Box} from "@material-ui/core";
 import {SizeMe} from "react-sizeme";
 import StackGrid from "react-stack-grid";
 
@@ -10,9 +10,8 @@ const useStyles = makeStyles((theme) => ({
     root: {
         flex: 1,
         paddingTop: 0,
-        height: "100%",
         display: "flex",
-        flexDirection: "column"
+        flexDirection: "column",
     },
 }));
 
@@ -40,7 +39,9 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
         return (
             <div style={{padding: mobile ? 0 : "1rem"}} className={classes.root}>
                 {groupData.id ? (searching ?
-                    <LinearProgress color="primary"/>
+                    <Box display="flex" justifyContent="center" mt={5}>
+                        <LinearProgress style={{width: "80%"}} color="primary"/>
+                    </Box>
                     :
                     renderStreamCards.length ?
                         <SizeMe>{({size}) => (
@@ -55,7 +56,8 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
                             </StackGrid>
                         )}</SizeMe>
                         : <Typography align="center" variant="h5"
-                                      style={{marginTop: 100}}><strong>{groupData.universityName} currently has no scheduled
+                                      style={{marginTop: mobile ? 100 : 0}}><strong>{groupData.universityName} currently has
+                            no scheduled
                             livestreams</strong></Typography>)
                     : <Typography variant="h6" style={{marginTop: 10}}>Chose a Group</Typography>}
             </div>
