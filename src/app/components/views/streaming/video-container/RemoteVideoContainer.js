@@ -6,7 +6,6 @@ function RemoteVideoContainer(props) {
     const videoElement = useRef(null);
 
     const [canPlay, setCanPlay] = useState(false);
-    const [showPlayButton, setShowPlayButton] = useState(false);
 
     useEffect(() => {
         videoElement.current.srcObject = props.stream.stream;
@@ -14,21 +13,22 @@ function RemoteVideoContainer(props) {
 
     useEffect(() => {
         if (videoElement.current && videoElement.current.paused) {
-            if (showPlayButton) {
+            if (props.showPlayButton) {
                 videoElement.current.muted = true;
                 videoElement.current.play();
             } else {
                 videoElement.current.play().catch( e => {
-                    setShowPlayButton(true);
+                    props.setShowPlayButton(true);
                 });
             }          
         }
-    },[videoElement, showPlayButton]);
+    },[videoElement, props.showPlayButton]);
 
-    function unmuteVideo() {
-        videoElement.current.muted = false;
-        setShowPlayButton(false);
-    }
+    useEffect(() => {
+        if (props.unmute) {
+            videoElement.current.muted = false;
+        }
+    },[props.unmute])
 
     return (
         <div>
@@ -37,12 +37,6 @@ function RemoteVideoContainer(props) {
                 </video>
                 <div className={ 'loader ' + (canPlay ? 'hidden' : '')}>
                     <Image src='/loader.gif' style={{ width: '30%', maxWidth: '80px', height: 'auto', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}} />
-                </div>
-                <div className={ 'playButtonContent ' + (showPlayButton ? '' : 'hidden')} onClick={unmuteVideo}>
-                    <div className='playButton'>
-                        <Icon name='volume up' style={{ fontSize: '3rem' }}/>
-                        <div>Click to unmute</div>
-                    </div>     
                 </div>
             </div>           
             <style jsx>{`
@@ -79,24 +73,6 @@ function RemoteVideoContainer(props) {
                     padding-top: 54%;
                     background-color: rgb(40,40,40);
                     z-index: 9901;
-                }
-
-                .playButton {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    color: white;
-                    font-weight: 500;
-                }
-
-                .playButtonContent {
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(10,10,10,0.4);
-                    z-index: 9901;
-                    cursor: pointer;
                 }
           `}</style>
         </div>
