@@ -24,7 +24,7 @@ export default function CountdownTimer(props) {
     let timeout = setTimeout(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
-    return clearTimeout(timeout);
+    return () => clearTimeout(timeout);
   });
 
   const timerComponents = [];
