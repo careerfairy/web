@@ -224,7 +224,7 @@ function VideoContainer(props) {
                 }
             </div>
             <div className='controls-container'>
-                <VideoControlsContainer webRTCAdaptor={webRTCAdaptor} currentLivestream={props.currentLivestream} viewer={props.viewer}/>
+                <VideoControlsContainer webRTCAdaptor={webRTCAdaptor} currentLivestream={props.currentLivestream} viewer={props.viewer} joining={isMainStreamer}/>
             </div>
             {/* <div className='button-container'>         
                 <Grid centered className='middle aligned'>

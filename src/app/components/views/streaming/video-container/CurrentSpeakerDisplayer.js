@@ -212,7 +212,7 @@ function CurrentSpeakerDisplayer(props) {
                 .relative-container {
                     position: relative;
                     height: 100%;
-                    min-height: calc(100vh - 50px);
+                    min-height: calc(100vh - 55px);
                 }
 
                 .relative-container-videos {

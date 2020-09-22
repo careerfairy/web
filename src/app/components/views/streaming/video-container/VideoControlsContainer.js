@@ -44,7 +44,7 @@ function VideoControlsContainer(props) {
                                 </div>
                             </Grid.Column>
                         </Grid.Row>
-                        <Grid.Row style={{ margin: '10px 0', display: props.viewer ? 'none' : 'block'}}>
+                        <Grid.Row style={{ margin: '10px 0', display: props.viewer || props.joining ? 'none' : 'block'}}>
                             <Grid.Column textAlign='center'>
                                 <div className='side-button' onClick={() => setLivestreamSpeakerSwitchMode(props.currentLivestream.speakerSwitchMode === "automatic" ? "manual" : "automatic")} style={{  color: props.currentLivestream.speakerSwitchMode === "automatic" ? 'red' : 'white' }}>
                                     <Icon name='assistive listening systems' size='large' style={{ margin: '0 0 5px 0' }}/>
