@@ -25,12 +25,13 @@ const Feed = ({user, userData, firebase}) => {
                 querySnapshot.forEach(doc => {
                     let livestream = doc.data();
                     livestream.id = doc.id;
-                    if (selectedOptions.length && livestream.targetGroups) {//TODO Database model of livestream should be changed for filter to work
-                        const found = selectedOptions.some(r => livestream.targetGroups.indexOf(r) >= 0)
-                        if (found) {
+                    const livestreamCategories = livestream.targetCategories[groupData.groupId]
+                    if (selectedOptions.length && livestreamCategories) {
+                        if (checkIfLivestreamHasAll(selectedOptions, livestreamCategories)) {
                             livestreams.push(livestream)
                         }
-                    } else {
+
+                    } else if (!selectedOptions.length) {
                         livestreams.push(livestream);
                     }
                 })
@@ -47,7 +48,7 @@ const Feed = ({user, userData, firebase}) => {
             groupData.categories.forEach(category => {
                 category.options.forEach(option => {
                     if (option.active === true) {
-                        activeOptions.push(option.name)
+                        activeOptions.push(option.id)
                     }
                 })
             })
@@ -70,6 +71,11 @@ const Feed = ({user, userData, firebase}) => {
 
     const handleChangeIndex = (index) => {
         setValue(index);
+    };
+
+    const checkIfLivestreamHasAll = (selected, arr) => {
+        console.log("has all?", selected.every(v => arr.includes(v)));
+        return selected.every(v => arr.includes(v))
     };
 
     const handleSetGroup = (groupObj) => {
