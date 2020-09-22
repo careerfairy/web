@@ -165,7 +165,7 @@ const GroupJoinModal = ({
                     onClick={handleJoinGroup}
                     color="primary"
                     autoFocus>
-                    Confirm
+                    Follow
                 </Button>}
                 <Button
                     size="large"

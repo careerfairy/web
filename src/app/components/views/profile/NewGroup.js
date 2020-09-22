@@ -80,7 +80,7 @@ const NewGroup = ({group, userData, makeSix, selected}) => {
                                 onClick={handleOpenJoinModal}
                                 endIcon={<GroupAddIcon size={20} color="inherit"/>}
                             >
-                                Join
+                                Follow
                             </Button>
                         )}
                     </CardActions>

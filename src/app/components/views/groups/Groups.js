@@ -71,9 +71,7 @@ const Groups = ({groups, userData, makeSix}) => {
                         groups={groups}/>
             <Grid style={{marginBottom: makeSix ? 0 : 50}} container spacing={3}>
                 {selectedGroup ?
-                    // <Grid item xs={12} sm={12} md={12} lg={12}>
                             <NewGroup selected={true} makeSix={makeSix} group={selectedGroup} userData={userData}/>
-                    // </Grid>
                     : moreGroupElements}
             </Grid>
         </Fragment>

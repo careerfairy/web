@@ -15,12 +15,9 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const GroupStreams = ({groupData, firebase, userData, user, mobile, setCachedStreams, cachedStreams}) => {
+const GroupStreams = ({groupData, userData, user, livestreams}) => {
 
         const classes = useStyles()
-        const [livestreams, setLivestreams] = useState([])
-        const [searching, setSearching] = useState(false)
-        const [selectedOptions, setSelectedOptions] = useState([])
         const [grid, setGrid] = useState(null);
 
 
@@ -32,55 +29,7 @@ const GroupStreams = ({groupData, firebase, userData, user, mobile, setCachedStr
             }
         }, [grid, livestreams]);
 
-        useEffect(() => {
-            if (cachedStreams && cachedStreams.length) {
-                setLivestreams(cachedStreams)
-            }
-        }, [cachedStreams])
-
-        useEffect(() => {
-            if (groupData && groupData.universityId) {
-                setSearching(true)
-                const unsubscribe = firebase.listenToLiveStreamsByUniversityId(groupData.universityId, querySnapshot => {
-                    setSearching(false);
-                    let livestreams = [];
-                    querySnapshot.forEach(doc => {
-                        let livestream = doc.data();
-                        livestream.id = doc.id;
-                        if (selectedOptions.length && livestream.targetGroups) {//TODO Database model of livestream should be changed for filter to work
-                            const found = selectedOptions.some(r => livestream.targetGroups.indexOf(r) >= 0)
-                            if (found) {
-                                livestreams.push(livestream)
-                            }
-                        } else {
-                            livestreams.push(livestream);
-                        }
-                    })
-                    setLivestreams(livestreams);
-                    if (mobile) {
-                        setCachedStreams(livestreams)
-                    }
-                    setSearching(false)
-                })
-                return () => unsubscribe()
-            }
-        }, [groupData, selectedOptions])
-
-        useEffect(() => {
-            if (groupData && groupData.categories) {
-                let activeOptions = [];
-                groupData.categories.forEach(category => {
-                    category.options.forEach(option => {
-                        if (option.active === true) {
-                            activeOptions.push(option.name)
-                        }
-                    })
-                })
-                setSelectedOptions(activeOptions)
-            }
-        }, [groupData.categories, groupData])
-
-        const renderStreamCards = livestreams.map(livestream => {
+        const renderStreamCards = livestreams?.map(livestream => {
             return <GroupStreamCard
                 user={user} userData={userData} fields={null}
                 grid={grid} careerCenters={[]}

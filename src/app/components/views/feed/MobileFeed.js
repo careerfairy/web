@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import SwipeableViews from 'react-swipeable-views';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -6,11 +6,10 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
 
-import { Typography,} from "@material-ui/core";
+import {Typography,} from "@material-ui/core";
 import {withFirebase} from "../../../data/firebase";
 import GroupCategories from "./GroupCategories/GroupCategories";
 import GroupStreams from "./GroupStreams/GroupStreams";
-
 
 
 function TabPanel(props) {
@@ -41,11 +40,9 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user, value, handleChange, handleChangeIndex}) => {
+const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user, value, handleChange, handleChangeIndex, livestreams}) => {
     const classes = useStyles();
     const theme = useTheme();
-    const [cachedStreams, setCachedStreams] = useState([])
-
 
     return (
         <>
@@ -60,7 +57,7 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                 >
                     <Tab wrapped fullWidth label={<Typography variant="h5">Events</Typography>}/>
                     {groupData.categories && <Tab wrapped fullWidth disabled={!groupData.categories}
-                          label={<Typography variant="h5">Filter</Typography>}/>}
+                                                  label={<Typography variant="h5">Filter</Typography>}/>}
                 </Tabs>
             </AppBar>
             <SwipeableViews
@@ -71,8 +68,7 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                 <TabPanel id="panel-category" value={value} index={0} dir={theme.direction}>
                     <GroupStreams user={user}
                                   mobile={true}
-                                  cachedStreams={cachedStreams}
-                                  setCachedStreams={setCachedStreams}
+                                  livestreams={livestreams}
                                   userData={userData}
                                   groupData={groupData}/>
                 </TabPanel>
