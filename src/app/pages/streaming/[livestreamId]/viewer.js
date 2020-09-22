@@ -37,8 +37,8 @@ function ViewerPage(props) {
     }, [livestreamId]);
 
     useEffect(() => {
-        if (currentLivestream) {
-            props.firebase.getLivestreamCareerCenters(currentLivestream.universities).then( querySnapshot => {
+        if (currentLivestream && currentLivestream.universities.length > 0) {
+            props.firebase.getDetailLivestreamCareerCenters(currentLivestream.universities).then( querySnapshot => {
                 let groupList = [];
                 querySnapshot.forEach(doc => {
                     let group = doc.data();
@@ -201,7 +201,7 @@ function ViewerPage(props) {
                         right: 10px;
                         top: 50%;
                         transform: translateY(-50%);
-                        z-index: 100;
+                        z-index: 150;
                     }
     
                     .action-button {
@@ -222,7 +222,7 @@ function ViewerPage(props) {
                         bottom: 30px;
                         left: 50%;
                         transform: translateX(-50%);
-                        z-index: 100;
+                        z-index: 150;
                     }
 
                     .action-container {

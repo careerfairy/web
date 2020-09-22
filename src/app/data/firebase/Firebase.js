@@ -174,7 +174,7 @@ class Firebase {
         return livestreamCollRef.add({
             companyId: 'CareerFairy',
             test: true,
-            universities: ['ethzurich'],
+            universities: [],
             start: firebase.firestore.Timestamp.fromDate(new Date('March 17, 2020 03:24:00'))
         });
     }
