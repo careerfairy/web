@@ -9,7 +9,7 @@ import TargetElementList from "../../common/TargetElementList";
 import BookingModal from "../../common/booking-modal/BookingModal";
 import {withFirebase} from "../../../../data/firebase";
 
-const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, key, userData}) => {
+const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, key, userData, firebase}) => {
 
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
 

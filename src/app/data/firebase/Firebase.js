@@ -718,9 +718,7 @@ class Firebase {
                 transaction.set(registeredUsersRef, {
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    university: user.university,
-                    levelOfStudy: user.levelOfStudy,
-                    faculty: user.faculty,
+                    registeredGroups: user.registeredGroups || []
                 });
             });
         });
