@@ -42,16 +42,19 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
 
     return (
         <div style={{width: mobile ? "100%" : "40%", paddingTop: 18}} className={classes.root}>
-            {groupData.categories.length &&
+            {groupData.categories?.length &&
             <Card style={{position: mobile ? "static" : "sticky", top: mobile ? "auto" : 160}}>
                 {!alreadyJoined &&
                 <Typography variant="h5" align="center">Start Following {groupData.universityName}:</Typography>}
+                {!mobile && <CardMedia className={classes.media}>
+                    <img src={groupData.logoUrl} className={classes.image} alt=""/>
+                </CardMedia>}
                 <CardContent>
                     <Typography variant="h4" hidden={mobile || !groupData.categories}>Filter events by:</Typography>
                     <Box className={classes.actions}>
                         <SizeMe>{({size}) => (
                             <StackGrid
-                                style={{marginTop: 20}}
+                                style={{marginTop: 10}}
                                 duration={0}
                                 columnWidth={"100%"}
                                 gutterWidth={20}

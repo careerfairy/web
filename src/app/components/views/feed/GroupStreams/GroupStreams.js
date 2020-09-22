@@ -9,13 +9,12 @@ import StackGrid from "react-stack-grid";
 const useStyles = makeStyles((theme) => ({
     root: {
         flex: 1,
-        padding: theme.spacing(2),
         paddingTop: 0,
         height: "100%",
     },
 }));
 
-const GroupStreams = ({groupData, userData, user, livestreams}) => {
+const GroupStreams = ({groupData, userData, user, livestreams, mobile}) => {
 
         const classes = useStyles()
         const [grid, setGrid] = useState(null);
@@ -38,7 +37,7 @@ const GroupStreams = ({groupData, userData, user, livestreams}) => {
         })
 
         return (
-            <div className={classes.root}>
+            <div style={{padding: mobile? 0 : "1rem"}} className={classes.root}>
                 {groupData.id ? (renderStreamCards.length ?
                     <SizeMe>{({size}) => (
                         <StackGrid
@@ -51,8 +50,8 @@ const GroupStreams = ({groupData, userData, user, livestreams}) => {
                             {renderStreamCards}
                         </StackGrid>
                     )}</SizeMe>
-                    : <Typography>No Scheduled Livestreams...</Typography>)
-                    : <Typography>Chose a Group</Typography>}
+                    : <Typography variant="h6" style={{marginTop: 10}}>No Scheduled Livestreams...</Typography>)
+                    : <Typography variant="h6"  style={{marginTop: 10}}>Chose a Group</Typography>}
             </div>
         );
     }

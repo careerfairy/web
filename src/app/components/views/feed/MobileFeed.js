@@ -37,12 +37,16 @@ const useStyles = makeStyles((theme) => ({
         boxShadow: "none",
         position: "sticky",
         top: 110
+    },
+    panel: {
+         minHeight: 300
     }
 }));
 
 const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user, value, handleChange, handleChangeIndex, livestreams}) => {
     const classes = useStyles();
     const theme = useTheme();
+
 
     return (
         <>
@@ -60,23 +64,28 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                                                   label={<Typography variant="h5">Filter</Typography>}/>}
                 </Tabs>
             </AppBar>
-            <SwipeableViews
+            <SwipeableViews containerStyle={{WebkitOverflowScrolling: 'touch'}}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
                 onChangeIndex={handleChangeIndex}
             >
-                <TabPanel id="panel-category" value={value} index={0} dir={theme.direction}>
+                <TabPanel className={classes.panel} id="panel-category" value={value} index={0} dir={theme.direction}>
                     <GroupStreams user={user}
                                   mobile={true}
                                   livestreams={livestreams}
                                   userData={userData}
-                                  groupData={groupData}/>
+                                  groupData={groupData}
+                                  id="panel-category" value={value} index={0} dir={theme.direction}
+                    />
                 </TabPanel>
-                <TabPanel id="panel-streams" value={value} index={1} dir={theme.direction}>
+                <TabPanel className={classes.panel} id="panel-streams" value={value} index={1} dir={theme.direction}>
                     <GroupCategories alreadyJoined={alreadyJoined}
                                      groupData={groupData}
                                      handleToggleActive={handleToggleActive}
-                                     mobile={true}/>
+                                     mobile={true}
+                                     id="panel-streams" value={value} index={1} dir={theme.direction}
+
+                    />
                 </TabPanel>
             </SwipeableViews>
         </>

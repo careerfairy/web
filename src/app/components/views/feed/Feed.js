@@ -30,7 +30,6 @@ const Feed = ({user, userData, firebase}) => {
                         if (checkIfLivestreamHasAll(selectedOptions, livestreamCategories)) {
                             livestreams.push(livestream)
                         }
-
                     } else if (!selectedOptions.length) {
                         livestreams.push(livestream);
                     }
@@ -74,7 +73,6 @@ const Feed = ({user, userData, firebase}) => {
     };
 
     const checkIfLivestreamHasAll = (selected, arr) => {
-        console.log("has all?", selected.every(v => arr.includes(v)));
         return selected.every(v => arr.includes(v))
     };
 
