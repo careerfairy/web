@@ -284,7 +284,7 @@ function UpcomingLivestream(props) {
 
     let logoElements = careerCenters.map( (careerCenter, index) => {
         return (
-            <Grid.Column mobile='5' computer='3'>
+            <Grid.Column mobile='5' computer='3' key={index}>
                 <Image src={ careerCenter.logoUrl } style={{ filter: userIsRegistered() ? 'brightness(0) invert(1)' : '', maxWidth: '120px', maxHeight: '60px', margin: '10px auto 5px auto' }}/>
             </Grid.Column>
         );
