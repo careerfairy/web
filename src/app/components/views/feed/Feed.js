@@ -10,7 +10,6 @@ const Feed = ({user, userData, firebase}) => {
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const [groupData, setGroupData] = useState({})
-    const [value, setValue] = useState(0);
     const [livestreams, setLivestreams] = useState([])
     const [searching, setSearching] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState([])
@@ -60,17 +59,7 @@ const Feed = ({user, userData, firebase}) => {
         window.scrollTo(0, 0);
     }
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
 
-    const handleResetView = () => {
-        setValue(0)
-    }
-
-    const handleChangeIndex = (index) => {
-        setValue(index);
-    };
 
     const checkIfLivestreamHasAll = (selected, arr) => {
         return selected.every(v => arr.includes(v))
@@ -87,7 +76,6 @@ const Feed = ({user, userData, firebase}) => {
             })
         }
         setGroupData(newGroupObj)
-        handleResetView()
         scrollToTop()
     }
 
@@ -117,13 +105,10 @@ const Feed = ({user, userData, firebase}) => {
             {mobile ?
                 <MobileFeed groupData={groupData}
                             user={user}
+                            scrollToTop={scrollToTop}
                             handleResetGroup={handleResetGroup}
-                            value={value}
                             searching={searching}
                             livestreams={livestreams}
-                            handleChangeIndex={handleChangeIndex}
-                            handleResetView={handleResetView}
-                            handleChange={handleChange}
                             alreadyJoined={groupData.alreadyJoined}
                             handleToggleActive={handleToggleActive}
                             userData={userData}/>

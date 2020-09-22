@@ -6,7 +6,7 @@ import GroupStreams from "../GroupStreams/GroupStreams";
 
 const DesktopFeed = ({groupData, userData, alreadyJoined, handleToggleActive, mobile, user, livestreams, searching}) => {
     return (
-        <Container style={{flex: 1, display: "flex", minHeight: mobile ? "none" : 700}}>
+        <Container style={{flex: 1, display: "flex", minHeight: 700}}>
             {groupData.categories && livestreams.length ?
                 <GroupCategories livestreams={livestreams}
                                  mobile={mobile}

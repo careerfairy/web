@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../data/firebase";
 import GroupStreamCard from "./GroupStreamCard";
-import {Typography, LinearProgress } from "@material-ui/core";
+import {Typography, LinearProgress} from "@material-ui/core";
 import {SizeMe} from "react-sizeme";
 import StackGrid from "react-stack-grid";
 
@@ -40,7 +40,7 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
         return (
             <div style={{padding: mobile ? 0 : "1rem"}} className={classes.root}>
                 {groupData.id ? (searching ?
-                        <LinearProgress color="primary" />
+                    <LinearProgress color="primary"/>
                     :
                     renderStreamCards.length ?
                         <SizeMe>{({size}) => (
@@ -54,8 +54,9 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
                                 {renderStreamCards}
                             </StackGrid>
                         )}</SizeMe>
-                        : <Typography variant="h6" style={{marginTop: 10}}>{groupData.universityName} Has No Scheduled
-                            Livestreams...</Typography>)
+                        : <Typography align="center" variant="h5"
+                                      style={{marginTop: 100}}><strong>{groupData.universityName} currently has no scheduled
+                            livestreams</strong></Typography>)
                     : <Typography variant="h6" style={{marginTop: 10}}>Chose a Group</Typography>}
             </div>
         );
