@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {withFirebase} from "../../../data/firebase";
 import GroupsCarousel from "./GroupsCarousel/GroupsCarousel";
-import {Container, useMediaQuery, useTheme} from "@material-ui/core";
+import {useMediaQuery, useTheme} from "@material-ui/core";
 import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import MobileFeed from "./MobileFeed";
 

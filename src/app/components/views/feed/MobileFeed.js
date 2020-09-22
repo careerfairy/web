@@ -75,18 +75,13 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                                   searching={searching}
                                   livestreams={livestreams}
                                   userData={userData}
-                                  groupData={groupData}
-                                  id="panel-category" value={value} index={0} dir={theme.direction}
-                    />
+                                  groupData={groupData}/>
                 </TabPanel>
                 <TabPanel className={classes.panel} id="panel-streams" value={value} index={1} dir={theme.direction}>
                     <GroupCategories alreadyJoined={alreadyJoined}
                                      groupData={groupData}
                                      handleToggleActive={handleToggleActive}
-                                     mobile={true}
-                                     id="panel-streams" value={value} index={1} dir={theme.direction}
-
-                    />
+                                     mobile={true}/>
                 </TabPanel>
             </SwipeableViews>
         </>

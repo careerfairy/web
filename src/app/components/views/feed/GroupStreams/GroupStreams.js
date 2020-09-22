@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../data/firebase";
 import GroupStreamCard from "./GroupStreamCard";
-import {Box, Typography, LinearProgress } from "@material-ui/core";
+import {Typography, LinearProgress } from "@material-ui/core";
 import {SizeMe} from "react-sizeme";
 import StackGrid from "react-stack-grid";
 
