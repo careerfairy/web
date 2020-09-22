@@ -36,10 +36,16 @@ const GroupCarouselCard = ({group, groupId, firebase, handleSetGroup, groupData,
     const [noGroup, setNoGroup] = useState(false)
 
     useEffect(() => {
+        if (index && index === 0) {
+            handleSetGroup(localGroup)
+        }
+    }, [index])
+
+    useEffect(() => {
         if (activeSlide === index) {
             handleSetGroup(localGroup)
         }
-    }, [activeSlide, group, localGroup.universityName])
+    }, [activeSlide, group, localGroup.universityName, index])
 
     useEffect(() => {
         if (group) {

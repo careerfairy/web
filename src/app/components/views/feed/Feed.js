@@ -6,9 +6,9 @@ import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import MobileFeed from "./MobileFeed";
 import {useRouter} from "next/router";
 
-const Feed = ({user, userData, firebase}) => {
+const Feed = ({user, userData, firebase, setStreamRef}) => {
     const router = useRouter();
-    const {query: {livestream}} = router
+    const {query: {livestreamId}} = router
 
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -78,8 +78,8 @@ const Feed = ({user, userData, firebase}) => {
     const handleGetGroupIds = async () => {
         setIdsHasBeenSet(true)
         const newGroupIds = [...userData.groupIds]
-        if (livestream) {
-            const careerCenterId = await getLivestreamFromParams(livestream)
+        if (livestreamId) {
+            const careerCenterId = await getLivestreamFromParams(livestreamId)
             newGroupIds.unshift(careerCenterId)
         }
         setGroupIds(newGroupIds)
@@ -139,6 +139,8 @@ const Feed = ({user, userData, firebase}) => {
                             handleResetGroup={handleResetGroup}
                             searching={searching}
                             livestreams={livestreams}
+                            livestreamId={livestreamId}
+                            setStreamRef={setStreamRef}
                             alreadyJoined={groupData.alreadyJoined}
                             handleToggleActive={handleToggleActive}
                             userData={userData}/>
@@ -146,7 +148,9 @@ const Feed = ({user, userData, firebase}) => {
                 <DesktopFeed alreadyJoined={groupData.alreadyJoined}
                              handleToggleActive={handleToggleActive}
                              userData={userData}
+                             livestreamId={livestreamId}
                              searching={searching}
+                             setStreamRef={setStreamRef}
                              handleResetGroup={handleResetGroup}
                              user={user}
                              livestreams={livestreams}

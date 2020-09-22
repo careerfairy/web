@@ -14,6 +14,7 @@ const feed = ({firebase}) => {
     const [loading, setLoading] = useState(false)
     const [userData, setUserData] = useState(null)
     const [user, setUser] = useState(null);
+    const [streamRef, setStreamRef] = useState(null)
 
 
     useEffect(() => {
@@ -41,6 +42,13 @@ const feed = ({firebase}) => {
         }
     }, [user]);
 
+    useEffect(() => {
+        if (streamRef) {
+            console.log("streamRef", streamRef);
+            // window.scrollTo({behavior: 'smooth', top: streamRef.top * streamRef.index +1})
+        }
+    }, [streamRef])
+
     if (user === null || userData == null || loading === true) {
         return <Loader/>;
     }
@@ -54,7 +62,7 @@ const feed = ({firebase}) => {
             <div style={{background: "rgb(44, 66, 81)"}}>
                 <Header color="white"/>
             </div>
-            <Feed user={user} userData={userData}/>
+            <Feed setStreamRef={setStreamRef} user={user} userData={userData}/>
             <Footer/>
         </GreyBackground>
     );
