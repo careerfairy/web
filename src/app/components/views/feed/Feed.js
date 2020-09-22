@@ -91,6 +91,10 @@ const Feed = ({user, userData, firebase}) => {
         scrollToTop()
     }
 
+    const handleResetGroup = () => {
+        setGroupData({})
+    }
+
     const handleToggleActive = (categoryId, optionId) => {
         const newGroupData = {...groupData}
         const targetCategory = newGroupData.categories.find(category => category.id === categoryId)
@@ -104,29 +108,35 @@ const Feed = ({user, userData, firebase}) => {
 
     return (
         <>
-            <GroupsCarousel groupData={groupData} mobile={mobile} handleSetGroup={handleSetGroup}
+            <GroupsCarousel groupData={groupData}
+                            mobile={mobile}
+                            handleResetGroup={handleResetGroup}
+                            handleSetGroup={handleSetGroup}
                             groupIds={userData.groupIds}/>
-            <Container disableGutters>
-                {!mobile &&
+
+            {mobile ?
+                <MobileFeed groupData={groupData}
+                            user={user}
+                            handleResetGroup={handleResetGroup}
+                            value={value}
+                            searching={searching}
+                            livestreams={livestreams}
+                            handleChangeIndex={handleChangeIndex}
+                            handleResetView={handleResetView}
+                            handleChange={handleChange}
+                            alreadyJoined={groupData.alreadyJoined}
+                            handleToggleActive={handleToggleActive}
+                            userData={userData}/>
+                :
                 <DesktopFeed alreadyJoined={groupData.alreadyJoined}
                              handleToggleActive={handleToggleActive}
                              userData={userData}
+                             searching={searching}
+                             handleResetGroup={handleResetGroup}
                              user={user}
                              livestreams={livestreams}
                              mobile={mobile}
                              groupData={groupData}/>}
-            </Container>
-            {mobile &&
-            <MobileFeed groupData={groupData}
-                        user={user}
-                        value={value}
-                        livestreams={livestreams}
-                        handleChangeIndex={handleChangeIndex}
-                        handleResetView={handleResetView}
-                        handleChange={handleChange}
-                        alreadyJoined={groupData.alreadyJoined}
-                        handleToggleActive={handleToggleActive}
-                        userData={userData}/>}
         </>
     );
 };

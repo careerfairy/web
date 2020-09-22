@@ -1,26 +1,29 @@
 import React from 'react';
-import {Box} from "@material-ui/core";
+import {Box, Container} from "@material-ui/core";
 import GroupCategories from "../GroupCategories/GroupCategories";
 import GroupStreams from "../GroupStreams/GroupStreams";
 
 
-const DesktopFeed = ({groupData, userData, alreadyJoined, handleToggleActive, mobile, user, livestreams}) => {
+const DesktopFeed = ({groupData, userData, alreadyJoined, handleToggleActive, mobile, user, livestreams,searching}) => {
     return (
-        <Box style={{flex: 1, margin: "20px 0"}} display="flex" flexDirection="row">
-            {groupData.categories &&
-            <GroupCategories livestreams={livestreams}
-                             mobile={mobile}
-                             handleToggleActive={handleToggleActive}
-                             userData={userData}
-                             alreadyJoined={alreadyJoined}
-                             groupData={groupData}/>}
-            <GroupStreams
-                user={user}
-                livestreams={livestreams}
-                userData={userData}
-                groupData={groupData}
-            />
-        </Box>
+        <Container style={{flex: 1}}>
+            <Box style={{flex: 1, margin: "20px 0"}} display="flex" flexDirection="row">
+                {groupData.categories && livestreams.length ?
+                    <GroupCategories livestreams={livestreams}
+                                     mobile={mobile}
+                                     handleToggleActive={handleToggleActive}
+                                     userData={userData}
+                                     alreadyJoined={alreadyJoined}
+                                     groupData={groupData}/> : null}
+                <GroupStreams
+                    user={user}
+                    searching={searching}
+                    livestreams={livestreams}
+                    userData={userData}
+                    groupData={groupData}
+                />
+            </Box>
+        </Container>
     );
 };
 

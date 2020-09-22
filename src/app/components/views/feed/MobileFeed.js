@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user, value, handleChange, handleChangeIndex, livestreams}) => {
+const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user, value, handleChange, handleChangeIndex, livestreams, searching}) => {
     const classes = useStyles();
     const theme = useTheme();
 
@@ -72,6 +72,7 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                 <TabPanel className={classes.panel} id="panel-category" value={value} index={0} dir={theme.direction}>
                     <GroupStreams user={user}
                                   mobile={true}
+                                  searching={searching}
                                   livestreams={livestreams}
                                   userData={userData}
                                   groupData={groupData}

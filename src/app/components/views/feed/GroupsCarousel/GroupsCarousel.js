@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {createRef, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import GroupCarouselCard from "./GroupCarouselCard";
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
@@ -8,72 +8,63 @@ import {Button, IconButton} from "@material-ui/core";
 
 
 const useStyles = makeStyles((theme) => ({
+    root: {
+        zIndex: 1000,
+        position: "sticky",
+        top: 0
+    },
     slider: {
         boxShadow: "0 0 5px grey",
         "& .slick-next:before, .slick-prev:before": {
             content: "'' !important"
         },
         background: "rgb(250, 250, 250)",
-        zIndex: 1000,
-        position: "sticky",
-        top: 0
+
     },
     button: {
         height: 90,
         borderRadius: 20,
         marginTop: "auto",
     },
+    next: {
+        display: 'block',
+        position: "absolute",
+        zIndex: 20,
+        right: 0,
+        WebkitTransform: "translate(-50%,-50%)",
+        transform: "translate(-50%,-50%)",
+        top: "50%",
+    },
+    prev: {
+        display: 'block',
+        position: "absolute",
+        zIndex: 20,
+        left: 50,
+        WebkitTransform: "translate(-50%,-50%)",
+        transform: "translate(-50%,-50%)",
+        top: "50%",
+    }
 }));
 
-function NextArrow({className, style, onClick}) {
-    return (
-        <div
-            className={className}
-            style={{
-                ...style,
-                display: 'block',
-                position: "absolute",
-                zIndex: 20,
-                right: 33,
-                top: 34
-            }}
-            onClick={onClick}
-        >
-            <IconButton>
-                <NavigateNextIcon color="primary" fontSize="large"/>
-            </IconButton>
-        </div>
-    );
-}
-
-function PrevArrow({className, style, onClick}) {
-    return (
-        <div
-            className={className}
-            style={{
-                ...style,
-                display: 'block',
-                position: "absolute",
-                zIndex: 20,
-                left: 0,
-                top: 34
-            }}
-            onClick={onClick}
-        >
-            <IconButton>
-                <NavigateBeforeIcon color="primary" fontSize="large"/>
-            </IconButton>
-        </div>
-    );
-}
-
-const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData}) => {
+const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup}) => {
+    const [activeSlide, setActiveSlide] = useState(0)
 
     const classes = useStyles()
+    const customSlider = createRef()
+
+    const handleNext = () => {
+        customSlider.current.slickNext()
+    }
+
+    const handlePrev = () => {
+        customSlider.current.slickPrev()
+    }
 
 
     const renderGroupCards = groupIds?.map((id, index) => {
-        return <GroupCarouselCard index={index} mobile={mobile} groupData={groupData} key={id} handleSetGroup={handleSetGroup} groupId={id}/>
+        return <GroupCarouselCard index={index} mobile={mobile} handleResetGroup={handleResetGroup}
+                                  activeSlide={activeSlide}
+                                  groupData={groupData} key={id} handleSetGroup={handleSetGroup} groupId={id}/>
     })
     const handleHowMany = (defaultNum) => {
         let num = defaultNum
@@ -86,25 +77,29 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData}) => {
         centerMode: true,
         centerPadding: "60px",
         infinite: true,
-        focusOnSelect:true,
+        focusOnSelect: true,
         initialSlide: 0,
         slidesToScroll: 1,
-        slidesToShow: mobile ? 1 : handleHowMany(6),
+        slidesToShow: mobile ? 1 : handleHowMany(5),
         speed: 500,
-        nextArrow: <NextArrow/>,
-        prevArrow: <PrevArrow/>,
-
+        beforeChange: (current, next) => setActiveSlide(next),
     };
 
-    const onlyOne = renderGroupCards.length < 2
-
     return (
-            <Slider className={classes.slider} {...settings}>
+        <div className={classes.root}>
+            <IconButton className={classes.prev} onClick={handlePrev}>
+                <NavigateBeforeIcon color="primary" fontSize="large"/>
+            </IconButton>
+            <Slider ref={customSlider} className={classes.slider} {...settings}>
                 {renderGroupCards}
                 {/*<Button className={classes.button} color="primary">*/}
                 {/*    Follow more*/}
                 {/*</Button>*/}
             </Slider>
+            <IconButton className={classes.next} onClick={handleNext}>
+                <NavigateNextIcon color="primary" fontSize="large"/>
+            </IconButton>
+        </div>
     )
 
 };

@@ -11,6 +11,8 @@ export const GlobalBackground = withStyles({
 
 export const GreyBackground = withStyles({
     root: {
+        display: "flex",
+        flexDirection: "column" ,
         backgroundColor: "rgb(230,230,230)",
         height: "100%",
         minHeight: "100vh",

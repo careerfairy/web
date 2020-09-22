@@ -48,7 +48,7 @@ function TargetElementList(props) {
                         padding: props.size === 'large' ? '8px 12px' : '2px 10px',
                         borderRadius: props.size === 'large' ? '20px' : '12px'
                     }}>
-                        {targetElement.text}
+                        {targetElement?.text}
                     </div>
                     <style jsx>{`
                         .tag {
