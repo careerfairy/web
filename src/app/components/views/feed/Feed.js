@@ -4,15 +4,30 @@ import GroupsCarousel from "./GroupsCarousel/GroupsCarousel";
 import {useMediaQuery, useTheme} from "@material-ui/core";
 import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import MobileFeed from "./MobileFeed";
+import {useRouter} from "next/router";
 
 const Feed = ({user, userData, firebase}) => {
+    const router = useRouter();
+    const {query: {livestream}} = router
+
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const [groupData, setGroupData] = useState({})
+    const [groupIds, setGroupIds] = useState([])
     const [livestreams, setLivestreams] = useState([])
+    const [iDsHasBeenSet, setIdsHasBeenSet] = useState(false)
     const [searching, setSearching] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState([])
+
+    const getLivestreamFromParams = async (livestreamId) => {
+        let careerCenterId = null
+        const querySnapshot = await firebase.getFirstCareerCenterByLivestreamId(livestreamId)
+        querySnapshot.forEach(function (doc) {
+            careerCenterId = doc.id
+        });
+        return careerCenterId
+    }
 
 
     useEffect(() => {
@@ -54,11 +69,26 @@ const Feed = ({user, userData, firebase}) => {
         }
     }, [groupData.categories, groupData])
 
+    useEffect(() => {
+        if (userData && userData.groupIds && userData.groupIds.length && !iDsHasBeenSet) {
+            handleGetGroupIds()
+        }
+    }, [userData])
+
+    const handleGetGroupIds = async () => {
+        setIdsHasBeenSet(true)
+        const newGroupIds = [...userData.groupIds]
+        if (livestream) {
+            const careerCenterId = await getLivestreamFromParams(livestream)
+            newGroupIds.unshift(careerCenterId)
+        }
+        setGroupIds(newGroupIds)
+    }
+
 
     const scrollToTop = () => {
         window.scrollTo(0, 0);
     }
-
 
 
     const checkIfLivestreamHasAll = (selected, arr) => {
@@ -100,7 +130,7 @@ const Feed = ({user, userData, firebase}) => {
                             mobile={mobile}
                             handleResetGroup={handleResetGroup}
                             handleSetGroup={handleSetGroup}
-                            groupIds={userData.groupIds}/>
+                            groupIds={groupIds}/>
 
             {mobile ?
                 <MobileFeed groupData={groupData}

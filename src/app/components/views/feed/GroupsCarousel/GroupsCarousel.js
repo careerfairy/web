@@ -68,8 +68,8 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
     })
     const handleHowMany = (defaultNum) => {
         let num = defaultNum
-        if (renderGroupCards.length < defaultNum) {
-            num = renderGroupCards.length
+        if (groupIds.length < defaultNum) {
+            num = groupIds.length
         }
         return num
     }
@@ -77,10 +77,9 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
         centerMode: true,
         centerPadding: "60px",
         infinite: true,
-        focusOnSelect: true,
         initialSlide: 0,
         slidesToScroll: 1,
-        slidesToShow: mobile ? 1 : handleHowMany(5),
+        slidesToShow: mobile ? 1 : groupIds.length > 4 ? 4 : groupIds.length,
         speed: 500,
         beforeChange: (current, next) => setActiveSlide(next),
     };

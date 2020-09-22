@@ -193,6 +193,20 @@ class Firebase {
         return ref.get();
     };
 
+    getFirstCareerCenterByLivestreamId = (livestreamId) => {
+        return this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .get().then(doc => {
+                let livestreamObj = doc.data()
+                let firstCareerCenterName = livestreamObj.universities[0]
+                return this.firestore
+                    .collection("careerCenterData")
+                    .where("universityId", "==", firstCareerCenterName)
+                    .limit(1).get()
+            })
+    };
+
     getCareerCenterByUniversityId = (universityId) => {
         let ref = this.firestore
             .collection("careerCenterData")
