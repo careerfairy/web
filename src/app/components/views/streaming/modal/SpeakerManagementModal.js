@@ -5,7 +5,7 @@ import { Modal, Input, Icon, Button, Form } from 'semantic-ui-react';
 
 function SpeakerManagementModal(props) {
 
-    const link = `https://testing.careerfairy.io/streaming/${props.livestreamId}/joining-streamer?pwd=qdhwuiehd7qw789d79w8e8dheiuhiqwdu`;
+    const link = `https://careerfairy.io/streaming/${props.livestreamId}/joining-streamer?pwd=qdhwuiehd7qw789d79w8e8dheiuhiqwdu`;
 
     return (
         <Modal open={props.open} onClose={() => props.setOpen(false)}>

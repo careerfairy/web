@@ -95,7 +95,7 @@ function StreamingPage(props) {
     }
 
     function openStudentView() {
-        const studentLink = `https://testing.careerfairy.io/streaming/${currentLivestream.id}/viewer`
+        const studentLink = `https://careerfairy.io/streaming/${currentLivestream.id}/viewer`
         window.open(studentLink, '_blank');
     }
 
