@@ -12,6 +12,7 @@ import Feed from "../components/views/feed/Feed";
 const feed = ({firebase}) => {
     const router = useRouter();
     const {query: {livestreamId}} = router
+    const {query: {careerCenterId}} = router
 
     const [loading, setLoading] = useState(false)
     const [userData, setUserData] = useState(null)
@@ -57,7 +58,7 @@ const feed = ({firebase}) => {
             <div style={{background: "rgb(44, 66, 81)"}}>
                 <Header color="white"/>
             </div>
-            <Feed livestreamId={livestreamId} user={user} userData={userData}/>
+            <Feed careerCenterId={careerCenterId} livestreamId={livestreamId} user={user} userData={userData}/>
             <Footer/>
         </GreyBackground>
     );

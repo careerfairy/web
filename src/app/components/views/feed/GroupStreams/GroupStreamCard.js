@@ -31,7 +31,7 @@ const PlaceHolder = () => {
 }
 
 
-const GroupStreamCard = ({livestream, user, index, careerCenters, fields, grid, key, userData, firebase, livestreamId, id}) => {
+const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userData, firebase, livestreamId, id, careerCenterId, groupData}) => {
 
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [isHighlighted, setIsHighlighted] = useState(false)
@@ -41,13 +41,20 @@ const GroupStreamCard = ({livestream, user, index, careerCenters, fields, grid, 
     const avatar = livestream.mainSpeakerAvatar ? livestream.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
 
     useEffect(() => {
-        if (livestreamId && id && livestreamId === id && !isHighlighted) {
+        if (careerCenterId && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId && !isHighlighted) {
+            console.log(`careerCenterId: ${careerCenterId} | groupData.groupId: ${groupData.groupId}`);
             console.log(isHighlighted);
             setIsHighlighted(true)
-        } else if (livestreamId && id && livestreamId !== id && isHighlighted) {
+        } else if (careerCenterId && livestreamId && id && livestreamId !== id && groupData.groupId !== careerCenterId && isHighlighted) {
             setIsHighlighted(false)
         }
-    }, [livestreamId, id]);
+    }, [livestreamId, id, careerCenterId, groupData.groupId]);
+
+    useEffect(() => {
+        if (grid && livestream) {
+            grid.updateLayout()
+        }
+    }, [livestream])
 
 
     function targetHasClickHandler(event) {
@@ -129,9 +136,9 @@ const GroupStreamCard = ({livestream, user, index, careerCenters, fields, grid, 
                       placeholder={<PlaceHolder/>}>
                 <div style={
                     {
-                        "-webkit-box-shadow": isHighlighted ? "#FFF 0 -1px 4px, #ff0 0 -2px 10px, #ff8000 0 -10px 20px, red 0 -18px 40px, 5px 5px 15px 5px rgba(0,0,0,0)" : "none",
-                        boxShadow: isHighlighted ? "#FFF 0 -1px 4px, #ff0 0 -2px 10px, #ff8000 0 -10px 20px, red 0 -18px 40px, 5px 5px 15px 5px rgba(0,0,0,0)" : "none"
-
+                        WebkitBoxShadow: isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
+                        boxShadow: isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
+                        MozBoxShadow: isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)"
                     }
                 } className='companies-mentor-discriber-content'
                      onClick={(event) => goToRouteFromParent(event, '/upcoming-livestream/' + livestream.id)}>

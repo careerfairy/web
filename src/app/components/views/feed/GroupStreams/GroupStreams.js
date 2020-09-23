@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId}) => {
+const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId, careerCenterId}) => {
 
         const classes = useStyles()
         const [grid, setGrid] = useState(null);
@@ -36,6 +36,8 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
                 return (
                     <GroupStreamCard
                         index={index}
+                        groupData={groupData}
+                        careerCenterId={careerCenterId}
                         livestreamId={livestreamId}
                         user={user} userData={userData} fields={null}
                         grid={grid} careerCenters={[]}

@@ -4,9 +4,8 @@ import GroupsCarousel from "./GroupsCarousel/GroupsCarousel";
 import {useMediaQuery, useTheme} from "@material-ui/core";
 import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import MobileFeed from "./MobileFeed";
-import {useRouter} from "next/router";
 
-const Feed = ({user, userData, firebase, livestreamId}) => {
+const Feed = ({user, userData, firebase, livestreamId, careerCenterId}) => {
 
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -18,13 +17,9 @@ const Feed = ({user, userData, firebase, livestreamId}) => {
     const [searching, setSearching] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState([])
 
-    const getLivestreamFromParams = async (livestreamId) => {
-        let careerCenterId = null
-        const querySnapshot = await firebase.getFirstCareerCenterByLivestreamId(livestreamId)
-        querySnapshot.forEach(function (doc) {
-            careerCenterId = doc.id
-        });
-        return careerCenterId
+    const checkIfCareerCenterExists = async (centerId) => {
+        const querySnapshot = await firebase.getCareerCenterById(centerId)
+        return querySnapshot.exists
     }
 
 
@@ -46,7 +41,7 @@ const Feed = ({user, userData, firebase, livestreamId}) => {
                         livestreams.push(livestream);
                     }
                 })
-                if (livestreamId) {
+                if (livestreamId && careerCenterId && careerCenterId === groupData.groupId) {
                     const currentIndex = livestreams.findIndex(el => el.id === livestreamId)
                     if (currentIndex > -1) {
                         repositionElement(livestreams, currentIndex, 0)
@@ -82,9 +77,18 @@ const Feed = ({user, userData, firebase, livestreamId}) => {
     const handleGetGroupIds = async () => {
         setIdsHasBeenSet(true)
         const newGroupIds = [...userData.groupIds]
-        if (livestreamId) {
-            const careerCenterId = await getLivestreamFromParams(livestreamId)
-            newGroupIds.unshift(careerCenterId)
+        if (livestreamId && careerCenterId) {
+            if (newGroupIds.includes(careerCenterId)) {
+                const currentIndex = newGroupIds.findIndex(el => el === careerCenterId)
+                if (currentIndex > -1) {
+                    repositionElement(newGroupIds, currentIndex, 0)
+                }
+            } else {
+                const exists = await checkIfCareerCenterExists(careerCenterId)
+                if (exists) {
+                    newGroupIds.unshift(careerCenterId)
+                }
+            }
         }
         setGroupIds(newGroupIds)
     }
@@ -149,6 +153,7 @@ const Feed = ({user, userData, firebase, livestreamId}) => {
                             handleResetGroup={handleResetGroup}
                             searching={searching}
                             livestreams={livestreams}
+                            careerCenterId={careerCenterId}
                             livestreamId={livestreamId}
                             alreadyJoined={groupData.alreadyJoined}
                             handleToggleActive={handleToggleActive}
@@ -159,6 +164,7 @@ const Feed = ({user, userData, firebase, livestreamId}) => {
                              userData={userData}
                              livestreamId={livestreamId}
                              searching={searching}
+                             careerCenterId={careerCenterId}
                              handleResetGroup={handleResetGroup}
                              user={user}
                              livestreams={livestreams}

@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user, livestreams, searching, scrollToTop, livestreamId}) => {
+const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user, livestreams, searching, scrollToTop, livestreamId, careerCenterId}) => {
     const classes = useStyles();
     const theme = useTheme();
     const [value, setValue] = useState(0);
@@ -91,6 +91,7 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                     <GroupStreams user={user}
                                   key={key}
                                   mobile={true}
+                                  careerCenterId={careerCenterId}
                                   livestreamId={livestreamId}
                                   searching={searching}
                                   livestreams={livestreams}
