@@ -10,6 +10,10 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import TargetElementList from "../../common/TargetElementList";
 import BookingModal from "../../common/booking-modal/BookingModal";
 import {withFirebase} from "../../../../data/firebase";
+import {makeStyles} from "@material-ui/core/styles";
+
+
+const useStyles = makeStyles((theme) => ({}));
 
 const AvatarSkeleton = () => (<Skeleton variant="circle" width={40} height={40}/>)
 
@@ -27,22 +31,21 @@ const PlaceHolder = () => {
 }
 
 
-const GroupStreamCard = ({livestream, user, index, careerCenters, fields, setStreamRef, grid, key, userData, firebase, livestreamId, id}) => {
+const GroupStreamCard = ({livestream, user, index, careerCenters, fields, grid, key, userData, firebase, livestreamId, id}) => {
 
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
+    const [isHighlighted, setIsHighlighted] = useState(false)
 
     const router = useRouter();
-    const streamRef = useRef(null)
 
     const avatar = livestream.mainSpeakerAvatar ? livestream.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
 
     useEffect(() => {
-        if (livestreamId && id && livestreamId === id) {
-            setTimeout(() => {
-                // const domCoordinates = streamRef.current.getBoundingClientRect()
-                // domCoordinates.index = index
-                // setStreamRef(domCoordinates)
-            }, 1000)
+        if (livestreamId && id && livestreamId === id && !isHighlighted) {
+            console.log(isHighlighted);
+            setIsHighlighted(true)
+        } else if (livestreamId && id && livestreamId !== id && isHighlighted) {
+            setIsHighlighted(false)
         }
     }, [livestreamId, id]);
 
@@ -124,7 +127,13 @@ const GroupStreamCard = ({livestream, user, index, careerCenters, fields, setStr
             <LazyLoad key={livestream.id}
                       offset={[-100, 100]}
                       placeholder={<PlaceHolder/>}>
-                <div className='companies-mentor-discriber-content'
+                <div style={
+                    {
+                        "-webkit-box-shadow": isHighlighted ? "#FFF 0 -1px 4px, #ff0 0 -2px 10px, #ff8000 0 -10px 20px, red 0 -18px 40px, 5px 5px 15px 5px rgba(0,0,0,0)" : "none",
+                        boxShadow: isHighlighted ? "#FFF 0 -1px 4px, #ff0 0 -2px 10px, #ff8000 0 -10px 20px, red 0 -18px 40px, 5px 5px 15px 5px rgba(0,0,0,0)" : "none"
+
+                    }
+                } className='companies-mentor-discriber-content'
                      onClick={(event) => goToRouteFromParent(event, '/upcoming-livestream/' + livestream.id)}>
                     <div className='date-indicator'>
                         {/* <div className='coming-icon-container'>

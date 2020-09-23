@@ -14,10 +14,8 @@ const feed = ({firebase}) => {
     const {query: {livestreamId}} = router
 
     const [loading, setLoading] = useState(false)
-    const [hasScrolled, setHasScrolled] = useState(false)
     const [userData, setUserData] = useState(null)
     const [user, setUser] = useState(null);
-    const [streamRef, setStreamRef] = useState(null)
 
 
     useEffect(() => {
@@ -45,19 +43,6 @@ const feed = ({firebase}) => {
         }
     }, [user]);
 
-    useEffect(() => {
-        if (livestreamId && !hasScrolled) {
-            // document.body.style.overflow = 'hidden';
-        }
-    }, livestreamId)
-
-    useEffect(() => {
-        if (streamRef && !hasScrolled) {
-            // document.body.style.overflow = 'visible';
-            setHasScrolled(true)
-            window.scrollTo({behavior: 'smooth', top: streamRef.top - 310})
-        }
-    }, [streamRef])
 
     if (user === null || userData == null || loading === true) {
         return <Loader/>;
@@ -72,7 +57,7 @@ const feed = ({firebase}) => {
             <div style={{background: "rgb(44, 66, 81)"}}>
                 <Header color="white"/>
             </div>
-            <Feed livestreamId={livestreamId} setStreamRef={setStreamRef} user={user} userData={userData}/>
+            <Feed livestreamId={livestreamId} user={user} userData={userData}/>
             <Footer/>
         </GreyBackground>
     );

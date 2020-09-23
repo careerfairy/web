@@ -6,7 +6,7 @@ import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import MobileFeed from "./MobileFeed";
 import {useRouter} from "next/router";
 
-const Feed = ({user, userData, firebase, setStreamRef, livestreamId}) => {
+const Feed = ({user, userData, firebase, livestreamId}) => {
 
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -46,6 +46,12 @@ const Feed = ({user, userData, firebase, setStreamRef, livestreamId}) => {
                         livestreams.push(livestream);
                     }
                 })
+                if (livestreamId) {
+                    const currentIndex = livestreams.findIndex(el => el.id === livestreamId)
+                    if (currentIndex > -1) {
+                        repositionElement(livestreams, currentIndex, 0)
+                    }
+                }
                 setLivestreams(livestreams);
                 setSearching(false)
             })
@@ -88,9 +94,15 @@ const Feed = ({user, userData, firebase, setStreamRef, livestreamId}) => {
         window.scrollTo(0, 0);
     }
 
+    const repositionElement = (arr, fromIndex, toIndex) => {
+        const element = arr[fromIndex];
+        arr.splice(fromIndex, 1);
+        arr.splice(toIndex, 0, element);
+    }
+
 
     const checkIfLivestreamHasAll = (selected, arr) => {
-        return selected.every(v => arr.includes(v))
+        return selected.some(v => arr.includes(v)) // switch to selected.includes to make it an AND Operator
     };
 
     const handleSetGroup = (groupObj) => {
@@ -138,7 +150,6 @@ const Feed = ({user, userData, firebase, setStreamRef, livestreamId}) => {
                             searching={searching}
                             livestreams={livestreams}
                             livestreamId={livestreamId}
-                            setStreamRef={setStreamRef}
                             alreadyJoined={groupData.alreadyJoined}
                             handleToggleActive={handleToggleActive}
                             userData={userData}/>
@@ -148,7 +159,6 @@ const Feed = ({user, userData, firebase, setStreamRef, livestreamId}) => {
                              userData={userData}
                              livestreamId={livestreamId}
                              searching={searching}
-                             setStreamRef={setStreamRef}
                              handleResetGroup={handleResetGroup}
                              user={user}
                              livestreams={livestreams}

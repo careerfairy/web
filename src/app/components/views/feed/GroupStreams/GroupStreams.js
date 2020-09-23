@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId, setStreamRef}) => {
+const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId}) => {
 
         const classes = useStyles()
         const [grid, setGrid] = useState(null);
@@ -32,18 +32,19 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
         }, [grid, livestreams]);
 
         const renderStreamCards = livestreams?.map((livestream, index) => {
-            return (
-                <GroupStreamCard
-                    setStreamRef={setStreamRef}
-                    index={index}
-                    livestreamId={livestreamId}
-                    user={user} userData={userData} fields={null}
-                    grid={grid} careerCenters={[]}
-                    id={livestream.id}
-                    key={livestream.id} livestream={livestream}
-                />
+            if (livestream) {
+                return (
+                    <GroupStreamCard
+                        index={index}
+                        livestreamId={livestreamId}
+                        user={user} userData={userData} fields={null}
+                        grid={grid} careerCenters={[]}
+                        id={livestream.id}
+                        key={livestream.id} livestream={livestream}
+                    />
 
-            )
+                )
+            }
         })
 
         return (
