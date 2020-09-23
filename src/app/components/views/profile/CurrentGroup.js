@@ -163,7 +163,7 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                                 <MenuItem onClick={() => router.push('/group/' + localGroup.id)}>Group Page</MenuItem>
                                 <MenuItem onMouseEnter={() => setLeaveGroup(true)} onClick={() => setOpen(true)}>Leave
                                     Group</MenuItem>
-                                {localGroup.categories && <MenuItem onClick={handleOpenJoinModal}>Update</MenuItem>}
+                                {localGroup.categories && <MenuItem onClick={handleOpenJoinModal}>Update Categories</MenuItem>}
                                 {isAdmin &&
                                 <>
                                     <MenuItem onClick={() => push(`/group/${localGroup.id}/admin`)}>
@@ -182,6 +182,7 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                 </Grid>
             </Grow>
             <GroupJoinModal
+                fromProfile={true}
                 open={openJoinModal}
                 group={localGroup}
                 alreadyJoined={userData.groupIds?.includes(localGroup.id)}
