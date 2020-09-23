@@ -97,7 +97,7 @@ function MiniChatContainer(props) {
     });
 
     return (
-        <div>
+        <>
             <div className='chat-container' style={{ height: open ? '250px' : '40px' }}>
                 <div className='chat-container-title' onClick={() => setOpen(!open)}>
                     <Icon name='comments outline'/>Chat
@@ -127,7 +127,8 @@ function MiniChatContainer(props) {
             </div>
             <style jsx>{`
                 .chat-container {
-                    position: relative;
+                    position: sticky;
+                    bottom: 10;
                     width: 100%;
                     height: 220px;
                     background-color: rgb(245,245,245);
@@ -143,7 +144,6 @@ function MiniChatContainer(props) {
                 .scroll-to-bottom {
                     height: 100%;
                     padding: 10px;
-                    border: 2px solid red;
                 }
 
                 .chat-container-title {
@@ -185,7 +185,7 @@ function MiniChatContainer(props) {
                     background-color: rgb(240,240,240);
                 }
           `}</style>
-        </div>
+        </>
     );
 }
 

@@ -6,11 +6,14 @@ import ChatCategory from 'components/views/streaming/comment-container/categorie
 import QuestionCategory from './categories/QuestionCategory';
 import PollCategory from './categories/PollCategory';
 import HandRaiseCategory from './categories/HandRaiseCategory';
+import { useWindowSize } from 'components/custom-hook/useWindowSize';
 
 
 function CommentContainer(props) {
 
     const [selectedState, setSelectedState] = useState("questions");
+    const [isMobile, setIsMobile] = useState(false);
+    const { width, height } = useWindowSize();
 
     function handleStateChange(state) {
         if (!props.showMenu) {
@@ -19,16 +22,32 @@ function CommentContainer(props) {
         setSelectedState(state);
     }
 
+    useEffect(() => {
+        if (width < 768) {
+            setIsMobile(true);
+        } else {
+            setIsMobile(false);
+        }
+    },[width])
+
     const ButtonComponent = (props) => {
+
+        if (isMobile && props.showMenu) {
+            return null;
+        }
 
         return (
             <Fragment>
                 <div className='interaction-selector'>
                     <div className='interaction-selectors'>
-                        {/* <div>
-                            <Button circular size='big' icon='comments outline' disabled={props.showMenu && selectedState === 'chat'} onClick={() => props.handleStateChange("chat")} color='teal'/>
-                            <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("chat")}>Main Chat</span>
-                        </div> */}
+                        {
+                            isMobile ? 
+                            <div>
+                                <Button circular size='big' icon='comments outline' disabled={props.showMenu && selectedState === 'chat'} onClick={() => props.handleStateChange("chat")} color='teal'/>
+                                <span onClick={() => props.handleStateChange("chat")}>Chat</span>
+                            </div> : 
+                            null
+                        }     
                         <div>
                             <Button circular size='big' icon='question circle outline' disabled={props.showMenu && selectedState === 'questions'} onClick={() => props.handleStateChange("questions")} color='teal'/>
                             <span onClick={() => props.handleStateChange("questions")}>Q&A</span>
@@ -37,10 +56,14 @@ function CommentContainer(props) {
                             <Button circular size='big' icon='chart bar outline' disabled={props.showMenu && selectedState === 'polls'} onClick={() => props.handleStateChange("polls")} color='teal'/>
                             <span onClick={() => props.handleStateChange("polls")}>Polls</span>
                         </div>
+                        {
+                        !isMobile ? 
                         <div>
                             <Button circular size='big' icon='hand pointer outline' disabled={props.showMenu && selectedState === 'hand'} onClick={() => props.handleStateChange("hand")} color='teal'/>
                             <span onClick={() => props.handleStateChange("hand")}>Hand Raise</span>
-                        </div>
+                        </div> : 
+                            null
+                        }     
                         {/* <div>
                             <Button circular size='big' icon='cog' onClick={() => props.setShowMenu(!props.showMenu)} secondary/>
                             <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("settings")}>Settings</span>
@@ -103,7 +126,7 @@ function CommentContainer(props) {
                 <Button circular size='big' icon='angle left' color='pink' onClick={() => {props.setShowMenu(!props.showMenu)}}/>
             </div>
             <div className='interaction-category'>
-                {/* <ChatCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData} isStreamer={false}/> */}
+                <ChatCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData} isStreamer={false}/>
                 <QuestionCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}/>
                 <PollCategory livestream={props.livestream} selectedState={selectedState} setSelectedState={setSelectedState} setShowMenu={props.setShowMenu} streamer={props.streamer} user={props.user} userData={props.userData}/>
                 <HandRaiseCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}  handRaiseActive={props.handRaiseActive} setHandRaiseActive={props.setHandRaiseActive}/>
@@ -125,9 +148,9 @@ function CommentContainer(props) {
                 }
 
                 .close-menu {
-                    position: absolute;
+                    position: fixed;
                     top: 10px;
-                    left: 10px;
+                    right: 10px;
                     text-align: center;
                     z-index: 9100;
                 }

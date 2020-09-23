@@ -102,6 +102,7 @@ function ChatCategory(props) {
                     box-shadow: 0 4px 2px -2px rgb(200,200,200);
                     z-index: 9000;
                     padding: 10px;
+                    background: white;
                 }
 
                 .questionToggleTitle {

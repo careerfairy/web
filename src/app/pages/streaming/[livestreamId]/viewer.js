@@ -15,7 +15,7 @@ function ViewerPage(props) {
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
 
-    const [showMenu, setShowMenu] = useState(true);
+    const [showMenu, setShowMenu] = useState(false);
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
     
@@ -146,6 +146,7 @@ function ViewerPage(props) {
                     min-height: 100vh;
                     height: 100%;
                     width: 100%;
+                    touch-action: manipulation;
                 }
 
                 .top-menu {
@@ -286,6 +287,12 @@ function ViewerPage(props) {
                     z-index: 150;
                 }
 
+                @media(max-width: 768px) {
+                    .mini-chat-container{
+                        display:none;
+                    }
+                }
+
                 .icons-container {
                     position: absolute;
                     bottom: 50px;
@@ -359,6 +366,16 @@ function ViewerPage(props) {
                         width: 280px;
                     }
                 }
+            `}</style>
+             <style jsx global>{`
+                body {
+                    min-height: 100vh;
+                    min-height: -webkit-fill-available;
+                  }
+                  
+                  html {
+                    height: -webkit-fill-available;
+                  }
             `}</style>
         </div>
     );
