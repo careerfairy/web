@@ -1,7 +1,7 @@
 import { Fragment, useState, useEffect, useRef } from 'react';
 
 import { useRouter } from 'next/router';
-import { withFirebasePage } from '../../data/firebase'
+import { withFirebasePage } from '../../context/firebase'
 
 import CompanyLandingPage from '../../components/views/company-profile/CompanyLandingPage';
 import CompanyDiscoverPage from '../../components/views/company-profile/CompanyDiscoverPage';

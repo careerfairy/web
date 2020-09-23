@@ -4,7 +4,7 @@ import { Container, Grid, Image, Button, Icon } from "semantic-ui-react";
 import Header from "../components/views/header/Header";
 
 import { useRouter } from 'next/router';
-import { withFirebase } from "../data/firebase";
+import { withFirebase } from "context/firebase";
 import { compose } from "redux";
 import Footer from '../components/views/footer/Footer';
 import { UNIVERSITY_SUBJECTS } from '../data/StudyFieldData';

@@ -9,5 +9,5 @@ module.exports = {
         REACT_APP_FIREBASE_PROJECT_ID: 'careerfairy-e1fd9',
         REACT_APP_FIREBASE_STORAGE_BUCKET: 'careerfairy-e1fd9.appspot.com',
         REACT_APP_FIREBASE_MESSAGING_SENDER_ID: '993933306494'
-    },
+    }
   }

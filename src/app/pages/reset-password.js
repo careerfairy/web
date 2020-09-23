@@ -1,6 +1,6 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Button, Container, Form, Header, Image, Message, Icon} from "semantic-ui-react";
-import { withFirebase} from "../data/firebase";
+import { withFirebase} from "../context/firebase";
 
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -147,7 +147,6 @@ export function ResetPasswordBase(props) {
                                 width: 55%;
                                 padding: 50px;
                                 height: 100%;
-                                border: 2px solid red;
                             }
 
                             #signingContainer h5 {

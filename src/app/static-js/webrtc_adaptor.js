@@ -19,11 +19,18 @@ export function WebRTCAdaptor(initialValues)
 			this.startTime = 0;
 			this.lastBytesReceived = 0;
 			this.lastBytesSent = 0;
+			this.lastFramesEncoded = 0;
+			this.totalFramesEncodedCount = 0;
 			this.currentTimestamp = 0;
 			this.lastTime = 0;
 			this.timerId = 0;
 			this.firstByteSentCount = 0;
 			this.firstBytesReceivedCount = 0;
+			this.audioLevel = -1;
+			this.qualityLimitationReason = "";
+			this.resWidth = 0;
+			this.resHeight = 0;
+			this.srcFps = 0;
 		}
 
 		//kbits/sec
@@ -1109,12 +1116,6 @@ export function WebRTCAdaptor(initialValues)
 			}
 		}
 
-		var sendPing = function() {			
-			var jsCmd = {
-					command : "ping"
-			};
-			wsConn.send(JSON.stringify(jsCmd));
-		}
 
 		this.close = function() {
 			wsConn.close();
@@ -1125,9 +1126,6 @@ export function WebRTCAdaptor(initialValues)
 				console.log("websocket connected");
 			}
 
-			pingTimerId = setInterval(() => {
-				sendPing();
-			}, 3000);
 
 			connected = true;
 			thiz.callback("initialized");

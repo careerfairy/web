@@ -16,6 +16,13 @@ export const UNIVERSITY_SUBJECTS = [
             value: "COMP",
             color: "#52494c"
         },{
+            text: "Communication Systems",
+            value: "COMPSCI"
+        },{
+            text: "Computational Science and Engineering",
+            value: "COMPSCIENG",
+            color: "#52494c"
+        },{
             text: "Earth Sciences",
             value: "EARTH",
             color: "#9a6324"
@@ -55,6 +62,14 @@ export const UNIVERSITY_SUBJECTS = [
             text: "Physics",
             value: "PHYS",
             color: "#54556c"
+        },{
+            text: "Financial Engineering",
+            value: "FINENG",
+            color: "#b39eb5"
+        },{
+            text: "Robotics",
+            value: "ROBOT",
+            color: "#52494c"
         },{
             text: "Health Sciences and Technology",
             value: "HEALTH",
@@ -369,5 +384,35 @@ export const UNIVERSITY_SUBJECTS = [
         },{
             text: "Wirtschaftswissenschaften",
             value: "WIRTWISS"
+        },{
+            text: "Ernst Ruska-Centre for Microscopy and Spectroscopy with Electrons (ER-C)",
+            value: "MIKROSPEKTRO"
+        },{
+            text: "Institute for Advanced Simulation (IAS)",
+            value: "ADVSIM"
+        },{
+            text: "Institute of Bio- and Geosciences (IBG)",
+            value: "BIOGEOSCI"
+        },{
+            text: "Institute of Biological Information Processing (IBI)",
+            value: "BIOINFO"
+        },{
+            text: "Institute of Energy and Climate Research (IEK)",
+            value: "ENERCLIMATE"
+        },{
+            text: "Nuclear Physics Institute (IKP)",
+            value: "PARTIPHYS"
+        },{
+            text: "Institute of Neuroscience and Medicine (INM)",
+            value: "NEUROSCIMED"
+        },{
+            text: "Jülich Centre for Neutron Science (JCNS)",
+            value: "NEUTRSCI"
+        },{
+            text: "Peter Grünberg Institute (PGI)",
+            value: "PETERGRUEN"
+        },{
+            text: "Central Institute of Engineering, Electronics and Analytics (ZEA)",
+            value: "ENERGELEKANALYT"
         }
     ];

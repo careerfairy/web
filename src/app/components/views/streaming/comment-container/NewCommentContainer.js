@@ -1,149 +1,136 @@
-import React, {useState, useEffect} from 'react';
-import {Input, Icon, Button, Label} from 'semantic-ui-react';
 
-import QuestionContainer from './question-container/QuestionContainer';
+import React, {useState, useEffect, Fragment} from 'react';
+import {Input, Icon, Button, Label, Grid} from "semantic-ui-react";
 
-import { withFirebase } from 'data/firebase';
-import { animateScroll } from 'react-scroll';
+import { withFirebase } from 'context/firebase';
+import QuestionCategory from './categories/QuestionCategory';
+import PollCategory from './categories/PollCategory';
+import HandRaiseCategory from './categories/HandRaiseCategory';
 
 function CommentContainer(props) {
-    
-    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
-    const [pastQuestions, setPastQuestions] = useState([]);
 
-    const [showNextQuestions, setShowNextQuestions] = useState(true);
+    const [selectedState, setSelectedState] = useState("questions");
 
     useEffect(() => {
-        if (props.livestream.id) {
-            const unsubscribe = props.firebase.listenToLivestreamQuestions(props.livestream.id, querySnapshot => {
-                var upcomingQuestionsList = [];
-                var pastQuestionsList = [];
-                querySnapshot.forEach(doc => {
-                    let question = doc.data();
-                    question.id = doc.id;
-                    if (question.type !== 'done') {
-                        upcomingQuestionsList.push(question);
-                    } else {
-                        pastQuestionsList.push(question);
-                    }
-                });
-                setUpcomingQuestions(upcomingQuestionsList);
-                setPastQuestions(pastQuestionsList);
-            });
-            return () => unsubscribe();
+        if (!typeof window === 'object') {
+          return false;
         }
-    }, [props.livestream.id]);
+        
+        function handleResize() {
+            if (window.innerWidth < 996) {
+                props.setShowMenu(false);
+            }
+            if (window.innerWidth > 1248) {
+                props.setShowMenu(true);
+            }
+        }
+    
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+      }, []);
 
-    let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
-        return (
-            <div key={index}>
-                <QuestionContainer livestream={ props.livestream } questions={upcomingQuestions} question={ question } user={props.user} userData={props.userData}/>
-            </div>       
-        );
-    });
+    function handleStateChange(state) {
+        if (!props.showMenu) {
+            props.setShowMenu(true);
+        }
+        setSelectedState(state);
+    }
 
-    let pastQuestionsElements = pastQuestions.map((question, index) => {
+    const ButtonComponent = (props) => {
+
+        const [showLabels, setShowLabels] = useState(true);
+
         return (
-            <div key={index}>
-                <QuestionContainer livestream={ props.livestream } questions={pastQuestions} question={ question } user={props.user} userData={props.userData}/>
-            </div>       
+            <Fragment>
+                <div className='interaction-selector' onMouseEnter={() => setShowLabels(true)}>
+                    <div className='interaction-selectors'>
+                        {/* <div>
+                            <Button circular size='big' icon='comments outline' disabled={props.showMenu && selectedState === 'chat'} onClick={() => props.handleStateChange("chat")} primary/>
+                            <span onClick={() => props.handleStateChange("chat")}>Main Chat</span>
+                        </div> */}
+                        <div>
+                            <Button circular size='big' icon='question circle outline' disabled={props.showMenu && selectedState === 'questions'} onClick={() => props.handleStateChange("questions")} primary/>
+                            <span onClick={() => props.handleStateChange("questions")}>Q&A</span>
+                        </div>
+                        <div>
+                            <Button circular size='big' icon='chart bar outline' disabled={props.showMenu && selectedState === 'polls'} onClick={() => props.handleStateChange("polls")} primary/>
+                            <span onClick={() => props.handleStateChange("polls")}>Polls</span>
+                        </div>
+                        <div>
+                            <Button circular size='big' icon='hand pointer outline' disabled={props.showMenu && selectedState === 'hand'} onClick={() => props.handleStateChange("hand")} primary/>
+                            <span onClick={() => props.handleStateChange("hand")}>Hand Raise</span>
+                        </div>
+                        {/* <div>
+                            <Button circular size='big' icon='cog' onClick={() => props.setShowMenu(!props.showMenu)} secondary/>
+                            <span style={{ opacity: props.showMenu ? '0' : '1' }} onClick={() => props.handleStateChange("settings")}>Settings</span>
+                        </div> */}
+                        <div className={ props.showMenu ? '' : 'hidden' }>
+                            <Button circular size='big' icon={'angle left'} onClick={() => props.setShowMenu(!props.showMenu)} color='pink'/>
+                        </div>
+                    </div>
+                </div>
+                <style jsx>{`
+                    .hidden {
+                        display: none;
+                    }
+
+                    .interaction-selector {
+                        position: absolute;
+                        right: -200px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        height: 100%;
+                        cursor: pointer;
+                        width: 200px;
+                        background: linear-gradient(90deg, rgba(42,42,42,1) 0%, rgba(60,60,60,0) 100%);
+                    }
+
+                    .interaction-selectors {
+                        position: absolute;
+                        right: 0;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        width: 100%;
+                        padding: 20px;
+                    }
+
+                    .interaction-selector div {
+                        margin: 0 0 15px 0;
+                    }
+
+                    .interaction-selector span {
+                        color: white;
+                        margin-left: 10px;
+                        font-weight: 600;
+                    }
+                `}</style>
+            </Fragment>
+        )
+    }
+
+    if (!props.showMenu) {
+        return (
+            <Fragment>
+                <ButtonComponent handleStateChange={handleStateChange} {...props}/>
+            </Fragment>
         );
-    });
+    }
 
     return (
-        <div>
-            <div className='questionToggle'>
-                <div className='questionToggleTitle'>
-                    Questions
-                </div>
-                <div className='questionToggleSwitches'>
-                    <div className={'questionToggleSwitch ' + (showNextQuestions ? 'active'  : '')} onClick={() => setShowNextQuestions(true)}>
-                        Upcoming [{ upcomingQuestions.length }]
-                    </div>
-                    <div className={'questionToggleSwitch ' + (showNextQuestions ? ''  : 'active')} onClick={() => setShowNextQuestions(false)}>
-                        Answered [{ pastQuestions.length }]
-                    </div>
-                </div>
+        <div className='interaction-container'>
+            <div className='interaction-category'>
+                <QuestionCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}/>
+                <PollCategory livestream={props.livestream} selectedState={selectedState} streamer={props.streamer} user={props.user} userData={props.userData}/>
+                <HandRaiseCategory livestream={props.livestream} selectedState={selectedState} user={props.user} userData={props.userData}  handRaiseActive={props.handRaiseActive} setHandRaiseActive={props.setHandRaiseActive}/>
             </div>
-            <div className='chat-container'>
-                <div className={'chat-scrollable ' + (showNextQuestions ? ''  : 'hidden')}>
-                    { upcomingQuestionsElements }
-                </div>
-                <div className={'chat-scrollable ' + (showNextQuestions ? 'hidden'  : '')}>
-                    { pastQuestionsElements }
-                </div>
-            </div>
+            <ButtonComponent handleStateChange={handleStateChange} {...props}/>
             <style jsx>{`
-                .questionToggle {
-                    position: relative;
-                    height: 100px;
-                    box-shadow: 0 4px 2px -2px rgb(200,200,200);
-                    z-index: 9000;
-                }
-
-                .questionToggleTitle {
+                .interaction-category {
                     position: absolute;
-                    top: 15px;
-                    width: 100%;
-                    font-size: 1.2em;
-                    font-weight: 500;
-                    text-align: center;
-                }
-
-                .questionToggleSwitches {
-                    position: absolute;
-                    bottom: 10px;
-                    width: 100%;
-                    text-align: center;
-                }
-
-                .questionToggleSwitch {
-                    display: inline-block;
-                    padding: 8px 12px;
-                    border-radius: 20px;
-                    margin: 0 10px;
-                    font-weight: 600;
-                    font-size: 0.8em;
-                    color: rgb(120,120,120);
-                    background-color: rgb(240,240,240);
-                    cursor: pointer;
-                }
-
-                .questionToggleSwitch.active {
-                    background-color: rgb(0, 210, 170);
-                    color: white;
-                    cursor: default;
-                }
-
-                .hidden {
-                    display: none;
-                }
-
-                .chat-container {
-                    position: absolute;
-                    top: 100px;
                     left: 0;
-                    bottom: 0;
-                    width: 100%;
-                    background-color: rgb(220,220,220);
-                }
-
-                .chat-scrollable {
-                    position: absolute;
+                    right: 0;
                     top: 0;
-                    left: 0;
                     bottom: 0;
-                    width: 100%;
-                    overflow-y: scroll;
-                    overflow-x: hidden;
-                }
-
-                ::-webkit-scrollbar {
-                    width: 5px;
-                }
-
-                ::-webkit-scrollbar-thumb {
-                    background-color: rgb(130,130,130);
                 }
           `}</style>
         </div>

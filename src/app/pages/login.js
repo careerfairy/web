@@ -1,6 +1,5 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Form, Header, Image, Message, Icon} from "semantic-ui-react";
-import {withFirebase} from "../data/firebase";
 
 import {useRouter} from 'next/router';
 import Link from 'next/link';

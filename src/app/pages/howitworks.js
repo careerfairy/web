@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import {Container, Grid, Image, Button, Icon} from "semantic-ui-react";
 
-import { withFirebase } from '../data/firebase/FirebaseContext';
+import { withFirebase } from '../context/firebase/FirebaseContext';
 import { useRouter } from 'next/router';
 import { compose } from 'redux';
 import Header from "../components/views/header/Header";

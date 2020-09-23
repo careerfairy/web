@@ -80,11 +80,15 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
             value: "CIVI",
             color: "#ff6961"
         },{
-            text: "Communication Sciences",
+            text: "Communication Systems",
             value: "COMPSCI"
         },{
             text: "Computer Science",
             value: "COMP",
+            color: "#52494c"
+        },{
+            text: "Computational Science and Engineering",
+            value: "COMPSCIENG",
             color: "#52494c"
         },{
             text: "Electrical and Electronic Engineering",
@@ -126,6 +130,14 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
             text: "Digital Humanities",
             value: "HUMAN",
             color: "#b39eb5"
+        },{
+            text: "Financial Engineering",
+            value: "FINENG",
+            color: "#b39eb5"
+        },{
+            text: "Robotics",
+            value: "ROBOT",
+            color: "#52494c"
         }
     ],
    unilausanne: [
@@ -555,6 +567,38 @@ export const UNIVERSITY_SPECIFIC_SUBJECTS = {
         },{
             text: "Wirtschaftswissenschaften",
             value: "WIRTWISS"
+        }
+    ], fzjuelich: [
+        {
+            text: "Ernst Ruska-Centre for Microscopy and Spectroscopy with Electrons (ER-C)",
+            value: "MIKROSPEKTRO"
+        },{
+            text: "Institute for Advanced Simulation (IAS)",
+            value: "ADVSIM"
+        },{
+            text: "Institute of Bio- and Geosciences (IBG)",
+            value: "BIOGEOSCI"
+        },{
+            text: "Institute of Biological Information Processing (IBI)",
+            value: "BIOINFO"
+        },{
+            text: "Institute of Energy and Climate Research (IEK)",
+            value: "ENERCLIMATE"
+        },{
+            text: "Nuclear Physics Institute (IKP)",
+            value: "PARTIPHYS"
+        },{
+            text: "Institute of Neuroscience and Medicine (INM)",
+            value: "NEUROSCIMED"
+        },{
+            text: "Jülich Centre for Neutron Science (JCNS)",
+            value: "NEUTRSCI"
+        },{
+            text: "Peter Grünberg Institute (PGI)",
+            value: "PETERGRUEN"
+        },{
+            text: "Central Institute of Engineering, Electronics and Analytics (ZEA)",
+            value: "ENERGELEKANALYT"
         }
     ]
 };

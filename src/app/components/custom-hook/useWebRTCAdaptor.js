@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { navigator, document } from 'global';
 import axios from 'axios';
-
-import { WebRTCAdaptor } from 'static-js/webrtc_adaptor.js';
+import { WebRTCAdaptor } from 'static-js/webrtc_adaptor_new.js';
 import { WEBRTC_ERRORS } from 'data/errors/StreamingErrors.js';
-import LivestreamId from 'pages/upcoming-livestream/[livestreamId].js';
 
 export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId) {
 
@@ -33,9 +31,10 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
 
     useEffect(() => {
         if (streamerReady && document && mediaConstraints && nsToken && nsToken.iceServers) {
-            setupWebRTCAdaptor();
+            const adaptor = getWebRTCAdaptor();
+            setWebRTCAdaptor(adaptor);
         }
-    }, [streamerReady, mediaConstraints, document, nsToken]);
+    }, [streamerReady, mediaConstraints, document, nsToken, isPlayMode]);
 
     useEffect(() => {
         if (addedStream) {
@@ -111,20 +110,29 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         }
     }
 
+    function certifyExternalMediaStreams(adaptorInstance, infoObj) {
+        infoObj.streams.forEach( streamId => {
+            if (externalMediaStreams.map(stream => stream.streamId).indexOf(streamId) < 0) {
+                adaptorInstance.play(streamId, 'null', infoObj.ATTR_ROOM_NAME);
+                adaptorInstance.enableStats(streamId);
+            }
+         })
+    }
+
     function publishNewStream(adaptorInstance, infoObj) {
-        adaptorInstance.publish(infoObj.streamId, 'null', infoObj.ATTR_ROOM_NAME);
+        adaptorInstance.publish(streamId, 'null', infoObj.ATTR_ROOM_NAME);
     }
 
     function playIncumbentStreams(adaptorInstance, infoObj) {
         if (infoObj.streams && infoObj.streams.length > 0) {
-            infoObj.streams.filter((streamId, index, streams) => streams.indexOf(streamId) === index).forEach( streamId => {
-                adaptorInstance.play(streamId, "null", infoObj.ATTR_ROOM_NAME);
+            infoObj.streams.forEach( streamId => {
+                adaptorInstance.play(streamId, 'null', infoObj.ATTR_ROOM_NAME);
                 adaptorInstance.enableStats(streamId);
             })
         }
     }
 
-    function playNewStream(adaptorInstance, infoObj) {
+    function playStream(adaptorInstance, infoObj) {
         adaptorInstance.play(infoObj.streamId, 'null', infoObj.ATTR_ROOM_NAME);
         adaptorInstance.enableStats(infoObj.streamId);
     }
@@ -140,14 +148,13 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         setAudioLevels(newAudioLevels);
     }
 
-    function setupWebRTCAdaptor() {
+    function getWebRTCAdaptor() {
         var pc_config = nsToken ? { 'iceServers' : nsToken.iceServers } : null; 
 
         var sdpConstraints = {
             OfferToReceiveAudio : false,
             OfferToReceiveVideo : false
         };
-
         const newAdaptor = new WebRTCAdaptor({
             websocket_url : "wss://thrillin.work/WebRTCAppEE/websocket",
             mediaConstraints : mediaConstraints,
@@ -168,7 +175,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             } else {
                                 this.joinRoom(roomId);
                             }
-                        }, 2000);
+                        }, 400);                        
                         break;
                     }
                     case "joinedTheRoom": {
@@ -179,6 +186,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             publishNewStream(this, infoObj);
                         }
                         playIncumbentStreams(this, infoObj);
+                        this.getRoomInfo(infoObj.ATTR_ROOM_NAME, infoObj.streamId);
                         break;
                     }
                     case "streamJoined": {
@@ -186,8 +194,8 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onStreamJoined(infoObj);
                         }
                         setTimeout(() => {
-                            playNewStream(this, infoObj);
-                        }, 500);                        
+                            playStream(this, infoObj);
+                        }, 200);                           
                         break;
                     }
                     case "streamLeaved": {
@@ -203,6 +211,13 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onNewStreamAvailable(infoObj);
                         }
                         setAddedStream(infoObj);
+                        break;
+                    }
+                    case "roomInformation": {
+                        if (typeof streamingCallbackObject.onNewStreamAvailable === 'function') {
+                            streamingCallbackObject.onNewStreamAvailable(infoObj);
+                        }
+                        certifyExternalMediaStreams(this, infoObj);
                         break;
                     }
                     case "publish_started": {
@@ -246,6 +261,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         if (typeof streamingCallbackObject.onClosed === 'function') {
                             streamingCallbackObject.onClosed(infoObj);
                         }
+                        this.closeWebSocket();
                         break;
                     }
                     case "ice_connection_state_changed": {
@@ -281,7 +297,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                 errorCallback(error)
             }
         });
-        setWebRTCAdaptor(newAdaptor);
+        return newAdaptor;
     }
   
     return { webRTCAdaptor, externalMediaStreams, audioLevels };

@@ -1,13 +1,15 @@
-import React, {useState, useEffect} from 'react';
-import {Input, Icon, Button, Label} from 'semantic-ui-react';
+
+import React, {useState, useEffect, useContext} from 'react';
+import {Input, Icon, Button, Label} from "semantic-ui-react";
 import Linkify from 'react-linkify';
 
-import { withFirebase } from 'data/firebase';
+import { withFirebase } from 'context/firebase';
 
 function QuestionContainer(props) {
     
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
+    const [showAllReactions, setShowAllReactions] = useState(false);
 
     useEffect(() => {
         if (props.livestream.id, props.question.id) {
@@ -24,18 +26,28 @@ function QuestionContainer(props) {
         }
     }, [props.livestream.id, props.question.id]);
 
+    function goToThisQuestion(nextQuestionId) {
+        const currentQuestion = props.questions.find(question => question.type === 'current');
+        if (currentQuestion) {
+            props.firebase.goToNextLivestreamQuestion(currentQuestion.id, nextQuestionId, props.livestream.id);
+        } else {
+            props.firebase.goToNextLivestreamQuestion(null, nextQuestionId, props.livestream.id);
+        }
+    }
+
     function addNewComment() {
-        if (!props.userData || !(newCommentTitle.trim())) {
+        if (!(newCommentTitle.trim())) {
             return;
         }
 
         const newComment = {
             title: newCommentTitle,
-            author: props.userData ? (props.userData.firstName + ' ' + props.userData.lastName.charAt(0)) : 'anonymous',
+            author: 'Streamer',
         }
         props.firebase.putQuestionComment(props.livestream.id, props.question.id, newComment)
             .then(() => {
                 setNewCommentTitle("");
+                setShowAllReactions(true);
             }, error => {
                 console.log("Error: " + error);
             })
@@ -45,10 +57,6 @@ function QuestionContainer(props) {
         if(target.charCode==13){
             addNewComment();   
         } 
-    }
-
-    function upvoteLivestreamQuestion() {
-        props.firebase.upvoteLivestreamQuestion(props.livestream.id, props.question, props.user.email);
     }
 
     const componentDecorator = (href, text, key) => (
@@ -74,12 +82,13 @@ function QuestionContainer(props) {
                 <style jsx>{`
                     .questionContainer {
                         position: relative;
-                        padding: 15px;
-                        margin: 10px 0 5px 0;
+                        padding: 10px;
+                        margin: 6px 0 3px 0;
                         background-color: white;
                         color: black;
-                        border-radius: 20px;
+                        border-radius: 10px;
                         box-shadow: 0 0 5px rgb(180,180,180);
+                        font-size: 0.9em;
                     }
 
                     .questionTitle {
@@ -95,6 +104,32 @@ function QuestionContainer(props) {
         );
     });
 
+    if (!showAllReactions) {
+        commentsElements = commentsElements.slice(0, 1);
+    }
+
+    const ReactionsToggle = (props) => {
+        if (comments.length < 2) {
+            return null;
+        }
+
+        return (
+            <div className='reactions-toggle' onClick={() => setShowAllReactions(!showAllReactions)}>
+                <Icon name={ showAllReactions ? 'angle up' : 'angle down'} style={{ marginRight: '3px'}}/>{ showAllReactions ? 'Hide' : 'Show all reactions'}
+                <style jsx>{`
+                    .reactions-toggle {
+                        margin: 5px 0 0 0;
+                        font-size: 0.8em;
+                        font-weight: 500;
+                        text-transform: uppercase;
+                        cursor: pointer;
+                        color: rgb(210,210,210);
+                    }
+                `}</style>
+            </div>
+        )
+    } 
+
     return (
         <div className='animated fadeInUp faster'>
                 <div className={'questionContainer ' + (props.question.type === 'current' ? 'active' : '') }>
@@ -109,6 +144,7 @@ function QuestionContainer(props) {
                     <div>
                         { commentsElements }
                     </div>
+                    <ReactionsToggle/>
                     <div className='comment-input'>
                         <Input
                             icon={<Icon name='chevron circle right' inverted circular link onClick={() => addNewComment()} disabled={newCommentTitle.length < 4} color='teal'/>}
@@ -120,19 +156,12 @@ function QuestionContainer(props) {
                             fluid
                         />
                     </div>
-                    <div className='upvotes'>
+                    <div className={'upvotes ' + (props.question.type === 'current' ? 'active' : '') }>
                         { props.question.votes } <Icon name='thumbs up' size='small'/>
                     </div>
                 </div>
-                <Button 
-                    attached='bottom'
-                    icon='thumbs up' 
-                    content={ !props.livestream.test && (props.question.emailOfVoters && props.user && props.question.emailOfVoters.indexOf(props.user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'} 
-                    size='small' 
-                    primary 
-                    onClick={() => upvoteLivestreamQuestion()} 
-                    style={{ margin: '0 10px 10px 10px' }} 
-                    disabled={!props.livestream.test ? (props.question.type !== 'new' || !props.user || (props.question.emailOfVoters ? props.question.emailOfVoters.indexOf(props.user.email) > -1 : false)) : false}/>
+                <Button attached='bottom' icon='thumbs up' content={ 'Answer Now' } primary onClick={() => goToThisQuestion(props.question.id)} style={{ margin: '0 10px 10px 10px' }} disabled={props.question.type !== 'new'}/>
+
                 <style jsx>{`
                     .questionContainer {
                         position: relative;
@@ -155,11 +184,11 @@ function QuestionContainer(props) {
 
                     .questionTitle {
                         font-weight: 700;
-                        font-size: 1.3em;
-                        line-height: 1.3em;
+                        font-size: 1.1em;
+                        line-height: 1.2em;
                         color: rgb(50,50,50);
-                        margin: 5px 0;
-                        width: 85%;
+                        margin: 15px 0 5px 0;
+                        width: 100%;
                         word-break: break-word;
                     }
 
@@ -215,6 +244,10 @@ function QuestionContainer(props) {
                         margin: 0 0 0 30px;
                         font-weight: 700; 
                         color: rgba(0, 210, 170, 1);
+                    }
+
+                    .upvotes.active {
+                        color: white;
                     }
 
                     .comment-input {

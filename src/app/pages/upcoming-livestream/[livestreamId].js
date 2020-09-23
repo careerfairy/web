@@ -2,7 +2,8 @@ import React, {useState, useEffect} from 'react';
 import {Container, Button, Grid, Icon, Input, Image} from "semantic-ui-react";
 
 import Header from '../../components/views/header/Header';
-import {withFirebasePage} from '../../data/firebase';
+
+import { withFirebasePage } from 'context/firebase';
 import TargetElementList from '../../components/views/common/TargetElementList'
 import Loader from '../../components/views/loader/Loader'
 import DateUtil from '../../util/DateUtil';
@@ -95,7 +96,7 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (currentLivestream) {
-            props.firebase.getLivestreamCareerCenters(currentLivestream.universities).then(querySnapshot => {
+            props.firebase.getDetailLivestreamCareerCenters(currentLivestream.universities).then( querySnapshot => {
                 let groupList = [];
                 querySnapshot.forEach(doc => {
                     let group = doc.data();
