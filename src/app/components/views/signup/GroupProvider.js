@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import Groups from "../groups/Groups";
-import {withFirebase} from "../../../data/firebase";
+import {withFirebase} from "../../../context/firebase";
 import {Button} from "@material-ui/core";
 import Link from "next/link";
 

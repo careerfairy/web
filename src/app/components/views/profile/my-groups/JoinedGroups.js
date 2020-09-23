@@ -1,7 +1,7 @@
 import React from 'react'
 import {Button, Grid, Typography} from "@material-ui/core";
 import {useRouter} from 'next/router';
-import {withFirebase} from 'data/firebase';
+import {withFirebase} from 'context/firebase';
 import AddIcon from '@material-ui/icons/Add';
 import CurrentGroup from 'components/views/profile/CurrentGroup';
 import {makeStyles} from "@material-ui/core/styles";

@@ -7,7 +7,7 @@ import {Button, Grid, Icon, Image} from "semantic-ui-react";
 import Link from "next/link";
 import TargetElementList from "../../common/TargetElementList";
 import BookingModal from "../../common/booking-modal/BookingModal";
-import {withFirebase} from "../../../../data/firebase";
+import {withFirebase} from "../../../../context/firebase";
 
 const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, key, userData}) => {
 

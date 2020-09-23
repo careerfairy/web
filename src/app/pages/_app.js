@@ -1,8 +1,8 @@
-import {Fragment} from 'react';
+import {Fragment, useState, useEffect} from 'react';
 import 'semantic/dist/semantic.min.css';
 import 'styles.css';
-import FirebaseContext from 'context/firebase/FirebaseContext';
-import Firebase from 'data/firebase/Firebase';
+import FirebaseContext from 'context/firebase';
+import Firebase from 'context/firebase';
 import * as Sentry from '@sentry/browser';
 import {ThemeProvider} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -63,15 +63,15 @@ function MyApp({Component, pageProps}) {
             <Head>
                 <title>CareerFairy | Watch live streams. Get hired.</title>
             </Head>
-            <ThemeProvider theme={theme}>
-                {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                <CssBaseline/>
-                <FirebaseContext.Provider value={firebase}>
-                    <UserContext.Provider value={{authenticatedUser: authenticatedUser, userData: userData}}>
+                {/* <FirebaseContext.Provider value={firebase}>
+                    <UserContext.Provider value={{authenticatedUser: authenticatedUser, userData: userData}}> */}
+                        <ThemeProvider theme={theme}>
+                        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                        <CssBaseline/>
                         <Component {...pageProps} />
-                    </UserContext.Provider>
-                </FirebaseContext.Provider>
-            </ThemeProvider>
+                    </ThemeProvider>
+                    {/* </UserContext.Provider>
+                </FirebaseContext.Provider> */}
         </Fragment>
     );
 }

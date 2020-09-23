@@ -2,7 +2,7 @@ import React, {Fragment } from 'react'
 import { Button, Image, Grid, Modal } from 'semantic-ui-react';
 
 
-import { withFirebase } from 'data/firebase';
+import { withFirebase } from 'context/firebase';
 import UserCategorySelector from 'UserCategorySelector';
 
 const GroupInfoModal = (props) => {

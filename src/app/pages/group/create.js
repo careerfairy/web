@@ -2,7 +2,7 @@ import {useEffect, useState, Fragment} from 'react'
 import Head from 'next/head';
 import {Container} from 'semantic-ui-react';
 import {useRouter} from 'next/router';
-import {withFirebase} from '../../data/firebase';
+import {withFirebase} from '../../context/firebase';
 import Header from '../../components/views/header/Header';
 import Footer from '../../components/views/footer/Footer';
 import CreateBaseGroup from "../../components/views/group/create/CreateBaseGroup";

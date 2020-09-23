@@ -4,7 +4,7 @@ import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
 import {useEffect, useState} from "react";
 import Loader from "../components/views/loader/Loader";
-import {withFirebase} from "../data/firebase";
+import {withFirebase} from "../context/firebase";
 import {useRouter} from "next/router";
 import Feed from "../components/views/feed/Feed";
 

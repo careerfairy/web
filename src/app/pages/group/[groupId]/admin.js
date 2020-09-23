@@ -6,7 +6,7 @@ import Head from "next/head";
 import Footer from "../../../components/views/footer/Footer";
 import AdminHeader from "../../../components/views/group/admin/AdminHeader";
 import GroupNav from "../../../components/views/group/admin/GroupNav";
-import { withFirebase } from "../../../data/firebase";
+import { withFirebase } from "../../../context/firebase";
 
 const JoinGroup = (props) => {
   const router = useRouter();

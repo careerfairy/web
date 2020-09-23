@@ -1,5 +1,5 @@
 import React, {Fragment, useState, useEffect} from 'react';
-import {withFirebase} from 'data/firebase';
+import {withFirebase} from 'context/firebase';
 import {SizeMe} from 'react-sizeme';
 import StackGrid from 'react-stack-grid';
 import LivestreamCard from 'components/views/livestream-card/LivestreamCard';

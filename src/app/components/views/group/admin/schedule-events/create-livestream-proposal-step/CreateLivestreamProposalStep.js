@@ -1,7 +1,7 @@
 import { useEffect, useState, Fragment } from 'react'
 import { Container, Image, Grid, Form, Button } from 'semantic-ui-react';
 import { useRouter } from 'next/router';
-import { withFirebase } from 'data/firebase';
+import { withFirebase } from 'context/firebase';
 import { Formik } from 'formik';
 
 const SelectCompanyStep = (props) => {

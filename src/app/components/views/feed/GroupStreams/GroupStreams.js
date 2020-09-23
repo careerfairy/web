@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {withFirebase} from "../../../../data/firebase";
+import {withFirebase} from "../../../../context/firebase";
 import GroupStreamCard from "./GroupStreamCard";
 import {Typography, LinearProgress, Box} from "@material-ui/core";
 import {SizeMe} from "react-sizeme";

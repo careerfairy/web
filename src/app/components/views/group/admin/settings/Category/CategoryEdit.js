@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import AddIcon from '@material-ui/icons/Add';
-import {withFirebase} from "data/firebase";
+import {withFirebase} from "context/firebase";
 import {AddCategory, DeleteCategory, DeleteOption, RenameOption} from './Option/CategoryEditOption';
 import {
     Zoom,

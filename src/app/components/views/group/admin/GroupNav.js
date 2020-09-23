@@ -10,7 +10,7 @@ import {Container, Typography, useMediaQuery} from "@material-ui/core";
 import Events from "./events/Events";
 import Members from "./members/Members";
 import Settings from "./settings/Settings";
-import {withFirebase} from "../../../../data/firebase";
+import {withFirebase} from "../../../../context/firebase";
 
 function TabPanel(props) {
     const {children, value, index, ...other} = props;
