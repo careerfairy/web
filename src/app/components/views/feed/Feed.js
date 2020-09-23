@@ -6,9 +6,7 @@ import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import MobileFeed from "./MobileFeed";
 import {useRouter} from "next/router";
 
-const Feed = ({user, userData, firebase, setStreamRef}) => {
-    const router = useRouter();
-    const {query: {livestreamId}} = router
+const Feed = ({user, userData, firebase, setStreamRef, livestreamId}) => {
 
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));

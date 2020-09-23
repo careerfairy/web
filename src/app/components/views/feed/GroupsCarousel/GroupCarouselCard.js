@@ -31,6 +31,7 @@ const placeholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1f
 
 
 const GroupCarouselCard = ({group, groupId, firebase, handleSetGroup, groupData, mobile, index, handleResetGroup, activeSlide}) => {
+    // console.log(`active slide ${activeSlide} & index ${index}`);
     const classes = useStyles()
     const [localGroup, setLocalGroup] = useState({})
     const [noGroup, setNoGroup] = useState(false)

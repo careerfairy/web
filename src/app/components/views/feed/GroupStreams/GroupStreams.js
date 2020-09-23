@@ -2,7 +2,9 @@ import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../data/firebase";
 import GroupStreamCard from "./GroupStreamCard";
+import LazyLoad from 'react-lazyload'
 import {Typography, LinearProgress, Box} from "@material-ui/core";
+import Skeleton from '@material-ui/lab/Skeleton';
 import {SizeMe} from "react-sizeme";
 import StackGrid from "react-stack-grid";
 
@@ -14,6 +16,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: "column",
     },
 }));
+
 
 const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId, setStreamRef}) => {
 
@@ -29,15 +32,18 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
         }, [grid, livestreams]);
 
         const renderStreamCards = livestreams?.map((livestream, index) => {
-            return <GroupStreamCard
-                setStreamRef={setStreamRef}
-                index={index}
-                livestreamId={livestreamId}
-                user={user} userData={userData} fields={null}
-                grid={grid} careerCenters={[]}
-                id={livestream.id}
-                key={livestream.id} livestream={livestream}
-            />
+            return (
+                <GroupStreamCard
+                    setStreamRef={setStreamRef}
+                    index={index}
+                    livestreamId={livestreamId}
+                    user={user} userData={userData} fields={null}
+                    grid={grid} careerCenters={[]}
+                    id={livestream.id}
+                    key={livestream.id} livestream={livestream}
+                />
+
+            )
         })
 
         return (

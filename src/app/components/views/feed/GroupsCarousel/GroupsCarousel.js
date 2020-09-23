@@ -18,6 +18,9 @@ const useStyles = makeStyles((theme) => ({
         "& .slick-next:before, .slick-prev:before": {
             content: "'' !important"
         },
+        ".slick-slide.slick-center ": {
+            transform: "scale(1.1)"
+        },
         background: "rgb(250, 250, 250)",
 
     },
@@ -48,6 +51,7 @@ const useStyles = makeStyles((theme) => ({
 
 const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup}) => {
     const [activeSlide, setActiveSlide] = useState(0)
+    // console.log("activeSlide on car", activeSlide);
 
     const classes = useStyles()
     const customSlider = createRef()
@@ -66,22 +70,18 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
                                   activeSlide={activeSlide}
                                   groupData={groupData} key={id} handleSetGroup={handleSetGroup} groupId={id}/>
     })
-    const handleHowMany = (defaultNum) => {
-        let num = defaultNum
-        if (groupIds.length < defaultNum) {
-            num = groupIds.length
-        }
-        return num
-    }
+
     const settings = {
+        initialSlide: 0,
         centerMode: true,
         centerPadding: "60px",
+        focusOnSelect: true,
         infinite: true,
-        initialSlide: 0,
         slidesToScroll: 1,
         slidesToShow: mobile ? 1 : groupIds.length > 4 ? 4 : groupIds.length,
         speed: 500,
         beforeChange: (current, next) => setActiveSlide(next),
+
     };
 
     return (
@@ -89,12 +89,13 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
             <IconButton className={classes.prev} onClick={handlePrev}>
                 <NavigateBeforeIcon color="primary" fontSize="large"/>
             </IconButton>
+            {renderGroupCards != null && renderGroupCards.length > 0 &&
             <Slider ref={customSlider} className={classes.slider} {...settings}>
                 {renderGroupCards}
                 {/*<Button className={classes.button} color="primary">*/}
                 {/*    Follow more*/}
                 {/*</Button>*/}
-            </Slider>
+            </Slider>}
             <IconButton className={classes.next} onClick={handleNext}>
                 <NavigateNextIcon color="primary" fontSize="large"/>
             </IconButton>

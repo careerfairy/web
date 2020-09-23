@@ -11,7 +11,10 @@ import Feed from "../components/views/feed/Feed";
 
 const feed = ({firebase}) => {
     const router = useRouter();
+    const {query: {livestreamId}} = router
+
     const [loading, setLoading] = useState(false)
+    const [hasScrolled, setHasScrolled] = useState(false)
     const [userData, setUserData] = useState(null)
     const [user, setUser] = useState(null);
     const [streamRef, setStreamRef] = useState(null)
@@ -43,9 +46,16 @@ const feed = ({firebase}) => {
     }, [user]);
 
     useEffect(() => {
-        if (streamRef) {
-            console.log("streamRef", streamRef);
-            // window.scrollTo({behavior: 'smooth', top: streamRef.top * streamRef.index +1})
+        if (livestreamId && !hasScrolled) {
+            // document.body.style.overflow = 'hidden';
+        }
+    }, livestreamId)
+
+    useEffect(() => {
+        if (streamRef && !hasScrolled) {
+            // document.body.style.overflow = 'visible';
+            setHasScrolled(true)
+            window.scrollTo({behavior: 'smooth', top: streamRef.top - 310})
         }
     }, [streamRef])
 
@@ -62,7 +72,7 @@ const feed = ({firebase}) => {
             <div style={{background: "rgb(44, 66, 81)"}}>
                 <Header color="white"/>
             </div>
-            <Feed setStreamRef={setStreamRef} user={user} userData={userData}/>
+            <Feed livestreamId={livestreamId} setStreamRef={setStreamRef} user={user} userData={userData}/>
             <Footer/>
         </GreyBackground>
     );
