@@ -103,9 +103,10 @@ function LogInPage({firebase}) {
             } else {
                 firebase.getUserData(user.email).then(querySnapshot => {
                     if (querySnapshot.exists) {
-                        router.replace('/profile');
+
+                        router.replace(absolutePath ||'/profile');
                     } else {
-                        router.replace('/profile');
+                        router.replace(absolutePath || '/profile');
                     }
                     setGeneralLoading(false);
                 })

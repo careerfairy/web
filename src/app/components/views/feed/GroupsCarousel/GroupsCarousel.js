@@ -4,7 +4,9 @@ import GroupCarouselCard from "./GroupCarouselCard";
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Slider from "react-slick";
-import {Button, IconButton} from "@material-ui/core";
+import {Button, IconButton, Typography} from "@material-ui/core";
+import Link from "next/link";
+import {useRouter} from "next/router";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -49,9 +51,10 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup}) => {
+const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user}) => {
     const [activeSlide, setActiveSlide] = useState(0)
-    // console.log("activeSlide on car", activeSlide);
+    const router = useRouter()
+    const absolutePath = router.asPath;
 
     const classes = useStyles()
     const customSlider = createRef()
@@ -81,24 +84,43 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
         slidesToShow: mobile ? 1 : groupIds.length > 4 ? 4 : groupIds.length,
         speed: 500,
         beforeChange: (current, next) => setActiveSlide(next),
-
     };
+
+    const singleSettings = {
+        initialSlide: 0,
+        centerMode: true,
+        centerPadding: "60px",
+        focusOnSelect: true,
+        slidesToScroll: 1,
+        slidesToShow: 1,
+        speed: 500,
+    }
 
     return (
         <div className={classes.root}>
-            <IconButton className={classes.prev} onClick={handlePrev}>
-                <NavigateBeforeIcon color="primary" fontSize="large"/>
-            </IconButton>
-            {renderGroupCards != null && renderGroupCards.length > 0 &&
-            <Slider ref={customSlider} className={classes.slider} {...settings}>
-                {renderGroupCards}
-                {/*<Button className={classes.button} color="primary">*/}
-                {/*    Follow more*/}
-                {/*</Button>*/}
-            </Slider>}
-            <IconButton className={classes.next} onClick={handleNext}>
-                <NavigateNextIcon color="primary" fontSize="large"/>
-            </IconButton>
+            {groupIds.length > 0 ?
+                <>
+                    <IconButton className={classes.prev} onClick={handlePrev}>
+                        <NavigateBeforeIcon color="primary" fontSize="large"/>
+                    </IconButton>
+                    <Slider ref={customSlider} className={classes.slider} {...settings}>
+                        {renderGroupCards}
+                    </Slider>
+                    <IconButton className={classes.next} onClick={handleNext}>
+                        <NavigateNextIcon color="primary" fontSize="large"/>
+                    </IconButton>
+                </>
+                :
+                <Slider ref={customSlider} className={classes.slider} {...singleSettings}>
+                    <Link href={user ? "/groups" : {
+                        pathname: '/login',
+                        query: {absolutePath}
+                    }}>
+                        <Button fullWidth className={classes.button} color="primary">
+                            <Typography variant="h5">Follow Groups</Typography>
+                        </Button>
+                    </Link>
+                </Slider>}
         </div>
     )
 

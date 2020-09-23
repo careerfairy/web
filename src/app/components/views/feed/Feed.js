@@ -17,7 +17,6 @@ const Feed = ({user, userData, firebase}) => {
     const [groupData, setGroupData] = useState({})
     const [groupIds, setGroupIds] = useState([])
     const [livestreams, setLivestreams] = useState([])
-    const [iDsHasBeenSet, setIdsHasBeenSet] = useState(false)
     const [paramsLivestreamId, setParamsLivestreamId] = useState(null)
     const [paramsCareerCenterId, setParamsCareerCenterId] = useState(null)
     const [searching, setSearching] = useState(false)
@@ -31,7 +30,7 @@ const Feed = ({user, userData, firebase}) => {
 
     useEffect(() => {
         // will set the params once the router is loaded whether it be undefined or truthy
-        if (paramsLivestreamId === null &&  router) {
+        if (paramsLivestreamId === null && router) {
             setParamsCareerCenterId(careerCenterId)
             setParamsLivestreamId(livestreamId)
         }
@@ -85,16 +84,12 @@ const Feed = ({user, userData, firebase}) => {
 
     useEffect(() => {
         // This checks if the params from the next router have been defined and only then will it set groupIds
-        if (!iDsHasBeenSet && paramsLivestreamId !== null && paramsCareerCenterId !== null) {
-            console.log("careerCenterId", careerCenterId);
-            console.log("careerCenterId", livestreamId);
-            console.log("router.query", router.query);
+        if ( paramsLivestreamId !== null && paramsCareerCenterId !== null) {
             handleGetGroupIds()
         }
     }, [userData, router, paramsLivestreamId, paramsCareerCenterId])
 
     const handleGetGroupIds = async () => {
-        setIdsHasBeenSet(true)
         let newGroupIds = []
         if (userData && userData.groupIds) {
             newGroupIds = [...userData.groupIds]
@@ -112,7 +107,6 @@ const Feed = ({user, userData, firebase}) => {
                 }
             }
         }
-        console.log("newGroupIds", newGroupIds)
         setGroupIds(newGroupIds)
     }
 
@@ -165,6 +159,7 @@ const Feed = ({user, userData, firebase}) => {
         <>
             <GroupsCarousel groupData={groupData}
                             mobile={mobile}
+                            user={user}
                             handleResetGroup={handleResetGroup}
                             handleSetGroup={handleSetGroup}
                             groupIds={groupIds}/>
