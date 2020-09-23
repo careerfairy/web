@@ -106,12 +106,85 @@ function NextLivestreams(props) {
                     setNoLivestreamsPresent(true);
                 }
                 setAllLivestreams(filteredStreams);
+                console.log(filteredStreams.length);
             }
         }, error => {
             console.log(error);
         });
         return () => unsubscribe();
     }, [university]);
+
+    const [isBottom, setIsBottom] = useState(false);
+    const [groupsToDisplay, setGroupsToDisplay] = useState([])
+    const [page, setPage] = useState(0)
+    const [selectedGroup, setSelectedGroup] = useState(null)
+
+    useEffect(() => {
+        console.log("updated livestreams")
+        if (livestreams) {
+            if (groupsToDisplay.length === 0) {
+                const initialGroups = livestreams.slice(0, 10)
+                setGroupsToDisplay(initialGroups)
+            }   
+        }
+    }, [livestreams])
+
+    useEffect(() => {
+        console.log(groupsToDisplay);
+    },[groupsToDisplay]);
+
+    useEffect(() => {
+        window.addEventListener('scroll', throttle(handleScroll, 500));
+        return () => window.removeEventListener('scroll', throttle(handleScroll, 500));
+    }, []);
+
+    useEffect(() => {
+        console.log("isBottom");
+        if (isBottom) {
+            addItems();
+        }
+    }, [isBottom]);
+
+    const addItems = () => {
+        if (livestreams.length !== 0) {
+            console.log("setting local groups");
+            setGroupsToDisplay(prevState => 
+                prevState.concat(
+                    livestreams.slice(
+                        (page + 1) * 10,
+                        (page + 1) * 10 + 10,
+                    ),
+                ),
+            );
+            setPage(prevState => prevState + 1);
+            setIsBottom(false);
+        }
+    };
+
+    function throttle(fn, wait) {
+        var time = Date.now();
+        return function() {
+          if ((time + wait - Date.now()) < 0) {
+            fn();
+            time = Date.now();
+          }
+        }
+      }
+
+    function handleScroll() {
+        const scrollTop = (document.documentElement
+            && document.documentElement.scrollTop)
+            || document.body.scrollTop;
+        const scrollHeight = (document.documentElement
+            && document.documentElement.scrollHeight)
+            || document.body.scrollHeight;
+        console.log("scrollTop", scrollTop)
+        console.log("scrollHeight", scrollHeight)
+        console.log("window.innerHeight", window.innerHeight)
+        if (scrollTop + window.innerHeight + 50 >= (scrollHeight / 2)) {
+            setIsBottom(true);
+        }
+    }
 
     useEffect(() => {
         if (fields.length === 0) {
@@ -158,11 +231,12 @@ function NextLivestreams(props) {
 
     useEffect(() => {
         if (grid) {
-            setTimeout(() => {
+            const interval = setInterval(() => {
                 grid.updateLayout();
-            }, 500);
+            }, 1000);
+            return () => clearInterval(interval);
         }
-    }, [grid,livestreams, careerCenters]);
+    }, [grid]);
 
     useEffect(() => {
         if (localStorage.getItem('hideCookieMessage') === 'yes') {
@@ -249,7 +323,7 @@ function NextLivestreams(props) {
         );
     })
 
-    const mentorElements = livestreams.map( (mentor, index) => {
+    const mentorElements = groupsToDisplay.map( (mentor, index) => {
         const avatar = mentor.mainSpeakerAvatar ? mentor.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
         return(
             <div key={index}>
@@ -306,6 +380,7 @@ function NextLivestreams(props) {
                             columnWidth={(size.width <= 768 ? '100%' : 450)}
                             gutterWidth={20}
                             gutterHeight={0}
+                            monitorImagesLoaded={true}
                             gridRef={ grid  => setGrid(grid) }>
                             { mentorElements }
                         </StackGrid>

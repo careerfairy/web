@@ -93,7 +93,7 @@ function LivestreamCard(props) {
     });
         
     return(
-        <Fragment>
+        <>
             <div className='companies-mentor-discriber-content' onClick={(event) => goToRouteFromParent(event, '/upcoming-livestream/' + props.livestream.id)}>
                 <div className='date-indicator'>
                     {/* <div className='coming-icon-container'>
@@ -422,7 +422,7 @@ function LivestreamCard(props) {
                     color: rgb(0, 210, 170);
                 }
             `}</style>
-        </Fragment>
+        </>
     );
 }
 
