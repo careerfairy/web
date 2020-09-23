@@ -147,7 +147,6 @@ export function ResetPasswordBase(props) {
                                 width: 55%;
                                 padding: 50px;
                                 height: 100%;
-                                border: 2px solid red;
                             }
 
                             #signingContainer h5 {
