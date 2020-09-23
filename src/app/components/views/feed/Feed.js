@@ -4,8 +4,13 @@ import GroupsCarousel from "./GroupsCarousel/GroupsCarousel";
 import {useMediaQuery, useTheme} from "@material-ui/core";
 import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import MobileFeed from "./MobileFeed";
+import {useRouter} from "next/router";
 
-const Feed = ({user, userData, firebase, livestreamId, careerCenterId}) => {
+const Feed = ({user, userData, firebase}) => {
+        const router = useRouter();
+    const {query: {livestreamId}} = router
+    const {query: {careerCenterId}} = router
+    console.log("careerCenterId on Feed", careerCenterId);
 
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -16,6 +21,8 @@ const Feed = ({user, userData, firebase, livestreamId, careerCenterId}) => {
     const [iDsHasBeenSet, setIdsHasBeenSet] = useState(false)
     const [searching, setSearching] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState([])
+    console.log("careerCenterId", careerCenterId);
+    console.log("iDsHasBeenSet", iDsHasBeenSet);
 
     const checkIfCareerCenterExists = async (centerId) => {
         const querySnapshot = await firebase.getCareerCenterById(centerId)
@@ -69,14 +76,17 @@ const Feed = ({user, userData, firebase, livestreamId, careerCenterId}) => {
     }, [groupData.categories, groupData])
 
     useEffect(() => {
-        if (userData && userData.groupIds && userData.groupIds.length && !iDsHasBeenSet) {
+        if (!iDsHasBeenSet) {
             handleGetGroupIds()
         }
-    }, [userData])
+    }, [userData, careerCenterId])
 
     const handleGetGroupIds = async () => {
         setIdsHasBeenSet(true)
-        const newGroupIds = [...userData.groupIds]
+        let newGroupIds = []
+        if (userData && userData.groupIds) {
+            newGroupIds = [...userData.groupIds]
+        }
         if (careerCenterId) {
             if (newGroupIds.includes(careerCenterId)) {
                 const currentIndex = newGroupIds.findIndex(el => el === careerCenterId)
@@ -90,6 +100,7 @@ const Feed = ({user, userData, firebase, livestreamId, careerCenterId}) => {
                 }
             }
         }
+        console.log("newGroupIds", newGroupIds)
         setGroupIds(newGroupIds)
     }
 
@@ -112,7 +123,7 @@ const Feed = ({user, userData, firebase, livestreamId, careerCenterId}) => {
     const handleSetGroup = (groupObj) => {
         const newGroupObj = {
             ...groupObj,
-            alreadyJoined: userData.groupIds?.includes(groupObj.id)
+            alreadyJoined: userData ? userData.groupIds?.includes(groupObj.id) : false
         }
         if (newGroupObj.categories) {
             newGroupObj.categories.forEach(category => {

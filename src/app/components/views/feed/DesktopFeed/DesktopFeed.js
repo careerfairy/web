@@ -11,7 +11,6 @@ const DesktopFeed = ({groupData, userData, alreadyJoined, handleToggleActive, mo
                 <GroupCategories livestreams={livestreams}
                                  mobile={mobile}
                                  handleToggleActive={handleToggleActive}
-                                 userData={userData}
                                  alreadyJoined={alreadyJoined}
                                  groupData={groupData}/> : null}
             <GroupStreams

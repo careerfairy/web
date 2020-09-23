@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import {Typography} from "@material-ui/core";
+import {Button, Typography} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import NewGroup from "../profile/NewGroup";
 import {Fade} from 'react-reveal';
@@ -66,7 +66,7 @@ const Groups = ({groups, userData, makeSix}) => {
     });
     return (
         <Fragment>
-            <Typography align="center" variant="h3" gutterBottom>Join A New Career&nbsp;Group</Typography>
+            <Typography align="center" variant="h3" gutterBottom>Follow More Career&nbsp;Groups</Typography>
             <Highlights handleSelectGroup={handleSelectGroup}
                         groups={groups}/>
             <Grid style={{marginBottom: makeSix ? 0 : 50}} container spacing={3}>
