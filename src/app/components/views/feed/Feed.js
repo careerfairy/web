@@ -77,7 +77,7 @@ const Feed = ({user, userData, firebase, livestreamId, careerCenterId}) => {
     const handleGetGroupIds = async () => {
         setIdsHasBeenSet(true)
         const newGroupIds = [...userData.groupIds]
-        if (livestreamId && careerCenterId) {
+        if (careerCenterId) {
             if (newGroupIds.includes(careerCenterId)) {
                 const currentIndex = newGroupIds.findIndex(el => el === careerCenterId)
                 if (currentIndex > -1) {
