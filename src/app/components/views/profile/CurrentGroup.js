@@ -160,7 +160,7 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                                 open={Boolean(anchorEl)}
                                 onClose={handleClose}
                             >
-                                <MenuItem onClick={() => router.push('/group/' + localGroup.id)}>Group Page</MenuItem>
+                                <MenuItem onClick={() => router.push(`feed?careerCenterId=${localGroup.groupId}`)}>Group Page</MenuItem>
                                 <MenuItem onMouseEnter={() => setLeaveGroup(true)} onClick={() => setOpen(true)}>Leave
                                     Group</MenuItem>
                                 {localGroup.categories && <MenuItem onClick={handleOpenJoinModal}>Update Categories</MenuItem>}
