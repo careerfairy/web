@@ -7,10 +7,9 @@ import MobileFeed from "./MobileFeed";
 import {useRouter} from "next/router";
 
 const Feed = ({user, userData, firebase}) => {
-        const router = useRouter();
+    const router = useRouter();
     const {query: {livestreamId}} = router
     const {query: {careerCenterId}} = router
-    console.log("careerCenterId on Feed", careerCenterId);
 
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -19,15 +18,24 @@ const Feed = ({user, userData, firebase}) => {
     const [groupIds, setGroupIds] = useState([])
     const [livestreams, setLivestreams] = useState([])
     const [iDsHasBeenSet, setIdsHasBeenSet] = useState(false)
+    const [paramsLivestreamId, setParamsLivestreamId] = useState(null)
+    const [paramsCareerCenterId, setParamsCareerCenterId] = useState(null)
     const [searching, setSearching] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState([])
-    console.log("careerCenterId", careerCenterId);
-    console.log("iDsHasBeenSet", iDsHasBeenSet);
+
 
     const checkIfCareerCenterExists = async (centerId) => {
         const querySnapshot = await firebase.getCareerCenterById(centerId)
         return querySnapshot.exists
     }
+
+    useEffect(() => {
+        // will set the params once the router is loaded whether it be undefined or truthy
+        if (paramsLivestreamId === null &&  router) {
+            setParamsCareerCenterId(careerCenterId)
+            setParamsLivestreamId(livestreamId)
+        }
+    }, [router])
 
 
     useEffect(() => {
@@ -76,10 +84,14 @@ const Feed = ({user, userData, firebase}) => {
     }, [groupData.categories, groupData])
 
     useEffect(() => {
-        if (!iDsHasBeenSet) {
+        // This checks if the params from the next router have been defined and only then will it set groupIds
+        if (!iDsHasBeenSet && paramsLivestreamId !== null && paramsCareerCenterId !== null) {
+            console.log("careerCenterId", careerCenterId);
+            console.log("careerCenterId", livestreamId);
+            console.log("router.query", router.query);
             handleGetGroupIds()
         }
-    }, [userData, careerCenterId])
+    }, [userData, router, paramsLivestreamId, paramsCareerCenterId])
 
     const handleGetGroupIds = async () => {
         setIdsHasBeenSet(true)
