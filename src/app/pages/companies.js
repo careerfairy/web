@@ -3,7 +3,7 @@ import {Container, Grid, Header as SemanticHeader, Image, Button} from "semantic
 
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
-import { withFirebase } from "../data/firebase";
+import { withFirebase } from "../context/firebase";
 import ElementTagList from "../components/views/common/ElementTagList";
 
 import Loader from '../components/views/loader/Loader';

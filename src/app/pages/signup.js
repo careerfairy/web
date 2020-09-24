@@ -1,9 +1,10 @@
 import React, {Fragment, useState, useEffect} from 'react';
-import {withFirebase} from "../data/firebase";
+import {withFirebase} from "context/firebase";
 import TheatersRoundedIcon from '@material-ui/icons/TheatersRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
 import BusinessCenterRoundedIcon from '@material-ui/icons/BusinessCenterRounded';
 import {useRouter} from 'next/router';
+
 import Link from 'next/link';
 import {Formik} from 'formik';
 import axios from 'axios';
@@ -234,7 +235,6 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     } else if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/i.test(values.password)) {
                         errors.password = 'Your password needs to be at least 6 characters long and contain at least one uppercase character, one lowercase character and one number';
                     }
-
                     if (!values.confirmPassword) {
                         errors.confirmPassword = 'You need to confirm your password';
                     } else if (values.confirmPassword !== values.password) {

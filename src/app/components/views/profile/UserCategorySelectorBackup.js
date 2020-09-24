@@ -1,7 +1,7 @@
 import {useEffect, useState, Fragment} from 'react'
 import { Dropdown} from 'semantic-ui-react';
 
-import {withFirebase} from 'data/firebase';
+import {withFirebase} from 'context/firebase';
 
 const UserCategorySelector = (props) => {
 

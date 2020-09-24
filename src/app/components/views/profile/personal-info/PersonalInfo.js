@@ -2,7 +2,7 @@ import React from 'react';
 import {Formik} from 'formik';
 import {useRouter} from 'next/router';
 
-import {withFirebase} from 'data/firebase';
+import {withFirebase} from 'context/firebase';
 import {makeStyles} from "@material-ui/core/styles";
 import {Typography, TextField, Button, Grid, CircularProgress, Box, Container} from "@material-ui/core";
 

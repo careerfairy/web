@@ -36,6 +36,9 @@ export const UNIVERSITY_NAMES = [
         text: "Schweizer Bundesverwaltung",
         value: "chbundesverwaltung"
     },{
+        text: "Forschungszentrum Jülich",
+        value: "fzjuelich"
+    },{
         text: "Other Institution",
         value: "othe"
     }

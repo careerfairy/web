@@ -7,7 +7,7 @@ import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
 
 import {Typography,} from "@material-ui/core";
-import {withFirebase} from "../../../data/firebase";
+import {withFirebase} from "../../../context/firebase";
 import GroupCategories from "./GroupCategories/GroupCategories";
 import GroupStreams from "./GroupStreams/GroupStreams";
 

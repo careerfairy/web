@@ -2,116 +2,30 @@ import {useState, useEffect, useRef, Fragment} from 'react';
 import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Dropdown} from "semantic-ui-react";
 
 import { useRouter } from 'next/router';
-import ViewerVideoContainer from '../../../components/views/streaming/video-container/ViewerVideoContainer';
-import { withFirebasePage } from '../../../data/firebase';
-import NewCommentContainer from '../../../components/views/viewer/comment-container/NewCommentContainer';
-import SmallViewerVideoDisplayer from '../../../components/views/streaming/video-container/SmallViewerVideoDisplayer';
-import ViewerVideoDisplayer from '../../../components/views/streaming/video-container/ViewerVideoDisplayer';
-import LivestreamPdfViewer from '../../../components/util/LivestreamPdfViewer';
-import useWebRTCAdaptor from '../../../components/custom-hook/useWebRTCAdaptor';
-import CurrentSpeakerDisplayer from '../../../components/views/streaming/video-container/CurrentSpeakerDisplayer';
-import SmallStreamerVideoDisplayer from '../../../components/views/streaming/video-container/SmallStreamerVideoDisplayer';
+import { withFirebasePage } from '../../../context/firebase';
+import ViewerHandRaiseComponent from 'components/views/viewer/viewer-hand-raise-component/ViewerHandRaiseComponent';
+import ViewerComponent from 'components/views/viewer/viewer-component/ViewerComponent';
+import NewCommentContainer from 'components/views/viewer/comment-container/NewCommentContainer';
+import UserContext from 'context/user/UserContext';
+import MiniChatContainer from 'components/views/streaming/comment-container/categories/chat/MiniChatContainer';
+import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 
 function ViewerPage(props) {
 
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
 
-    const [user, setUser] = useState(null);
-    const [userData, setUserData] = useState(null);
-
-    const [questionSubmittedModalOpen, setQuestionSubmittedModalOpen] = useState(false);
-
+    const [showMenu, setShowMenu] = useState(false);
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
-
-    const [careerCenters, setCareerCenters] = useState([]);
-
-    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
-    const [pastQuestions, setPastQuestions] = useState([]);
-
-    const [mediaConstraints, setMediaConstraints] = useState({ audio: true, video: true});
-    const [speakingLivestreamId, setSpeakingLivestreamId] = useState(livestreamId);
-
-    const streamerReady = true;
-    const isPlayMode = true;
-    const localVideoId = null;
-    const streamingCallbacks = {};
-    const errorCallbacks = {
-        onOtherError: (error) => {}
-    };
-    const streamerId = null;
-
-    const { webRTCAdaptor, externalMediaStreams, audioLevels } = 
-        useWebRTCAdaptor(
-            streamerReady,
-            isPlayMode,
-            localVideoId,
-            mediaConstraints,
-            streamingCallbacks,
-            errorCallbacks,
-            livestreamId,
-            streamerId
-        );
-
-    useEffect(() => {
-        if (currentLivestream.id) {
-            const unsubscribe = props.firebase.listenToLivestreamQuestions(currentLivestream.id, querySnapshot => {
-                var upcomingQuestionsList = [];
-                var pastQuestionsList = [];
-                querySnapshot.forEach(doc => {
-                    let question = doc.data();
-                    question.id = doc.id;
-                    if (question.type !== 'done') {
-                        upcomingQuestionsList.push(question);
-                    } else {
-                        pastQuestionsList.push(question);
-                    }
-                });
-                setUpcomingQuestions(upcomingQuestionsList);
-                setPastQuestions(pastQuestionsList);
-            });
-            return () => unsubscribe();
-        }
-    }, [currentLivestream.id]);
-
-    useEffect(() => {
-        if (currentLivestream) {
-            if (currentLivestream.test === true) {
-                var testUser = {
-                    firstName: 'Tester',
-                    lastName: 'Tester'
-                };
-                props.firebase.auth.onAuthStateChanged(user => {
-                    if (user) {
-                        setUser(user);
-                    } else {
-                        setUserData(testUser);
-                    }
-                });
-            } else {
-                props.firebase.auth.onAuthStateChanged(user => {
-                    if (user) {
-                        setUser(user);
-                    } else {
-                        router.replace('/login');
-                    }
-                });
-            }
-        }
-    }, [currentLivestream]);
-
-    useEffect(() => {
-        if (user) {
-            props.firebase.listenToUserData(user.email, querySnapshot => {
-                let user = querySnapshot.data();
-                if (user) {
-                    setUserData(user);
-                }
-            });
-        }
-    },[user]);
     
+    const [careerCenters, setCareerCenters] = useState([]);
+    const [handRaiseActive, setHandRaiseActive] = useState(false);
+    const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
+
+
+    const { authenticatedUser, userData } = React.useContext(UserContext);
+
     useEffect(() => {
         if (livestreamId) {
             props.firebase.listenToScheduledLivestreamById(livestreamId, querySnapshot => {
@@ -123,8 +37,8 @@ function ViewerPage(props) {
     }, [livestreamId]);
 
     useEffect(() => {
-        if (currentLivestream) {
-            props.firebase.getLivestreamCareerCenters(currentLivestream.universities).then( querySnapshot => {
+        if (currentLivestream && currentLivestream.universities.length > 0) {
+            props.firebase.getDetailLivestreamCareerCenters(currentLivestream.universities).then( querySnapshot => {
                 let groupList = [];
                 querySnapshot.forEach(doc => {
                     let group = doc.data();
@@ -145,28 +59,37 @@ function ViewerPage(props) {
     }, [currentLivestream, userData]);
 
     function joinTalentPool() {
-        if (!user) {
+        if (!authenticatedUser) {
             return router.replace('/signup');
         }
 
-        props.firebase.joinCompanyTalentPool(currentLivestream.companyId, user.email);
+        props.firebase.joinCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email);
     }
 
     function leaveTalentPool() {
-        if (!user) {
+        if (!authenticatedUser) {
             return router.replace('/signup');
         }
 
-        props.firebase.leaveCompanyTalentPool(currentLivestream.companyId, user.email);
+        props.firebase.leaveCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email);
+    }
+
+    function postIcon(iconName) {
+        let email = currentLivestream.test ? 'streamerEmail' : authenticatedUser.email;
+        props.firebase.postIcon(currentLivestream.id, iconName, email);
     }
 
     let logoElements = careerCenters.map( (careerCenter, index) => {
         return (
-            <Fragment>
+            <Fragment key={index}>
                 <Image src={ careerCenter.logoUrl } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block' }}/>
             </Fragment>
         );
     });
+
+    if (currentLivestream && !currentLivestream.test && authenticatedUser === null) {
+        router.push('/login');
+    }
 
     return (
         <div className='topLevelContainer'>
@@ -178,38 +101,41 @@ function ViewerPage(props) {
                 </div>
                 <div className={'top-menu-right'}>
                     <Image src={ currentLivestream.companyLogoUrl } style={{ position: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block', margin: '0 10px'}}/>
-                    <Button style={{ display: currentLivestream.hasNoTalentPool ? 'none' : 'inline-block' }}size='big' content={ userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'} icon={ userIsInTalentPool ? 'delete' : 'handshake outline'} onClick={ userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()} primary={!userIsInTalentPool}/> 
+                    <Button style={{ display: currentLivestream.hasNoTalentPool ? 'none' : 'inline-block' }} content={ userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'} icon={ userIsInTalentPool ? 'delete' : 'handshake outline'} onClick={ userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()} primary={!userIsInTalentPool}/> 
                 </div>
             </div>
-            <div className='black-frame'>
-                <div>
-                    <CurrentSpeakerDisplayer isPlayMode={true} mode={currentLivestream.mode} speakerSwitchModeActive={false} streams={externalMediaStreams} currentSpeaker={currentLivestream.currentSpeakerId} muted={!currentLivestream.hasStarted || !(currentLivestream.mode === 'default')}/>
+            <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
+                { handRaiseActive ? 
+                    <ViewerHandRaiseComponent currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive}/> :
+                    <ViewerComponent livestreamId={livestreamId} streamerId={streamerId}  currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive}/>
+                }
+                <div className='mini-chat-container'>
+                    <MiniChatContainer livestream={ currentLivestream }  isStreamer={false}/>
                 </div>
-                <div style={{ display: (currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
-                    <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams} livestreamId={currentLivestream.id} presenter={false} />
-                </div>
-                {/* <div className={ currentLivestream.hasStarted ? 'hidden' : '' }style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'white', zIndex: '9999'}}>
-                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: '1.4em', fontWeight: '700', color: 'rgb(0, 210, 170)'}}>
-                        Thank you for joining!
+                <div className='action-buttons'>
+                    <div className='action-container'>
+                        <div className='button action-button red' onClick={() => postIcon('like')}>
+                            <Image src='/like.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
+                        </div>
                     </div>
-                </div> */}
-            </div>  
-            <div className='video-menu-left'>
-                <NewCommentContainer livestream={ currentLivestream } upcomingQuestions={upcomingQuestions} pastQuestions={pastQuestions} userData={userData}  user={user}/>
+                    <div className='action-container'>
+                        <div className='button action-button orange' onClick={() => postIcon('clapping')}>
+                            <Image src='/clapping.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
+                        </div>
+                    </div>
+                    <div className='action-container'>
+                        <div className='button action-button yellow' onClick={() => postIcon('heart')}>
+                            <Image src='/heart.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
+                        </div>
+                    </div>            
+                </div>
             </div>
-            <Modal
-                style={{ zIndex: '9999' }}
-                open={questionSubmittedModalOpen}
-                onClose={() => setQuestionSubmittedModalOpen(false)}>
-                <Modal.Content>
-                    <h3>Thank you! You question has been submitted to the vote of the audience!</h3>
-                </Modal.Content>
-                <Modal.Actions>
-                <Button primary onClick={() => setQuestionSubmittedModalOpen(false)}>
-                    <Icon name='checkmark' /> Got it
-                </Button>
-                </Modal.Actions>
-            </Modal>
+            <div className={'video-menu-left ' + (showMenu ? 'withMenu' : '')}>
+                <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={false} livestream={ currentLivestream } handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive} localId/>
+            </div>
+            <div className='icons-container'>
+                <IconsContainer livestreamId={ currentLivestream.id } />
+            </div>
             <style jsx>{`
                 .hidden {
                     display: none
@@ -218,12 +144,15 @@ function ViewerPage(props) {
                 .topLevelContainer {
                     position: relative;
                     min-height: 100vh;
+                    height: 100%;
+                    width: 100%;
+                    touch-action: manipulation;
                 }
 
                 .top-menu {
                     background-color: rgba(245,245,245,1);
                     padding: 15px 0;
-                    height: 75px;
+                    height: 55px;
                     text-align: center;
                     position: relative;
                 }
@@ -267,45 +196,109 @@ function ViewerPage(props) {
                     transform: translateY(-50%);
                 }
 
-                .remoteVideoContainer {
+                @media(max-width: 768px) {
+                    .action-buttons {
+                        position: absolute;
+                        right: 10px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        z-index: 150;
+                    }
+    
+                    .action-button {
+                        position: relative;
+                        border-radius: 50%;
+                        background-color: rgb(0, 210, 170);
+                        width: 50px;
+                        height: 50px;
+                        margin: 15px;
+                        cursor: pointer;
+                        box-shadow: 0 0 8px rgb(120,120,120);
+                    }
+                }
+
+                @media(min-width: 768px) {
+                    .action-buttons {
+                        position: absolute;
+                        bottom: 30px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        z-index: 150;
+                    }
+
+                    .action-container {
+                        display: inline-block;
+                    }
+    
+                    .action-button {
+                        position: relative;
+                        border-radius: 50%;
+                        background-color: rgb(0, 210, 170);
+                        width: 70px;
+                        height: 70px;
+                        margin: 15px;
+                        cursor: pointer;
+                        box-shadow: 0 0 8px rgb(120,120,120);
+                    }
+                }
+
+                .action-button.red {
+                    background-color: #e01a4f;
+                }
+                .button.action-button.red:hover {
+                    background-color: #c91847;
+                    transition: all ease-in-out 0.2s;
+                }
+                .button.action-button.red:active {
+                    background-color: #a4133a;
+                    transition: all ease-in-out 0.2s;
+                }
+
+                .action-button.orange {
+                    background-color: #f15946;
+                }
+                .button.action-button.orange:hover {
+                    background-color: #ef452e;
+                    transition: all ease-in-out 0.2s;
+                }
+                .button.action-button.orange:active {
+                    background-color: #e42a11;
+                    transition: all ease-in-out 0.2s;
+                }
+
+                .action-button.yellow {
+                    background-color: #f9c22e;
+                }
+                .button.action-button.yellow:hover {
+                    background-color: #f8ba12;
+                    transition: all ease-in-out 0.2s;
+                }
+                .button.action-button.yellow:active {
+                    background-color: #daa107;
+                    transition: all ease-in-out 0.2s;
+                }
+
+                .mini-chat-container {
                     position: absolute;
-                    top: 20px;
-                    left: 50%;
-                    transform: translate(-50%);
-                    width: 80%;
-                    height: 200px;
+                    bottom: 0;
+                    right: 20px;
+                    width: 20%;
+                    min-width: 250px;
+                    z-index: 150;
                 }
 
-                #localVideo {
+                @media(max-width: 768px) {
+                    .mini-chat-container{
+                        display:none;
+                    }
+                }
+
+                .icons-container {
                     position: absolute;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    max-height: 100%;
-                    height: auto;
-                    z-index: 9900;
-                    background-color: black;
-                }
-
-                .side-button {
-                    cursor: pointer;
-                }
-
-                .test-title {
-                    font-size: 2em;
-                    margin: 30px 0;
-                }
-
-                .test-button {
-                    margin: 20px 0;
-                }
-
-                .test-hint {
-                    margin: 20px 0;
-                }
-
-                .teal {
-                    color: rgb(0, 210, 170);
-                    font-weight: 700;
+                    bottom: 50px;
+                    right: 20px;
+                    z-index: 100;
+                    width: 80px;
                 }
 
                 .black-frame {
@@ -317,142 +310,72 @@ function ViewerPage(props) {
                     .black-frame {
                         position: absolute;
                         width: 100%;
-                        height: 60vh;
                         top: 0;
                         left: 0;
+                        right: 0;
+                        bottom: 0;
                     }
                 }
 
                 @media(min-width: 768px) {
                     .black-frame {
                         position: absolute;
-                        top: 75px;
+                        top: 55px;
                         bottom: 0;
-                        left: 330px;
-                        width: calc(100% - 330px);
+                        right: 0;
+                        left: 0;
+                    }
+
+                    .black-frame.withMenu {
+                        position: absolute;
+                        top: 55px;
+                        bottom: 0;
+                        right: 0;
+                        left: 280px;
                     }
                 }
 
-                .video-box {
-                    position: relative;
-                    width: 100%;
-                    height: calc(100% - 85px);
-                    background-color: black;
-                }
-
-                .video-box-overlay {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: white;
-                    z-index: 9999;
-                }
-
-                .video-box-overlay-content {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                }
-
-                .reactions-sender {
-                    position: absolute;
-                    padding: 30px 0;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    left: 0;
-                    right: 0;
-                    z-index: 1100;
-                    text-align: center;
-                    background-color: rgba(0,0,0,0.6);
-                }
-
-                .reactions-sender div {
-                    margin-bottom: 20px;
-                    font-weight: 700;
-                    font-size: 1.2em;
-                    color: white;
-                }
-
-                .video-menu {
-                    position: absolute;
-                    bottom: 0;
-                    left: 330px;
-                    right: 0;
-                    height: 85px;
-                    z-index: 3000;
-                    padding: 12px;
-                    text-align: center;
-                    width: calc(100% - 330px);
-                    background-color: white;
-                }
-
-                .video-menu .center {
-                    display: inline-block;
-                    width: 600px;
-                }
-
-                .video-menu .right {
-                    float: right;
-                    padding: 0 20px 0 0;
-                }
-
                 .video-menu-left {
-                    z-index: 1;
+                    z-index: 15;
                 }
 
                 @media(max-width: 768px) {
                     .video-menu-left {
                         position: absolute;
-                        top: 60vh;
+                        top: 0;
                         left: 0;
+                        width: 0;
+                        bottom 0;
+                    }
+
+                    .video-menu-left.withMenu {
                         width: 100%;
-                        height: 100vh;
                     }
                 }
 
                 @media(min-width: 768px) {
                     .video-menu-left {
                         position: absolute;
-                        top: 75px;
+                        top: 55px;
                         left: 0;
                         bottom: 0;
-                        width: 330px;
+                        width: 0;
+                    }
+
+                    .video-menu-left.withMenu {
+                        width: 280px;
                     }
                 }
-
-                .button-container {
-                    position: absolute;
-                    left: 0;
-                    bottom: 0;
-                    width: 100%;
-                    height: 90px;
-                    cursor:  pointer;
-                    padding: 17px;
-                    z-index: 8000;
-                }
-
-                .left-container {
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    height: calc(100% - 75px);
-                    width: 120px;
-                    padding: 20px;
-                    background-color: rgb(80,80,80);
-                }
-
-                .logo-container {
-                    position: absolute;
-                    bottom: 90px;
-                    left: 0;
-                    right: 0;
-                    color: rgb(0, 210, 170);
-                    font-size: 1.4em;
-                    text-align: center;
-                }
+            `}</style>
+             <style jsx global>{`
+                body {
+                    min-height: 100vh;
+                    min-height: -webkit-fill-available;
+                  }
+                  
+                  html {
+                    height: -webkit-fill-available;
+                  }
             `}</style>
         </div>
     );

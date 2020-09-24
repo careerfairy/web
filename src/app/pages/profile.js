@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
-import {withFirebase} from '../data/firebase';
+import {withFirebase} from 'context/firebase';
 import Header from '../components/views/header/Header';
 import Head from 'next/head';
 import {useRouter} from "next/router";
@@ -20,7 +20,6 @@ const useStyles = makeStyles((theme) => ({
 const UserProfile = ({firebase}) => {
     const classes = useStyles();
     const router = useRouter();
-
     const [loading, setLoading] = useState(false)
     const [userData, setUserData] = useState(null)
     const [user, setUser] = useState(null);

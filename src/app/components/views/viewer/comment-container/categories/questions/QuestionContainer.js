@@ -1,13 +1,17 @@
-import React, {useState, useEffect} from 'react';
-import {Input, Icon, Button, Label} from 'semantic-ui-react';
+import React, {useState, useEffect, useContext} from 'react';
+import {Input, Icon, Button, Label} from "semantic-ui-react";
 import Linkify from 'react-linkify';
 
-import { withFirebase } from 'data/firebase';
+import { withFirebase } from 'context/firebase';
+import UserContext from 'context/user/UserContext';
 
 function QuestionContainer(props) {
     
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
+    const [showAllReactions, setShowAllReactions] = useState(false);
+
+    const { authenticatedUser, userData } = useContext(UserContext);
 
     useEffect(() => {
         if (props.livestream.id, props.question.id) {
@@ -25,13 +29,18 @@ function QuestionContainer(props) {
     }, [props.livestream.id, props.question.id]);
 
     function addNewComment() {
+        if (!(newCommentTitle.trim()) || (!userData && !props.livestream.test)) {
+            return;
+        }
+
         const newComment = {
             title: newCommentTitle,
-            author: 'STREAMER',
+            author: userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous',
         }
         props.firebase.putQuestionComment(props.livestream.id, props.question.id, newComment)
             .then(() => {
                 setNewCommentTitle("");
+                setShowAllReactions(true);
             }, error => {
                 console.log("Error: " + error);
             })
@@ -43,25 +52,21 @@ function QuestionContainer(props) {
         } 
     }
 
-    function goToThisQuestion(nextQuestionId) {
-        const currentQuestion = props.questions.find(question => question.type === 'current');
-        if (currentQuestion) {
-            props.firebase.goToNextLivestreamQuestion(currentQuestion.id, nextQuestionId, props.livestream.id);
-        } else {
-            props.firebase.goToNextLivestreamQuestion(null, nextQuestionId, props.livestream.id);
-        }
+    function upvoteLivestreamQuestion() {
+        let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
+        props.firebase.upvoteLivestreamQuestion(props.livestream.id, props.question, authEmail);
     }
 
     const componentDecorator = (href, text, key) => (
         <a href={href} key={key} target="_blank">
           {text}
         </a>
-    );
+      );
 
     
     let commentsElements = comments.map((comment, index) => {
         return (
-            <div className='animated fadeInUp faster' key={index}>
+            <div className='animated fadeInUp faster' key={comment.id}>
                 <div className='questionContainer'>
                     <div className='questionTitle'>
                         <Linkify componentDecorator={componentDecorator}>
@@ -75,13 +80,13 @@ function QuestionContainer(props) {
                 <style jsx>{`
                     .questionContainer {
                         position: relative;
-                        padding: 15px;
-                        margin: 10px 0;
+                        padding: 10px;
+                        margin: 6px 0 3px 0;
                         background-color: white;
                         color: black;
-                        border-radius: 20px;
+                        border-radius: 10px;
                         box-shadow: 0 0 5px rgb(180,180,180);
-                        word-break: break-word;
+                        font-size: 0.9em;
                     }
 
                     .questionTitle {
@@ -97,6 +102,32 @@ function QuestionContainer(props) {
         );
     });
 
+    if (!showAllReactions) {
+        commentsElements = commentsElements.slice(0, 1);
+    }
+
+    const ReactionsToggle = (props) => {
+        if (comments.length < 2) {
+            return null;
+        }
+
+        return (
+            <div className='reactions-toggle' onClick={() => setShowAllReactions(!showAllReactions)}>
+                <Icon name={ showAllReactions ? 'angle up' : 'angle down'} style={{ marginRight: '3px'}}/>{ showAllReactions ? 'Hide' : 'Show all reactions'}
+                <style jsx>{`
+                    .reactions-toggle {
+                        margin: 5px 0 0 0;
+                        font-size: 0.8em;
+                        font-weight: 500;
+                        text-transform: uppercase;
+                        cursor: pointer;
+                        color: rgb(210,210,210);
+                    }
+                `}</style>
+            </div>
+        )
+    } 
+
     return (
         <div className='animated fadeInUp faster'>
                 <div className={'questionContainer ' + (props.question.type === 'current' ? 'active' : '') }>
@@ -105,27 +136,37 @@ function QuestionContainer(props) {
                     </div>
                     <div className='bottom-element'>
                         <div className='comments'>
-                            <p className='comments-number'>{ comments.length } comments</p>
+                            <p className='comments-number'>{ comments.length } reactions</p>
                         </div>
                     </div>
                     <div>
                         { commentsElements }
                     </div>
+                    <ReactionsToggle/>
                     <div className='comment-input'>
                         <Input
-                            icon={<Icon name='chevron circle right' inverted circular link onClick={() => addNewComment()} color='teal'/>}
+                            icon={<Icon name='chevron circle right' inverted circular link onClick={() => addNewComment()} disabled={newCommentTitle.length < 4} color='teal'/>}
                             value={newCommentTitle}
                             onChange={(event) => {setNewCommentTitle(event.target.value)}}
                             onKeyPress={addNewCommentOnEnter}
-                            placeholder='Send a comment...'
+                            maxLength='340'
+                            placeholder='Send a reaction...'
                             fluid
                         />
                     </div>
+                    <div className='upvotes'>
+                        { props.question.votes } <Icon name='thumbs up' size='small'/>
+                    </div>
                 </div>
-                <div className='upvotes'>
-                    { props.question.votes } <Icon name='thumbs up'/>
-                </div>
-                <Button attached='bottom' icon='thumbs up' content={ 'ANSWER THIS QUESTION' } primary onClick={() => goToThisQuestion(props.question.id)} style={{ margin: '0 10px 10px 10px' }} disabled={props.question.type !== 'new'}/>
+                <Button 
+                    attached='bottom'
+                    icon='thumbs up' 
+                    content={ !props.livestream.test && (props.question.emailOfVoters && props.user && props.question.emailOfVoters.indexOf(props.user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'} 
+                    size='small' 
+                    primary 
+                    onClick={() => upvoteLivestreamQuestion()} 
+                    style={{ margin: '0 10px 10px 10px' }} 
+                    disabled={(props.question.type !== 'new' || (!props.user && !props.livestream.test) || (props.question.emailOfVoters ? props.question.emailOfVoters.indexOf(props.livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false))}/>
                 <style jsx>{`
                     .questionContainer {
                         position: relative;
@@ -153,6 +194,7 @@ function QuestionContainer(props) {
                         color: rgb(50,50,50);
                         margin: 5px 0;
                         width: 85%;
+                        word-break: break-word;
                     }
 
                     .questionContainer.active .questionTitle {
@@ -170,7 +212,7 @@ function QuestionContainer(props) {
 
                     .bottom-element {
                         margin-top: 5px;
-                        color: rgba(0, 210, 170, 0.5);
+                        color: rgb(200,200,200);
                         font-size: 0.9em;  
                         font-weight: 700; 
                     }
@@ -201,7 +243,8 @@ function QuestionContainer(props) {
                     .upvotes {
                         position: absolute;
                         top: 10px;
-                        right: 15px;
+                        right: 10px;
+                        font-size: 1.2em;
                         display: inline-block;
                         margin: 0 0 0 30px;
                         font-weight: 700; 

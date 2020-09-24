@@ -1,6 +1,6 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Grid, Image, Icon, Modal, Step, Input, Checkbox} from 'semantic-ui-react';
-import {withFirebase} from 'data/firebase';
+import {withFirebase} from 'context/firebase';
 import AddIcon from "@material-ui/icons/Add";
 import {Button} from "@material-ui/core";
 

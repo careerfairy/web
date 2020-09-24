@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Container, Button, Grid, Icon, Header as SemanticHeader} from "semantic-ui-react";
 
-import { withFirebasePage } from '../../data/firebase';
+import { withFirebasePage } from '../../context/firebase';
 import { useRouter } from 'next/router';
 import Header from '../../components/views/header/Header';
 import ElementTagList from '../../components/views/common/ElementTagList';

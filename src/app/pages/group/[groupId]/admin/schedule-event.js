@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Container, Image, Grid } from 'semantic-ui-react';
 import { useRouter } from 'next/router';
-import { withFirebase } from 'data/firebase';
+import { withFirebase } from 'context/firebase';
 import Head from 'next/head';
 
 import Header from 'components/views/header/Header';

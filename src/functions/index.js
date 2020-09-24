@@ -653,32 +653,34 @@ exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 2 
         });
 });
 
+// Run this function every hour
+exports.exportFirestoreBackup = functions.pubsub.schedule('every 1 hours').timeZone('Europe/Zurich').onRun((context) => {
+    const firestore = require('@google-cloud/firestore');
+    const client = new firestore.v1.FirestoreAdminClient();
 
+    const dateNow = new Date(Date.now());
+    const bucket = `gs://careerfairy-backup/${dateNow.toDateString()}-${dateNow.toTimeString()}`;
 
-// Run this function every day at midnight (UNIX cron:'0 0 * * *')
-exports.scheduleReminderEmailSend = functions.pubsub.schedule('every 2 hours').timeZone('Europe/Zurich').onRun((context) => {
-    const dateNow = new Date(Date.now() + 1000 * 60 * 60 * 3);
-    const dateTomorrow =  new Date(Date.now() + 1000 * 60 * 60 * 5);
-    admin.firestore().collection("livestreams")
-        .where("start", ">=", dateNow)
-        .where("start", "<", dateTomorrow)
-        .get().then((querySnapshot) => {
-            console.log("querysnapshot size: " + querySnapshot.size);
-            querySnapshot.forEach(doc => {
-                const livestream = doc.data();
-                livestream.id = doc.id;
-                livestream.registeredUsers.forEach(userEmail => {
-                    console.log("sending email for: " + userEmail);
-                    var data = generateEmailData(userEmail, livestream);
-                    mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
-                })
-            });
-            return null;
-        }).catch((error) => {
-            console.log("error: " + error);
-            return null;
-        });
+    const projectId = process.env.GCP_PROJECT || process.env.GCLOUD_PROJECT;
+    const databaseName = 
+        client.databasePath(projectId, '(default)');
+
+    return client.exportDocuments({
+            name: databaseName,
+            outputUriPrefix: bucket,
+            collectionIds: []
+        })
+    .then(responses => {
+        const response = responses[0];
+        console.log(`Operation Name: ${response['name']}`);
+    })
+    .catch(err => {
+        console.error(err);
+        throw new Error('Export operation failed');
+    });
 });
+
+exports.scheduleTestLivestreamDeletion = functions.pubsub.schedule('every 24 hours').timeZone('Europe/Zurich').onRun((context) => {});
 
 function generateEmailData(recipientEmail, livestream) {
     var luxonStartDateTime = DateTime.fromJSDate(livestream.start.toDate(), { zone: 'Europe/Zurich' });

@@ -356,6 +356,49 @@ class Firebase {
         });
     };
 
+    //TEST_LIVESTREAMS
+
+    createTestLivestream = () => {
+        let livestreamCollRef = this.firestore
+            .collection("livestreams");
+
+        return livestreamCollRef.add({
+            companyId: 'CareerFairy',
+            test: true,
+            universities: [],
+            start: firebase.firestore.Timestamp.fromDate(new Date('March 17, 2020 03:24:00'))
+        });
+    }
+
+    setupTestLivestream = (livestreamId, testChats, testQuestions, testPolls) => {
+        var batch = this.firestore.batch();
+        let livestreamRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId);
+        batch.update(livestreamRef, {
+            currentSpeakerId: livestreamId
+        });
+        let chatsRef = livestreamRef
+            .collection("chatEntries");
+        testChats.forEach( chat => {
+            let docRef = chatsRef.doc();
+            batch.set(docRef, chat);
+        });
+        let questionsRef = livestreamRef
+            .collection("questions");
+        testQuestions.forEach( question => {
+            let docRef = questionsRef.doc();
+            batch.set(docRef, question);
+        });
+        let pollsRef = livestreamRef
+            .collection("polls");
+        testPolls.forEach( poll => {
+            let docRef = pollsRef.doc();
+            batch.set(docRef, poll);
+        });
+        return batch.commit();
+    }
+
     //SCHEDULED_LIVESTREAMS
 
     getScheduledLivestreamById = (livestreamId) => {
@@ -641,6 +684,24 @@ class Firebase {
         return ref.add(comment);
     };
 
+    listenToChatEntries = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("chatEntries")
+            .orderBy("timestamp", "asc");
+        return ref.onSnapshot(callback);
+    }
+
+    putChatEntry = (livestreamId, chatEntry) => {
+        chatEntry.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("chatEntries");
+        return ref.add(chatEntry);
+    }
+
     setLivestreamHasStarted = (hasStarted, livestreamId) => {
         let ref = this.firestore.collection("livestreams").doc(livestreamId);
         return ref.update({
@@ -651,10 +712,18 @@ class Firebase {
     getLivestreamCareerCenters = (universityIds) => {
         let ref = this.firestore
             .collection("careerCenterData")
+            .where("test", "==", false);
+            return ref.get();
+    }
+
+    getDetailLivestreamCareerCenters = (universityIds) => {
+        let ref = this.firestore
+            .collection("careerCenterData")
             .where("test", "==", false)
             .where("universityId", "in", universityIds);
         return ref.get();
     };
+
 
     getLegacyPastLivestreamQuestions = (livestreamId) => {
         let ref = this.firestore
@@ -703,6 +772,177 @@ class Firebase {
             });
         });
     };
+
+    createLivestreamPoll = (livestreamId, pollQuestion, pollOptions) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls");
+
+        let pollObject = {
+            timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+            question: pollQuestion,
+            options: [],
+            voters: [],
+            state: 'upcoming'
+        }
+        pollOptions.forEach((option, index) => {
+            pollObject.options.push({
+                name: option,
+                votes: 0,
+                voters: [],
+                index: index
+            });
+        });         
+        return ref.add(pollObject);
+    }
+
+    updateLivestreamPoll = (livestreamId, pollId, pollQuestion, pollOptions) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId);
+
+        let pollObject = {
+            question: pollQuestion,
+            options: []
+        }
+        pollOptions.forEach((option, index) => {
+            pollObject.options.push({
+                name: option,
+                votes: 0,
+                voters: [],
+                index: index
+            });
+        });         
+        return ref.update(pollObject);
+    }
+
+    deleteLivestreamPoll(livestreamId, pollId) {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId);
+        return ref.delete();
+    }
+
+    listenToPollEntries = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .orderBy("timestamp", "asc");
+        return ref.onSnapshot(callback);
+    }
+
+    listenToPollOptions = (livestreamId, pollId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId)
+            .collection("options")
+            .orderBy("index", "asc");
+        return ref.onSnapshot(callback);
+    }
+
+    voteForPollOption = (livestreamId, pollId, userEmail, optionIndex) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId);
+        return this.firestore.runTransaction( transaction => {
+            return transaction.get(ref).then(pollDoc => {
+                let poll = pollDoc.data();
+                const updatedOptions = poll.options.map((option, index) => {
+                    if (index !== optionIndex) {
+                        return option;
+                    } else {
+                        return {
+                            name: option.name,
+                            votes: option.votes ? option.votes + 1 : 1,
+                            index: index,
+                            voters: option.voters ? [...option.voters, userEmail] : [userEmail]
+                        }
+                    }
+                })
+                poll.voters = firebase.firestore.FieldValue.arrayUnion(userEmail),
+                poll.options = updatedOptions;
+                transaction.update(ref, poll);
+            });
+        });
+    }
+
+    setPollState= (livestreamId, pollId, state) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls")
+            .doc(pollId);
+        return ref.update({ state: state });
+    }
+
+    listenToHandRaiseState = (livestreamId, userEmail, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("handRaises")
+            .doc(userEmail);
+        return ref.onSnapshot(callback);
+    }
+
+    listenToHandRaises = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("handRaises");
+        return ref.onSnapshot(callback);
+    }
+
+    setHandRaiseMode = (livestreamId, mode) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+        return ref.update({
+            handRaiseActive: mode
+        });
+    }
+
+    createHandRaiseRequest = (livestreamId, userEmail, userData) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("handRaises")
+            .doc(userEmail);
+        return ref.set({
+            state: 'requested',
+            timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+            name: userData.firstName + ' ' + userData.lastName
+        });
+    }
+
+    updateHandRaiseRequest = (livestreamId, userEmail, state) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("handRaises")
+            .doc(userEmail);
+        return ref.update({
+            state: state,
+            timestamp: firebase.firestore.Timestamp.fromDate(new Date())
+        });
+    }
+
+    listenToPolls = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("polls");
+        return ref.onSnapshot(callback);
+    }
 
     getPastLivestreams = () => {
         let ref = this.firestore
@@ -799,6 +1039,28 @@ class Firebase {
             .where("talentPools", "array-contains", companyId);
         return ref.get();
     };
+
+    postIcon = (livestreamId, iconName, authorEmail) => {
+        let ref = this.firestore
+                    .collection("livestreams")
+                    .doc(livestreamId)
+                    .collection("icons");
+        return ref.add({
+            iconName: iconName,
+            timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+            authorEmail: authorEmail,
+            randomPosition: Math.random()
+        })
+    }
+
+    listenToLivestreamIcons = (livestreamId, callback) => {
+        let ref = this.firestore
+                    .collection("livestreams")
+                    .doc(livestreamId)
+                    .collection("icons")
+                    .orderBy("timestamp", "asc");
+        return ref.onSnapshot(callback);
+    }
 
     getStorageRef() {
         return this.storage.ref();

@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 import EditIcon from "@material-ui/icons/Edit";
-import {withFirebase} from "data/firebase";
+import {withFirebase} from "context/firebase";
 import {
     Button,
     Card,

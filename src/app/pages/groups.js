@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react'
 import Grid from '@material-ui/core/Grid';
 import {useRouter} from 'next/router';
-import {withFirebase} from '../data/firebase';
+import {withFirebase} from '../context/firebase';
 import Header from '../components/views/header/Header';
 import Loader from '../components/views/loader/Loader';
 

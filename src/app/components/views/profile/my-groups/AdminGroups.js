@@ -1,6 +1,6 @@
 import React, {useEffect, useState, Fragment} from 'react'
 import {Button, Grid, Typography} from "@material-ui/core";
-import {withFirebase} from 'data/firebase';
+import {withFirebase} from 'context/firebase';
 import CurrentGroup from 'components/views/profile/CurrentGroup';
 import {makeStyles} from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";

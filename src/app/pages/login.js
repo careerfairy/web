@@ -1,6 +1,5 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Form, Header, Image, Message, Icon} from "semantic-ui-react";
-import {withFirebase} from "../data/firebase";
 
 import {useRouter} from 'next/router';
 import Link from 'next/link';
@@ -8,6 +7,7 @@ import {Formik} from 'formik';
 import axios from 'axios';
 
 import Head from 'next/head';
+import { withFirebase } from "context/firebase";
 import {TealBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import {
     Box,

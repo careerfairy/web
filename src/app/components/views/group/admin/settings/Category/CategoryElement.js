@@ -1,7 +1,7 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {Grid, Icon} from "semantic-ui-react";
 import EditIcon from '@material-ui/icons/Edit';
-import {withFirebase} from 'data/firebase';
+import {withFirebase} from 'context/firebase';
 import CategoryEdit from './CategoryEdit';
 import {Box, Chip, IconButton, Zoom} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";

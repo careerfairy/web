@@ -13,7 +13,7 @@ import {
 import CheckIcon from "@material-ui/icons/Check";
 import ClearIcon from "@material-ui/icons/Clear";
 import EditIcon from "@material-ui/icons/Edit";
-import {withFirebase} from "../../../../data/firebase";
+import {withFirebase} from "../../../../context/firebase";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {makeStyles} from "@material-ui/core/styles";
 import FilePickerContainer from "../../../ssr/FilePickerContainer";

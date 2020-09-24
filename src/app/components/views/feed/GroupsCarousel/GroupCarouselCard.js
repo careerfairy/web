@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Card, CardContent, CardMedia, Typography, Grow, withStyles} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import {withFirebase} from "../../../../data/firebase";
+import {withFirebase} from "../../../../context/firebase";
 
 const useStyles = makeStyles((theme) => ({
     root: {

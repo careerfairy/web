@@ -2,12 +2,7 @@ import { Fragment, useState, useEffect } from 'react';
 import { Grid, Image, Button, Icon, Modal, Step, Input } from 'semantic-ui-react';
 
 import { useRouter } from 'next/router';
-import { withFirebasePage } from 'data/firebase';
-import DateUtil from 'util/DateUtil';
-import TargetElementList from 'components/views/common/TargetElementList';
-import BookingModal from 'components/views/common/booking-modal/BookingModal';
-
-import Link from 'next/link';
+import { withFirebasePage } from "context/firebase";
 
 
 function QuestionVotingBox(props) {

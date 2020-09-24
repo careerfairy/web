@@ -1,5 +1,5 @@
 import React, {useEffect, Fragment, useRef, useState} from 'react';
-import {Grid} from 'semantic-ui-react';
+import {Grid, Icon} from "semantic-ui-react";
 import RemoteVideoContainer from './RemoteVideoContainer';
 import { useWindowSize } from 'components/custom-hook/useWindowSize';
 
@@ -7,6 +7,9 @@ function CurrentSpeakerDisplayer(props) {
 
     const localVideoRef = useRef(null);
     const windowSize = useWindowSize();
+
+    const [showPlayButton, setShowPlayButton] = useState(false);
+    const [unmute, setUnmute] = useState(false);
 
     useEffect(() => {
         if (!props.isPlayMode && props.localStream) {
@@ -16,45 +19,44 @@ function CurrentSpeakerDisplayer(props) {
 
     function getVideoContainerHeight(streamId) {
         if (props.isPlayMode) {
+            if (props.smallScreenMode) {
+                return windowSize.width > 768 ? '20vh' : '15vh';
+            }
             if (props.streams.length > 1) {
-                if (streamId === props.currentSpeaker && props.mode === 'default') {
-                    return windowSize.width > 768 ? 'calc(80vh - 75px)' : '45vh';
+
+                if (streamId === props.currentSpeaker) {
+                    return windowSize.width > 768 ? 'calc(80vh - 55px)' : '45vh';
                 } else {
                     return windowSize.width > 768 ? '20vh' : '15vh';
                 }
             } else {
-                if (props.mode === 'default') {
-                    return windowSize.width > 768 ? 'calc(100vh - 75px)' : '60vh';
-                } else {
-                    return windowSize.width > 768 ? '20vh' : '15vh';
-                }
+                return windowSize.width > 768 ? 'calc(100vh - 55px)' : '60vh';
             }
         } else {
+            if (props.smallScreenMode) {
+                return '20vh';
+            }
             if (props.streams.length > 0) {
-                if (streamId === props.currentSpeaker && props.mode === 'default') {
-                    return 'calc(80vh - 75px)';
+                if (streamId === props.currentSpeaker) {
+                    return 'calc(80vh - 55px)';
                 } else {
                     return '20vh';
                 }
             } else {
-                if (props.mode === 'default') {
-                    return 'calc(100vh - 75px)';
-                } else {
-                    return '20vh';
-                }
+                return 'calc(100vh - 55px)';
             }
         }
     } 
 
     function getMinimizedSpeakersGridHeight() {
         if (props.isPlayMode) {
-            if (props.streams.length > 1 || props.mode !== 'default') {
+            if (props.streams.length > 1 || props.smallScreenMode) {
                 return windowSize.width > 768 ? '20vh' : '15vh';
             } else {
                 return '0';
             }
         } else {
-            if (props.streams.length > 0 || props.mode !== 'default') {
+            if (props.streams.length > 0 || props.smallScreenMode) {
                 return '20vh';
             } else {
                 return '0';
@@ -62,7 +64,15 @@ function CurrentSpeakerDisplayer(props) {
         }
     } 
 
+    function unmuteVideos() {
+        setShowPlayButton(false);
+        setUnmute(true);
+    }
+
     function getVideoContainerClass(streamId) {
+        if (props.smallScreenMode) {
+            return 'quarter-width';
+        }
         if (props.isPlayMode) {
             if (props.streams.length > 1) {
                 if (props.mode === 'default') {
@@ -99,11 +109,10 @@ function CurrentSpeakerDisplayer(props) {
             props.setLivestreamCurrentSpeakerId(streamId);
         }
     }
-
     let externalVideoElements = props.streams.map( (stream, index) => {
         return (
-            <div className={getVideoContainerClass(stream.streamId)} style={{ padding: 0 }} key={stream.streamId} onClick={() => updateCurrentStreamId(stream.streamId)}>
-                <RemoteVideoContainer isPlayMode={props.isPlayMode} muted={props.muted} stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
+            <div key={stream.streamId} className={getVideoContainerClass(stream.streamId)} style={{ padding: 0 }} onClick={() => updateCurrentStreamId(stream.streamId)}>
+                <RemoteVideoContainer showPlayButton={showPlayButton} setShowPlayButton={setShowPlayButton} unmute={unmute} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
                 <style jsx>{`
                     .quarter-width {
                         height: 100%;
@@ -209,12 +218,18 @@ function CurrentSpeakerDisplayer(props) {
                 <div className='relative-container-videos' style={{ height: getMinimizedSpeakersGridHeight() }}>
                     { externalVideoElements }
                 </div> 
+                <div className={ 'playButtonContent ' + (showPlayButton ? '' : 'hidden')} onClick={unmuteVideos}>
+                    <div className='playButton'>
+                        <Icon name='volume up' style={{ fontSize: '3rem' }}/>
+                        <div>Click to unmute</div>
+                    </div>     
+                </div>
             </div>             
             <style jsx>{`
                 .relative-container {
                     position: relative;
                     height: 100%;
-                    min-height: calc(100vh - 85px);
+                    min-height: calc(100vh - 55px);
                 }
 
                 .relative-container-videos {
@@ -242,6 +257,26 @@ function CurrentSpeakerDisplayer(props) {
                 
                 .hidden {
                     display: none;
+                }
+
+                .playButton {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    color: white;
+                    font-weight: 500;
+                }
+
+                .playButtonContent {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(10,10,10,0.4);
+                    z-index: 9901;
+                    cursor: pointer;
                 }
           `}</style>
         </Fragment>

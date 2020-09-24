@@ -8,7 +8,7 @@ import Box from '@material-ui/core/Box';
 
 import {Container, Typography, useMediaQuery} from "@material-ui/core";
 import PersonalInfo from "./personal-info/PersonalInfo";
-import {withFirebase} from "../../../data/firebase";
+import {withFirebase} from "context/firebase";
 import JoinedGroups from "./my-groups/JoinedGroups";
 import AdminGroups from "./my-groups/AdminGroups";
 

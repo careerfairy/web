@@ -21,9 +21,10 @@ export default function CountdownTimer(props) {
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   useEffect(() => {
-    setTimeout(() => {
+    let timeout = setTimeout(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
+    return () => clearTimeout(timeout);
   });
 
   const timerComponents = [];
