@@ -22,15 +22,7 @@ const AvatarSkeleton = () => (<Skeleton variant="circle" width={40} height={40}/
 const ThumbnailSkeleton = () => <Skeleton variant="rect" width={210} height={118}/>
 const BigThumbnailSkeleton = () => <Skeleton variant="rect" width={600} height={400}/>
 
-const PlaceHolder = () => {
-    return (
-        <div>
-            <Skeleton width="100%" variant="text"/>
-            <Skeleton variant="circle" width={40} height={40}/>
-            <Skeleton variant="rect" width="100%" height={550}/>
-        </div>
-    )
-}
+
 
 
 const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userData, firebase, livestreamId, id, careerCenterId, groupData, listenToUpcoming}) => {
@@ -144,10 +136,7 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
     });
 
     return (
-        <Fragment>
-            <LazyLoad key={livestream.id}
-                      offset={[-100, 100]}
-                      placeholder={<PlaceHolder/>}>
+            <Fragment>
                 <div style={
                     {
                         WebkitBoxShadow: isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
@@ -257,10 +246,9 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
                         </div>
                     </div>
                 </div>
-            </LazyLoad>
-            <BookingModal livestream={livestream} modalOpen={bookingModalOpen} setModalOpen={setBookingModalOpen}
-                          user={user}/>
-            <style jsx>{`
+                <BookingModal livestream={livestream} modalOpen={bookingModalOpen} setModalOpen={setBookingModalOpen}
+                              user={user}/>
+                <style jsx>{`
                 .hidden {
                     display: none
                 }
@@ -535,7 +523,7 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
                     color: rgb(0, 210, 170);
                 }
             `}</style>
-        </Fragment>
+            </Fragment>
     );
 };
 

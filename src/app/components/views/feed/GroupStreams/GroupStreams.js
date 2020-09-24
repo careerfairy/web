@@ -7,6 +7,8 @@ import {SizeMe} from "react-sizeme";
 import StackGrid from "react-stack-grid";
 import {useRouter} from "next/router";
 import GroupJoinModal from "../../profile/GroupJoinModal";
+import LazyLoad from "react-lazyload";
+import Skeleton from "@material-ui/lab/Skeleton";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -22,8 +24,18 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const PlaceHolder = () => {
+    return (
+        <div>
+            <Skeleton width="100%" variant="text"/>
+            <Skeleton variant="circle" width={40} height={40}/>
+            <Skeleton variant="rect" width="100%" height={550}/>
+        </div>
+    )
+}
 
-const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId, careerCenterId, alreadyJoined,listenToUpcoming}) => {
+
+const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId, careerCenterId, alreadyJoined, listenToUpcoming}) => {
         const classes = useStyles()
         const router = useRouter()
         const absolutePath = router.asPath
@@ -57,18 +69,21 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
         const renderStreamCards = livestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
-                    <GroupStreamCard
-                        index={index}
-                        groupData={groupData}
-                        listenToUpcoming={listenToUpcoming}
-                        careerCenterId={careerCenterId}
-                        livestreamId={livestreamId}
-                        user={user} userData={userData} fields={null}
-                        grid={grid} careerCenters={[]}
-                        id={livestream.id}
-                        key={livestream.id} livestream={livestream}
-                    />
-
+                    <LazyLoad key={livestream.id}
+                              offset={[-100, 100]}
+                              placeholder={<PlaceHolder/>}>
+                        <GroupStreamCard
+                            index={index}
+                            groupData={groupData}
+                            listenToUpcoming={listenToUpcoming}
+                            careerCenterId={careerCenterId}
+                            livestreamId={livestreamId}
+                            user={user} userData={userData} fields={null}
+                            grid={grid} careerCenters={[]}
+                            id={livestream.id}
+                            key={livestream.id} livestream={livestream}
+                        />
+                    </LazyLoad>
                 )
             }
         })
@@ -80,18 +95,19 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
                         color="primary" align="center">
                     <Typography variant="h6">Start Following {groupData.universityName}</Typography>
                 </Button>}
-                {groupData.id || listenToUpcoming? (searching ?
+                {groupData.id || listenToUpcoming ? (searching ?
                     <Box display="flex" justifyContent="center" mt={5}>
                         <LinearProgress style={{width: "80%"}} color="primary"/>
                     </Box>
                     :
                     renderStreamCards.length ?
-                        <SizeMe>{({size}) => (
+                        <SizeMe noPlaceholder={true}>{({size}) => (
                             <StackGrid
                                 style={{marginTop: 10}}
-                                duration={0}
                                 columnWidth={(size.width <= 768 ? '100%' : '50%')}
                                 gutterWidth={20}
+                                duration={0}
+                                monitorImagesLoaded
                                 gutterHeight={20}
                                 gridRef={grid => setGrid(grid)}>
                                 {renderStreamCards}

@@ -145,6 +145,7 @@ const Feed = ({user, userData, firebase}) => {
     };
 
     const handleSetGroup = (groupObj) => {
+        scrollToTop()
         if (groupObj.universityName) {
             setListenToUpcoming(false)
             const newGroupObj = {
@@ -158,7 +159,6 @@ const Feed = ({user, userData, firebase}) => {
                 })
             }
             setGroupData(newGroupObj)
-            scrollToTop()
         } else {
             setGroupData(groupObj)
             setListenToUpcoming(true)
