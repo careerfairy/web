@@ -463,8 +463,7 @@ function SignUpFormValidate({user, setEmailVerificationSent, setActiveStep, abso
                             pinCode: parseInt(values.pinCode)
                         }
                     }).then(response => {
-                        user.reload();
-                        absolutePath ? router.push(absolutePath) : setActiveStep(2).then(console.log("leaving Page!"))
+                        absolutePath ? router.push(absolutePath) : setActiveStep(2)
                     }).catch(error => {
                         console.log("error", error);
                         setIncorrectPin(true);
