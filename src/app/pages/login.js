@@ -7,6 +7,7 @@ import {Formik} from 'formik';
 import axios from 'axios';
 
 import Head from 'next/head';
+import { withFirebase } from "context/firebase";
 import {TealBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import {
     Box,
