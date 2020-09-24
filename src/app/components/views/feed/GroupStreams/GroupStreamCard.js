@@ -33,7 +33,7 @@ const PlaceHolder = () => {
 }
 
 
-const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userData, firebase, livestreamId, id, careerCenterId, groupData}) => {
+const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userData, firebase, livestreamId, id, careerCenterId, groupData, listenToUpcoming}) => {
 
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [isHighlighted, setIsHighlighted] = useState(false)
@@ -41,7 +41,7 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
     const router = useRouter();
     const absolutePath = router.asPath
 
-    const linkToStream = `/feed?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
+    const linkToStream = listenToUpcoming ? "/feed" : `/feed?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
 
     const avatar = livestream.mainSpeakerAvatar ? livestream.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
 

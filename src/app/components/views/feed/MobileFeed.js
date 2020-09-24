@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user, livestreams, searching, scrollToTop, livestreamId, careerCenterId}) => {
+const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user, livestreams, searching, scrollToTop, livestreamId, careerCenterId,listenToUpcoming}) => {
     const classes = useStyles();
     const theme = useTheme();
     const router = useRouter()
@@ -130,7 +130,7 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                         null}
                 </Tabs>
             </AppBar>
-            {!userData?.groupIds?.includes(groupData.groupId) &&
+            {!userData?.groupIds?.includes(groupData.groupId) && !listenToUpcoming &&
             <>
                 <Button className={classes.followButton} onClick={handleJoin} size="large" variant="contained" fullWidth
                         color="primary" align="center">
@@ -155,6 +155,7 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                 <TabPanel dir={theme.direction}>
                     <GroupStreams user={user}
                                   mobile={true}
+                                  listenToUpcoming={listenToUpcoming}
                                   careerCenterId={careerCenterId}
                                   livestreamId={livestreamId}
                                   searching={searching}

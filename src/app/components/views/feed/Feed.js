@@ -21,12 +21,30 @@ const Feed = ({user, userData, firebase}) => {
     const [paramsCareerCenterId, setParamsCareerCenterId] = useState(null)
     const [searching, setSearching] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState([])
+    const [listenToUpcoming, setListenToUpcoming] = useState(false)
 
 
     const checkIfCareerCenterExists = async (centerId) => {
         const querySnapshot = await firebase.getCareerCenterById(centerId)
         return querySnapshot.exists
     }
+
+    useEffect(() => {
+        if (listenToUpcoming) {
+            const unsubscribe = firebase.listenToUpcomingLivestreams(querySnapshot => {
+                let livestreams = [];
+                querySnapshot.forEach(doc => {
+                    let livestream = doc.data();
+                    livestream.id = doc.id;
+                    livestreams.push(livestream);
+                });
+                setLivestreams(livestreams);
+            }, error => {
+                console.log(error);
+            });
+            return () => unsubscribe();
+        }
+    }, [listenToUpcoming])
 
     useEffect(() => {
         // will set the params once the router is loaded whether it be undefined or truthy
@@ -127,18 +145,24 @@ const Feed = ({user, userData, firebase}) => {
     };
 
     const handleSetGroup = (groupObj) => {
-        const newGroupObj = {
-            ...groupObj,
-            alreadyJoined: userData ? userData.groupIds?.includes(groupObj.id) : false
-        }
+        if (groupObj.universityName) {
+            setListenToUpcoming(false)
+            const newGroupObj = {
+                ...groupObj,
+                alreadyJoined: userData ? userData.groupIds?.includes(groupObj.id) : false
+            }
 
-        if (newGroupObj.categories) {
-            newGroupObj.categories.forEach(category => {
-                category.options.forEach(option => (option.active = false))
-            })
+            if (newGroupObj.categories) {
+                newGroupObj.categories.forEach(category => {
+                    category.options.forEach(option => (option.active = false))
+                })
+            }
+            setGroupData(newGroupObj)
+            scrollToTop()
+        } else {
+            setGroupData(groupObj)
+            setListenToUpcoming(true)
         }
-        setGroupData(newGroupObj)
-        scrollToTop()
     }
 
     const handleResetGroup = () => {
@@ -172,6 +196,7 @@ const Feed = ({user, userData, firebase}) => {
                             handleResetGroup={handleResetGroup}
                             searching={searching}
                             livestreams={livestreams}
+                            listenToUpcoming={listenToUpcoming}
                             careerCenterId={careerCenterId}
                             livestreamId={livestreamId}
                             alreadyJoined={groupData.alreadyJoined}
@@ -181,6 +206,7 @@ const Feed = ({user, userData, firebase}) => {
                 <DesktopFeed alreadyJoined={groupData.alreadyJoined}
                              handleToggleActive={handleToggleActive}
                              userData={userData}
+                             listenToUpcoming={listenToUpcoming}
                              livestreamId={livestreamId}
                              searching={searching}
                              careerCenterId={careerCenterId}

@@ -1,12 +1,13 @@
 import React, {createRef, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import GroupCarouselCard from "./GroupCarouselCard";
+import CarouselCard from "./CarouselCard";
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Slider from "react-slick";
 import {Button, IconButton, Typography} from "@material-ui/core";
 import Link from "next/link";
 import {useRouter} from "next/router";
+import NextLivestreamsCard from "./NextLivestreamsCard";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -50,12 +51,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user}) => {
-    const [activeSlide, setActiveSlide] = useState(0)
     const router = useRouter()
     const absolutePath = router.asPath;
-
     const classes = useStyles()
     const customSlider = createRef()
+
+    const [activeSlide, setActiveSlide] = useState(0)
 
     const handleNext = () => {
         customSlider.current.slickNext()
@@ -71,9 +72,15 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
 
 
     const renderGroupCards = groupIds?.map((id, index) => {
-        return <GroupCarouselCard index={index} mobile={mobile} handleResetGroup={handleResetGroup}
-                                  activeSlide={activeSlide}
-                                  groupData={groupData} key={id} handleSetGroup={handleSetGroup} groupId={id}/>
+        return <CarouselCard index={index}
+                             mobile={mobile}
+                             handleSetGroup={handleSetGroup}
+                             handleResetGroup={handleResetGroup}
+                             activeSlide={activeSlide}
+                             groupData={groupData}
+                             key={id}
+                             groupId={id}
+        />
     })
 
     const settings = {
@@ -105,6 +112,9 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
                     </IconButton>
                     <Slider ref={customSlider} className={classes.slider} {...settings}>
                         {renderGroupCards}
+                        <NextLivestreamsCard mobile={mobile} handleSetGroup={handleSetGroup} groupData={groupData}
+                                             position={groupIds?.length}
+                                             handleResetGroup={handleResetGroup} activeSlide={activeSlide}/>
                     </Slider>
                     <IconButton className={classes.next} onClick={handleNext}>
                         <NavigateNextIcon color="primary" fontSize="large"/>
@@ -112,9 +122,9 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
                 </>
                 :
                 <Slider className={classes.slider} {...singleSettings}>
-                        <Button fullWidth onClick={handleFollowGroups} className={classes.button} color="primary">
-                            <Typography variant="h5">Follow Some Groups</Typography>
-                        </Button>
+                    <Button fullWidth onClick={handleFollowGroups} className={classes.button} color="primary">
+                        <Typography variant="h5">Follow Some Groups</Typography>
+                    </Button>
                 </Slider>}
         </div>
     )

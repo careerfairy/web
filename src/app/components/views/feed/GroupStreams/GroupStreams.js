@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId, careerCenterId, alreadyJoined}) => {
+const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId, careerCenterId, alreadyJoined,listenToUpcoming}) => {
         const classes = useStyles()
         const router = useRouter()
         const absolutePath = router.asPath
@@ -60,6 +60,7 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
                     <GroupStreamCard
                         index={index}
                         groupData={groupData}
+                        listenToUpcoming={listenToUpcoming}
                         careerCenterId={careerCenterId}
                         livestreamId={livestreamId}
                         user={user} userData={userData} fields={null}
@@ -74,11 +75,12 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
 
         return (
             <div style={{padding: mobile ? 0 : "1rem"}} className={classes.root}>
-                {!userData?.groupIds?.includes(groupData.groupId) && !mobile &&
-                <Button className={classes.followButton} size="large" onClick={handleJoin} variant="contained" fullWidth color="primary" align="center">
+                {!userData?.groupIds?.includes(groupData.groupId) && !mobile && !listenToUpcoming &&
+                <Button className={classes.followButton} size="large" onClick={handleJoin} variant="contained" fullWidth
+                        color="primary" align="center">
                     <Typography variant="h6">Start Following {groupData.universityName}</Typography>
                 </Button>}
-                {groupData.id ? (searching ?
+                {groupData.id || listenToUpcoming? (searching ?
                     <Box display="flex" justifyContent="center" mt={5}>
                         <LinearProgress style={{width: "80%"}} color="primary"/>
                     </Box>

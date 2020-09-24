@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Card, CardContent, CardMedia, Typography, Grow, withStyles} from "@material-ui/core";
+import {Card, CardMedia, Typography, Grow} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../context/firebase";
 
@@ -30,20 +30,19 @@ const useStyles = makeStyles((theme) => ({
 const placeholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
 
 
-const GroupCarouselCard = ({group, groupId, firebase, handleSetGroup, groupData, mobile, index, handleResetGroup, activeSlide}) => {
-    // console.log(`active slide ${activeSlide} & index ${index}`);
+const CarouselCard = ({group, groupId, firebase, handleSetGroup, groupData, mobile, index, handleResetGroup, activeSlide}) => {
     const classes = useStyles()
     const [localGroup, setLocalGroup] = useState({})
     const [noGroup, setNoGroup] = useState(false)
 
     useEffect(() => {
-        if (index && index === 0) {
+        if (isSelected()) {
             handleSetGroup(localGroup)
         }
     }, [index])
 
     useEffect(() => {
-        if (activeSlide === index) {
+        if (isSelected()) {
             handleSetGroup(localGroup)
         }
     }, [activeSlide, group, localGroup.universityName, index])
@@ -71,6 +70,10 @@ const GroupCarouselCard = ({group, groupId, firebase, handleSetGroup, groupData,
         }
     }, [])
 
+    const isSelected = () => {
+        return activeSlide === index || index && index === 0
+    }
+
     if (noGroup) {
         return null
     }
@@ -78,7 +81,7 @@ const GroupCarouselCard = ({group, groupId, firebase, handleSetGroup, groupData,
 
     return (
         <Grow in={Boolean(localGroup.id)} timeout={600}>
-            <Card style={{borderTop: groupData.id === groupId ? "3px solid #00d2aa" : "none"}}
+            <Card style={{borderTop: isSelected() ? "3px solid #00d2aa" : "none"}}
                   onClick={() => {
                       handleResetGroup()
                       handleSetGroup(localGroup)
@@ -93,4 +96,4 @@ const GroupCarouselCard = ({group, groupId, firebase, handleSetGroup, groupData,
     );
 };
 
-export default withFirebase(GroupCarouselCard);
+export default withFirebase(CarouselCard);
