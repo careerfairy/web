@@ -3,15 +3,13 @@ import Head from "next/head";
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
 import {useEffect, useState} from "react";
-import Loader from "../components/views/loader/Loader";
-import {withFirebase} from "../context/firebase";
-import {useRouter} from "next/router";
+import {withFirebase} from "context/firebase";
 import Feed from "../components/views/feed/Feed";
 
 
 const feed = ({firebase}) => {
-    const router = useRouter();
-    const [loading, setLoading] = useState(false)
+
+
     const [userData, setUserData] = useState(null)
     const [user, setUser] = useState(null);
 
@@ -20,17 +18,13 @@ const feed = ({firebase}) => {
         firebase.auth.onAuthStateChanged(user => {
             if (user) {
                 setUser(user);
-            } else {
-                router.replace('/login');
             }
         })
     }, []);
 
     useEffect(() => {
-        setLoading(true);
         if (user) {
             const unsubscribe = firebase.listenToUserData(user.email, querySnapshot => {
-                setLoading(false);
                 let user = querySnapshot.data();
                 user.id = querySnapshot.id;
                 if (user) {
@@ -40,10 +34,6 @@ const feed = ({firebase}) => {
             return () => unsubscribe
         }
     }, [user]);
-
-    if (user === null || userData == null || loading === true) {
-        return <Loader/>;
-    }
 
 
     return (

@@ -10,6 +10,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal";
 import Skeleton from '@material-ui/lab/Skeleton';
 import GroupJoinModal from "./GroupJoinModal";
+import Link from "next/link";
 
 
 const useStyles = makeStyles({
@@ -35,6 +36,7 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
     const [noGroup, setNoGroup] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null);
     const [leaving, setLeaving] = useState(false);
+    const [deleting, setDeleting] = useState(false)
     const [openJoinModal, setOpenJoinModal] = useState(false);
     const [leaveGroup, setLeaveGroup] = useState(false)
 
@@ -82,11 +84,14 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
 
     const handleDeleteCareerCenter = async () => {
         try {
+            setDeleting(true)
             await firebase.deleteCareerCenter(group.id)
             await firebase.deleteCareerCenterFromAllUsers(group.id)
+            setDeleting(false)
             setOpen(false)
 
         } catch (e) {
+            setDeleting(false)
             console.log("error in career center deletion", e)
         }
     }
@@ -143,9 +148,11 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                             <MoreVertIcon/>
                         </IconButton>
                         <CardActions>
-                            <Button fullWidth size="large" color="primary">
-                                View Calendar
-                            </Button>
+                            <Link href={`feed?careerCenterId=${localGroup.groupId}`}>
+                                <Button fullWidth size="large" color="primary">
+                                    View Calendar
+                                </Button>
+                            </Link>
                             <Menu
                                 id="simple-menu"
                                 anchorEl={anchorEl}
@@ -153,10 +160,13 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                                 open={Boolean(anchorEl)}
                                 onClose={handleClose}
                             >
-                                <MenuItem onClick={() => router.push('/group/' + localGroup.id)}>Group Page</MenuItem>
+                                <MenuItem onClick={() => {
+                                    router.push(`/feed?careerCenterId=${localGroup.groupId}`)
+                                }}>Group Page</MenuItem>
                                 <MenuItem onMouseEnter={() => setLeaveGroup(true)} onClick={() => setOpen(true)}>Leave
                                     Group</MenuItem>
-                                {localGroup.categories && <MenuItem onClick={handleOpenJoinModal}>Update</MenuItem>}
+                                {localGroup.categories &&
+                                <MenuItem onClick={handleOpenJoinModal}>Update Categories</MenuItem>}
                                 {isAdmin &&
                                 <>
                                     <MenuItem onClick={() => push(`/group/${localGroup.id}/admin`)}>
@@ -175,6 +185,7 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                 </Grid>
             </Grow>
             <GroupJoinModal
+                fromProfile={true}
                 open={openJoinModal}
                 group={localGroup}
                 alreadyJoined={userData.groupIds?.includes(localGroup.id)}
@@ -183,6 +194,7 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
             />
             <AreYouSureModal
                 open={open}
+                loading={leaveGroup ? leaving : deleting}
                 handleClose={() => setOpen(false)}
                 handleConfirm={leaveGroup ? handleLeaveGroup : handleDeleteCareerCenter}
                 title="Warning"

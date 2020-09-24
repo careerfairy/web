@@ -46,7 +46,7 @@ const JoinedGroups = ({userData}) => {
                         style={{position: 'sticky'}}
                         color="primary"
                         onClick={() => router.push('/groups')}>
-                    Join More Groups
+                    Follow More Groups
                 </Button>
             </div>
             {existingGroupElements.length ?

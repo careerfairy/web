@@ -31,15 +31,22 @@ const placeholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1f
 
 
 const GroupCarouselCard = ({group, groupId, firebase, handleSetGroup, groupData, mobile, index, handleResetGroup, activeSlide}) => {
+    // console.log(`active slide ${activeSlide} & index ${index}`);
     const classes = useStyles()
     const [localGroup, setLocalGroup] = useState({})
     const [noGroup, setNoGroup] = useState(false)
 
     useEffect(() => {
+        if (index && index === 0) {
+            handleSetGroup(localGroup)
+        }
+    }, [index])
+
+    useEffect(() => {
         if (activeSlide === index) {
             handleSetGroup(localGroup)
         }
-    }, [activeSlide, group, localGroup.universityName])
+    }, [activeSlide, group, localGroup.universityName, index])
 
     useEffect(() => {
         if (group) {

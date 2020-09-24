@@ -36,6 +36,7 @@ const GroupJoinModal = ({
                             closeModal,
                             userData,
                             alreadyJoined,
+                            fromProfile
                         }) => {
     const classes = useStyles();
     const [categories, setCategories] = useState([]);
@@ -165,7 +166,7 @@ const GroupJoinModal = ({
                     onClick={handleJoinGroup}
                     color="primary"
                     autoFocus>
-                    Follow
+                    {fromProfile ? "Confirm" : "Follow"}
                 </Button>}
                 <Button
                     size="large"

@@ -4,15 +4,37 @@ import GroupsCarousel from "./GroupsCarousel/GroupsCarousel";
 import {useMediaQuery, useTheme} from "@material-ui/core";
 import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import MobileFeed from "./MobileFeed";
+import {useRouter} from "next/router";
 
 const Feed = ({user, userData, firebase}) => {
+    const router = useRouter();
+    const {query: {livestreamId}} = router
+    const {query: {careerCenterId}} = router
+
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const [groupData, setGroupData] = useState({})
+    const [groupIds, setGroupIds] = useState([])
     const [livestreams, setLivestreams] = useState([])
+    const [paramsLivestreamId, setParamsLivestreamId] = useState(null)
+    const [paramsCareerCenterId, setParamsCareerCenterId] = useState(null)
     const [searching, setSearching] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState([])
+
+
+    const checkIfCareerCenterExists = async (centerId) => {
+        const querySnapshot = await firebase.getCareerCenterById(centerId)
+        return querySnapshot.exists
+    }
+
+    useEffect(() => {
+        // will set the params once the router is loaded whether it be undefined or truthy
+        if (paramsLivestreamId === null && router) {
+            setParamsCareerCenterId(careerCenterId)
+            setParamsLivestreamId(livestreamId)
+        }
+    }, [router])
 
 
     useEffect(() => {
@@ -33,6 +55,12 @@ const Feed = ({user, userData, firebase}) => {
                         livestreams.push(livestream);
                     }
                 })
+                if (livestreamId && careerCenterId && careerCenterId === groupData.groupId) {
+                    const currentIndex = livestreams.findIndex(el => el.id === livestreamId)
+                    if (currentIndex > -1) {
+                        repositionElement(livestreams, currentIndex, 0)
+                    }
+                }
                 setLivestreams(livestreams);
                 setSearching(false)
             })
@@ -54,21 +82,54 @@ const Feed = ({user, userData, firebase}) => {
         }
     }, [groupData.categories, groupData])
 
+    useEffect(() => {
+        // This checks if the params from the next router have been defined and only then will it set groupIds
+        if ( paramsLivestreamId !== null && paramsCareerCenterId !== null) {
+            handleGetGroupIds()
+        }
+    }, [userData, router, paramsLivestreamId, paramsCareerCenterId])
+
+    const handleGetGroupIds = async () => {
+        let newGroupIds = []
+        if (userData && userData.groupIds) {
+            newGroupIds = [...userData.groupIds]
+        }
+        if (careerCenterId) {
+            if (newGroupIds.includes(careerCenterId)) {
+                const currentIndex = newGroupIds.findIndex(el => el === careerCenterId)
+                if (currentIndex > -1) {
+                    repositionElement(newGroupIds, currentIndex, 0)
+                }
+            } else {
+                const exists = await checkIfCareerCenterExists(careerCenterId)
+                if (exists) {
+                    newGroupIds.unshift(careerCenterId)
+                }
+            }
+        }
+        setGroupIds(newGroupIds)
+    }
+
 
     const scrollToTop = () => {
         window.scrollTo(0, 0);
     }
 
+    const repositionElement = (arr, fromIndex, toIndex) => {
+        const element = arr[fromIndex];
+        arr.splice(fromIndex, 1);
+        arr.splice(toIndex, 0, element);
+    }
 
 
     const checkIfLivestreamHasAll = (selected, arr) => {
-        return selected.every(v => arr.includes(v))
+        return selected.some(v => arr.includes(v)) // switch to selected.includes to make it an AND Operator
     };
 
     const handleSetGroup = (groupObj) => {
         const newGroupObj = {
             ...groupObj,
-            alreadyJoined: userData.groupIds?.includes(groupObj.id)
+            alreadyJoined: userData ? userData.groupIds?.includes(groupObj.id) : false
         }
         if (newGroupObj.categories) {
             newGroupObj.categories.forEach(category => {
@@ -98,9 +159,10 @@ const Feed = ({user, userData, firebase}) => {
         <>
             <GroupsCarousel groupData={groupData}
                             mobile={mobile}
+                            user={user}
                             handleResetGroup={handleResetGroup}
                             handleSetGroup={handleSetGroup}
-                            groupIds={userData.groupIds}/>
+                            groupIds={groupIds}/>
 
             {mobile ?
                 <MobileFeed groupData={groupData}
@@ -109,6 +171,8 @@ const Feed = ({user, userData, firebase}) => {
                             handleResetGroup={handleResetGroup}
                             searching={searching}
                             livestreams={livestreams}
+                            careerCenterId={careerCenterId}
+                            livestreamId={livestreamId}
                             alreadyJoined={groupData.alreadyJoined}
                             handleToggleActive={handleToggleActive}
                             userData={userData}/>
@@ -116,7 +180,9 @@ const Feed = ({user, userData, firebase}) => {
                 <DesktopFeed alreadyJoined={groupData.alreadyJoined}
                              handleToggleActive={handleToggleActive}
                              userData={userData}
+                             livestreamId={livestreamId}
                              searching={searching}
+                             careerCenterId={careerCenterId}
                              handleResetGroup={handleResetGroup}
                              user={user}
                              livestreams={livestreams}

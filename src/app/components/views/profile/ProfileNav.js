@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import SwipeableViews from 'react-swipeable-views';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -48,7 +48,7 @@ const ProfileNav = ({userData}) => {
     const classes = useStyles();
     const theme = useTheme();
     const native = useMediaQuery(theme.breakpoints.down('xs'));
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = useState(1);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);

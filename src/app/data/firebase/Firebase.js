@@ -158,14 +158,22 @@ class Firebase {
             .then((querySnapshot) => {
                 querySnapshot.docs.forEach((userDoc, index) => {
                     // get the user document
-                    let userRef = this.firestore.collection("userData").doc(userDoc.id);
+                    const userRef = userDoc.ref
+                    let userData = userDoc.data()
                     // remove the careerCenterId from the groupIds Array in the userData field
-                    batch.update(userRef, {
-                        groupIds: firebase.firestore.FieldValue.arrayRemove(careerCenterId),
-                    });
-                    // remove the careerCenterId from the registeredGroups collection
-                    let registeredGroupsRef = userRef.collection("registeredGroups");
-                    batch.delete(registeredGroupsRef.doc(careerCenterId));
+                    // remove the careerCenterId from the registeredGroups array of Objects
+                    if (userData.registeredGroups) {
+                        let registeredGroups = userData.registeredGroups
+                        const filteredRegisteredGroups = registeredGroups.filter(group => group.groupId !== careerCenterId)
+                        batch.update(userRef, {
+                            registeredGroups: filteredRegisteredGroups,
+                            groupIds: firebase.firestore.FieldValue.arrayRemove(careerCenterId)
+                        });
+                    } else {
+                        batch.update(userRef, {
+                            groupIds: firebase.firestore.FieldValue.arrayRemove(careerCenterId)
+                        });
+                    }
                     if (index === querySnapshot.size - 1) {
                         // Once done looping, return the batch commit
                         return batch.commit();
@@ -191,6 +199,20 @@ class Firebase {
     getCareerCenterById = (careerCenterId) => {
         let ref = this.firestore.collection("careerCenterData").doc(careerCenterId);
         return ref.get();
+    };
+
+    getFirstCareerCenterByLivestreamId = (livestreamId) => {
+        return this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .get().then(doc => {
+                let livestreamObj = doc.data()
+                let firstCareerCenterName = livestreamObj.universities[0]
+                return this.firestore
+                    .collection("careerCenterData")
+                    .where("universityId", "==", firstCareerCenterName)
+                    .limit(1).get()
+            })
     };
 
     getCareerCenterByUniversityId = (universityId) => {
@@ -958,9 +980,7 @@ class Firebase {
                 transaction.set(registeredUsersRef, {
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    university: user.university,
-                    levelOfStudy: user.levelOfStudy,
-                    faculty: user.faculty,
+                    registeredGroups: user.registeredGroups || []
                 });
             });
         });

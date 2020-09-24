@@ -2,7 +2,9 @@ import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../context/firebase";
 import GroupStreamCard from "./GroupStreamCard";
+import LazyLoad from 'react-lazyload'
 import {Typography, LinearProgress, Box} from "@material-ui/core";
+import Skeleton from '@material-ui/lab/Skeleton';
 import {SizeMe} from "react-sizeme";
 import StackGrid from "react-stack-grid";
 
@@ -15,7 +17,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching}) => {
+
+const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId, careerCenterId}) => {
 
         const classes = useStyles()
         const [grid, setGrid] = useState(null);
@@ -28,12 +31,22 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
             }
         }, [grid, livestreams]);
 
-        const renderStreamCards = livestreams?.map(livestream => {
-            return <GroupStreamCard
-                user={user} userData={userData} fields={null}
-                grid={grid} careerCenters={[]}
-                key={livestream.id} livestream={livestream}
-            />
+        const renderStreamCards = livestreams?.map((livestream, index) => {
+            if (livestream) {
+                return (
+                    <GroupStreamCard
+                        index={index}
+                        groupData={groupData}
+                        careerCenterId={careerCenterId}
+                        livestreamId={livestreamId}
+                        user={user} userData={userData} fields={null}
+                        grid={grid} careerCenters={[]}
+                        id={livestream.id}
+                        key={livestream.id} livestream={livestream}
+                    />
+
+                )
+            }
         })
 
         return (
