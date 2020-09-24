@@ -12,6 +12,7 @@ import BookingModal from "../../common/booking-modal/BookingModal";
 import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
 import {useRouter} from "next/router";
+import CopyToClipboard from "./CopyToClipboard";
 
 
 const useStyles = makeStyles((theme) => ({}));
@@ -39,6 +40,8 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
 
     const router = useRouter();
     const absolutePath = router.asPath
+
+    const linkToStream = `/feed?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
 
     const avatar = livestream.mainSpeakerAvatar ? livestream.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
 
@@ -83,7 +86,7 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
         if (!user) {
             return router.push({
                 pathname: '/login',
-                query: {absolutePath:`/feed?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`}
+                query: {absolutePath: linkToStream}
             });
         }
 
@@ -152,7 +155,8 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
                         MozBoxShadow: isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)"
                     }
                 } className='companies-mentor-discriber-content'
-                     onClick={(event) => goToRouteFromParent(event, '/upcoming-livestream/' + livestream.id)}>
+                    // onClick={(event) => goToRouteFromParent(event, '/upcoming-livestream/' + livestream.id)}
+                >
                     <div className='date-indicator'>
                         {/* <div className='coming-icon-container'>
                         <div className='coming-icon' style={{ color: userIsRegistered() ? 'white' : '', border: userIsRegistered() ? '2px solid white' : ''}} ><Icon name='rss'/>Live stream</div>
@@ -175,6 +179,7 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
                              style={{backgroundImage: 'url(' + livestream.backgroundImageUrl + ')'}}>
                             <div className='livestream-thumbnail-overlay'
                                  style={{backgroundColor: userIsRegistered() ? 'rgba(0, 210, 170, 0.9)' : ''}}>
+                                <CopyToClipboard value={linkToStream}/>
                                 <div className='livestream-thumbnail-overlay-content'>
                                     <LazyLoad placeholder={<ThumbnailSkeleton/>}>
                                         <Image style={{
@@ -244,7 +249,7 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
                                 height: '2px',
                                 backgroundColor: 'rgba(0,210,170,0.6)',
                                 margin: '30px 0 10px 0'
-                            }}></div>
+                            }}/>
                             <div style={{textAlign: 'center', fontSize: '0.8em'}}>created by</div>
                             <Grid className='middle aligned' centered style={{padding: '10px'}}>
                                 {logoElements}
@@ -313,9 +318,11 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
 
                 .livestream-thumbnail-overlay {
                     cursor: pointer;
+                    display: flex;
+                    flex-direction: column;
                     width: 100%;
                     height: 100%;
-                    padding: 50px 0 50px 30px;
+                    padding: 10px 0 50px 30px;
                     background-color: rgba(255, 255, 255, 0.90);
                     transition: background-color 0.5s;
                 }
@@ -466,7 +473,7 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
                 .booked-icon {
                     position: absolute;
                     top: 0;
-                    right: 0;
+                    left: 0;
                     padding: 20px;
                     color: white;
                     text-align: center;
