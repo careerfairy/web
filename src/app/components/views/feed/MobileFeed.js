@@ -71,7 +71,7 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
 
 
     const handleChange = (event, newValue) => {
-            setValue(newValue);
+        setValue(newValue);
     }
 
     const handleResetView = () => {
@@ -115,23 +115,26 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
 
     return (
         <>
-            <AppBar className={classes.bar} position="static" color="default">
+            <AppBar variant="elevation" className={classes.bar} position="static" color="default">
                 <Tabs
                     value={value}
+                    variant="fullWidth"
                     onChange={handleChange}
                     indicatorColor="primary"
                     textColor="primary"
                     centered
                 >
-                    <Tab wrapped  {...a11yProps(0)} fullWidth label={<Typography variant="h5">Events</Typography>}/>
+                    <Tab wrapped value={0}  {...a11yProps(0)} fullWidth label={<Typography variant="h5">Events</Typography>}/>
                     {groupData.categories ?
-                        <Tab wrapped fullWidth disabled={!groupData.categories}
+                        <Tab value={1} wrapped fullWidth disabled={!groupData.categories}
+                             {...a11yProps(1)}
                              label={<Typography variant="h5">Filter</Typography>}/>
                         :
                         null}
                 </Tabs>
             </AppBar>
             <SwipeableViews
+                disabled={!Boolean(groupData.categories)}
                 style={{minHeight: 200}}
                 containerStyle={{WebkitOverflowScrolling: 'touch'}}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
@@ -147,12 +150,12 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                                   userData={userData}
                                   groupData={groupData}/>
                 </TabPanel>
-                <TabPanel dir={theme.direction}>
+                {groupData.categories ? <TabPanel dir={theme.direction}>
                     <GroupCategories alreadyJoined={alreadyJoined}
                                      groupData={groupData}
                                      handleToggleActive={handleToggleActive}
                                      mobile={true}/>
-                </TabPanel>
+                </TabPanel> : null}
             </SwipeableViews>
         </>
     );
