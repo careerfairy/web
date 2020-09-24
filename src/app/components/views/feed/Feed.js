@@ -84,7 +84,7 @@ const Feed = ({user, userData, firebase}) => {
 
     useEffect(() => {
         // This checks if the params from the next router have been defined and only then will it set groupIds
-        if ( paramsLivestreamId !== null && paramsCareerCenterId !== null) {
+        if (paramsLivestreamId !== null && paramsCareerCenterId !== null) {
             handleGetGroupIds()
         }
     }, [userData, router, paramsLivestreamId, paramsCareerCenterId])
@@ -131,6 +131,7 @@ const Feed = ({user, userData, firebase}) => {
             ...groupObj,
             alreadyJoined: userData ? userData.groupIds?.includes(groupObj.id) : false
         }
+
         if (newGroupObj.categories) {
             newGroupObj.categories.forEach(category => {
                 category.options.forEach(option => (option.active = false))

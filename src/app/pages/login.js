@@ -7,7 +7,7 @@ import {Formik} from 'formik';
 import axios from 'axios';
 
 import Head from 'next/head';
-import { withFirebase } from "context/firebase";
+import {withFirebase} from "context/firebase";
 import {TealBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import {
     Box,
@@ -104,7 +104,7 @@ function LogInPage({firebase}) {
                 firebase.getUserData(user.email).then(querySnapshot => {
                     if (querySnapshot.exists) {
 
-                        router.replace(absolutePath ||'/profile');
+                        router.replace(absolutePath || '/profile');
                     } else {
                         router.replace(absolutePath || '/profile');
                     }

@@ -6,10 +6,12 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
 
-import {Typography,} from "@material-ui/core";
+import {Button, Typography,} from "@material-ui/core";
 import {withFirebase} from "../../../context/firebase";
 import GroupCategories from "./GroupCategories/GroupCategories";
 import GroupStreams from "./GroupStreams/GroupStreams";
+import {useRouter} from "next/router";
+import GroupJoinModal from "../profile/GroupJoinModal";
 
 
 function TabPanel({children, value, index, ...other}) {
@@ -48,6 +50,12 @@ const useStyles = makeStyles((theme) => ({
     },
     panel: {
         minHeight: 300
+    },
+    followButton: {
+        marginTop: 5,
+        position: "sticky",
+        top: 165,
+        zIndex: 20
     }
 }));
 
@@ -55,7 +63,11 @@ const useStyles = makeStyles((theme) => ({
 const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user, livestreams, searching, scrollToTop, livestreamId, careerCenterId}) => {
     const classes = useStyles();
     const theme = useTheme();
+    const router = useRouter()
+    const absolutePath = router.asPath
     const [value, setValue] = useState(0);
+    const [openJoinModal, setOpenJoinModal] = useState(false);
+
     useEffect(() => {
         if (groupData) {
             handleResetView()
@@ -81,6 +93,21 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
         }
     };
 
+    const handleCloseJoinModal = () => {
+        setOpenJoinModal(false);
+    };
+    const handleOpenJoinModal = () => {
+        setOpenJoinModal(true);
+    };
+
+    const handleJoin = () => {
+        if (userData) {
+            handleOpenJoinModal()
+        } else {
+            return router.push({pathname: "/login", query: {absolutePath}})
+        }
+    }
+
 
     return (
         <>
@@ -103,6 +130,21 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                         null}
                 </Tabs>
             </AppBar>
+            {!userData?.groupIds?.includes(groupData.groupId) &&
+            <>
+                <Button className={classes.followButton} onClick={handleJoin} size="large" variant="contained" fullWidth
+                        color="primary" align="center">
+                    <Typography variant="h5">Start Following {groupData.universityName}</Typography>
+                </Button>
+                <GroupJoinModal
+                    open={openJoinModal}
+                    group={groupData}
+                    alreadyJoined={alreadyJoined}
+                    userData={userData}
+                    closeModal={handleCloseJoinModal}
+                />
+            </>
+            }
             <SwipeableViews
                 disabled={!Boolean(groupData.categories)}
                 style={{minHeight: 200}}

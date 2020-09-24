@@ -5,7 +5,6 @@ import GroupStreamCard from "./GroupStreamCard";
 import {Typography, LinearProgress, Box, Button, Card} from "@material-ui/core";
 import {SizeMe} from "react-sizeme";
 import StackGrid from "react-stack-grid";
-import Link from "next/link";
 import {useRouter} from "next/router";
 import GroupJoinModal from "../../profile/GroupJoinModal";
 
@@ -16,6 +15,11 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         flexDirection: "column",
     },
+    followButton: {
+        position: "sticky",
+        top: 165,
+        zIndex: 20
+    }
 }));
 
 
@@ -46,7 +50,7 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
             if (userData) {
                 handleOpenJoinModal()
             } else {
-                return router.push({pathname: "/login", query: absolutePath})
+                return router.push({pathname: "/login", query: {absolutePath}})
             }
         }
 
@@ -70,9 +74,9 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
 
         return (
             <div style={{padding: mobile ? 0 : "1rem"}} className={classes.root}>
-                {!alreadyJoined && groupData.universityName &&
-                <Button onClick={handleJoin} variant="contained" fullWidth color="primary" align="center">
-                    Start Following {groupData.universityName}
+                {!userData?.groupIds?.includes(groupData.groupId) && !mobile &&
+                <Button className={classes.followButton} size="large" onClick={handleJoin} variant="contained" fullWidth color="primary" align="center">
+                    <Typography variant="h6">Start Following {groupData.universityName}</Typography>
                 </Button>}
                 {groupData.id ? (searching ?
                     <Box display="flex" justifyContent="center" mt={5}>
