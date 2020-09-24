@@ -1,5 +1,4 @@
 import React, {Fragment, useState, useEffect, useRef} from 'react';
-import {useRouter} from "next/router";
 import UserUtil from "../../../../data/util/UserUtil";
 import axios from "axios";
 import LazyLoad from 'react-lazyload'
@@ -11,6 +10,7 @@ import TargetElementList from "../../common/TargetElementList";
 import BookingModal from "../../common/booking-modal/BookingModal";
 import {withFirebase} from "../../../../data/firebase";
 import {makeStyles} from "@material-ui/core/styles";
+import {useRouter} from "next/router";
 
 
 const useStyles = makeStyles((theme) => ({}));
@@ -37,6 +37,7 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
     const [isHighlighted, setIsHighlighted] = useState(false)
 
     const router = useRouter();
+    const absolutePath = router.asPath
 
     const avatar = livestream.mainSpeakerAvatar ? livestream.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
 
@@ -68,7 +69,10 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
 
     function deregisterFromLivestream() {
         if (!user) {
-            return router.push('/signup');
+            return router.push({
+                pathname: '/login',
+                query: {absolutePath}
+            });
         }
 
         firebase.deregisterFromLivestream(livestream.id, user.email);
@@ -76,11 +80,17 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
 
     function startRegistrationProcess() {
         if (!user) {
-            return router.push('/signup');
+            return router.push({
+                pathname: '/login',
+                query: {absolutePath}
+            });
         }
 
         if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-            return router.push('/profile');
+            return router.push({
+                pathname: '/profile',
+                query: "profile"
+            });
         }
 
         firebase.registerToLivestream(livestream.id, user.email).then(() => {

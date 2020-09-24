@@ -1,7 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import SwipeableViews from 'react-swipeable-views';
-import {virtualize} from 'react-swipeable-views-utils';
-
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -12,8 +10,6 @@ import {Typography,} from "@material-ui/core";
 import {withFirebase} from "../../../data/firebase";
 import GroupCategories from "./GroupCategories/GroupCategories";
 import GroupStreams from "./GroupStreams/GroupStreams";
-
-const VirtualizeSwipeableViews = virtualize(SwipeableViews);
 
 
 function TabPanel({children, value, index, ...other}) {
@@ -47,7 +43,8 @@ const useStyles = makeStyles((theme) => ({
     bar: {
         boxShadow: "none",
         position: "sticky",
-        top: 110
+        top: 110,
+        zIndex: 1
     },
     panel: {
         minHeight: 300
@@ -84,38 +81,10 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
         }
     };
 
-    const slideRenderer = ({index, key}) => {// TODO prevent user from swiping out
-
-        switch (index) {
-            case 0:
-                return <TabPanel value={0} index={index} key={key} dir={theme.direction}>
-                    <GroupStreams user={user}
-                                  key={key}
-                                  mobile={true}
-                                  careerCenterId={careerCenterId}
-                                  livestreamId={livestreamId}
-                                  searching={searching}
-                                  livestreams={livestreams}
-                                  userData={userData}
-                                  groupData={groupData}/>
-                </TabPanel>
-            case 1:
-                return <TabPanel value={1} index={index} key={key} dir={theme.direction}>
-                    <GroupCategories alreadyJoined={alreadyJoined}
-                                     key={key}
-                                     groupData={groupData}
-                                     handleToggleActive={handleToggleActive}
-                                     mobile={true}/>
-                </TabPanel>
-            default:
-                return <div key={key}/>
-        }
-    }
-
 
     return (
         <>
-            <AppBar variant="elevation" className={classes.bar} position="static" color="default">
+            <AppBar className={classes.bar} position="static" color="default">
                 <Tabs
                     value={value}
                     variant="fullWidth"
@@ -124,7 +93,8 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                     textColor="primary"
                     centered
                 >
-                    <Tab wrapped value={0}  {...a11yProps(0)} fullWidth label={<Typography variant="h5">Events</Typography>}/>
+                    <Tab wrapped value={0}  {...a11yProps(0)} fullWidth
+                         label={<Typography variant="h5">Events</Typography>}/>
                     {groupData.categories ?
                         <Tab value={1} wrapped fullWidth disabled={!groupData.categories}
                              {...a11yProps(1)}
@@ -150,12 +120,12 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                                   userData={userData}
                                   groupData={groupData}/>
                 </TabPanel>
-                {groupData.categories ? <TabPanel dir={theme.direction}>
+                <TabPanel dir={theme.direction}>
                     <GroupCategories alreadyJoined={alreadyJoined}
                                      groupData={groupData}
                                      handleToggleActive={handleToggleActive}
                                      mobile={true}/>
-                </TabPanel> : null}
+                </TabPanel>
             </SwipeableViews>
         </>
     );

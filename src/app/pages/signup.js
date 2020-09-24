@@ -75,15 +75,15 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function getSteps() {
-    return ['Credentials', 'Email Verification', 'Join Groups'];
+function getSteps(absolutePath) {
+    return absolutePath ? ['Credentials', 'Email Verification'] : ['Credentials', 'Email Verification', 'Join Groups']
 }
 
 function SignUpPage({firebase}) {
     const classes = useStyles()
-    const steps = getSteps();
     const router = useRouter();
     const {absolutePath} = router.query
+    const steps = getSteps(absolutePath);
 
     const [user, setUser] = useState(false);
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
@@ -93,7 +93,7 @@ function SignUpPage({firebase}) {
     useEffect(() => {
         firebase.auth.onAuthStateChanged(user => {
             if (user && user.emailVerified) {
-                router.push('/profile')
+                router.push('/feed')
             } else if (user && !user.emailVerified) {
                 setUser(user);
                 setActiveStep(1)
@@ -114,6 +114,7 @@ function SignUpPage({firebase}) {
             case 1:
                 return <SignUpFormSent
                     user={user}
+                    absolutePath={absolutePath}
                     setActiveStep={setActiveStep}
                     emailVerificationSent={emailVerificationSent}/>
             case 2:
@@ -413,8 +414,9 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
     )
 }
 
-function SignUpFormValidate({user, setEmailVerificationSent, setActiveStep}) {
+function SignUpFormValidate({user, setEmailVerificationSent, setActiveStep, absolutePath}) {
     const classes = useStyles()
+    const router = useRouter()
 
     const [errorMessageShown, setErrorMessageShown] = useState(false);
     const [incorrectPin, setIncorrectPin] = useState(false);
@@ -461,8 +463,10 @@ function SignUpFormValidate({user, setEmailVerificationSent, setActiveStep}) {
                             pinCode: parseInt(values.pinCode)
                         }
                     }).then(response => {
-                        setActiveStep(2)
+                        user.reload();
+                        absolutePath ? router.push(absolutePath) : setActiveStep(2).then(console.log("leaving Page!"))
                     }).catch(error => {
+                        console.log("error", error);
                         setIncorrectPin(true);
                         setGeneralLoading(false);
                         setSubmitting(false);
@@ -538,9 +542,9 @@ function SignUpFormValidate({user, setEmailVerificationSent, setActiveStep}) {
                                 href="mailto:maximilian@careerfairy.io"> Let us
                                 know</MuiLink></div>
                         </div>
-                        <FormHelperText error hidden={!errorMessageShown}>
+                        <Typography align="center" color="secondary" hidden={!errorMessageShown}>
                             An error occurred while creating to your account
-                        </FormHelperText>
+                        </Typography>
                     </form>
                 )}
             </Formik>

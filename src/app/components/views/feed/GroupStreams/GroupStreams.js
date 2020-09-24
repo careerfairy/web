@@ -2,9 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../data/firebase";
 import GroupStreamCard from "./GroupStreamCard";
-import LazyLoad from 'react-lazyload'
 import {Typography, LinearProgress, Box} from "@material-ui/core";
-import Skeleton from '@material-ui/lab/Skeleton';
 import {SizeMe} from "react-sizeme";
 import StackGrid from "react-stack-grid";
 
@@ -19,7 +17,6 @@ const useStyles = makeStyles((theme) => ({
 
 
 const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId, careerCenterId}) => {
-
         const classes = useStyles()
         const [grid, setGrid] = useState(null);
 
@@ -72,7 +69,7 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
                                       style={{marginTop: mobile ? 100 : 0}}><strong>{groupData.universityName} currently has
                             no scheduled
                             livestreams</strong></Typography>)
-                    : <Typography variant="h6" style={{marginTop: 10}}>Chose a Group</Typography>}
+                    : null}
             </div>
         );
     }

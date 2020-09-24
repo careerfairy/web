@@ -113,7 +113,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
                         query: {absolutePath}
                     }} passHref><a>
                         <Button fullWidth className={classes.button} color="primary">
-                            <Typography variant="h5">Follow Groups</Typography>
+                            <Typography variant="h5">Follow Some Groups</Typography>
                         </Button></a>
                     </Link>
                 </Slider>}
