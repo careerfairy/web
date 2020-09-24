@@ -9,6 +9,7 @@ import NewCommentContainer from 'components/views/viewer/comment-container/NewCo
 import UserContext from 'context/user/UserContext';
 import MiniChatContainer from 'components/views/streaming/comment-container/categories/chat/MiniChatContainer';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
+import { useWindowSize } from 'components/custom-hook/useWindowSize';
 
 function ViewerPage(props) {
 
@@ -21,10 +22,21 @@ function ViewerPage(props) {
     
     const [careerCenters, setCareerCenters] = useState([]);
     const [handRaiseActive, setHandRaiseActive] = useState(false);
+    const [iconsDisabled, setIconsDisabled] = useState(false);
+
     const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
 
 
     const { authenticatedUser, userData } = React.useContext(UserContext);
+    const { width, height } = useWindowSize();
+
+    useEffect(() => {
+        if ( width < 768) {
+            setShowMenu(false)
+        } else {
+            setShowMenu(true);
+        }
+    }, [width]);
 
     useEffect(() => {
         if (livestreamId) {
@@ -58,6 +70,15 @@ function ViewerPage(props) {
         }
     }, [currentLivestream, userData]);
 
+    useEffect(() => {
+        if (iconsDisabled) {
+            let timeout = setTimeout(() => {
+                setIconsDisabled(false);
+            }, 3000);
+            return () => clearTimeout(timeout);
+        }
+    }, [iconsDisabled]);
+
     function joinTalentPool() {
         if (!authenticatedUser) {
             return router.replace('/signup');
@@ -75,8 +96,11 @@ function ViewerPage(props) {
     }
 
     function postIcon(iconName) {
-        let email = currentLivestream.test ? 'streamerEmail' : authenticatedUser.email;
-        props.firebase.postIcon(currentLivestream.id, iconName, email);
+        if (!iconsDisabled) {
+            setIconsDisabled(true);
+            let email = currentLivestream.test ? 'streamerEmail' : authenticatedUser.email;
+            props.firebase.postIcon(currentLivestream.id, iconName, email);
+        }  
     }
 
     let logoElements = careerCenters.map( (careerCenter, index) => {
@@ -115,17 +139,17 @@ function ViewerPage(props) {
                 <div className='action-buttons'>
                     <div className='action-container'>
                         <div className='button action-button red' onClick={() => postIcon('like')}>
-                            <Image src='/like.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
+                            <Image src='/like.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
                         </div>
                     </div>
                     <div className='action-container'>
                         <div className='button action-button orange' onClick={() => postIcon('clapping')}>
-                            <Image src='/clapping.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
+                            <Image src='/clapping.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
                         </div>
                     </div>
                     <div className='action-container'>
                         <div className='button action-button yellow' onClick={() => postIcon('heart')}>
-                            <Image src='/heart.png' style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
+                            <Image src='/heart.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
                         </div>
                     </div>            
                 </div>
@@ -284,7 +308,7 @@ function ViewerPage(props) {
                     right: 20px;
                     width: 20%;
                     min-width: 250px;
-                    z-index: 150;
+                    z-index: 7250;
                 }
 
                 @media(max-width: 768px) {

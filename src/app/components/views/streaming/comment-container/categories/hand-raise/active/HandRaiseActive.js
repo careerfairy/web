@@ -6,7 +6,7 @@ import NotificationsContext from 'context/notifications/NotificationsContext';
 
 function HandRaiseActive(props) {
 
-    const { setNewNotification } = useContext(NotificationsContext);
+    const { setNewNotification, setNotificationToRemove } = useContext(NotificationsContext);
 
     if (!props.livestream.handRaiseActive) {
         return null;
@@ -38,7 +38,7 @@ function HandRaiseActive(props) {
 
     let handRaiseElements = handRaises.filter( handRaise => (handRaise.state !== 'unrequested' && handRaise.state !== 'denied')).map( handRaise => {
         return (
-            <HandRaiseElement request={handRaise} updateHandRaiseRequest={updateHandRaiseRequest} setNewNotification={setNewNotification} />
+            <HandRaiseElement request={handRaise} updateHandRaiseRequest={updateHandRaiseRequest} setNewNotification={setNewNotification} setNotificationToRemove={setNotificationToRemove}/>
         );
     })
 

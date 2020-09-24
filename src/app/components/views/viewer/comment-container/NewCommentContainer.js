@@ -68,9 +68,9 @@ function CommentContainer(props) {
                             <Button circular size='big' icon='cog' onClick={() => props.setShowMenu(!props.showMenu)} secondary/>
                             <span style={{ opacity: showLabels ? '1' : '0' }} onClick={() => props.handleStateChange("settings")}>Settings</span>
                         </div> */}
-                        <div className={ props.showMenu ? '' : 'hidden' }>
+                        {/* <div className={ props.showMenu ? '' : 'hidden' }>
                             <Button circular size='big' icon={'angle left'} onClick={() => props.setShowMenu(!props.showMenu)}/>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
                 <style jsx>{`

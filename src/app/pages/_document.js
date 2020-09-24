@@ -37,7 +37,7 @@ class CustomDocument extends Document {
                         window.dataLayer = window.dataLayer || [];
                         function gtag(){dataLayer.push(arguments);}
                         gtag('js', new Date());
-                        gtag('config', '[Tracking ID]');
+                        gtag('config', 'UA-138497589-1');
                     `,
                 }}/>
         </Head>

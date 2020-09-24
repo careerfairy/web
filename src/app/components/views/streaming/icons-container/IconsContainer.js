@@ -1,5 +1,5 @@
-import {useState, useEffect, useRef, Fragment} from 'react';
-import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Dropdown} from "semantic-ui-react";
+import {useState, useEffect} from 'react';
+import {Header as SemanticHeader, Image} from "semantic-ui-react";
 
 import { withFirebasePage } from 'context/firebase';
 
