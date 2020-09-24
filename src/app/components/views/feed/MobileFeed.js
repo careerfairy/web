@@ -65,12 +65,13 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
         }
     }, [groupData.universityName])
 
+    useEffect(() => {
+        scrollToTop()
+    }, [value])
+
 
     const handleChange = (event, newValue) => {
-        if (newValue === 0 || newValue === 1) {
-            scrollToTop()
             setValue(newValue);
-        }
     }
 
     const handleResetView = () => {
@@ -107,7 +108,7 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                                      mobile={true}/>
                 </TabPanel>
             default:
-                return null
+                return <div key={key}/>
         }
     }
 
@@ -130,14 +131,29 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                         null}
                 </Tabs>
             </AppBar>
-            <VirtualizeSwipeableViews slideRenderer={slideRenderer}
-                                      style={{minHeight: 200}}
-                                      {...a11yProps(1)}
-                                      disabled //TODO annoyingly allows you to swipe past the available indexes so had to disable
-                                      containerStyle={{WebkitOverflowScrolling: 'touch'}}
-                                      axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                                      index={value}
-                                      onChangeIndex={handleChangeIndex}/>
+            <SwipeableViews
+                style={{minHeight: 200}}
+                containerStyle={{WebkitOverflowScrolling: 'touch'}}
+                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                index={value}
+                onChangeIndex={handleChangeIndex}>
+                <TabPanel dir={theme.direction}>
+                    <GroupStreams user={user}
+                                  mobile={true}
+                                  careerCenterId={careerCenterId}
+                                  livestreamId={livestreamId}
+                                  searching={searching}
+                                  livestreams={livestreams}
+                                  userData={userData}
+                                  groupData={groupData}/>
+                </TabPanel>
+                <TabPanel dir={theme.direction}>
+                    <GroupCategories alreadyJoined={alreadyJoined}
+                                     groupData={groupData}
+                                     handleToggleActive={handleToggleActive}
+                                     mobile={true}/>
+                </TabPanel>
+            </SwipeableViews>
         </>
     );
 }

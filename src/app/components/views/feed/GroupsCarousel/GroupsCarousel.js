@@ -111,14 +111,14 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
                     </IconButton>
                 </>
                 :
-                <Slider ref={customSlider} className={classes.slider} {...singleSettings}>
+                <Slider className={classes.slider} {...singleSettings}>
                     <Link href={user ? "/groups" : {
                         pathname: '/login',
                         query: {absolutePath}
-                    }}>
+                    }} passHref><a>
                         <Button fullWidth className={classes.button} color="primary">
                             <Typography variant="h5">Follow Groups</Typography>
-                        </Button>
+                        </Button></a>
                     </Link>
                 </Slider>}
         </div>
