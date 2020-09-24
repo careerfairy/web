@@ -30,6 +30,17 @@ export default class CustomDocument extends Document {
             <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
             <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Poppins:400,400i,500,500i,700, 700i|Roboto+Slab|Permanent+Marker"/>
             <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+            {/* Global site tag (gtag.js) - Google Analytics */}
+            <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138497589-1"></script>
+            <script
+                dangerouslySetInnerHTML={{
+                  __html: `
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+                        gtag('config', 'UA-138497589-1');
+                    `,
+                }}/>
         </Head>
         <body>
           <Main />
