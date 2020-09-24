@@ -18,10 +18,8 @@ const useStyles = makeStyles((theme) => ({
     slider: {
         boxShadow: "0 0 5px grey",
         "& .slick-next:before, .slick-prev:before": {
-            content: "'' !important"
-        },
-        ".slick-slide.slick-center ": {
-            transform: "scale(1.1)"
+            content: "'' !important",
+            display: "none"
         },
         background: "rgb(250, 250, 250)",
 
@@ -80,6 +78,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
         centerPadding: "60px",
         focusOnSelect: true,
         infinite: true,
+        arrows: false,
         slidesToScroll: 1,
         slidesToShow: mobile ? 1 : groupIds.length > 4 ? 4 : groupIds.length,
         speed: 500,
@@ -87,13 +86,10 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
     };
 
     const singleSettings = {
-        initialSlide: 0,
         centerMode: true,
-        centerPadding: "60px",
-        focusOnSelect: true,
         slidesToScroll: 1,
         slidesToShow: 1,
-        speed: 500,
+        arrows: false,
     }
 
     return (
