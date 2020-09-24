@@ -83,7 +83,7 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
         if (!user) {
             return router.push({
                 pathname: '/login',
-                query: {absolutePath}
+                query: {absolutePath:`/feed?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`}
             });
         }
 

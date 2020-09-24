@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Card, CardContent, CardMedia, Typography} from "@material-ui/core";
+import {Box, Card, CardContent, CardMedia, Typography, Button} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import CategoryCard from "./CategoryCard";
 import {SizeMe} from "react-sizeme";
@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile}) => {
+
     const classes = useStyles();
     const [grid, setGrid] = useState(null);
 
@@ -44,12 +45,11 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile})
         <div style={{width: mobile ? "100%" : "40%", paddingTop: 18}} className={classes.root}>
             {groupData.categories?.length &&
             <Card style={{position: mobile ? "static" : "sticky", top: mobile ? "auto" : 165}}>
-                {!alreadyJoined &&
-                <Typography style={{marginTop: 10}} variant="h5" align="center">Start Following {groupData.universityName}:</Typography>}
-                {!mobile && <CardMedia className={classes.media}>
-                    <img src={groupData.logoUrl} className={classes.image} alt={`${groupData.universityName} logo`}/>
-                </CardMedia>}
                 <CardContent>
+                    {!mobile && <CardMedia className={classes.media}>
+                        <img src={groupData.logoUrl} className={classes.image}
+                             alt={`${groupData.universityName} logo`}/>
+                    </CardMedia>}
                     <Box className={classes.actions}>
                         <SizeMe>{({size}) => (
                             <StackGrid
@@ -60,11 +60,11 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile})
                                 gridRef={grid => setGrid(grid)}>
                                 {groupData.categories.map(category => {
                                     if (category.name.toLowerCase() !== "level of study") {
-                                    return (
-                                        <CategoryCard width={size.width} mobile={mobile} key={category.id}
-                                                      category={category}
-                                                      handleToggleActive={handleToggleActive}/>
-                                    )
+                                        return (
+                                            <CategoryCard width={size.width} mobile={mobile} key={category.id}
+                                                          category={category}
+                                                          handleToggleActive={handleToggleActive}/>
+                                        )
                                     }
                                 })}
                             </StackGrid>

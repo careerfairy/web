@@ -10,12 +10,15 @@ const DesktopFeed = ({groupData, userData, alreadyJoined, handleToggleActive, mo
             {groupData.categories ?
                 <GroupCategories livestreams={livestreams}
                                  mobile={mobile}
+                                 user={user}
                                  handleToggleActive={handleToggleActive}
+                                 userData={userData}
                                  alreadyJoined={alreadyJoined}
                                  groupData={groupData}/> : null}
             <GroupStreams
                 user={user}
                 livestreamId={livestreamId}
+                alreadyJoined={alreadyJoined}
                 searching={searching}
                 mobile={mobile}
                 careerCenterId={careerCenterId}

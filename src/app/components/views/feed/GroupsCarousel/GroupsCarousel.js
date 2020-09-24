@@ -65,6 +65,10 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
         customSlider.current.slickPrev()
     }
 
+    const handleFollowGroups = () => {
+        return router.push(user ? '/groups' : {pathname: '/login', query: {absolutePath}})
+    }
+
 
     const renderGroupCards = groupIds?.map((id, index) => {
         return <GroupCarouselCard index={index} mobile={mobile} handleResetGroup={handleResetGroup}
@@ -108,14 +112,9 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
                 </>
                 :
                 <Slider className={classes.slider} {...singleSettings}>
-                    <Link href={user ? "/groups" : {
-                        pathname: '/login',
-                        query: {absolutePath}
-                    }} passHref><a>
-                        <Button fullWidth className={classes.button} color="primary">
+                        <Button fullWidth onClick={handleFollowGroups} className={classes.button} color="primary">
                             <Typography variant="h5">Follow Some Groups</Typography>
-                        </Button></a>
-                    </Link>
+                        </Button>
                 </Slider>}
         </div>
     )

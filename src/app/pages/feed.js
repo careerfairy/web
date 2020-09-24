@@ -25,10 +25,10 @@ const feed = ({firebase}) => {
     useEffect(() => {
         if (user) {
             const unsubscribe = firebase.listenToUserData(user.email, querySnapshot => {
-                let user = querySnapshot.data();
-                user.id = querySnapshot.id;
+                let userObj = querySnapshot.data();
+                userObj.id = querySnapshot.id;
                 if (user) {
-                    setUserData(user);
+                    setUserData(userObj);
                 }
             })
             return () => unsubscribe

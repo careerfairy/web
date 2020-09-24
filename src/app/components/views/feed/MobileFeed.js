@@ -116,6 +116,7 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                                   careerCenterId={careerCenterId}
                                   livestreamId={livestreamId}
                                   searching={searching}
+                                  alreadyJoined={alreadyJoined}
                                   livestreams={livestreams}
                                   userData={userData}
                                   groupData={groupData}/>
@@ -123,6 +124,8 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                 <TabPanel dir={theme.direction}>
                     <GroupCategories alreadyJoined={alreadyJoined}
                                      groupData={groupData}
+                                     user={user}
+                                     userData={userData}
                                      handleToggleActive={handleToggleActive}
                                      mobile={true}/>
                 </TabPanel>

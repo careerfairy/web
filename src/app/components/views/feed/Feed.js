@@ -66,7 +66,7 @@ const Feed = ({user, userData, firebase}) => {
             })
             return () => unsubscribe()
         }
-    }, [groupData, selectedOptions])
+    }, [groupData, selectedOptions, userData, user])
 
     useEffect(() => {
         if (groupData && groupData.categories) {

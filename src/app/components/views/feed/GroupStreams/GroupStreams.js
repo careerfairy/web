@@ -2,9 +2,12 @@ import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../context/firebase";
 import GroupStreamCard from "./GroupStreamCard";
-import {Typography, LinearProgress, Box} from "@material-ui/core";
+import {Typography, LinearProgress, Box, Button, Card} from "@material-ui/core";
 import {SizeMe} from "react-sizeme";
 import StackGrid from "react-stack-grid";
+import Link from "next/link";
+import {useRouter} from "next/router";
+import GroupJoinModal from "../../profile/GroupJoinModal";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -16,9 +19,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId, careerCenterId}) => {
+const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId, careerCenterId, alreadyJoined}) => {
         const classes = useStyles()
+        const router = useRouter()
+        const absolutePath = router.asPath
         const [grid, setGrid] = useState(null);
+        const [openJoinModal, setOpenJoinModal] = useState(false);
 
         useEffect(() => {
             if (grid) {
@@ -27,6 +33,22 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
                 }, 10);
             }
         }, [grid, livestreams]);
+
+
+        const handleCloseJoinModal = () => {
+            setOpenJoinModal(false);
+        };
+        const handleOpenJoinModal = () => {
+            setOpenJoinModal(true);
+        };
+
+        const handleJoin = () => {
+            if (userData) {
+                handleOpenJoinModal()
+            } else {
+                return router.push({pathname: "/login", query: absolutePath})
+            }
+        }
 
         const renderStreamCards = livestreams?.map((livestream, index) => {
             if (livestream) {
@@ -48,6 +70,10 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
 
         return (
             <div style={{padding: mobile ? 0 : "1rem"}} className={classes.root}>
+                {!alreadyJoined && groupData.universityName &&
+                <Button onClick={handleJoin} variant="contained" fullWidth color="primary" align="center">
+                    Start Following {groupData.universityName}
+                </Button>}
                 {groupData.id ? (searching ?
                     <Box display="flex" justifyContent="center" mt={5}>
                         <LinearProgress style={{width: "80%"}} color="primary"/>
@@ -70,6 +96,13 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
                             no scheduled
                             livestreams</strong></Typography>)
                     : null}
+                <GroupJoinModal
+                    open={openJoinModal}
+                    group={groupData}
+                    alreadyJoined={alreadyJoined}
+                    userData={userData}
+                    closeModal={handleCloseJoinModal}
+                />
             </div>
         );
     }
