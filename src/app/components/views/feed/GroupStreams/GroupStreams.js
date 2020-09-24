@@ -40,7 +40,10 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
         const router = useRouter()
         const absolutePath = router.asPath
         const [grid, setGrid] = useState(null);
+        const [page, setPage] = useState(0)
+        const [isBottom, setIsBottom] = useState(false);
         const [openJoinModal, setOpenJoinModal] = useState(false);
+        const [localLiveStreams, setLocalLivestreams] = useState([])
 
         useEffect(() => {
             if (grid) {
@@ -49,6 +52,28 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
                 }, 10);
             }
         }, [grid, livestreams]);
+
+        useEffect(() => {
+            console.log("updated livestreams")
+            if (livestreams) {
+                if (localLiveStreams.length === 0) {
+                    const initialGroups = livestreams.slice(0, 10)
+                    setLocalLivestreams(initialGroups)
+                }
+            }
+        }, [livestreams])
+
+        useEffect(() => {
+            window.addEventListener('scroll', throttle(handleScroll, 500));
+            return () => window.removeEventListener('scroll', throttle(handleScroll, 500));
+        }, []);
+
+        useEffect(() => {
+            console.log("isBottom");
+            if (isBottom) {
+                addItems();
+            }
+        }, [isBottom]);
 
 
         const handleCloseJoinModal = () => {
@@ -66,7 +91,48 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
             }
         }
 
-        const renderStreamCards = livestreams?.map((livestream, index) => {
+        function handleScroll() {
+            const scrollTop = (document.documentElement
+                && document.documentElement.scrollTop)
+                || document.body.scrollTop;
+            const scrollHeight = (document.documentElement
+                && document.documentElement.scrollHeight)
+                || document.body.scrollHeight;
+            console.log("scrollTop", scrollTop)
+            console.log("scrollHeight", scrollHeight)
+            console.log("window.innerHeight", window.innerHeight)
+            if (scrollTop + window.innerHeight + 50 >= (scrollHeight / 2)) {
+                setIsBottom(true);
+            }
+        }
+
+        const addItems = () => {
+            if (livestreams.length !== 0) {
+                console.log("setting local groups");
+                setLocalLivestreams(prevState =>
+                    prevState.concat(
+                        livestreams.slice(
+                            (page + 1) * 10,
+                            (page + 1) * 10 + 10,
+                        ),
+                    ),
+                );
+                setPage(prevState => prevState + 1);
+                setIsBottom(false);
+            }
+        };
+
+        function throttle(fn, wait) {
+            var time = Date.now();
+            return function () {
+                if ((time + wait - Date.now()) < 0) {
+                    fn();
+                    time = Date.now();
+                }
+            }
+        }
+
+        const renderStreamCards = localLiveStreams?.map((livestream, index) => {
             if (livestream) {
                 return (
                     <LazyLoad key={livestream.id}
