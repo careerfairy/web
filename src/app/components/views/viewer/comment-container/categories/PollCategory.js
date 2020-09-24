@@ -9,6 +9,7 @@ function PollCategory(props) {
 
     const { authenticatedUser, userData } = React.useContext(UserContext);
     const [currentPoll, setCurrentPoll] = useState(null); 
+    const [currentPollId, setCurrenPollId] = useState(null);
 
     useEffect(() => {
         if (props.livestream) {
@@ -27,9 +28,10 @@ function PollCategory(props) {
     }, [props.livestream]);
 
     useEffect(() => {
-        if (currentPoll) {
+        if (currentPoll && currentPoll.id !== currentPollId) {
             props.setSelectedState("polls");
             props.setShowMenu(true);
+            setCurrenPollId(currentPoll.id);
         }
     }, [currentPoll]);
 

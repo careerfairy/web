@@ -24,6 +24,7 @@ function StreamingPage(props) {
     const [showMenu, setShowMenu] = useState(true);
 
     const [newNotification, setNewNotification] = useState(null);
+    const [notificationToRemove, setNotificationToRemove] = useState(null);
     const [notifications, setNotifications] = useState([]);
 
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
@@ -75,6 +76,14 @@ function StreamingPage(props) {
     }, [newNotification]);
 
     useEffect(() => {
+        debugger;
+        if (notificationToRemove) {
+            let updatedNotifications = notifications.filter(not => not.id !== notificationToRemove);
+            setNotifications(updatedNotifications);
+        }
+    }, [notificationToRemove]);
+
+    useEffect(() => {
         if (currentLivestream.start) {
             let interval = setInterval(() => {
                 if (dateIsInUnder2Minutes(currentLivestream.start.toDate())) {
@@ -99,7 +108,7 @@ function StreamingPage(props) {
     }
 
     return (
-        <NotificationsContext.Provider value={{ setNewNotification: setNewNotification }}>
+        <NotificationsContext.Provider value={{ setNewNotification: setNewNotification, setNotificationToRemove: setNotificationToRemove }}>
             <div className='topLevelContainer'>
                 <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
                     <div style={{ position: 'absolute', top: '50%', left: '20px', transform: 'translateY(-50%)', verticalAlign: 'middle'}}>
@@ -135,7 +144,7 @@ function StreamingPage(props) {
                     <VideoContainer currentLivestream={ currentLivestream } streamerId={ currentLivestream.id } streamingCallbacks={streamingCallbacks} errorCallbacks={errorCallbacks} showMenu={showMenu} viewer={false}/>
                 </div>
                 <div className='video-menu-left' style={{ width: showMenu ? '280px' : '0'}}>
-                    <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={true} livestream={ currentLivestream } setNotifications={setNotifications}/>
+                    <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={true} livestream={ currentLivestream }/>
                 </div>
                 <div className='mini-chat-container'>
                     <MiniChatContainer livestream={ currentLivestream } isStreamer={true}/>

@@ -1,4 +1,4 @@
-import { Fragment, useState} from 'react';
+import { Fragment, useState, useEffect} from 'react';
 import { Button } from "semantic-ui-react";
 
 function Notification({ notification, index }) {

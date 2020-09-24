@@ -1,17 +1,26 @@
 import React, {useState, useEffect, Fragment, useContext} from 'react';
 import { Input, Icon, Button, Modal } from 'semantic-ui-react';
+import { v4 as uuidv4 } from 'uuid';
 
 function RequestedHandRaiseElement(props) {
 
+    const [notificationId, setNotificationId] = useState(uuidv4());
+
     useEffect(() => {
         props.setNewNotification({
+            id: notificationId,
             message: props.request.name + ' has haised a hand and requested to join the stream',
             confirmMessage: 'Invite',
             confirm: ()  =>  props.updateHandRaiseRequest(props.request.id, 'invited'),
             cancelMessage: 'Deny',
-            cancel: () =>  props.updateHandRaiseRequest(props.request.id, 'denied')  
+            cancel: () =>  props.updateHandRaiseRequest(props.request.id, 'denied'),
         });
-    },[])
+    },[]);
+
+    function updateHandRaiseRequest(state) {
+        props.updateHandRaiseRequest(props.request.id, state);
+        props.setNotificationToRemove(notificationId);
+    }
 
     return (
         <div>
@@ -19,8 +28,8 @@ function RequestedHandRaiseElement(props) {
                 <div className='label'>HAND RAISED</div>
                 <div className='name'>{ props.request.name }</div>
                 <div className='button-group'>
-                    <Button content='Invite to speak' size='mini' onClick={() => props.updateHandRaiseRequest(props.request.id, 'invited')} primary/>
-                    <Button content='Deny' size='mini'  onClick={() => props.updateHandRaiseRequest(props.request.id, 'denied')}/>
+                    <Button content='Invite to speak' size='mini' onClick={() => updateHandRaiseRequest('invited')} primary/>
+                    <Button content='Deny' size='mini'  onClick={() => updateHandRaiseRequest('denied')}/>
                 </div>
             </div>  
             <style jsx>{`
@@ -84,15 +93,23 @@ function InvitedHandRaiseElement(props) {
 
 function ConnectingHandRaiseElement(props) {
 
+    const [notificationId, setNotificationId] = useState(uuidv4());
+
     useEffect(() => {
         props.setNewNotification({
+            id: notificationId,
             message: props.request.name + ' is now connecting to the stream',
             confirmMessage: 'OK',
             confirm: ()  =>  {},
             cancelMessage: 'Stop Connection',
-            cancel: () =>  props.updateHandRaiseRequest(props.request.id, 'denied')  
+            cancel: () =>  props.updateHandRaiseRequest(props.request.id, 'denied'),
         });
     },[])
+
+    function updateHandRaiseRequest(state) {
+        props.updateHandRaiseRequest(props.request.id, state);
+        props.setNotificationToRemove(notificationId);
+    }
 
     return (
         <div>
@@ -100,7 +117,7 @@ function ConnectingHandRaiseElement(props) {
                 <div className='label'>CONNECTING</div>
                 <div className='name'>{ props.request.name }</div>
                 <div className='button-group'>
-                    <Button content='Remove' size='mini'  onClick={() => props.updateHandRaiseRequest(props.request.id, 'denied')}/>
+                    <Button content='Remove' size='mini'  onClick={() => updateHandRaiseRequest('denied')}/>
                 </div>
             </div>  
             <style jsx>{`
@@ -130,15 +147,23 @@ function ConnectingHandRaiseElement(props) {
 
 function ConnectedHandRaiseElement(props) {
 
+    const [notificationId, setNotificationId] = useState(uuidv4());
+
     useEffect(() => {
         props.setNewNotification({
-            message: props.request.name + ' is now connectied to the stream',
+            id: notificationId,
+            message: props.request.name + ' is now connected to the stream',
             confirmMessage: 'OK',
             confirm: ()  =>  {},
             cancelMessage: 'Remove from Stream',
-            cancel: () =>  props.updateHandRaiseRequest(props.request.id, 'denied')  
+            cancel: () =>  props.updateHandRaiseRequest(props.request.id, 'denied'),
         });
     },[])
+
+    function updateHandRaiseRequest(state) {
+        props.updateHandRaiseRequest(props.request.id, state);
+        props.setNotificationToRemove(notificationId);
+    }
 
     return (
         <div>
@@ -146,7 +171,7 @@ function ConnectedHandRaiseElement(props) {
                 <div className='label'>CONNECTED</div>
                 <div className='name'>{ props.request.name }</div>
                 <div className='button-group'>
-                    <Button content='Remove' size='mini'  onClick={() => props.updateHandRaiseRequest(props.request.id, 'denied')}/>
+                    <Button content='Remove' size='mini'  onClick={() => updateHandRaiseRequest('denied')}/>
                 </div>
             </div>  
             <style jsx>{`
