@@ -74,14 +74,14 @@ function LogInPage({firebase}) {
     const router = useRouter();
     const {absolutePath} = router.query
 
-    useEffect(() => {
-        if (authenticatedUser && authenticatedUser.emailVerified && absolutePath) {
-            router.push(`${absolutePath}`)
-        }
-    }, [authenticatedUser, absolutePath])
+    // useEffect(() => {
+    //     if (authenticatedUser && authenticatedUser.emailVerified && absolutePath) {
+    //         router.replace(`${absolutePath}`)
+    //     }
+    // }, [authenticatedUser, absolutePath])
 
     useEffect(() => {
-        if (authenticatedUser) {
+        if (authenticatedUser && userData !== undefined) {
             if (!authenticatedUser.emailVerified) {
                 router.replace(absolutePath ? {
                     pathname: '/signup',
@@ -89,14 +89,14 @@ function LogInPage({firebase}) {
                 } : '/signup');
             } else {
                 if (userData) {
-                    router.push(absolutePath || '/next-livestreams');
+                    router.replace(absolutePath || '/next-livestreams');
                 } else {
-                    router.push(absolutePath || '/profile');
+                    router.replace(absolutePath || '/profile');
                 }
                 setGeneralLoading(false);
             }
         }
-    }, [authenticatedUser]);
+    }, [authenticatedUser, absolutePath, userData]);
 
     useEffect(() => {
         if (userEmailNotValidated) {

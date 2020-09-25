@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import {withFirebase} from 'context/firebase';
 import Header from '../components/views/header/Header';
@@ -7,6 +7,7 @@ import {useRouter} from "next/router";
 import Loader from "../components/views/loader/Loader";
 import Footer from "../components/views/footer/Footer";
 import ProfileNav from "../components/views/profile/ProfileNav";
+import UserContext from "../context/user/UserContext";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -23,37 +24,14 @@ const UserProfile = ({firebase}) => {
     const classes = useStyles();
     const router = useRouter();
     const [loading, setLoading] = useState(false)
-    const [userData, setUserData] = useState(null)
-    const [user, setUser] = useState(null);
+    const {authenticatedUser, userData} = useContext(UserContext)
+
 
     useEffect(() => {
-        firebase.auth.onAuthStateChanged(user => {
-            if (user) {
-                setUser(user);
-            } else {
-                router.replace('/login');
-            }
-        })
-    }, []);
-
-    useEffect(() => {
-        setLoading(true);
-        if (user) {
-            const unsubscribe = firebase.listenToUserData(user.email, querySnapshot => {
-                setLoading(false);
-                let user = querySnapshot.data();
-                user.id = querySnapshot.id;
-                if (user) {
-                    setUserData(user);
-                }
-            })
-            return () => unsubscribe
+        if (!authenticatedUser) {
+            router.push('/login');
         }
-    }, [user]);
-
-    if (user === null || userData == null || loading === true) {
-        return <Loader/>;
-    }
+    }, [authenticatedUser]);
 
     return (
         <div className={classes.root}>
@@ -61,7 +39,7 @@ const UserProfile = ({firebase}) => {
                 <title key="title">CareerFairy | My Profile</title>
             </Head>
             <Header classElement='relative white-background'/>
-            <ProfileNav user={user} userData={userData}/>
+            <ProfileNav user={authenticatedUser} userData={userData}/>
             <Footer/>
         </div>
     );

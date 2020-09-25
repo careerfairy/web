@@ -6,6 +6,7 @@ import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import MobileFeed from "./MobileFeed";
 import {useRouter} from "next/router";
 import UserContext from "../../../context/user/UserContext";
+import SingleCarousel from "./GroupsCarousel/SingleCarousel";
 
 const NextLivestreams = ({user, firebase}) => {
 
@@ -47,6 +48,7 @@ const NextLivestreams = ({user, firebase}) => {
     }, [listenToUpcoming])
 
     useEffect(() => {
+        console.log("router", router)
         // will set the params once the router is loaded whether it be undefined or truthy
         if (paramsLivestreamId === null && router) {
             setParamsCareerCenterId(careerCenterId)
@@ -104,38 +106,46 @@ const NextLivestreams = ({user, firebase}) => {
         }
     }, [groupData.categories, groupData])
 
+
     useEffect(() => {
         // This checks if the params from the next router have been defined and only then will it set groupIds
-        if (routerMounted && userData !== undefined) {
+        if (userData !== undefined) {
             handleGetGroupIds()
         }
-    }, [userData, router, paramsLivestreamId, paramsCareerCenterId, authenticatedUser, routerMounted])
-
+    }, [userData, careerCenterId])
 
     const checkIfCareerCenterExists = async (centerId) => {
         const querySnapshot = await firebase.getCareerCenterById(centerId)
         return querySnapshot.exists
     }
 
-    const handleGetGroupIds = async () => {
+    const handleGetGroupIds = () => {
         let newGroupIds = []
         if (userData && userData.groupIds) {
-            newGroupIds = [...userData.groupIds]
+            newGroupIds = [...groupIds, ...userData.groupIds]
         }
         if (careerCenterId) {
-            if (newGroupIds.includes(careerCenterId)) {
-                const currentIndex = newGroupIds.findIndex(el => el === careerCenterId)
-                if (currentIndex > -1) {
-                    swapPositions(newGroupIds, 0, currentIndex)
-                }
-            } else {
-                const exists = await checkIfCareerCenterExists(careerCenterId)
-                if (exists) {
-                    newGroupIds.unshift(careerCenterId)
-                }
-            }
+            return handleGetParams(newGroupIds)
+        } else {
+            setGroupIds(newGroupIds)
         }
-        return setGroupIds(newGroupIds)
+    }
+
+    const handleGetParams = async (userGroupIds) => {
+        let newGroupIds = [...userGroupIds]
+        if (newGroupIds.includes(careerCenterId)) {
+            const currentIndex = newGroupIds.findIndex(el => el === careerCenterId)
+            if (currentIndex > -1) {
+                swapPositions(newGroupIds, 0, currentIndex)
+            }
+            setGroupIds(newGroupIds)
+        } else {
+            const exists = await checkIfCareerCenterExists(careerCenterId)
+            if (exists) {
+                newGroupIds.unshift(careerCenterId)
+            }
+            setGroupIds(newGroupIds)
+        }
     }
 
 
@@ -203,7 +213,6 @@ const NextLivestreams = ({user, firebase}) => {
                             handleResetGroup={handleResetGroup}
                             handleSetGroup={handleSetGroup}
                             groupIds={groupIds}/>
-
             {mobile ?
                 <MobileFeed groupData={groupData}
                             user={authenticatedUser}

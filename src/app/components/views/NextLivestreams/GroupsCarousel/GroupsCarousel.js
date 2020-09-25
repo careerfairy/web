@@ -99,12 +99,29 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
         swipeToSlide: true,
         arrows: false,
         slidesToScroll: 1,
-        slidesToShow: mobile ? 1 : groupIds.length > 4 ? 4 : groupIds.length,
+        slidesToShow: !groupIds.length || mobile ? 1 : groupIds.length > 4 ? 4 : groupIds.length,
         speed: 500,
         beforeChange: (current, next) => setActiveSlide(next),
     };
 
-    return groupIds.length ? (
+    const singleSettings = {
+        initialSlide: 0,
+        centerMode: true,
+        // variableWidth: true,
+        // centerPadding: "40%",
+        focusOnSelect: true,
+        swipeToSlide: true,
+        infinite: true,
+        arrows: false,
+        slidesToScroll: 1,
+        slidesToShow: 1,
+        speed: 500,
+        beforeChange: (current, next) => setActiveSlide(next),
+    }
+
+    console.log("groupids", groupIds)
+
+    return (
         <div className={classes.root}>
             <IconButton className={classes.prev} onClick={handlePrev}>
                 <NavigateBeforeIcon className={classes.icon} color="primary" fontSize="large"/>
@@ -119,7 +136,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
                 <NavigateNextIcon className={classes.icon} fontSize="large"/>
             </IconButton>
         </div>
-    ) : null
+    )
 
 };
 
