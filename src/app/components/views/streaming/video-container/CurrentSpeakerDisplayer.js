@@ -8,9 +8,6 @@ function CurrentSpeakerDisplayer(props) {
     const localVideoRef = useRef(null);
     const windowSize = useWindowSize();
 
-    const [showPlayButton, setShowPlayButton] = useState(false);
-    const [unmute, setUnmute] = useState(false);
-
     useEffect(() => {
         if (!props.isPlayMode && props.localStream) {
             localVideoRef.current.srcObject = props.localStream;
@@ -63,10 +60,7 @@ function CurrentSpeakerDisplayer(props) {
         }
     } 
 
-    function unmuteVideos() {
-        setShowPlayButton(false);
-        setUnmute(true);
-    }
+    
 
     function getVideoContainerClass(streamId) {
         if (props.smallScreenMode) {
@@ -95,7 +89,7 @@ function CurrentSpeakerDisplayer(props) {
     let externalVideoElements = props.streams.map( (stream, index) => {
         return (
             <div key={stream.streamId} className={getVideoContainerClass(stream.streamId)} style={{ padding: 0 }} onClick={() => updateCurrentStreamId(stream.streamId)}>
-                <RemoteVideoContainer showPlayButton={showPlayButton} setShowPlayButton={setShowPlayButton} unmute={unmute} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
+                <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
                 <style jsx>{`
                     .quarter-width {
                         height: 100%;
@@ -201,12 +195,6 @@ function CurrentSpeakerDisplayer(props) {
                 <div className='relative-container-videos' style={{ height: getMinimizedSpeakersGridHeight() }}>
                     { externalVideoElements }
                 </div> 
-                <div className={ 'playButtonContent ' + (showPlayButton ? '' : 'hidden')} onClick={unmuteVideos}>
-                    <div className='playButton'>
-                        <Icon name='volume up' style={{ fontSize: '3rem' }}/>
-                        <div>Click to unmute</div>
-                    </div>     
-                </div>
             </div>             
             <style jsx>{`
                 .relative-container {
@@ -240,26 +228,6 @@ function CurrentSpeakerDisplayer(props) {
                 
                 .hidden {
                     display: none;
-                }
-
-                .playButton {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    color: white;
-                    font-weight: 500;
-                }
-
-                .playButtonContent {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(10,10,10,0.4);
-                    z-index: 9901;
-                    cursor: pointer;
                 }
           `}</style>
         </Fragment>

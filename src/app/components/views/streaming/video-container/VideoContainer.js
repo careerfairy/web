@@ -209,6 +209,7 @@ function VideoContainer(props) {
                         streams={externalMediaStreams} 
                         mediaConstraints={mediaConstraints} 
                         currentSpeaker={props.currentLivestream.currentSpeakerId} 
+                        {...props}
                         muted={false}/>
                 </div>
                 { props.currentLivestream.mode === 'presentation' ?
