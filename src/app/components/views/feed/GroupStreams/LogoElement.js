@@ -45,9 +45,9 @@ const LogoElement = ({careerCenter, userData, user, livestreamId}) => {
         <Box display="flex" justifyContent="space-between" flexDirection="column" alignItems="center"
              style={{margin: '0 auto', width: '65px', height: "100%"}}>
             <LazyLoad placeholder={<LogoSkeleton/>}>
-                {checkIfUserFollows(careerCenter) ? null :
-                    <Button onClick={handleJoin} style={{marginBottom: 10}} variant="outlined" color="primary"> Follow </Button>}
                 <Image alt={`${careerCenter.universityName} logo`} src={careerCenter.logoUrl}/>
+                {checkIfUserFollows(careerCenter) ? null :
+                    <Button onClick={handleJoin} style={{marginTop: 10}} variant="outlined" color="primary"> Follow </Button>}
                 <GroupJoinModal
                     open={openJoinModal}
                     group={careerCenter}
