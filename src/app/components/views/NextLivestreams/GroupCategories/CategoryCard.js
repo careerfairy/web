@@ -15,7 +15,7 @@ const CategoryCard = ({category, handleToggleActive, mobile, width}) => {
                     variant={option.active ? "default" : "outlined"}
                     size={mobile ? "small" : "medium"}
                     style={{maxWidth: width}}
-                    label={<Typography variant="body1">{option.name}</Typography>}
+                    label={option.name}
                     onClick={() => handleToggleActive(category.id, option.id)}/>
             </Tooltip>
         )
