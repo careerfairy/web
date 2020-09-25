@@ -7,7 +7,7 @@ import MobileFeed from "./MobileFeed";
 import {useRouter} from "next/router";
 import UserContext from "../../../context/user/UserContext";
 
-const Feed = ({user, firebase}) => {
+const NextLivestreams = ({user, firebase}) => {
 
     const {userData, authenticatedUser} = useContext(UserContext)
 
@@ -234,4 +234,4 @@ const Feed = ({user, firebase}) => {
     );
 };
 
-export default withFirebase(Feed);
+export default withFirebase(NextLivestreams);

@@ -14,7 +14,7 @@ const LogoElement = ({careerCenter, userData, user, livestreamId}) => {
 
     const router = useRouter()
 
-    const linkToStream = `/feed?careerCenterId=${careerCenter.groupId}&livestreamId=${livestreamId}`
+    const linkToStream = `/next-livestreams?careerCenterId=${careerCenter.groupId}&livestreamId=${livestreamId}`
 
     const [openJoinModal, setOpenJoinModal] = useState(false);
 

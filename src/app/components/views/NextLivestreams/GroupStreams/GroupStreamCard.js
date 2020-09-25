@@ -48,7 +48,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
     const router = useRouter();
     const absolutePath = router.asPath
 
-    const linkToStream = listenToUpcoming ? "/feed" : `/feed?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
+    const linkToStream = listenToUpcoming ? "/next-livestreams" : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
 
     const avatar = livestream.mainSpeakerAvatar ? livestream.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
 

@@ -12,8 +12,10 @@ import ProfileNav from "../components/views/profile/ProfileNav";
 const useStyles = makeStyles((theme) => ({
     root: {
         backgroundColor: "rgb(250,250,250)",
-        height: "100%",
+        height: "100vh",
         minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column"
     },
 }));
 

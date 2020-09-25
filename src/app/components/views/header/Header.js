@@ -154,7 +154,7 @@ function Header(props) {
                     <li><Link
                         href={authenticated ? '/profile' : '/login'}><a>{authenticated ? 'My Profile' : 'Log in'}</a></Link>
                     </li>
-                    {authenticated && <li><Button onClick={handleLogout} color="primary">Logout</Button></li>}
+                    {authenticated && <li><a onClick={handleLogout}>Logout</a></li>}
                 </ul>
             </div>
             <style jsx>{`

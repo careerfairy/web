@@ -49,6 +49,8 @@ const ProfileNav = ({userData}) => {
     const theme = useTheme();
     const native = useMediaQuery(theme.breakpoints.down('xs'));
     const [value, setValue] = useState(1);
+    const [isAdmin, setIsAdmin] = useState(true);
+
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -59,7 +61,7 @@ const ProfileNav = ({userData}) => {
     };
 
     return (
-        <Container style={{marginTop: '50px'}}>
+        <Container style={{marginTop: '50px', flex: 1}}>
             <AppBar className={classes.bar} position="static" color="default">
                 <Tabs
                     value={value}
@@ -70,11 +72,13 @@ const ProfileNav = ({userData}) => {
                     centered
                 >
                     <Tab wrapped fullWidth
-                         label={<Typography noWrap variant="h5">{native ? "Personal" : "Personal Information"}</Typography>}/>
+                         label={<Typography noWrap
+                                            variant="h5">{native ? "Personal" : "Personal Information"}</Typography>}/>
                     <Tab wrapped fullWidth
                          label={<Typography variant="h5">{native ? "Groups" : "Joined Groups"}</Typography>}/>
-                    {"isAdmin?"?<Tab wrapped fullWidth
-                          label={<Typography variant="h5">{native ? "Admin" : "Admin Groups"}</Typography>}/> : null}
+                    {isAdmin ? <Tab wrapped fullWidth
+                                    label={<Typography
+                                        variant="h5">{native ? "Admin" : "Admin Groups"}</Typography>}/> : null}
                 </Tabs>
             </AppBar>
             <SwipeableViews

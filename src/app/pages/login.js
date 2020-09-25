@@ -89,7 +89,7 @@ function LogInPage({firebase}) {
                 } : '/signup');
             } else {
                 if (userData) {
-                    router.push(absolutePath || '/feed');
+                    router.push(absolutePath || '/next-livestreams');
                 } else {
                     router.push(absolutePath || '/profile');
                 }

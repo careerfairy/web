@@ -94,7 +94,7 @@ function SignUpPage({firebase}) {
     useEffect(() => {
         firebase.auth.onAuthStateChanged(user => {
             if (user && user.emailVerified) {
-                router.push('/feed')
+                router.push('/next-livestreams')
             } else if (user && !user.emailVerified) {
                 setUser(user);
                 setActiveStep(1)

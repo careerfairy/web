@@ -74,7 +74,7 @@ const AdminGroups = ({userData, firebase}) => {
                     </Grid>
                     :
                     <Typography gutterBottom>
-                        You are currently not a member of any career group.
+                        You are currently not an admin of any career group.
                     </Typography>}
             </div>
         </Fragment>
