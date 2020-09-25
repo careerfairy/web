@@ -1,11 +1,8 @@
-import React, {Fragment, useState, useEffect} from 'react';
-import {Form, Header, Image, Message, Icon} from "semantic-ui-react";
-
+import React, {Fragment, useState, useEffect, useContext} from 'react';
 import {useRouter} from 'next/router';
 import Link from 'next/link';
 import {Formik} from 'formik';
 import axios from 'axios';
-
 import Head from 'next/head';
 import {withFirebase} from "context/firebase";
 import {TealBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
@@ -17,13 +14,13 @@ import {
     TextField,
     CircularProgress,
     Button,
-    Link as MuiLink, Paper
+    Paper
 } from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import TheatersRoundedIcon from "@material-ui/icons/TheatersRounded";
-import ArrowForwardIosRoundedIcon from "@material-ui/icons/ArrowForwardIosRounded";
 import BusinessCenterRoundedIcon from "@material-ui/icons/BusinessCenterRounded";
 import MicOutlinedIcon from '@material-ui/icons/MicOutlined';
+import UserContext from "../context/user/UserContext";
 
 const useStyles = makeStyles((theme) => ({
     box: {
@@ -71,48 +68,35 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function LogInPage({firebase}) {
-    const [user, setUser] = useState(null);
+    const {authenticatedUser, userData} = useContext(UserContext)
     const [userEmailNotValidated, setUserEmailNotValidated] = useState(false);
     const [generalLoading, setGeneralLoading] = useState(false);
     const router = useRouter();
     const {absolutePath} = router.query
 
     useEffect(() => {
-        firebase.auth.onAuthStateChanged(user => {
-            if (user !== null) {
-                setUser(user);
-            } else {
-                setUser(null);
-            }
-        })
-    }, []);
-
-    useEffect(() => {
-        if (user && user.emailVerified && absolutePath) {
-            router.replace(`${absolutePath}`)
+        if (authenticatedUser && authenticatedUser.emailVerified && absolutePath) {
+            router.push(`${absolutePath}`)
         }
-    }, [user, absolutePath])
+    }, [authenticatedUser, absolutePath])
 
     useEffect(() => {
-        if (user) {
-            if (!user.emailVerified) {
+        if (authenticatedUser) {
+            if (!authenticatedUser.emailVerified) {
                 router.replace(absolutePath ? {
                     pathname: '/signup',
                     query: {absolutePath}
                 } : '/signup');
             } else {
-                firebase.getUserData(user.email).then(querySnapshot => {
-                    if (querySnapshot.exists) {
-
-                        router.replace(absolutePath || '/profile');
-                    } else {
-                        router.replace(absolutePath || '/profile');
-                    }
-                    setGeneralLoading(false);
-                })
+                if (userData) {
+                    router.push(absolutePath || '/feed');
+                } else {
+                    router.push(absolutePath || '/profile');
+                }
+                setGeneralLoading(false);
             }
         }
-    }, [user]);
+    }, [authenticatedUser]);
 
     useEffect(() => {
         if (userEmailNotValidated) {

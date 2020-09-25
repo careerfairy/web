@@ -17,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
     },
     slider: {
         boxShadow: "0 0 5px grey",
+        width: "100%",
         "& .slick-next:before, .slick-prev:before": {
             content: "'' !important",
             display: "none"
@@ -92,7 +93,6 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
     const settings = {
         initialSlide: 0,
         centerMode: true,
-        variableWidth: groupIds.length < 3 || false,
         centerPadding: "60px",
         focusOnSelect: true,
         infinite: true,
@@ -104,42 +104,22 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
         beforeChange: (current, next) => setActiveSlide(next),
     };
 
-    const singleSettings = {
-        centerMode: true,
-        slidesToScroll: 1,
-        slidesToShow: 1,
-        arrows: false,
-        rtl: true
-    }
-
-    return (
+    return groupIds.length ? (
         <div className={classes.root}>
-            {groupIds.length > 0 ?
-                <>
-                    <IconButton className={classes.prev} onClick={handlePrev}>
-                        <NavigateBeforeIcon className={classes.icon} color="primary" fontSize="large"/>
-                    </IconButton>
-                    <Slider ref={customSlider} className={classes.slider} {...settings}>
-                        {renderGroupCards}
-                        <NextLivestreamsCard mobile={mobile} handleSetGroup={handleSetGroup} groupData={groupData}
-                                             position={groupIds?.length}
-                                             handleResetGroup={handleResetGroup} activeSlide={activeSlide}/>
-                    </Slider>
-                    <IconButton className={classes.next} onClick={handleNext}>
-                        <NavigateNextIcon className={classes.icon} fontSize="large"/>
-                    </IconButton>
-                </>
-                :
-                <Slider className={classes.slider} {...singleSettings}>
-                    <NextLivestreamsCard mobile={mobile} handleSetGroup={handleSetGroup} groupData={groupData}
-                                         position={groupIds.length}
-                                         handleResetGroup={handleResetGroup} activeSlide={activeSlide}/>
-                    {/*<Button fullWidth onClick={handleFollowGroups} className={classes.button} color="primary">*/}
-                    {/*    <Typography variant="h5">Follow Some Groups</Typography>*/}
-                    {/*</Button>*/}
-                </Slider>}
+            <IconButton className={classes.prev} onClick={handlePrev}>
+                <NavigateBeforeIcon className={classes.icon} color="primary" fontSize="large"/>
+            </IconButton>
+            <Slider ref={customSlider} className={classes.slider} {...settings}>
+                {renderGroupCards}
+                <NextLivestreamsCard mobile={mobile} handleSetGroup={handleSetGroup} groupData={groupData}
+                                     position={groupIds?.length}
+                                     handleResetGroup={handleResetGroup} activeSlide={activeSlide}/>
+            </Slider>
+            <IconButton className={classes.next} onClick={handleNext}>
+                <NavigateNextIcon className={classes.icon} fontSize="large"/>
+            </IconButton>
         </div>
-    )
+    ) : null
 
 };
 

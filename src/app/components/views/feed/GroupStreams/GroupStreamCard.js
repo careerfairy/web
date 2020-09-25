@@ -159,12 +159,11 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
 
     return (
         <Fragment>
-            <LazyLoad height={607}
-                      offset={200}
-                      unmountIfInvisible
-                      once
+            <LazyLoad
+                // height={500}
+                      offset={[200, -200]}
                       placeholder={<PlaceHolder/>}>
-                <Grow in={Boolean(livestream)}>
+                {/*<Grow in={true}>*/}
                     <div style={
                         {
                             WebkitBoxShadow: isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
@@ -272,7 +271,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                             </div>
                         </div>
                     </div>
-                </Grow>
+                {/*</Grow>*/}
                 <BookingModal livestream={livestream} modalOpen={bookingModalOpen}
                               setModalOpen={setBookingModalOpen}
                               user={user}/>

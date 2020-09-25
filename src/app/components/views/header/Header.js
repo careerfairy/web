@@ -14,9 +14,7 @@ import UserContext from "../../../context/user/UserContext";
 function Header(props) {
     const [authenticated, setAuthenticated] = useState(false);
     const [sidebarState, setSidebarState] = useState("unopened");
-    const {userData, authenticatedUser} = useContext(UserContext)
-    console.log("userData in header", userData);
-
+    const {userData, authenticatedUser, setUserData} = useContext(UserContext)
     const {push} = useRouter()
 
     useEffect(() => {
@@ -28,6 +26,7 @@ function Header(props) {
     }, [userData]);
 
     const handleLogout = () => {
+        setUserData(undefined)
         props.firebase.doSignOut().then(
             push("/login")
         )

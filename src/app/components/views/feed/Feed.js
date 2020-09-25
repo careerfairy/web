@@ -26,8 +26,7 @@ const Feed = ({user, firebase}) => {
     const [searching, setSearching] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState([])
     const [listenToUpcoming, setListenToUpcoming] = useState(false)
-    const [isRouterMounted, setIsRouterMounted] = useState(false)
-
+    const routerMounted = paramsLivestreamId !== null && paramsCareerCenterId !== null
 
     useEffect(() => {
         if (listenToUpcoming) {
@@ -107,13 +106,11 @@ const Feed = ({user, firebase}) => {
 
     useEffect(() => {
         // This checks if the params from the next router have been defined and only then will it set groupIds
-        if (routerMounted) {
-            console.log("routerMounted", routerMounted);
+        if (routerMounted && userData !== undefined) {
             handleGetGroupIds()
         }
-    }, [userData, router, paramsLivestreamId, paramsCareerCenterId])
+    }, [userData, router, paramsLivestreamId, paramsCareerCenterId, authenticatedUser, routerMounted])
 
-    const routerMounted = paramsLivestreamId !== null && paramsCareerCenterId !== null
 
     const checkIfCareerCenterExists = async (centerId) => {
         const querySnapshot = await firebase.getCareerCenterById(centerId)
@@ -129,7 +126,7 @@ const Feed = ({user, firebase}) => {
             if (newGroupIds.includes(careerCenterId)) {
                 const currentIndex = newGroupIds.findIndex(el => el === careerCenterId)
                 if (currentIndex > -1) {
-                    repositionElement(newGroupIds, currentIndex, 0)
+                    swapPositions(newGroupIds, 0, currentIndex)
                 }
             } else {
                 const exists = await checkIfCareerCenterExists(careerCenterId)
@@ -138,7 +135,7 @@ const Feed = ({user, firebase}) => {
                 }
             }
         }
-        setGroupIds(newGroupIds)
+        return setGroupIds(newGroupIds)
     }
 
 
@@ -150,6 +147,10 @@ const Feed = ({user, firebase}) => {
         const element = arr[fromIndex];
         arr.splice(fromIndex, 1);
         arr.splice(toIndex, 0, element);
+    }
+
+    const swapPositions = (arr, index1, index2) => {
+        [arr[index1], arr[index2]] = [arr[index2], arr[index1]]
     }
 
 

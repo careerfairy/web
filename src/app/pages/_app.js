@@ -23,8 +23,8 @@ function MyApp({Component, pageProps}) {
     
     const firebase = new Firebase();
     
-    const [authenticatedUser, setAuthenticatedUser] = useState(null);
-    const [userData, setUserData] = useState(null);
+    const [authenticatedUser, setAuthenticatedUser] = useState(undefined);
+    const [userData, setUserData] = useState(undefined);
             
     useEffect(() => {
         // Remove the server-side injected CSS.
@@ -65,7 +65,7 @@ function MyApp({Component, pageProps}) {
                 <title>CareerFairy | Watch live streams. Get hired.</title>
             </Head>
                 <FirebaseContext.Provider value={firebase}>
-                    <UserContext.Provider value={{authenticatedUser: authenticatedUser, userData: userData}}>
+                    <UserContext.Provider value={{authenticatedUser, userData, setUserData}}>
                         <ThemeProvider theme={theme}>
                         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                         <CssBaseline/>

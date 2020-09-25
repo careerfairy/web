@@ -47,7 +47,7 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
         const renderStreamCards = livestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
-                    <Grid md={12} lg={12} item>
+                    <Grid key={livestream.id} md={12} lg={12} item>
                         <GroupStreamCard
                             index={index}
                             groupData={groupData}
