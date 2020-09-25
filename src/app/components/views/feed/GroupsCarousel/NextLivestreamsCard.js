@@ -6,16 +6,17 @@ import {withFirebase} from "../../../../context/firebase";
 const useStyles = makeStyles((theme) => ({
     root: {
         display: "flex",
-        justifyContent: "center"
+        justifyContent: "center",
+        width: "100%"
     },
     card: {
         margin: theme.spacing(1.5),
-        maxWidth: 500,
         padding: theme.spacing(1),
         cursor: "pointer",
         borderRadius: "5px",
         maxHeight: 200,
-        transition: "all 1s, all 1s",
+        // maxWidth: 350,
+        transition: "all 0.5s, all 0.5s",
         "&:hover": {
             backgroundColor: "rgba(233,233,233,0.5)",
             color: "white"
@@ -58,7 +59,7 @@ const NextLivestreamsCard = ({handleSetGroup, mobile, index, handleResetGroup, a
 
     return (
         <Grow in={true} timeout={600}>
-            <div className={classes.root}>
+            <div>
                 <Card style={{borderTop: amISelected() ? "3px solid #00d2aa" : "none"}}
                       onClick={() => {
                           handleResetGroup()

@@ -4,18 +4,14 @@ import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../context/firebase";
 
 const useStyles = makeStyles((theme) => ({
-    root:{
-        display: "flex",
-        justifyContent: "center"
-    },
     card: {
         margin: theme.spacing(1.5),
         padding: theme.spacing(1),
         cursor: "pointer",
         borderRadius: "5px",
         maxHeight: 200,
-        maxWidth: 500,
-        transition: "background 1s, color 1s",
+        // maxWidth: 350,
+        transition: "all 0.5s, all 0.5s",
         "&:hover": {
             backgroundColor: "rgba(233,233,233,0.5)",
         },
@@ -76,7 +72,7 @@ const CarouselCard = ({group, groupId, firebase, handleSetGroup, groupData, mobi
     }, [])
 
     const isSelected = () => {
-        return activeSlide === index || index === 0
+        return activeSlide === index
     }
 
     if (noGroup) {
@@ -85,8 +81,8 @@ const CarouselCard = ({group, groupId, firebase, handleSetGroup, groupData, mobi
 
 
     return (
-        <Grow in={Boolean(localGroup.id)} timeout={600}>
-            <div className={classes.root}>
+        <Grow  in={Boolean(localGroup.id)} timeout={600}>
+            <div>
                 <Card style={{borderTop: isSelected() ? "3px solid #00d2aa" : "none"}}
                       onClick={() => {
                           handleResetGroup()

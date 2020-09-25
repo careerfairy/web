@@ -92,9 +92,11 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
     const settings = {
         initialSlide: 0,
         centerMode: true,
+        variableWidth: groupIds.length < 3 || false,
         centerPadding: "60px",
         focusOnSelect: true,
         infinite: true,
+        swipeToSlide: true,
         arrows: false,
         slidesToScroll: 1,
         slidesToShow: mobile ? 1 : groupIds.length > 4 ? 4 : groupIds.length,
@@ -107,6 +109,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
         slidesToScroll: 1,
         slidesToShow: 1,
         arrows: false,
+        rtl: true
     }
 
     return (
@@ -129,7 +132,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
                 :
                 <Slider className={classes.slider} {...singleSettings}>
                     <NextLivestreamsCard mobile={mobile} handleSetGroup={handleSetGroup} groupData={groupData}
-                                         position={groupIds?.length}
+                                         position={groupIds.length}
                                          handleResetGroup={handleResetGroup} activeSlide={activeSlide}/>
                     {/*<Button fullWidth onClick={handleFollowGroups} className={classes.button} color="primary">*/}
                     {/*    <Typography variant="h5">Follow Some Groups</Typography>*/}
