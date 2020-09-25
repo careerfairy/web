@@ -10,10 +10,10 @@ const useStyles = makeStyles((theme) => ({
         cursor: "pointer",
         borderRadius: "5px",
         maxHeight: 200,
-        transition: "all 1s, all 1s",
+        transition: "background 1s, color 1s",
         "&:hover": {
             backgroundColor: "rgba(233,233,233,0.5)",
-        }
+        },
     },
     media: {
         display: "flex",

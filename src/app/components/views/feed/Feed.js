@@ -24,16 +24,12 @@ const Feed = ({user, userData, firebase}) => {
     const [listenToUpcoming, setListenToUpcoming] = useState(false)
 
 
-    const checkIfCareerCenterExists = async (centerId) => {
-        const querySnapshot = await firebase.getCareerCenterById(centerId)
-        return querySnapshot.exists
-    }
-
     useEffect(() => {
         if (listenToUpcoming) {
             const unsubscribe = firebase.listenToUpcomingLivestreams(querySnapshot => {
                 let livestreams = [];
                 querySnapshot.forEach(doc => {
+
                     let livestream = doc.data();
                     livestream.id = doc.id;
                     livestreams.push(livestream);
@@ -64,13 +60,17 @@ const Feed = ({user, userData, firebase}) => {
                 querySnapshot.forEach(doc => {
                     let livestream = doc.data();
                     livestream.id = doc.id;
-                    const livestreamCategories = livestream.targetCategories[groupData.groupId]
-                    if (selectedOptions.length && livestreamCategories) {
-                        if (checkIfLivestreamHasAll(selectedOptions, livestreamCategories)) {
-                            livestreams.push(livestream)
+                    if (livestream.targetCategories) {
+                        const livestreamCategories = livestream.targetCategories[groupData.groupId]
+                        if (selectedOptions.length && livestreamCategories) {
+                            if (checkIfLivestreamHasAll(selectedOptions, livestreamCategories)) {
+                                livestreams.push(livestream)
+                            }
+                        } else if (!selectedOptions.length) {
+                            livestreams.push(livestream);
                         }
-                    } else if (!selectedOptions.length) {
-                        livestreams.push(livestream);
+                    } else {
+                        livestreams.push(livestream)
                     }
                 })
                 if (livestreamId && careerCenterId && careerCenterId === groupData.groupId) {
@@ -106,6 +106,12 @@ const Feed = ({user, userData, firebase}) => {
             handleGetGroupIds()
         }
     }, [userData, router, paramsLivestreamId, paramsCareerCenterId])
+
+
+    const checkIfCareerCenterExists = async (centerId) => {
+        const querySnapshot = await firebase.getCareerCenterById(centerId)
+        return querySnapshot.exists
+    }
 
     const handleGetGroupIds = async () => {
         let newGroupIds = []

@@ -5,6 +5,8 @@ import LazyLoad from 'react-lazyload'
 import DateUtil from "../../../../util/DateUtil";
 import {Button, Grid, Icon, Image} from "semantic-ui-react";
 import Link from "next/link";
+import {Box, Button as MuiButton} from "@material-ui/core";
+
 import Skeleton from '@material-ui/lab/Skeleton';
 import TargetElementList from "../../common/TargetElementList";
 import BookingModal from "../../common/booking-modal/BookingModal";
@@ -13,6 +15,10 @@ import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
 import {useRouter} from "next/router";
 import CopyToClipboard from "./CopyToClipboard";
+import LivestreamCard from "../../livestream-card/LivestreamCard";
+import {Typography} from "@material-ui/core";
+import GroupJoinModal from "../../profile/GroupJoinModal";
+import LogoElement from "./LogoElement";
 
 
 const useStyles = makeStyles((theme) => ({}));
@@ -22,13 +28,22 @@ const AvatarSkeleton = () => (<Skeleton variant="circle" width={40} height={40}/
 const ThumbnailSkeleton = () => <Skeleton variant="rect" width={210} height={118}/>
 const BigThumbnailSkeleton = () => <Skeleton variant="rect" width={600} height={400}/>
 
+const PlaceHolder = () => {
+    return (
+        <div>
+            <Skeleton width="100%" variant="text"/>
+            <Skeleton variant="circle" width={40} height={40}/>
+            <Skeleton variant="rect" width="100%" height={550}/>
+        </div>
+    )
+}
 
 
-
-const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userData, firebase, livestreamId, id, careerCenterId, groupData, listenToUpcoming}) => {
+const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestreamId, id, careerCenterId, groupData, listenToUpcoming}) => {
 
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [isHighlighted, setIsHighlighted] = useState(false)
+    const [careerCenters, setCareerCenters] = useState([])
 
     const router = useRouter();
     const absolutePath = router.asPath
@@ -38,21 +53,29 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
     const avatar = livestream.mainSpeakerAvatar ? livestream.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
 
     useEffect(() => {
-        if (careerCenterId && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId && !isHighlighted) {
+        if (checkIfHighlighted && !isHighlighted) {
             console.log(`careerCenterId: ${careerCenterId} | groupData.groupId: ${groupData.groupId}`);
-            console.log(isHighlighted);
             setIsHighlighted(true)
-        } else if (careerCenterId && livestreamId && id && livestreamId !== id && groupData.groupId !== careerCenterId && isHighlighted) {
+        } else if (checkIfHighlighted && isHighlighted) {
             setIsHighlighted(false)
         }
     }, [livestreamId, id, careerCenterId, groupData.groupId]);
 
     useEffect(() => {
-        if (grid && livestream) {
-            grid.updateLayout()
+        if (livestream) {
+            firebase.getDetailLivestreamCareerCenters(livestream.universities).then(querySnapshot => {
+                let groupList = [];
+                querySnapshot.forEach(doc => {
+                    let group = doc.data();
+                    group.id = doc.id;
+                    groupList.push(group);
+                });
+                setCareerCenters(groupList);
+            });
         }
-    }, [livestream])
+    }, [livestream]);
 
+    const checkIfHighlighted = careerCenterId && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId
 
     function targetHasClickHandler(event) {
         let element = event.target;
@@ -125,18 +148,21 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
         });
     }
 
+
     let logoElements = careerCenters.map((careerCenter, index) => {
         return (
             <Grid.Column width='8' key={index}>
-                <LazyLoad placeholder={<ThumbnailSkeleton/>}>
-                    <Image src={careerCenter.logoUrl} style={{maxHeight: '45px', margin: '0 auto'}}/>
-                </LazyLoad>
+                <LogoElement livestreamId={livestream.id} careerCenter={careerCenter} userData={userData} user={user}/>
             </Grid.Column>
         );
     });
 
     return (
-            <Fragment>
+        <Fragment>
+
+            <LazyLoad height={500}
+                      offset={200}
+                      placeholder={<PlaceHolder/>}>
                 <div style={
                     {
                         WebkitBoxShadow: isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
@@ -156,11 +182,13 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
                                 fontSize: '0.7em',
                                 marginRight: '10px'
                             }}/>{DateUtil.getPrettyDay(livestream.start.toDate())}</div>
-                            <div style={{display: 'inline-block', float: 'right'}}><Icon name='clock outline' style={{
-                                color: 'rgb(0, 210, 170)',
-                                fontSize: '0.7em',
-                                marginRight: '10px'
-                            }}/>{DateUtil.getPrettyTime(livestream.start.toDate())}</div>
+                            <div style={{display: 'inline-block', float: 'right'}}><Icon name='clock outline'
+                                                                                         style={{
+                                                                                             color: 'rgb(0, 210, 170)',
+                                                                                             fontSize: '0.7em',
+                                                                                             marginRight: '10px'
+                                                                                         }}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
+                            </div>
                         </div>
                     </div>
                     <LazyLoad height={400} placeholder={<BigThumbnailSkeleton/>}>
@@ -176,10 +204,7 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
                                             margin: '30px 0',
                                             maxHeight: '120px',
                                             filter: userIsRegistered() ? 'brightness(0) invert(1)' : ''
-                                        }} src={livestream.companyLogoUrl}
-                                               onLoad={() => {
-                                                   grid.updateLayout()
-                                               }}/>
+                                        }} src={livestream.companyLogoUrl}/>
                                     </LazyLoad>
                                     <div className='livestream-position'
                                          style={{color: userIsRegistered() ? 'white' : ''}}>{livestream.title}</div>
@@ -191,7 +216,8 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
                                                 onClick={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
                                         <Link href={('/upcoming-livestream/' + livestream.id)}
                                               prefetch={false}><a><Button
-                                            size='large' style={{margin: '5px 5px 0 0'}} icon='signup' content='Details'
+                                            size='large' style={{margin: '5px 5px 0 0'}} icon='signup'
+                                            content='Details'
                                             color='pink'/></a></Link>
                                     </div>
                                 </div>
@@ -215,7 +241,8 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
                                             </LazyLoad>
                                         </div>
                                         <div className='livestream-streamer'>
-                                            <div className='livestream-streamer-name'>{livestream.mainSpeakerName}</div>
+                                            <div
+                                                className='livestream-streamer-name'>{livestream.mainSpeakerName}</div>
                                             <div
                                                 className='livestream-streamer-position'>{livestream.mainSpeakerPosition}</div>
                                             <div
@@ -228,7 +255,8 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
                         <Grid className='middle aligned' centered>
                             <Grid.Row style={{paddingTop: 0, paddingBottom: '5px'}}>
                                 <Grid.Column width={15}>
-                                    <TargetElementList fields={livestream.targetGroups || []} selectedFields={fields}/>
+                                    <TargetElementList fields={livestream.targetGroups || []}
+                                                       selectedFields={fields}/>
                                 </Grid.Column>
                             </Grid.Row>
                         </Grid>
@@ -246,7 +274,9 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
                         </div>
                     </div>
                 </div>
-                <BookingModal livestream={livestream} modalOpen={bookingModalOpen} setModalOpen={setBookingModalOpen}
+
+                <BookingModal livestream={livestream} modalOpen={bookingModalOpen}
+                              setModalOpen={setBookingModalOpen}
                               user={user}/>
                 <style jsx>{`
                 .hidden {
@@ -523,8 +553,10 @@ const GroupStreamCard = ({livestream, user, careerCenters, fields, grid, userDat
                     color: rgb(0, 210, 170);
                 }
             `}</style>
-            </Fragment>
-    );
+            </LazyLoad>
+        </Fragment>
+    )
+        ;
 };
 
 export default withFirebase(GroupStreamCard);

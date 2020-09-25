@@ -5,8 +5,8 @@ import Header from "../components/views/header/Header";
 import Footer from '../components/views/footer/Footer';
 import LivestreamCard from '../components/views/livestream-card/LivestreamCard'
 
-import { useRouter } from 'next/router';
-import { withFirebasePage } from "context/firebase";
+import {useRouter} from 'next/router';
+import {withFirebasePage} from "context/firebase";
 import axios from "axios";
 import {UNIVERSITY_SUBJECTS} from '../data/StudyFieldData';
 import {UNIVERSITY_NAMES} from '../data/UniversityData';
@@ -125,13 +125,13 @@ function NextLivestreams(props) {
             if (groupsToDisplay.length === 0) {
                 const initialGroups = livestreams.slice(0, 10)
                 setGroupsToDisplay(initialGroups)
-            }   
+            }
         }
     }, [livestreams])
 
     useEffect(() => {
         console.log(groupsToDisplay);
-    },[groupsToDisplay]);
+    }, [groupsToDisplay]);
 
     useEffect(() => {
         window.addEventListener('scroll', throttle(handleScroll, 500));
@@ -139,7 +139,7 @@ function NextLivestreams(props) {
     }, []);
 
     useEffect(() => {
-        console.log("isBottom");
+        console.log("isBottom", isBottom);
         if (isBottom) {
             addItems();
         }
@@ -148,7 +148,7 @@ function NextLivestreams(props) {
     const addItems = () => {
         if (livestreams.length !== 0) {
             console.log("setting local groups");
-            setGroupsToDisplay(prevState => 
+            setGroupsToDisplay(prevState =>
                 prevState.concat(
                     livestreams.slice(
                         (page + 1) * 10,
@@ -163,13 +163,13 @@ function NextLivestreams(props) {
 
     function throttle(fn, wait) {
         var time = Date.now();
-        return function() {
-          if ((time + wait - Date.now()) < 0) {
-            fn();
-            time = Date.now();
-          }
+        return function () {
+            if ((time + wait - Date.now()) < 0) {
+                fn();
+                time = Date.now();
+            }
         }
-      }
+    }
 
     function handleScroll() {
         const scrollTop = (document.documentElement
@@ -325,7 +325,7 @@ function NextLivestreams(props) {
         );
     })
 
-    const mentorElements = groupsToDisplay.map( (mentor, index) => {
+    const mentorElements = groupsToDisplay.map((mentor, index) => {
         const avatar = mentor.mainSpeakerAvatar ? mentor.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
         return (
             <div key={index}>
@@ -417,8 +417,8 @@ function NextLivestreams(props) {
                             gutterWidth={20}
                             gutterHeight={0}
                             monitorImagesLoaded={true}
-                            gridRef={ grid  => setGrid(grid) }>
-                            { mentorElements }
+                            gridRef={grid => setGrid(grid)}>
+                            {mentorElements}
                         </StackGrid>
                     )}</SizeMe>
                     <div className={'empty-livestreams-message ' + (!noLivestreamsPresent ? 'hidden' : '')}>

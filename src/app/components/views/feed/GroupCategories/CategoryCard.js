@@ -1,6 +1,5 @@
 import React from 'react';
 import {Box, Chip, Typography, Tooltip} from "@material-ui/core";
-import {useWindowSize} from "../../../custom-hook/useWindowSize";
 
 const CategoryCard = ({category, handleToggleActive, mobile, width}) => {
 
@@ -16,7 +15,7 @@ const CategoryCard = ({category, handleToggleActive, mobile, width}) => {
                     variant={option.active ? "default" : "outlined"}
                     size={mobile ? "small" : "medium"}
                     style={{maxWidth: width}}
-                    label={option.name}
+                    label={<Typography variant="body1">{option.name}</Typography>}
                     onClick={() => handleToggleActive(category.id, option.id)}/>
             </Tooltip>
         )

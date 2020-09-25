@@ -42,7 +42,7 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile})
     }, [grid, groupData]);
 
     return (
-        <div style={{width: mobile ? "100%" : "40%", paddingTop: 18}} className={classes.root}>
+        <div style={{width: mobile ? "100%" : "40%", paddingTop: 14}} className={classes.root}>
             {groupData.categories?.length &&
             <Card style={{position: mobile ? "static" : "sticky", top: mobile ? "auto" : 165}}>
                 <CardContent>

@@ -2,38 +2,14 @@ import {GreyBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import Head from "next/head";
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
-import {useEffect, useState} from "react";
-import {withFirebase} from "context/firebase";
+import {useContext} from "react";
 import Feed from "../components/views/feed/Feed";
+import UserContext from "../context/user/UserContext";
 
 
-const feed = ({firebase}) => {
+const feed = () => {
 
-
-    const [userData, setUserData] = useState(null)
-    const [user, setUser] = useState(null);
-
-
-    useEffect(() => {
-        firebase.auth.onAuthStateChanged(user => {
-            if (user) {
-                setUser(user);
-            }
-        })
-    }, []);
-
-    useEffect(() => {
-        if (user) {
-            const unsubscribe = firebase.listenToUserData(user.email, querySnapshot => {
-                let userObj = querySnapshot.data();
-                userObj.id = querySnapshot.id;
-                if (user) {
-                    setUserData(userObj);
-                }
-            })
-            return () => unsubscribe
-        }
-    }, [user]);
+    const {userData, authenticatedUser} = useContext(UserContext)
 
 
     return (
@@ -44,10 +20,10 @@ const feed = ({firebase}) => {
             <div style={{background: "rgb(44, 66, 81)"}}>
                 <Header color="white"/>
             </div>
-            <Feed user={user} userData={userData}/>
+            <Feed user={authenticatedUser} userData={userData}/>
             <Footer/>
         </GreyBackground>
     );
 };
 
-export default withFirebase(feed);
+export default feed;

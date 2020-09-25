@@ -5,7 +5,6 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Slider from "react-slick";
 import {Button, IconButton, Typography} from "@material-ui/core";
-import Link from "next/link";
 import {useRouter} from "next/router";
 import NextLivestreamsCard from "./NextLivestreamsCard";
 
@@ -22,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
             content: "'' !important",
             display: "none"
         },
-        background: "rgb(250, 250, 250)",
+        background: "rgb(44, 66, 81)",
 
     },
     button: {
@@ -43,10 +42,16 @@ const useStyles = makeStyles((theme) => ({
         display: 'block',
         position: "absolute",
         zIndex: 20,
-        left: 50,
+        left: 57,
         WebkitTransform: "translate(-50%,-50%)",
         transform: "translate(-50%,-50%)",
         top: "50%",
+    },
+    icon: {
+        color: "black",
+        backgroundColor: "white",
+        borderRadius: "50%",
+        opacity: 0.5
     }
 }));
 
@@ -108,7 +113,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
             {groupIds.length > 0 ?
                 <>
                     <IconButton className={classes.prev} onClick={handlePrev}>
-                        <NavigateBeforeIcon color="primary" fontSize="large"/>
+                        <NavigateBeforeIcon className={classes.icon} color="primary" fontSize="large"/>
                     </IconButton>
                     <Slider ref={customSlider} className={classes.slider} {...settings}>
                         {renderGroupCards}
@@ -117,7 +122,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
                                              handleResetGroup={handleResetGroup} activeSlide={activeSlide}/>
                     </Slider>
                     <IconButton className={classes.next} onClick={handleNext}>
-                        <NavigateNextIcon color="primary" fontSize="large"/>
+                        <NavigateNextIcon className={classes.icon} fontSize="large"/>
                     </IconButton>
                 </>
                 :
