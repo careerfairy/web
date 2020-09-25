@@ -1,12 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {withFirebase} from "../../../context/firebase";
 import GroupsCarousel from "./GroupsCarousel/GroupsCarousel";
 import {useMediaQuery, useTheme} from "@material-ui/core";
 import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import MobileFeed from "./MobileFeed";
 import {useRouter} from "next/router";
+import UserContext from "../../../context/user/UserContext";
 
-const Feed = ({user, userData, firebase}) => {
+const Feed = ({user, firebase}) => {
+
+    const {userData, authenticatedUser} = useContext(UserContext)
+
     const router = useRouter();
     const {query: {livestreamId}} = router
     const {query: {careerCenterId}} = router
@@ -22,6 +26,7 @@ const Feed = ({user, userData, firebase}) => {
     const [searching, setSearching] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState([])
     const [listenToUpcoming, setListenToUpcoming] = useState(false)
+    const [isRouterMounted, setIsRouterMounted] = useState(false)
 
 
     useEffect(() => {
@@ -84,7 +89,7 @@ const Feed = ({user, userData, firebase}) => {
             })
             return () => unsubscribe()
         }
-    }, [groupData, selectedOptions, userData, user])
+    }, [groupData, selectedOptions, userData, authenticatedUser])
 
     useEffect(() => {
         if (groupData && groupData.categories) {
@@ -102,11 +107,13 @@ const Feed = ({user, userData, firebase}) => {
 
     useEffect(() => {
         // This checks if the params from the next router have been defined and only then will it set groupIds
-        if (paramsLivestreamId !== null && paramsCareerCenterId !== null) {
+        if (routerMounted) {
+            console.log("routerMounted", routerMounted);
             handleGetGroupIds()
         }
     }, [userData, router, paramsLivestreamId, paramsCareerCenterId])
 
+    const routerMounted = paramsLivestreamId !== null && paramsCareerCenterId !== null
 
     const checkIfCareerCenterExists = async (centerId) => {
         const querySnapshot = await firebase.getCareerCenterById(centerId)
@@ -190,14 +197,15 @@ const Feed = ({user, userData, firebase}) => {
         <>
             <GroupsCarousel groupData={groupData}
                             mobile={mobile}
-                            user={user}
+                            careerCenterId={careerCenterId}
+                            user={authenticatedUser}
                             handleResetGroup={handleResetGroup}
                             handleSetGroup={handleSetGroup}
                             groupIds={groupIds}/>
 
             {mobile ?
                 <MobileFeed groupData={groupData}
-                            user={user}
+                            user={authenticatedUser}
                             scrollToTop={scrollToTop}
                             handleResetGroup={handleResetGroup}
                             searching={searching}
@@ -217,7 +225,7 @@ const Feed = ({user, userData, firebase}) => {
                              searching={searching}
                              careerCenterId={careerCenterId}
                              handleResetGroup={handleResetGroup}
-                             user={user}
+                             user={authenticatedUser}
                              livestreams={livestreams}
                              mobile={mobile}
                              groupData={groupData}/>}

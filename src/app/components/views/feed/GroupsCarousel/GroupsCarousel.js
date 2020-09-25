@@ -55,7 +55,8 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user}) => {
+const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user, careerCenterId}) => {
+    // console.log("careerCenterId", careerCenterId);
     const router = useRouter()
     const absolutePath = router.asPath;
     const classes = useStyles()
@@ -127,9 +128,12 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
                 </>
                 :
                 <Slider className={classes.slider} {...singleSettings}>
-                    <Button fullWidth onClick={handleFollowGroups} className={classes.button} color="primary">
-                        <Typography variant="h5">Follow Some Groups</Typography>
-                    </Button>
+                    <NextLivestreamsCard mobile={mobile} handleSetGroup={handleSetGroup} groupData={groupData}
+                                         position={groupIds?.length}
+                                         handleResetGroup={handleResetGroup} activeSlide={activeSlide}/>
+                    {/*<Button fullWidth onClick={handleFollowGroups} className={classes.button} color="primary">*/}
+                    {/*    <Typography variant="h5">Follow Some Groups</Typography>*/}
+                    {/*</Button>*/}
                 </Slider>}
         </div>
     )

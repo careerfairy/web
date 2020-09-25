@@ -40,6 +40,7 @@ function MyApp({Component, pageProps}) {
                 setAuthenticatedUser(user);
             } else {
                 setAuthenticatedUser(null);
+                setUserData(null);
             }
         })
     }, []);

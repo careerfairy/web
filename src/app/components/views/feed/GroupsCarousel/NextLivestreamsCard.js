@@ -5,7 +5,12 @@ import {withFirebase} from "../../../../context/firebase";
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        display: "flex",
+        justifyContent: "center"
+    },
+    card: {
         margin: theme.spacing(1.5),
+        maxWidth: 500,
         padding: theme.spacing(1),
         cursor: "pointer",
         borderRadius: "5px",
@@ -13,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
         transition: "all 1s, all 1s",
         "&:hover": {
             backgroundColor: "rgba(233,233,233,0.5)",
+            color: "white"
         }
     },
     media: {
@@ -30,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 const NextLivestreamsCard = ({handleSetGroup, mobile, index, handleResetGroup, activeSlide, groupData, position}) => {
+    // console.log("activeSlide in next",activeSlide);
     const classes = useStyles()
 
     useEffect(() => {
@@ -51,16 +58,18 @@ const NextLivestreamsCard = ({handleSetGroup, mobile, index, handleResetGroup, a
 
     return (
         <Grow in={true} timeout={600}>
-            <Card style={{borderTop: amISelected() ? "3px solid #00d2aa" : "none"}}
-                  onClick={() => {
-                      handleResetGroup()
-                      handleSetGroup({})
-                  }} elevation={2} className={classes.root}>
-                <CardMedia style={{height: mobile ? 50 : 90}} className={classes.media}>
-                    <Typography variant="h4" align="center" noWrap>Next Livestreams</Typography>
-                </CardMedia>
-                <Typography align="center" noWrap>click here for upcoming streams</Typography>
-            </Card>
+            <div className={classes.root}>
+                <Card style={{borderTop: amISelected() ? "3px solid #00d2aa" : "none"}}
+                      onClick={() => {
+                          handleResetGroup()
+                          handleSetGroup({})
+                      }} elevation={2} className={classes.card}>
+                    <CardMedia style={{height: mobile ? 50 : 90}} className={classes.media}>
+                        <Typography variant="h4" align="center" noWrap><strong>Next Livestreams</strong></Typography>
+                    </CardMedia>
+                    <Typography align="center" noWrap>click here for upcoming streams</Typography>
+                </Card>
+            </div>
         </Grow>
     );
 };

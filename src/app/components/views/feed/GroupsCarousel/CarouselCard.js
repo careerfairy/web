@@ -4,12 +4,17 @@ import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../context/firebase";
 
 const useStyles = makeStyles((theme) => ({
-    root: {
+    root:{
+        display: "flex",
+        justifyContent: "center"
+    },
+    card: {
         margin: theme.spacing(1.5),
         padding: theme.spacing(1),
         cursor: "pointer",
         borderRadius: "5px",
         maxHeight: 200,
+        maxWidth: 500,
         transition: "background 1s, color 1s",
         "&:hover": {
             backgroundColor: "rgba(233,233,233,0.5)",
@@ -71,7 +76,7 @@ const CarouselCard = ({group, groupId, firebase, handleSetGroup, groupData, mobi
     }, [])
 
     const isSelected = () => {
-        return activeSlide === index || index && index === 0
+        return activeSlide === index || index === 0
     }
 
     if (noGroup) {
@@ -81,17 +86,19 @@ const CarouselCard = ({group, groupId, firebase, handleSetGroup, groupData, mobi
 
     return (
         <Grow in={Boolean(localGroup.id)} timeout={600}>
-            <Card style={{borderTop: isSelected() ? "3px solid #00d2aa" : "none"}}
-                  onClick={() => {
-                      handleResetGroup()
-                      handleSetGroup(localGroup)
-                  }} elevation={2} className={classes.root}>
-                <CardMedia style={{height: mobile ? 50 : 90}} className={classes.media}>
-                    <img src={localGroup.logoUrl || placeholder} className={classes.image}
-                         alt={`${localGroup.universityName} Logo`}/>
-                </CardMedia>
-                <Typography align="center" noWrap>{localGroup.universityName}</Typography>
-            </Card>
+            <div className={classes.root}>
+                <Card style={{borderTop: isSelected() ? "3px solid #00d2aa" : "none"}}
+                      onClick={() => {
+                          handleResetGroup()
+                          handleSetGroup(localGroup)
+                      }} elevation={2} className={classes.card}>
+                    <CardMedia style={{height: mobile ? 50 : 90}} className={classes.media}>
+                        <img src={localGroup.logoUrl || placeholder} className={classes.image}
+                             alt={`${localGroup.universityName} Logo`}/>
+                    </CardMedia>
+                    <Typography align="center" noWrap>{localGroup.universityName}</Typography>
+                </Card>
+            </div>
         </Grow>
     );
 };

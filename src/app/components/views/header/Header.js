@@ -1,29 +1,31 @@
-import {useEffect, useState, Fragment} from 'react'
+import {useEffect, useState, Fragment, useContext} from 'react'
 import {withFirebase} from "context/firebase";
 import {Icon} from "semantic-ui-react";
 import AuthenticatedHeader from "./authenticated-header/AuthenticatedHeader";
 import NonAuthenticatedHeader from "./non-authenticated-header/NonAuthenticatedHeader";
-import { compose } from "redux"
+import {compose} from "redux"
 
 import Link from 'next/link';
 import {useRouter, withRouter} from 'next/router';
 import LandingHeader from './landing-header/LandingHeader';
 import {Button} from "@material-ui/core";
+import UserContext from "../../../context/user/UserContext";
 
 function Header(props) {
     const [authenticated, setAuthenticated] = useState(false);
     const [sidebarState, setSidebarState] = useState("unopened");
+    const {userData, authenticatedUser} = useContext(UserContext)
+    console.log("userData in header", userData);
+
     const {push} = useRouter()
 
     useEffect(() => {
-        props.firebase.auth.onAuthStateChanged(user => {
-            if (user && user.emailVerified) {
-                setAuthenticated(true);
-            } else {
-                setAuthenticated(false);
-            }
-        })
-    }, []);
+        if (userData) {
+            setAuthenticated(true);
+        } else {
+            setAuthenticated(false);
+        }
+    }, [userData]);
 
     const handleLogout = () => {
         props.firebase.doSignOut().then(
@@ -42,8 +44,11 @@ function Header(props) {
                     <li><Link href='/wishlist'><a>Wishlist</a></Link></li>
                     <li><a href='https://corporate.careerfairy.io/companies'>For Companies</a></li>
                     <li><a href='https://corporate.careerfairy.io/career-center'>For Career Centers</a></li>
-                    <li><Link href={authenticated ? '/profile' : '/login'}><a>{authenticated ? 'My Profile' : 'Log in'}</a></Link></li>
-                    {authenticated && <li><Button onClick={handleLogout} variant="contained" color="primary">Logout</Button></li>}
+                    <li><Link
+                        href={authenticated ? '/profile' : '/login'}><a>{authenticated ? 'My Profile' : 'Log in'}</a></Link>
+                    </li>
+                    {authenticated &&
+                    <li><Button onClick={handleLogout} variant="contained" color="primary">Logout</Button></li>}
 
                 </ul>
                 <style jsx>{`
