@@ -8,6 +8,7 @@ import * as Sentry from '@sentry/browser';
 
 import Head from 'next/head';
 import UserContext from 'context/user/UserContext';
+import TagManager from 'react-gtm-module'
 
 function MyApp({ Component, pageProps }) {
 
@@ -17,6 +18,14 @@ function MyApp({ Component, pageProps }) {
 
     const [authenticatedUser, setAuthenticatedUser] = useState(null);
     const [userData, setUserData] = useState(null);
+
+    const tagManagerArgs = {
+        gtmId: 'GTM-P29VCWC'
+    }
+
+    useEffect(() => {
+        TagManager.initialize(tagManagerArgs);
+    }, []);
 
     useEffect(() => {
         firebase.auth.onAuthStateChanged(user => {
