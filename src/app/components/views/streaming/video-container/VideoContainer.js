@@ -196,6 +196,10 @@ function VideoContainer(props) {
         return new Date(date).getTime() - Date.now() < 1000*60*2 || Date.now() > new Date(date).getTime();
     }
 
+    function reloadPage() {
+        location.reload();
+    }
+
     return (
         <Fragment>
             <div className='screen-container'>
@@ -241,8 +245,11 @@ function VideoContainer(props) {
             <Modal open={showDisconnectionModal}>
                 <Modal.Header>You have been disconnected</Modal.Header>
                 <Modal.Content>
-                    <p>No need to panic! To rejoin the stream, simply check your internet connection and reload this page.</p>
-                    <Button content='Reload' primary/>
+                        <p>Don't panic! Follow these steps to quickly restart the stream:</p>
+                        <p>1. Check your internet connection</p>
+                        <p>2. Reload this page</p> 
+                        <p>3. Restart the stream</p>
+                        <Button icon='undo alternate' content='Reload Page' size='large' primary onClick={() => reloadPage()}/>
                 </Modal.Content>
             </Modal>
             <StreamPreparationModal streamerReady={streamerReady} setStreamerReady={setStreamerReady} localStream={localStream} mediaConstraints={mediaConstraints} connectionEstablished={connectionEstablished} setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage} isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource} videoSource={videoSource} setVideoSource={setVideoSource}/>
