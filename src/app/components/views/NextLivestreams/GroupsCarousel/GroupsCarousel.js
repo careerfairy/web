@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
         top: 0
     },
     slider: {
-        boxShadow: "0 0 5px grey",
+        boxShadow: "0 3px 3px grey",
         width: "100%",
         "& .slick-next:before, .slick-prev:before": {
             content: "'' !important",

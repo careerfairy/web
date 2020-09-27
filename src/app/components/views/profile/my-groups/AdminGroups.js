@@ -21,24 +21,9 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const AdminGroups = ({userData, firebase}) => {
+const AdminGroups = ({userData, adminGroups, firebase}) => {
     const router = useRouter()
     const classes = useStyles()
-    const [adminGroups, setAdminGroups] = useState([]);
-
-    useEffect(() => {
-        if (userData) {
-            firebase.listenCareerCentersByAdminEmail(userData.id, querySnapshot => {
-                let careerCenters = [];
-                querySnapshot.forEach(doc => {
-                    let careerCenter = doc.data();
-                    careerCenter.id = doc.id;
-                    careerCenters.push(careerCenter);
-                })
-                setAdminGroups(careerCenters);
-            })
-        }
-    }, [userData])
 
     let adminGroupElements = [];
 
@@ -46,9 +31,7 @@ const AdminGroups = ({userData, firebase}) => {
         adminGroupElements = adminGroups.map(group => {
             return (
                 <Fragment key={group.id}>
-
-                        <CurrentGroup isAdmin={true} group={group} userData={userData}/>
-
+                    <CurrentGroup isAdmin={true} group={group} userData={userData}/>
                 </Fragment>
             )
         });
@@ -61,12 +44,12 @@ const AdminGroups = ({userData, firebase}) => {
                     <Typography className={classes.title} variant="h5">
                         Admin Groups
                     </Typography>
-                    <Button endIcon={<AddIcon/>}
+                    {/* <Button endIcon={<AddIcon/>}
                         variant="contained"
                         color="primary"
                         onClick={() => router.push('/group/create')}>
-                    Create a group
-                </Button>
+                        Create a group
+                    </Button> */}
                 </div>
                 {adminGroupElements.length ?
                     <Grid style={{marginBottom: 50}} container spacing={3}>

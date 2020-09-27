@@ -19,6 +19,11 @@ const useStyles = makeStyles((theme) => ({
         top: 165,
         zIndex: 101,
         marginBottom: 14
+    },
+    emptyMessage: {
+        maxWidth: "400px",
+        margin: "0 auto",
+        color: "rgb(130,130,130)"
     }
 }));
 
@@ -77,10 +82,10 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
                         <Grid container spacing={2}>
                             {renderStreamCards}
                         </Grid>
-                        : <Typography align="center" variant="h5"
-                                      style={{marginTop: mobile ? 100 : 0}}><strong>{groupData.universityName} currently has
+                        : <Typography className={classes.emptyMessage} align="center" variant="h5"
+                                      style={{marginTop: 100}}><strong>{groupData.universityName} currently has
                             no scheduled
-                            livestreams</strong></Typography>)
+                            live streams</strong></Typography>)
                     : null}
                 <GroupJoinModal
                     open={openJoinModal}

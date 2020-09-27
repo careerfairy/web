@@ -13,18 +13,22 @@ const useStyles = makeStyles((theme) => ({
         // maxWidth: 350,
         transition: "all 0.5s, all 0.5s",
         "&:hover": {
-            backgroundColor: "rgba(233,233,233,0.5)",
+            transform: "scale(1.02)"
         },
     },
     media: {
+        position: "relative",
         display: "flex",
         justifyContent: "center",
-        padding: "0 1em 1em 1em",
-        height: "70px",
     },
     image: {
+        position: "absolute",
+        top: "50%",
+        transform: "translateY(-50%)",
         objectFit: "contain",
-        maxWidth: "50%",
+        width: "35%",
+        maxWidth: "120px",
+        maxHeight: "60px"
     }
 }));
 
@@ -88,11 +92,11 @@ const CarouselCard = ({group, groupId, firebase, handleSetGroup, groupData, mobi
                           handleResetGroup()
                           handleSetGroup(localGroup)
                       }} elevation={2} className={classes.card}>
-                    <CardMedia style={{height: mobile ? 50 : 90}} className={classes.media}>
+                    <CardMedia style={{height: mobile ? 60 : 90, padding: mobile ? "0.5em" : "0 1em 1em 1em"}} className={classes.media}>
                         <img src={localGroup.logoUrl || placeholder} className={classes.image}
                              alt={`${localGroup.universityName} Logo`}/>
-                    </CardMedia>
-                    <Typography align="center" noWrap>{localGroup.universityName}</Typography>
+                    </CardMedia>{!mobile &&
+                    <Typography align="center" noWrap>{localGroup.universityName}</Typography>}
                 </Card>
             </div>
         </Grow>

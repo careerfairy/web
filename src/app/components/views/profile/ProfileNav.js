@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import SwipeableViews from 'react-swipeable-views';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -44,12 +44,27 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const ProfileNav = ({userData}) => {
+const ProfileNav = ({userData, firebase}) => {
     const classes = useStyles();
     const theme = useTheme();
     const native = useMediaQuery(theme.breakpoints.down('xs'));
     const [value, setValue] = useState(1);
-    const [isAdmin, setIsAdmin] = useState(true);
+
+    const [adminGroups, setAdminGroups] = useState([]);
+
+    useEffect(() => {
+        if (userData) {
+            firebase.listenCareerCentersByAdminEmail(userData.id, querySnapshot => {
+                let careerCenters = [];
+                querySnapshot.forEach(doc => {
+                    let careerCenter = doc.data();
+                    careerCenter.id = doc.id;
+                    careerCenters.push(careerCenter);
+                })
+                setAdminGroups(careerCenters);
+            })
+        }
+    }, [userData])
 
 
     const handleChange = (event, newValue) => {
@@ -72,13 +87,14 @@ const ProfileNav = ({userData}) => {
                     centered
                 >
                     <Tab wrapped fullWidth
-                         label={<Typography noWrap
+                        label={<Typography noWrap
                                             variant="h5">{native ? "Personal" : "Personal Information"}</Typography>}/>
                     <Tab wrapped fullWidth
-                         label={<Typography variant="h5">{native ? "Groups" : "Joined Groups"}</Typography>}/>
-                    {isAdmin ? <Tab wrapped fullWidth
-                                    label={<Typography
-                                        variant="h5">{native ? "Admin" : "Admin Groups"}</Typography>}/> : null}
+                        label={<Typography variant="h5">{native ? "Groups" : "My Groups"}</Typography>}/>
+                    { adminGroups.length && 
+                    <Tab wrapped fullWidth
+                        label={<Typography
+                            variant="h5">{native ? "Admin" : "Admin Groups"}</Typography>}/>}
                 </Tabs>
             </AppBar>
             <SwipeableViews
@@ -92,9 +108,10 @@ const ProfileNav = ({userData}) => {
                 <TabPanel value={value} index={1} dir={theme.direction}>
                     <JoinedGroups userData={userData}/>
                 </TabPanel>
+                { adminGroups.length &&
                 <TabPanel value={value} index={2} dir={theme.direction}>
-                    <AdminGroups userData={userData}/>
-                </TabPanel>
+                    <AdminGroups userData={userData} adminGroups={adminGroups}/>
+                </TabPanel> }
             </SwipeableViews>
         </Container>
     );

@@ -406,6 +406,13 @@ class Firebase {
         return ref.get();
     };
 
+    updateLivestreamCategories = (livestreamId, newCategories) => {
+        let ref = this.firestore.collection("livestreams").doc(livestreamId);
+        return ref.update({
+            targetCategories: newCategories,
+        });
+    }
+
     setMainStreamIdToLivestreamStreamers = (livestreamId, streamId) => {
         let ref = this.firestore.collection("livestreams").doc(livestreamId);
         return ref.update({
@@ -509,6 +516,16 @@ class Firebase {
         let ref = this.firestore
             .collection("livestreams")
             .where("universities", "array-contains", universityId)
+            .where("start", ">", currentTime)
+            .orderBy("start", "asc")
+        return ref.onSnapshot(callback)
+    }
+
+    listenToLiveStreamsByGroupId = (groupId, callback) => {
+        const currentTime = new Date();
+        let ref = this.firestore
+            .collection("livestreams")
+            .where("groupIds", "array-contains", groupId)
             .where("start", ">", currentTime)
             .orderBy("start", "asc")
         return ref.onSnapshot(callback)
