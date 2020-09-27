@@ -58,9 +58,9 @@ const NextLivestreams = ({user, firebase}) => {
 
 
     useEffect(() => {
-        if (groupData && groupData.universityId) {
+        if (groupData && groupData.groupId) {
             setSearching(true)
-            const unsubscribe = firebase.listenToLiveStreamsByUniversityId(groupData.universityId, querySnapshot => {
+            const unsubscribe = firebase.listenToLiveStreamsByGroupId(groupData.groupId, querySnapshot => {
                 setSearching(false);
                 let livestreams = [];
                 querySnapshot.forEach(doc => {
@@ -85,6 +85,7 @@ const NextLivestreams = ({user, firebase}) => {
                         repositionElement(livestreams, currentIndex, 0)
                     }
                 }
+                debugger;
                 setLivestreams(livestreams);
                 setSearching(false)
             })

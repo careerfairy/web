@@ -18,20 +18,22 @@ const useStyles = makeStyles((theme) => ({
         // maxWidth: 350,
         transition: "all 0.5s, all 0.5s",
         "&:hover": {
-            backgroundColor: "rgba(233,233,233,0.5)",
-            color: "white"
+            transform: "scale(1.02)"
         }
     },
     media: {
         display: "flex",
         justifyContent: "center",
-        padding: "0 1em 1em 1em",
         height: "70px",
         alignItems: "center"
     },
     image: {
         objectFit: "contain",
         maxWidth: "50%",
+    },
+    text: {
+        textTransform: "uppercase",
+        fontSize: "1.3rem"
     }
 }));
 
@@ -65,10 +67,10 @@ const NextLivestreamsCard = ({handleSetGroup, mobile, index, handleResetGroup, a
                           handleResetGroup()
                           handleSetGroup({})
                       }} elevation={2} className={classes.card}>
-                    <CardMedia style={{height: mobile ? 50 : 90}} className={classes.media}>
-                        <Typography variant="h4" align="center" noWrap><strong>Next Livestreams</strong></Typography>
-                    </CardMedia>
-                    <Typography align="center" noWrap>click here for upcoming streams</Typography>
+                    <CardMedia style={{height: mobile ? 60 : 90, padding: mobile ? "0.5em" : "0 1em 1em 1em"}} className={classes.media}>
+                        <Typography variant="h4" align="center" className={classes.text} noWrap><strong>Next Live Streams</strong></Typography>
+                    </CardMedia>{!mobile &&
+                    <Typography align="center" noWrap>Coming up on CareerFairy</Typography>}
                 </Card>
             </div>
         </Grow>

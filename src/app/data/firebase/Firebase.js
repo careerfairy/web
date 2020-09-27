@@ -514,6 +514,16 @@ class Firebase {
         return ref.onSnapshot(callback)
     }
 
+    listenToLiveStreamsByGroupId = (groupId, callback) => {
+        const currentTime = new Date();
+        let ref = this.firestore
+            .collection("livestreams")
+            .where("groupIds", "array-contains", groupId)
+            .where("start", ">", currentTime)
+            .orderBy("start", "asc")
+        return ref.onSnapshot(callback)
+    }
+
     getLivestreamSpeakers = (livestreamId) => {
         let ref = this.firestore
             .collection("livestreams")
@@ -980,7 +990,10 @@ class Firebase {
                 transaction.set(registeredUsersRef, {
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    registeredGroups: user.registeredGroups || []
+                    registeredGroups: user.registeredGroups || [],
+                    university: user.university || "",
+                    levelOfStudy: user.levelOfStudy || "",
+                    faculty: user.faculty || ""
                 });
             });
         });

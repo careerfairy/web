@@ -24,21 +24,6 @@ const useStyles = makeStyles((theme) => ({
 const AdminGroups = ({userData, firebase}) => {
     const router = useRouter()
     const classes = useStyles()
-    const [adminGroups, setAdminGroups] = useState([]);
-
-    useEffect(() => {
-        if (userData) {
-            firebase.listenCareerCentersByAdminEmail(userData.id, querySnapshot => {
-                let careerCenters = [];
-                querySnapshot.forEach(doc => {
-                    let careerCenter = doc.data();
-                    careerCenter.id = doc.id;
-                    careerCenters.push(careerCenter);
-                })
-                setAdminGroups(careerCenters);
-            })
-        }
-    }, [userData])
 
     let adminGroupElements = [];
 
@@ -46,9 +31,7 @@ const AdminGroups = ({userData, firebase}) => {
         adminGroupElements = adminGroups.map(group => {
             return (
                 <Fragment key={group.id}>
-
-                        <CurrentGroup isAdmin={true} group={group} userData={userData}/>
-
+                    <CurrentGroup isAdmin={true} group={group} userData={userData}/>
                 </Fragment>
             )
         });
