@@ -388,8 +388,10 @@ function UpcomingLivestream(props) {
                                 <div>
                                     {/* <Button size='big' content={ 'Ready To Join' } icon={ 'play' } style={{ margin: '5px' }} onClick={() => setUserIsReady(true)} disabled={!currentLivestream.hasStarted} color='pink'/>  */}
                                     <Button size='big'
+                                            id='register-button'
                                             content={user ? (registered ? 'Cancel' : 'I\'ll attend!') : 'Register to attend'}
-                                            icon={registered ? 'delete' : 'plus'} style={{margin: '5px'}}
+                                            icon={registered ? 'delete' : 'plus'} 
+                                            style={{margin: '5px'}}
                                             onClick={registered ? () => deregisterFromLivestream(currentLivestream.id) : () => startRegistrationProcess(currentLivestream.id)}
                                             color={registered ? null : 'teal'}/>
                                     <Button size='big' content={'How Live Streams Work'} icon={'cog'}

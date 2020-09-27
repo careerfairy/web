@@ -23,9 +23,11 @@ function ViewerPage(props) {
     const [careerCenters, setCareerCenters] = useState([]);
     const [handRaiseActive, setHandRaiseActive] = useState(false);
     const [iconsDisabled, setIconsDisabled] = useState(false);
+    const [showVideoButton, setShowVideoButton] = useState({ paused: false, muted: false});
+    const [unmute, setUnmute] = useState(false);
+    const [play, setPlay] = useState(false);
 
     const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
-
 
     const { authenticatedUser, userData } = React.useContext(UserContext);
     const { width, height } = useWindowSize();
@@ -103,6 +105,16 @@ function ViewerPage(props) {
         }  
     }
 
+    function unmuteVideos() {
+        setShowVideoButton(prevState => { return { paused: prevState.paused, muted: false }});
+        setUnmute(true);
+    }
+
+    function playVideos() {
+        setShowVideoButton(prevState => { return { paused: false, muted: false }});
+        setPlay(true);
+    }
+
     let logoElements = careerCenters.map( (careerCenter, index) => {
         return (
             <Fragment key={index}>
@@ -131,7 +143,7 @@ function ViewerPage(props) {
             <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
                 { handRaiseActive ? 
                     <ViewerHandRaiseComponent currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive}/> :
-                    <ViewerComponent livestreamId={livestreamId} streamerId={streamerId}  currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive}/>
+                    <ViewerComponent livestreamId={livestreamId} streamerId={streamerId}  currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton} setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>
                 }
                 <div className='mini-chat-container'>
                     <MiniChatContainer livestream={ currentLivestream }  isStreamer={false}/>
@@ -159,6 +171,18 @@ function ViewerPage(props) {
             </div>
             <div className='icons-container'>
                 <IconsContainer livestreamId={ currentLivestream.id } />
+            </div>
+            <div className={ 'playButtonContent ' + (showVideoButton.muted ? '' : 'hidden')} onClick={unmuteVideos}>
+                <div className='playButton'>
+                    <Icon name='volume up' style={{ fontSize: '3rem' }}/>
+                    <div>Click to unmute</div>
+                </div>     
+            </div>
+            <div className={ 'playButtonContent ' + (showVideoButton.paused ? '' : 'hidden')} onClick={playVideos}>
+                <div className='playButton'>
+                    <Icon name='play' style={{ fontSize: '3rem' }}/>
+                    <div>Click to play</div>
+                </div>     
             </div>
             <style jsx>{`
                 .hidden {
@@ -359,10 +383,6 @@ function ViewerPage(props) {
                     }
                 }
 
-                .video-menu-left {
-                    z-index: 15;
-                }
-
                 @media(max-width: 768px) {
                     .video-menu-left {
                         position: absolute;
@@ -370,6 +390,7 @@ function ViewerPage(props) {
                         left: 0;
                         width: 0;
                         bottom 0;
+                        z-index: 15;
                     }
 
                     .video-menu-left.withMenu {
@@ -384,11 +405,33 @@ function ViewerPage(props) {
                         left: 0;
                         bottom: 0;
                         width: 0;
+                        z-index: 15;
                     }
 
                     .video-menu-left.withMenu {
                         width: 280px;
                     }
+                }
+
+                .playButton {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    color: white;
+                    font-weight: 500;
+                    text-align: center;
+                }
+
+                .playButtonContent {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(10,10,10,0.4);
+                    cursor: pointer;
+                    z-index: 200;
                 }
             `}</style>
              <style jsx global>{`

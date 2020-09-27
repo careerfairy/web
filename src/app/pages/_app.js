@@ -15,6 +15,7 @@ import "slick-carousel/slick/slick-theme.css";
 import Head from 'next/head';
 import {theme} from "../materialUI";
 import UserContext from 'context/user/UserContext';
+import TagManager from 'react-gtm-module'
 
 function MyApp({Component, pageProps}) {
 
@@ -32,6 +33,14 @@ function MyApp({Component, pageProps}) {
         if (jssStyles) {
             jssStyles.parentElement.removeChild(jssStyles);
         }
+    }, []);
+
+    const tagManagerArgs = {
+        gtmId: 'GTM-P29VCWC'
+    }
+
+    useEffect(() => {
+        TagManager.initialize(tagManagerArgs);
     }, []);
 
     useEffect(() => {
