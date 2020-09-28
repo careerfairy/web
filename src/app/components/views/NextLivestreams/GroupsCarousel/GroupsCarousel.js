@@ -23,7 +23,6 @@ const useStyles = makeStyles((theme) => ({
             display: "none"
         },
         background: "rgb(44, 66, 81)",
-
     },
     button: {
         height: 90,
@@ -62,7 +61,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
     const classes = useStyles({mobile, singleCard: !groupIds.length})
     const customSlider = createRef()
     const [activeSlide, setActiveSlide] = useState(0)
-
+    const [activeSlide2, setActiveSlide2] = useState(0)
 
     useEffect(() => {
         if (checkIfOnlyLivestreamId()) {
@@ -88,15 +87,21 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
 
 
     const renderGroupCards = groupIds?.map((id, index) => {
-        return <CarouselCard index={index}
-                             mobile={mobile}
-                             handleSetGroup={handleSetGroup}
-                             handleResetGroup={handleResetGroup}
-                             activeSlide={activeSlide}
-                             groupData={groupData}
-                             key={id}
-                             groupId={id}
-        />
+        if (id === "upcoming") {
+            return <NextLivestreamsCard mobile={mobile} handleSetGroup={handleSetGroup} groupData={groupData}
+                                        index={index} key={id}
+                                        handleResetGroup={handleResetGroup} activeSlide={activeSlide}/>
+        } else {
+            return <CarouselCard index={index}
+                                 mobile={mobile}
+                                 handleSetGroup={handleSetGroup}
+                                 handleResetGroup={handleResetGroup}
+                                 activeSlide={activeSlide}
+                                 groupData={groupData}
+                                 key={id}
+                                 groupId={id}
+            />
+        }
     })
 
     const settings = {
@@ -111,6 +116,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
         slidesToShow: !groupIds.length || mobile ? 1 : groupIds.length > 4 ? 4 : groupIds.length,
         speed: 500,
         beforeChange: (current, next) => setActiveSlide(next),
+        afterChange: current => setActiveSlide2(current)
     };
     // console.log("settings.initialSlide", settings.initialSlide);
 
@@ -121,9 +127,6 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
             </IconButton>
             <Slider ref={customSlider} className={classes.slider} {...settings}>
                 {renderGroupCards}
-                <NextLivestreamsCard mobile={mobile} handleSetGroup={handleSetGroup} groupData={groupData}
-                                     position={groupIds?.length}
-                                     handleResetGroup={handleResetGroup} activeSlide={activeSlide}/>
             </Slider>
             <IconButton mobile={mobile} className={classes.next} onClick={handleNext}>
                 <NavigateNextIcon className={classes.icon} fontSize="large"/>
