@@ -54,11 +54,7 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
         const renderStreamCards = livestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
-                        <Grid key={livestream.id} md={12} lg={12} item>
-                    <LazyLoadComponent
-                        width="100%"
-                        threshold={50}
-                        placeholder={<StreamCardPlaceHolder/>}>
+                        <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
                             <GroupStreamCard
                                 index={index}
                                 groupData={groupData}
@@ -69,7 +65,6 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
                                 careerCenters={[]}
                                 id={livestream.id}
                                 key={livestream.id} livestream={livestream}/>
-                    </LazyLoadComponent>
                         </Grid>
                 )
             }
