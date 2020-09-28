@@ -75,6 +75,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
     }
 
     const checkIfOnlyLivestreamId = () => {
+        console.log(livestreamId && !careerCenterId);
         return livestreamId && !careerCenterId
     }
 
@@ -100,7 +101,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
     })
 
     const settings = {
-        initialSlide: checkIfOnlyLivestreamId() ? groupIds.length : 1,
+        initialSlide: checkIfOnlyLivestreamId() ? groupIds.length : 0,
         centerMode: true,
         centerPadding: "60px",
         focusOnSelect: true,
