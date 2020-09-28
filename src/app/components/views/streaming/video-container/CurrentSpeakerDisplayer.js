@@ -1,7 +1,7 @@
 import React, {useEffect, Fragment, useRef, useState} from 'react';
 import {Grid, Icon} from "semantic-ui-react";
 import RemoteVideoContainer from './RemoteVideoContainer';
-import { useWindowSize } from 'components/custom-hook/useWindowSize';
+import { useWindowSize } from '../../../custom-hook/useWindowSize';
 
 function CurrentSpeakerDisplayer(props) {
 
@@ -20,7 +20,6 @@ function CurrentSpeakerDisplayer(props) {
                 return windowSize.width > 768 ? '20vh' : '15vh';
             }
             if (props.streams.length > 1) {
-
                 if (streamId === props.currentSpeaker) {
                     return windowSize.width > 768 ? 'calc(80vh - 55px)' : '45vh';
                 } else {
@@ -69,31 +68,15 @@ function CurrentSpeakerDisplayer(props) {
         }
         if (props.isPlayMode) {
             if (props.streams.length > 1) {
-                if (props.mode === 'default') {
-                    return streamId === props.currentSpeaker ? 'speaker-video' : 'quarter-width';
-                } else {
-                    return 'quarter-width';
-                }
+                return streamId === props.currentSpeaker ? 'speaker-video' : 'quarter-width';
             } else {
-                if (props.mode === 'default') {
-                    return 'speaker-video-solo';
-                } else {
-                    return 'quarter-width';
-                }
+                return 'speaker-video-solo';
             }
         } else {
             if (props.streams.length > 0) {
-                if (props.mode === 'default') {
-                    return streamId === props.currentSpeaker ? 'speaker-video' : 'quarter-width';
-                } else {
-                    return 'quarter-width';
-                }
+                return streamId === props.currentSpeaker ? 'speaker-video' : 'quarter-width';
             } else {
-                if (props.mode === 'default') {
-                    return 'speaker-video-solo';
-                } else {
-                    return 'quarter-width';
-                }
+                return 'speaker-video-solo';
             }
         }
     }
@@ -227,8 +210,8 @@ function CurrentSpeakerDisplayer(props) {
                     overflow-y: hidden;
                     white-space: nowrap;
                     text-align: center;
-                    scrollbar-width: thin;
-                    scrollbar-color: rgba(0, 210, 170, 0.8) black;
+                    scrollbar-width: 5px;
+                    scollbar-color: black rgba(0, 210, 170, 0.8);
                 }
 
                 .relative-container-videos::-webkit-scrollbar {

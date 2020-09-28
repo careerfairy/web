@@ -72,7 +72,9 @@ class Firebase {
     };
 
     listenToGroups = (callback) => {
-        let groupRefs = this.firestore.collection("careerCenterData");
+        let groupRefs = this.firestore
+        .collection("careerCenterData")
+        .where("test", "==", false);
         return groupRefs.onSnapshot(callback);
     };
 

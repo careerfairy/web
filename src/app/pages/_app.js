@@ -59,6 +59,7 @@ function MyApp({Component, pageProps}) {
            const unsubscribe = firebase.listenToUserData(authenticatedUser.email, querySnapshot => {
                 if (querySnapshot.exists) {
                     let user = querySnapshot.data();
+                    user.id = querySnapshot.id;
                     setUserData(user);
                 } else {
                     setUserData(null);

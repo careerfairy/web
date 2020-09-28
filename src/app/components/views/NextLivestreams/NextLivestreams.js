@@ -85,7 +85,6 @@ const NextLivestreams = ({user, firebase}) => {
                         repositionElement(livestreams, currentIndex, 0)
                     }
                 }
-                debugger;
                 setLivestreams(livestreams);
                 setSearching(false)
             })

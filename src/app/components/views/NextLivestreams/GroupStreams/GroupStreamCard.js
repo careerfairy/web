@@ -183,12 +183,13 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                                     fontSize: '0.7em',
                                     marginRight: '10px'
                                 }}/>{DateUtil.getPrettyDay(livestream.start.toDate())}</div>
-                                <div style={{display: 'inline-block', float: 'right'}}><Icon name='clock outline'
-                                                                                             style={{
-                                                                                                 color: 'rgb(0, 210, 170)',
-                                                                                                 fontSize: '0.7em',
-                                                                                                 marginRight: '10px'
-                                                                                             }}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
+                                <div style={{display: 'inline-block', float: 'right'}}>
+                                    <Icon name='clock outline'
+                                        style={{
+                                            color: 'rgb(0, 210, 170)',
+                                            fontSize: '0.7em',
+                                            marginRight: '10px'
+                                        }}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
                                 </div>
                             </div>
                         </div>

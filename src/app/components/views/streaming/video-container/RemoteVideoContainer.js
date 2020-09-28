@@ -4,7 +4,6 @@ import {Icon, Image} from "semantic-ui-react";
 function RemoteVideoContainer(props) {
 
     const videoElement = useRef(null);
-    const [muted, setMuted] = useState(false);
 
     const [canPlay, setCanPlay] = useState(false);
 
@@ -61,10 +60,10 @@ function RemoteVideoContainer(props) {
                     background-color: black;
                     width: 100%;
                     margin: 0 auto;
-                    z-index: 1000;
+                    z-index: 2000;
                 }
 
-                .videoElement {
+                #videoElement {
                     position: absolute;
                     top: 50%;
                     left: 50%;
