@@ -30,7 +30,7 @@ const NextLivestreams = ({user, firebase}) => {
     const routerMounted = paramsLivestreamId !== null && paramsCareerCenterId !== null
 
     useEffect(() => {
-        if (listenToUpcoming) {
+        if (listenToUpcoming && routerMounted) {
             const unsubscribe = firebase.listenToUpcomingLivestreams(querySnapshot => {
                 let livestreams = [];
                 querySnapshot.forEach(doc => {
@@ -39,16 +39,24 @@ const NextLivestreams = ({user, firebase}) => {
                     livestream.id = doc.id;
                     livestreams.push(livestream);
                 });
+                console.log(router.query.livestreamId)
+                console.log("livestreamId", livestreamId);
+                if (livestreamId && !careerCenterId) {
+                    const currentIndex = livestreams.findIndex(el => el.id === livestreamId)
+                    if (currentIndex > -1) {
+                        repositionElement(livestreams, currentIndex, 0)
+                    }
+                }
+
                 setLivestreams(livestreams);
             }, error => {
                 console.log(error);
             });
             return () => unsubscribe();
         }
-    }, [listenToUpcoming])
+    }, [listenToUpcoming, livestreamId])
 
     useEffect(() => {
-        console.log("router", router)
         // will set the params once the router is loaded whether it be undefined or truthy
         if (paramsLivestreamId === null && router) {
             setParamsCareerCenterId(careerCenterId)

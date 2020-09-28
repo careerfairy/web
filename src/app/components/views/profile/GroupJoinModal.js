@@ -49,7 +49,7 @@ const GroupJoinModal = ({
                 ...obj,
                 selectedValueId: "",
             }));
-            if (alreadyJoined) {
+            if (userData && alreadyJoined) {
                 const userCategories = userData.registeredGroups.find(
                     (el) => el.groupId === group.id
                 ).categories;

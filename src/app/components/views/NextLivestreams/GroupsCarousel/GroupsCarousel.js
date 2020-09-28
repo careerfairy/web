@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
         marginTop: "auto",
     },
     next: {
-        display: 'block',
+        display: ({singleCard}) => singleCard ? 'none' : 'block',
         position: "absolute",
         zIndex: 20,
         right: 0,
@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
         top: "50%",
     },
     prev: {
-        display: 'block',
+        display: ({singleCard}) => singleCard ? 'none' : 'block',
         position: "absolute",
         zIndex: 20,
         left: 57,
@@ -57,10 +57,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user, careerCenterId}) => {
-    // console.log("careerCenterId", careerCenterId);
     const router = useRouter()
     const absolutePath = router.asPath;
-    const classes = useStyles()
+    const classes = useStyles({mobile, singleCard: groupIds.length < 2})
     const customSlider = createRef()
 
     const [activeSlide, setActiveSlide] = useState(0)
@@ -104,26 +103,9 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
         beforeChange: (current, next) => setActiveSlide(next),
     };
 
-    const singleSettings = {
-        initialSlide: 0,
-        centerMode: true,
-        // variableWidth: true,
-        // centerPadding: "40%",
-        focusOnSelect: true,
-        swipeToSlide: true,
-        infinite: true,
-        arrows: false,
-        slidesToScroll: 1,
-        slidesToShow: 1,
-        speed: 500,
-        beforeChange: (current, next) => setActiveSlide(next),
-    }
-
-    console.log("groupids", groupIds)
-
     return (
         <div className={classes.root}>
-            <IconButton className={classes.prev} onClick={handlePrev}>
+            <IconButton mobile={mobile} className={classes.prev} onClick={handlePrev}>
                 <NavigateBeforeIcon className={classes.icon} color="primary" fontSize="large"/>
             </IconButton>
             <Slider ref={customSlider} className={classes.slider} {...settings}>
@@ -132,7 +114,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
                                      position={groupIds?.length}
                                      handleResetGroup={handleResetGroup} activeSlide={activeSlide}/>
             </Slider>
-            <IconButton className={classes.next} onClick={handleNext}>
+            <IconButton mobile={mobile} className={classes.next} onClick={handleNext}>
                 <NavigateNextIcon className={classes.icon} fontSize="large"/>
             </IconButton>
         </div>
