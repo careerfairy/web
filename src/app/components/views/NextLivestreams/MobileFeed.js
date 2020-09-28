@@ -111,7 +111,7 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
 
     return (
         <>
-            {/* <AppBar className={classes.bar} position="static" color="default">
+            <AppBar className={classes.bar} position="static" color="default">
                 <Tabs
                     value={value}
                     variant="fullWidth"
@@ -129,7 +129,7 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                         :
                         null}
                 </Tabs>
-            </AppBar> */}
+            </AppBar>
             {!userData?.groupIds?.includes(groupData.groupId) && !listenToUpcoming &&
             <>
                 <Button className={classes.followButton} onClick={handleJoin} size="large" variant="contained" fullWidth
@@ -168,6 +168,7 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                     <GroupCategories alreadyJoined={alreadyJoined}
                                      groupData={groupData}
                                      user={user}
+                                     livestreams={livestreams}
                                      userData={userData}
                                      handleToggleActive={handleToggleActive}
                                      mobile={true}/>

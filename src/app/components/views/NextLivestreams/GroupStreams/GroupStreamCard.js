@@ -12,6 +12,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {useRouter} from "next/router";
 import CopyToClipboard from "./CopyToClipboard";
 import LogoElement from "./LogoElement";
+import TargetOptions from "../GroupsCarousel/TargetOptions";
 
 
 const useStyles = makeStyles((theme) => ({}));
@@ -37,6 +38,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [isHighlighted, setIsHighlighted] = useState(false)
     const [careerCenters, setCareerCenters] = useState([])
+    const [targetOptions, setTargetOptions] = useState([])
 
     const router = useRouter();
     const absolutePath = router.asPath
@@ -53,6 +55,26 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
             setIsHighlighted(false)
         }
     }, [livestreamId, id, careerCenterId, groupData.groupId]);
+
+    useEffect(() => {
+
+        if (groupData.categories && livestream.targetCategories) {
+            const {groupId, categories} = groupData
+            let totalOptions = []
+            categories.forEach(category => totalOptions.push(category.options))
+            const flattenedOptions = totalOptions.reduce(function (a, b) {
+                return a.concat(b);
+            }, []);
+            // console.log("flattenedOptions", flattenedOptions);
+            const matchedOptions = livestream.targetCategories[groupId]
+            // console.log(matchedOptions);
+            if (matchedOptions) {
+                const filteredOptions = flattenedOptions.filter(option => matchedOptions.includes(option.id))
+                // console.log("filteredOptions", filteredOptions);
+                setTargetOptions(filteredOptions)
+            }
+        }
+    }, [groupData, livestream])
 
     useEffect(() => {
         if (livestream) {
@@ -143,6 +165,10 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                 livestream_link: ('https://careerfairy.io/upcoming-livestream/' + livestream.id)
             }
         });
+    }
+
+    function getTargetOptions() {
+
     }
 
 
@@ -247,8 +273,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                     <Grid className='middle aligned' centered>
                         <Grid.Row style={{paddingTop: 0, paddingBottom: '5px'}}>
                             <Grid.Column width={15}>
-                                <TargetElementList fields={livestream.targetGroups || []}
-                                                   selectedFields={fields}/>
+                                <TargetOptions options={targetOptions}/>
                             </Grid.Column>
                         </Grid.Row>
                     </Grid>
