@@ -62,8 +62,6 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
     const classes = useStyles({mobile, singleCard: !groupIds.length})
     const customSlider = createRef()
     const [activeSlide, setActiveSlide] = useState(0)
-    console.log("groupIds.length", groupIds.length);
-    console.log("activeSlide", activeSlide);
 
 
     useEffect(() => {
