@@ -12,8 +12,8 @@ import {makeStyles} from "@material-ui/core/styles";
 import {useRouter} from "next/router";
 import CopyToClipboard from "./CopyToClipboard";
 import LogoElement from "./LogoElement";
-import TargetOptions from "../GroupsCarousel/TargetOptions";
 import {LazyLoadComponent} from "react-lazy-load-image-component";
+import TargetOptions from "../GroupsCarousel/TargetOptions";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -50,8 +50,8 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [isHighlighted, setIsHighlighted] = useState(false)
     const [careerCenters, setCareerCenters] = useState([])
-    const classes = useStyles({isHighlighted})
     const [targetOptions, setTargetOptions] = useState([])
+    const classes = useStyles({isHighlighted})
 
     const router = useRouter();
     const absolutePath = router.asPath
