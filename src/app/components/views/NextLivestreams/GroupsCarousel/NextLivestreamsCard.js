@@ -58,7 +58,7 @@ const NextLivestreamsCard = ({handleSetGroup, mobile, index, handleResetGroup, a
     }, [activeSlide, index])
 
     const amISelected = () => {
-        return activeSlide === index
+        return position === activeSlide
     }
 
 

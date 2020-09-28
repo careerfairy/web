@@ -241,7 +241,7 @@ const NextLivestreams = ({user, firebase}) => {
                 user={authenticatedUser}
                 handleResetGroup={handleResetGroup}
                 handleSetGroup={handleSetGroup}
-                groupIds={[...groupIds, "upcoming"]}
+                groupIds={groupIds}
             />
             {mobile ? (
                 <MobileFeed
