@@ -114,7 +114,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
 
     return (
         <div className={classes.root}>
-            <IconButton mobile={mobile} className={classes.prev} onClick={handlePrev}>
+            <IconButton className={classes.prev} onClick={handlePrev}>
                 <NavigateBeforeIcon className={classes.icon} color="primary" fontSize="large"/>
             </IconButton>
             <Slider ref={customSlider} className={classes.slider} {...settings}>
@@ -123,7 +123,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
                                      position={groupIds?.length}
                                      handleResetGroup={handleResetGroup} activeSlide={activeSlide}/>
             </Slider>
-            <IconButton mobile={mobile} className={classes.next} onClick={handleNext}>
+            <IconButton className={classes.next} onClick={handleNext}>
                 <NavigateNextIcon className={classes.icon} fontSize="large"/>
             </IconButton>
         </div>
