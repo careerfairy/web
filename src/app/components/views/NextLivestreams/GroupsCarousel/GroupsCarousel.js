@@ -57,9 +57,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user, careerCenterId, livestreamId}) => {
+    console.log("groupIds", groupIds);
     const router = useRouter()
     const absolutePath = router.asPath;
-    const classes = useStyles({mobile, singleCard: groupIds.length < 2})
+    const classes = useStyles({mobile, singleCard: !groupIds.length})
     const customSlider = createRef()
     const [activeSlide, setActiveSlide] = useState(0)
 
