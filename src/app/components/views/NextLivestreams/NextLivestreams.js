@@ -216,6 +216,7 @@ const NextLivestreams = ({user, firebase}) => {
         <>
             <GroupsCarousel groupData={groupData}
                             mobile={mobile}
+                            livestreamId={livestreamId}
                             careerCenterId={careerCenterId}
                             user={authenticatedUser}
                             handleResetGroup={handleResetGroup}

@@ -1,4 +1,4 @@
-import React, {createRef, useState} from 'react';
+import React, {createRef, useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import CarouselCard from "./CarouselCard";
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
@@ -56,16 +56,26 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user, careerCenterId}) => {
+const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user, careerCenterId, livestreamId}) => {
     const router = useRouter()
     const absolutePath = router.asPath;
     const classes = useStyles({mobile, singleCard: groupIds.length < 2})
     const customSlider = createRef()
-
     const [activeSlide, setActiveSlide] = useState(0)
+
+
+    useEffect(() => {
+        if (checkIfOnlyLivestreamId() && groupIds.length) {
+            setActiveSlide(groupIds.length)
+        }
+    }, [livestreamId, careerCenterId, groupIds])
 
     const handleNext = () => {
         customSlider.current.slickNext()
+    }
+
+    const checkIfOnlyLivestreamId = () => {
+        return livestreamId && !careerCenterId
     }
 
     const handlePrev = () => {
@@ -90,7 +100,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
     })
 
     const settings = {
-        initialSlide: 0,
+        initialSlide: checkIfOnlyLivestreamId() ? groupIds.length : 1,
         centerMode: true,
         centerPadding: "60px",
         focusOnSelect: true,
