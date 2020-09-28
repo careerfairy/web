@@ -15,7 +15,10 @@ const useStyles = makeStyles((theme) => ({
         cursor: "pointer",
         borderRadius: "5px",
         maxHeight: 200,
+        color: "white",
+        boxShadow: "none",
         // maxWidth: 350,
+        background: "rgba(255, 255, 255, 0)",
         transition: "all 0.5s, all 0.5s",
         "&:hover": {
             transform: "scale(1.02)"
@@ -33,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
     },
     text: {
         textTransform: "uppercase",
-        fontSize: "1.3rem"
+        fontSize: "1.3rem",
     }
 }));
 
@@ -62,7 +65,8 @@ const NextLivestreamsCard = ({handleSetGroup, mobile, index, handleResetGroup, a
     return (
         <Grow in={true} timeout={600}>
             <div>
-                <Card style={{borderTop: amISelected() ? "3px solid #00d2aa" : "none"}}
+                <Card
+                    style={{border: amISelected() ? " 5px solid #00d2aa" : "white"}}
                       onClick={() => {
                           handleResetGroup()
                           handleSetGroup({})
