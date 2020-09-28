@@ -5,7 +5,6 @@ import DateUtil from "../../../../util/DateUtil";
 import {Button, Grid, Icon, Image} from "semantic-ui-react";
 import Link from "next/link";
 import Skeleton from '@material-ui/lab/Skeleton';
-import TargetElementList from "../../common/TargetElementList";
 import BookingModal from "../../common/booking-modal/BookingModal";
 import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";

@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
     bar: {
         boxShadow: "none",
         position: "sticky",
-        top: 110,
+        top: 100,
         zIndex: 1
     },
     panel: {

@@ -57,16 +57,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user, careerCenterId, livestreamId}) => {
-    console.log("groupIds", groupIds);
     const router = useRouter()
     const absolutePath = router.asPath;
     const classes = useStyles({mobile, singleCard: !groupIds.length})
     const customSlider = createRef()
     const [activeSlide, setActiveSlide] = useState(0)
+    console.log("groupIds.length", groupIds.length);
+    console.log("activeSlide", activeSlide);
 
 
     useEffect(() => {
-        if (checkIfOnlyLivestreamId() && groupIds.length) {
+        if (checkIfOnlyLivestreamId()) {
             setActiveSlide(groupIds.length)
         }
     }, [livestreamId, careerCenterId, groupIds])
@@ -76,7 +77,6 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
     }
 
     const checkIfOnlyLivestreamId = () => {
-        console.log(livestreamId && !careerCenterId);
         return livestreamId && !careerCenterId
     }
 
@@ -114,6 +114,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
         speed: 500,
         beforeChange: (current, next) => setActiveSlide(next),
     };
+    // console.log("settings.initialSlide", settings.initialSlide);
 
     return (
         <div className={classes.root}>

@@ -5,7 +5,6 @@ import GroupStreamCard, {StreamCardPlaceHolder} from "./GroupStreamCard";
 import {Typography, LinearProgress, Box, Button, Grid} from "@material-ui/core";
 import {useRouter} from "next/router";
 import GroupJoinModal from "../../profile/GroupJoinModal";
-import { LazyLoadComponent } from 'react-lazy-load-image-component';
 
 
 const useStyles = makeStyles((theme) => ({
