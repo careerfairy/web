@@ -3,7 +3,7 @@ import {Container, Button, Grid, Icon, Input, Image} from "semantic-ui-react";
 
 import Header from '../../components/views/header/Header';
 
-import { withFirebasePage } from 'context/firebase';
+import {withFirebasePage} from 'context/firebase';
 import TargetElementList from '../../components/views/common/TargetElementList'
 import Loader from '../../components/views/loader/Loader'
 import DateUtil from '../../util/DateUtil';
@@ -25,7 +25,6 @@ function UpcomingLivestream(props) {
     const absolutePath = router.asPath;
 
     const [user, setUser] = useState(null);
-    const [userHasBeenSet, setUserHasBeenSet] = useState(false)
     const [livestreamSpeakers, setLivestreamSpeakers] = useState([]);
     const [userData, setUserData] = useState(null);
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
@@ -43,22 +42,12 @@ function UpcomingLivestream(props) {
         props.firebase.auth.onAuthStateChanged(user => {
             if (user !== null && user.emailVerified) {
                 setUser(user);
-                setUserHasBeenSet(true)
             } else {
                 setUser(null);
-                setUserHasBeenSet(true)
             }
         })
     }, []);
 
-    useEffect(() => {
-        if (userHasBeenSet && !user && absolutePath) {
-            router.push({
-                pathname: `/login`,
-                query: {absolutePath}
-            })
-        }
-    }, [userHasBeenSet, absolutePath, user])
 
     useEffect(() => {
         if (livestreamId) {
@@ -96,7 +85,7 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (currentLivestream) {
-            props.firebase.getDetailLivestreamCareerCenters(currentLivestream.universities).then( querySnapshot => {
+            props.firebase.getDetailLivestreamCareerCenters(currentLivestream.universities).then(querySnapshot => {
                 let groupList = [];
                 querySnapshot.forEach(doc => {
                     let group = doc.data();
@@ -192,7 +181,10 @@ function UpcomingLivestream(props) {
 
     function startRegistrationProcess(livestreamId) {
         if (!user || !user.emailVerified) {
-            return router.push('/signup');
+            return router.push(absolutePath ? {
+                pathname: `/login`,
+                query: {absolutePath}
+            } : '/signup');
         }
 
         if (!userData || !UserUtil.userProfileIsComplete(userData)) {
@@ -390,7 +382,7 @@ function UpcomingLivestream(props) {
                                     <Button size='big'
                                             id='register-button'
                                             content={user ? (registered ? 'Cancel' : 'I\'ll attend!') : 'Register to attend'}
-                                            icon={registered ? 'delete' : 'plus'} 
+                                            icon={registered ? 'delete' : 'plus'}
                                             style={{margin: '5px'}}
                                             onClick={registered ? () => deregisterFromLivestream(currentLivestream.id) : () => startRegistrationProcess(currentLivestream.id)}
                                             color={registered ? null : 'teal'}/>
