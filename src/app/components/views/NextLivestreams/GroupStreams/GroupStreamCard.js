@@ -1,4 +1,4 @@
-import React, {Fragment, useState, useEffect} from 'react';
+import React, {Fragment, useState, useEffect, useRef} from 'react';
 import UserUtil from "../../../../data/util/UserUtil";
 import axios from "axios";
 import DateUtil from "../../../../util/DateUtil";
@@ -25,7 +25,6 @@ const useStyles = makeStyles((theme) => ({
         WebkitBoxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
         boxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
         MozBoxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
-
     }
 
 }));
@@ -211,8 +210,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
     let logoElements = careerCenters.map((careerCenter, index) => {
         return (
             <Grid.Column width='8' key={index}>
-                <LogoElement livestreamId={livestream.id} userfollows={checkIfUserFollows(careerCenter)}
-                             careerCenter={careerCenter} userData={userData} user={user}/>
+                <LogoElement livestreamId={livestream.id} userfollows={checkIfUserFollows(careerCenter)} careerCenter={careerCenter} userData={userData} user={user}/>
             </Grid.Column>
         );
     });
