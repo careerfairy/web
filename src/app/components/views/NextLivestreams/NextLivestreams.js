@@ -117,7 +117,7 @@ const NextLivestreams = ({ user, firebase }) => {
       );
       return () => unsubscribe();
     }
-  }, [groupData, selectedOptions, userData, authenticatedUser]);
+  }, [groupData, selectedOptions, authenticatedUser]);
 
   useEffect(() => {
     if (groupData && groupData.categories) {

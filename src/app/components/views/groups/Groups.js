@@ -59,9 +59,7 @@ const Groups = ({groups, userData, makeSix}) => {
 
     moreGroupElements = groups.map(group => {
         return (
-
-                    <NewGroup makeSix={makeSix} key={group.id} group={group} userData={userData}/>
-
+            <NewGroup makeSix={makeSix} key={group.id} group={group} userData={userData}/>
         )
     });
     return (

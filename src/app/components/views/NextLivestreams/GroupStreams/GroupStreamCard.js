@@ -13,6 +13,7 @@ import CopyToClipboard from "./CopyToClipboard";
 import LogoElement from "./LogoElement";
 import {LazyLoadComponent} from "react-lazy-load-image-component";
 import TargetOptions from "../GroupsCarousel/TargetOptions";
+import GroupJoinToAttendModal from './GroupJoinToAttendModal';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -50,6 +51,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
     const [isHighlighted, setIsHighlighted] = useState(false)
     const [careerCenters, setCareerCenters] = useState([])
     const [targetOptions, setTargetOptions] = useState([])
+    const [openJoinModal, setOpenJoinModal] = useState(false);
     const classes = useStyles({isHighlighted})
 
     const router = useRouter();
@@ -143,10 +145,26 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
             });
         }
 
+        if (!userData?.groupIds?.includes(groupData.groupId)) {
+            setOpenJoinModal(true)
+        } else {
+            firebase.registerToLivestream(livestream.id, user.email).then(() => {
+                setBookingModalOpen(true);
+                sendEmailRegistrationConfirmation();
+            })       
+        }
+    }
+
+    function completeRegistrationProcess() {
         firebase.registerToLivestream(livestream.id, user.email).then(() => {
+            debugger;
             setBookingModalOpen(true);
             sendEmailRegistrationConfirmation();
-        })
+        })       
+    }
+
+    function handleCloseJoinModal() {
+        setOpenJoinModal(false);
     }
 
     function userIsRegistered() {
@@ -233,16 +251,16 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                             <div className='livestream-position'
                                  style={{color: userIsRegistered() ? 'white' : ''}}>{livestream.title}</div>
                             <div>
-                            <Button size='large' style={{margin: '5px 5px 0 0'}}
-                                    icon={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? 'delete' : 'add'}
-                                    color={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? null : 'teal'}
-                                    content={user ? ((livestream.registeredUsers?.indexOf(user.email) > -1) ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
-                                    onClick={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
-                            <Link href={('/upcoming-livestream/' + livestream.id)}
-                                    prefetch={false}><a><Button
-                                size='large' style={{margin: '5px 5px 0 0'}} icon='signup'
-                                content='Details'
-                                color='pink'/></a></Link>
+                                <Button size='large' style={{margin: '5px 5px 0 0'}}
+                                        icon={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? 'delete' : 'add'}
+                                        color={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? null : 'teal'}
+                                        content={user ? ((livestream.registeredUsers?.indexOf(user.email) > -1) ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
+                                        onClick={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
+                                <Link href={('/upcoming-livestream/' + livestream.id)}
+                                        prefetch={false}><a><Button
+                                    size='large' style={{margin: '5px 5px 0 0'}} icon='signup'
+                                    content='Details'
+                                    color='pink'/></a></Link>
                             </div>
                         </div>
                     </div>
@@ -297,6 +315,14 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                 </div>
             </div>
             {/*</Grow>*/}
+            <GroupJoinToAttendModal
+                open={openJoinModal}
+                group={groupData}
+                alreadyJoined={false}
+                userData={userData}
+                onConfirm={completeRegistrationProcess}
+                closeModal={handleCloseJoinModal}
+            />
             <BookingModal livestream={livestream} modalOpen={bookingModalOpen}
                           setModalOpen={setBookingModalOpen}
                           user={user}/>
