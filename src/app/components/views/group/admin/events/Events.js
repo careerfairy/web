@@ -7,6 +7,7 @@ import {useRouter} from 'next/router';
 import AddIcon from "@material-ui/icons/Add";
 import EditIcon from '@material-ui/icons/Edit';
 import {Box, Button, CardMedia, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, IconButton, InputLabel, Menu, MenuItem, Select, Typography} from "@material-ui/core";
+import GroupStreamCard from 'components/views/NextLivestreams/GroupStreams/GroupStreamCard';
 
 const Events = (props) => {
 
@@ -117,7 +118,7 @@ const Events = (props) => {
 
         return (
             <>
-                <IconButton style={{ position: 'absolute', top: '100px', right: '10px', zIndex: '2000' }} onClick={() => setModalOpen(true)}>
+                <IconButton style={{ position: 'absolute', top: '140px', right: '10px', zIndex: '2000' }} onClick={() => setModalOpen(true)}>
                     <EditIcon fontSize="large" color="inherit"/>
                 </IconButton>
                 <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
@@ -156,8 +157,8 @@ const Events = (props) => {
                         </Button>
                     </DialogActions>
                 </Dialog>
-                <LivestreamCard livestream={props.livestream} user={props.user} userData={props.userData} fields={null}
-                    grid={props.grid} careerCenters={[]}/>
+                <GroupStreamCard livestream={props.livestream} user={props.user} userData={props.userData} fields={null}
+                    grid={props.grid} groupData={props.group}/>
             </>
         );
     }
@@ -165,7 +166,7 @@ const Events = (props) => {
     livestreamElements = livestreams.map((livestream, index) => {
         return (
             <div key={index} style={{ position: 'relative' }}>
-                <EnhancedCard livestream={livestream} {...props} fields={null} grid={grid} careerCenters={[]}/>
+                <EnhancedCard livestream={livestream} {...props} fields={null} grid={grid} group={props.group}/>
             </div>
         );
     });
@@ -188,9 +189,9 @@ const Events = (props) => {
                     open={Boolean(anchorEl)}
                     onClose={handleClose}
                 >
-                    <MenuItem onClick={() => router.push('/group/' + props.group.id + '/admin/schedule-event')}>Send a
-                        Company Request</MenuItem>
-                    <MenuItem onClick={handleClose}>Schedule a Live Stream</MenuItem>
+                <MenuItem onClick={() => router.push('/group/' + props.group.id + '/admin/schedule-event')}>Send a
+                    Company Request</MenuItem>
+                <MenuItem onClick={handleClose}>Schedule a Live Stream</MenuItem>
                 </Menu>
             </div>
             <SizeMe>{({size}) => (
