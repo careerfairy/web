@@ -12,7 +12,7 @@ const TargetOptions = ({options}) => {
             <Chip
                 variant="outlined"
                 size="small"
-                style={{maxWidth: 300}}
+                style={{maxWidth: 300, background: "rgba(255,255,255, 0.5)"}}
                 // style={{maxWidth: width}}
                 label={<Typography variant="body1" noWrap>{option.name}</Typography>}/>
         </Tooltip>
