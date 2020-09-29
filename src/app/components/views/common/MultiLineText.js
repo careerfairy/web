@@ -2,7 +2,7 @@ function MulitLineText(props) {
 
     let textElements = props.text.split('//n').map((textElement, index) => {
         return(
-            <div key={textElement} style={{ margin: '15px 0'}}>
+            <div key={index} style={{ margin: '15px 0'}}>
                 { textElement }
             </div>
         );
