@@ -112,11 +112,9 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
 
     function certifyExternalMediaStreams(adaptorInstance, infoObj) {
         infoObj.streams.forEach( streamId => {
-            if (externalMediaStreams.map(stream => stream.streamId).indexOf(streamId) < 0) {
-                adaptorInstance.play(streamId, 'null', infoObj.ATTR_ROOM_NAME);
-                adaptorInstance.enableStats(streamId);
-            }
-         })
+            adaptorInstance.play(streamId, 'null', infoObj.ATTR_ROOM_NAME);
+            adaptorInstance.enableStats(streamId);
+        })
     }
 
     function publishNewStream(adaptorInstance, infoObj) {
