@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user, livestreams, searching, scrollToTop, livestreamId, careerCenterId,listenToUpcoming}) => {
+const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user, livestreams, searching, scrollToTop, livestreamId, careerCenterId, listenToUpcoming, selectedOptions}) => {
     const classes = useStyles();
     const theme = useTheme();
     const router = useRouter()
@@ -154,15 +154,16 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                 onChangeIndex={handleChangeIndex}>
                 <TabPanel dir={theme.direction}>
                     <GroupStreams user={user}
-                        mobile={true}
-                        livestreamId={livestreamId}
-                        listenToUpcoming={listenToUpcoming}
-                        careerCenterId={careerCenterId}
-                        searching={searching}
-                        alreadyJoined={alreadyJoined}
-                        livestreams={livestreams}
-                        userData={userData}
-                        groupData={groupData}/>
+                                  mobile={true}
+                                  livestreamId={livestreamId}
+                                  listenToUpcoming={listenToUpcoming}
+                                  careerCenterId={careerCenterId}
+                                  selectedOptions={selectedOptions}
+                                  searching={searching}
+                                  alreadyJoined={alreadyJoined}
+                                  livestreams={livestreams}
+                                  userData={userData}
+                                  groupData={groupData}/>
                 </TabPanel>
                 <TabPanel dir={theme.direction}>
                     <GroupCategories alreadyJoined={alreadyJoined}

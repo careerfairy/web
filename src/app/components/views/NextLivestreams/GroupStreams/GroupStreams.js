@@ -28,12 +28,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId, careerCenterId, alreadyJoined, listenToUpcoming}) => {
+const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId, careerCenterId, alreadyJoined, listenToUpcoming, selectedOptions}) => {
         const classes = useStyles()
         const router = useRouter()
         const absolutePath = router.asPath
         const [openJoinModal, setOpenJoinModal] = useState(false);
         const [hasChecked, setHasChecked] = useState(false)
+        const searchedButNoResults = selectedOptions.length && !searching && !livestreams.length
+
 
         const handleCloseJoinModal = () => {
             setOpenJoinModal(false);
@@ -53,18 +55,18 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
         const renderStreamCards = livestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
-                        <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
-                            <GroupStreamCard
-                                index={index}
-                                groupData={groupData}
-                                listenToUpcoming={listenToUpcoming}
-                                careerCenterId={careerCenterId}
-                                livestreamId={livestreamId}
-                                user={user} userData={userData} fields={null}
-                                careerCenters={[]}
-                                id={livestream.id}
-                                key={livestream.id} livestream={livestream}/>
-                        </Grid>
+                    <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
+                        <GroupStreamCard
+                            index={index}
+                            groupData={groupData}
+                            listenToUpcoming={listenToUpcoming}
+                            careerCenterId={careerCenterId}
+                            livestreamId={livestreamId}
+                            user={user} userData={userData} fields={null}
+                            careerCenters={[]}
+                            id={livestream.id}
+                            key={livestream.id} livestream={livestream}/>
+                    </Grid>
                 )
             }
         })
@@ -85,10 +87,9 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
                         <Grid container spacing={2}>
                             {renderStreamCards}
                         </Grid>
-                        : <Typography className={classes.emptyMessage} align="center" variant="h5"
-                                      style={{marginTop: 100}}><strong>{groupData.universityName} currently has
-                            no scheduled
-                            live streams</strong></Typography>)
+                        :
+                        <Typography className={classes.emptyMessage} align="center" variant="h5"
+                                      style={{marginTop: 100}}>{searchedButNoResults ? "We couldn't find anything... 😕" :<strong>{groupData.universityName} currently has no scheduled live streams</strong>}</Typography>)
                     : null}
                 <GroupJoinModal
                     open={openJoinModal}
