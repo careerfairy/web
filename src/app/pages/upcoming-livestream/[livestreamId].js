@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useContext} from "react";
 import {Container, Button, Grid, Icon, Input, Image} from "semantic-ui-react";
 
 import Header from "../../components/views/header/Header";
@@ -19,15 +19,17 @@ import UserUtil from "../../data/util/UserUtil";
 import MulitLineText from "../../components/views/common/MultiLineText";
 import CurrentGroup from "components/views/profile/CurrentGroup";
 import TargetOptions from "../../components/views/NextLivestreams/GroupsCarousel/TargetOptions";
+import UserContext from "../../context/user/UserContext";
 
 function UpcomingLivestream(props) {
     const router = useRouter();
     const {livestreamId, groupId} = router.query;
+    console.log("groupId", groupId);
     const absolutePath = router.asPath;
 
-    const [user, setUser] = useState(null);
+    const {userData, authenticatedUser: user} = useContext(UserContext);
+
     const [livestreamSpeakers, setLivestreamSpeakers] = useState([]);
-    const [userData, setUserData] = useState(null);
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
     const [currentLivestream, setCurrentLivestream] = useState(null);
@@ -41,15 +43,6 @@ function UpcomingLivestream(props) {
     const [currentGroup, setCurrentGroup] = useState(null);
     const [targetOptions, setTargetOptions] = useState([]);
 
-    useEffect(() => {
-        props.firebase.auth.onAuthStateChanged((user) => {
-            if (user !== null && user.emailVerified) {
-                setUser(user);
-            } else {
-                setUser(null);
-            }
-        });
-    }, []);
 
     useEffect(() => {
         if (livestreamId) {
@@ -162,20 +155,6 @@ function UpcomingLivestream(props) {
         }
     }, [currentLivestream, userData]);
 
-    useEffect(() => {
-        if (user) {
-            const unsubscribe = props.firebase.listenToUserData(
-                user.email,
-                (querySnapshot) => {
-                    let user = querySnapshot.data();
-                    if (user) {
-                        setUserData(user);
-                    }
-                }
-            );
-            return () => unsubscribe;
-        }
-    }, [user]);
 
     useEffect(() => {
         if (livestreamId) {
@@ -575,7 +554,7 @@ function UpcomingLivestream(props) {
                                 </div>
                             </div>
                             <div style={{textAlign: "center", marginBottom: "20px"}}>
-                                {groupId ? <TargetOptions options={targetOptions}/>: <TargetElementList fields={ currentLivestream.targetGroups }/>}
+                                <TargetOptions options={targetOptions}/>
                             </div>
                             <div style={{textAlign: "center", marginBottom: "20px"}}>
                                 <Grid centered className="middle aligned">
