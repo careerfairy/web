@@ -109,7 +109,7 @@ const ProfileNav = ({userData, firebase}) => {
                 </TabPanel>
                 { adminGroups.length && 
                 <TabPanel value={value} index={2} dir={theme.direction}>
-                    <AdminGroups userData={userData}/>
+                    <AdminGroups userData={userData} adminGroups={adminGroups}/>
                 </TabPanel>}
             </SwipeableViews>
         </Container>

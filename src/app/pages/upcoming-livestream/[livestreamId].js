@@ -17,11 +17,12 @@ import StringUtils from '../../util/StringUtils';
 import Head from 'next/head';
 import UserUtil from '../../data/util/UserUtil';
 import MulitLineText from '../../components/views/common/MultiLineText';
+import CurrentGroup from 'components/views/profile/CurrentGroup';
 
 function UpcomingLivestream(props) {
 
     const router = useRouter();
-    const {livestreamId} = router.query;
+    const {livestreamId, groupId} = router.query;
     const absolutePath = router.asPath;
 
     const [user, setUser] = useState(null);
@@ -37,6 +38,8 @@ function UpcomingLivestream(props) {
 
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [careerCenters, setCareerCenters] = useState([]);
+    const [currentGroup, setCurrentGroup] = useState(null); 
+    const [targetOptions, setTargetOptions] = useState([])
 
     useEffect(() => {
         props.firebase.auth.onAuthStateChanged(user => {
@@ -65,6 +68,17 @@ function UpcomingLivestream(props) {
     }, [livestreamId, user]);
 
     useEffect(() => {
+        if (groupId) {
+            const unsubscribe = props.firebase.listenToCareerCenterById(groupId, querySnapshot => {
+                let group = querySnapshot.data();
+                group.id = querySnapshot.id;
+                setCurrentGroup(group);
+            });
+            return () => unsubscribe();
+        }
+    }, [groupId]);
+
+    useEffect(() => {
         if (livestreamId) {
             const unsubscribe = props.firebase.listenToScheduledLivestreamById(livestreamId, querySnapshot => {
                 let livestream = querySnapshot.data();
@@ -82,6 +96,25 @@ function UpcomingLivestream(props) {
             setRegistered(false);
         }
     }, [currentLivestream, user]);
+
+    useEffect(() => {
+        if (currentGroup.categories && currentLivestream.targetCategories) {
+            const {groupId, categories} = currentGroup
+            let totalOptions = []
+            categories.forEach(category => totalOptions.push(category.options))
+            const flattenedOptions = totalOptions.reduce(function (a, b) {
+                return a.concat(b);
+            }, []);
+            // console.log("flattenedOptions", flattenedOptions);
+            const matchedOptions = currentLivestream.targetCategories[groupId]
+            // console.log(matchedOptions);
+            if (matchedOptions) {
+                const filteredOptions = flattenedOptions.filter(option => matchedOptions.includes(option.id))
+                // console.log("filteredOptions", filteredOptions);
+                setTargetOptions(filteredOptions)
+            }
+        }
+    }, [groupData, currentLivestream])
 
     useEffect(() => {
         if (currentLivestream) {

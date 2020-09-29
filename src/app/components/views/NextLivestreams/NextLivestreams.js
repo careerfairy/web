@@ -32,34 +32,36 @@ const NextLivestreams = ({user, firebase}) => {
     const [listenToUpcoming, setListenToUpcoming] = useState(false);
     const routerMounted = paramsLivestreamId !== null && paramsCareerCenterId !== null;
 
-    useEffect(() => {
-        if (listenToUpcoming && routerMounted) {
-            const unsubscribe = firebase.listenToUpcomingLivestreams(
-                (querySnapshot) => {
-                    let livestreams = [];
-                    querySnapshot.forEach((doc) => {
-                        let livestream = doc.data();
-                        livestream.id = doc.id;
-                        livestreams.push(livestream);
-                    });
-                    if (livestreamId && !careerCenterId) {
-                        const currentIndex = livestreams.findIndex(
-                            (el) => el.id === livestreamId
-                        );
-                        if (currentIndex > -1) {
-                            repositionElement(livestreams, currentIndex, 0);
-                        }
-                    }
-
-                    setLivestreams(livestreams);
-                },
-                (error) => {
-                    console.log(error);
-                }
+  useEffect(() => {
+    if (listenToUpcoming && routerMounted) {
+      const unsubscribe = firebase.listenToUpcomingLivestreams(
+        (querySnapshot) => {
+          let livestreams = [];
+          querySnapshot.forEach((doc) => {
+            let livestream = doc.data();
+            livestream.id = doc.id;
+            livestreams.push(livestream);
+          });
+          if (livestreamId && !careerCenterId) {
+            const currentIndex = livestreams.findIndex(
+              (el) => el.id === livestreamId
             );
-            return () => unsubscribe();
+            if (currentIndex > -1) {
+              repositionElement(livestreams, currentIndex, 0);
+            }
+            }
+            if (!careerCenterId) {
+                livestreams = livestreams.filter( livestream => !livestream.hidden);
+            }
+          setLivestreams(livestreams);
+        },
+        (error) => {
+          console.log(error);
         }
-    }, [listenToUpcoming, livestreamId]);
+      );
+      return () => unsubscribe();
+    }
+  }, [listenToUpcoming, livestreamId]);
 
     useEffect(() => {
         // will set the params once the router is loaded whether it be undefined or truthy
