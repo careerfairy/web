@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const AdminGroups = ({userData, adminGroups, firebase}) => {
+const AdminGroups = ({userData, firebase, adminGroups}) => {
     const router = useRouter()
     const classes = useStyles()
 

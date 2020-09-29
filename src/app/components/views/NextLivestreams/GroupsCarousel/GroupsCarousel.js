@@ -1,4 +1,4 @@
-import React, {createRef, useState} from 'react';
+import React, {createRef, useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import CarouselCard from "./CarouselCard";
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
         marginTop: "auto",
     },
     next: {
-        display: 'block',
+        display: ({singleCard}) => singleCard ? 'none' : 'block',
         position: "absolute",
         zIndex: 20,
         right: 0,
@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
         top: "50%",
     },
     prev: {
-        display: 'block',
+        display: ({singleCard}) => singleCard ? 'none' : 'block',
         position: "absolute",
         zIndex: 20,
         left: 57,
@@ -56,17 +56,26 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user, careerCenterId}) => {
-    // console.log("careerCenterId", careerCenterId);
+const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user, careerCenterId, livestreamId}) => {
     const router = useRouter()
     const absolutePath = router.asPath;
-    const classes = useStyles()
+    const classes = useStyles({mobile, singleCard: !groupIds.length})
     const customSlider = createRef()
-
     const [activeSlide, setActiveSlide] = useState(0)
+
+
+    useEffect(() => {
+        if (checkIfOnlyLivestreamId()) {
+            setActiveSlide(groupIds.length)
+        }
+    }, [livestreamId, careerCenterId, groupIds])
 
     const handleNext = () => {
         customSlider.current.slickNext()
+    }
+
+    const checkIfOnlyLivestreamId = () => {
+        return livestreamId && !careerCenterId
     }
 
     const handlePrev = () => {
@@ -91,7 +100,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
     })
 
     const settings = {
-        initialSlide: 0,
+        initialSlide: checkIfOnlyLivestreamId() ? groupIds.length : 0,
         centerMode: true,
         centerPadding: "60px",
         focusOnSelect: true,
@@ -103,27 +112,11 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
         speed: 500,
         beforeChange: (current, next) => setActiveSlide(next),
     };
-
-    const singleSettings = {
-        initialSlide: 0,
-        centerMode: true,
-        // variableWidth: true,
-        // centerPadding: "40%",
-        focusOnSelect: true,
-        swipeToSlide: true,
-        infinite: true,
-        arrows: false,
-        slidesToScroll: 1,
-        slidesToShow: 1,
-        speed: 500,
-        beforeChange: (current, next) => setActiveSlide(next),
-    }
-
-    console.log("groupids", groupIds)
+    // console.log("settings.initialSlide", settings.initialSlide);
 
     return (
         <div className={classes.root}>
-            <IconButton className={classes.prev} onClick={handlePrev}>
+            <IconButton mobile={mobile} className={classes.prev} onClick={handlePrev}>
                 <NavigateBeforeIcon className={classes.icon} color="primary" fontSize="large"/>
             </IconButton>
             <Slider ref={customSlider} className={classes.slider} {...settings}>
@@ -132,7 +125,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
                                      position={groupIds?.length}
                                      handleResetGroup={handleResetGroup} activeSlide={activeSlide}/>
             </Slider>
-            <IconButton className={classes.next} onClick={handleNext}>
+            <IconButton mobile={mobile} className={classes.next} onClick={handleNext}>
                 <NavigateNextIcon className={classes.icon} fontSize="large"/>
             </IconButton>
         </div>

@@ -15,6 +15,7 @@ import "slick-carousel/slick/slick-theme.css";
 import Head from 'next/head';
 import {theme} from "../materialUI";
 import UserContext from 'context/user/UserContext';
+import TagManager from 'react-gtm-module'
 
 function MyApp({Component, pageProps}) {
 
@@ -34,6 +35,14 @@ function MyApp({Component, pageProps}) {
         }
     }, []);
 
+    const tagManagerArgs = {
+        gtmId: 'GTM-P29VCWC'
+    }
+
+    useEffect(() => {
+        TagManager.initialize(tagManagerArgs);
+    }, []);
+
     useEffect(() => {
         firebase.auth.onAuthStateChanged(user => {
             if (user) {
@@ -50,6 +59,7 @@ function MyApp({Component, pageProps}) {
            const unsubscribe = firebase.listenToUserData(authenticatedUser.email, querySnapshot => {
                 if (querySnapshot.exists) {
                     let user = querySnapshot.data();
+                    user.id = querySnapshot.id;
                     setUserData(user);
                 } else {
                     setUserData(null);

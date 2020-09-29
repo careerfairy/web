@@ -49,7 +49,6 @@ const ProfileNav = ({userData, firebase}) => {
     const theme = useTheme();
     const native = useMediaQuery(theme.breakpoints.down('xs'));
     const [value, setValue] = useState(1);
-
     const [adminGroups, setAdminGroups] = useState([]);
 
     useEffect(() => {
@@ -65,7 +64,6 @@ const ProfileNav = ({userData, firebase}) => {
             })
         }
     }, [userData])
-
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -88,9 +86,9 @@ const ProfileNav = ({userData, firebase}) => {
                 >
                     <Tab wrapped fullWidth
                         label={<Typography noWrap
-                                            variant="h5">{native ? "Personal" : "Personal Information"}</Typography>}/>
+                            variant="h5">{native ? "Personal" : "Personal Information"}</Typography>}/>
                     <Tab wrapped fullWidth
-                        label={<Typography variant="h5">{native ? "Groups" : "My Groups"}</Typography>}/>
+                        label={<Typography variant="h5">{native ? "Groups" : "Joined Groups"}</Typography>}/>
                     { adminGroups.length && 
                     <Tab wrapped fullWidth
                         label={<Typography
@@ -108,10 +106,10 @@ const ProfileNav = ({userData, firebase}) => {
                 <TabPanel value={value} index={1} dir={theme.direction}>
                     <JoinedGroups userData={userData}/>
                 </TabPanel>
-                { adminGroups.length &&
+                { adminGroups.length && 
                 <TabPanel value={value} index={2} dir={theme.direction}>
                     <AdminGroups userData={userData} adminGroups={adminGroups}/>
-                </TabPanel> }
+                </TabPanel>}
             </SwipeableViews>
         </Container>
     );

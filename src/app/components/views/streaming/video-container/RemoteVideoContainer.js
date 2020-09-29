@@ -4,7 +4,6 @@ import {Icon, Image} from "semantic-ui-react";
 function RemoteVideoContainer(props) {
 
     const videoElement = useRef(null);
-    const [muted, setMuted] = useState(false);
 
     const [canPlay, setCanPlay] = useState(false);
 
@@ -14,16 +13,21 @@ function RemoteVideoContainer(props) {
 
     useEffect(() => {
         if (videoElement.current && videoElement.current.paused) {
-            if (props.showPlayButton) {
-                videoElement.current.muted = true;
-                videoElement.current.play();
-            } else {
+            if (props.showVideoButton && !props.showVideoButton.muted && !props.showVideoButton.paused) {
                 videoElement.current.play().catch( e => {
-                    props.setShowPlayButton(true);
+                    props.setShowVideoButton({ paused: false, muted: true });
                 });
-            }          
+            } else if (props.showVideoButton && props.showVideoButton.muted && !props.showVideoButton.paused) {
+                videoElement.current.muted = true;
+                videoElement.current.play().catch(e => {
+                    videoElement.current.muted = false;
+                    props.setShowVideoButton({ paused: true, muted: false });
+                });
+            } else {
+                videoElement.current.play()
+            }       
         }
-    },[videoElement, props.showPlayButton]);
+    },[videoElement, props.showVideoButton]);
 
     useEffect(() => {
         if (props.unmute) {
@@ -32,20 +36,10 @@ function RemoteVideoContainer(props) {
     },[props.unmute])
 
     useEffect(() => {
-        setMuted(props.muted);
-    },[props.muted]);
-
-    useEffect(() => {
-        setTimeout(() => {
-            playVideo().catch( error => {
-                console.log(error);
-            })
-        }, 500);
-    }, []);
-
-    function playVideo() {
-        return document.getElementById('videoElement' + props.stream.streamId).play();
-    }
+        if (props.play) {
+            videoElement.current.play();
+        }
+    },[props.play])
 
     return (
         <div>
@@ -66,10 +60,10 @@ function RemoteVideoContainer(props) {
                     background-color: black;
                     width: 100%;
                     margin: 0 auto;
-                    z-index: 1000;
+                    z-index: 2000;
                 }
 
-                .videoElement {
+                #videoElement {
                     position: absolute;
                     top: 50%;
                     left: 50%;

@@ -15,7 +15,7 @@ const nextLivestreams = () => {
     return (
         <GreyBackground>
             <Head>
-                <title key="title">CareerFairy | Feed</title>
+                <title key="title">CareerFairy | Next Live Streams</title>
             </Head>
             <div style={{background: "rgb(44, 66, 81)"}}>
                 <Header color="white"/>

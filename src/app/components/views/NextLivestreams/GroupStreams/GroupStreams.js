@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../context/firebase";
-import GroupStreamCard from "./GroupStreamCard";
+import GroupStreamCard, {StreamCardPlaceHolder} from "./GroupStreamCard";
 import {Typography, LinearProgress, Box, Button, Grid} from "@material-ui/core";
 import {useRouter} from "next/router";
 import GroupJoinModal from "../../profile/GroupJoinModal";
@@ -33,6 +33,7 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
         const router = useRouter()
         const absolutePath = router.asPath
         const [openJoinModal, setOpenJoinModal] = useState(false);
+        const [hasChecked, setHasChecked] = useState(false)
 
         const handleCloseJoinModal = () => {
             setOpenJoinModal(false);
@@ -52,18 +53,20 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
         const renderStreamCards = livestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
-                    <Grid key={livestream.id} md={12} lg={12} item>
-                        <GroupStreamCard
-                            index={index}
-                            groupData={groupData}
-                            listenToUpcoming={listenToUpcoming}
-                            careerCenterId={careerCenterId}
-                            livestreamId={livestreamId}
-                            user={user} userData={userData} fields={null}
-                            careerCenters={[]}
-                            id={livestream.id}
-                            key={livestream.id} livestream={livestream}/>
-                    </Grid>)}
+                        <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
+                            <GroupStreamCard
+                                index={index}
+                                groupData={groupData}
+                                listenToUpcoming={listenToUpcoming}
+                                careerCenterId={careerCenterId}
+                                livestreamId={livestreamId}
+                                user={user} userData={userData} fields={null}
+                                careerCenters={[]}
+                                id={livestream.id}
+                                key={livestream.id} livestream={livestream}/>
+                        </Grid>
+                )
+            }
         })
 
         return (

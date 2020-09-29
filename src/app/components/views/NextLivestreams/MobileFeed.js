@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
     bar: {
         boxShadow: "none",
         position: "sticky",
-        top: 110,
+        top: 100,
         zIndex: 1
     },
     panel: {
@@ -154,20 +154,21 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                 onChangeIndex={handleChangeIndex}>
                 <TabPanel dir={theme.direction}>
                     <GroupStreams user={user}
-                                  mobile={true}
-                                  listenToUpcoming={listenToUpcoming}
-                                  careerCenterId={careerCenterId}
-                                  livestreamId={livestreamId}
-                                  searching={searching}
-                                  alreadyJoined={alreadyJoined}
-                                  livestreams={livestreams}
-                                  userData={userData}
-                                  groupData={groupData}/>
+                        mobile={true}
+                        livestreamId={livestreamId}
+                        listenToUpcoming={listenToUpcoming}
+                        careerCenterId={careerCenterId}
+                        searching={searching}
+                        alreadyJoined={alreadyJoined}
+                        livestreams={livestreams}
+                        userData={userData}
+                        groupData={groupData}/>
                 </TabPanel>
                 <TabPanel dir={theme.direction}>
                     <GroupCategories alreadyJoined={alreadyJoined}
                                      groupData={groupData}
                                      user={user}
+                                     livestreams={livestreams}
                                      userData={userData}
                                      handleToggleActive={handleToggleActive}
                                      mobile={true}/>

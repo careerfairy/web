@@ -148,7 +148,7 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                             <MoreVertIcon/>
                         </IconButton>
                         <CardActions>
-                            <Link href={`feed?careerCenterId=${localGroup.groupId}`}>
+                            <Link href={`next-livestreams?careerCenterId=${localGroup.groupId}`}>
                                 <Button fullWidth size="large" color="primary">
                                     View Calendar
                                 </Button>
@@ -161,7 +161,7 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                                 onClose={handleClose}
                             >
                                 <MenuItem onClick={() => {
-                                    router.push(`/feed?careerCenterId=${localGroup.groupId}`)
+                                    router.push(`/next-livestreams?careerCenterId=${localGroup.groupId}`)
                                 }}>Group Page</MenuItem>
                                 <MenuItem onMouseEnter={() => setLeaveGroup(true)} onClick={() => setOpen(true)}>Leave
                                     Group</MenuItem>

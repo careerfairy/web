@@ -76,7 +76,6 @@ function StreamingPage(props) {
     }, [newNotification]);
 
     useEffect(() => {
-        debugger;
         if (notificationToRemove) {
             let updatedNotifications = notifications.filter(not => not.id !== notificationToRemove);
             setNotifications(updatedNotifications);

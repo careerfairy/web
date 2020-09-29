@@ -1,36 +1,41 @@
 import React, {Fragment, useState, useEffect, useRef} from 'react';
 import UserUtil from "../../../../data/util/UserUtil";
 import axios from "axios";
-import LazyLoad from 'react-lazyload'
 import DateUtil from "../../../../util/DateUtil";
 import {Button, Grid, Icon, Image} from "semantic-ui-react";
 import Link from "next/link";
-import {Box, Button as MuiButton} from "@material-ui/core";
-
 import Skeleton from '@material-ui/lab/Skeleton';
-import TargetElementList from "../../common/TargetElementList";
 import BookingModal from "../../common/booking-modal/BookingModal";
-import {Grow} from '@material-ui/core'
 import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
 import {useRouter} from "next/router";
 import CopyToClipboard from "./CopyToClipboard";
-import LivestreamCard from "../../livestream-card/LivestreamCard";
-import {Typography} from "@material-ui/core";
-import GroupJoinModal from "../../profile/GroupJoinModal";
 import LogoElement from "./LogoElement";
+import {LazyLoadComponent} from "react-lazy-load-image-component";
+import TargetOptions from "../GroupsCarousel/TargetOptions";
 
 
-const useStyles = makeStyles((theme) => ({}));
+const useStyles = makeStyles((theme) => ({
+    root: {
+        borderRadius: 5,
+        overflow: "hidden",
+        paddingBottom: 15,
+        textAlign: "left",
+        WebkitBoxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
+        boxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
+        MozBoxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
+    }
+
+}));
 
 const AvatarSkeleton = () => (<Skeleton variant="circle" width={40} height={40}/>)
 
 const ThumbnailSkeleton = () => <Skeleton variant="rect" width={210} height={118}/>
 const BigThumbnailSkeleton = () => <Skeleton variant="rect" width={600} height={400}/>
 
-const PlaceHolder = () => {
+export const StreamCardPlaceHolder = () => {
     return (
-        <div>
+        <div style={{width: "100%"}}>
             <Skeleton width="100%" variant="text"/>
             <Skeleton variant="circle" width={40} height={40}/>
             <Skeleton variant="rect" width="100%" height={550}/>
@@ -44,22 +49,44 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [isHighlighted, setIsHighlighted] = useState(false)
     const [careerCenters, setCareerCenters] = useState([])
+    const [targetOptions, setTargetOptions] = useState([])
+    const classes = useStyles({isHighlighted})
 
     const router = useRouter();
     const absolutePath = router.asPath
 
-    const linkToStream = listenToUpcoming ? "/next-livestreams" : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
+    const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
 
     const avatar = livestream.mainSpeakerAvatar ? livestream.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
 
     useEffect(() => {
-        if (checkIfHighlighted && !isHighlighted) {
-            console.log(`careerCenterId: ${careerCenterId} | groupData.groupId: ${groupData.groupId}`);
+        if (checkIfHighlighted() && !isHighlighted) {
+            // console.log(`careerCenterId: ${careerCenterId} | groupData.groupId: ${groupData.groupId}`);
             setIsHighlighted(true)
-        } else if (checkIfHighlighted && isHighlighted) {
+        } else if (checkIfHighlighted() && isHighlighted) {
             setIsHighlighted(false)
         }
     }, [livestreamId, id, careerCenterId, groupData.groupId]);
+
+    useEffect(() => {
+
+        if (groupData.categories && livestream.targetCategories) {
+            const {groupId, categories} = groupData
+            let totalOptions = []
+            categories.forEach(category => totalOptions.push(category.options))
+            const flattenedOptions = totalOptions.reduce(function (a, b) {
+                return a.concat(b);
+            }, []);
+            // console.log("flattenedOptions", flattenedOptions);
+            const matchedOptions = livestream.targetCategories[groupId]
+            // console.log(matchedOptions);
+            if (matchedOptions) {
+                const filteredOptions = flattenedOptions.filter(option => matchedOptions.includes(option.id))
+                // console.log("filteredOptions", filteredOptions);
+                setTargetOptions(filteredOptions)
+            }
+        }
+    }, [groupData, livestream])
 
     useEffect(() => {
         if (livestream) {
@@ -75,7 +102,11 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
         }
     }, [livestream]);
 
-    const checkIfHighlighted = careerCenterId && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId
+    const checkIfHighlighted = () => {
+        if (careerCenterId && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId) {
+            return true
+        } else return livestreamId && !careerCenterId && !groupData.id && livestreamId === id;
+    }
 
     function targetHasClickHandler(event) {
         let element = event.target;
@@ -158,125 +189,118 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
     });
 
     return (
-        <Fragment>
-            <LazyLoad
-                // height={500}
-                      offset={[200, -200]}
-                      placeholder={<PlaceHolder/>}>
-                {/*<Grow in={true}>*/}
-                    <div style={
-                        {
-                            WebkitBoxShadow: isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
-                            boxShadow: isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
-                            MozBoxShadow: isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)"
-                        }
-                    } className='companies-mentor-discriber-content'
-                        // onClick={(event) => goToRouteFromParent(event, '/upcoming-livestream/' + livestream.id)}
-                    >
-                        <div className='date-indicator'>
-                            {/* <div className='coming-icon-container'>
+        <LazyLoadComponent
+            width="100%"
+            style={{width: "100%"}}
+            threshold={50}
+            placeholder={<StreamCardPlaceHolder/>}>
+            <Fragment>
+                <div className={classes.root}
+                    // onClick={(event) => goToRouteFromParent(event, '/upcoming-livestream/' + livestream.id)}
+                >
+                    <div className='date-indicator'>
+                        {/* <div className='coming-icon-container'>
                         <div className='coming-icon' style={{ color: userIsRegistered() ? 'white' : '', border: userIsRegistered() ? '2px solid white' : ''}} ><Icon name='rss'/>Live stream</div>
                     </div> */}
+                    <div>
+                        <div style={{display: 'inline-block'}}><Icon name='calendar alternate outline' style={{
+                            color: 'rgb(0, 210, 170)',
+                            fontSize: '0.7em',
+                            marginRight: '10px'
+                        }}/>{DateUtil.getPrettyDay(livestream.start.toDate())}</div>
+                        <div style={{display: 'inline-block', float: 'right'}}>
+                            <Icon name='clock outline'
+                                  style={{
+                                      color: 'rgb(0, 210, 170)',
+                                      fontSize: '0.7em',
+                                      marginRight: '10px'
+                                  }}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
+                        </div>
+                    </div>
+                </div>
+                <div className='livestream-thumbnail'
+                     style={{backgroundImage: 'url(' + livestream.backgroundImageUrl + ')'}}>
+                    <div className='livestream-thumbnail-overlay'
+                         style={{backgroundColor: userIsRegistered() ? 'rgba(0, 210, 170, 0.9)' : ''}}>
+                        <CopyToClipboard value={linkToStream}/>
+                        <div className='livestream-thumbnail-overlay-content'>
+                            <Image style={{
+                                maxWidth: '220px',
+                                margin: '30px 0',
+                                maxHeight: '120px',
+                                filter: userIsRegistered() ? 'brightness(0) invert(1)' : ''
+                            }} src={livestream.companyLogoUrl}/>
+                            <div className='livestream-position'
+                                 style={{color: userIsRegistered() ? 'white' : ''}}>{livestream.title}</div>
                             <div>
-                                <div style={{display: 'inline-block'}}><Icon name='calendar alternate outline' style={{
-                                    color: 'rgb(0, 210, 170)',
-                                    fontSize: '0.7em',
-                                    marginRight: '10px'
-                                }}/>{DateUtil.getPrettyDay(livestream.start.toDate())}</div>
-                                <div style={{display: 'inline-block', float: 'right'}}>
-                                    <Icon name='clock outline'
-                                        style={{
-                                        color: 'rgb(0, 210, 170)',
-                                        fontSize: '0.7em',
-                                        marginRight: '10px'
-                                        }}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
-                                </div>
-                            </div>
-                        </div>
-                        <div className='livestream-thumbnail'
-                             style={{backgroundImage: 'url(' + livestream.backgroundImageUrl + ')'}}>
-                            <div className='livestream-thumbnail-overlay'
-                                 style={{backgroundColor: userIsRegistered() ? 'rgba(0, 210, 170, 0.9)' : ''}}>
-                                <CopyToClipboard value={linkToStream}/>
-                                <div className='livestream-thumbnail-overlay-content'>
-                                    <Image style={{
-                                        maxWidth: '220px',
-                                        margin: '30px 0',
-                                        maxHeight: '120px',
-                                        filter: userIsRegistered() ? 'brightness(0) invert(1)' : ''
-                                    }} src={livestream.companyLogoUrl}/>
-                                    <div className='livestream-position'
-                                         style={{color: userIsRegistered() ? 'white' : ''}}>{livestream.title}</div>
-                                    <div>
-                                        <Button size='large' style={{margin: '5px 5px 0 0'}}
-                                                icon={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? 'delete' : 'add'}
-                                                color={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? null : 'teal'}
-                                                content={user ? ((livestream.registeredUsers?.indexOf(user.email) > -1) ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
-                                                onClick={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
-                                        <Link href={('/upcoming-livestream/' + livestream.id)}
-                                              prefetch={false}><a><Button
-                                            size='large' style={{margin: '5px 5px 0 0'}} icon='signup'
-                                            content='Details'
-                                            color='pink'/></a></Link>
-                                    </div>
-                                </div>
-                            </div>
-                            <div
-                                className={'booked-icon animated tada delay-1s ' + (userIsRegistered() ? '' : 'hidden')}>
-                                <Icon
-                                    name='check circle'/>Booked
-                            </div>
-                        </div>
-                        <div className='background'>
-                            <Grid centered className='middle aligned' divided>
-                                <Grid.Row>
-                                    <Grid.Column width={14}>
-                                        <div className='livestream-streamer-description'>
-                                            <div className='livestream-speaker-avatar-capsule'>
-                                                <LazyLoad placeholder={<AvatarSkeleton/>}>
-                                                    <div className='livestream-speaker-avatar'
-                                                         style={{backgroundImage: 'url(' + avatar + ')'}}/>
-                                                </LazyLoad>
-                                            </div>
-                                            <div className='livestream-streamer'>
-                                                <div
-                                                    className='livestream-streamer-name'>{livestream.mainSpeakerName}</div>
-                                                <div
-                                                    className='livestream-streamer-position'>{livestream.mainSpeakerPosition}</div>
-                                                <div
-                                                    className='livestream-streamer-position light'>{livestream.mainSpeakerBackground}</div>
-                                            </div>
-                                        </div>
-                                    </Grid.Column>
-                                </Grid.Row>
-                            </Grid>
-                            <Grid className='middle aligned' centered>
-                                <Grid.Row style={{paddingTop: 0, paddingBottom: '5px'}}>
-                                    <Grid.Column width={15}>
-                                        <TargetElementList fields={livestream.targetGroups || []}
-                                                           selectedFields={fields}/>
-                                    </Grid.Column>
-                                </Grid.Row>
-                            </Grid>
-                            <div className={careerCenters.length === 0 ? 'hidden' : ''}>
-                                <div style={{
-                                    width: '100%',
-                                    height: '2px',
-                                    backgroundColor: 'rgba(0,210,170,0.6)',
-                                    margin: '30px 0 10px 0'
-                                }}/>
-                                <div style={{textAlign: 'center', fontSize: '0.8em'}}>created by</div>
-                                <Grid className='middle aligned' centered style={{padding: '10px'}}>
-                                    {logoElements}
-                                </Grid>
+                            <Button size='large' style={{margin: '5px 5px 0 0'}}
+                                    icon={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? 'delete' : 'add'}
+                                    color={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? null : 'teal'}
+                                    content={user ? ((livestream.registeredUsers?.indexOf(user.email) > -1) ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
+                                    onClick={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
+                            <Link href={('/upcoming-livestream/' + livestream.id)}
+                                    prefetch={false}><a><Button
+                                size='large' style={{margin: '5px 5px 0 0'}} icon='signup'
+                                content='Details'
+                                color='pink'/></a></Link>
                             </div>
                         </div>
                     </div>
-                {/*</Grow>*/}
-                <BookingModal livestream={livestream} modalOpen={bookingModalOpen}
-                              setModalOpen={setBookingModalOpen}
-                              user={user}/>
-                <style jsx>{`
+                    <div
+                        className={'booked-icon animated tada delay-1s ' + (userIsRegistered() ? '' : 'hidden')}>
+                        <Icon
+                            name='check circle'/>Booked
+                    </div>
+                </div>
+                <div className='background'>
+                    <Grid centered className='middle aligned' divided>
+                        <Grid.Row>
+                            <Grid.Column width={14}>
+                                <div className='livestream-streamer-description'>
+                                    <div className='livestream-speaker-avatar-capsule'>
+                                        {/*<LazyLoad placeholder={<AvatarSkeleton/>}>*/}
+                                        <div className='livestream-speaker-avatar'
+                                             style={{backgroundImage: 'url(' + avatar + ')'}}/>
+                                        {/*</LazyLoad>*/}
+                                    </div>
+                                    <div className='livestream-streamer'>
+                                        <div
+                                            className='livestream-streamer-name'>{livestream.mainSpeakerName}</div>
+                                        <div
+                                            className='livestream-streamer-position'>{livestream.mainSpeakerPosition}</div>
+                                        <div
+                                            className='livestream-streamer-position light'>{livestream.mainSpeakerBackground}</div>
+                                    </div>
+                                </div>
+                            </Grid.Column>
+                        </Grid.Row>
+                    </Grid>
+                    <Grid className='middle aligned' centered>
+                        <Grid.Row style={{paddingTop: 0, paddingBottom: '5px'}}>
+                            <Grid.Column width={15}>
+                                <TargetOptions options={targetOptions}/>
+                            </Grid.Column>
+                        </Grid.Row>
+                    </Grid>
+                    <div className={careerCenters.length === 0 ? 'hidden' : ''}>
+                        <div style={{
+                            width: '100%',
+                            height: '2px',
+                            backgroundColor: 'rgba(0,210,170,0.6)',
+                            margin: '30px 0 10px 0'
+                        }}/>
+                        <div style={{textAlign: 'center', fontSize: '0.8em'}}>created by</div>
+                        <Grid className='middle aligned' centered style={{padding: '10px'}}>
+                            {logoElements}
+                        </Grid>
+                    </div>
+                </div>
+            </div>
+            {/*</Grow>*/}
+            <BookingModal livestream={livestream} modalOpen={bookingModalOpen}
+                          setModalOpen={setBookingModalOpen}
+                          user={user}/>
+            <style jsx>{`
                 .hidden {
                     display: none
                 }
@@ -296,14 +320,6 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                     width: 100%;
                     margin: 0 auto;
                     text-align: center;
-                }
-
-                .companies-mentor-discriber-content {
-                    border-radius: 5px;
-                    box-shadow: 0 0 5px rgb(180,180,180);
-                    overflow: hidden;
-                    padding-bottom: 15px;
-                    text-align: left;
                 }
 
                 .livestream-thumbnail {
@@ -551,8 +567,8 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                     color: rgb(0, 210, 170);
                 }
             `}</style>
-            </LazyLoad>
-        </Fragment>
+            </Fragment>
+        </LazyLoadComponent>
     )
         ;
 };

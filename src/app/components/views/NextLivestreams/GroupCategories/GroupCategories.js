@@ -8,10 +8,16 @@ import StackGrid from "react-stack-grid";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        paddingBottom: 0,        
+        paddingBottom: 0,
+        paddingTop: 14,
+        width: ({mobile}) => mobile ? "100%" : "40%",
     },
     card: {
-        padding: "1em"
+        // padding: "1em",
+        overflow: "auto",
+        position: ({mobile}) => mobile ? "static" : "sticky",
+        top: ({mobile}) => mobile ? "auto" : 165,
+        maxHeight: ({mobile}) => mobile? "auto": "calc(100vh - 180px)"
     },
     actions: {
         display: "flex",
@@ -44,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 
 const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile}) => {
 
-    const classes = useStyles();
+    const classes = useStyles({mobile});
     const [grid, setGrid] = useState(null);
 
 
@@ -57,10 +63,10 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile})
     }, [grid, groupData]);
 
     return (
-        <div style={{width: mobile ? "100%" : "40%", paddingTop: 14}} className={classes.root}>
+        <div className={classes.root}>
             {groupData.categories?.length &&
             <Grow in={Boolean(groupData.categories?.length)}>
-                <Card style={{position: mobile ? "static" : "sticky", top: mobile ? "auto" : 165}}  className={classes.card}>
+                <Card className={classes.card}>
                     <CardContent>
                         <CardMedia className={classes.media}>
                             <div className={classes.imageContainer }>
