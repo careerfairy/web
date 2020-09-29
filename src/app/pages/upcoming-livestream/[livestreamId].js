@@ -125,7 +125,7 @@ function UpcomingLivestream(props) {
                 setTargetOptions(filteredOptions)
             }
         }
-    }, [groupData, currentLivestream])
+    }, [currentLivestream])
 
     useEffect(() => {
         if (currentLivestream) {
