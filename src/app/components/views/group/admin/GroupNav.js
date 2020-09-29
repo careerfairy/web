@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
 const GroupNav = ({userData, user, groupId, group}) => {
     const classes = useStyles();
     const theme = useTheme();
-    const [value, setValue] = React.useState(2);
+    const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -69,7 +69,7 @@ const GroupNav = ({userData, user, groupId, group}) => {
                     centered
                 >
                     <Tab wrapped fullWidth label={<Typography variant="h5">Events</Typography>}/>
-                    <Tab wrapped fullWidth label={<Typography variant="h5">Members</Typography>}/>
+                    {/* <Tab wrapped fullWidth label={<Typography variant="h5">Members</Typography>}/> */}
                     <Tab wrapped fullWidth label={<Typography variant="h5">Settings</Typography>}/>
                 </Tabs>
             </AppBar>
@@ -79,12 +79,12 @@ const GroupNav = ({userData, user, groupId, group}) => {
                 onChangeIndex={handleChangeIndex}
             >
                 <TabPanel value={value} index={0} dir={theme.direction}>
-                    <Events groupId={groupId} user={user} userData={userData} menuItem={"events"}/>
+                    <Events group={group} user={user} userData={userData} menuItem={"events"}/>
                 </TabPanel>
-                <TabPanel value={value} index={1} dir={theme.direction}>
+                {/* <TabPanel value={value} index={1} dir={theme.direction}>
                     <Members groupId={groupId}/>
-                </TabPanel>
-                <TabPanel value={value} index={2} dir={theme.direction}>
+                </TabPanel> */}
+                <TabPanel value={value} index={1} dir={theme.direction}>
                     <Settings group={group} groupId={groupId}/>
                 </TabPanel>
             </SwipeableViews>
