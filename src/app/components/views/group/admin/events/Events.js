@@ -6,7 +6,7 @@ import LivestreamCard from 'components/views/livestream-card/LivestreamCard';
 import {useRouter} from 'next/router';
 import AddIcon from "@material-ui/icons/Add";
 import EditIcon from '@material-ui/icons/Edit';
-import {Box, Button, CardMedia, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, IconButton, InputLabel, Menu, MenuItem, Select, Typography} from "@material-ui/core";
+import {Box, Button, CardMedia, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, IconButton, InputLabel, Menu, MenuItem, Select, Typography} from "@material-ui/core";
 import GroupStreamCard from 'components/views/NextLivestreams/GroupStreams/GroupStreamCard';
 
 const Events = (props) => {
@@ -165,9 +165,11 @@ const Events = (props) => {
 
     livestreamElements = livestreams.map((livestream, index) => {
         return (
-            <div key={index} style={{ position: 'relative' }}>
+            <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
+                <div style={{position: "relative"}}>
                 <EnhancedCard livestream={livestream} {...props} fields={null} grid={grid} group={props.group}/>
-            </div>
+                </div>
+            </Grid>
         );
     });
 
@@ -194,17 +196,9 @@ const Events = (props) => {
                 <MenuItem onClick={handleClose}>Schedule a Live Stream</MenuItem>
                 </Menu>
             </div>
-            <SizeMe>{({size}) => (
-                <StackGrid
-                    style={{marginTop: 20}}
-                    duration={0}
-                    columnWidth={(size.width <= 768 ? '100%' : '50%')}
-                    gutterWidth={20}
-                    gutterHeight={20}
-                    gridRef={grid => setGrid(grid)}>
-                    {livestreamElements}
-                </StackGrid>
-            )}</SizeMe>
+            <Grid container spacing={2}>
+                {livestreamElements}
+            </Grid>
             <style jsx>{`
                 .hidden {
                     display: none;
