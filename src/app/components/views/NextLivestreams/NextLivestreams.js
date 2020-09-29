@@ -32,36 +32,37 @@ const NextLivestreams = ({user, firebase}) => {
     const [listenToUpcoming, setListenToUpcoming] = useState(false);
     const routerMounted = paramsLivestreamId !== null && paramsCareerCenterId !== null;
 
-  useEffect(() => {
-    if (listenToUpcoming && routerMounted) {
-      const unsubscribe = firebase.listenToUpcomingLivestreams(
-        (querySnapshot) => {
-          let livestreams = [];
-          querySnapshot.forEach((doc) => {
-            let livestream = doc.data();
-            livestream.id = doc.id;
-            livestreams.push(livestream);
-          });
-          if (livestreamId && !careerCenterId) {
-            const currentIndex = livestreams.findIndex(
-              (el) => el.id === livestreamId
+    useEffect(() => {
+        if (listenToUpcoming && routerMounted) {
+            console.log("listenToUpcoming");
+            const unsubscribe = firebase.listenToUpcomingLivestreams(
+                (querySnapshot) => {
+                    let livestreams = [];
+                    querySnapshot.forEach((doc) => {
+                        let livestream = doc.data();
+                        livestream.id = doc.id;
+                        livestreams.push(livestream);
+                    });
+                    if (livestreamId && !careerCenterId) {
+                        const currentIndex = livestreams.findIndex(
+                            (el) => el.id === livestreamId
+                        );
+                        if (currentIndex > -1) {
+                            repositionElement(livestreams, currentIndex, 0);
+                        }
+                    }
+                    if (!careerCenterId) {
+                        livestreams = livestreams.filter(livestream => !livestream.hidden);
+                    }
+                    setLivestreams(livestreams);
+                },
+                (error) => {
+                    console.log(error);
+                }
             );
-            if (currentIndex > -1) {
-              repositionElement(livestreams, currentIndex, 0);
-            }
-            }
-            if (!careerCenterId) {
-                livestreams = livestreams.filter( livestream => !livestream.hidden);
-            }
-          setLivestreams(livestreams);
-        },
-        (error) => {
-          console.log(error);
+            return () => unsubscribe();
         }
-      );
-      return () => unsubscribe();
-    }
-  }, [listenToUpcoming, livestreamId]);
+    }, [listenToUpcoming, livestreamId]);
 
     useEffect(() => {
         // will set the params once the router is loaded whether it be undefined or truthy
@@ -72,6 +73,7 @@ const NextLivestreams = ({user, firebase}) => {
     }, [router]);
 
     useEffect(() => {
+        console.log("listenToLiveStreamsByGroupId", groupData.groupId);
         if (groupData && groupData.groupId) {
             setSearching(true);
             const unsubscribe = firebase.listenToLiveStreamsByGroupId(
