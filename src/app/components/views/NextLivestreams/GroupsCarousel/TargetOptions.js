@@ -7,13 +7,14 @@ const TargetOptions = ({options}) => {
         return <Tooltip arrow
                         key={option.id}
                         style={{maxWidth: "inherit"}}
-                        title={<Typography variant="body1">{option.name}</Typography>}
+                        title={<Typography align="center" variant="body1">{option.name}</Typography>}
                         placement="top">
             <Chip
                 variant="outlined"
                 size="small"
+                style={{maxWidth: 300}}
                 // style={{maxWidth: width}}
-                label={option.name}/>
+                label={<Typography variant="body1" noWrap>{option.name}</Typography>}/>
         </Tooltip>
     })
     return (

@@ -1,26 +1,26 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect} from "react";
 import {Container, Button, Grid, Icon, Input, Image} from "semantic-ui-react";
 
-import Header from '../../components/views/header/Header';
+import Header from "../../components/views/header/Header";
 
-import {withFirebasePage} from 'context/firebase';
-import TargetElementList from '../../components/views/common/TargetElementList'
-import Loader from '../../components/views/loader/Loader'
-import DateUtil from '../../util/DateUtil';
-import {useRouter} from 'next/router';
-import Footer from '../../components/views/footer/Footer';
-import Countdown from '../../components/views/common/Countdown';
-import BookingModal from '../../components/views/common/booking-modal/BookingModal';
-import QuestionVotingBox from '../../components/views/question-voting-box/QuestionVotingBox';
-import StringUtils from '../../util/StringUtils';
+import {withFirebasePage} from "context/firebase";
+import TargetElementList from "../../components/views/common/TargetElementList";
+import Loader from "../../components/views/loader/Loader";
+import DateUtil from "../../util/DateUtil";
+import {useRouter} from "next/router";
+import Footer from "../../components/views/footer/Footer";
+import Countdown from "../../components/views/common/Countdown";
+import BookingModal from "../../components/views/common/booking-modal/BookingModal";
+import QuestionVotingBox from "../../components/views/question-voting-box/QuestionVotingBox";
+import StringUtils from "../../util/StringUtils";
 
-import Head from 'next/head';
-import UserUtil from '../../data/util/UserUtil';
-import MulitLineText from '../../components/views/common/MultiLineText';
-import CurrentGroup from 'components/views/profile/CurrentGroup';
+import Head from "next/head";
+import UserUtil from "../../data/util/UserUtil";
+import MulitLineText from "../../components/views/common/MultiLineText";
+import CurrentGroup from "components/views/profile/CurrentGroup";
+import TargetOptions from "../../components/views/NextLivestreams/GroupsCarousel/TargetOptions";
 
 function UpcomingLivestream(props) {
-
     const router = useRouter();
     const {livestreamId, groupId} = router.query;
     const absolutePath = router.asPath;
@@ -38,59 +38,74 @@ function UpcomingLivestream(props) {
 
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [careerCenters, setCareerCenters] = useState([]);
-    const [currentGroup, setCurrentGroup] = useState(null); 
-    const [targetOptions, setTargetOptions] = useState([])
+    const [currentGroup, setCurrentGroup] = useState(null);
+    const [targetOptions, setTargetOptions] = useState([]);
 
     useEffect(() => {
-        props.firebase.auth.onAuthStateChanged(user => {
+        props.firebase.auth.onAuthStateChanged((user) => {
             if (user !== null && user.emailVerified) {
                 setUser(user);
             } else {
                 setUser(null);
             }
-        })
+        });
     }, []);
-
 
     useEffect(() => {
         if (livestreamId) {
-            const unsubscribe = props.firebase.listenToLivestreamQuestions(livestreamId, querySnapshot => {
-                var questionsList = [];
-                querySnapshot.forEach(doc => {
-                    let question = doc.data();
-                    question.id = doc.id;
-                    questionsList.push(question);
-                });
-                setUpcomingQuestions(questionsList);
-            });
+            const unsubscribe = props.firebase.listenToLivestreamQuestions(
+                livestreamId,
+                (querySnapshot) => {
+                    var questionsList = [];
+                    querySnapshot.forEach((doc) => {
+                        let question = doc.data();
+                        question.id = doc.id;
+                        questionsList.push(question);
+                    });
+                    setUpcomingQuestions(questionsList);
+                }
+            );
             return () => unsubscribe();
         }
     }, [livestreamId, user]);
 
     useEffect(() => {
         if (groupId) {
-            const unsubscribe = props.firebase.listenToCareerCenterById(groupId, querySnapshot => {
-                let group = querySnapshot.data();
-                group.id = querySnapshot.id;
-                setCurrentGroup(group);
-            });
+            const unsubscribe = props.firebase.listenToCareerCenterById(
+                groupId,
+                (querySnapshot) => {
+                    let group = querySnapshot.data();
+                    group.id = querySnapshot.id;
+                    setCurrentGroup(group);
+                }
+            );
             return () => unsubscribe();
         }
     }, [groupId]);
 
     useEffect(() => {
         if (livestreamId) {
-            const unsubscribe = props.firebase.listenToScheduledLivestreamById(livestreamId, querySnapshot => {
-                let livestream = querySnapshot.data();
-                livestream.id = querySnapshot.id;
-                setCurrentLivestream(livestream);
-            });
+            const unsubscribe = props.firebase.listenToScheduledLivestreamById(
+                livestreamId,
+                (querySnapshot) => {
+                    if (querySnapshot.data()) {
+                        let livestream = querySnapshot.data();
+                        livestream.id = querySnapshot.id;
+                        setCurrentLivestream(livestream);
+                    }
+                }
+            );
             return () => unsubscribe();
         }
     }, [livestreamId]);
 
     useEffect(() => {
-        if (user && currentLivestream && currentLivestream.registeredUsers && currentLivestream.registeredUsers.indexOf(user.email) > -1) {
+        if (
+            user &&
+            currentLivestream &&
+            currentLivestream.registeredUsers &&
+            currentLivestream.registeredUsers.indexOf(user.email) > -1
+        ) {
             setRegistered(true);
         } else {
             setRegistered(false);
@@ -98,40 +113,49 @@ function UpcomingLivestream(props) {
     }, [currentLivestream, user]);
 
     useEffect(() => {
-        if (currentGroup.categories && currentLivestream.targetCategories) {
-            const {groupId, categories} = currentGroup
-            let totalOptions = []
-            categories.forEach(category => totalOptions.push(category.options))
+        if (currentGroup && currentGroup.categories && currentLivestream && currentLivestream.targetCategories) {
+            const {groupId, categories} = currentGroup;
+            let totalOptions = [];
+            categories.forEach((category) => totalOptions.push(category.options));
             const flattenedOptions = totalOptions.reduce(function (a, b) {
                 return a.concat(b);
             }, []);
             // console.log("flattenedOptions", flattenedOptions);
-            const matchedOptions = currentLivestream.targetCategories[groupId]
+            const matchedOptions = currentLivestream.targetCategories[groupId];
             // console.log(matchedOptions);
             if (matchedOptions) {
-                const filteredOptions = flattenedOptions.filter(option => matchedOptions.includes(option.id))
+                const filteredOptions = flattenedOptions.filter((option) =>
+                    matchedOptions.includes(option.id)
+                );
                 // console.log("filteredOptions", filteredOptions);
-                setTargetOptions(filteredOptions)
+                setTargetOptions(filteredOptions);
             }
         }
-    }, [groupData, currentLivestream])
+    }, [currentGroup, currentLivestream]);
 
     useEffect(() => {
         if (currentLivestream) {
-            props.firebase.getDetailLivestreamCareerCenters(currentLivestream.universities).then(querySnapshot => {
-                let groupList = [];
-                querySnapshot.forEach(doc => {
-                    let group = doc.data();
-                    group.id = doc.id;
-                    groupList.push(group);
+            props.firebase
+                .getDetailLivestreamCareerCenters(currentLivestream.universities)
+                .then((querySnapshot) => {
+                    let groupList = [];
+                    querySnapshot.forEach((doc) => {
+                        let group = doc.data();
+                        group.id = doc.id;
+                        groupList.push(group);
+                    });
+                    setCareerCenters(groupList);
                 });
-                setCareerCenters(groupList);
-            });
         }
     }, [currentLivestream]);
 
     useEffect(() => {
-        if (userData && currentLivestream && userData.talentPools && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
+        if (
+            userData &&
+            currentLivestream &&
+            userData.talentPools &&
+            userData.talentPools.indexOf(currentLivestream.companyId) > -1
+        ) {
             setUserIsInTalentPool(true);
         } else {
             setUserIsInTalentPool(false);
@@ -140,41 +164,46 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (user) {
-            const unsubscribe = props.firebase.listenToUserData(user.email, querySnapshot => {
-                let user = querySnapshot.data();
-                if (user) {
-                    setUserData(user);
+            const unsubscribe = props.firebase.listenToUserData(
+                user.email,
+                (querySnapshot) => {
+                    let user = querySnapshot.data();
+                    if (user) {
+                        setUserData(user);
+                    }
                 }
-            });
-            return () => unsubscribe
+            );
+            return () => unsubscribe;
         }
     }, [user]);
 
     useEffect(() => {
         if (livestreamId) {
-            props.firebase.getLivestreamSpeakers(livestreamId).then(querySnapshot => {
-                var speakerList = [];
-                querySnapshot.forEach(doc => {
-                    let speaker = doc.data();
-                    speaker.id = doc.id;
-                    speakerList.push(speaker);
+            props.firebase
+                .getLivestreamSpeakers(livestreamId)
+                .then((querySnapshot) => {
+                    var speakerList = [];
+                    querySnapshot.forEach((doc) => {
+                        let speaker = doc.data();
+                        speaker.id = doc.id;
+                        speakerList.push(speaker);
+                    });
+                    setLivestreamSpeakers(speakerList);
                 });
-                setLivestreamSpeakers(speakerList);
-            });
         }
     }, [livestreamId]);
 
     function goToSeparateRoute(route) {
-        window.open('http://careerfairy.io' + route, '_blank');
+        window.open("http://careerfairy.io" + route, "_blank");
     }
 
     function deregisterFromLivestream() {
         if (!user || !user.emailVerified) {
-            return router.replace('/signup');
+            return router.replace("/signup");
         }
 
         if (!userData) {
-            return router.push('/profile');
+            return router.push("/profile");
         }
 
         props.firebase.deregisterFromLivestream(currentLivestream.id, user.email);
@@ -182,28 +211,33 @@ function UpcomingLivestream(props) {
 
     function joinTalentPool() {
         if (!user || !user.emailVerified) {
-            return router.replace('/signup');
+            return router.replace("/signup");
         }
 
         if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-            return router.push('/profile');
+            return router.push("/profile");
         }
 
-        props.firebase.joinCompanyTalentPool(currentLivestream.companyId, user.email);
+        props.firebase.joinCompanyTalentPool(
+            currentLivestream.companyId,
+            user.email
+        );
     }
 
     function leaveTalentPool() {
         if (!user || !user.emailVerified) {
-            return router.replace('/signup');
+            return router.replace("/signup");
         }
 
         if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-            return router.push('/profile');
+            return router.push("/profile");
         }
 
-        props.firebase.leaveCompanyTalentPool(currentLivestream.companyId, user.email);
+        props.firebase.leaveCompanyTalentPool(
+            currentLivestream.companyId,
+            user.email
+        );
     }
-
 
     function userIsRegistered() {
         if (!user || !currentLivestream.registeredUsers) {
@@ -214,42 +248,51 @@ function UpcomingLivestream(props) {
 
     function startRegistrationProcess(livestreamId) {
         if (!user || !user.emailVerified) {
-            return router.push(absolutePath ? {
-                pathname: `/login`,
-                query: {absolutePath}
-            } : '/signup');
+            return router.push(
+                absolutePath
+                    ? {
+                        pathname: `/login`,
+                        query: {absolutePath},
+                    }
+                    : "/signup"
+            );
         }
 
         if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-            return router.push('/profile');
+            return router.push("/profile");
         }
 
         setBookingModalOpen(true);
         setRegistration(true);
-        props.firebase.registerToLivestream(currentLivestream.id, user.email).then(() => {
-            setRegistration(false);
-        });
+        props.firebase
+            .registerToLivestream(currentLivestream.id, user.email)
+            .then(() => {
+                setRegistration(false);
+            });
     }
 
     function deregisterFromLivestream(livestreamId) {
         if (!user || !user.emailVerified) {
-            return router.push('/signup');
+            return router.push("/signup");
         }
 
         if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-            return router.push('/profile');
+            return router.push("/profile");
         }
 
         props.firebase.deregisterFromLivestream(livestreamId, user.email);
     }
 
     function dateIsInUnder24Hours(date) {
-        return new Date(date).getTime() - Date.now() < 1000 * 60 * 60 * 24 || Date.now() > new Date(date).getTime();
+        return (
+            new Date(date).getTime() - Date.now() < 1000 * 60 * 60 * 24 ||
+            Date.now() > new Date(date).getTime()
+        );
     }
 
     function addNewQuestion() {
         if (!user || !user.emailVerified) {
-            return router.replace('/signup');
+            return router.replace("/signup");
         }
 
         if (StringUtils.isEmpty(newQuestionTitle)) {
@@ -260,72 +303,102 @@ function UpcomingLivestream(props) {
             title: newQuestionTitle,
             votes: 0,
             type: "new",
-            author: user.email
-        }
+            author: user.email,
+        };
 
-        props.firebase.putLivestreamQuestion(currentLivestream.id, newQuestion)
-            .then(() => {
-                setNewQuestionTitle("");
-            }, () => {
-                console.log("Error");
-            })
+        props.firebase
+            .putLivestreamQuestion(currentLivestream.id, newQuestion)
+            .then(
+                () => {
+                    setNewQuestionTitle("");
+                },
+                () => {
+                    console.log("Error");
+                }
+            );
     }
 
     let speakerElements = livestreamSpeakers.map((speaker, index) => {
         return (
-            <Grid.Column textAlign='center' mobile='16' tablet='8' computer='5' key={index}>
-                <div className='livestream-speaker-avatar-capsule'>
-                    <div className='livestream-speaker-avatar'
-                         style={{backgroundImage: 'url(' + (speaker.avatar ? speaker.avatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media' + ')')}}/>
+            <Grid.Column
+                textAlign="center"
+                mobile="16"
+                tablet="8"
+                computer="5"
+                key={index}
+            >
+                <div className="livestream-speaker-avatar-capsule">
+                    <div
+                        className="livestream-speaker-avatar"
+                        style={{
+                            backgroundImage:
+                                "url(" +
+                                (speaker.avatar
+                                    ? speaker.avatar
+                                    : "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media" +
+                                    ")"),
+                        }}
+                    />
                 </div>
-                <div className='livestream-speaker-description'>
-                    <div style={{
-                        fontWeight: '700',
-                        fontSize: '1.2em',
-                        marginBottom: '10px',
-                        color: userIsRegistered() ? 'white' : 'rgb(44, 66, 81)'
-                    }}>{speaker.firstName + " " + speaker.lastName}</div>
-                    <div style={{
-                        fontWeight: '700',
-                        fontSize: '0.9em',
-                        marginBottom: '5px',
-                        color: userIsRegistered() ? 'white' : 'rgb(44, 66, 81)'
-                    }}>{speaker.position}</div>
-                    <div style={{
-                        fontWeight: '500',
-                        fontSize: '0.9em',
-                        marginBottom: '5px',
-                        color: userIsRegistered() ? 'white' : 'rgb(140,140,140)'
-                    }}>{speaker.background}</div>
+                <div className="livestream-speaker-description">
+                    <div
+                        style={{
+                            fontWeight: "700",
+                            fontSize: "1.2em",
+                            marginBottom: "10px",
+                            color: userIsRegistered() ? "white" : "rgb(44, 66, 81)",
+                        }}
+                    >
+                        {speaker.firstName + " " + speaker.lastName}
+                    </div>
+                    <div
+                        style={{
+                            fontWeight: "700",
+                            fontSize: "0.9em",
+                            marginBottom: "5px",
+                            color: userIsRegistered() ? "white" : "rgb(44, 66, 81)",
+                        }}
+                    >
+                        {speaker.position}
+                    </div>
+                    <div
+                        style={{
+                            fontWeight: "500",
+                            fontSize: "0.9em",
+                            marginBottom: "5px",
+                            color: userIsRegistered() ? "white" : "rgb(140,140,140)",
+                        }}
+                    >
+                        {speaker.background}
+                    </div>
                 </div>
                 <style jsx>{`
-                    .livestream-speaker-avatar-capsule {
-                        border: 2px solid rgb(0, 210, 170);
-                        display: inline-block;
-                        margin: 20px auto;
-                        padding 8px;
-                        border-radius: 50%;
-                    }
+          .livestream-speaker-avatar-capsule {
+            border: 2px solid rgb(0, 210, 170);
+            display: inline-block;
+            margin: 20px auto;
+            padding: 8px;
+            border-radius: 50%;
+          }
 
-                    .livestream-speaker-avatar {
-                        width: 110px;
-                        padding-top: 110px;
-                        border-radius: 50%;
-                        vertical-align: middle;
-                        display: inline-block;
-                        box-shadow: 0 0 2px grey;
-                        display: inline-block;
-                        background-size: cover;
-                    }
+          .livestream-speaker-avatar {
+            width: 110px;
+            padding-top: 110px;
+            border-radius: 50%;
+            vertical-align: middle;
+            display: inline-block;
+            box-shadow: 0 0 2px grey;
+            background-size: cover;
+          }
 
-                    .livestream-speaker-description {
-                        display: inline-block;
-                        vertical-align: middle;
-                        width: 100%;
-                        text-align: center;
-                        margin: 0 0 0 10px;
-                    }
-                `}</style>
+          .livestream-speaker-description {
+            display: inline-block;
+            vertical-align: middle;
+            width: 100%;
+            text-align: center;
+            margin: 0 0 0 10px;
+          }
+        `}</style>
             </Grid.Column>
         );
     });
@@ -333,20 +406,27 @@ function UpcomingLivestream(props) {
     let questionElements = upcomingQuestions.map((question, index) => {
         return (
             <Grid.Column key={index}>
-                <QuestionVotingBox question={question} user={user} livestream={currentLivestream}/>
+                <QuestionVotingBox
+                    question={question}
+                    user={user}
+                    livestream={currentLivestream}
+                />
             </Grid.Column>
         );
     });
 
     let logoElements = careerCenters.map((careerCenter, index) => {
         return (
-            <Grid.Column mobile='5' computer='3'>
-                <Image src={careerCenter.logoUrl} style={{
-                    filter: userIsRegistered() ? 'brightness(0) invert(1)' : '',
-                    maxWidth: '120px',
-                    maxHeight: '60px',
-                    margin: '10px auto 5px auto'
-                }}/>
+            <Grid.Column key={careerCenter.groupId} mobile="5" computer="3">
+                <Image
+                    src={careerCenter.logoUrl}
+                    style={{
+                        filter: userIsRegistered() ? "brightness(0) invert(1)" : "",
+                        maxWidth: "120px",
+                        maxHeight: "60px",
+                        margin: "10px auto 5px auto",
+                    }}
+                />
             </Grid.Column>
         );
     });
@@ -356,175 +436,356 @@ function UpcomingLivestream(props) {
     }
 
     if (currentLivestream.hasStarted) {
-        router.replace('/streaming/' + currentLivestream.id + '/viewer');
+        router.replace("/streaming/" + currentLivestream.id + "/viewer");
     }
 
     return (
         <div>
-            <div className='topLevelContainer'>
+            <div className="topLevelContainer">
                 <Head>
                     <title key="title">CareerFairy | Upcoming Live Stream</title>
                 </Head>
-                <Header color='white'/>
-                <div className='video-mask'
-                     style={{backgroundImage: 'url(' + currentLivestream.backgroundImageUrl + ')'}}>
-                    <div className='mask' style={{backgroundColor: userIsRegistered() ? 'rgba(0, 210, 170, 0.9)' : ''}}>
+                <Header color="white"/>
+                <div
+                    className="video-mask"
+                    style={{
+                        backgroundImage:
+                            "url(" + currentLivestream.backgroundImageUrl + ")",
+                    }}
+                >
+                    <div
+                        className="mask"
+                        style={{
+                            backgroundColor: userIsRegistered()
+                                ? "rgba(0, 210, 170, 0.9)"
+                                : "",
+                        }}
+                    >
                         <Container>
-                            <div className='livestream-label' style={{
-                                color: userIsRegistered() ? 'white' : '',
-                                border: userIsRegistered() ? '2px solid white' : ''
-                            }}><Icon name='rss'/>Live stream
-                            </div>
-                            <div className='livestream-title' style={{color: userIsRegistered() ? 'white' : ''}}>
-                                {currentLivestream.title}
-                            </div>
-                            <div className='livestream-date' style={{color: userIsRegistered() ? 'white' : ''}}>
-                                <span><Icon
-                                    name='calendar outline alternate'/>{DateUtil.getPrettyDate(currentLivestream.start.toDate())}</span>
+                            <div
+                                className="livestream-label"
+                                style={{
+                                    color: userIsRegistered() ? "white" : "",
+                                    border: userIsRegistered() ? "2px solid white" : "",
+                                }}
+                            >
+                                <Icon name="rss"/>
+                                Live stream
                             </div>
                             <div
-                                className={'topDescriptionContainer ' + (dateIsInUnder24Hours(currentLivestream.start.toDate()) ? '' : 'hidden')}>
-                                <div className='countdown-title'
-                                     style={{textAlign: 'center', color: 'rgb(255, 20, 147)', fontSize: '1.4em'}}>Please
-                                    wait here! You will be redirected when the stream starts.
+                                className="livestream-title"
+                                style={{color: userIsRegistered() ? "white" : ""}}
+                            >
+                                {currentLivestream.title}
+                            </div>
+                            <div
+                                className="livestream-date"
+                                style={{color: userIsRegistered() ? "white" : ""}}
+                            >
+                <span>
+                  <Icon name="calendar outline alternate"/>
+                    {DateUtil.getPrettyDate(currentLivestream.start.toDate())}
+                </span>
+                            </div>
+                            <div
+                                className={
+                                    "topDescriptionContainer " +
+                                    (dateIsInUnder24Hours(currentLivestream.start.toDate())
+                                        ? ""
+                                        : "hidden")
+                                }
+                            >
+                                <div
+                                    className="countdown-title"
+                                    style={{
+                                        textAlign: "center",
+                                        color: "rgb(255, 20, 147)",
+                                        fontSize: "1.4em",
+                                    }}
+                                >
+                                    Please wait here! You will be redirected when
+                                    the stream
+                                    starts.
                                 </div>
-                                <div style={{textAlign: 'center', color: 'rgb(255, 20, 147)'}}>
-                                    <Countdown date={currentLivestream.start.toDate()}><span style={{margin: '30px'}}>This livestream will start shortly</span></Countdown>
+                                <div
+                                    style={{
+                                        textAlign: "center",
+                                        color: "rgb(255, 20, 147)",
+                                    }}
+                                >
+                                    <Countdown
+                                        date={currentLivestream.start.toDate()}>
+                    <span style={{margin: "30px"}}>
+                      This livestream will start shortly
+                    </span>
+                                    </Countdown>
                                 </div>
                             </div>
-                            <div style={{margin: '30px 0'}}>
-                                <Grid className='middle aligned' centered>
+                            <div style={{margin: "30px 0"}}>
+                                <Grid className="middle aligned" centered>
                                     <Grid.Row>
-                                        <Grid.Column textAlign='center' mobile='16' computer='5'>
-                                            <Image src={currentLivestream.companyLogoUrl} style={{
-                                                filter: userIsRegistered() ? 'brightness(0) invert(1)' : '',
-                                                maxWidth: '230px',
-                                                maxHeight: '140px',
-                                                margin: '10px auto 5px auto'
-                                            }}/>
+                                        <Grid.Column textAlign="center"
+                                                     mobile="16" computer="5">
+                                            <Image
+                                                src={currentLivestream.companyLogoUrl}
+                                                style={{
+                                                    filter: userIsRegistered()
+                                                        ? "brightness(0) invert(1)"
+                                                        : "",
+                                                    maxWidth: "230px",
+                                                    maxHeight: "140px",
+                                                    margin: "10px auto 5px auto",
+                                                }}
+                                            />
                                         </Grid.Column>
                                     </Grid.Row>
-                                    <Grid.Row>
-                                        {speakerElements}
-                                    </Grid.Row>
+                                    <Grid.Row>{speakerElements}</Grid.Row>
                                 </Grid>
                             </div>
-                            <div style={{margin: '40px 0', width: '100%'}}>
+                            <div style={{margin: "40px 0", width: "100%"}}>
                                 <div>
                                     {/* <Button size='big' content={ 'Ready To Join' } icon={ 'play' } style={{ margin: '5px' }} onClick={() => setUserIsReady(true)} disabled={!currentLivestream.hasStarted} color='pink'/>  */}
-                                    <Button size='big'
-                                            id='register-button'
-                                            content={user ? (registered ? 'Cancel' : 'I\'ll attend!') : 'Register to attend'}
-                                            icon={registered ? 'delete' : 'plus'}
-                                            style={{margin: '5px'}}
-                                            onClick={registered ? () => deregisterFromLivestream(currentLivestream.id) : () => startRegistrationProcess(currentLivestream.id)}
-                                            color={registered ? null : 'teal'}/>
-                                    <Button size='big' content={'How Live Streams Work'} icon={'cog'}
-                                            style={{margin: '5px'}} onClick={() => goToSeparateRoute('/howitworks')}
-                                            color='pink'/>
+                                    <Button
+                                        size="big"
+                                        id="register-button"
+                                        content={
+                                            user
+                                                ? registered
+                                                ? "Cancel"
+                                                : "I'll attend!"
+                                                : "Register to attend"
+                                        }
+                                        icon={registered ? "delete" : "plus"}
+                                        style={{margin: "5px"}}
+                                        onClick={
+                                            registered
+                                                ? () => deregisterFromLivestream(currentLivestream.id)
+                                                : () => startRegistrationProcess(currentLivestream.id)
+                                        }
+                                        color={registered ? null : "teal"}
+                                    />
+                                    <Button
+                                        size="big"
+                                        content={"How Live Streams Work"}
+                                        icon={"cog"}
+                                        style={{margin: "5px"}}
+                                        onClick={() => goToSeparateRoute("/howitworks")}
+                                        color="pink"
+                                    />
                                 </div>
                             </div>
-                            <div style={{textAlign: 'center', marginBottom: '20px'}}>
-                                <TargetElementList fields={currentLivestream.targetGroups}/>
+                            <div style={{textAlign: "center", marginBottom: "20px"}}>
+                                {groupId ? <TargetOptions options={targetOptions}/>: <TargetElementList fields={ currentLivestream.targetGroups }/>}
                             </div>
-                            <div style={{textAlign: 'center', marginBottom: '20px'}}>
-                                <Grid centered className='middle aligned'>
+                            <div style={{textAlign: "center", marginBottom: "20px"}}>
+                                <Grid centered className="middle aligned">
                                     {logoElements}
                                 </Grid>
                             </div>
-                            <div className='topDescriptionContainer'>
-                                <div className='countdown-title' style={{
-                                    textAlign: 'center',
-                                    color: registered ? 'white' : 'rgb(255, 20, 147)'
-                                }}>This live stream starts here in
+                            <div className="topDescriptionContainer">
+                                <div
+                                    className="countdown-title"
+                                    style={{
+                                        textAlign: "center",
+                                        color: registered ? "white" : "rgb(255, 20, 147)",
+                                    }}
+                                >
+                                    This live stream starts here in
                                 </div>
-                                <div style={{textAlign: 'center', color: 'rgb(255, 20, 147)'}}>
-                                    <Countdown date={currentLivestream.start.toDate()}><span style={{margin: '30px'}}>This livestream will start shortly</span></Countdown>
+                                <div
+                                    style={{
+                                        textAlign: "center",
+                                        color: "rgb(255, 20, 147)",
+                                    }}
+                                >
+                                    <Countdown
+                                        date={currentLivestream.start.toDate()}>
+                    <span style={{margin: "30px"}}>
+                      This livestream will start shortly
+                    </span>
+                                    </Countdown>
                                 </div>
                             </div>
                         </Container>
-                        <div className='bottom-icon'>
-                            <Icon style={{color: 'rgb(44, 66, 81)'}} name='angle down' size='big'/>
+                        <div className="bottom-icon">
+                            <Icon
+                                style={{color: "rgb(44, 66, 81)"}}
+                                name="angle down"
+                                size="big"
+                            />
                         </div>
                     </div>
                 </div>
             </div>
-            <div className='white-container'>
+            <div className="white-container">
                 <Container>
-                    <div className='container-title'>Short summary</div>
-                    <div style={{fontSize: '1.3em', lineHeight: '1.4em', width: '80%', margin: '0 auto'}}><MulitLineText
-                        text={currentLivestream.summary}/></div>
+                    <div className="container-title">Short summary</div>
+                    <div
+                        style={{
+                            fontSize: "1.3em",
+                            lineHeight: "1.4em",
+                            width: "80%",
+                            margin: "0 auto",
+                        }}
+                    >
+                        <MulitLineText text={currentLivestream.summary}/>
+                    </div>
                 </Container>
             </div>
-            <div className='grey-container'>
+            <div className="grey-container">
                 <Container>
-                    <div className='container-title'>Which questions should the speaker answer during the livestream?
+                    <div className="container-title">
+                        Which questions should the speaker answer during the livestream?
                     </div>
-                    <div style={{textAlign: 'center'}}>
-                        <Input size='huge' value={newQuestionTitle}
-                               onChange={(event) => setNewQuestionTitle(event.target.value)} maxLength='170' fluid/>
-                        <Button size='huge' content='Submit Your Question' style={{margin: '20px 0 0 0'}}
-                                onClick={() => addNewQuestion()} primary/>
+                    <div style={{textAlign: "center"}}>
+                        <Input
+                            size="huge"
+                            value={newQuestionTitle}
+                            onChange={(event) => setNewQuestionTitle(event.target.value)}
+                            maxLength="170"
+                            fluid
+                        />
+                        <Button
+                            size="huge"
+                            content="Submit Your Question"
+                            style={{margin: "20px 0 0 0"}}
+                            onClick={() => addNewQuestion()}
+                            primary
+                        />
                     </div>
-                    <div className={'container-title ' + (questionElements.length === 0 ? 'hidden' : '')}
-                         style={{margin: '30px 0 0 0'}}>Upvote questions from your peers
+                    <div
+                        className={
+                            "container-title " +
+                            (questionElements.length === 0 ? "hidden" : "")
+                        }
+                        style={{margin: "30px 0 0 0"}}
+                    >
+                        Upvote questions from your peers
                     </div>
-                    <Grid stackable columns={3} style={{margin: '5px 0 30px 0'}}>
+                    <Grid stackable columns={3} style={{margin: "5px 0 30px 0"}}>
                         {questionElements}
                     </Grid>
-                    <div className={(user ? '' : 'hidden')} style={{textAlign: 'center'}}
-                         className={questionElements.length === 0 ? '' : 'hidden'}>The speaker is eagerly waiting for
-                        your input!
+                    <div
+                        className={user ? "" : "hidden"}
+                        style={{textAlign: "center"}}
+                        className={questionElements.length === 0 ? "" : "hidden"}
+                    >
+                        The speaker is eagerly waiting for your input!
                     </div>
                 </Container>
             </div>
-            <div className={'white-container ' + (currentLivestream.hasNoTalentPool ? 'hidden' : '')}
-                 style={{backgroundColor: (userIsInTalentPool ? 'rgb(0, 210, 170)' : '')}}>
+            <div
+                className={
+                    "white-container " +
+                    (currentLivestream.hasNoTalentPool ? "hidden" : "")
+                }
+                style={{
+                    backgroundColor: userIsInTalentPool ? "rgb(0, 210, 170)" : "",
+                }}
+            >
                 <Container>
-                    <div className='container-title'
-                         style={{color: (userIsInTalentPool ? 'white' : '')}}>{userIsInTalentPool ? 'You are part of the talent pool' : 'Join the Talent Pool and Get Hired'}</div>
-                    <Grid style={{margin: '50px 0 0 0'}} className='middle aligned' centered>
-                        <Grid.Column computer='8' mobile='16'>
+                    <div
+                        className="container-title"
+                        style={{color: userIsInTalentPool ? "white" : ""}}
+                    >
+                        {userIsInTalentPool
+                            ? "You are part of the talent pool"
+                            : "Join the Talent Pool and Get Hired"}
+                    </div>
+                    <Grid
+                        style={{margin: "50px 0 0 0"}}
+                        className="middle aligned"
+                        centered
+                    >
+                        <Grid.Column computer="8" mobile="16">
                             <Image
-                                src={currentLivestream.companyLogoUrl ? currentLivestream.companyLogoUrl : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media'}
+                                src={
+                                    currentLivestream.companyLogoUrl
+                                        ? currentLivestream.companyLogoUrl
+                                        : "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media"
+                                }
                                 style={{
-                                    margin: '0 auto',
-                                    maxHeight: '100px',
-                                    maxWidth: '50%',
-                                    filter: (userIsInTalentPool ? 'brightness(0) invert(1)' : '')
-                                }}/>
+                                    margin: "0 auto",
+                                    maxHeight: "100px",
+                                    maxWidth: "50%",
+                                    filter: userIsInTalentPool ? "brightness(0) invert(1)" : "",
+                                }}
+                            />
                         </Grid.Column>
-                        <Grid.Column computer='8' mobile='16' style={{textAlign: 'center'}}>
-                            <Button size='big' content={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
-                                    icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
-                                    onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
-                                    primary={!userIsInTalentPool}/>
+                        <Grid.Column
+                            computer="8"
+                            mobile="16"
+                            style={{textAlign: "center"}}
+                        >
+                            <Button
+                                size="big"
+                                content={
+                                    userIsInTalentPool ? "Leave Talent Pool" : "Join Talent Pool"
+                                }
+                                icon={userIsInTalentPool ? "delete" : "handshake outline"}
+                                onClick={
+                                    userIsInTalentPool
+                                        ? () => leaveTalentPool()
+                                        : () => joinTalentPool()
+                                }
+                                primary={!userIsInTalentPool}
+                            />
                         </Grid.Column>
                         <Grid.Column width={16}>
-                            <div style={{margin: '20px 0', color: (userIsInTalentPool ? 'white' : '')}}>
-                                We want to make it easy for students and young pros to find the right company for them.
-                                To help you let companies know that you're interested in potentially joining - now or in
-                                the future -, we've invented the Talent Pool. By joining its talent pool, the company
-                                can contact you at any time with a relevant opportunity.
+                            <div
+                                style={{
+                                    margin: "20px 0",
+                                    color: userIsInTalentPool ? "white" : "",
+                                }}
+                            >
+                                We want to make it easy for students and young pros to
+                                find the
+                                right company for them. To help you let companies know
+                                that
+                                you're interested in potentially joining - now or in the
+                                future
+                                -, we've invented the Talent Pool. By joining its talent
+                                pool,
+                                the company can contact you at any time with a relevant
+                                opportunity.
                             </div>
                         </Grid.Column>
                     </Grid>
                 </Container>
             </div>
-            <div className={'grey-container ' + (currentLivestream.hasNoTalentPool ? 'hidden' : '')}>
-                <div className='container-title'>Any problem or question ? We want to hear from you</div>
+            <div
+                className={
+                    "grey-container " +
+                    (currentLivestream.hasNoTalentPool ? "hidden" : "")
+                }
+            >
+                <div className="container-title">
+                    Any problem or question ? We want to hear from you
+                </div>
                 <Container>
-                    <Grid.Column width={16} style={{textAlign: 'center'}}>
-                        <a className="aboutContentContactButton" href="mailto:thomas@careerfairy.io"><Button size='big'
-                                                                                                             content='Contact CareerFairy'
-                                                                                                             style={{margin: '30px 0 0 0'}}/>
+                    <Grid.Column width={16} style={{textAlign: "center"}}>
+                        <a
+                            className="aboutContentContactButton"
+                            href="mailto:thomas@careerfairy.io"
+                        >
+                            <Button
+                                size="big"
+                                content="Contact CareerFairy"
+                                style={{margin: "30px 0 0 0"}}
+                            />
                         </a>
                     </Grid.Column>
                 </Container>
             </div>
             <Footer/>
-            <BookingModal livestream={currentLivestream} modalOpen={bookingModalOpen} setModalOpen={setBookingModalOpen}
-                          registration={registration} setRegistration={(value) => setRegistration(value)} user={user}/>
+            <BookingModal
+                livestream={currentLivestream}
+                modalOpen={bookingModalOpen}
+                setModalOpen={setBookingModalOpen}
+                registration={registration}
+                setRegistration={(value) => setRegistration(value)}
+                user={user}
+            />
             <style jsx>{`
                 .hidden {
                     display: none;
