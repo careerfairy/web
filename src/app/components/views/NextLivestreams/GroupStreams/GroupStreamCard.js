@@ -233,16 +233,16 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                             <div className='livestream-position'
                                  style={{color: userIsRegistered() ? 'white' : ''}}>{livestream.title}</div>
                             <div>
-                                <Button size='large' style={{margin: '5px 5px 0 0'}}
-                                        icon={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? 'delete' : 'add'}
-                                        color={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? null : 'teal'}
-                                        content={user ? ((livestream.registeredUsers?.indexOf(user.email) > -1) ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
-                                        onClick={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
-                                <Link href={('/upcoming-livestream/' + livestream.id)}
-                                      prefetch={false}><a><Button
-                                    size='large' style={{margin: '5px 5px 0 0'}} icon='signup'
-                                    content='Details'
-                                    color='pink'/></a></Link>
+                            <Button size='large' style={{margin: '5px 5px 0 0'}}
+                                    icon={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? 'delete' : 'add'}
+                                    color={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? null : 'teal'}
+                                    content={user ? ((livestream.registeredUsers?.indexOf(user.email) > -1) ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
+                                    onClick={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
+                            <Link href={('/upcoming-livestream/' + livestream.id)}
+                                    prefetch={false}><a><Button
+                                size='large' style={{margin: '5px 5px 0 0'}} icon='signup'
+                                content='Details'
+                                color='pink'/></a></Link>
                             </div>
                         </div>
                     </div>
