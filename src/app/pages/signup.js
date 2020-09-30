@@ -1,4 +1,4 @@
-import React, {Fragment, useState, useEffect} from 'react';
+import React, {Fragment, useState, useEffect, useContext} from 'react';
 import {withFirebase} from "context/firebase";
 import TheatersRoundedIcon from '@material-ui/icons/TheatersRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
@@ -8,7 +8,7 @@ import {useRouter} from 'next/router';
 import Link from 'next/link';
 import {Formik} from 'formik';
 import axios from 'axios';
-import {Link as MuiLink} from '@material-ui/core';
+import {FormControl, Link as MuiLink, MenuItem, Select} from '@material-ui/core';
 
 import Head from 'next/head';
 import Stepper from "@material-ui/core/Stepper";
@@ -20,6 +20,7 @@ import {
     Grid,
     Paper,
     TextField,
+    InputLabel,
     FormControlLabel,
     Container,
     Button,
@@ -29,6 +30,8 @@ import {
 import {makeStyles} from "@material-ui/core/styles";
 import {TealBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import GroupProvider from "../components/views/signup/GroupProvider";
+import UserContext from "../context/user/UserContext";
+import UniversitySelector from "../components/views/signup/UniversitySelector";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -84,25 +87,36 @@ function SignUpPage({firebase}) {
     const classes = useStyles()
     const router = useRouter();
     const {absolutePath} = router.query
+    const {authenticatedUser: user, userData} = useContext(UserContext)
+    console.log(userData);
     const steps = getSteps(absolutePath);
+    // console.log(user);
 
-    const [user, setUser] = useState(false);
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
     const [activeStep, setActiveStep] = useState(0);
 
 
+    // useEffect(() => {
+    //     firebase.auth.onAuthStateChanged(user => {
+    //         if (user && user.emailVerified) {
+    //             router.push('/next-livestreams')
+    //         } else if (user && !user.emailVerified) {
+    //             setUser(user);
+    //             setActiveStep(1)
+    //         } else {
+    //             setUser(null);
+    //         }
+    //     })
+    // }, []);
+
     useEffect(() => {
-        firebase.auth.onAuthStateChanged(user => {
-            if (user && user.emailVerified) {
-                router.push('/next-livestreams')
-            } else if (user && !user.emailVerified) {
-                setUser(user);
-                setActiveStep(1)
-            } else {
-                setUser(null);
-            }
-        })
-    }, []);
+        if (user && user.emailVerified) {
+            router.push('/next-livestreams')
+        } else if (user && !user.emailVerified) {
+            // firebase.auth.signOut()
+            setActiveStep(1)
+        }
+    }, [user])
 
     function getStepContent(stepIndex) {
         switch (stepIndex) {
@@ -180,6 +194,10 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
     const [errorMessageShown, setErrorMessageShown] = useState(false);
     const [generalLoading, setGeneralLoading] = useState(false);
     const [formData, setFormData] = useState({})
+    const [options, setOptions] = useState([]);
+    const [countryCode, setCountryCode] = React.useState('');
+    const [open, setOpen] = React.useState(false);
+
 
     useEffect(() => {
         if (emailSent && user && !emailVerificationSent) {
@@ -202,6 +220,18 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
         }
     }, [user, emailSent]);
 
+    const handleChangeSelect = (event) => {
+        setCountryCode(event.target.value);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
     return (
         <Fragment>
             <Formik
@@ -211,7 +241,9 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     email: '',
                     password: '',
                     confirmPassword: '',
-                    agreeTerm: false
+                    agreeTerm: false,
+                    selectedUniversity: '',
+                    countryCode: ""
                 }}
                 validate={values => {
                     let errors = {};
@@ -324,6 +356,45 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     disabled={isSubmitting || emailSent || generalLoading}
                                     label="Email Address"
                                 />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <FormControl fullWidth variant="outlined">
+                                    <InputLabel id="countryCode">University Country</InputLabel>
+                                    <Select
+                                        id="countryCode"
+                                        labelId="countryCode"
+                                        name="countryCode"
+                                        label="University Country"
+                                        open={open}
+                                        required
+                                        variant="outlined"
+                                        fullWidth
+                                        onClose={handleClose}
+                                        onOpen={handleOpen}
+                                        value={values.countryCode}
+                                        onChange={handleChange}
+                                    >
+                                        <MenuItem value="">
+                                            <em>None</em>
+                                        </MenuItem>
+                                        <MenuItem value={"AT"}>Austria</MenuItem>
+                                        <MenuItem value={"CH"}>Switzerland</MenuItem>
+                                        <MenuItem value={"DE"}>Germany</MenuItem>
+                                        <MenuItem value={"ES"}>Spain</MenuItem>
+                                        <MenuItem value={"FI"}>Finland</MenuItem>
+                                        <MenuItem value={"FR"}>France</MenuItem>
+                                        <MenuItem value={"GB"}>United Kingdom</MenuItem>
+                                        <MenuItem value={"IT"}>Italy</MenuItem>
+                                        <MenuItem value={"NL"}>Netherlands</MenuItem>
+                                        <MenuItem value={"NO"}>Norway</MenuItem>
+                                        <MenuItem value={"SE"}>Sweden</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <UniversitySelector setOptions={setOptions} options={options}
+                                                    countryCode={values.countryCode}
+                                                    handleChange={handleChange}/>
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
