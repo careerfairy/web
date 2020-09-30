@@ -28,22 +28,22 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const PersonalInfo = (props) => {
+const PersonalInfo = ({firebase, userData}) => {
     const classes = useStyles()
     const {push} = useRouter()
 
     function logout() {
         setLoading(true);
-        props.firebase.doSignOut().then(() => {
+        firebase.doSignOut().then(() => {
             router.replace('/login');
         });
     }
 
     return (
         <Formik
-            initialValues={props.userData.firstName ? {
-                firstName: props.userData.firstName,
-                lastName: props.userData.lastName
+            initialValues={ userData && userData.firstName ? {
+                firstName: userData.firstName,
+                lastName: userData.lastName
             } : {firstName: '', lastName: ''}}
             enableReinitialize={true}
             validate={values => {
@@ -62,7 +62,7 @@ const PersonalInfo = (props) => {
             }}
             onSubmit={(values, {setSubmitting}) => {
                 setSubmitting(true);
-                props.firebase.setUserData(props.userData.id, values.firstName, values.lastName)
+                firebase.setUserData(userData.id, values.firstName, values.lastName)
                     .then(() => {
                         // return push('/next-livestreams');
                         setSubmitting(false);
@@ -92,7 +92,7 @@ const PersonalInfo = (props) => {
                                     <TextField
                                         variant="outlined"
                                         disabled
-                                        value={props.userData.id}
+                                        value={userData.id}
                                         fullWidth
                                         id="email"
                                         label="Email Address"

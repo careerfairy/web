@@ -1,9 +1,9 @@
 import React from 'react';
 import {FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
 
-const UniversityCountrySelector = ({handleClose, handleOpen, open, value, handleChange}) => {
+const UniversityCountrySelector = ({handleClose, handleOpen, open, value, handleChange, submitting}) => {
     return (
-        <FormControl fullWidth variant="outlined">
+        <FormControl disabled={submitting} fullWidth variant="outlined">
             <InputLabel id="countryCode">Select Country of University</InputLabel>
             <Select
                 id="countryCode"
@@ -13,6 +13,7 @@ const UniversityCountrySelector = ({handleClose, handleOpen, open, value, handle
                 open={open}
                 variant="outlined"
                 fullWidth
+                disabled={submitting}
                 onClose={handleClose}
                 onOpen={handleOpen}
                 value={value}

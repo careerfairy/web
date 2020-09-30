@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handleBlur}) => {
+const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handleBlur, submitting}) => {
     const classes = useStyles()
     const [open, setOpen] = useState(false);
     const [universities, setUniversities] = useState(["other"])
@@ -46,6 +46,7 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handle
             id="selectedUniversity"
             name="selectedUniversity"
             fullWidth
+            disabled={submitting}
             selectOnFocus
             onBlur={handleBlur}
             autoHighlight
@@ -72,6 +73,7 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handle
                     name="selectedUniversity"
                     label="University"
                     helperText={error}
+                    disabled={submitting}
                     FormHelperTextProps={{classes: {root: classes.helperText}}}
                     variant="outlined"
                     InputProps={{
