@@ -20,7 +20,7 @@ import {
     Grid,
     Paper,
     TextField,
-    InputLabel,
+    Collapse,
     FormControlLabel,
     Container,
     Button,
@@ -226,6 +226,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
         return isSubmitting || emailSent || generalLoading
     }
 
+
     const handleClose = () => {
         setOpen(false);
     };
@@ -390,7 +391,11 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     type='password'
                                     name='password'
                                     error={Boolean(errors.password && touched.password && errors.password)}
-                                    helperText={errors.password && touched.password && errors.password}
+                                    helperText={
+                                        <Collapse
+                                        in={Boolean(errors.password && touched.password && errors.password)}>{errors.password
+                                        && touched.password && errors.password}</Collapse>
+                                    }
                                     placeholder='Password'
                                     onChange={handleChange} onBlur={handleBlur}
                                     value={values.password}
@@ -430,10 +435,11 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                         the <Link href='/terms'><a>Terms & Conditions</a></Link> and the <Link
                                             href='/privacy'><a>Privacy Policy</a></Link></>}
                                 />
-                                <FormHelperText style={{position: "absolute"}}
-                                                error={Boolean(errors.agreeTerm && touched.agreeTerm && errors.agreeTerm)}>
-                                    {errors.agreeTerm && touched.agreeTerm && errors.agreeTerm}
-                                </FormHelperText>
+                                <Collapse in={Boolean(errors.agreeTerm && touched.agreeTerm && errors.agreeTerm)}>
+                                    <FormHelperText error>
+                                        {errors.agreeTerm && touched.agreeTerm && errors.agreeTerm}
+                                    </FormHelperText>
+                                </Collapse>
                             </Grid>
                         </Grid>
                         <Button
