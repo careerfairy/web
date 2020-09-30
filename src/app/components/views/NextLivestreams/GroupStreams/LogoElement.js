@@ -10,7 +10,7 @@ import {useRouter} from "next/router";
 const LogoSkeleton = () => <Skeleton variant="rect" width={50} height={50}/>
 
 
-const LogoElement = ({careerCenter, userData, user, livestreamId}) => {
+const LogoElement = ({careerCenter, userData, userfollows, livestreamId}) => {
 
     const router = useRouter()
 
@@ -33,20 +33,13 @@ const LogoElement = ({careerCenter, userData, user, livestreamId}) => {
         }
     }
 
-    const checkIfUserFollows = (careerCenter) => {
-        if (user && userData && userData.groupIds) {
-            const {groupId} = careerCenter
-            return userData.groupIds.includes(groupId)
-        } else {
-            return false
-        }
-    }
+
     return (
         <Box display="flex" justifyContent="space-between" flexDirection="column" alignItems="center"
              style={{margin: '0 auto', width: '65px', height: "100%"}}>
             <LazyLoad placeholder={<LogoSkeleton/>}>
                 <Image alt={`${careerCenter.universityName} logo`} src={careerCenter.logoUrl}/>
-                {checkIfUserFollows(careerCenter) ? null :
+                {userfollows ? null :
                     <Button onClick={handleJoin} style={{marginTop: 10}} variant="outlined" color="primary"> Follow </Button>}
                 <GroupJoinModal
                     open={openJoinModal}

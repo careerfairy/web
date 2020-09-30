@@ -5,13 +5,13 @@ import {useMediaQuery, useTheme} from "@material-ui/core";
 import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import MobileFeed from "./MobileFeed";
 import {useRouter} from "next/router";
-import UserContext from "../../../context/user/UserContext";
-import SingleCarousel from "./GroupsCarousel/SingleCarousel";
+import UserContext from "../../../context/user/UserContext"
 
-const NextLivestreams = ({user, firebase}) => {
+const NextLivestreams = ({firebase}) => {
     const {userData, authenticatedUser} = useContext(UserContext);
 
     const router = useRouter();
+    // console.log("router.asPath :", router.asPath, "router.route :", router.route, "router.query: ", router.query);
     const {
         query: {livestreamId},
     } = router;
@@ -25,51 +25,52 @@ const NextLivestreams = ({user, firebase}) => {
     const [groupData, setGroupData] = useState({});
     const [groupIds, setGroupIds] = useState([]);
     const [livestreams, setLivestreams] = useState([]);
-    const [paramsLivestreamId, setParamsLivestreamId] = useState(null);
-    const [paramsCareerCenterId, setParamsCareerCenterId] = useState(null);
+    // const [paramsLivestreamId, setParamsLivestreamId] = useState(null);
+    // const [paramsCareerCenterId, setParamsCareerCenterId] = useState(null);
     const [searching, setSearching] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [listenToUpcoming, setListenToUpcoming] = useState(false);
-    const routerMounted = paramsLivestreamId !== null && paramsCareerCenterId !== null;
-
-  useEffect(() => {
-    if (listenToUpcoming && routerMounted) {
-      const unsubscribe = firebase.listenToUpcomingLivestreams(
-        (querySnapshot) => {
-          let livestreams = [];
-          querySnapshot.forEach((doc) => {
-            let livestream = doc.data();
-            livestream.id = doc.id;
-            livestreams.push(livestream);
-          });
-          if (livestreamId && !careerCenterId) {
-            const currentIndex = livestreams.findIndex(
-              (el) => el.id === livestreamId
-            );
-            if (currentIndex > -1) {
-              repositionElement(livestreams, currentIndex, 0);
-            }
-            }
-            if (!careerCenterId) {
-                livestreams = livestreams.filter( livestream => !livestream.hidden);
-            }
-          setLivestreams(livestreams);
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
-      return () => unsubscribe();
-    }
-  }, [listenToUpcoming, livestreamId]);
+    // const routerMounted = paramsLivestreamId !== null && paramsCareerCenterId !== null;
 
     useEffect(() => {
-        // will set the params once the router is loaded whether it be undefined or truthy
-        if (paramsLivestreamId === null && router) {
-            setParamsCareerCenterId(careerCenterId);
-            setParamsLivestreamId(livestreamId);
+        if (listenToUpcoming) { // && routerMounted
+            const unsubscribe = firebase.listenToUpcomingLivestreams(
+                (querySnapshot) => {
+                    let livestreams = [];
+                    querySnapshot.forEach((doc) => {
+                        let livestream = doc.data();
+                        livestream.id = doc.id;
+                        livestreams.push(livestream);
+                    });
+                    if (livestreamId && !careerCenterId) {
+                        const currentIndex = livestreams.findIndex(
+                            (el) => el.id === livestreamId
+                        );
+                        if (currentIndex > -1) {
+                            repositionElement(livestreams, currentIndex, 0);
+                        }
+                    }
+                    if (!careerCenterId) {
+                        livestreams = livestreams.filter(livestream => !livestream.hidden);
+                    }
+                    setLivestreams(livestreams);
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+            return () => unsubscribe();
         }
-    }, [router]);
+    }, [listenToUpcoming, livestreamId]);
+
+    // useEffect(() => {
+    //     // will set the params once the router is loaded whether it be undefined or truthy
+    //     if (paramsLivestreamId === null && router) {
+    //         console.log("paramsLivestreamId");
+    //         setParamsCareerCenterId(careerCenterId);
+    //         setParamsLivestreamId(livestreamId);
+    //     }
+    // }, [router]);
 
     useEffect(() => {
         if (groupData && groupData.groupId) {
@@ -114,9 +115,9 @@ const NextLivestreams = ({user, firebase}) => {
                     setSearching(false);
                 }
             );
-      return () => unsubscribe();
-    }
-  }, [groupData, selectedOptions, authenticatedUser]);
+            return () => unsubscribe();
+        }
+    }, [groupData, selectedOptions]);
 
     useEffect(() => {
         if (groupData && groupData.categories) {
