@@ -91,7 +91,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
     }, [groupData, livestream])
 
     useEffect(() => {
-        if (livestream && livestream.categories && livestream.categories.length) {
+        if (livestream && livestream.universities && livestream.universities.length) {
             firebase.getDetailLivestreamCareerCenters(livestream.universities).then(querySnapshot => {
                 let groupList = [];
                 querySnapshot.forEach(doc => {
@@ -157,7 +157,6 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
 
     function completeRegistrationProcess() {
         firebase.registerToLivestream(livestream.id, user.email).then(() => {
-            debugger;
             setBookingModalOpen(true);
             sendEmailRegistrationConfirmation();
         })
