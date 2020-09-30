@@ -51,16 +51,17 @@ function ViewerPage(props) {
     }, [livestreamId]);
 
     useEffect(() => {
-        if (currentLivestream && currentLivestream.universities.length > 0) {
-            props.firebase.getDetailLivestreamCareerCenters(currentLivestream.universities).then( querySnapshot => {
-                let groupList = [];
-                querySnapshot.forEach(doc => {
-                    let group = doc.data();
-                    group.id = doc.id;
-                    groupList.push(group);
+        if (currentLivestream && currentLivestream.groupIds && currentLivestream.groupIds.length) {
+            props.firebase.getDetailLivestreamCareerCenters(currentLivestream.groupIds)
+                .then((querySnapshot) => {
+                    let groupList = [];
+                    querySnapshot.forEach((doc) => {
+                        let group = doc.data();
+                        group.id = doc.id;
+                        groupList.push(group);
+                    });
+                    setCareerCenters(groupList);
                 });
-                setCareerCenters(groupList);
-            });
         }
     }, [currentLivestream]);
 
