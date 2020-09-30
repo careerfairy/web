@@ -29,7 +29,7 @@ const UserProfile = ({firebase}) => {
 
     useEffect(() => {
         if (!authenticatedUser) {
-            router.push('/login');
+            return router.push('/login');
         }
     }, [authenticatedUser]);
 
