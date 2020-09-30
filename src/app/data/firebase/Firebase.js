@@ -38,7 +38,12 @@ class Firebase {
 
   doSignOut = () => this.auth.signOut();
 
-  // *** Firestore API ***
+    getUniversitiesFromCountryCode = (countryCode) => {
+        let ref = this.firestore.collection("universitiesByCountry").doc(countryCode)
+        return ref.get()
+    }
+
+    // *** Firestore API ***
 
   // USER
 
@@ -139,7 +144,7 @@ class Firebase {
     return ref.get();
   };
 
-  createCareerCenter = (careerCenter) => { 
+  createCareerCenter = (careerCenter) => {
     let ref = this.firestore.collection("careerCenterData");
     return ref.add(careerCenter);
   }

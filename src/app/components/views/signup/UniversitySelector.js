@@ -12,47 +12,48 @@ function sleep(delay = 0) {
     });
 }
 
-const UniversitySelector = ({firbase, countryCode, options, handleChange, setOptions}) => {
+const UniversitySelector = ({firebase, countryCode, setFieldValue, setOptions, values}) => {
+    console.log("values", values);
     console.log("countryCode in select", countryCode);
     const [open, setOpen] = useState(false);
-    // console.log("options", options);
-    const loading = open && options.length === 0;
+    const [universities, setUniversities] = useState([])
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        let active = true;
-
-        if (!loading) {
-            return undefined;
+        if (countryCode && countryCode.length) {
+            (async () => {
+                try {
+                    setLoading(true)
+                    const querySnapshot = await firebase.getUniversitiesFromCountryCode(countryCode)
+                    const fetchedUniversities = querySnapshot.data().universities
+                    const onlyUniNames = fetchedUniversities.map(obj => obj.name)
+                    setUniversities([...new Set(onlyUniNames)]) // getting rid of any duplicate names
+                    return setLoading(false)
+                } catch (e) {
+                    console.log("error in fetch universities", e)
+                    return setLoading(false)
+                }
+            })()
         }
+    }, [countryCode]);
 
-        (async () => {
-            const response = await fetch('https://country.register.gov.uk/records.json?page-size=5000');
-            await sleep(1e3); // For demo purposes.
-            const countries = await response.json();
-            console.log(countries);
-
-            if (active) {
-                setOptions(Object.keys(countries).map((key) => countries[key].item[0]));
-            }
-        })();
-
-        return () => {
-            active = false;
-        };
-    }, [loading]);
-
-    React.useEffect(() => {
+    useEffect(() => {
         if (!open) {
             setOptions([]);
         }
-    }, [open]);
+    }, [open, countryCode]);
 
     return (
         <Autocomplete
             id="selectedUniversity"
             name="selectedUniversity"
             fullWidth
-            onChange={handleChange}
+            selectOnFocus
+            autoHighlight
+            onChange={(e, value) => {
+                let name = value || ""
+                setFieldValue("selectedUniversity", name)
+            }}
             open={open}
             onOpen={() => {
                 setOpen(true);
@@ -60,14 +61,16 @@ const UniversitySelector = ({firbase, countryCode, options, handleChange, setOpt
             onClose={() => {
                 setOpen(false);
             }}
-            getOptionSelected={(option, value) => option.name === value.name}
-            getOptionLabel={(option) => option.name}
-            options={options}
+            getOptionSelected={(option, value) => option === value}
+            getOptionLabel={(option) => option || ""}
+            options={universities}
             loading={loading}
             renderInput={(params) => (
                 <TextField
                     {...params}
-                    label="Asynchronous"
+                    id="selectedUniversity"
+                    name="selectedUniversity"
+                    label="University"
                     variant="outlined"
                     InputProps={{
                         ...params.InputProps,
