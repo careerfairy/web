@@ -38,6 +38,11 @@ class Firebase {
 
     doSignOut = () => this.auth.signOut();
 
+    getUniversitiesFromCountryCode = (countryCode) => {
+        let ref = this.firestore.collection("universitiesByCountry").doc(countryCode)
+        return ref.get()
+    }
+
     // *** Firestore API ***
 
     // USER

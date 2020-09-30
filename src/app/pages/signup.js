@@ -198,7 +198,6 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
     const [countryCode, setCountryCode] = React.useState('');
     const [open, setOpen] = React.useState(false);
 
-
     useEffect(() => {
         if (emailSent && user && !emailVerificationSent) {
             axios({
@@ -393,8 +392,9 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <UniversitySelector setOptions={setOptions} options={options}
+                                                    values={values}
                                                     countryCode={values.countryCode}
-                                                    handleChange={handleChange}/>
+                                                    setFieldValue={setFieldValue}/>
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
