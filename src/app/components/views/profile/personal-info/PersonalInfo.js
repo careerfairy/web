@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Formik} from 'formik';
 import {useRouter} from 'next/router';
 
@@ -41,7 +41,7 @@ const PersonalInfo = ({firebase, userData}) => {
 
     return (
         <Formik
-            initialValues={ userData && userData.firstName ? {
+            initialValues={userData && userData.firstName ? {
                 firstName: userData.firstName,
                 lastName: userData.lastName
             } : {firstName: '', lastName: ''}}
@@ -81,7 +81,7 @@ const PersonalInfo = ({firebase, userData}) => {
                   handleSubmit,
                   isSubmitting,
                   /* and other goodies */
-              }) => (
+              }) => userData ? (
                 <form onSubmit={handleSubmit}>
                     <Container component="main" maxWidth="sm">
                         <Box boxShadow={1} p={4} className={classes.box}>
@@ -149,7 +149,7 @@ const PersonalInfo = ({firebase, userData}) => {
                         </Box>
                     </Container>
                 </form>
-            )}
+            ) : null}
         </Formik>
     );
 };
