@@ -20,11 +20,12 @@ import MulitLineText from "../../components/views/common/MultiLineText";
 import CurrentGroup from "components/views/profile/CurrentGroup";
 import TargetOptions from "../../components/views/NextLivestreams/GroupsCarousel/TargetOptions";
 import UserContext from "../../context/user/UserContext";
+import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
+import axios from "axios";
 
 function UpcomingLivestream(props) {
     const router = useRouter();
     const {livestreamId, groupId} = router.query;
-    console.log("groupId", groupId);
     const absolutePath = router.asPath;
 
     const {userData, authenticatedUser: user} = useContext(UserContext);
@@ -42,6 +43,8 @@ function UpcomingLivestream(props) {
     const [careerCenters, setCareerCenters] = useState([]);
     const [currentGroup, setCurrentGroup] = useState(null);
     const [targetOptions, setTargetOptions] = useState([]);
+
+    const [openJoinModal, setOpenJoinModal] = useState(false);
 
 
     useEffect(() => {
@@ -225,6 +228,30 @@ function UpcomingLivestream(props) {
         return currentLivestream.registeredUsers.indexOf(user.email) > -1;
     }
 
+    function sendEmailRegistrationConfirmation() {
+        return axios({
+            method: 'post',
+            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendLivestreamRegistrationConfirmationEmail',
+            data: {
+                recipientEmail: user.email,
+                user_first_name: userData.firstName,
+                livestream_date: DateUtil.getPrettyDate(currentLivestream.start.toDate()),
+                company_name: currentLivestream.company,
+                company_logo_url: currentLivestream.companyLogoUrl,
+                livestream_title: currentLivestream.title,
+                livestream_link: ('https://careerfairy.io/upcoming-livestream/' + currentLivestream.id)
+            }
+        });
+    }
+
+    function userFollowsSomeCareerCenter() {
+        return userData.groupIds?.some( groupId => {
+            return careerCenters.some( careerCenter => {
+                return careerCenter.groupId === groupId;
+            });
+        })
+    }
+
     function startRegistrationProcess(livestreamId) {
         if (!user || !user.emailVerified) {
             return router.push(
@@ -241,13 +268,29 @@ function UpcomingLivestream(props) {
             return router.push("/profile");
         }
 
-        setBookingModalOpen(true);
-        setRegistration(true);
-        props.firebase
-            .registerToLivestream(currentLivestream.id, user.email)
+        if (careerCenters.length > 0 && !userFollowsSomeCareerCenter()) {
+            setOpenJoinModal(true)
+        } else {
+            setBookingModalOpen(true);
+            setRegistration(true);
+            props.firebase
+                .registerToLivestream(currentLivestream.id, user.email)
             .then(() => {
+                sendEmailRegistrationConfirmation();
                 setRegistration(false);
             });
+        }
+    }
+
+    function completeRegistrationProcess() {
+        props.firebase.registerToLivestream(currentLivestream.id, user.email).then(() => {
+            setBookingModalOpen(true);
+            sendEmailRegistrationConfirmation();
+        })       
+    }
+
+    function handleCloseJoinModal() {
+        setOpenJoinModal(false);
     }
 
     function deregisterFromLivestream(livestreamId) {
@@ -757,6 +800,16 @@ function UpcomingLivestream(props) {
                 </Container>
             </div>
             <Footer/>
+            {
+                careerCenters.length > 0 &&          
+                <GroupJoinToAttendModal
+                    open={openJoinModal}
+                    group={careerCenters[0]}
+                    alreadyJoined={false}
+                    userData={userData}
+                    onConfirm={completeRegistrationProcess}
+                    closeModal={handleCloseJoinModal}
+                />}
             <BookingModal
                 livestream={currentLivestream}
                 modalOpen={bookingModalOpen}

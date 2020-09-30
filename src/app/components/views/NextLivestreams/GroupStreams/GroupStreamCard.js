@@ -145,7 +145,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
             });
         }
 
-        if (!userData?.groupIds?.includes(groupData.groupId)) {
+        if (groupData.groupId && !userData?.groupIds?.includes(groupData.groupId)) {
             setOpenJoinModal(true)
         } else {
             firebase.registerToLivestream(livestream.id, user.email).then(() => {

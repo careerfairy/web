@@ -168,7 +168,7 @@ const GroupJoinToAttendModal = ({
             color="primary"
             autoFocus
           >
-            {fromProfile ? "Confirm" : "Follow"}
+            I'll attend
           </Button>
         )}
         <Button size="large" onClick={closeModal}>

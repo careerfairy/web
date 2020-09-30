@@ -152,7 +152,7 @@ const NextLivestreams = ({user, firebase}) => {
         if (careerCenterId) {
             return handleGetParams(newGroupIds);
         } else {
-            setGroupIds(newGroupIds);
+            setGroupIds([...new Set(newGroupIds)]);
         }
     };
 
@@ -163,13 +163,13 @@ const NextLivestreams = ({user, firebase}) => {
             if (currentIndex > -1) {
                 swapPositions(newGroupIds, 0, currentIndex);
             }
-            setGroupIds(newGroupIds);
+            setGroupIds([...new Set(newGroupIds)]);
         } else {
             const exists = await checkIfCareerCenterExists(careerCenterId);
             if (exists) {
                 newGroupIds.unshift(careerCenterId);
             }
-            setGroupIds(newGroupIds);
+            setGroupIds([...new Set(newGroupIds)]);
         }
     };
 
