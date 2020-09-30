@@ -222,9 +222,9 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
         }
     }, [user, emailSent]);
 
-    const handleChangeSelect = (event) => {
-        setCountryCode(event.target.value);
-    };
+    const submitting = (isSubmitting) => {
+        return isSubmitting || emailSent || generalLoading
+    }
 
     const handleClose = () => {
         setOpen(false);
@@ -324,7 +324,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     inputProps={{maxLength: 50}}
                                     onBlur={handleBlur}
                                     value={values.firstName}
-                                    disabled={isSubmitting || emailSent || generalLoading}
+                                    disabled={submitting(isSubmitting)}
                                     error={Boolean(errors.firstName && touched.firstName && errors.firstName)}
                                     onChange={handleChange}
                                     helperText={errors.firstName && touched.firstName && errors.firstName}
@@ -342,7 +342,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     FormHelperTextProps={{classes: {root: classes.helperText}}}
                                     autoComplete="lname"
                                     onBlur={handleBlur}
-                                    disabled={isSubmitting || emailSent || generalLoading}
+                                    disabled={submitting(isSubmitting)}
                                     value={values.lastName}
                                     error={Boolean(errors.lastName && touched.lastName && errors.lastName)}
                                     onChange={handleChange}
@@ -361,13 +361,14 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     name='email'
                                     placeholder='Email'
                                     onChange={handleChange} onBlur={handleBlur} value={values.email}
-                                    disabled={isSubmitting || emailSent || generalLoading}
+                                    disabled={submitting(isSubmitting)}
                                     label="Email Address"
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <UniversityCountrySelector value={values.countryCode}
                                                            handleClose={handleClose}
+                                                           submitting={submitting(isSubmitting)}
                                                            handleChange={handleChange}
                                                            handleOpen={handleOpen}
                                                            open={open}/>
@@ -376,6 +377,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                 <UniversitySelector handleBlur={handleBlur}
                                                     error={errors.selectedUniversity && touched.selectedUniversity && errors.selectedUniversity}
                                                     countryCode={values.countryCode}
+                                                    submitting={submitting(isSubmitting)}
                                                     setFieldValue={setFieldValue}/>
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -392,7 +394,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     placeholder='Password'
                                     onChange={handleChange} onBlur={handleBlur}
                                     value={values.password}
-                                    disabled={isSubmitting || emailSent || generalLoading}
+                                    disabled={submitting(isSubmitting)}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -410,7 +412,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     value={values.confirmPassword}
-                                    disabled={isSubmitting || emailSent || generalLoading}
+                                    disabled={submitting(isSubmitting)}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -421,7 +423,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         value={values.agreeTerm}
-                                        disabled={isSubmitting || emailSent || generalLoading}
+                                        disabled={submitting(isSubmitting)}
                                         color="primary"
                                     />}
                                     label={<>I agree to
