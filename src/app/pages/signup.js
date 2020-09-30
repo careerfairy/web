@@ -93,7 +93,6 @@ function SignUpPage({firebase}) {
     const {absolutePath} = router.query
     const {authenticatedUser: user, userData} = useContext(UserContext)
     const steps = getSteps(absolutePath);
-    // console.log(user);
 
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
     const [activeStep, setActiveStep] = useState(0);
@@ -116,7 +115,6 @@ function SignUpPage({firebase}) {
         if (user && user.emailVerified) {
             router.push('/next-livestreams')
         } else if (user && !user.emailVerified) {
-            // firebase.auth.signOut()
             setActiveStep(1)
         }
     }, [user])
@@ -385,8 +383,9 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                         <MenuItem value="">
                                             <em>Other</em>
                                         </MenuItem>
+                                        <MenuItem  value={"CH"}>Switzerland</MenuItem>
                                         <MenuItem value={"AT"}>Austria</MenuItem>
-                                        <MenuItem value={"CH"}>Switzerland</MenuItem>
+                                        <MenuItem value={"US"}>United States</MenuItem>
                                         <MenuItem value={"DE"}>Germany</MenuItem>
                                         <MenuItem value={"ES"}>Spain</MenuItem>
                                         <MenuItem value={"FI"}>Finland</MenuItem>

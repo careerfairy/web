@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const UniversitySelector = ({firebase, countryCode, setFieldValue, setOptions, error, handleBlur, values}) => {
+const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handleBlur}) => {
     const classes = useStyles()
     const [open, setOpen] = useState(false);
     const [universities, setUniversities] = useState(["other"])
@@ -29,7 +29,7 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, setOptions, e
                     const querySnapshot = await firebase.getUniversitiesFromCountryCode(countryCode)
                     const fetchedUniversities = querySnapshot.data().universities
                     const onlyUniNames = fetchedUniversities.map(obj => obj.name)
-                    setUniversities([...new Set(onlyUniNames), ...universities]) // getting rid of any duplicate names
+                    setUniversities(onlyUniNames)
                     return setLoading(false)
                 } catch (e) {
                     console.log("error in fetch universities", e)
@@ -40,12 +40,6 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, setOptions, e
             return () => setUniversities(["other"])
         }
     }, [countryCode]);
-
-    useEffect(() => {
-        if (!open) {
-            setOptions([]);
-        }
-    }, [open, countryCode]);
 
     return (
         <Autocomplete
