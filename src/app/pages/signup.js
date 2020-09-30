@@ -76,6 +76,10 @@ const useStyles = makeStyles((theme) => ({
     icon: {
         margin: '0 10px',
         color: 'white'
+    },
+    helperText: {
+        position: "absolute",
+        bottom: -19
     }
 }));
 
@@ -88,7 +92,6 @@ function SignUpPage({firebase}) {
     const router = useRouter();
     const {absolutePath} = router.query
     const {authenticatedUser: user, userData} = useContext(UserContext)
-    console.log(userData);
     const steps = getSteps(absolutePath);
     // console.log(user);
 
@@ -207,6 +210,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     recipientEmail: user.email,
                     firstName: formData.firstName,
                     lastName: formData.lastName,
+                    university: formData.selectedUniversity,
                 }
             }).then(response => {
                 setEmailVerificationSent(true);
@@ -262,7 +266,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                         errors.lastName = 'Cannot be longer than 50 characters';
                     }
                     if (!values.selectedUniversity) {
-                        errors.selectedUniversity = 'Select a university or type other';
+                        errors.selectedUniversity = 'Select a university or type "other"';
                     }
                     if (!values.password) {
                         errors.password = 'A password is required';
@@ -307,13 +311,14 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                       /* and other goodies */
                   }) => (
                     <form id='signUpForm' onSubmit={handleSubmit}>
-                        <Grid container spacing={2}>
+                        <Grid container spacing={3}>
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     autoComplete="fname"
                                     name="firstName"
                                     variant="outlined"
                                     fullWidth
+                                    FormHelperTextProps={{ classes: { root: classes.helperText } }}
                                     id="firstName"
                                     label="First Name"
                                     autoFocus
@@ -335,6 +340,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     maxLength="50"
                                     label="Last Name"
                                     name="lastName"
+                                    FormHelperTextProps={{ classes: { root: classes.helperText } }}
                                     autoComplete="lname"
                                     onBlur={handleBlur}
                                     disabled={isSubmitting || emailSent || generalLoading}
@@ -348,6 +354,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                 <TextField
                                     variant="outlined"
                                     fullWidth
+                                    FormHelperTextProps={{ classes: { root: classes.helperText } }}
                                     helperText={errors.email && touched.email && errors.email}
                                     error={Boolean(errors.email && touched.email)}
                                     autoComplete="email"
@@ -361,12 +368,12 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <FormControl fullWidth variant="outlined">
-                                    <InputLabel id="countryCode">University Country</InputLabel>
+                                    <InputLabel id="countryCode">Select Country of University</InputLabel>
                                     <Select
                                         id="countryCode"
                                         labelId="countryCode"
                                         name="countryCode"
-                                        label="University Country"
+                                        label="Select Country of University"
                                         open={open}
                                         variant="outlined"
                                         fullWidth
@@ -395,14 +402,14 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                             <Grid item xs={12} sm={6}>
                                 <UniversitySelector setOptions={setOptions} options={options}
                                                     values={values}
-                                                    error={errors.selectedUniversity}
+                                                    handleBlur={handleBlur}
+                                                    error={errors.selectedUniversity && touched.selectedUniversity && errors.selectedUniversity}
                                                     countryCode={values.countryCode}
                                                     setFieldValue={setFieldValue}/>
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     variant="outlined"
-                                    required
                                     fullWidth
                                     label="Password"
                                     id="password"
@@ -420,7 +427,6 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     variant="outlined"
-                                    required
                                     fullWidth
                                     label="Confirm Password"
                                     autoComplete="current-password"
@@ -451,8 +457,8 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                         the <Link href='/terms'><a>Terms & Conditions</a></Link> and the <Link
                                             href='/privacy'><a>Privacy Policy</a></Link></>}
                                 />
-                                <FormHelperText
-                                    error={errors.agreeTerm && touched.agreeTerm && errors.agreeTerm}>
+                                <FormHelperText style={{position: "absolute"}}
+                                    error={Boolean(errors.agreeTerm && touched.agreeTerm && errors.agreeTerm)}>
                                     {errors.agreeTerm && touched.agreeTerm && errors.agreeTerm}
                                 </FormHelperText>
                             </Grid>
@@ -460,6 +466,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                         <Button
                             type="submit"
                             fullWidth
+                            size="large"
                             variant="contained"
                             color="primary"
                             disabled={emailSent}

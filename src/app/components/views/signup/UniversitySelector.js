@@ -5,6 +5,16 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {withFirebase} from "../../../context/firebase";
+import {makeStyles} from "@material-ui/core/styles";
+import match from "autosuggest-highlight/match";
+import parse from "autosuggest-highlight/parse";
+
+const useStyles = makeStyles(theme => ({
+    helperText: {
+        position: "absolute",
+        bottom: -19
+    }
+}))
 
 function sleep(delay = 0) {
     return new Promise((resolve) => {
@@ -12,10 +22,10 @@ function sleep(delay = 0) {
     });
 }
 
-const UniversitySelector = ({firebase, countryCode, setFieldValue, setOptions, error}) => {
+const UniversitySelector = ({firebase, countryCode, setFieldValue, setOptions, error, handleBlur, values}) => {
+    const classes = useStyles()
     const [open, setOpen] = useState(false);
     const [universities, setUniversities] = useState(["other"])
-    // console.log("universities", universities);
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
@@ -51,6 +61,7 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, setOptions, e
             name="selectedUniversity"
             fullWidth
             selectOnFocus
+            onBlur={handleBlur}
             autoHighlight
             onChange={(e, value) => {
                 let name = value || ""
@@ -75,6 +86,7 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, setOptions, e
                     name="selectedUniversity"
                     label="University"
                     helperText={error}
+                    FormHelperTextProps={{classes: {root: classes.helperText}}}
                     variant="outlined"
                     InputProps={{
                         ...params.InputProps,
@@ -87,6 +99,14 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, setOptions, e
                     }}
                 />
             )}
+            renderOption={(option, {inputValue}) => {
+                const matches = match(option, inputValue);
+                const parts = parse(option, matches);
+                return (<div>
+                        {parts.map((part, index) => (<span key={index} style={{fontWeight: part.highlight ? 700 : 400}}>{part.text}</span>))}
+                    </div>
+                );
+            }}
         />
     );
 }
