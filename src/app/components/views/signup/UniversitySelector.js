@@ -12,28 +12,30 @@ function sleep(delay = 0) {
     });
 }
 
-const UniversitySelector = ({firebase, countryCode, setFieldValue, setOptions, values}) => {
-    console.log("values", values);
-    console.log("countryCode in select", countryCode);
+const UniversitySelector = ({firebase, countryCode, setFieldValue, setOptions, error}) => {
     const [open, setOpen] = useState(false);
-    const [universities, setUniversities] = useState([])
+    const [universities, setUniversities] = useState(["other"])
+    // console.log("universities", universities);
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         if (countryCode && countryCode.length) {
             (async () => {
                 try {
+                    setUniversities(["other"])
                     setLoading(true)
                     const querySnapshot = await firebase.getUniversitiesFromCountryCode(countryCode)
                     const fetchedUniversities = querySnapshot.data().universities
                     const onlyUniNames = fetchedUniversities.map(obj => obj.name)
-                    setUniversities([...new Set(onlyUniNames)]) // getting rid of any duplicate names
+                    setUniversities([...new Set(onlyUniNames), ...universities]) // getting rid of any duplicate names
                     return setLoading(false)
                 } catch (e) {
                     console.log("error in fetch universities", e)
                     return setLoading(false)
                 }
             })()
+
+            return () => setUniversities(["other"])
         }
     }, [countryCode]);
 
@@ -68,9 +70,11 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, setOptions, v
             renderInput={(params) => (
                 <TextField
                     {...params}
+                    error={Boolean(error)}
                     id="selectedUniversity"
                     name="selectedUniversity"
                     label="University"
+                    helperText={error}
                     variant="outlined"
                     InputProps={{
                         ...params.InputProps,
