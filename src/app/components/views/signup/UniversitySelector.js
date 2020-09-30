@@ -1,5 +1,3 @@
-// *https://www.registers.service.gov.uk/registers/country/use-the-api*
-import fetch from 'cross-fetch';
 import React, {useEffect, useState} from 'react';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -15,12 +13,6 @@ const useStyles = makeStyles(theme => ({
         bottom: -19
     }
 }))
-
-function sleep(delay = 0) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, delay);
-    });
-}
 
 const UniversitySelector = ({firebase, countryCode, setFieldValue, setOptions, error, handleBlur, values}) => {
     const classes = useStyles()
