@@ -132,7 +132,7 @@ function UpcomingLivestream(props) {
     useEffect(() => {
         if (currentLivestream) {
             props.firebase
-                .getDetailLivestreamCareerCenters(currentLivestream.universities)
+                .getDetailLivestreamCareerCenters(currentLivestream.groupIds)
                 .then((querySnapshot) => {
                     let groupList = [];
                     querySnapshot.forEach((doc) => {
@@ -245,8 +245,8 @@ function UpcomingLivestream(props) {
     }
 
     function userFollowsSomeCareerCenter() {
-        return userData.groupIds?.some( groupId => {
-            return careerCenters.some( careerCenter => {
+        return userData.groupIds?.some(groupId => {
+            return careerCenters.some(careerCenter => {
                 return careerCenter.groupId === groupId;
             });
         })
@@ -275,10 +275,10 @@ function UpcomingLivestream(props) {
             setRegistration(true);
             props.firebase
                 .registerToLivestream(currentLivestream.id, user.email)
-            .then(() => {
-                sendEmailRegistrationConfirmation();
-                setRegistration(false);
-            });
+                .then(() => {
+                    sendEmailRegistrationConfirmation();
+                    setRegistration(false);
+                });
         }
     }
 
@@ -286,7 +286,7 @@ function UpcomingLivestream(props) {
         props.firebase.registerToLivestream(currentLivestream.id, user.email).then(() => {
             setBookingModalOpen(true);
             sendEmailRegistrationConfirmation();
-        })       
+        })
     }
 
     function handleCloseJoinModal() {
@@ -801,7 +801,7 @@ function UpcomingLivestream(props) {
             </div>
             <Footer/>
             {
-                careerCenters.length > 0 &&          
+                careerCenters.length > 0 &&
                 <GroupJoinToAttendModal
                     open={openJoinModal}
                     group={careerCenters[0]}

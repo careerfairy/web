@@ -613,7 +613,7 @@ class Firebase {
         let ref = this.firestore
             .collection("careerCenterData")
             .where("test", "==", false)
-            .where("universityId", "in", universityIds);
+            .where("groupId", "in", universityIds);
         return ref.get();
     };
 

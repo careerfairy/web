@@ -91,8 +91,8 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
     }, [groupData, livestream])
 
     useEffect(() => {
-        if (currentLivestream && currentLivestream.groupIds && currentLivestream.groupIds.length) {
-            props.firebase.getDetailLivestreamCareerCenters(currentLivestream.groupIds)
+        if (livestream && livestream.groupIds && livestream.groupIds.length) {
+            firebase.getDetailLivestreamCareerCenters(livestream.groupIds)
                 .then((querySnapshot) => {
                     let groupList = [];
                     querySnapshot.forEach((doc) => {
@@ -100,10 +100,11 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                         group.id = doc.id;
                         groupList.push(group);
                     });
+                    console.log(groupList);
                     setCareerCenters(groupList);
                 });
         }
-    }, [currentLivestream]);
+    }, [livestream]);
 
     const checkIfHighlighted = () => {
         if (careerCenterId && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId) {
