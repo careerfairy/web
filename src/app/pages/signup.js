@@ -31,7 +31,8 @@ import {makeStyles} from "@material-ui/core/styles";
 import {TealBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import GroupProvider from "../components/views/signup/GroupProvider";
 import UserContext from "../context/user/UserContext";
-import UniversitySelector from "../components/views/signup/UniversitySelector";
+import UniversitySelector from "../components/views/universitySelect/UniversitySelector";
+import UniversityCountrySelector from "../components/views/universitySelect/UniversityCountrySelector";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -316,7 +317,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     name="firstName"
                                     variant="outlined"
                                     fullWidth
-                                    FormHelperTextProps={{ classes: { root: classes.helperText } }}
+                                    FormHelperTextProps={{classes: {root: classes.helperText}}}
                                     id="firstName"
                                     label="First Name"
                                     autoFocus
@@ -338,7 +339,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     maxLength="50"
                                     label="Last Name"
                                     name="lastName"
-                                    FormHelperTextProps={{ classes: { root: classes.helperText } }}
+                                    FormHelperTextProps={{classes: {root: classes.helperText}}}
                                     autoComplete="lname"
                                     onBlur={handleBlur}
                                     disabled={isSubmitting || emailSent || generalLoading}
@@ -352,7 +353,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                 <TextField
                                     variant="outlined"
                                     fullWidth
-                                    FormHelperTextProps={{ classes: { root: classes.helperText } }}
+                                    FormHelperTextProps={{classes: {root: classes.helperText}}}
                                     helperText={errors.email && touched.email && errors.email}
                                     error={Boolean(errors.email && touched.email)}
                                     autoComplete="email"
@@ -365,43 +366,14 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <FormControl fullWidth variant="outlined">
-                                    <InputLabel id="countryCode">Select Country of University</InputLabel>
-                                    <Select
-                                        id="countryCode"
-                                        labelId="countryCode"
-                                        name="countryCode"
-                                        label="Select Country of University"
-                                        open={open}
-                                        variant="outlined"
-                                        fullWidth
-                                        onClose={handleClose}
-                                        onOpen={handleOpen}
-                                        value={values.countryCode}
-                                        onChange={handleChange}
-                                    >
-                                        <MenuItem value="">
-                                            <em>Other</em>
-                                        </MenuItem>
-                                        <MenuItem  value={"CH"}>Switzerland</MenuItem>
-                                        <MenuItem value={"AT"}>Austria</MenuItem>
-                                        <MenuItem value={"US"}>United States</MenuItem>
-                                        <MenuItem value={"DE"}>Germany</MenuItem>
-                                        <MenuItem value={"ES"}>Spain</MenuItem>
-                                        <MenuItem value={"FI"}>Finland</MenuItem>
-                                        <MenuItem value={"FR"}>France</MenuItem>
-                                        <MenuItem value={"GB"}>United Kingdom</MenuItem>
-                                        <MenuItem value={"IT"}>Italy</MenuItem>
-                                        <MenuItem value={"NL"}>Netherlands</MenuItem>
-                                        <MenuItem value={"NO"}>Norway</MenuItem>
-                                        <MenuItem value={"SE"}>Sweden</MenuItem>
-                                    </Select>
-                                </FormControl>
+                                <UniversityCountrySelector value={values.countryCode}
+                                                           handleClose={handleClose}
+                                                           handleChange={handleChange}
+                                                           handleOpen={handleOpen}
+                                                           open={open}/>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <UniversitySelector setOptions={setOptions} options={options}
-                                                    values={values}
-                                                    handleBlur={handleBlur}
+                                <UniversitySelector handleBlur={handleBlur}
                                                     error={errors.selectedUniversity && touched.selectedUniversity && errors.selectedUniversity}
                                                     countryCode={values.countryCode}
                                                     setFieldValue={setFieldValue}/>
@@ -457,7 +429,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                             href='/privacy'><a>Privacy Policy</a></Link></>}
                                 />
                                 <FormHelperText style={{position: "absolute"}}
-                                    error={Boolean(errors.agreeTerm && touched.agreeTerm && errors.agreeTerm)}>
+                                                error={Boolean(errors.agreeTerm && touched.agreeTerm && errors.agreeTerm)}>
                                     {errors.agreeTerm && touched.agreeTerm && errors.agreeTerm}
                                 </FormHelperText>
                             </Grid>
