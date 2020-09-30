@@ -261,6 +261,9 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     } else if (values.lastName.length > 50) {
                         errors.lastName = 'Cannot be longer than 50 characters';
                     }
+                    if (!values.selectedUniversity) {
+                        errors.selectedUniversity = 'Select a university or type other';
+                    }
                     if (!values.password) {
                         errors.password = 'A password is required';
                     } else if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/i.test(values.password)) {
@@ -365,7 +368,6 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                         name="countryCode"
                                         label="University Country"
                                         open={open}
-                                        required
                                         variant="outlined"
                                         fullWidth
                                         onClose={handleClose}
@@ -374,7 +376,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                         onChange={handleChange}
                                     >
                                         <MenuItem value="">
-                                            <em>None</em>
+                                            <em>Other</em>
                                         </MenuItem>
                                         <MenuItem value={"AT"}>Austria</MenuItem>
                                         <MenuItem value={"CH"}>Switzerland</MenuItem>
@@ -393,6 +395,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                             <Grid item xs={12} sm={6}>
                                 <UniversitySelector setOptions={setOptions} options={options}
                                                     values={values}
+                                                    error={errors.selectedUniversity}
                                                     countryCode={values.countryCode}
                                                     setFieldValue={setFieldValue}/>
                             </Grid>
