@@ -100,7 +100,6 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                         group.id = doc.id;
                         groupList.push(group);
                     });
-                    console.log(groupList);
                     setCareerCenters(groupList);
                 });
         }
