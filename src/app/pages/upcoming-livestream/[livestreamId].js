@@ -130,9 +130,8 @@ function UpcomingLivestream(props) {
     }, [currentGroup, currentLivestream]);
 
     useEffect(() => {
-        if (currentLivestream) {
-            props.firebase
-                .getDetailLivestreamCareerCenters(currentLivestream.groupIds)
+        if (currentLivestream && currentLivestream.groupIds && currentLivestream.groupIds.length) {
+            props.firebase.getDetailLivestreamCareerCenters(currentLivestream.groupIds)
                 .then((querySnapshot) => {
                     let groupList = [];
                     querySnapshot.forEach((doc) => {
@@ -245,8 +244,8 @@ function UpcomingLivestream(props) {
     }
 
     function userFollowsSomeCareerCenter() {
-        return userData.groupIds?.some(groupId => {
-            return careerCenters.some(careerCenter => {
+        return userData.groupIds?.some( groupId => {
+            return careerCenters.some( careerCenter => {
                 return careerCenter.groupId === groupId;
             });
         })
@@ -275,10 +274,10 @@ function UpcomingLivestream(props) {
             setRegistration(true);
             props.firebase
                 .registerToLivestream(currentLivestream.id, user.email)
-                .then(() => {
-                    sendEmailRegistrationConfirmation();
-                    setRegistration(false);
-                });
+            .then(() => {
+                sendEmailRegistrationConfirmation();
+                setRegistration(false);
+            });
         }
     }
 
