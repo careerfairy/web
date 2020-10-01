@@ -16,8 +16,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const otherObj = {name: "other"}
-const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handleBlur, submitting, values}) => {
-    console.log("values", values);
+const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handleBlur, submitting}) => {
     const classes = useStyles()
     const [open, setOpen] = useState(false);
     const [universities, setUniversities] = useState([otherObj])
