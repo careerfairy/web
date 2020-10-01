@@ -1,7 +1,7 @@
 import React from 'react';
-import {FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
+import {FormControl, FormHelperText, InputLabel, MenuItem, Select, Collapse} from "@material-ui/core";
 
-const UniversityCountrySelector = ({handleClose, handleOpen, open, value, handleChange, submitting}) => {
+const UniversityCountrySelector = ({handleClose, handleOpen, open, value, handleChange, submitting, handleBlur, error}) => {
     return (
         <FormControl disabled={submitting} fullWidth variant="outlined">
             <InputLabel id="universityCountryCode">Select Country of University</InputLabel>
@@ -13,6 +13,7 @@ const UniversityCountrySelector = ({handleClose, handleOpen, open, value, handle
                 open={open}
                 variant="outlined"
                 fullWidth
+                error={Boolean(error)}
                 disabled={submitting}
                 onClose={handleClose}
                 onOpen={handleOpen}
@@ -35,6 +36,11 @@ const UniversityCountrySelector = ({handleClose, handleOpen, open, value, handle
                 <MenuItem value={"NO"}>Norway</MenuItem>
                 <MenuItem value={"SE"}>Sweden</MenuItem>
             </Select>
+            <Collapse in={Boolean(error)}>
+                <FormHelperText error={Boolean(error)}>
+                    {error}
+                </FormHelperText>
+            </Collapse>
         </FormControl>
     );
 };
