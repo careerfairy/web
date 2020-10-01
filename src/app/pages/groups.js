@@ -14,11 +14,10 @@ import Groups from "../components/views/groups/Groups";
 
 const JoinGroup = (props) => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [groups, setGroups] = useState([]);
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const [groups, setGroups] = useState([]);
 
   useEffect(() => {
     props.firebase.auth.onAuthStateChanged((user) => {
