@@ -226,6 +226,7 @@ exports.sendPostmarkEmailVerificationEmailWithPinAndUpdateUserDataAndUni = funct
     const recipient_first_name = req.body.firstName;
     const recipient_last_name = req.body.lastName;
     const recipient_university = req.body.university;
+    const recipient_university_country_code = req.body.universityCountryCode;
     const pinCode = getRandomInt(9999);
 
     await admin.firestore().collection("userData").doc(recipient_email).set(
@@ -236,6 +237,7 @@ exports.sendPostmarkEmailVerificationEmailWithPinAndUpdateUserDataAndUni = funct
             lastName: recipient_last_name,
             userEmail: recipient_email,
             university: recipient_university,
+            universityCountryCode: recipient_university_country_code,
         });
 
     const email = {
