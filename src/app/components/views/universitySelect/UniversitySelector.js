@@ -16,7 +16,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const otherObj = {name: "other"}
-const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handleBlur, submitting}) => {
+const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handleBlur, submitting, values}) => {
     const classes = useStyles()
     const [open, setOpen] = useState(false);
     const [universities, setUniversities] = useState([otherObj])
@@ -24,6 +24,7 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handle
 
     useEffect(() => {
         if (countryCode && countryCode.length) {
+            console.log("countryCode", countryCode);
             (async () => {
                 try {
                     setUniversities([otherObj])
@@ -64,6 +65,7 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handle
             }}
             getOptionSelected={(option, value) => option.name === value.name}
             getOptionLabel={(option) => option.name || ""}
+            value={values.universityObj}
             options={universities}
             loading={loading}
             renderInput={(params) => (
@@ -75,7 +77,6 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handle
                         name="universityObj"
                         label="University"
                         disabled={submitting}
-                        // FormHelperTextProps={{classes: {root: classes.helperText}}}
                         variant="outlined"
                         InputProps={{
                             ...params.InputProps,

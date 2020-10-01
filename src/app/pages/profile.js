@@ -23,15 +23,36 @@ const useStyles = makeStyles((theme) => ({
 const UserProfile = ({firebase}) => {
     const classes = useStyles();
     const router = useRouter();
-    const [loading, setLoading] = useState(false)
-    const {authenticatedUser, userData} = useContext(UserContext)
-
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [userData, setUserData] = useState(null);
 
     useEffect(() => {
-        if (!authenticatedUser) {
-            return router.push('/login');
+        firebase.auth.onAuthStateChanged((user) => {
+            if (user) {
+                setUser(user);
+            } else {
+                router.replace("/login");
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        setLoading(true);
+        if (user) {
+            firebase.listenToUserData(user.email, (querySnapshot) => {
+                setLoading(false);
+                let user = querySnapshot.data();
+                if (user) {
+                    setUserData(user);
+                }
+            });
         }
-    }, [authenticatedUser]);
+    }, [user]);
+
+    if (user === null || userData === null || loading === true) {
+        return <Loader/>;
+    }
 
     return (
         <div className={classes.root}>
@@ -39,7 +60,7 @@ const UserProfile = ({firebase}) => {
                 <title key="title">CareerFairy | My Profile</title>
             </Head>
             <Header classElement='relative white-background'/>
-            <ProfileNav user={authenticatedUser} userData={userData}/>
+            <ProfileNav user={user} userData={userData}/>
             <Footer/>
         </div>
     );

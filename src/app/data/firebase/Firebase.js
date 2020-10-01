@@ -57,15 +57,16 @@ class Firebase {
     return ref.onSnapshot(callback);
   };
 
-  setUserData = (userEmail, firstName, lastName) => {
-    let ref = this.firestore.collection("userData").doc(userEmail);
-    return ref.update({
-      id: userEmail,
-      userEmail: userEmail,
-      firstName: firstName,
-      lastName: lastName,
-    });
-  };
+    setUserData = (userEmail, firstName, lastName, university) => {
+        let ref = this.firestore.collection("userData").doc(userEmail);
+        return ref.update({
+            id: userEmail,
+            userEmail,
+            firstName,
+            lastName,
+            university
+        });
+    };
 
   setgroups = (userId, arrayOfIds, arrayOfGroupObjects) => {
     let userRef = this.firestore.collection("userData").doc(userId);

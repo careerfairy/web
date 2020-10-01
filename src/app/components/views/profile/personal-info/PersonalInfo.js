@@ -1,10 +1,22 @@
-import React, {useEffect} from 'react';
+import React, {useState} from 'react';
 import {Formik} from 'formik';
 import {useRouter} from 'next/router';
 
 import {withFirebase} from 'context/firebase';
 import {makeStyles} from "@material-ui/core/styles";
-import {Typography, TextField, Button, Grid, CircularProgress, Box, Container} from "@material-ui/core";
+import {
+    Typography,
+    TextField,
+    Button,
+    Grid,
+    CircularProgress,
+    Box,
+    Container,
+    Collapse,
+    FormHelperText, FormControl
+} from "@material-ui/core";
+import UniversityCountrySelector from "../../universitySelect/UniversityCountrySelector";
+import UniversitySelector from "../../universitySelect/UniversitySelector";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -31,6 +43,7 @@ const useStyles = makeStyles((theme) => ({
 const PersonalInfo = ({firebase, userData}) => {
     const classes = useStyles()
     const {push} = useRouter()
+    const [open, setOpen] = useState(false);
 
     function logout() {
         setLoading(true);
@@ -39,12 +52,27 @@ const PersonalInfo = ({firebase, userData}) => {
         });
     }
 
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
     return (
         <Formik
             initialValues={userData && userData.firstName ? {
                 firstName: userData.firstName,
-                lastName: userData.lastName
-            } : {firstName: '', lastName: ''}}
+                lastName: userData.lastName,
+                universityObj: typeof userData?.university === 'string' ? {name: userData.university} : userData?.university || {},
+                countryCode: ""
+            } : {
+                firstName: '',
+                lastName: '',
+                universityObj: null,
+                countryCode: ""
+            }}
             enableReinitialize={true}
             validate={values => {
                 let errors = {};
@@ -58,11 +86,14 @@ const PersonalInfo = ({firebase, userData}) => {
                 } else if (!/^\D+$/i.test(values.lastName)) {
                     errors.lastName = 'Please enter a valid last name';
                 }
+                if (!values.universityObj) {
+                    errors.universityObj = 'Select a university or type "other"';
+                }
                 return errors;
             }}
             onSubmit={(values, {setSubmitting}) => {
                 setSubmitting(true);
-                firebase.setUserData(userData.id, values.firstName, values.lastName)
+                firebase.setUserData(userData.id, values.firstName, values.lastName, values.universityObj)
                     .then(() => {
                         // return push('/next-livestreams');
                         setSubmitting(false);
@@ -79,6 +110,7 @@ const PersonalInfo = ({firebase, userData}) => {
                   handleChange,
                   handleBlur,
                   handleSubmit,
+                  setFieldValue,
                   isSubmitting,
                   /* and other goodies */
               }) => userData ? (
@@ -100,39 +132,69 @@ const PersonalInfo = ({firebase, userData}) => {
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        autoComplete="fname"
-                                        name="firstName"
-                                        variant="outlined"
-                                        required
-                                        fullWidth
-                                        id="firstName"
-                                        label="First Name"
-                                        autoFocus
-                                        disabled={isSubmitting}
-                                        onBlur={handleBlur}
-                                        value={values.firstName}
-                                        error={Boolean(errors.firstName && touched.firstName && errors.firstName)}
-                                        onChange={handleChange}
-                                        helperText={errors.firstName && touched.firstName && errors.firstName}
-                                    />
+                                    <FormControl fullWidth>
+                                        <TextField
+                                            autoComplete="fname"
+                                            name="firstName"
+                                            variant="outlined"
+                                            required
+                                            fullWidth
+                                            id="firstName"
+                                            label="First Name"
+                                            autoFocus
+                                            disabled={isSubmitting}
+                                            onBlur={handleBlur}
+                                            value={values.firstName}
+                                            error={Boolean(errors.firstName && touched.firstName && errors.firstName)}
+                                            onChange={handleChange}
+                                        />
+                                        <Collapse
+                                            in={Boolean(errors.firstName && touched.firstName && errors.firstName)}>
+                                            <FormHelperText error>
+                                                {errors.firstName}
+                                            </FormHelperText>
+                                        </Collapse>
+                                    </FormControl>
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        variant="outlined"
-                                        required
-                                        fullWidth
-                                        id="lastName"
-                                        label="Last Name"
-                                        name="lastName"
-                                        autoComplete="lname"
-                                        disabled={isSubmitting}
-                                        onBlur={handleBlur}
-                                        value={values.lastName}
-                                        error={Boolean(errors.lastName && touched.lastName && errors.lastName)}
-                                        onChange={handleChange}
-                                        helperText={errors.lastName && touched.lastName && errors.lastName}
-                                    />
+                                    <FormControl fullWidth>
+                                        <TextField
+                                            variant="outlined"
+                                            required
+                                            fullWidth
+                                            id="lastName"
+                                            label="Last Name"
+                                            name="lastName"
+                                            autoComplete="lname"
+                                            disabled={isSubmitting}
+                                            onBlur={handleBlur}
+                                            value={values.lastName}
+                                            error={Boolean(errors.lastName && touched.lastName && errors.lastName)}
+                                            onChange={handleChange}
+                                        />
+                                        <Collapse
+                                            in={Boolean(errors.lastName && touched.lastName && errors.lastName)}>
+                                            <FormHelperText error>
+                                                {errors.lastName}
+                                            </FormHelperText>
+                                        </Collapse>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <UniversityCountrySelector value={values.countryCode}
+                                                               handleClose={handleClose}
+                                                               submitting={isSubmitting}
+                                                               handleChange={handleChange}
+                                                               handleOpen={handleOpen}
+                                                               open={open}/>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <UniversitySelector handleBlur={handleBlur}
+                                                        error={errors.universityObj && touched.universityObj && errors.universityObj}
+                                                        countryCode={values.countryCode}
+                                                        values={values}
+                                                        submitting={isSubmitting}
+                                                        setFieldValue={setFieldValue}/>
                                 </Grid>
                             </Grid>
                             <Button
