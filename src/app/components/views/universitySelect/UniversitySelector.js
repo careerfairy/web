@@ -6,6 +6,7 @@ import {withFirebase} from "../../../context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
+import {Collapse} from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     helperText: {
@@ -29,7 +30,7 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handle
                     const querySnapshot = await firebase.getUniversitiesFromCountryCode(countryCode)
                     const fetchedUniversities = querySnapshot.data().universities
                     const onlyUniNames = fetchedUniversities.map(obj => obj.name)
-                    setUniversities(onlyUniNames)
+                    setUniversities([...onlyUniNames, "other"])
                     return setLoading(false)
                 } catch (e) {
                     console.log("error in fetch universities", e)
@@ -72,9 +73,11 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handle
                     id="selectedUniversity"
                     name="selectedUniversity"
                     label="University"
-                    helperText={error}
+                    helperText={
+                        <Collapse in={Boolean(error)}>{error}</Collapse>
+                    }
                     disabled={submitting}
-                    FormHelperTextProps={{classes: {root: classes.helperText}}}
+                    // FormHelperTextProps={{classes: {root: classes.helperText}}}
                     variant="outlined"
                     InputProps={{
                         ...params.InputProps,
