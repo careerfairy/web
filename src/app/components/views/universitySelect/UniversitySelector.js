@@ -3,21 +3,12 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {withFirebase} from "../../../context/firebase";
-import {makeStyles} from "@material-ui/core/styles";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import {Collapse, FormControl, FormHelperText} from "@material-ui/core";
 
-const useStyles = makeStyles(theme => ({
-    helperText: {
-        position: "absolute",
-        bottom: -19
-    }
-}))
-
-const otherObj = {name: "other"}
+const otherObj = {name: "other", id: "other"}
 const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, error, handleBlur, submitting, values}) => {
-    const classes = useStyles()
     const [open, setOpen] = useState(false);
     const [universities, setUniversities] = useState([otherObj])
     const [loading, setLoading] = useState(false)
@@ -26,11 +17,15 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
         if (universityCountryCode && universityCountryCode.length) {
             (async () => {
                 try {
-                    setUniversities([])
+                    setUniversities([otherObj])
                     setLoading(true)
-                    const querySnapshot = await firebase.getUniversitiesFromCountryCode(universityCountryCode)
-                    const fetchedUniversities = querySnapshot.data().universities
-                    setUniversities([...fetchedUniversities, otherObj])
+                    if (universityCountryCode !== "OTHER") {
+                        const querySnapshot = await firebase.getUniversitiesFromCountryCode(universityCountryCode)
+                        const fetchedUniversities = querySnapshot.data().universities
+                        setUniversities([...fetchedUniversities, otherObj])
+                    } else {
+                        setFieldValue("university", "other")
+                    }
                     return setLoading(false)
                 } catch (e) {
                     console.log("error in fetch universities", e)
@@ -41,6 +36,8 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
             return () => setUniversities([otherObj])
         }
     }, [universityCountryCode]);
+
+
 
     const getSelectedItem = () => {// Autocomplete will always complain because of async filtering... :( So ignore the warning
         const item = universities.find((uni) => uni.id === values.university)
@@ -68,7 +65,6 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
             onClose={() => {
                 setOpen(false);
             }}
-            noOptionsText="No labels"
             getOptionLabel={(option) => option.name || ""}
             value={getSelectedItem()}
             options={universities}

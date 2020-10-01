@@ -20,8 +20,8 @@ const UniversityCountrySelector = ({handleClose, handleOpen, open, value, handle
                 value={value}
                 onChange={handleChange}
             >
-                <MenuItem value="">
-                    <em>Other</em>
+                <MenuItem value="OTHER">
+                    Other
                 </MenuItem>
                 <MenuItem value={"CH"}>Switzerland</MenuItem>
                 <MenuItem value={"AT"}>Austria</MenuItem>
