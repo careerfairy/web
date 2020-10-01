@@ -101,7 +101,7 @@ export function WebRTCAdaptor(initialValues)
 	thiz.playStreamId = new Array();
 	thiz.micGainNode = null;
 	thiz.localStream = null;
-	thiz.bandwidth = 900; //default bandwidth kbps
+	thiz.bandwidth = 600; //default bandwidth kbps
 	thiz.isMultiPeer = false; //used for multiple peer client
 	thiz.multiPeerStreamId = null;   //used for multiple peer client
 	thiz.roomTimerId = -1;
