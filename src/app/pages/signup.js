@@ -264,7 +264,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     } else if (values.lastName.length > 50) {
                         errors.lastName = 'Cannot be longer than 50 characters';
                     }
-                    if (!values.university.name) {
+                    if (!values.university) {
                         errors.university = 'Select a university or type "other"';
                     }
                     if (!values.password) {
