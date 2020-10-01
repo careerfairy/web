@@ -16,20 +16,19 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const otherObj = {name: "other"}
-const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handleBlur, submitting, values}) => {
+const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, error, handleBlur, submitting, values}) => {
     const classes = useStyles()
     const [open, setOpen] = useState(false);
-    const [universities, setUniversities] = useState([otherObj])
+    const [universities, setUniversities] = useState([])
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        if (countryCode && countryCode.length) {
-            console.log("countryCode", countryCode);
+        if (universityCountryCode && universityCountryCode.length) {
             (async () => {
                 try {
-                    setUniversities([otherObj])
+                    setUniversities([])
                     setLoading(true)
-                    const querySnapshot = await firebase.getUniversitiesFromCountryCode(countryCode)
+                    const querySnapshot = await firebase.getUniversitiesFromCountryCode(universityCountryCode)
                     const fetchedUniversities = querySnapshot.data().universities
                     setUniversities([...fetchedUniversities, otherObj])
                     return setLoading(false)
@@ -41,20 +40,26 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handle
 
             return () => setUniversities([otherObj])
         }
-    }, [countryCode]);
+    }, [universityCountryCode]);
+
+    const getSelectedItem = () => {// Autocomplete will always complain because of async filtering... :( So ignore the warning
+        const item = universities.find((uni) => uni.id === values.university)
+        return item || {}
+    }
 
     return (
         <Autocomplete
-            id="universityObj"
-            name="universityObj"
+            id="university"
+            name="university"
             fullWidth
             disabled={submitting}
             selectOnFocus
             onBlur={handleBlur}
             autoHighlight
             onChange={(e, value) => {
-                const uniObj = value || null
-                setFieldValue("universityObj", uniObj)
+                if (value) {
+                    setFieldValue("university", value.id)
+                }
             }}
             open={open}
             onOpen={() => {
@@ -63,9 +68,11 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handle
             onClose={() => {
                 setOpen(false);
             }}
-            getOptionSelected={(option, value) => option.name === value.name}
+            getOptionSelected={(option, value) => {
+             return (option.id === value) || ""
+            }}
             getOptionLabel={(option) => option.name || ""}
-            value={values.universityObj}
+            value={getSelectedItem()}
             options={universities}
             loading={loading}
             renderInput={(params) => (
@@ -73,8 +80,8 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handle
                     <TextField
                         {...params}
                         error={Boolean(error)}
-                        id="universityObj"
-                        name="universityObj"
+                        id="university"
+                        name="university"
                         label="University"
                         disabled={submitting}
                         variant="outlined"
