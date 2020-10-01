@@ -196,8 +196,6 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
     const [errorMessageShown, setErrorMessageShown] = useState(false);
     const [generalLoading, setGeneralLoading] = useState(false);
     const [formData, setFormData] = useState({})
-    const [options, setOptions] = useState([]);
-    const [countryCode, setCountryCode] = React.useState('');
     const [open, setOpen] = React.useState(false);
 
     useEffect(() => {
@@ -311,14 +309,14 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                       /* and other goodies */
                   }) => (
                     <form id='signUpForm' onSubmit={handleSubmit}>
-                        <Grid container spacing={3}>
+                        <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     autoComplete="fname"
                                     name="firstName"
                                     variant="outlined"
                                     fullWidth
-                                    FormHelperTextProps={{classes: {root: classes.helperText}}}
+                                    // FormHelperTextProps={{classes: {root: classes.helperText}}}
                                     id="firstName"
                                     label="First Name"
                                     autoFocus
@@ -328,7 +326,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     disabled={submitting(isSubmitting)}
                                     error={Boolean(errors.firstName && touched.firstName && errors.firstName)}
                                     onChange={handleChange}
-                                    helperText={errors.firstName && touched.firstName && errors.firstName}
+                                    helperText={<Collapse in={Boolean(errors.firstName && touched.firstName && errors.firstName)}>{errors.firstName}</Collapse>}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -340,22 +338,26 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     maxLength="50"
                                     label="Last Name"
                                     name="lastName"
-                                    FormHelperTextProps={{classes: {root: classes.helperText}}}
+                                    // FormHelperTextProps={{classes: {root: classes.helperText}}}
                                     autoComplete="lname"
                                     onBlur={handleBlur}
                                     disabled={submitting(isSubmitting)}
                                     value={values.lastName}
                                     error={Boolean(errors.lastName && touched.lastName && errors.lastName)}
                                     onChange={handleChange}
-                                    helperText={errors.lastName && touched.lastName && errors.lastName}
+                                    helperText={
+                                        <Collapse in={Boolean(errors.lastName && touched.lastName && errors.lastName)}>{errors.lastName}</Collapse>
+                                    }
                                 />
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
                                     variant="outlined"
                                     fullWidth
-                                    FormHelperTextProps={{classes: {root: classes.helperText}}}
-                                    helperText={errors.email && touched.email && errors.email}
+                                    // FormHelperTextProps={{classes: {root: classes.helperText}}}
+                                    helperText={
+                                        <Collapse in={Boolean(errors.email && touched.email && errors.email)}>{errors.email}</Collapse>
+                                    }
                                     error={Boolean(errors.email && touched.email)}
                                     autoComplete="email"
                                     id='emailInput'
@@ -392,9 +394,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     name='password'
                                     error={Boolean(errors.password && touched.password && errors.password)}
                                     helperText={
-                                        <Collapse
-                                        in={Boolean(errors.password && touched.password && errors.password)}>{errors.password
-                                        && touched.password && errors.password}</Collapse>
+                                        <Collapse in={Boolean(errors.password && touched.password && errors.password)}>{errors.password}</Collapse>
                                     }
                                     placeholder='Password'
                                     onChange={handleChange} onBlur={handleBlur}
@@ -409,7 +409,9 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     label="Confirm Password"
                                     autoComplete="current-password"
                                     error={Boolean(errors.confirmPassword && touched.confirmPassword && errors.confirmPassword)}
-                                    helperText={errors.confirmPassword && touched.confirmPassword && errors.confirmPassword}
+                                    helperText={
+                                        <Collapse in={Boolean(errors.confirmPassword && touched.confirmPassword && errors.confirmPassword)}>{errors.confirmPassword}</Collapse>
+                                    }
                                     id='confirmPasswordInput'
                                     type='password'
                                     name='confirmPassword'
@@ -437,7 +439,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                 />
                                 <Collapse in={Boolean(errors.agreeTerm && touched.agreeTerm && errors.agreeTerm)}>
                                     <FormHelperText error>
-                                        {errors.agreeTerm && touched.agreeTerm && errors.agreeTerm}
+                                        {errors.agreeTerm}
                                     </FormHelperText>
                                 </Collapse>
                             </Grid>
