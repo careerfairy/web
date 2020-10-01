@@ -205,9 +205,9 @@ const PersonalInfo = ({firebase, userData}) => {
                                     <UniversityCountrySelector value={values.universityCountryCode}
                                                                handleClose={handleClose}
                                                                submitting={isSubmitting}
+                                                               handleChange={handleChange}
                                                                error={errors.universityCountryCode && touched.universityCountryCode && errors.universityCountryCode}
                                                                handleBlur={handleBlur}
-                                                               handleChange={handleChange}
                                                                handleOpen={handleOpen}
                                                                open={open}/>
                                 </Grid>
