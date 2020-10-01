@@ -202,12 +202,12 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
         if (emailSent && user && !emailVerificationSent) {
             axios({
                 method: 'post',
-                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmailWithPinAndUpdateUserData',
+                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmailWithPinAndUpdateUserDataAndUni',
                 data: {
                     recipientEmail: user.email,
                     firstName: formData.firstName,
                     lastName: formData.lastName,
-                    university: formData.selectedUniversity,
+                    university: formData.universityObj || {},
                 }
             }).then(response => {
                 setEmailVerificationSent(true);
@@ -243,7 +243,6 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     password: '',
                     confirmPassword: '',
                     agreeTerm: false,
-                    selectedUniversity: '',
                     universityObj: null,
                     countryCode: ""
                 }}
@@ -318,7 +317,6 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                         name="firstName"
                                         variant="outlined"
                                         fullWidth
-                                        // FormHelperTextProps={{classes: {root: classes.helperText}}}
                                         id="firstName"
                                         label="First Name"
                                         autoFocus
@@ -347,7 +345,6 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                         maxLength="50"
                                         label="Last Name"
                                         name="lastName"
-                                        // FormHelperTextProps={{classes: {root: classes.helperText}}}
                                         autoComplete="lname"
                                         onBlur={handleBlur}
                                         disabled={submitting(isSubmitting)}
@@ -368,7 +365,6 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                     <TextField
                                         variant="outlined"
                                         fullWidth
-                                        // FormHelperTextProps={{classes: {root: classes.helperText}}}
                                         error={Boolean(errors.email && touched.email)}
                                         autoComplete="email"
                                         id='emailInput'
@@ -398,7 +394,6 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                 <UniversitySelector handleBlur={handleBlur}
                                                     error={errors.universityObj && touched.universityObj && errors.universityObj}
                                                     countryCode={values.countryCode}
-                                                    values={values}
                                                     submitting={submitting(isSubmitting)}
                                                     setFieldValue={setFieldValue}/>
                             </Grid>
