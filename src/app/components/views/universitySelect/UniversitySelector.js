@@ -44,7 +44,7 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
 
     const getSelectedItem = () => {// Autocomplete will always complain because of async filtering... :( So ignore the warning
         const item = universities.find((uni) => uni.id === values.university)
-        return item || otherObj
+        return item || {}
     }
 
     return (
@@ -80,6 +80,7 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
                         error={Boolean(error)}
                         id="university"
                         name="university"
+                        onBlur={handleBlur}
                         label="University"
                         disabled={submitting}
                         variant="outlined"

@@ -279,6 +279,9 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     if (!values.agreeTerm) {
                         errors.agreeTerm = 'Please agree to our T&C and our Privacy Policy';
                     }
+                    if (!values.universityCountryCode) {
+                        errors.universityCountryCode = 'Please chose a country code';
+                    }
                     return errors;
                 }}
                 onSubmit={(values, {setSubmitting}) => {
@@ -387,13 +390,16 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                                            handleClose={handleClose}
                                                            submitting={submitting(isSubmitting)}
                                                            handleChange={handleChange}
+                                                           error={errors.universityCountryCode && touched.universityCountryCode && errors.universityCountryCode}
                                                            handleOpen={handleOpen}
+                                                           handleBlur={handleBlur}
                                                            open={open}/>
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <UniversitySelector handleBlur={handleBlur}
                                                     error={errors.university && touched.university && errors.university}
                                                     universityCountryCode={values.universityCountryCode}
+                                                    values={values}
                                                     submitting={submitting(isSubmitting)}
                                                     setFieldValue={setFieldValue}/>
                             </Grid>

@@ -73,6 +73,21 @@ const ProfileNav = ({userData, firebase}) => {
         setValue(index);
     };
 
+    const views = [
+        <TabPanel key={0} value={value} index={0} dir={theme.direction}>
+            <PersonalInfo userData={userData}/>
+        </TabPanel>,
+        <TabPanel key={1} value={value} index={1} dir={theme.direction}>
+            <JoinedGroups userData={userData}/>
+        </TabPanel>
+    ]
+
+    if (adminGroups.length) {
+    views.push(<TabPanel key={2} value={value} index={2} dir={theme.direction}>
+                        <AdminGroups userData={userData} adminGroups={adminGroups}/>
+                    </TabPanel>)
+}
+
     return (
         <Container style={{marginTop: '50px', flex: 1}}>
             <AppBar className={classes.bar} position="static" color="default">
@@ -85,14 +100,14 @@ const ProfileNav = ({userData, firebase}) => {
                     centered
                 >
                     <Tab wrapped fullWidth
-                        label={<Typography noWrap
-                            variant="h5">{native ? "Personal" : "Personal Information"}</Typography>}/>
+                         label={<Typography noWrap
+                                            variant="h5">{native ? "Personal" : "Personal Information"}</Typography>}/>
                     <Tab wrapped fullWidth
-                        label={<Typography variant="h5">{native ? "Groups" : "Joined Groups"}</Typography>}/>
-                    { adminGroups.length && 
-                    <Tab wrapped fullWidth
-                        label={<Typography
-                            variant="h5">{native ? "Admin" : "Admin Groups"}</Typography>}/>}
+                         label={<Typography variant="h5">{native ? "Groups" : "Joined Groups"}</Typography>}/>
+                    {adminGroups.length ?
+                        <Tab wrapped fullWidth
+                             label={<Typography
+                                 variant="h5">{native ? "Admin" : "Admin Groups"}</Typography>}/> : null}
                 </Tabs>
             </AppBar>
             <SwipeableViews
@@ -100,16 +115,7 @@ const ProfileNav = ({userData, firebase}) => {
                 index={value}
                 onChangeIndex={handleChangeIndex}
             >
-                <TabPanel value={value} index={0} dir={theme.direction}>
-                    <PersonalInfo userData={userData}/>
-                </TabPanel>
-                <TabPanel value={value} index={1} dir={theme.direction}>
-                    <JoinedGroups userData={userData}/>
-                </TabPanel>
-                { adminGroups.length && 
-                <TabPanel value={value} index={2} dir={theme.direction}>
-                    <AdminGroups userData={userData} adminGroups={adminGroups}/>
-                </TabPanel>}
+                {views}
             </SwipeableViews>
         </Container>
     );
