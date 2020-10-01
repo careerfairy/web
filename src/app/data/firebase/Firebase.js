@@ -43,6 +43,11 @@ class Firebase {
         return ref.get()
     }
 
+    getUniversitiesFromCountryCode = (countryCode) => {
+        let ref = this.firestore.collection("universitiesByCountry").doc(countryCode)
+        return ref.get()
+    }
+
     // *** Firestore API ***
 
   // USER
