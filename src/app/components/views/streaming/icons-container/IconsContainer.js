@@ -24,10 +24,10 @@ function IconsContainer({ livestreamId, firebase }) {
 
     useEffect(() => {
         if (postedIcons.length) {
-            if (filteredIcons.length < 50) {
+            if (filteredIcons.length < 250) {
                 setFilteredIcons([...filteredIcons, postedIcons[postedIcons.length - 1]]);
             } else {
-                setFilteredIcons([...filteredIcons.slice(filteredIcons.length - 50), postedIcons[postedIcons.length - 1]]);
+                setFilteredIcons([...filteredIcons.slice(filteredIcons.length - 150), postedIcons[postedIcons.length - 1]]);
             }
         }
     }, [postedIcons]);
