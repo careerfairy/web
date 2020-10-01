@@ -19,12 +19,12 @@ import UniversityCountrySelector from "../../universitySelect/UniversityCountryS
 import UniversitySelector from "../../universitySelect/UniversitySelector";
 
 const LightTooltip = withStyles((theme) => ({
-  tooltip: {
-    backgroundColor: theme.palette.primary.main,
-    color: "white",
-    boxShadow: theme.shadows[1],
-    fontSize: "1rem",
-  },
+    tooltip: {
+        backgroundColor: theme.palette.primary.main,
+        color: "white",
+        boxShadow: theme.shadows[1],
+        fontSize: "1rem",
+    },
 }))(Tooltip);
 
 const useStyles = makeStyles((theme) => ({
@@ -83,13 +83,13 @@ const PersonalInfo = ({firebase, userData}) => {
             initialValues={userData && userData.firstName ? {
                 firstName: userData.firstName,
                 lastName: userData.lastName,
-                university: userData.university || "",
-                universityCountryCode: userData.universityCountryCode || ""
+                university: userData.university,
+                universityCountryCode: userData.universityCountryCode
             } : {
                 firstName: '',
                 lastName: '',
-                university: "",
-                universityCountryCode: ""
+                university: '',
+                universityCountryCode: ''
             }}
             enableReinitialize={true}
             validate={values => {
@@ -106,6 +106,9 @@ const PersonalInfo = ({firebase, userData}) => {
                 }
                 if (!values.university) {
                     errors.university = 'Select a university or type "other"';
+                }
+                if (!values.universityCountryCode) {
+                    errors.universityCountryCode = 'Please chose a country code';
                 }
                 return errors;
             }}
@@ -202,6 +205,8 @@ const PersonalInfo = ({firebase, userData}) => {
                                     <UniversityCountrySelector value={values.universityCountryCode}
                                                                handleClose={handleClose}
                                                                submitting={isSubmitting}
+                                                               error={errors.universityCountryCode && touched.universityCountryCode && errors.universityCountryCode}
+                                                               handleBlur={handleBlur}
                                                                handleChange={handleChange}
                                                                handleOpen={handleOpen}
                                                                open={open}/>

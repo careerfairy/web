@@ -19,7 +19,7 @@ const otherObj = {name: "other"}
 const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, error, handleBlur, submitting, values}) => {
     const classes = useStyles()
     const [open, setOpen] = useState(false);
-    const [universities, setUniversities] = useState([])
+    const [universities, setUniversities] = useState([otherObj])
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
@@ -44,7 +44,7 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
 
     const getSelectedItem = () => {// Autocomplete will always complain because of async filtering... :( So ignore the warning
         const item = universities.find((uni) => uni.id === values.university)
-        return item || {}
+        return item || otherObj
     }
 
     return (
@@ -68,9 +68,7 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
             onClose={() => {
                 setOpen(false);
             }}
-            getOptionSelected={(option, value) => {
-             return (option.id === value) || ""
-            }}
+            noOptionsText="No labels"
             getOptionLabel={(option) => option.name || ""}
             value={getSelectedItem()}
             options={universities}
