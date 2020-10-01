@@ -207,7 +207,8 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     recipientEmail: user.email,
                     firstName: formData.firstName,
                     lastName: formData.lastName,
-                    university: formData.university || {},
+                    university: formData.university,
+                    universityCountryCode: formData.universityCountryCode,
                 }
             }).then(response => {
                 setEmailVerificationSent(true);
@@ -243,8 +244,8 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     password: '',
                     confirmPassword: '',
                     agreeTerm: false,
-                    university: {},
-                    universityCountryCode: ""
+                    university: '',
+                    universityCountryCode: ''
                 }}
                 validate={values => {
                     let errors = {};

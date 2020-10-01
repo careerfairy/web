@@ -113,8 +113,7 @@ const ProfileNav = ({userData, firebase}) => {
             <SwipeableViews
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
-                onChangeIndex={handleChangeIndex}
-            >
+                onChangeIndex={handleChangeIndex}>
                 {views}
             </SwipeableViews>
         </Container>
