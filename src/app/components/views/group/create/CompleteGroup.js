@@ -44,15 +44,9 @@ const CompleteGroup = ({handleBack, baseGroupInfo, createCareerCenter, arrayOfCa
     const [submitting, setSubmitting] = useState(false)
     const classes = useStyles();
 
-    const {push} = useRouter()
-
     const handleFinalize = async () => {
         setSubmitting(true)
-        createCareerCenter().then(careerCenterRef => {
-            const ID = careerCenterRef.id
-            setSubmitting(false)
-            push(`/group/${ID}/admin`)
-        })
+        createCareerCenter()
     }
 
     const categories = arrayOfCategories.map((category, index) => {
@@ -91,6 +85,7 @@ const CompleteGroup = ({handleBack, baseGroupInfo, createCareerCenter, arrayOfCa
                     <div className="category-wrapper">
                         {categories}
                     </div>
+                    { categories.length === 0 && <Typography>No categories</Typography>}
                     <div className={classes.actions}>
                         <Typography gutterBottom align="center">
                             Are you satisfied?

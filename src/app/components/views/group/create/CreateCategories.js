@@ -44,7 +44,6 @@ const useStyles = makeStyles((theme) => ({
 const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCategory, handleAddTempCategory, handleNext, arrayOfCategories}) => {
     const classes = useStyles()
     const [createMode, setCreateMode] = useState(false)
-    const [notEnoughCategories, setNotEnoughCategories] = useState(false)
 
     useEffect(() => {
         if (!arrayOfCategories.length) {
@@ -58,9 +57,6 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
         }
     })
 
-    useEffect(() => {
-        if (notEnoughCategories && arrayOfCategories.length > 0) setNotEnoughCategories(false)
-    }, [arrayOfCategories.length])
     const groupId = "temp"
 
     const categoryElements = arrayOfCategories.map((category, index) => {
@@ -74,7 +70,6 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
     })
 
     const verifyNext = () => {
-        if (arrayOfCategories.length < 1) return setNotEnoughCategories(true)
         handleNext()
     }
 
@@ -106,9 +101,6 @@ const CreateCategories = ({handleBack, handleDeleteLocalCategory, handleUpdateCa
                               newCategory={true}
                               setEditMode={setCreateMode}/>}
                 {categoryElements}
-                {notEnoughCategories && <Typography className={classes.error}>
-                    You need at least one category
-                </Typography>}
             </Box>
             <Box className={classes.buttons}>
                 <Button

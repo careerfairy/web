@@ -139,9 +139,8 @@ class Firebase {
     return ref.get();
   };
 
-  createCareerCenter = (careerCenter) => {
-    let ref = this.firestore.collection("careerCenterData").doc();
-    careerCenter.groupId = ref.id;
+  createCareerCenter = (careerCenter) => { 
+    let ref = this.firestore.collection("careerCenterData");
     return ref.add(careerCenter);
   }
 
@@ -399,11 +398,11 @@ class Firebase {
     }
 
     listenToLiveStreamsByGroupId = (groupId, callback) => {
-        const currentTime = new Date();
+      var thirtyMinutesInMilliseconds = 1000 * 60 * 45;
         let ref = this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
-            .where("start", ">", currentTime)
+            .where("start", ">", new Date(Date.now() - thirtyMinutesInMilliseconds))
             .orderBy("start", "asc")
         return ref.onSnapshot(callback)
     }
@@ -981,7 +980,7 @@ class Firebase {
   };
 
   listenToUpcomingLivestreams = (callback) => {
-    var thirtyMinutesInMilliseconds = 1000 * 60 * 30;
+    var thirtyMinutesInMilliseconds = 1000 * 60 * 45;
     let ref = this.firestore
       .collection("livestreams")
       .where("start", ">", new Date(Date.now() - thirtyMinutesInMilliseconds))

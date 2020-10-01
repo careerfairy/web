@@ -115,7 +115,11 @@ const CreateGroup = ({firebase}) => {
                 test: false,
                 categories: arrayOfCategories
             }
-            return firebase.createCareerCenter(careerCenter)
+            let ref = await firebase.createCareerCenter(careerCenter);
+            firebase.updateCareerCenter(ref.id, { groupId: ref.id }).then(() =>{
+                router.push(`/group/${ref.id}/admin`)
+            })
+
             // const careerCenterId = careerCenterRef.id
             // await firebase.addMultipleGroupCategoryWithElements(careerCenterRef.id, arrayOfCategories)
             // return careerCenterId
