@@ -4,11 +4,11 @@ import {FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
 const UniversityCountrySelector = ({handleClose, handleOpen, open, value, handleChange, submitting}) => {
     return (
         <FormControl disabled={submitting} fullWidth variant="outlined">
-            <InputLabel id="countryCode">Select Country of University</InputLabel>
+            <InputLabel id="universityCountryCode">Select Country of University</InputLabel>
             <Select
-                id="countryCode"
-                labelId="countryCode"
-                name="countryCode"
+                id="universityCountryCode"
+                labelId="universityCountryCode"
+                name="universityCountryCode"
                 label="Select Country of University"
                 open={open}
                 variant="outlined"

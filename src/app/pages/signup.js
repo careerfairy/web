@@ -207,7 +207,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     recipientEmail: user.email,
                     firstName: formData.firstName,
                     lastName: formData.lastName,
-                    university: formData.universityObj || {},
+                    university: formData.university || {},
                 }
             }).then(response => {
                 setEmailVerificationSent(true);
@@ -243,8 +243,8 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     password: '',
                     confirmPassword: '',
                     agreeTerm: false,
-                    universityObj: null,
-                    countryCode: ""
+                    university: {},
+                    universityCountryCode: ""
                 }}
                 validate={values => {
                     let errors = {};
@@ -263,8 +263,8 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     } else if (values.lastName.length > 50) {
                         errors.lastName = 'Cannot be longer than 50 characters';
                     }
-                    if (!values.universityObj) {
-                        errors.universityObj = 'Select a university or type "other"';
+                    if (!values.university.name) {
+                        errors.university = 'Select a university or type "other"';
                     }
                     if (!values.password) {
                         errors.password = 'A password is required';
@@ -383,7 +383,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <UniversityCountrySelector value={values.countryCode}
+                                <UniversityCountrySelector value={values.universityCountryCode}
                                                            handleClose={handleClose}
                                                            submitting={submitting(isSubmitting)}
                                                            handleChange={handleChange}
@@ -392,8 +392,8 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <UniversitySelector handleBlur={handleBlur}
-                                                    error={errors.universityObj && touched.universityObj && errors.universityObj}
-                                                    countryCode={values.countryCode}
+                                                    error={errors.university && touched.university && errors.university}
+                                                    universityCountryCode={values.universityCountryCode}
                                                     submitting={submitting(isSubmitting)}
                                                     setFieldValue={setFieldValue}/>
                             </Grid>
