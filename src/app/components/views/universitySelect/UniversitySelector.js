@@ -6,7 +6,7 @@ import {withFirebase} from "../../../context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
-import {Collapse} from "@material-ui/core";
+import {Collapse, FormControl, FormHelperText} from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     helperText: {
@@ -15,22 +15,23 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handleBlur, submitting}) => {
+const otherObj = {name: "other"}
+const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handleBlur, submitting, values}) => {
+    console.log("values", values);
     const classes = useStyles()
     const [open, setOpen] = useState(false);
-    const [universities, setUniversities] = useState(["other"])
+    const [universities, setUniversities] = useState([otherObj])
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         if (countryCode && countryCode.length) {
             (async () => {
                 try {
-                    setUniversities(["other"])
+                    setUniversities([otherObj])
                     setLoading(true)
                     const querySnapshot = await firebase.getUniversitiesFromCountryCode(countryCode)
                     const fetchedUniversities = querySnapshot.data().universities
-                    const onlyUniNames = fetchedUniversities.map(obj => obj.name)
-                    setUniversities([...onlyUniNames, "other"])
+                    setUniversities([...fetchedUniversities, otherObj])
                     return setLoading(false)
                 } catch (e) {
                     console.log("error in fetch universities", e)
@@ -38,22 +39,22 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handle
                 }
             })()
 
-            return () => setUniversities(["other"])
+            return () => setUniversities([otherObj])
         }
     }, [countryCode]);
 
     return (
         <Autocomplete
-            id="selectedUniversity"
-            name="selectedUniversity"
+            id="universityObj"
+            name="universityObj"
             fullWidth
             disabled={submitting}
             selectOnFocus
             onBlur={handleBlur}
             autoHighlight
             onChange={(e, value) => {
-                let name = value || ""
-                setFieldValue("selectedUniversity", name)
+                const uniObj = value || null
+                setFieldValue("universityObj", uniObj)
             }}
             open={open}
             onOpen={() => {
@@ -62,39 +63,45 @@ const UniversitySelector = ({firebase, countryCode, setFieldValue, error, handle
             onClose={() => {
                 setOpen(false);
             }}
-            getOptionSelected={(option, value) => option === value}
-            getOptionLabel={(option) => option || ""}
+            getOptionSelected={(option, value) => option.name === value.name}
+            getOptionLabel={(option) => option.name || ""}
             options={universities}
             loading={loading}
             renderInput={(params) => (
-                <TextField
-                    {...params}
-                    error={Boolean(error)}
-                    id="selectedUniversity"
-                    name="selectedUniversity"
-                    label="University"
-                    helperText={
-                        <Collapse in={Boolean(error)}>{error}</Collapse>
-                    }
-                    disabled={submitting}
-                    // FormHelperTextProps={{classes: {root: classes.helperText}}}
-                    variant="outlined"
-                    InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                            <React.Fragment>
-                                {loading ? <CircularProgress color="inherit" size={20}/> : null}
-                                {params.InputProps.endAdornment}
-                            </React.Fragment>
-                        ),
-                    }}
-                />
+                <FormControl error={Boolean(error)} fullWidth>
+                    <TextField
+                        {...params}
+                        error={Boolean(error)}
+                        id="universityObj"
+                        name="universityObj"
+                        label="University"
+                        disabled={submitting}
+                        // FormHelperTextProps={{classes: {root: classes.helperText}}}
+                        variant="outlined"
+                        InputProps={{
+                            ...params.InputProps,
+                            endAdornment: (
+                                <React.Fragment>
+                                    {loading ? <CircularProgress color="inherit" size={20}/> : null}
+                                    {params.InputProps.endAdornment}
+                                </React.Fragment>
+                            ),
+                        }}
+                    />
+                    <Collapse
+                        in={Boolean(error)}>
+                        <FormHelperText>
+                            {error}
+                        </FormHelperText>
+                    </Collapse>
+                </FormControl>
             )}
             renderOption={(option, {inputValue}) => {
-                const matches = match(option, inputValue);
-                const parts = parse(option, matches);
+                const matches = match(option.name, inputValue);
+                const parts = parse(option.name, matches);
                 return (<div>
-                        {parts.map((part, index) => (<span key={index} style={{fontWeight: part.highlight ? 700 : 400}}>{part.text}</span>))}
+                        {parts.map((part, index) => (
+                            <span key={index} style={{fontWeight: part.highlight ? 700 : 400}}>{part.text}</span>))}
                     </div>
                 );
             }}
