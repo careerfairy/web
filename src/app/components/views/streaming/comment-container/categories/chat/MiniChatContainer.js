@@ -59,7 +59,7 @@ function MiniChatContainer(props) {
     }, [open])
 
     function addNewChatEntry() {
-        if (!(newChatEntry.trim()) || (!userData && !props.livestream.test)) {
+        if (!(newChatEntry.trim()) || (!userData && !props.livestream.test && !props.isStreamer)) {
             return;
         }
 
