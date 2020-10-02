@@ -1,8 +1,8 @@
-import React, {Fragment} from 'react'
+import React, {Fragment} from 'react'
 import {Image, Icon, Button} from "semantic-ui-react";
 
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import {useRouter} from 'next/router';
 
 const LandingHeader = (props) => {
 
@@ -16,17 +16,26 @@ const LandingHeader = (props) => {
         <Fragment>
             <header id='main-header'>
                 <ul id='left-menu' className='float-left'>
-                    <li><Icon id='sidebar-toggle' style={{ display: 'inline-block', cursor: 'pointer' }} name='bars' size='big' onClick={props.toggleSideBar}/></li>
-                    <li><Link href='/'><a><Image src='/logo_white.png' style={{ width: '150px', display: 'inline-block', marginTop: '10px', marginLeft: '10px'}}/></a></Link></li>
+                    <li><Icon id='sidebar-toggle' style={{display: 'inline-block', cursor: 'pointer'}} name='bars'
+                              size='big' onClick={props.toggleSideBar}/></li>
+                    <li><Link href='/'><a><Image src='/logo_white.png' style={{
+                        width: '150px',
+                        display: 'inline-block',
+                        marginTop: '10px',
+                        marginLeft: '10px'
+                    }}/></a></Link></li>
                 </ul>
                 <ul id='middle-menu' className={'centered-menu white'}>
-                    <li className={props.page === 'landing' ? 'active' : ''}><Link href='/'><a>For Students</a></Link></li>
+                    <li className={props.page === 'landing' ? 'active' : ''}><Link href='/'><a>For Students</a></Link>
+                    </li>
                     <li><a href='https://corporate.careerfairy.io/companies'>For Companies</a></li>
                     <li><a href='https://corporate.careerfairy.io/career-center'>For Career Centers</a></li>
                 </ul>
                 <div id='right-menu' className={'float-right white'}>
-                    <Button primary style={{ position: 'relative', zIndex: '1000'}} onClick={() => { goToRoute( props.authenticated ? '/profile' : '/login')} }>{ props.authenticated ? 'My Profile' : 'Log in'}</Button>
-                </div> 
+                    <Button color="primary" variant="contained"
+                            style={{ position: 'relative', zIndex: '1000', fontWeight: 600}}
+                            onClick={() => { goToRoute( props.authenticated ? '/profile' : '/login')} }>{ props.authenticated ? 'My Profile' : 'Log in'}</Button>
+                </div>
             </header>
             <style jsx>{`
                 #main-header {

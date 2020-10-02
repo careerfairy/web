@@ -258,11 +258,15 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                         errors.firstName = 'Your first name is required';
                     } else if (values.firstName.length > 50) {
                         errors.firstName = 'Cannot be longer than 50 characters';
+                    } else if (!/^\D+$/i.test(values.firstName)) {
+                        errors.firstName = 'Please enter a valid first name';
                     }
                     if (!values.lastName) {
                         errors.lastName = 'Your last name is required';
                     } else if (values.lastName.length > 50) {
                         errors.lastName = 'Cannot be longer than 50 characters';
+                    } else if (!/^\D+$/i.test(values.lastName)) {
+                        errors.lastName = 'Please enter a valid last name';
                     }
                     if (!values.university) {
                         errors.university = 'Select a university or type "other"';

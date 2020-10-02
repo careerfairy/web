@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {Formik} from 'formik';
-import {useRouter} from 'next/router';
 
 import {withFirebase} from 'context/firebase';
 import {makeStyles, withStyles} from "@material-ui/core/styles";
@@ -24,6 +23,9 @@ const LightTooltip = withStyles((theme) => ({
         color: "white",
         boxShadow: theme.shadows[1],
         fontSize: "1rem",
+        "& .MuiTooltip-arrow": {
+            color: theme.palette.primary.main,
+        }
     },
 }))(Tooltip);
 
@@ -98,11 +100,15 @@ const PersonalInfo = ({firebase, userData}) => {
                     errors.firstName = 'Required';
                 } else if (!/^\D+$/i.test(values.firstName)) {
                     errors.firstName = 'Please enter a valid first name';
+                } else if (values.firstName.length > 50) {
+                    errors.firstName = 'Cannot be longer than 50 characters';
                 }
                 if (!values.lastName) {
                     errors.lastName = 'Required';
                 } else if (!/^\D+$/i.test(values.lastName)) {
                     errors.lastName = 'Please enter a valid last name';
+                } else if (values.lastName.length > 50) {
+                    errors.lastName = 'Cannot be longer than 50 characters';
                 }
                 if (!values.university) {
                     errors.university = 'Select a university or type "other"';
