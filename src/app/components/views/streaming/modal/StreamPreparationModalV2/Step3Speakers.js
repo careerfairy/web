@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Step3Speakers = () => {
+const Step3Speakers = ({setSpeakerSource, speakerSource}) => {
     return (
         <div>
             

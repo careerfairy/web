@@ -26,6 +26,7 @@ function VideoContainer(props) {
 
     const [mediaConstraints, setMediaConstraints] = useState(null);
     const [audioSource, setAudioSource] = useState(null);
+    const [speakerSource, setSpeakerSource] = useState(null);
     const [videoSource, setVideoSource] = useState(null);
 
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
@@ -177,7 +178,7 @@ function VideoContainer(props) {
             }
           };
         setMediaConstraints(constraints);
-    },[audioSource, videoSource]);
+    },[audioSource, videoSource, speakerSource]);
 
     useEffect(() => {
         if (webRTCAdaptor) {
@@ -254,7 +255,7 @@ function VideoContainer(props) {
                 </Modal.Content>
             </Modal>
             {/*<StreamPreparationModal streamerReady={streamerReady} setStreamerReady={setStreamerReady} localStream={localStream} mediaConstraints={mediaConstraints} connectionEstablished={connectionEstablished} setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage} isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource} videoSource={videoSource} setVideoSource={setVideoSource}/>*/}
-            <StreamPreparationModalV2 streamerReady={streamerReady} setStreamerReady={setStreamerReady} localStream={localStream} mediaConstraints={mediaConstraints} connectionEstablished={connectionEstablished} setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage} isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource} videoSource={videoSource} setVideoSource={setVideoSource}/>
+            <StreamPreparationModalV2 speakerSource={speakerSource} setSpeakerSource={setSpeakerSource} streamerReady={streamerReady} setStreamerReady={setStreamerReady} localStream={localStream} mediaConstraints={mediaConstraints} connectionEstablished={connectionEstablished} setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage} isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource} videoSource={videoSource} setVideoSource={setVideoSource}/>
             <style jsx>{`
                 .screen-container {
                     position: absolute;                 

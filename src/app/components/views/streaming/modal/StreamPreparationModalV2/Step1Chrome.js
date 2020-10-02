@@ -1,6 +1,6 @@
 import React from 'react';
 import {Button, Icon} from "semantic-ui-react";
-import {DialogContent, Typography} from "@material-ui/core";
+import {Box, DialogContent, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 
 const chromeLogo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fchrome.svg?alt=media&token=516e705a-bafa-4a43-99f7-e184cc85b557"
@@ -17,8 +17,11 @@ const Step1Chrome = ({setShowAudioVideo}) => {
             <Typography variant="h5">Preparation</Typography>
             <Typography variant="subtitle1">Please follow these couple of instructions to ensure a smooth streaming
                 experience:</Typography>
+            <Box display="flex" flexDirection="column" alignItems="center" m={1} elevation={2}>
+                <img style={{marginBottom: 10}} alt="chrome logo" className={classes.svg} src={chromeLogo}/><Typography align="center"><strong>PLEASE USE</strong> the latest Google
+                Chrome desktop browser (v. 80 and newer).</Typography>
+            </Box>
             <ul className='list'>
-                <li><img alt="chrome logo" className={classes.svg} src={chromeLogo}/>Use the latest Google Chrome desktop browser (v. 80 and newer).</li>
                 <li><Icon name='video'/>Make sure that your browser is authorized to access your webcam and
                     microphone.
                 </li>

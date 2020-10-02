@@ -16,9 +16,12 @@ import Step from "@material-ui/core/Step";
 import StepLabel from "@material-ui/core/StepLabel";
 import Step1Chrome from "./Step1Chrome";
 import Step2Camera from "./Step2Camera";
+import Step3Speakers from "./Step3Speakers";
+import Step4Mic from "./Step4Mic";
+import Step5Confirm from "./Step5Confirm";
 
 function getSteps() {
-    return ['Google Chrome', 'Setup Camera', 'Setup Microphone', 'Setup Speakers', 'Confirm'];
+    return ['Google Chrome', 'Setup Camera', 'Setup Speakers', 'Setup Microphone', 'Confirm'];
 }
 
 
@@ -36,27 +39,32 @@ const StreamPreparationModalV2 = ({
                                       setStreamerReady,
                                       localStream,
                                       mediaConstraints,
-                                      connectionEstablished, setConnectionEstablished, errorMessage, isStreaming, audioSource, setAudioSource, videoSource, setVideoSource
+                                      connectionEstablished,
+                                      setConnectionEstablished,
+                                      errorMessage,
+                                      isStreaming,
+                                      audioSource,
+                                      setAudioSource,
+                                      videoSource,
+                                      setVideoSource,
+                                      setSpeakerSource,
+                                      speakerSource
                                   }) => {
-
     const [showAudioVideo, setShowAudioVideo] = useState(false);
     const [playSound, setPlaySound] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
-    const testVideoRef = useRef(null);
+    console.log("activeStep", activeStep);
     const devices = useUserMedia(showAudioVideo);
     const audioLevel = useSoundMeter(showAudioVideo, localStream);
 
     const steps = getSteps();
 
     useEffect(() => {
-        if (localStream) {
-            testVideoRef.current.srcObject = localStream;
-        }
-    }, [localStream]);
-
-    useEffect(() => {
         if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
             setAudioSource(devices.audioInputList[0].value);
+        }
+        if (!audioSource && devices.audioOutputList && devices.audioOutputList.length > 0) {
+            setSpeakerSource(devices.audioOutputList[0].value);
         }
         if (!videoSource && devices.videoDeviceList && devices.videoDeviceList.length > 0) {
             setVideoSource(devices.videoDeviceList[0].value);
@@ -69,9 +77,9 @@ const StreamPreparationModalV2 = ({
         } else if (!streamerReady && showAudioVideo && !connectionEstablished) {
             setActiveStep(1)
         } else if (streamerReady && !connectionEstablished) {
-            setActiveStep(3)
+            setActiveStep(4)
         }
-    }, [])
+    }, [streamerReady, showAudioVideo, connectionEstablished])
 
     function getStepContent(stepIndex) {
         switch (stepIndex) {
@@ -79,9 +87,9 @@ const StreamPreparationModalV2 = ({
                 return <Step1Chrome setShowAudioVideo={setShowAudioVideo}/>;
             case 1:
                 return <Step2Camera audioLevel={audioLevel}
-                                    testVideoRef={testVideoRef}
                                     audioSource={audioSource}
                                     devices={devices}
+                                    localStream={localStream}
                                     playSound={playSound}
                                     setAudioSource={setAudioSource}
                                     setPlaySound={setPlaySound}
@@ -89,7 +97,14 @@ const StreamPreparationModalV2 = ({
                                     setVideoSource={setVideoSource}
                                     videoSource={videoSource}/>;
             case 2:
-                return <h1>step 3</h1>
+                return <Step3Speakers setSpeakerSource
+                                      speakerSource/>
+            case 3:
+                return <Step4Mic setSpeakerSource
+                                      speakerSource/>
+            case 4:
+                return <Step5Confirm setSpeakerSource
+                                      speakerSource/>
             default:
                 return 'Unknown stepIndex';
         }
@@ -101,35 +116,8 @@ const StreamPreparationModalV2 = ({
                          id="draggable-dialog-title">
                 <h3 style={{color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3>
             </DialogTitle>
-
             {getStepContent(activeStep)}
 
-            <DialogContent hidden={!(streamerReady && !connectionEstablished)}
-                           style={{textAlign: 'center', padding: '40px'}}>
-                <div
-                    style={{display: (streamerReady && !isStreaming && !errorMessage) ? 'block' : 'none'}}>
-                    <Image src='/loader.gif' style={{width: '50px', height: 'auto', margin: '0 auto'}}/>
-                    <div>Attempting to connect...</div>
-                </div>
-                <div style={{display: isStreaming ? 'block' : 'none'}}>
-                    <Icon name='check circle outline'
-                          style={{color: 'rgb(0, 210, 170)', fontSize: '3em', margin: '0 auto'}}/>
-                    <h3>You are ready to stream!</h3>
-                    <div>Your stream will go live once you press "Start Streaming".</div>
-                    <Button content='Continue' style={{marginTop: '20px'}} primary
-                            onClick={() => setConnectionEstablished(true)}/>
-                </div>
-                <div style={{display: errorMessage ? 'block' : 'none'}}>
-                    <Icon name='frown outline' style={{color: 'rgb(240, 30, 0)', fontSize: '3em', margin: '0 auto'}}/>
-                    <h3>An error occured with the following message:</h3>
-                    <div>{errorMessage}</div>
-                    <Button content='Try again' style={{margin: '20px 0'}} primary onClick={() => {
-                        window.location.reload(false)
-                    }}/>
-                    <p>If anything is unclear or not working, please <a href='mailto:thomas@careerfairy.io'>contact
-                        us</a>!</p>
-                </div>
-            </DialogContent>
             <DialogContent>
                 <Stepper activeStep={activeStep} alternativeLabel>
                     {steps.map((label) => (

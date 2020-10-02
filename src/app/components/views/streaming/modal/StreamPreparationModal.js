@@ -18,11 +18,7 @@ function StreamPreparationModal(props) {
 
     const [playSound, setPlaySound] = useState(true);
 
-    useEffect(() => {
-        if (props.localStream) {
-            testVideoRef.current.srcObject = props.localStream;
-        }
-    },[props.localStream]);
+
 
     useEffect(() => {
         if (!props.audioSource && devices.audioInputList && devices.audioInputList.length > 0) {

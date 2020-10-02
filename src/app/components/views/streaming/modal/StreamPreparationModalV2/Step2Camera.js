@@ -1,9 +1,16 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {Button, Dropdown, Grid, Icon} from "semantic-ui-react";
 import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
 import {DialogContent} from "@material-ui/core";
 
-const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudioSource, playSound, setPlaySound, setStreamerReady, testVideoRef, audioLevel}) => {
+const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudioSource, playSound, setPlaySound, setStreamerReady, audioLevel, localStream}) => {
+    const testVideoRef = useRef(null);
+    useEffect(() => {
+        if (localStream) {
+            testVideoRef.current.srcObject = localStream;
+        }
+    }, [localStream]);
+
     return (
         <DialogContent>
             <h3>Audio & Video</h3>
