@@ -575,7 +575,7 @@ export function WebRTCAdaptor(initialValues)
 				room: roomName,
 		};
 		this.webSocketAdaptor.send(JSON.stringify(jsCmd));
-		}, 15000);
+		}, 5000);
 	}
 
 	this.enableTrack = function(mainTrackId, trackId, enabled) {

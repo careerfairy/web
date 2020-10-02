@@ -44,7 +44,7 @@ function RemoteVideoContainer(props) {
     return (
         <div>
             <div className='videoContainer' style={{ height: props.height }}>
-                <video id='videoElement' ref={videoElement} width={ '100%' } onCanPlay={() => setCanPlay(true) } controls={false} muted={props.muted} playsInline>
+                <video id='videoElement' ref={videoElement} width={ '100%' } onCanPlay={() => setCanPlay(true) } controls={false} onEnded={() => videoElement.current.play() } muted={props.muted} playsInline>
                 </video>
                 <div className={ 'loader ' + (canPlay ? 'hidden' : '')}>
                     <Image src='/loader.gif' style={{ width: '30%', maxWidth: '80px', height: 'auto', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}} />
