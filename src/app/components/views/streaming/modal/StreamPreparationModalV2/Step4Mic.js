@@ -1,10 +1,11 @@
 import React from 'react';
+import {DialogContent} from "@material-ui/core";
 
-const Step4Mic = () => {
+const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySound}) => {
     return (
-        <div>
+        <DialogContent>
 
-        </div>
+        </DialogContent>
     );
 };
 

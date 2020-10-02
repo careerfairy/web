@@ -41,10 +41,10 @@ const StreamPreparationModalV2 = ({
                                       mediaConstraints,
                                       connectionEstablished,
                                       setConnectionEstablished,
-                                      errorMessage,
                                       isStreaming,
                                       audioSource,
                                       setAudioSource,
+                                      errorMessage,
                                       videoSource,
                                       setVideoSource,
                                       setSpeakerSource,
@@ -97,14 +97,20 @@ const StreamPreparationModalV2 = ({
                                     setVideoSource={setVideoSource}
                                     videoSource={videoSource}/>;
             case 2:
-                return <Step3Speakers setSpeakerSource
-                                      speakerSource/>
+                return <Step3Speakers setSpeakerSource={setSpeakerSource}
+                                      devices={devices}
+                                      speakerSource={speakerSource}/>
             case 3:
-                return <Step4Mic setSpeakerSource
-                                      speakerSource/>
+                return <Step4Mic setAudioSource={setAudioSource}
+                                 audioLevel={audioLevel}
+                                 devices={devices}
+                                 setPlaySound={setPlaySound}
+                                 audioSource={audioSource} />
             case 4:
-                return <Step5Confirm setSpeakerSource
-                                      speakerSource/>
+                return <Step5Confirm setConnectionEstablished={setConnectionEstablished}
+                                     isStreaming={isStreaming}
+                                     errorMessage={errorMessage}
+                                     streamerReady={streamerReady}/>
             default:
                 return 'Unknown stepIndex';
         }
@@ -117,7 +123,6 @@ const StreamPreparationModalV2 = ({
                 <h3 style={{color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3>
             </DialogTitle>
             {getStepContent(activeStep)}
-
             <DialogContent>
                 <Stepper activeStep={activeStep} alternativeLabel>
                     {steps.map((label) => (

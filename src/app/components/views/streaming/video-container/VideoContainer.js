@@ -11,6 +11,7 @@ import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
 import StreamPreparationModal from 'components/views/streaming/modal/StreamPreparationModal';
 import VideoControlsContainer from './VideoControlsContainer';
 import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
+import ErrorMessageModal from "../modal/StreamPreparationModalV2/ErrorMessageModal";
 
 function VideoContainer(props) {
 
@@ -256,6 +257,7 @@ function VideoContainer(props) {
             </Modal>
             {/*<StreamPreparationModal streamerReady={streamerReady} setStreamerReady={setStreamerReady} localStream={localStream} mediaConstraints={mediaConstraints} connectionEstablished={connectionEstablished} setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage} isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource} videoSource={videoSource} setVideoSource={setVideoSource}/>*/}
             <StreamPreparationModalV2 speakerSource={speakerSource} setSpeakerSource={setSpeakerSource} streamerReady={streamerReady} setStreamerReady={setStreamerReady} localStream={localStream} mediaConstraints={mediaConstraints} connectionEstablished={connectionEstablished} setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage} isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource} videoSource={videoSource} setVideoSource={setVideoSource}/>
+            <ErrorMessageModal isStreaming={isStreaming} connectionEstablished={connectionEstablished} errorMessage={errorMessage} streamerReady={streamerReady}/>
             <style jsx>{`
                 .screen-container {
                     position: absolute;                 

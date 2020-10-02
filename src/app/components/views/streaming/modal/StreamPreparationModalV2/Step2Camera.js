@@ -1,7 +1,7 @@
 import React, {useEffect, useRef} from 'react';
 import {Button, Dropdown, Grid, Icon} from "semantic-ui-react";
 import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
-import {DialogContent} from "@material-ui/core";
+import {DialogContent, MenuItem, Select} from "@material-ui/core";
 
 const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudioSource, playSound, setPlaySound, setStreamerReady, audioLevel, localStream}) => {
     const testVideoRef = useRef(null);
@@ -10,6 +10,10 @@ const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudi
             testVideoRef.current.srcObject = localStream;
         }
     }, [localStream]);
+
+    const handleChangeMic = (event) => {
+        setAudioSource(event.target.value)
+    }
 
     return (
         <DialogContent>
@@ -26,9 +30,17 @@ const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudi
                     </div>
                 </Grid.Column>
                 <Grid.Column>
-                    <Dropdown fluid selection value={audioSource}
-                              onChange={(event, {value}) => setAudioSource(value)}
-                              options={devices.audioInputList} style={{margin: '0 0 15px 0'}}/>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={audioSource}
+                        onChange={handleChangeMic}
+                    >
+                        {devices.audioInputList.map(device => {
+                            console.log("device", device);
+                            return (<MenuItem value={device.value}>{device.text}</MenuItem>)
+                        })}
+                    </Select>
                     <div style={{padding: '20px 0', textAlign: 'center'}}>
                         <div style={{fontWeight: '600', marginBottom: '10px', color: 'pink'}}>Microphone Volume
                         </div>
