@@ -1,15 +1,28 @@
 import {useState, useEffect, useRef, Fragment} from 'react';
-import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Dropdown} from "semantic-ui-react";
-
-import { useRouter } from 'next/router';
-import { withFirebasePage } from '../../../context/firebase';
+import {
+    Container,
+    Button,
+    Grid,
+    Header as SemanticHeader,
+    Icon,
+    Image,
+    Input,
+    Modal,
+    Transition,
+    Dropdown
+} from "semantic-ui-react";
+import Fab from '@material-ui/core/Fab';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
+import {useRouter} from 'next/router';
+import {withFirebasePage} from '../../../context/firebase';
 import ViewerHandRaiseComponent from 'components/views/viewer/viewer-hand-raise-component/ViewerHandRaiseComponent';
 import ViewerComponent from 'components/views/viewer/viewer-component/ViewerComponent';
 import NewCommentContainer from 'components/views/viewer/comment-container/NewCommentContainer';
 import UserContext from 'context/user/UserContext';
 import MiniChatContainer from 'components/views/streaming/comment-container/categories/chat/MiniChatContainer';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
-import { useWindowSize } from 'components/custom-hook/useWindowSize';
+import {useWindowSize} from 'components/custom-hook/useWindowSize';
 
 function ViewerPage(props) {
 
@@ -19,21 +32,21 @@ function ViewerPage(props) {
     const [showMenu, setShowMenu] = useState(false);
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
-    
+
     const [careerCenters, setCareerCenters] = useState([]);
     const [handRaiseActive, setHandRaiseActive] = useState(false);
     const [iconsDisabled, setIconsDisabled] = useState(false);
-    const [showVideoButton, setShowVideoButton] = useState({ paused: false, muted: false});
+    const [showVideoButton, setShowVideoButton] = useState({paused: false, muted: false});
     const [unmute, setUnmute] = useState(false);
     const [play, setPlay] = useState(false);
 
     const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
 
-    const { authenticatedUser, userData } = React.useContext(UserContext);
-    const { width, height } = useWindowSize();
+    const {authenticatedUser, userData} = React.useContext(UserContext);
+    const {width, height} = useWindowSize();
 
     useEffect(() => {
-        if ( width < 768) {
+        if (width < 768) {
             setShowMenu(false)
         } else {
             setShowMenu(true);
@@ -103,23 +116,28 @@ function ViewerPage(props) {
             setIconsDisabled(true);
             let email = currentLivestream.test ? 'streamerEmail' : authenticatedUser.email;
             props.firebase.postIcon(currentLivestream.id, iconName, email);
-        }  
+        }
     }
 
     function unmuteVideos() {
-        setShowVideoButton(prevState => { return { paused: prevState.paused, muted: false }});
+        setShowVideoButton(prevState => {
+            return {paused: prevState.paused, muted: false}
+        });
         setUnmute(true);
     }
 
     function playVideos() {
-        setShowVideoButton(prevState => { return { paused: false, muted: false }});
+        setShowVideoButton(prevState => {
+            return {paused: false, muted: false}
+        });
         setPlay(true);
     }
 
-    let logoElements = careerCenters.map( (careerCenter, index) => {
+    let logoElements = careerCenters.map((careerCenter, index) => {
         return (
             <Fragment key={index}>
-                <Image src={ careerCenter.logoUrl } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block' }}/>
+                <Image src={careerCenter.logoUrl}
+                       style={{maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block'}}/>
             </Fragment>
         );
     });
@@ -131,59 +149,97 @@ function ViewerPage(props) {
     return (
         <div className='topLevelContainer'>
             <div className='top-menu'>
-                <div className='top-menu-left'>    
-                    <Image src='/logo_teal.png' style={{ maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
-                    { logoElements }
-                    <div style={{ position: 'absolute', bottom: '13px', left: '120px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
+                <div className='top-menu-left'>
+                    <Image src='/logo_teal.png'
+                           style={{maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
+                    {logoElements}
+                    <div style={{
+                        position: 'absolute',
+                        bottom: '13px',
+                        left: '120px',
+                        fontSize: '7em',
+                        fontWeight: '700',
+                        color: 'rgba(0, 210, 170, 0.2)',
+                        zIndex: '50'
+                    }}>&
+                    </div>
                 </div>
                 <div className={'top-menu-right'}>
-                    <Image src={ currentLivestream.companyLogoUrl } style={{ position: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block', margin: '0 10px'}}/>
-                    <Button style={{ display: currentLivestream.hasNoTalentPool ? 'none' : 'inline-block' }} content={ userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'} icon={ userIsInTalentPool ? 'delete' : 'handshake outline'} onClick={ userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()} primary={!userIsInTalentPool}/> 
+                    <Image src={currentLivestream.companyLogoUrl} style={{
+                        position: 'relative',
+                        zIndex: '100',
+                        maxHeight: '50px',
+                        maxWidth: '150px',
+                        display: 'inline-block',
+                        margin: '0 10px'
+                    }}/>
+                    <Button style={{display: currentLivestream.hasNoTalentPool ? 'none' : 'inline-block'}}
+                            content={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
+                            icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
+                            onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
+                            primary={!userIsInTalentPool}/>
                 </div>
             </div>
-            <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
-                { handRaiseActive ? 
-                    <ViewerHandRaiseComponent currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive}/> :
-                    <ViewerComponent livestreamId={livestreamId} streamerId={streamerId}  currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton} setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>
+            <div className={'black-frame ' + (!showMenu ? 'withMenu' : '')}>
+                {handRaiseActive ?
+                    <ViewerHandRaiseComponent currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
+                                              setHandRaiseActive={setHandRaiseActive}/> :
+                    <ViewerComponent livestreamId={livestreamId} streamerId={streamerId}
+                                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
+                                     setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton}
+                                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>
                 }
                 <div className='mini-chat-container'>
-                    <MiniChatContainer livestream={ currentLivestream }  isStreamer={false}/>
+                    <MiniChatContainer livestream={currentLivestream} isStreamer={false}/>
                 </div>
                 <div className='action-buttons'>
                     <div className='action-container'>
-                        <div className='button action-button red' onClick={() => postIcon('like')}>
-                            <Image src='/like.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
-                        </div>
+                        {/*<div className='button action-button red' onClick={() => postIcon('like')}>*/}
+                        {/*    <Image src='/like.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>*/}
+                        {/*</div>*/}
+                            <Fab onClick={() => postIcon('like')} disabled={iconsDisabled} color="secondary">
+                                <ThumbUpIcon/>
+                            </Fab>
                     </div>
                     <div className='action-container'>
-                        <div className='button action-button orange' onClick={() => postIcon('clapping')}>
-                            <Image src='/clapping.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
-                        </div>
+                            {/*<Image src='/clapping.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>*/}
+                            <Fab onClick={() => postIcon('clapping')} disabled={iconsDisabled} style={{color: "orange"}}>
+                                <ThumbUpIcon/>
+                            </Fab>
                     </div>
                     <div className='action-container'>
-                        <div className='button action-button yellow' onClick={() => postIcon('heart')}>
-                            <Image src='/heart.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
-                        </div>
-                    </div>            
+                            {/*<Image src='/heart.png' disabled={iconsDisabled} style={{*/}
+                            {/*    position: 'absolute',*/}
+                            {/*    top: '50%',*/}
+                            {/*    left: '50%',*/}
+                            {/*    transform: 'translate(-50%, -50%)',*/}
+                            {/*    width: '28px'*/}
+                            {/*}}/>*/}
+                              <Fab onClick={() => postIcon('heart')} disabled={iconsDisabled} style={{color: "yellow"}} color="secondary">
+                                <FavoriteBorderIcon/>
+                            </Fab>
+                    </div>
                 </div>
             </div>
             <div className={'video-menu-left ' + (showMenu ? 'withMenu' : '')}>
-                <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={false} livestream={ currentLivestream } handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive} localId/>
+                <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={false}
+                                     livestream={currentLivestream} handRaiseActive={handRaiseActive}
+                                     setHandRaiseActive={setHandRaiseActive} localId/>
             </div>
             <div className='icons-container'>
-                <IconsContainer livestreamId={ currentLivestream.id } />
+                <IconsContainer livestreamId={currentLivestream.id}/>
             </div>
-            <div className={ 'playButtonContent ' + (showVideoButton.muted ? '' : 'hidden')} onClick={unmuteVideos}>
+            <div className={'playButtonContent ' + (showVideoButton.muted ? '' : 'hidden')} onClick={unmuteVideos}>
                 <div className='playButton'>
-                    <Icon name='volume up' style={{ fontSize: '3rem' }}/>
+                    <Icon name='volume up' style={{fontSize: '3rem'}}/>
                     <div>Click to unmute</div>
-                </div>     
+                </div>
             </div>
-            <div className={ 'playButtonContent ' + (showVideoButton.paused ? '' : 'hidden')} onClick={playVideos}>
+            <div className={'playButtonContent ' + (showVideoButton.paused ? '' : 'hidden')} onClick={playVideos}>
                 <div className='playButton'>
-                    <Icon name='play' style={{ fontSize: '3rem' }}/>
+                    <Icon name='play' style={{fontSize: '3rem'}}/>
                     <div>Click to play</div>
-                </div>     
+                </div>
             </div>
             <style jsx>{`
                 .hidden {
@@ -435,7 +491,7 @@ function ViewerPage(props) {
                     z-index: 200;
                 }
             `}</style>
-             <style jsx global>{`
+            <style jsx global>{`
                 body {
                     min-height: 100vh;
                     min-height: -webkit-fill-available;

@@ -202,7 +202,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
         if (emailSent && user && !emailVerificationSent) {
             axios({
                 method: 'post',
-                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmailWithPinAndUpdateUserDataAndUni',
+                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailUserDataAndUni',
                 data: {
                     recipientEmail: user.email,
                     firstName: formData.firstName,
