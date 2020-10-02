@@ -11,9 +11,6 @@ import {
     Transition,
     Dropdown
 } from "semantic-ui-react";
-import Fab from '@material-ui/core/Fab';
-import ThumbUpIcon from '@material-ui/icons/ThumbUp';
-import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import {useRouter} from 'next/router';
 import {withFirebasePage} from '../../../context/firebase';
 import ViewerHandRaiseComponent from 'components/views/viewer/viewer-hand-raise-component/ViewerHandRaiseComponent';
@@ -194,30 +191,19 @@ function ViewerPage(props) {
                 </div>
                 <div className='action-buttons'>
                     <div className='action-container'>
-                        {/*<div className='button action-button red' onClick={() => postIcon('like')}>*/}
-                        {/*    <Image src='/like.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>*/}
-                        {/*</div>*/}
-                            <Fab onClick={() => postIcon('like')} disabled={iconsDisabled} color="secondary">
-                                <ThumbUpIcon/>
-                            </Fab>
+                        <div className='button action-button red' onClick={() => postIcon('like')}>
+                            <Image src='/like.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
+                        </div>
                     </div>
                     <div className='action-container'>
-                            {/*<Image src='/clapping.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>*/}
-                            <Fab onClick={() => postIcon('clapping')} disabled={iconsDisabled} style={{color: "orange"}}>
-                                <ThumbUpIcon/>
-                            </Fab>
+                        <div className='button action-button orange' onClick={() => postIcon('clapping')}>
+                            <Image src='/clapping.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
+                        </div>
                     </div>
                     <div className='action-container'>
-                            {/*<Image src='/heart.png' disabled={iconsDisabled} style={{*/}
-                            {/*    position: 'absolute',*/}
-                            {/*    top: '50%',*/}
-                            {/*    left: '50%',*/}
-                            {/*    transform: 'translate(-50%, -50%)',*/}
-                            {/*    width: '28px'*/}
-                            {/*}}/>*/}
-                              <Fab onClick={() => postIcon('heart')} disabled={iconsDisabled} style={{color: "yellow"}} color="secondary">
-                                <FavoriteBorderIcon/>
-                            </Fab>
+                        <div className='button action-button yellow' onClick={() => postIcon('heart')}>
+                            <Image src='/heart.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
+                        </div>
                     </div>
                 </div>
             </div>
