@@ -10,7 +10,7 @@ import CurrentSpeakerDisplayer from './CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
 import StreamPreparationModal from 'components/views/streaming/modal/StreamPreparationModal';
 import VideoControlsContainer from './VideoControlsContainer';
-import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2";
+import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
 
 function VideoContainer(props) {
 
