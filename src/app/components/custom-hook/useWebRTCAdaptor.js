@@ -8,16 +8,13 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
     
-    const [localStreams, setLocalStreams] = useState([]);
-    const [streamsInRoom, setStreamsInRoom] = useState([]);
-
-    const [addedStream, setAddedStream] = useState(null);
     const [externalMediaStreams, setExternalMediaStreams] = useState([]);
-
-    const [streamsToRemove, setStreamsToRemove] = useState([]);
-    const [audioLevels, setAudioLevels] = useState([]);
-    const [latestAudioLevel, setLatestAudioLevel] = useState(null);
+    const [addedStream, setAddedStream] = useState(null);
+    const [removedStream, setRemovedStream] = useState(null);
     const [playFinishedStream, setPlayFinishedStream] = useState(null);
+
+    const [latestAudioLevel, setLatestAudioLevel] = useState(null);
+    const [audioLevels, setAudioLevels] = useState([]);
 
     const [nsToken, setNsToken] = useState(null);
 
@@ -33,28 +30,11 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
     }, []);
 
     useEffect(() => {
-        if (streamsInRoom && streamsInRoom.length) {
-            if (localStreams && localStreams.length) {
-                let streamToRemove = [];
-                localStreams.forEach( stream => {
-                    if (!streamsInRoom.includes(stream)) {
-                        streamToRemove.push(stream);
-                    }
-                });
-                setStreamsToRemove(streamToRemove);
-            }
-            setLocalStreams(streamsInRoom);
+        if (streamerReady && document && mediaConstraints && nsToken && nsToken.iceServers) {
+            const adaptor = getWebRTCAdaptor();
+            setWebRTCAdaptor(adaptor);
         }
-    }, [streamsInRoom]);
-
-    useEffect(() => {
-        if (localStreams && localStreams.length) {
-            localStreams.forEach( stream => {
-                webRTCAdaptor.play(stream, 'null', roomId);
-                webRTCAdaptor.enableStats(streamId);
-            })
-        }
-    }, [localStreams]);
+    }, [streamerReady, mediaConstraints, document, nsToken, isPlayMode]);
 
     useEffect(() => {
         if (addedStream) {
@@ -64,22 +44,17 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
     }, [addedStream]);
 
     useEffect(() => {
-        if (streamsToRemove && streamsToRemove.length) {
-            setExternalMediaStreams(removeStreamsFromList(streamsToRemove, externalMediaStreams));
-            setAudioLevels(removeStreamsFromList(streamsToRemove, audioLevels));
+        if (removedStream) {
+            setExternalMediaStreams(removeStreamFromList(removedStream, externalMediaStreams));
+            setAudioLevels(removeStreamFromList(removedStream, audioLevels));
         }
-    }, [streamsToRemove]);
-
-    useEffect(() => {
-        if (streamerReady && document && mediaConstraints && nsToken && nsToken.iceServers) {
-            const adaptor = getWebRTCAdaptor();
-            setWebRTCAdaptor(adaptor);
-        }
-    }, [streamerReady, mediaConstraints, document, nsToken, isPlayMode]);
+    }, [removedStream]);
 
     useEffect(() => {
         if (playFinishedStream) {
-            setStreamsToRemove([playFinishedStream])
+            if (externalMediaStreams.some(stream => stream.streamId === playFinishedStream.streamId)) {
+                webRTCAdaptor.play(playFinishedStream.streamId, roomId);
+            }
         }
     }, [playFinishedStream]);
 
@@ -98,14 +73,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
             streamListCopy.splice(streamListCopy.indexOf(streamEntry), 1);
         }
         return streamListCopy;
-    } 
-
-    function removeStreamsFromList(streams, streamList) {
-        let filteredList = streamList.filter( entry => {
-                return !streams.includes(entry.streamId);
-            });
-        return filteredList;
-    } 
+    }
 
     function convertTokenFromXirsysApi(token) {
         let tempToken = token.data.v;
@@ -219,6 +187,23 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         this.getRoomInfo(infoObj.ATTR_ROOM_NAME, infoObj.streamId);
                         break;
                     }
+                    case "streamJoined": {
+                        if (typeof streamingCallbackObject.onStreamJoined === 'function') {
+                            streamingCallbackObject.onStreamJoined(infoObj);
+                        }
+                        setTimeout(() => {
+                            playStream(this, infoObj);
+                        }, 200);                           
+                        break;
+                    }
+                    case "streamLeaved": {
+                        if (typeof streamingCallbackObject.onStreamLeaved === 'function') {
+                            streamingCallbackObject.onStreamLeaved(infoObj);
+                        }
+                        setRemovedStream(infoObj);
+                        this.disableStats(infoObj.streamId);
+                        break;
+                    }
                     case "newStreamAvailable": {
                         if (typeof streamingCallbackObject.onNewStreamAvailable === 'function') {
                             streamingCallbackObject.onNewStreamAvailable(infoObj);
@@ -230,7 +215,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         if (typeof streamingCallbackObject.onNewStreamAvailable === 'function') {
                             streamingCallbackObject.onNewStreamAvailable(infoObj);
                         }
-                        setStreamsInRoom(infoObj.streams);
+                        certifyExternalMediaStreams(this, infoObj);
                         break;
                     }
                     case "publish_started": {
@@ -260,8 +245,8 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                     case "play_finished": {
                         if (typeof streamingCallbackObject.onPlayFinished === 'function') {
                             streamingCallbackObject.onPlayFinished(infoObj);
-                        }         
-                        setPlayFinishedStream(infoObj.streamId);               
+                        }
+                        setPlayFinishedStream(infoObj);
                         break;
                     }
                     case "screen_share_stopped": {
