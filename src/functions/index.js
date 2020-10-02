@@ -400,6 +400,51 @@ exports.updateFakeUser = functions.https.onRequest(async (req, res) => {
     });
 });
 
+exports.sendPostmarkEmailUserDataAndUni = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    const recipient_email = req.body.recipientEmail;
+    const recipient_first_name = req.body.firstName;
+    const recipient_last_name = req.body.lastName;
+    const recipient_university = req.body.university;
+    const recipient_university_country_code = req.body.universityCountryCode;
+    const pinCode = getRandomInt(9999);
+
+    await admin.firestore().collection("userData").doc(recipient_email).set(
+        {
+            id: recipient_email,
+            validationPin: pinCode,
+            firstName: recipient_first_name,
+            lastName: recipient_last_name,
+            userEmail: recipient_email,
+            university: recipient_university,
+            universityCountryCode: recipient_university_country_code,
+        });
+
+    const email = {
+        "TemplateId": 17669843,
+        "From": 'CareerFairy <noreply@careerfairy.io>',
+        "To": recipient_email,
+        "TemplateModel": { pinCode: pinCode }
+    };
+
+    return client.sendEmailWithTemplate(email).then(response => {
+        res.sendStatus(200);
+    }, error => {
+        res.sendStatus(500);
+    });
+});
+
 exports.sendReminderEmailToRegistrants = functions.https.onRequest(async (req, res) => {
 
     res.set('Access-Control-Allow-Origin', '*');
