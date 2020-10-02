@@ -7,7 +7,8 @@ import * as Sentry from '@sentry/browser';
 import {ThemeProvider} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import config from 'react-reveal/globals';
-config({ ssrFadeout: true });
+
+config({ssrFadeout: true});
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -21,12 +22,13 @@ function MyApp({Component, pageProps}) {
 
     Sentry.init({dsn: "https://6852108b71ce4fbab24839792f82fa90@sentry.io/4261031"});
 
-    
+
     const firebase = new Firebase();
-    
+
     const [authenticatedUser, setAuthenticatedUser] = useState(undefined);
     const [userData, setUserData] = useState(undefined);
-            
+    const [loading, setLoading] = useState(false)
+
     useEffect(() => {
         // Remove the server-side injected CSS.
         const jssStyles = document.querySelector('#jss-server-side');
@@ -55,15 +57,17 @@ function MyApp({Component, pageProps}) {
     }, []);
 
     useEffect(() => {
+        setLoading(true);
         if (authenticatedUser && authenticatedUser.email) {
-           const unsubscribe = firebase.listenToUserData(authenticatedUser.email, querySnapshot => {
+            const unsubscribe = firebase.listenToUserData(authenticatedUser.email, querySnapshot => {
                 if (querySnapshot.exists) {
+                    setLoading(false)
                     let user = querySnapshot.data();
                     user.id = querySnapshot.id;
                     setUserData(user);
                 } else {
                     setUserData(null);
-                }              
+                }
             });
             return () => unsubscribe();
         }
@@ -74,15 +78,15 @@ function MyApp({Component, pageProps}) {
             <Head>
                 <title>CareerFairy | Watch live streams. Get hired.</title>
             </Head>
-                <FirebaseContext.Provider value={firebase}>
-                    <UserContext.Provider value={{authenticatedUser, userData, setUserData}}>
-                        <ThemeProvider theme={theme}>
+            <FirebaseContext.Provider value={firebase}>
+                <UserContext.Provider value={{authenticatedUser, userData, setUserData, loading}}>
+                    <ThemeProvider theme={theme}>
                         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                         <CssBaseline/>
                         <Component {...pageProps} />
                     </ThemeProvider>
-                    </UserContext.Provider>
-                </FirebaseContext.Provider>
+                </UserContext.Provider>
+            </FirebaseContext.Provider>
         </Fragment>
     );
 }
