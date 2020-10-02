@@ -1,4 +1,4 @@
-import {useEffect, useState, Fragment} from 'react'
+import {useEffect, useState, Fragment, useContext} from 'react'
 import Head from 'next/head';
 import {Container} from 'semantic-ui-react';
 import {useRouter} from 'next/router';
@@ -13,6 +13,8 @@ import StepLabel from '@material-ui/core/StepLabel';
 import CreateCategories from "../../components/views/group/create/CreateCategories";
 import CompleteGroup from "../../components/views/group/create/CompleteGroup";
 import {GlobalBackground} from "../../materialUI/GlobalBackground/GlobalBackGround";
+import UserContext from "../../context/user/UserContext";
+import Loader from "../../components/views/loader/Loader";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -33,22 +35,19 @@ function getSteps() {
 
 
 const CreateGroup = ({firebase}) => {
+    const {userData, authenticatedUser: user, loading} = useContext(UserContext);
     const [activeStep, setActiveStep] = useState(0);
     const [baseGroupInfo, setBaseGroupInfo] = useState({});
     const [arrayOfCategories, setArrayOfCategories] = useState([]);
-    const [user, setUser] = useState(null);
 
     const router = useRouter();
 
     useEffect(() => {
-        firebase.auth.onAuthStateChanged(user => {
-            if (user) {
-                setUser(user);
-            } else {
-                router.replace('/login');
-            }
-        })
-    }, []);
+        if (user === null) {
+            router.replace("/login");
+        }
+    }, [user]);
+
 
     const steps = getSteps();
 
@@ -116,7 +115,7 @@ const CreateGroup = ({firebase}) => {
                 categories: arrayOfCategories
             }
             let ref = await firebase.createCareerCenter(careerCenter);
-            firebase.updateCareerCenter(ref.id, { groupId: ref.id }).then(() =>{
+            firebase.updateCareerCenter(ref.id, {groupId: ref.id}).then(() => {
                 router.push(`/group/${ref.id}/admin`)
             })
 
@@ -160,6 +159,10 @@ const CreateGroup = ({firebase}) => {
             default:
                 return 'Unknown stepIndex';
         }
+    }
+
+    if (user === null || userData === null || loading === true) {
+        return <Loader/>;
     }
 
     return (
