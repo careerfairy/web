@@ -23,30 +23,11 @@ const useStyles = makeStyles((theme) => ({
 const UserProfile = ({firebase}) => {
     const classes = useStyles();
     const router = useRouter();
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [userData, setUserData] = useState(null);
+    const {userData, authenticatedUser: user, loading} = useContext(UserContext);
 
     useEffect(() => {
-        firebase.auth.onAuthStateChanged((user) => {
-            if (user) {
-                setUser(user);
-            } else {
-                router.replace("/login");
-            }
-        });
-    }, []);
-
-    useEffect(() => {
-        setLoading(true);
-        if (user) {
-            firebase.listenToUserData(user.email, (querySnapshot) => {
-                setLoading(false);
-                let user = querySnapshot.data();
-                if (user) {
-                    setUserData(user);
-                }
-            });
+        if (user === null) {
+            router.replace("/login");
         }
     }, [user]);
 

@@ -1,8 +1,9 @@
 import React, {Fragment} from 'react'
-import {Image, Icon, Button} from "semantic-ui-react";
+import {Image, Icon} from "semantic-ui-react";
 
 import Link from 'next/link';
 import {useRouter} from 'next/router';
+import {Button} from "@material-ui/core";
 
 const LandingHeader = (props) => {
 

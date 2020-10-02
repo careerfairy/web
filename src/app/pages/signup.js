@@ -135,7 +135,7 @@ function SignUpPage({firebase}) {
                     setActiveStep={setActiveStep}
                     emailVerificationSent={emailVerificationSent}/>
             case 2:
-                return <GroupProvider absolutePath={absolutePath} user={user}/>
+                return <GroupProvider absolutePath={absolutePath}/>
             default:
                 return setActiveStep(0);
         }
