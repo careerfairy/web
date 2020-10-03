@@ -30,32 +30,6 @@ function StreamingPage(props) {
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
 
     const numberOfViewers = useNumberOfViewers(currentLivestream);
-    
-    let streamingCallbacks = {
-        onPublishStarted: (infoObj) => {
-            setShowDisconnectionModal(false);
-            setIsStreaming(true);
-        },
-        onPublishFinished: (infoObj) => {
-            setIsStreaming(false);
-        },
-        onDisconnected: (infoObj) => {
-            setShowDisconnectionModal(true);
-        },
-        onConnected: (infoObj) => {
-            setShowDisconnectionModal(false);
-        },
-    }
-
-    let errorCallbacks = {
-        onOtherError: (error) => {
-            if (typeof error === "string") {
-                setErrorMessage(error);
-            } else {
-                setErrorMessage("A connection error occured");
-            }
-        }
-    }
 
     useEffect(() => {
         if (livestreamId) {
@@ -140,7 +114,7 @@ function StreamingPage(props) {
                     </div>
                 </div>
                 <div className='black-frame' style={{ left: showMenu ? '280px' : '0'}}>
-                    <VideoContainer currentLivestream={ currentLivestream } streamerId={ currentLivestream.id } streamingCallbacks={streamingCallbacks} errorCallbacks={errorCallbacks} showMenu={showMenu} viewer={false}/>
+                    <VideoContainer currentLivestream={ currentLivestream } streamerId={ currentLivestream.id } showMenu={ showMenu } viewer={ false }/>
                 </div>
                 <div className='video-menu-left' style={{ width: showMenu ? '280px' : '0'}}>
                     <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={true} livestream={ currentLivestream }/>

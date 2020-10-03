@@ -14,7 +14,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 function ViewerHandRaiseComponent(props) {
 
-    const router = useRouter();
     const { authenticatedUser, userData } = React.useContext(UserContext);
 
     const [streamerId, setStreamerId] = useState(uuidv4())

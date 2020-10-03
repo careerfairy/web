@@ -6,6 +6,7 @@ function RemoteVideoContainer(props) {
     const videoElement = useRef(null);
 
     const [canPlay, setCanPlay] = useState(false);
+    const [hasError, setHasError] = useState(false);
 
     useEffect(() => {
         videoElement.current.srcObject = props.stream.stream;
@@ -37,14 +38,24 @@ function RemoteVideoContainer(props) {
 
     useEffect(() => {
         if (props.play) {
-            videoElement.current.play();
+            playVideo();
         }
     },[props.play])
+
+    function playVideo() {
+        videoElement.current.play().catch((e) => console.log("Video Error:", e));
+    }
+
+    function handleVideoLoss() {
+        if (!videoElement.current.srcObject.active) {
+            props.removeStreamFromExternalMediaStreams(props.stream.streamId)
+        }
+    }
 
     return (
         <div>
             <div className='videoContainer' style={{ height: props.height }}>
-                <video id='videoElement' ref={videoElement} width={ '100%' } onCanPlay={() => setCanPlay(true) } controls={false} onEnded={() => videoElement.current.play() } muted={props.muted} playsInline>
+                <video id='videoElement' ref={videoElement} width={ '100%' } onCanPlay={() => setCanPlay(true) } controls={false} onEnded={handleVideoLoss} onError={handleVideoLoss} onSuspend={handleVideoLoss} muted={props.muted} playsInline>
                 </video>
                 <div className={ 'loader ' + (canPlay ? 'hidden' : '')}>
                     <Image src='/loader.gif' style={{ width: '30%', maxWidth: '80px', height: 'auto', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}} />

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { navigator, document } from 'global';
 import axios from 'axios';
-import { WebRTCAdaptor } from 'static-js/webrtc_adaptor_new.js';
+import { WebRTCAdaptor } from 'static-js/webrtc_adaptor_new2.js';
 import { WEBRTC_ERRORS } from 'data/errors/StreamingErrors.js';
 
 export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId) {
@@ -100,6 +100,20 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         return streamListCopy;
     } 
 
+    function removeStreamFromExternalMediaStreams(streamId) {
+        const externalMediaStreamsListCopy = [...externalMediaStreams];
+        const localStreamsListCopy = localStreams.filter( localStreamId => localStreamId !== streamId);
+        const streamEntry = externalMediaStreamsListCopy.find( entry => {
+            return entry.streamId === streamId;
+        });
+        if (streamEntry) {
+            externalMediaStreamsListCopy.splice(externalMediaStreamsListCopy.indexOf(streamEntry), 1);
+        }
+        
+        setExternalMediaStreams([...externalMediaStreamsListCopy]);
+        setLocalStreams([...localStreamsListCopy]);
+    } 
+
     function removeStreamsFromList(streams, streamList) {
         let filteredList = streamList.filter( entry => {
                 return !streams.includes(entry.streamId);
@@ -142,29 +156,8 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         }
     }
 
-    function certifyExternalMediaStreams(adaptorInstance, infoObj) {
-        infoObj.streams.forEach( streamId => {
-            adaptorInstance.play(streamId, 'null', infoObj.ATTR_ROOM_NAME);
-            adaptorInstance.enableStats(streamId);
-        })
-    }
-
     function publishNewStream(adaptorInstance, infoObj) {
         adaptorInstance.publish(streamId, 'null', infoObj.ATTR_ROOM_NAME);
-    }
-
-    function playIncumbentStreams(adaptorInstance, infoObj) {
-        if (infoObj.streams && infoObj.streams.length > 0) {
-            infoObj.streams.forEach( streamId => {
-                adaptorInstance.play(streamId, 'null', infoObj.ATTR_ROOM_NAME);
-                adaptorInstance.enableStats(streamId);
-            })
-        }
-    }
-
-    function playStream(adaptorInstance, infoObj) {
-        adaptorInstance.play(infoObj.streamId, 'null', infoObj.ATTR_ROOM_NAME);
-        adaptorInstance.enableStats(infoObj.streamId);
     }
 
     function updateAudioLevel(latestAudioLevel) {
@@ -215,7 +208,6 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         if (!isPlayMode) {
                             publishNewStream(this, infoObj);
                         }
-                        playIncumbentStreams(this, infoObj);
                         this.getRoomInfo(infoObj.ATTR_ROOM_NAME, infoObj.streamId);
                         break;
                     }
@@ -278,12 +270,12 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         break;
                     }
                     case "ice_connection_state_changed": {
-                        if (infoObj.state === 'connected') {
+                        if (infoObj.streamId === streamId && infoObj.state === 'connected') {
                             if (typeof streamingCallbackObject.onConnected === 'function') {
                                 streamingCallbackObject.onConnected(infoObj);
                             }
                         }
-                        if (infoObj.state === 'disconnected') {
+                        if (infoObj.streamId === streamId && infoObj.state === 'disconnected') {
                             if (typeof streamingCallbackObject.onDisconnected === 'function') {
                                 streamingCallbackObject.onDisconnected(infoObj);
                             }
@@ -313,5 +305,5 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         return newAdaptor;
     }
   
-    return { webRTCAdaptor, externalMediaStreams, audioLevels };
+    return { webRTCAdaptor, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels };
 }
