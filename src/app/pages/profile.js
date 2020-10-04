@@ -23,15 +23,17 @@ const useStyles = makeStyles((theme) => ({
 const UserProfile = ({firebase}) => {
     const classes = useStyles();
     const router = useRouter();
-    const [loading, setLoading] = useState(false)
-    const {authenticatedUser, userData} = useContext(UserContext)
-
+    const {userData, authenticatedUser: user, loading} = useContext(UserContext);
 
     useEffect(() => {
-        if (!authenticatedUser) {
-            router.push('/login');
+        if (user === null) {
+            router.replace("/login");
         }
-    }, [authenticatedUser]);
+    }, [user]);
+
+    if (user === null || userData === null || loading === true) {
+        return <Loader/>;
+    }
 
     return (
         <div className={classes.root}>
@@ -39,7 +41,7 @@ const UserProfile = ({firebase}) => {
                 <title key="title">CareerFairy | My Profile</title>
             </Head>
             <Header classElement='relative white-background'/>
-            <ProfileNav user={authenticatedUser} userData={userData}/>
+            <ProfileNav user={user} userData={userData}/>
             <Footer/>
         </div>
     );

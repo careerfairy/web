@@ -1,4 +1,4 @@
-import React, {Fragment, useState, useEffect} from 'react';
+import React, {Fragment, useState, useEffect, useContext} from 'react';
 import {withFirebase} from "context/firebase";
 import TheatersRoundedIcon from '@material-ui/icons/TheatersRounded';
 import ArrowForwardIosRoundedIcon from '@material-ui/icons/ArrowForwardIosRounded';
@@ -8,7 +8,7 @@ import {useRouter} from 'next/router';
 import Link from 'next/link';
 import {Formik} from 'formik';
 import axios from 'axios';
-import {Link as MuiLink} from '@material-ui/core';
+import {FormControl, Link as MuiLink, MenuItem, Select} from '@material-ui/core';
 
 import Head from 'next/head';
 import Stepper from "@material-ui/core/Stepper";
@@ -20,6 +20,7 @@ import {
     Grid,
     Paper,
     TextField,
+    Collapse,
     FormControlLabel,
     Container,
     Button,
@@ -29,6 +30,9 @@ import {
 import {makeStyles} from "@material-ui/core/styles";
 import {TealBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import GroupProvider from "../components/views/signup/GroupProvider";
+import UserContext from "../context/user/UserContext";
+import UniversitySelector from "../components/views/universitySelect/UniversitySelector";
+import UniversityCountrySelector from "../components/views/universitySelect/UniversityCountrySelector";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -73,6 +77,10 @@ const useStyles = makeStyles((theme) => ({
     icon: {
         margin: '0 10px',
         color: 'white'
+    },
+    helperText: {
+        position: "absolute",
+        bottom: -19
     }
 }));
 
@@ -84,25 +92,33 @@ function SignUpPage({firebase}) {
     const classes = useStyles()
     const router = useRouter();
     const {absolutePath} = router.query
+    const {authenticatedUser: user, userData} = useContext(UserContext)
     const steps = getSteps(absolutePath);
 
-    const [user, setUser] = useState(false);
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
     const [activeStep, setActiveStep] = useState(0);
 
 
+    // useEffect(() => {
+    //     firebase.auth.onAuthStateChanged(user => {
+    //         if (user && user.emailVerified) {
+    //             router.push('/next-livestreams')
+    //         } else if (user && !user.emailVerified) {
+    //             setUser(user);
+    //             setActiveStep(1)
+    //         } else {
+    //             setUser(null);
+    //         }
+    //     })
+    // }, []);
+
     useEffect(() => {
-        firebase.auth.onAuthStateChanged(user => {
-            if (user && user.emailVerified) {
-                router.push('/next-livestreams')
-            } else if (user && !user.emailVerified) {
-                setUser(user);
-                setActiveStep(1)
-            } else {
-                setUser(null);
-            }
-        })
-    }, []);
+        if (user && user.emailVerified) {
+            router.push('/next-livestreams')
+        } else if (user && !user.emailVerified) {
+            setActiveStep(1)
+        }
+    }, [user])
 
     function getStepContent(stepIndex) {
         switch (stepIndex) {
@@ -119,7 +135,7 @@ function SignUpPage({firebase}) {
                     setActiveStep={setActiveStep}
                     emailVerificationSent={emailVerificationSent}/>
             case 2:
-                return <GroupProvider absolutePath={absolutePath} user={user}/>
+                return <GroupProvider absolutePath={absolutePath}/>
             default:
                 return setActiveStep(0);
         }
@@ -180,16 +196,19 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
     const [errorMessageShown, setErrorMessageShown] = useState(false);
     const [generalLoading, setGeneralLoading] = useState(false);
     const [formData, setFormData] = useState({})
+    const [open, setOpen] = React.useState(false);
 
     useEffect(() => {
         if (emailSent && user && !emailVerificationSent) {
             axios({
                 method: 'post',
-                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailVerificationEmailWithPinAndUpdateUserData',
+                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailUserDataAndUni',
                 data: {
                     recipientEmail: user.email,
                     firstName: formData.firstName,
                     lastName: formData.lastName,
+                    university: formData.university,
+                    universityCountryCode: formData.universityCountryCode,
                 }
             }).then(response => {
                 setEmailVerificationSent(true);
@@ -202,6 +221,19 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
         }
     }, [user, emailSent]);
 
+    const submitting = (isSubmitting) => {
+        return isSubmitting || emailSent || generalLoading
+    }
+
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
     return (
         <Fragment>
             <Formik
@@ -211,7 +243,9 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     email: '',
                     password: '',
                     confirmPassword: '',
-                    agreeTerm: false
+                    agreeTerm: false,
+                    university: '',
+                    universityCountryCode: ''
                 }}
                 validate={values => {
                     let errors = {};
@@ -224,11 +258,18 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                         errors.firstName = 'Your first name is required';
                     } else if (values.firstName.length > 50) {
                         errors.firstName = 'Cannot be longer than 50 characters';
+                    } else if (!/^\D+$/i.test(values.firstName)) {
+                        errors.firstName = 'Please enter a valid first name';
                     }
                     if (!values.lastName) {
                         errors.lastName = 'Your last name is required';
                     } else if (values.lastName.length > 50) {
                         errors.lastName = 'Cannot be longer than 50 characters';
+                    } else if (!/^\D+$/i.test(values.lastName)) {
+                        errors.lastName = 'Please enter a valid last name';
+                    }
+                    if (!values.university) {
+                        errors.university = 'Select a university or type "other"';
                     }
                     if (!values.password) {
                         errors.password = 'A password is required';
@@ -242,6 +283,9 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     }
                     if (!values.agreeTerm) {
                         errors.agreeTerm = 'Please agree to our T&C and our Privacy Policy';
+                    }
+                    if (!values.universityCountryCode) {
+                        errors.universityCountryCode = 'Please chose a country code';
                     }
                     return errors;
                 }}
@@ -275,92 +319,143 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     <form id='signUpForm' onSubmit={handleSubmit}>
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
-                                <TextField
-                                    autoComplete="fname"
-                                    name="firstName"
-                                    variant="outlined"
-                                    fullWidth
-                                    id="firstName"
-                                    label="First Name"
-                                    autoFocus
-                                    inputProps={{maxLength: 50}}
-                                    onBlur={handleBlur}
-                                    value={values.firstName}
-                                    disabled={isSubmitting || emailSent || generalLoading}
-                                    error={Boolean(errors.firstName && touched.firstName && errors.firstName)}
-                                    onChange={handleChange}
-                                    helperText={errors.firstName && touched.firstName && errors.firstName}
-                                />
+                                <FormControl fullWidth>
+                                    <TextField
+                                        autoComplete="fname"
+                                        name="firstName"
+                                        variant="outlined"
+                                        fullWidth
+                                        id="firstName"
+                                        label="First Name"
+                                        autoFocus
+                                        inputProps={{maxLength: 50}}
+                                        onBlur={handleBlur}
+                                        value={values.firstName}
+                                        disabled={submitting(isSubmitting)}
+                                        error={Boolean(errors.firstName && touched.firstName && errors.firstName)}
+                                        onChange={handleChange}
+                                    />
+                                    <Collapse
+                                        in={Boolean(errors.firstName && touched.firstName && errors.firstName)}>
+                                        <FormHelperText error>
+                                            {errors.firstName}
+                                        </FormHelperText>
+                                    </Collapse>
+                                </FormControl>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField
-                                    variant="outlined"
-                                    fullWidth
-                                    id="lastName"
-                                    inputProps={{maxLength: 50}}
-                                    maxLength="50"
-                                    label="Last Name"
-                                    name="lastName"
-                                    autoComplete="lname"
-                                    onBlur={handleBlur}
-                                    disabled={isSubmitting || emailSent || generalLoading}
-                                    value={values.lastName}
-                                    error={Boolean(errors.lastName && touched.lastName && errors.lastName)}
-                                    onChange={handleChange}
-                                    helperText={errors.lastName && touched.lastName && errors.lastName}
-                                />
+                                <FormControl fullWidth>
+                                    <TextField
+                                        variant="outlined"
+                                        fullWidth
+                                        id="lastName"
+                                        inputProps={{maxLength: 50}}
+                                        maxLength="50"
+                                        label="Last Name"
+                                        name="lastName"
+                                        autoComplete="lname"
+                                        onBlur={handleBlur}
+                                        disabled={submitting(isSubmitting)}
+                                        value={values.lastName}
+                                        error={Boolean(errors.lastName && touched.lastName && errors.lastName)}
+                                        onChange={handleChange}
+                                    />
+                                    <Collapse
+                                        in={Boolean(errors.lastName && touched.lastName && errors.lastName)}>
+                                        <FormHelperText error>
+                                            {errors.lastName}
+                                        </FormHelperText>
+                                    </Collapse>
+                                </FormControl>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField
-                                    variant="outlined"
-                                    fullWidth
-                                    helperText={errors.email && touched.email && errors.email}
-                                    error={Boolean(errors.email && touched.email)}
-                                    autoComplete="email"
-                                    id='emailInput'
-                                    name='email'
-                                    placeholder='Email'
-                                    onChange={handleChange} onBlur={handleBlur} value={values.email}
-                                    disabled={isSubmitting || emailSent || generalLoading}
-                                    label="Email Address"
-                                />
+                                <FormControl fullWidth>
+                                    <TextField
+                                        variant="outlined"
+                                        fullWidth
+                                        error={Boolean(errors.email && touched.email)}
+                                        autoComplete="email"
+                                        id='emailInput'
+                                        name='email'
+                                        placeholder='Email'
+                                        onChange={handleChange} onBlur={handleBlur} value={values.email}
+                                        disabled={submitting(isSubmitting)}
+                                        label="Email Address"
+                                    />
+                                    <Collapse
+                                        in={Boolean(errors.email && touched.email && errors.email)}>
+                                        <FormHelperText error>
+                                            {errors.email}
+                                        </FormHelperText>
+                                    </Collapse>
+                                </FormControl>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField
-                                    variant="outlined"
-                                    required
-                                    fullWidth
-                                    label="Password"
-                                    id="password"
-                                    autoComplete="current-password"
-                                    type='password'
-                                    name='password'
-                                    error={Boolean(errors.password && touched.password && errors.password)}
-                                    helperText={errors.password && touched.password && errors.password}
-                                    placeholder='Password'
-                                    onChange={handleChange} onBlur={handleBlur}
-                                    value={values.password}
-                                    disabled={isSubmitting || emailSent || generalLoading}
-                                />
+                                <UniversityCountrySelector value={values.universityCountryCode}
+                                                           handleClose={handleClose}
+                                                           submitting={submitting(isSubmitting)}
+                                                           handleChange={handleChange}
+                                                           error={errors.universityCountryCode && touched.universityCountryCode && errors.universityCountryCode}
+                                                           handleOpen={handleOpen}
+                                                           handleBlur={handleBlur}
+                                                           open={open}/>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField
-                                    variant="outlined"
-                                    required
-                                    fullWidth
-                                    label="Confirm Password"
-                                    autoComplete="current-password"
-                                    error={Boolean(errors.confirmPassword && touched.confirmPassword && errors.confirmPassword)}
-                                    helperText={errors.confirmPassword && touched.confirmPassword && errors.confirmPassword}
-                                    id='confirmPasswordInput'
-                                    type='password'
-                                    name='confirmPassword'
-                                    placeholder='Confirm Password'
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.confirmPassword}
-                                    disabled={isSubmitting || emailSent || generalLoading}
-                                />
+                                <UniversitySelector handleBlur={handleBlur}
+                                                    error={errors.university && touched.university && errors.university}
+                                                    universityCountryCode={values.universityCountryCode}
+                                                    values={values}
+                                                    submitting={submitting(isSubmitting)}
+                                                    setFieldValue={setFieldValue}/>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <FormControl fullWidth>
+                                    <TextField
+                                        variant="outlined"
+                                        fullWidth
+                                        label="Password"
+                                        id="password"
+                                        autoComplete="current-password"
+                                        type='password'
+                                        name='password'
+                                        error={Boolean(errors.password && touched.password && errors.password)}
+                                        placeholder='Password'
+                                        onChange={handleChange} onBlur={handleBlur}
+                                        value={values.password}
+                                        disabled={submitting(isSubmitting)}
+                                    />
+                                    <Collapse
+                                        in={Boolean(errors.password && touched.password && errors.password)}>
+                                        <FormHelperText error>
+                                            {errors.password}
+                                        </FormHelperText>
+                                    </Collapse>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <FormControl fullWidth>
+                                    <TextField
+                                        variant="outlined"
+                                        fullWidth
+                                        label="Confirm Password"
+                                        autoComplete="current-password"
+                                        id='confirmPasswordInput'
+                                        type='password'
+                                        error={Boolean(errors.confirmPassword && touched.confirmPassword && errors.confirmPassword)}
+                                        name='confirmPassword'
+                                        placeholder='Confirm Password'
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        value={values.confirmPassword}
+                                        disabled={submitting(isSubmitting)}
+                                    />
+                                    <Collapse
+                                        in={Boolean(errors.confirmPassword && touched.confirmPassword && errors.confirmPassword)}>
+                                        <FormHelperText error>
+                                            {errors.confirmPassword}
+                                        </FormHelperText>
+                                    </Collapse>
+                                </FormControl>
                             </Grid>
                             <Grid item xs={12}>
                                 <FormControlLabel
@@ -370,22 +465,24 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         value={values.agreeTerm}
-                                        disabled={isSubmitting || emailSent || generalLoading}
+                                        disabled={submitting(isSubmitting)}
                                         color="primary"
                                     />}
                                     label={<>I agree to
                                         the <Link href='/terms'><a>Terms & Conditions</a></Link> and the <Link
                                             href='/privacy'><a>Privacy Policy</a></Link></>}
                                 />
-                                <FormHelperText
-                                    error={errors.agreeTerm && touched.agreeTerm && errors.agreeTerm}>
-                                    {errors.agreeTerm && touched.agreeTerm && errors.agreeTerm}
-                                </FormHelperText>
+                                <Collapse in={Boolean(errors.agreeTerm && touched.agreeTerm && errors.agreeTerm)}>
+                                    <FormHelperText error>
+                                        {errors.agreeTerm}
+                                    </FormHelperText>
+                                </Collapse>
                             </Grid>
                         </Grid>
                         <Button
                             type="submit"
                             fullWidth
+                            size="large"
                             variant="contained"
                             color="primary"
                             disabled={emailSent}

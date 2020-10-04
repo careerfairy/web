@@ -132,11 +132,11 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
     }
 
     function startRegistrationProcess() {
-        if (!user) {
+        if (!user || !user.emailVerified) {
             return router.push({
-                pathname: '/login',
-                query: {absolutePath: linkToStream}
-            });
+                        pathname: `/login`,
+                        query: {absolutePath: linkToStream},
+                });
         }
 
         if (!userData || !UserUtil.userProfileIsComplete(userData)) {

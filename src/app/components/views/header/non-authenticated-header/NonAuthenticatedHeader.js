@@ -1,8 +1,9 @@
 import {Fragment} from 'react';
-import {Image, Icon, Button} from "semantic-ui-react";
+import {Image, Icon} from "semantic-ui-react";
 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import {Button} from "@material-ui/core";
 
 const NonAuthenticatedHeader = (props) => {
 
@@ -25,7 +26,7 @@ const NonAuthenticatedHeader = (props) => {
                 <li className={props.page === 'wishlist' ? 'active' : ''}><Link href='/wishlist'><a>Wishlist</a></Link></li>
             </ul>
             <div id='right-menu' className={'float-right ' + (props.color === "white" ? 'white' : 'dark')}>
-                <Button  style={{ margin: '5px 10px', position: 'relative', zIndex: '1000' }} onClick={() => goToRoute('/login')} primary>Log in</Button>
+                <Button color="primary" variant="contained" style={{ margin: '8px 10px 5px 10px', position: 'relative', zIndex: '1000', fontWeight: 600 }} onClick={() => goToRoute('/login')}>Log in</Button>
             </div>
         </header>
         <style jsx>{`

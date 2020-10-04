@@ -570,11 +570,7 @@ function UpcomingLivestream(props) {
                                         size="big"
                                         id="register-button"
                                         content={
-                                            user
-                                                ? registered
-                                                ? "Cancel"
-                                                : "I'll attend!"
-                                                : "Register to attend"
+                                            user ? registered ? "Cancel" : "I'll attend!" : "Register to attend"
                                         }
                                         icon={registered ? "delete" : "plus"}
                                         style={{margin: "5px"}}
