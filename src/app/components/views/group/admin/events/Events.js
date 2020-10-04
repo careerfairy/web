@@ -61,14 +61,14 @@ const Events = (props) => {
         const [loading, setLoading] = useState(false);
 
         useEffect(() => {
-            if (props.livestream && props.livestream.targetCategories[props.group.id] && modalOpen) {
+            if (props.livestream && props.livestream.targetCategories && props.livestream.targetCategories[props.group.id] && modalOpen) {
                 setLocalCategories(props.livestream.targetCategories[props.group.id])
             }
         },[props.livestream, modalOpen])
 
         useEffect(() => {
             if (props.group && props.group.categories) {
-                let fieldOfStudyCategories = props.group.categories.find(category => category.name.toLowerCase() === "field of study");
+                let fieldOfStudyCategories = props.group.categories.find(category => category.name?.toLowerCase() === "field of study");
                 setGroupCategories(fieldOfStudyCategories.options);
             }
         },[props.group])
@@ -76,7 +76,7 @@ const Events = (props) => {
         function getOptionName(optionId) {
             let correspondingOption = {};
             correspondingOption = groupCategories.find( option => option.id === optionId );
-            return correspondingOption;
+            return correspondingOption.name || 'CATEGORY_UNDEFINED';
         }
 
         function addElement(optionId) {
@@ -106,13 +106,13 @@ const Events = (props) => {
                     size={"medium"}
                     variant={"outlined"}
                     onDelete={() => removeElement(category)}
-                    label={getOptionName(category).name} /> 
+                    label={getOptionName(category)} /> 
             );
         });
 
         let menuItems = groupCategories.map( group => {
             return (
-                 <MenuItem value={group.id}>{group.name}</MenuItem>
+                 <MenuItem value={group.id}>{group?.name}</MenuItem>
             );
         });
 
