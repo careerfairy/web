@@ -4,7 +4,6 @@ import {Button, Grid, Icon, Input, Modal} from "semantic-ui-react";
 import { withFirebasePage } from 'context/firebase';
 
 import CountdownTimer from 'components/views/common/Countdown';
-import { useLocalStream } from 'components/custom-hook/useLocalStream';
 import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
 import CurrentSpeakerDisplayer from './CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
@@ -20,11 +19,15 @@ function VideoContainer(props) {
 
     const [isStreaming, setIsStreaming] = useState(false);
 
-    const [mediaConstraints, setMediaConstraints] = useState(null);
-    const [audioSource, setAudioSource] = useState(null);
-    const [videoSource, setVideoSource] = useState(null);
+    const [mediaConstraints, setMediaConstraints] = useState({
+        audio: true,
+        video: { 
+            width: { ideal: 1920, max: 1920 },
+            height: { ideal: 1080, max: 1080 },
+            aspectRatio: 1.77,   
+        }
+    });
 
-    const { permissionGranted, userMediaError, localStream } = useLocalStream(mediaConstraints);
     const [audioCounter, setAudioCounter] = useState(0);
 
     const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
@@ -83,7 +86,7 @@ function VideoContainer(props) {
         }
     }
 
-    const { webRTCAdaptor, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels } = 
+    const { webRTCAdaptor, localMediaStream, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels } = 
         useWebRTCAdaptor(
             streamerReady,
             isPlayMode,
@@ -122,19 +125,6 @@ function VideoContainer(props) {
     }, [audioCounter, props.currentLivestream.speakerSwitchMode]);
 
     useEffect(() => {
-        const constraints = {
-            audio: { deviceId: audioSource || undefined },
-            video: { 
-                width: { ideal: 1920, max: 1920 },
-                height: { ideal: 1080, max: 1080 },
-                aspectRatio: 1.77,   
-                deviceId: videoSource ? videoSource : undefined
-            }
-          };
-        setMediaConstraints(constraints);
-    },[audioSource, videoSource]);
-
-    useEffect(() => {
         if (webRTCAdaptor) {
             if (props.currentLivestream.mode === 'desktop') {
                 webRTCAdaptor.switchDesktopCaptureWithCamera(props.streamerId);
@@ -162,7 +152,7 @@ function VideoContainer(props) {
                         setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId} 
                         removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
                         localId={props.streamerId} 
-                        localStream={localStream} 
+                        localStream={localMediaStream} 
                         streams={externalMediaStreams} 
                         mediaConstraints={mediaConstraints} 
                         currentSpeaker={props.currentLivestream.currentSpeakerId} 
@@ -172,7 +162,7 @@ function VideoContainer(props) {
                 { props.currentLivestream.mode === 'presentation' ?
                     <SmallStreamerVideoDisplayer 
                         isPlayMode={false} 
-                        localStream={localStream} 
+                        localStream={localMediaStream} 
                         streams={externalMediaStreams} 
                         mediaConstraints={mediaConstraints} 
                         livestreamId={props.currentLivestream.id} 
@@ -194,7 +184,7 @@ function VideoContainer(props) {
                         <Button icon='undo alternate' content='Reload Page' size='large' primary onClick={() => reloadPage()}/>
                 </Modal.Content>
             </Modal>
-            <StreamPreparationModal streamerReady={streamerReady} setStreamerReady={setStreamerReady} localStream={localStream} mediaConstraints={mediaConstraints} connectionEstablished={connectionEstablished} setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage} isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource} videoSource={videoSource} setVideoSource={setVideoSource}/>
+            <StreamPreparationModal streamerReady={streamerReady} setStreamerReady={setStreamerReady} streamId={props.streamerId} webRTCAdaptor={webRTCAdaptor} localStream={localMediaStream} mediaConstraints={mediaConstraints} connectionEstablished={connectionEstablished} setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage} isStreaming={isStreaming}/>
             <style jsx>{`
                 .screen-container {
                     position: absolute;                 

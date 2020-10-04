@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { navigator } from 'global';
 import { isEmptyArray } from 'formik';
 
-export default function useUserMedia(showAudioVideo) {
+export default function useDevices(showAudioVideo) {
 
     const [deviceList, setDeviceList] = useState({ audioInputList: [], audioOutputList: [], videoDeviceList: [] });
 
@@ -43,7 +43,7 @@ export default function useUserMedia(showAudioVideo) {
     }
 
     function handleError(error) {
-        console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
+        console.log('error: ', error.message, error.name);
     }
 
     function isEmpty(devicesObject) {

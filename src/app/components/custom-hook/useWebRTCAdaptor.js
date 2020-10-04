@@ -8,6 +8,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
     
+    const [localMediaStream, setLocalMediaStream] = useState(null);
     const [localStreams, setLocalStreams] = useState([]);
     const [streamsInRoom, setStreamsInRoom] = useState([]);
 
@@ -70,11 +71,21 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
     }, [streamsToRemove]);
 
     useEffect(() => {
-        if (streamerReady && document && mediaConstraints && nsToken && nsToken.iceServers) {
+        if (document && mediaConstraints && nsToken && nsToken.iceServers) {
             const adaptor = getWebRTCAdaptor();
             setWebRTCAdaptor(adaptor);
         }
-    }, [streamerReady, mediaConstraints, document, nsToken, isPlayMode]);
+    }, [mediaConstraints, document, nsToken, isPlayMode]);
+
+    useEffect(() => {
+        if (webRTCAdaptor && streamerReady) {
+            if (!isPlayMode) {
+                webRTCAdaptor.joinRoom(roomId, streamId);
+            } else {
+                webRTCAdaptor.joinRoom(roomId);
+            }
+        }
+    }, [webRTCAdaptor, streamerReady]);
 
     useEffect(() => {
         if (playFinishedStream) {
@@ -193,13 +204,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         if (typeof streamingCallbackObject.onInitialized === 'function') {
                             streamingCallbackObject.onInitialized(infoObj);
                         }
-                        setTimeout(() => {
-                            if (!isPlayMode) {
-                                this.joinRoom(roomId, streamId);
-                            } else {
-                                this.joinRoom(roomId);
-                            }
-                        }, 400);                        
+                        setLocalMediaStream(this.getLocalStream());                        
                         break;
                     }
                     case "joinedTheRoom": {
@@ -307,5 +312,5 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         return newAdaptor;
     }
   
-    return { webRTCAdaptor, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels };
+    return { webRTCAdaptor, localMediaStream, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels };
 }

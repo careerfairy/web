@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { navigator } from "global";
 
-export function useSoundMeter(isShowAudioVideo, localStream) {
+export function useSoundMeter(isShowAudioVideo, localStream, update) {
 
     const [audioValue, setAudioValue] = useState(0);
     const [soundMeter, setSoundMeter] = useState(null);
@@ -17,9 +17,10 @@ export function useSoundMeter(isShowAudioVideo, localStream) {
             if (soundMeter) {
                 soundMeter.stop();
             }
+            debugger;
             connectStream(localStream);
         }
-    },[localStream, navigator]);
+    },[localStream, navigator, update]);
 
     useEffect(() => {
         if (!isShowAudioVideo && soundMeter) {
