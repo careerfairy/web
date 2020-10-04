@@ -51,7 +51,6 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         if (localStreams && localStreams.length) {
             localStreams.forEach( stream => {
                 webRTCAdaptor.play(stream, 'null', roomId);
-                webRTCAdaptor.enableStats(streamId);
             })
         }
     }, [localStreams]);
@@ -101,6 +100,8 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
     } 
 
     function removeStreamFromExternalMediaStreams(streamId) {
+        console.log("removeStreamFromExternalMediaStreams was called");
+        webRTCAdaptor.stop(streamId);
         const externalMediaStreamsListCopy = [...externalMediaStreams];
         const localStreamsListCopy = localStreams.filter( localStreamId => localStreamId !== streamId);
         const streamEntry = externalMediaStreamsListCopy.find( entry => {
@@ -216,6 +217,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onNewStreamAvailable(infoObj);
                         }
                         setAddedStream(infoObj);
+                        this.enableStats(infoObj.streamId);
                         break;
                     }
                     case "roomInformation": {

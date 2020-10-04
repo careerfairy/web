@@ -583,7 +583,7 @@ export function WebRTCAdaptor(initialValues)
 				room: roomName,
 		};
 		this.webSocketAdaptor.send(JSON.stringify(jsCmd));
-		}, 5000);
+		}, 3000);
 	}
 
 	this.enableTrack = function(mainTrackId, trackId, enabled) {
@@ -977,6 +977,7 @@ export function WebRTCAdaptor(initialValues)
 			}
 
 			thiz.remotePeerConnection[streamId].oniceconnectionstatechange = function (event) {
+                debugger;
 				var obj = {state:thiz.remotePeerConnection[streamId].iceConnectionState, streamId:streamId};
 				thiz.callback("ice_connection_state_changed",obj);
 
