@@ -441,182 +441,6 @@ exports.sendReminderEmailToRegistrants = functions.https.onRequest(async (req, r
         })  
 });
 
-exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
-
-    let university = req.body.universityId;
-    let faculties = req.body.faculties;
-
-    let collectionRef;
-
-    if (faculties && faculties.length > 0) {
-        collectionRef = admin.firestore().collection("userData")
-        .where("university", "==", university)
-        .where("faculty", "in", faculties);
-    } else {
-        collectionRef = admin.firestore().collection("userData")
-        .where("university", "==", university);
-    }
-
-    collectionRef.get()
-    .then((querySnapshot) => {
-        let counter = 0;
-        console.log("snapshotSize:" + querySnapshot.size);
-        querySnapshot.forEach(doc => {
-            var id = doc.id;
-            const email = {
-                "TemplateId": req.body.templateId,
-                "From": 'CareerFairy <noreply@careerfairy.io>',
-                "To": id,
-                "TemplateModel": {       
-                }
-            };
-            client.sendEmailWithTemplate(email).then(() => {
-                counter++;
-                console.log("email sent to: " + id);
-                if (counter === querySnapshot.size) {
-                    return res.status(200).send();
-                }
-            }, error => {
-                console.log('error:' + error);
-                return res.status(400).send();
-            });
-        });
-    }).catch(error => {
-        console.log('error:' + error);
-        return res.status(400).send();
-    })
-});
-
-exports.sendReminderEmailToViewersFromLivestream = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
-
-    let livestreamId = req.body.livestreamId;
-    let faculties = req.body.faculties;
-    let university = req.body.university;
-
-    console.log("Hello world");
-    admin.firestore().collection("livestreams").doc(livestreamId).collection("registeredStudents")
-    .where("faculty", "in", faculties).where("university", "==", university).get()
-    .then((querySnapshot) => {
-        let counter = 0;
-        console.log("snapshotSize:" + querySnapshot.size);
-        querySnapshot.forEach(doc => {
-            var id = doc.id;
-            const email = {
-                "TemplateId": req.body.templateId,
-                "From": 'CareerFairy <noreply@careerfairy.io>',
-                "To": id,
-                "TemplateModel": {       
-                }
-            };
-            client.sendEmailWithTemplate(email).then(() => {
-                counter++;
-                console.log("email sent to: " + id);
-                if (counter === querySnapshot.size) {
-                    return res.status(200).send();
-                }
-            }, error => {
-                console.log('error:' + error);
-                return res.status(400).send();
-            });
-        });
-    }).catch(error => {
-        console.log('error:' + error);
-        return res.status(400).send();
-    })
-});
-
-exports.sendSpecificEmailsToUsers = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
-
-    admin.firestore().collection("userData").get()
-        .then((querySnapshot) => {
-            let counter = 0;
-            console.log("snapshotSize:" + querySnapshot.size);
-            querySnapshot.forEach(doc => {
-                var id = doc.id;
-                const email = {
-                    "TemplateId": req.body.templateId,
-                    "From": 'CareerFairy <noreply@careerfairy.io>',
-                    "To": id,
-                    "TemplateModel": {       
-                    }
-                };
-                client.sendEmailWithTemplate(email).then(() => {
-                    counter++;
-                    console.log("email sent to: " + id);
-                    if (counter === querySnapshot.size) {
-                        return res.status(200).send();
-                    }
-                }, error => {
-                    console.log('error:' + error);
-                    return res.status(400).send();
-                });
-            });
-        }).catch(() => {
-            return res.status(400).send();
-        })
-});
-
-exports.getAuthUsers = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
-
-    admin.auth().listUsers()
-        .then((userRecords) => {
-            var emails = [];
-            userRecords.users.forEach(user => {
-                emails.push(user.email);
-                if (emails.length === userRecords.length) {
-                    res.status(200).send(userRecords);
-                }
-            })
-        }).catch(() => {
-            return res.status(400).send();
-        })
-    
-});
-
 exports.getXirsysNtsToken = functions.https.onRequest(async (req, res) => {
 
     const https = require('https');
@@ -673,7 +497,7 @@ exports.getNumberOfViewers = functions.https.onRequest(async (req, res) => {
     });
 });
 
-exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 2 minutes').timeZone('Europe/Zurich').onRun((context) => {
+exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 1 hours').timeZone('Europe/Zurich').onRun((context) => {
     const dateNow = new Date(Date.now() + 1000 * 60 * 60 * 2);
     const dateTomorrow =  new Date(Date.now() + 1000 * 60 * 60 * 24);
     admin.firestore().collection("livestreams")
@@ -689,14 +513,39 @@ exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 2 
                 var data = generateEmailData("mvoss.private@gmail.com", livestream);
                 mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
             });
-            console.log("Finishes Logging Emails");
             res.send(200);
         }).catch((error) => {
             console.log("error: " + error);
-            return null;
             res.send(400);
         });
 });
+
+function generateEmailData(recipientEmail, livestream) {
+    var luxonStartDateTime = DateTime.fromJSDate(livestream.start.toDate(), { zone: 'Europe/Zurich' });
+    return {
+        //Specify email data
+        from: "CareerFairy <noreply@careerfairy.io>",
+        to: recipientEmail,
+        subject: 'Reminder: TODAY - Live Stream with ' + livestream.company + ' ' + getLivestreamTimeInterval(livestream.start),
+        template: 'registration-reminder',
+        "h:X-Mailgun-Variables": JSON.stringify({ "company": livestream.company, "startTime": formatHour(luxonStartDateTime), "streamLink": getStreamLink(livestream.id), "german": livestream.language === "DE" ? true : false }),
+        "o:deliverytime": luxonStartDateTime.minus({ hours: 2 }).toRFC2822()
+    }
+}
+
+function getStreamLink(streamId) {
+    return 'https://www.careerfairy.io/upcoming-livestream/' + streamId;
+}
+
+function formatHour(LuxonTime) {
+    return LuxonTime.hour + ':' + (LuxonTime.minute < 10 ? ('0' + LuxonTime.minute) : LuxonTime.minute);
+}
+
+function getLivestreamTimeInterval(livestreamStartDateTime) {
+    var startDateTime = DateTime.fromJSDate(livestreamStartDateTime.toDate(), { zone: 'Europe/Zurich' });
+    var endDateTime = DateTime.fromJSDate(livestreamStartDateTime.toDate(), { zone: 'Europe/Zurich' }).plus({ minutes: 30 });
+    return '(' + formatHour(startDateTime) + '-' + formatHour(endDateTime) + ')';
+}
 
 // Run this function every hour
 exports.exportFirestoreBackup = functions.pubsub.schedule('every 1 hours').timeZone('Europe/Zurich').onRun((context) => {
@@ -725,31 +574,13 @@ exports.exportFirestoreBackup = functions.pubsub.schedule('every 1 hours').timeZ
     });
 });
 
-exports.scheduleTestLivestreamDeletion = functions.pubsub.schedule('every 24 hours').timeZone('Europe/Zurich').onRun((context) => {});
-
-function generateEmailData(recipientEmail, livestream) {
-    var luxonStartDateTime = DateTime.fromJSDate(livestream.start.toDate(), { zone: 'Europe/Zurich' });
-    return {
-        //Specify email data
-        from: "CareerFairy <noreply@careerfairy.io>",
-        to: recipientEmail,
-        subject: 'Reminder: TODAY - Live Stream with ' + livestream.company + ' ' + getLivestreamTimeInterval(livestream.start),
-        template: 'registration-reminder',
-        "h:X-Mailgun-Variables": JSON.stringify({ "company": livestream.company, "startTime": formatHour(luxonStartDateTime), "streamLink": getStreamLink(livestream.id), "german": livestream.language === "DE" ? true : false }),
-        "o:deliverytime": luxonStartDateTime.minus({ hours: 2 }).toRFC2822()
-    }
-}
-
-function getStreamLink(streamId) {
-    return 'https://www.careerfairy.io/upcoming-livestream/' + streamId;
-}
-
-function formatHour(LuxonTime) {
-    return LuxonTime.hour + ':' + (LuxonTime.minute < 10 ? ('0' + LuxonTime.minute) : LuxonTime.minute);
-}
-
-function getLivestreamTimeInterval(livestreamStartDateTime) {
-    var startDateTime = DateTime.fromJSDate(livestreamStartDateTime.toDate(), { zone: 'Europe/Zurich' });
-    var endDateTime = DateTime.fromJSDate(livestreamStartDateTime.toDate(), { zone: 'Europe/Zurich' }).plus({ minutes: 30 });
-    return '(' + formatHour(startDateTime) + '-' + formatHour(endDateTime) + ')';
-}
+exports.scheduleTestLivestreamDeletion = functions.pubsub.schedule('every 6 hours').timeZone('Europe/Zurich').onRun((context) => {
+    admin.firestore().collection("livestreams")
+        .where("test", "==", true)
+        .get().then((querySnapshot) => {
+            console.log("querysnapshot size: " + querySnapshot.size);
+            querySnapshot.forEach( doc => {
+                admin.firestore().collection("livestreams").doc(doc.id).delete().catch((e) => { console.log(e)});        
+            })
+        });
+});
