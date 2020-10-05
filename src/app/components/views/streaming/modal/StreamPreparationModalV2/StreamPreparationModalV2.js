@@ -60,6 +60,7 @@ const StreamPreparationModalV2 = ({
     const [playSound, setPlaySound] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
     const devices = useUserMedia(activeStep);
+    console.log("devices", devices);
     const audioLevel = useSoundMeter(showAudioVideo, localStream);
 
     const steps = getSteps();
@@ -120,7 +121,7 @@ const StreamPreparationModalV2 = ({
             </DialogTitle>
             {getStepContent(activeStep)}
             <DialogContent>
-                <Stepper className={classes.stepper}  activeStep={activeStep} alternativeLabel>
+                <Stepper className={classes.stepper} activeStep={activeStep} alternativeLabel>
                     {steps.map((label) => (
                         <Step key={label}>
                             <StepLabel>{label}</StepLabel>

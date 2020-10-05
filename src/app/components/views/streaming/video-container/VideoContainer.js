@@ -179,7 +179,7 @@ function VideoContainer(props) {
             }
           };
         setMediaConstraints(constraints);
-    },[audioSource, videoSource, speakerSource]);
+    },[audioSource, videoSource]);
 
     useEffect(() => {
         if (webRTCAdaptor) {
