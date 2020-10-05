@@ -542,12 +542,12 @@ exports.getNumberOfViewers = functions.https.onRequest(async (req, res) => {
     });
 });
 
-exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 1 hours').timeZone('Europe/Zurich').onRun((context) => {
-    const dateNow = new Date(Date.now() + 1000 * 60 * 60 * 2);
-    const dateTomorrow =  new Date(Date.now() + 1000 * 60 * 60 * 24);
+exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 45 minutes').timeZone('Europe/Zurich').onRun((context) => {
+    const dateStart = new Date(Date.now() + 1000 * 60 * 60 * 1);
+    const dateEnd =  new Date(Date.now() + 1000 * 60 * 60 * 1.75);
     admin.firestore().collection("livestreams")
-        .where("start", ">=", dateNow)
-        .where("start", "<", dateTomorrow)
+        .where("start", ">=", dateStart)
+        .where("start", "<", dateEnd)
         .get().then((querySnapshot) => {
             console.log("querysnapshot size: " + querySnapshot.size);
             querySnapshot.forEach(doc => {
@@ -555,7 +555,7 @@ exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 1 
                 livestream.id = doc.id;
                 console.log("livestream company: " + livestream.company);
                 console.log("number of emails: " + livestream.registeredUsers.length);
-                var data = generateEmailData("mvoss.private@gmail.com", livestream);
+                var data = generateEmailData("link.aerospace@gmail.com", livestream);
                 mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
             });
             res.send(200);
@@ -574,7 +574,7 @@ function generateEmailData(recipientEmail, livestream) {
         subject: 'Reminder: TODAY - Live Stream with ' + livestream.company + ' ' + getLivestreamTimeInterval(livestream.start),
         template: 'registration-reminder',
         "h:X-Mailgun-Variables": JSON.stringify({ "company": livestream.company, "startTime": formatHour(luxonStartDateTime), "streamLink": getStreamLink(livestream.id), "german": livestream.language === "DE" ? true : false }),
-        "o:deliverytime": luxonStartDateTime.minus({ hours: 2 }).toRFC2822()
+        "o:deliverytime": luxonStartDateTime.minus({ minutes: 45 }).toRFC2822()
     }
 }
 
