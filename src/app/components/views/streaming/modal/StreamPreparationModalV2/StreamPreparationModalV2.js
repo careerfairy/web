@@ -16,6 +16,14 @@ import Step2Camera from "./Step2Camera";
 import Step3Speakers from "./Step3Speakers";
 import Step4Mic from "./Step4Mic";
 import Step5Confirm from "./Step5Confirm";
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles(theme => ({
+    stepper: {
+        paddingLeft: 0,
+        paddingRight: 0
+    }
+}))
 
 function getSteps() {
     return ['Browser', 'Camera', 'Speakers', 'Microphone', 'Confirm'];
@@ -47,6 +55,7 @@ const StreamPreparationModalV2 = ({
                                       setSpeakerSource,
                                       speakerSource
                                   }) => {
+    const classes = useStyles()
     const [showAudioVideo, setShowAudioVideo] = useState(false);
     const [playSound, setPlaySound] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
@@ -111,7 +120,7 @@ const StreamPreparationModalV2 = ({
             </DialogTitle>
             {getStepContent(activeStep)}
             <DialogContent>
-                <Stepper activeStep={activeStep} alternativeLabel>
+                <Stepper className={classes.stepper}  activeStep={activeStep} alternativeLabel>
                     {steps.map((label) => (
                         <Step key={label}>
                             <StepLabel>{label}</StepLabel>

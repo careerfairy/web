@@ -8,9 +8,9 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        width: "100%",
-        marginTop: 20
-
+    },
+    button: {
+        height: "100%"
     }
 }))
 
@@ -32,34 +32,40 @@ const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudi
 
     return (
         <div style={{padding: "0 20px"}}>
-            <Typography variant="h5">Video</Typography>
-            <Typography variant="subtitle1">Please select your camera for this stream:</Typography>
-            <Grid container>
+            <Grid container spacing={2}>
+                <Grid item>
+                    <Typography variant="h5">Video</Typography>
+                    <Typography variant="subtitle1">Please select your camera for this stream:</Typography>
+                </Grid>
                 <Grid item>
                     <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
                         <video style={{boxShadow: '0 0 3px rgb(200,200,200)', borderRadius: '5px'}}
                                ref={testVideoRef} muted={playSound} autoPlay width={'100%'}/>
                     </div>
-                    <div className={classes.actions}>
-                        <FormControl  variant="outlined">
-                            <InputLabel id="camera">Select Camera</InputLabel>
-                            <Select value={videoSource}
-                                    onChange={handleChangeCam}
-                                    variant="outlined"
-                                    id="camera"
-                                    label="Select Camera">
-                                {devices.videoDeviceList.map(device => {
-                                    return (<MenuItem value={device.value}>{device.text}</MenuItem>)
-                                })}
-                            </Select>
-                        </FormControl>
-                        <Button color="primary" variant="contained" size="large"
-                                onClick={() => {
-                                    setActiveStep(2)
-                                }}>
-                            Next step
-                        </Button>
-                    </div>
+                </Grid>
+                <Grid item className={classes.actions} lg={10} md={10} sm={12} xs={12}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel id="camera">Select Camera</InputLabel>
+                        <Select value={videoSource}
+                                fullWidth
+                                onChange={handleChangeCam}
+                                variant="outlined"
+                                id="camera"
+                                label="Select Camera"
+                        >
+                            {devices.videoDeviceList.map(device => {
+                                return (<MenuItem value={device.value}>{device.text}</MenuItem>)
+                            })}
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid lg={2} md={2} sm={12} xs={12} item>
+                    <Button fullWidth color="primary" className={classes.button} variant="contained" size="large"
+                            onClick={() => {
+                                setActiveStep(2)
+                            }}>
+                        Next step
+                    </Button>
                 </Grid>
             </Grid>
         </div>
