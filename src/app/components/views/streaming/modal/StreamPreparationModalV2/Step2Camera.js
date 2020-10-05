@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudioSource, playSound, setPlaySound, setStreamerReady, setActiveStep, localStream}) => {
+const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudioSource, playSound, setPlaySound, setStreamerReady, handleNext, localStream}) => {
     const classes = useStyles()
 
     const testVideoRef = useRef(null);
@@ -61,9 +61,7 @@ const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudi
                 </Grid>
                 <Grid lg={2} md={2} sm={12} xs={12} item>
                     <Button fullWidth color="primary" className={classes.button} variant="contained" size="large"
-                            onClick={() => {
-                                setActiveStep(2)
-                            }}>
+                            onClick={handleNext}>
                         Next step
                     </Button>
                 </Grid>

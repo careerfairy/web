@@ -1,16 +1,22 @@
 import React, {useState, useEffect, useRef} from 'react';
 
 import {withFirebase} from 'context/firebase';
-import {Modal, Input, Icon, Button, Form, Image, Grid, Dropdown, Container} from 'semantic-ui-react';
-import {Formik} from 'formik';
-import {Dialog, DialogTitle, DialogContent, Paper} from '@material-ui/core'
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    Paper,
+    StepButton,
+    Typography,
+    DialogActions,
+    Button
+} from '@material-ui/core'
 import {useSoundMeter} from 'components/custom-hook/useSoundMeter';
 import SoundLevelDisplayer from 'components/views/common/SoundLevelDisplayer';
 import useUserMedia from 'components/custom-hook/useDevices';
 import Draggable from 'react-draggable';
 import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
 import Step1Chrome from "./Step1Chrome";
 import Step2Camera from "./Step2Camera";
 import Step3Speakers from "./Step3Speakers";
@@ -59,6 +65,8 @@ const StreamPreparationModalV2 = ({
     const [showAudioVideo, setShowAudioVideo] = useState(false);
     const [playSound, setPlaySound] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
+    const [completed, setCompleted] = React.useState(new Set());
+    const [skipped, setSkipped] = React.useState(new Set());
     const devices = useUserMedia(activeStep);
     const audioLevel = useSoundMeter(showAudioVideo, localStream);
 
@@ -76,8 +84,102 @@ const StreamPreparationModalV2 = ({
         }
     }, [devices]);
 
+    const totalSteps = () => {
+        return getSteps().length;
+    };
+
+    const isStepOptional = (step) => {
+        // return step === 1;
+        return false
+    };
+
+    const isCompleted = () =>{
+        return activeStep !== steps.length && completed.has(activeStep)
+    }
+
+    const handleSkip = () => {
+        if (!isStepOptional(activeStep)) {
+            // You probably want to guard against something like this
+            // it should never occur unless someone's actively trying to break something.
+            throw new Error("You can't skip a step that isn't optional.");
+        }
+
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        setSkipped((prevSkipped) => {
+            const newSkipped = new Set(prevSkipped.values());
+            newSkipped.add(activeStep);
+            return newSkipped;
+        });
+    };
+
+    const skippedSteps = () => {
+        return skipped.size;
+    };
+
+    const completedSteps = () => {
+        return completed.size;
+    };
+
+    const allStepsCompleted = () => {
+        return completedSteps() === totalSteps() - skippedSteps();
+    };
+
+    const isLastStep = () => {
+        return activeStep === totalSteps() - 1;
+    };
+
+    const handleNext = () => {
+        const newActiveStep =
+            isLastStep() && !allStepsCompleted()
+                ? // It's the last step, but not all steps have been completed
+                  // find the first step that has been completed
+                steps.findIndex((step, i) => !completed.has(i))
+                : activeStep + 1;
+
+        setActiveStep(newActiveStep);
+    };
+
+    const handleBack = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    };
+
+    const handleStep = (step) => () => {
+        setActiveStep(step);
+    };
+
+    const handleComplete = () => {
+        const newCompleted = new Set(completed);
+        newCompleted.add(activeStep);
+        setCompleted(newCompleted);
+
+        /**
+         * Sigh... it would be much nicer to replace the following if conditional with
+         * `if (!this.allStepsComplete())` however state is not set when we do this,
+         * thus we have to resort to not being very DRY.
+         */
+        if (completed.size !== totalSteps() - skippedSteps()) {
+            handleNext();
+        }
+    };
+
+    const handleReset = () => {
+        setActiveStep(0);
+        setCompleted(new Set());
+        setSkipped(new Set());
+    };
+
+    const isStepSkipped = (step) => {
+        return skipped.has(step);
+    };
+
+    function isStepComplete(step) {
+        return completed.has(step);
+    }
+
+
     const attachSinkId = (element, sinkId) => {
         if (typeof element.sinkId !== 'undefined') {
+            console.log("element", element);
             element.setSinkId(sinkId)
                 .then(() => {
                     console.log(`Success, audio output device attached: ${sinkId}`);
@@ -98,7 +200,7 @@ const StreamPreparationModalV2 = ({
     function getStepContent(stepIndex) {
         switch (stepIndex) {
             case 0:
-                return <Step1Chrome setActiveStep={setActiveStep}/>;
+                return <Step1Chrome handleComplete={handleComplete}/>;
             case 1:
                 return <Step2Camera audioLevel={audioLevel}
                                     audioSource={audioSource}
@@ -107,7 +209,7 @@ const StreamPreparationModalV2 = ({
                                     playSound={playSound}
                                     setAudioSource={setAudioSource}
                                     setPlaySound={setPlaySound}
-                                    setActiveStep={setActiveStep}
+                                    handleNext={handleComplete}
                                     setStreamerReady={setStreamerReady}
                                     setVideoSource={setVideoSource}
                                     videoSource={videoSource}/>;
@@ -115,13 +217,14 @@ const StreamPreparationModalV2 = ({
                 return <Step3Speakers setSpeakerSource={setSpeakerSource}
                                       devices={devices}
                                       attachSinkId={attachSinkId}
-                                      setActiveStep={setActiveStep}
+                                      handleNext={handleComplete}
                                       localStream={localStream}
                                       speakerSource={speakerSource}/>
             case 3:
                 return <Step4Mic setAudioSource={setAudioSource}
                                  audioLevel={audioLevel}
                                  devices={devices}
+                                 handleNext={handleComplete}
                                  attachSinkId={attachSinkId}
                                  localStream={localStream}
                                  playSound={playSound}
@@ -147,12 +250,59 @@ const StreamPreparationModalV2 = ({
             {getStepContent(activeStep)}
             <DialogContent>
                 <Stepper className={classes.stepper} activeStep={activeStep} alternativeLabel>
-                    {steps.map((label) => (
-                        <Step key={label}>
-                            <StepLabel>{label}</StepLabel>
-                        </Step>
-                    ))}
+                    {steps.map((label, index) => {
+                        const stepProps = {};
+                        const buttonProps = {};
+                        if (isStepOptional(index)) {
+                            buttonProps.optional = <Typography variant="caption">Optional</Typography>;
+                        }
+                        if (isStepSkipped(index)) {
+                            stepProps.completed = false;
+                        }
+
+                        return (<Step key={label} {...stepProps}>
+                            <StepButton onClick={handleStep(index)}
+                                        completed={isStepComplete(index)}
+                                        {...buttonProps}>
+                                {label}
+                            </StepButton>
+                        </Step>)
+                    })}
                 </Stepper>
+                <DialogActions>
+                    <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
+                        Back
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        disabled={!isStepComplete(activeStep)}
+                        onClick={handleNext}
+                        className={classes.button}
+                    >
+                        Next
+                    </Button>
+                    {isStepOptional(activeStep) && !completed.has(activeStep) && (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleSkip}
+                            className={classes.button}
+                        >
+                            Skip
+                        </Button>
+                    )}
+
+                    {isCompleted() ? (
+                        <Typography variant="caption" className={classes.completed}>
+                            Step {activeStep + 1} already completed
+                        </Typography>
+                    ) : (null
+                        // <Button variant="contained" color="primary" onClick={handleComplete}>
+                        //     {completedSteps() === totalSteps() - 1 ? 'Finish' : 'Complete Step'}
+                        // </Button>
+                    )}
+                </DialogActions>
                 <p>Don't worry, your stream will not start until you decide to.</p>
                 <p style={{fontSize: '0.8em', color: 'grey'}}>If anything is unclear or not working, please <a
                     href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
