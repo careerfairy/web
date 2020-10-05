@@ -55,14 +55,14 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
                     <Typography variant="h5">Speakers</Typography>
                     <Typography variant="subtitle1">Please select your speaker for this stream:</Typography>
                 </Grid>
-                <Grid item className={classes.actions} lg={10} md={10} sm={12} xs={12}>
+                <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
                     <FormControl fullWidth variant="outlined">
-                        <InputLabel id="camera">Select Speakers</InputLabel>
+                        <InputLabel id="speakerSelect">Select Speakers</InputLabel>
                         <Select value={speakerSource}
                                 fullWidth
                                 onChange={handleChangeSpeaker}
                                 variant="outlined"
-                                id="camera"
+                                id="speakerSelect"
                                 label="Select Speakers"
                         >
                             {devices.audioOutputList.map(device => {

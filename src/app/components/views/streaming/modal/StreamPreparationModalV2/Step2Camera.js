@@ -50,12 +50,12 @@ const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudi
                 </Grid>
                 <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
                     <FormControl fullWidth variant="outlined">
-                        <InputLabel id="camera">Select Camera</InputLabel>
+                        <InputLabel id="cameraSelect">Select Camera</InputLabel>
                         <Select value={videoSource}
                                 fullWidth
                                 onChange={handleChangeCam}
                                 variant="outlined"
-                                id="camera"
+                                id="cameraSelect"
                                 label="Select Camera"
                         >
                             {devices.videoDeviceList.map(device => {
