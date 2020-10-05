@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Button, DialogContent, FormControl, Grid, InputLabel, MenuItem, Select, Typography} from "@material-ui/core";
+import HeadsetMicIcon from '@material-ui/icons/HeadsetMic';
 import {Icon} from "semantic-ui-react";
 import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
 import {makeStyles} from "@material-ui/core/styles";
@@ -27,10 +28,26 @@ const useStyles = makeStyles(theme => ({
             margin: "0 5px"
         }
     },
-    micWrapper: {
+    micLabel: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        "& <": {
+            margin: "0 5px"
+        }
+    },
+    label: {
         display: "flex",
         flexDirection: "column",
         alignItems: "center"
+    },
+    emphasis: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        "& <": {
+            margin: "0 5px"
+        }
     }
 }))
 
@@ -152,19 +169,17 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid lg={4} md={4} sm={12} xs={12} item>
-                    <Typography align="center" style={{fontWeight: '600'}}>Microphone Volume</Typography>
+                <Grid className={classes.label} lg={4} md={4} sm={12} xs={12} item>
+                    <div className={classes.emphasis}>
+                        <HeadsetMicIcon style={{marginRight: 5}} fontSize="large" color="primary"/>
+                        <Typography color="primary"><b>USE HEADPHONES!</b></Typography>
+                        <HeadsetMicIcon style={{marginLeft: 5}} fontSize="large" color="primary"/>
+                    </div>
+                    <Typography align="center" style={{fontWeight: '600'}}>Microphone Volume:</Typography>
                 </Grid>
-                <Grid className={classes.micWrapper} lg={8} md={8} sm={12} xs={12} item>
+                <Grid className={classes.micLabel} lg={8} md={8} sm={12} xs={12} item>
                     <audio ref={testAudioRef} autoPlay/>
                     <SoundLevelDisplayer audioLevel={audioLevel}/>
-                    <Typography style={{
-                        marginTop: '5px',
-                        fontWeight: '500',
-                        marginBottom: '5px',
-                        fontSize: '0.8em',
-                        color: 'pink'
-                    }}><Icon name='headphones' color='pink'/>USE HEADPHONES!</Typography>
                 </Grid>
             </Grid>
         </div>

@@ -25,7 +25,7 @@ function SoundLevelDisplayer(props) {
                 }
 
                 .green {
-                    background-color: pink;
+                    background-color: #00d2aa;
                 }
 
                 .red {
