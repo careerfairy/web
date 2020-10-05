@@ -234,7 +234,10 @@ const StreamPreparationModalV2 = ({
             case 4:
                 return <Step5Confirm setConnectionEstablished={setConnectionEstablished}
                                      isStreaming={isStreaming}
-                                     errorMessage={errorMessage}
+                                     audioSource={audioSource}
+                                     devices={devices}
+                                      speakerSource={speakerSource}
+                                     videoSource={videoSource}
                                      streamerReady={streamerReady}/>
             default:
                 return 'Unknown stepIndex';
@@ -295,10 +298,9 @@ const StreamPreparationModalV2 = ({
 
                     {completedSteps() === totalSteps() - 1 &&
                     <Button variant="contained" color="primary" onClick={handleComplete}>
-                        Finish
+                        Start Streaming
                     </Button>}
                 </DialogActions>
-                <p>Don't worry, your stream will not start until you decide to.</p>
                 <p style={{fontSize: '0.8em', color: 'grey'}}>If anything is unclear or not working, please <a
                     href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
             </DialogContent>

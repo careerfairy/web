@@ -18,6 +18,7 @@ export const useAudio = (url) => {
             setPlaying(false)
         });
         return () => {
+            audio.pause()
             audio.removeEventListener('ended', () => setPlaying(false));
         };
     }, []);
