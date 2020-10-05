@@ -1,13 +1,30 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {DialogContent, MenuItem, Select} from "@material-ui/core";
 import {Button, Grid, Icon} from "semantic-ui-react";
 import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
 
-const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySound}) => {
+const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySound, playSound, localStream, speakerSource, attachSinkId}) => {
 
     const handleChangeMic = (event) => {
         setAudioSource(event.target.value)
     }
+
+    const testAudioRef = useRef(null);
+    useEffect(() => {
+        if (localStream) {
+            testAudioRef.current.srcObject = localStream;
+        }
+    }, [localStream]);
+
+    useEffect(() => {
+        if(speakerSource && testAudioRef){
+
+        }
+    },[speakerSource, testAudioRef])
+    console.log("localStream", localStream);
+
+    console.log("testAudioRef", testAudioRef);
+
     return (
         <DialogContent>
             <Select
@@ -28,6 +45,8 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
                         into
                         the microphone to test the audio capture</p>
                     <SoundLevelDisplayer audioLevel={audioLevel} style={{margin: '20px auto'}}/>
+                    <audio style={{boxShadow: '0 0 3px rgb(200,200,200)', borderRadius: '5px'}}
+                           ref={testAudioRef} muted={playSound} autoPlay/>
                     <div style={{marginTop: '30px'}}>
                         <p style={{fontWeight: '300', marginBottom: '5px', fontSize: '0.8em'}}>Listen to the
                             playback of your microphone:</p>

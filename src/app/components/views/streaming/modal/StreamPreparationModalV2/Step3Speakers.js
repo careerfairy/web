@@ -14,18 +14,27 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const Step3Speakers = ({setSpeakerSource, speakerSource, setActiveStep, devices}) => {
+const Step3Speakers = ({setSpeakerSource, speakerSource, setActiveStep, devices, localStream, attachSinkId}) => {
     const classes = useStyles()
-    const [playing, toggle] = useAudio("https://www.kozco.com/tech/piano2-CoolEdit.mp3")
-    console.log("playing", playing);
+    const [playing, toggle, audio] = useAudio("https://www.kozco.com/tech/piano2-CoolEdit.mp3")
+    // console.log("audio", audio);
+    // console.log("localStream", localStream);
 
     useEffect(() => {
         toggle()
     }, []);
 
+    useEffect(() => {
+        if (!playing) {
+            toggle()
+        }
+    }, [playing])
 
-    const handleChangeSpeaker = (event) => {
+//
+
+    const handleChangeSpeaker = async (event) => {
         setSpeakerSource(event.target.value)
+        await attachSinkId(audio, event.target.value);
     }
 
     return (
@@ -53,9 +62,7 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, setActiveStep, devices}
                 </Grid>
                 <Grid lg={2} md={2} sm={12} xs={12} item>
                     <Button fullWidth color="primary" className={classes.button} variant="contained" size="large"
-                            onClick={() => {
-                                setActiveStep(2)
-                            }}>
+                            onClick={() => setActiveStep(3)}>
                         Next
                     </Button>
                 </Grid>

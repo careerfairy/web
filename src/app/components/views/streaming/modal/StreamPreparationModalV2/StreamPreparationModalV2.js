@@ -76,6 +76,25 @@ const StreamPreparationModalV2 = ({
         }
     }, [devices]);
 
+    const attachSinkId = (element, sinkId) => {
+        if (typeof element.sinkId !== 'undefined') {
+            element.setSinkId(sinkId)
+                .then(() => {
+                    console.log(`Success, audio output device attached: ${sinkId}`);
+                })
+                .catch(error => {
+                    let errorMessage = error;
+                    if (error.name === 'SecurityError') {
+                        errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
+                    }
+                    console.error(errorMessage);
+                    // Jump back to first output device in the list as it's the default.
+                });
+        } else {
+            console.warn('Browser does not support output device selection.');
+        }
+    }
+
     function getStepContent(stepIndex) {
         switch (stepIndex) {
             case 0:
@@ -95,11 +114,18 @@ const StreamPreparationModalV2 = ({
             case 2:
                 return <Step3Speakers setSpeakerSource={setSpeakerSource}
                                       devices={devices}
+                                      attachSinkId={attachSinkId}
+                                      setActiveStep={setActiveStep}
+                                      localStream={localStream}
                                       speakerSource={speakerSource}/>
             case 3:
                 return <Step4Mic setAudioSource={setAudioSource}
                                  audioLevel={audioLevel}
                                  devices={devices}
+                                 attachSinkId={attachSinkId}
+                                 localStream={localStream}
+                                 playSound={playSound}
+                                 speakerSource={speakerSource}
                                  setPlaySound={setPlaySound}
                                  audioSource={audioSource}/>
             case 4:

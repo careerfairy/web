@@ -181,39 +181,6 @@ function VideoContainer(props) {
         setMediaConstraints(constraints);
     }, [audioSource, videoSource]);
 
-    useEffect( () => {
-        if (speakerSource && videoSource) {
-            changeSpeakers()
-        }
-    }, [speakerSource, videoSource])
-
-    const changeSpeakers = async () => {
-        const audio = document.createElement('audio');
-        await videoSource.setSinkId(speakerSource);
-        console.log('Audio is being played on ' + audio.sinkId);
-    }
-
-    // Attach audio output device to video element using device/sink ID.
-    function attachSinkId(element, sinkId) {
-        if (typeof element.sinkId !== 'undefined') {
-            element.setSinkId(sinkId)
-                .then(() => {
-                    console.log(`Success, audio output device attached: ${sinkId}`);
-                })
-                .catch(error => {
-                    let errorMessage = error;
-                    if (error.name === 'SecurityError') {
-                        errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
-                    }
-                    console.error(errorMessage);
-                    // Jump back to first output device in the list as it's the default.
-                    // audioOutputSelect.selectedIndex = 0;
-                });
-        } else {
-            console.warn('Browser does not support output device selection.');
-        }
-    }
-
     useEffect(() => {
         if (webRTCAdaptor) {
             if (props.currentLivestream.mode === 'desktop') {

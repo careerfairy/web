@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 
 
 export const useAudio = (url) => {
@@ -15,12 +15,12 @@ export const useAudio = (url) => {
 
     useEffect(() => {
         audio.addEventListener('ended', () => {
-            return audio.play()
+            setPlaying(false)
         });
         return () => {
             audio.removeEventListener('ended', () => setPlaying(false));
         };
     }, []);
 
-    return [playing, toggle];
+    return [playing, toggle, audio];
 };
