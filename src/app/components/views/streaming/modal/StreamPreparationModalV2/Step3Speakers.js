@@ -139,8 +139,8 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
                             </>
                         }
                     </div>
-                    {clickedNo && !allTested && <Typography align="center">You have {localSpeakers.length} speakers... Now testing
-                        speaker {speakerNumber() + 1} </Typography>}
+                    {clickedNo && !allTested && <Typography align="center">You have {localSpeakers.length} speakers, Now testing
+                        speaker {speakerNumber() + 1}... </Typography>}
                 </Grid>
                 <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
                     <FormControl disabled={isFirefox} fullWidth variant="outlined">

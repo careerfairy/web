@@ -1,9 +1,41 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {DialogContent, MenuItem, Select, Typography} from "@material-ui/core";
-import {Button, Grid, Icon} from "semantic-ui-react";
+import {Button, DialogContent, FormControl, Grid, InputLabel, MenuItem, Select, Typography} from "@material-ui/core";
+import {Icon} from "semantic-ui-react";
 import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles(theme => ({
+    actions: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+    },
+    button: {
+        height: "100%"
+    },
+    warning: {
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "column"
+    },
+    buttons: {
+        display: "flex",
+        justifyContent: "center",
+        marginBottom: 5,
+        width: "100%",
+        "& .MuiButton-root": {
+            margin: "0 5px"
+        }
+    },
+    micWrapper: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center"
+    }
+}))
 
 const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySound, playSound, localStream, speakerSource, attachSinkId, handleComplete}) => {
+    const classes = useStyles()
     const [localMicrophones, setLocalSpeakers] = useState([])
     const [clickedNo, setClickedNo] = useState(false)
     const [allTested, setAllTested] = useState(false)
@@ -58,8 +90,8 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
         setLocalSpeakers(newLocalSpeakers)
     }
 
-    const speakerNumber = () => {
-        const targetIndex = localMicrophones.findIndex(device => device.value === speakerSource)
+    const micNumber = () => {
+        const targetIndex = localMicrophones.findIndex(device => device.value === audioSource)
         return targetIndex
     }
 
@@ -83,7 +115,7 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
             <Grid container spacing={2}>
                 <Grid lg={12} md={12} sm={12} xs={12} item>
                     <Typography align="center" variant="h4"
-                                gutterBottom><b>{allTested ? "We have tested all your Microphone" : "Do you hear a ringtone?"}</b></Typography>
+                                gutterBottom><b>{allTested ? "We have tested all your Microphones" : "Speak and pause, do you hear a replay?"}</b></Typography>
                     <div className={classes.buttons}>
                         {allTested ?
                             <Button variant="outlined" onClick={handleTestAgain}>
@@ -101,40 +133,39 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
                         }
                     </div>
                     {clickedNo && !allTested &&
-                    <Typography align="center">You have {localMicrophones.length} speakers... Now testing
-                        speaker {speakerNumber() + 1} </Typography>}
+                    <Typography align="center">You have {localMicrophones.length} microphones, Now testing
+                        microphone {micNumber() + 1}... </Typography>}
                 </Grid>
-                <Select
-                    labelId="Microphone Select"
-                    id="mic-select"
-                    value={audioSource}
-                    onChange={handleChangeMic}
-                >
-                    {devices.audioInputList.map(device => {
-                        return (<MenuItem value={device.value}>{device.text}</MenuItem>)
-                    })}
-                </Select>
-                <Grid.Column>
-                    <div style={{padding: '20px 0', textAlign: 'center'}}>
-                        <Typography style={{fontWeight: '600', color: 'pink'}}>Microphone Volume
-                        </Typography>
-                        <p style={{fontWeight: '300', marginBottom: '15px', fontSize: '0.8em'}}>Please speak
-                            into
-                            the microphone to test the audio capture</p>
-                        <SoundLevelDisplayer audioLevel={audioLevel} style={{margin: '20px auto'}}/>
-                        <audio style={{boxShadow: '0 0 3px rgb(200,200,200)', borderRadius: '5px'}}
-                               ref={testAudioRef} muted={playSound} autoPlay/>
-                        <div style={{marginTop: '30px'}}>
-                            <p style={{
-                                marginTop: '5px',
-                                fontWeight: '500',
-                                marginBottom: '5px',
-                                fontSize: '0.8em',
-                                color: 'pink'
-                            }}><Icon name='headphones' color='pink'/>USE HEADPHONES!</p>
-                        </div>
-                    </div>
-                </Grid.Column>
+                <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel id="microphoneSelect">Select Microphone</InputLabel>
+                        <Select value={audioSource}
+                                fullWidth
+                                onChange={handleChangeMic}
+                                variant="outlined"
+                                id="microphoneSelect"
+                                label="Select Microphone"
+                        >
+                            {localMicrophones.map(device => {
+                                return (<MenuItem key={device.value} value={device.value}>{device.text}</MenuItem>)
+                            })}
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid lg={4} md={4} sm={12} xs={12} item>
+                    <Typography align="center" style={{fontWeight: '600'}}>Microphone Volume</Typography>
+                </Grid>
+                <Grid className={classes.micWrapper} lg={8} md={8} sm={12} xs={12} item>
+                    <audio ref={testAudioRef} autoPlay/>
+                    <SoundLevelDisplayer audioLevel={audioLevel}/>
+                    <Typography style={{
+                        marginTop: '5px',
+                        fontWeight: '500',
+                        marginBottom: '5px',
+                        fontSize: '0.8em',
+                        color: 'pink'
+                    }}><Icon name='headphones' color='pink'/>USE HEADPHONES!</Typography>
+                </Grid>
             </Grid>
         </div>
     );
