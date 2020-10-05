@@ -58,13 +58,26 @@ function StreamingPage(props) {
         return new Date(date).getTime() - Date.now() < 1000*60*2 || Date.now() > new Date(date).getTime();
     }
 
+    function setStreamingStarted(started) {
+        props.firebase.setLivestreamHasStarted(started, currentLivestream.id);
+    }
+
     return (
         <NotificationsContext.Provider value={{ setNewNotification: setNewNotification }}>
             <div className='topLevelContainer'>
                 <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
+                    <div style={{ position: 'absolute', top: '50%', left: '20px', transform: 'translateY(-50%)', verticalAlign: 'middle'}}>
+                        <ButtonWithConfirm
+                            color={currentLivestream.hasStarted ? 'red' : 'teal'}  
+                            fluid
+                            disabled={!streamStartTimeIsNow}
+                            buttonAction={() => setStreamingStarted(!currentLivestream.hasStarted)} 
+                            confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
+                            buttonLabel={ currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming' }/>
+                    </div>
                     <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', display: 'inline-block', padding: '10px', verticalAlign: 'middle', fontSize: '0.8em'}}>
                         <h3 style={{ color: (currentLivestream.hasStarted ?  'teal' : 'orange') }}>{ currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}</h3>
-                        { currentLivestream.hasStarted ? '' : 'Host must press Start Streaming to begin'}
+                        { currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
                     </div>
                     <div style={{ float: 'right', margin: '0 20px', fontSize: '1em', padding: '3px', verticalAlign: 'middle'}}>
                         Viewers: { numberOfViewers }
