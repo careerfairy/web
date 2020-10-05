@@ -22,6 +22,7 @@ const useStyles = makeStyles(theme => ({
     buttons: {
         display: "flex",
         justifyContent: "center",
+        marginBottom: 5,
         width: "100%",
         "& .MuiButton-root": {
             margin: "0 5px"
@@ -30,17 +31,13 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices, localStream, attachSinkId}) => {
-    console.log("devices", devices);
     const classes = useStyles()
     const [playing, toggle, audio] = useAudio("https://www.kozco.com/tech/piano2-CoolEdit.mp3")
     const [localSpeakers, setLocalSpeakers] = useState([])
-    console.log("localSpeakers", localSpeakers);
+    const [clickedNo, setClickedNo] = useState(false)
+    const [allTested, setAllTested] = useState(false)
 
     const isFirefox = typeof InstallTrigger !== 'undefined';
-    console.log("isFirefox", isFirefox);
-
-    // console.log("audio", audio);
-    // console.log("localStream", localStream);
 
     useEffect(() => {
         if (devices && devices.audioOutputList && devices.audioOutputList.length) {
@@ -68,7 +65,31 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
         }
     }, [speakerSource])
 
-//
+    const handleCantHear = () => {
+        if (!clickedNo) {
+            setClickedNo(true)
+        }
+        const uncheckedSpeakers = [...localSpeakers].filter(device => !device.hasBeenChecked)
+        if (uncheckedSpeakers.length) {
+            setSpeakerSource(uncheckedSpeakers[0].value)
+            const index = localSpeakers.findIndex(device => device.value === uncheckedSpeakers[0].value)
+            markAsChecked(index)
+            attachSinkId(audio, uncheckedSpeakers[0].value);
+        } else {
+            setAllTested(true)
+        }
+
+    }
+
+    const handleTestAgain = () => {
+        setAllTested(false)
+        const mappedSpeakers = devices.audioOutputList.map(speaker => (
+            {...speaker, hasBeenChecked: false}
+        ))// first speaker in device array is allways selected by default
+        const index = localSpeakers.findIndex(device => device.value === speakerSource)
+        mappedSpeakers[index].hasBeenChecked = true
+        setLocalSpeakers(mappedSpeakers)
+    }
 
     const handleChangeSpeaker = async (event) => {
         const value = event.target.value
@@ -91,19 +112,35 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
         return targetDevice?.text
     }
 
+    const speakerNumber = () => {
+        const targetIndex = localSpeakers.findIndex(device => device.value === speakerSource)
+        return targetIndex
+    }
+
     return (
         <div style={{padding: "0 20px"}}>
             <Grid container spacing={2}>
                 <Grid lg={12} md={12} sm={12} xs={12} item>
-                    <Typography align="center" variant="h4" gutterBottom><b>Do you hear a ringtone?</b></Typography>
+                    <Typography align="center" variant="h4"
+                                gutterBottom><b>{allTested ? "We have tested all your speakers" : "Do you hear a ringtone?"}</b></Typography>
                     <div className={classes.buttons}>
-                        <Button style={{}} variant="outlined">
-                            Yes
-                        </Button>
-                        <Button variant="outlined">
-                            No
-                        </Button>
+                        {allTested ?
+                            <Button variant="outlined" onClick={handleTestAgain}>
+                                Test Again
+                            </Button>
+                            :
+                            <>
+                                <Button onClick={handleComplete} variant="outlined">
+                                    Yes
+                                </Button>
+                                <Button onClick={handleCantHear} variant="outlined">
+                                    No
+                                </Button>
+                            </>
+                        }
                     </div>
+                    {clickedNo && !allTested && <Typography align="center">You have {localSpeakers.length} speakers... Now testing
+                        speaker {speakerNumber() + 1} </Typography>}
                 </Grid>
                 <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
                     <FormControl disabled={isFirefox} fullWidth variant="outlined">
@@ -122,7 +159,7 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid className={classes.warning} hidden={!isFirefox} lg={12} md={12} sm={12} xs={12} item>
+                {isFirefox && <Grid className={classes.warning} lg={12} md={12} sm={12} xs={12} item>
                     <Typography align="center" color="error">
                         It seems that you are using the Firefox browser, please be aware that you may encounter issues
                         using this browser
@@ -137,7 +174,7 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
                             </strong>
                         </Typography>
                     </Button>
-                </Grid>
+                </Grid>}
                 <Grid hidden={isFirefox} lg={12} md={12} sm={12} xs={12} item>
                     <Button fullWidth color="primary" className={classes.button} size="large"
                             onClick={handleComplete}>
