@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, FormControl, Grid, InputLabel, MenuItem, Select, Typography} from "@material-ui/core";
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import {makeStyles} from "@material-ui/core/styles";
@@ -21,7 +21,11 @@ const useStyles = makeStyles(theme => ({
     },
     buttons: {
         display: "flex",
-        alignItems: "center"
+        justifyContent: "center",
+        width: "100%",
+        "& .MuiButton-root": {
+            margin: "0 5px"
+        }
     }
 }))
 
@@ -29,12 +33,24 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
     console.log("devices", devices);
     const classes = useStyles()
     const [playing, toggle, audio] = useAudio("https://www.kozco.com/tech/piano2-CoolEdit.mp3")
+    const [localSpeakers, setLocalSpeakers] = useState([])
+    console.log("localSpeakers", localSpeakers);
 
     const isFirefox = typeof InstallTrigger !== 'undefined';
     console.log("isFirefox", isFirefox);
 
     // console.log("audio", audio);
     // console.log("localStream", localStream);
+
+    useEffect(() => {
+        if (devices && devices.audioOutputList && devices.audioOutputList.length) {
+            const mappedSpeakers = devices.audioOutputList.map(speaker => (
+                {...speaker, hasBeenChecked: false}
+            ))// first speaker in device array is allways selected by default
+            mappedSpeakers[0].hasBeenChecked = true
+            setLocalSpeakers(mappedSpeakers)
+        }
+    }, [devices])
 
     useEffect(() => {
         toggle()
@@ -55,12 +71,23 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
 //
 
     const handleChangeSpeaker = async (event) => {
-        setSpeakerSource(event.target.value)
+        const value = event.target.value
+        setSpeakerSource(value)
+        const targetIndex = localSpeakers.findIndex(device => device.value === value)
+        markAsChecked(targetIndex)
         attachSinkId(audio, event.target.value);
     }
 
+    const markAsChecked = (index) => {
+        const newLocalSpeakers = [...localSpeakers]
+        if (newLocalSpeakers[index]) {
+            newLocalSpeakers[index].hasBeenChecked = true
+        }
+        setLocalSpeakers(newLocalSpeakers)
+    }
+
     const getSelected = () => {
-        const targetDevice = devices.audioOutputList.find(device => device.value === speakerSource)
+        const targetDevice = localSpeakers.find(device => device.value === speakerSource)
         return targetDevice?.text
     }
 
@@ -68,9 +95,9 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
         <div style={{padding: "0 20px"}}>
             <Grid container spacing={2}>
                 <Grid lg={12} md={12} sm={12} xs={12} item>
-                    <Typography align="center" variant="h4"><b>Do you hear a ringtone?</b></Typography>
+                    <Typography align="center" variant="h4" gutterBottom><b>Do you hear a ringtone?</b></Typography>
                     <div className={classes.buttons}>
-                        <Button variant="outlined">
+                        <Button style={{}} variant="outlined">
                             Yes
                         </Button>
                         <Button variant="outlined">
@@ -89,7 +116,7 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
                                 id="speakerSelect"
                                 label="Select Speakers"
                         >
-                            {devices.audioOutputList.map(device => {
+                            {localSpeakers.map(device => {
                                 return (<MenuItem value={device.value}>{device.text}</MenuItem>)
                             })}
                         </Select>
