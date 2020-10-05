@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
         width: 50
     }
 }));
-const Step1Chrome = ({setShowAudioVideo}) => {
+const Step1Chrome = ({setActiveStep}) => {
     const classes = useStyles()
     return (
         <DialogContent>
@@ -34,9 +34,7 @@ const Step1Chrome = ({setShowAudioVideo}) => {
                 </li>
             </ul>
             <Button content='Next' primary fluid style={{margin: '40px 0 10px 0'}}
-                    onClick={() => setShowAudioVideo(true)}/>
-            <p style={{fontSize: '0.8em', color: 'grey'}}>If anything is unclear or not working, please <a
-                href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
+                    onClick={() => setActiveStep(1)}/>
         </DialogContent>
     );
 };

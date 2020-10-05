@@ -8,9 +8,6 @@ import {useSoundMeter} from 'components/custom-hook/useSoundMeter';
 import SoundLevelDisplayer from 'components/views/common/SoundLevelDisplayer';
 import useUserMedia from 'components/custom-hook/useDevices';
 import Draggable from 'react-draggable';
-import CreateBaseGroup from "../../../group/create/CreateBaseGroup";
-import CreateCategories from "../../../group/create/CreateCategories";
-import CompleteGroup from "../../../group/create/CompleteGroup";
 import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
 import StepLabel from "@material-ui/core/StepLabel";
@@ -21,7 +18,7 @@ import Step4Mic from "./Step4Mic";
 import Step5Confirm from "./Step5Confirm";
 
 function getSteps() {
-    return ['Google Chrome', 'Setup Camera', 'Setup Speakers', 'Setup Microphone', 'Confirm'];
+    return ['Browser', 'Camera', 'Speakers', 'Microphone', 'Confirm'];
 }
 
 
@@ -53,8 +50,7 @@ const StreamPreparationModalV2 = ({
     const [showAudioVideo, setShowAudioVideo] = useState(false);
     const [playSound, setPlaySound] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
-    console.log("activeStep", activeStep);
-    const devices = useUserMedia(showAudioVideo);
+    const devices = useUserMedia(activeStep);
     const audioLevel = useSoundMeter(showAudioVideo, localStream);
 
     const steps = getSteps();
@@ -71,20 +67,10 @@ const StreamPreparationModalV2 = ({
         }
     }, [devices]);
 
-    useEffect(() => {
-        if (!streamerReady && !showAudioVideo && !connectionEstablished) {
-            setActiveStep(0)
-        } else if (!streamerReady && showAudioVideo && !connectionEstablished) {
-            setActiveStep(1)
-        } else if (streamerReady && !connectionEstablished) {
-            setActiveStep(4)
-        }
-    }, [streamerReady, showAudioVideo, connectionEstablished])
-
     function getStepContent(stepIndex) {
         switch (stepIndex) {
             case 0:
-                return <Step1Chrome setShowAudioVideo={setShowAudioVideo}/>;
+                return <Step1Chrome setActiveStep={setActiveStep}/>;
             case 1:
                 return <Step2Camera audioLevel={audioLevel}
                                     audioSource={audioSource}
@@ -93,6 +79,7 @@ const StreamPreparationModalV2 = ({
                                     playSound={playSound}
                                     setAudioSource={setAudioSource}
                                     setPlaySound={setPlaySound}
+                                    setActiveStep={setActiveStep}
                                     setStreamerReady={setStreamerReady}
                                     setVideoSource={setVideoSource}
                                     videoSource={videoSource}/>;
@@ -105,7 +92,7 @@ const StreamPreparationModalV2 = ({
                                  audioLevel={audioLevel}
                                  devices={devices}
                                  setPlaySound={setPlaySound}
-                                 audioSource={audioSource} />
+                                 audioSource={audioSource}/>
             case 4:
                 return <Step5Confirm setConnectionEstablished={setConnectionEstablished}
                                      isStreaming={isStreaming}
@@ -117,7 +104,7 @@ const StreamPreparationModalV2 = ({
     }
 
     return (
-        <Dialog PaperComponent={PaperComponent} open={!streamerReady || !connectionEstablished}>
+        <Dialog maxWidth="md" PaperComponent={PaperComponent} open={!streamerReady || !connectionEstablished}>
             <DialogTitle hidden={streamerReady && connectionEstablished} style={{cursor: 'move'}}
                          id="draggable-dialog-title">
                 <h3 style={{color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3>
@@ -131,6 +118,9 @@ const StreamPreparationModalV2 = ({
                         </Step>
                     ))}
                 </Stepper>
+                <p>Don't worry, your stream will not start until you decide to.</p>
+                <p style={{fontSize: '0.8em', color: 'grey'}}>If anything is unclear or not working, please <a
+                    href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
             </DialogContent>
         </Dialog>
     );
