@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudioSource, playSound, setPlaySound, setStreamerReady, handleNext, localStream}) => {
+const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudioSource, playSound, setPlaySound, setStreamerReady, handleComplete, localStream}) => {
     const classes = useStyles()
 
     const testVideoRef = useRef(null);
@@ -27,6 +27,11 @@ const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudi
 
     const handleChangeCam = (event) => {
         setVideoSource(event.target.value)
+    }
+
+    const getSelected = () => {
+        const targetDevice = devices.videoDeviceList.find(device => device.value === videoSource)
+        return targetDevice?.text
     }
 
 
@@ -43,7 +48,7 @@ const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudi
                                ref={testVideoRef} muted={playSound} autoPlay width={'100%'}/>
                     </div>
                 </Grid>
-                <Grid item className={classes.actions} lg={10} md={10} sm={12} xs={12}>
+                <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
                     <FormControl fullWidth variant="outlined">
                         <InputLabel id="camera">Select Camera</InputLabel>
                         <Select value={videoSource}
@@ -59,10 +64,10 @@ const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudi
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid lg={2} md={2} sm={12} xs={12} item>
-                    <Button fullWidth color="primary" className={classes.button} variant="contained" size="large"
-                            onClick={handleNext}>
-                        Next step
+                <Grid lg={12} md={12} sm={12} xs={12} item>
+                    <Button fullWidth color="primary" className={classes.button} size="large"
+                            onClick={handleComplete}>
+                        I wish to use {getSelected()}
                     </Button>
                 </Grid>
             </Grid>

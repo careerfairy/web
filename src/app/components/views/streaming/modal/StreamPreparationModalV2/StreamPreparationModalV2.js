@@ -93,7 +93,7 @@ const StreamPreparationModalV2 = ({
         return false
     };
 
-    const isCompleted = () =>{
+    const isCompleted = () => {
         return activeStep !== steps.length && completed.has(activeStep)
     }
 
@@ -200,7 +200,7 @@ const StreamPreparationModalV2 = ({
     function getStepContent(stepIndex) {
         switch (stepIndex) {
             case 0:
-                return <Step1Chrome handleComplete={handleComplete}/>;
+                return <Step1Chrome handleComplete={handleComplete} isCompleted={isCompleted()}/>;
             case 1:
                 return <Step2Camera audioLevel={audioLevel}
                                     audioSource={audioSource}
@@ -209,7 +209,7 @@ const StreamPreparationModalV2 = ({
                                     playSound={playSound}
                                     setAudioSource={setAudioSource}
                                     setPlaySound={setPlaySound}
-                                    handleNext={handleComplete}
+                                    handleComplete={handleComplete}
                                     setStreamerReady={setStreamerReady}
                                     setVideoSource={setVideoSource}
                                     videoSource={videoSource}/>;
@@ -217,14 +217,14 @@ const StreamPreparationModalV2 = ({
                 return <Step3Speakers setSpeakerSource={setSpeakerSource}
                                       devices={devices}
                                       attachSinkId={attachSinkId}
-                                      handleNext={handleComplete}
+                                      handleComplete={handleComplete}
                                       localStream={localStream}
                                       speakerSource={speakerSource}/>
             case 3:
                 return <Step4Mic setAudioSource={setAudioSource}
                                  audioLevel={audioLevel}
                                  devices={devices}
-                                 handleNext={handleComplete}
+                                 handleComplete={handleComplete}
                                  attachSinkId={attachSinkId}
                                  localStream={localStream}
                                  playSound={playSound}
@@ -242,7 +242,7 @@ const StreamPreparationModalV2 = ({
     }
 
     return (
-        <Dialog maxWidth="md" PaperComponent={PaperComponent} open={!streamerReady || !connectionEstablished}>
+        <Dialog fullWidth maxWidth="sm" PaperComponent={PaperComponent} open={!streamerReady || !connectionEstablished}>
             <DialogTitle hidden={streamerReady && connectionEstablished} style={{cursor: 'move'}}
                          id="draggable-dialog-title">
                 <h3 style={{color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3>
@@ -293,15 +293,10 @@ const StreamPreparationModalV2 = ({
                         </Button>
                     )}
 
-                    {isCompleted() ? (
-                        <Typography variant="caption" className={classes.completed}>
-                            Step {activeStep + 1} already completed
-                        </Typography>
-                    ) : (null
-                        // <Button variant="contained" color="primary" onClick={handleComplete}>
-                        //     {completedSteps() === totalSteps() - 1 ? 'Finish' : 'Complete Step'}
-                        // </Button>
-                    )}
+                    {completedSteps() === totalSteps() - 1 &&
+                    <Button variant="contained" color="primary" onClick={handleComplete}>
+                        Finish
+                    </Button>}
                 </DialogActions>
                 <p>Don't worry, your stream will not start until you decide to.</p>
                 <p style={{fontSize: '0.8em', color: 'grey'}}>If anything is unclear or not working, please <a

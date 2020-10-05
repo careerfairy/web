@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const Step3Speakers = ({setSpeakerSource, speakerSource, handleNext, devices, localStream, attachSinkId}) => {
+const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices, localStream, attachSinkId}) => {
     const classes = useStyles()
     const [playing, toggle, audio] = useAudio("https://www.kozco.com/tech/piano2-CoolEdit.mp3")
     // console.log("audio", audio);
@@ -43,6 +43,11 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleNext, devices, lo
         attachSinkId(audio, event.target.value);
     }
 
+    const getSelected = () => {
+        const targetDevice = devices.audioOutputList.find(device => device.value === speakerSource)
+        return targetDevice?.text
+    }
+
     return (
         <div style={{padding: "0 20px"}}>
             <Grid container spacing={2}>
@@ -66,10 +71,10 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleNext, devices, lo
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid lg={2} md={2} sm={12} xs={12} item>
-                    <Button fullWidth color="primary" className={classes.button} variant="contained" size="large"
-                            onClick={handleNext}>
-                        Next
+                <Grid lg={12} md={12} sm={12} xs={12} item>
+                    <Button fullWidth color="primary" className={classes.button} size="large"
+                            onClick={handleComplete}>
+                        I confirm that I can hear from {getSelected()}
                     </Button>
                 </Grid>
             </Grid>

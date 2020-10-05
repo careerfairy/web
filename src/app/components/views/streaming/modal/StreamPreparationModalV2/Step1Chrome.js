@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
         alignItems: "center"
     }
 }));
-const Step1Chrome = ({handleComplete}) => {
+const Step1Chrome = ({handleComplete, isCompleted}) => {
     const classes = useStyles()
     return (
         <DialogContent className={classes.root}>
@@ -39,7 +39,7 @@ const Step1Chrome = ({handleComplete}) => {
                     restrictive firewall rules.
                 </li>
             </ul>
-            <Button size="large" color="primary"
+            <Button size="large" color="primary" disabled={isCompleted}
                     onClick={handleComplete}>
                 <Typography variant="h5"><strong>I agree to use Google Chrome as a browser</strong></Typography>
             </Button>

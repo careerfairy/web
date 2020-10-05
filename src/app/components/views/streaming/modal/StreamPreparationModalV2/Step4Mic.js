@@ -3,7 +3,7 @@ import {DialogContent, MenuItem, Select} from "@material-ui/core";
 import {Button, Grid, Icon} from "semantic-ui-react";
 import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
 
-const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySound, playSound, localStream, speakerSource, attachSinkId, handleNext}) => {
+const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySound, playSound, localStream, speakerSource, attachSinkId, handleComplete}) => {
 
     const handleChangeMic = (event) => {
         setAudioSource(event.target.value)
