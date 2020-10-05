@@ -38,7 +38,17 @@ class Firebase {
 
   doSignOut = () => this.auth.signOut();
 
-  // *** Firestore API ***
+    getUniversitiesFromCountryCode = (countryCode) => {
+        let ref = this.firestore.collection("universitiesByCountry").doc(countryCode)
+        return ref.get()
+    }
+
+    getUniversitiesFromCountryCode = (countryCode) => {
+        let ref = this.firestore.collection("universitiesByCountry").doc(countryCode)
+        return ref.get()
+    }
+
+    // *** Firestore API ***
 
   // USER
 
@@ -52,15 +62,17 @@ class Firebase {
     return ref.onSnapshot(callback);
   };
 
-  setUserData = (userEmail, firstName, lastName) => {
-    let ref = this.firestore.collection("userData").doc(userEmail);
-    return ref.update({
-      id: userEmail,
-      userEmail: userEmail,
-      firstName: firstName,
-      lastName: lastName,
-    });
-  };
+    setUserData = (userEmail, firstName, lastName, university, universityCountryCode) => {
+        let ref = this.firestore.collection("userData").doc(userEmail);
+        return ref.update({
+            id: userEmail,
+            userEmail,
+            firstName,
+            lastName,
+            university,
+            universityCountryCode
+        });
+    };
 
   setgroups = (userId, arrayOfIds, arrayOfGroupObjects) => {
     let userRef = this.firestore.collection("userData").doc(userId);
@@ -139,7 +151,7 @@ class Firebase {
     return ref.get();
   };
 
-  createCareerCenter = (careerCenter) => { 
+  createCareerCenter = (careerCenter) => {
     let ref = this.firestore.collection("careerCenterData");
     return ref.add(careerCenter);
   }

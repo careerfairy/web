@@ -232,6 +232,20 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         setStreamsInRoom(infoObj.streams);
                         break;
                     }
+                    case "leavedFromRoom": {
+                        if (typeof streamingCallbackObject.onNewStreamAvailable === 'function') {
+                            streamingCallbackObject.onNewStreamAvailable(infoObj);
+                        }
+                        debugger;
+                        setTimeout(() => {
+                            if (!isPlayMode) {
+                                this.joinRoom(roomId, streamId);
+                            } else {
+                                this.joinRoom(roomId);
+                            }
+                        }, 400); 
+                        break;
+                    }
                     case "publish_started": {
                         if (typeof streamingCallbackObject.onPublishStarted === 'function') {
                             streamingCallbackObject.onPublishStarted(infoObj);

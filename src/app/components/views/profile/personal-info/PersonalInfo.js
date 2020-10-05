@@ -1,10 +1,33 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Formik} from 'formik';
-import {useRouter} from 'next/router';
 
 import {withFirebase} from 'context/firebase';
-import {makeStyles} from "@material-ui/core/styles";
-import {Typography, TextField, Button, Grid, CircularProgress, Box, Container} from "@material-ui/core";
+import {makeStyles, withStyles} from "@material-ui/core/styles";
+import {
+    Typography,
+    TextField,
+    Button,
+    Grid,
+    CircularProgress,
+    Box,
+    Container,
+    Collapse,
+    FormHelperText, FormControl, Tooltip
+} from "@material-ui/core";
+import UniversityCountrySelector from "../../universitySelect/UniversityCountrySelector";
+import UniversitySelector from "../../universitySelect/UniversitySelector";
+
+const LightTooltip = withStyles((theme) => ({
+    tooltip: {
+        backgroundColor: theme.palette.primary.main,
+        color: "white",
+        boxShadow: theme.shadows[1],
+        fontSize: "1rem",
+        "& .MuiTooltip-arrow": {
+            color: theme.palette.primary.main,
+        }
+    },
+}))(Tooltip);
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -25,26 +48,51 @@ const useStyles = makeStyles((theme) => ({
     },
     submit: {
         margin: theme.spacing(3, 0, 2),
+        marginBottom: 0
     },
 }));
 
-const PersonalInfo = (props) => {
+const PersonalInfo = ({firebase, userData}) => {
     const classes = useStyles()
-    const {push} = useRouter()
+    const [open, setOpen] = useState(false);
+    const [updated, setUpdated] = useState(false)
+
+    useEffect(() => {
+        if (updated) {
+            setTimeout(() => {
+                setUpdated(false);
+            }, 2000);
+        }
+    }, [updated])
 
     function logout() {
         setLoading(true);
-        props.firebase.doSignOut().then(() => {
+        firebase.doSignOut().then(() => {
             router.replace('/login');
         });
     }
 
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
     return (
         <Formik
-            initialValues={props.userData.firstName ? {
-                firstName: props.userData.firstName,
-                lastName: props.userData.lastName
-            } : {firstName: '', lastName: ''}}
+            initialValues={userData && userData.firstName ? {
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                university: userData.university,
+                universityCountryCode: userData.universityCountryCode
+            } : {
+                firstName: '',
+                lastName: '',
+                university: '',
+                universityCountryCode: ''
+            }}
             enableReinitialize={true}
             validate={values => {
                 let errors = {};
@@ -52,20 +100,30 @@ const PersonalInfo = (props) => {
                     errors.firstName = 'Required';
                 } else if (!/^\D+$/i.test(values.firstName)) {
                     errors.firstName = 'Please enter a valid first name';
+                } else if (values.firstName.length > 50) {
+                    errors.firstName = 'Cannot be longer than 50 characters';
                 }
                 if (!values.lastName) {
                     errors.lastName = 'Required';
                 } else if (!/^\D+$/i.test(values.lastName)) {
                     errors.lastName = 'Please enter a valid last name';
+                } else if (values.lastName.length > 50) {
+                    errors.lastName = 'Cannot be longer than 50 characters';
+                }
+                if (!values.university) {
+                    errors.university = 'Select a university or type "other"';
+                }
+                if (!values.universityCountryCode) {
+                    errors.universityCountryCode = 'Please chose a country code';
                 }
                 return errors;
             }}
             onSubmit={(values, {setSubmitting}) => {
                 setSubmitting(true);
-                props.firebase.setUserData(props.userData.id, values.firstName, values.lastName)
+                firebase.setUserData(userData.id, values.firstName, values.lastName, values.university, values.universityCountryCode)
                     .then(() => {
-                        // return push('/next-livestreams');
                         setSubmitting(false);
+                        setUpdated(true)
                     }).catch(error => {
                     setSubmitting(false);
                     console.log(error);
@@ -79,9 +137,10 @@ const PersonalInfo = (props) => {
                   handleChange,
                   handleBlur,
                   handleSubmit,
+                  setFieldValue,
                   isSubmitting,
                   /* and other goodies */
-              }) => (
+              }) => userData ? (
                 <form onSubmit={handleSubmit}>
                     <Container component="main" maxWidth="sm">
                         <Box boxShadow={1} p={4} className={classes.box}>
@@ -92,7 +151,7 @@ const PersonalInfo = (props) => {
                                     <TextField
                                         variant="outlined"
                                         disabled
-                                        value={props.userData.id}
+                                        value={userData.id}
                                         fullWidth
                                         id="email"
                                         label="Email Address"
@@ -100,56 +159,98 @@ const PersonalInfo = (props) => {
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        autoComplete="fname"
-                                        name="firstName"
-                                        variant="outlined"
-                                        required
-                                        fullWidth
-                                        id="firstName"
-                                        label="First Name"
-                                        autoFocus
-                                        disabled={isSubmitting}
-                                        onBlur={handleBlur}
-                                        value={values.firstName}
-                                        error={Boolean(errors.firstName && touched.firstName && errors.firstName)}
-                                        onChange={handleChange}
-                                        helperText={errors.firstName && touched.firstName && errors.firstName}
-                                    />
+                                    <FormControl fullWidth>
+                                        <TextField
+                                            autoComplete="fname"
+                                            name="firstName"
+                                            variant="outlined"
+                                            required
+                                            fullWidth
+                                            id="firstName"
+                                            label="First Name"
+                                            autoFocus
+                                            disabled={isSubmitting}
+                                            onBlur={handleBlur}
+                                            value={values.firstName}
+                                            error={Boolean(errors.firstName && touched.firstName && errors.firstName)}
+                                            onChange={handleChange}
+                                        />
+                                        <Collapse
+                                            in={Boolean(errors.firstName && touched.firstName && errors.firstName)}>
+                                            <FormHelperText error>
+                                                {errors.firstName}
+                                            </FormHelperText>
+                                        </Collapse>
+                                    </FormControl>
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        variant="outlined"
-                                        required
-                                        fullWidth
-                                        id="lastName"
-                                        label="Last Name"
-                                        name="lastName"
-                                        autoComplete="lname"
-                                        disabled={isSubmitting}
-                                        onBlur={handleBlur}
-                                        value={values.lastName}
-                                        error={Boolean(errors.lastName && touched.lastName && errors.lastName)}
-                                        onChange={handleChange}
-                                        helperText={errors.lastName && touched.lastName && errors.lastName}
-                                    />
+                                    <FormControl fullWidth>
+                                        <TextField
+                                            variant="outlined"
+                                            required
+                                            fullWidth
+                                            id="lastName"
+                                            label="Last Name"
+                                            name="lastName"
+                                            autoComplete="lname"
+                                            disabled={isSubmitting}
+                                            onBlur={handleBlur}
+                                            value={values.lastName}
+                                            error={Boolean(errors.lastName && touched.lastName && errors.lastName)}
+                                            onChange={handleChange}
+                                        />
+                                        <Collapse
+                                            in={Boolean(errors.lastName && touched.lastName && errors.lastName)}>
+                                            <FormHelperText error>
+                                                {errors.lastName}
+                                            </FormHelperText>
+                                        </Collapse>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <UniversityCountrySelector value={values.universityCountryCode}
+                                                               handleClose={handleClose}
+                                                               submitting={isSubmitting}
+                                                               handleChange={handleChange}
+                                                               error={errors.universityCountryCode && touched.universityCountryCode && errors.universityCountryCode}
+                                                               handleBlur={handleBlur}
+                                                               handleOpen={handleOpen}
+                                                               open={open}/>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <UniversitySelector handleBlur={handleBlur}
+                                                        error={errors.university && touched.university && errors.university}
+                                                        universityCountryCode={values.universityCountryCode}
+                                                        values={values}
+                                                        submitting={isSubmitting}
+                                                        setFieldValue={setFieldValue}/>
                                 </Grid>
                             </Grid>
-                            <Button
-                                type="submit"
-                                fullWidth
-                                variant="contained"
-                                color="primary"
-                                disabled={isSubmitting}
-                                endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
-                                className={classes.submit}
-                            >
-                                {isSubmitting ? "Updating" : "Update"}
-                            </Button>
+                            <LightTooltip
+                                title="Saved!"
+                                open={updated}
+                                enterDelay={500}
+                                leaveDelay={200}
+                                arrow
+                                disableFocusListener
+                                disableHoverListener
+                                disableTouchListener>
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    variant="contained"
+                                    color="primary"
+                                    disabled={isSubmitting}
+                                    endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
+                                    className={classes.submit}
+                                >
+                                    {isSubmitting ? "Updating" : "Update"}
+                                </Button>
+                            </LightTooltip>
                         </Box>
                     </Container>
                 </form>
-            )}
+            ) : null}
         </Formik>
     );
 };

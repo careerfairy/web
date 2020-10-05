@@ -209,6 +209,51 @@ exports.sendPostmarkEmailVerificationEmailWithPinAndUpdateUserData = functions.h
     });
 });
 
+exports.sendPostmarkEmailVerificationEmailWithPinAndUpdateUserDataAndUni = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    const recipient_email = req.body.recipientEmail;
+    const recipient_first_name = req.body.firstName;
+    const recipient_last_name = req.body.lastName;
+    const recipient_university = req.body.university;
+    const recipient_university_country_code = req.body.universityCountryCode;
+    const pinCode = getRandomInt(9999);
+
+    await admin.firestore().collection("userData").doc(recipient_email).set(
+        {
+            id: recipient_email,
+            validationPin: pinCode,
+            firstName: recipient_first_name,
+            lastName: recipient_last_name,
+            userEmail: recipient_email,
+            university: recipient_university,
+            universityCountryCode: recipient_university_country_code,
+        });
+
+    const email = {
+        "TemplateId": 17669843,
+        "From": 'CareerFairy <noreply@careerfairy.io>',
+        "To": recipient_email,
+        "TemplateModel": { pinCode: pinCode }
+    };
+
+    return client.sendEmailWithTemplate(email).then(response => {
+        res.sendStatus(200);
+    }, error => {
+        res.sendStatus(500);
+    });
+});
+
 function getRandomInt(max) {
     let variable = Math.floor(Math.random() * Math.floor(max));
     if (variable < 1000) {
@@ -497,12 +542,12 @@ exports.getNumberOfViewers = functions.https.onRequest(async (req, res) => {
     });
 });
 
-exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 1 hours').timeZone('Europe/Zurich').onRun((context) => {
-    const dateNow = new Date(Date.now() + 1000 * 60 * 60 * 2);
-    const dateTomorrow =  new Date(Date.now() + 1000 * 60 * 60 * 24);
+exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 45 minutes').timeZone('Europe/Zurich').onRun((context) => {
+    const dateStart = new Date(Date.now() + 1000 * 60 * 60 * 1);
+    const dateEnd =  new Date(Date.now() + 1000 * 60 * 60 * 1.75);
     admin.firestore().collection("livestreams")
-        .where("start", ">=", dateNow)
-        .where("start", "<", dateTomorrow)
+        .where("start", ">=", dateStart)
+        .where("start", "<", dateEnd)
         .get().then((querySnapshot) => {
             console.log("querysnapshot size: " + querySnapshot.size);
             querySnapshot.forEach(doc => {
@@ -510,7 +555,7 @@ exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 1 
                 livestream.id = doc.id;
                 console.log("livestream company: " + livestream.company);
                 console.log("number of emails: " + livestream.registeredUsers.length);
-                var data = generateEmailData("mvoss.private@gmail.com", livestream);
+                var data = generateEmailData("link.aerospace@gmail.com", livestream);
                 mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
             });
             res.send(200);
@@ -529,7 +574,7 @@ function generateEmailData(recipientEmail, livestream) {
         subject: 'Reminder: TODAY - Live Stream with ' + livestream.company + ' ' + getLivestreamTimeInterval(livestream.start),
         template: 'registration-reminder',
         "h:X-Mailgun-Variables": JSON.stringify({ "company": livestream.company, "startTime": formatHour(luxonStartDateTime), "streamLink": getStreamLink(livestream.id), "german": livestream.language === "DE" ? true : false }),
-        "o:deliverytime": luxonStartDateTime.minus({ hours: 2 }).toRFC2822()
+        "o:deliverytime": luxonStartDateTime.minus({ minutes: 45 }).toRFC2822()
     }
 }
 
