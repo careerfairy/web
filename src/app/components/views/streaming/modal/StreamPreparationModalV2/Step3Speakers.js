@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Button, FormControl, Grid, InputLabel, MenuItem, Select, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
+import {useAudio} from "../../../../custom-hook/useAudio";
 
 const useStyles = makeStyles(theme => ({
     actions: {
@@ -15,6 +16,13 @@ const useStyles = makeStyles(theme => ({
 
 const Step3Speakers = ({setSpeakerSource, speakerSource, setActiveStep, devices}) => {
     const classes = useStyles()
+    const [playing, toggle] = useAudio("https://www.kozco.com/tech/piano2-CoolEdit.mp3")
+    console.log("playing", playing);
+
+    useEffect(() => {
+        toggle()
+    }, []);
+
 
     const handleChangeSpeaker = (event) => {
         setSpeakerSource(event.target.value)
@@ -24,7 +32,7 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, setActiveStep, devices}
         <div style={{padding: "0 20px"}}>
             <Grid container spacing={2}>
                 <Grid item>
-                    <Typography variant="h5">Video</Typography>
+                    <Typography variant="h5">Speakers</Typography>
                     <Typography variant="subtitle1">Please select your speaker for this stream:</Typography>
                 </Grid>
                 <Grid item className={classes.actions} lg={10} md={10} sm={12} xs={12}>
@@ -48,7 +56,7 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, setActiveStep, devices}
                             onClick={() => {
                                 setActiveStep(2)
                             }}>
-                        Next step
+                        Next
                     </Button>
                 </Grid>
             </Grid>

@@ -60,7 +60,6 @@ const StreamPreparationModalV2 = ({
     const [playSound, setPlaySound] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
     const devices = useUserMedia(activeStep);
-    console.log("devices", devices);
     const audioLevel = useSoundMeter(showAudioVideo, localStream);
 
     const steps = getSteps();
