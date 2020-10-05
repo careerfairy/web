@@ -154,7 +154,7 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
                                 label="Select Speakers"
                         >
                             {localSpeakers.map(device => {
-                                return (<MenuItem value={device.value}>{device.text}</MenuItem>)
+                                return (<MenuItem key={device.value} value={device.value}>{device.text}</MenuItem>)
                             })}
                         </Select>
                     </FormControl>
@@ -175,12 +175,6 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
                         </Typography>
                     </Button>
                 </Grid>}
-                <Grid hidden={isFirefox} lg={12} md={12} sm={12} xs={12} item>
-                    <Button fullWidth color="primary" className={classes.button} size="large"
-                            onClick={handleComplete}>
-                        I confirm that I can hear from {getSelected()}
-                    </Button>
-                </Grid>
             </Grid>
         </div>
     );
