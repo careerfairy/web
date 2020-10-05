@@ -13,7 +13,6 @@ export default function useUserMedia(showAudioVideo) {
     }, [showAudioVideo])
 
     function gotDevices(deviceInfos) {
-
         let audioInputList = [];
         let audioOutputList = [];
         let videoDeviceList = [];

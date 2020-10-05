@@ -1,7 +1,9 @@
 import React, {useEffect} from 'react';
 import {Button, FormControl, Grid, InputLabel, MenuItem, Select, Typography} from "@material-ui/core";
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import {makeStyles} from "@material-ui/core/styles";
 import {useAudio} from "../../../../custom-hook/useAudio";
+
 
 const useStyles = makeStyles(theme => ({
     actions: {
@@ -11,12 +13,26 @@ const useStyles = makeStyles(theme => ({
     },
     button: {
         height: "100%"
+    },
+    warning: {
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "column"
+    },
+    buttons: {
+        display: "flex",
+        alignItems: "center"
     }
 }))
 
 const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices, localStream, attachSinkId}) => {
+    console.log("devices", devices);
     const classes = useStyles()
     const [playing, toggle, audio] = useAudio("https://www.kozco.com/tech/piano2-CoolEdit.mp3")
+
+    const isFirefox = typeof InstallTrigger !== 'undefined';
+    console.log("isFirefox", isFirefox);
+
     // console.log("audio", audio);
     // console.log("localStream", localStream);
 
@@ -51,15 +67,23 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
     return (
         <div style={{padding: "0 20px"}}>
             <Grid container spacing={2}>
-                <Grid item>
-                    <Typography variant="h5">Speakers</Typography>
-                    <Typography variant="subtitle1">Please select your speaker for this stream:</Typography>
+                <Grid lg={12} md={12} sm={12} xs={12} item>
+                    <Typography align="center" variant="h4"><b>Do you hear a ringtone?</b></Typography>
+                    <div className={classes.buttons}>
+                        <Button variant="outlined">
+                            Yes
+                        </Button>
+                        <Button variant="outlined">
+                            No
+                        </Button>
+                    </div>
                 </Grid>
                 <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl disabled={isFirefox} fullWidth variant="outlined">
                         <InputLabel id="speakerSelect">Select Speakers</InputLabel>
                         <Select value={speakerSource}
                                 fullWidth
+                                disabled={isFirefox}
                                 onChange={handleChangeSpeaker}
                                 variant="outlined"
                                 id="speakerSelect"
@@ -71,7 +95,23 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid lg={12} md={12} sm={12} xs={12} item>
+                <Grid className={classes.warning} hidden={!isFirefox} lg={12} md={12} sm={12} xs={12} item>
+                    <Typography align="center" color="error">
+                        It seems that you are using the Firefox browser, please be aware that you may encounter issues
+                        using this browser
+                    </Typography>
+                    <Button fullWidth color="secondary" size="large"
+                            startIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
+                            endIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
+                            onClick={handleComplete}>
+                        <Typography align="center" color="error">
+                            <strong>
+                                I am aware and I wish to continue
+                            </strong>
+                        </Typography>
+                    </Button>
+                </Grid>
+                <Grid hidden={isFirefox} lg={12} md={12} sm={12} xs={12} item>
                     <Button fullWidth color="primary" className={classes.button} size="large"
                             onClick={handleComplete}>
                         I confirm that I can hear from {getSelected()}

@@ -1,5 +1,6 @@
 import React, {useEffect, useRef} from 'react';
 import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
+import OutlinedInput from "@material-ui/core/OutlinedInput";
 import {Button, DialogContent, Grid, MenuItem, Select, Typography, InputLabel, FormControl} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 
@@ -18,11 +19,18 @@ const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudi
     const classes = useStyles()
 
     const testVideoRef = useRef(null);
+    const inputLabel = React.useRef(null);
+    const [labelWidth, setLabelWidth] = React.useState(0);
+
     useEffect(() => {
         if (localStream) {
             testVideoRef.current.srcObject = localStream;
         }
     }, [localStream]);
+
+    React.useEffect(() => {
+        setLabelWidth(inputLabel.current.offsetWidth);
+    }, []);
 
 
     const handleChangeCam = (event) => {
@@ -50,12 +58,22 @@ const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudi
                 </Grid>
                 <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
                     <FormControl fullWidth variant="outlined">
-                        <InputLabel id="cameraSelect">Select Camera</InputLabel>
+                        <InputLabel shrink
+                                    ref={inputLabel}
+                                    htmlFor="cameraSelect">Select Camera</InputLabel>
                         <Select value={videoSource}
                                 fullWidth
                                 onChange={handleChangeCam}
                                 variant="outlined"
                                 id="cameraSelect"
+                                input={
+                                    <OutlinedInput
+                                        notched
+                                        labelWidth={labelWidth}
+                                        name="camera"
+                                        id="cameraSelect"
+                                    />
+                                }
                                 label="Select Camera"
                         >
                             {devices.videoDeviceList.map(device => {
