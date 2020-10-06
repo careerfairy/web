@@ -1,7 +1,8 @@
 import React from 'react';
 import {Icon} from "semantic-ui-react";
-import {Box, Button, DialogContent, Typography} from "@material-ui/core";
+import {Box, Button, Checkbox, DialogContent, FormControlLabel, Grid, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
+import Link from "next/link";
 
 const chromeLogo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fchrome.svg?alt=media&token=516e705a-bafa-4a43-99f7-e184cc85b557"
 
@@ -16,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 const Step1Chrome = ({handleComplete, isCompleted}) => {
+
     const classes = useStyles()
     return (
         <DialogContent className={classes.root}>
@@ -39,6 +41,19 @@ const Step1Chrome = ({handleComplete, isCompleted}) => {
                     restrictive firewall rules.
                 </li>
             </ul>
+            <FormControlLabel
+                control={<Checkbox
+                    name='agreeTerm'
+                    placeholder='Confirm Password'
+                    onChange={handleComplete}
+                    value={isCompleted}
+                    disabled={isCompleted}
+                    color="primary"
+                />}
+                label={<>I agree to
+                    the <Link href='/terms'><a>Terms & Conditions</a></Link> and the <Link
+                        href='/privacy'><a>Privacy Policy</a></Link></>}
+            />
             <Button size="large" color="primary"
                     disabled={isCompleted}
                     onClick={handleComplete}>
