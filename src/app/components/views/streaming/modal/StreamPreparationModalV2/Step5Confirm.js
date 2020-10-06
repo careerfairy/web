@@ -1,20 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Dialog, DialogContent, Grid, TextField} from "@material-ui/core";
+import {Grid, TextField} from "@material-ui/core";
 import {Button, Icon, Image} from "semantic-ui-react";
-import {makeStyles} from "@material-ui/core/styles";
-
-const useStyles = makeStyles(theme => ({
-    root: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "0 20px"
-    }
-}))
-
 
 const Step5Confirm = ({audioSource, videoSource, devices, speakerSource, setStreamerReady}) => {
-    const classes = useStyles()
     const [labels, setLabels] = useState({
         speaker: "",
         microphone: "",
@@ -45,7 +33,7 @@ const Step5Confirm = ({audioSource, videoSource, devices, speakerSource, setStre
     }, [audioSource, videoSource, devices, speakerSource]);
 
     return (
-        <div className={classes.root}>
+        <>
             <Icon name='check circle outline'
                   style={{color: 'rgb(0, 210, 170)', fontSize: '3em', margin: '0 auto'}}/>
             <h3>You are ready to stream!</h3>
@@ -76,7 +64,7 @@ const Step5Confirm = ({audioSource, videoSource, devices, speakerSource, setStre
                                variant="outlined"/>
                 </Grid>
             </Grid>
-        </div>
+        </>
     );
 };
 
