@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySound, playSound, localStream, speakerSource, attachSinkId, handleComplete}) => {
+const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySound, localStream, speakerSource, attachSinkId, handleMarkIncomplete, handleMarkComplete, isCompleted}) => {
     const classes = useStyles()
     const [localMicrophones, setLocalMicrophones] = useState([])
     const [clickedNo, setClickedNo] = useState(false)
@@ -105,6 +105,7 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
     }
 
     const handleCantHear = () => {
+        handleMarkIncomplete()
         if (!clickedNo) {
             setClickedNo(true)
         }
@@ -134,7 +135,7 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
                         </Button>
                         :
                         <>
-                            <Button onClick={handleComplete} variant="outlined">
+                            <Button  disabled={isCompleted} onClick={handleMarkComplete} variant="outlined">
                                 Yes
                             </Button>
                             <Button onClick={handleCantHear} variant="outlined">

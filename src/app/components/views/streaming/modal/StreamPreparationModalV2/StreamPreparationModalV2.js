@@ -9,7 +9,7 @@ import {
     StepButton,
     Typography,
     DialogActions,
-    Button
+    Button, useMediaQuery, useTheme
 } from '@material-ui/core'
 import {useSoundMeter} from 'components/custom-hook/useSoundMeter';
 import SoundLevelDisplayer from 'components/views/common/SoundLevelDisplayer';
@@ -34,6 +34,9 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
+// Firefox 1.0+
+const isFirefox = typeof InstallTrigger !== 'undefined';
+
 function getSteps() {
     return ['Browser', 'Camera', 'Speakers', 'Microphone', 'Confirm'];
 }
@@ -57,6 +60,7 @@ const StreamPreparationModalV2 = ({
                                       attachSinkId
                                   }) => {
     const classes = useStyles()
+    const theme = useTheme()
     const [showAudioVideo, setShowAudioVideo] = useState(false);
     const [playSound, setPlaySound] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
@@ -64,6 +68,8 @@ const StreamPreparationModalV2 = ({
     const [skipped, setSkipped] = useState(new Set());
     const devices = useUserMedia(activeStep);
     const audioLevel = useSoundMeter(showAudioVideo, localStream);
+
+    const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
     const steps = getSteps();
 
@@ -152,9 +158,9 @@ const StreamPreparationModalV2 = ({
          * thus we have to resort to not being very DRY.
          */
 
-        if (completedSteps() === totalSteps() - 1) {
-            handleFinalize()
-        }
+        // if (completedSteps() === totalSteps() - 1) {
+        //     handleFinalize()
+        // }
         if (completed.size !== totalSteps() - skippedSteps()) {
             handleNext();
         }
@@ -187,10 +193,17 @@ const StreamPreparationModalV2 = ({
         setCompleted(newCompleted);
     }
 
+        const handleMarkIncomplete = () => {
+        const newCompleted = new Set(completed);
+        newCompleted.delete(activeStep);
+        setCompleted(newCompleted);
+    }
+
     function getStepContent(stepIndex) {
         switch (stepIndex) {
             case 0:
                 return <Step1Chrome handleMarkComplete={handleMarkComplete}
+                                    isFirefox={isFirefox}
                                     isCompleted={isCompleted()}/>;
             case 1:
                 return <Step2Camera audioLevel={audioLevel}
@@ -202,24 +215,28 @@ const StreamPreparationModalV2 = ({
                                     playSound={playSound}
                                     setAudioSource={setAudioSource}
                                     setPlaySound={setPlaySound}
-                                    handleComplete={handleComplete}
                                     setStreamerReady={setStreamerReady}
                                     setVideoSource={setVideoSource}
                                     videoSource={videoSource}/>;
             case 2:
                 return <Step3Speakers setSpeakerSource={setSpeakerSource}
                                       devices={devices}
+                                      isFirefox={isFirefox}
+                                      handleMarkIncomplete={handleMarkIncomplete}
+                                      handleMarkComplete={handleMarkComplete}
+                                      isCompleted={isCompleted()}
                                       attachSinkId={attachSinkId}
-                                      handleComplete={handleComplete}
                                       localStream={localStream}
                                       speakerSource={speakerSource}/>
             case 3:
                 return <Step4Mic setAudioSource={setAudioSource}
                                  audioLevel={audioLevel}
                                  devices={devices}
-                                 handleComplete={handleComplete}
                                  attachSinkId={attachSinkId}
                                  localStream={localStream}
+                                 handleMarkIncomplete={handleMarkIncomplete}
+                                 handleMarkComplete={handleMarkComplete}
+                                 isCompleted={isCompleted()}
                                  playSound={playSound}
                                  speakerSource={speakerSource}
                                  setPlaySound={setPlaySound}
@@ -239,61 +256,65 @@ const StreamPreparationModalV2 = ({
     }
 
     return (
-        <Dialog fullWidth maxWidth="sm" open={!streamerReady || !connectionEstablished}>
-            <DialogTitle disableTypography hidden={streamerReady && connectionEstablished} style={{cursor: 'move'}}>
+        <Dialog fullScreen={fullScreen} fullWidth maxWidth="sm" open={!streamerReady || !connectionEstablished}>
+            <DialogTitle disableTypography hidden={streamerReady && connectionEstablished}>
                 <h3 style={{color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3>
             </DialogTitle>
             <DialogContent className={classes.root}>
                 {getStepContent(activeStep)}
-                <Stepper className={classes.stepper} activeStep={activeStep} alternativeLabel>
-                    {steps.map((label, index) => {
-                        const stepProps = {};
-                        const buttonProps = {};
-                        if (isStepOptional(index)) {
-                            buttonProps.optional = <Typography variant="caption">Optional</Typography>;
-                        }
-                        if (isStepSkipped(index)) {
-                            stepProps.completed = false;
-                        }
+                {!isFirefox ?
+                    <>
+                        <Stepper className={classes.stepper} activeStep={activeStep} alternativeLabel>
+                            {steps.map((label, index) => {
+                                const stepProps = {};
+                                const buttonProps = {};
+                                if (isStepOptional(index)) {
+                                    buttonProps.optional = <Typography variant="caption">Optional</Typography>;
+                                }
+                                if (isStepSkipped(index)) {
+                                    stepProps.completed = false;
+                                }
 
-                        return (<Step key={label} {...stepProps}>
-                            <StepButton onClick={handleStep(index)}
-                                        completed={isStepComplete(index)}
-                                        {...buttonProps}>
-                                {label}
-                            </StepButton>
-                        </Step>)
-                    })}
-                </Stepper>
-                <DialogActions>
-                    <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
-                        Back
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        disabled={!isStepComplete(activeStep)}
-                        onClick={handleNext}
-                        className={classes.button}
-                    >
-                        Next
-                    </Button>
-                    {isStepOptional(activeStep) && !completed.has(activeStep) && (
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleSkip}
-                            className={classes.button}
-                        >
-                            Skip
-                        </Button>
-                    )}
+                                return (<Step key={label} {...stepProps}>
+                                    <StepButton onClick={handleStep(index)}
+                                                completed={isStepComplete(index)}
+                                                {...buttonProps}>
+                                        {label}
+                                    </StepButton>
+                                </Step>)
+                            })}
+                        </Stepper>
+                        <DialogActions>
+                            <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
+                                Back
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                disabled={!isStepComplete(activeStep)}
+                                onClick={handleNext}
+                                className={classes.button}
+                            >
+                                Next
+                            </Button>
+                            {isStepOptional(activeStep) && !completed.has(activeStep) && (
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleSkip}
+                                    className={classes.button}
+                                >
+                                    Skip
+                                </Button>
+                            )}
 
-                    {completedSteps() === totalSteps() - 1 &&
-                    <Button variant="contained" color="primary" onClick={handleComplete}>
-                        Continue
-                    </Button>}
-                </DialogActions>
+                            {completedSteps() === totalSteps() - 1 &&
+                            <Button variant="contained" color="primary" onClick={handleFinalize}>
+                                Continue
+                            </Button>}
+                        </DialogActions>
+                    </>
+                    : null}
                 <p style={{fontSize: '0.8em', color: 'grey'}}>If anything is unclear or not working, please <a
                     href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
             </DialogContent>

@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {Grid, TextField} from "@material-ui/core";
-import {Button, Icon, Image} from "semantic-ui-react";
+import {Grid, TextField, Typography} from "@material-ui/core";
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 
-const Step5Confirm = ({audioSource, videoSource, devices, speakerSource, setStreamerReady}) => {
+const Step5Confirm = ({audioSource, videoSource, devices, speakerSource}) => {
     const [labels, setLabels] = useState({
         speaker: "",
         microphone: "",
@@ -34,10 +34,9 @@ const Step5Confirm = ({audioSource, videoSource, devices, speakerSource, setStre
 
     return (
         <>
-            <Icon name='check circle outline'
-                  style={{color: 'rgb(0, 210, 170)', fontSize: '3em', margin: '0 auto'}}/>
-            <h3>You are ready to stream!</h3>
-            <div>Your stream will go live once you press "Start Streaming".</div>
+            <CheckCircleOutlineIcon color="primary" style={{margin: '0 auto', fontSize: "3em", marginBottom: "0.2rem"}}/>
+            <Typography variant="h4" align="center"><b>You are ready to stream!</b></Typography>
+            <Typography variant="subtitle1" align="center">Your stream will go live once you press "Start Streaming".</Typography>
             <Grid style={{marginTop: 10}} spacing={2} container>
                 <Grid sm={12} xs={12} lg={12} xl={12} hidden={!labels.camera.length} item>
                     <TextField id="camera"

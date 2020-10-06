@@ -30,23 +30,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-function getBrowserName() {
-    var name = "Unknown";
-    if (navigator.userAgent.indexOf("MSIE") != -1) {
-        name = "MSIE";
-    } else if (navigator.userAgent.indexOf("Firefox") != -1) {
-        name = "Firefox";
-    } else if (navigator.userAgent.indexOf("Opera") != -1) {
-        name = "Opera";
-    } else if (navigator.userAgent.indexOf("Chrome") != -1) {
-        name = "Chrome";
-    } else if (navigator.userAgent.indexOf("Safari") != -1) {
-        name = "Safari";
-    }
-    return name;
-}
-
-const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices, localStream, attachSinkId}) => {
+const Step3Speakers = ({setSpeakerSource, speakerSource, devices, isFirefox, attachSinkId, handleMarkComplete, isCompleted, handleMarkIncomplete}) => {
     const classes = useStyles()
     const [playing, toggle, audio] = useAudio("https://www.kozco.com/tech/piano2-CoolEdit.mp3")
     const [localSpeakers, setLocalSpeakers] = useState([])
@@ -80,6 +64,7 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
     }, [speakerSource])
 
     const handleCantHear = () => {
+        handleMarkIncomplete()
         if (!clickedNo) {
             setClickedNo(true)
         }
@@ -131,93 +116,89 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
     }
 
     const speakerNumber = () => {
-        const targetIndex = localSpeakers.findIndex(device => device.value === speakerSource)
-        return targetIndex
+        return localSpeakers.findIndex(device => device.value === speakerSource)
     }
 
-    if (["Safari", "Firefox"].includes(getBrowserName())) {
+    if (isFirefox) {
         return (
-            <div style={{padding: "0 20px"}}>
-                <Grid container spacing={2}>
-                    <Grid lg={12} md={12} sm={12} xs={12} item>
-                        <Typography align="center" variant="h4"
-                                    gutterBottom><b>Do you hear a ringtone?</b></Typography>
-                        <Typography align="center" variant="subtitle1">If not please check your device sound
-                            settings.</Typography>
-                    </Grid>
-                    <Grid className={classes.warning} lg={12} md={12} sm={12} xs={12} item>
-                        <Typography align="center" color="error">
-                            It seems that you are using the <b>{getBrowserName()}</b> web browser, please
-                            be aware that you may
-                            encounter issues
-                            using this browser
-                        </Typography>
-                        <Button fullWidth color="secondary" size="large"
-                                variant="outlined"
-                                style={{marginTop: 10}}
-                                startIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
-                                endIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
-                                onClick={handleComplete}>
-                            <Typography align="center" color="error">
-                                <strong>
-                                    I am aware and I wish to continue
-                                </strong>
-                            </Typography>
-                        </Button>
-                    </Grid>
+            <Grid container spacing={2}>
+                <Grid lg={12} md={12} sm={12} xs={12} item>
+                    <Typography align="center" variant="h4"
+                                gutterBottom><b>Do you hear a ringtone?</b></Typography>
+                    <Typography align="center" variant="subtitle1">If not please check your device sound
+                        settings.</Typography>
                 </Grid>
-            </div>
+                <Grid className={classes.warning} lg={12} md={12} sm={12} xs={12} item>
+                    <Typography align="center" color="error">
+                        It seems that you are using the <b>Firefox</b> web browser, please
+                        be aware that you may
+                        encounter issues
+                        using this browser
+                    </Typography>
+                    <Button fullWidth color="secondary" size="large"
+                            variant="outlined"
+                            style={{marginTop: 10}}
+                            disabled={isCompleted}
+                            startIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
+                            endIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
+                            onClick={handleMarkComplete}>
+                        <Typography align="center" color="error">
+                            <strong>
+                                I am aware and I wish to continue
+                            </strong>
+                        </Typography>
+                    </Button>
+                </Grid>
+            </Grid>
         )
     }
 
     return (
-        <div style={{padding: "0 20px"}}>
-            <Grid container spacing={2}>
-                <Grid lg={12} md={12} sm={12} xs={12} item>
-                    <Typography align="center" variant="h4"
-                                gutterBottom><b>{allTested ? "We have tested all your speakers" : "Do you hear a ringtone?"}</b></Typography>
-                    <div className={classes.buttons}>
-                        {allTested ?
-                            <Button variant="outlined" onClick={handleTestAgain}>
-                                Test Again
+        <Grid container spacing={2}>
+            <Grid lg={12} md={12} sm={12} xs={12} item>
+                <Typography align="center" variant="h4"
+                            gutterBottom><b>{allTested ? "We have tested all your speakers" : "Do you hear a ringtone?"}</b></Typography>
+                <div className={classes.buttons}>
+                    {allTested ?
+                        <Button variant="outlined" onClick={handleTestAgain}>
+                            Test Again
+                        </Button>
+                        :
+                        <>
+                            <Button disabled={isCompleted} onClick={handleMarkComplete} variant="outlined">
+                                Yes
                             </Button>
-                            :
-                            <>
-                                <Button onClick={handleComplete} variant="outlined">
-                                    Yes
-                                </Button>
-                                <Button onClick={handleCantHear} variant="outlined">
-                                    No
-                                </Button>
-                            </>
-                        }
-                    </div>
-                    {clickedNo && !allTested &&
-                    <Typography align="center">You have {localSpeakers.length} speakers, Now testing
-                        speaker {speakerNumber() + 1}... </Typography>}
-                </Grid>
-                {localSpeakers.length && <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
-                    <FormControl disabled={!localSpeakers.length} fullWidth variant="outlined">
-                        <InputLabel id="speakerSelect">Select Speakers</InputLabel>
-                        <Select value={speakerSource}
-                                fullWidth
-                                disabled={!localSpeakers.length}
-                                onChange={handleChangeSpeaker}
-                                variant="outlined"
-                                id="speakerSelect"
-                                label="Select Speakers"
-                        >
-                            <MenuItem value="" disabled>
-                                Choose a Speaker
-                            </MenuItem>
-                            {localSpeakers.map(device => {
-                                return (<MenuItem key={device.value} value={device.value}>{device.text}</MenuItem>)
-                            })}
-                        </Select>
-                    </FormControl>
-                </Grid>}
+                            <Button onClick={handleCantHear} variant="outlined">
+                                No
+                            </Button>
+                        </>
+                    }
+                </div>
+                {clickedNo && !allTested &&
+                <Typography align="center">You have {localSpeakers.length} speakers, Now testing
+                    speaker {speakerNumber() + 1}... </Typography>}
             </Grid>
-        </div>
+            {localSpeakers.length && <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
+                <FormControl disabled={!localSpeakers.length} fullWidth variant="outlined">
+                    <InputLabel id="speakerSelect">Select Speakers</InputLabel>
+                    <Select value={speakerSource}
+                            fullWidth
+                            disabled={!localSpeakers.length}
+                            onChange={handleChangeSpeaker}
+                            variant="outlined"
+                            id="speakerSelect"
+                            label="Select Speakers"
+                    >
+                        <MenuItem value="" disabled>
+                            Choose a Speaker
+                        </MenuItem>
+                        {localSpeakers.map(device => {
+                            return (<MenuItem key={device.value} value={device.value}>{device.text}</MenuItem>)
+                        })}
+                    </Select>
+                </FormControl>
+            </Grid>}
+        </Grid>
     );
 };
 

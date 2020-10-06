@@ -6,6 +6,7 @@ import Link from "next/link";
 
 const chromeLogo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fchrome.svg?alt=media&token=516e705a-bafa-4a43-99f7-e184cc85b557"
 
+
 const useStyles = makeStyles((theme) => ({
     svg: {
         width: 50
@@ -16,14 +17,27 @@ const useStyles = makeStyles((theme) => ({
         alignItems: "center"
     }
 }));
-const Step1Chrome = ({isCompleted, handleMarkComplete}) => {
-
-
+const Step1Chrome = ({isCompleted, handleMarkComplete, isFirefox}) => {
     const classes = useStyles()
+
+    if (isFirefox) {
+        return (
+            <>
+                <Typography align="center" variant="h4"><b>Please use a supported browser</b></Typography>
+                <Box display="flex" flexDirection="column" alignItems="center" m={1} elevation={2}>
+                    <img style={{marginBottom: 10}} alt="chrome logo" className={classes.svg}
+                         src={chromeLogo}/><Typography
+                    align="center">Use a supported browser like the latest Google
+                    Chrome desktop browser (v. 80 and newer).</Typography>
+                </Box>
+            </>
+        )
+    }
+
     return (
         <>
-            <Typography variant="h5">Preparation</Typography>
-            <Typography variant="subtitle1">Please follow these couple of instructions to ensure a smooth streaming
+            <Typography gutterBottom align="center" variant="h4"><b>Preparation</b></Typography>
+            <Typography align="center" variant="subtitle1">Please follow these couple of instructions to ensure a smooth streaming
                 experience:</Typography>
             <Box display="flex" flexDirection="column" alignItems="center" m={1} elevation={2}>
                 <img style={{marginBottom: 10}} alt="chrome logo" className={classes.svg} src={chromeLogo}/><Typography
@@ -43,16 +57,16 @@ const Step1Chrome = ({isCompleted, handleMarkComplete}) => {
                 </li>
             </ul>
             <FormControlLabel style={{margin: "0 auto"}}
-                control={<Checkbox
-                    name='agreeTerm'
-                    placeholder='Confirm Password'
-                    onChange={handleMarkComplete}
-                    value={isCompleted}
-                    checked={isCompleted}
-                    disabled={isCompleted}
-                    color="primary"
-                />}
-                label={<Typography variant="h5">I will use Google Chrome as a browser</Typography>}
+                              control={<Checkbox
+                                  name='agreeTerm'
+                                  placeholder='Confirm Password'
+                                  onChange={handleMarkComplete}
+                                  value={isCompleted}
+                                  checked={isCompleted}
+                                  disabled={isCompleted}
+                                  color="primary"
+                              />}
+                              label={<Typography variant="h5">I will use Google Chrome as a browser</Typography>}
             />
             {/*<Button onClick={handleComplete} color="primary" variant="contained" fullWidth>*/}
             {/*    I agree to use Google Chrome as a browser*/}

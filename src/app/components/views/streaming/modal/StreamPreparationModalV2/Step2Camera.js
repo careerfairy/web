@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
 
 }))
 
-const Step2Camera = ({videoSource, devices, setVideoSource, cameraChecked, playSound, handleMarkComplete, localStream, handleCheckBox, isCompleted}) => {
+const Step2Camera = ({videoSource, devices, setVideoSource, playSound, handleMarkComplete, localStream, isCompleted}) => {
     const classes = useStyles()
 
     const testVideoRef = useRef(null);
@@ -56,7 +56,7 @@ const Step2Camera = ({videoSource, devices, setVideoSource, cameraChecked, playS
     return (
         <Grid container spacing={2}>
             <Grid sm={12} xs={12} item>
-                <Typography variant="h5">Video</Typography>
+                <Typography align="center" gutterBottom variant="h4"><b>Video</b></Typography>
                 <Typography variant="subtitle1">Please select your camera for this stream:</Typography>
             </Grid>
             <Grid sm={12} xs={12} item>
