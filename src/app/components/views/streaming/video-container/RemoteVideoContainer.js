@@ -9,6 +9,7 @@ function RemoteVideoContainer(props) {
 
     useEffect(() => {
         videoElement.current.srcObject = props.stream.stream;
+        props.attachSinkId(videoElement.current, props.speakerSource)
     },[props.stream.streamId]);
 
     useEffect(() => {

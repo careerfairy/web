@@ -205,7 +205,6 @@ function VideoContainer(props) {
 
     const attachSinkId = (element, sinkId) => {
         if (typeof element.sinkId !== 'undefined') {
-            console.log("element", element);
             element.setSinkId(sinkId)
                 .then(() => {
                     console.log(`Success, audio output device attached: ${sinkId}`);
@@ -233,6 +232,8 @@ function VideoContainer(props) {
                                              setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId}
                                              localId={props.streamerId}
                                              localStream={localStream}
+                                             speakerSource={speakerSource}
+                                             attachSinkId={attachSinkId}
                                              streams={externalMediaStreams}
                                              mediaConstraints={mediaConstraints}
                                              currentSpeaker={props.currentLivestream.currentSpeakerId}

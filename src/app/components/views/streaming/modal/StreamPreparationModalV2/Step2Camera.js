@@ -67,7 +67,7 @@ const Step2Camera = ({videoSource, devices, setVideoSource, cameraChecked, playS
                     </div>
                 </Grid>
                 <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl disabled={!devices.videoDeviceList.length} fullWidth variant="outlined">
                         <InputLabel shrink
                                     ref={inputLabel}
                                     htmlFor="cameraSelect">Select Camera</InputLabel>
@@ -91,10 +91,10 @@ const Step2Camera = ({videoSource, devices, setVideoSource, cameraChecked, playS
                     </FormControl>
                 </Grid>
                 <Grid lg={12} md={12} sm={12} xs={12} item>
-                    <Button fullWidth color="primary" className={classes.button} size="large"
-                            onClick={handleComplete}>
-                        I wish to use {getSelected()}
-                    </Button>
+                    {<Button fullWidth color="primary" variant="outlined" className={classes.button} size="large"
+                             onClick={handleComplete}>
+                        {devices.videoDeviceList.length? `I wish to use ${getSelected()}` : "No camera detected, continue without"}
+                    </Button>}
                 </Grid>
             </Grid>
         </div>

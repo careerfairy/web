@@ -121,6 +121,38 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
         return targetIndex
     }
 
+    if (isFirefox){
+        return (
+            <div style={{padding: "0 20px"}}>
+            <Grid container spacing={2}>
+                <Grid lg={12} md={12} sm={12} xs={12} item>
+                    <Typography align="center" variant="h4"
+                                gutterBottom><b>Do you hear a ringtone?</b></Typography>
+                    <Typography align="center" variant="subtitle1">If not please check your device sound settings.</Typography>
+                </Grid>
+               <Grid className={classes.warning} lg={12} md={12} sm={12} xs={12} item>
+                    <Typography align="center" color="error">
+                        It seems that you are using the <b>Firefox</b> browser, please be aware that you may encounter issues
+                        using this browser
+                    </Typography>
+                    <Button fullWidth color="secondary" size="large"
+                            variant="outlined"
+                            style={{marginTop: 10}}
+                            startIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
+                            endIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
+                            onClick={handleComplete}>
+                        <Typography align="center" color="error">
+                            <strong>
+                                I am aware and I wish to continue
+                            </strong>
+                        </Typography>
+                    </Button>
+                </Grid>
+            </Grid>
+        </div>
+        )
+    }
+
     return (
         <div style={{padding: "0 20px"}}>
             <Grid container spacing={2}>
@@ -148,7 +180,7 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
                         speaker {speakerNumber() + 1}... </Typography>}
                 </Grid>
                 <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
-                    <FormControl disabled={isFirefox} fullWidth variant="outlined">
+                    <FormControl disabled={!localSpeakers.length} fullWidth variant="outlined">
                         <InputLabel id="speakerSelect">Select Speakers</InputLabel>
                         <Select value={speakerSource }
                                 fullWidth
@@ -164,22 +196,6 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
                         </Select>
                     </FormControl>
                 </Grid>
-                {isFirefox && <Grid className={classes.warning} lg={12} md={12} sm={12} xs={12} item>
-                    <Typography align="center" color="error">
-                        It seems that you are using the Firefox browser, please be aware that you may encounter issues
-                        using this browser
-                    </Typography>
-                    <Button fullWidth color="secondary" size="large"
-                            startIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
-                            endIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
-                            onClick={handleComplete}>
-                        <Typography align="center" color="error">
-                            <strong>
-                                I am aware and I wish to continue
-                            </strong>
-                        </Typography>
-                    </Button>
-                </Grid>}
             </Grid>
         </div>
     );
