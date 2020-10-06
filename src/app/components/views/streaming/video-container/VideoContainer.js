@@ -203,6 +203,26 @@ function VideoContainer(props) {
         location.reload();
     }
 
+    const attachSinkId = (element, sinkId) => {
+        if (typeof element.sinkId !== 'undefined') {
+            console.log("element", element);
+            element.setSinkId(sinkId)
+                .then(() => {
+                    console.log(`Success, audio output device attached: ${sinkId}`);
+                })
+                .catch(error => {
+                    let errorMessage = error;
+                    if (error.name === 'SecurityError') {
+                        errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
+                    }
+                    console.error(errorMessage);
+                    // Jump back to first output device in the list as it's the default.
+                });
+        } else {
+            console.warn('Browser does not support output device selection.');
+        }
+    }
+
     return (
         <Fragment>
             <div className='screen-container'>
@@ -262,6 +282,7 @@ function VideoContainer(props) {
                                       streamerReady={streamerReady} setStreamerReady={setStreamerReady}
                                       localStream={localStream} mediaConstraints={mediaConstraints}
                                       connectionEstablished={connectionEstablished}
+                                      attachSinkId={attachSinkId}
                                       setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
                                       isStreaming={isStreaming} audioSource={audioSource}
                                       setAudioSource={setAudioSource} videoSource={videoSource}

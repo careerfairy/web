@@ -39,7 +39,8 @@ const Step1Chrome = ({handleComplete, isCompleted}) => {
                     restrictive firewall rules.
                 </li>
             </ul>
-            <Button size="large" color="primary" disabled={isCompleted}
+            <Button size="large" color="primary"
+                    disabled={isCompleted}
                     onClick={handleComplete}>
                 <Typography variant="h5"><strong>I agree to use Google Chrome as a browser</strong></Typography>
             </Button>
