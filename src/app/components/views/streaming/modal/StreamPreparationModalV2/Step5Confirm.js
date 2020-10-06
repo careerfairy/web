@@ -13,14 +13,13 @@ const useStyles = makeStyles(theme => ({
 }))
 
 
-const Step5Confirm = ({streamerReady, isStreaming, errorMessage, setConnectionEstablished, audioSource, videoSource, devices, speakerSource}) => {
+const Step5Confirm = ({audioSource, videoSource, devices, speakerSource, setStreamerReady}) => {
     const classes = useStyles()
     const [labels, setLabels] = useState({
         speaker: "",
         microphone: "",
         camera: ""
     })
-    console.log("labels", labels);
 
     const setLabelObj = (value, deviceList) => {
         const targetIndex = deviceList.findIndex(device => device.value === value)
@@ -35,7 +34,6 @@ const Step5Confirm = ({streamerReady, isStreaming, errorMessage, setConnectionEs
         let labelsObj = {...labels}
         if (audioSource && devices && devices.audioInputList && devices.audioInputList.length) {
             labelsObj.microphone = setLabelObj(audioSource, devices.audioInputList)
-
         }
         if (speakerSource && devices && devices.audioOutputList && devices.audioOutputList.length) {
             labelsObj.speaker = setLabelObj(speakerSource, devices.audioOutputList)

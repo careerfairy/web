@@ -1,7 +1,16 @@
-import React, {useEffect, useRef} from 'react';
-import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
+import React, {useEffect, useRef, useState} from 'react';
 import OutlinedInput from "@material-ui/core/OutlinedInput";
-import {Button, DialogContent, Grid, MenuItem, Select, Typography, InputLabel, FormControl} from "@material-ui/core";
+import {
+    Button,
+    Grid,
+    MenuItem,
+    Select,
+    Typography,
+    InputLabel,
+    FormControl,
+    FormControlLabel,
+    Checkbox, DialogContent
+} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({
@@ -12,15 +21,16 @@ const useStyles = makeStyles(theme => ({
     },
     button: {
         height: "100%"
-    }
+    },
+
 }))
 
-const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudioSource, playSound, setPlaySound, setStreamerReady, handleComplete, localStream}) => {
+const Step2Camera = ({videoSource, devices, setVideoSource, cameraChecked, playSound,  handleComplete, localStream, handleCheckBox, isCompleted}) => {
     const classes = useStyles()
 
     const testVideoRef = useRef(null);
-    const inputLabel = React.useRef(null);
-    const [labelWidth, setLabelWidth] = React.useState(0);
+    const inputLabel = useRef(null);
+    const [labelWidth, setLabelWidth] = useState(0);
 
     useEffect(() => {
         if (localStream) {
@@ -46,11 +56,11 @@ const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudi
     return (
         <div style={{padding: "0 20px"}}>
             <Grid container spacing={2}>
-                <Grid item>
+                <Grid sm={12} xs={12} item>
                     <Typography variant="h5">Video</Typography>
                     <Typography variant="subtitle1">Please select your camera for this stream:</Typography>
                 </Grid>
-                <Grid item>
+                <Grid sm={12} xs={12} item>
                     <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
                         <video style={{boxShadow: '0 0 3px rgb(200,200,200)', borderRadius: '5px'}}
                                ref={testVideoRef} muted={playSound} autoPlay width={'100%'}/>
@@ -71,13 +81,11 @@ const Step2Camera = ({videoSource, devices, setVideoSource, audioSource, setAudi
                                         notched
                                         labelWidth={labelWidth}
                                         name="camera"
-                                        id="cameraSelect"
-                                    />
+                                        id="cameraSelect"/>
                                 }
-                                label="Select Camera"
-                        >
+                                label="Select Camera">
                             {devices.videoDeviceList.map(device => {
-                                return (<MenuItem value={device.value}>{device.text}</MenuItem>)
+                                return (<MenuItem key={device.value} value={device.value}>{device.text}</MenuItem>)
                             })}
                         </Select>
                     </FormControl>

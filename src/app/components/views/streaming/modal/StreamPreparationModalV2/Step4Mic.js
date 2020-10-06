@@ -49,7 +49,6 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
     const [clickedNo, setClickedNo] = useState(false)
     const [allTested, setAllTested] = useState(false)
 
-
     useEffect(() => {
         if (devices && devices.audioInputList && devices.audioInputList.length) {
             const mappedMicrophones = devices.audioInputList.map(speaker => (
@@ -86,8 +85,10 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
         const mappedMicrophones = devices.audioInputList.map(speaker => (
             {...speaker, hasBeenChecked: false}
         ))// first speaker in device array is allways selected by default
-        const index = localMicrophones.findIndex(device => device.value === speakerSource)
-        mappedMicrophones[index].hasBeenChecked = true
+        const index = localMicrophones.findIndex(device => device.value === audioSource)
+        if (index > -1) {
+            mappedMicrophones[index].hasBeenChecked = true
+        }
         setLocalSpeakers(mappedMicrophones)
     }
 
@@ -112,7 +113,9 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
         if (uncheckedSpeakers.length) {
             setAudioSource(uncheckedSpeakers[0].value)
             const index = localMicrophones.findIndex(device => device.value === uncheckedSpeakers[0].value)
-            markAsChecked(index)
+            if (index > -1) {
+                markAsChecked(index)
+            }
         } else {
             setAllTested(true)
         }
@@ -163,9 +166,9 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
                     </FormControl>
                 </Grid>
                 <Grid className={classes.emphasis} lg={12} md={12} sm={12} xs={12} item>
-                        <HeadsetMicIcon style={{marginRight: 5}} fontSize="large" color="primary"/>
-                        <Typography color="primary"><b>USE HEADPHONES!</b></Typography>
-                        <HeadsetMicIcon style={{marginLeft: 5}} fontSize="large" color="primary"/>
+                    <HeadsetMicIcon style={{marginRight: 5}} fontSize="large" color="primary"/>
+                    <Typography color="primary"><b>USE HEADPHONES!</b></Typography>
+                    <HeadsetMicIcon style={{marginLeft: 5}} fontSize="large" color="primary"/>
                 </Grid>
                 <Grid lg={4} md={4} sm={4} xs={12} item>
                     <Typography align="center" style={{fontWeight: '600'}}>Microphone Volume:</Typography>

@@ -67,7 +67,7 @@ const StreamPreparationModalV2 = ({
     const [playSound, setPlaySound] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
     const [chromeChecked, setChromeChecked] = useState(false)
-    console.log("-> chromeChecked", chromeChecked);
+    const [cameraChecked, setCameraChecked] = useState(false)
     const [completed, setCompleted] = useState(new Set());
     const [skipped, setSkipped] = useState(new Set());
     const devices = useUserMedia(activeStep);
@@ -154,16 +154,25 @@ const StreamPreparationModalV2 = ({
         const newCompleted = new Set(completed);
         newCompleted.add(activeStep);
         setCompleted(newCompleted);
-
         /**
          * Sigh... it would be much nicer to replace the following if conditional with
          * `if (!this.allStepsComplete())` however state is not set when we do this,
          * thus we have to resort to not being very DRY.
          */
+
+        if(completedSteps() === totalSteps() - 1){
+            handleStartStreaming()
+        }
         if (completed.size !== totalSteps() - skippedSteps()) {
             handleNext();
         }
+
     };
+
+    const handleStartStreaming = () => {
+        setStreamerReady(true)
+        setConnectionEstablished(true)
+    }
 
     const handleReset = () => {
         setActiveStep(0);
@@ -180,7 +189,11 @@ const StreamPreparationModalV2 = ({
     }
     const handleCheckBox = (event) => {
         const {target: {checked}} = event
-        setChromeChecked(checked)
+        if (activeStep === 0) {
+            setChromeChecked(checked)
+        } else if (activeStep === 1) {
+            setCameraChecked(checked)
+        }
         if (checked) {
             const newCompleted = new Set(completed);
             newCompleted.add(activeStep);
@@ -199,6 +212,9 @@ const StreamPreparationModalV2 = ({
                 return <Step2Camera audioLevel={audioLevel}
                                     audioSource={audioSource}
                                     devices={devices}
+                                    isCompleted={isCompleted()}
+                                    cameraChecked={cameraChecked}
+                                    handleCheckBox={handleCheckBox}
                                     localStream={localStream}
                                     playSound={playSound}
                                     setAudioSource={setAudioSource}
@@ -230,6 +246,7 @@ const StreamPreparationModalV2 = ({
                                      isStreaming={isStreaming}
                                      audioSource={audioSource}
                                      devices={devices}
+                                     setStreamerReady={setStreamerReady}
                                      speakerSource={speakerSource}
                                      videoSource={videoSource}
                                      streamerReady={streamerReady}/>

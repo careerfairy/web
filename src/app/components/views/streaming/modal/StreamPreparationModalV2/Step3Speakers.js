@@ -73,7 +73,9 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
         if (uncheckedSpeakers.length) {
             setSpeakerSource(uncheckedSpeakers[0].value)
             const index = localSpeakers.findIndex(device => device.value === uncheckedSpeakers[0].value)
-            markAsChecked(index)
+            if (index > -1) {
+                markAsChecked(index)
+            }
             attachSinkId(audio, uncheckedSpeakers[0].value);
         } else {
             setAllTested(true)
@@ -87,7 +89,9 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
             {...speaker, hasBeenChecked: false}
         ))// first speaker in device array is allways selected by default
         const index = localSpeakers.findIndex(device => device.value === speakerSource)
-        mappedSpeakers[index].hasBeenChecked = true
+        if (index > -1) {
+            mappedSpeakers[index].hasBeenChecked = true
+        }
         setLocalSpeakers(mappedSpeakers)
     }
 
@@ -139,13 +143,14 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
                             </>
                         }
                     </div>
-                    {clickedNo && !allTested && <Typography align="center">You have {localSpeakers.length} speakers, Now testing
+                    {clickedNo && !allTested &&
+                    <Typography align="center">You have {localSpeakers.length} speakers, Now testing
                         speaker {speakerNumber() + 1}... </Typography>}
                 </Grid>
                 <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
                     <FormControl disabled={isFirefox} fullWidth variant="outlined">
                         <InputLabel id="speakerSelect">Select Speakers</InputLabel>
-                        <Select value={speakerSource}
+                        <Select value={speakerSource }
                                 fullWidth
                                 disabled={isFirefox}
                                 onChange={handleChangeSpeaker}
