@@ -14,7 +14,6 @@ import {
 import {useSoundMeter} from 'components/custom-hook/useSoundMeter';
 import SoundLevelDisplayer from 'components/views/common/SoundLevelDisplayer';
 import useUserMedia from 'components/custom-hook/useDevices';
-import Draggable from 'react-draggable';
 import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
 import Step1Chrome from "./Step1Chrome";
@@ -33,15 +32,6 @@ const useStyles = makeStyles(theme => ({
 
 function getSteps() {
     return ['Browser', 'Camera', 'Speakers', 'Microphone', 'Confirm'];
-}
-
-
-function PaperComponent(props) {
-    return (
-        <Draggable handle="#draggable-dialog-title" cancel={'[class*="MuiDialogContent-root"]'}>
-            <Paper {...props} />
-        </Draggable>
-    );
 }
 
 
@@ -256,7 +246,7 @@ const StreamPreparationModalV2 = ({
     }
 
     return (
-        <Dialog fullWidth maxWidth="sm" PaperComponent={PaperComponent} open={!streamerReady || !connectionEstablished}>
+        <Dialog fullWidth maxWidth="sm" open={!streamerReady || !connectionEstablished}>
             <DialogTitle disableTypography hidden={streamerReady && connectionEstablished} style={{cursor: 'move'}}
                          id="draggable-dialog-title">
                 <h3 style={{color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3>
