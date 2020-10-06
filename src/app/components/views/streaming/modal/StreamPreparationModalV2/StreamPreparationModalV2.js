@@ -24,6 +24,10 @@ import Step5Confirm from "./Step5Confirm";
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({
+    root: {
+        display: "flex",
+        flexDirection: "column"
+    },
     stepper: {
         paddingLeft: 0,
         paddingRight: 0
@@ -56,8 +60,6 @@ const StreamPreparationModalV2 = ({
     const [showAudioVideo, setShowAudioVideo] = useState(false);
     const [playSound, setPlaySound] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
-    const [chromeChecked, setChromeChecked] = useState(false)
-    const [cameraChecked, setCameraChecked] = useState(false)
     const [completed, setCompleted] = useState(new Set());
     const [skipped, setSkipped] = useState(new Set());
     const devices = useUserMedia(activeStep);
@@ -150,8 +152,8 @@ const StreamPreparationModalV2 = ({
          * thus we have to resort to not being very DRY.
          */
 
-        if(completedSteps() === totalSteps() - 1){
-            handleStartStreaming()
+        if (completedSteps() === totalSteps() - 1) {
+            handleFinalize()
         }
         if (completed.size !== totalSteps() - skippedSteps()) {
             handleNext();
@@ -159,7 +161,7 @@ const StreamPreparationModalV2 = ({
 
     };
 
-    const handleStartStreaming = () => {
+    const handleFinalize = () => {
         setStreamerReady(true)
         setConnectionEstablished(true)
     }
@@ -177,34 +179,25 @@ const StreamPreparationModalV2 = ({
     const isStepComplete = (step) => {
         return completed.has(step);
     }
-    const handleCheckBox = (event) => {
-        const {target: {checked}} = event
-        if (activeStep === 0) {
-            setChromeChecked(checked)
-        } else if (activeStep === 1) {
-            setCameraChecked(checked)
-        }
-        if (checked) {
-            const newCompleted = new Set(completed);
-            newCompleted.add(activeStep);
-            setCompleted(newCompleted);
-        }
+
+
+    const handleMarkComplete = () => {
+        const newCompleted = new Set(completed);
+        newCompleted.add(activeStep);
+        setCompleted(newCompleted);
     }
 
     function getStepContent(stepIndex) {
         switch (stepIndex) {
             case 0:
-                return <Step1Chrome handleComplete={handleComplete}
-                                    chromeChecked={chromeChecked}
-                                    handleCheckBox={handleCheckBox}
+                return <Step1Chrome handleMarkComplete={handleMarkComplete}
                                     isCompleted={isCompleted()}/>;
             case 1:
                 return <Step2Camera audioLevel={audioLevel}
                                     audioSource={audioSource}
                                     devices={devices}
+                                    handleMarkComplete={handleMarkComplete}
                                     isCompleted={isCompleted()}
-                                    cameraChecked={cameraChecked}
-                                    handleCheckBox={handleCheckBox}
                                     localStream={localStream}
                                     playSound={playSound}
                                     setAudioSource={setAudioSource}
@@ -247,12 +240,11 @@ const StreamPreparationModalV2 = ({
 
     return (
         <Dialog fullWidth maxWidth="sm" open={!streamerReady || !connectionEstablished}>
-            <DialogTitle disableTypography hidden={streamerReady && connectionEstablished} style={{cursor: 'move'}}
-                         id="draggable-dialog-title">
+            <DialogTitle disableTypography hidden={streamerReady && connectionEstablished} style={{cursor: 'move'}}>
                 <h3 style={{color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3>
             </DialogTitle>
-            {getStepContent(activeStep)}
-            <DialogContent>
+            <DialogContent className={classes.root}>
+                {getStepContent(activeStep)}
                 <Stepper className={classes.stepper} activeStep={activeStep} alternativeLabel>
                     {steps.map((label, index) => {
                         const stepProps = {};
@@ -299,7 +291,7 @@ const StreamPreparationModalV2 = ({
 
                     {completedSteps() === totalSteps() - 1 &&
                     <Button variant="contained" color="primary" onClick={handleComplete}>
-                        Start Streaming
+                        Continue
                     </Button>}
                 </DialogActions>
                 <p style={{fontSize: '0.8em', color: 'grey'}}>If anything is unclear or not working, please <a

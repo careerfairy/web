@@ -16,12 +16,12 @@ const useStyles = makeStyles((theme) => ({
         alignItems: "center"
     }
 }));
-const Step1Chrome = ({handleComplete, isCompleted, chromeChecked, handleCheckBox}) => {
+const Step1Chrome = ({isCompleted, handleMarkComplete}) => {
 
 
     const classes = useStyles()
     return (
-        <DialogContent className={classes.root}>
+        <>
             <Typography variant="h5">Preparation</Typography>
             <Typography variant="subtitle1">Please follow these couple of instructions to ensure a smooth streaming
                 experience:</Typography>
@@ -42,19 +42,22 @@ const Step1Chrome = ({handleComplete, isCompleted, chromeChecked, handleCheckBox
                     restrictive firewall rules.
                 </li>
             </ul>
-            <FormControlLabel
+            <FormControlLabel style={{margin: "0 auto"}}
                 control={<Checkbox
                     name='agreeTerm'
                     placeholder='Confirm Password'
-                    onChange={handleCheckBox}
-                    value={chromeChecked}
-                    checked={chromeChecked}
+                    onChange={handleMarkComplete}
+                    value={isCompleted}
+                    checked={isCompleted}
                     disabled={isCompleted}
                     color="primary"
                 />}
-                label={<Typography variant="h5">I agree to use Google Chrome as a browser</Typography>}
+                label={<Typography variant="h5">I will use Google Chrome as a browser</Typography>}
             />
-        </DialogContent>
+            {/*<Button onClick={handleComplete} color="primary" variant="contained" fullWidth>*/}
+            {/*    I agree to use Google Chrome as a browser*/}
+            {/*</Button>*/}
+        </>
     );
 };
 

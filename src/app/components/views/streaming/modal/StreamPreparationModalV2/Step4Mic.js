@@ -45,7 +45,7 @@ const useStyles = makeStyles(theme => ({
 
 const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySound, playSound, localStream, speakerSource, attachSinkId, handleComplete}) => {
     const classes = useStyles()
-    const [localMicrophones, setLocalSpeakers] = useState([])
+    const [localMicrophones, setLocalMicrophones] = useState([])
     const [clickedNo, setClickedNo] = useState(false)
     const [allTested, setAllTested] = useState(false)
 
@@ -55,7 +55,7 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
                 {...speaker, hasBeenChecked: false}
             ))// first speaker in device array is allways selected by default
             mappedMicrophones[0].hasBeenChecked = true
-            setLocalSpeakers(mappedMicrophones)
+            setLocalMicrophones(mappedMicrophones)
         }
     }, [devices])
 
@@ -89,7 +89,7 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
         if (index > -1) {
             mappedMicrophones[index].hasBeenChecked = true
         }
-        setLocalSpeakers(mappedMicrophones)
+        setLocalMicrophones(mappedMicrophones)
     }
 
     const markAsChecked = (index) => {
@@ -97,12 +97,11 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
         if (newLocalSpeakers[index]) {
             newLocalSpeakers[index].hasBeenChecked = true
         }
-        setLocalSpeakers(newLocalSpeakers)
+        setLocalMicrophones(newLocalSpeakers)
     }
 
     const micNumber = () => {
-        const targetIndex = localMicrophones.findIndex(device => device.value === audioSource)
-        return targetIndex
+        return localMicrophones.findIndex(device => device.value === audioSource)
     }
 
     const handleCantHear = () => {
@@ -149,8 +148,8 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
                     <Typography align="center">You have {localMicrophones.length} microphones, Now testing
                         microphone {micNumber() + 1}... </Typography>}
                 </Grid>
-                <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
-                    <FormControl fullWidth variant="outlined">
+                {localMicrophones.length && <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
+                    <FormControl disabled={!devices.audioInputList.length} fullWidth variant="outlined">
                         <InputLabel id="microphoneSelect">Select Microphone</InputLabel>
                         <Select value={audioSource}
                                 fullWidth
@@ -159,12 +158,15 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
                                 id="microphoneSelect"
                                 label="Select Microphone"
                         >
+                            <MenuItem value="" disabled>
+                                Choose a Microphone
+                            </MenuItem>
                             {localMicrophones.map(device => {
                                 return (<MenuItem key={device.value} value={device.value}>{device.text}</MenuItem>)
                             })}
                         </Select>
                     </FormControl>
-                </Grid>
+                </Grid>}
                 <Grid className={classes.emphasis} lg={12} md={12} sm={12} xs={12} item>
                     <HeadsetMicIcon style={{marginRight: 5}} fontSize="large" color="primary"/>
                     <Typography color="primary"><b>USE HEADPHONES!</b></Typography>
@@ -180,5 +182,6 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
         </div>
     );
 };
+
 
 export default Step4Mic;

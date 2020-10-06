@@ -30,14 +30,28 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
+function getBrowserName() {
+    var name = "Unknown";
+    if (navigator.userAgent.indexOf("MSIE") != -1) {
+        name = "MSIE";
+    } else if (navigator.userAgent.indexOf("Firefox") != -1) {
+        name = "Firefox";
+    } else if (navigator.userAgent.indexOf("Opera") != -1) {
+        name = "Opera";
+    } else if (navigator.userAgent.indexOf("Chrome") != -1) {
+        name = "Chrome";
+    } else if (navigator.userAgent.indexOf("Safari") != -1) {
+        name = "Safari";
+    }
+    return name;
+}
+
 const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices, localStream, attachSinkId}) => {
     const classes = useStyles()
     const [playing, toggle, audio] = useAudio("https://www.kozco.com/tech/piano2-CoolEdit.mp3")
     const [localSpeakers, setLocalSpeakers] = useState([])
     const [clickedNo, setClickedNo] = useState(false)
     const [allTested, setAllTested] = useState(false)
-
-    const isFirefox = typeof InstallTrigger !== 'undefined';
 
     useEffect(() => {
         if (devices && devices.audioOutputList && devices.audioOutputList.length) {
@@ -121,35 +135,38 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
         return targetIndex
     }
 
-    if (isFirefox){
+    if (["Safari", "Firefox"].includes(getBrowserName())) {
         return (
             <div style={{padding: "0 20px"}}>
-            <Grid container spacing={2}>
-                <Grid lg={12} md={12} sm={12} xs={12} item>
-                    <Typography align="center" variant="h4"
-                                gutterBottom><b>Do you hear a ringtone?</b></Typography>
-                    <Typography align="center" variant="subtitle1">If not please check your device sound settings.</Typography>
-                </Grid>
-               <Grid className={classes.warning} lg={12} md={12} sm={12} xs={12} item>
-                    <Typography align="center" color="error">
-                        It seems that you are using the <b>Firefox</b> browser, please be aware that you may encounter issues
-                        using this browser
-                    </Typography>
-                    <Button fullWidth color="secondary" size="large"
-                            variant="outlined"
-                            style={{marginTop: 10}}
-                            startIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
-                            endIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
-                            onClick={handleComplete}>
+                <Grid container spacing={2}>
+                    <Grid lg={12} md={12} sm={12} xs={12} item>
+                        <Typography align="center" variant="h4"
+                                    gutterBottom><b>Do you hear a ringtone?</b></Typography>
+                        <Typography align="center" variant="subtitle1">If not please check your device sound
+                            settings.</Typography>
+                    </Grid>
+                    <Grid className={classes.warning} lg={12} md={12} sm={12} xs={12} item>
                         <Typography align="center" color="error">
-                            <strong>
-                                I am aware and I wish to continue
-                            </strong>
+                            It seems that you are using the <b>{getBrowserName()}</b> web browser, please
+                            be aware that you may
+                            encounter issues
+                            using this browser
                         </Typography>
-                    </Button>
+                        <Button fullWidth color="secondary" size="large"
+                                variant="outlined"
+                                style={{marginTop: 10}}
+                                startIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
+                                endIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
+                                onClick={handleComplete}>
+                            <Typography align="center" color="error">
+                                <strong>
+                                    I am aware and I wish to continue
+                                </strong>
+                            </Typography>
+                        </Button>
+                    </Grid>
                 </Grid>
-            </Grid>
-        </div>
+            </div>
         )
     }
 
@@ -179,23 +196,26 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, handleComplete, devices
                     <Typography align="center">You have {localSpeakers.length} speakers, Now testing
                         speaker {speakerNumber() + 1}... </Typography>}
                 </Grid>
-                <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
+                {localSpeakers.length && <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
                     <FormControl disabled={!localSpeakers.length} fullWidth variant="outlined">
                         <InputLabel id="speakerSelect">Select Speakers</InputLabel>
-                        <Select value={speakerSource }
+                        <Select value={speakerSource}
                                 fullWidth
-                                disabled={isFirefox}
+                                disabled={!localSpeakers.length}
                                 onChange={handleChangeSpeaker}
                                 variant="outlined"
                                 id="speakerSelect"
                                 label="Select Speakers"
                         >
+                            <MenuItem value="" disabled>
+                                Choose a Speaker
+                            </MenuItem>
                             {localSpeakers.map(device => {
                                 return (<MenuItem key={device.value} value={device.value}>{device.text}</MenuItem>)
                             })}
                         </Select>
                     </FormControl>
-                </Grid>
+                </Grid>}
             </Grid>
         </div>
     );

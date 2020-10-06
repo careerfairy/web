@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
 
 }))
 
-const Step2Camera = ({videoSource, devices, setVideoSource, cameraChecked, playSound,  handleComplete, localStream, handleCheckBox, isCompleted}) => {
+const Step2Camera = ({videoSource, devices, setVideoSource, cameraChecked, playSound, handleMarkComplete, localStream, handleCheckBox, isCompleted}) => {
     const classes = useStyles()
 
     const testVideoRef = useRef(null);
@@ -54,50 +54,65 @@ const Step2Camera = ({videoSource, devices, setVideoSource, cameraChecked, playS
 
 
     return (
-        <div style={{padding: "0 20px"}}>
-            <Grid container spacing={2}>
-                <Grid sm={12} xs={12} item>
-                    <Typography variant="h5">Video</Typography>
-                    <Typography variant="subtitle1">Please select your camera for this stream:</Typography>
-                </Grid>
-                <Grid sm={12} xs={12} item>
-                    <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-                        <video style={{boxShadow: '0 0 3px rgb(200,200,200)', borderRadius: '5px'}}
-                               ref={testVideoRef} muted={playSound} autoPlay width={'100%'}/>
-                    </div>
-                </Grid>
-                <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
-                    <FormControl disabled={!devices.videoDeviceList.length} fullWidth variant="outlined">
-                        <InputLabel shrink
-                                    ref={inputLabel}
-                                    htmlFor="cameraSelect">Select Camera</InputLabel>
-                        <Select value={videoSource}
-                                fullWidth
-                                onChange={handleChangeCam}
-                                variant="outlined"
-                                id="cameraSelect"
-                                input={
-                                    <OutlinedInput
-                                        notched
-                                        labelWidth={labelWidth}
-                                        name="camera"
-                                        id="cameraSelect"/>
-                                }
-                                label="Select Camera">
-                            {devices.videoDeviceList.map(device => {
-                                return (<MenuItem key={device.value} value={device.value}>{device.text}</MenuItem>)
-                            })}
-                        </Select>
-                    </FormControl>
-                </Grid>
-                <Grid lg={12} md={12} sm={12} xs={12} item>
-                    {<Button fullWidth color="primary" variant="outlined" className={classes.button} size="large"
-                             onClick={handleComplete}>
-                        {devices.videoDeviceList.length? `I wish to use ${getSelected()}` : "No camera detected, continue without"}
-                    </Button>}
-                </Grid>
+        <Grid container spacing={2}>
+            <Grid sm={12} xs={12} item>
+                <Typography variant="h5">Video</Typography>
+                <Typography variant="subtitle1">Please select your camera for this stream:</Typography>
             </Grid>
-        </div>
+            <Grid sm={12} xs={12} item>
+                <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                    <video style={{boxShadow: '0 0 3px rgb(200,200,200)', borderRadius: '5px'}}
+                           ref={testVideoRef} muted={playSound} autoPlay width={'100%'}/>
+                </div>
+            </Grid>
+            <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
+                <FormControl disabled={!devices.videoDeviceList.length} fullWidth variant="outlined">
+                    <InputLabel shrink
+                                ref={inputLabel}
+                                htmlFor="cameraSelect">Select Camera</InputLabel>
+                    <Select value={videoSource || ""}
+                            fullWidth
+                            onChange={handleChangeCam}
+                            variant="outlined"
+                            id="cameraSelect"
+                            input={
+                                <OutlinedInput
+                                    notched
+                                    labelWidth={labelWidth}
+                                    name="camera"
+                                    id="cameraSelect"/>
+                            }
+                            label="Select Camera">
+                        <MenuItem value="" disabled>
+                            Choose a Camera
+                        </MenuItem>
+                        {devices.videoDeviceList.map(device => {
+                            return (<MenuItem key={device.value} value={device.value}>{device.text}</MenuItem>)
+                        })}
+                    </Select>
+                </FormControl>
+            </Grid>
+            <Grid style={{display: "flex"}} lg={12} md={12} sm={12} xs={12} item>
+                <FormControlLabel style={{margin: "0 auto"}}
+                                  control={<Checkbox
+                                      name='agree to camera'
+                                      placeholder='Confirm Password'
+                                      onChange={handleMarkComplete}
+                                      value={isCompleted}
+                                      checked={isCompleted}
+                                      disabled={isCompleted}
+                                      color="primary"
+                                  />}
+                                  label={<Typography
+                                      variant="h5">{devices.videoDeviceList.length ? `I wish to use ${getSelected()}` : "No camera detected, I wish to continue without"}
+                                  </Typography>}
+                />
+                {/*<Button fullWidth color="primary" variant="contained" className={classes.button} size="large"*/}
+                {/*         onClick={handleComplete}>*/}
+                {/*    {devices.videoDeviceList.length? `I wish to use ${getSelected()}` : "No camera detected, continue without"}*/}
+                {/*</Button>*/}
+            </Grid>
+        </Grid>
     );
 };
 
