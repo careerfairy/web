@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Icon} from "semantic-ui-react";
 import {Box, Button, Checkbox, DialogContent, FormControlLabel, Grid, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
@@ -16,7 +16,8 @@ const useStyles = makeStyles((theme) => ({
         alignItems: "center"
     }
 }));
-const Step1Chrome = ({handleComplete, isCompleted}) => {
+const Step1Chrome = ({handleComplete, isCompleted, chromeChecked, handleCheckBox}) => {
+
 
     const classes = useStyles()
     return (
@@ -45,20 +46,14 @@ const Step1Chrome = ({handleComplete, isCompleted}) => {
                 control={<Checkbox
                     name='agreeTerm'
                     placeholder='Confirm Password'
-                    onChange={handleComplete}
-                    value={isCompleted}
+                    onChange={handleCheckBox}
+                    value={chromeChecked}
+                    checked={chromeChecked}
                     disabled={isCompleted}
                     color="primary"
                 />}
-                label={<>I agree to
-                    the <Link href='/terms'><a>Terms & Conditions</a></Link> and the <Link
-                        href='/privacy'><a>Privacy Policy</a></Link></>}
+                label={<Typography variant="h5">I agree to use Google Chrome as a browser</Typography>}
             />
-            <Button size="large" color="primary"
-                    disabled={isCompleted}
-                    onClick={handleComplete}>
-                <Typography variant="h5"><strong>I agree to use Google Chrome as a browser</strong></Typography>
-            </Button>
         </DialogContent>
     );
 };

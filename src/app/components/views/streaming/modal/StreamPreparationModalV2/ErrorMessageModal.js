@@ -4,7 +4,7 @@ import {Button, Icon, Image} from "semantic-ui-react";
 
 const ErrorMessageModal = ({errorMessage, streamerReady, connectionEstablished, isStreaming}) => {
     return (
-        <Dialog open={(!streamerReady || !connectionEstablished) && errorMessage}>
+        <Dialog open={Boolean((!streamerReady || !connectionEstablished) && errorMessage)}>
             <DialogContent>
                 <Box hidden={!(streamerReady && !isStreaming && !errorMessage)}>
                     <Image src='/loader.gif' style={{width: '50px', height: 'auto', margin: '0 auto'}}/>

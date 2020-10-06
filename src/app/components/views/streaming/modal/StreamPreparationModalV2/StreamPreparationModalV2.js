@@ -66,8 +66,10 @@ const StreamPreparationModalV2 = ({
     const [showAudioVideo, setShowAudioVideo] = useState(false);
     const [playSound, setPlaySound] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
-    const [completed, setCompleted] = React.useState(new Set());
-    const [skipped, setSkipped] = React.useState(new Set());
+    const [chromeChecked, setChromeChecked] = useState(false)
+    console.log("-> chromeChecked", chromeChecked);
+    const [completed, setCompleted] = useState(new Set());
+    const [skipped, setSkipped] = useState(new Set());
     const devices = useUserMedia(activeStep);
     const audioLevel = useSoundMeter(showAudioVideo, localStream);
 
@@ -173,14 +175,26 @@ const StreamPreparationModalV2 = ({
         return skipped.has(step);
     };
 
-    function isStepComplete(step) {
+    const isStepComplete = (step) => {
         return completed.has(step);
+    }
+    const handleCheckBox = (event) => {
+        const {target: {checked}} = event
+        setChromeChecked(checked)
+        if (checked) {
+            const newCompleted = new Set(completed);
+            newCompleted.add(activeStep);
+            setCompleted(newCompleted);
+        }
     }
 
     function getStepContent(stepIndex) {
         switch (stepIndex) {
             case 0:
-                return <Step1Chrome handleComplete={handleComplete} isCompleted={isCompleted()}/>;
+                return <Step1Chrome handleComplete={handleComplete}
+                                    chromeChecked={chromeChecked}
+                                    handleCheckBox={handleCheckBox}
+                                    isCompleted={isCompleted()}/>;
             case 1:
                 return <Step2Camera audioLevel={audioLevel}
                                     audioSource={audioSource}
@@ -216,7 +230,7 @@ const StreamPreparationModalV2 = ({
                                      isStreaming={isStreaming}
                                      audioSource={audioSource}
                                      devices={devices}
-                                      speakerSource={speakerSource}
+                                     speakerSource={speakerSource}
                                      videoSource={videoSource}
                                      streamerReady={streamerReady}/>
             default:
@@ -226,7 +240,7 @@ const StreamPreparationModalV2 = ({
 
     return (
         <Dialog fullWidth maxWidth="sm" PaperComponent={PaperComponent} open={!streamerReady || !connectionEstablished}>
-            <DialogTitle hidden={streamerReady && connectionEstablished} style={{cursor: 'move'}}
+            <DialogTitle disableTypography hidden={streamerReady && connectionEstablished} style={{cursor: 'move'}}
                          id="draggable-dialog-title">
                 <h3 style={{color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3>
             </DialogTitle>
