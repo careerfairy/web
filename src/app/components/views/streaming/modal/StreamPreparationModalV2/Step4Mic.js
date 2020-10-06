@@ -1,5 +1,15 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Button, DialogContent, FormControl, Grid, InputLabel, MenuItem, Select, Typography} from "@material-ui/core";
+import {
+    Box,
+    Button,
+    DialogContent,
+    FormControl,
+    Grid,
+    InputLabel,
+    MenuItem,
+    Select,
+    Typography
+} from "@material-ui/core";
 import HeadsetMicIcon from '@material-ui/icons/HeadsetMic';
 import {Icon} from "semantic-ui-react";
 import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
@@ -123,7 +133,7 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
     }
 
     return (
-        <Grid container spacing={2}>
+        <Grid style={{padding: "1rem 0"}} container spacing={4}>
             <audio ref={testAudioRef} autoPlay/>
             <Grid lg={12} md={12} sm={12} xs={12} item>
                 <Typography align="center" variant="h4"
@@ -135,7 +145,7 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
                         </Button>
                         :
                         <>
-                            <Button  disabled={isCompleted} onClick={handleMarkComplete} variant="outlined">
+                            <Button disabled={isCompleted} onClick={handleMarkComplete} variant="outlined">
                                 Yes
                             </Button>
                             <Button onClick={handleCantHear} variant="outlined">
@@ -147,6 +157,17 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
                 {clickedNo && !allTested &&
                 <Typography align="center">You have {localMicrophones.length} microphones, Now testing
                     microphone {micNumber() + 1}... </Typography>}
+            </Grid>
+            <Grid style={{display: "flex", justifyContent: "center"}} lg={12} md={12} sm={12} xs={12} item>
+                <Box p={2} borderRadius={16} boxShadow={2}>
+                    <div className={classes.emphasis}>
+                        <HeadsetMicIcon style={{marginRight: 5}} fontSize="large" color="primary"/>
+                        <Typography color="primary"><b>USE HEADPHONES!</b></Typography>
+                        <HeadsetMicIcon style={{marginLeft: 5}} fontSize="large" color="primary"/>
+                    </div>
+                    <Typography align="center" style={{fontWeight: '600'}}>Microphone Volume:</Typography>
+                    <SoundLevelDisplayer audioLevel={audioLevel}/>
+                </Box>
             </Grid>
             {localMicrophones.length && <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
                 <FormControl disabled={!devices.audioInputList.length} fullWidth variant="outlined">
@@ -167,17 +188,7 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
                     </Select>
                 </FormControl>
             </Grid>}
-            <Grid className={classes.emphasis} lg={12} md={12} sm={12} xs={12} item>
-                <HeadsetMicIcon style={{marginRight: 5}} fontSize="large" color="primary"/>
-                <Typography color="primary"><b>USE HEADPHONES!</b></Typography>
-                <HeadsetMicIcon style={{marginLeft: 5}} fontSize="large" color="primary"/>
-            </Grid>
-            <Grid lg={4} md={4} sm={4} xs={12} item>
-                <Typography align="center" style={{fontWeight: '600'}}>Microphone Volume:</Typography>
-            </Grid>
-            <Grid style={{display: "flex"}} lg={8} md={8} sm={8} xs={12} item>
-                <SoundLevelDisplayer audioLevel={audioLevel}/>
-            </Grid>
+
         </Grid>
     );
 };

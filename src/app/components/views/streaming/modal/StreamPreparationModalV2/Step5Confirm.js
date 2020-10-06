@@ -37,7 +37,7 @@ const Step5Confirm = ({audioSource, videoSource, devices, speakerSource}) => {
             <CheckCircleOutlineIcon color="primary" style={{margin: '0 auto', fontSize: "3em", marginBottom: "0.2rem"}}/>
             <Typography variant="h4" align="center"><b>You are ready to stream!</b></Typography>
             <Typography variant="subtitle1" align="center">Your stream will go live once you press "Start Streaming".</Typography>
-            <Grid style={{marginTop: 10}} spacing={2} container>
+            <Grid style={{padding: "1rem 0"}} spacing={2} container>
                 <Grid sm={12} xs={12} lg={12} xl={12} hidden={!labels.camera.length} item>
                     <TextField id="camera"
                                label="Camera"

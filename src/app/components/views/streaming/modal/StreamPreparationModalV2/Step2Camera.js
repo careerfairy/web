@@ -55,10 +55,10 @@ const Step2Camera = ({videoSource, devices, setVideoSource, playSound, handleMar
 
     return (
         <Grid container spacing={2}>
-            <Grid sm={12} xs={12} item>
-                <Typography align="center" gutterBottom variant="h4"><b>Video</b></Typography>
-                <Typography variant="subtitle1">Please select your camera for this stream:</Typography>
-            </Grid>
+            {/*<Grid sm={12} xs={12} item>*/}
+            {/*    <Typography align="center" gutterBottom variant="h4"><b>Video</b></Typography>*/}
+            {/*    <Typography variant="subtitle1">Please select your camera for this stream:</Typography>*/}
+            {/*</Grid>*/}
             <Grid sm={12} xs={12} item>
                 <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
                     <video style={{boxShadow: '0 0 3px rgb(200,200,200)', borderRadius: '5px'}}

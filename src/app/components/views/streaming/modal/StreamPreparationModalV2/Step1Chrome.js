@@ -36,7 +36,7 @@ const Step1Chrome = ({isCompleted, handleMarkComplete, isFirefox}) => {
 
     return (
         <>
-            <Typography gutterBottom align="center" variant="h4"><b>Preparation</b></Typography>
+            {/*<Typography gutterBottom align="center" variant="h4"><b>Preparation</b></Typography>*/}
             <Typography align="center" variant="subtitle1">Please follow these couple of instructions to ensure a smooth streaming
                 experience:</Typography>
             <Box display="flex" flexDirection="column" alignItems="center" m={1} elevation={2}>

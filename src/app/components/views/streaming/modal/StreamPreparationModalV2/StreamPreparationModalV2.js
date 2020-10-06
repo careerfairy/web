@@ -68,7 +68,6 @@ const StreamPreparationModalV2 = ({
     const [skipped, setSkipped] = useState(new Set());
     const devices = useUserMedia(activeStep);
     const audioLevel = useSoundMeter(showAudioVideo, localStream);
-
     const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
     const steps = getSteps();
@@ -193,7 +192,7 @@ const StreamPreparationModalV2 = ({
         setCompleted(newCompleted);
     }
 
-        const handleMarkIncomplete = () => {
+    const handleMarkIncomplete = () => {
         const newCompleted = new Set(completed);
         newCompleted.delete(activeStep);
         setCompleted(newCompleted);
@@ -261,29 +260,28 @@ const StreamPreparationModalV2 = ({
                 <h3 style={{color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3>
             </DialogTitle>
             <DialogContent className={classes.root}>
-                {getStepContent(activeStep)}
-                {!isFirefox ?
-                    <>
-                        <Stepper className={classes.stepper} activeStep={activeStep} alternativeLabel>
-                            {steps.map((label, index) => {
-                                const stepProps = {};
-                                const buttonProps = {};
-                                if (isStepOptional(index)) {
-                                    buttonProps.optional = <Typography variant="caption">Optional</Typography>;
-                                }
-                                if (isStepSkipped(index)) {
-                                    stepProps.completed = false;
-                                }
+                {!isFirefox && <Stepper className={classes.stepper} activeStep={activeStep} alternativeLabel>
+                    {steps.map((label, index) => {
+                        const stepProps = {};
+                        const buttonProps = {};
+                        if (isStepOptional(index)) {
+                            buttonProps.optional = <Typography variant="caption">Optional</Typography>;
+                        }
+                        if (isStepSkipped(index)) {
+                            stepProps.completed = false;
+                        }
 
-                                return (<Step key={label} {...stepProps}>
-                                    <StepButton onClick={handleStep(index)}
-                                                completed={isStepComplete(index)}
-                                                {...buttonProps}>
-                                        {label}
-                                    </StepButton>
-                                </Step>)
-                            })}
-                        </Stepper>
+                        return (<Step key={label} {...stepProps}>
+                            <StepButton onClick={handleStep(index)}
+                                        completed={isStepComplete(index)}
+                                        {...buttonProps}>
+                                {label}
+                            </StepButton>
+                        </Step>)
+                    })}
+                </Stepper>}
+                {getStepContent(activeStep)}
+                {!isFirefox &&
                         <DialogActions>
                             <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
                                 Back
@@ -308,13 +306,11 @@ const StreamPreparationModalV2 = ({
                                 </Button>
                             )}
 
-                            {completedSteps() === totalSteps() - 1 &&
+                            {completedSteps() === totalSteps() - 1 && activeStep === 4 &&
                             <Button variant="contained" color="primary" onClick={handleFinalize}>
                                 Continue
                             </Button>}
-                        </DialogActions>
-                    </>
-                    : null}
+                        </DialogActions>}
                 <p style={{fontSize: '0.8em', color: 'grey'}}>If anything is unclear or not working, please <a
                     href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
             </DialogContent>
