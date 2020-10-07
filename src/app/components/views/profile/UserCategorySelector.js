@@ -45,7 +45,7 @@ const UserCategorySelector = ({category, handleSetSelected}) => {
 
     let sortedOptions = []
 
-    sortedOptions = [...category.options].sort(dynamicSort(name))
+    sortedOptions = [...category.options].sort(dynamicSort("name"))
 
     const renderOptions = sortedOptions.map(option => {
         if (native) {
