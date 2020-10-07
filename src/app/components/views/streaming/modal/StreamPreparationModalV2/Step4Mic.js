@@ -158,14 +158,14 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
                 <Typography align="center">You have {localMicrophones.length} microphones, Now testing
                     microphone {micNumber() + 1}... </Typography>}
             </Grid>
-            <Grid style={{display: "flex", justifyContent: "center"}} lg={12} md={12} sm={12} xs={12} item>
-                <Box p={2} borderRadius={16} boxShadow={2}>
-                    <div className={classes.emphasis}>
-                        <HeadsetMicIcon style={{marginRight: 5}} fontSize="large" color="primary"/>
-                        <Typography color="primary"><b>USE HEADPHONES!</b></Typography>
-                        <HeadsetMicIcon style={{marginLeft: 5}} fontSize="large" color="primary"/>
-                    </div>
-                    <Typography align="center" style={{fontWeight: '600'}}>Microphone Volume:</Typography>
+            <Grid style={{display: "flex", alignItems: "center", flexDirection: "column"}} lg={12} md={12} sm={12} xs={12} item>
+                {/*<div className={classes.emphasis}>*/}
+                {/*    <HeadsetMicIcon style={{marginRight: 5}} fontSize="large" color="primary"/>*/}
+                {/*    <Typography color="primary"><b>USE HEADPHONES!</b></Typography>*/}
+                {/*    <HeadsetMicIcon style={{marginLeft: 5}} fontSize="large" color="primary"/>*/}
+                {/*</div>*/}
+                <Box style={{width: "fit-content"}} p={2} borderRadius={16} boxShadow={2}>
+                    <Typography variant="h5" style={{fontWeight: '700'}}>Microphone:</Typography>
                     <SoundLevelDisplayer audioLevel={audioLevel}/>
                 </Box>
             </Grid>
