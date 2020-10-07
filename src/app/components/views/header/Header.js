@@ -146,6 +146,7 @@ function Header(props) {
                 <Icon name='times circle outline' size='big' onClick={toggleSideBar} style={{cursor: 'pointer'}}/>
                 <ul>
                     <li><Link href='/next-livestreams'><a>Next Live Streams</a></Link></li>
+                    {authenticated && <li><a href='/groups'>Follow Groups</a></li>}
                     <li><Link href='/discover'><a>Past Live Streams</a></Link></li>
                     <li><Link href='/companies'><a>Companies</a></Link></li>
                     <li><Link href='/wishlist'><a>Wishlist</a></Link></li>

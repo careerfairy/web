@@ -30,7 +30,7 @@ const GroupProvider = ({firebase, absolutePath}) => {
 
     return userData ? (
         <Fragment>
-            <Groups makeSix={6} userData={userData} groups={groups}/>
+            <Groups absolutePath={absolutePath} makeSix={6} userData={userData} groups={groups}/>
             <Link href={absolutePath || "/profile"} underline="none">
                 <Button color="primary" style={{position: "sticky", bottom: 10}} variant="contained" fullWidth>
                     Finish
