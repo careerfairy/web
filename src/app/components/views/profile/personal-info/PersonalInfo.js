@@ -227,7 +227,7 @@ const PersonalInfo = ({firebase, userData}) => {
                                 </Grid>
                             </Grid>
                             <LightTooltip
-                                title="Saved!"
+                                title="Updated!"
                                 open={updated}
                                 enterDelay={500}
                                 leaveDelay={200}

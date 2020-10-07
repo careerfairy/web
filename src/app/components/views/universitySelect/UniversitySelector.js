@@ -41,7 +41,7 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
 
     const getSelectedItem = () => {// Autocomplete will always complain because of async filtering... :( So ignore the warning
         const item = universities.find((uni) => uni.id === values.university)
-        return item || {}
+        return item || otherObj
     }
 
     return (
@@ -67,6 +67,7 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
             }}
             getOptionLabel={(option) => option.name || ""}
             value={getSelectedItem()}
+            getOptionSelected={(option, value) => option.id === value.id}
             options={universities}
             loading={loading}
             renderInput={(params) => (
