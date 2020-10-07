@@ -161,7 +161,7 @@ const NextLivestreams = ({firebase}) => {
     };
 
     const handleGetGroupIds = () => {
-        let newGroupIds = [];
+        let newGroupIds = [...groupIds];
         if (userData && userData.groupIds) {
             newGroupIds = [...groupIds, ...userData.groupIds];
         }

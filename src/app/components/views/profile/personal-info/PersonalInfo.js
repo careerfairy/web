@@ -90,7 +90,7 @@ const PersonalInfo = ({firebase, userData}) => {
             } : {
                 firstName: '',
                 lastName: '',
-                university: '',
+                university: 'other',
                 universityCountryCode: ''
             }}
             enableReinitialize={true}
