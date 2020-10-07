@@ -64,7 +64,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
 
 
     useEffect(() => {
-        if (checkIfOnlyLivestreamId()) {
+        if (setUpcomingSlide()) {
             setActiveSlide(groupIds.length)
         }
     }, [livestreamId, careerCenterId, groupIds])
@@ -73,8 +73,8 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
         customSlider.current.slickNext()
     }
 
-    const checkIfOnlyLivestreamId = () => {
-        return livestreamId && !careerCenterId
+    const setUpcomingSlide = () => {
+        return livestreamId && !careerCenterId || (!livestreamId && !careerCenterId)
     }
 
     const handlePrev = () => {
@@ -99,7 +99,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
     })
 
     const settings = {
-        initialSlide: checkIfOnlyLivestreamId() ? groupIds.length : 0,
+        initialSlide: setUpcomingSlide() ? groupIds.length : 0,
         centerMode: true,
         centerPadding: "60px",
         focusOnSelect: true,
