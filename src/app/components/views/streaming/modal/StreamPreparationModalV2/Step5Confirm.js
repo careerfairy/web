@@ -42,6 +42,7 @@ const Step5Confirm = ({audioSource, videoSource, devices, speakerSource}) => {
                     <TextField id="camera"
                                label="Camera"
                                fullWidth
+                               disabled
                                InputProps={{readOnly: true}}
                                value={labels.camera}
                                variant="outlined"/>
@@ -50,6 +51,7 @@ const Step5Confirm = ({audioSource, videoSource, devices, speakerSource}) => {
                     <TextField id="microphone"
                                label="Microphone"
                                fullWidth
+                               disabled
                                InputProps={{readOnly: true}}
                                value={labels.microphone}
                                variant="outlined"/>
@@ -58,6 +60,7 @@ const Step5Confirm = ({audioSource, videoSource, devices, speakerSource}) => {
                     <TextField id="speaker"
                                label="Speaker"
                                fullWidth
+                               disabled
                                InputProps={{readOnly: true}}
                                value={labels.speaker}
                                variant="outlined"/>

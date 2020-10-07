@@ -123,7 +123,7 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, devices, isFirefox, att
         return (
             <Grid container spacing={2}>
                 <Grid lg={12} md={12} sm={12} xs={12} item>
-                    <Typography align="center" variant="h4"
+                    <Typography align="center" variant="h3"
                                 gutterBottom><b>Do you hear a ringtone?</b></Typography>
                     <Typography align="center" variant="subtitle1">If not please check your device sound
                         settings.</Typography>

@@ -20,6 +20,7 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
+        flexDirection: "column"
     },
     button: {
         height: "100%"
@@ -136,13 +137,16 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
         <Grid style={{padding: "1rem 0"}} container spacing={4}>
             <audio ref={testAudioRef} autoPlay/>
             <Grid lg={12} md={12} sm={12} xs={12} item>
-                <Typography align="center" variant="h4"
+                <Typography align="center" variant="h5"
                             gutterBottom><b>{allTested ? "We have tested all your Microphones" : "Speak and pause, do you hear a replay?"}</b></Typography>
                 <div className={classes.buttons}>
                     {allTested ?
+                        <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+                        <Typography color="error" align="center" gutterBottom>Make sure your Microphone and camera are not in use by another app</Typography>
                         <Button variant="outlined" onClick={handleTestAgain}>
                             Test Again
                         </Button>
+                        </div>
                         :
                         <>
                             <Button disabled={isCompleted} onClick={handleMarkComplete} variant="outlined">
@@ -158,36 +162,36 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
                 <Typography align="center">You have {localMicrophones.length} microphones, Now testing
                     microphone {micNumber() + 1}... </Typography>}
             </Grid>
-            <Grid style={{display: "flex", alignItems: "center", flexDirection: "column"}} lg={12} md={12} sm={12} xs={12} item>
+            <Grid style={{display: "flex", alignItems: "center", flexDirection: "column"}} lg={12} md={12} sm={12}
+                  xs={12} item>
                 {/*<div className={classes.emphasis}>*/}
                 {/*    <HeadsetMicIcon style={{marginRight: 5}} fontSize="large" color="primary"/>*/}
                 {/*    <Typography color="primary"><b>USE HEADPHONES!</b></Typography>*/}
                 {/*    <HeadsetMicIcon style={{marginLeft: 5}} fontSize="large" color="primary"/>*/}
                 {/*</div>*/}
-                <Box style={{width: "fit-content"}} p={2} borderRadius={16} boxShadow={2}>
-                    <Typography variant="h5" style={{fontWeight: '700'}}>Microphone:</Typography>
+                    {/*<Typography variant="h5" style={{fontWeight: '700'}}>Microphone:</Typography>*/}
+                    {localMicrophones.length && <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
+                        <FormControl style={{marginBottom: 10}} disabled={!devices.audioInputList.length} fullWidth variant="outlined">
+                            <InputLabel id="microphoneSelect">Select Microphone</InputLabel>
+                            <Select value={audioSource}
+                                    fullWidth
+                                    onChange={handleChangeMic}
+                                    variant="outlined"
+                                    id="microphoneSelect"
+                                    label="Select Microphone"
+                            >
+                                <MenuItem value="" disabled>
+                                    Choose a Microphone
+                                </MenuItem>
+                                {localMicrophones.map(device => {
+                                    return (<MenuItem key={device.value} value={device.value}>{device.text}</MenuItem>)
+                                })}
+                            </Select>
+                        </FormControl>
                     <SoundLevelDisplayer audioLevel={audioLevel}/>
-                </Box>
+                    </Grid>}
             </Grid>
-            {localMicrophones.length && <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
-                <FormControl disabled={!devices.audioInputList.length} fullWidth variant="outlined">
-                    <InputLabel id="microphoneSelect">Select Microphone</InputLabel>
-                    <Select value={audioSource}
-                            fullWidth
-                            onChange={handleChangeMic}
-                            variant="outlined"
-                            id="microphoneSelect"
-                            label="Select Microphone"
-                    >
-                        <MenuItem value="" disabled>
-                            Choose a Microphone
-                        </MenuItem>
-                        {localMicrophones.map(device => {
-                            return (<MenuItem key={device.value} value={device.value}>{device.text}</MenuItem>)
-                        })}
-                    </Select>
-                </FormControl>
-            </Grid>}
+
 
         </Grid>
     );
