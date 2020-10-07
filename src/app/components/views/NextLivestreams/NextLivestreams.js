@@ -23,7 +23,7 @@ const NextLivestreams = ({firebase}) => {
     const mobile = useMediaQuery(theme.breakpoints.down("sm"));
 
     const [groupData, setGroupData] = useState({});
-    const [groupIds, setGroupIds] = useState([]);
+    const [groupIds, setGroupIds] = useState(["upcoming"]);
     const [livestreams, setLivestreams] = useState([]);
     // const [paramsLivestreamId, setParamsLivestreamId] = useState(null);
     // const [paramsCareerCenterId, setParamsCareerCenterId] = useState(null);
@@ -139,6 +139,21 @@ const NextLivestreams = ({firebase}) => {
             handleGetGroupIds();
         }
     }, [userData, careerCenterId]);
+
+    useEffect(() => {
+        if (groupIds.length > 1 && setToUpcomingSlide()) {
+            const newGroupIds = [...groupIds]
+            const currentIndex = newGroupIds.findIndex((el) => el === "upcoming");
+            if (currentIndex > -1) {
+                swapPositions(newGroupIds, 0, currentIndex);
+            }
+            setGroupIds([...new Set(newGroupIds)]);
+        }
+    }, [livestreamId, careerCenterId, router])
+
+    const setToUpcomingSlide = () => {
+        return livestreamId && !careerCenterId || (!livestreamId && !careerCenterId)
+    }
 
     const checkIfCareerCenterExists = async (centerId) => {
         const querySnapshot = await firebase.getCareerCenterById(centerId);
