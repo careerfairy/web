@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 import {withFirebase} from "context/firebase";
 
-function BookingModal({modalOpen, user, careerCenters, livestream, registration, setModalOpen, setRegistration, buttonAction, firebase}) {
+function BookingModal({modalOpen, user, careerCenters, livestream, registration, groupId, setModalOpen, setRegistration, buttonAction, firebase}) {
 
     const [modalStep, setModalStep] = useState(0);
 
@@ -72,7 +72,9 @@ function BookingModal({modalOpen, user, careerCenters, livestream, registration,
 
     function handleUrl() {
         let url = "/next-livestreams"
-        if(careerCenters && careerCenters.length && careerCenters.length === 1){// If there's only one group, please send me to that groups page
+        if (groupId) {
+            url = `/next-livestreams?careerCenterId=${groupId}&livestreamId=${livestream.id}`
+        } else if (careerCenters && careerCenters.length && careerCenters.length === 1) {// If there's only one group, please send me to that groups page
             url = `/next-livestreams?careerCenterId=${careerCenters[0].id}&livestreamId=${livestream.id}`
         }
         return url
@@ -203,12 +205,12 @@ function BookingModal({modalOpen, user, careerCenters, livestream, registration,
                             <h2 className='booking-modal-title'><Icon name='check circle'/>Thank you!</h2>
                             {careerCenters ? // This boolean checks whether or not you're in the details page
                                 <Link href={handleUrl()}><a><Button style={{margin: '20px 0 0 0'}} primary fluid
-                                                                 content='See all our events' size='large'
-                                                                 onClick={() => setModalOpen(false)}/></a></Link>
-                            :
-                            <Button style={{margin: '20px 0 0 0'}} primary fluid
-                                                                 content='Finish' size='large'
-                                                                 onClick={() => setModalOpen(false)}/>
+                                                                    content='See all our events' size='large'
+                                                                    onClick={() => setModalOpen(false)}/></a></Link>
+                                :
+                                <Button style={{margin: '20px 0 0 0'}} primary fluid
+                                        content='Finish' size='large'
+                                        onClick={() => setModalOpen(false)}/>
                             }
                         </div>
                     </div>

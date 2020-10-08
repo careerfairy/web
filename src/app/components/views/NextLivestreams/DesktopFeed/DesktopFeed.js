@@ -17,13 +17,13 @@ const DesktopFeed = ({groupData, userData, alreadyJoined, handleToggleActive, mo
                                  groupData={groupData}/> : null}
             <GroupStreams
                 user={user}
+                mobile={false}
                 livestreamId={livestreamId}
-                alreadyJoined={alreadyJoined}
-                searching={searching}
-                selectedOptions={selectedOptions}
-                mobile={mobile}
                 listenToUpcoming={listenToUpcoming}
                 careerCenterId={careerCenterId}
+                selectedOptions={selectedOptions}
+                searching={searching}
+                alreadyJoined={alreadyJoined}
                 livestreams={livestreams}
                 userData={userData}
                 groupData={groupData}

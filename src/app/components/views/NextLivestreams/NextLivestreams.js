@@ -50,9 +50,7 @@ const NextLivestreams = ({firebase}) => {
                             repositionElement(livestreams, currentIndex, 0);
                         }
                     }
-                    if (!careerCenterId) {
-                        livestreams = livestreams.filter(livestream => !livestream.hidden);
-                    }
+                    livestreams = livestreams.filter(livestream => !livestream.hidden);
                     setLivestreams(livestreams);
                 },
                 (error) => {

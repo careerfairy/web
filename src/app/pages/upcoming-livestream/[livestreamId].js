@@ -808,6 +808,7 @@ function UpcomingLivestream(props) {
             <BookingModal
                 careerCenters={careerCenters}
                 livestream={currentLivestream}
+                groupId={groupId}
                 modalOpen={bookingModalOpen}
                 setModalOpen={setBookingModalOpen}
                 registration={registration}
