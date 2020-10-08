@@ -104,8 +104,8 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
         }
     }, [livestream]);
 
-    const userRegistered = livestream.registeredUsers?.indexOf(user.email) > -1
-    const userFollowing = userData?.groupIds?.includes(groupData.groupId)
+    const userRegistered = livestream?.registeredUsers?.indexOf(user?.email) > -1
+    const userFollowing = userData?.groupIds?.includes(groupData?.groupId)
 
     const checkIfHighlighted = () => {
         if (careerCenterId && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId) {
