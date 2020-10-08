@@ -90,7 +90,7 @@ const PersonalInfo = ({firebase, userData}) => {
             } : {
                 firstName: '',
                 lastName: '',
-                university: '',
+                university: 'other',
                 universityCountryCode: ''
             }}
             enableReinitialize={true}
@@ -227,7 +227,7 @@ const PersonalInfo = ({firebase, userData}) => {
                                 </Grid>
                             </Grid>
                             <LightTooltip
-                                title="Saved!"
+                                title="Updated!"
                                 open={updated}
                                 enterDelay={500}
                                 leaveDelay={200}

@@ -37,13 +37,35 @@ const CreateGroup = ({firebase}) => {
 
     const steps = getSteps();
 
+    const dynamicSort = (property) => {
+        let sortOrder = 1;
+        if (property[0] === "-") {
+            sortOrder = -1;
+            property = property.substr(1);
+        }
+        return function (a, b) {
+            /* next line works with strings and numbers,
+             * and you may want to customize it to your needs
+             */
+            const result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+            return result * sortOrder;
+        }
+    }
+
+
     const handleAddTempCategory = (categoryObj) => {
         // adds temporary categories locally
+        if (categoryObj && categoryObj.options && categoryObj.options.length) {
+            categoryObj.options.sort(dynamicSort("name"))
+        }
         setArrayOfCategories([...arrayOfCategories, categoryObj])
     }
 
     const handleUpdateCategory = (categoryObj) => {
         // updates the temporary categories locally
+        if (categoryObj && categoryObj.options && categoryObj.options.length) {
+            categoryObj.options.sort(dynamicSort("name"))
+        }
         const newCategories = [...arrayOfCategories]
         const indexOfOldObj = newCategories.findIndex(el => categoryObj.id === el.id)
         newCategories[indexOfOldObj] = categoryObj

@@ -244,7 +244,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     password: '',
                     confirmPassword: '',
                     agreeTerm: false,
-                    university: '',
+                    university: 'other',
                     universityCountryCode: ''
                 }}
                 validate={values => {

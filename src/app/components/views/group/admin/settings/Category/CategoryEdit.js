@@ -86,7 +86,9 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
 
     useEffect(() => {
         if (category.options && category.options.length > 0) {
-            setEditableOptions(category.options);
+            let sortedOptions = [...category.options]
+            sortedOptions.sort(dynamicSort("name"))
+            setEditableOptions(sortedOptions);
         }
     }, [category.options]);
 
@@ -203,6 +205,22 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
     const handleClose = () => {
         setAnchorEl(null)
     }
+
+    const dynamicSort = (property) => {
+        let sortOrder = 1;
+        if (property[0] === "-") {
+            sortOrder = -1;
+            property = property.substr(1);
+        }
+        return function (a, b) {
+            /* next line works with strings and numbers,
+             * and you may want to customize it to your needs
+             */
+            const result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+            return result * sortOrder;
+        }
+    }
+
 
     const optionElements = editableOptions.map(el => {
         return (

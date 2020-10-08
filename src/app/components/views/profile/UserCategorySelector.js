@@ -28,7 +28,26 @@ const UserCategorySelector = ({category, handleSetSelected}) => {
         setOpen(true);
     };
 
-    const renderOptions = category.options?.map(option => {
+    const dynamicSort = (property) => {
+        let sortOrder = 1;
+        if (property[0] === "-") {
+            sortOrder = -1;
+            property = property.substr(1);
+        }
+        return function (a, b) {
+            /* next line works with strings and numbers,
+             * and you may want to customize it to your needs
+             */
+            const result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+            return result * sortOrder;
+        }
+    }
+
+    let sortedOptions = []
+
+    sortedOptions = [...category.options].sort(dynamicSort("name"))
+
+    const renderOptions = sortedOptions.map(option => {
         if (native) {
             return <option key={option.id} value={option.id}>
                 {option.name}
@@ -45,7 +64,7 @@ const UserCategorySelector = ({category, handleSetSelected}) => {
 
     return (
         <Fragment>
-            <FormControl style={{width: native ? '100%' : '100%' }} className={classes.formControl}>
+            <FormControl style={{width: native ? '100%' : '100%'}} className={classes.formControl}>
                 <InputLabel id="demo-controlled-open-select-label">{category.name}</InputLabel>
                 <Select
                     open={open}

@@ -26,6 +26,7 @@ const AuthenticatedHeader = (props) => {
                 <li className={props.page === 'next-livestreams' ? 'active' : ''}><Link href='/next-livestreams'><a>Next Live Streams</a></Link></li>
                 <li className={props.page === 'discover' ? 'active' : ''}><Link href='/discover'><a>Past Live Streams</a></Link></li>
                 <li className={props.page === 'wishlist' ? 'active' : ''}><Link href='/wishlist'><a>Wishlist</a></Link></li>
+                <li className={props.page === 'groups' ? 'active' : ''}><Link href='/groups'><a>Follow Groups</a></Link></li>
             </ul>
             <div id='right-menu' className={'float-right ' + (props.color === "white" ? 'white' : 'dark')}>
                 <Button color="primary" variant="contained" style={{ margin: '8px 10px 5px 10px', position: 'relative', zIndex: '1000', fontWeight: 600 }} onClick={() => goToRoute('/profile')}>My Profile</Button>

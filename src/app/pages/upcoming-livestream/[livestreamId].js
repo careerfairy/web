@@ -244,8 +244,8 @@ function UpcomingLivestream(props) {
     }
 
     function userFollowsSomeCareerCenter() {
-        return userData.groupIds?.some( groupId => {
-            return careerCenters.some( careerCenter => {
+        return userData.groupIds?.some(groupId => {
+            return careerCenters.some(careerCenter => {
                 return careerCenter.groupId === groupId;
             });
         })
@@ -274,10 +274,10 @@ function UpcomingLivestream(props) {
             setRegistration(true);
             props.firebase
                 .registerToLivestream(currentLivestream.id, user.email)
-            .then(() => {
-                sendEmailRegistrationConfirmation();
-                setRegistration(false);
-            });
+                .then(() => {
+                    sendEmailRegistrationConfirmation();
+                    setRegistration(false);
+                });
         }
     }
 
@@ -799,14 +799,16 @@ function UpcomingLivestream(props) {
                 careerCenters.length > 0 &&
                 <GroupJoinToAttendModal
                     open={openJoinModal}
-                    group={careerCenters[0]}
+                    groups={careerCenters}
                     alreadyJoined={false}
                     userData={userData}
                     onConfirm={completeRegistrationProcess}
                     closeModal={handleCloseJoinModal}
                 />}
             <BookingModal
+                careerCenters={careerCenters}
                 livestream={currentLivestream}
+                groupId={groupId}
                 modalOpen={bookingModalOpen}
                 setModalOpen={setBookingModalOpen}
                 registration={registration}
