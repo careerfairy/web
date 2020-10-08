@@ -799,7 +799,7 @@ function UpcomingLivestream(props) {
                 careerCenters.length > 0 &&
                 <GroupJoinToAttendModal
                     open={openJoinModal}
-                    group={careerCenters[0]}
+                    groups={careerCenters}
                     alreadyJoined={false}
                     userData={userData}
                     onConfirm={completeRegistrationProcess}

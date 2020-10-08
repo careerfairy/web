@@ -46,7 +46,6 @@ export const StreamCardPlaceHolder = () => {
 
 
 const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestreamId, id, careerCenterId, groupData, listenToUpcoming}) => {
-
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [isHighlighted, setIsHighlighted] = useState(false)
     const [careerCenters, setCareerCenters] = useState([])
@@ -105,6 +104,9 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
         }
     }, [livestream]);
 
+    const userRegistered = livestream.registeredUsers?.indexOf(user.email) > -1
+    const userFollowing = userData?.groupIds?.includes(groupData.groupId)
+
     const checkIfHighlighted = () => {
         if (careerCenterId && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId) {
             return true
@@ -134,9 +136,9 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
     function startRegistrationProcess() {
         if (!user || !user.emailVerified) {
             return router.push({
-                        pathname: `/login`,
-                        query: {absolutePath: linkToStream},
-                });
+                pathname: `/login`,
+                query: {absolutePath: linkToStream},
+            });
         }
 
         if (!userData || !UserUtil.userProfileIsComplete(userData)) {
@@ -146,7 +148,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
             });
         }
 
-        if (groupData.groupId && !userData?.groupIds?.includes(groupData.groupId)) {
+        if (((groupData.groupId && !userFollowing) || !groupData.groupId && !userRegistered) && careerCenters.length) {
             setOpenJoinModal(true)
         } else {
             firebase.registerToLivestream(livestream.id, user.email).then(() => {
@@ -203,6 +205,14 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
             return userData.groupIds.includes(groupId)
         } else {
             return false
+        }
+    }
+
+    const getGroups = () => {
+        if (groupData.groupId) {
+            return [groupData]
+        } else {
+            return careerCenters
         }
     }
 
@@ -330,7 +340,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                 {/*</Grow>*/}
                 <GroupJoinToAttendModal
                     open={openJoinModal}
-                    group={groupData}
+                    groups={getGroups()}
                     alreadyJoined={false}
                     userData={userData}
                     onConfirm={completeRegistrationProcess}
