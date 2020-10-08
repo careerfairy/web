@@ -104,8 +104,6 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
         }
     }, [livestream]);
 
-    const userRegistered = livestream?.registeredUsers?.indexOf(user?.email) > -1
-    const userFollowing = userData?.groupIds?.includes(groupData?.groupId)
 
     const checkIfHighlighted = () => {
         if (careerCenterId && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId) {
@@ -133,6 +131,39 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
         firebase.deregisterFromLivestream(livestream.id, user.email);
     }
 
+    const moreThanOneGroup = () => {
+        return careerCenters.length > 1
+    }
+
+    const onlyOneGroup = () => {
+        return careerCenters.length === 1
+    }
+
+    const userRegistered = () => {
+        if (livestream && livestream.registeredUsers && user) {
+            return livestream.registeredUsers.indexOf(user.email) > -1
+        } else {
+            return false
+        }
+    }
+
+    const userFollowingAnyGroup = () => {
+        if (userData.groupIds && livestream.groupIds) { // are you following any group thats part of this livstream?
+            return userData.groupIds.some(id => livestream.groupIds.indexOf(id) >= 0)
+        } else {
+            return false
+        }
+    }
+
+    const userFollowingCurrentGroup = () => {
+        if (userData.groupIds && groupData.groupId) { // Are you following the group in group tab?
+            return userData.groupIds.includes(groupData.groupId)
+        } else {
+            return false
+        }
+    }
+
+
     function startRegistrationProcess() {
         if (!user || !user.emailVerified) {
             return router.push({
@@ -147,15 +178,26 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                 query: "profile"
             });
         }
-
-        if (((groupData.groupId && !userFollowing) || !groupData.groupId && !userRegistered) && careerCenters.length) {
-            setOpenJoinModal(true)
-        } else {
-            firebase.registerToLivestream(livestream.id, user.email).then(() => {
-                setBookingModalOpen(true);
-                sendEmailRegistrationConfirmation();
-            })
+        if (listenToUpcoming) {// If on next livestreams tab...
+            if (!userFollowingAnyGroup()) {
+                setOpenJoinModal(true)
+            } else {
+                firebase.registerToLivestream(livestream.id, user.email).then(() => {
+                    setBookingModalOpen(true);
+                    sendEmailRegistrationConfirmation();
+                })
+            }
+        } else { // if on any other tab that isn't next livestreams...
+            if (!userFollowingCurrentGroup()) {
+                setOpenJoinModal(true)
+            } else {
+                firebase.registerToLivestream(livestream.id, user.email).then(() => {
+                    setBookingModalOpen(true);
+                    sendEmailRegistrationConfirmation();
+                })
+            }
         }
+
     }
 
     function completeRegistrationProcess() {
