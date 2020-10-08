@@ -66,7 +66,7 @@ const EnhancedGroupStreamCard = (props) => {
     }
 
     function updateLivestreamCategories() {
-        let categoryCopy = props.livestream.targetCategories;
+        let categoryCopy = props.livestream.targetCategories ? props.livestream.targetCategories : {};
         categoryCopy[props.group.id] = localCategories;
         setLoading(true);
         props.firebase.updateLivestreamCategories(props.livestream.id, categoryCopy).then(() => {
