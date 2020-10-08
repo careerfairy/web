@@ -20,7 +20,7 @@ function ViewerComponent(props) {
         onOtherError: (error) => {}
     };
 
-    const { webRTCAdaptor, externalMediaStreams, audioLevels } = 
+    const { webRTCAdaptor, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels } = 
         useWebRTCAdaptor(
             streamerReady,
             true,
@@ -47,7 +47,7 @@ function ViewerComponent(props) {
     return (
         <div>
             <div> 
-                <CurrentSpeakerDisplayer isPlayMode={!props.handRaiseActive} smallScreenMode={props.currentLivestream.mode === 'presentation'} speakerSwitchModeActive={false} localStream={null} streams={externalMediaStreams} localId={props.streamerId} currentSpeaker={props.currentLivestream.currentSpeakerId} muted={!props.currentLivestream.hasStarted } {...props}/>
+                <CurrentSpeakerDisplayer isPlayMode={!props.handRaiseActive} smallScreenMode={props.currentLivestream.mode === 'presentation'} speakerSwitchModeActive={false} localStream={null} streams={externalMediaStreams} localId={props.streamerId} currentSpeaker={props.currentLivestream.currentSpeakerId} removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams} muted={!props.currentLivestream.hasStarted } {...props}/>
             </div>
             <div style={{ display: (props.currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
                 <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams} livestreamId={props.currentLivestream.id} presenter={false}/>

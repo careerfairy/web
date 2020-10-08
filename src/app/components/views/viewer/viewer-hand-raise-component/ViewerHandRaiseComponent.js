@@ -7,7 +7,6 @@ import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
 import SmallStreamerVideoDisplayer from 'components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 import NewCommentContainer from 'components/views/streaming/comment-container/NewCommentContainer';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
-import { useLocalStream } from 'components/custom-hook/useLocalStream';
 import UserContext from 'context/user/UserContext';
 import useUserMedia from '../../../custom-hook/useDevices';
 import { v4 as uuidv4 } from 'uuid';
