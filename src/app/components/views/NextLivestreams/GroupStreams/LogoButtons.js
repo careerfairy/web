@@ -88,7 +88,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const LogoButtons = ({groups, setGroup}) => {
-    console.log("-> groups", groups);
     const classes = useStyles();
 
     return (

@@ -55,12 +55,13 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user, careerCenterId, livestreamId}) => {
+const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user, setGroupIdsToRemove, groupIdsToRemove}) => {
     const router = useRouter()
     const absolutePath = router.asPath;
     const classes = useStyles({mobile, singleCard: groupIds.length <= 1})
     const customSlider = createRef()
     const [activeSlide, setActiveSlide] = useState(0)
+
 
 
 
@@ -88,6 +89,8 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
         } else {
             return <CarouselCard index={index}
                                  mobile={mobile}
+                                 groupIdsToRemove={groupIdsToRemove}
+                                 setGroupIdsToRemove={setGroupIdsToRemove}
                                  handleSetGroup={handleSetGroup}
                                  handleResetGroup={handleResetGroup}
                                  activeSlide={activeSlide}
