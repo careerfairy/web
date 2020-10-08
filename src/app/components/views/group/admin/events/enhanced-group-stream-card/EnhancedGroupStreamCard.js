@@ -24,29 +24,31 @@ const EnhancedGroupStreamCard = (props) => {
     useEffect(() => {
         if (props.group && props.group.categories) {
             let fieldOfStudyCategories = props.group.categories.find(category => category.name?.toLowerCase() === "field of study");
-            setGroupCategories(fieldOfStudyCategories.options);
+            if (fieldOfStudyCategories) {
+                setGroupCategories(fieldOfStudyCategories.options);
+            }
         }
     },[props.group])
 
-    useEffect(() => {
-        if (props.livestream && props.group) {
-            props.firebase.getLivestreamRegisteredStudentsFromGroup(props.livestream.id, props.group.groupId).then(querySnapshot => {
-                let registeredStudents = [];
-                querySnapshot.forEach(doc => {
-                    let student = doc.data();
-                    let publishedStudent = {
-                        'First Name': student.firstName,
-                        'Last Name': student.lastName,
-                        'Email': doc.id,
-                        'Study Subject': getUniversitySubjectValue(student.faculty),
-                        'Study Level': student.levelOfStudy,
-                    };
-                    registeredStudents.push(publishedStudent);
-                });
-                setRegisteredStudents(registeredStudents);
-            })
-        }      
-    }, [props.firebase, livestream, careerCenter]);
+    // useEffect(() => {
+    //     if (props.livestream && props.group) {
+    //         props.firebase.getLivestreamRegisteredStudentsFromGroup(props.livestream.id, props.group.groupId).then(querySnapshot => {
+    //             let registeredStudents = [];
+    //             querySnapshot.forEach(doc => {
+    //                 let student = doc.data();
+    //                 let publishedStudent = {
+    //                     'First Name': student.firstName,
+    //                     'Last Name': student.lastName,
+    //                     'Email': doc.id,
+    //                     'Study Subject': getUniversitySubjectValue(student.faculty),
+    //                     'Study Level': student.levelOfStudy,
+    //                 };
+    //                 registeredStudents.push(publishedStudent);
+    //             });
+    //             setRegisteredStudents(registeredStudents);
+    //         })
+    //     }      
+    // }, [props.livestream, props.group]);
 
     function getOptionName(optionId) {
         let correspondingOption = {};
@@ -96,9 +98,9 @@ const EnhancedGroupStreamCard = (props) => {
             <IconButton style={{ position: 'absolute', top: '140px', right: '10px', zIndex: '2000' }} onClick={() => setModalOpen(true)}>
                 <EditIcon fontSize="large" color="inherit"/>
             </IconButton>
-            <IconButton style={{ position: 'absolute', top: '190px', right: '10px', zIndex: '2000' }}>
+            {/* <IconButton style={{ position: 'absolute', top: '190px', right: '10px', zIndex: '2000' }}>
                 <GetAppIcon fontSize="large" color="inherit"/>
-            </IconButton>
+            </IconButton> */}
             <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle align="center">Update Target Groups</DialogTitle>
                 <DialogContent>
