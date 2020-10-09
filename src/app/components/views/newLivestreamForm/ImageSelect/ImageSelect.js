@@ -91,7 +91,7 @@ const ImageSelect =
                     options={options}
                     loading={loading}
                     renderInput={(params) => (
-                        <FormControl error={Boolean(error)} fullWidth>
+                        <FormControl disabled={submitting} error={Boolean(error)} fullWidth>
                             <TextField
                                 {...params}
                                 error={Boolean(error)}

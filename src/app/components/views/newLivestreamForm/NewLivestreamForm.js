@@ -1,11 +1,17 @@
 import React, {useState, useEffect} from 'react';
-import {Container, Grid, Typography} from "@material-ui/core";
+import {Container, Grid, Typography, TextField, FormControl, Collapse, FormHelperText} from "@material-ui/core";
 import {Formik} from 'formik';
 import {v4 as uuidv4} from 'uuid';
 import {withFirebase} from "../../../context/firebase";
 import ImageSelect from "./ImageSelect/ImageSelect";
 import {makeStyles} from "@material-ui/core/styles";
-import {GlobalBackground} from "../../../materialUI/GlobalBackground/GlobalBackGround";
+import {
+  DateTimePicker,
+  MuiPickersUtilsProvider,
+} from "@material-ui/pickers";
+import DateFnsUtils from '@date-io/date-fns';
+
+
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -194,8 +200,77 @@ const NewLivestreamForm = ({firebase}) => {
                                              setFieldValue={setFieldValue} submitting={isSubmitting}
                                              path="illustration-images"
                                              label="Company Background" handleBlur={handleBlur} formName="backgroundUrl"
-                                             value={values.backgroundUrl} options={existingBackgrounds} loading={fetchingBackgrounds}
+                                             value={values.backgroundUrl} options={existingBackgrounds}
+                                             loading={fetchingBackgrounds}
                                              error={errors.backgroundUrl && touched.backgroundUrl && errors.backgroundUrl}/>
+                            </Grid>
+                            <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+                                <FormControl fullWidth>
+                                    <TextField name="company"
+                                               variant="outlined"
+                                               fullWidth
+                                               id="company"
+                                               label="Company Name"
+                                               inputProps={{maxLength: 70}}
+                                               onBlur={handleBlur}
+                                               value={values.company}
+                                               disabled={isSubmitting}
+                                               error={Boolean(errors.company && touched.company && errors.company)}
+                                               onChange={handleChange}/>
+                                    <Collapse in={Boolean(errors.company && touched.company)}>
+                                        <FormHelperText error>
+                                            {errors.company}
+                                        </FormHelperText>
+                                    </Collapse>
+                                </FormControl>
+                            </Grid>
+                            <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+                                <FormControl fullWidth>
+                                    <TextField name="companyId"
+                                               variant="outlined"
+                                               fullWidth
+                                               id="companyId"
+                                               label="Company ID"
+                                               inputProps={{maxLength: 70}}
+                                               onBlur={handleBlur}
+                                               value={values.companyId}
+                                               disabled={isSubmitting}
+                                               error={Boolean(errors.companyId && touched.companyId && errors.companyId)}
+                                               onChange={handleChange}/>
+                                    <Collapse in={Boolean(errors.companyId && touched.companyId)}>
+                                        <FormHelperText error>
+                                            {errors.companyId}
+                                        </FormHelperText>
+                                    </Collapse>
+                                </FormControl>
+                            </Grid>
+                            <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+                                <FormControl fullWidth>
+                                    <TextField name="title"
+                                               variant="outlined"
+                                               fullWidth
+                                               id="title"
+                                               label="Livestream Title"
+                                               inputProps={{maxLength: 70}}
+                                               onBlur={handleBlur}
+                                               value={values.companyId}
+                                               disabled={isSubmitting}
+                                               error={Boolean(errors.title && touched.title && errors.title)}
+                                               onChange={handleChange}/>
+                                    <Collapse in={Boolean(errors.title && touched.title)}>
+                                        <FormHelperText error>
+                                            {errors.title}
+                                        </FormHelperText>
+                                    </Collapse>
+                                </FormControl>
+                            </Grid>
+                            <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+                                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                    <label className='login-label'>Livestream Start Date</label>
+                                        <DateTimePicker value={values.startDate} onChange={(value) => {
+                                            setFieldValue('startDate', new Date(value), true)
+                                        }}/>
+                                </MuiPickersUtilsProvider>
                             </Grid>
                         </Grid>
                     </form>
