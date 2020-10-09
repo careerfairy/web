@@ -3,6 +3,7 @@ import {Container, Grid, Typography} from "@material-ui/core";
 import {Formik} from 'formik';
 import {v4 as uuidv4} from 'uuid';
 import {withFirebase} from "../../../context/firebase";
+import ImageSelect from "./ImageSelect/ImageSelect";
 
 const speakerObj = {
     id: uuidv4(),
@@ -60,7 +61,7 @@ const NewLivestreamForm = ({firebase}) => {
                 fileItems.push(itemRef);
             });
             let backgroundOptions = fileItems.map(backgroundFile => {
-                return {text: backgroundFile.name, value: backgroundFile.fullPath}
+                return {text: backgroundFile.name, value: getDownloadUrl(backgroundFile.fullPath)}
             });
             setFetchingBackgrounds(false)
             setExistingBackgrounds(backgroundOptions);
@@ -71,6 +72,7 @@ const NewLivestreamForm = ({firebase}) => {
         if (fileElement) {
             return 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/' + fileElement.replace('/', '%2F') + '?alt=media';
         } else {
+            console.log("-> no fileElement", fileElement);
             return '';
         }
     }
@@ -163,7 +165,12 @@ const NewLivestreamForm = ({firebase}) => {
                   }) => (
                     <form id='signUpForm' onSubmit={handleSubmit}>
                         <Grid container>
-
+                            <Grid item>
+                                <ImageSelect setFieldValue={setFieldValue} submitting={isSubmitting}  handleBlur={handleBlur} formName="logoUrl" loading={fetchingLogos} currentImageUrl={values.logoUrl}
+                                             error={errors.logoUrl && touched.logoUrl && errors.logoUrl}
+                                             value={values.logoUrl} options={existingLogos}
+                                />
+                            </Grid>
                         </Grid>
                     </form>
                 )}

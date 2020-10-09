@@ -12,8 +12,6 @@ const ImageSelect =
     ({
          options,
          currentImageUrl,
-         setCurrentImageUrl,
-         getDownloadUrl,
          error,
          value,
          formName,
@@ -32,7 +30,6 @@ const ImageSelect =
 
         const handleSelect = (event, value) => {
             setFieldValue(formName, value, true);
-            setCurrentImageUrl(getDownloadUrl(value));
         }
 
 
@@ -114,7 +111,6 @@ const ImageSelect =
                         uploadLogo('company-logos', fileObject, (newUrl, fullPath) => {
                             debugger;
                             setFieldValue(formName, fullPath, true);
-                            setCurrentImageUrl(newUrl);
                         })
                     }}
                     onError={errMsg => (console.log(errMsg))}
