@@ -693,32 +693,9 @@ class Firebase {
         return careerCenterRef.delete();
     };
 
-    getCareerCenters = () => {
-        let ref = this.firestore
-            .collection("careerCenterData")
-            .where("test", "==", false);
-        return ref.get();
-    };
-
     getCareerCenterById = (careerCenterId) => {
         let ref = this.firestore.collection("careerCenterData").doc(careerCenterId);
         return ref.get();
-    };
-
-    getFirstCareerCenterByLivestreamId = (livestreamId) => {
-        return this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
-            .get()
-            .then((doc) => {
-                let livestreamObj = doc.data();
-                let firstCareerCenterName = livestreamObj.universities[0];
-                return this.firestore
-                    .collection("careerCenterData")
-                    .where("universityId", "==", firstCareerCenterName)
-                    .limit(1)
-                    .get();
-            });
     };
 
     getCareerCenterByUniversityId = (universityId) => {
@@ -729,24 +706,17 @@ class Firebase {
         return ref.get();
     };
 
-    getCareerCentersByAdminEmail = (adminEmail) => {
-        let ref = this.firestore
-            .collection("careerCenterData")
-            .where("adminEmail", "==", adminEmail);
-        return ref.get();
-    };
-
-    getCareerCentersByGroupId = (arrayOfIds) => {
-        const refs = arrayOfIds.map((id) =>
-            this.firestore.collection("careerCenterData").doc(id)
-        );
-        return this.firestore.getAll(...refs);
-    };
-
     listenToCareerCenterById = (groupId, callback) => {
         let ref = this.firestore.collection("careerCenterData").doc(groupId);
         return ref.onSnapshot(callback);
     };
+
+    listenCareerCenters = (callback) => {
+      let ref = this.firestore
+          .collection("careerCenterData")
+          .where("test", "==", false);
+      return ref.onSnapshot(callback);
+  };
 
     listenCareerCentersByAdminEmail = (email, callback) => {
         let ref = this.firestore
