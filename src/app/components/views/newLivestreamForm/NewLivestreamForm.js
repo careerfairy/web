@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Container, Grid, Typography} from "@material-ui/core";
 import {Formik} from 'formik';
 import {v4 as uuidv4} from 'uuid';
+import {withFirebase} from "../../../context/firebase";
 
 const speakerObj = {
     id: uuidv4(),
@@ -12,7 +13,7 @@ const speakerObj = {
     background: ''
 }
 
-const NewLivestreamForm = () => {
+const NewLivestreamForm = ({firebase}) => {
 
     const [formData, setFormData] = useState({
         logoUrl: '',
@@ -29,6 +30,50 @@ const NewLivestreamForm = () => {
         ],
         summary: ''
     })
+
+    const [existingLogos, setExistingLogos] = useState([]);
+    const [fetchingLogos, setFetchingLogos] = useState(false)
+    const [existingBackgrounds, setExistingBackgrounds] = useState([]);
+    const [fetchingBackgrounds, setFetchingBackgrounds] = useState(false)
+
+    useEffect(() => {
+        firebase.getStorageRef().child('company-logos').listAll().then(res => {
+            setFetchingLogos(true)
+            let fileItems = [];
+            res.items.forEach(itemRef => {
+                fileItems.push(itemRef);
+            });
+            console.log(fileItems);
+            let logoOptions = fileItems.map(logoFile => {
+                return {text: logoFile.name, value: logoFile.fullPath}
+            });
+            setFetchingLogos(false)
+            setExistingLogos(logoOptions);
+        });
+    }, [firebase]);
+
+    useEffect(() => {
+        firebase.getStorageRef().child('illustration-images').listAll().then(res => {
+            setFetchingBackgrounds(true)
+            let fileItems = [];
+            res.items.forEach(itemRef => {
+                fileItems.push(itemRef);
+            });
+            let backgroundOptions = fileItems.map(backgroundFile => {
+                return {text: backgroundFile.name, value: backgroundFile.fullPath}
+            });
+            setFetchingBackgrounds(false)
+            setExistingBackgrounds(backgroundOptions);
+        });
+    }, [firebase]);
+
+    const getDownloadUrl = (fileElement) => {
+        if (fileElement) {
+            return 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/' + fileElement.replace('/', '%2F') + '?alt=media';
+        } else {
+            return '';
+        }
+    }
 
     const handleAddSpeaker = () => {
 
@@ -127,4 +172,4 @@ const NewLivestreamForm = () => {
     );
 };
 
-export default NewLivestreamForm;
+export default withFirebase(NewLivestreamForm);
