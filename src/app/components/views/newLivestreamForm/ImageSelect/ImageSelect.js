@@ -37,11 +37,18 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: 4,
         // maxWidth: "80%",
     },
+    inputRoot: {
+        paddingRight: 9,
+    },
     input: {
         "& .MuiInputBase-input": {
-            cursor: "pointer"
+            cursor: "pointer",
+        },
+        "& .MuiInputBase-root": {
+            padding: "9px !important"
         }
-    }
+    },
+
 }));
 
 const ImageSelect =
@@ -125,12 +132,13 @@ const ImageSelect =
                                 disabled={submitting}
                                 variant="outlined"
                                 InputProps={{
+                                    root: classes.inputRoot,
                                     ...params.InputProps,
                                     endAdornment: (
                                         <React.Fragment>
                                             {loading ? <CircularProgress color="inherit" size={20}/> : null}
-                                            {renderImage}
                                             {params.InputProps.endAdornment}
+                                            {renderImage}
                                         </React.Fragment>
                                     ),
                                 }}
