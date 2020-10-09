@@ -1,43 +1,74 @@
 import React, {useState} from 'react';
-import {Button, Collapse, FormControl, FormHelperText} from "@material-ui/core";
-import {FilePicker} from 'react-file-picker';
+import {Button, Card, CardMedia, Collapse, FormControl, FormHelperText} from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import {uploadLogo} from "../../../helperFunctions/HelperFunctions";
+import FilePickerContainer from "../../../ssr/FilePickerContainer";
+import {makeStyles} from "@material-ui/core/styles";
+
+const placeholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fimage-placeholder.jpg?alt=media&token=760615d8-dfac-40f3-87b2-e8af315b5995"
+
+const useStyles = makeStyles((theme) => ({
+    media: {
+        display: "flex",
+        justifyContent: "center",
+        padding: "1.5em 1em 1em 1em",
+        height: 200,
+    },
+    image: {
+        objectFit: "contain",
+        maxWidth: "80%",
+    }
+}));
 
 const ImageSelect =
     ({
          options,
-         currentImageUrl,
+         firebase,
          error,
          value,
          formName,
+         label,
          loading,
+         values,
          submitting,
          handleBlur,
-         setFieldValue
+         getDownloadUrl,
+         setFieldValue,
+         path
      }) => {
 
+        const classes = useStyles()
         const [open, setOpen] = useState(false);
+        const [filePickerError, setFilePickerError] = useState(null)
 
         const getSelectedItem = () => {// Autocomplete will always complain because of async filtering... :( So ignore the warning
-            const item = options.find((option) => option.value === value.value)
-            return item || {}
+            const item = options.find((option) => option.value === value)
+            // console.log("-> item", item);
+            if (item) {
+                return item.value
+            } else {
+                return options[0].value
+            }
         }
 
         const handleSelect = (event, value) => {
-            setFieldValue(formName, value, true);
+            const actualValue = value ? value.value : ""
+            setFieldValue(formName, actualValue, true);
         }
 
 
-        return (
+        return options.length ? (
             <>
-                <div className={formName}>
-                    <img alt={formName} src={currentImageUrl}/>
-                </div>
+                <CardMedia className={classes.media}>
+
+                    <img src={value.length ? value : placeholder}
+                         className={classes.image}
+                         alt={formName}/>
+                </CardMedia>
                 <Autocomplete
                     id={formName}
                     name={formName}
@@ -54,9 +85,9 @@ const ImageSelect =
                     onClose={() => {
                         setOpen(false);
                     }}
-                    getOptionLabel={(option) => option.name || ""}
+                    getOptionLabel={(option) => option.text || ""}
                     value={getSelectedItem()}
-                    getOptionSelected={(option, value) => option.value === value.value}
+                    getOptionSelected={(option, value) => option.value === value}
                     options={options}
                     loading={loading}
                     renderInput={(params) => (
@@ -67,7 +98,7 @@ const ImageSelect =
                                 id={formName}
                                 name={formName}
                                 onBlur={handleBlur}
-                                label={formName}
+                                label={`Chose a ${label}`}
                                 disabled={submitting}
                                 variant="outlined"
                                 InputProps={{
@@ -88,8 +119,8 @@ const ImageSelect =
                         </FormControl>
                     )}
                     renderOption={(option, {inputValue}) => {
-                        const matches = match(option.name, inputValue);
-                        const parts = parse(option.name, matches);
+                        const matches = match(option.text, inputValue);
+                        const parts = parse(option.text, matches);
                         return (<div>
                                 {parts.map((part, index) => (
                                     <span key={index}
@@ -98,28 +129,25 @@ const ImageSelect =
                         );
                     }}
                 />
-                {/*<label>Company Logo</label>*/}
-
-                {/*<Dropdown placeholder='Select Company Logo' value={values.logoUrl} onChange={(event, {value}) => {*/}
-                {/*    setFieldValue('logoUrl', value, true);*/}
-                {/*    setCurrentLogoUrl(getDownloadUrl(value));*/}
-                {/*}} compact selection options={options}/>*/}
-                <FilePicker
+                <FilePickerContainer
                     extensions={['jpg', 'jpeg', 'png']}
                     maxSize={20}
+                    onError={errMsg => (setFilePickerError(errMsg))}
                     onChange={fileObject => {
-                        uploadLogo('company-logos', fileObject, (newUrl, fullPath) => {
-                            debugger;
-                            setFieldValue(formName, fullPath, true);
+                        uploadLogo(path, fileObject, firebase, (newUrl, fullPath) => {
+                            setFieldValue(formName, getDownloadUrl(fullPath), true);
+                            setFilePickerError(null)
                         })
                     }}
-                    onError={errMsg => (console.log(errMsg))}
                 >
-                    <Button variant="contained" id='upButton'>- OR - Upload New Logo</Button>
-                </FilePicker>
-
+                    <Button style={{marginTop: "0.5rem"}} fullWidth variant="contained" id='upButton'>
+                        {`-OR - Upload a New ${label}`}</Button>
+                </FilePickerContainer>
+                <Collapse in={Boolean(filePickerError)}>
+                    <FormHelperText error>{filePickerError}</FormHelperText>
+                </Collapse>
             </>
-        )
+        ) : null
     };
 
 export default ImageSelect;

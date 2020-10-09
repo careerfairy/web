@@ -4,6 +4,21 @@ import {Formik} from 'formik';
 import {v4 as uuidv4} from 'uuid';
 import {withFirebase} from "../../../context/firebase";
 import ImageSelect from "./ImageSelect/ImageSelect";
+import {makeStyles} from "@material-ui/core/styles";
+import {GlobalBackground} from "../../../materialUI/GlobalBackground/GlobalBackGround";
+
+const useStyles = makeStyles(theme => ({
+    root: {
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        minHeight: 700,
+        background: "white",
+    },
+    form: {
+        width: "100%"
+    }
+}));
 
 const speakerObj = {
     id: uuidv4(),
@@ -15,6 +30,7 @@ const speakerObj = {
 }
 
 const NewLivestreamForm = ({firebase}) => {
+    const classes = useStyles()
 
     const [formData, setFormData] = useState({
         logoUrl: '',
@@ -44,9 +60,8 @@ const NewLivestreamForm = ({firebase}) => {
             res.items.forEach(itemRef => {
                 fileItems.push(itemRef);
             });
-            console.log(fileItems);
             let logoOptions = fileItems.map(logoFile => {
-                return {text: logoFile.name, value: logoFile.fullPath}
+                return {text: logoFile.name, value: getDownloadUrl(logoFile.fullPath)}
             });
             setFetchingLogos(false)
             setExistingLogos(logoOptions);
@@ -97,7 +112,8 @@ const NewLivestreamForm = ({firebase}) => {
 
 
     return (
-        <Container style={{flex: 1, display: "flex", minHeight: 700, marginBottom: 10}}>
+        <Container className={classes.root}>
+            <Typography variant="h3" align="center" gutterBottom>Create a Livestream</Typography>
             <Formik
                 initialValues={formData}
                 validate={values => {
@@ -163,13 +179,23 @@ const NewLivestreamForm = ({firebase}) => {
                       setFieldValue
                       /* and other goodies */
                   }) => (
-                    <form id='signUpForm' onSubmit={handleSubmit}>
-                        <Grid container>
-                            <Grid item>
-                                <ImageSelect setFieldValue={setFieldValue} submitting={isSubmitting}  handleBlur={handleBlur} formName="logoUrl" loading={fetchingLogos} currentImageUrl={values.logoUrl}
-                                             error={errors.logoUrl && touched.logoUrl && errors.logoUrl}
-                                             value={values.logoUrl} options={existingLogos}
-                                />
+                    <form className={classes.form} onSubmit={handleSubmit}>
+                        <Grid spacing={2} container>
+                            <Grid lg={6} xl={6} item>
+                                <ImageSelect getDownloadUrl={getDownloadUrl} values={values} firebase={firebase}
+                                             setFieldValue={setFieldValue} submitting={isSubmitting}
+                                             path="company-logos"
+                                             label="Logo" handleBlur={handleBlur} formName="logoUrl"
+                                             value={values.logoUrl} options={existingLogos} loading={fetchingLogos}
+                                             error={errors.logoUrl && touched.logoUrl && errors.logoUrl}/>
+                            </Grid>
+                            <Grid lg={6} xl={6} item>
+                                <ImageSelect getDownloadUrl={getDownloadUrl} values={values} firebase={firebase}
+                                             setFieldValue={setFieldValue} submitting={isSubmitting}
+                                             path="illustration-images"
+                                             label="Company Background" handleBlur={handleBlur} formName="backgroundUrl"
+                                             value={values.backgroundUrl} options={existingBackgrounds} loading={fetchingBackgrounds}
+                                             error={errors.backgroundUrl && touched.backgroundUrl && errors.backgroundUrl}/>
                             </Grid>
                         </Grid>
                     </form>

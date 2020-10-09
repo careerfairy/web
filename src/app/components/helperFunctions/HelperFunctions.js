@@ -1,5 +1,5 @@
-export const uploadLogo = (location, fileObject, callback) => {
-    var storageRef = props.firebase.getStorageRef();
+export const uploadLogo = (location, fileObject, firebase, callback ) => {
+    var storageRef = firebase.getStorageRef();
     let fullPath = location + '/' + fileObject.name;
     let companyLogoRef = storageRef.child(fullPath);
 
