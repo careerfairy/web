@@ -1,8 +1,8 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {withFirebase} from 'context/firebase';
-import AddIcon from "@material-ui/icons/Add";
+import GetAppIcon from "@material-ui/icons/GetApp";
 import EditIcon from '@material-ui/icons/Edit';
-import GetAppIcon from '@material-ui/icons/GetApp';
+import HowToRegIcon from '@material-ui/icons/HowToReg';
 import {Box, Button, CardMedia, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, IconButton, InputLabel, Menu, MenuItem, Select, Typography} from "@material-ui/core";
 import GroupStreamCard from 'components/views/NextLivestreams/GroupStreams/GroupStreamCard';
 import { CSVLink } from "react-csv";
@@ -14,7 +14,10 @@ const EnhancedGroupStreamCard = (props) => {
     const [groupCategories, setGroupCategories] = useState([]);
     const [newCategory, setNewCategory] = useState(null);
     const [loading, setLoading] = useState(false);
+
     const [registeredStudents, setRegisteredStudents] = useState([]);
+    const [registeredStudentsFromGroup, setRegisteredStudentsFromGroup] = useState([]);
+    const [talentPool, setTalentPool] = useState([]);
 
     useEffect(() => {
         if (props.livestream && props.livestream.targetCategories && props.livestream.targetCategories[props.group.id] && modalOpen) {
@@ -25,13 +28,49 @@ const EnhancedGroupStreamCard = (props) => {
     useEffect(() => {
         if (props.group && props.group.categories) {
             let fieldOfStudyCategories = props.group.categories.find(category => category.name?.toLowerCase() === "field of study");
-            setGroupCategories(fieldOfStudyCategories.options);
+            if (fieldOfStudyCategories && fieldOfStudyCategories.options) {
+                setGroupCategories(fieldOfStudyCategories.options);
+            }
         }
     },[props.group])
 
     useEffect(() => {
         if (props.livestream && props.group) {
             props.firebase.getLivestreamRegisteredStudents(props.livestream.id).then(querySnapshot => {
+                let registeredStudents = [];
+                querySnapshot.forEach(doc => {
+                    let student = doc.data();
+                    student.id = doc.id;
+                    registeredStudents.push(student);
+                });
+                setRegisteredStudents(registeredStudents);
+            })
+        }      
+    }, [props.livestream]);
+
+    useEffect(() => {
+        if (registeredStudents) {
+            let studentsOfGroup = [];
+            registeredStudents.forEach( registeredStudent => {
+                if (studentBelongsToGroup(registeredStudent)) {
+                    let publishedStudent = {
+                        'First Name': registeredStudent.firstName,
+                        'Last Name': registeredStudent.lastName,
+                        'Email': registeredStudent.id,
+                        'University': props.group.universityName,
+                        'Study Subject': getUniversitySubjectValue(registeredStudent),
+                        'Study Level': getUniversityLevelValue(registeredStudent),
+                    };
+                    studentsOfGroup.push(publishedStudent);
+                }
+            });
+            setRegisteredStudentsFromGroup(studentsOfGroup);
+        }      
+    }, [registeredStudents]);
+
+    useEffect(() => {
+        if (props.livestream) {
+            props.firebase.getLivestreamTalentPoolMembers(props.livestream.companyId).then(querySnapshot => {
                 let registeredStudents = [];
                 querySnapshot.forEach(doc => {
                     let student = doc.data();
@@ -45,30 +84,22 @@ const EnhancedGroupStreamCard = (props) => {
                     };
                     registeredStudents.push(publishedStudent);
                 });
-                setRegisteredStudents(registeredStudents);
-            })
-        }      
-    }, [props.livestream]);
-
-    useEffect(() => {
-        if (props.livestream) {
-            props.firebase.getLivestreamTalentPoolMembers(props.livestream.id).then(querySnapshot => {
-                let registeredStudents = [];
-                querySnapshot.forEach(doc => {
-                    let student = doc.data();
-                    let publishedStudent = {
-                        'First Name': student.firstName,
-                        'Last Name': student.lastName,
-                        'Email': doc.id,
-                        'Study Subject': getUniversitySubjectValue(student),
-                        'Study Level': getUniversityLevelValue(student),
-                    };
-                    registeredStudents.push(publishedStudent);
-                });
                 setTalentPool(registeredStudents);
             })
         }      
     }, [props.livestream]);
+
+    function studentBelongsToGroup(student) {
+        if (student.university) {
+            if (student.university === props.group.universityCode) {
+                return student.categories && student.categories[props.group.groupId];
+            } else {
+                return false;
+            }
+        } else {
+            return student.categories && student.categories[props.group.groupId];
+        }
+    }
 
     function getUniversityValue(student) {
         if (student.university) {
@@ -77,9 +108,7 @@ const EnhancedGroupStreamCard = (props) => {
     }
 
     function getUniversitySubjectValue(student) {
-        if (student.university) {
-
-        }
+        
     }
 
     function getUniversityLevelValue(student) {
@@ -134,11 +163,16 @@ const EnhancedGroupStreamCard = (props) => {
             <IconButton style={{ position: 'absolute', top: '140px', right: '10px', zIndex: '2000' }} onClick={() => setModalOpen(true)}>
                 <EditIcon fontSize="large" color="inherit"/>
             </IconButton>
-            <IconButton style={{ position: 'absolute', top: '190px', right: '10px', zIndex: '2000' }}>
-                <GetAppIcon fontSize="large" color="inherit">
-                    <CSVLink data={registeredStudents} filename={'livestream' + livestream.id + '.csv'} style={{ color: 'white' }}></CSVLink>
-                </GetAppIcon>
-            </IconButton>
+            <CSVLink data={registeredStudents} filename={'livestream' + props.livestream.id + '.csv'} style={{ color: 'red' }}>
+                <IconButton style={{ position: 'absolute', top: '190px', right: '10px', zIndex: '2000' }}>
+                    <GetAppIcon fontSize="large" color="inherit"/>
+                </IconButton>
+            </CSVLink>
+            <CSVLink data={talentPool} filename={'talentPool' + props.livestream.id + '.csv'} style={{ color: 'red' }}>
+                <IconButton style={{ position: 'absolute', top: '240px', right: '10px', zIndex: '2000' }}>
+                    <HowToRegIcon fontSize="large" color="inherit"/>
+                </IconButton>
+            </CSVLink>
             <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle align="center">Update Target Groups</DialogTitle>
                 <DialogContent>
