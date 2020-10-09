@@ -69,9 +69,9 @@ const ImageSelect =
             const item = options.find((option) => option.value === value)
             // console.log("-> item", item);
             if (item) {
-                return item.value
+                return item
             } else {
-                return options[0].value
+                return {}
             }
         }
 
@@ -91,7 +91,6 @@ const ImageSelect =
 
         return options.length ? (
             <>
-
                 <Autocomplete
                     id={formName}
                     name={formName}
@@ -110,7 +109,7 @@ const ImageSelect =
                     }}
                     getOptionLabel={(option) => option.text || ""}
                     value={getSelectedItem()}
-                    getOptionSelected={(option, value) => option.value === value}
+                    getOptionSelected={(option, value) => option.value === value.value || true}
                     options={options}
                     loading={loading}
                     renderInput={(params) => (
