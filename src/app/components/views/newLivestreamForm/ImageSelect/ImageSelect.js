@@ -15,8 +15,11 @@ const useStyles = makeStyles((theme) => ({
     media: {
         display: "flex",
         justifyContent: "center",
-        padding: "1.5em 1em 1em 1em",
+        padding: "0 1em 0 1em",
         height: 200,
+        borderRadius: 4,
+        border: "1px solid rgba(0, 0, 0, 0.3)",
+        marginBottom: theme.spacing(2)
     },
     image: {
         objectFit: "contain",
@@ -44,6 +47,7 @@ const ImageSelect =
         const classes = useStyles()
         const [open, setOpen] = useState(false);
         const [filePickerError, setFilePickerError] = useState(null)
+        console.log("-> values", values);
 
         const getSelectedItem = () => {// Autocomplete will always complain because of async filtering... :( So ignore the warning
             const item = options.find((option) => option.value === value)
@@ -69,14 +73,15 @@ const ImageSelect =
                          className={classes.image}
                          alt={formName}/>
                 </CardMedia>
+                <div style={{display: "flex"}}>
                 <Autocomplete
                     id={formName}
                     name={formName}
-                    fullWidth
                     disabled={submitting}
                     selectOnFocus
                     onBlur={handleBlur}
                     autoHighlight
+                    fullWidth
                     onChange={handleSelect}
                     open={open}
                     onOpen={() => {
@@ -140,12 +145,13 @@ const ImageSelect =
                         })
                     }}
                 >
-                    <Button style={{marginTop: "0.5rem"}} fullWidth variant="contained" id='upButton'>
-                        {`-OR - Upload a New ${label}`}</Button>
+                    <Button style={{marginLeft: "0.5rem"}} variant="contained" id='upButton'>
+                        {`-OR - Upload`}</Button>
                 </FilePickerContainer>
                 <Collapse in={Boolean(filePickerError)}>
                     <FormHelperText error>{filePickerError}</FormHelperText>
                 </Collapse>
+                    </div>
             </>
         ) : null
     };

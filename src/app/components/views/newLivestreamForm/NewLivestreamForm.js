@@ -1,16 +1,26 @@
 import React, {useState, useEffect} from 'react';
-import {Container, Grid, Typography, TextField, FormControl, Collapse, FormHelperText} from "@material-ui/core";
+import {
+    Container,
+    Grid,
+    Typography,
+    TextField,
+    FormControl,
+    Collapse,
+    FormHelperText,
+    Switch,
+    FormControlLabel, Button
+} from "@material-ui/core";
 import {Formik} from 'formik';
 import {v4 as uuidv4} from 'uuid';
 import {withFirebase} from "../../../context/firebase";
 import ImageSelect from "./ImageSelect/ImageSelect";
 import {makeStyles} from "@material-ui/core/styles";
 import {
-  DateTimePicker,
-  MuiPickersUtilsProvider,
+    DateTimePicker,
+    MuiPickersUtilsProvider,
 } from "@material-ui/pickers";
-import DateFnsUtils from '@date-io/date-fns';
-
+import DateFnsUtils from "@date-io/date-fns";
+import SpeakerForm from "./SpeakerForm/SpeakerForm";
 
 
 const useStyles = makeStyles(theme => ({
@@ -23,11 +33,20 @@ const useStyles = makeStyles(theme => ({
     },
     form: {
         width: "100%"
-    }
+    },
+    switch: {
+        placeItems: "center",
+        borderRadius: 4,
+        width: "100%",
+        height: "100%",
+        border: "1px solid rgba(0, 0, 0, 0.3)",
+        display: "flex",
+        justifyContent: "center"
+    },
+
 }));
 
 const speakerObj = {
-    id: uuidv4(),
     avatarUrl: '',
     firstName: '',
     lastName: '',
@@ -37,7 +56,7 @@ const speakerObj = {
 
 const NewLivestreamForm = ({firebase}) => {
     const classes = useStyles()
-
+    const id = uuidv4()
     const [formData, setFormData] = useState({
         logoUrl: '',
         backgroundUrl: '',
@@ -48,9 +67,10 @@ const NewLivestreamForm = ({firebase}) => {
         universities: [],
         startDate: new Date(),
         hiddenLivestream: false,
-        speakers: [
-            speakerObj
-        ],
+        speakers: {
+            [uuidv4()]: speakerObj,
+        }
+        ,
         summary: ''
     })
 
@@ -99,21 +119,15 @@ const NewLivestreamForm = ({firebase}) => {
     }
 
     const handleAddSpeaker = () => {
-
         const newFormData = {...formData}
-        newFormData.speakers.push(speakerObj)
+        newFormData.speakers[uuidv4()] = speakerObj
         setFormData(newFormData)
     }
 
     const handleDeleteSpeaker = (id) => {
         const newFormData = {...formData}
-        const speakers = newFormData.speakers
-        const index = speakers.findIndex(speaker => speaker.id === id)
-        if (index > -1) {
-            speakers.splice(index, 1);
-            newFormData.speakers = speakers
-            setFormData(speakers)
-        }
+        delete newFormData.speakers[id]
+        setFormData(newFormData)
     }
 
 
@@ -143,20 +157,19 @@ const NewLivestreamForm = ({firebase}) => {
                         errors.targetBackgrounds = 'Required';
                     }
 
-                    values.speakers.forEach((speaker, index) => {
-                        if (!values.speakers[index].firstName) {
-                            errors.values.speakers[index].firstName = 'Required';
+                    Object.keys(values.speakers).forEach((key) => {
+                        if (!values.speakers[key].firstName) {
+                            errors.values.speakers[key].firstName = 'Required';
                         }
-                        if (!values.speakers[index].lastName) {
-                            errors.values.speakers[index].lastName = 'Required';
+                        if (!values.speakers[key].lastName) {
+                            errors.values.speakers[key].lastName = 'Required';
                         }
-                        if (!values.speakers[index].position) {
-                            errors.values.speakers[index].position = 'Required';
+                        if (!values.speakers[key].position) {
+                            errors.values.speakers[key].position = 'Required';
                         }
-                        if (!values.speakers[index].background) {
-                            errors.values.speakers[index].background = 'Required';
+                        if (!values.speakers[key].background) {
+                            errors.values.speakers[key].background = 'Required';
                         }
-
                     })
 
                     return errors;
@@ -244,7 +257,7 @@ const NewLivestreamForm = ({firebase}) => {
                                     </Collapse>
                                 </FormControl>
                             </Grid>
-                            <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+                            <Grid xs={7} sm={7} md={4} lg={4} xl={4} item>
                                 <FormControl fullWidth>
                                     <TextField name="title"
                                                variant="outlined"
@@ -253,7 +266,7 @@ const NewLivestreamForm = ({firebase}) => {
                                                label="Livestream Title"
                                                inputProps={{maxLength: 70}}
                                                onBlur={handleBlur}
-                                               value={values.companyId}
+                                               value={values.title}
                                                disabled={isSubmitting}
                                                error={Boolean(errors.title && touched.title && errors.title)}
                                                onChange={handleChange}/>
@@ -264,13 +277,47 @@ const NewLivestreamForm = ({firebase}) => {
                                     </Collapse>
                                 </FormControl>
                             </Grid>
+                            <Grid xs={5} sm={5} md={2} lg={2} xl={2}
+                                  item>
+                                <div className={classes.switch}>
+                                    <FormControlLabel
+                                        labelPlacement="start"
+                                        control={
+                                            <Switch
+                                                checked={values.hiddenLivestream}
+                                                onChange={handleChange}
+                                                color="primary"
+                                                id="hiddenLivestream"
+                                                name="hiddenLivestream"
+                                                inputProps={{'aria-label': 'primary checkbox'}}
+                                            />}
+                                        label="Hidden"
+                                    />
+                                </div>
+                            </Grid>
                             <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                    <label className='login-label'>Livestream Start Date</label>
-                                        <DateTimePicker value={values.startDate} onChange={(value) => {
-                                            setFieldValue('startDate', new Date(value), true)
-                                        }}/>
+                                    <DateTimePicker inputVariant="outlined" fullWidth variant="outlined"
+                                                    label="Livestream Start Date" value={values.startDate}
+                                                    onChange={(value) => {
+                                                        setFieldValue('startDate', new Date(value), true)
+                                                    }}/>
                                 </MuiPickersUtilsProvider>
+                            </Grid>
+                            {values.speakers.map((speaker, index) => {
+                                return (
+                                    <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+                                        <SpeakerForm index={index}
+                                                     error={errors.spea && touched.backgroundUrl && errors.backgroundUrl}
+                                                     firebase={firebase}
+                                                     speaker={speaker}/>
+                                    </Grid>
+                                )
+                            })}
+                            <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                                <Button onClick={handleAddSpeaker} color="primary" variant="contained" fullWidth>
+                                    Add Speaker
+                                </Button>
                             </Grid>
                         </Grid>
                     </form>
