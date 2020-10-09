@@ -1,7 +1,16 @@
 import React, {useState} from 'react';
 import {Container, Grid, Typography} from "@material-ui/core";
 import {Formik} from 'formik';
+import {v4 as uuidv4} from 'uuid';
 
+const speakerObj = {
+    id: uuidv4(),
+    avatarUrl: '',
+    firstName: '',
+    lastName: '',
+    position: '',
+    background: ''
+}
 
 const NewLivestreamForm = () => {
 
@@ -15,23 +24,31 @@ const NewLivestreamForm = () => {
         universities: [],
         startDate: new Date(),
         hiddenLivestream: false,
-
         speakers: [
-            {
-                avatarUrl: '',
-                firstName: '',
-                lastName: '',
-                position: '',
-                background: ''
-            }
+            speakerObj
         ],
-
         summary: ''
     })
 
     const handleAddSpeaker = () => {
 
+        const newFormData = {...formData}
+        newFormData.speakers.push(speakerObj)
+        setFormData(newFormData)
     }
+
+    const handleDeleteSpeaker = (id) => {
+        const newFormData = {...formData}
+        const speakers = newFormData.speakers
+        const index = speakers.findIndex(speaker => speaker.id === id)
+        if (index > -1) {
+            speakers.splice(index, 1);
+            newFormData.speakers = speakers
+            setFormData(speakers)
+        }
+    }
+
+
     return (
         <Container style={{flex: 1, display: "flex", minHeight: 700, marginBottom: 10}}>
             <Formik
@@ -56,54 +73,23 @@ const NewLivestreamForm = () => {
                     if (!values.universities || values.universities.length < 1) {
                         errors.targetBackgrounds = 'Required';
                     }
-                    if (!values.mainSpeakerFirstName) {
-                        errors.mainSpeakerFirstName = 'Required';
-                    }
-                    if (!values.mainSpeakerLastName) {
-                        errors.mainSpeakerLastName = 'Required';
-                    }
-                    if (!values.mainSpeakerPosition) {
-                        errors.mainSpeakerPosition = 'Required';
-                    }
-                    if (!values.mainSpeakerBackground) {
-                        errors.mainSpeakerBackground = 'Required';
-                    }
 
-                    if (values.secondSpeakerPresent) {
-                        if (!values.secondSpeakerFirstName) {
-                            errors.secondSpeakerFirstName = 'Required';
+                    values.speakers.forEach((speaker, index) => {
+                        if (!values.speakers[index].firstName) {
+                            errors.values.speakers[index].firstName = 'Required';
                         }
-                        if (!values.secondSpeakerFirstName) {
-                            errors.secondSpeakerFirstName = 'Required';
+                        if (!values.speakers[index].lastName) {
+                            errors.values.speakers[index].lastName = 'Required';
                         }
-                        if (!values.secondSpeakerLastName) {
-                            errors.secondSpeakerLastName = 'Required';
+                        if (!values.speakers[index].position) {
+                            errors.values.speakers[index].position = 'Required';
                         }
-                        if (!values.secondSpeakerPosition) {
-                            errors.secondSpeakerPosition = 'Required';
+                        if (!values.speakers[index].background) {
+                            errors.values.speakers[index].background = 'Required';
                         }
-                        if (!values.secondSpeakerBackground) {
-                            errors.secondSpeakerBackground = 'Required';
-                        }
-                    }
 
-                    if (values.thirdSpeakerPresent) {
-                        if (!values.thirdSpeakerFirstName) {
-                            errors.thirdSpeakerFirstName = 'Required';
-                        }
-                        if (!values.thirdSpeakerFirstName) {
-                            errors.thirdSpeakerFirstName = 'Required';
-                        }
-                        if (!values.thirdSpeakerLastName) {
-                            errors.thirdSpeakerLastName = 'Required';
-                        }
-                        if (!values.thirdSpeakerPosition) {
-                            errors.thirdSpeakerPosition = 'Required';
-                        }
-                        if (!values.thirdSpeakerBackground) {
-                            errors.thirdSpeakerBackground = 'Required';
-                        }
-                    }
+                    })
+
                     return errors;
                 }}
                 onSubmit={(values, {setSubmitting}) => {
