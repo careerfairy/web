@@ -181,7 +181,7 @@ const NewLivestreamForm = ({firebase}) => {
                   }) => (
                     <form className={classes.form} onSubmit={handleSubmit}>
                         <Grid spacing={2} container>
-                            <Grid lg={6} xl={6} item>
+                            <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                                 <ImageSelect getDownloadUrl={getDownloadUrl} values={values} firebase={firebase}
                                              setFieldValue={setFieldValue} submitting={isSubmitting}
                                              path="company-logos"
@@ -189,7 +189,7 @@ const NewLivestreamForm = ({firebase}) => {
                                              value={values.logoUrl} options={existingLogos} loading={fetchingLogos}
                                              error={errors.logoUrl && touched.logoUrl && errors.logoUrl}/>
                             </Grid>
-                            <Grid lg={6} xl={6} item>
+                            <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                                 <ImageSelect getDownloadUrl={getDownloadUrl} values={values} firebase={firebase}
                                              setFieldValue={setFieldValue} submitting={isSubmitting}
                                              path="illustration-images"
