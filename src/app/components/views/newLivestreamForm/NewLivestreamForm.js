@@ -188,20 +188,22 @@ const NewLivestreamForm = ({firebase}) => {
                             errors.speakers[key].background = 'Required';
                         }
                     })
+                    console.log("-> errors", errors);
 
                     return errors;
                 }}
                 onSubmit={(values, {setSubmitting}) => {
-                    let livestream = buildLivestreamObject(values);
-                    let speakers = buildSpeakersArray(values);
-
-                    props.firebase.addLivestream(livestream).then(docRef => {
-                        alert("added livestream with Id: " + docRef.id);
-                        console.log("added livestream with Id: " + docRef.id);
-                        speakers.forEach(speaker => {
-                            props.firebase.addLivestreamSpeaker(docRef.id, speaker);
-                        })
-                    });
+                    setSubmitting(true)
+                    // let livestream = buildLivestreamObject(values);
+                    // let speakers = buildSpeakersArray(values);
+                    //
+                    // props.firebase.addLivestream(livestream).then(docRef => {
+                    //     alert("added livestream with Id: " + docRef.id);
+                    //     console.log("added livestream with Id: " + docRef.id);
+                    //     speakers.forEach(speaker => {
+                    //         props.firebase.addLivestreamSpeaker(docRef.id, speaker);
+                    //     })
+                    // });
                 }}
             >
                 {({
@@ -212,7 +214,7 @@ const NewLivestreamForm = ({firebase}) => {
                       handleBlur,
                       handleSubmit,
                       isSubmitting,
-                      setFieldValue
+                      setFieldValue,
                       /* and other goodies */
                   }) => (
                     <form className={classes.form} onSubmit={handleSubmit}>
@@ -330,14 +332,20 @@ const NewLivestreamForm = ({firebase}) => {
                                 </MuiPickersUtilsProvider>
                             </Grid>
                             {Object.keys(values.speakers).map((key) => {
+                                const baseError = errors && errors.speakers && errors.speakers[key]
                                 return (
                                     <Grid key={key} xs={12} sm={12} md={12} lg={12} xl={12} item>
                                         <SpeakerForm objectKey={key}
                                                      errors={errors}
+                                                     firstNameError={baseError && errors.speakers[key].firstName}
+                                                     lastNameError={baseError && errors.speakers[key].lastName}
+                                                     positionError={baseError && errors.speakers[key].position}
+                                                     backgroundError={baseError && errors.speakers[key].background}
                                                      getDownloadUrl={getDownloadUrl}
                                                      loading={fetchingAvatars}
                                                      speaker={values.speakers[key]}
                                                      values={values}
+                                                     touched={touched}
                                                      firebase={firebase}
                                                      setFieldValue={setFieldValue}
                                                      submitting={isSubmitting}
@@ -354,6 +362,9 @@ const NewLivestreamForm = ({firebase}) => {
                                 </Button>
                             </Grid>
                         </Grid>
+                        <Button type="submit" color="primary" variant="contained" fullWidth>
+                            Create
+                        </Button>
                     </form>
                 )}
             </Formik>
