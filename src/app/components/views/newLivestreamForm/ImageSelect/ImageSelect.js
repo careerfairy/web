@@ -1,11 +1,12 @@
 import React, {useState} from 'react';
-import {Collapse, FormControl, FormHelperText} from "@material-ui/core";
+import {Button, Collapse, FormControl, FormHelperText} from "@material-ui/core";
 import {FilePicker} from 'react-file-picker';
 import TextField from "@material-ui/core/TextField";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import {uploadLogo} from "../../../helperFunctions/HelperFunctions";
 
 const ImageSelect =
     ({
@@ -14,17 +15,18 @@ const ImageSelect =
          setCurrentImageUrl,
          getDownloadUrl,
          error,
+         value,
          formName,
          loading,
          submitting,
          handleBlur,
-        setFieldValue
+         setFieldValue
      }) => {
 
         const [open, setOpen] = useState(false);
 
         const getSelectedItem = () => {// Autocomplete will always complain because of async filtering... :( So ignore the warning
-            const item = options.find((uni) => uni.id === values.university)
+            const item = options.find((option) => option.value === value.value)
             return item || {}
         }
 
@@ -35,20 +37,19 @@ const ImageSelect =
 
 
         return (
-            <FormControl>
+            <>
+                <div className={formName}>
+                    <img alt={formName} src={currentImageUrl}/>
+                </div>
                 <Autocomplete
-                    id="university"
-                    name="university"
+                    id={formName}
+                    name={formName}
                     fullWidth
                     disabled={submitting}
                     selectOnFocus
                     onBlur={handleBlur}
                     autoHighlight
-                    onChange={(e, value) => {
-                        if (value) {
-                            setFieldValue("university", value.id)
-                        }
-                    }}
+                    onChange={handleSelect}
                     open={open}
                     onOpen={() => {
                         setOpen(true);
@@ -58,18 +59,18 @@ const ImageSelect =
                     }}
                     getOptionLabel={(option) => option.name || ""}
                     value={getSelectedItem()}
-                    getOptionSelected={(option, value) => option.id === value.id}
-                    options={universities}
+                    getOptionSelected={(option, value) => option.value === value.value}
+                    options={options}
                     loading={loading}
                     renderInput={(params) => (
                         <FormControl error={Boolean(error)} fullWidth>
                             <TextField
                                 {...params}
                                 error={Boolean(error)}
-                                id="university"
-                                name="university"
+                                id={formName}
+                                name={formName}
                                 onBlur={handleBlur}
-                                label="University"
+                                label={formName}
                                 disabled={submitting}
                                 variant="outlined"
                                 InputProps={{
@@ -100,32 +101,29 @@ const ImageSelect =
                         );
                     }}
                 />
-                <label>Company Logo</label>
-                <div className={formName}>
-                    <img alt={formName} src={currentImageUrl}/>
-                </div>
-                <Dropdown placeholder='Select Company Logo' value={values.logoUrl} onChange={(event, {value}) => {
-                    setFieldValue('logoUrl', value, true);
-                    setCurrentLogoUrl(getDownloadUrl(value));
-                }} compact selection options={options}/>
+                {/*<label>Company Logo</label>*/}
+
+                {/*<Dropdown placeholder='Select Company Logo' value={values.logoUrl} onChange={(event, {value}) => {*/}
+                {/*    setFieldValue('logoUrl', value, true);*/}
+                {/*    setCurrentLogoUrl(getDownloadUrl(value));*/}
+                {/*}} compact selection options={options}/>*/}
                 <FilePicker
                     extensions={['jpg', 'jpeg', 'png']}
                     maxSize={20}
                     onChange={fileObject => {
                         uploadLogo('company-logos', fileObject, (newUrl, fullPath) => {
                             debugger;
-                            setFieldValue('logoUrl', fullPath, true);
-                            setCurrentLogoUrl(newUrl);
+                            setFieldValue(formName, fullPath, true);
+                            setCurrentImageUrl(newUrl);
                         })
                     }}
                     onError={errMsg => (console.log(errMsg))}
                 >
-                    <Button id='upButton'>- OR - Upload New Logo</Button>
+                    <Button variant="contained" id='upButton'>- OR - Upload New Logo</Button>
                 </FilePicker>
 
-            </FormControl>
+            </>
         )
-            ;
     };
 
 export default ImageSelect;
