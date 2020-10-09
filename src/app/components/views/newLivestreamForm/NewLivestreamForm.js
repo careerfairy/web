@@ -78,6 +78,8 @@ const NewLivestreamForm = ({firebase}) => {
     const [fetchingLogos, setFetchingLogos] = useState(false)
     const [existingBackgrounds, setExistingBackgrounds] = useState([]);
     const [fetchingBackgrounds, setFetchingBackgrounds] = useState(false)
+    const [existingAvatars, setExistingAvatars] = useState([]);
+    const [fetchingAvatars, setFetchingAvatars] = useState(false)
 
     useEffect(() => {
         firebase.getStorageRef().child('company-logos').listAll().then(res => {
@@ -106,6 +108,21 @@ const NewLivestreamForm = ({firebase}) => {
             });
             setFetchingBackgrounds(false)
             setExistingBackgrounds(backgroundOptions);
+        });
+    }, [firebase]);
+
+    useEffect(() => {
+        firebase.getStorageRef().child('mentors-pictures').listAll().then(res => {
+            setFetchingAvatars(true)
+            let fileItems = [];
+            res.items.forEach(itemRef => {
+                fileItems.push(itemRef);
+            });
+            let avatarOptions = fileItems.map(backgroundFile => {
+                return {text: backgroundFile.name, value: getDownloadUrl(backgroundFile.fullPath)}
+            });
+            setFetchingAvatars(false)
+            setExistingAvatars(avatarOptions);
         });
     }, [firebase]);
 
@@ -304,13 +321,14 @@ const NewLivestreamForm = ({firebase}) => {
                                                     }}/>
                                 </MuiPickersUtilsProvider>
                             </Grid>
-                            {values.speakers.map((speaker, index) => {
+                            {Object.keys(values.speakers).map((key) => {
                                 return (
-                                    <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-                                        <SpeakerForm index={index}
-                                                     error={errors.spea && touched.backgroundUrl && errors.backgroundUrl}
+                                    <Grid key={key} xs={12} sm={12} md={6} lg={6} xl={6} item>
+                                        <SpeakerForm objectKey={key}
+                                                     values={values.speakers[key]}
+                                                     errors={errors.values.speakers[key]}
                                                      firebase={firebase}
-                                                     speaker={speaker}/>
+                                                     speaker={values.speakers[key]}/>
                                     </Grid>
                                 )
                             })}
