@@ -10,7 +10,7 @@ import {
     Switch,
     FormControlLabel, Button
 } from "@material-ui/core";
-import {Formik} from 'formik';
+import {Formik, withFormik} from 'formik';
 import {v4 as uuidv4} from 'uuid';
 import {withFirebase} from "../../../context/firebase";
 import ImageSelect from "./ImageSelect/ImageSelect";
@@ -75,15 +75,15 @@ const NewLivestreamForm = ({firebase}) => {
     })
 
     const [existingLogos, setExistingLogos] = useState([]);
-    const [fetchingLogos, setFetchingLogos] = useState(false)
+    const [fetchingLogos, setFetchingLogos] = useState(true)
     const [existingBackgrounds, setExistingBackgrounds] = useState([]);
-    const [fetchingBackgrounds, setFetchingBackgrounds] = useState(false)
+    const [fetchingBackgrounds, setFetchingBackgrounds] = useState(true)
     const [existingAvatars, setExistingAvatars] = useState([]);
-    const [fetchingAvatars, setFetchingAvatars] = useState(false)
+    const [fetchingAvatars, setFetchingAvatars] = useState(true)
+    const [allFetched, setAllFetched] = useState(false)
 
     useEffect(() => {
         firebase.getStorageRef().child('company-logos').listAll().then(res => {
-            setFetchingLogos(true)
             let fileItems = [];
             res.items.forEach(itemRef => {
                 fileItems.push(itemRef);
@@ -98,7 +98,6 @@ const NewLivestreamForm = ({firebase}) => {
 
     useEffect(() => {
         firebase.getStorageRef().child('illustration-images').listAll().then(res => {
-            setFetchingBackgrounds(true)
             let fileItems = [];
             res.items.forEach(itemRef => {
                 fileItems.push(itemRef);
@@ -113,7 +112,6 @@ const NewLivestreamForm = ({firebase}) => {
 
     useEffect(() => {
         firebase.getStorageRef().child('mentors-pictures').listAll().then(res => {
-            setFetchingAvatars(true)
             let fileItems = [];
             res.items.forEach(itemRef => {
                 fileItems.push(itemRef);
@@ -126,6 +124,12 @@ const NewLivestreamForm = ({firebase}) => {
         });
     }, [firebase]);
 
+    useEffect(() => {
+        if (!fetchingBackgrounds && !fetchingLogos && !fetchingAvatars) {
+            setAllFetched(true)
+        }
+    }, [fetchingAvatars, fetchingBackgrounds, fetchingLogos])
+
     const getDownloadUrl = (fileElement) => {
         if (fileElement) {
             return 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/' + fileElement.replace('/', '%2F') + '?alt=media';
@@ -135,11 +139,6 @@ const NewLivestreamForm = ({firebase}) => {
         }
     }
 
-    const handleAddSpeaker = () => {
-        const newFormData = {...formData}
-        newFormData.speakers[uuidv4()] = speakerObj
-        setFormData(newFormData)
-    }
 
     const handleDeleteSpeaker = (id) => {
         const newFormData = {...formData}
@@ -148,7 +147,7 @@ const NewLivestreamForm = ({firebase}) => {
     }
 
 
-    return (
+    return allFetched ? (
         <Container className={classes.root}>
             <Typography variant="h3" align="center" gutterBottom>Create a Livestream</Typography>
             <Formik
@@ -215,161 +214,171 @@ const NewLivestreamForm = ({firebase}) => {
                       handleSubmit,
                       isSubmitting,
                       setFieldValue,
+                      setValues,
                       /* and other goodies */
-                  }) => (
-                    <form className={classes.form} onSubmit={handleSubmit}>
-                        <Grid spacing={2} container>
-                            <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-                                <ImageSelect
-                                    getDownloadUrl={getDownloadUrl}
-                                    values={values}
-                                    firebase={firebase}
-                                    setFieldValue={setFieldValue}
-                                    submitting={isSubmitting}
-                                    path="company-logos"
-                                    label="Logo"
-                                    handleBlur={handleBlur}
-                                    formName="logoUrl"
-                                    value={values.logoUrl}
-                                    options={existingLogos}
-                                    loading={fetchingLogos}
-                                    error={errors.logoUrl && touched.logoUrl && errors.logoUrl}/>
-                            </Grid>
-                            <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-                                <ImageSelect getDownloadUrl={getDownloadUrl} values={values} firebase={firebase}
-                                             setFieldValue={setFieldValue} submitting={isSubmitting}
-                                             path="illustration-images"
-                                             label="Company Background" handleBlur={handleBlur} formName="backgroundUrl"
-                                             value={values.backgroundUrl} options={existingBackgrounds}
-                                             loading={fetchingBackgrounds}
-                                             error={errors.backgroundUrl && touched.backgroundUrl && errors.backgroundUrl}/>
-                            </Grid>
-                            <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-                                <FormControl fullWidth>
-                                    <TextField name="company"
-                                               variant="outlined"
-                                               fullWidth
-                                               id="company"
-                                               label="Company Name"
-                                               inputProps={{maxLength: 70}}
-                                               onBlur={handleBlur}
-                                               value={values.company}
-                                               disabled={isSubmitting}
-                                               error={Boolean(errors.company && touched.company && errors.company)}
-                                               onChange={handleChange}/>
-                                    <Collapse in={Boolean(errors.company && touched.company)}>
-                                        <FormHelperText error>
-                                            {errors.company}
-                                        </FormHelperText>
-                                    </Collapse>
-                                </FormControl>
-                            </Grid>
-                            <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-                                <FormControl fullWidth>
-                                    <TextField name="companyId"
-                                               variant="outlined"
-                                               fullWidth
-                                               id="companyId"
-                                               label="Company ID"
-                                               inputProps={{maxLength: 70}}
-                                               onBlur={handleBlur}
-                                               value={values.companyId}
-                                               disabled={isSubmitting}
-                                               error={Boolean(errors.companyId && touched.companyId && errors.companyId)}
-                                               onChange={handleChange}/>
-                                    <Collapse in={Boolean(errors.companyId && touched.companyId)}>
-                                        <FormHelperText error>
-                                            {errors.companyId}
-                                        </FormHelperText>
-                                    </Collapse>
-                                </FormControl>
-                            </Grid>
-                            <Grid xs={7} sm={7} md={4} lg={4} xl={4} item>
-                                <FormControl fullWidth>
-                                    <TextField name="title"
-                                               variant="outlined"
-                                               fullWidth
-                                               id="title"
-                                               label="Livestream Title"
-                                               inputProps={{maxLength: 70}}
-                                               onBlur={handleBlur}
-                                               value={values.title}
-                                               disabled={isSubmitting}
-                                               error={Boolean(errors.title && touched.title && errors.title)}
-                                               onChange={handleChange}/>
-                                    <Collapse in={Boolean(errors.title && touched.title)}>
-                                        <FormHelperText error>
-                                            {errors.title}
-                                        </FormHelperText>
-                                    </Collapse>
-                                </FormControl>
-                            </Grid>
-                            <Grid xs={5} sm={5} md={2} lg={2} xl={2}
-                                  item>
-                                <div className={classes.switch}>
-                                    <FormControlLabel
-                                        labelPlacement="start"
-                                        control={
-                                            <Switch
-                                                checked={values.hiddenLivestream}
-                                                onChange={handleChange}
-                                                color="primary"
-                                                id="hiddenLivestream"
-                                                name="hiddenLivestream"
-                                                inputProps={{'aria-label': 'primary checkbox'}}
-                                            />}
-                                        label="Hidden"
-                                    />
-                                </div>
-                            </Grid>
-                            <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-                                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                    <DateTimePicker inputVariant="outlined" fullWidth variant="outlined"
-                                                    label="Livestream Start Date" value={values.startDate}
-                                                    onChange={(value) => {
-                                                        setFieldValue('startDate', new Date(value), true)
-                                                    }}/>
-                                </MuiPickersUtilsProvider>
-                            </Grid>
-                            {Object.keys(values.speakers).map((key) => {
-                                const baseError = errors && errors.speakers && errors.speakers[key]
-                                return (
-                                    <Grid key={key} xs={12} sm={12} md={12} lg={12} xl={12} item>
-                                        <SpeakerForm objectKey={key}
-                                                     errors={errors}
-                                                     firstNameError={baseError && errors.speakers[key].firstName}
-                                                     lastNameError={baseError && errors.speakers[key].lastName}
-                                                     positionError={baseError && errors.speakers[key].position}
-                                                     backgroundError={baseError && errors.speakers[key].background}
-                                                     getDownloadUrl={getDownloadUrl}
-                                                     loading={fetchingAvatars}
-                                                     speaker={values.speakers[key]}
-                                                     values={values}
-                                                     touched={touched}
-                                                     firebase={firebase}
-                                                     setFieldValue={setFieldValue}
-                                                     submitting={isSubmitting}
-                                                     path="mentors-pictures"
-                                                     handleBlur={handleBlur}
-                                                     options={existingAvatars}
+                  }) => {
+
+                    const handleAddSpeaker = () => {
+                        const newValues = {...values}
+                        newValues.speakers[uuidv4()] = speakerObj
+                        setValues(newValues)
+                    }
+                    return (
+                        <form className={classes.form} onSubmit={handleSubmit}>
+                            <Grid spacing={2} container>
+                                <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+                                    <ImageSelect
+                                        getDownloadUrl={getDownloadUrl}
+                                        values={values}
+                                        firebase={firebase}
+                                        setFieldValue={setFieldValue}
+                                        submitting={isSubmitting}
+                                        path="company-logos"
+                                        label="Logo"
+                                        handleBlur={handleBlur}
+                                        formName="logoUrl"
+                                        value={values.logoUrl}
+                                        options={existingLogos}
+                                        loading={fetchingLogos}
+                                        error={errors.logoUrl && touched.logoUrl && errors.logoUrl}/>
+                                </Grid>
+                                <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+                                    <ImageSelect getDownloadUrl={getDownloadUrl} values={values} firebase={firebase}
+                                                 setFieldValue={setFieldValue} submitting={isSubmitting}
+                                                 path="illustration-images"
+                                                 label="Company Background" handleBlur={handleBlur}
+                                                 formName="backgroundUrl"
+                                                 value={values.backgroundUrl} options={existingBackgrounds}
+                                                 loading={fetchingBackgrounds}
+                                                 error={errors.backgroundUrl && touched.backgroundUrl && errors.backgroundUrl}/>
+                                </Grid>
+                                <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+                                    <FormControl fullWidth>
+                                        <TextField name="company"
+                                                   variant="outlined"
+                                                   fullWidth
+                                                   id="company"
+                                                   label="Company Name"
+                                                   inputProps={{maxLength: 70}}
+                                                   onBlur={handleBlur}
+                                                   value={values.company}
+                                                   disabled={isSubmitting}
+                                                   error={Boolean(errors.company && touched.company && errors.company)}
+                                                   onChange={handleChange}/>
+                                        <Collapse in={Boolean(errors.company && touched.company)}>
+                                            <FormHelperText error>
+                                                {errors.company}
+                                            </FormHelperText>
+                                        </Collapse>
+                                    </FormControl>
+                                </Grid>
+                                <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+                                    <FormControl fullWidth>
+                                        <TextField name="companyId"
+                                                   variant="outlined"
+                                                   fullWidth
+                                                   id="companyId"
+                                                   label="Company ID"
+                                                   inputProps={{maxLength: 70}}
+                                                   onBlur={handleBlur}
+                                                   value={values.companyId}
+                                                   disabled={isSubmitting}
+                                                   error={Boolean(errors.companyId && touched.companyId && errors.companyId)}
+                                                   onChange={handleChange}/>
+                                        <Collapse in={Boolean(errors.companyId && touched.companyId)}>
+                                            <FormHelperText error>
+                                                {errors.companyId}
+                                            </FormHelperText>
+                                        </Collapse>
+                                    </FormControl>
+                                </Grid>
+                                <Grid xs={7} sm={7} md={4} lg={4} xl={4} item>
+                                    <FormControl fullWidth>
+                                        <TextField name="title"
+                                                   variant="outlined"
+                                                   fullWidth
+                                                   id="title"
+                                                   label="Livestream Title"
+                                                   inputProps={{maxLength: 70}}
+                                                   onBlur={handleBlur}
+                                                   value={values.title}
+                                                   disabled={isSubmitting}
+                                                   error={Boolean(errors.title && touched.title && errors.title)}
+                                                   onChange={handleChange}/>
+                                        <Collapse in={Boolean(errors.title && touched.title)}>
+                                            <FormHelperText error>
+                                                {errors.title}
+                                            </FormHelperText>
+                                        </Collapse>
+                                    </FormControl>
+                                </Grid>
+                                <Grid xs={5} sm={5} md={2} lg={2} xl={2}
+                                      item>
+                                    <div className={classes.switch}>
+                                        <FormControlLabel
+                                            labelPlacement="start"
+                                            control={
+                                                <Switch
+                                                    checked={values.hiddenLivestream}
+                                                    onChange={handleChange}
+                                                    color="primary"
+                                                    id="hiddenLivestream"
+                                                    name="hiddenLivestream"
+                                                    inputProps={{'aria-label': 'primary checkbox'}}
+                                                />}
+                                            label="Hidden"
                                         />
-                                    </Grid>
-                                )
-                            })}
-                            <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
-                                <Button onClick={handleAddSpeaker} color="primary" variant="contained" fullWidth>
-                                    Add Speaker
-                                </Button>
+                                    </div>
+                                </Grid>
+                                <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+                                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                        <DateTimePicker inputVariant="outlined" fullWidth variant="outlined"
+                                                        label="Livestream Start Date" value={values.startDate}
+                                                        onChange={(value) => {
+                                                            setFieldValue('startDate', new Date(value), true)
+                                                        }}/>
+                                    </MuiPickersUtilsProvider>
+                                </Grid>
+                                {Object.keys(values.speakers).map((key) => {
+                                    const baseError = errors && errors.speakers && errors.speakers[key]
+                                    return (
+                                        <Grid key={key} xs={12} sm={12} md={12} lg={12} xl={12} item>
+                                            <SpeakerForm objectKey={key}
+                                                         errors={errors}
+                                                         firstNameError={baseError && errors.speakers[key].firstName}
+                                                         lastNameError={baseError && errors.speakers[key].lastName}
+                                                         positionError={baseError && errors.speakers[key].position}
+                                                         backgroundError={baseError && errors.speakers[key].background}
+                                                         getDownloadUrl={getDownloadUrl}
+                                                         loading={fetchingAvatars}
+                                                         speaker={values.speakers[key]}
+                                                         values={values}
+                                                         touched={touched}
+                                                         firebase={firebase}
+                                                         setFieldValue={setFieldValue}
+                                                         submitting={isSubmitting}
+                                                         path="mentors-pictures"
+                                                         handleBlur={handleBlur}
+                                                         options={existingAvatars}
+                                            />
+                                        </Grid>
+                                    )
+                                })}
+                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                                    <Button onClick={handleAddSpeaker} color="primary" variant="contained" fullWidth>
+                                        Add Speaker
+                                    </Button>
+                                </Grid>
                             </Grid>
-                        </Grid>
-                        <Button type="submit" color="primary" variant="contained" fullWidth>
-                            Create
-                        </Button>
-                    </form>
-                )}
+                            <Button type="submit" color="primary" variant="contained" fullWidth>
+                                Create
+                            </Button>
+                        </form>
+                    )
+                }}
             </Formik>
         </Container>
-    );
+    ) : null;
 };
 
 export default withFirebase(NewLivestreamForm);

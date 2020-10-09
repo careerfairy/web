@@ -1,7 +1,20 @@
 import React from 'react';
 import ImageSelect from "../ImageSelect/ImageSelect";
 import {Collapse, FormControl, FormHelperText, Grid, TextField} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
 
+const useStyles = makeStyles(theme => ({
+    formGrid: {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        "& .MuiFormControl-root:not(:last-child)": {
+            marginBottom: theme.spacing(0.5),
+        }
+    }
+
+
+}));
 const SpeakerForm = (
     {
         firstNameError,
@@ -19,6 +32,7 @@ const SpeakerForm = (
         handleBlur,
         ...props
     }) => {
+    const classes = useStyles()
 
 
     return (
@@ -26,8 +40,8 @@ const SpeakerForm = (
             <Grid xs={12} sm={12} md={12} lg={6} xl={6} item>
                 <ImageSelect value={speaker.avatarUrl} firebase={firebase} setFieldValue={setFieldValue} {...props}/>
             </Grid>
-            <Grid xs={12} sm={12} md={12} lg={6} xl={6} item>
-                <FormControl fullWidth>
+            <Grid className={classes.formGrid} xs={12} sm={12} md={12} lg={6} xl={6} item>
+                <FormControl  fullWidth>
                     <TextField name={`speakers.${objectKey}.firstName`}
                                id={`speakers.${objectKey}.firstName`}
                                variant="outlined"
@@ -44,9 +58,7 @@ const SpeakerForm = (
                         </FormHelperText>
                     </Collapse>
                 </FormControl>
-            </Grid>
-            <Grid xs={12} sm={12} md={12} lg={6} xl={6} item>
-                <FormControl fullWidth>
+                <FormControl  fullWidth>
                     <TextField name={`speakers.${objectKey}.lastName`}
                                id={`speakers.${objectKey}.lastName`}
                                variant="outlined"
@@ -54,18 +66,16 @@ const SpeakerForm = (
                                onBlur={handleBlur}
                                label="Last Name"
                                inputProps={{maxLength: 70}}
-                               value={speaker.firstName}
+                               value={speaker.lastName}
                                error={Boolean(lastNameError)}
                                onChange={({currentTarget: {value}}) => setFieldValue(`speakers.${objectKey}.lastName`, value)}/>
                     <Collapse in={Boolean(lastNameError)}>
                         <FormHelperText error>
-                            {firstNameError}
+                            {lastNameError}
                         </FormHelperText>
                     </Collapse>
                 </FormControl>
-            </Grid>
-            <Grid xs={12} sm={12} md={12} lg={6} xl={6} item>
-                <FormControl fullWidth>
+                <FormControl  fullWidth>
                     <TextField name={`speakers.${objectKey}.position`}
                                id={`speakers.${objectKey}.position`}
                                variant="outlined"
@@ -78,45 +88,24 @@ const SpeakerForm = (
                                onChange={({currentTarget: {value}}) => setFieldValue(`speakers.${objectKey}.position`, value)}/>
                     <Collapse in={Boolean(positionError)}>
                         <FormHelperText error>
-                            {firstNameError}
+                            {positionError}
                         </FormHelperText>
                     </Collapse>
                 </FormControl>
-            </Grid>
-            <Grid xs={12} sm={12} md={12} lg={6} xl={6} item>
-                <FormControl fullWidth>
-                    <TextField name={`speakers.${objectKey}.firstName`}
-                               id={`speakers.${objectKey}.firstName`}
+                <FormControl  fullWidth>
+                    <TextField name={`speakers.${objectKey}.background`}
+                               id={`speakers.${objectKey}.background`}
                                variant="outlined"
                                fullWidth
                                onBlur={handleBlur}
-                               label="First Name"
-                               inputProps={{maxLength: 70}}
-                               value={speaker.firstName}
-                               error={Boolean(firstNameError && firstNameError)}
-                               onChange={({currentTarget: {value}}) => setFieldValue(`speakers.${objectKey}.firstName`, value)}/>
-                    <Collapse in={Boolean(firstNameError)}>
+                               label="Background"
+                               inputProps={{maxLength: 200}}
+                               value={speaker.background}
+                               error={Boolean(backgroundError)}
+                               onChange={({currentTarget: {value}}) => setFieldValue(`speakers.${objectKey}.background`, value)}/>
+                    <Collapse in={Boolean(backgroundError)}>
                         <FormHelperText error>
-                            {firstNameError}
-                        </FormHelperText>
-                    </Collapse>
-                </FormControl>
-            </Grid>
-            <Grid xs={12} sm={12} md={12} lg={6} xl={6} item>
-                <FormControl fullWidth>
-                    <TextField name={`speakers.${objectKey}.firstName`}
-                               id={`speakers.${objectKey}.firstName`}
-                               variant="outlined"
-                               fullWidth
-                               onBlur={handleBlur}
-                               label="First Name"
-                               inputProps={{maxLength: 70}}
-                               value={speaker.firstName}
-                               error={Boolean(firstNameError && firstNameError)}
-                               onChange={({currentTarget: {value}}) => setFieldValue(`speakers.${objectKey}.firstName`, value)}/>
-                    <Collapse in={Boolean(firstNameError)}>
-                        <FormHelperText error>
-                            {firstNameError}
+                            {backgroundError}
                         </FormHelperText>
                     </Collapse>
                 </FormControl>

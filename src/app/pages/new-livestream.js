@@ -3,7 +3,6 @@ import Head from "next/head";
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
 import NewLivestreamForm from "../components/views/newLivestreamForm/NewLivestreamForm";
-import {Typography} from "@material-ui/core";
 import React from "react";
 
 

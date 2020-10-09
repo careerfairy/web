@@ -1,5 +1,15 @@
 import React, {useState} from 'react';
-import {Button, Card, CardMedia, Collapse, FormControl, FormHelperText} from "@material-ui/core";
+import {
+    Box,
+    Button,
+    Card,
+    CardMedia,
+    Collapse,
+    FormControl,
+    FormHelperText,
+    FormLabel,
+    Typography
+} from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import match from "autosuggest-highlight/match";
@@ -15,15 +25,22 @@ const useStyles = makeStyles((theme) => ({
     media: {
         display: "flex",
         justifyContent: "center",
-        padding: "0 1em 0 1em",
         height: 200,
+        width: "100%",
         borderRadius: 4,
-        border: "1px solid rgba(0, 0, 0, 0.3)",
-        marginBottom: theme.spacing(2)
+
+        // marginBottom: theme.spacing(2)
     },
     image: {
         objectFit: "contain",
-        maxWidth: "80%",
+        width: "100%",
+        borderRadius: 4,
+        // maxWidth: "80%",
+    },
+    input: {
+        "& .MuiInputBase-input": {
+            cursor: "pointer"
+        }
     }
 }));
 
@@ -63,16 +80,18 @@ const ImageSelect =
             setFieldValue(formName, actualValue, true);
         }
 
+        const renderImage = (
+            <Box boxShadow={2} component={CardMedia} className={classes.media}>
+                <img src={value.length ? value : placeholder}
+                     className={classes.image}
+                     alt={formName}/>
+            </Box>
+        )
+
 
         return options.length ? (
             <>
-                <CardMedia className={classes.media}>
 
-                    <img src={value.length ? value : placeholder}
-                         className={classes.image}
-                         alt={formName}/>
-                </CardMedia>
-                <div style={{display: "flex"}}>
                 <Autocomplete
                     id={formName}
                     name={formName}
@@ -100,6 +119,7 @@ const ImageSelect =
                                 {...params}
                                 error={Boolean(error)}
                                 id={formName}
+                                className={classes.input}
                                 name={formName}
                                 onBlur={handleBlur}
                                 label={`Chose a ${label}`}
@@ -110,6 +130,7 @@ const ImageSelect =
                                     endAdornment: (
                                         <React.Fragment>
                                             {loading ? <CircularProgress color="inherit" size={20}/> : null}
+                                            {renderImage}
                                             {params.InputProps.endAdornment}
                                         </React.Fragment>
                                     ),
@@ -144,13 +165,12 @@ const ImageSelect =
                         })
                     }}
                 >
-                    <Button style={{marginLeft: "0.5rem"}} variant="contained" id='upButton'>
+                    <Button fullWidth style={{marginTop: "0.5rem"}} variant="contained" id='upButton'>
                         {`-OR - Upload`}</Button>
                 </FilePickerContainer>
                 <Collapse in={Boolean(filePickerError)}>
                     <FormHelperText error>{filePickerError}</FormHelperText>
                 </Collapse>
-                    </div>
             </>
         ) : null
     };
