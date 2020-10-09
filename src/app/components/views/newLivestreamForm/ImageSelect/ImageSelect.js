@@ -47,7 +47,6 @@ const ImageSelect =
         const classes = useStyles()
         const [open, setOpen] = useState(false);
         const [filePickerError, setFilePickerError] = useState(null)
-        console.log("-> values", values);
 
         const getSelectedItem = () => {// Autocomplete will always complain because of async filtering... :( So ignore the warning
             const item = options.find((option) => option.value === value)

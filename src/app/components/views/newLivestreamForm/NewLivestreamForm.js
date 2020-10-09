@@ -154,7 +154,7 @@ const NewLivestreamForm = ({firebase}) => {
             <Formik
                 initialValues={formData}
                 validate={values => {
-                    let errors = {};
+                    let errors = {speakers: {}};
                     if (!values.logoUrl) {
                         errors.logoUrl = 'Required';
                     }
@@ -176,16 +176,16 @@ const NewLivestreamForm = ({firebase}) => {
 
                     Object.keys(values.speakers).forEach((key) => {
                         if (!values.speakers[key].firstName) {
-                            errors.values.speakers[key].firstName = 'Required';
+                            errors.speakers[key].firstName = 'Required';
                         }
                         if (!values.speakers[key].lastName) {
-                            errors.values.speakers[key].lastName = 'Required';
+                            errors.speakers[key].lastName = 'Required';
                         }
                         if (!values.speakers[key].position) {
-                            errors.values.speakers[key].position = 'Required';
+                            errors.speakers[key].position = 'Required';
                         }
                         if (!values.speakers[key].background) {
-                            errors.values.speakers[key].background = 'Required';
+                            errors.speakers[key].background = 'Required';
                         }
                     })
 
@@ -218,12 +218,20 @@ const NewLivestreamForm = ({firebase}) => {
                     <form className={classes.form} onSubmit={handleSubmit}>
                         <Grid spacing={2} container>
                             <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-                                <ImageSelect getDownloadUrl={getDownloadUrl} values={values} firebase={firebase}
-                                             setFieldValue={setFieldValue} submitting={isSubmitting}
-                                             path="company-logos"
-                                             label="Logo" handleBlur={handleBlur} formName="logoUrl"
-                                             value={values.logoUrl} options={existingLogos} loading={fetchingLogos}
-                                             error={errors.logoUrl && touched.logoUrl && errors.logoUrl}/>
+                                <ImageSelect
+                                    getDownloadUrl={getDownloadUrl}
+                                    values={values}
+                                    firebase={firebase}
+                                    setFieldValue={setFieldValue}
+                                    submitting={isSubmitting}
+                                    path="company-logos"
+                                    label="Logo"
+                                    handleBlur={handleBlur}
+                                    formName="logoUrl"
+                                    value={values.logoUrl}
+                                    options={existingLogos}
+                                    loading={fetchingLogos}
+                                    error={errors.logoUrl && touched.logoUrl && errors.logoUrl}/>
                             </Grid>
                             <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                                 <ImageSelect getDownloadUrl={getDownloadUrl} values={values} firebase={firebase}
@@ -323,12 +331,20 @@ const NewLivestreamForm = ({firebase}) => {
                             </Grid>
                             {Object.keys(values.speakers).map((key) => {
                                 return (
-                                    <Grid key={key} xs={12} sm={12} md={6} lg={6} xl={6} item>
+                                    <Grid key={key} xs={12} sm={12} md={12} lg={12} xl={12} item>
                                         <SpeakerForm objectKey={key}
-                                                     values={values.speakers[key]}
-                                                     errors={errors.values.speakers[key]}
+                                                     errors={errors}
+                                                     getDownloadUrl={getDownloadUrl}
+                                                     loading={fetchingAvatars}
+                                                     speaker={values.speakers[key]}
+                                                     values={values}
                                                      firebase={firebase}
-                                                     speaker={values.speakers[key]}/>
+                                                     setFieldValue={setFieldValue}
+                                                     submitting={isSubmitting}
+                                                     path="mentors-pictures"
+                                                     handleBlur={handleBlur}
+                                                     options={existingAvatars}
+                                        />
                                     </Grid>
                                 )
                             })}
