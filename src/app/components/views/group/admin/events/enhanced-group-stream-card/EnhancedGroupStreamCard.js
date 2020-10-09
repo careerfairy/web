@@ -24,31 +24,29 @@ const EnhancedGroupStreamCard = (props) => {
     useEffect(() => {
         if (props.group && props.group.categories) {
             let fieldOfStudyCategories = props.group.categories.find(category => category.name?.toLowerCase() === "field of study");
-            if (fieldOfStudyCategories) {
-                setGroupCategories(fieldOfStudyCategories.options);
-            }
+            setGroupCategories(fieldOfStudyCategories.options);
         }
     },[props.group])
 
-    // useEffect(() => {
-    //     if (props.livestream && props.group) {
-    //         props.firebase.getLivestreamRegisteredStudentsFromGroup(props.livestream.id, props.group.groupId).then(querySnapshot => {
-    //             let registeredStudents = [];
-    //             querySnapshot.forEach(doc => {
-    //                 let student = doc.data();
-    //                 let publishedStudent = {
-    //                     'First Name': student.firstName,
-    //                     'Last Name': student.lastName,
-    //                     'Email': doc.id,
-    //                     'Study Subject': getUniversitySubjectValue(student.faculty),
-    //                     'Study Level': student.levelOfStudy,
-    //                 };
-    //                 registeredStudents.push(publishedStudent);
-    //             });
-    //             setRegisteredStudents(registeredStudents);
-    //         })
-    //     }      
-    // }, [props.livestream, props.group]);
+    useEffect(() => {
+        if (props.livestream && props.group) {
+            props.firebase.getLivestreamRegisteredStudentsFromGroup(props.livestream.id, props.group.groupId).then(querySnapshot => {
+                let registeredStudents = [];
+                querySnapshot.forEach(doc => {
+                    let student = doc.data();
+                    let publishedStudent = {
+                        'First Name': student.firstName,
+                        'Last Name': student.lastName,
+                        'Email': doc.id,
+                        'Study Subject': getUniversitySubjectValue(student.faculty),
+                        'Study Level': student.levelOfStudy,
+                    };
+                    registeredStudents.push(publishedStudent);
+                });
+                setRegisteredStudents(registeredStudents);
+            })
+        }      
+    }, [props.firebase, livestream, careerCenter]);
 
     function getOptionName(optionId) {
         let correspondingOption = {};
