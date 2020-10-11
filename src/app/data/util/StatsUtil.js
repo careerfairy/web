@@ -1,15 +1,77 @@
 export default class StatsUtil {
+
+    static getStudentInGroupDataObject(student, group) {
+        let studentDataObject = {
+            'First Name': student.firstName,
+            'Last Name': student.lastName,
+            'Email': student.userEmail,
+            'University': group.universityName,
+        }
+        let studentCategoriesForGroup = StatsUtil.getRegisteredGroupById(student, group.groupId)
+        if (studentCategoriesForGroup && studentCategoriesForGroup.categories && studentCategoriesForGroup.categories.length && group.categories) {
+            group.categories.forEach( category => {
+                let studentCatValue = studentCategoriesForGroup.categories.find( studCat => studCat.id === category.id);
+                if (studentCatValue) {
+                    let studentSelectedOption = category.options.find( option => option.id === studentCatValue.selectedValueId);
+                    if (studentSelectedOption) {
+                        studentDataObject[category.name] = studentSelectedOption.name;
+                    }
+                }
+            })
+        }      
+        return studentDataObject;
+    }
+
+    static getStudentOutsideGroupDataObject(student, group, allGroups) {
+        let studentMainGroup = allGroups.find( group => {
+            if (group.universityCode) {
+                return group.universityCode === student.universityCode;
+            }
+        });
+        let studentDataObject = {
+            'First Name': student.firstName,
+            'Last Name': student.lastName,
+            'Email': student.userEmail,
+        }
+        if (studentMainGroup) {
+            let studentCategoriesForGroup = StatsUtil.getRegisteredGroupById(student, studentMainGroup.groupId)
+            studentDataObject["University"] = studentMainGroup.universityName;
+            if (studentCategoriesForGroup && studentCategoriesForGroup.categories && studentCategoriesForGroup.categories.length && studentMainGroup.categories) {
+                studentMainGroup.categories.forEach( category => {
+                    let studentCatValue = studentCategoriesForGroup.categories.find( studCat => studCat.id === category.id);
+                    if (studentCatValue) {
+                        let studentSelectedOption = category.options.find( option => option.id === studentCatValue.selectedValueId);
+                        if (studentSelectedOption) {
+                            studentDataObject[category.name] = studentSelectedOption.name;
+                        }
+                    }     
+                })
+            }  
+        } else if (student.groupIds && student.groupIds[0]){
+            let currentGroup = allGroups.find( group => group.groupId === student.groupIds[0]);
+            let studentCategoriesForGroup = StatsUtil.getRegisteredGroupById(student, student.groupIds[0])
+            studentDataObject["University"] = currentGroup.universityName;
+            if (studentCategoriesForGroup && studentCategoriesForGroup.categories && studentCategoriesForGroup.categories.length && currentGroup.categories) {
+                currentGroup.categories.forEach( category => {
+                    let studentCatValue = studentCategoriesForGroup.categories.find( studCat => studCat.id === category.id);
+                    let studentSelectedOption = category.options.find( option => option.id === studentCatValue.selectedValueId);
+                    studentDataObject[category.name] = studentSelectedOption.name;
+                })
+            } 
+        } 
+        return studentDataObject;      
+    }
     
     static getGroupByUniversityCode(allGroups, universityCode) {
         return allGroups.find( group => group.universityCode === universityCode );
     }
 
-    static getStudentCategories(student, universityCode, allGroups) {
+    static getStudentCategories(student, allGroups) {
         let studentMainGroup = StatsUtil.getGroupByUniversityCode(allGroups, student.university);
-        if (student.categories && student.categories[studentMainGroup.groupId]) {
-            return student.categories[studentMainGroup.groupId];
+        if (student.categories && student.registeredGroups[studentMainGroup.groupId]) {
+            return StatsUtil.getRegisteredGroupById(student, studentMainGroup.groupId);
         } else {
-            return student.categories[student.groupIds[0]];
+            return StatsUtil.getRegisteredGroupById(student, student.groupIds[0]);
         }
     }
 
@@ -17,11 +79,14 @@ export default class StatsUtil {
         let categoryStats = {};
         group.categories.forEach( category => {
             category.options.forEach( option => {
+                if (!categoryStats[category.id]) {
+                    categoryStats[category.id] = {};
+                }
                 categoryStats[category.id][option.id] = 0;
             })
         });
         registeredStudentsFromGroup.forEach( student  => {
-            let registeredGroup = StatsUtil.getRegisteredGroupById(student, groupId);
+            let registeredGroup = StatsUtil.getRegisteredGroupById(student, group.groupId);
             if (registeredGroup) {
                 registeredGroup.categories.forEach( category => {
                     categoryStats[category.id][category.selectedValueId] = categoryStats[category.id][category.selectedValueId] + 1;
@@ -32,7 +97,7 @@ export default class StatsUtil {
     }
 
     static getRegisteredGroupById(student, groupId) {
-        return student.registeredCategories.find( category => category.groupId === groupId);
+        return student.registeredGroups?.find( category => category.groupId === groupId);
     }
 
 }

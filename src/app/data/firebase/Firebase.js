@@ -647,6 +647,13 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
+    getAllCareerCenters = () => {
+      let ref = this.firestore
+          .collection("careerCenterData")
+          .where("test", "==", false);
+      return ref.get();
+  };
+
     listenCareerCenters = (callback) => {
       let ref = this.firestore
           .collection("careerCenterData")
