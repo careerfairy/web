@@ -14,7 +14,7 @@ import React from "react";
 const newLivestreams = () => {
 
     return (
-        <TealBackground>
+        <TealBackground style={{paddingBottom: 0}}>
             <Head>
                 <title key="title">CareerFairy | Create Live Streams</title>
             </Head>

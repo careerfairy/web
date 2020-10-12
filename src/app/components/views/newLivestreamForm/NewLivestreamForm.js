@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, Fragment} from 'react';
 import {
     Container,
     Grid,
@@ -47,13 +47,13 @@ const useStyles = makeStyles(theme => ({
         marginBottom: theme.spacing(3),
     },
     switch: {
-        placeItems: "center",
-        borderRadius: 4,
-        width: "100%",
-        height: "100%",
-        border: "1px solid rgba(0, 0, 0, 0.3)",
-        display: "flex",
-        justifyContent: "center"
+        // placeItems: "center",
+        // borderRadius: 4,
+        // width: "100%",
+        // height: "100%",
+        // // border: "1px solid rgba(0, 0, 0, 0.3)",
+        // display: "flex",
+        // justifyContent: "center"
     },
 
 }));
@@ -290,7 +290,7 @@ const NewLivestreamForm = ({firebase}) => {
                         }
                         return (
                             <form className={classes.form} onSubmit={handleSubmit}>
-                                <Box className={classes.formGroup} borderRadius={4} component={Grid} boxShadow={1} p={2}
+                                <Box className={classes.formGroup} borderRadius={4} component={Grid} boxShadow={1} p={1}
                                      spacing={2} container>
                                     <Grid xs={7} sm={7} md={10} lg={10} xl={10} item>
                                         <FormControl fullWidth>
@@ -313,22 +313,21 @@ const NewLivestreamForm = ({firebase}) => {
                                         </FormControl>
                                     </Grid>
                                     <Grid xs={5} sm={5} md={2} lg={2} xl={2}
+                                          style={{display: "grid", placeItems: "center"}}
                                           item>
-                                        <div className={classes.switch}>
-                                            <FormControlLabel
-                                                labelPlacement="start"
-                                                control={
-                                                    <Switch
-                                                        checked={values.hiddenLivestream}
-                                                        onChange={handleChange}
-                                                        color="primary"
-                                                        id="hiddenLivestream"
-                                                        name="hiddenLivestream"
-                                                        inputProps={{'aria-label': 'primary checkbox'}}
-                                                    />}
-                                                label="Hidden"
-                                            />
-                                        </div>
+                                        <FormControlLabel
+                                            labelPlacement="start"
+                                            control={
+                                                <Switch
+                                                    checked={values.hiddenLivestream}
+                                                    onChange={handleChange}
+                                                    color="primary"
+                                                    id="hiddenLivestream"
+                                                    name="hiddenLivestream"
+                                                    inputProps={{'aria-label': 'primary checkbox'}}
+                                                />}
+                                            label="Hidden"
+                                        />
                                     </Grid>
                                     <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                                         <ImageSelect
@@ -409,16 +408,17 @@ const NewLivestreamForm = ({firebase}) => {
 
                                 {Object.keys(values.speakers).map((key, index) => {
                                     return (
-                                        <>
+                                        <Fragment key={key}>
                                             <Box display="flex" justifyContent="space-between" alignItems="center">
-                                                <Typography style={{color: "white"}} variant="h4">{index === 0 ? "Main Speaker" : `Speaker ${index + 1}`}</Typography>
+                                                <Typography style={{color: "white"}}
+                                                            variant="h4">{index === 0 ? "Main Speaker" : `Speaker ${index + 1}`}</Typography>
                                                 {!!index && <Button onClick={() => handleDeleteSpeaker(key)}
                                                                     variant="contained" color="secondary"
                                                                     startIcon={<HighlightOffIcon/>}>
                                                     Delete</Button>}
                                             </Box>
                                             <Box className={classes.formGroup} borderRadius={4} component={Grid}
-                                                 boxShadow={1} spacing={2} p={2} container>
+                                                 boxShadow={1} spacing={2} p={1} container>
                                                 <SpeakerForm objectKey={key}
                                                              index={index}
                                                              handleDeleteSpeaker={handleDeleteSpeaker}
@@ -447,11 +447,11 @@ const NewLivestreamForm = ({firebase}) => {
                                                     </Button>
                                                 </Grid>}
                                             </Box>
-                                        </>
+                                        </Fragment>
                                     )
                                 })}
 
-                                <Box className={classes.formGroup} borderRadius={4} component={Grid} boxShadow={1} p={2}
+                                <Box className={classes.formGroup} borderRadius={4} component={Grid} boxShadow={1} p={1}
                                      spacing={2} container>
                                     <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                                         <FormControl fullWidth>
@@ -494,8 +494,12 @@ const NewLivestreamForm = ({firebase}) => {
                                                                  group={group}/>
                                         </Grid>
                                     })}
+                                </Box>
+                                <Box className={classes.formGroup} borderRadius={4} component={Grid} boxShadow={1} p={1}
+                                     spacing={2} container>
                                     <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
-                                        <Button type="submit" color="primary" variant="contained" fullWidth>
+                                        <Button type="submit" style={{background: "rgb(44, 66, 81)", color: "white"}}
+                                                variant="contained" fullWidth>
                                             Create Livestream
                                         </Button>
                                     </Grid>
@@ -503,7 +507,7 @@ const NewLivestreamForm = ({firebase}) => {
                             </form>
                         )
                     }}
-                </Formik> : <CircularProgress style={{marginTop: "30vh"}} color="primary"/>}
+                </Formik> : <CircularProgress style={{marginTop: "30vh", color: "white"}}/>}
             </Container>
         </>
     );

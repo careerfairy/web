@@ -172,7 +172,7 @@ const ImageSelect =
                         })
                     }}
                 >
-                    <Button startIcon={<PublishIcon/>} fullWidth style={{marginTop: "0.5rem"}} variant="outlined" id='upButton'>
+                    <Button startIcon={<PublishIcon/>} fullWidth style={{marginTop: "0.5rem"}} color="primary" variant="outlined" id='upButton'>
                         {`-OR - Upload`}</Button>
                 </FilePickerContainer>
                 <Collapse in={Boolean(filePickerError)}>

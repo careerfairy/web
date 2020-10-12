@@ -43,8 +43,7 @@ const GroupCategorySelect = ({group, handleSetGroupCategories}) => {
             )}
             renderTags={(value, getTagProps) =>
                 value.map((option, index) => (
-                    <Chip color="primary"
-                          variant="default"
+                    <Chip variant="outlined"
                           label={option.name}
                           {...getTagProps({index})}
                     />

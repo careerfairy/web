@@ -45,8 +45,7 @@ const MultiGroupSelect = (
             )}
             renderTags={(value, getTagProps) =>
                 value.map((option, index) => (
-                    <Chip color="primary"
-                          variant="default"
+                    <Chip variant="default"
                           label={option.universityName}
                           {...getTagProps({index})}
                     />
