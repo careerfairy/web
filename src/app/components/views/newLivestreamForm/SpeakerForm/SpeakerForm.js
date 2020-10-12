@@ -24,17 +24,13 @@ const SpeakerForm = (
         positionError,
         backgroundError,
         firebase,
-        index,
         speaker,
         objectKey,
         setFieldValue,
-        handleDeleteSpeaker,
-        touched,
         handleBlur,
         submitting,
         loading,
         getDownloadUrl,
-        values,
     }) => {
     const classes = useStyles()
 
