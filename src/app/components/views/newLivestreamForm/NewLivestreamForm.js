@@ -24,6 +24,7 @@ import {
 import DateFnsUtils from "@date-io/date-fns";
 import SpeakerForm from "./SpeakerForm/SpeakerForm";
 import MultiGroupSelect from "./MultiGroupSelect/MultiGroupSelect";
+import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
 
 
 const useStyles = makeStyles(theme => ({
@@ -75,15 +76,15 @@ const NewLivestreamForm = ({firebase}) => {
         companyId: '',
         title: '',
         targetBackgrounds: [],
+        targetCategories: {},
         universities: [],
         groupIds: [],
         startDate: new Date(),
         hiddenLivestream: false,
+        summary: '',
         speakers: {
             [id]: speakerObj,
-        }
-        ,
-        summary: ''
+        },
     })
 
     const [existingLogos, setExistingLogos] = useState([]);
@@ -96,7 +97,8 @@ const NewLivestreamForm = ({firebase}) => {
     const [fetchingGroups, setFetchingGroups] = useState([]);
     const [allFetched, setAllFetched] = useState(false)
     const [selectedGroups, setSelectedGroups] = useState([])
-    console.log("-> selectedGroups", selectedGroups);
+    const [targetCategories, setTargetCategories] = useState({})
+    console.log("-> targetCategories", targetCategories);
 
     useEffect(() => {
         firebase.getStorageRef().child('company-logos').listAll().then(res => {
@@ -161,6 +163,27 @@ const NewLivestreamForm = ({firebase}) => {
         }
     }, [fetchingAvatars, fetchingBackgrounds, fetchingLogos])
 
+    const handleAddTargetCategories = (arrayOfIds) => {
+        const oldTargetCategories = {...targetCategories}
+        const newTargetCategories = {}
+        arrayOfIds.forEach(id => {
+            if (!oldTargetCategories[id]) {
+                newTargetCategories[id] = []
+            } else {
+                newTargetCategories[id] = oldTargetCategories[id]
+            }
+        })
+        setTargetCategories(newTargetCategories)
+    }
+
+    const handleSetGroupCategories = (groupId, targetOptionIds) => {
+        const newTargetCategories = {...targetCategories}
+        if (newTargetCategories[groupId]) {
+            newTargetCategories[groupId] = targetOptionIds
+            setTargetCategories(newTargetCategories)
+        }
+    }
+
     const getDownloadUrl = (fileElement) => {
         if (fileElement) {
             return 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/' + fileElement.replace('/', '%2F') + '?alt=media';
@@ -168,6 +191,18 @@ const NewLivestreamForm = ({firebase}) => {
             console.log("-> no fileElement", fileElement);
             return '';
         }
+    }
+
+    const handleFlattenOptions = (group) => {
+        let optionsArray = []
+        if (group.categories && group.categories.length) {
+            group.categories.forEach(category => {
+                if (category.options && category.options.length) {
+                    category.options.forEach(option => optionsArray.push(option))
+                }
+            })
+        }
+        return optionsArray
     }
 
     return (
@@ -250,9 +285,9 @@ const NewLivestreamForm = ({firebase}) => {
                     }
 
                     const handleDeleteSpeaker = (key) => {
-                        const newFormData = {...formData}
-                        delete newFormData.speakers[key]
-                        setFormData(newFormData)
+                        const newValues = {...values}
+                        delete newValues.speakers[key]
+                        setValues(newValues)
                     }
                     return (
                         <form className={classes.form} onSubmit={handleSubmit}>
@@ -433,11 +468,20 @@ const NewLivestreamForm = ({firebase}) => {
                                     <MultiGroupSelect handleChange={handleChange}
                                                       handleBlur={handleBlur}
                                                       values={values}
+                                                      handleAddTargetCategories={handleAddTargetCategories}
+                                                      selectedGroups={selectedGroups}
+                                                      handleFlattenOptions={handleFlattenOptions}
                                                       setSelectedGroups={setSelectedGroups}
                                                       setFieldValue={setFieldValue}
                                                       value={values.groupIds}
                                                       groups={existingGroups}/>
                                 </Grid>
+                                {selectedGroups.map(group => {
+                                    return <Grid key={group.groupId} xs={12} sm={6} md={6} lg={4} xl={4} item>
+                                        <GroupCategorySelect handleSetGroupCategories={handleSetGroupCategories}
+                                                             group={group}/>
+                                    </Grid>
+                                })}
                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                                     <Button type="submit" color="primary" variant="contained" fullWidth>
                                         Create Livestream
