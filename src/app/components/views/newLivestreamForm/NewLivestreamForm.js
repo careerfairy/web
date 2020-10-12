@@ -25,6 +25,7 @@ import DateFnsUtils from "@date-io/date-fns";
 import SpeakerForm from "./SpeakerForm/SpeakerForm";
 import MultiGroupSelect from "./MultiGroupSelect/MultiGroupSelect";
 import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 
 
 const useStyles = makeStyles(theme => ({
@@ -54,11 +55,6 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         justifyContent: "center"
     },
-    field: {
-        "& .MuiOutlinedInput-root": {
-            boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)"
-        }
-    }
 
 }));
 
@@ -294,7 +290,7 @@ const NewLivestreamForm = ({firebase}) => {
                         }
                         return (
                             <form className={classes.form} onSubmit={handleSubmit}>
-                                <Box className={classes.formGroup} borderRadius={4} component={Grid} boxShadow={1} p={3}
+                                <Box className={classes.formGroup} borderRadius={4} component={Grid} boxShadow={1} p={2}
                                      spacing={2} container>
                                     <Grid xs={7} sm={7} md={10} lg={10} xl={10} item>
                                         <FormControl fullWidth>
@@ -403,7 +399,6 @@ const NewLivestreamForm = ({firebase}) => {
                                     <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                                         <MuiPickersUtilsProvider utils={DateFnsUtils}>
                                             <DateTimePicker inputVariant="outlined" fullWidth variant="outlined"
-                                                            className={classes.field}
                                                             label="Livestream Start Date" value={values.startDate}
                                                             onChange={(value) => {
                                                                 setFieldValue('startDate', new Date(value), true)
@@ -414,39 +409,49 @@ const NewLivestreamForm = ({firebase}) => {
 
                                 {Object.keys(values.speakers).map((key, index) => {
                                     return (
-                                        <Box className={classes.formGroup} borderRadius={4} component={Grid}
-                                             boxShadow={1} spacing={2} p={3} container>
-                                            <SpeakerForm objectKey={key}
-                                                         index={index}
-                                                         handleDeleteSpeaker={handleDeleteSpeaker}
-                                                         errors={errors}
-                                                         firstNameError={handleError(key, "firstName")}
-                                                         lastNameError={handleError(key, "lastName")}
-                                                         positionError={handleError(key, "position")}
-                                                         backgroundError={handleError(key, "background")}
-                                                         getDownloadUrl={getDownloadUrl}
-                                                         loading={fetchingAvatars}
-                                                         speaker={values.speakers[key]}
-                                                         values={values}
-                                                         touched={touched}
-                                                         firebase={firebase}
-                                                         setFieldValue={setFieldValue}
-                                                         submitting={isSubmitting}
-                                                         path="mentors-pictures"
-                                                         handleBlur={handleBlur}
-                                                         options={existingAvatars}
-                                            />
-                                            {index === Object.keys(values.speakers).length - 1 &&
-                                                <Button startIcon={<PersonAddIcon/>} onClick={handleAddSpeaker}
-                                                        style={{marginTop: "1rem"}}
-                                                        type="button" color="primary" variant="contained" fullWidth>
-                                                    Add a Speaker
-                                                </Button>}
-                                        </Box>
+                                        <>
+                                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                <Typography style={{color: "white"}} variant="h4">{index === 0 ? "Main Speaker" : `Speaker ${index + 1}`}</Typography>
+                                                {!!index && <Button onClick={() => handleDeleteSpeaker(key)}
+                                                                    variant="contained" color="secondary"
+                                                                    startIcon={<HighlightOffIcon/>}>
+                                                    Delete</Button>}
+                                            </Box>
+                                            <Box className={classes.formGroup} borderRadius={4} component={Grid}
+                                                 boxShadow={1} spacing={2} p={2} container>
+                                                <SpeakerForm objectKey={key}
+                                                             index={index}
+                                                             handleDeleteSpeaker={handleDeleteSpeaker}
+                                                             errors={errors}
+                                                             firstNameError={handleError(key, "firstName")}
+                                                             lastNameError={handleError(key, "lastName")}
+                                                             positionError={handleError(key, "position")}
+                                                             backgroundError={handleError(key, "background")}
+                                                             getDownloadUrl={getDownloadUrl}
+                                                             loading={fetchingAvatars}
+                                                             speaker={values.speakers[key]}
+                                                             values={values}
+                                                             touched={touched}
+                                                             firebase={firebase}
+                                                             setFieldValue={setFieldValue}
+                                                             submitting={isSubmitting}
+                                                             path="mentors-pictures"
+                                                             handleBlur={handleBlur}
+                                                             options={existingAvatars}
+                                                />
+                                                {index === Object.keys(values.speakers).length - 1 &&
+                                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                                                    <Button startIcon={<PersonAddIcon/>} onClick={handleAddSpeaker}
+                                                            type="button" color="primary" variant="contained" fullWidth>
+                                                        Add a Speaker
+                                                    </Button>
+                                                </Grid>}
+                                            </Box>
+                                        </>
                                     )
                                 })}
 
-                                <Box className={classes.formGroup} borderRadius={4} component={Grid} boxShadow={1} p={3}
+                                <Box className={classes.formGroup} borderRadius={4} component={Grid} boxShadow={1} p={2}
                                      spacing={2} container>
                                     <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                                         <FormControl fullWidth>
