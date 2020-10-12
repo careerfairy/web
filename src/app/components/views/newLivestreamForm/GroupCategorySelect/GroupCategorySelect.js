@@ -23,20 +23,23 @@ const GroupCategorySelect = ({group, handleSetGroupCategories}) => {
 
     const handleMultiSelect = (event, selectedOptions) => {
         const optionIdsArray = selectedOptions.map(option => option.id)
-        handleSetGroupCategories(optionIdsArray)
+        handleSetGroupCategories(group.groupId, optionIdsArray)
     }
+
+    const label = group.flattenedOptions.length ? `${group.universityName} Options` : `${group.universityName} has no options`
 
     return (
         <Autocomplete
             id="groupIds"
             name="groupIds"
             multiple
+            disabled={!group.flattenedOptions.length}
             options={group.flattenedOptions || []}
             onChange={handleMultiSelect}
             getOptionLabel={(option) => option.name}
             renderInput={(params) => (
-                <TextField {...params} variant="outlined" label={`${group.universityName} Options`}
-                           placeholder="Add partner groups"/>
+                <TextField {...params} variant="outlined" label={label}
+                           placeholder="Add another option"/>
             )}
             renderTags={(value, getTagProps) =>
                 value.map((option, index) => (

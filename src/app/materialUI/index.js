@@ -23,6 +23,7 @@ let baseTheme = createMuiTheme({
     },
     MuiInputBase: {
       root:{
+        backgroundColor: "white"
       }
     },
   },

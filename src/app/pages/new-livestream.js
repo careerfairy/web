@@ -1,4 +1,9 @@
-import {GlobalBackground, GreyBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
+import {
+    DarkBackground,
+    GlobalBackground,
+    GreyBackground,
+    TealBackground
+} from "../materialUI/GlobalBackground/GlobalBackGround";
 import Head from "next/head";
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
@@ -9,7 +14,7 @@ import React from "react";
 const newLivestreams = () => {
 
     return (
-        <GreyBackground>
+        <TealBackground>
             <Head>
                 <title key="title">CareerFairy | Create Live Streams</title>
             </Head>
@@ -18,7 +23,7 @@ const newLivestreams = () => {
             </div>
             <NewLivestreamForm/>
             <Footer/>
-        </GreyBackground>
+        </TealBackground>
     );
 };
 
