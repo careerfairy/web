@@ -20,7 +20,11 @@ let baseTheme = createMuiTheme({
         margin: "0.5em",
         marginLeft: 0,
       }
-    }
+    },
+    MuiInputBase: {
+      root:{
+      }
+    },
   },
 
   typography: {

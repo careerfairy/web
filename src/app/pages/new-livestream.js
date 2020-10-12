@@ -9,7 +9,7 @@ import React from "react";
 const newLivestreams = () => {
 
     return (
-        <GlobalBackground>
+        <GreyBackground>
             <Head>
                 <title key="title">CareerFairy | Create Live Streams</title>
             </Head>
@@ -18,7 +18,7 @@ const newLivestreams = () => {
             </div>
             <NewLivestreamForm/>
             <Footer/>
-        </GlobalBackground>
+        </GreyBackground>
     );
 };
 

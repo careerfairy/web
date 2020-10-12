@@ -15,12 +15,14 @@ import {v4 as uuidv4} from 'uuid';
 import {withFirebase} from "../../../context/firebase";
 import ImageSelect from "./ImageSelect/ImageSelect";
 import {makeStyles} from "@material-ui/core/styles";
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import {
     DateTimePicker,
     MuiPickersUtilsProvider,
 } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import SpeakerForm from "./SpeakerForm/SpeakerForm";
+import MultiGroupSelect from "./MultiGroupSelect/MultiGroupSelect";
 
 
 const useStyles = makeStyles(theme => ({
@@ -54,9 +56,9 @@ const speakerObj = {
     background: ''
 }
 
+const id = uuidv4()
 const NewLivestreamForm = ({firebase}) => {
     const classes = useStyles()
-    const id = uuidv4()
     const [formData, setFormData] = useState({
         logoUrl: '',
         backgroundUrl: '',
@@ -65,10 +67,11 @@ const NewLivestreamForm = ({firebase}) => {
         title: '',
         targetBackgrounds: [],
         universities: [],
+        groupIds: [],
         startDate: new Date(),
         hiddenLivestream: false,
         speakers: {
-            [uuidv4()]: speakerObj,
+            [id]: speakerObj,
         }
         ,
         summary: ''
@@ -80,6 +83,8 @@ const NewLivestreamForm = ({firebase}) => {
     const [fetchingBackgrounds, setFetchingBackgrounds] = useState(true)
     const [existingAvatars, setExistingAvatars] = useState([]);
     const [fetchingAvatars, setFetchingAvatars] = useState(true)
+    const [existingGroups, setExistingGroups] = useState([]);
+    const [fetchingGroups, setFetchingGroups] = useState([]);
     const [allFetched, setAllFetched] = useState(false)
 
     useEffect(() => {
@@ -125,6 +130,20 @@ const NewLivestreamForm = ({firebase}) => {
     }, [firebase]);
 
     useEffect(() => {
+        const unsubscribe = firebase.listenToGroups(querySnapshot => {
+            let careerCenters = [];
+            querySnapshot.forEach(doc => {
+                let careerCenter = doc.data();
+                careerCenter.id = doc.id;
+                careerCenters.push(careerCenter);
+            })
+            setExistingGroups(careerCenters);
+        });
+        return () => unsubscribe();
+
+    }, []);
+
+    useEffect(() => {
         if (!fetchingBackgrounds && !fetchingLogos && !fetchingAvatars) {
             setAllFetched(true)
         }
@@ -138,14 +157,6 @@ const NewLivestreamForm = ({firebase}) => {
             return '';
         }
     }
-
-
-    const handleDeleteSpeaker = (id) => {
-        const newFormData = {...formData}
-        delete newFormData.speakers[id]
-        setFormData(newFormData)
-    }
-
 
     return allFetched ? (
         <Container className={classes.root}>
@@ -169,11 +180,9 @@ const NewLivestreamForm = ({firebase}) => {
                     if (!values.title) {
                         errors.title = 'Required';
                     }
-                    if (!values.universities || values.universities.length < 1) {
-                        errors.targetBackgrounds = 'Required';
-                    }
 
                     Object.keys(values.speakers).forEach((key) => {
+                        errors.speakers[key] = {}
                         if (!values.speakers[key].firstName) {
                             errors.speakers[key].firstName = 'Required';
                         }
@@ -187,8 +196,6 @@ const NewLivestreamForm = ({firebase}) => {
                             errors.speakers[key].background = 'Required';
                         }
                     })
-                    console.log("-> errors", errors);
-
                     return errors;
                 }}
                 onSubmit={(values, {setSubmitting}) => {
@@ -222,6 +229,18 @@ const NewLivestreamForm = ({firebase}) => {
                         const newValues = {...values}
                         newValues.speakers[uuidv4()] = speakerObj
                         setValues(newValues)
+                    }
+
+                    const handleError = (key, fieldName) => {
+                        const baseError = errors && errors.speakers && errors.speakers[key] && errors.speakers[key][fieldName]
+                        const baseTouched = touched && touched.speakers && touched.speakers[key] && touched.speakers[key][fieldName]
+                        return baseError && baseTouched && baseError
+                    }
+
+                    const handleDeleteSpeaker = (key) => {
+                        const newFormData = {...formData}
+                        delete newFormData.speakers[key]
+                        setFormData(newFormData)
                     }
                     return (
                         <form className={classes.form} onSubmit={handleSubmit}>
@@ -339,16 +358,17 @@ const NewLivestreamForm = ({firebase}) => {
                                                         }}/>
                                     </MuiPickersUtilsProvider>
                                 </Grid>
-                                {Object.keys(values.speakers).map((key) => {
-                                    const baseError = errors && errors.speakers && errors.speakers[key]
+                                {Object.keys(values.speakers).map((key, index) => {
                                     return (
                                         <Grid key={key} xs={12} sm={12} md={12} lg={12} xl={12} item>
                                             <SpeakerForm objectKey={key}
+                                                         index={index}
+                                                         handleDeleteSpeaker={handleDeleteSpeaker}
                                                          errors={errors}
-                                                         firstNameError={baseError && errors.speakers[key].firstName}
-                                                         lastNameError={baseError && errors.speakers[key].lastName}
-                                                         positionError={baseError && errors.speakers[key].position}
-                                                         backgroundError={baseError && errors.speakers[key].background}
+                                                         firstNameError={handleError(key, "firstName")}
+                                                         lastNameError={handleError(key, "lastName")}
+                                                         positionError={handleError(key, "position")}
+                                                         backgroundError={handleError(key, "background")}
                                                          getDownloadUrl={getDownloadUrl}
                                                          loading={fetchingAvatars}
                                                          speaker={values.speakers[key]}
@@ -365,13 +385,44 @@ const NewLivestreamForm = ({firebase}) => {
                                     )
                                 })}
                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
-                                    <Button onClick={handleAddSpeaker} color="primary" variant="contained" fullWidth>
-                                        Add Speaker
+                                    <Button startIcon={<PersonAddIcon/>} onClick={handleAddSpeaker} type="button"
+                                            color="primary" fullWidth>
+                                        Add a Speaker
                                     </Button>
+                                </Grid>
+                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                                    <FormControl fullWidth>
+                                        <TextField name="summary"
+                                                   variant="outlined"
+                                                   fullWidth
+                                                   multiline
+                                                   id="summary"
+                                                   label="Summary"
+                                                   rows={2}
+                                                   rowsMax={5}
+                                                   inputProps={{maxLength: 200}}
+                                                   onBlur={handleBlur}
+                                                   value={values.summary}
+                                                   disabled={isSubmitting}
+                                                   error={Boolean(errors.summary && touched.summary && errors.summary)}
+                                                   onChange={handleChange}/>
+                                        <Collapse in={Boolean(errors.summary && touched.summary)}>
+                                            <FormHelperText error>
+                                                {errors.summary}
+                                            </FormHelperText>
+                                        </Collapse>
+                                    </FormControl>
+                                </Grid>
+                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                                    <MultiGroupSelect handleChange={handleChange}
+                                                      handleBlur={handleBlur}
+                                                      values={values}
+                                                      value={values.groupIds}
+                                                      groups={existingGroups} />
                                 </Grid>
                             </Grid>
                             <Button type="submit" color="primary" variant="contained" fullWidth>
-                                Create
+                                Submit
                             </Button>
                         </form>
                     )

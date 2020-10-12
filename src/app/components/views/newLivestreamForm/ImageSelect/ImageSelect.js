@@ -13,6 +13,7 @@ import {
 import TextField from "@material-ui/core/TextField";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import match from "autosuggest-highlight/match";
+import PublishIcon from '@material-ui/icons/Publish';
 import parse from "autosuggest-highlight/parse";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import {uploadLogo} from "../../../helperFunctions/HelperFunctions";
@@ -60,7 +61,6 @@ const ImageSelect =
          formName,
          label,
          loading,
-         values,
          submitting,
          handleBlur,
          getDownloadUrl,
@@ -172,7 +172,7 @@ const ImageSelect =
                         })
                     }}
                 >
-                    <Button fullWidth style={{marginTop: "0.5rem"}} variant="contained" id='upButton'>
+                    <Button startIcon={<PublishIcon/>} fullWidth style={{marginTop: "0.5rem"}} variant="outlined" id='upButton'>
                         {`-OR - Upload`}</Button>
                 </FilePickerContainer>
                 <Collapse in={Boolean(filePickerError)}>
