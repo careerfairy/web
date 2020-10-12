@@ -1,12 +1,14 @@
 import React from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import {TextField} from '@material-ui/core'
+import {Chip, TextField} from '@material-ui/core'
 
 
-const MultiGroupSelect = ({value, values, groups, handleBlur, handleChange, setFieldValue}) => {
+const MultiGroupSelect = ({groups, setSelectedGroups, setFieldValue}) => {
 
     const handleMultiSelect = (event, selectedOptions) => {
+
         const groupIdsArray = selectedOptions.map(option => option.groupId)
+        setSelectedGroups(selectedOptions)
         setFieldValue("groupIds", groupIdsArray)
     }
 
@@ -19,8 +21,18 @@ const MultiGroupSelect = ({value, values, groups, handleBlur, handleChange, setF
             onChange={handleMultiSelect}
             getOptionLabel={(option) => option.universityName}
             renderInput={(params) => (
-                <TextField {...params} variant="outlined" label="Add some Universities" placeholder="Favorites"/>
+                <TextField {...params} variant="outlined" label="Add some Universities"
+                           placeholder="Add partner groups"/>
             )}
+            renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                    <Chip color="primary"
+                        variant="default"
+                        label={option.universityName}
+                        {...getTagProps({index})}
+                    />
+                ))
+            }
         />
     ) : null;
 };

@@ -48,7 +48,7 @@ const SpeakerForm = (
         <Collapse in={animate}>
             <Box display="flex" justifyContent="space-between" alignItems="center">
             <Typography gutterBottom variant="h3">{index === 0 ? "Main Speaker" : `Speaker ${index + 1}`}</Typography>
-                {index && <Button onClick={() => handleDeleteSpeaker(objectKey)} startIcon={<HighlightOffIcon/>} style={{color: "red"}}>Delete</Button>}
+                {!!index && <Button onClick={() => handleDeleteSpeaker(objectKey)} startIcon={<HighlightOffIcon/>} style={{color: "red"}}>Delete</Button>}
             </Box>
             <Grid spacing={2} style={{display: "flex"}} container>
                 <Grid className={classes.formGrid} xs={12} sm={12} md={12} lg={6} xl={6} item>

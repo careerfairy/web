@@ -6,6 +6,7 @@ import {
     TextField,
     FormControl,
     Collapse,
+    CircularProgress,
     FormHelperText,
     Switch,
     FormControlLabel, Button
@@ -30,8 +31,11 @@ const useStyles = makeStyles(theme => ({
         flex: 1,
         display: "flex",
         flexDirection: "column",
-        minHeight: 700,
+        alignItems: "center",
+        minHeight: "90vh",
         background: "white",
+        paddingTop: 20,
+        paddingBottom: 40
     },
     form: {
         width: "100%"
@@ -45,6 +49,11 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         justifyContent: "center"
     },
+    field: {
+        "& .MuiOutlinedInput-root": {
+            boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)"
+        }
+    }
 
 }));
 
@@ -86,6 +95,8 @@ const NewLivestreamForm = ({firebase}) => {
     const [existingGroups, setExistingGroups] = useState([]);
     const [fetchingGroups, setFetchingGroups] = useState([]);
     const [allFetched, setAllFetched] = useState(false)
+    const [selectedGroups, setSelectedGroups] = useState([])
+    console.log("-> selectedGroups", selectedGroups);
 
     useEffect(() => {
         firebase.getStorageRef().child('company-logos').listAll().then(res => {
@@ -135,6 +146,7 @@ const NewLivestreamForm = ({firebase}) => {
             querySnapshot.forEach(doc => {
                 let careerCenter = doc.data();
                 careerCenter.id = doc.id;
+                careerCenter.selected = false
                 careerCenters.push(careerCenter);
             })
             setExistingGroups(careerCenters);
@@ -158,10 +170,10 @@ const NewLivestreamForm = ({firebase}) => {
         }
     }
 
-    return allFetched ? (
+    return (
         <Container className={classes.root}>
             <Typography variant="h3" align="center" gutterBottom>Create a Livestream</Typography>
-            <Formik
+            {allFetched ? <Formik
                 initialValues={formData}
                 validate={values => {
                     let errors = {speakers: {}};
@@ -276,6 +288,7 @@ const NewLivestreamForm = ({firebase}) => {
                                         <TextField name="company"
                                                    variant="outlined"
                                                    fullWidth
+                                                   className={classes.field}
                                                    id="company"
                                                    label="Company Name"
                                                    inputProps={{maxLength: 70}}
@@ -297,6 +310,7 @@ const NewLivestreamForm = ({firebase}) => {
                                                    variant="outlined"
                                                    fullWidth
                                                    id="companyId"
+                                                   className={classes.field}
                                                    label="Company ID"
                                                    inputProps={{maxLength: 70}}
                                                    onBlur={handleBlur}
@@ -317,6 +331,7 @@ const NewLivestreamForm = ({firebase}) => {
                                                    variant="outlined"
                                                    fullWidth
                                                    id="title"
+                                                   className={classes.field}
                                                    label="Livestream Title"
                                                    inputProps={{maxLength: 70}}
                                                    onBlur={handleBlur}
@@ -352,6 +367,7 @@ const NewLivestreamForm = ({firebase}) => {
                                 <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                                         <DateTimePicker inputVariant="outlined" fullWidth variant="outlined"
+                                                        className={classes.field}
                                                         label="Livestream Start Date" value={values.startDate}
                                                         onChange={(value) => {
                                                             setFieldValue('startDate', new Date(value), true)
@@ -417,20 +433,23 @@ const NewLivestreamForm = ({firebase}) => {
                                     <MultiGroupSelect handleChange={handleChange}
                                                       handleBlur={handleBlur}
                                                       values={values}
+                                                      setSelectedGroups={setSelectedGroups}
                                                       setFieldValue={setFieldValue}
                                                       value={values.groupIds}
-                                                      groups={existingGroups} />
+                                                      groups={existingGroups}/>
+                                </Grid>
+                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                                    <Button type="submit" color="primary" variant="contained" fullWidth>
+                                        Create Livestream
+                                    </Button>
                                 </Grid>
                             </Grid>
-                            <Button type="submit" color="primary" variant="contained" fullWidth>
-                                Submit
-                            </Button>
                         </form>
                     )
                 }}
-            </Formik>
+            </Formik> : <CircularProgress style={{marginTop: "30vh"}} color="primary"/>}
         </Container>
-    ) : null;
+    );
 };
 
 export default withFirebase(NewLivestreamForm);
