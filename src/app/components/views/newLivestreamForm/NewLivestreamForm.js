@@ -417,6 +417,7 @@ const NewLivestreamForm = ({firebase}) => {
                                     <MultiGroupSelect handleChange={handleChange}
                                                       handleBlur={handleBlur}
                                                       values={values}
+                                                      setFieldValue={setFieldValue}
                                                       value={values.groupIds}
                                                       groups={existingGroups} />
                                 </Grid>
