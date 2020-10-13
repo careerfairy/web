@@ -1008,6 +1008,15 @@ class Firebase {
         });
     };
 
+    setUserIsParticipating = (livestreamId, userData) => {
+      let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("participatingStudents")
+            .doc(userData.userEmail);
+        return ref.set(userData);
+    }
+
     getRegisteredStudentsInLivestream = (livestreamId) => {
         let ref = this.firestore
             .collection("livestreams")

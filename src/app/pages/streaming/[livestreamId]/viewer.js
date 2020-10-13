@@ -41,6 +41,12 @@ function ViewerPage(props) {
     }, [width]);
 
     useEffect(() => {
+        if (userData && livestreamId) {
+            props.firebase.setUserIsParticipating(livestreamId, userData);
+        }
+    }, [livestreamId, userData]);
+
+    useEffect(() => {
         if (livestreamId) {
             props.firebase.listenToScheduledLivestreamById(livestreamId, querySnapshot => {
                 let livestream = querySnapshot.data();
