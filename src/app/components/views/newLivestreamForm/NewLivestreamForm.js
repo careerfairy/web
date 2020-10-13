@@ -25,6 +25,7 @@ import SpeakerForm from "./SpeakerForm/SpeakerForm";
 import MultiGroupSelect from "./MultiGroupSelect/MultiGroupSelect";
 import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import {useRouter} from "next/router";
 
 
 const useStyles = makeStyles(theme => ({
@@ -57,36 +58,97 @@ const speakerObj = {
 
 const mainSpeakerId = uuidv4()
 const NewLivestreamForm = ({firebase}) => {
+    const router = useRouter()
+    const {
+        query: {livestreamId},
+    } = router;
+    // getLivestreamSpeakers
     const classes = useStyles()
+
+    const [targetCategories, setTargetCategories] = useState({})
+    const [selectedGroups, setSelectedGroups] = useState([])
+
+    const [fetchingBackgrounds, setFetchingBackgrounds] = useState(true)
+    const [fetchingLogos, setFetchingLogos] = useState(true)
+    const [fetchingGroups, setFetchingGroups] = useState(true);
+    const [fetchingAvatars, setFetchingAvatars] = useState(true)
+
+    const [allFetched, setAllFetched] = useState(false)
+
+    const [existingLogos, setExistingLogos] = useState([]);
+    const [existingAvatars, setExistingAvatars] = useState([]);
+    const [existingBackgrounds, setExistingBackgrounds] = useState([]);
+    const [existingGroups, setExistingGroups] = useState([]);
+
     const [formData, setFormData] = useState({
-        logoUrl: '',
-        backgroundUrl: '',
+        companyLogoUrl: '',
+        backgroundImageUrl: '',
         company: '',
         companyId: '',
         title: '',
-        targetBackgrounds: [],
         targetCategories: {},
-        universities: [],
         groupIds: [],
-        startDate: new Date(),
-        hiddenLivestream: false,
+        start: new Date(),
+        hidden: false,
         summary: '',
         speakers: {
             [mainSpeakerId]: speakerObj,
         },
     })
+    // console.log("-> formData", formData);
 
-    const [existingLogos, setExistingLogos] = useState([]);
-    const [fetchingLogos, setFetchingLogos] = useState(true)
-    const [existingBackgrounds, setExistingBackgrounds] = useState([]);
-    const [fetchingBackgrounds, setFetchingBackgrounds] = useState(true)
-    const [existingAvatars, setExistingAvatars] = useState([]);
-    const [fetchingAvatars, setFetchingAvatars] = useState(true)
-    const [existingGroups, setExistingGroups] = useState([]);
-    const [fetchingGroups, setFetchingGroups] = useState([]);
-    const [allFetched, setAllFetched] = useState(false)
-    const [selectedGroups, setSelectedGroups] = useState([])
-    const [targetCategories, setTargetCategories] = useState({})
+    useEffect(() => {
+        console.log("-> livestreamId", livestreamId);
+        if (livestreamId) {
+            (async () => {
+                const querySnapshot = await firebase.getLivestreamById(livestreamId)
+                if (querySnapshot.exists) {
+                    // debugger
+                    let livestream = querySnapshot.data()
+                    console.log("-> livestream", livestream);
+                    livestream.id = livestreamId
+                    setFormData({
+                        companyLogoUrl: livestream.companyLogoUrl || "",
+                        backgroundImageUrl: livestream.backgroundImageUrl || "",
+                        company: livestream.company || "",
+                        companyId: livestream.companyId || "",
+                        title: livestream.title || "",
+                        targetCategories: {},
+                        groupIds: livestream.groupIds || [],
+                        start: livestream.start.toDate() || new Date(),
+                        hidden: livestream.hidden || false,
+                        summary: livestream.summary || "",
+                        speakers: {
+                            [mainSpeakerId]: handleGetMainSpeaker(livestream),
+                        },
+                    })
+                    setTargetCategories(livestream.targetCategories || {})
+                }
+            })()
+        }
+    }, [livestreamId])
+
+    const handleSetDefaultGroups = (arrayOfGroupIds) => {
+        arrayOfGroupIds.forEach(group => {
+
+        })
+    }
+
+    const handleGetMainSpeaker = (streamObj) => {
+        if (streamObj.mainSpeakerName.length) {
+            const fullnameArray = streamObj.mainSpeakerName.split(/[ ]+/)
+            return {
+                firstName: fullnameArray[0],
+                lastName: fullnameArray[1],
+                avatarUrl: streamObj.mainSpeakerAvatar,
+                background: streamObj.mainSpeakerBackground,
+                position: streamObj.mainSpeakerPosition
+            }
+        } else {
+            return speakerObj
+        }
+    }
+
 
     useEffect(() => {
         firebase.getStorageRef().child('company-logos').listAll().then(res => {
@@ -150,7 +212,7 @@ const NewLivestreamForm = ({firebase}) => {
         if (!fetchingBackgrounds && !fetchingLogos && !fetchingAvatars && !fetchingGroups) {
             setAllFetched(true)
         }
-    }, [fetchingAvatars, fetchingBackgrounds, fetchingLogos])
+    }, [fetchingAvatars, fetchingBackgrounds, fetchingLogos, fetchingGroups])
 
     const handleAddTargetCategories = (arrayOfIds) => {
         const oldTargetCategories = {...targetCategories}
@@ -194,24 +256,24 @@ const NewLivestreamForm = ({firebase}) => {
 
     const buildLivestreamObject = (values) => {
         return {
-            backgroundImageUrl: values.backgroundUrl,
+            backgroundImageUrl: values.backgroundImageUrl,
             company: values.company,
             companyId: values.companyId,
             title: values.title,
-            companyLogoUrl: values.logoUrl,
+            companyLogoUrl: values.companyLogoUrl,
             mainSpeakerAvatar: values.speakers[mainSpeakerId].avatarUrl,
             mainSpeakerBackground: values.speakers[mainSpeakerId].background,
             mainSpeakerPosition: values.speakers[mainSpeakerId].position,
             mainSpeakerName: values.speakers[mainSpeakerId].firstName + ' ' + values.speakers[mainSpeakerId].lastName,
             registeredUsers: [],
-            start: firebase.getFirebaseTimestamp(values.startDate),
+            start: firebase.getFirebaseTimestamp(values.start),
             targetGroups: [],
             targetCategories: targetCategories,
             type: 'upcoming',
             test: true,
             groupIds: values.groupIds,
-            hidden: values.hiddenLivestream,
-            universities: values.universities,
+            hidden: values.hidden,
+            universities: [],
             summary: values.summary
         }
     }
@@ -254,13 +316,14 @@ const NewLivestreamForm = ({firebase}) => {
             <Container className={classes.root}>
                 {allFetched ? <Formik
                         initialValues={formData}
+                        enableReinitialize
                         validate={values => {
                             let errors = {speakers: {}};
-                            if (!values.logoUrl) {
-                                errors.logoUrl = 'Required';
+                            if (!values.companyLogoUrl) {
+                                errors.companyLogoUrl = 'Required';
                             }
-                            if (!values.backgroundUrl) {
-                                errors.backgroundUrl = 'Required';
+                            if (!values.backgroundImageUrl) {
+                                errors.backgroundImageUrl = 'Required';
                             }
                             if (!values.company) {
                                 errors.company = 'Required';
@@ -350,11 +413,11 @@ const NewLivestreamForm = ({firebase}) => {
                                         labelPlacement="start"
                                         control={
                                             <Switch
-                                                checked={values.hiddenLivestream}
+                                                checked={values.hidden}
                                                 onChange={handleChange}
                                                 color="primary"
-                                                id="hiddenLivestream"
-                                                name="hiddenLivestream"
+                                                id="hidden"
+                                                name="hidden"
                                                 inputProps={{'aria-label': 'primary checkbox'}}
                                             />}
                                         label="Hidden"
@@ -370,21 +433,21 @@ const NewLivestreamForm = ({firebase}) => {
                                         path="company-logos"
                                         label="Logo"
                                         handleBlur={handleBlur}
-                                        formName="logoUrl"
-                                        value={values.logoUrl}
+                                        formName="companyLogoUrl"
+                                        value={values.companyLogoUrl}
                                         options={existingLogos}
                                         loading={fetchingLogos}
-                                        error={errors.logoUrl && touched.logoUrl && errors.logoUrl}/>
+                                        error={errors.companyLogoUrl && touched.companyLogoUrl && errors.companyLogoUrl}/>
                                 </Grid>
                                 <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                                     <ImageSelect getDownloadUrl={getDownloadUrl} values={values} firebase={firebase}
                                                  setFieldValue={setFieldValue} submitting={isSubmitting}
                                                  path="illustration-images"
                                                  label="Company Background" handleBlur={handleBlur}
-                                                 formName="backgroundUrl"
-                                                 value={values.backgroundUrl} options={existingBackgrounds}
+                                                 formName="backgroundImageUrl"
+                                                 value={values.backgroundImageUrl} options={existingBackgrounds}
                                                  loading={fetchingBackgrounds}
-                                                 error={errors.backgroundUrl && touched.backgroundUrl && errors.backgroundUrl}/>
+                                                 error={errors.backgroundImageUrl && touched.backgroundImageUrl && errors.backgroundImageUrl}/>
                                 </Grid>
                                 <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                                     <FormControl fullWidth>
@@ -426,9 +489,9 @@ const NewLivestreamForm = ({firebase}) => {
                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                                         <DateTimePicker inputVariant="outlined" fullWidth variant="outlined"
-                                                        label="Livestream Start Date" value={values.startDate}
+                                                        label="Livestream Start Date" value={values.start}
                                                         onChange={(value) => {
-                                                            setFieldValue('startDate', new Date(value), true)
+                                                            setFieldValue('start', new Date(value), true)
                                                         }}/>
                                     </MuiPickersUtilsProvider>
                                 </Grid>
@@ -511,7 +574,6 @@ const NewLivestreamForm = ({firebase}) => {
                                                       handleFlattenOptions={handleFlattenOptions}
                                                       setSelectedGroups={setSelectedGroups}
                                                       setFieldValue={setFieldValue}
-                                                      value={values.groupIds}
                                                       groups={existingGroups}/>
                                 </Grid>
                                 {selectedGroups.map(group => {

@@ -269,6 +269,13 @@ class Firebase {
         return speakersRef.add(speaker);
     }
 
+    getLivestreamById = (livestreamId) => {
+         let livestreamsRef = this.firestore
+            .collection("livestreams")
+             .doc(livestreamId)
+        return livestreamsRef.get()
+    }
+
     //TEST_LIVESTREAMS
 
     createTestLivestream = () => {

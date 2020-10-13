@@ -16,6 +16,7 @@ const MultiGroupSelect = (
 
     // console.log("-> values", values);
     const handleMultiSelect = (event, selectedOptions) => {
+    console.log("-> selectedOptions", selectedOptions);
         const groupIdsArray = selectedOptions.map(option => option.groupId)
         const groupsWithOptions = selectedOptions.map(group => { // if any of the groups from the multi select exists already in the selectedOptions
             handleAddTargetCategories(groupIdsArray)
