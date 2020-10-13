@@ -1,6 +1,7 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {withFirebase} from 'context/firebase';
 import EditIcon from '@material-ui/icons/Edit';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import {Box, Button, CardMedia, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, IconButton, InputLabel, Menu, MenuItem, Select, Typography} from "@material-ui/core";
 import GroupStreamCard from 'components/views/NextLivestreams/GroupStreams/GroupStreamCard';
 import { CSVLink } from "react-csv";
@@ -209,12 +210,12 @@ const EnhancedGroupStreamCard = (props) => {
             </IconButton>
             <div style={{ position: 'absolute', top: '210px', right: '10px', zIndex: '2000', fontWeight: '600' }}>{ registeredStudentsFromGroup.length } students registered</div>
             <CSVLink data={registeredStudentsFromGroup} filename={'Registered Students ' + props.livestream.company + ' ' + props.livestream.id + '.csv'} style={{ color: 'red' }}>
-                <Button variant='outlined' style={{ position: 'absolute', top: '240px', right: '10px', zIndex: '2000' }}>
+            <Button startIcon={<GetAppIcon />} variant='outlined' style={{ position: 'absolute', top: '240px', right: '10px', zIndex: '2000' }}>
                     Registered Students
                 </Button>
             </CSVLink>
             <CSVLink data={talentPool} filename={'TalentPool ' + props.livestream.company + ' ' + props.livestream.id + '.csv'} style={{ color: 'red' }}>
-                <Button variant='outlined' style={{ position: 'absolute', top: '290px', right: '10px', zIndex: '2000' }}>
+            <Button startIcon={<GetAppIcon />} variant='outlined' style={{ position: 'absolute', top: '290px', right: '10px', zIndex: '2000' }}>
                     Talent Pool
                 </Button>
             </CSVLink>
