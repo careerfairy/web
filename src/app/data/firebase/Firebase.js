@@ -254,7 +254,7 @@ class Firebase {
 
     // CREATE_LIVESTREAMS
 
-    addLivestream = (livestream, speakers) => {
+    addLivestream = async (livestream, speakers) => {
         let batch = this.firestore.batch();
         let livestreamsRef = this.firestore
             .collection("livestreams")
@@ -270,12 +270,12 @@ class Firebase {
                 .doc();
             batch.set(speakersRef, speaker)
         })
-        return batch.commit().then(() => {
-            return livestreamsRef.id
-        });
+        
+        await batch.commit()
+        return livestreamsRef.id
     }
 
-    updateLivestream = (livestream, speakers) => {
+    updateLivestream = async (livestream, speakers) => {
         let batch = this.firestore.batch();
         let livestreamsRef = this.firestore
             .collection("livestreams")
@@ -285,24 +285,19 @@ class Firebase {
             .doc(livestreamsRef.id)
             .collection("speakers")
 
-        speakersRef
-            .get()
-            .then(docs => {
-                docs.map(doc => {
-                    let docRef = doc.ref
-                    batch.delete(docRef)
-                })
-            })
         batch.update(livestreamsRef, livestream)
 
         speakers.forEach(speaker => {
             let ref = speakersRef.doc()
             batch.set(ref, speaker)
         })
-
-        return batch.commit().then(() => {
-            return livestream.id
-        });
+        const docs = await speakersRef.get()
+        docs.forEach(doc => {
+            let docRef = doc.ref
+            batch.delete(docRef)
+        })
+        await batch.commit()
+        return livestream.id
     }
 
     addLivestreamSpeaker = (livestreamId, speaker) => {

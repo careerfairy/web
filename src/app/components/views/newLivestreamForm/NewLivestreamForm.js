@@ -363,8 +363,7 @@ const NewLivestreamForm = ({firebase}) => {
                             setSubmitting(true)
                             const livestream = buildLivestreamObject(values);
                             const speakers = buildSpeakersArray(values);
-                            console.log("-> speakers", speakers);
-                            console.log("-> livestream", livestream);
+           
                             if (updateMode) {
                                 const id = await firebase.updateLivestream(livestream, speakers)
                                 console.log("-> Livestream was updated with id", id);
