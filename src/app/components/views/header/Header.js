@@ -107,6 +107,7 @@ function Header(props) {
     }
 
     function toggleSideBar() {
+        debugger;
         if (sidebarState === "unopened" || sidebarState === "closed") {
             setSidebarState("opened");
         } else {
@@ -142,7 +143,7 @@ function Header(props) {
                 <TopHeader {...props}/>
             </div>
             <div
-                className={sidebarState === "unopened" ? 'sidebar hidden' : sidebarState === "opened" ? 'sidebar animated slideInLeft faster' : 'sidebar animated slideOutLeft faster'}>
+                className={sidebarState !== "opened" ? 'sidebar hidden' : sidebarState === "opened" ? 'sidebar animated slideInLeft faster' : 'sidebar animated slideOutLeft faster'}>
                 <Icon name='times circle outline' size='big' onClick={toggleSideBar} style={{cursor: 'pointer'}}/>
                 <ul>
                     <li><Link href='/next-livestreams'><a>Next Live Streams</a></Link></li>
