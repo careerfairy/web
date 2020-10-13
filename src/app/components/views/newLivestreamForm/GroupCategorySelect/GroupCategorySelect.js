@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
 }));
-const GroupCategorySelect = ({group, handleSetGroupCategories, targetCategories}) => {
+const GroupCategorySelect = ({group, handleSetGroupCategories, targetCategories, isSubmitting}) => {
 
     const handleMultiSelect = (event, selectedOptions) => {
         const optionIdsArray = selectedOptions.map(option => option.id)
@@ -50,7 +50,7 @@ const GroupCategorySelect = ({group, handleSetGroupCategories, targetCategories}
             name="groupIds"
             multiple
             value={handleValue()}
-            disabled={!group.flattenedOptions.length}
+            disabled={!group.flattenedOptions.length || isSubmitting}
             options={group.flattenedOptions || []}
             onChange={handleMultiSelect}
             getOptionLabel={(option) => option.name}

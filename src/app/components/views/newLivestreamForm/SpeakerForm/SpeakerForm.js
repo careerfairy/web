@@ -33,7 +33,7 @@ const SpeakerForm = (
         objectKey,
         setFieldValue,
         handleBlur,
-        submitting,
+        isSubmitting,
         loading,
         getDownloadUrl,
     }) => {
@@ -54,6 +54,7 @@ const SpeakerForm = (
                                    id={`speakers.${objectKey}.firstName`}
                                    variant="outlined"
                                    fullWidth
+                                   disabled={isSubmitting}
                                    style={{marginBottom: 0}}
                                    onBlur={handleBlur}
                                    label="First Name"
@@ -70,6 +71,7 @@ const SpeakerForm = (
                                    id={`speakers.${objectKey}.lastName`}
                                    variant="outlined"
                                    fullWidth
+                                   disabled={isSubmitting}
                                    style={{marginBottom: 0}}
                                    onBlur={handleBlur}
                                    label="Last Name"
@@ -86,6 +88,7 @@ const SpeakerForm = (
                                    id={`speakers.${objectKey}.position`}
                                    variant="outlined"
                                    fullWidth
+                                   disabled={isSubmitting}
                                    onBlur={handleBlur}
                                    label="Position"
                                    style={{marginBottom: 0}}
@@ -102,6 +105,7 @@ const SpeakerForm = (
                                    id={`speakers.${objectKey}.background`}
                                    variant="outlined"
                                    fullWidth
+                                   disabled={isSubmitting}
                                    onBlur={handleBlur}
                                    label="Background"
                                    style={{marginBottom: 0}}
@@ -116,9 +120,9 @@ const SpeakerForm = (
                 </Grid>
                 <Grid xs={12} sm={12} md={12} lg={6} xl={6} item>
                     <ImageSelect path="mentors-pictures" getDownloadUrl={getDownloadUrl}
-                                 formName={`speakers.${objectKey}.avatarUrl`} label="Speaker Avatar" error={false}
-                                 handleBlur={handleBlur} submitting={submitting} loading={loading} options={options}
-                                 value={speaker.avatarUrl} isAvatar
+                                 formName={`speakers.${objectKey}.avatar`} label="Speaker Avatar" error={false}
+                                 handleBlur={handleBlur} isSubmitting={isSubmitting} loading={loading} options={options}
+                                 value={speaker.avatar} isAvatar
                                  firebase={firebase}
                                  setFieldValue={setFieldValue}/>
                 </Grid>

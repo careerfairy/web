@@ -70,7 +70,7 @@ const ImageSelect =
          formName,
          label,
          loading,
-         submitting,
+         isSubmitting,
          handleBlur,
          getDownloadUrl,
          setFieldValue,
@@ -116,7 +116,7 @@ const ImageSelect =
                 <Autocomplete
                     id={formName}
                     name={formName}
-                    disabled={submitting}
+                    disabled={isSubmitting}
                     selectOnFocus
                     onBlur={handleBlur}
                     autoHighlight
