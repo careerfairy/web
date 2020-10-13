@@ -1,12 +1,7 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {withFirebase} from 'context/firebase';
-import {SizeMe} from 'react-sizeme';
-import StackGrid from 'react-stack-grid';
-import LivestreamCard from 'components/views/livestream-card/LivestreamCard';
 import {useRouter} from 'next/router';
-import AddIcon from "@material-ui/icons/Add";
-import EditIcon from '@material-ui/icons/Edit';
-import {Box, Button, CardMedia, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, IconButton, InputLabel, Menu, MenuItem, Select, Typography} from "@material-ui/core";
+import {AppBar, Box, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
 import EnhancedGroupStreamCard from './enhanced-group-stream-card/EnhancedGroupStreamCard';
 
 const Events = (props) => {
@@ -16,10 +11,13 @@ const Events = (props) => {
     const [grid, setGrid] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [livestreams, setLivestreams] = useState([]);
+    const [pastLivestreams, setPastLivestreams] = useState([]);
+
+    const [value, setValue] = React.useState(0);
 
     useEffect(() => {
         if (props.group.id) {
-            const unsubscribe = props.firebase.listenToLiveStreamsByGroupId(props.group.id, querySnapshot => {
+            const unsubscribe = props.firebase.listenToUpcomingLiveStreamsByGroupId(props.group.id, querySnapshot => {
                 var livestreams = [];
                 querySnapshot.forEach(doc => {
                     let livestream = doc.data();
@@ -27,6 +25,23 @@ const Events = (props) => {
                     livestreams.push(livestream);
                 });
                 setLivestreams(livestreams);
+            }, error => {
+                console.log(error);
+            });
+            return () => unsubscribe();
+        }
+    }, [props.group.id]);
+
+    useEffect(() => {
+        if (props.group.id) {
+            const unsubscribe = props.firebase.listenToPastLiveStreamsByGroupId(props.group.id, querySnapshot => {
+                var livestreams = [];
+                querySnapshot.forEach(doc => {
+                    let livestream = doc.data();
+                    livestream.id = doc.id;
+                    livestreams.push(livestream);
+                });
+                setPastLivestreams(livestreams);
             }, error => {
                 console.log(error);
             });
@@ -50,9 +65,38 @@ const Events = (props) => {
         setAnchorEl(null);
     };
 
-    let livestreamElements = [];
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
 
-    livestreamElements = livestreams.map((livestream, index) => {
+    function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`nav-tabpanel-${index}`}
+      aria-labelledby={`nav-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box p={3}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
+
+    function a11yProps(index) {
+        return {
+          id: `simple-tab-${index}`,
+          'aria-controls': `simple-tabpanel-${index}`,
+        };
+      }
+
+    let livestreamElements = livestreams.map((livestream, index) => {
         return (
             <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
                 <div style={{position: "relative"}}>
@@ -62,10 +106,42 @@ const Events = (props) => {
         );
     });
 
+    let pastLivestreamElements = pastLivestreams.map((livestream, index) => {
+        return (
+            <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
+                <div style={{position: "relative"}}>
+                <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid} group={props.group}/>
+                </div>
+            </Grid>
+        );
+    });
+
+
     return (
         <Fragment>
-            <div style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
-                <Typography variant="h4">Your Next Live Streams</Typography>
+            <div style={{width: '100%', textAlign: 'left', margin: '20px 0 20px 0'}}>
+                <AppBar color='default' position="static">
+                    <Tabs
+                    variant="fullWidth"
+                    value={value}
+                    onChange={handleChange}
+                    indicatorColor='primary'
+                    aria-label="nav tabs example"
+                    >
+                        <Tab label="Next Live streams" {...a11yProps(0)}/>
+                        <Tab label="Past Live streams" {...a11yProps(1)}/>
+                    </Tabs>
+                </AppBar>
+                <TabPanel value={value} index={0}>
+                    <Grid container spacing={2}>
+                        {livestreamElements}
+                    </Grid>
+                </TabPanel>
+                <TabPanel value={value} index={1}>
+                    <Grid container spacing={2}>
+                        {pastLivestreamElements}
+                    </Grid>
+                </TabPanel>
                 {/* <Button variant="contained"
                         color="primary"
                         size="medium"
@@ -80,14 +156,10 @@ const Events = (props) => {
                     open={Boolean(anchorEl)}
                     onClose={handleClose}
                 >
-                <MenuItem onClick={() => router.push('/group/' + props.group.id + '/admin/schedule-event')}>Send a
-                    Company Request</MenuItem>
+                <MenuItem onClick={() => router.push('/group/' + props.group.id + '/admin/schedule-event')}>Send a Company Request</MenuItem>
                 <MenuItem onClick={handleClose}>Schedule a Live Stream</MenuItem>
                 </Menu>
             </div>
-            <Grid container spacing={2}>
-                {livestreamElements}
-            </Grid>
             <style jsx>{`
                 .hidden {
                     display: none;
