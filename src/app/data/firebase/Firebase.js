@@ -266,6 +266,13 @@ class Firebase {
         let livestreamsRef = this.firestore
             .collection("livestreams")
             .doc(livestream.id)
+        livestreamsRef
+            .collection("speakers")
+            .listDocuments().then(docs => {
+            docs.map(doc => {
+                doc.delete()
+            })
+        })
         return livestreamsRef.set(livestream);
     }
 
