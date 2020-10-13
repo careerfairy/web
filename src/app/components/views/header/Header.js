@@ -107,7 +107,6 @@ function Header(props) {
     }
 
     function toggleSideBar() {
-        debugger;
         if (sidebarState === "unopened" || sidebarState === "closed") {
             setSidebarState("opened");
         } else {
