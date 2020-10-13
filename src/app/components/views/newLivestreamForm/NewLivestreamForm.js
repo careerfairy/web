@@ -99,7 +99,7 @@ const NewLivestreamForm = ({firebase}) => {
 
     useEffect(() => {
         console.log("-> livestreamId", livestreamId);
-        if (livestreamId) {
+        if (livestreamId && allFetched) {
             (async () => {
                 const querySnapshot = await firebase.getLivestreamById(livestreamId)
                 if (querySnapshot.exists) {
@@ -122,16 +122,27 @@ const NewLivestreamForm = ({firebase}) => {
                             [mainSpeakerId]: handleGetMainSpeaker(livestream),
                         },
                     })
+                    handleSetDefaultGroups(livestream.groupIds)
                     setTargetCategories(livestream.targetCategories || {})
                 }
             })()
         }
-    }, [livestreamId])
+    }, [livestreamId, allFetched])
 
     const handleSetDefaultGroups = (arrayOfGroupIds) => {
-        arrayOfGroupIds.forEach(group => {
 
-        })
+        if (Array.isArray(arrayOfGroupIds)) {
+            let groupsWithFlattenedOptions = []
+            arrayOfGroupIds.forEach(id => {
+                const targetGroup = existingGroups.find(group => group.groupId === id)
+                if (targetGroup) {
+                    targetGroup.flattenedOptions = handleFlattenOptions(targetGroup)
+                    groupsWithFlattenedOptions.push(targetGroup)
+                }
+            })
+            setSelectedGroups(groupsWithFlattenedOptions)
+            console.log("-> groupsWithFlattenedOptions", groupsWithFlattenedOptions);
+        }
     }
 
     const handleGetMainSpeaker = (streamObj) => {
@@ -569,8 +580,8 @@ const NewLivestreamForm = ({firebase}) => {
                                     <MultiGroupSelect handleChange={handleChange}
                                                       handleBlur={handleBlur}
                                                       values={values}
-                                                      handleAddTargetCategories={handleAddTargetCategories}
                                                       selectedGroups={selectedGroups}
+                                                      handleAddTargetCategories={handleAddTargetCategories}
                                                       handleFlattenOptions={handleFlattenOptions}
                                                       setSelectedGroups={setSelectedGroups}
                                                       setFieldValue={setFieldValue}
@@ -579,6 +590,7 @@ const NewLivestreamForm = ({firebase}) => {
                                 {selectedGroups.map(group => {
                                     return <Grid key={group.groupId} xs={12} sm={12} md={12} lg={12} xl={12} item>
                                         <GroupCategorySelect handleSetGroupCategories={handleSetGroupCategories}
+                                                             targetCategories={targetCategories}
                                                              group={group}/>
                                     </Grid>
                                 })}

@@ -37,6 +37,7 @@ const MultiGroupSelect = (
             id="groupIds"
             name="groupIds"
             multiple
+            value={selectedGroups}
             options={groups}
             onChange={handleMultiSelect}
             getOptionLabel={(option) => option.universityName}

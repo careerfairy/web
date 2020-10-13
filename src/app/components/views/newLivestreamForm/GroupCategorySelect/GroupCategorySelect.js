@@ -19,11 +19,27 @@ const useStyles = makeStyles((theme) => ({
     },
 
 }));
-const GroupCategorySelect = ({group, handleSetGroupCategories}) => {
+const GroupCategorySelect = ({group, handleSetGroupCategories, targetCategories}) => {
 
     const handleMultiSelect = (event, selectedOptions) => {
         const optionIdsArray = selectedOptions.map(option => option.id)
         handleSetGroupCategories(group.groupId, optionIdsArray)
+    }
+
+    const handleValue = () => {
+        if (targetCategories[group.groupId] && targetCategories[group.groupId].length) {
+            let selectedOptions = []
+            targetCategories[group.groupId].forEach(optionId => {
+                const targetOption = group.flattenedOptions.find(flatOption => flatOption.id === optionId)
+                if(targetOption){
+                    selectedOptions.push(targetOption)
+                }
+            })
+            return selectedOptions
+        } else {
+            return []
+        }
+
     }
 
     const label = group.flattenedOptions.length ? `${group.universityName} Options` : `${group.universityName} has no options`
@@ -33,6 +49,7 @@ const GroupCategorySelect = ({group, handleSetGroupCategories}) => {
             id="groupIds"
             name="groupIds"
             multiple
+            value={handleValue()}
             disabled={!group.flattenedOptions.length}
             options={group.flattenedOptions || []}
             onChange={handleMultiSelect}
@@ -52,5 +69,6 @@ const GroupCategorySelect = ({group, handleSetGroupCategories}) => {
         />
     );
 };
+
 
 export default GroupCategorySelect;
