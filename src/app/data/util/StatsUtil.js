@@ -82,22 +82,24 @@ export default class StatsUtil {
             return StatsUtil.getSpecializedStudentStats(registeredStudentsFromGroup, group);
         }
         let categoryStats = {};
-        group.categories.forEach( category => {
-            category.options.forEach( option => {
-                if (!categoryStats[category.id]) {
-                    categoryStats[category.id] = {};
-                }
-                categoryStats[category.id][option.id] = 0;
-            })
-        });
-        registeredStudentsFromGroup.forEach( student  => {
-            let registeredGroup = StatsUtil.getRegisteredGroupById(student, group.groupId);
-            if (registeredGroup) {
-                registeredGroup.categories.forEach( category => {
-                    categoryStats[category.id][category.selectedValueId] = categoryStats[category.id][category.selectedValueId] + 1;
+        if (group.categories && group.length) {
+            group.categories.forEach( category => {
+                category.options.forEach( option => {
+                    if (!categoryStats[category.id]) {
+                        categoryStats[category.id] = {};
+                    }
+                    categoryStats[category.id][option.id] = 0;
                 })
-            }
-        });
+            });
+            registeredStudentsFromGroup.forEach( student  => {
+                let registeredGroup = StatsUtil.getRegisteredGroupById(student, group.groupId);
+                if (registeredGroup) {
+                    registeredGroup.categories.forEach( category => {
+                        categoryStats[category.id][category.selectedValueId] = categoryStats[category.id][category.selectedValueId] + 1;
+                    })
+                }
+            });
+        }
         return categoryStats;
     }
 

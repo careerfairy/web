@@ -148,11 +148,20 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                             <MoreVertIcon/>
                         </IconButton>
                         <CardActions>
+                        {!isAdmin &&
                             <Link href={`next-livestreams?careerCenterId=${localGroup.groupId}`}>
                                 <Button fullWidth size="large" color="primary">
                                     View Calendar
                                 </Button>
                             </Link>
+                        }
+                        {isAdmin &&
+                            <Link href={`/group/${localGroup.id}/admin`}>
+                                <Button fullWidth size="large" color="primary">
+                                    View Admin Page
+                                </Button>
+                            </Link>
+                        }    
                             <Menu
                                 id="simple-menu"
                                 anchorEl={anchorEl}
@@ -160,23 +169,26 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                                 open={Boolean(anchorEl)}
                                 onClose={handleClose}
                             >
-                                <MenuItem onClick={() => {
-                                    router.push(`/next-livestreams?careerCenterId=${localGroup.groupId}`)
-                                }}>Group Page</MenuItem>
-                                <MenuItem onMouseEnter={() => setLeaveGroup(true)} onClick={() => setOpen(true)}>Leave
-                                    Group</MenuItem>
-                                {localGroup.categories &&
-                                <MenuItem onClick={handleOpenJoinModal}>Update Categories</MenuItem>}
+                                {!isAdmin &&
+                                <>
+                                    <MenuItem onClick={() => {
+                                        router.push(`/next-livestreams?careerCenterId=${localGroup.groupId}`)
+                                    }}>Group Page</MenuItem>
+                                    <MenuItem onMouseEnter={() => setLeaveGroup(true)} onClick={() => setOpen(true)}>Leave
+                                        Group</MenuItem>
+                                    {localGroup.categories &&
+                                    <MenuItem onClick={handleOpenJoinModal}>Update Categories</MenuItem>}
+                                </>}
                                 {isAdmin &&
                                 <>
                                     <MenuItem onClick={() => push(`/group/${localGroup.id}/admin`)}>
-                                        Settings
+                                        Admin group
                                     </MenuItem>
                                     <MenuItem onClick={() => {
                                         setOpen(true)
                                         handleClose()
                                     }}
-                                              onMouseEnter={() => setLeaveGroup(false)}
+                                    onMouseEnter={() => setLeaveGroup(false)}
                                     >Delete group</MenuItem>
                                 </>}
                             </Menu>
