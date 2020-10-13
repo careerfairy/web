@@ -104,6 +104,7 @@ const NewLivestreamForm = ({firebase}) => {
                     let livestream = livestreamQuery.data()
                     livestream.id = livestreamId
                     const newFormData = {
+                        id: livestreamId,
                         companyLogoUrl: livestream.companyLogoUrl || "",
                         backgroundImageUrl: livestream.backgroundImageUrl || "",
                         company: livestream.company || "",
@@ -260,6 +261,7 @@ const NewLivestreamForm = ({firebase}) => {
 
     const buildLivestreamObject = (values) => {
         return {
+            ...(updateMode && {id: livestreamId}),// only adds id: livestreamId field if there's actually a valid id, which is when updateMode is true
             backgroundImageUrl: values.backgroundImageUrl,
             company: values.company,
             companyId: values.companyId,
@@ -364,14 +366,17 @@ const NewLivestreamForm = ({firebase}) => {
                             console.log("-> speakers", speakers);
                             console.log("-> livestream", livestream);
 
-
-                            firebase.addLivestream(livestream).then(docRef => {
-                                alert("added livestream with Id: " + docRef.id);
-                                console.log("added livestream with Id: " + docRef.id);
-                                speakers.forEach(speaker => {
-                                    firebase.addLivestreamSpeaker(docRef.id, speaker);
-                                })
-                            });
+                            // if (updateMode) {
+                            //
+                            // } else {
+                            //     firebase.addLivestream(livestream).then(docRef => {
+                            //         alert("added livestream with Id: " + docRef.id);
+                            //         console.log("added livestream with Id: " + docRef.id);
+                            //         speakers.forEach(speaker => {
+                            //             firebase.addLivestreamSpeaker(docRef.id, speaker);
+                            //         })
+                            //     });
+                            // }
                         }}
                     >
                         {({

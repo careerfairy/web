@@ -135,7 +135,7 @@ const ImageSelect =
                     options={options}
                     loading={loading}
                     renderInput={(params) => (
-                        <FormControl disabled={submitting} error={Boolean(error)} fullWidth>
+                        <FormControl disabled={isSubmitting} error={Boolean(error)} fullWidth>
                             <TextField
                                 {...params}
                                 error={Boolean(error)}
@@ -144,7 +144,6 @@ const ImageSelect =
                                 name={formName}
                                 onBlur={handleBlur}
                                 label={`Chose a ${label}`}
-                                disabled={submitting}
                                 variant="outlined"
                                 InputProps={{
                                     root: classes.inputRoot,
@@ -176,8 +175,7 @@ const ImageSelect =
                         );
                     }}
                 />
-                <FilePickerContainer
-                    extensions={['jpg', 'jpeg', 'png']}
+                <FilePickerContainer  extensions={['jpg', 'jpeg', 'png']}
                     maxSize={20}
                     onError={errMsg => (setFilePickerError(errMsg))}
                     onChange={fileObject => {
@@ -187,7 +185,7 @@ const ImageSelect =
                         })
                     }}
                 >
-                    <Button startIcon={<PublishIcon/>} fullWidth style={{marginTop: "0.5rem"}} color="primary"
+                    <Button startIcon={<PublishIcon/>} disabled={isSubmitting} fullWidth style={{marginTop: "0.5rem"}} color="primary"
                             variant="outlined" id='upButton'>
                         {`-OR - Upload`}</Button>
                 </FilePickerContainer>

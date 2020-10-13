@@ -257,7 +257,16 @@ class Firebase {
     addLivestream = (livestream) => {
         let livestreamsRef = this.firestore
             .collection("livestreams")
-        return livestreamsRef.add(livestream);
+            .doc()
+        livestream.currentSpeakerId = livestreamsRef.id
+        return livestreamsRef.set(livestream);
+    }
+
+    updateLivestream = (livestream) => {
+        let livestreamsRef = this.firestore
+            .collection("livestreams")
+            .doc(livestream.id)
+        return livestreamsRef.set(livestream);
     }
 
     addLivestreamSpeaker = (livestreamId, speaker) => {
@@ -270,9 +279,9 @@ class Firebase {
     }
 
     getLivestreamById = (livestreamId) => {
-         let livestreamsRef = this.firestore
+        let livestreamsRef = this.firestore
             .collection("livestreams")
-             .doc(livestreamId)
+            .doc(livestreamId)
         return livestreamsRef.get()
     }
 
