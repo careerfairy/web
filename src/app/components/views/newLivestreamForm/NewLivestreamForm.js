@@ -541,7 +541,7 @@ const NewLivestreamForm = ({firebase}) => {
                                         <DeleteIcon/>
                                     </Fab>}
                                 </div>
-                                <FormGroup>
+                                <FormGroup spacing={3}>
                                     <SpeakerForm key={key} handleDeleteSpeaker={handleDeleteSpeaker}
                                                  setValues={setValues}
                                                  speakerObj={speakerObj}
