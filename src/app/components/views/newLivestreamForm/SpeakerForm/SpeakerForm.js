@@ -1,8 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import ImageSelect from "../ImageSelect/ImageSelect";
-import {Box, Button, Collapse, FormControl, FormHelperText, Grid, TextField, Typography} from "@material-ui/core";
+import {
+    FormControl,
+    Collapse,
+    Grid,
+    TextField,
+    FormHelperText, Box
+} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 
 const useStyles = makeStyles(theme => ({
     formGrid: {
@@ -56,10 +61,8 @@ const SpeakerForm = (
                                    value={speaker.firstName}
                                    error={Boolean(firstNameError)}
                                    onChange={({currentTarget: {value}}) => setFieldValue(`speakers.${objectKey}.firstName`, value)}/>
-                        <Collapse in={Boolean(firstNameError)}>
-                            <FormHelperText error>
-                                {firstNameError}
-                            </FormHelperText>
+                        <Collapse in={Boolean(firstNameError)} style={{color: "red"}}>
+                            {firstNameError}
                         </Collapse>
                     </FormControl>
                     <FormControl fullWidth>
@@ -74,10 +77,8 @@ const SpeakerForm = (
                                    value={speaker.lastName}
                                    error={Boolean(lastNameError)}
                                    onChange={({currentTarget: {value}}) => setFieldValue(`speakers.${objectKey}.lastName`, value)}/>
-                        <Collapse in={Boolean(lastNameError)}>
-                            <FormHelperText error>
-                                {lastNameError}
-                            </FormHelperText>
+                        <Collapse in={Boolean(lastNameError)} style={{color: "red"}}>
+                            {lastNameError}
                         </Collapse>
                     </FormControl>
                     <FormControl fullWidth>
@@ -92,10 +93,8 @@ const SpeakerForm = (
                                    value={speaker.position}
                                    error={Boolean(positionError)}
                                    onChange={({currentTarget: {value}}) => setFieldValue(`speakers.${objectKey}.position`, value)}/>
-                        <Collapse in={Boolean(positionError)}>
-                            <FormHelperText error>
-                                {positionError}
-                            </FormHelperText>
+                        <Collapse in={Boolean(positionError)} style={{color: "red"}}>
+                            {positionError}
                         </Collapse>
                     </FormControl>
                     <FormControl fullWidth>
@@ -110,10 +109,8 @@ const SpeakerForm = (
                                    value={speaker.background}
                                    error={Boolean(backgroundError)}
                                    onChange={({currentTarget: {value}}) => setFieldValue(`speakers.${objectKey}.background`, value)}/>
-                        <Collapse in={Boolean(backgroundError)}>
-                            <FormHelperText error>
-                                {backgroundError}
-                            </FormHelperText>
+                        <Collapse in={Boolean(backgroundError)} style={{color: "red"}}>
+                            {backgroundError}
                         </Collapse>
                     </FormControl>
                 </Grid>
@@ -121,7 +118,7 @@ const SpeakerForm = (
                     <ImageSelect path="mentors-pictures" getDownloadUrl={getDownloadUrl}
                                  formName={`speakers.${objectKey}.avatarUrl`} label="Speaker Avatar" error={false}
                                  handleBlur={handleBlur} submitting={submitting} loading={loading} options={options}
-                                 value={speaker.avatarUrl}
+                                 value={speaker.avatarUrl} isAvatar
                                  firebase={firebase}
                                  setFieldValue={setFieldValue}/>
                 </Grid>

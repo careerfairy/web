@@ -7,7 +7,7 @@ import {
     Collapse,
     FormControl,
     FormHelperText,
-    FormLabel,
+    Avatar,
     Typography
 } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
@@ -20,17 +20,22 @@ import {uploadLogo} from "../../../helperFunctions/HelperFunctions";
 import FilePickerContainer from "../../../ssr/FilePickerContainer";
 import {makeStyles} from "@material-ui/core/styles";
 
-const placeholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fimage-placeholder.jpg?alt=media&token=760615d8-dfac-40f3-87b2-e8af315b5995"
+const logoPlaceholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Flogo-placeholder.png?alt=media&token=ef6c8d5a-af92-4b69-a946-ce78a9997382"
 
 const useStyles = makeStyles((theme) => ({
     media: {
         display: "flex",
         justifyContent: "center",
+        borderRadius: 4,
         height: 200,
         width: "100%",
-        borderRadius: 4,
-
         // marginBottom: theme.spacing(2)
+    },
+    avaWrapper: {
+        display: "grid",
+        placeItems: "center",
+        height: 200,
+        width: "100%",
     },
     image: {
         objectFit: "contain",
@@ -49,6 +54,10 @@ const useStyles = makeStyles((theme) => ({
             padding: "9px !important"
         }
     },
+    avaLarge: {
+        width: theme.spacing(23),
+        height: theme.spacing(23),
+    },
 
 }));
 
@@ -65,7 +74,7 @@ const ImageSelect =
          handleBlur,
          getDownloadUrl,
          setFieldValue,
-         path
+         path, isAvatar
      }) => {
 
         const classes = useStyles()
@@ -87,9 +96,15 @@ const ImageSelect =
             setFieldValue(formName, actualValue, true);
         }
 
-        const renderImage = (
+        const renderImage = isAvatar ? (
+            <div className={classes.avaWrapper}>
+                <Box boxShadow={3} component={Avatar} src={value}
+                     className={classes.avaLarge}
+                     alt={formName}/>
+            </div>
+        ) : (
             <Box boxShadow={2} component={CardMedia} className={classes.media}>
-                <img src={value.length ? value : placeholder}
+                <img src={value.length ? value : logoPlaceholder}
                      className={classes.image}
                      alt={formName}/>
             </Box>
@@ -172,7 +187,8 @@ const ImageSelect =
                         })
                     }}
                 >
-                    <Button startIcon={<PublishIcon/>} fullWidth style={{marginTop: "0.5rem"}} color="primary" variant="outlined" id='upButton'>
+                    <Button startIcon={<PublishIcon/>} fullWidth style={{marginTop: "0.5rem"}} color="primary"
+                            variant="outlined" id='upButton'>
                         {`-OR - Upload`}</Button>
                 </FilePickerContainer>
                 <Collapse in={Boolean(filePickerError)}>

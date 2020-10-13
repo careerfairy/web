@@ -45,16 +45,6 @@ const useStyles = makeStyles(theme => ({
         marginTop: theme.spacing(3),
         marginBottom: theme.spacing(3),
     },
-    switch: {
-        // placeItems: "center",
-        // borderRadius: 4,
-        // width: "100%",
-        // height: "100%",
-        // // border: "1px solid rgba(0, 0, 0, 0.3)",
-        // display: "flex",
-        // justifyContent: "center"
-    },
-
 }));
 
 const speakerObj = {
@@ -149,6 +139,7 @@ const NewLivestreamForm = ({firebase}) => {
                 careerCenter.selected = false
                 careerCenters.push(careerCenter);
             })
+            setFetchingGroups(false)
             setExistingGroups(careerCenters);
         });
         return () => unsubscribe();
@@ -156,7 +147,7 @@ const NewLivestreamForm = ({firebase}) => {
     }, []);
 
     useEffect(() => {
-        if (!fetchingBackgrounds && !fetchingLogos && !fetchingAvatars) {
+        if (!fetchingBackgrounds && !fetchingLogos && !fetchingAvatars && !fetchingGroups) {
             setAllFetched(true)
         }
     }, [fetchingAvatars, fetchingBackgrounds, fetchingLogos])
@@ -310,14 +301,14 @@ const NewLivestreamForm = ({firebase}) => {
                             console.log("-> speakers", speakers);
                             console.log("-> livestream", livestream);
 
-                            //
-                            // props.firebase.addLivestream(livestream).then(docRef => {
-                            //     alert("added livestream with Id: " + docRef.id);
-                            //     console.log("added livestream with Id: " + docRef.id);
-                            //     speakers.forEach(speaker => {
-                            //         props.firebase.addLivestreamSpeaker(docRef.id, speaker);
-                            //     })
-                            // });
+
+                            firebase.addLivestream(livestream).then(docRef => {
+                                alert("added livestream with Id: " + docRef.id);
+                                console.log("added livestream with Id: " + docRef.id);
+                                speakers.forEach(speaker => {
+                                    firebase.addLivestreamSpeaker(docRef.id, speaker);
+                                })
+                            });
                         }}
                     >
                         {({
@@ -347,10 +338,8 @@ const NewLivestreamForm = ({firebase}) => {
                                                    disabled={isSubmitting}
                                                    error={Boolean(errors.title && touched.title && errors.title)}
                                                    onChange={handleChange}/>
-                                        <Collapse in={Boolean(errors.title && touched.title)}>
-                                            <FormHelperText error>
-                                                {errors.title}
-                                            </FormHelperText>
+                                        <Collapse style={{color: "red"}} in={Boolean(errors.title && touched.title)}>
+                                            {errors.title}
                                         </Collapse>
                                     </FormControl>
                                 </Grid>
@@ -410,10 +399,8 @@ const NewLivestreamForm = ({firebase}) => {
                                                    disabled={isSubmitting}
                                                    error={Boolean(errors.company && touched.company && errors.company)}
                                                    onChange={handleChange}/>
-                                        <Collapse in={Boolean(errors.company && touched.company)}>
-                                            <FormHelperText error>
-                                                {errors.company}
-                                            </FormHelperText>
+                                        <Collapse style={{color: "red"}} in={Boolean(errors.company && touched.company)}>
+                                            {errors.company}
                                         </Collapse>
                                     </FormControl>
                                 </Grid>
@@ -430,10 +417,9 @@ const NewLivestreamForm = ({firebase}) => {
                                                    disabled={isSubmitting}
                                                    error={Boolean(errors.companyId && touched.companyId && errors.companyId)}
                                                    onChange={handleChange}/>
-                                        <Collapse in={Boolean(errors.companyId && touched.companyId)}>
-                                            <FormHelperText error>
-                                                {errors.companyId}
-                                            </FormHelperText>
+                                        <Collapse style={{color: "red"}}
+                                                  in={Boolean(errors.companyId && touched.companyId)}>
+                                            {errors.companyId}
                                         </Collapse>
                                     </FormControl>
                                 </Grid>
@@ -511,10 +497,8 @@ const NewLivestreamForm = ({firebase}) => {
                                                    disabled={isSubmitting}
                                                    error={Boolean(errors.summary && touched.summary && errors.summary)}
                                                    onChange={handleChange}/>
-                                        <Collapse in={Boolean(errors.summary && touched.summary)}>
-                                            <FormHelperText error>
-                                                {errors.summary}
-                                            </FormHelperText>
+                                        <Collapse style={{color: "red"}} in={Boolean(errors.summary && touched.summary)}>
+                                            {errors.summary}
                                         </Collapse>
                                     </FormControl>
                                 </Grid>

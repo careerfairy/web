@@ -252,6 +252,23 @@ class Firebase {
         });
     };
 
+    // CREATE_LIVESTREAMS
+
+    addLivestream = (livestream) => {
+        let livestreamsRef = this.firestore
+            .collection("livestreams")
+        return livestreamsRef.add(livestream);
+    }
+
+    addLivestreamSpeaker = (livestreamId, speaker) => {
+        let speakersRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("speakers");
+
+        return speakersRef.add(speaker);
+    }
+
     //TEST_LIVESTREAMS
 
     createTestLivestream = () => {
