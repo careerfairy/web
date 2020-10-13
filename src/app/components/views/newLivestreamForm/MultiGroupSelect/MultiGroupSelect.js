@@ -13,8 +13,6 @@ const MultiGroupSelect = (
         handleAddTargetCategories,
         isSubmitting
     }) => {
-
-    // console.log("-> values", values);
     const handleMultiSelect = (event, selectedOptions) => {
         const groupIdsArray = selectedOptions.map(option => option.groupId)
         const groupsWithOptions = selectedOptions.map(group => { // if any of the groups from the multi select exists already in the selectedOptions
@@ -42,7 +40,7 @@ const MultiGroupSelect = (
             onChange={handleMultiSelect}
             getOptionLabel={(option) => option.universityName}
             renderInput={(params) => (
-                <TextField {...params} variant="outlined" label="Add some Universities"
+                <TextField {...params} variant="outlined" label="Add some Groups"
                            placeholder="Add partner groups"/>
             )}
             renderTags={(value, getTagProps) =>

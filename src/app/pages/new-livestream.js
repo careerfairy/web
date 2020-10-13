@@ -9,6 +9,7 @@ import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
 import NewLivestreamForm from "../components/views/newLivestreamForm/NewLivestreamForm";
 import React from "react";
+import {Typography} from "@material-ui/core";
 
 
 const newLivestreams = () => {
@@ -21,6 +22,8 @@ const newLivestreams = () => {
             <div style={{background: "rgb(44, 66, 81)"}}>
                 <Header color="white"/>
             </div>
+            <Typography variant="h3" align="center" style={{marginTop: "1.5rem", color: "white"}}>Create a
+                Livestream</Typography>
             <NewLivestreamForm/>
             <Footer/>
         </TealBackground>
