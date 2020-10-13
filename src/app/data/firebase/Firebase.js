@@ -254,26 +254,55 @@ class Firebase {
 
     // CREATE_LIVESTREAMS
 
-    addLivestream = (livestream) => {
+    addLivestream = (livestream, speakers) => {
+        let batch = this.firestore.batch();
         let livestreamsRef = this.firestore
             .collection("livestreams")
             .doc()
         livestream.currentSpeakerId = livestreamsRef.id
-        return livestreamsRef.set(livestream);
+        batch.set(livestreamsRef, livestream)
+
+        speakers.forEach(speaker => {
+            let speakersRef = this.firestore
+                .collection("livestreams")
+                .doc(livestreamsRef.id)
+                .collection("speakers")
+                .doc();
+            batch.set(speakersRef, speaker)
+        })
+        return batch.commit().then(() => {
+            return livestreamsRef.id
+        });
     }
 
-    updateLivestream = (livestream) => {
+    updateLivestream = (livestream, speakers) => {
+        let batch = this.firestore.batch();
         let livestreamsRef = this.firestore
             .collection("livestreams")
             .doc(livestream.id)
-        livestreamsRef
+        let speakersRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamsRef.id)
             .collection("speakers")
-            .listDocuments().then(docs => {
-            docs.map(doc => {
-                doc.delete()
+
+        speakersRef
+            .get()
+            .then(docs => {
+                docs.map(doc => {
+                    let docRef = doc.ref
+                    batch.delete(docRef)
+                })
             })
+        batch.update(livestreamsRef, livestream)
+
+        speakers.forEach(speaker => {
+            let ref = speakersRef.doc()
+            batch.set(ref, speaker)
         })
-        return livestreamsRef.set(livestream);
+
+        return batch.commit().then(() => {
+            return livestream.id
+        });
     }
 
     addLivestreamSpeaker = (livestreamId, speaker) => {

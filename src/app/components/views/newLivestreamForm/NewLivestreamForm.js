@@ -359,24 +359,19 @@ const NewLivestreamForm = ({firebase}) => {
                             }
                             return errors;
                         }}
-                        onSubmit={(values, {setSubmitting}) => {
+                        onSubmit={async (values, {setSubmitting}) => {
                             setSubmitting(true)
                             const livestream = buildLivestreamObject(values);
                             const speakers = buildSpeakersArray(values);
                             console.log("-> speakers", speakers);
                             console.log("-> livestream", livestream);
-
-                            // if (updateMode) {
-                            //
-                            // } else {
-                            //     firebase.addLivestream(livestream).then(docRef => {
-                            //         alert("added livestream with Id: " + docRef.id);
-                            //         console.log("added livestream with Id: " + docRef.id);
-                            //         speakers.forEach(speaker => {
-                            //             firebase.addLivestreamSpeaker(docRef.id, speaker);
-                            //         })
-                            //     });
-                            // }
+                            if (updateMode) {
+                                const id = await firebase.updateLivestream(livestream, speakers)
+                                console.log("-> Livestream was updated with id", id);
+                            } else {
+                                const id = await firebase.addLivestream(livestream, speakers)
+                                console.log("-> Livestream was created with id", id);
+                            }
                         }}
                     >
                         {({
