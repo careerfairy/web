@@ -418,7 +418,7 @@ class Firebase {
     }
 
     listenToLiveStreamsByGroupId = (groupId, callback) => {
-        var thirtyMinutesInMilliseconds = 1000 * 60 * 45;
+        var thirtyMinutesInMilliseconds = 1000 * 60 * 45 * 1000;
         let ref = this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
@@ -452,6 +452,15 @@ class Firebase {
             .orderBy("timestamp", "asc");
         return ref.onSnapshot(callback);
     };
+
+    listLivestreamQuestions = (livestreamId, callback) => {
+      let ref = this.firestore
+          .collection("livestreams")
+          .doc(livestreamId)
+          .collection("questions")
+          .orderBy("votes", "desc")
+      return ref.onSnapshot(callback);
+  };
 
     listenToQuestionComments = (livestreamId, questionId, callback) => {
         let ref = this.firestore

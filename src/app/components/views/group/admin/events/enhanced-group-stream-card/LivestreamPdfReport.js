@@ -1,5 +1,6 @@
-import { Document, Page, View, Text, Font } from '@react-pdf/renderer';
+import { Document, Page, View, Text, Font, Image } from '@react-pdf/renderer';
 import styled from '@react-pdf/styled-components';
+import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 import StatsUtil from 'data/util/StatsUtil';
 import { useEffect, useState } from 'react';
 
@@ -10,8 +11,26 @@ Font.register({ family: 'Poppins', fonts: [
 
 const CFPage = styled.Page`
     font-family: 'Poppins';
-    padding: 150px 40px 40px 40px;
+    padding: 5vw;
+    position: relative;
 `;
+
+const TopView = styled.View`
+    width: 90vw;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 10vw;
+`;
+
+const CFLogo = styled.Image`
+    max-height: 15vw;
+`;
+
+const CompanyLogo = styled.Image`
+    max-height: 25vw;
+`;
+
 
 const Label = styled.Text`
     font-family: 'Poppins';
@@ -27,23 +46,267 @@ const Title = styled.Text`
     font-size: 22px;
 `;
 
-const Border = styled.View`
+const SubTitle = styled.Text`
     font-family: 'Poppins';
-    border: 2px solid blue;
+    font-weight: bold;
+    color: grey;
+    font-size: 10px;
+    margin: 30px 0 5px 0;
+    text-transform: uppercase;
+`;
+
+const CategoriesParent = styled.View`
+    max-width: 100vw !important;
+    margin: 5vw 0;
+`;
+
+const EngagementParent = styled.View`
+    display: flex;
+    flex-direction: row;
+`;
+
+const EngagementChild = styled.View`
+    width: 25vw;
+    margin-right: 5vw;
+`;
+
+const SubCategoryParent = styled.View`
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+`;
+
+const LargeNumber = styled.Text`
+    font-weight: bold;
+    font-size: 17px;
+    width: 10vw;
+    color: #314150;
+`;
+
+const LargeText = styled.Text`
+    font-size: 9px;
+    width: 40vw;
+    padding: 2px;
+    font-weight: bold;
+    margin-right: 10vw;
+    text-transform: uppercase;
+    color: #314150;
 `;
 
 
+const TotalViewer = styled.Text`
+    font-size: 11px;
+    color: #555555;
+`;
 
-const LivestreamPdfReport = (props) => {
+const SmallNumber = styled.Text`
+    font-weight: bold;
+    font-size: 14px;
+    color: #bbbbbb;
+`;
 
-    debugger;
+const SmallText = styled.Text`
+    font-weight: bold;
+    font-size: 10px;
+    color: grey;
+`;
 
+const SmallLabel = styled.Text`
+    font-weight: bold;
+    font-size: 10px;
+    color: grey;
+`;
+
+const QuestionText = styled.Text`
+    font-size: 14px;
+`;
+
+const AnswerText = styled.Text`
+    font-size: 11px;
+`;
+
+const ColorText = styled.View`
+    font-weight: bold;
+    color: #00d2aa;
+`;
+
+const Poll = styled.View`
+    margin-bottom: 20px;
+`;
+
+const QuestionVotes = styled.Text`
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #00d2aa;
+`;
+
+const Border = styled.View`
+    font-family: 'Poppins';
+    font-size: 9px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    vertical-align: middle;
+    margin-bottom: 5px;
+`;
+
+const SmallView = styled.View`
+    font-family: 'Poppins';
+    font-size: 10px;
+    width: 10vw;
+`;
+
+const SpecializedSubCategoryElement = ({ subOption }) => {
+    return (
+        <SmallView>
+            <SmallNumber>{ subOption.entries }</SmallNumber>
+        </SmallView>
+    );
+}
+
+const SpecializedCategoryElement = ({ option, index }) => {
+    let subCategoryElements = Object.keys(option.subOptions).map( entry => {
+        return <SpecializedSubCategoryElement subOption={option.subOptions[entry]}/>
+    })
+    return (
+        <Border>
+            <LargeText>{ option.name }</LargeText> 
+            <LargeNumber>{ option.entries }</LargeNumber>
+            <SubCategoryParent>
+                {subCategoryElements }
+            </SubCategoryParent>
+        </Border>
+    );
+}
+
+const QuestionView = ({ question }) => {
+    return (
+        <View>
+            <QuestionText>{question.title}</QuestionText>
+            <View>
+                <QuestionVotes>{question.votes} votes</QuestionVotes>
+            </View>
+        </View>
+    );
+}
+
+const PollOptionView = ({ option }) => {
+    return (
+        <View>
+            <View/>
+            <AnswerText>{ option.name }</AnswerText>
+            <QuestionVotes>{ option.votes } Votes</QuestionVotes>
+        </View>
+    )
+}
+
+const PollView = ({ poll, index }) => {
+    let totalVotes = 0;
+    poll.options.forEach( option => totalVotes += option.votes );
+    let pollOptionElements = poll.options.map( option => {
+        return <PollOptionView option={option} totalVotes={totalVotes}/> 
+    });
+
+    return (
+        <Poll>
+            <SmallLabel>Poll {index + 1}</SmallLabel>
+            <QuestionText>{poll.question}</QuestionText>
+            { pollOptionElements }
+        </Poll>
+    );
+}
+
+const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromETH, totalViewerFromOutsideETH, totalStudentsInTalentPool, questions, polls, icons }) => {
+
+    let categoryElements = [];
+    let questionElements = [];
+    let pollElements = [];
+
+    function compareOptions(optionA, optionB) {
+        return studentStats.options[optionB].entries - studentStats.options[optionA].entries;
+    }
+
+    if (studentStats && studentStats.type === 'specialized') {
+        categoryElements = Object.keys(studentStats.options).sort(compareOptions).filter(option => studentStats.options[option].entries > 0).map( (option, index) => {
+            return <SpecializedCategoryElement option={studentStats.options[option]} index={index}/>
+        })
+    }
+
+    questionElements = questions.slice(0, 3).map( question => {
+        return <QuestionView question={question}/>;
+    })
+
+    pollElements = polls.filter( poll => !poll.new ).map( (poll, index) => {
+        return <PollView poll={poll} index={index}/>;
+    })
+
+    let numberOfUpvotes = 0;
+    questions.forEach( question => numberOfUpvotes += question.votes );
+    
     return (
         <Document>
             <CFPage>
+                <TopView>
+                    <View style={{ maxWidth: '15vw' }}>
+                        <CFLogo source={group.logoUrl}/>
+                    </View>
+                    <View style={{ maxWidth: '15vw' }}>
+                        <CFLogo source='https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fcareerfairy.png?alt=media&token=bb70f6e3-9c0d-47e7-8c56-66063b4a211e'/>
+                    </View>
+                </TopView>     
                 <View>
-                    <Label>Live Stream Report</Label>
-                    <Title>{ props.livestream.title }</Title>
+                    <View style={{ maxWidth: '25vw', marginBottom: '20px' }}>
+                        <CompanyLogo source={livestream.companyLogoUrl}/>
+                    </View>
+                    <Label>Live Stream Report</Label>                  
+                    <Title>{ livestream.title }</Title> 
+                    <SubTitle>Your Audience</SubTitle>
+                    <TotalViewer>
+                        Total Number Of Registered Students from {group.universityName}: { totalViewerFromETH }
+                    </TotalViewer>
+                    <TotalViewer>
+                        Total Number Of Registered Students from outside {group.universityName}: { totalViewerFromOutsideETH }
+                    </TotalViewer>
+                    <TotalViewer>
+                        Total Number Of Students registered to the Talent Pool: { totalStudentsInTalentPool }
+                    </TotalViewer>
+                    <CategoriesParent>
+                        <Border>
+                            <LargeText style={{ color: 'grey'}}>Category</LargeText> 
+                            <LargeNumber style={{ color: 'grey'}}>#</LargeNumber>
+                            <SubCategoryParent>
+                            <SmallView>
+                                <SmallText>Bachelor</SmallText>
+                            </SmallView>
+                            <SmallView>
+                                <SmallText>Master</SmallText>
+                            </SmallView>
+                            <SmallView>
+                                <SmallText>PhD</SmallText>
+                            </SmallView>
+                            </SubCategoryParent>
+                        </Border>
+                        { categoryElements }
+                    </CategoriesParent>
+                    <SubTitle>Engagement Figures</SubTitle>
+                    <EngagementParent>
+                        <EngagementChild>
+                            <View><Text># Questions</Text></View>
+                            <ColorText><Text>{ questions.length }</Text></ColorText>
+                        </EngagementChild>
+                        <EngagementChild>
+                            <View><Text># Reactions</Text></View>
+                            <ColorText><Text>{ icons.length }</Text></ColorText>
+                        </EngagementChild>
+                        <EngagementChild>
+                            <View><Text># Upvotes</Text></View>
+                            <ColorText><Text>{ numberOfUpvotes }</Text></ColorText>
+                        </EngagementChild>
+                    </EngagementParent>
+                    <SubTitle>Most upvoted questions</SubTitle>
+                    { questionElements }
+                    <SubTitle>Your polls</SubTitle>
+                    { pollElements }
                 </View>
             </CFPage>
         </Document>

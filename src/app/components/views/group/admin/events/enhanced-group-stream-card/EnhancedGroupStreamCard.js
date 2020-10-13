@@ -1,14 +1,11 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {withFirebase} from 'context/firebase';
-import GetAppIcon from "@material-ui/icons/GetApp";
 import EditIcon from '@material-ui/icons/Edit';
-import HowToRegIcon from '@material-ui/icons/HowToReg';
 import {Box, Button, CardMedia, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, IconButton, InputLabel, Menu, MenuItem, Select, Typography} from "@material-ui/core";
 import GroupStreamCard from 'components/views/NextLivestreams/GroupStreams/GroupStreamCard';
 import { CSVLink } from "react-csv";
 import StatsUtil from 'data/util/StatsUtil';
 import { PDFDownloadLink, Document, Page, View, Text } from '@react-pdf/renderer';
-import { window } from 'global';
 import LivestreamPdfReport from './LivestreamPdfReport';
 
 const EnhancedGroupStreamCard = (props) => {
@@ -22,6 +19,11 @@ const EnhancedGroupStreamCard = (props) => {
     const [registeredStudentsFromGroup, setRegisteredStudentsFromGroup] = useState([]);
     const [studentStats, setStudentStats] = useState(null);
     const [talentPool, setTalentPool] = useState([]);
+
+    const [icons, setIcons] = useState([]);
+    const [questions, setQuestions] = useState([]);
+    const [polls, setPolls] = useState([]);
+
     const [download, setDownload] = useState(false);
 
     useEffect(() => {
@@ -105,6 +107,48 @@ const EnhancedGroupStreamCard = (props) => {
         }      
     }, [props.livestream, allGroups, registeredStudentsFromGroup]);
 
+    useEffect(() => {
+        if (props.livestream) {
+            props.firebase.listLivestreamQuestions(props.livestream.id, querySnapshot => {
+                let questionList = [];
+                querySnapshot.forEach(doc => {
+                    let cc = doc.data();
+                    cc.id = doc.id;
+                    questionList.push(cc);
+                });
+                setQuestions(questionList);
+            })
+        }  
+    }, [props.livestream]);
+
+    useEffect(() => {
+        if (props.livestream) {
+            props.firebase.listenToPollEntries(props.livestream.id, querySnapshot => {
+                let pollList = [];
+                querySnapshot.forEach(doc => {
+                    let cc = doc.data();
+                    cc.id = doc.id;
+                    pollList.push(cc);
+                });
+                setPolls(pollList);
+            })
+        }  
+    }, [props.livestream]);
+
+    useEffect(() => {
+        if (props.livestream) {
+            props.firebase.listenToLivestreamIcons(props.livestream.id, querySnapshot => {
+                let iconList = [];
+                querySnapshot.forEach(doc => {
+                    let cc = doc.data();
+                    cc.id = doc.id;
+                    iconList.push(cc);
+                });
+                setIcons(iconList);
+            })
+        }  
+    }, [props.livestream]);
+
     function studentBelongsToGroup(student) {
         if (student.universityCode) {
             if (student.universityCode === props.group.universityCode) {
@@ -163,26 +207,33 @@ const EnhancedGroupStreamCard = (props) => {
             <IconButton style={{ position: 'absolute', top: '140px', right: '10px', zIndex: '2000' }} onClick={() => setModalOpen(true)}>
                 <EditIcon fontSize="large" color="inherit"/>
             </IconButton>
-            <CSVLink data={registeredStudentsFromGroup} filename={'livestream' + props.livestream.id + '.csv'} style={{ color: 'red' }}>
-                <IconButton style={{ position: 'absolute', top: '190px', right: '10px', zIndex: '2000' }}>
-                    <GetAppIcon fontSize="large" color="inherit"/>
-                </IconButton>
+            <div style={{ position: 'absolute', top: '210px', right: '10px', zIndex: '2000', fontWeight: '600' }}>{ registeredStudentsFromGroup.length } students registered</div>
+            <CSVLink data={registeredStudentsFromGroup} filename={'Registered Students ' + props.livestream.company + ' ' + props.livestream.id + '.csv'} style={{ color: 'red' }}>
+                <Button variant='outlined' style={{ position: 'absolute', top: '240px', right: '10px', zIndex: '2000' }}>
+                    Registered Students
+                </Button>
             </CSVLink>
-            <CSVLink data={talentPool} filename={'talentPool' + props.livestream.id + '.csv'} style={{ color: 'red' }}>
-                <IconButton style={{ position: 'absolute', top: '240px', right: '10px', zIndex: '2000' }}>
-                    <HowToRegIcon fontSize="large" color="inherit"/>
-                </IconButton>
+            <CSVLink data={talentPool} filename={'TalentPool ' + props.livestream.company + ' ' + props.livestream.id + '.csv'} style={{ color: 'red' }}>
+                <Button variant='outlined' style={{ position: 'absolute', top: '290px', right: '10px', zIndex: '2000' }}>
+                    Talent Pool
+                </Button>
             </CSVLink>
-            <div style={{ display: download ? 'none' : 'block', position: 'absolute', top: '290px', right: '10px', zIndex: '2000' }}>
-                <Button primary onClick={() => setDownload(true)}>Request</Button>
+            {/* <div style={{ display: download ? 'none' : 'block', position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }}>
+                <Button variant='outlined' primary onClick={() => setDownload(true)}>Generate Report</Button>
             </div>
-            <PDFDownloadLink document={download ? <LivestreamPdfReport livestream={props.livestream} studentStats={studentStats}/> : null} fileName="somename.pdf"  style={{ position: 'absolute', top: '290px', right: '10px', zIndex: '2000' }}>
+            <PDFDownloadLink fileName="somename.pdf" style={{ position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }} document={download ? 
+                <LivestreamPdfReport group={props.group} 
+                    livestream={props.livestream} 
+                    studentStats={studentStats} 
+                    totalStudentsInTalentPool={talentPool.length}
+                    totalViewerFromOutsideETH={registeredStudents.length - registeredStudentsFromGroup.length} 
+                    totalViewerFromETH={registeredStudentsFromGroup.length} questions={questions} polls={polls} icons={icons}/> : null} >
                 {({ blob, url, loading, error }) => (
                     <div>
-                        <Button primary >Download</Button>
+                        <Button variant='outlined' color='primary' >Download Report</Button>
                     </div>
                 )}
-            </PDFDownloadLink> 
+            </PDFDownloadLink>  */}
             <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle align="center">Update Target Groups</DialogTitle>
                 <DialogContent>
