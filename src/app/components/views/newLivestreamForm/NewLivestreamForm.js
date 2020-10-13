@@ -1,4 +1,5 @@
 import React, {Fragment, useEffect, useState} from 'react';
+import DeleteIcon from '@material-ui/icons/Delete';
 import {
     Box,
     Button,
@@ -24,6 +25,10 @@ import MultiGroupSelect from "./MultiGroupSelect/MultiGroupSelect";
 import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import {useRouter} from "next/router";
+import FormGroup from "./FormGroup";
+import IconButton from "@material-ui/core/IconButton";
+import {HighlightOffOutlined} from "@material-ui/icons";
+import Fab from "@material-ui/core/Fab";
 
 
 const useStyles = makeStyles(theme => ({
@@ -39,11 +44,21 @@ const useStyles = makeStyles(theme => ({
     form: {
         width: "100%"
     },
-    formGroup: {
-        background: "white",
-        marginTop: theme.spacing(3),
-        marginBottom: theme.spacing(3),
+    speakersLabel: {
+        color: "white",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between"
     },
+    submit: {
+        color: theme.palette.primary.main,
+        background: "white",
+        marginTop: theme.spacing(2),
+        "&:hover": {
+            color: 'white',
+            background: theme.palette.primary.main,
+        }
+    }
 }));
 
 const speakerObj = {
@@ -384,8 +399,8 @@ const NewLivestreamForm = ({firebase}) => {
                               setValues,
                               /* and other goodies */
                           }) => (<form onSubmit={handleSubmit} className={classes.form}>
-                            <Box className={classes.formGroup} borderRadius={4} component={Grid} boxShadow={1} p={1}
-                                 spacing={2} container>
+                            <Typography style={{color: "white"}} variant="h4">Stream Info:</Typography>
+                            <FormGroup>
                                 <Grid xs={7} sm={7} md={10} lg={10} xl={10} item>
                                     <FormControl fullWidth>
                                         <TextField name="title"
@@ -516,47 +531,48 @@ const NewLivestreamForm = ({firebase}) => {
                                         </Collapse>
                                     </FormControl>
                                 </Grid>
-                            </Box>
+                            </FormGroup>
 
                             {Object.keys(values.speakers).map((key, index) => {
                                 return (
-                                    <>
-                                        <Box display="flex" justifyContent="space-between" alignItems="center">
-                                            <Typography style={{color: "white"}}
-                                                        variant="h4">{index === 0 ? "Main Speaker" : `Speaker ${index + 1}`}</Typography>
-                                            {!!index && <Button onClick={() => handleDeleteSpeaker(key, values, setValues)}
-                                                                variant="contained" color="secondary"
-                                                                startIcon={<HighlightOffIcon/>}>
-                                                Delete</Button>}
-                                        </Box>
-                                        <SpeakerForm key={key} handleDeleteSpeaker={handleDeleteSpeaker}
-                                                     setValues={setValues}
-                                                     speakerObj={speakerObj}
-                                                     handleAddSpeaker={handleAddSpeaker}
-                                                     objectKey={key}
-                                                     index={index}
-                                                     errors={errors}
-                                                     firstNameError={handleError(key, "firstName", errors, touched)}
-                                                     lastNameError={handleError(key, "lastName", errors, touched)}
-                                                     positionError={handleError(key, "position", errors, touched)}
-                                                     backgroundError={handleError(key, "background", errors, touched)}
-                                                     getDownloadUrl={getDownloadUrl}
-                                                     loading={fetchingAvatars}
-                                                     speaker={values.speakers[key]}
-                                                     values={values}
-                                                     touched={touched}
-                                                     firebase={firebase}
-                                                     setFieldValue={setFieldValue}
-                                                     isSubmitting={isSubmitting}
-                                                     path="mentors-pictures"
-                                                     handleBlur={handleBlur}
-                                                     options={existingAvatars}/>
-                                    </>)
+                                    <Fragment key={key}>
+                                        <div className={classes.speakersLabel}>
+                                            <Typography variant="h4">{index === 0 ? "Main Speaker:" : `Speaker ${index + 1}:`}</Typography>
+                                            {!!index &&
+                                            <Fab size="small" color="secondary"
+                                                 onClick={() => handleDeleteSpeaker(key, values, setValues)}>
+                                                <DeleteIcon/>
+                                            </Fab>}
+                                        </div>
+                                        <FormGroup>
+                                            <SpeakerForm key={key} handleDeleteSpeaker={handleDeleteSpeaker}
+                                                         setValues={setValues}
+                                                         speakerObj={speakerObj}
+                                                         handleAddSpeaker={handleAddSpeaker}
+                                                         objectKey={key}
+                                                         index={index}
+                                                         errors={errors}
+                                                         firstNameError={handleError(key, "firstName", errors, touched)}
+                                                         lastNameError={handleError(key, "lastName", errors, touched)}
+                                                         positionError={handleError(key, "position", errors, touched)}
+                                                         backgroundError={handleError(key, "background", errors, touched)}
+                                                         getDownloadUrl={getDownloadUrl}
+                                                         loading={fetchingAvatars}
+                                                         speaker={values.speakers[key]}
+                                                         values={values}
+                                                         touched={touched}
+                                                         firebase={firebase}
+                                                         setFieldValue={setFieldValue}
+                                                         isSubmitting={isSubmitting}
+                                                         path="mentors-pictures"
+                                                         handleBlur={handleBlur}
+                                                         options={existingAvatars}/>
+                                        </FormGroup>
+                                    </Fragment>)
                             })}
 
-                            <Typography style={{color: "white"}} variant="h4">Group Info</Typography>
-                            <Box className={classes.formGroup} borderRadius={4} component={Grid} boxShadow={1} p={1}
-                                 spacing={2} container>
+                            <Typography style={{color: "white"}} variant="h4">Group Info:</Typography>
+                            <FormGroup>
                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                                     <MultiGroupSelect handleChange={handleChange}
                                                       handleBlur={handleBlur}
@@ -577,19 +593,18 @@ const NewLivestreamForm = ({firebase}) => {
                                                              group={group}/>
                                     </Grid>
                                 })}
-                            </Box>
-                            <Box className={classes.formGroup} borderRadius={4} component={Grid} boxShadow={1} p={1}
-                                 spacing={2} container>
-                                <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
-                                    <Button type="submit"
-                                            disabled={isSubmitting}
-                                            color="primary"
-                                            endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
-                                            variant="contained" fullWidth>
-                                        {isSubmitting ? "Saving" : updateMode ? "Update Livestream" : "Create Livestream"}
-                                    </Button>
-                                </Grid>
-                            </Box>
+                            </FormGroup>
+                            <Button type="submit"
+                                    disabled={isSubmitting}
+                                    size="large"
+                                    className={classes.submit}
+                                    endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
+                                    variant="contained" fullWidth>
+                                <Typography variant="h4">
+                                    {updateMode ? isSubmitting ? "Updating" : "Update Livestream" : isSubmitting ? "Saving" : "Create Livestream"}
+                                </Typography>
+                            </Button>
+
                         </form>)}
                     </Formik> :
                     <CircularProgress style={{marginTop: "30vh", color: "white"}}/>}
