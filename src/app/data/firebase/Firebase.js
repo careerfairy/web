@@ -957,14 +957,7 @@ class Firebase {
                 transaction.update(livestreamRef, {
                     registeredUsers: firebase.firestore.FieldValue.arrayUnion(userId),
                 });
-                transaction.set(registeredUsersRef, {
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    registeredGroups: user.registeredGroups || [],
-                    university: user.university || "",
-                    levelOfStudy: user.levelOfStudy || "",
-                    faculty: user.faculty || "",
-                });
+                transaction.set(registeredUsersRef, user);
             });
         });
     };

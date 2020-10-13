@@ -151,7 +151,7 @@ const EnhancedGroupStreamCard = (props) => {
     }, [props.livestream]);
 
     function studentBelongsToGroup(student) {
-        if (student.universityCode) {
+        if (props.group.universityCode) {
             if (student.universityCode === props.group.universityCode) {
                 return student.groupIds && student.groupIds.includes(props.group.groupId);
             } else {
