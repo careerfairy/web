@@ -17,7 +17,6 @@ import {v4 as uuidv4} from 'uuid';
 import {withFirebase} from "../../../context/firebase";
 import ImageSelect from "./ImageSelect/ImageSelect";
 import {makeStyles} from "@material-ui/core/styles";
-import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import {DateTimePicker, MuiPickersUtilsProvider,} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import SpeakerForm from "./SpeakerForm/SpeakerForm";
@@ -496,56 +495,6 @@ const NewLivestreamForm = ({firebase}) => {
                                                         }}/>
                                     </MuiPickersUtilsProvider>
                                 </Grid>
-                            </Box>
-
-                            {Object.keys(values.speakers).map((key, index) => {
-                                return (
-                                    <Fragment key={key}>
-                                        <Box display="flex" justifyContent="space-between" alignItems="center">
-                                            <Typography style={{color: "white"}}
-                                                        variant="h4">{index === 0 ? "Main Speaker" : `Speaker ${index + 1}`}</Typography>
-                                            {!!index && <Button onClick={() => handleDeleteSpeaker(key, values, setValues)}
-                                                                variant="contained" color="secondary"
-                                                                startIcon={<HighlightOffIcon/>}>
-                                                Delete</Button>}
-                                        </Box>
-                                        <Box className={classes.formGroup} borderRadius={4} component={Grid}
-                                             boxShadow={1} spacing={2} p={1} container>
-                                            <SpeakerForm objectKey={key}
-                                                         index={index}
-                                                         errors={errors}
-                                                         firstNameError={handleError(key, "firstName", errors, touched)}
-                                                         lastNameError={handleError(key, "lastName", errors, touched)}
-                                                         positionError={handleError(key, "position", errors, touched)}
-                                                         backgroundError={handleError(key, "background", errors, touched)}
-                                                         getDownloadUrl={getDownloadUrl}
-                                                         loading={fetchingAvatars}
-                                                         speaker={values.speakers[key]}
-                                                         values={values}
-                                                         touched={touched}
-                                                         firebase={firebase}
-                                                         setFieldValue={setFieldValue}
-                                                         isSubmitting={isSubmitting}
-                                                         path="mentors-pictures"
-                                                         handleBlur={handleBlur}
-                                                         options={existingAvatars}
-                                            />
-                                            {index === Object.keys(values.speakers).length - 1 &&
-                                            <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
-                                                <Button startIcon={<PersonAddIcon/>}
-                                                        disabled={Object.keys(values.speakers).length >= 3 || isSubmitting}
-                                                        onClick={() => handleAddSpeaker(values, setValues, speakerObj)}
-                                                        type="button" color="primary" variant="contained" fullWidth>
-                                                    {Object.keys(values.speakers).length >= 3 ? "3 Speakers Maximum" : "Add a Speaker"}
-                                                </Button>
-                                            </Grid>}
-                                        </Box>
-                                    </Fragment>
-                                )
-                            })}
-
-                            <Box className={classes.formGroup} borderRadius={4} component={Grid} boxShadow={1} p={1}
-                                 spacing={2} container>
                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                                     <FormControl fullWidth>
                                         <TextField name="summary"
@@ -567,6 +516,47 @@ const NewLivestreamForm = ({firebase}) => {
                                         </Collapse>
                                     </FormControl>
                                 </Grid>
+                            </Box>
+
+                            {Object.keys(values.speakers).map((key, index) => {
+                                return (
+                                    <>
+                                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                                            <Typography style={{color: "white"}}
+                                                        variant="h4">{index === 0 ? "Main Speaker" : `Speaker ${index + 1}`}</Typography>
+                                            {!!index && <Button onClick={() => handleDeleteSpeaker(key, values, setValues)}
+                                                                variant="contained" color="secondary"
+                                                                startIcon={<HighlightOffIcon/>}>
+                                                Delete</Button>}
+                                        </Box>
+                                        <SpeakerForm key={key} handleDeleteSpeaker={handleDeleteSpeaker}
+                                                     setValues={setValues}
+                                                     speakerObj={speakerObj}
+                                                     handleAddSpeaker={handleAddSpeaker}
+                                                     objectKey={key}
+                                                     index={index}
+                                                     errors={errors}
+                                                     firstNameError={handleError(key, "firstName", errors, touched)}
+                                                     lastNameError={handleError(key, "lastName", errors, touched)}
+                                                     positionError={handleError(key, "position", errors, touched)}
+                                                     backgroundError={handleError(key, "background", errors, touched)}
+                                                     getDownloadUrl={getDownloadUrl}
+                                                     loading={fetchingAvatars}
+                                                     speaker={values.speakers[key]}
+                                                     values={values}
+                                                     touched={touched}
+                                                     firebase={firebase}
+                                                     setFieldValue={setFieldValue}
+                                                     isSubmitting={isSubmitting}
+                                                     path="mentors-pictures"
+                                                     handleBlur={handleBlur}
+                                                     options={existingAvatars}/>
+                                    </>)
+                            })}
+
+                            <Typography style={{color: "white"}} variant="h4">Group Info</Typography>
+                            <Box className={classes.formGroup} borderRadius={4} component={Grid} boxShadow={1} p={1}
+                                 spacing={2} container>
                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                                     <MultiGroupSelect handleChange={handleChange}
                                                       handleBlur={handleBlur}
@@ -593,9 +583,10 @@ const NewLivestreamForm = ({firebase}) => {
                                 <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                                     <Button type="submit"
                                             disabled={isSubmitting}
-                                            style={{background: "rgb(44, 66, 81)", color: "white"}}
+                                            color="primary"
+                                            endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
                                             variant="contained" fullWidth>
-                                        {updateMode ? "Update Livestream" : "Create Livestream"}
+                                        {isSubmitting ? "Saving" : updateMode ? "Update Livestream" : "Create Livestream"}
                                     </Button>
                                 </Grid>
                             </Box>
