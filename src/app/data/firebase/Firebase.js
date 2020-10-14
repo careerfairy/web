@@ -254,7 +254,7 @@ class Firebase {
 
     // CREATE_LIVESTREAMS
 
-    addLivestream = async (livestream, speakers, setErrorCallback) => {
+    addLivestream = async (livestream, speakers) => {
         try {
             let batch = this.firestore.batch();
             let livestreamsRef = this.firestore

@@ -81,7 +81,7 @@ const ImageSelect =
         const [open, setOpen] = useState(false);
         const [filePickerError, setFilePickerError] = useState(null)
 
-        const getSelectedItem = () => {// Autocomplete will always complain because of async filtering... :( So ignore the warning
+        const getSelectedItem = () => {// Not needed anymore
             const item = options.find((option) => option.value === value)
             // console.log("-> item", item);
             if (item) {
@@ -130,8 +130,8 @@ const ImageSelect =
                         setOpen(false);
                     }}
                     getOptionLabel={(option) => option.text || ""}
-                    value={getSelectedItem()}
-                    getOptionSelected={(option, value) => option.value === value.value || true}
+                    // value={getSelectedItem()}
+                    // getOptionSelected={(option, value) =>  true}
                     options={options}
                     loading={loading}
                     renderInput={(params) => (

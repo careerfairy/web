@@ -34,7 +34,7 @@ const MultiGroupSelect = (
             id="groupIds"
             name="groupIds"
             multiple
-            disabled={isSubmitting}
+            disabled={!groups.length || isSubmitting}
             value={selectedGroups}
             options={groups}
             onChange={handleMultiSelect}
