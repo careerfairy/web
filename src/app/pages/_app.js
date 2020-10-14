@@ -28,7 +28,7 @@ function MyApp({Component, pageProps}) {
     const [authenticatedUser, setAuthenticatedUser] = useState(undefined);
     const [userData, setUserData] = useState(undefined);
     const [loading, setLoading] = useState(false)
-    const [loaded, setLoaded] = useState(false)
+    const [hideLoader, setHideLoader] = useState(false)
 
     useEffect(() => {
         // Remove the server-side injected CSS.
@@ -76,7 +76,7 @@ function MyApp({Component, pageProps}) {
 
     useEffect(() => {
         if (authenticatedUser === null || userData === null || loading === true) {
-            setLoaded(true)
+            setHideLoader(true)
         }
 
     }, [authenticatedUser, userData, loading])
@@ -88,7 +88,7 @@ function MyApp({Component, pageProps}) {
                 <title>CareerFairy | Watch live streams. Get hired.</title>
             </Head>
             <FirebaseContext.Provider value={firebase}>
-                <UserContext.Provider value={{authenticatedUser, userData, setUserData, loading, loaded}}>
+                <UserContext.Provider value={{authenticatedUser, userData, setUserData, loading, hideLoader}}>
                     <ThemeProvider theme={theme}>
                         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                         <CssBaseline/>

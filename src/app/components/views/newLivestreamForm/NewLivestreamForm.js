@@ -74,6 +74,7 @@ const NewLivestreamForm = ({firebase}) => {
     const router = useRouter()
     const {
         query: {livestreamId},
+        push
     } = router;
     const classes = useStyles()
 
@@ -381,13 +382,18 @@ const NewLivestreamForm = ({firebase}) => {
                     setSubmitting(true)
                     const livestream = buildLivestreamObject(values);
                     const speakers = buildSpeakersArray(values);
-
+                    let id = ""
                     if (updateMode) {
-                        const id = await firebase.updateLivestream(livestream, speakers)
+                        id = await firebase.updateLivestream(livestream, speakers)
                         console.log("-> Livestream was updated with id", id);
                     } else {
-                        const id = await firebase.addLivestream(livestream, speakers)
+                        id = await firebase.addLivestream(livestream, speakers)
                         console.log("-> Livestream was created with id", id);
+                    }
+                    if (values.hidden && values.groupIds.length) {
+                        return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)
+                    } else {
+                        return push(`/upcoming-livestream/${id}`)
                     }
                 }}
             >

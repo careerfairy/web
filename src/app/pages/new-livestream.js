@@ -17,8 +17,8 @@ import Loader from "../components/views/loader/Loader";
 
 const newLivestreams = () => {
 
-    const {replace, asPath: absolutePath} = useRouter();
-    const {userData, authenticatedUser: user, loading, loaded} = useContext(UserContext);
+    const {replace, asPath: absolutePath, back} = useRouter();
+    const {userData, authenticatedUser: user, hideLoader} = useContext(UserContext);
 
     useEffect(() => {
         if (user === null) {
@@ -27,10 +27,14 @@ const newLivestreams = () => {
                 query: {absolutePath},
             });
         }
-    }, [user]);
+
+        if (userData && !userData.isAdmin) {
+            replace(`/`);
+        }
+    }, [user, userData]);
 
 
-    return loaded ? (
+    return hideLoader && userData && userData.isAdmin ? (
         <TealBackground style={{paddingBottom: 0}}>
             <Head>
                 <title key="title">CareerFairy | Create Live Streams</title>
@@ -39,9 +43,9 @@ const newLivestreams = () => {
                 <Header color="white"/>
             </div>
             <Typography variant="h3" align="center" style={{marginTop: "1.5rem", color: "white"}}>
-                {userData?.isAdmin ? "Create a Livestream" : "You are not authorized"}
+                Create a Livestream
             </Typography>
-            {userData?.isAdmin && <NewLivestreamForm/>}
+            <NewLivestreamForm/>
             <Footer/>
         </TealBackground>
     ) : <Loader/>;
