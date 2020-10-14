@@ -2,7 +2,7 @@ import React, {Fragment, useEffect, useState} from 'react';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {
     Box,
-    Button,
+    Button, Card, CardHeader,
     CircularProgress,
     Collapse,
     Container,
@@ -148,10 +148,10 @@ const NewLivestreamForm = ({firebase}) => {
                         })
                     }
                     setUpdateMode(true)
-                } else {
-                    setUpdateMode(false)
                 }
             })()
+        } else {
+            setUpdateMode(false)
         }
     }, [livestreamId, allFetched])
 
@@ -323,6 +323,14 @@ const NewLivestreamForm = ({firebase}) => {
         setCallback(newValues)
     }
 
+    const renderUnauthorized = (
+        <Container className={classes.root}>
+            <Card>
+                <CardHeader>You are not authorized to use this page</CardHeader>
+            </Card>
+        </Container>
+    )
+
 
     return (<Container className={classes.root}>
         {(allFetched && updateMode !== undefined) ? <Formik
@@ -420,6 +428,7 @@ const NewLivestreamForm = ({firebase}) => {
                               item>
                             <FormControlLabel
                                 labelPlacement="start"
+                                label="Hidden"
                                 control={
                                     <Switch
                                         checked={values.hidden}
@@ -430,7 +439,6 @@ const NewLivestreamForm = ({firebase}) => {
                                         name="hidden"
                                         inputProps={{'aria-label': 'primary checkbox'}}
                                     />}
-                                label="Hidden"
                             />
                         </Grid>
                         <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
@@ -528,7 +536,6 @@ const NewLivestreamForm = ({firebase}) => {
                             </FormControl>
                         </Grid>
                     </FormGroup>
-
                     {Object.keys(values.speakers).map((key, index) => {
                         return (
                             <Fragment key={key}>
@@ -567,7 +574,6 @@ const NewLivestreamForm = ({firebase}) => {
                                 </FormGroup>
                             </Fragment>)
                     })}
-
                     <Typography style={{color: "white"}} variant="h4">Group Info:</Typography>
                     <FormGroup>
                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
