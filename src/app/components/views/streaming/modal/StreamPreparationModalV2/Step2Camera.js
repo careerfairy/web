@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
 
 }))
 
-const Step2Camera = ({videoSource, devices, setVideoSource, playSound, handleMarkComplete, localStream, isCompleted}) => {
+const Step2Camera = ({videoSource, devices, setVideoSource, playSound, handleMarkComplete, handleMarkIncomplete, localStream, isCompleted}) => {
     const classes = useStyles()
 
     const testVideoRef = useRef(null);
@@ -45,6 +45,7 @@ const Step2Camera = ({videoSource, devices, setVideoSource, playSound, handleMar
 
     const handleChangeCam = (event) => {
         setVideoSource(event.target.value)
+        handleMarkIncomplete()
     }
 
     const getSelected = () => {
@@ -59,12 +60,7 @@ const Step2Camera = ({videoSource, devices, setVideoSource, playSound, handleMar
             {/*    <Typography align="center" gutterBottom variant="h4"><b>Video</b></Typography>*/}
             {/*    <Typography variant="subtitle1">Please select your camera for this stream:</Typography>*/}
             {/*</Grid>*/}
-            <Grid sm={12} xs={12} item>
-                <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-                    <video style={{boxShadow: '0 0 3px rgb(200,200,200)', borderRadius: '5px'}}
-                           ref={testVideoRef} muted={playSound} autoPlay width={'100%'}/>
-                </div>
-            </Grid>
+            
             <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
                 <FormControl disabled={!devices.videoDeviceList.length} fullWidth variant="outlined">
                     <InputLabel shrink
@@ -92,6 +88,12 @@ const Step2Camera = ({videoSource, devices, setVideoSource, playSound, handleMar
                     </Select>
                 </FormControl>
             </Grid>
+            <Grid sm={12} xs={12} item>
+                <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                    <video style={{boxShadow: '0 0 3px rgb(200,200,200)', borderRadius: '5px'}}
+                           ref={testVideoRef} muted={playSound} autoPlay width={'100%'}/>
+                </div>
+            </Grid>
             <Grid style={{display: "flex"}} lg={12} md={12} sm={12} xs={12} item>
                 <FormControlLabel style={{margin: "0 auto"}}
                                   control={<Checkbox
@@ -100,11 +102,9 @@ const Step2Camera = ({videoSource, devices, setVideoSource, playSound, handleMar
                                       onChange={handleMarkComplete}
                                       value={isCompleted}
                                       checked={isCompleted}
-                                      disabled={isCompleted}
                                       color="primary"
                                   />}
-                                  label={<Typography
-                                      variant="h5">{devices.videoDeviceList.length ? `I wish to use ${getSelected()}` : "No camera detected, I wish to continue without"}
+                                  label={<Typography>{devices.videoDeviceList.length ? `I wish to use this camera for the live stream` : "No camera detected, I wish to continue without"}
                                   </Typography>}
                 />
                 {/*<Button fullWidth color="primary" variant="contained" className={classes.button} size="large"*/}

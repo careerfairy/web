@@ -22,6 +22,7 @@ import Step3Speakers from "./Step3Speakers";
 import Step4Mic from "./Step4Mic";
 import Step5Confirm from "./Step5Confirm";
 import {makeStyles} from "@material-ui/core/styles";
+import window from 'global';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -35,10 +36,10 @@ const useStyles = makeStyles(theme => ({
 }))
 
 // Firefox 1.0+
-const isFirefox = typeof InstallTrigger !== 'undefined';
+var isChromium = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
 
 function getSteps() {
-    return ['Browser', 'Camera', 'Speakers', 'Microphone', 'Confirm'];
+    return ['Get Started', 'Camera', 'Speakers', 'Microphone', 'Confirm'];
 }
 
 
@@ -202,13 +203,14 @@ const StreamPreparationModalV2 = ({
         switch (stepIndex) {
             case 0:
                 return <Step1Chrome handleMarkComplete={handleMarkComplete}
-                                    isFirefox={isFirefox}
+                                    isChromium={isChromium}
                                     isCompleted={isCompleted()}/>;
             case 1:
                 return <Step2Camera audioLevel={audioLevel}
                                     audioSource={audioSource}
                                     devices={devices}
                                     handleMarkComplete={handleMarkComplete}
+                                    handleMarkIncomplete={handleMarkIncomplete}
                                     isCompleted={isCompleted()}
                                     localStream={localStream}
                                     playSound={playSound}
@@ -220,7 +222,6 @@ const StreamPreparationModalV2 = ({
             case 2:
                 return <Step3Speakers setSpeakerSource={setSpeakerSource}
                                       devices={devices}
-                                      isFirefox={isFirefox}
                                       handleMarkIncomplete={handleMarkIncomplete}
                                       handleMarkComplete={handleMarkComplete}
                                       isCompleted={isCompleted()}
@@ -260,7 +261,8 @@ const StreamPreparationModalV2 = ({
                 <h3 style={{color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3>
             </DialogTitle>
             <DialogContent className={classes.root}>
-                {!isFirefox && <Stepper className={classes.stepper} activeStep={activeStep} alternativeLabel>
+                { isChromium && 
+                <Stepper className={classes.stepper} activeStep={activeStep} alternativeLabel>
                     {steps.map((label, index) => {
                         const stepProps = {};
                         const buttonProps = {};
@@ -281,38 +283,39 @@ const StreamPreparationModalV2 = ({
                     })}
                 </Stepper>}
                 {getStepContent(activeStep)}
-                {!isFirefox &&
-                        <DialogActions>
-                            <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
-                                Back
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                disabled={!isStepComplete(activeStep)}
-                                onClick={handleNext}
-                                className={classes.button}
-                            >
-                                Next
-                            </Button>
-                            {isStepOptional(activeStep) && !completed.has(activeStep) && (
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={handleSkip}
-                                    className={classes.button}
-                                >
-                                    Skip
-                                </Button>
-                            )}
+                { isChromium && 
+                <DialogActions>
+                    <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
+                        Back
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        disabled={!isStepComplete(activeStep)}
+                        onClick={handleNext}
+                        className={classes.button}
+                    >
+                        Next
+                    </Button>
+                    {isStepOptional(activeStep) && !completed.has(activeStep) && (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleSkip}
+                            className={classes.button}
+                        >
+                            Skip
+                        </Button>
+                    )}
 
-                            {completedSteps() === totalSteps() - 1 && activeStep === 4 &&
-                            <Button variant="contained" color="primary" onClick={handleFinalize}>
-                                Continue
-                            </Button>}
-                        </DialogActions>}
+                    {completedSteps() === totalSteps() - 1 && activeStep === 4 &&
+                    <Button variant="contained" color="primary" onClick={handleFinalize}>
+                        Continue
+                    </Button>}
+                </DialogActions>}
                 <p style={{fontSize: '0.8em', color: 'grey'}}>If anything is unclear or not working, please <a
                     href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
+                
             </DialogContent>
         </Dialog>
     );

@@ -27,10 +27,13 @@ const useStyles = makeStyles(theme => ({
         "& .MuiButton-root": {
             margin: "0 5px"
         }
+    },
+    speakerTester: {
+        padding: "3rem 0"
     }
 }))
 
-const Step3Speakers = ({setSpeakerSource, speakerSource, devices, isFirefox, attachSinkId, handleMarkComplete, isCompleted, handleMarkIncomplete}) => {
+const Step3Speakers = ({setSpeakerSource, speakerSource, devices, attachSinkId, handleMarkComplete, isCompleted, handleMarkIncomplete}) => {
     const classes = useStyles()
     const [playing, toggle, audio] = useAudio("https://www.kozco.com/tech/piano2-CoolEdit.mp3")
     const [localSpeakers, setLocalSpeakers] = useState([])
@@ -49,6 +52,7 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, devices, isFirefox, att
 
     useEffect(() => {
         toggle()
+        handleMarkIncomplete()
     }, []);
 
     useEffect(() => {
@@ -100,6 +104,7 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, devices, isFirefox, att
         const targetIndex = localSpeakers.findIndex(device => device.value === value)
         markAsChecked(targetIndex)
         attachSinkId(audio, event.target.value);
+        handleMarkIncomplete();
     }
 
     const markAsChecked = (index) => {
@@ -119,66 +124,10 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, devices, isFirefox, att
         return localSpeakers.findIndex(device => device.value === speakerSource)
     }
 
-    if (isFirefox) {
-        return (
-            <Grid container spacing={2}>
-                <Grid lg={12} md={12} sm={12} xs={12} item>
-                    <Typography align="center" variant="h3"
-                                gutterBottom><b>Do you hear a ringtone?</b></Typography>
-                    <Typography align="center" variant="subtitle1">If not please check your device sound
-                        settings.</Typography>
-                </Grid>
-                <Grid className={classes.warning} lg={12} md={12} sm={12} xs={12} item>
-                    <Typography align="center" color="error">
-                        It seems that you are using the <b>Firefox</b> web browser, please
-                        be aware that you may
-                        encounter issues
-                        using this browser
-                    </Typography>
-                    <Button fullWidth color="secondary" size="large"
-                            variant="outlined"
-                            style={{marginTop: 10}}
-                            disabled={isCompleted}
-                            startIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
-                            endIcon={<ErrorOutlineIcon style={{color: "red"}}/>}
-                            onClick={handleMarkComplete}>
-                        <Typography align="center" color="error">
-                            <strong>
-                                I am aware and I wish to continue
-                            </strong>
-                        </Typography>
-                    </Button>
-                </Grid>
-            </Grid>
-        )
-    }
-
     return (
         <Grid style={{padding: "1rem 0"}} container spacing={4}>
-            <Grid lg={12} md={12} sm={12} xs={12} item>
-                <Typography align="center" variant="h4"
-                            gutterBottom><b>{allTested ? "We have tested all your speakers" : "Do you hear a ringtone?"}</b></Typography>
-                <div className={classes.buttons}>
-                    {allTested ?
-                        <Button variant="outlined" onClick={handleTestAgain}>
-                            Test Again
-                        </Button>
-                        :
-                        <>
-                            <Button disabled={isCompleted} onClick={handleMarkComplete} variant="outlined">
-                                Yes
-                            </Button>
-                            <Button onClick={handleCantHear} variant="outlined">
-                                No
-                            </Button>
-                        </>
-                    }
-                </div>
-                {clickedNo && !allTested &&
-                <Typography align="center">You have {localSpeakers.length} speakers, Now testing
-                    speaker {speakerNumber() + 1}... </Typography>}
-            </Grid>
-            {localSpeakers.length && <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
+            {localSpeakers.length && 
+            <Grid item lg={12} md={12} sm={12} xs={12}>
                 <FormControl disabled={!localSpeakers.length} fullWidth variant="outlined">
                     <InputLabel id="speakerSelect">Select Speakers</InputLabel>
                     <Select value={speakerSource}
@@ -198,6 +147,31 @@ const Step3Speakers = ({setSpeakerSource, speakerSource, devices, isFirefox, att
                     </Select>
                 </FormControl>
             </Grid>}
+            <Grid lg={12} md={12} sm={12} xs={12} item>
+                <div className={classes.speakerTester}>
+                    <Typography align="center" variant="h4"
+                                gutterBottom><b>{allTested ? "We have tested all your speakers" : "Do you hear a ringtone?"}</b></Typography>
+                    <div className={classes.buttons}>
+                        {allTested ?
+                            <Button variant="outlined" onClick={handleTestAgain}>
+                                Test Again
+                            </Button>
+                            :
+                            <>
+                                <Button disabled={isCompleted} onClick={handleMarkComplete} variant="outlined">
+                                    Yes
+                                </Button>
+                                <Button onClick={handleCantHear} variant="outlined">
+                                    No
+                                </Button>
+                            </>
+                        }
+                    </div>
+                    {clickedNo && !allTested &&
+                    <Typography align="center">You have {localSpeakers.length} speakers, Now testing
+                        speaker {speakerNumber() + 1}... </Typography>}
+                </div>
+            </Grid>
         </Grid>
     );
 };

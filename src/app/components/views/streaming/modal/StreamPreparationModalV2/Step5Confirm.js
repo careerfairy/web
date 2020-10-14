@@ -34,15 +34,18 @@ const Step5Confirm = ({audioSource, videoSource, devices, speakerSource}) => {
 
     return (
         <>
-            <CheckCircleOutlineIcon color="primary" style={{margin: '0 auto', fontSize: "3em", marginBottom: "0.2rem"}}/>
-            <Typography variant="h4" align="center"><b>You are ready to stream!</b></Typography>
-            <Typography variant="subtitle1" align="center">Your stream will go live once you press "Start Streaming".</Typography>
+            <div style={{ textAlign: "center", padding: "3rem 0"}}>
+                <CheckCircleOutlineIcon color="primary" style={{margin: '0 auto', fontSize: "3em", marginBottom: "0.2rem"}}/>
+                <Typography variant="h5" align="center"><b>You are ready to stream!</b></Typography>
+                <Typography variant="subtitle1" align="center">Your stream will go live once you press "Start Streaming".</Typography>
+            </div>      
             <Grid style={{padding: "1rem 0"}} spacing={2} container>
                 <Grid sm={12} xs={12} lg={12} xl={12} hidden={!labels.camera.length} item>
                     <TextField id="camera"
                                label="Camera"
                                fullWidth
                                disabled
+                               size="small"
                                InputProps={{readOnly: true}}
                                value={labels.camera}
                                variant="outlined"/>
@@ -52,6 +55,7 @@ const Step5Confirm = ({audioSource, videoSource, devices, speakerSource}) => {
                                label="Microphone"
                                fullWidth
                                disabled
+                               size="small"
                                InputProps={{readOnly: true}}
                                value={labels.microphone}
                                variant="outlined"/>
@@ -61,6 +65,7 @@ const Step5Confirm = ({audioSource, videoSource, devices, speakerSource}) => {
                                label="Speaker"
                                fullWidth
                                disabled
+                               size="small"
                                InputProps={{readOnly: true}}
                                value={labels.speaker}
                                variant="outlined"/>

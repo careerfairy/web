@@ -16,12 +16,6 @@ import SoundLevelDisplayer from "../../../common/SoundLevelDisplayer";
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({
-    actions: {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        flexDirection: "column"
-    },
     button: {
         height: "100%"
     },
@@ -85,10 +79,12 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
 
     useEffect(() => {
         setPlaySound(true)
+        handleMarkIncomplete()
     }, [])
 
     const handleChangeMic = (event) => {
         setAudioSource(event.target.value)
+        handleMarkIncomplete()
     }
 
     const handleTestAgain = () => {
@@ -134,9 +130,30 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
     }
 
     return (
-        <Grid style={{padding: "1rem 0"}} container spacing={4}>
-            <audio ref={testAudioRef} autoPlay/>
-            <Grid lg={12} md={12} sm={12} xs={12} item>
+        <Grid container spacing={4}>
+            <audio ref={testAudioRef} autoPlay/>       
+            {localMicrophones.length && 
+            <Grid item lg={12} md={12} sm={12} xs={12}>
+                <FormControl style={{marginBottom: 10}} disabled={!devices.audioInputList.length} fullWidth variant="outlined">
+                    <InputLabel id="microphoneSelect">Select Microphone</InputLabel>
+                    <Select value={audioSource}
+                            fullWidth
+                            onChange={handleChangeMic}
+                            variant="outlined"
+                            id="microphoneSelect"
+                            label="Select Microphone"
+                    >
+                        <MenuItem value="" disabled>
+                            Choose a Microphone
+                        </MenuItem>
+                        {localMicrophones.map(device => {
+                            return (<MenuItem key={device.value} value={device.value}>{device.text}</MenuItem>)
+                        })}
+                    </Select>
+                </FormControl>
+                <SoundLevelDisplayer audioLevel={audioLevel}/>
+            </Grid>}
+            <Grid lg={12} md={12} sm={12} xs={12} style={{padding: "3rem 0"}} item>
                 <Typography align="center" variant="h5"
                             gutterBottom><b>{allTested ? "We have tested all your Microphones" : "Speak and pause, do you hear a replay?"}</b></Typography>
                 <div className={classes.buttons}>
@@ -162,36 +179,6 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
                 <Typography align="center">You have {localMicrophones.length} microphones, Now testing
                     microphone {micNumber() + 1}... </Typography>}
             </Grid>
-            <Grid style={{display: "flex", alignItems: "center", flexDirection: "column"}} lg={12} md={12} sm={12}
-                  xs={12} item>
-                {/*<div className={classes.emphasis}>*/}
-                {/*    <HeadsetMicIcon style={{marginRight: 5}} fontSize="large" color="primary"/>*/}
-                {/*    <Typography color="primary"><b>USE HEADPHONES!</b></Typography>*/}
-                {/*    <HeadsetMicIcon style={{marginLeft: 5}} fontSize="large" color="primary"/>*/}
-                {/*</div>*/}
-                    {/*<Typography variant="h5" style={{fontWeight: '700'}}>Microphone:</Typography>*/}
-                    {localMicrophones.length && <Grid item className={classes.actions} lg={12} md={12} sm={12} xs={12}>
-                        <FormControl style={{marginBottom: 10}} disabled={!devices.audioInputList.length} fullWidth variant="outlined">
-                            <InputLabel id="microphoneSelect">Select Microphone</InputLabel>
-                            <Select value={audioSource}
-                                    fullWidth
-                                    onChange={handleChangeMic}
-                                    variant="outlined"
-                                    id="microphoneSelect"
-                                    label="Select Microphone"
-                            >
-                                <MenuItem value="" disabled>
-                                    Choose a Microphone
-                                </MenuItem>
-                                {localMicrophones.map(device => {
-                                    return (<MenuItem key={device.value} value={device.value}>{device.text}</MenuItem>)
-                                })}
-                            </Select>
-                        </FormControl>
-                    <SoundLevelDisplayer audioLevel={audioLevel}/>
-                    </Grid>}
-            </Grid>
-
 
         </Grid>
     );

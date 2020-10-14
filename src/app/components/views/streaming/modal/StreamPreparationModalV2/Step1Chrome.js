@@ -5,30 +5,54 @@ import {makeStyles} from "@material-ui/core/styles";
 import Link from "next/link";
 
 const chromeLogo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fchrome.svg?alt=media&token=516e705a-bafa-4a43-99f7-e184cc85b557"
+const edgeLogo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fedge.svg?alt=media&token=f4165230-170e-454f-9fca-adea53798b9f"
 
 
 const useStyles = makeStyles((theme) => ({
+    icons: {
+        margin: "20px 20px 20px 20px"
+    },
     svg: {
-        width: 50
+        width: 60,
+        margin: "0 10px"
     },
     root: {
         display: "flex",
         flexDirection: "column",
         alignItems: "center"
+    },
+    boldText: {
+        fontWeight: 800,
+        fontStyle: "normal"
+    },
+    bottomText: {
+        paddingBottom: "20px"
+    },
+    list: {
+        padding: "5px 20px",
+        fontSize: "1rem"
+    },
+    icon: {
+        marginRight: "5px"
     }
 }));
-const Step1Chrome = ({isCompleted, handleMarkComplete, isFirefox}) => {
+const Step1Chrome = ({isCompleted, handleMarkComplete, isChromium}) => {
     const classes = useStyles()
 
-    if (isFirefox) {
+    if (!isChromium) {
         return (
             <>
-                <Typography align="center" variant="h4"><b>Please use a supported browser</b></Typography>
+                <Typography align="center" variant="h5"><b>This browser is not supported for streaming</b></Typography>
                 <Box display="flex" flexDirection="column" alignItems="center" m={1} elevation={2}>
-                    <img style={{marginBottom: 10}} alt="chrome logo" className={classes.svg}
-                         src={chromeLogo}/><Typography
-                    align="center">Use a supported browser like the latest Google
-                    Chrome desktop browser (v. 80 and newer).</Typography>
+                    <div  className={classes.icons}>
+                        <img style={{marginBottom: 10}} alt="chrome logo" className={classes.svg}
+                            src={chromeLogo}/>
+                        <img style={{marginBottom: 10}} alt="edge logo" className={classes.svg}
+                            src={edgeLogo}/>
+                    </div>      
+                    <Typography className={classes.bottomText}
+                    align="center">Please use a supported browser like the latest <em className={classes.boldText}>Google
+                    Chrome</em> (v. 80 and newer) or <em className={classes.boldText}>Chromium Microsoft Edge</em> (v. 79 or newer).</Typography>
                 </Box>
             </>
         )
@@ -37,22 +61,16 @@ const Step1Chrome = ({isCompleted, handleMarkComplete, isFirefox}) => {
     return (
         <>
             {/*<Typography gutterBottom align="center" variant="h4"><b>Preparation</b></Typography>*/}
-            <Typography align="center" variant="subtitle1">Please follow these couple of instructions to ensure a smooth streaming
-                experience:</Typography>
-            <Box display="flex" flexDirection="column" alignItems="center" m={1} elevation={2}>
-                <img style={{marginBottom: 10}} alt="chrome logo" className={classes.svg} src={chromeLogo}/><Typography
-                align="center"><strong>PLEASE USE</strong> the latest Google
-                Chrome desktop browser (v. 80 and newer).</Typography>
-            </Box>
-            <ul className='list'>
-                <li><Icon name='video'/>Make sure that your browser is authorized to access your webcam and
+            <Typography align="left" variant="subtitle1">Please follow these couple of instructions:</Typography>
+            <ul className={classes.list} >
+                <li><Icon name='video' style={{ marginRight: '10px' }}/>Make sure that your browser is authorized to access your webcam and
                     microphone.
                 </li>
-                <li><Icon name='microphone'/>Make sure that your webcam and/or microphone are not currently used
+                <li><Icon name='microphone' style={{ marginRight: '10px' }}/>Make sure that your webcam and/or microphone are not currently used
                     by
                     any other application.
                 </li>
-                <li><Icon name='wifi'/>If possible, avoid connecting through any VPN or corporate network with
+                <li><Icon name='wifi' style={{ marginRight: '10px' }}/>If possible, avoid connecting through any VPN or corporate network with
                     restrictive firewall rules.
                 </li>
             </ul>
@@ -63,10 +81,9 @@ const Step1Chrome = ({isCompleted, handleMarkComplete, isFirefox}) => {
                                   onChange={handleMarkComplete}
                                   value={isCompleted}
                                   checked={isCompleted}
-                                  disabled={isCompleted}
                                   color="primary"
                               />}
-                              label={<Typography variant="h5">I will use Google Chrome as a browser</Typography>}
+                              label={<Typography>I have understood and will follow these instructions</Typography>}
             />
             {/*<Button onClick={handleComplete} color="primary" variant="contained" fullWidth>*/}
             {/*    I agree to use Google Chrome as a browser*/}
