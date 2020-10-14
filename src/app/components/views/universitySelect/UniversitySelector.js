@@ -40,7 +40,7 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
 
 
     const getSelectedItem = () => {// Autocomplete will always complain because of async filtering... :( So ignore the warning
-        const item = universities.find((uni) => uni.id === values.university)
+        const item = universities.find((uni) => uni.id === values.universityCode)
         return item || otherObj
     }
 
@@ -55,7 +55,7 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
             autoHighlight
             onChange={(e, value) => {
                 if (value) {
-                    setFieldValue("university", value.id)
+                    setFieldValue("universityCode", value.id)
                 }
             }}
             open={open}
