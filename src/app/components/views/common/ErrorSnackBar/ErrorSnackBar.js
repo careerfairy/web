@@ -18,13 +18,14 @@ const ErrorSnackBar = ({errorMessage, handleClose}) => {
     const classes = useStyles()
     return (
         <Snackbar
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             open={Boolean(errorMessage.length)}
             onClose={handleClose}
             autoHideDuration={6000}
             TransitionComponent={TransitionRight}
             key={errorMessage}>
             <SnackbarContent
-                style={{backgroundColor: 'red'}}
+                style={{backgroundColor: 'red', fontSize: "1rem"}}
                 message={errorMessage}
                 action={
                     <IconButton
