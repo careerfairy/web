@@ -1,14 +1,15 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {
-    Box,
+    Snackbar,
+    SnackbarContent,
     Button, Card, CardHeader,
     CircularProgress,
     Collapse,
     Container,
     FormControl,
     FormControlLabel,
-    Grid,
+    Grid, Slide,
     Switch,
     TextField,
     Typography
@@ -23,7 +24,7 @@ import DateFnsUtils from "@date-io/date-fns";
 import SpeakerForm from "./SpeakerForm/SpeakerForm";
 import MultiGroupSelect from "./MultiGroupSelect/MultiGroupSelect";
 import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import CloseIcon from '@material-ui/icons/Close';
 import {useRouter} from "next/router";
 import FormGroup from "./FormGroup";
 import IconButton from "@material-ui/core/IconButton";
@@ -58,7 +59,10 @@ const useStyles = makeStyles(theme => ({
             color: 'white',
             background: theme.palette.primary.main,
         }
-    }
+    },
+    close: {
+        padding: theme.spacing(0.5),
+    },
 }));
 
 const speakerObj = {
@@ -69,6 +73,10 @@ const speakerObj = {
     background: ''
 }
 
+function TransitionRight(props) {
+    return <Slide {...props} direction="right"/>;
+}
+
 const mainSpeakerId = uuidv4()
 const NewLivestreamForm = ({firebase}) => {
     const router = useRouter()
@@ -77,6 +85,8 @@ const NewLivestreamForm = ({firebase}) => {
         push
     } = router;
     const classes = useStyles()
+
+    const [submitError, setSubmitError] = useState("");
 
     const [targetCategories, setTargetCategories] = useState({})
     const [selectedGroups, setSelectedGroups] = useState([])
@@ -324,6 +334,14 @@ const NewLivestreamForm = ({firebase}) => {
         setCallback(newValues)
     }
 
+    const handleOpenSnack = () => {
+
+    }
+
+    const handleCloseSnack = () => {
+        setSubmitError("")
+    }
+
     const renderUnauthorized = (
         <Container className={classes.root}>
             <Card>
@@ -379,21 +397,30 @@ const NewLivestreamForm = ({firebase}) => {
                     return errors;
                 }}
                 onSubmit={async (values, {setSubmitting}) => {
-                    setSubmitting(true)
-                    const livestream = buildLivestreamObject(values);
-                    const speakers = buildSpeakersArray(values);
-                    let id = ""
-                    if (updateMode) {
-                        id = await firebase.updateLivestream(livestream, speakers)
-                        console.log("-> Livestream was updated with id", id);
-                    } else {
-                        id = await firebase.addLivestream(livestream, speakers)
-                        console.log("-> Livestream was created with id", id);
-                    }
-                    if (values.hidden && values.groupIds.length) {
-                        return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)
-                    } else {
-                        return push(`/upcoming-livestream/${id}`)
+                    try {
+                        setSubmitError("")
+                        setSubmitting(true)
+                        const livestream = buildLivestreamObject(values);
+                        const speakers = buildSpeakersArray(values);
+                        let id = ""
+                        if (updateMode) {
+                            // id = await firebase.updateLivestream(livestream, speakers)
+                            console.log("-> Livestream was updated with id", id);
+                        } else {
+                            id = await firebase.addLivestream(livestream, speakers)
+                            console.log("-> Livestream was created with id", id);
+                        }
+                        if (values.hidden && values.groupIds.length) {
+                            return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)
+                        } else {
+                            return push(`/upcoming-livestream/${id}`)
+                        }
+                    } catch (e) {
+                        if (e.message) {
+                            setSubmitError(e.message)
+                        } else {
+                            setSubmitError("Something went wrong. Please try and refresh.")
+                        }
                     }
                 }}
             >
@@ -617,6 +644,23 @@ const NewLivestreamForm = ({firebase}) => {
                 </form>)}
             </Formik> :
             <CircularProgress style={{marginTop: "30vh", color: "white"}}/>}
+        <Snackbar open={Boolean(submitError.length)}
+                  onClose={handleCloseSnack}
+                  autoHideDuration={6000}
+                  TransitionComponent={TransitionRight}
+                  key={submitError}>
+            <SnackbarContent style={{backgroundColor: 'red'}}
+                             message={submitError}
+                             action={
+                                 <IconButton
+                                     aria-label="close"
+                                     color="inherit"
+                                     className={classes.close}
+                                     onClick={handleCloseSnack}>
+                                     <CloseIcon/>
+                                 </IconButton>
+                             }/>
+        </Snackbar>
     </Container>);
 };
 
