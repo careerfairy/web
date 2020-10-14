@@ -1,15 +1,13 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {Fragment, useContext, useEffect, useState} from 'react';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {
-    Snackbar,
-    SnackbarContent,
     Button, Card, CardHeader,
     CircularProgress,
     Collapse,
     Container,
     FormControl,
     FormControlLabel,
-    Grid, Slide,
+    Grid,
     Switch,
     TextField,
     Typography
@@ -24,12 +22,10 @@ import DateFnsUtils from "@date-io/date-fns";
 import SpeakerForm from "./SpeakerForm/SpeakerForm";
 import MultiGroupSelect from "./MultiGroupSelect/MultiGroupSelect";
 import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
-import CloseIcon from '@material-ui/icons/Close';
 import {useRouter} from "next/router";
 import FormGroup from "./FormGroup";
-import IconButton from "@material-ui/core/IconButton";
-import {HighlightOffOutlined} from "@material-ui/icons";
 import Fab from "@material-ui/core/Fab";
+import ErrorContext from "../../../context/error/ErrorContext";
 
 
 const useStyles = makeStyles(theme => ({
@@ -60,9 +56,6 @@ const useStyles = makeStyles(theme => ({
             background: theme.palette.primary.main,
         }
     },
-    close: {
-        padding: theme.spacing(0.5),
-    },
 }));
 
 const speakerObj = {
@@ -73,9 +66,6 @@ const speakerObj = {
     background: ''
 }
 
-function TransitionRight(props) {
-    return <Slide {...props} direction="right"/>;
-}
 
 const mainSpeakerId = uuidv4()
 const NewLivestreamForm = ({firebase}) => {
@@ -86,8 +76,7 @@ const NewLivestreamForm = ({firebase}) => {
     } = router;
     const classes = useStyles()
 
-    const [submitError, setSubmitError] = useState("");
-
+    const {setGeneralError} = useContext(ErrorContext);
     const [targetCategories, setTargetCategories] = useState({})
     const [selectedGroups, setSelectedGroups] = useState([])
 
@@ -166,61 +155,11 @@ const NewLivestreamForm = ({firebase}) => {
         }
     }, [livestreamId, allFetched])
 
-    const handleAddSpeaker = (values, setCallback, obj) => {
-        const newValues = {...values}
-        newValues.speakers[uuidv4()] = obj
-        setCallback(newValues)
-    }
-
-    const handleSetDefaultGroups = (arrayOfGroupIds) => {
-
-        if (Array.isArray(arrayOfGroupIds)) {
-            let groupsWithFlattenedOptions = []
-            arrayOfGroupIds.forEach(id => {
-                const targetGroup = existingGroups.find(group => group.groupId === id)
-                if (targetGroup) {
-                    targetGroup.flattenedOptions = handleFlattenOptions(targetGroup)
-                    groupsWithFlattenedOptions.push(targetGroup)
-                }
-            })
-            setSelectedGroups(groupsWithFlattenedOptions)
-        }
-    }
-
-    const handleGetMainSpeaker = (streamObj) => {
-        if (streamObj.mainSpeakerName.length) {
-            const fullnameArray = streamObj.mainSpeakerName.split(/[ ]+/)
-            return {
-                firstName: fullnameArray[0],
-                lastName: fullnameArray[1],
-                avatar: streamObj.mainSpeakerAvatar,
-                background: streamObj.mainSpeakerBackground,
-                position: streamObj.mainSpeakerPosition
-            }
-        } else {
-            return speakerObj
-        }
-    }
-
     useEffect(() => {
         handleGetFiles('mentors-pictures', setFetchingAvatars, setExistingAvatars)
         handleGetFiles('illustration-images', setFetchingBackgrounds, setExistingBackgrounds)
         handleGetFiles('company-logos', setFetchingLogos, setExistingLogos)
     }, [firebase])
-
-    const handleGetFiles = (path, setFetchingCallback, setDataCallback) => {
-        firebase.getStorageRef().child(path).listAll().then(res => {
-            let fileItems = [];
-            res.items.forEach(itemRef => {
-                fileItems.push(itemRef);
-            });
-            let options = fileItems.map(file => {
-                return {text: file.name, value: getDownloadUrl(file.fullPath)}
-            });
-            setFetchingCallback(false)
-            setDataCallback(options);
-        });
-    }
 
     useEffect(() => {
         const unsubscribe = firebase.listenToGroups(querySnapshot => {
@@ -271,6 +210,41 @@ const NewLivestreamForm = ({firebase}) => {
             return '';
         }
     }
+    const handleAddSpeaker = (values, setCallback, obj) => {
+        const newValues = {...values}
+        newValues.speakers[uuidv4()] = obj
+        setCallback(newValues)
+    }
+
+    const handleSetDefaultGroups = (arrayOfGroupIds) => {
+
+        if (Array.isArray(arrayOfGroupIds)) {
+            let groupsWithFlattenedOptions = []
+            arrayOfGroupIds.forEach(id => {
+                const targetGroup = existingGroups.find(group => group.groupId === id)
+                if (targetGroup) {
+                    targetGroup.flattenedOptions = handleFlattenOptions(targetGroup)
+                    groupsWithFlattenedOptions.push(targetGroup)
+                }
+            })
+            setSelectedGroups(groupsWithFlattenedOptions)
+        }
+    }
+
+    const handleGetMainSpeaker = (streamObj) => {
+        if (streamObj.mainSpeakerName.length) {
+            const fullnameArray = streamObj.mainSpeakerName.split(/[ ]+/)
+            return {
+                firstName: fullnameArray[0],
+                lastName: fullnameArray[1],
+                avatar: streamObj.mainSpeakerAvatar,
+                background: streamObj.mainSpeakerBackground,
+                position: streamObj.mainSpeakerPosition
+            }
+        } else {
+            return speakerObj
+        }
+    }
 
     const handleFlattenOptions = (group) => {
         let optionsArray = []
@@ -309,6 +283,20 @@ const NewLivestreamForm = ({firebase}) => {
         }
     }
 
+    const handleGetFiles = (path, setFetchingCallback, setDataCallback) => {
+        firebase.getStorageRef().child(path).listAll().then(res => {
+            let fileItems = [];
+            res.items.forEach(itemRef => {
+                fileItems.push(itemRef);
+            });
+            let options = fileItems.map(file => {
+                return {text: file.name, value: getDownloadUrl(file.fullPath)}
+            });
+            setFetchingCallback(false)
+            setDataCallback(options);
+        });
+    }
+
     const buildSpeakersArray = (values) => {
         return Object.keys(values.speakers).map((key) => {
             return {
@@ -333,23 +321,6 @@ const NewLivestreamForm = ({firebase}) => {
         delete newValues.speakers[key]
         setCallback(newValues)
     }
-
-    const handleOpenSnack = () => {
-
-    }
-
-    const handleCloseSnack = () => {
-        setSubmitError("")
-    }
-
-    const renderUnauthorized = (
-        <Container className={classes.root}>
-            <Card>
-                <CardHeader>You are not authorized to use this page</CardHeader>
-            </Card>
-        </Container>
-    )
-
 
     return (<Container className={classes.root}>
         {(allFetched && updateMode !== undefined) ? <Formik
@@ -398,29 +369,33 @@ const NewLivestreamForm = ({firebase}) => {
                 }}
                 onSubmit={async (values, {setSubmitting}) => {
                     try {
-                        setSubmitError("")
+                        setGeneralError("")
                         setSubmitting(true)
                         const livestream = buildLivestreamObject(values);
                         const speakers = buildSpeakersArray(values);
-                        let id = ""
+                        let response = {}
                         if (updateMode) {
-                            // id = await firebase.updateLivestream(livestream, speakers)
-                            console.log("-> Livestream was updated with id", id);
+                            response = await firebase.updateLivestream(livestream, speakers)
+                            if (response.status === "ERROR") {
+                                throw new Error()
+                            }
                         } else {
-                            id = await firebase.addLivestream(livestream, speakers)
-                            console.log("-> Livestream was created with id", id);
+                            response = await firebase.addLivestream(livestream, speakers)
+                            if (response.status === "ERROR") {
+                                throw new Error()
+                            }
                         }
-                        if (values.hidden && values.groupIds.length) {
-                            return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)
-                        } else {
-                            return push(`/upcoming-livestream/${id}`)
+                        if (response.status === "OK") {
+                            const id = response.data
+                            console.log("-> Livestream was created or updated with id", id);
+                            if (values.hidden && values.groupIds.length) {
+                                return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)
+                            } else {
+                                return push(`/upcoming-livestream/${id}`)
+                            }
                         }
                     } catch (e) {
-                        if (e.message) {
-                            setSubmitError(e.message)
-                        } else {
-                            setSubmitError("Something went wrong. Please try and refresh.")
-                        }
+                        setGeneralError("Something went wrong")
                     }
                 }}
             >
@@ -440,17 +415,18 @@ const NewLivestreamForm = ({firebase}) => {
                     <FormGroup>
                         <Grid xs={7} sm={7} md={10} lg={10} xl={10} item>
                             <FormControl fullWidth>
-                                <TextField name="title"
-                                           variant="outlined"
-                                           fullWidth
-                                           id="title"
-                                           label="Livestream Title"
-                                           inputProps={{maxLength: 70}}
-                                           onBlur={handleBlur}
-                                           value={values.title}
-                                           disabled={isSubmitting}
-                                           error={Boolean(errors.title && touched.title && errors.title)}
-                                           onChange={handleChange}/>
+                                <TextField
+                                    name="title"
+                                    variant="outlined"
+                                    fullWidth
+                                    id="title"
+                                    label="Livestream Title"
+                                    inputProps={{maxLength: 70}}
+                                    onBlur={handleBlur}
+                                    value={values.title}
+                                    disabled={isSubmitting}
+                                    error={Boolean(errors.title && touched.title && errors.title)}
+                                    onChange={handleChange}/>
                                 <Collapse style={{color: "red"}} in={Boolean(errors.title && touched.title)}>
                                     {errors.title}
                                 </Collapse>
@@ -471,8 +447,7 @@ const NewLivestreamForm = ({firebase}) => {
                                         disabled={isSubmitting}
                                         name="hidden"
                                         inputProps={{'aria-label': 'primary checkbox'}}
-                                    />}
-                            />
+                                    />}/>
                         </Grid>
                         <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                             <ImageSelect
@@ -491,28 +466,30 @@ const NewLivestreamForm = ({firebase}) => {
                                 error={errors.companyLogoUrl && touched.companyLogoUrl && errors.companyLogoUrl}/>
                         </Grid>
                         <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-                            <ImageSelect getDownloadUrl={getDownloadUrl} values={values} firebase={firebase}
-                                         setFieldValue={setFieldValue} isSubmitting={isSubmitting}
-                                         path="illustration-images"
-                                         label="Company Background" handleBlur={handleBlur}
-                                         formName="backgroundImageUrl"
-                                         value={values.backgroundImageUrl} options={existingBackgrounds}
-                                         loading={fetchingBackgrounds}
-                                         error={errors.backgroundImageUrl && touched.backgroundImageUrl && errors.backgroundImageUrl}/>
+                            <ImageSelect
+                                getDownloadUrl={getDownloadUrl} values={values} firebase={firebase}
+                                setFieldValue={setFieldValue} isSubmitting={isSubmitting}
+                                path="illustration-images"
+                                label="Company Background" handleBlur={handleBlur}
+                                formName="backgroundImageUrl"
+                                value={values.backgroundImageUrl} options={existingBackgrounds}
+                                loading={fetchingBackgrounds}
+                                error={errors.backgroundImageUrl && touched.backgroundImageUrl && errors.backgroundImageUrl}/>
                         </Grid>
                         <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                             <FormControl fullWidth>
-                                <TextField name="company"
-                                           variant="outlined"
-                                           fullWidth
-                                           id="company"
-                                           label="Company Name"
-                                           inputProps={{maxLength: 70}}
-                                           onBlur={handleBlur}
-                                           value={values.company}
-                                           disabled={isSubmitting}
-                                           error={Boolean(errors.company && touched.company && errors.company)}
-                                           onChange={handleChange}/>
+                                <TextField
+                                    name="company"
+                                    variant="outlined"
+                                    fullWidth
+                                    id="company"
+                                    label="Company Name"
+                                    inputProps={{maxLength: 70}}
+                                    onBlur={handleBlur}
+                                    value={values.company}
+                                    disabled={isSubmitting}
+                                    error={Boolean(errors.company && touched.company && errors.company)}
+                                    onChange={handleChange}/>
                                 <Collapse style={{color: "red"}} in={Boolean(errors.company && touched.company)}>
                                     {errors.company}
                                 </Collapse>
@@ -520,17 +497,18 @@ const NewLivestreamForm = ({firebase}) => {
                         </Grid>
                         <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                             <FormControl fullWidth>
-                                <TextField name="companyId"
-                                           variant="outlined"
-                                           fullWidth
-                                           id="companyId"
-                                           label="Company ID"
-                                           inputProps={{maxLength: 70}}
-                                           onBlur={handleBlur}
-                                           value={values.companyId}
-                                           disabled={isSubmitting}
-                                           error={Boolean(errors.companyId && touched.companyId && errors.companyId)}
-                                           onChange={handleChange}/>
+                                <TextField
+                                    name="companyId"
+                                    variant="outlined"
+                                    fullWidth
+                                    id="companyId"
+                                    label="Company ID"
+                                    inputProps={{maxLength: 70}}
+                                    onBlur={handleBlur}
+                                    value={values.companyId}
+                                    disabled={isSubmitting}
+                                    error={Boolean(errors.companyId && touched.companyId && errors.companyId)}
+                                    onChange={handleChange}/>
                                 <Collapse style={{color: "red"}}
                                           in={Boolean(errors.companyId && touched.companyId)}>
                                     {errors.companyId}
@@ -539,30 +517,32 @@ const NewLivestreamForm = ({firebase}) => {
                         </Grid>
                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                             <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                <DateTimePicker inputVariant="outlined" fullWidth variant="outlined"
-                                                disabled={isSubmitting}
-                                                label="Livestream Start Date" value={values.start}
-                                                onChange={(value) => {
-                                                    setFieldValue('start', new Date(value), true)
-                                                }}/>
+                                <DateTimePicker
+                                    inputVariant="outlined" fullWidth variant="outlined"
+                                    disabled={isSubmitting}
+                                    label="Livestream Start Date" value={values.start}
+                                    onChange={(value) => {
+                                        setFieldValue('start', new Date(value), true)
+                                    }}/>
                             </MuiPickersUtilsProvider>
                         </Grid>
                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                             <FormControl fullWidth>
-                                <TextField name="summary"
-                                           variant="outlined"
-                                           fullWidth
-                                           multiline
-                                           id="summary"
-                                           label="Summary"
-                                           rows={2}
-                                           rowsMax={7}
-                                           inputProps={{maxLength: 500}}
-                                           onBlur={handleBlur}
-                                           value={values.summary}
-                                           disabled={isSubmitting}
-                                           error={Boolean(errors.summary && touched.summary && errors.summary)}
-                                           onChange={handleChange}/>
+                                <TextField
+                                    name="summary"
+                                    variant="outlined"
+                                    fullWidth
+                                    multiline
+                                    id="summary"
+                                    label="Summary"
+                                    rows={2}
+                                    rowsMax={7}
+                                    inputProps={{maxLength: 500}}
+                                    onBlur={handleBlur}
+                                    value={values.summary}
+                                    disabled={isSubmitting}
+                                    error={Boolean(errors.summary && touched.summary && errors.summary)}
+                                    onChange={handleChange}/>
                                 <Collapse style={{color: "red"}} in={Boolean(errors.summary && touched.summary)}>
                                     {errors.summary}
                                 </Collapse>
@@ -582,85 +562,72 @@ const NewLivestreamForm = ({firebase}) => {
                                     </Fab>}
                                 </div>
                                 <FormGroup spacing={3}>
-                                    <SpeakerForm key={key} handleDeleteSpeaker={handleDeleteSpeaker}
-                                                 setValues={setValues}
-                                                 speakerObj={speakerObj}
-                                                 handleAddSpeaker={handleAddSpeaker}
-                                                 objectKey={key}
-                                                 index={index}
-                                                 errors={errors}
-                                                 firstNameError={handleError(key, "firstName", errors, touched)}
-                                                 lastNameError={handleError(key, "lastName", errors, touched)}
-                                                 positionError={handleError(key, "position", errors, touched)}
-                                                 backgroundError={handleError(key, "background", errors, touched)}
-                                                 getDownloadUrl={getDownloadUrl}
-                                                 loading={fetchingAvatars}
-                                                 speaker={values.speakers[key]}
-                                                 values={values}
-                                                 touched={touched}
-                                                 firebase={firebase}
-                                                 setFieldValue={setFieldValue}
-                                                 isSubmitting={isSubmitting}
-                                                 path="mentors-pictures"
-                                                 handleBlur={handleBlur}
-                                                 options={existingAvatars}/>
+                                    <SpeakerForm
+                                        key={key}
+                                        handleDeleteSpeaker={handleDeleteSpeaker}
+                                        setValues={setValues}
+                                        speakerObj={speakerObj}
+                                        handleAddSpeaker={handleAddSpeaker}
+                                        objectKey={key}
+                                        index={index}
+                                        errors={errors}
+                                        firstNameError={handleError(key, "firstName", errors, touched)}
+                                        lastNameError={handleError(key, "lastName", errors, touched)}
+                                        positionError={handleError(key, "position", errors, touched)}
+                                        backgroundError={handleError(key, "background", errors, touched)}
+                                        getDownloadUrl={getDownloadUrl}
+                                        loading={fetchingAvatars}
+                                        speaker={values.speakers[key]}
+                                        values={values}
+                                        touched={touched}
+                                        firebase={firebase}
+                                        setFieldValue={setFieldValue}
+                                        isSubmitting={isSubmitting}
+                                        path="mentors-pictures"
+                                        handleBlur={handleBlur}
+                                        options={existingAvatars}/>
                                 </FormGroup>
                             </Fragment>)
                     })}
                     <Typography style={{color: "white"}} variant="h4">Group Info:</Typography>
                     <FormGroup>
                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
-                            <MultiGroupSelect handleChange={handleChange}
-                                              handleBlur={handleBlur}
-                                              values={values}
-                                              isSubmitting={isSubmitting}
-                                              selectedGroups={selectedGroups}
-                                              handleAddTargetCategories={handleAddTargetCategories}
-                                              handleFlattenOptions={handleFlattenOptions}
-                                              setSelectedGroups={setSelectedGroups}
-                                              setFieldValue={setFieldValue}
-                                              groups={existingGroups}/>
+                            <MultiGroupSelect
+                                handleChange={handleChange}
+                                handleBlur={handleBlur}
+                                values={values}
+                                isSubmitting={isSubmitting}
+                                selectedGroups={selectedGroups}
+                                handleAddTargetCategories={handleAddTargetCategories}
+                                handleFlattenOptions={handleFlattenOptions}
+                                setSelectedGroups={setSelectedGroups}
+                                setFieldValue={setFieldValue}
+                                groups={existingGroups}/>
                         </Grid>
                         {selectedGroups.map(group => {
                             return <Grid key={group.groupId} xs={12} sm={12} md={12} lg={12} xl={12} item>
-                                <GroupCategorySelect handleSetGroupCategories={handleSetGroupCategories}
-                                                     targetCategories={targetCategories}
-                                                     isSubmitting={isSubmitting}
-                                                     group={group}/>
+                                <GroupCategorySelect
+                                    handleSetGroupCategories={handleSetGroupCategories}
+                                    targetCategories={targetCategories}
+                                    isSubmitting={isSubmitting}
+                                    group={group}/>
                             </Grid>
                         })}
                     </FormGroup>
-                    <Button type="submit"
-                            disabled={isSubmitting}
-                            size="large"
-                            className={classes.submit}
-                            endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
-                            variant="contained" fullWidth>
+                    <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        size="large"
+                        className={classes.submit}
+                        endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
+                        variant="contained" fullWidth>
                         <Typography variant="h4">
                             {updateMode ? isSubmitting ? "Updating" : "Update Livestream" : isSubmitting ? "Saving" : "Create Livestream"}
                         </Typography>
                     </Button>
-
                 </form>)}
             </Formik> :
             <CircularProgress style={{marginTop: "30vh", color: "white"}}/>}
-        <Snackbar open={Boolean(submitError.length)}
-                  onClose={handleCloseSnack}
-                  autoHideDuration={6000}
-                  TransitionComponent={TransitionRight}
-                  key={submitError}>
-            <SnackbarContent style={{backgroundColor: 'red'}}
-                             message={submitError}
-                             action={
-                                 <IconButton
-                                     aria-label="close"
-                                     color="inherit"
-                                     className={classes.close}
-                                     onClick={handleCloseSnack}>
-                                     <CloseIcon/>
-                                 </IconButton>
-                             }/>
-        </Snackbar>
     </Container>);
 };
 
