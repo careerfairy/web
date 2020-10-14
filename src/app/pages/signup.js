@@ -207,7 +207,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     recipientEmail: user.email,
                     firstName: formData.firstName,
                     lastName: formData.lastName,
-                    university: formData.university,
+                    universityCode: formData.universityCode,
                     universityCountryCode: formData.universityCountryCode,
                 }
             }).then(response => {
@@ -268,8 +268,8 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     } else if (!/^\D+$/i.test(values.lastName)) {
                         errors.lastName = 'Please enter a valid last name';
                     }
-                    if (!values.university) {
-                        errors.university = 'Select a university or type "other"';
+                    if (!values.universityCode) {
+                        errors.universityCode = 'Select a university or type "other"';
                     }
                     if (!values.password) {
                         errors.password = 'A password is required';
@@ -402,7 +402,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <UniversitySelector handleBlur={handleBlur}
-                                                    error={errors.university && touched.university && errors.university}
+                                                    error={errors.universityCode && touched.universityCode && errors.universityCode}
                                                     universityCountryCode={values.universityCountryCode}
                                                     values={values}
                                                     submitting={submitting(isSubmitting)}

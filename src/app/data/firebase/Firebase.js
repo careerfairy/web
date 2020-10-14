@@ -62,14 +62,14 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    setUserData = (userEmail, firstName, lastName, university, universityCountryCode) => {
+    setUserData = (userEmail, firstName, lastName, universityCode, universityCountryCode) => {
         let ref = this.firestore.collection("userData").doc(userEmail);
         return ref.update({
             id: userEmail,
             userEmail,
             firstName,
             lastName,
-            university,
+            universityCode,
             universityCountryCode
         });
     };
@@ -957,14 +957,7 @@ class Firebase {
                 transaction.update(livestreamRef, {
                     registeredUsers: firebase.firestore.FieldValue.arrayUnion(userId),
                 });
-                transaction.set(registeredUsersRef, {
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    registeredGroups: user.registeredGroups || [],
-                    university: user.university || "",
-                    levelOfStudy: user.levelOfStudy || "",
-                    faculty: user.faculty || "",
-                });
+                transaction.set(registeredUsersRef, user);
             });
         });
     };

@@ -416,7 +416,7 @@ exports.sendPostmarkEmailUserDataAndUni = functions.https.onRequest(async (req, 
     const recipient_email = req.body.recipientEmail;
     const recipient_first_name = req.body.firstName;
     const recipient_last_name = req.body.lastName;
-    const recipient_university = req.body.university;
+    const recipient_university = req.body.universityCode;
     const recipient_university_country_code = req.body.universityCountryCode;
     const pinCode = getRandomInt(9999);
 
@@ -427,7 +427,7 @@ exports.sendPostmarkEmailUserDataAndUni = functions.https.onRequest(async (req, 
             firstName: recipient_first_name,
             lastName: recipient_last_name,
             userEmail: recipient_email,
-            university: recipient_university,
+            universityCode: recipient_university,
             universityCountryCode: recipient_university_country_code,
         });
 
