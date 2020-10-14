@@ -20,14 +20,16 @@ function HandRaiseCategory(props) {
     const [handRaiseState, setHandRaiseState] = useState(null); 
 
     useEffect(() => {
-        let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
-        if (props.livestream && authEmail) {
-            props.firebase.listenToHandRaiseState(props.livestream.id, authEmail, querySnapshot => {
-                if (querySnapshot.exists) {
-                    let request = querySnapshot.data();
-                    setHandRaiseState(request);
-                }
-            });
+        if (props.livestream.test || authenticatedUser) {
+            let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
+            if (props.livestream && authEmail) {
+                props.firebase.listenToHandRaiseState(props.livestream.id, authEmail, querySnapshot => {
+                    if (querySnapshot.exists) {
+                        let request = querySnapshot.data();
+                        setHandRaiseState(request);
+                    }
+                });
+            }
         }
     },[props.livestream, authenticatedUser]);
 
@@ -40,14 +42,15 @@ function HandRaiseCategory(props) {
     },[handRaiseState]);
 
     function updateHandRaiseRequest(state) {
-        let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
-        let checkedUserData = props.livestream.test ? { firstName: 'Test', lastName: 'Streamer' } : userData;
-        debugger;
-        if (handRaiseState) {
-            props.firebase.updateHandRaiseRequest(props.livestream.id, authEmail, state);
-        } else {
-            props.firebase.createHandRaiseRequest(props.livestream.id, authEmail, checkedUserData);
-        }
+        if (props.livestream.test || authenticatedUser.email) {
+            let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
+            let checkedUserData = props.livestream.test ? { firstName: 'Test', lastName: 'Streamer' } : userData;
+            if (handRaiseState) {
+                props.firebase.updateHandRaiseRequest(props.livestream.id, authEmail, state);
+            } else {
+                props.firebase.createHandRaiseRequest(props.livestream.id, authEmail, checkedUserData);
+            }
+        }    
     }
 
     return (
