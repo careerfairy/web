@@ -5,8 +5,8 @@ import StatsUtil from 'data/util/StatsUtil';
 import { useEffect, useState } from 'react';
 
 Font.register({ family: 'Poppins', fonts: [
-    { src: 'http://fonts.gstatic.com/s/poppins/v13/pxiByp8kv8JHgFVrLGT9Z1xlEN2JQEk.ttf', fontWeight: 'normal'},
-    { src: 'http://fonts.gstatic.com/s/poppins/v13/pxiByp8kv8JHgFVrLDD4Z1xlEN2JQEk.ttf', fontWeight: 'bold'}
+    { src: 'https://fonts.gstatic.com/s/poppins/v13/pxiByp8kv8JHgFVrLGT9Z1xlEN2JQEk.ttf', fontWeight: 'normal'},
+    { src: 'https://fonts.gstatic.com/s/poppins/v13/pxiByp8kv8JHgFVrLDD4Z1xlEN2JQEk.ttf', fontWeight: 'bold'}
 ]});
 
 const CFPage = styled.Page`
