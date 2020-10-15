@@ -196,6 +196,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         setTimeout(() => {
                             if (!isPlayMode) {
                                 this.joinRoom(roomId, streamId);
+                                console.log("joiningTheRoom");
                             } else {
                                 this.joinRoom(roomId);
                             }
@@ -210,6 +211,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             publishNewStream(this, infoObj);
                         }
                         this.getRoomInfo(infoObj.ATTR_ROOM_NAME, infoObj.streamId);
+                        console.log("joinedTheRoom", infoObj);
                         break;
                     }
                     case "newStreamAvailable": {
@@ -218,6 +220,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         }
                         setAddedStream(infoObj);
                         this.enableStats(infoObj.streamId);
+                        console.log("newStreamAvailable", infoObj);
                         break;
                     }
                     case "roomInformation": {
@@ -225,6 +228,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onNewStreamAvailable(infoObj);
                         }
                         setStreamsInRoom(infoObj.streams);
+                        console.log("roomInformation", infoObj);
                         break;
                     }
                     case "leavedFromRoom": {
@@ -239,6 +243,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                                 this.joinRoom(roomId);
                             }
                         }, 400); 
+                        console.log("leavedFromRoom", infoObj);
                         break;
                     }
                     case "publish_started": {
