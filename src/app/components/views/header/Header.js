@@ -14,8 +14,12 @@ import UserContext from "../../../context/user/UserContext";
 function Header(props) {
     const [authenticated, setAuthenticated] = useState(false);
     const [sidebarState, setSidebarState] = useState("unopened");
+    const [highlightNext, setHighlightNext] = useState(false);
     const {userData, authenticatedUser, setUserData} = useContext(UserContext)
-    const {push} = useRouter()
+    const {push, pathname, query:{careerCenterId, livestreamId}} = useRouter()
+    console.log("-> careerCenterId", careerCenterId);
+    console.log("-> livestreamId", livestreamId);
+    console.log("-> pathname", pathname);
 
     useEffect(() => {
         if (userData) {
@@ -145,7 +149,7 @@ function Header(props) {
                 className={sidebarState !== "opened" ? 'sidebar hidden' : sidebarState === "opened" ? 'sidebar animated slideInLeft faster' : 'sidebar animated slideOutLeft faster'}>
                 <Icon name='times circle outline' size='big' onClick={toggleSideBar} style={{cursor: 'pointer'}}/>
                 <ul>
-                    <li><Link href='/next-livestreams'><a>Next Live Streams</a></Link></li>
+                    <li><Link className="next-livestream-link" href='/next-livestreams'><a>Next Live Streams</a></Link></li>
                     {authenticated && <li><a href='/groups'>Follow Groups</a></li>}
                     <li><Link href='/discover'><a>Past Live Streams</a></Link></li>
                     <li><Link href='/companies'><a>Companies</a></Link></li>
