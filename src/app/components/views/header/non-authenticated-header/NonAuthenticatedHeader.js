@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
     nextLink: {
         border: ({isHighlighted}) => isHighlighted ? '3px solid #00d2aa' : 'none',
         borderRadius: ({isHighlighted}) => isHighlighted ? '5px' : '0',
-        padding: ({isHighlighted}) => isHighlighted ? "0.5rem" : 0,
+        padding: ({isHighlighted}) => isHighlighted ? "0.5rem 0.8rem" : 0,
     },
 }));
 
