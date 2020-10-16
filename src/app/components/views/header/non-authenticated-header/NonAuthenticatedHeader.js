@@ -1,34 +1,60 @@
-import {Fragment} from 'react';
-import {Image, Icon, Button} from "semantic-ui-react";
+import {Fragment, useEffect, useState} from 'react';
+import {Image, Icon} from "semantic-ui-react";
 
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import {useRouter} from 'next/router';
+import {Button} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme) => ({
+    nextLink: {
+        border: ({isHighlighted}) => isHighlighted ? '3px solid #00d2aa' : 'none',
+        borderRadius: ({isHighlighted}) => isHighlighted ? '5px' : '0',
+        padding: ({isHighlighted}) => isHighlighted ? "0.5rem 0.8rem" : 0,
+    },
+}));
 
 const NonAuthenticatedHeader = (props) => {
 
-    const router = useRouter();
+    const {push, pathname, query: {careerCenterId}} = useRouter()
+    const isHighlighted = Boolean(pathname === "/next-livestreams" && careerCenterId)
+    const classes = useStyles({isHighlighted})
 
     function goToRoute(route) {
-        router.push(route);
+        push(route);
     }
 
     return (
         <Fragment>
-        <header id='main-header'>
-            <ul id='left-menu'>
-                <li><Icon id='sidebar-toggle' style={{ cursor: 'pointer' }} name='bars' size='big' color={props.color === "white" ? null : 'teal'} onClick={props.toggleSideBar}/></li>
-                <li><Link href='/'><a><Image src={props.color === "white" ? '/logo_white.png' : '/logo_teal.png'} style={{ cursor: 'pointer', width: '150px', display: 'inline-block', marginTop: '10px', marginLeft: '10px'}}/></a></Link></li>
-            </ul>
-            <ul id='middle-menu' className={'centered-menu ' + (props.color === "white" ? 'white' : 'dark')}>
-                <li className={props.page === 'next-livestreams' ? 'active' : ''}><Link href='/next-livestreams'><a>Next Live Streams</a></Link></li>
-                <li className={props.page === 'discover' ? 'active' : ''}><Link href='/discover'><a>Past Live Streams</a></Link></li>
-                <li className={props.page === 'wishlist' ? 'active' : ''}><Link href='/wishlist'><a>Wishlist</a></Link></li>
-            </ul>
-            <div id='right-menu' className={'float-right ' + (props.color === "white" ? 'white' : 'dark')}>
-                <Button  style={{ margin: '5px 10px', position: 'relative', zIndex: '1000' }} onClick={() => goToRoute('/login')} primary>Log in</Button>
-            </div>
-        </header>
-        <style jsx>{`
+            <header id='main-header'>
+                <ul id='left-menu'>
+                    <li><Icon id='sidebar-toggle' style={{cursor: 'pointer'}} name='bars' size='big'
+                              color={props.color === "white" ? null : 'teal'} onClick={props.toggleSideBar}/></li>
+                    <li><Link href='/'><a><Image src={props.color === "white" ? '/logo_white.png' : '/logo_teal.png'}
+                                                 style={{
+                                                     cursor: 'pointer',
+                                                     width: '150px',
+                                                     display: 'inline-block',
+                                                     marginTop: '10px',
+                                                     marginLeft: '10px'
+                                                 }}/></a></Link></li>
+                </ul>
+                <ul id='middle-menu' className={'centered-menu ' + (props.color === "white" ? 'white' : 'dark')}>
+                    <li className={`${props.page === 'next-livestreams' ? 'active' : ''}`}>
+                        <Link  href='/next-livestreams'><a className={classes.nextLink}>Next
+                            Live Streams</a></Link></li>
+                    <li className={props.page === 'discover' ? 'active' : ''}><Link href='/discover'><a>Past Live
+                        Streams</a></Link></li>
+                    <li className={props.page === 'wishlist' ? 'active' : ''}><Link
+                        href='/wishlist'><a>Wishlist</a></Link></li>
+                </ul>
+                <div id='right-menu' className={'float-right ' + (props.color === "white" ? 'white' : 'dark')}>
+                    <Button color="primary" variant="contained"
+                            style={{margin: '8px 10px 5px 10px', position: 'relative', zIndex: '1000', fontWeight: 600}}
+                            onClick={() => goToRoute('/login')}>Log in</Button>
+                </div>
+            </header>
+            <style jsx>{`
                 #main-header {
                     width: 100%;
                     height: 80px;
@@ -39,7 +65,7 @@ const NonAuthenticatedHeader = (props) => {
                     z-index: 1000;
                     color: white;
                 }
-
+                
                 #left-menu {
                     position: absolute;
                     left: 0;

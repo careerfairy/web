@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
 const placeholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
 
 
-const CarouselCard = ({groupId, firebase, handleSetGroup, groupData, mobile, index, handleResetGroup, activeSlide}) => {
+const CarouselCard = ({groupId, firebase, handleSetGroup, groupIdsToRemove, mobile, index, handleResetGroup, activeSlide, setGroupIdsToRemove}) => {
     const classes = useStyles()
     const [localGroup, setLocalGroup] = useState({})
     const [noGroup, setNoGroup] = useState(false)
@@ -55,15 +55,17 @@ const CarouselCard = ({groupId, firebase, handleSetGroup, groupData, mobile, ind
     useEffect(() => {
         if (groupId) {
             const unsubscribe = firebase.listenToCareerCenterById(groupId, querySnapshot => {
-                if (querySnapshot) {
-                    if (querySnapshot.data()) {
-                        let careerCenter = querySnapshot.data();
-                        careerCenter.id = querySnapshot.id;
-                        setLocalGroup(careerCenter);
-                    } else {
-                        setNoGroup(true)
-                    }
+                if (querySnapshot.data()) {
+                    let careerCenter = querySnapshot.data();
+                    careerCenter.id = querySnapshot.id;
+                    setLocalGroup(careerCenter);
+                } else {
+                    const newGroupIds = [...groupIdsToRemove]
+                    newGroupIds.push(groupId)
+                    setGroupIdsToRemove([...new Set(newGroupIds)])
+                    setNoGroup(true)
                 }
+
             })
             return () => unsubscribe()
         }
@@ -79,18 +81,19 @@ const CarouselCard = ({groupId, firebase, handleSetGroup, groupData, mobile, ind
 
 
     return (
-        <Grow  in={Boolean(localGroup.id)} timeout={600}>
+        <Grow in={Boolean(localGroup.id)} timeout={600}>
             <div>
                 <Card style={{borderTop: isSelected() ? "3px solid #00d2aa" : "none"}}
                       onClick={() => {
                           handleResetGroup()
                           handleSetGroup(localGroup)
                       }} elevation={2} className={classes.card}>
-                    <CardMedia style={{height: mobile ? 60 : 90, padding: mobile ? "0.5em" : "0 1em 1em 1em"}} className={classes.media}>
+                    <CardMedia style={{height: mobile ? 60 : 90, padding: mobile ? "0.5em" : "0 1em 1em 1em"}}
+                               className={classes.media}>
                         <img src={localGroup.logoUrl || placeholder} className={classes.image}
                              alt={`${localGroup.universityName} Logo`}/>
                     </CardMedia>{!mobile &&
-                    <Typography align="center" noWrap>{localGroup.universityName}</Typography>}
+                <Typography align="center" noWrap>{localGroup.universityName}</Typography>}
                 </Card>
             </div>
         </Grow>

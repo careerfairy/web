@@ -85,6 +85,7 @@ const GroupJoinModal = ({
   };
 
   const handleJoinGroup = async () => {
+
     try {
       setSubmitting(true);
       const newCategories = categories.map((categoryObj) => {
@@ -116,9 +117,10 @@ const GroupJoinModal = ({
         arrayOfGroupIds.push(groupObj.groupId);
       }
       const userId = userData.id || userData.userEmail;
-      await firebase.setgroups(userId, arrayOfGroupIds, arrayOfGroupObjects);
+      firebase.setgroups(userId, arrayOfGroupIds, arrayOfGroupObjects).then(() =>{
       setSubmitting(false);
       closeModal();
+      });
     } catch (e) {
       console.log("error in handle join", e);
       setSubmitting(false);

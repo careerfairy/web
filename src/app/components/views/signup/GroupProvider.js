@@ -1,24 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState, Fragment} from 'react';
 import Groups from "../groups/Groups";
 import {withFirebase} from "../../../context/firebase";
 import {Button} from "@material-ui/core";
 import Link from "next/link";
+import UserContext from "../../../context/user/UserContext";
 
-const GroupProvider = ({firebase, user, absolutePath}) => {
-    const [userData, setUserData] = useState(null);
+const GroupProvider = ({firebase, absolutePath}) => {
+    const {userData} = useContext(UserContext)
     const [groups, setGroups] = useState([]);
 
-    useEffect(() => {
-        if (user) {
-            const unsubscribe = firebase.listenToUserData(user.email, querySnapshot => {
-                let user = querySnapshot.data();
-                if (user) {
-                    setUserData(user);
-                }
-            });
-            return () => unsubscribe();
-        }
-    }, [user]);
 
     useEffect(() => {
         if (userData) {
@@ -38,16 +28,16 @@ const GroupProvider = ({firebase, user, absolutePath}) => {
     }, [userData]);
 
 
-    return (userData ?
-        <>
-            <Groups makeSix={6} userData={userData} groups={groups}/>
+    return userData ? (
+        <Fragment>
+            <Groups absolutePath={absolutePath} makeSix={6} userData={userData} groups={groups}/>
             <Link href={absolutePath || "/profile"} underline="none">
                 <Button color="primary" style={{position: "sticky", bottom: 10}} variant="contained" fullWidth>
                     Finish
                 </Button>
             </Link>
-        </>
-        : null);
+        </Fragment>
+    ) : null;
 };
 
 export default withFirebase(GroupProvider);

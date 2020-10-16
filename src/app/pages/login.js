@@ -91,7 +91,7 @@ function LogInPage({firebase}) {
                 if (userData) {
                     router.replace(absolutePath || '/next-livestreams');
                 } else {
-                    router.replace(absolutePath || '/profile');
+                    router.replace(absolutePath || '/next-livestreams');
                 }
                 setGeneralLoading(false);
             }

@@ -55,27 +55,22 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user, careerCenterId, livestreamId}) => {
+const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user, setGroupIdsToRemove, groupIdsToRemove}) => {
     const router = useRouter()
     const absolutePath = router.asPath;
-    const classes = useStyles({mobile, singleCard: !groupIds.length})
+    const classes = useStyles({mobile, singleCard: groupIds.length <= 1})
     const customSlider = createRef()
     const [activeSlide, setActiveSlide] = useState(0)
 
 
-    useEffect(() => {
-        if (checkIfOnlyLivestreamId()) {
-            setActiveSlide(groupIds.length)
-        }
-    }, [livestreamId, careerCenterId, groupIds])
+
+
 
     const handleNext = () => {
         customSlider.current.slickNext()
     }
 
-    const checkIfOnlyLivestreamId = () => {
-        return livestreamId && !careerCenterId
-    }
+
 
     const handlePrev = () => {
         customSlider.current.slickPrev()
@@ -87,19 +82,27 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
 
 
     const renderGroupCards = groupIds?.map((id, index) => {
-        return <CarouselCard index={index}
-                             mobile={mobile}
-                             handleSetGroup={handleSetGroup}
-                             handleResetGroup={handleResetGroup}
-                             activeSlide={activeSlide}
-                             groupData={groupData}
-                             key={id}
-                             groupId={id}
-        />
+        if (id === "upcoming") {
+            return (<NextLivestreamsCard mobile={mobile} handleSetGroup={handleSetGroup} groupData={groupData}
+                                         position={index} key={index}
+                                         handleResetGroup={handleResetGroup} activeSlide={activeSlide}/>)
+        } else {
+            return <CarouselCard index={index}
+                                 mobile={mobile}
+                                 groupIdsToRemove={groupIdsToRemove}
+                                 setGroupIdsToRemove={setGroupIdsToRemove}
+                                 handleSetGroup={handleSetGroup}
+                                 handleResetGroup={handleResetGroup}
+                                 activeSlide={activeSlide}
+                                 groupData={groupData}
+                                 key={index}
+                                 groupId={id}
+            />
+        }
     })
 
     const settings = {
-        initialSlide: checkIfOnlyLivestreamId() ? groupIds.length : 0,
+        initialSlide: 0,
         centerMode: true,
         centerPadding: "60px",
         focusOnSelect: true,
@@ -107,7 +110,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
         swipeToSlide: true,
         arrows: false,
         slidesToScroll: 1,
-        slidesToShow: !groupIds.length || mobile ? 1 : groupIds.length > 4 ? 4 : groupIds.length,
+        slidesToShow: groupIds.length < 3 || mobile ? 1 : groupIds.length > 4 ? 4 : groupIds.length,
         speed: 500,
         beforeChange: (current, next) => setActiveSlide(next),
     };
@@ -119,9 +122,6 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
             </IconButton>
             <Slider ref={customSlider} className={classes.slider} {...settings}>
                 {renderGroupCards}
-                <NextLivestreamsCard mobile={mobile} handleSetGroup={handleSetGroup} groupData={groupData}
-                                     position={groupIds?.length}
-                                     handleResetGroup={handleResetGroup} activeSlide={activeSlide}/>
             </Slider>
             <IconButton className={classes.next} onClick={handleNext}>
                 <NavigateNextIcon className={classes.icon} fontSize="large"/>

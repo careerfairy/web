@@ -10,12 +10,24 @@ import {useRouter, withRouter} from 'next/router';
 import LandingHeader from './landing-header/LandingHeader';
 import {Button} from "@material-ui/core";
 import UserContext from "../../../context/user/UserContext";
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme) => ({
+    nextLink: {
+        border: ({isHighlighted}) => isHighlighted ? '3px solid #00d2aa' : 'none',
+        borderRadius: ({isHighlighted}) => isHighlighted ? '5px' : '0',
+        padding: ({isHighlighted}) => isHighlighted ? "0.5rem 0.8rem" : 0,
+    },
+}));
 
 function Header(props) {
+    const {push, pathname, query: {careerCenterId}} = useRouter()
+    const isHighlighted = Boolean(pathname === "/next-livestreams" && careerCenterId)
+    const classes = useStyles({isHighlighted})
+
     const [authenticated, setAuthenticated] = useState(false);
     const [sidebarState, setSidebarState] = useState("unopened");
-    const {userData, authenticatedUser, setUserData} = useContext(UserContext)
-    const {push} = useRouter()
+    const {userData, setUserData} = useContext(UserContext)
 
     useEffect(() => {
         if (userData) {
@@ -37,7 +49,8 @@ function Header(props) {
             <div className='sidebar'>
                 <Icon name='times circle outline' size='big' onClick={toggleSideBar} style={{cursor: 'pointer'}}/>
                 <ul>
-                    <li><Link href='/next-livestreams'><a>Next Live Streams</a></Link></li>
+                    <li><Link className={`${isHighlighted ? "highlighted": ""}`} href='/next-livestreams'><a className={classes.nextLink}>Next Live
+                        Streams</a></Link></li>
                     <li><Link href='/discover'><a>Past Live Streams</a></Link></li>
                     <li><Link href='/companies'><a>Companies</a></Link></li>
                     <li><Link href='/wishlist'><a>Wishlist</a></Link></li>
@@ -62,6 +75,11 @@ function Header(props) {
                         color: white;
                         padding: 20px;
                         text-align: center;
+                    }
+                    
+                    .highlighted {
+                        border: 5px solid #00d2aa;
+                        border-radius: 5px;
                     }
 
                     .sidebar.hidden {
@@ -142,13 +160,15 @@ function Header(props) {
                 <TopHeader {...props}/>
             </div>
             <div
-                className={sidebarState === "unopened" ? 'sidebar hidden' : sidebarState === "opened" ? 'sidebar animated slideInLeft faster' : 'sidebar animated slideOutLeft faster'}>
+                className={sidebarState !== "opened" ? 'sidebar hidden' : sidebarState === "opened" ? 'sidebar animated slideInLeft faster' : 'sidebar animated slideOutLeft faster'}>
                 <Icon name='times circle outline' size='big' onClick={toggleSideBar} style={{cursor: 'pointer'}}/>
                 <ul>
-                    <li><Link href='/next-livestreams'><a>Next Live Streams</a></Link></li>
-                    <li><Link href='/discover'><a>Past Live Streams</a></Link></li>
-                    <li><Link href='/companies'><a>Companies</a></Link></li>
-                    <li><Link href='/wishlist'><a>Wishlist</a></Link></li>
+                    <li><Link  className="next-livestream-link" href='/next-livestreams'><a onClick={toggleSideBar} className={classes.nextLink}>Next Live Streams</a></Link>
+                    </li>
+                    {authenticated && <li><a onClick={toggleSideBar} href='/groups'>Follow Groups</a></li>}
+                    <li><Link href='/discover'><a onClick={toggleSideBar}>Past Live Streams</a></Link></li>
+                    <li><Link href='/companies'><a onClick={toggleSideBar}>Companies</a></Link></li>
+                    <li><Link href='/wishlist'><a onClick={toggleSideBar}>Wishlist</a></Link></li>
                     <li><a href='https://corporate.careerfairy.io/companies'>For Companies</a></li>
                     <li><a href='https://corporate.careerfairy.io/career-center'>For Career Centers</a></li>
                     <li><Link

@@ -9,7 +9,6 @@ import UserContext from "../../../context/user/UserContext"
 
 const NextLivestreams = ({firebase}) => {
     const {userData, authenticatedUser} = useContext(UserContext);
-
     const router = useRouter();
     // console.log("router.asPath :", router.asPath, "router.route :", router.route, "router.query: ", router.query);
     const {
@@ -23,8 +22,9 @@ const NextLivestreams = ({firebase}) => {
     const mobile = useMediaQuery(theme.breakpoints.down("sm"));
 
     const [groupData, setGroupData] = useState({});
-    const [groupIds, setGroupIds] = useState([]);
+    const [groupIds, setGroupIds] = useState(["upcoming"]);
     const [livestreams, setLivestreams] = useState([]);
+    const [groupIdsToRemove, setGroupIdsToRemove] = useState([])
     // const [paramsLivestreamId, setParamsLivestreamId] = useState(null);
     // const [paramsCareerCenterId, setParamsCareerCenterId] = useState(null);
     const [searching, setSearching] = useState(false);
@@ -50,9 +50,7 @@ const NextLivestreams = ({firebase}) => {
                             repositionElement(livestreams, currentIndex, 0);
                         }
                     }
-                    if (!careerCenterId) {
-                        livestreams = livestreams.filter(livestream => !livestream.hidden);
-                    }
+                    livestreams = livestreams.filter(livestream => !livestream.hidden);
                     setLivestreams(livestreams);
                 },
                 (error) => {
@@ -62,6 +60,15 @@ const NextLivestreams = ({firebase}) => {
             return () => unsubscribe();
         }
     }, [listenToUpcoming, livestreamId]);
+
+    useEffect(() => {
+        if (userData && userData.groupIds && userData.registeredGroups && groupIdsToRemove && groupIdsToRemove.length) {
+            const filteredGroupIds = [...userData.groupIds].filter(id => !groupIdsToRemove.includes(id))
+            const filteredRegisteredGroups = [...userData.registeredGroups].filter(group => !groupIdsToRemove.includes(group.groupId))
+            const userId = userData.id || userData.userEmail
+            return firebase.updateUserGroups(userId, filteredGroupIds, filteredRegisteredGroups)
+        }
+    }, [groupIdsToRemove])
 
     // useEffect(() => {
     //     // will set the params once the router is loaded whether it be undefined or truthy
@@ -75,7 +82,7 @@ const NextLivestreams = ({firebase}) => {
     useEffect(() => {
         if (groupData && groupData.groupId) {
             setSearching(true);
-            const unsubscribe = firebase.listenToLiveStreamsByGroupId(
+            const unsubscribe = firebase.listenToUpcomingLiveStreamsByGroupId(
                 groupData.groupId,
                 (querySnapshot) => {
                     setSearching(false);
@@ -140,13 +147,28 @@ const NextLivestreams = ({firebase}) => {
         }
     }, [userData, careerCenterId]);
 
+    useEffect(() => {
+        if (groupIds.length > 1 && setToUpcomingSlide()) {
+            const newGroupIds = [...groupIds]
+            const currentIndex = newGroupIds.findIndex((el) => el === "upcoming");
+            if (currentIndex > -1) {
+                swapPositions(newGroupIds, 0, currentIndex);
+            }
+            setGroupIds([...new Set(newGroupIds)]);
+        }
+    }, [livestreamId, careerCenterId, router])
+
+    const setToUpcomingSlide = () => {
+        return livestreamId && !careerCenterId || (!livestreamId && !careerCenterId)
+    }
+
     const checkIfCareerCenterExists = async (centerId) => {
         const querySnapshot = await firebase.getCareerCenterById(centerId);
         return querySnapshot.exists;
     };
 
     const handleGetGroupIds = () => {
-        let newGroupIds = [];
+        let newGroupIds = [...groupIds];
         if (userData && userData.groupIds) {
             newGroupIds = [...groupIds, ...userData.groupIds];
         }
@@ -239,6 +261,8 @@ const NextLivestreams = ({firebase}) => {
             <GroupsCarousel
                 groupData={groupData}
                 mobile={mobile}
+                groupIdsToRemove={groupIdsToRemove}
+                setGroupIdsToRemove={setGroupIdsToRemove}
                 livestreamId={livestreamId}
                 careerCenterId={careerCenterId}
                 user={authenticatedUser}

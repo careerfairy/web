@@ -1,13 +1,8 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {withFirebase} from 'context/firebase';
-import {SizeMe} from 'react-sizeme';
-import StackGrid from 'react-stack-grid';
-import LivestreamCard from 'components/views/livestream-card/LivestreamCard';
 import {useRouter} from 'next/router';
-import AddIcon from "@material-ui/icons/Add";
-import EditIcon from '@material-ui/icons/Edit';
-import {Box, Button, CardMedia, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, IconButton, InputLabel, Menu, MenuItem, Select, Typography} from "@material-ui/core";
-import GroupStreamCard from 'components/views/NextLivestreams/GroupStreams/GroupStreamCard';
+import {AppBar, Box, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
+import EnhancedGroupStreamCard from './enhanced-group-stream-card/EnhancedGroupStreamCard';
 
 const Events = (props) => {
 
@@ -16,10 +11,13 @@ const Events = (props) => {
     const [grid, setGrid] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [livestreams, setLivestreams] = useState([]);
+    const [pastLivestreams, setPastLivestreams] = useState([]);
+
+    const [value, setValue] = React.useState(0);
 
     useEffect(() => {
         if (props.group.id) {
-            const unsubscribe = props.firebase.listenToLiveStreamsByGroupId(props.group.id, querySnapshot => {
+            const unsubscribe = props.firebase.listenToUpcomingLiveStreamsByGroupId(props.group.id, querySnapshot => {
                 var livestreams = [];
                 querySnapshot.forEach(doc => {
                     let livestream = doc.data();
@@ -27,6 +25,23 @@ const Events = (props) => {
                     livestreams.push(livestream);
                 });
                 setLivestreams(livestreams);
+            }, error => {
+                console.log(error);
+            });
+            return () => unsubscribe();
+        }
+    }, [props.group.id]);
+
+    useEffect(() => {
+        if (props.group.id) {
+            const unsubscribe = props.firebase.listenToPastLiveStreamsByGroupId(props.group.id, querySnapshot => {
+                var livestreams = [];
+                querySnapshot.forEach(doc => {
+                    let livestream = doc.data();
+                    livestream.id = doc.id;
+                    livestreams.push(livestream);
+                });
+                setPastLivestreams(livestreams);
             }, error => {
                 console.log(error);
             });
@@ -50,133 +65,83 @@ const Events = (props) => {
         setAnchorEl(null);
     };
 
-    let livestreamElements = [];
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
 
-    const EnhancedCard = (props) => {
+    function TabPanel(props) {
+  const { children, value, index, ...other } = props;
 
-        const [modalOpen, setModalOpen] = useState(false);
-        const [localCategories, setLocalCategories] = useState([]);
-        const [groupCategories, setGroupCategories] = useState([]);
-        const [newCategory, setNewCategory] = useState(null);
-        const [loading, setLoading] = useState(false);
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`nav-tabpanel-${index}`}
+      aria-labelledby={`nav-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box p={3}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
 
-        useEffect(() => {
-            if (props.livestream && props.livestream.targetCategories && props.livestream.targetCategories[props.group.id] && modalOpen) {
-                setLocalCategories(props.livestream.targetCategories[props.group.id])
-            }
-        },[props.livestream, modalOpen])
+    function a11yProps(index) {
+        return {
+          id: `simple-tab-${index}`,
+          'aria-controls': `simple-tabpanel-${index}`,
+        };
+      }
 
-        useEffect(() => {
-            if (props.group && props.group.categories) {
-                let fieldOfStudyCategories = props.group.categories.find(category => category.name?.toLowerCase() === "field of study");
-                setGroupCategories(fieldOfStudyCategories.options);
-            }
-        },[props.group])
-
-        function getOptionName(optionId) {
-            let correspondingOption = {};
-            correspondingOption = groupCategories.find( option => option.id === optionId );
-            return correspondingOption.name || 'CATEGORY_UNDEFINED';
-        }
-
-        function addElement(optionId) {
-            if (localCategories.indexOf(optionId) < 0) {
-                setLocalCategories([...localCategories, optionId])
-            }
-        }
-
-        function removeElement(optionId) {
-            const filteredOptions = localCategories.filter( option => option !== optionId);
-            setLocalCategories(filteredOptions);
-        }
-
-        function updateLivestreamCategories() {
-            let categoryCopy = props.livestream.targetCategories;
-            categoryCopy[props.group.id] = localCategories;
-            setLoading(true);
-            props.firebase.updateLivestreamCategories(props.livestream.id, categoryCopy).then(() => {
-                setLoading(false);
-                setModalOpen(false);
-            });
-        }
-        
-        let categoryElements = localCategories.map( category => {
-            return (
-                <Chip
-                    size={"medium"}
-                    variant={"outlined"}
-                    onDelete={() => removeElement(category)}
-                    label={getOptionName(category)} /> 
-            );
-        });
-
-        let menuItems = groupCategories.map( group => {
-            return (
-                 <MenuItem value={group.id}>{group?.name}</MenuItem>
-            );
-        });
-
-        return (
-            <>
-                <IconButton style={{ position: 'absolute', top: '140px', right: '10px', zIndex: '2000' }} onClick={() => setModalOpen(true)}>
-                    <EditIcon fontSize="large" color="inherit"/>
-                </IconButton>
-                <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
-                    <DialogTitle align="center">Update Target Groups</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText align="left">
-                        <FormControl variant="outlined" fullWidth style={{ marginBottom: "10px"}}>
-                            <InputLabel>Add a Target Group</InputLabel>
-                            <Select
-                            value={null}
-                            placeholder="Select a target group"
-                            onChange={(e) => addElement(e.target.value) }
-                            label="New target group"
-                            >
-                            { menuItems }
-                            </Select>
-                        </FormControl>
-                            { categoryElements }
-                        </DialogContentText>
-                        <Box>
-                        </Box>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button
-                            variant="contained"
-                            size="large"
-                            color="primary"
-                            onClick={updateLivestreamCategories}
-                            autoFocus>
-                            Confirm
-                        </Button>
-                        <Button
-                            size="large"
-                            onClick={() => setModalOpen(false)}>
-                            Cancel
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-                <GroupStreamCard livestream={props.livestream} user={props.user} userData={props.userData} fields={null}
-                    grid={props.grid} groupData={props.group}/>
-            </>
-        );
-    }
-
-    livestreamElements = livestreams.map((livestream, index) => {
+    let livestreamElements = livestreams.map((livestream, index) => {
         return (
             <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
                 <div style={{position: "relative"}}>
-                <EnhancedCard livestream={livestream} {...props} fields={null} grid={grid} group={props.group}/>
+                <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid} group={props.group}/>
                 </div>
             </Grid>
         );
     });
 
+    let pastLivestreamElements = pastLivestreams.map((livestream, index) => {
+        return (
+            <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
+                <div style={{position: "relative"}}>
+                <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid} group={props.group}/>
+                </div>
+            </Grid>
+        );
+    });
+
+
     return (
         <Fragment>
-            <div style={{width: '100%', textAlign: 'left', margin: '0 0 20px 0'}}>
-                <Typography variant="h4">Your Next Live Streams</Typography>
+            <div style={{width: '100%', textAlign: 'left', margin: '20px 0 20px 0'}}>
+                <AppBar color='default' position="static">
+                    <Tabs
+                    variant="fullWidth"
+                    value={value}
+                    onChange={handleChange}
+                    indicatorColor='primary'
+                    aria-label="nav tabs example"
+                    >
+                        <Tab label="Next Live streams" {...a11yProps(0)}/>
+                        <Tab label="Past Live streams" {...a11yProps(1)}/>
+                    </Tabs>
+                </AppBar>
+                <TabPanel value={value} index={0}>
+                    <Grid container spacing={2}>
+                        {livestreamElements}
+                    </Grid>
+                </TabPanel>
+                <TabPanel value={value} index={1}>
+                    <Grid container spacing={2}>
+                        {pastLivestreamElements}
+                    </Grid>
+                </TabPanel>
                 {/* <Button variant="contained"
                         color="primary"
                         size="medium"
@@ -191,14 +156,10 @@ const Events = (props) => {
                     open={Boolean(anchorEl)}
                     onClose={handleClose}
                 >
-                <MenuItem onClick={() => router.push('/group/' + props.group.id + '/admin/schedule-event')}>Send a
-                    Company Request</MenuItem>
+                <MenuItem onClick={() => router.push('/group/' + props.group.id + '/admin/schedule-event')}>Send a Company Request</MenuItem>
                 <MenuItem onClick={handleClose}>Schedule a Live Stream</MenuItem>
                 </Menu>
             </div>
-            <Grid container spacing={2}>
-                {livestreamElements}
-            </Grid>
             <style jsx>{`
                 .hidden {
                     display: none;

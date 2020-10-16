@@ -7,9 +7,6 @@ import {Image} from "semantic-ui-react";
 import {useRouter} from "next/router";
 
 
-const LogoSkeleton = () => <Skeleton variant="rect" width={50} height={50}/>
-
-
 const LogoElement = ({careerCenter, userData, userfollows, livestreamId}) => {
 
     const router = useRouter()
@@ -37,7 +34,6 @@ const LogoElement = ({careerCenter, userData, userfollows, livestreamId}) => {
     return (
         <Box display="flex" justifyContent="space-between" flexDirection="column" alignItems="center"
              style={{margin: '0 auto', width: '65px', height: "100%"}}>
-            <LazyLoad placeholder={<LogoSkeleton/>}>
                 <Image alt={`${careerCenter.universityName} logo`} src={careerCenter.logoUrl}/>
                 {userfollows ? null :
                     <Button onClick={handleJoin} style={{marginTop: 10}} variant="outlined" color="primary"> Follow </Button>}
@@ -48,7 +44,6 @@ const LogoElement = ({careerCenter, userData, userfollows, livestreamId}) => {
                     userData={userData}
                     closeModal={handleCloseJoinModal}
                 />
-            </LazyLoad>
         </Box>
     );
 };

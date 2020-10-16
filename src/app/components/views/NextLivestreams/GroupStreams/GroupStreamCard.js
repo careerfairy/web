@@ -46,7 +46,6 @@ export const StreamCardPlaceHolder = () => {
 
 
 const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestreamId, id, careerCenterId, groupData, listenToUpcoming}) => {
-
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [isHighlighted, setIsHighlighted] = useState(false)
     const [careerCenters, setCareerCenters] = useState([])
@@ -105,6 +104,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
         }
     }, [livestream]);
 
+
     const checkIfHighlighted = () => {
         if (careerCenterId && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId) {
             return true
@@ -131,11 +131,44 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
         firebase.deregisterFromLivestream(livestream.id, user.email);
     }
 
+    const moreThanOneGroup = () => {
+        return careerCenters.length > 1
+    }
+
+    const onlyOneGroup = () => {
+        return careerCenters.length === 1
+    }
+
+    const userRegistered = () => {
+        if (livestream && livestream.registeredUsers && user) {
+            return livestream.registeredUsers.indexOf(user.email) > -1
+        } else {
+            return false
+        }
+    }
+
+    const userFollowingAnyGroup = () => {
+        if (userData.groupIds && livestream.groupIds) { // are you following any group thats part of this livstream?
+            return userData.groupIds.some(id => livestream.groupIds.indexOf(id) >= 0)
+        } else {
+            return false
+        }
+    }
+
+    const userFollowingCurrentGroup = () => {
+        if (userData.groupIds && groupData.groupId) { // Are you following the group in group tab?
+            return userData.groupIds.includes(groupData.groupId)
+        } else {
+            return false
+        }
+    }
+
+
     function startRegistrationProcess() {
-        if (!user) {
+        if (!user || !user.emailVerified) {
             return router.push({
-                pathname: '/login',
-                query: {absolutePath: linkToStream}
+                pathname: `/login`,
+                query: {absolutePath: linkToStream},
             });
         }
 
@@ -145,15 +178,26 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                 query: "profile"
             });
         }
-
-        if (groupData.groupId && !userData?.groupIds?.includes(groupData.groupId)) {
-            setOpenJoinModal(true)
-        } else {
-            firebase.registerToLivestream(livestream.id, user.email).then(() => {
-                setBookingModalOpen(true);
-                sendEmailRegistrationConfirmation();
-            })
+        if (listenToUpcoming) {// If on next livestreams tab...
+            if (!userFollowingAnyGroup()) {
+                setOpenJoinModal(true)
+            } else {
+                firebase.registerToLivestream(livestream.id, user.email).then(() => {
+                    setBookingModalOpen(true);
+                    sendEmailRegistrationConfirmation();
+                })
+            }
+        } else { // if on any other tab that isn't next livestreams...
+            if (!userFollowingCurrentGroup()) {
+                setOpenJoinModal(true)
+            } else {
+                firebase.registerToLivestream(livestream.id, user.email).then(() => {
+                    setBookingModalOpen(true);
+                    sendEmailRegistrationConfirmation();
+                })
+            }
         }
+
     }
 
     function completeRegistrationProcess() {
@@ -203,6 +247,14 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
             return userData.groupIds.includes(groupId)
         } else {
             return false
+        }
+    }
+
+    const getGroups = () => {
+        if (groupData.groupId) {
+            return [groupData]
+        } else {
+            return careerCenters
         }
     }
 
@@ -330,7 +382,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                 {/*</Grow>*/}
                 <GroupJoinToAttendModal
                     open={openJoinModal}
-                    group={groupData}
+                    groups={getGroups()}
                     alreadyJoined={false}
                     userData={userData}
                     onConfirm={completeRegistrationProcess}
