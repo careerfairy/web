@@ -1,23 +1,20 @@
 import {
-    DarkBackground,
-    GlobalBackground,
-    GreyBackground,
     TealBackground
 } from "../materialUI/GlobalBackground/GlobalBackGround";
 import Head from "next/head";
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
-import NewLivestreamForm from "../components/views/newLivestreamForm/NewLivestreamForm";
 import React, {useContext, useEffect, useState} from "react";
 import {Typography} from "@material-ui/core";
 import {useRouter} from "next/router";
 import UserContext from "../context/user/UserContext";
 import Loader from "../components/views/loader/Loader";
+import CompanyStreamForm from "../components/views/companyStreamForm/CompanyStreamForm";
 
 
-const newLivestream = () => {
+const companyStream = () => {
 
-    const {replace, asPath: absolutePath, back} = useRouter();
+    const {replace, asPath: absolutePath} = useRouter();
     const {userData, authenticatedUser: user, hideLoader} = useContext(UserContext);
 
     useEffect(() => {
@@ -26,10 +23,6 @@ const newLivestream = () => {
                 pathname: `/login`,
                 query: {absolutePath},
             });
-        }
-
-        if (userData && !userData.isAdmin) {
-            replace(`/`);
         }
     }, [user, userData]);
 
@@ -45,10 +38,10 @@ const newLivestream = () => {
             <Typography variant="h3" align="center" style={{marginTop: "1.5rem", color: "white"}}>
                 Create a Livestream
             </Typography>
-            <NewLivestreamForm/>
+            <CompanyStreamForm/>
             <Footer/>
         </TealBackground>
     ) : <Loader/>;
 };
 
-export default newLivestream;
+export default companyStream;
