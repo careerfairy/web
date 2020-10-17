@@ -210,6 +210,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         if (!isPlayMode) {
                             publishNewStream(this, infoObj);
                         }
+                        setStreamsInRoom(infoObj.streams);
                         this.getRoomInfo(infoObj.ATTR_ROOM_NAME, infoObj.streamId);
                         console.log("joinedTheRoom", infoObj);
                         break;

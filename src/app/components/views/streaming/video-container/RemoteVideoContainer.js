@@ -7,17 +7,19 @@ function RemoteVideoContainer(props) {
 
     const [canPlay, setCanPlay] = useState(false);
     const [stoppedByUserAgent, setStoppedByUserAgent] = useState(false);
-    const [hasError, setHasError] = useState(false);
 
     useEffect(() => {
         videoElement.current.srcObject = props.stream.stream;
-        props.attachSinkId(videoElement.current, props.speakerSource)
+        if (!props.isPlayMode) {
+            props.attachSinkId(videoElement.current, props.speakerSource)
+        }
     },[props.stream.streamId]);
 
     useEffect(() => {
         if (videoElement.current && videoElement.current.srcObject && videoElement.current.paused) {
             if (props.showVideoButton && !props.showVideoButton.muted && !props.showVideoButton.paused) {
                 videoElement.current.play().catch( e => {
+
                     props.setShowVideoButton({ paused: false, muted: true });
                 });
             } else if (props.showVideoButton && props.showVideoButton.muted && !props.showVideoButton.paused) {
@@ -60,6 +62,11 @@ function RemoteVideoContainer(props) {
         }
     }
 
+    function handleVideoError(error) {
+        handleVideoLoss()
+        throw error;
+    }
+
     useEffect(() => {
         if (videoElement && videoElement.current && videoElement.current.srcObject && !videoElement.current.srcObject.active) {
             props.removeStreamFromExternalMediaStreams(props.stream.streamId)
@@ -69,7 +76,7 @@ function RemoteVideoContainer(props) {
     return (
         <div>
             <div className='videoContainer' style={{ height: props.height }}>
-                <video id='videoElement' ref={videoElement} width={ '100%' } onCanPlay={() => setCanPlay(true) } controls={false} muted={props.muted} onEnded={handleVideoLoss} onError={handleVideoLoss} onSuspend={handleVideoLoss} playsInline>
+                <video id='videoElement' ref={videoElement} width={ '100%' } onCanPlay={() => setCanPlay(true) } controls={false} muted={props.muted} onEnded={handleVideoLoss} onError={(e) => handleVideoError(e)} onSuspend={handleVideoLoss} playsInline>
                 </video>
                 <div className={ 'loader ' + (canPlay ? 'hidden' : '')}>
                     <Image src='/loader.gif' style={{ width: '30%', maxWidth: '80px', height: 'auto', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}} />
