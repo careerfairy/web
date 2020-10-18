@@ -18,6 +18,7 @@ const EnhancedGroupStreamCard = (props) => {
 
     const [registeredStudents, setRegisteredStudents] = useState([]);
     const [registeredStudentsFromGroup, setRegisteredStudentsFromGroup] = useState([]);
+    const [livestreamSpeakers, setLivestreamSpeakers] = useState([]);
     const [studentStats, setStudentStats] = useState(null);
     const [talentPool, setTalentPool] = useState([]);
 
@@ -138,6 +139,20 @@ const EnhancedGroupStreamCard = (props) => {
 
     useEffect(() => {
         if (props.livestream) {
+            props.firebase.getLivestreamSpeakers(props.livestream.id).then((querySnapshot) => {
+                    var speakerList = [];
+                    querySnapshot.forEach((doc) => {
+                        let speaker = doc.data();
+                        speaker.id = doc.id;
+                        speakerList.push(speaker);
+                    });
+                    setLivestreamSpeakers(speakerList);
+                });
+        }
+    }, [props.livestream]);
+
+    useEffect(() => {
+        if (props.livestream) {
             props.firebase.listenToLivestreamIcons(props.livestream.id, querySnapshot => {
                 let iconList = [];
                 querySnapshot.forEach(doc => {
@@ -219,13 +234,14 @@ const EnhancedGroupStreamCard = (props) => {
                     Talent Pool
                 </Button>
             </CSVLink>
-            {/* <div style={{ display: download ? 'none' : 'block', position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }}>
+            <div style={{ display: download ? 'none' : 'block', position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }}>
                 <Button variant='outlined' primary onClick={() => setDownload(true)}>Generate Report</Button>
             </div>
             <PDFDownloadLink fileName="somename.pdf" style={{ position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }} document={download ? 
                 <LivestreamPdfReport group={props.group} 
                     livestream={props.livestream} 
                     studentStats={studentStats} 
+                    speakers={livestreamSpeakers}
                     totalStudentsInTalentPool={talentPool.length}
                     totalViewerFromOutsideETH={registeredStudents.length - registeredStudentsFromGroup.length} 
                     totalViewerFromETH={registeredStudentsFromGroup.length} questions={questions} polls={polls} icons={icons}/> : null} >
@@ -234,7 +250,7 @@ const EnhancedGroupStreamCard = (props) => {
                         <Button variant='outlined' color='primary' >Download Report</Button>
                     </div>
                 )}
-            </PDFDownloadLink>  */}
+            </PDFDownloadLink> 
             <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle align="center">Update Target Groups</DialogTitle>
                 <DialogContent>

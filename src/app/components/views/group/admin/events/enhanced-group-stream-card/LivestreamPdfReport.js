@@ -3,6 +3,7 @@ import styled from '@react-pdf/styled-components';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 import StatsUtil from 'data/util/StatsUtil';
 import { useEffect, useState } from 'react';
+import DateUtil from 'util/DateUtil';
 
 Font.register({ family: 'Poppins', fonts: [
     { src: 'https://fonts.gstatic.com/s/poppins/v13/pxiByp8kv8JHgFVrLGT9Z1xlEN2JQEk.ttf', fontWeight: 'normal'},
@@ -27,16 +28,21 @@ const CFLogo = styled.Image`
     max-height: 15vw;
 `;
 
+
+
 const CompanyLogo = styled.Image`
     max-height: 25vw;
 `;
 
+const SpeakerAvatar = styled.Image`
+    max-height: 15vw;
+`;
 
 const Label = styled.Text`
     font-family: 'Poppins';
     text-transform: uppercase;
     font-weight: bold;
-    font-size: 15px;
+    font-size: 18px;
     color: #00d2aa;
 `;
 
@@ -74,6 +80,12 @@ const SubCategoryParent = styled.View`
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+`;
+
+const SpeakersView = styled.View`
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;    
 `;
 
 const LargeNumber = styled.Text`
@@ -115,6 +127,13 @@ const SmallLabel = styled.Text`
     font-weight: bold;
     font-size: 10px;
     color: grey;
+`;
+
+const DateText = styled.Text`
+    font-size: 14px;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #bbbbbb;
 `;
 
 const QuestionText = styled.Text`
@@ -216,7 +235,29 @@ const PollView = ({ poll, index }) => {
     );
 }
 
-const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromETH, totalViewerFromOutsideETH, totalStudentsInTalentPool, questions, polls, icons }) => {
+const SpeakerView = ({ speaker }) => {
+    return (
+        <View>
+            <View style={{ maxWidth: '15vw', borderRadius: '50%', marginRight: '10vw', marginBottom: '5px', border: '2px solid #00d2aa' }}>
+                <SpeakerAvatar source={speaker.avatar} />
+            </View>
+            <SmallLabel>{ speaker.firstName } { speaker.lastName }</SmallLabel>
+        </View>
+    );
+}
+
+const SpeakersViewElement = ({ speakers }) => {
+    let speakerElements = speakers.map( speaker => {
+        return <SpeakerView speaker={speaker}/> 
+    });
+    return (
+        <SpeakersView>
+            { speakerElements }
+        </SpeakersView>
+    );
+}
+
+const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromETH, totalViewerFromOutsideETH, totalStudentsInTalentPool, questions, polls, icons, speakers }) => {
 
     let categoryElements = [];
     let questionElements = [];
@@ -227,7 +268,7 @@ const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromE
     }
 
     if (studentStats && studentStats.type === 'specialized') {
-        categoryElements = Object.keys(studentStats.options).sort(compareOptions).filter(option => studentStats.options[option].entries > 0).map( (option, index) => {
+        categoryElements = Object.keys(studentStats.options).sort(compareOptions).map( (option, index) => {
             return <SpecializedCategoryElement option={studentStats.options[option]} index={index}/>
         })
     }
@@ -260,6 +301,9 @@ const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromE
                     </View>
                     <Label>Live Stream Report</Label>                  
                     <Title>{ livestream.title }</Title> 
+                    <DateText>{ DateUtil.getPrettyDate(livestream.start.toDate()) }</DateText>
+                    <SubTitle>Speakers</SubTitle>
+                    <SpeakersViewElement speakers={speakers}/>
                     <SubTitle>Your Audience</SubTitle>
                     <TotalViewer>
                         Total Number Of Registered Students from {group.universityName}: { totalViewerFromETH }
@@ -305,8 +349,8 @@ const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromE
                     </EngagementParent>
                     <SubTitle>Most upvoted questions</SubTitle>
                     { questionElements }
-                    <SubTitle>Your polls</SubTitle>
-                    { pollElements }
+                    {/* <SubTitle>Your polls</SubTitle>
+                    { pollElements } */}
                 </View>
             </CFPage>
         </Document>
