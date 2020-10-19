@@ -234,7 +234,7 @@ const EnhancedGroupStreamCard = (props) => {
                     Talent Pool
                 </Button>
             </CSVLink>
-            <div style={{ display: download ? 'none' : 'block', position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }}>
+            {/* <div style={{ display: download ? 'none' : 'block', position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }}>
                 <Button variant='outlined' primary onClick={() => setDownload(true)}>Generate Report</Button>
             </div>
             <PDFDownloadLink fileName="somename.pdf" style={{ position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }} document={download ? 
@@ -250,7 +250,7 @@ const EnhancedGroupStreamCard = (props) => {
                         <Button variant='outlined' color='primary' >Download Report</Button>
                     </div>
                 )}
-            </PDFDownloadLink> 
+            </PDFDownloadLink>  */}
             <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle align="center">Update Target Groups</DialogTitle>
                 <DialogContent>
