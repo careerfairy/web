@@ -415,8 +415,16 @@ const NewLivestreamForm = ({firebase}) => {
                       isSubmitting,
                       setFieldValue,
                       setValues,
+                    validateForm,
                       /* and other goodies */
-                  }) => (<form onSubmit={handleSubmit} className={classes.form}>
+                  }) => (<form onSubmit={async (event) => {
+                    event.preventDefault()
+                    const error = await validateForm()
+                    if (Object.keys(error).length) {
+                        window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
+                    }
+                    handleSubmit()
+                }} className={classes.form}>
                     <Typography style={{color: "white"}} variant="h4">Stream Info:</Typography>
                     <FormGroup>
                         <Grid xs={7} sm={7} md={10} lg={10} xl={10} item>

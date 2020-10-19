@@ -37,7 +37,7 @@ const newLivestream = () => {
     return hideLoader && userData && userData.isAdmin ? (
         <TealBackground style={{paddingBottom: 0}}>
             <Head>
-                <title key="title">CareerFairy | Create Live Streams</title>
+                <title key="title">CareerFairy | Create Livestreams</title>
             </Head>
             <div style={{background: "rgb(44, 66, 81)"}}>
                 <Header color="white"/>
