@@ -540,7 +540,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
                     variant="contained" fullWidth>
                     <Typography variant="h4">
-                        {isSubmitting ? "Submitting" : "Submit Draft Livestream"}
+                        {isSubmitting ? "Submitting" : "Submit Draft"}
                     </Typography>
                 </Button>
             </form>)}
