@@ -635,6 +635,14 @@ class Firebase {
         return ref.get();
     }
 
+    getLivestreamParticipatingStudents = (livestreamId) => {
+      let ref = this.firestore
+          .collection("livestreams")
+          .doc(livestreamId)
+          .collection("participatingStudents");
+      return ref.get();
+  }
+
     getLivestreamTalentPoolMembers = (companyId) => {
         let ref = this.firestore
             .collection("userData")

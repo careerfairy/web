@@ -306,17 +306,17 @@ const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromE
                     <SpeakersViewElement speakers={speakers}/>
                     <SubTitle>Your Audience</SubTitle>
                     <TotalViewer>
-                        Total Number Of Registered Students from {group.universityName}: { totalViewerFromETH }
+                        Total Number Of Participating Students from {group.universityName}: { totalViewerFromETH }
                     </TotalViewer>
                     <TotalViewer>
-                        Total Number Of Registered Students from outside {group.universityName}: { totalViewerFromOutsideETH }
+                        Total Number Of Participating Students from outside {group.universityName}: { totalViewerFromOutsideETH }
                     </TotalViewer>
                     <TotalViewer>
                         Total Number Of Students registered to the Talent Pool: { totalStudentsInTalentPool }
                     </TotalViewer>
                     <CategoriesParent>
                         <Border>
-                            <LargeText style={{ color: 'grey'}}>Category</LargeText> 
+                            <LargeText style={{ color: 'grey'}}>Faculty</LargeText> 
                             <LargeNumber style={{ color: 'grey'}}>#</LargeNumber>
                             <SubCategoryParent>
                             <SmallView>

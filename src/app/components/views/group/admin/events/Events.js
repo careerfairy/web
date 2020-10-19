@@ -100,7 +100,7 @@ const Events = (props) => {
         return (
             <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
                 <div style={{position: "relative"}}>
-                <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid} group={props.group}/>
+                <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid} group={props.group} isPastLivestream={false}/>
                 </div>
             </Grid>
         );
@@ -110,7 +110,7 @@ const Events = (props) => {
         return (
             <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
                 <div style={{position: "relative"}}>
-                <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid} group={props.group}/>
+                <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid} group={props.group} isPastLivestream={true}/>
                 </div>
             </Grid>
         );

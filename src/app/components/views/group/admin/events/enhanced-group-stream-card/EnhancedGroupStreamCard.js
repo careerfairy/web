@@ -18,6 +18,9 @@ const EnhancedGroupStreamCard = (props) => {
 
     const [registeredStudents, setRegisteredStudents] = useState([]);
     const [registeredStudentsFromGroup, setRegisteredStudentsFromGroup] = useState([]);
+    const [participatingStudents, setParticipatingStudents] = useState([]);
+    const [participatingStudentsFromGroup, setParticipatingStudentsFromGroup] = useState([]);
+
     const [livestreamSpeakers, setLivestreamSpeakers] = useState([]);
     const [studentStats, setStudentStats] = useState(null);
     const [talentPool, setTalentPool] = useState([]);
@@ -70,6 +73,20 @@ const EnhancedGroupStreamCard = (props) => {
     }, [props.livestream]);
 
     useEffect(() => {
+        if (props.livestream && props.group) {
+            props.firebase.getLivestreamParticipatingStudents(props.livestream.id).then(querySnapshot => {
+                let participatingStudents = [];
+                querySnapshot.forEach(doc => {
+                    let student = doc.data();
+                    student.id = doc.id;
+                    participatingStudents.push(student);
+                });
+                setParticipatingStudents(participatingStudents);
+            })
+        }      
+    }, [props.livestream]);
+
+    useEffect(() => {
         if (registeredStudents && registeredStudents.length) {
             let studentsOfGroup = [];
             registeredStudents.forEach( registeredStudent => {
@@ -83,12 +100,25 @@ const EnhancedGroupStreamCard = (props) => {
     }, [registeredStudents]);
 
     useEffect(() => {
-        if (registeredStudents && registeredStudents.length) {
-            let listOfStudents = registeredStudents.filter( student => studentBelongsToGroup(student));
+        if (participatingStudents && participatingStudents.length) {
+            let studentsOfGroup = [];
+            participatingStudents.forEach( student => {
+                if (studentBelongsToGroup(student)) {
+                    let publishedStudent = StatsUtil.getStudentInGroupDataObject(student, props.group);
+                    studentsOfGroup.push(publishedStudent);
+                }
+            });
+            setParticipatingStudentsFromGroup(studentsOfGroup);
+        }      
+    }, [participatingStudents]);
+
+    useEffect(() => {
+        if (participatingStudents && participatingStudents.length) {
+            let listOfStudents = participatingStudents.filter( student => studentBelongsToGroup(student));
             let stats = StatsUtil.getRegisteredStudentsStats(listOfStudents, props.group);
             setStudentStats(stats);
         }      
-    }, [registeredStudents]);
+    }, [participatingStudents]);
 
     useEffect(() => {
         if (props.livestream && allGroups.length && registeredStudentsFromGroup) {
@@ -233,24 +263,28 @@ const EnhancedGroupStreamCard = (props) => {
             <Button startIcon={<GetAppIcon />} variant='outlined' style={{ position: 'absolute', top: '290px', right: '10px', zIndex: '2000' }}>
                     Talent Pool
                 </Button>
-            </CSVLink>
-            {/* <div style={{ display: download ? 'none' : 'block', position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }}>
-                <Button variant='outlined' primary onClick={() => setDownload(true)}>Generate Report</Button>
-            </div>
-            <PDFDownloadLink fileName="somename.pdf" style={{ position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }} document={download ? 
-                <LivestreamPdfReport group={props.group} 
-                    livestream={props.livestream} 
-                    studentStats={studentStats} 
-                    speakers={livestreamSpeakers}
-                    totalStudentsInTalentPool={talentPool.length}
-                    totalViewerFromOutsideETH={registeredStudents.length - registeredStudentsFromGroup.length} 
-                    totalViewerFromETH={registeredStudentsFromGroup.length} questions={questions} polls={polls} icons={icons}/> : null} >
-                {({ blob, url, loading, error }) => (
-                    <div>
-                        <Button variant='outlined' color='primary' >Download Report</Button>
+            </CSVLink>{
+                props.isPastLivestream &&
+                <Fragment>
+                    <div style={{ display: download ? 'none' : 'block', position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }}>
+                        <Button variant='outlined' primary onClick={() => setDownload(true)}>Generate Report</Button>
                     </div>
-                )}
-            </PDFDownloadLink>  */}
+                    <PDFDownloadLink fileName="somename.pdf" style={{ position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }} document={download ? 
+                        <LivestreamPdfReport group={props.group} 
+                            livestream={props.livestream} 
+                            studentStats={studentStats} 
+                            speakers={livestreamSpeakers}
+                            totalStudentsInTalentPool={talentPool.length}
+                            totalViewerFromOutsideETH={participatingStudents.length - participatingStudentsFromGroup.length} 
+                            totalViewerFromETH={participatingStudentsFromGroup.length} questions={questions} polls={polls} icons={icons}/> : null} >
+                        {({ blob, url, loading, error }) => (
+                            <div>
+                                <Button variant='outlined' color='primary' >Download Report</Button>
+                            </div>
+                        )}
+                    </PDFDownloadLink>
+                </Fragment>
+            }
             <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle align="center">Update Target Groups</DialogTitle>
                 <DialogContent>
@@ -258,11 +292,11 @@ const EnhancedGroupStreamCard = (props) => {
                     <FormControl variant="outlined" fullWidth style={{ marginBottom: "10px"}}>
                         <InputLabel>Add a Target Group</InputLabel>
                         <Select
-                        value={null}
-                        placeholder="Select a target group"
-                        onChange={(e) => addElement(e.target.value) }
-                        label="New target group"
-                        >
+                            value={null}
+                            placeholder="Select a target group"
+                            onChange={(e) => addElement(e.target.value) }
+                            label="New target group"
+                            >
                         { menuItems }
                         </Select>
                     </FormControl>
