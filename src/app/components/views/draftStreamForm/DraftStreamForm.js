@@ -267,7 +267,7 @@ const DraftStreamForm = ({firebase}) => {
     }
 
     const SuccessMessage = (
-        <Typography style={{color: "white"}}>Thanks for your submission, we will review it and get back to
+        <Typography variant="h5" align="center" style={{color: "white", marginTop: "20vh"}}>Thanks for your submission, we will review it and get back to
             you!</Typography>
     )
 

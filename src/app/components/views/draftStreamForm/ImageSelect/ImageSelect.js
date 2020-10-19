@@ -82,11 +82,7 @@ const ImageSelect =
         const [filePickerError, setFilePickerError] = useState(null)
 
         useEffect(() => {
-            if (error && !filePickerError) {
-                setFilePickerError("Please Upload")
-            } else {
-                setFilePickerError(null)
-            }
+            setFilePickerError(error)
         }, [error])
 
         const getSelectedItem = () => {// Autocomplete will always complain because of async filtering... :( So ignore the warning
@@ -132,9 +128,10 @@ const ImageSelect =
                     })
                 }}>
                 <Button startIcon={<PublishIcon/>} disabled={isSubmitting} fullWidth style={{marginTop: "0.5rem"}}
-                        color="primary"
+                        color={error ? "secondary" : "primary"}
                         variant="outlined" id='upButton'>
-                    {`Upload ${label}`}</Button>
+                    {value?.length ? `Change ${label}` : `Upload ${label}`}
+                </Button>
             </FilePickerContainer>
             <Collapse in={Boolean(filePickerError)}>
                 <FormHelperText error>{filePickerError}</FormHelperText>

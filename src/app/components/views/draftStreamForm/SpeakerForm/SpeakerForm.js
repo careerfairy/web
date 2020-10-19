@@ -132,7 +132,7 @@ const SpeakerForm = (
                     </Collapse>
                 </FormControl>
             </Collapse>
-            <Collapse in={animate} component={Grid}  xs={12} sm={12} md={12} lg={6} xl={6} item>
+            <Collapse in={animate} style={{display: "flex", flexDirection: "column", justifyContent: "flex-end"}} component={Grid} xs={12} sm={12} md={12} lg={6} xl={6} item>
                 <ImageSelect path="mentors-pictures" getDownloadUrl={getDownloadUrl}
                              formName={`speakers.${objectKey}.avatar`} label="Speaker Avatar" error={false}
                              handleBlur={handleBlur} isSubmitting={isSubmitting} loading={loading}
