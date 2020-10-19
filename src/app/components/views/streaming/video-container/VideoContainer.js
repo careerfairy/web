@@ -13,10 +13,7 @@ import VideoControlsContainer from './VideoControlsContainer';
 
 function VideoContainer(props) {
 
-    const videoContainerRef = useRef();
-
     const [errorMessage, setErrorMessage] = useState(null);
-    const [showLivestreamCountdown, setShowLivestreamCountdown] = useState(true);
     
     const [streamerReady, setStreamerReady] = useState(false);
     const [connectionEstablished, setConnectionEstablished] = useState(false);
@@ -27,7 +24,6 @@ function VideoContainer(props) {
     const [audioSource, setAudioSource] = useState(null);
     const [videoSource, setVideoSource] = useState(null);
 
-    const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const { permissionGranted, userMediaError, localStream } = useLocalStream(mediaConstraints);
     const [audioCounter, setAudioCounter] = useState(0);
 
@@ -45,38 +41,18 @@ function VideoContainer(props) {
     }
 
     let streamingCallbacks = {
-        onInitialized: (infoObj) => {
-            if (isExistingCallback('onInitialized')) {
-                props.additionalCallbacks.onInitialized(infoObj);
-            }
-        },
         onPublishStarted: (infoObj) => {
             if (isExistingCallback('onPublishStarted')) {
-                    props.additionalCallbacks.onPublishStarted(infoObj);
+                props.additionalCallbacks.onPublishStarted(infoObj);
             }
             setShowDisconnectionModal(false);
             setIsStreaming(true);
-        },
-        onJoinedTheRoom: (infoObj) => {
-            if (isExistingCallback('onJoinedTheRoom')) {
-                    props.additionalCallbacks.onJoinedTheRoom(infoObj);
-            }
-        },
-        onStreamLeaved: (infoObj) => {
-            if (isExistingCallback('onStreamLeaved')) {
-                    props.additionalCallbacks.onStreamLeaved(infoObj);
-            }
         },
         onPublishFinished: (infoObj) => {
             if (isExistingCallback('onPublishFinished')) {
                     props.additionalCallbacks.onPublishFinished(infoObj);
             }
             setIsStreaming(false);
-        },
-        onScreenShareStopped: (infoObj) => {
-            if (isExistingCallback('onScreenShareStopped')) {
-                props.additionalCallbacks.onScreenShareStopped(infoObj);
-            }
         },
         onDisconnected: (infoObj) => {
             if (isExistingCallback('onDisconnected')) {
@@ -89,16 +65,6 @@ function VideoContainer(props) {
                 props.additionalCallbacks.onConnected(infoObj);
             }
             setShowDisconnectionModal(false);
-        },
-        onClosed: (infoObj) => {
-            if (isExistingCallback('onJoinedTheRoom')) {
-                props.additionalCallbacks.onJoinedTheRoom(infoObj);
-            }
-        },
-        onUpdatedStats: (infoObj) => {
-            if (isExistingCallback('onUpdatedStats')) {
-                props.additionalCallbacks.onUpdatedStats(infoObj);
-            }
         },
     }
 
@@ -117,7 +83,7 @@ function VideoContainer(props) {
         }
     }
 
-    const { webRTCAdaptor, externalMediaStreams, audioLevels } = 
+    const { webRTCAdaptor, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels } = 
         useWebRTCAdaptor(
             streamerReady,
             isPlayMode,
@@ -142,6 +108,7 @@ function VideoContainer(props) {
     useEffect(() => {
         if (isMainStreamer && props.currentLivestream.speakerSwitchMode === 'automatic') { 
             let timeout = setTimeout(() => {
+                console.log(audioLevels)
                 if (audioLevels && audioLevels.length > 0) {
                     const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
                     if (maxEntry.audioLevel > 0.05) {
@@ -155,19 +122,8 @@ function VideoContainer(props) {
     }, [audioCounter, props.currentLivestream.speakerSwitchMode]);
 
     useEffect(() => {
-        if (props.currentLivestream.start) {
-            let interval = setInterval(() => {
-                if (dateIsInUnder2Minutes(props.currentLivestream.start.toDate())) {
-                    setStreamStartTimeIsNow(true);
-                    clearInterval(interval);
-                }
-            }, 1000)
-        }
-    }, [props.currentLivestream.start]);
-
-    useEffect(() => {
         const constraints = {
-            audio: {deviceId: audioSource ? audioSource : undefined },
+            audio: { deviceId: audioSource || undefined },
             video: { 
                 width: { ideal: 1920, max: 1920 },
                 height: { ideal: 1080, max: 1080 },
@@ -192,10 +148,6 @@ function VideoContainer(props) {
         props.firebase.setLivestreamCurrentSpeakerId(props.currentLivestream.id, id);
     }
 
-    function dateIsInUnder2Minutes(date) {
-        return new Date(date).getTime() - Date.now() < 1000*60*2 || Date.now() > new Date(date).getTime();
-    }
-
     function reloadPage() {
         location.reload();
     }
@@ -208,6 +160,7 @@ function VideoContainer(props) {
                         smallScreenMode={props.currentLivestream.mode === 'presentation'} 
                         speakerSwitchModeActive={isMainStreamer} 
                         setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId} 
+                        removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
                         localId={props.streamerId} 
                         localStream={localStream} 
                         streams={externalMediaStreams} 
@@ -231,17 +184,6 @@ function VideoContainer(props) {
             <div className='controls-container'>
                 <VideoControlsContainer webRTCAdaptor={webRTCAdaptor} currentLivestream={props.currentLivestream} viewer={props.viewer} joining={!isMainStreamer}/>
             </div>
-            {/* <div className='button-container'>         
-                <Grid centered className='middle aligned'>
-                    <Grid.Column width={10} textAlign='center'>
-                        <div className='countdown' style={{ display: (props.currentLivestream.hasStarted || !props.currentLivestream.start || !showLivestreamCountdown ) ? 'none' : 'block', backgroundColor: streamStartTimeIsNow ? 'rgba(0, 210, 170, 0.8)' : 'rgba(100,100,100,0.8)'}}>
-                            <Icon name='delete' onClick={() => setShowLivestreamCountdown(false)} style={{ position: 'absolute', top: '22px', right: '20px', color: 'white' }}/>
-                            <div>Your livestream is scheduled to start in</div>
-                            <CountdownTimer date={ props.currentLivestream.start ? props.currentLivestream.start.toDate() : null }><span>Press Start Streaming to start the event</span></CountdownTimer>
-                        </div>
-                    </Grid.Column>
-                </Grid>
-            </div>  */}
             <Modal open={showDisconnectionModal}>
                 <Modal.Header>You have been disconnected</Modal.Header>
                 <Modal.Content>

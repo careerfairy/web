@@ -24,7 +24,6 @@ function StreamingPage(props) {
     const [currentLivestream, setCurrentLivestream] = useState(false);
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
-    const [showSpeakersModal, setShowSpeakersModal] = useState(false);
     const [showMenu, setShowMenu] = useState(true);
 
     const [newNotification, setNewNotification] = useState(null);
@@ -62,24 +61,6 @@ function StreamingPage(props) {
     function setStreamingStarted(started) {
         props.firebase.setLivestreamHasStarted(started, currentLivestream.id);
     }
-
-    function setLivestreamMode(mode) {
-        props.firebase.setLivestreamMode(livestreamId, mode);
-    }
-
-    function setLivestreamSpeakerSwitchMode(mode) {
-        props.firebase.setLivestreamSpeakerSwitchMode(livestreamId, mode);
-    }
-
-    function toggleMicrophone() {
-        if (isLocalMicMuted) {
-            webRTCAdaptor.unmuteLocalMic();
-        } else {
-            webRTCAdaptor.muteLocalMic();
-        }
-        setIsLocalMicMuted(!isLocalMicMuted);
-    }
-
 
     return (
         <NotificationsContext.Provider value={{ setNewNotification: setNewNotification }}>

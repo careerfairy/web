@@ -52,7 +52,17 @@ const ProfileNav = ({userData, firebase}) => {
     const [adminGroups, setAdminGroups] = useState([]);
 
     useEffect(() => {
-        if (userData) {
+        if (userData?.isAdmin) {
+            firebase.listenCareerCenters(querySnapshot => {
+                let careerCenters = [];
+                querySnapshot.forEach(doc => {
+                    let careerCenter = doc.data();
+                    careerCenter.id = doc.id;
+                    careerCenters.push(careerCenter);
+                })
+                setAdminGroups(careerCenters);
+            })
+        } else if (userData) {
             firebase.listenCareerCentersByAdminEmail(userData.id, querySnapshot => {
                 let careerCenters = [];
                 querySnapshot.forEach(doc => {
@@ -84,8 +94,8 @@ const ProfileNav = ({userData, firebase}) => {
 
     if (adminGroups.length) {
     views.push(<TabPanel key={2} value={value} index={2} dir={theme.direction}>
-                        <AdminGroups userData={userData} adminGroups={adminGroups}/>
-                    </TabPanel>)
+                <AdminGroups userData={userData} adminGroups={adminGroups}/>
+            </TabPanel>)
 }
 
     return (

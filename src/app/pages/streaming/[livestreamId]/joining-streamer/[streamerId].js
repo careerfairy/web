@@ -58,18 +58,6 @@ function StreamingPage(props) {
         return new Date(date).getTime() - Date.now() < 1000*60*2 || Date.now() > new Date(date).getTime();
     }
 
-    function setStreamingStarted(started) {
-        props.firebase.setLivestreamHasStarted(started, currentLivestream.id);
-    }
-
-    function setLivestreamMode(mode) {
-        props.firebase.setLivestreamMode(livestreamId, mode);
-    }
-
-    function setLivestreamSpeakerSwitchMode(mode) {
-        props.firebase.setLivestreamSpeakerSwitchMode(livestreamId, mode);
-    }
-
     function toggleMicrophone() {
         if (isLocalMicMuted) {
             webRTCAdaptor.unmuteLocalMic();
@@ -84,15 +72,6 @@ function StreamingPage(props) {
         <NotificationsContext.Provider value={{ setNewNotification: setNewNotification }}>
             <div className='topLevelContainer'>
                 <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
-                    <div style={{ position: 'absolute', top: '50%', left: '20px', transform: 'translateY(-50%)', verticalAlign: 'middle'}}>
-                        <ButtonWithConfirm
-                            color={currentLivestream.hasStarted ? 'red' : 'teal'}  
-                            fluid
-                            disabled={!streamStartTimeIsNow}
-                            buttonAction={() => setStreamingStarted(!currentLivestream.hasStarted)} 
-                            confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
-                            buttonLabel={ currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming' }/>
-                    </div>
                     <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', display: 'inline-block', padding: '10px', verticalAlign: 'middle', fontSize: '0.8em'}}>
                         <h3 style={{ color: (currentLivestream.hasStarted ?  'teal' : 'orange') }}>{ currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}</h3>
                         { currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
@@ -102,7 +81,7 @@ function StreamingPage(props) {
                     </div>
                 </div>
                 <div className='black-frame' style={{ left: showMenu ? '280px' : '0'}}>
-                    <VideoContainer currentLivestream={ currentLivestream } streamerId={ streamerId } viewer={false}/>
+                    <VideoContainer currentLivestream={ currentLivestream } streamerId={ streamerId } viewer={ false }/>
                 </div>
                 <div className='video-menu-left' style={{ width: showMenu ? '280px' : '0'}}> 
                     <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={true} livestream={ currentLivestream }/>

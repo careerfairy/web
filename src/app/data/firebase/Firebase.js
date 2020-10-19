@@ -62,14 +62,14 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    setUserData = (userEmail, firstName, lastName, university, universityCountryCode) => {
+    setUserData = (userEmail, firstName, lastName, universityCode, universityCountryCode) => {
         let ref = this.firestore.collection("userData").doc(userEmail);
         return ref.update({
             id: userEmail,
             userEmail,
             firstName,
             lastName,
-            university,
+            universityCode,
             universityCountryCode
         });
     };
@@ -517,15 +517,26 @@ class Firebase {
         return ref.onSnapshot(callback)
     }
 
-    listenToLiveStreamsByGroupId = (groupId, callback) => {
-        var thirtyMinutesInMilliseconds = 1000 * 60 * 45;
+    listenToUpcomingLiveStreamsByGroupId = (groupId, callback) => {
+        var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
         let ref = this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
-            .where("start", ">", new Date(Date.now() - thirtyMinutesInMilliseconds))
+            .where("start", ">", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
             .orderBy("start", "asc")
         return ref.onSnapshot(callback)
     }
+
+    listenToPastLiveStreamsByGroupId = (groupId, callback) => {
+      var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
+      let ref = this.firestore
+          .collection("livestreams")
+          .where("groupIds", "array-contains", groupId)
+          .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
+          .where("start", ">", new Date(2020, 9, 1, 0, 0, 0))
+          .orderBy("start", "desc")
+      return ref.onSnapshot(callback)
+  }
 
     getLivestreamSpeakers = (livestreamId) => {
         let ref = this.firestore
@@ -533,93 +544,6 @@ class Firebase {
             .doc(livestreamId)
             .collection("speakers");
         return ref.get();
-    };
-
-    getStreamSpeakers = (streamId, collection) => {
-        let ref = this.firestore
-            .collection(collection)
-            .doc(streamId)
-            .collection("speakers");
-        return ref.get();
-    };
-
-    createNewLivestreamSpeaker = (livestreamId, speakerName, mainSpeaker) => {
-        if (mainSpeaker) {
-            let ref = this.firestore
-                .collection("livestreams")
-                .doc(livestreamId)
-                .collection("liveSpeakers")
-                .doc(livestreamId);
-            return ref.set({
-                counter: 0,
-                name: speakerName,
-                connected: false,
-                timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
-            });
-        } else {
-            let ref = this.firestore
-                .collection("livestreams")
-                .doc(livestreamId)
-                .collection("liveSpeakers");
-            return ref.add({
-                counter: 0,
-                name: speakerName,
-                connected: false,
-                timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
-            });
-        }
-    };
-
-    deleteLivestreamSpeaker = (livestreamId, speakerId) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
-            .collection("liveSpeakers")
-            .doc(speakerId);
-        return ref.delete();
-    };
-
-    listenToLivestreamLiveSpeakers = (livestreamId, callback) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
-            .collection("liveSpeakers")
-            .orderBy("timestamp", "asc");
-        return ref.onSnapshot(callback);
-    };
-
-    listenToConnectedLivestreamLiveSpeakers = (livestreamId, callback) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
-            .collection("liveSpeakers")
-            .where("connected", "==", true);
-        return ref.onSnapshot(callback);
-    };
-
-    setLivestreamLiveSpeakersConnected = (livestreamId, registeredSpeaker) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
-            .collection("liveSpeakers")
-            .doc(registeredSpeaker.id);
-        return ref.update({
-            connected: true,
-            connectionValue: registeredSpeaker.connectionValue
-                ? registeredSpeaker.connectionValue + 1
-                : 1,
-        });
-    };
-
-    setLivestreamLiveSpeakersDisconnected = (livestreamId, speakerId) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
-            .collection("liveSpeakers")
-            .doc(speakerId);
-        return ref.update({
-            connected: false,
-        });
     };
 
     getLegacyScheduledLivestreamById = (livestreamId) => {
@@ -639,6 +563,15 @@ class Firebase {
             .orderBy("timestamp", "asc");
         return ref.onSnapshot(callback);
     };
+
+    listLivestreamQuestions = (livestreamId, callback) => {
+      let ref = this.firestore
+          .collection("livestreams")
+          .doc(livestreamId)
+          .collection("questions")
+          .orderBy("votes", "desc")
+      return ref.onSnapshot(callback);
+  };
 
     listenToQuestionComments = (livestreamId, questionId, callback) => {
         let ref = this.firestore
@@ -794,39 +727,39 @@ class Firebase {
         });
     };
 
-    deleteCareerCenter = (careerCenterId) => {
-        let careerCenterRef = this.firestore
-            .collection("careerCenterData")
-            .doc(careerCenterId);
-        return careerCenterRef.delete();
-    };
-
-    getCareerCenters = () => {
+    getLivestreamRegisteredStudents = (livestreamId) => {
         let ref = this.firestore
-            .collection("careerCenterData")
-            .where("test", "==", false);
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("registeredStudents");
         return ref.get();
+    }
+
+    getLivestreamParticipatingStudents = (livestreamId) => {
+      let ref = this.firestore
+          .collection("livestreams")
+          .doc(livestreamId)
+          .collection("participatingStudents");
+      return ref.get();
+  }
+
+    getLivestreamTalentPoolMembers = (companyId) => {
+        let ref = this.firestore
+            .collection("userData")
+            .where("talentPools", "array-contains", companyId);
+        return ref.get();
+    }
+
+    deleteCareerCenter = (careerCenterId) => {
+      let careerCenterRef = this.firestore
+        .collection("careerCenterData")
+        .doc(careerCenterId);
+      return careerCenterRef.delete();
     };
 
     getCareerCenterById = (careerCenterId) => {
         let ref = this.firestore.collection("careerCenterData").doc(careerCenterId);
         return ref.get();
-    };
-
-    getFirstCareerCenterByLivestreamId = (livestreamId) => {
-        return this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
-            .get()
-            .then((doc) => {
-                let livestreamObj = doc.data();
-                let firstCareerCenterName = livestreamObj.universities[0];
-                return this.firestore
-                    .collection("careerCenterData")
-                    .where("universityId", "==", firstCareerCenterName)
-                    .limit(1)
-                    .get();
-            });
     };
 
     getCareerCenterByUniversityId = (universityId) => {
@@ -837,13 +770,24 @@ class Firebase {
         return ref.get();
     };
 
-    getCareerCentersByAdminEmail = (adminEmail) => {
-        let ref = this.firestore
-            .collection("careerCenterData")
-            .where("adminEmail", "==", adminEmail);
-        return ref.get();
+    listenToCareerCenterById = (groupId, callback) => {
+        let ref = this.firestore.collection("careerCenterData").doc(groupId);
+        return ref.onSnapshot(callback);
     };
 
+    getAllCareerCenters = () => {
+      let ref = this.firestore
+          .collection("careerCenterData")
+          .where("test", "==", false);
+      return ref.get();
+  };
+
+    listenCareerCenters = (callback) => {
+      let ref = this.firestore
+          .collection("careerCenterData")
+          .where("test", "==", false);
+      return ref.onSnapshot(callback);
+  };
     getCareerCentersByGroupId = async (arrayOfIds) => {
         let groups = []
         for (const id of arrayOfIds) {
@@ -855,11 +799,6 @@ class Firebase {
             }
         }
         return groups;
-    };
-
-    listenToCareerCenterById = (groupId, callback) => {
-        let ref = this.firestore.collection("careerCenterData").doc(groupId);
-        return ref.onSnapshot(callback);
     };
 
     listenCareerCentersByAdminEmail = (email, callback) => {
@@ -1138,14 +1077,7 @@ class Firebase {
                 transaction.update(livestreamRef, {
                     registeredUsers: firebase.firestore.FieldValue.arrayUnion(userId),
                 });
-                transaction.set(registeredUsersRef, {
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    registeredGroups: user.registeredGroups || [],
-                    university: user.university || "",
-                    levelOfStudy: user.levelOfStudy || "",
-                    faculty: user.faculty || "",
-                });
+                transaction.set(registeredUsersRef, user);
             });
         });
     };
@@ -1188,6 +1120,15 @@ class Firebase {
             });
         });
     };
+
+    setUserIsParticipating = (livestreamId, userData) => {
+      let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("participatingStudents")
+            .doc(userData.userEmail);
+        return ref.set(userData);
+    }
 
     getRegisteredStudentsInLivestream = (livestreamId) => {
         let ref = this.firestore

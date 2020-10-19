@@ -110,7 +110,7 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
         swipeToSlide: true,
         arrows: false,
         slidesToScroll: 1,
-        slidesToShow: !groupIds.length || mobile ? 1 : groupIds.length > 4 ? 4 : groupIds.length,
+        slidesToShow: groupIds.length < 3 || mobile ? 1 : groupIds.length > 4 ? 4 : groupIds.length,
         speed: 500,
         beforeChange: (current, next) => setActiveSlide(next),
     };
@@ -122,7 +122,6 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
             </IconButton>
             <Slider ref={customSlider} className={classes.slider} {...settings}>
                 {renderGroupCards}
-
             </Slider>
             <IconButton className={classes.next} onClick={handleNext}>
                 <NavigateNextIcon className={classes.icon} fontSize="large"/>

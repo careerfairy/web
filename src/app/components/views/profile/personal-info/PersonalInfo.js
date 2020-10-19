@@ -85,12 +85,12 @@ const PersonalInfo = ({firebase, userData}) => {
             initialValues={userData && userData.firstName ? {
                 firstName: userData.firstName,
                 lastName: userData.lastName,
-                university: userData.university,
+                universityCode: userData.universityCode,
                 universityCountryCode: userData.universityCountryCode
             } : {
                 firstName: '',
                 lastName: '',
-                university: 'other',
+                universityCode: 'other',
                 universityCountryCode: ''
             }}
             enableReinitialize={true}
@@ -110,8 +110,8 @@ const PersonalInfo = ({firebase, userData}) => {
                 } else if (values.lastName.length > 50) {
                     errors.lastName = 'Cannot be longer than 50 characters';
                 }
-                if (!values.university) {
-                    errors.university = 'Select a university or type "other"';
+                if (!values.universityCode) {
+                    errors.universityCode = 'Select a university or type "other"';
                 }
                 if (!values.universityCountryCode) {
                     errors.universityCountryCode = 'Please chose a country code';
@@ -120,7 +120,7 @@ const PersonalInfo = ({firebase, userData}) => {
             }}
             onSubmit={(values, {setSubmitting}) => {
                 setSubmitting(true);
-                firebase.setUserData(userData.id, values.firstName, values.lastName, values.university, values.universityCountryCode)
+                firebase.setUserData(userData.id, values.firstName, values.lastName, values.universityCode, values.universityCountryCode)
                     .then(() => {
                         setSubmitting(false);
                         setUpdated(true)
@@ -219,7 +219,7 @@ const PersonalInfo = ({firebase, userData}) => {
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <UniversitySelector handleBlur={handleBlur}
-                                                        error={errors.university && touched.university && errors.university}
+                                                        error={errors.universityCode && touched.universityCode && errors.universityCode}
                                                         universityCountryCode={values.universityCountryCode}
                                                         values={values}
                                                         submitting={isSubmitting}

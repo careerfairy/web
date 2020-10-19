@@ -1,3 +1,8 @@
+/**
+ *
+ * @returns
+ */
+
 "use strict";
 
 export function WebRTCAdaptor(initialValues)
@@ -14,18 +19,12 @@ export function WebRTCAdaptor(initialValues)
 			this.startTime = 0;
 			this.lastBytesReceived = 0;
 			this.lastBytesSent = 0;
-			this.lastFramesEncoded = 0;
-			this.totalFramesEncodedCount = 0;
 			this.currentTimestamp = 0;
 			this.lastTime = 0;
 			this.timerId = 0;
 			this.firstByteSentCount = 0;
 			this.firstBytesReceivedCount = 0;
 			this.audioLevel = -1;
-			this.qualityLimitationReason = "";
-			this.resWidth = 0;
-			this.resHeight = 0;
-			this.srcFps = 0;
 		}
 
 		//kbits/sec
@@ -46,11 +45,6 @@ export function WebRTCAdaptor(initialValues)
 		//kbits/sec
 		get currentIncomingBitrate() {
 			return Math.floor(8 * (this.totalBytesReceivedCount - this.lastBytesReceived) / (this.currentTimestamp - this.lastTime));
-		}
-		
-		//frames per second
-		get currentFPS() {
-			return (((this.totalFramesEncodedCount - this.lastFramesEncoded) / (this.currentTimestamp - this.lastTime))*1000).toFixed(1);
 		}
 
 		set currentTime(timestamp) {
@@ -74,14 +68,6 @@ export function WebRTCAdaptor(initialValues)
 			this.totalBytesSentCount = bytesSent;
 			if (this.firstByteSentCount == 0) {
 				this.firstByteSentCount = bytesSent;
-			}
-		}
-		
-		set totalFramesEncoded(framesEncoded) {
-			this.lastFramesEncoded = this.totalFramesEncodedCount;
-			this.totalFramesEncodedCount = framesEncoded;
-			if (this.lastFramesEncoded == 0) {
-				this.lastFramesEncoded = framesEncoded;
 			}
 		}
 
@@ -226,6 +212,8 @@ export function WebRTCAdaptor(initialValues)
 				}
 				canvasContext.drawImage(cameraVideo, positionX, positionY, cameraWidth, cameraHeight);
 			}, 66);
+
+
 		})
 		.catch(function(error) {
 			thiz.callbackError(error.name, error.message);
@@ -233,10 +221,11 @@ export function WebRTCAdaptor(initialValues)
 	}
 
 	this.prepareStreamTracks = function (mediaConstraints,audioConstraint,stream,streamId) {
-
+		
 		//this trick, getting audio and video separately, make us add or remove tracks on the fly
 		var audioTrack = stream.getAudioTracks();
 		if (audioTrack.length > 0) {
+			audioTrack[0].stop();
 			stream.removeTrack(audioTrack[0]);
 		}
 
@@ -268,9 +257,11 @@ export function WebRTCAdaptor(initialValues)
 			});
 		}
 		else {
+			//TODO: there is no audioStream 
 			stream.addTrack(audioStream.getAudioTracks()[0]);
 			thiz.gotStream(stream);
 		}
+		
 	}
 
 	/**
@@ -361,6 +352,8 @@ export function WebRTCAdaptor(initialValues)
 			track.onended = null;
 			track.stop();
 		});
+		
+		
 
 	}
 
@@ -470,14 +463,29 @@ export function WebRTCAdaptor(initialValues)
 	}
 
 	this.publish = function (streamId, token) {
-		var jsCmd = {
-				command : "publish",
-				streamId : streamId,
-				token : token,
-				video: thiz.localStream.getVideoTracks().length > 0 ? true : false,
-						audio: thiz.localStream.getAudioTracks().length > 0 ? true : false,
-		};
-
+		//If it started with playOnly mode and wants to publish now
+		if(thiz.localStream == null){
+			navigator.mediaDevices.getUserMedia(mediaConstraints).then(function(stream){
+				thiz.gotStream(stream);
+				var jsCmd = {
+					command : "publish",
+					streamId : streamId,
+					token : token,
+					video: thiz.localStream.getVideoTracks().length > 0 ? true : false,
+							audio: thiz.localStream.getAudioTracks().length > 0 ? true : false,
+				};
+				thiz.webSocketAdaptor.send(JSON.stringify(jsCmd));
+			});
+		}else{
+			console.debug("getvideotrack = " + thiz.localStream.getVideoTracks()[0])
+			var jsCmd = {
+					command : "publish",
+					streamId : streamId,
+					token : token,
+					video: thiz.localStream.getVideoTracks().length > 0 ? true : false,
+							audio: thiz.localStream.getAudioTracks().length > 0 ? true : false,
+			};
+		}
 		thiz.webSocketAdaptor.send(JSON.stringify(jsCmd));
 	}
 
@@ -575,7 +583,7 @@ export function WebRTCAdaptor(initialValues)
 				room: roomName,
 		};
 		this.webSocketAdaptor.send(JSON.stringify(jsCmd));
-		}, 5000);
+		}, 3000);
 	}
 
 	this.enableTrack = function(mainTrackId, trackId, enabled) {
@@ -671,8 +679,8 @@ export function WebRTCAdaptor(initialValues)
 	}
 
 	this.switchDesktopCaptureWithCamera = function(streamId) {
+
 		thiz.publishMode = "screen+camera";
-		const mediaConstraints = thiz.mediaConstraints;
 
 		var audioConstraint = false;
 		if (typeof mediaConstraints.audio != "undefined" && mediaConstraints.audio != false) {
@@ -969,6 +977,7 @@ export function WebRTCAdaptor(initialValues)
 			}
 
 			thiz.remotePeerConnection[streamId].oniceconnectionstatechange = function (event) {
+                debugger;
 				var obj = {state:thiz.remotePeerConnection[streamId].iceConnectionState, streamId:streamId};
 				thiz.callback("ice_connection_state_changed",obj);
 
@@ -1069,7 +1078,13 @@ export function WebRTCAdaptor(initialValues)
 	}
 
 	this.turnOnLocalCamera = function() {
-		if (thiz.remotePeerConnection != null) {
+		//If it started in playOnly mode and wants to turn on the camera
+		if(thiz.localStream == null){
+			navigator.mediaDevices.getUserMedia(mediaConstraints).then(function(stream){
+				thiz.gotStream(stream);
+			});
+		}
+		else if (thiz.remotePeerConnection != null) {
 			var track = thiz.localStream.getVideoTracks()[0];
 			track.enabled = true;
 		}
@@ -1264,7 +1279,7 @@ export function WebRTCAdaptor(initialValues)
 				}
 			}
 
-		}
+        }
 		return videoSender;
 	}
 
@@ -1302,10 +1317,10 @@ export function WebRTCAdaptor(initialValues)
 
 	this.getStats = function(streamId)
 	{
-		if (!thiz.remotePeerConnection[streamId] || !thiz.remotePeerConnectionStats[streamId]) {
+        if (!thiz.remotePeerConnection[streamId] || !thiz.remotePeerConnectionStats[streamId]) {
 			return;
-		}
-		
+        }
+        
 		thiz.remotePeerConnection[streamId].getStats(null).then(stats =>
 		{
 			var bytesReceived = 0;
@@ -1314,11 +1329,6 @@ export function WebRTCAdaptor(initialValues)
 			var currentTime = 0;
 			var bytesSent = 0;
 			var audioLevel = -1;
-			var qlr = "";
-			var framesEncoded = 0;
-			var width = 0;
-			var height = 0;
-			var fps = 0;
 
 			stats.forEach(value => {
 
@@ -1330,25 +1340,13 @@ export function WebRTCAdaptor(initialValues)
 					currentTime = value.timestamp;
 				}
 				else if (value.type == "outbound-rtp")
-				{ //todo: split audio and video bitrates here
-					bytesSent += value.bytesSent;
-					currentTime = value.timestamp;
-					qlr = value.qualityLimitationReason;
-					if(value.framesEncoded != null) { //audio tracks are undefined here
-						framesEncoded += value.framesEncoded;
-					}
+				{
+					bytesSent += value.bytesSent
+					currentTime = value.timestamp
 				}
 				else if ((value.type == "track" && typeof value.kind != "undefined" && value.kind == "audio") || (value.type == "media-source" && typeof value.kind != "undefined" && value.kind == "audio")) {
 					if (typeof value.audioLevel != "undefined") {
 						audioLevel = value.audioLevel;
-					}
-				}
-				else if (value.type == "media-source")
-				{
-					if(value.kind == "video") { //returns video source dimensions, not necessarily dimensions being encoded by browser
-						width = value.width;
-						height = value.height;
-						fps = value.framesPerSecond;
 					}
 				}
 			});
@@ -1359,11 +1357,6 @@ export function WebRTCAdaptor(initialValues)
 			thiz.remotePeerConnectionStats[streamId].currentTime = currentTime;
 			thiz.remotePeerConnectionStats[streamId].totalBytesSent = bytesSent;
 			thiz.remotePeerConnectionStats[streamId].audioLevel = audioLevel;
-			thiz.remotePeerConnectionStats[streamId].qualityLimitationReason = qlr;
-			thiz.remotePeerConnectionStats[streamId].totalFramesEncoded = framesEncoded;
-			thiz.remotePeerConnectionStats[streamId].resWidth = width;
-			thiz.remotePeerConnectionStats[streamId].resHeight = height;
-			thiz.remotePeerConnectionStats[streamId].srcFps = fps;
 
 			thiz.callback("updated_stats", thiz.remotePeerConnectionStats[streamId]);
 
@@ -1377,13 +1370,7 @@ export function WebRTCAdaptor(initialValues)
 		{
 			thiz.getStats(streamId);
 
-		}, 3000);
-	}
-	
-	this.disableStats = function(streamId) {
-        if (thiz.remotePeerConnectionStats[streamId]) {
-            clearInterval(thiz.remotePeerConnectionStats[streamId].timerId);
-        }
+		}, 5000);
 	}
 
 	/**

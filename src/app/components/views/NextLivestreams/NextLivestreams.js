@@ -82,7 +82,7 @@ const NextLivestreams = ({firebase}) => {
     useEffect(() => {
         if (groupData && groupData.groupId) {
             setSearching(true);
-            const unsubscribe = firebase.listenToLiveStreamsByGroupId(
+            const unsubscribe = firebase.listenToUpcomingLiveStreamsByGroupId(
                 groupData.groupId,
                 (querySnapshot) => {
                     setSearching(false);
