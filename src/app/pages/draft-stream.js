@@ -9,10 +9,10 @@ import {Typography} from "@material-ui/core";
 import {useRouter} from "next/router";
 import UserContext from "../context/user/UserContext";
 import Loader from "../components/views/loader/Loader";
-import CompanyStreamForm from "../components/views/companyStreamForm/CompanyStreamForm";
+import DraftStreamForm from "../components/views/DraftStreamForm/DraftStreamForm";
 
 
-const companyStream = () => {
+const draftStream = () => {
 
     const {replace, asPath: absolutePath} = useRouter();
     const {userData, authenticatedUser: user, hideLoader} = useContext(UserContext);
@@ -38,10 +38,10 @@ const companyStream = () => {
             <Typography variant="h3" align="center" style={{marginTop: "1.5rem", color: "white"}}>
                 Create a Livestream
             </Typography>
-            <CompanyStreamForm/>
+            <DraftStreamForm/>
             <Footer/>
         </TealBackground>
     ) : <Loader/>;
 };
 
-export default companyStream;
+export default draftStream;

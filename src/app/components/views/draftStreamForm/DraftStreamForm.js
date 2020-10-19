@@ -68,22 +68,19 @@ const speakerObj = {
 
 
 const mainSpeakerId = uuidv4()
-const CompanyStreamForm = ({firebase}) => {
+const DraftStreamForm = ({firebase}) => {
     const router = useRouter()
     const {
-        query: {livestreamId},
-        push
+        query: {careerCenterIds},
     } = router;
+
     const classes = useStyles()
 
     const {setGeneralError} = useContext(ErrorContext);
     const [targetCategories, setTargetCategories] = useState({})
     const [selectedGroups, setSelectedGroups] = useState([])
 
-
-    const [fetchingGroups, setFetchingGroups] = useState(true);
-
-    const [allFetched, setAllFetched] = useState(false)
+    const [allFetched, setAllFetched] = useState(true)
     const [updateMode, setUpdateMode] = useState(undefined)
 
     const [existingGroups, setExistingGroups] = useState([]);
@@ -104,74 +101,38 @@ const CompanyStreamForm = ({firebase}) => {
     })
 
     useEffect(() => {
-        if (livestreamId && allFetched) {
+        if (careerCenterIds) {
             (async () => {
-                const livestreamQuery = await firebase.getLivestreamById(livestreamId)
-                const speakerQuery = await firebase.getLivestreamSpeakers(livestreamId)
-                if (livestreamQuery.exists) {
-
-                    let livestream = livestreamQuery.data()
-                    livestream.id = livestreamId
-                    const newFormData = {
-                        id: livestreamId,
-                        companyLogoUrl: livestream.companyLogoUrl || "",
-                        backgroundImageUrl: livestream.backgroundImageUrl || "",
-                        company: livestream.company || "",
-                        companyId: livestream.companyId || "",
-                        title: livestream.title || "",
-                        targetCategories: {},
-                        groupIds: livestream.groupIds || [],
-                        start: livestream.start.toDate() || new Date(),
-                        hidden: livestream.hidden || false,
-                        summary: livestream.summary || "",
-                        speakers: {
-                            [mainSpeakerId]: handleGetMainSpeaker(livestream),
-                        },
-                    }
-                    setFormData(newFormData)
-                    handleSetDefaultGroups(livestream.groupIds)
-                    setTargetCategories(livestream.targetCategories || {})
-                    if (!speakerQuery.empty) {
-                        const mainSpeakerFirstName = livestream.mainSpeakerName.split(/[ ]+/)[0]
-                        const mainSpeakerLastName = livestream.mainSpeakerName.split(/[ ]+/)[1]
-                        speakerQuery.forEach(query => {
-                            let speaker = query.data()
-                            speaker.id = query.id
-                            if (speaker.firstName !== mainSpeakerFirstName && speaker.lastName !== mainSpeakerLastName) {
-                                handleAddSpeaker(newFormData, setFormData, speaker)
-                            }
-                        })
-                    }
-                    setUpdateMode(true)
-                }
+                setAllFetched(false)
+                const arrayOfIds = careerCenterIds.split("/")
+                console.log("-> arrayOfIds", arrayOfIds);
+                const arrayOfGroups = await firebase.getCareerCentersByGroupId(arrayOfIds)
+                arrayOfGroups.forEach(el => el.selected = true)
+                const arrayOfActualGroupId = arrayOfGroups.map(groupObj => groupObj.id)
+                setExistingGroups(arrayOfGroups)
+                setFormData({...formData, groupIds: arrayOfActualGroupId})
+                handleSetDefaultGroups(arrayOfActualGroupId)
+                setAllFetched(true)
             })()
-        } else {
-            setUpdateMode(false)
         }
-    }, [livestreamId, allFetched])
+    }, [careerCenterIds])
 
 
-    useEffect(() => {
-        const unsubscribe = firebase.listenToGroups(querySnapshot => {
-            let careerCenters = [];
-            querySnapshot.forEach(doc => {
-                let careerCenter = doc.data();
-                careerCenter.id = doc.id;
-                careerCenter.selected = false
-                careerCenters.push(careerCenter);
-            })
-            setFetchingGroups(false)
-            setExistingGroups(careerCenters);
-        });
-        return () => unsubscribe();
-
-    }, []);
-
-    useEffect(() => {
-        if (!fetchingGroups) {
-            setAllFetched(true)
-        }
-    }, [fetchingGroups])
+    // useEffect(() => {
+    //     const unsubscribe = firebase.listenToGroups(querySnapshot => {
+    //         let careerCenters = [];
+    //         querySnapshot.forEach(doc => {
+    //             let careerCenter = doc.data();
+    //             careerCenter.id = doc.id;
+    //             careerCenter.selected = false
+    //             careerCenters.push(careerCenter);
+    //         })
+    //         setFetchingGroups(false)
+    //         setExistingGroups(careerCenters);
+    //     });
+    //     return () => unsubscribe();
+    //
+    // }, []);
 
     const handleAddTargetCategories = (arrayOfIds) => {
         const oldTargetCategories = {...targetCategories}
@@ -207,7 +168,6 @@ const CompanyStreamForm = ({firebase}) => {
     }
 
     const handleSetDefaultGroups = (arrayOfGroupIds) => {
-
         if (Array.isArray(arrayOfGroupIds)) {
             let groupsWithFlattenedOptions = []
             arrayOfGroupIds.forEach(id => {
@@ -222,7 +182,7 @@ const CompanyStreamForm = ({firebase}) => {
     }
 
     const handleGetMainSpeaker = (streamObj) => {
-        if (streamObj.mainSpeakerName.length) {
+        if (streamObj?.mainSpeakerName?.length) {
             const fullnameArray = streamObj.mainSpeakerName.split(/[ ]+/)
             return {
                 firstName: fullnameArray[0],
@@ -250,7 +210,6 @@ const CompanyStreamForm = ({firebase}) => {
 
     const buildLivestreamObject = (values) => {
         return {
-            ...(updateMode && {id: livestreamId}),// only adds id: livestreamId field if there's actually a valid id, which is when updateMode is true
             backgroundImageUrl: values.backgroundImageUrl,
             company: values.company,
             companyId: values.companyId,
@@ -287,8 +246,8 @@ const CompanyStreamForm = ({firebase}) => {
 
 
     const handleError = (key, fieldName, errors, touched) => {
-        const baseError = errors && errors.speakers && errors.speakers[key] && errors.speakers[key][fieldName]
-        const baseTouched = touched && touched.speakers && touched.speakers[key] && touched.speakers[key][fieldName]
+        const baseError = errors?.speakers?.[key]?.[fieldName]
+        const baseTouched = touched?.speakers?.[key]?.[fieldName]
         return baseError && baseTouched && baseError
     }
 
@@ -299,7 +258,7 @@ const CompanyStreamForm = ({firebase}) => {
     }
 
     return (<Container className={classes.root}>
-        {(allFetched && updateMode !== undefined) ? <Formik
+        {allFetched ? <Formik
                 initialValues={formData}
                 enableReinitialize
                 validate={values => {
@@ -312,9 +271,6 @@ const CompanyStreamForm = ({firebase}) => {
                     }
                     if (!values.company) {
                         errors.company = 'Required';
-                    }
-                    if (!values.companyId) {
-                        errors.companyId = 'Required';
                     }
                     if (!values.title) {
                         errors.title = 'Required';
@@ -389,7 +345,7 @@ const CompanyStreamForm = ({firebase}) => {
                   }) => (<form onSubmit={handleSubmit} className={classes.form}>
                     <Typography style={{color: "white"}} variant="h4">Stream Info:</Typography>
                     <FormGroup>
-                        <Grid xs={7} sm={7} md={10} lg={10} xl={10} item>
+                        <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                             <FormControl fullWidth>
                                 <TextField
                                     name="title"
@@ -448,26 +404,6 @@ const CompanyStreamForm = ({firebase}) => {
                                     onChange={handleChange}/>
                                 <Collapse style={{color: "red"}} in={Boolean(errors.company && touched.company)}>
                                     {errors.company}
-                                </Collapse>
-                            </FormControl>
-                        </Grid>
-                        <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-                            <FormControl fullWidth>
-                                <TextField
-                                    name="companyId"
-                                    variant="outlined"
-                                    fullWidth
-                                    id="companyId"
-                                    label="Company ID"
-                                    inputProps={{maxLength: 70}}
-                                    onBlur={handleBlur}
-                                    value={values.companyId}
-                                    disabled={isSubmitting}
-                                    error={Boolean(errors.companyId && touched.companyId && errors.companyId)}
-                                    onChange={handleChange}/>
-                                <Collapse style={{color: "red"}}
-                                          in={Boolean(errors.companyId && touched.companyId)}>
-                                    {errors.companyId}
                                 </Collapse>
                             </FormControl>
                         </Grid>
@@ -576,7 +512,7 @@ const CompanyStreamForm = ({firebase}) => {
                         endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
                         variant="contained" fullWidth>
                         <Typography variant="h4">
-                            {updateMode ? isSubmitting ? "Updating" : "Update Livestream" : isSubmitting ? "Saving" : "Create Livestream"}
+                            {updateMode ? isSubmitting ? "Updating" : "Update Livestream" : isSubmitting ? "Saving" : "Submit Test Livestream"}
                         </Typography>
                     </Button>
                 </form>)}
@@ -585,4 +521,4 @@ const CompanyStreamForm = ({firebase}) => {
     </Container>);
 };
 
-export default withFirebase(CompanyStreamForm);
+export default withFirebase(DraftStreamForm);

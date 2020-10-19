@@ -809,11 +809,17 @@ class Firebase {
         return ref.get();
     };
 
-    getCareerCentersByGroupId = (arrayOfIds) => {
-        const refs = arrayOfIds.map((id) =>
-            this.firestore.collection("careerCenterData").doc(id)
-        );
-        return this.firestore.getAll(...refs);
+    getCareerCentersByGroupId = async (arrayOfIds) => {
+        let groups = []
+        for (const id of arrayOfIds) {
+            const snapshot = await this.firestore.collection("careerCenterData").doc(id).get()
+            if (snapshot.exists) {
+                let group = snapshot.data()
+                group.id = snapshot.id
+                groups.push(group)
+            }
+        }
+        return groups;
     };
 
     listenToCareerCenterById = (groupId, callback) => {
