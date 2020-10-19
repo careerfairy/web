@@ -533,7 +533,7 @@ exports.getNumberOfViewers = functions.https.onRequest(async (req, res) => {
 
     axios({
         method: 'get',
-        url: 'https://thrillin.work/WebRTCAppEE/rest/v2/broadcasts/' + req.query.livestreamId + '/broadcast-statistics',
+        url: 'https://streaming.careerfairy.io/WebRTCAppEE/rest/v2/broadcasts/' + req.query.livestreamId + '/broadcast-statistics',
     }).then( response => { 
             console.log(response.data);
             return res.status(200).send(response.data);
@@ -555,13 +555,13 @@ exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 45
                 livestream.id = doc.id;
                 console.log("livestream company: " + livestream.company);
                 console.log("number of emails: " + livestream.registeredUsers.length);
-                var data = generateEmailData("link.aerospace@gmail.com", livestream);
-                mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
+                livestream.registeredUsers.forEach( email => {
+                    var data = generateEmailData("link.aerospace@gmail.com", livestream);
+                    mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
+                });
             });
-            res.send(200);
         }).catch((error) => {
             console.log("error: " + error);
-            res.send(400);
         });
 });
 
@@ -571,7 +571,7 @@ function generateEmailData(recipientEmail, livestream) {
         //Specify email data
         from: "CareerFairy <noreply@careerfairy.io>",
         to: recipientEmail,
-        subject: 'Reminder: TODAY - Live Stream with ' + livestream.company + ' ' + getLivestreamTimeInterval(livestream.start),
+        subject: 'Reminder: Live Stream with ' + livestream.company + ' ' + getLivestreamTimeInterval(livestream.start),
         template: 'registration-reminder',
         "h:X-Mailgun-Variables": JSON.stringify({ "company": livestream.company, "startTime": formatHour(luxonStartDateTime), "streamLink": getStreamLink(livestream.id), "german": livestream.language === "DE" ? true : false }),
         "o:deliverytime": luxonStartDateTime.minus({ minutes: 45 }).toRFC2822()
