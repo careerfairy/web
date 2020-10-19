@@ -280,6 +280,26 @@ class Firebase {
         }
     }
 
+    addDraftLivestream = async (livestream, speakers) => {
+
+        let batch = this.firestore.batch();
+        let livestreamsRef = this.firestore
+            .collection("draftLivestreams")
+            .doc()
+        livestream.currentSpeakerId = livestreamsRef.id
+        batch.set(livestreamsRef, livestream)
+        speakers.forEach(speaker => {
+            let speakersRef = this.firestore
+                .collection("draftLivestreams")
+                .doc(livestreamsRef.id)
+                .collection("speakers")
+                .doc();
+            batch.set(speakersRef, speaker)
+        })
+        await batch.commit()
+        return livestreamsRef.id
+    }
+
     updateLivestream = async (livestream, speakers) => {
         try {
             let batch = this.firestore.batch();

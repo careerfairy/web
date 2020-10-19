@@ -41,7 +41,7 @@ const MultiGroupSelect = (
             getOptionLabel={(option) => option.universityName}
             renderInput={(params) => (
                 <TextField {...params} variant="outlined" label="Add some Groups"
-                           placeholder="Add partner groups"/>
+                           placeholder={selectedGroups.length >= groups.length ? "" : "Add some partner Groups"}/>
             )}
             renderTags={(value, getTagProps) =>
                 value.map((option, index) => (

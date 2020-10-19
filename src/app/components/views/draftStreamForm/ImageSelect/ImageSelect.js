@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Box,
     Button,
@@ -80,6 +80,14 @@ const ImageSelect =
         const classes = useStyles()
         const [open, setOpen] = useState(false);
         const [filePickerError, setFilePickerError] = useState(null)
+
+        useEffect(() => {
+            if (error && !filePickerError) {
+                setFilePickerError("Please Upload")
+            } else {
+                setFilePickerError(null)
+            }
+        }, [error])
 
         const getSelectedItem = () => {// Autocomplete will always complain because of async filtering... :( So ignore the warning
             const item = options.find((option) => option.value === value)
