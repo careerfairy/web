@@ -16,6 +16,7 @@ const draftStream = () => {
 
     const {replace, asPath: absolutePath} = useRouter();
     const {userData, authenticatedUser: user, hideLoader} = useContext(UserContext);
+    const [submitted, setSubmitted] = useState(false)
 
     useEffect(() => {
         if (user === null) {
@@ -35,10 +36,10 @@ const draftStream = () => {
             <div style={{background: "rgb(44, 66, 81)"}}>
                 <Header color="white"/>
             </div>
-            <Typography variant="h3" align="center" style={{marginTop: "1.5rem", color: "white"}}>
-                Create a Livestream
+            <Typography variant="h3" align="center" style={{marginTop: submitted? "15vh" :"1.5rem", color: "white"}} gutterBottom>
+                {submitted ? "Success!" : "Draft a Livestream"}
             </Typography>
-            <DraftStreamForm/>
+            <DraftStreamForm submitted={submitted} setSubmitted={setSubmitted}/>
             <Footer/>
         </TealBackground>
     ) : <Loader/>;

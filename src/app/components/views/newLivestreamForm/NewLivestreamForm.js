@@ -71,7 +71,7 @@ const mainSpeakerId = uuidv4()
 const NewLivestreamForm = ({firebase}) => {
     const router = useRouter()
     const {
-        query: {livestreamId},
+        query: {livestreamId, draftStreamId},
         push
     } = router;
     const classes = useStyles()
@@ -109,16 +109,20 @@ const NewLivestreamForm = ({firebase}) => {
     })
 
     useEffect(() => {
-        if (livestreamId && allFetched) {
+        if ((livestreamId || draftStreamId) && allFetched) {
             (async () => {
-                const livestreamQuery = await firebase.getLivestreamById(livestreamId)
-                const speakerQuery = await firebase.getLivestreamSpeakers(livestreamId)
+                const targetId = livestreamId || draftStreamId
+                const forLivestream = (targetId === livestreamId)
+                const targetCollection = livestreamId ? "livestreams" : "draftLivestreams"
+                const livestreamQuery = await firebase.getStreamById(targetId, targetCollection)
+                const speakerQuery = await firebase.getStreamSpeakers(targetId, targetCollection)
                 if (livestreamQuery.exists) {
-
                     let livestream = livestreamQuery.data()
-                    livestream.id = livestreamId
+                    if (forLivestream) {
+                        livestream.id = livestreamId
+                    }
                     const newFormData = {
-                        id: livestreamId,
+                        ...(forLivestream && {id: livestreamId}),
                         companyLogoUrl: livestream.companyLogoUrl || "",
                         backgroundImageUrl: livestream.backgroundImageUrl || "",
                         company: livestream.company || "",
@@ -147,13 +151,15 @@ const NewLivestreamForm = ({firebase}) => {
                             }
                         })
                     }
-                    setUpdateMode(true)
+                    if (forLivestream) {
+                        setUpdateMode(true)
+                    }
                 }
             })()
         } else {
             setUpdateMode(false)
         }
-    }, [livestreamId, allFetched])
+    }, [livestreamId, allFetched, draftStreamId])
 
     useEffect(() => {
         handleGetFiles('mentors-pictures', setFetchingAvatars, setExistingAvatars)

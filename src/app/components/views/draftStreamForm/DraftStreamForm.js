@@ -1,6 +1,7 @@
 import React, {Fragment, useContext, useEffect, useState} from 'react';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {
+    Box,
     Button,
     CircularProgress,
     Collapse,
@@ -56,6 +57,15 @@ const useStyles = makeStyles(theme => ({
             background: theme.palette.primary.main,
         }
     },
+    whiteBtn: {
+        color: theme.palette.primary.main,
+        background: "white",
+        margin: theme.spacing(1),
+        "&:hover": {
+            color: 'white',
+            background: theme.palette.primary.main,
+        }
+    }
 }));
 
 const speakerObj = {
@@ -68,7 +78,7 @@ const speakerObj = {
 
 
 const mainSpeakerId = uuidv4()
-const DraftStreamForm = ({firebase}) => {
+const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
     const router = useRouter()
     const {
         query: {careerCenterIds},
@@ -82,9 +92,8 @@ const DraftStreamForm = ({firebase}) => {
     const [selectedGroups, setSelectedGroups] = useState([])
 
     const [allFetched, setAllFetched] = useState(true)
-    const [submitted, setSubmitted] = useState(false)
 
-    const [updateMode, setUpdateMode] = useState(undefined)
+    const [draftId, setDraftId] = useState("")
 
     const [existingGroups, setExistingGroups] = useState([]);
     const [formData, setFormData] = useState({
@@ -108,19 +117,20 @@ const DraftStreamForm = ({firebase}) => {
             (async () => {
                 setAllFetched(false)
                 const arrayOfIds = careerCenterIds.split(",")
-                console.log("-> arrayOfIds", arrayOfIds);
-                const arrayOfGroups = await firebase.getCareerCentersByGroupId(arrayOfIds)
-                const newSelectedGroups = arrayOfGroups.map(group => (
-                    {
-                        ...group,
-                        selected: true,
-                        flattenedOptions: handleFlattenOptions(group)
-                    }))
-                setSelectedGroups(newSelectedGroups)
-                setExistingGroups(newSelectedGroups)
-                const arrayOfActualGroupIds = arrayOfGroups.map(groupObj => groupObj.id)
-                setFormData({...formData, groupIds: arrayOfActualGroupIds})
-                setAllFetched(true)
+                if (arrayOfIds.length) {
+                    const arrayOfGroups = await firebase.getCareerCentersByGroupId(arrayOfIds)
+                    const newSelectedGroups = arrayOfGroups.map(group => (
+                        {
+                            ...group,
+                            selected: true,
+                            flattenedOptions: handleFlattenOptions(group)
+                        }))
+                    setSelectedGroups(newSelectedGroups)
+                    setExistingGroups(newSelectedGroups)
+                    const arrayOfActualGroupIds = arrayOfGroups.map(groupObj => groupObj.id)
+                    setFormData({...formData, groupIds: arrayOfActualGroupIds})
+                    setAllFetched(true)
+                }
             })()
         }
     }, [careerCenterIds])
@@ -267,8 +277,20 @@ const DraftStreamForm = ({firebase}) => {
     }
 
     const SuccessMessage = (
-        <Typography variant="h5" align="center" style={{color: "white", marginTop: "20vh"}}>Thanks for your submission, we will review it and get back to
-            you!</Typography>
+        <>
+            <Typography variant="h5" align="center" style={{color: "white"}}>Thanks for your
+                submission, the code for your created draft is <b>{draftId}</b>, please save it somewhere.
+                We will review the draft and get back to
+                you as soon as possible!</Typography>
+            <div style={{display: "flex", justifyContent: "space-between"}}>
+                <Button className={classes.whiteBtn} variant="contained" href="/profile">
+                    To Profile
+                </Button>
+                <Button className={classes.whiteBtn} variant="contained" href="/next-livestreams">
+                    To Next Livestreams
+                </Button>
+            </div>
+        </>
     )
 
     return (<Container className={classes.root}>
@@ -319,19 +341,12 @@ const DraftStreamForm = ({firebase}) => {
                     setSubmitting(true)
                     const livestream = buildLivestreamObject(values);
                     const speakers = buildSpeakersArray(values);
-                    let livestreamId = ""
-                    if (updateMode) {
-                        // response = await firebase.updateLivestream(livestream, speakers)
-                        // if (response.status === "ERROR") {
-                        //     throw new Error()
-                        // }
-                    } else {
-                        livestreamId = await firebase.addDraftLivestream(livestream, speakers)
-                    }
-                    console.log("-> Livestream was created or updated with id", livestreamId);
+                    const livestreamId = await firebase.addDraftLivestream(livestream, speakers)
+                    console.log("-> Draft livestream was created with id", livestreamId);
+                    setDraftId(livestreamId)
                     setSubmitted(true)
+                    window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
                 } catch (e) {
-                    console.log("-> e", e);
                     setGeneralError("Something went wrong")
                 }
             }}
@@ -525,7 +540,7 @@ const DraftStreamForm = ({firebase}) => {
                     endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
                     variant="contained" fullWidth>
                     <Typography variant="h4">
-                        {updateMode ? isSubmitting ? "Updating" : "Update Livestream" : isSubmitting ? "Saving" : "Submit Test Livestream"}
+                        {isSubmitting ? "Submitting" : "Submit Draft Livestream"}
                     </Typography>
                 </Button>
             </form>)}

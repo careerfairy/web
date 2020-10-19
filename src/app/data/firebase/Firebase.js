@@ -345,6 +345,13 @@ class Firebase {
         return livestreamsRef.get()
     }
 
+    getStreamById = (streamId, collection) => {
+        let livestreamsRef = this.firestore
+            .collection(collection)
+            .doc(streamId)
+        return livestreamsRef.get()
+    }
+
     //TEST_LIVESTREAMS
 
     createTestLivestream = () => {
@@ -524,6 +531,14 @@ class Firebase {
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
+            .collection("speakers");
+        return ref.get();
+    };
+
+    getStreamSpeakers = (streamId, collection) => {
+        let ref = this.firestore
+            .collection(collection)
+            .doc(streamId)
             .collection("speakers");
         return ref.get();
     };
