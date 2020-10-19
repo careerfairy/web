@@ -507,8 +507,8 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                             </FormGroup>
                         </Fragment>)
                 })}
-                <Typography style={{color: "white"}} variant="h4">Group Info:</Typography>
-                <FormGroup>
+                {!!existingGroups.length && <FormGroup>
+                    <Typography style={{color: "white"}} variant="h4">Group Info:</Typography>
                     <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                         <MultiGroupSelect
                             handleChange={handleChange}
@@ -531,7 +531,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                                 group={group}/>
                         </Grid>
                     })}
-                </FormGroup>
+                </FormGroup>}
                 <Button
                     type="submit"
                     disabled={isSubmitting}
