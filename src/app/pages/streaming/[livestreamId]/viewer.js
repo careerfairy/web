@@ -1,8 +1,6 @@
 import {useState, useEffect, Fragment} from 'react';
-import {
-    Icon,
-    Image,
-} from "semantic-ui-react";
+import VolumeUpRoundedIcon from '@material-ui/icons/VolumeUpRounded';
+import PlayArrowRoundedIcon from '@material-ui/icons/PlayArrowRounded';
 import ThumbUpAltOutlinedIcon from '@material-ui/icons/ThumbUpAltOutlined';
 import FavoriteBorderOutlinedIcon from '@material-ui/icons/FavoriteBorderOutlined';
 import {useRouter} from 'next/router';
@@ -17,7 +15,7 @@ import {useWindowSize} from 'components/custom-hook/useWindowSize';
 import React from 'react';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import {Fab, ClickAwayListener, Zoom, Box, fade} from "@material-ui/core";
+import {Fab, ClickAwayListener, Box, fade} from "@material-ui/core";
 import {amber, deepOrange, red} from "@material-ui/core/colors";
 
 const useStyles = makeStyles((theme) => ({
@@ -294,7 +292,7 @@ function ViewerPage({firebase}) {
     let logoElements = careerCenters.map((careerCenter, index) => {
         return (
             <Fragment key={index}>
-                <Image src={careerCenter.logoUrl}
+                <img src={careerCenter.logoUrl}
                        style={{maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block'}}/>
             </Fragment>
         );
@@ -308,7 +306,7 @@ function ViewerPage({firebase}) {
         <div className={classes.root}>
             <div className='top-menu'>
                 <div className='top-menu-left'>
-                    <Image src='/logo_teal.png'
+                    <img src='/logo_teal.png'
                            style={{maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
                     {logoElements}
                     <div style={{
@@ -323,7 +321,7 @@ function ViewerPage({firebase}) {
                     </div>
                 </div>
                 <div className={'top-menu-right'}>
-                    <Image src={currentLivestream.companyLogoUrl} style={{
+                    <img src={currentLivestream.companyLogoUrl} style={{
                         position: 'relative',
                         zIndex: '100',
                         maxHeight: '50px',
@@ -382,13 +380,13 @@ function ViewerPage({firebase}) {
             </div>
             <div className={'playButtonContent ' + (showVideoButton.muted ? '' : 'hidden')} onClick={unmuteVideos}>
                 <div className='playButton'>
-                    <Icon name='volume up' style={{fontSize: '3rem'}}/>
+                    <VolumeUpRoundedIcon style={{fontSize: '3rem'}}/>
                     <div>Click to unmute</div>
                 </div>
             </div>
             <div className={'playButtonContent ' + (showVideoButton.paused ? '' : 'hidden')} onClick={playVideos}>
                 <div className='playButton'>
-                    <Icon name='play' style={{fontSize: '3rem'}}/>
+                    <PlayArrowRoundedIcon style={{fontSize: '3rem'}}/>
                     <div>Click to play</div>
                 </div>
             </div>

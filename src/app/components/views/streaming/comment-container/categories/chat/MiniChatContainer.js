@@ -1,17 +1,37 @@
 import React, {useState, useEffect, useContext} from 'react';
 
-import { withFirebase } from 'context/firebase';
-
-import { css } from 'glamor';
+import {withFirebase} from 'context/firebase';
+import ChevronRightRoundedIcon from '@material-ui/icons/ChevronRightRounded';
+import {css} from 'glamor';
 import ScrollToBottom from 'react-scroll-to-bottom';
 import ChatEntryContainer from './chat-entry-container/ChatEntryContainer';
-import { Icon, Input } from 'semantic-ui-react';
+import {Icon, Input} from 'semantic-ui-react';
 import UserContext from 'context/user/UserContext';
+import {
+    TextField,
+    InputAdornment, Fab,
+} from "@material-ui/core";
+import IconButton from "@material-ui/core/IconButton";
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles(theme => ({
+    sendIcon: {
+        background: "white",
+        color: theme.palette.primary.main,
+        borderRadius: "50%"
+    },
+    sendBtn: {
+        width: "35px !important",
+        height: "35px !important",
+        margin: "0.3rem"
+    }
+}))
 
 function MiniChatContainer(props) {
+    const classes = useStyles()
 
-    const { authenticatedUser, userData } = useContext(UserContext);
-    
+    const {authenticatedUser, userData} = useContext(UserContext);
+
     const [chatEntries, setChatEntries] = useState([]);
 
     const [numberOfMissedEntries, setNumberOfMissedEntries] = useState(0);
@@ -27,19 +47,19 @@ function MiniChatContainer(props) {
                 var chatEntries = [];
                 querySnapshot.forEach(doc => {
                     let entry = doc.data();
-                    entry.id = doc.id;                    
+                    entry.id = doc.id;
                     chatEntries.push(entry);
                 });
                 setChatEntries(chatEntries);
                 if (!open) {
                     let number = 0;
-                    querySnapshot.docChanges().forEach( change => {
+                    querySnapshot.docChanges().forEach(change => {
                         if (change.type === "added" && number < 99) {
                             number++;
                         }
                     })
                     setNumberOfLatestChanges(number);
-                }           
+                }
             });
             return () => unsubscribe();
         }
@@ -66,7 +86,7 @@ function MiniChatContainer(props) {
         const newChatEntryObject = {
             message: newChatEntry,
             authorName: props.isStreamer || props.livestream.test ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
-            authorEmail: props.isStreamer || props.livestream.test? 'Streamer' : authenticatedUser.email,
+            authorEmail: props.isStreamer || props.livestream.test ? 'Streamer' : authenticatedUser.email,
             votes: 0
         }
 
@@ -79,9 +99,9 @@ function MiniChatContainer(props) {
     }
 
     function addNewChatEntryOnEnter(target) {
-        if(target.charCode==13){
-            addNewChatEntry();   
-        } 
+        if (target.charCode == 13) {
+            addNewChatEntry();
+        }
     }
 
     const ROOT_CSS = css({
@@ -92,38 +112,50 @@ function MiniChatContainer(props) {
         return (
             <div key={index}>
                 <ChatEntryContainer chatEntry={chatEntry}/>
-            </div>       
+            </div>
         );
     });
 
+    const playIcon = (<div>
+        <Fab className={classes.sendBtn} onClick={() => addNewChatEntry()} color="primary">
+            <ChevronRightRoundedIcon style={{fontSize: 20}}
+                                     className={classes.sendIcon}/>
+        </Fab>
+    </div>)
+
     return (
         <>
-            <div className='chat-container' style={{ height: open ? '250px' : '40px' }}>
+            <div className='chat-container' style={{height: open ? '250px' : '40px'}}>
                 <div className='chat-container-title' onClick={() => setOpen(!open)}>
                     <Icon name='comments outline'/>Chat
-                    <Icon name={ open ? 'angle down' : 'angle up'} style={{ position: 'absolute', top: '10px', right: '5px', color: 'rgb(120,120,120)'}}/>         
-                    <div className='number-of-missed-entries' style={{ display: numberOfMissedEntries ? 'block' : 'none'}}>
+                    <Icon name={open ? 'angle down' : 'angle up'}
+                          style={{position: 'absolute', top: '10px', right: '5px', color: 'rgb(120,120,120)'}}/>
+                    <div className='number-of-missed-entries'
+                         style={{display: numberOfMissedEntries ? 'block' : 'none'}}>
                         <div>
-                            { numberOfMissedEntries }
+                            {numberOfMissedEntries}
                         </div>
                     </div>
                 </div>
-                <div style={{ display: open ? 'block' : 'none' }}>
-                    <ScrollToBottom className={ ROOT_CSS }>
-                        { chatElements }
-                    </ScrollToBottom> 
+                <div style={{display: open ? 'block' : 'none'}}>
+                    <ScrollToBottom className={ROOT_CSS}>
+                        {chatElements}
+                    </ScrollToBottom>
                     <div className='comment-input'>
-                        <Input
-                            icon={<Icon name='chevron circle right' inverted circular link onClick={() => addNewChatEntry()} color='teal'/>}
+                        <TextField
+                            variant="outlined"
+                            fullWidth
+                            size="small"
+                            onKeyPress={addNewChatEntryOnEnter}
                             value={newChatEntry}
                             onChange={() => setNewChatEntry(event.target.value)}
-                            onKeyPress={addNewChatEntryOnEnter}
-                            maxLength='340'
                             placeholder='Post in the chat...'
-                            fluid
-                        />
+                            InputProps={{
+                                maxLength: 340,
+                                endAdornment: playIcon,
+                            }}/>
                     </div>
-                </div>             
+                </div>
             </div>
             <style jsx>{`
                 .chat-container {
