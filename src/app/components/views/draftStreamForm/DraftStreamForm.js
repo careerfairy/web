@@ -79,6 +79,7 @@ const DraftStreamForm = ({firebase}) => {
     const {setGeneralError} = useContext(ErrorContext);
     const [targetCategories, setTargetCategories] = useState({})
     const [selectedGroups, setSelectedGroups] = useState([])
+    console.log("-> selectedGroups", selectedGroups);
 
     const [allFetched, setAllFetched] = useState(true)
     const [updateMode, setUpdateMode] = useState(undefined)
@@ -105,13 +106,16 @@ const DraftStreamForm = ({firebase}) => {
             (async () => {
                 setAllFetched(false)
                 const arrayOfIds = careerCenterIds.split("/")
-                console.log("-> arrayOfIds", arrayOfIds);
                 const arrayOfGroups = await firebase.getCareerCentersByGroupId(arrayOfIds)
-                arrayOfGroups.forEach(el => el.selected = true)
-                const arrayOfActualGroupId = arrayOfGroups.map(groupObj => groupObj.id)
-                setExistingGroups(arrayOfGroups)
-                setFormData({...formData, groupIds: arrayOfActualGroupId})
-                handleSetDefaultGroups(arrayOfActualGroupId)
+                const newSelectedGroups = arrayOfGroups.map(group => (
+                    {...group,
+                        selected: true,
+                        flattenedOptions: handleFlattenOptions(group)
+                    }))
+                setSelectedGroups(newSelectedGroups)
+                setExistingGroups(newSelectedGroups)
+                const arrayOfActualGroupIds = arrayOfGroups.map(groupObj => groupObj.id)
+                setFormData({...formData, groupIds: arrayOfActualGroupIds})
                 setAllFetched(true)
             })()
         }
@@ -168,6 +172,7 @@ const DraftStreamForm = ({firebase}) => {
     }
 
     const handleSetDefaultGroups = (arrayOfGroupIds) => {
+
         if (Array.isArray(arrayOfGroupIds)) {
             let groupsWithFlattenedOptions = []
             arrayOfGroupIds.forEach(id => {
