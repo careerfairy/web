@@ -481,7 +481,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                                     <DeleteIcon/>
                                 </Fab>}
                             </div>
-                            <FormGroup spacing={3}>
+                            <FormGroup>
                                 <SpeakerForm
                                     key={key}
                                     handleDeleteSpeaker={handleDeleteSpeaker}

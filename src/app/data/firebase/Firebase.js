@@ -352,6 +352,14 @@ class Firebase {
         return livestreamsRef.get()
     }
 
+    getStreamSpeakers = (streamId, collection) => {
+        let ref = this.firestore
+            .collection(collection)
+            .doc(streamId)
+            .collection("speakers");
+        return ref.get();
+    };
+
     //TEST_LIVESTREAMS
 
     createTestLivestream = () => {
@@ -528,15 +536,15 @@ class Firebase {
     }
 
     listenToPastLiveStreamsByGroupId = (groupId, callback) => {
-      var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
-      let ref = this.firestore
-          .collection("livestreams")
-          .where("groupIds", "array-contains", groupId)
-          .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
-          .where("start", ">", new Date(2020, 9, 1, 0, 0, 0))
-          .orderBy("start", "desc")
-      return ref.onSnapshot(callback)
-  }
+        var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
+        let ref = this.firestore
+            .collection("livestreams")
+            .where("groupIds", "array-contains", groupId)
+            .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
+            .where("start", ">", new Date(2020, 9, 1, 0, 0, 0))
+            .orderBy("start", "desc")
+        return ref.onSnapshot(callback)
+    }
 
     getLivestreamSpeakers = (livestreamId) => {
         let ref = this.firestore
@@ -565,13 +573,13 @@ class Firebase {
     };
 
     listLivestreamQuestions = (livestreamId, callback) => {
-      let ref = this.firestore
-          .collection("livestreams")
-          .doc(livestreamId)
-          .collection("questions")
-          .orderBy("votes", "desc")
-      return ref.onSnapshot(callback);
-  };
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("questions")
+            .orderBy("votes", "desc")
+        return ref.onSnapshot(callback);
+    };
 
     listenToQuestionComments = (livestreamId, questionId, callback) => {
         let ref = this.firestore
@@ -736,12 +744,12 @@ class Firebase {
     }
 
     getLivestreamParticipatingStudents = (livestreamId) => {
-      let ref = this.firestore
-          .collection("livestreams")
-          .doc(livestreamId)
-          .collection("participatingStudents");
-      return ref.get();
-  }
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("participatingStudents");
+        return ref.get();
+    }
 
     getLivestreamTalentPoolMembers = (companyId) => {
         let ref = this.firestore
@@ -751,10 +759,10 @@ class Firebase {
     }
 
     deleteCareerCenter = (careerCenterId) => {
-      let careerCenterRef = this.firestore
-        .collection("careerCenterData")
-        .doc(careerCenterId);
-      return careerCenterRef.delete();
+        let careerCenterRef = this.firestore
+            .collection("careerCenterData")
+            .doc(careerCenterId);
+        return careerCenterRef.delete();
     };
 
     getCareerCenterById = (careerCenterId) => {
@@ -776,18 +784,18 @@ class Firebase {
     };
 
     getAllCareerCenters = () => {
-      let ref = this.firestore
-          .collection("careerCenterData")
-          .where("test", "==", false);
-      return ref.get();
-  };
+        let ref = this.firestore
+            .collection("careerCenterData")
+            .where("test", "==", false);
+        return ref.get();
+    };
 
     listenCareerCenters = (callback) => {
-      let ref = this.firestore
-          .collection("careerCenterData")
-          .where("test", "==", false);
-      return ref.onSnapshot(callback);
-  };
+        let ref = this.firestore
+            .collection("careerCenterData")
+            .where("test", "==", false);
+        return ref.onSnapshot(callback);
+    };
     getCareerCentersByGroupId = async (arrayOfIds) => {
         let groups = []
         for (const id of arrayOfIds) {
@@ -1122,7 +1130,7 @@ class Firebase {
     };
 
     setUserIsParticipating = (livestreamId, userData) => {
-      let ref = this.firestore
+        let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("participatingStudents")
