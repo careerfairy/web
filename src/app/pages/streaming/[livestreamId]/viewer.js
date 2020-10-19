@@ -21,18 +21,6 @@ import {Fab, ClickAwayListener, Zoom, Box, fade} from "@material-ui/core";
 import {amber, deepOrange, red} from "@material-ui/core/colors";
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        height: 380,
-        transform: 'translateZ(0px)',
-        flexGrow: 1,
-    },
-    speedDial: {
-        position: 'absolute',
-        bottom: theme.spacing(2),
-        right: theme.spacing(2),
-
-    },
-
     image: {
         position: 'absolute',
         top: '50%',
@@ -79,12 +67,6 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: amber[600],
         }
     },
-    disabled: {},
-    realButtons: {
-        "& > *": {
-            margin: "0.5rem"
-        },
-    },
     miniButtons: {
         "& > *": {
             margin: "0.2rem"
@@ -105,9 +87,15 @@ const useStyles = makeStyles((theme) => ({
     cardHovered: {
         "@media(min-width: 768px)": {
             transform: "translate(0, -50px) scale3d(2.4, 2.4, 2.4)",
+            "-moz-transform": "translate(0, -50px) scale3d(2.4, 2.4, 2.4)",
+            "-o-transform": "translate(0, -50px) scale3d(2.4, 2.4, 2.4)",
+            "-webkit-transform": "translate(0, -50px) scale3d(2.4, 2.4, 2.4)",
         },
         "@media(max-width: 768px)": {
             transform: "translate(-50px, 0) scale3d(2.4, 2.4, 2.4)",
+            "-moz-transform": "translate(-50px, 0) scale3d(2.4, 2.4, 2.4)",
+            "-o-transform": "translate(-50px, 0) scale3d(2.4, 2.4, 2.4)",
+            "-webkit-transform": "translate(-50px, 0) scale3d(2.4, 2.4, 2.4)",
         }
     },
     actionArea: {
@@ -136,6 +124,13 @@ const useStyles = makeStyles((theme) => ({
             alignItems: "center",
         }
     },
+    root: {
+        position: "relative",
+        minHeight: "100vh",
+        height: "100%",
+        width: "100%",
+        touchAction: "manipulation"
+    }
 
 }));
 
@@ -227,7 +222,7 @@ function ViewerPage({firebase}) {
     }, [livestreamId]);
 
     useEffect(() => {
-        if (currentLivestream && currentLivestream.groupIds && currentLivestream.groupIds.length) {
+        if (currentLivestream?.groupIds?.length) {
             firebase.getDetailLivestreamCareerCenters(currentLivestream.groupIds)
                 .then((querySnapshot) => {
                     let groupList = [];
@@ -242,7 +237,7 @@ function ViewerPage({firebase}) {
     }, [currentLivestream]);
 
     useEffect(() => {
-        if (userData && currentLivestream && userData.talentPools && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
+        if ( userData?.talentPools && currentLivestream && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
             setUserIsInTalentPool(true);
         } else {
             setUserIsInTalentPool(false);
@@ -310,7 +305,7 @@ function ViewerPage({firebase}) {
     }
 
     return (
-        <div className='topLevelContainer'>
+        <div className={classes.root}>
             <div className='top-menu'>
                 <div className='top-menu-left'>
                     <Image src='/logo_teal.png'
@@ -336,11 +331,13 @@ function ViewerPage({firebase}) {
                         display: 'inline-block',
                         margin: '0 10px'
                     }}/>
-                    <Button style={{display: currentLivestream.hasNoTalentPool ? 'none' : 'inline-block'}}
-                            content={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
-                            icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
-                            onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
-                            primary={!userIsInTalentPool}/>
+                    {currentLivestream.hasNoTalentPool &&
+                    <Button
+                        children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
+                        variant="contained"
+                        icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
+                        onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
+                        color={userIsInTalentPool ? "default" : "primary"}/>}
                 </div>
             </div>
             <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
@@ -360,7 +357,7 @@ function ViewerPage({firebase}) {
                         <Box className={classes.miniButtons} classes={{root: open ? classes.cardHovered : ""}}>
                             <Fab onClick={handleLike} disabled={iconsDisabled} className={classes.miniLike}
                                  aria-label="like">
-                                <ThumbUpAltOutlinedIcon fontSize="inherit" />
+                                <ThumbUpAltOutlinedIcon fontSize="inherit"/>
                             </Fab>
                             <Fab onClick={handleClap} disabled={iconsDisabled} className={classes.miniClap}
                                  aria-label="clap">
@@ -369,7 +366,7 @@ function ViewerPage({firebase}) {
                             </Fab>
                             <Fab onClick={handleHeart} disabled={iconsDisabled} className={classes.miniHeart}
                                  aria-label="heart">
-                                <FavoriteBorderOutlinedIcon fontSize="inherit" />
+                                <FavoriteBorderOutlinedIcon fontSize="inherit"/>
                             </Fab>
                         </Box>
                     </div>
@@ -398,14 +395,6 @@ function ViewerPage({firebase}) {
             <style jsx>{`
                 .hidden {
                     display: none
-                }
-
-                .topLevelContainer {
-                    position: relative;
-                    min-height: 100vh;
-                    height: 100%;
-                    width: 100%;
-                    touch-action: manipulation;
                 }
 
                 .top-menu {
