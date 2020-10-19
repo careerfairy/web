@@ -13,22 +13,37 @@ import {
 } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import {makeStyles} from "@material-ui/core/styles";
+import {deepOrange, grey} from "@material-ui/core/colors";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
         background: "white",
-        color: theme.palette.primary.main,
-        borderRadius: "50%"
+        color: ({isEmpty}) => isEmpty ? "grey" : theme.palette.primary.main,
+        borderRadius: "50%",
+        fontSize: 15
     },
     sendBtn: {
-        width: "35px !important",
-        height: "35px !important",
-        margin: "0.3rem"
+        background: theme.palette.primary.main,
+        "&$buttonDisabled": {
+            color: grey[800]
+        },
+        "&:hover": {
+            backgroundColor: theme.palette.primary.main,
+        },
+        margin: "0.5rem"
+    },
+    buttonDisabled: {},
+    chat: {
+        borderRadius: 10,
+        "& .MuiInputBase-root": {
+            paddingRight: "0 !important",
+            borderRadius: 10,
+        },
+        background: "white"
     }
 }))
 
 function MiniChatContainer(props) {
-    const classes = useStyles()
 
     const {authenticatedUser, userData} = useContext(UserContext);
 
@@ -38,8 +53,10 @@ function MiniChatContainer(props) {
     const [numberOfLatestChanges, setNumberOfLatestChanges] = useState(0);
 
     const [newChatEntry, setNewChatEntry] = useState('');
-
     const [open, setOpen] = useState(false);
+
+    const isEmpty = (!(newChatEntry.trim()) || (!userData && !props.livestream.test && !props.isStreamer))
+    const classes = useStyles({isEmpty})
 
     useEffect(() => {
         if (props.livestream.id) {
@@ -78,8 +95,9 @@ function MiniChatContainer(props) {
         }
     }, [open])
 
+
     function addNewChatEntry() {
-        if (!(newChatEntry.trim()) || (!userData && !props.livestream.test && !props.isStreamer)) {
+        if (isEmpty) {
             return;
         }
 
@@ -117,10 +135,10 @@ function MiniChatContainer(props) {
     });
 
     const playIcon = (<div>
-        <Fab className={classes.sendBtn} onClick={() => addNewChatEntry()} color="primary">
-            <ChevronRightRoundedIcon style={{fontSize: 20}}
-                                     className={classes.sendIcon}/>
-        </Fab>
+        <IconButton classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}} disabled={isEmpty} size="small"
+                    onClick={() => addNewChatEntry()}>
+            <ChevronRightRoundedIcon className={classes.sendIcon}/>
+        </IconButton>
     </div>)
 
     return (
@@ -145,7 +163,9 @@ function MiniChatContainer(props) {
                         <TextField
                             variant="outlined"
                             fullWidth
+                            className={classes.chat}
                             size="small"
+                            margin="none"
                             onKeyPress={addNewChatEntryOnEnter}
                             value={newChatEntry}
                             onChange={() => setNewChatEntry(event.target.value)}
