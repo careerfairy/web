@@ -7,17 +7,58 @@ import {Input, Icon} from 'semantic-ui-react';
 import {css} from 'glamor';
 import ScrollToBottom from 'react-scroll-to-bottom';
 import UserContext from 'context/user/UserContext';
+import {AccordionDetails, Collapse, fade, TextField, Typography} from "@material-ui/core";
+import IconButton from "@material-ui/core/IconButton";
+import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
+import {makeStyles} from "@material-ui/core/styles";
+import {grey} from "@material-ui/core/colors";
 
-function ChatCategory(props) {
+const useStyles = makeStyles(theme => ({
+    sendIcon: {
+        background: "white",
+        color: ({isEmpty}) => isEmpty ? "grey" : theme.palette.primary.main,
+        borderRadius: "50%",
+        fontSize: 15
+    },
+    sendBtn: {
+        width: 30,
+        height: 30,
+        background: fade(theme.palette.primary.main, 0.5),
+        "&$buttonDisabled": {
+            color: grey[800]
+        },
+        "&:hover": {
+            backgroundColor: theme.palette.primary.main,
+        },
+        margin: "0.5rem"
+    },
+    buttonDisabled: {},
+    chatInput: {
+        borderRadius: 10,
+        "& .MuiInputBase-root": {
+            paddingRight: "0 !important",
+            borderRadius: 10,
+        },
+        background: "white"
+    },
+}))
+
+function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
+
 
     const {authenticatedUser, userData} = useContext(UserContext);
+    const [focused, setFocused] = useState(false);
+
 
     const [newChatEntry, setNewChatEntry] = useState('');
     const [chatEntries, setChatEntries] = useState([]);
 
+    const isEmpty = (!(newChatEntry.trim()) || (!userData && !livestream.test && !isStreamer))
+    const classes = useStyles({isEmpty})
+
     useEffect(() => {
-        if (props.livestream.id) {
-            const unsubscribe = props.firebase.listenToChatEntries(props.livestream.id, querySnapshot => {
+        if (livestream.id) {
+            const unsubscribe = firebase.listenToChatEntries(livestream.id, querySnapshot => {
                 var chatEntries = [];
                 querySnapshot.forEach(doc => {
                     let entry = doc.data();
@@ -28,7 +69,7 @@ function ChatCategory(props) {
             });
             return () => unsubscribe();
         }
-    }, [props.livestream.id]);
+    }, [livestream.id]);
 
     function addNewChatEntry() {
         if (!(newChatEntry.trim())) {
@@ -37,12 +78,12 @@ function ChatCategory(props) {
 
         const newChatEntryObject = {
             message: newChatEntry,
-            authorName: props.isStreamer ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
-            authorEmail: props.isStreamer ? 'Streamer' : authenticatedUser.email,
+            authorName: isStreamer ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
+            authorEmail: isStreamer ? 'Streamer' : authenticatedUser.email,
             votes: 0
         }
 
-        props.firebase.putChatEntry(props.livestream.id, newChatEntryObject)
+        firebase.putChatEntry(livestream.id, newChatEntryObject)
             .then(() => {
                 setNewChatEntry('');
             }, error => {
@@ -70,9 +111,16 @@ function ChatCategory(props) {
         );
     });
 
-    if (props.selectedState !== 'chat') {
+    if (selectedState !== 'chat') {
         return null;
     }
+
+    const playIcon = (<div>
+        <IconButton classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}} disabled={isEmpty}
+                    onClick={() => addNewChatEntry()}>
+            <ChevronRightRoundedIcon className={classes.sendIcon}/>
+        </IconButton>
+    </div>)
 
     return (
         <div>
@@ -80,17 +128,28 @@ function ChatCategory(props) {
                 <div className='questionToggleTitle'>
                     <Icon name='comments outline' color='teal'/> Main Chat
                 </div>
-                <div className='comment-input'>
-                    <Input
-                        icon={<Icon name='chevron circle right' inverted circular link onClick={() => addNewChatEntry()}
-                                    color='teal'/>}
+                <div style={{margin: 5}}>
+                    <TextField
+                        variant="outlined"
+                        fullWidth
+                        autoFocus
+                        onBlur={() => setFocused(false)}
+                        onFocus={() => setFocused(true)}
+                        className={classes.chatInput}
+                        size="small"
+                        onKeyPress={addNewChatEntryOnEnter}
                         value={newChatEntry}
                         onChange={() => setNewChatEntry(event.target.value)}
-                        onKeyPress={addNewChatEntryOnEnter}
-                        maxLength='340'
                         placeholder='Post in the chat...'
-                        fluid
-                    />
+                        InputProps={{
+                            maxLength: 340,
+                            endAdornment: playIcon,
+                        }}/>
+                    <Collapse align="center"
+                              style={{color: "grey", fontSize: "1em", marginTop: 3, padding: "0 0.8em"}}
+                              in={focused && !isStreamer}>
+                        For questions, please use the Q&A tool!
+                    </Collapse>
                 </div>
             </div>
             <div className='chat-container'>
@@ -101,7 +160,6 @@ function ChatCategory(props) {
             <style jsx>{`
                 .questionToggle {
                     position: relative;
-                    height: 100px;
                     box-shadow: 0 4px 2px -2px rgb(200,200,200);
                     z-index: 9000;
                     padding: 10px;

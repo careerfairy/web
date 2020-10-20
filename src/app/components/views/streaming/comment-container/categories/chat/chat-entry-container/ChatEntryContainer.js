@@ -35,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function ChatEntryContainer({chatEntry}) {
-    console.log("-> chatEntry", chatEntry);
     const timeAgo = chatEntry?.timestamp ? dayjs(chatEntry.timestamp.toDate()).fromNow() : ""
 
     const {authenticatedUser} = useContext(UserContext);

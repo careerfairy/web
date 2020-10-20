@@ -9,7 +9,7 @@ import UserContext from 'context/user/UserContext';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import {
     TextField,
-    AccordionDetails, Fab, Badge, Typography, Accordion, AccordionSummary, Collapse, FormHelperText, FormControl,
+    AccordionDetails, Badge, Typography, Accordion, AccordionSummary, Collapse, FormHelperText, FormControl, fade,
 } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import {makeStyles} from "@material-ui/core/styles";
@@ -23,7 +23,9 @@ const useStyles = makeStyles(theme => ({
         fontSize: 15
     },
     sendBtn: {
-        background: theme.palette.primary.main,
+        width: 30,
+        height: 30,
+        background: fade(theme.palette.primary.main, 0.5),
         "&$buttonDisabled": {
             color: grey[800]
         },
@@ -61,7 +63,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-function MiniChatContainer(props) {
+function MiniChatContainer({isStreamer, livestream, firebase}) {
     const {authenticatedUser, userData} = useContext(UserContext);
 
     const [chatEntries, setChatEntries] = useState([]);
@@ -73,12 +75,12 @@ function MiniChatContainer(props) {
     const [newChatEntry, setNewChatEntry] = useState('');
     const [open, setOpen] = useState(false);
 
-    const isEmpty = (!(newChatEntry.trim()) || (!userData && !props.livestream.test && !props.isStreamer))
+    const isEmpty = (!(newChatEntry.trim()) || (!userData && !livestream.test && !isStreamer))
     const classes = useStyles({isEmpty})
 
     useEffect(() => {
-        if (props.livestream.id) {
-            const unsubscribe = props.firebase.listenToChatEntries(props.livestream.id, querySnapshot => {
+        if (livestream.id) {
+            const unsubscribe = firebase.listenToChatEntries(livestream.id, querySnapshot => {
                 var chatEntries = [];
                 querySnapshot.forEach(doc => {
                     let entry = doc.data();
@@ -98,7 +100,7 @@ function MiniChatContainer(props) {
             });
             return () => unsubscribe();
         }
-    }, [props.livestream.id]);
+    }, [livestream.id]);
 
     useEffect(() => {
         if (numberOfMissedEntries + numberOfLatestChanges < 100 && !open) {
@@ -119,21 +121,14 @@ function MiniChatContainer(props) {
             return;
         }
 
-        // const newChatEntryObject = {
-        //     message: newChatEntry,
-        //     authorName: props.isStreamer || props.livestream.test ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
-        //     authorEmail: props.isStreamer || props.livestream.test ? 'Streamer' : authenticatedUser.email,
-        //     votes: 0
-        // }
-
         const newChatEntryObject = {
             message: newChatEntry,
-            authorName: props.isStreamer ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
-            authorEmail: props.isStreamer ? 'Streamer' : authenticatedUser.email,
+            authorName: isStreamer || livestream.test ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
+            authorEmail: isStreamer || livestream.test ? 'Streamer' : authenticatedUser.email,
             votes: 0
         }
 
-        props.firebase.putChatEntry(props.livestream.id, newChatEntryObject)
+        firebase.putChatEntry(livestream.id, newChatEntryObject)
             .then(() => {
                 setNewChatEntry('');
             }, error => {
@@ -162,7 +157,7 @@ function MiniChatContainer(props) {
     });
 
     const playIcon = (<div>
-        <IconButton classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}} disabled={isEmpty} size="small"
+        <IconButton classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}} disabled={isEmpty}
                     onClick={() => addNewChatEntry()}>
             <ChevronRightRoundedIcon className={classes.sendIcon}/>
         </IconButton>
@@ -206,8 +201,10 @@ function MiniChatContainer(props) {
                                 maxLength: 340,
                                 endAdornment: playIcon,
                             }}/>
-                        <Collapse align="center" style={{color: "grey", fontSize: "0.8em", marginTop: 3, padding: "0 0.8em"}} component={Typography} in={focused}>
-                           For questions, please use the Q&A tool!
+                        <Collapse align="center"
+                                  style={{color: "grey", fontSize: "0.8em", marginTop: 3, padding: "0 0.8em"}}
+                                  in={focused && !isStreamer}>
+                            For questions, please use the Q&A tool!
                         </Collapse>
                     </div>
                 </AccordionDetails>
