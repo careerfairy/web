@@ -27,8 +27,8 @@ const useStyles = makeStyles((theme) => ({
         width: '28px'
     },
     miniLike: {
-        width: "35px !important",
-        height: "35px !important",
+        width: "36px !important",
+        height: "36px !important",
         backgroundColor: red["A400"],
         color: "white",
         "&:disabled": {
@@ -40,8 +40,8 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     miniClap: {
-        width: "35px !important",
-        height: "35px !important",
+        width: "36px !important",
+        height: "36px !important",
         backgroundColor: deepOrange[400],
         color: "white",
         "&:disabled": {
@@ -53,8 +53,8 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     miniHeart: {
-        width: "35px !important",
-        height: "35px !important",
+        width: "36px !important",
+        height: "36px !important",
         backgroundColor: amber[400],
         color: "white",
         "&:disabled": {
