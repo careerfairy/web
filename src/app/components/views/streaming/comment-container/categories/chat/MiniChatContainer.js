@@ -1,19 +1,19 @@
 import React, {useState, useEffect, useContext} from 'react';
-
+import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
 import {withFirebase} from 'context/firebase';
 import ChevronRightRoundedIcon from '@material-ui/icons/ChevronRightRounded';
 import {css} from 'glamor';
 import ScrollToBottom from 'react-scroll-to-bottom';
 import ChatEntryContainer from './chat-entry-container/ChatEntryContainer';
-import {Icon, Input} from 'semantic-ui-react';
 import UserContext from 'context/user/UserContext';
+import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import {
     TextField,
-    InputAdornment, Fab,
+    AccordionDetails, Fab, Badge, Typography, Accordion, AccordionSummary,
 } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import {makeStyles} from "@material-ui/core/styles";
-import {deepOrange, grey} from "@material-ui/core/colors";
+import { grey} from "@material-ui/core/colors";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -33,18 +33,35 @@ const useStyles = makeStyles(theme => ({
         margin: "0.5rem"
     },
     buttonDisabled: {},
-    chat: {
+    chatInput: {
         borderRadius: 10,
         "& .MuiInputBase-root": {
             paddingRight: "0 !important",
             borderRadius: 10,
         },
         background: "white"
+    },
+    header: {
+        height: "41px !important",
+        padding: "10px 15px",
+        "& .MuiAccordionSummary-content": {
+            margin: 0,
+            display: "flex",
+            alignItems: "center"
+        },
+    },
+    expanded: {
+        minHeight: "41px !important"
+    },
+    chatRoom: {
+        display: "flex",
+        flexDirection: "column",
+        padding: 0,
+        backgroundColor: "rgb(245,245,245)"
     }
 }))
 
 function MiniChatContainer(props) {
-
     const {authenticatedUser, userData} = useContext(UserContext);
 
     const [chatEntries, setChatEntries] = useState([]);
@@ -123,7 +140,7 @@ function MiniChatContainer(props) {
     }
 
     const ROOT_CSS = css({
-        height: open ? '160px' : '0'
+        height: "160px"
     });
 
     let chatElements = chatEntries.map((chatEntry, index) => {
@@ -143,29 +160,31 @@ function MiniChatContainer(props) {
 
     return (
         <>
-            <div className='chat-container' style={{height: open ? '250px' : '40px'}}>
-                <div className='chat-container-title' onClick={() => setOpen(!open)}>
-                    <Icon name='comments outline'/>Chat
-                    <Icon name={open ? 'angle down' : 'angle up'}
-                          style={{position: 'absolute', top: '10px', right: '5px', color: 'rgb(120,120,120)'}}/>
-                    <div className='number-of-missed-entries'
-                         style={{display: numberOfMissedEntries ? 'block' : 'none'}}>
-                        <div>
-                            {numberOfMissedEntries}
-                        </div>
-                    </div>
-                </div>
-                <div style={{display: open ? 'block' : 'none'}}>
+            <Accordion TransitionProps={{ unmountOnExit: true }} onChange={() => setOpen(!open)} expanded={open}>
+                <AccordionSummary className={classes.header}
+                                  expandIcon={<ExpandLessRoundedIcon/>}
+                                  aria-controls="chat-header"
+                                  id="chat-header"
+                                  classes={{expanded: classes.expanded}}
+                                  style={{boxShadow: "0 0 2px grey"}}
+                >
+                    <Badge badgeContent={numberOfMissedEntries} color="error">
+                        <ForumOutlinedIcon fontSize="small"/>
+                    </Badge>
+                    <Typography style={{marginLeft: "0.6rem"}}>
+                        Chat
+                    </Typography>
+                </AccordionSummary>
+                <AccordionDetails className={classes.chatRoom}>
                     <ScrollToBottom className={ROOT_CSS}>
                         {chatElements}
                     </ScrollToBottom>
-                    <div className='comment-input'>
+                    <div style={{margin: 5}}>
                         <TextField
                             variant="outlined"
                             fullWidth
-                            className={classes.chat}
+                            className={classes.chatInput}
                             size="small"
-                            margin="none"
                             onKeyPress={addNewChatEntryOnEnter}
                             value={newChatEntry}
                             onChange={() => setNewChatEntry(event.target.value)}
@@ -175,68 +194,8 @@ function MiniChatContainer(props) {
                                 endAdornment: playIcon,
                             }}/>
                     </div>
-                </div>
-            </div>
-            <style jsx>{`
-                .chat-container {
-                    position: sticky;
-                    bottom: 10;
-                    width: 100%;
-                    height: 220px;
-                    background-color: rgb(245,245,245);
-                    border-top-left-radius: 5px;
-                    border-top-right-radius: 5px;
-                    box-shadow: 0 0 2px grey;
-                }
-
-                .comment-input {
-                    margin: 5px;
-                }
-
-                .scroll-to-bottom {
-                    height: 100%;
-                    padding: 10px;
-                }
-
-                .chat-container-title {
-                    position: relative;
-                    padding: 10px 15px;
-                    color: rgb(80,80,80);
-                    font-weight: 600;
-                    box-shadow: 0 0 2px grey;
-                    z-index: 100;
-                    cursor: pointer;
-                    background-color: white;
-                    border-top-left-radius: 5px;
-                    border-top-right-radius: 5px;
-                }
-
-                .number-of-missed-entries {
-                    position: absolute;
-                    left: 80px;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    display: inline-block;
-                    background-color: red;
-                    width: 20px;
-                    height: 20px;
-                    border-radius: 50%;
-                    color: white;
-                }
-
-                .number-of-missed-entries div {
-                    font-size: 0.8rem;
-                    position: absolute;
-                    left: 50%;
-                    top: 50%;
-                    transform: translate(-50%,-50%);
-                    font-weight: 300;
-                }
-
-                .chat-container-title:hover {
-                    background-color: rgb(240,240,240);
-                }
-          `}</style>
+                </AccordionDetails>
+            </Accordion>
         </>
     );
 }
