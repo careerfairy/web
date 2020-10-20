@@ -62,6 +62,35 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile})
         }
     }, [grid, groupData]);
 
+    if (groupData.groupId === 'EllidQJoeiKjrXp55n3m') {
+
+        let murparkLogo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fmurpark-logo.png?alt=media&token=13e3a087-a53d-4ace-83b8-6b4b539ef269";
+        let soundportalLogo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fsoundportal-logo.png?alt=media&token=8acbf9d6-8e28-44c5-be07-4334e86e0db6";
+
+        return (
+            <div className={classes.root}>
+                <Card className={classes.card} style={{ padding: '40px 0' }}>
+                    <CardContent>
+                            <div style={{ position: 'relative', padding: '40px', marginBottom: '30px' }}>
+                                <img src={groupData.logoUrl} style={{ maxWidth: '100%' }}
+                                    alt={`${groupData.universityName} logo`}/>
+                            </div>
+                            <div style={{ position: 'relative', padding: '40px', marginBottom: '30px'}}>
+                                <div style={{ marginBottom: '20px', fontWeight: '800'}}>Gewinnspiel gesponsort von:</div>
+                                <img src={murparkLogo} style={{ maxWidth: '70%' }}
+                                    alt={`${groupData.universityName} logo`}/>
+                            </div>
+                            <div style={{ position: 'relative', padding: '40px', marginBottom: '30px'}}>
+                                <div style={{ marginBottom: '20px', fontWeight: '800'}}>Medienpartner:</div>
+                                <img src={soundportalLogo} style={{ maxWidth: '70%' }}
+                                    alt={`${groupData.universityName} logo`}/>
+                            </div>
+                    </CardContent>
+                </Card>
+        </div>
+        )
+    }
+
     return (
         <div className={classes.root}>
             {groupData.categories?.length &&

@@ -25,6 +25,16 @@ const useStyles = makeStyles((theme) => ({
         WebkitBoxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
         boxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
         MozBoxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
+    },
+    highlightedRoot: {
+        borderRadius: 5,
+        border: '20px solid #00d2aa',
+        overflow: "hidden",
+        paddingBottom: 15,
+        textAlign: "left",
+        WebkitBoxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
+        boxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
+        MozBoxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
     }
 
 }));
@@ -275,7 +285,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
             threshold={50}
             placeholder={<StreamCardPlaceHolder/>}>
             <Fragment>
-                <div className={classes.root}
+                <div className={livestream.highlighted ? classes.highlightedRoot : classes.root }
                     // onClick={(event) => goToRouteFromParent(event, '/upcoming-livestream/' + livestream.id)}
                 >
                     <div className='date-indicator'>
