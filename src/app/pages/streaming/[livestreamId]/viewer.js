@@ -330,7 +330,7 @@ function ViewerPage({firebase}) {
                         display: 'inline-block',
                         margin: '0 10px'
                     }}/>
-                    {currentLivestream.hasNoTalentPool ?
+                    {!currentLivestream.hasNoTalentPool ?
                     <Button
                         children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
                         variant="contained"
