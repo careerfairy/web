@@ -147,7 +147,9 @@ function MiniChatContainer(props) {
     }
 
     const ROOT_CSS = css({
-        height: "160px"
+        display: "flex",
+        flexDirection: "column",
+        height: "200px"
     });
 
     let chatElements = chatEntries.map((chatEntry, index) => {

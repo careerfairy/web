@@ -1,17 +1,17 @@
 import React, {useState, useEffect, useContext} from 'react';
 
-import { withFirebase } from '../../../../../context/firebase';
+import {withFirebase} from '../../../../../context/firebase';
 import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
-import { Input, Icon } from 'semantic-ui-react';
+import {Input, Icon} from 'semantic-ui-react';
 
-import { css } from 'glamor';
+import {css} from 'glamor';
 import ScrollToBottom from 'react-scroll-to-bottom';
 import UserContext from 'context/user/UserContext';
 
 function ChatCategory(props) {
 
-    const { authenticatedUser, userData } = useContext(UserContext);
-    
+    const {authenticatedUser, userData} = useContext(UserContext);
+
     const [newChatEntry, setNewChatEntry] = useState('');
     const [chatEntries, setChatEntries] = useState([]);
 
@@ -21,7 +21,7 @@ function ChatCategory(props) {
                 var chatEntries = [];
                 querySnapshot.forEach(doc => {
                     let entry = doc.data();
-                    entry.id = doc.id;                    
+                    entry.id = doc.id;
                     chatEntries.push(entry);
                 });
                 setChatEntries(chatEntries);
@@ -51,20 +51,22 @@ function ChatCategory(props) {
     }
 
     function addNewChatEntryOnEnter(target) {
-        if(target.charCode==13){
-            addNewChatEntry();   
-        } 
+        if (target.charCode == 13) {
+            addNewChatEntry();
+        }
     }
 
     const ROOT_CSS = css({
         height: '100%',
+        display: "flex",
+        flexDirection: "column",
     });
 
     let chatElements = chatEntries.map((chatEntry, index) => {
         return (
             <div key={index}>
                 <ChatEntryContainer chatEntry={chatEntry}/>
-            </div>       
+            </div>
         );
     });
 
@@ -80,7 +82,8 @@ function ChatCategory(props) {
                 </div>
                 <div className='comment-input'>
                     <Input
-                        icon={<Icon name='chevron circle right' inverted circular link onClick={() => addNewChatEntry()} color='teal'/>}
+                        icon={<Icon name='chevron circle right' inverted circular link onClick={() => addNewChatEntry()}
+                                    color='teal'/>}
                         value={newChatEntry}
                         onChange={() => setNewChatEntry(event.target.value)}
                         onKeyPress={addNewChatEntryOnEnter}
@@ -91,9 +94,9 @@ function ChatCategory(props) {
                 </div>
             </div>
             <div className='chat-container'>
-                <ScrollToBottom className={ ROOT_CSS }>
-                    { chatElements }
-                </ScrollToBottom>          
+                <ScrollToBottom className={ROOT_CSS}>
+                    {chatElements}
+                </ScrollToBottom>
             </div>
             <style jsx>{`
                 .questionToggle {
