@@ -9,7 +9,7 @@ import UserContext from 'context/user/UserContext';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import {
     TextField,
-    AccordionDetails, Fab, Badge, Typography, Accordion, AccordionSummary,
+    AccordionDetails, Fab, Badge, Typography, Accordion, AccordionSummary, Collapse, FormHelperText, FormControl,
 } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import {makeStyles} from "@material-ui/core/styles";
@@ -65,6 +65,7 @@ function MiniChatContainer(props) {
     const {authenticatedUser, userData} = useContext(UserContext);
 
     const [chatEntries, setChatEntries] = useState([]);
+    const [focused, setFocused] = useState(false);
 
     const [numberOfMissedEntries, setNumberOfMissedEntries] = useState(0);
     const [numberOfLatestChanges, setNumberOfLatestChanges] = useState(0);
@@ -192,6 +193,9 @@ function MiniChatContainer(props) {
                         <TextField
                             variant="outlined"
                             fullWidth
+                            autoFocus
+                            onBlur={() => setFocused(false)}
+                            onFocus={() => setFocused(true)}
                             className={classes.chatInput}
                             size="small"
                             onKeyPress={addNewChatEntryOnEnter}
@@ -202,6 +206,9 @@ function MiniChatContainer(props) {
                                 maxLength: 340,
                                 endAdornment: playIcon,
                             }}/>
+                        <Collapse align="center" style={{color: "grey", fontSize: "0.8em", marginTop: 3, padding: "0 0.8em"}} component={Typography} in={focused}>
+                           For questions, please use the Q&A tool!
+                        </Collapse>
                     </div>
                 </AccordionDetails>
             </Accordion>

@@ -18,13 +18,13 @@ const useStyles = makeStyles((theme) => ({
         margin: 8,
         padding: "10px 15px",
         paddingBottom: 5,
-        backgroundColor: ({isMe}) => isMe ? theme.palette.primary.main : "rgba(255,255,255,0.90)",
-        color: ({isMe}) => isMe ? "white" : "inherit",
+        backgroundColor: ({isMe, isStreamer}) => isMe ? theme.palette.primary.main : isStreamer ? "#ff1493" : "rgba(255,255,255,0.90)",
+        color: ({isMe, isStreamer}) => isMe || isStreamer ? "white" : "inherit",
         overflowWrap: "break-word",
     },
     author: {
         fontSize: "0.8em",
-        color: ({isMe}) => isMe ? "white" : "rgb(180,180,180)",
+        color: ({isMe, isStreamer}) => isMe || isStreamer ? "white" : "rgb(180,180,180)",
         overflowWrap: "break-word",
         whiteSpace: "nowrap"
     },
@@ -35,10 +35,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function ChatEntryContainer({chatEntry}) {
+    console.log("-> chatEntry", chatEntry);
     const timeAgo = chatEntry?.timestamp ? dayjs(chatEntry.timestamp.toDate()).fromNow() : ""
 
     const {authenticatedUser} = useContext(UserContext);
-    const classes = useStyles({isMe: chatEntry?.authorEmail === authenticatedUser?.email})
+    const classes = useStyles({
+        isMe: chatEntry?.authorEmail === authenticatedUser?.email,
+        isStreamer: chatEntry?.authorEmail === "Streamer"
+    })
 
     const componentDecorator = (href, text, key) => (
         <a href={href} key={key} target="_blank">
