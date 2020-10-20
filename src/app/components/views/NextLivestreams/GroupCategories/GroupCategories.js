@@ -76,7 +76,7 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile})
                                     alt={`${groupData.universityName} logo`}/>
                             </div>
                             <div style={{ position: 'relative', padding: '40px', marginBottom: '30px'}}>
-                                <div style={{ marginBottom: '20px', fontWeight: '800'}}>Gewinnspiel gesponsort von:</div>
+                                <div style={{ marginBottom: '20px', fontWeight: '800'}}>Gewinnspiel gesponsert von:</div>
                                 <img src={murparkLogo} style={{ maxWidth: '70%' }}
                                     alt={`${groupData.universityName} logo`}/>
                             </div>
