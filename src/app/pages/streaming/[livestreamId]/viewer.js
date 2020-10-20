@@ -73,7 +73,8 @@ const useStyles = makeStyles((theme) => ({
         "@media(min-width: 768px)": {
             display: "flex",
             alignItems: "center",
-            justifyContent: "flex-end"
+            justifyContent: "flex-end",
+            transform: "translate(-90px, 0)" // prevent the icons from being overlapped by the chat box when shrunk
         },
         "@media(max-width: 768px)": {
             flexDirection: "column",
@@ -84,10 +85,10 @@ const useStyles = makeStyles((theme) => ({
     },
     cardHovered: {
         "@media(min-width: 768px)": {
-            transform: "translate(0, -50px) scale3d(2.4, 2.4, 2.4)",
-            "-moz-transform": "translate(0, -50px) scale3d(2.4, 2.4, 2.4)",
-            "-o-transform": "translate(0, -50px) scale3d(2.4, 2.4, 2.4)",
-            "-webkit-transform": "translate(0, -50px) scale3d(2.4, 2.4, 2.4)",
+            transform: "translate(0, -70px) scale3d(2.4, 2.4, 2.4)",
+            "-moz-transform": "translate(0, -70px) scale3d(2.4, 2.4, 2.4)",
+            "-o-transform": "translate(0, -70px) scale3d(2.4, 2.4, 2.4)",
+            "-webkit-transform": "translate(0, -70px) scale3d(2.4, 2.4, 2.4)",
         },
         "@media(max-width: 768px)": {
             transform: "translate(-50px, 0) scale3d(2.4, 2.4, 2.4)",
@@ -329,13 +330,13 @@ function ViewerPage({firebase}) {
                         display: 'inline-block',
                         margin: '0 10px'
                     }}/>
-                    {currentLivestream.hasNoTalentPool &&
+                    {!currentLivestream.hasNoTalentPool ?
                     <Button
                         children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
                         variant="contained"
                         icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
                         onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
-                        color={userIsInTalentPool ? "default" : "primary"}/>}
+                        color={userIsInTalentPool ? "default" : "primary"}/>: null}
                 </div>
             </div>
             <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>

@@ -13,7 +13,7 @@ import {
 } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import {makeStyles} from "@material-ui/core/styles";
-import { grey} from "@material-ui/core/colors";
+import {grey} from "@material-ui/core/colors";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -118,10 +118,17 @@ function MiniChatContainer(props) {
             return;
         }
 
+        // const newChatEntryObject = {
+        //     message: newChatEntry,
+        //     authorName: props.isStreamer || props.livestream.test ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
+        //     authorEmail: props.isStreamer || props.livestream.test ? 'Streamer' : authenticatedUser.email,
+        //     votes: 0
+        // }
+
         const newChatEntryObject = {
             message: newChatEntry,
-            authorName: props.isStreamer || props.livestream.test ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
-            authorEmail: props.isStreamer || props.livestream.test ? 'Streamer' : authenticatedUser.email,
+            authorName: props.isStreamer ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
+            authorEmail: props.isStreamer ? 'Streamer' : authenticatedUser.email,
             votes: 0
         }
 
@@ -160,7 +167,7 @@ function MiniChatContainer(props) {
 
     return (
         <>
-            <Accordion TransitionProps={{ unmountOnExit: true }} onChange={() => setOpen(!open)} expanded={open}>
+            <Accordion TransitionProps={{unmountOnExit: true}} onChange={() => setOpen(!open)} expanded={open}>
                 <AccordionSummary className={classes.header}
                                   expandIcon={<ExpandLessRoundedIcon/>}
                                   aria-controls="chat-header"
