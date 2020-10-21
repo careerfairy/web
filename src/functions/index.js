@@ -555,9 +555,11 @@ exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 45
                 livestream.id = doc.id;
                 console.log("livestream company: " + livestream.company);
                 console.log("number of emails: " + livestream.registeredUsers.length);
-                livestream.registeredUsers.forEach( email => {
+                livestream.registeredUsers.forEach( (email, index) => {
                     var data = generateEmailData(email, livestream, false);
-                    await mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
+                    setTimeout(() => {
+                        mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
+                    }, (1000 * index));
                 });
             });
         }).catch((error) => {
@@ -577,7 +579,7 @@ exports.sendReminderEmailsWhenLivestreamStarts = functions.firestore
                 admin.firestore().collection("livestreams").doc(context.params.livestreamId).update({ hasSentEmails: true }).then(() => {
                     newValue.registeredUsers.forEach( email => {
                         var data = generateEmailData(email, newValue, true);
-                        await mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
+                        mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
                     });
                 })
             }
@@ -657,3 +659,60 @@ exports.scheduleTestLivestreamDeletion = functions.pubsub.schedule('every sunday
             })
         });
 });
+
+exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(async (req, res) => {
+
+    console.log("running");
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    let counter = 0;
+
+    let groupId = req.body.groupId;
+    let categoryId = req.body.categoryId;
+    let categoryValueId = req.body.categoryValueId;
+
+    let collectionRef = admin.firestore().collection("userData")
+    .where("groupIds", "array-contains", groupId);
+
+    collectionRef.get()
+    .then((querySnapshot) => {
+        console.log("snapshotSize:" + querySnapshot.size);
+        querySnapshot.forEach(doc => {
+            var id = doc.id;
+            var userData = doc.data()
+            let groupCategory = userData.registeredGroups.find(group => group.groupId === groupId);
+            if (groupCategory) {
+                let filteringCategory = groupCategory.categories.find(category => category.id === categoryId);
+                if (filteringCategory && filteringCategory.selectedValueId === categoryValueId) {
+                    console.log(userData.userEmail)
+                    counter++;
+                    const email = {
+                        "TemplateId": req.body.templateId,
+                        "From": 'CareerFairy <noreply@careerfairy.io>',
+                        "To": userData.userEmail,
+                        "TemplateModel": {       
+                            userEmail: userData.userEmail
+                        }
+                    };
+                    client.sendEmailWithTemplate(email).then(() => {
+                        console.log("email sent to: " + userData.userEmail);                        
+                    }, error => {
+                        console.log('error:' + error);
+                    });
+                }
+            }
+        });
+    }).catch(error => {
+        console.log('error:' + error);
+        return res.status(400).send();
+    })});

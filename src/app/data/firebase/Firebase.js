@@ -74,6 +74,13 @@ class Firebase {
         });
     };
 
+    setUserUnsubscribed = (userEmail) => {
+        let ref = this.firestore.collection("userData").doc(userEmail);
+        return ref.update({
+            unsubscribed: true
+        });
+    }
+
     updateUserGroups = (userEmail, groupIds, registeredGroups) => {
         let ref = this.firestore.collection("userData").doc(userEmail);
         return ref.update({
