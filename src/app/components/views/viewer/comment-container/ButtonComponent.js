@@ -8,7 +8,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
-import {fade} from "@material-ui/core";
+import {ClickAwayListener, fade} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -23,8 +23,11 @@ const useStyles = makeStyles((theme) => ({
     },
     speedDial: {
         marginLeft: theme.spacing(3),
-        transform: ({open}) => open ? "" : "translate(0, -120px)",
-        transition: "transform 0.2s ease-in"
+        transition: "transform 0.2s ease-in",
+        transform: ({open}) => open ? "" : "translate(-30px, 0) scale3d(0.6, 0.6, 0.6)",
+        "-moz-transform": ({open}) => open ? "" : "translate(-30px, 0) scale3d(0.6, 0.6, 0.6)",
+        "-o-transform": ({open}) => open ? "" : "translate(-30px, 0) scale3d(0.6, 0.6, 0.6)",
+        "-webkit-transform": ({open}) => open ? "" : "translate(-30px, 0) scale3d(0.6, 0.6, 0.6)",
     },
     actionButton: {
         backgroundColor: theme.palette.primary.main,
@@ -37,21 +40,39 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: theme.palette.primary.dark,
         },
     },
+    cardHovered: {},
 
     tooltip: {
         // backgroundColor: "transparent",
         // color: "white",
         // fontWeight: 600,
         // boxShadow: "none"
+        display: ({open}) => open ? "block" : "none"
+    },
+    dialButton: {
+        display: "none"
     }
 
 }));
 
 
 export const ButtonComponent = ({handleStateChange, showMenu, isMobile, selectedState}) => {
-    const [open, setOpen] = useState(true);
+    const DELAY = 3000; //3 seconds
+    const [open, setOpen] = useState(false);
     const classes = useStyles({open});
     const [hidden, setHidden] = useState(false);
+    const [delayHandler, setDelayHandler] = useState(null)
+
+    const handleMouseEnter = event => {
+        clearTimeout(delayHandler)
+        handleOpen()
+    }
+
+    const handleMouseLeave = () => {
+        setDelayHandler(setTimeout(() => {
+            handleClose()
+        }, DELAY))
+    }
 
     const handleVisibility = () => {
         setHidden((prevHidden) => !prevHidden);
@@ -107,38 +128,40 @@ export const ButtonComponent = ({handleStateChange, showMenu, isMobile, selected
     const test = true
 
     return test ?
-        <div className={classes.root}>
-            <SpeedDial
-                ariaLabel="interaction-selector"
-                className={classes.speedDial}
-                hidden={hidden}
-                FabProps={{onClick: handleToggle}}
-                icon={<SpeedDialIcon/>}
-                onMouseEnter={handleOpen}
-                onFocus={handleOpen}
-                //onClose={handleClose}
-                // onClick={handleToggle}
-                //onOpen={handleOpen}
-                open={open}
-            >
-                {actions.map((action) => (
-                    <SpeedDialAction
-                        key={action.name}
-                        icon={action.icon}
-                        tooltipPlacement="right"
-                        tooltipTitle={action.name}
-                        classes={{staticTooltipLabel: classes.tooltip}}
-                        tooltipOpen
-                        FabProps={{
-                            size: "large",
-                            classes: {root: classes.actionButton},
-                            disabled: action.disabled
-                        }}
-                        onClick={action.onClick}
-                    />
-                ))}
-            </SpeedDial>
-        </div>
+        <ClickAwayListener onClickAway={handleClose}>
+            <div className={classes.root}>
+                <SpeedDial
+                    ariaLabel="interaction-selector"
+                    className={classes.speedDial}
+                    hidden={hidden}
+                    FabProps={{onClick: handleToggle, className: classes.dialButton}}
+                    icon={<SpeedDialIcon/>}
+                    onMouseEnter={handleOpen}
+                    onFocus={handleOpen}
+                    //onClose={handleClose}
+                    // onClick={handleToggle}
+                    //onOpen={handleOpen}
+                    open
+                >
+                    {actions.map((action) => (
+                        <SpeedDialAction
+                            key={action.name}
+                            icon={action.icon}
+                            tooltipPlacement="right"
+                            tooltipTitle={action.name}
+                            classes={{staticTooltipLabel: classes.tooltip}}
+                            tooltipOpen
+                            FabProps={{
+                                size: "large",
+                                classes: {root: classes.actionButton},
+                                disabled: action.disabled
+                            }}
+                            onClick={action.onClick}
+                        />
+                    ))}
+                </SpeedDial>
+            </div>
+        </ClickAwayListener>
         :
         (
             <Fragment>
