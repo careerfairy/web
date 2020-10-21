@@ -1,14 +1,16 @@
 import React, {useState, useEffect, Fragment} from 'react';
 
-import { withFirebase } from 'context/firebase';
-import { Input, Icon, Button, Modal } from 'semantic-ui-react';
+import {withFirebase} from 'context/firebase';
+import {Input, Icon, Button, Modal} from 'semantic-ui-react';
 import UserContext from 'context/user/UserContext';
-import PollOptionResultViewer from 'components/views/streaming/comment-container/categories/polls/poll-entry-container/current-poll/PollOptionResultViewer';
+import PollOptionResultViewer
+    from 'components/views/streaming/comment-container/categories/polls/poll-entry-container/current-poll/PollOptionResultViewer';
+import CurrentPollGraph from "./CurrentPollGraph";
 
 function PollCategory(props) {
 
-    const { authenticatedUser, userData } = React.useContext(UserContext);
-    const [currentPoll, setCurrentPoll] = useState(null); 
+    const {authenticatedUser, userData} = React.useContext(UserContext);
+    const [currentPoll, setCurrentPoll] = useState(null);
     const [currentPollId, setCurrenPollId] = useState(null);
 
     useEffect(() => {
@@ -36,11 +38,13 @@ function PollCategory(props) {
     }, [currentPoll]);
 
     function voteForPollOption(index) {
-        let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
+        // let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
+        let authEmail =  authenticatedUser.email;
         props.firebase.voteForPollOption(props.livestream.id, currentPoll.id, authEmail, index);
     }
 
-    let authEmail = (authenticatedUser && authenticatedUser.email && !props.livestream.test) ? authenticatedUser.email : 'streamerEmail';
+    // let authEmail = (authenticatedUser && authenticatedUser.email && !props.livestream.test) ? authenticatedUser.email : 'streamerEmail';
+    let authEmail = (authenticatedUser && authenticatedUser.email) ? authenticatedUser.email : 'streamerEmail';
 
     if (currentPoll && authEmail) {
         if (currentPoll.voters.indexOf(authEmail) === -1) {
@@ -49,7 +53,8 @@ function PollCategory(props) {
                 return (
                     <Fragment key={index}>
                         <div className='option-container'>
-                            <Button content={option.name} color={colors[index]} onClick={() => voteForPollOption(index)} size='small' fluid/>
+                            <Button content={option.name} color={colors[index]} onClick={() => voteForPollOption(index)}
+                                    size='small' fluid/>
                         </div>
                         <style jsx>{`
                             .option-container {
@@ -60,15 +65,15 @@ function PollCategory(props) {
                 );
             });
             return (
-                <div   style={{ display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
+                <div style={{display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
                     <div className='handraise-container'>
                         <div className='central-container'>
-                            <h2>{ currentPoll.question }</h2>
+                            <h2>{currentPoll.question}</h2>
                             <div>
-                                { optionElementsLarge }
+                                {optionElementsLarge}
                             </div>
                         </div>
-                    </div> 
+                    </div>
                     <style jsx>{`
                         .handraise-container {
                             position: absolute;
@@ -98,25 +103,29 @@ function PollCategory(props) {
                 </div>
             );
         } else {
+            return (
+                <CurrentPollGraph currentPoll={currentPoll}/>
+            )
+            console.log("-> currentPoll", currentPoll);
             let optionElementsLarge = currentPoll.options.map((option, index) => {
                 let totalVotes = 0;
-                currentPoll.options.forEach( option => totalVotes += option.votes );
+                currentPoll.options.forEach(option => totalVotes += option.votes);
                 return (
                     <Fragment key={index}>
-                        <PollOptionResultViewer option={option} index={index} totalVotes={totalVotes} />
+                        <PollOptionResultViewer option={option} index={index} totalVotes={totalVotes}/>
                     </Fragment>
                 );
             });
             return (
-                <div  style={{ display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
+                <div style={{display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
                     <div className='handraise-container'>
                         <div className='central-container'>
-                            <h2>{ currentPoll.question }</h2>
+                            <h2>{currentPoll.question}</h2>
                             <div>
-                                { optionElementsLarge }
+                                {optionElementsLarge}
                             </div>
                         </div>
-                    </div> 
+                    </div>
                     <style jsx>{`
                         .handraise-container {
                             position: absolute;
@@ -148,12 +157,12 @@ function PollCategory(props) {
         }
     } else {
         return (
-            <div  style={{ display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
+            <div style={{display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
                 <div className='handraise-container'>
                     <div className='central-container'>
                         <h2>No current poll</h2>
                     </div>
-                </div> 
+                </div>
                 <style jsx>{`
                     .handraise-container {
                         position: absolute;
