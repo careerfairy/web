@@ -7,6 +7,11 @@ let baseTheme = createMuiTheme({
       dark: "#00b08f",
       contrastText: "#FFFFFF"
     },
+    secondary: {
+      main: "#fa0087",
+      dark: "#be0066",
+      contrastText: "#FFFFFF"
+    }
   },
   overrides: {
     MuiButton: {

@@ -69,7 +69,8 @@ const useStyles = makeStyles((theme) => ({
         "& > *": {
             margin: "0.2rem"
         },
-        transition: "all 0.3s, all 0.3s",
+        transition: "transform 0.3s",
+        transitionTimingFunction: theme.transitions.easeInOut,
         "@media(min-width: 768px)": {
             display: "flex",
             alignItems: "center",
@@ -152,14 +153,8 @@ function ViewerPage({firebase}) {
     const [play, setPlay] = useState(false);
 
     const classes = useStyles();
-    const theme = useTheme();
-    const [open, setOpen] = React.useState(false);
-    const [hidden, setHidden] = React.useState(false);
+    const [open, setOpen] = React.useState(true);
     const [delayHandler, setDelayHandler] = useState(null)
-
-    const handleVisibility = () => {
-        setHidden((prevHidden) => !prevHidden);
-    };
 
     const handleOpen = () => {
         setOpen(true);

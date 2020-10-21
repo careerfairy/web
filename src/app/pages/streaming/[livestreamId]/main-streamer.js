@@ -93,7 +93,7 @@ function StreamingPage(props) {
                             confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'} 
                             buttonLabel={ currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming' }/>
                     </div>
-                    <div style={{ position: 'absolute', top: '50%', left: '220px', transform: 'translateY(-50%)', verticalAlign: 'middle', cursor: 'pointer', color: 'rgb(80,80,80)', cursor: 'pointer', color: 'rgb(80,80,80)'}} onClick={() => {setSpeakerManagementOpen(true)}}>
+                    <div style={{ position: 'absolute', top: '50%', left: '220px', transform: 'translateY(-50%)', verticalAlign: 'middle', cursor: 'pointer', color: 'rgb(80,80,80)'}} onClick={() => {setSpeakerManagementOpen(true)}}>
                         <Icon name='user plus' color='darkgrey' size='large' />
                         <div style={{ fontSize: '0.7em'}}>
                             Invite additional streamer

@@ -60,7 +60,7 @@ function CommentContainer(props) {
                                    userData={props.userData} handRaiseActive={props.handRaiseActive}
                                    setHandRaiseActive={props.setHandRaiseActive}/>
             </div>
-            <ButtonComponent showMenu={props.showMenu} selectedState={selectedState} handleStateChange={handleStateChange} isMobile={isMobile} {...props}/>
+            <ButtonComponent selectedState={selectedState} handleStateChange={handleStateChange} isMobile={isMobile} {...props}/>
             <style jsx>{`
                 .interaction-container {
                     position: relative;
