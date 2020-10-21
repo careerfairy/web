@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
         right: 0,
         top: 0,
         height: "100%",
-        width: 200,
+        width: 120,
         padding: 30,
         backgroundColor: "transparent",
         display: "flex",

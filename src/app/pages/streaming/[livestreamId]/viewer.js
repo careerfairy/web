@@ -99,6 +99,7 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     actionArea: {
+        display: ({handRaiseActive}) => handRaiseActive ? "none" : "flex",
         "@media(min-width: 768px)": {
             position: "absolute",
             width: "100%",
@@ -152,7 +153,7 @@ function ViewerPage({firebase}) {
     const [unmute, setUnmute] = useState(false);
     const [play, setPlay] = useState(false);
 
-    const classes = useStyles();
+    const classes = useStyles({handRaiseActive});
     const [open, setOpen] = React.useState(true);
     const [delayHandler, setDelayHandler] = useState(null)
 
@@ -231,7 +232,7 @@ function ViewerPage({firebase}) {
     }, [currentLivestream]);
 
     useEffect(() => {
-        if ( userData?.talentPools && currentLivestream && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
+        if (userData?.talentPools && currentLivestream && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
             setUserIsInTalentPool(true);
         } else {
             setUserIsInTalentPool(false);
@@ -289,7 +290,7 @@ function ViewerPage({firebase}) {
         return (
             <Fragment key={index}>
                 <img src={careerCenter.logoUrl}
-                       style={{maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block'}}/>
+                     style={{maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block'}}/>
             </Fragment>
         );
     });
@@ -303,7 +304,7 @@ function ViewerPage({firebase}) {
             <div className='top-menu'>
                 <div className='top-menu-left'>
                     <img src='/logo_teal.png'
-                           style={{maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
+                         style={{maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
                     {logoElements}
                     <div style={{
                         position: 'absolute',
@@ -326,12 +327,12 @@ function ViewerPage({firebase}) {
                         margin: '0 10px'
                     }}/>
                     {!currentLivestream.hasNoTalentPool ?
-                    <Button
-                        children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
-                        variant="contained"
-                        icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
-                        onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
-                        color={userIsInTalentPool ? "default" : "primary"}/>: null}
+                        <Button
+                            children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
+                            variant="contained"
+                            icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
+                            onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
+                            color={userIsInTalentPool ? "default" : "primary"}/> : null}
                 </div>
             </div>
             <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
@@ -443,7 +444,7 @@ function ViewerPage({firebase}) {
                 .mini-chat-container {
                     position: absolute;
                     bottom: 0;
-                    right: 20px;
+                    right: 120px;
                     width: 20%;
                     min-width: 250px;
                     z-index: 7250;

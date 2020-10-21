@@ -13,9 +13,9 @@ import ChevronLeftRoundedIcon from '@material-ui/icons/ChevronLeftRounded';
 const useStyles = makeStyles((theme) => ({
     root: {
         position: "absolute",
-        right: "-200px",
+        right: ({showMenu}) => showMenu ? "-120px" : "auto",
         height: "100%",
-        width: 200,
+        width: 120,
         display: "flex",
         alignItems: "center",
         padding: 30,
@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
 export const ButtonComponent = ({handleStateChange, showMenu, isMobile, selectedState, streamer, setShowMenu}) => {
     const DELAY = 3000; //3 seconds
     const [open, setOpen] = useState(true);
-    const classes = useStyles({open});
+    const classes = useStyles({open, showMenu});
     const [delayHandler, setDelayHandler] = useState(null)
 
     const handleMouseEnter = event => {
