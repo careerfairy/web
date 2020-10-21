@@ -121,19 +121,19 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
             return;
         }
 
-        // const newChatEntryObject = {
-        //     message: newChatEntry,
-        //     authorName: isStreamer || livestream.test ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
-        //     authorEmail: isStreamer || livestream.test ? 'Streamer' : authenticatedUser.email,
-        //     votes: 0
-        // }
-
         const newChatEntryObject = {
             message: newChatEntry,
-            authorName: isStreamer  ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
-            authorEmail: isStreamer  ? 'Streamer' : authenticatedUser.email,
+            authorName: isStreamer || livestream.test ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
+            authorEmail: isStreamer || livestream.test ? 'Streamer' : authenticatedUser.email,
             votes: 0
         }
+
+        // const newChatEntryObject = {// only use this mode to check chat ui in Development
+        //     message: newChatEntry,
+        //     authorName: isStreamer  ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
+        //     authorEmail: isStreamer  ? 'Streamer' : authenticatedUser.email,
+        //     votes: 0
+        // }
 
         firebase.putChatEntry(livestream.id, newChatEntryObject)
             .then(() => {
