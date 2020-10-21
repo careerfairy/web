@@ -28,10 +28,10 @@ const useStyles = makeStyles((theme) => ({
         marginRight: theme.spacing(3),
         transition: "transform 0.2s",
         transitionTimingFunction: theme.transitions.easeInOut,
-        transform: ({open}) => open ? "" : "translate(30px, 0) scale3d(0.6, 0.6, 0.6)",
-        "-moz-transform": ({open}) => open ? "" : "translate(30px, 0) scale3d(0.6, 0.6, 0.6)",
-        "-o-transform": ({open}) => open ? "" : "translate(30px, 0) scale3d(0.6, 0.6, 0.6)",
-        "-webkit-transform": ({open}) => open ? "" : "translate(30px, 0) scale3d(0.6, 0.6, 0.6)",
+        transform: ({open}) => open ? "" : "translate(30px, 0) scale3d(0.8, 0.8, 0.8)",
+        "-moz-transform": ({open}) => open ? "" : "translate(30px, 0) scale3d(0.8, 0.8, 0.8)",
+        "-o-transform": ({open}) => open ? "" : "translate(30px, 0) scale3d(0.8, 0.8, 0.8)",
+        "-webkit-transform": ({open}) => open ? "" : "translate(30px, 0) scale3d(0.8, 0.8, 0.8)",
     },
     actionButton: {
         backgroundColor: theme.palette.primary.main,
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
     },
     cardHovered: {},
     tooltip: {
-        transition: "all 0.6s",
+        transition: "all 0.8s",
         transitionTimingFunction: theme.transitions.easeInOut,
         display: ({open}) => open ? "block" : "none",
         whiteSpace: "nowrap"
@@ -111,7 +111,7 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
     const actions = [
         {
             icon: isLocalMicMuted ? <MicOffIcon fontSize="large"/> : <MicIcon fontSize="large" color="primary"/>,
-            name: isLocalMicMuted ? 'unmute' : 'Mute',
+            name: isLocalMicMuted ? 'Turn mic on' : 'Turn mic off',
             onClick: toggleMicrophone,
         }
     ];
@@ -119,7 +119,7 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
     if (!(viewer || joining)) {
         actions.push({
             icon: <HearingIcon fontSize="large" color={automaticMode ? "primary" : "default"}/>,
-            name: automaticMode ? 'Manual Speaker Switch' : 'Automatic Speaker Switch',
+            name: automaticMode ? 'Deactivate automatic speaker Switch' : 'Activate automatic speaker Switch',
             onClick: () => setLivestreamSpeakerSwitchMode(automaticMode ? "manual" : "automatic")
         })
     }
@@ -127,7 +127,7 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
     if (!viewer) {
         actions.push({
             icon: <DynamicFeedIcon fontSize="large" color={presentMode ? "primary" : "default"}/>,
-            name: presentMode ? 'Stop Sharing Slides' : 'Share Slides',
+            name: presentMode ? 'Stop sharing slides' : 'Share slides',
             onClick: () => setLivestreamMode(presentMode ? "default" : "presentation")
         })
     }

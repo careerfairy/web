@@ -14,21 +14,20 @@ const useStyles = makeStyles((theme) => ({
     root: {
         position: "absolute",
         right: "-200px",
-        top: "50%",
-        transform: "translateY(-50%)",
         height: "100%",
         width: "200px",
         display: "flex",
-        alignItems: "center"
+        alignItems: "center",
+        padding: 20,
     },
     speedDial: {
         marginLeft: theme.spacing(3),
         transition: "transform 0.2s",
         transitionTimingFunction: theme.transitions.easeInOut,
-        transform: ({open}) => open ? "" : "translate(-30px, 0) scale3d(0.6, 0.6, 0.6)",
-        "-moz-transform": ({open}) => open ? "" : "translate(-30px, 0) scale3d(0.6, 0.6, 0.6)",
-        "-o-transform": ({open}) => open ? "" : "translate(-30px, 0) scale3d(0.6, 0.6, 0.6)",
-        "-webkit-transform": ({open}) => open ? "" : "translate(-30px, 0) scale3d(0.6, 0.6, 0.6)",
+        transform: ({open}) => open ? "" : "translate(-50px, 0) scale3d(0.8, 0.8, 0.8)",
+        "-moz-transform": ({open}) => open ? "" : "translate(-50px, 0) scale3d(0.8, 0.8, 0.8)",
+        "-o-transform": ({open}) => open ? "" : "translate(-50px, 0) scale3d(0.8, 0.8, 0.8)",
+        "-webkit-transform": ({open}) => open ? "" : "translate(-50px, 0) scale3d(0.8, 0.8, 0.8)",
     },
     actionButton: {
         backgroundColor: theme.palette.primary.main,
