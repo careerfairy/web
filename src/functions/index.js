@@ -556,8 +556,8 @@ exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 45
                 console.log("livestream company: " + livestream.company);
                 console.log("number of emails: " + livestream.registeredUsers.length);
                 livestream.registeredUsers.forEach( email => {
-                    var data = generateEmailData("link.aerospace@gmail.com", livestream);
-                    mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
+                    var data = generateEmailData(email, livestream, false);
+                    await mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
                 });
             });
         }).catch((error) => {
@@ -565,17 +565,45 @@ exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 45
         });
 });
 
-function generateEmailData(recipientEmail, livestream) {
+exports.sendReminderEmailsWhenLivestreamStarts = functions.firestore
+    .document('livestreams/{livestreamId}')
+    .onUpdate((change, context) => {
+        console.log("onUpdate")
+        const previousValue = change.before.data();
+        const newValue = change.after.data();
+        if (newValue.test === false) {
+            if (!previousValue.hasStarted && !previousValue.hasSentEmails && newValue.hasStarted === true) {
+                console.log("sendEmail")
+                admin.firestore().collection("livestreams").doc(context.params.livestreamId).update({ hasSentEmails: true }).then(() => {
+                    newValue.registeredUsers.forEach( email => {
+                        var data = generateEmailData(email, newValue, true);
+                        await mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
+                    });
+                })
+            }
+        }    
+    });
+
+function generateEmailData(recipientEmail, livestream, startingNow) {
     var luxonStartDateTime = DateTime.fromJSDate(livestream.start.toDate(), { zone: 'Europe/Zurich' });
-    return {
-        //Specify email data
-        from: "CareerFairy <noreply@careerfairy.io>",
-        to: recipientEmail,
-        subject: 'Reminder: Live Stream with ' + livestream.company + ' ' + getLivestreamTimeInterval(livestream.start),
-        template: 'registration-reminder',
-        "h:X-Mailgun-Variables": JSON.stringify({ "company": livestream.company, "startTime": formatHour(luxonStartDateTime), "streamLink": getStreamLink(livestream.id), "german": livestream.language === "DE" ? true : false }),
-        "o:deliverytime": luxonStartDateTime.minus({ minutes: 45 }).toRFC2822()
-    }
+    if (startingNow) {
+        return {
+            from: "CareerFairy <noreply@careerfairy.io>",
+            to: recipientEmail,
+            subject:  'NOW: Live Stream with ' + livestream.company + ' ' + getLivestreamTimeInterval(livestream.start),
+            template: 'registration-reminder',
+            "h:X-Mailgun-Variables": JSON.stringify({ "company": livestream.company, "startTime": formatHour(luxonStartDateTime), "streamLink": getStreamLink(livestream.id), "german": livestream.language === "DE" ? true : false }),
+        }
+    } else {
+        return {
+            from: "CareerFairy <noreply@careerfairy.io>",
+            to: recipientEmail,
+            subject: 'Reminder: Live Stream with ' + livestream.company + ' ' + getLivestreamTimeInterval(livestream.start),
+            template: 'registration-reminder',
+            "h:X-Mailgun-Variables": JSON.stringify({ "company": livestream.company, "startTime": formatHour(luxonStartDateTime), "streamLink": getStreamLink(livestream.id), "german": livestream.language === "DE" ? true : false }),
+            "o:deliverytime": luxonStartDateTime.minus({ minutes: 45 }).toRFC2822()
+        }
+    }  
 }
 
 function getStreamLink(streamId) {
@@ -619,7 +647,7 @@ exports.exportFirestoreBackup = functions.pubsub.schedule('every 1 hours').timeZ
     });
 });
 
-exports.scheduleTestLivestreamDeletion = functions.pubsub.schedule('every 6 hours').timeZone('Europe/Zurich').onRun((context) => {
+exports.scheduleTestLivestreamDeletion = functions.pubsub.schedule('every sunday 09:00').timeZone('Europe/Zurich').onRun((context) => {
     admin.firestore().collection("livestreams")
         .where("test", "==", true)
         .get().then((querySnapshot) => {
