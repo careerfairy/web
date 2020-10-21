@@ -438,6 +438,8 @@ function ViewerPage({firebase}) {
 
                 .top-menu-right {
                     position: absolute;
+                    display: flex !important;
+                    align-items: center;
                     top: 50%;
                     right: 20px;
                     transform: translateY(-50%);
