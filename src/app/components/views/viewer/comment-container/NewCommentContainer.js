@@ -36,7 +36,7 @@ function CommentContainer(props) {
     if (!props.showMenu) {
         return (
             <Fragment>
-                <ButtonComponent handleStateChange={handleStateChange} {...props}/>
+                <ButtonComponent isMobile={isMobile} handleStateChange={handleStateChange} {...props}/>
             </Fragment>
         );
     }
