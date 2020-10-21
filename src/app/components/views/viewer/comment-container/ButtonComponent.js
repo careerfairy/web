@@ -8,7 +8,6 @@ import {makeStyles} from "@material-ui/core/styles";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
-import {amber} from "@material-ui/core/colors";
 import {fade} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
@@ -38,6 +37,14 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: theme.palette.primary.dark,
         },
     },
+
+    tooltip: {
+        // backgroundColor: "transparent",
+        // color: "white",
+        // fontWeight: 600,
+        // boxShadow: "none"
+    }
+
 }));
 
 
@@ -120,6 +127,7 @@ export const ButtonComponent = ({handleStateChange, showMenu, isMobile, selected
                         icon={action.icon}
                         tooltipPlacement="right"
                         tooltipTitle={action.name}
+                        classes={{staticTooltipLabel: classes.tooltip}}
                         tooltipOpen
                         FabProps={{
                             size: "large",

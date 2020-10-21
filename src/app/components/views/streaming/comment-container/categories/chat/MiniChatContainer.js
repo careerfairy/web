@@ -145,7 +145,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
     const ROOT_CSS = css({
         display: "flex",
         flexDirection: "column",
-        height: "200px"
+        height: "240px"
     });
 
     let chatElements = chatEntries.map((chatEntry, index) => {
