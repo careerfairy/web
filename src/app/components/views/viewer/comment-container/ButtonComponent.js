@@ -56,7 +56,8 @@ const useStyles = makeStyles((theme) => ({
     tooltip: {
         transition: "all 0.6s",
         transitionTimingFunction: theme.transitions.easeInOut,
-        display: ({open}) => open ? "block" : "none"
+        display: ({open}) => open ? "block" : "none",
+        whiteSpace: "nowrap"
     },
     dialButton: {
         display: "none"
