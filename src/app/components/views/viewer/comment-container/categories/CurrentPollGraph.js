@@ -2,49 +2,8 @@ import React, {useEffect, useRef, useState} from 'react';
 import {Doughnut} from "react-chartjs-2";
 import {Checkbox, List, ListItem, Typography} from "@material-ui/core";
 import 'chartjs-plugin-labels'
-import {Chart} from 'react-chartjs-2'
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-
-const formatLabel = (str, maxWidth) => {
-    let sections = [];
-    let words = str.split(" ");
-    let temp = "";
-
-    words.forEach(function (item, index) {
-        if (temp.length > 0) {
-            const concat = temp + ' ' + item;
-
-            if (concat.length > maxWidth) {
-                sections.push(temp);
-                temp = "";
-            } else {
-                if (index === (words.length - 1)) {
-                    sections.push(concat);
-                    return;
-                } else {
-                    temp = concat;
-                    return;
-                }
-            }
-        }
-
-        if (index === (words.length - 1)) {
-            sections.push(item);
-            return;
-        }
-
-        if (item.length < maxWidth) {
-            temp = item;
-        } else {
-            sections.push(item);
-        }
-
-    });
-
-    console.log("-> sections", sections);
-    return [sections];
-}
 
 const baseColors = [
     '#E74C3C',
@@ -56,17 +15,15 @@ const baseColors = [
     '#8E44AD',
     '#B7950B',
 ]
-// const option = {name: "Our next product", voters: Array(1), votes: 1, index: 0}
-const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}}) => {
+
+const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, selectedState}) => {
+        const chartRef = useRef()
+        const [chartHeight, setChartHeight] = useState(0)
+        const [legendElements, setLegendElements] = useState([])
         const [legendLabels, setLegendLabels] = useState([])
         const [chartData, setChartData] = useState({
-            labels: options.map(option => option.name, 20),
-            datasets: [{
-                label: question,
-                data: options.map(option => option.votes),
-                backgroundColor: options.map((option, index) => baseColors[index]),
-                hoverBackgroundColor: options.map((option, index) => baseColors[index])
-            }],
+            labels: [],
+            datasets: [],
         })
 
         useEffect(() => {
@@ -75,7 +32,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}})
 
         useEffect(() => {
             setChartData({
-                labels: options.map(option => formatLabel(option.name, 20)),
+                labels: options.map(option => option.name),
                 datasets: [{
                     label: question,
                     data: options.map(option => option.votes),
@@ -85,23 +42,22 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}})
             })
         }, [options])
 
-        const chartRef = useRef(null)
-        console.log("-> chartRef", chartRef);
+        useEffect(() => {
+            setChartHeight(chartRef.current.chartInstance.height)
+            setLegendElements(chartRef.current.chartInstance.legend.legendItems)
 
-        const chartWidth = chartRef?.current?.chartInstance.chartArea.right
+        }, [chartRef.current])
 
         const getTotalVotes = (arr) => {
             return arr.reduce((acc, obj) => acc + obj.votes, 0); // 7
         }
-        const renderLegendItems = () => {
-            return chartRef?.current?.chartInstance?.legend?.legendItems || []
-        }
-        const handleClickLegend = (e, legendItem) => {
-            var index = legendItem.index;
-            var chart = chartRef?.current?.chartInstance;
-            var i, ilen, meta;
 
-            for (i = 0, ilen = (chart.data.datasets || []).length; i < ilen; ++i) {
+        const handleClickLegend = (e, legendItem) => {
+            const index = legendItem.index;
+            const chart = chartRef?.current?.chartInstance;
+            let i, iLength, meta;
+
+            for (i = 0, iLength = (chart.data.datasets || []).length; i < iLength; ++i) {
                 meta = chart.getDatasetMeta(i);
                 // toggle visibility of index if exists
                 if (meta.data[index]) {
@@ -130,16 +86,6 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}})
                 }]
             },
             cutoutPercentage: 70,
-            elements: {
-                center: {
-                    text: `${getTotalVotes(options)} Votes`,
-                    color: '#000000', // Default is #000000
-                    fontStyle: 'Poppins', // Default is Arial
-                    sidePadding: 20, // Default is 20 (as a percentage)
-                    minFontSize: 45, // Default is 20 (in px), set to false and text will not wrap.
-                    lineHeight: 40 // Default is 25 (in px), used for when text wraps
-                }
-            },
             redraw: true,
             tooltips: {
                 callbacks: {
@@ -166,7 +112,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}})
             }
         }
 
-        return (
+        return  (
             <div style={{
                 background: "rgb(240, 240, 240)",
                 padding: 12,
@@ -180,7 +126,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}})
                             variant="h3"
                             gutterBottom>{question}</Typography>
                 <List dense>
-                    {renderLegendItems().map((item) => {
+                    {legendElements.map((item) => {
                         const votesNum = chartData.datasets[0].data[item.index]
                         return (
                             <ListItem dense key={item.index} onClick={(e) => handleClickLegend(e, item)} button>
@@ -189,9 +135,6 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}})
                                         edge="start"
                                         style={{color: item.fillStyle}}
                                         checked={!legendLabels[item.index].hidden}
-                                        tabIndex={-1}
-                                        disableRipple
-                                        inputProps={{'aria-labelledby': item.text}}
                                     />
                                 </ListItemIcon>
                                 <ListItemText>
@@ -210,17 +153,15 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}})
                         options={optionsObj}/>
                     <div style={{
                         position: "absolute",
-                        top: chartWidth / 2,
-                        display: "flex",
+                        top: chartHeight / 2,
+                        right: chartHeight / 2,
+                        borderRadius: "50%",
                         paddingTop: "7%",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        width: "100%",
-                        height: chartWidth,
-                        transform: "translateY(-50%)"
+                        transform: "translateY(-50%) translateX(50%)"
                     }}>
-                        <Typography variant="h1" style={{fontWeight: 500, fontSize: "5.3rem", lineHeight: 0.6}} align="center">{getTotalVotes(options)}</Typography>
-                        <Typography  variant="subtitle2" style={{fontSize: "2.4rem",  }} align="center">votes</Typography>
+                        <Typography variant="h1" style={{fontWeight: 500, fontSize: "5.3rem", lineHeight: 0.6}}
+                                    align="center">{getTotalVotes(options)}</Typography>
+                        <Typography variant="subtitle2" style={{fontSize: "2.4rem"}} align="center">votes</Typography>
                     </div>
                 </div>
             </div>

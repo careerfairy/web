@@ -51,24 +51,20 @@ function PollCategory(props) {
             const colors = ['#E74C3C', '#E67E22', '#FFCE56', '#27AE60'];
             let optionElementsLarge = currentPoll.options.map((option, index) => {
                 return (
-                    <Fragment key={index}>
-                        <div className='option-container'>
-                            <Button variant="contained" children={option.name} fullWidth style={{background: colors[index], color: "white"}} onClick={() => voteForPollOption(index)}
-                                    size='small'/>
-                        </div>
-                        <style jsx>{`
-                            .option-container {
-                                margin: 10px 10px 0 0;
-                            }
-                        `}</style>
-                    </Fragment>
+                    <div key={index} style={{margin: "10px 10px 0 0"}}>
+                        <Button variant="contained" children={option.name} fullWidth
+                                style={{background: colors[index], color: "white"}}
+                                onClick={() => voteForPollOption(index)}
+                                size='small'/>
+                    </div>
                 );
             });
             return (
                 <div style={{display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
                     <div className='handraise-container'>
                         <div className='central-container'>
-                            <Typography style={{fontFamily: "Permanent Marker", fontSize: "2.5em"}} variant="h3" gutterBottom>{currentPoll.question}</Typography>
+                            <Typography style={{fontFamily: "Permanent Marker", fontSize: "2.5em"}} variant="h3"
+                                        gutterBottom>{currentPoll.question}</Typography>
                             <div>
                                 {optionElementsLarge}
                             </div>
@@ -103,57 +99,7 @@ function PollCategory(props) {
                 </div>
             );
         } else {
-            return (
-                <CurrentPollGraph currentPoll={currentPoll}/>
-            )
-            console.log("-> currentPoll", currentPoll);
-            let optionElementsLarge = currentPoll.options.map((option, index) => {
-                let totalVotes = 0;
-                currentPoll.options.forEach(option => totalVotes += option.votes);
-                return (
-                    <Fragment key={index}>
-                        <PollOptionResultViewer option={option} index={index} totalVotes={totalVotes}/>
-                    </Fragment>
-                );
-            });
-            return (
-                <div style={{display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
-                    <div className='handraise-container'>
-                        <div className='central-container'>
-                            <h2>{currentPoll.question}</h2>
-                            <div>
-                                {optionElementsLarge}
-                            </div>
-                        </div>
-                    </div>
-                    <style jsx>{`
-                        .handraise-container {
-                            position: absolute;
-                            top: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 100%;
-                            background-color: rgb(240,240,240);
-                        }
-
-                        .central-container {
-                            position: absolute;
-                            top: 50%;
-                            left: 50%;
-                            transform: translate(-50%,-50%);
-                            text-align: center;
-                            width: 80%;
-                            color: rgb(0, 210, 170);
-                        }
-
-                        .central-container h2 {
-                            font-family: 'Permanent Marker';
-                            font-size: 2.5em;
-                            margin: 20px 0;
-                        }
-                `}</style>
-                </div>
-            );
+            return (<CurrentPollGraph selectedState={props.selectedState} currentPoll={currentPoll}/>)
         }
     } else {
         return (
