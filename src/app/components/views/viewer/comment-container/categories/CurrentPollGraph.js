@@ -15,14 +15,14 @@ Chart.pluginService.register({
 
             // Get options from the center object in options
             var centerConfig = chart.config.options.elements.center;
-            var fontStyle = "'Permanent Marker'";
+            var fontStyle = "'Poppins'";
             var txt = centerConfig.text;
-            var color = "#00d2aa";
+            var color = "#000000";
             var maxFontSize = centerConfig.maxFontSize || 75;
             var sidePadding = centerConfig.sidePadding || 20;
             var sidePaddingCalculated = (sidePadding / 100) * (chart.innerRadius * 2)
             // Start with a base font of 30px
-            ctx.font = "25px " + fontStyle;
+            ctx.font = "30px " + fontStyle;
 
             // Get the width of the string and also the width of the element minus 10 to give it 5px side padding
             var stringWidth = ctx.measureText(txt).width;
@@ -70,7 +70,7 @@ Chart.pluginService.register({
                 var testLine = line + words[n] + ' ';
                 var metrics = ctx.measureText(testLine);
                 var testWidth = metrics.width;
-                if (testWidth > elementWidth && n > 0) {
+                if (testWidth > (elementWidth -100) && n > 0) {
                     lines.push(line);
                     line = words[n] + ' ';
                 } else {
@@ -86,6 +86,7 @@ Chart.pluginService.register({
                 centerY += lineHeight;
             }
             //Draw text in center
+
             ctx.fillText(line, centerX, centerY);
         }
     }
@@ -208,19 +209,18 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}})
                     fontColor: 'white',
                     render: 'value',
                     fontStyle: 'bold',
-                    position: 'border',
                     arc: true,
                 }]
             },
-            cutoutPercentage: 60,
+            cutoutPercentage: 70,
             elements: {
                 center: {
-                    text: `Votes: ${getTotalVotes(options)}`,
+                    text: `${getTotalVotes(options)} Votes`,
                     color: '#000000', // Default is #000000
                     fontStyle: 'Poppins', // Default is Arial
                     sidePadding: 20, // Default is 20 (as a percentage)
-                    minFontSize: 25, // Default is 20 (in px), set to false and text will not wrap.
-                    lineHeight: 25 // Default is 25 (in px), used for when text wraps
+                    minFontSize: 45, // Default is 20 (in px), set to false and text will not wrap.
+                    lineHeight: 40 // Default is 25 (in px), used for when text wraps
                 }
             },
             redraw: true,
@@ -259,7 +259,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}})
                 justifyContent: "center",
                 alignItems: "center"
             }}>
-                <Typography align="center" color="primary" style={{fontFamily: "Permanent Marker", fontSize: "2.5em"}}
+                <Typography align="center" color="primary" style={{fontSize: "2.5em"}}
                             variant="h3"
                             gutterBottom>{question}</Typography>
                 <List dense>
