@@ -99,7 +99,7 @@ function PollCategory(props) {
                 </div>
             );
         } else {
-            return (<CurrentPollGraph selectedState={props.selectedState} currentPoll={currentPoll}/>)
+            return props.selectedState === 'polls' ? (<CurrentPollGraph currentPoll={currentPoll}/>) : null
         }
     } else {
         return (

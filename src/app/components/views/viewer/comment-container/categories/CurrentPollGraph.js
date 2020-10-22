@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Doughnut} from "react-chartjs-2";
-import {Checkbox, List, ListItem, Typography} from "@material-ui/core";
+import {Box, Checkbox, List, ListItem, Typography, useTheme} from "@material-ui/core";
 import 'chartjs-plugin-labels'
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -17,6 +17,7 @@ const baseColors = [
 ]
 
 const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, selectedState}) => {
+    const theme = useTheme()
         const chartRef = useRef()
         const [chartHeight, setChartHeight] = useState(0)
         const [legendElements, setLegendElements] = useState([])
@@ -56,7 +57,6 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, 
             const index = legendItem.index;
             const chart = chartRef?.current?.chartInstance;
             let i, iLength, meta;
-
             for (i = 0, iLength = (chart.data.datasets || []).length; i < iLength; ++i) {
                 meta = chart.getDatasetMeta(i);
                 // toggle visibility of index if exists
@@ -67,7 +67,6 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, 
                     setLegendLabels(newLabels)
                 }
             }
-
             chart.update();
         }
 
@@ -100,15 +99,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, 
                         const percent = Math.round((dataset['data'][tooltipItem['index']] / dataset["_meta"][0]?.['total']) * 100)
                         return '(' + percent + '%)';
                     }
-                },
-                // backgroundColor: '#FFF',
-                // titleFontSize: 16,
-                // titleFontColor: theme.palette.primary.main,
-                // bodyFontColor: '#000',
-                // bodyFontSize: 14,
-                // displayColors: false,
-                // borderColor: theme.palette.primary.main,
-                // borderWidth: 3,
+                }
             }
         }
 
@@ -157,9 +148,10 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, 
                         right: chartHeight / 2,
                         borderRadius: "50%",
                         paddingTop: "7%",
+                        zIndex: 1,
                         transform: "translateY(-50%) translateX(50%)"
                     }}>
-                        <Typography variant="h1" style={{fontWeight: 500, fontSize: "5.3rem", lineHeight: 0.6}}
+                        <Typography variant="h1" style={{fontWeight: 500, fontSize: "5.3rem", lineHeight: 0.6, }}
                                     align="center">{getTotalVotes(options)}</Typography>
                         <Typography variant="subtitle2" style={{fontSize: "2.4rem"}} align="center">votes</Typography>
                     </div>
