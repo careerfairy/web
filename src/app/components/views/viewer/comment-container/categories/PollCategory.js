@@ -1,21 +1,19 @@
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {useState, useEffect} from 'react';
 
 import {withFirebase} from 'context/firebase';
 import UserContext from 'context/user/UserContext';
-import PollOptionResultViewer
-    from 'components/views/streaming/comment-container/categories/polls/poll-entry-container/current-poll/PollOptionResultViewer';
 import CurrentPollGraph from "./CurrentPollGraph";
-import {Button, Typography} from "@material-ui/core";
+import {Button, Typography, Grow } from "@material-ui/core";
 
-function PollCategory(props) {
+function PollCategory({firebase, selectedState, livestream, setSelectedState, setShowMenu}) {
 
     const {authenticatedUser, userData} = React.useContext(UserContext);
     const [currentPoll, setCurrentPoll] = useState(null);
     const [currentPollId, setCurrenPollId] = useState(null);
 
     useEffect(() => {
-        if (props.livestream) {
-            props.firebase.listenToPolls(props.livestream.id, querySnapshot => {
+        if (livestream) {
+            firebase.listenToPolls(livestream.id, querySnapshot => {
                 let pollSwitch = null;
                 querySnapshot.forEach(doc => {
                     let poll = doc.data();
@@ -27,24 +25,22 @@ function PollCategory(props) {
                 return setCurrentPoll(pollSwitch);
             });
         }
-    }, [props.livestream]);
+    }, [livestream]);
 
     useEffect(() => {
         if (currentPoll && currentPoll.id !== currentPollId) {
-            props.setSelectedState("polls");
-            props.setShowMenu(true);
+            setSelectedState("polls");
+            setShowMenu(true);
             setCurrenPollId(currentPoll.id);
         }
     }, [currentPoll]);
 
     function voteForPollOption(index) {
-        let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
-        // let authEmail = authenticatedUser.email;
-        props.firebase.voteForPollOption(props.livestream.id, currentPoll.id, authEmail, index);
+        let authEmail = livestream.test ? 'streamerEmail' : authenticatedUser.email;
+        firebase.voteForPollOption(livestream.id, currentPoll.id, authEmail, index);
     }
 
-    let authEmail = (authenticatedUser && authenticatedUser.email && !props.livestream.test) ? authenticatedUser.email : 'streamerEmail';
-    // let authEmail = (authenticatedUser && authenticatedUser.email) ? authenticatedUser.email : 'streamerEmail';
+    let authEmail = (authenticatedUser && authenticatedUser.email && !livestream.test) ? authenticatedUser.email : 'streamerEmail';
 
     if (currentPoll && authEmail) {
         if (currentPoll.voters.indexOf(authEmail) === -1) {
@@ -60,7 +56,7 @@ function PollCategory(props) {
                 );
             });
             return (
-                <div style={{display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
+                <div style={{display: (selectedState !== 'polls' ? 'none' : 'block')}}>
                     <div className='handraise-container'>
                         <div className='central-container'>
                             <Typography style={{fontFamily: "Permanent Marker", fontSize: "2.5em"}} variant="h3"
@@ -99,11 +95,12 @@ function PollCategory(props) {
                 </div>
             );
         } else {
-            return props.selectedState === 'polls' ? (<CurrentPollGraph currentPoll={currentPoll}/>) : null
+            return selectedState === 'polls' &&
+                <CurrentPollGraph
+                    currentPoll={currentPoll}/>
         }
     } else {
-        return (
-            <div style={{display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
+        return (<div style={{display: (selectedState !== 'polls' ? 'none' : 'block')}}>
                 <div className='handraise-container'>
                     <div className='central-container'>
                         <h2>No current poll</h2>
