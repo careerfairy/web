@@ -1,12 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Doughnut} from "react-chartjs-2";
-import {List, ListItem, Typography, useTheme} from "@material-ui/core";
-// import 'chartjs-plugin-datalabels'
+import {Checkbox, List, ListItem, Typography} from "@material-ui/core";
 import 'chartjs-plugin-labels'
 import {Chart} from 'react-chartjs-2'
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import StopRoundedIcon from '@material-ui/icons/StopRounded';
 
 Chart.pluginService.register({
     beforeDraw: function (chart) {
@@ -17,9 +15,9 @@ Chart.pluginService.register({
 
             // Get options from the center object in options
             var centerConfig = chart.config.options.elements.center;
-            var fontStyle = centerConfig.fontStyle || 'Arial';
+            var fontStyle = "'Permanent Marker'";
             var txt = centerConfig.text;
-            var color = centerConfig.color || '#000';
+            var color = "#00d2aa";
             var maxFontSize = centerConfig.maxFontSize || 75;
             var sidePadding = centerConfig.sidePadding || 20;
             var sidePaddingCalculated = (sidePadding / 100) * (chart.innerRadius * 2)
@@ -145,9 +143,9 @@ const baseColors = [
 ]
 // const option = {name: "Our next product", voters: Array(1), votes: 1, index: 0}
 const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}}) => {
-
+        const [legendLabels, setLegendLabels] = useState([])
         const [chartData, setChartData] = useState({
-            labels: options.map(option => formatLabel(option.name, 20)),
+            labels: options.map(option => option.name, 20),
             datasets: [{
                 label: question,
                 data: options.map(option => option.votes),
@@ -155,6 +153,10 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}})
                 hoverBackgroundColor: options.map((option, index) => baseColors[index])
             }],
         })
+
+        useEffect(() => {
+            setLegendLabels(options.map(option => ({name: option.name, hidden: false})))
+        }, [question])
 
         useEffect(() => {
             setChartData({
@@ -176,19 +178,36 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}})
         const renderLegendItems = () => {
             return chartRef?.current?.chartInstance?.legend?.legendItems || []
         }
+        const handleClickLegend = (e, legendItem) => {
+            var index = legendItem.index;
+            var chart = chartRef?.current?.chartInstance;
+            var i, ilen, meta;
 
-        const handleClick = chartRef?.current?.chartInstance.legend.options.onClick
+            for (i = 0, ilen = (chart.data.datasets || []).length; i < ilen; ++i) {
+                meta = chart.getDatasetMeta(i);
+                // toggle visibility of index if exists
+                if (meta.data[index]) {
+                    meta.data[index].hidden = !meta.data[index].hidden;
+                    const newLabels = [...legendLabels]
+                    newLabels[index].hidden = meta.data[index].hidden
+                    setLegendLabels(newLabels)
+                }
+            }
+
+            chart.update();
+        }
 
         const optionsObj = {
             responsive: true,
+            maintainAspectRatio: true,
             legend: {
-                display: true,
-                position: 'top',
+                display: false,
             },
             plugins: {
                 labels: [{
                     fontColor: 'white',
-                    render: 'percentage',
+                    render: 'value',
+                    fontStyle: 'bold',
                     position: 'border',
                     arc: true,
                 }]
@@ -233,31 +252,43 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}})
         return (
             <div style={{
                 background: "rgb(240, 240, 240)",
+                padding: 12,
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center"
             }}>
+                <Typography align="center" color="primary" style={{fontFamily: "Permanent Marker", fontSize: "2.5em"}}
+                            variant="h3"
+                            gutterBottom>{question}</Typography>
                 <List dense>
-                    {renderLegendItems().map((item, index) => {
+                    {renderLegendItems().map((item) => {
+                        const votesNum = chartData.datasets[0].data[item.index]
                         return (
-                            <ListItem onClick={(e) => handleClick(e, item)} button>
+                            <ListItem dense key={item.index} onClick={(e) => handleClickLegend(e, item)} button>
                                 <ListItemIcon>
-                                    <StopRoundedIcon style={{color: item.fillStyle}}/>
+                                    <Checkbox
+                                        edge="start"
+                                        style={{color: item.fillStyle}}
+                                        checked={!legendLabels[item.index].hidden}
+                                        tabIndex={-1}
+                                        disableRipple
+                                        inputProps={{'aria-labelledby': item.text}}
+                                    />
                                 </ListItemIcon>
-                                <ListItemText primary={item.text}/>
+                                <ListItemText>
+                                    {item.text}<strong> - {votesNum} Votes</strong>
+                                </ListItemText>
                             </ListItem>
                         )
                     })}
                 </List>
-                <Typography align="center" style={{fontFamily: "Permanent Marker", fontSize: "2.5em"}} variant="h3"
-                            gutterBottom>{question}</Typography>
                 <Doughnut
                     data={chartData}
-                    width="350"
+                    width={70}
+                    height={70}
                     ref={chartRef}
-                    height="350"
                     options={optionsObj}/>
             </div>
         )
