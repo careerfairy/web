@@ -156,12 +156,12 @@ export const ButtonComponent = ({handleStateChange, showMenu, isMobile, selected
                             tooltipTitle={action.name}
                             classes={{staticTooltipLabel:  classes.tooltip}}
                             tooltipOpen={Boolean(action.name.length)}
+                            onClick={action.onClick}
                             FabProps={{
                                 size: "large",
                                 classes: {root: action.name.length? classes.actionButton : classes.actionButtonPink},
                                 disabled: action.disabled
                             }}
-                            onClick={action.onClick}
                         />
                     ))}
                 </SpeedDial>

@@ -93,8 +93,8 @@ export const DeleteCategory = ({setUpdateMode, updateMode, categoryName, handleD
                     they
                     manually update their categorisation.</Typography>
                 <Box display="flex" alignItems="center">
-                    <Warning color="secondary"/><FormHelperText error>This operation cannot be
-                    reverted!</FormHelperText><Warning color="secondary"/>
+                    <Warning color="error"/><FormHelperText error>This operation cannot be
+                    reverted!</FormHelperText><Warning color="error"/>
                 </Box>
             </DialogContent>
             <DialogActions>
@@ -202,8 +202,8 @@ export const DeleteOption = ({updateMode, handleDelete, setUpdateMode, open}) =>
                     classification
                     until they manually update their categorisation.</Typography>
                 <Box display="flex" alignItems="center">
-                    <Warning color="secondary"/><FormHelperText error>This operation cannot be
-                    reverted!</FormHelperText><Warning color="secondary"/>
+                    <Warning color="error"/><FormHelperText error>This operation cannot be
+                    reverted!</FormHelperText><Warning color="error"/>
                 </Box>
             </DialogContent>
             <DialogActions>

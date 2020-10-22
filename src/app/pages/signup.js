@@ -168,7 +168,7 @@ function SignUpPage({firebase}) {
                         <Stepper style={{padding: "0 0 24px 0"}} activeStep={activeStep} alternativeLabel>
                             {steps.map((label) => (
                                 <Step key={label}>
-                                    <StepLabel color="secondary">{label}</StepLabel>
+                                    <StepLabel>{label}</StepLabel>
                                 </Step>
                             ))}
                         </Stepper>
@@ -626,7 +626,7 @@ function SignUpFormValidate({user, setEmailVerificationSent, setActiveStep, abso
                             {isSubmitting ? "Checking" : (generalLoading ? "Resending" : "Validate Email")}
                         </Button>
                         <Typography style={{marginTop: "0.5rem"}} align="center" hidden={!incorrectPin}
-                                    color="secondary" margin="dense">
+                                    color="error" margin="dense">
                             <strong>Incorrect PIN</strong> <br/>
                             The PIN code you entered appears to be incorrect. <MuiLink href="#"
                                                                                        onClick={() => resendVerificationEmail()}><br/>Resend
@@ -639,7 +639,7 @@ function SignUpFormValidate({user, setEmailVerificationSent, setActiveStep, abso
                                 href="mailto:maximilian@careerfairy.io"> Let us
                                 know</MuiLink></div>
                         </div>
-                        <Typography align="center" color="secondary" hidden={!errorMessageShown}>
+                        <Typography align="center" color="error" hidden={!errorMessageShown}>
                             An error occurred while creating to your account
                         </Typography>
                     </form>

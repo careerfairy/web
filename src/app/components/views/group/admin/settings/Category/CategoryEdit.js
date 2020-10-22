@@ -52,6 +52,10 @@ const useStyles = makeStyles((theme) => ({
         height: "1px",
         backgroundColor: "rgb(230,230,230)",
         margin: "20px 0",
+    },
+    errorButton:{
+        background: theme.palette.error.main,
+        color: theme.palette.error.contrastText
     }
 }));
 
@@ -279,7 +283,7 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
                 </div>
                 {!newCategory &&
                 <Button onClick={() => setUpdateMode({mode: 'deleteCategory', option: {name: categoryName}})}
-                        color="secondary"
+                        className={classes.errorButton}
                         size="small"
                         variant="outlined">
                     Delete

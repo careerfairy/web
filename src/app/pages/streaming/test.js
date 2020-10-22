@@ -1,11 +1,12 @@
 import {useState, useEffect} from 'react';
-import { Container, Header as SemanticHeader, Button } from "semantic-ui-react";
 
 import { withFirebasePage } from 'context/firebase';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Header from 'components/views/header/Header';
+import {Button, Container, Typography} from "@material-ui/core";
 
 function TestStreamingPage(props) {
 
@@ -78,20 +79,17 @@ function TestStreamingPage(props) {
                 <title key="title">CareerFairy | Next Live Streams</title>
             </Head>
             <Header color="teal"/>
-            <Container style={{ padding: '10% 0 0 0'}}>
+            <Container style={{paddingTop: "10%"}}>
                 <div>
-                    <SemanticHeader as='h1' style={{ width: '60%'}}>Prepare your livestream</SemanticHeader>
-                    <p style={{ width: '60%'}}>
+                    <Typography gutterBottom variant="h3" style={{ width: '60%'}}>Prepare your livestream</Typography>
+                    <Typography style={{ width: '60%'}}>
                         Make sure that you can connect to the CareerFairy streaming server and get familiar with 
                         our interactive features. 
-                    </p>
-                    <p style={{ width: '60%', margin: '0 0 5% 0'}}>Let's make sure that you're ready when it is time for your stream to start!</p>
-                    <Button primary loading={loading} onClick={createTestLivestream}>Test the streaming connection</Button>
+                    </Typography>
+                    <Typography style={{ width: '60%', margin: '0 0 5% 0'}}>Let's make sure that you're ready when it is time for your stream to start!</Typography>
+                    <Button size="large" variant="contained" color="primary" endIcon={loading && <CircularProgress color="inherit" size={20}/>} disabled={loading} onClick={createTestLivestream}>Test the streaming connection</Button>
                 </div>
             </Container>
-            <style jsx>{`
-               
-            `}</style>
         </div>
     );
 }

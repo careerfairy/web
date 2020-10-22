@@ -1,11 +1,11 @@
 import React, {useState, useEffect, Fragment} from 'react';
 
 import {withFirebase} from 'context/firebase';
-import {Input, Icon, Button, Modal} from 'semantic-ui-react';
 import UserContext from 'context/user/UserContext';
 import PollOptionResultViewer
     from 'components/views/streaming/comment-container/categories/polls/poll-entry-container/current-poll/PollOptionResultViewer';
 import CurrentPollGraph from "./CurrentPollGraph";
+import {Button, Typography} from "@material-ui/core";
 
 function PollCategory(props) {
 
@@ -38,23 +38,23 @@ function PollCategory(props) {
     }, [currentPoll]);
 
     function voteForPollOption(index) {
-        // let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
-        let authEmail =  authenticatedUser.email;
+        let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
+        // let authEmail = authenticatedUser.email;
         props.firebase.voteForPollOption(props.livestream.id, currentPoll.id, authEmail, index);
     }
 
-    // let authEmail = (authenticatedUser && authenticatedUser.email && !props.livestream.test) ? authenticatedUser.email : 'streamerEmail';
-    let authEmail = (authenticatedUser && authenticatedUser.email) ? authenticatedUser.email : 'streamerEmail';
+    let authEmail = (authenticatedUser && authenticatedUser.email && !props.livestream.test) ? authenticatedUser.email : 'streamerEmail';
+    // let authEmail = (authenticatedUser && authenticatedUser.email) ? authenticatedUser.email : 'streamerEmail';
 
     if (currentPoll && authEmail) {
         if (currentPoll.voters.indexOf(authEmail) === -1) {
-            const colors = ['red', 'orange', 'pink', 'olive'];
+            const colors = ['#E74C3C', '#E67E22', '#FFCE56', '#27AE60'];
             let optionElementsLarge = currentPoll.options.map((option, index) => {
                 return (
                     <Fragment key={index}>
                         <div className='option-container'>
-                            <Button content={option.name} color={colors[index]} onClick={() => voteForPollOption(index)}
-                                    size='small' fluid/>
+                            <Button variant="contained" children={option.name} fullWidth style={{background: colors[index], color: "white"}} onClick={() => voteForPollOption(index)}
+                                    size='small'/>
                         </div>
                         <style jsx>{`
                             .option-container {
@@ -68,7 +68,7 @@ function PollCategory(props) {
                 <div style={{display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
                     <div className='handraise-container'>
                         <div className='central-container'>
-                            <h2>{currentPoll.question}</h2>
+                            <Typography style={{fontFamily: "Permanent Marker", fontSize: "2.5em"}} variant="h3" gutterBottom>{currentPoll.question}</Typography>
                             <div>
                                 {optionElementsLarge}
                             </div>
