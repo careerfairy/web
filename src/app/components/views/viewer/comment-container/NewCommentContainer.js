@@ -1,19 +1,23 @@
 import React, {useState, useEffect, Fragment} from 'react';
-import {Input, Icon, Button, Label, Grid} from "semantic-ui-react";
-
+import {Input, Label, Grid} from "semantic-ui-react";
+import {makeStyles, useTheme} from '@material-ui/core/styles';
+import {Button, Typography, Box, Fab} from "@material-ui/core";
+import ChevronRightRoundedIcon from '@material-ui/icons/ChevronRightRounded';
 import ChatCategory from 'components/views/streaming/comment-container/categories/ChatCategory';
 import QuestionCategory from './categories/QuestionCategory';
 import PollCategory from './categories/PollCategory';
 import HandRaiseCategory from './categories/HandRaiseCategory';
 import {useWindowSize} from 'components/custom-hook/useWindowSize';
 import {ButtonComponent} from "./ButtonComponent";
-
-
+import SwipeableViews from "react-swipeable-views";
 
 
 function CommentContainer(props) {
+    const theme = useTheme();
 
     const [selectedState, setSelectedState] = useState("questions");
+    const [value, setValue] = useState(0);
+
     const [isMobile, setIsMobile] = useState(false);
     const {width, height} = useWindowSize();
 
@@ -23,6 +27,18 @@ function CommentContainer(props) {
         }
         setSelectedState(state);
     }
+
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    }
+
+    const handleResetView = () => {
+        setValue(0)
+    }
+
+    const handleChangeIndex = (index) => {
+        setValue(index);
+    };
 
     useEffect(() => {
         if (width < 768) {
@@ -44,9 +60,11 @@ function CommentContainer(props) {
     return (
         <div className='interaction-container'>
             <div className='close-menu'>
-                <Button circular size='big' icon='angle left' color='pink' onClick={() => {
+                <Fab size='large' color='secondary' onClick={() => {
                     props.setShowMenu(!props.showMenu)
-                }}/>
+                }}>
+                    <ChevronRightRoundedIcon />
+                </Fab>
             </div>
             <div className='interaction-category'>
                 <ChatCategory livestream={props.livestream} selectedState={selectedState} user={props.user}
@@ -60,7 +78,8 @@ function CommentContainer(props) {
                                    userData={props.userData} handRaiseActive={props.handRaiseActive}
                                    setHandRaiseActive={props.setHandRaiseActive}/>
             </div>
-            <ButtonComponent selectedState={selectedState} handleStateChange={handleStateChange} isMobile={isMobile} {...props}/>
+            <ButtonComponent selectedState={selectedState} handleStateChange={handleStateChange}
+                             isMobile={isMobile} {...props}/>
             <style jsx>{`
                 .interaction-container {
                     position: relative;
