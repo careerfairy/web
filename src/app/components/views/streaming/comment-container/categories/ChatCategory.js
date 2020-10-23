@@ -2,16 +2,17 @@ import React, {useState, useEffect, useContext} from 'react';
 
 import {withFirebase} from '../../../../../context/firebase';
 import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
-import {Input, Icon} from 'semantic-ui-react';
+import {Icon} from 'semantic-ui-react';
 
 import {css} from 'glamor';
 import ScrollToBottom from 'react-scroll-to-bottom';
 import UserContext from 'context/user/UserContext';
-import {AccordionDetails, Collapse, fade, TextField, Typography} from "@material-ui/core";
+import {AccordionSummary, Collapse, fade, TextField, Typography} from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import {makeStyles} from "@material-ui/core/styles";
 import {grey} from "@material-ui/core/colors";
+import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -133,7 +134,10 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
         <div>
             <div className='questionToggle'>
                 <div className='questionToggleTitle'>
-                    <Icon name='comments outline' color='teal'/> Main Chat
+                    <ForumOutlinedIcon color="primary" fontSize="small"/>
+                    <Typography style={{marginLeft: "0.6rem"}}>
+                        Main Chat
+                    </Typography>
                 </div>
                 <div style={{margin: 5}}>
                     <TextField
@@ -174,7 +178,9 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
                 }
 
                 .questionToggleTitle {
+                    display: flex;
                     width: 100%;
+                    justify-content: center;
                     font-size: 1.2em;
                     font-weight: 500;
                     text-align: center;
@@ -187,7 +193,7 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
 
                 .chat-container {
                     position: absolute;
-                    top: 100px;
+                    top: 110px;
                     left: 0;
                     bottom: 0;
                     width: 100%;

@@ -1,6 +1,5 @@
 import React, {useState, useEffect, Fragment} from 'react';
-import {makeStyles, useTheme} from '@material-ui/core/styles';
-import {Button, Typography, Box, Fab} from "@material-ui/core";
+import { Fab} from "@material-ui/core";
 import ChevronLeftRoundedIcon from '@material-ui/icons/ChevronLeftRounded';
 import ChatCategory from 'components/views/streaming/comment-container/categories/ChatCategory';
 import QuestionCategory from './categories/QuestionCategory';

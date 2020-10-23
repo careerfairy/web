@@ -178,7 +178,7 @@ function QuestionContainer(props) {
     }
 
     return (
-        <Slide in={props.appear} mountOnEnter unmountOnExit direction="right">
+        <Slide in={props.appear} direction="right">
             <div className='animated fadeInUp faster'>
                 <div className={'questionContainer ' + (props.question.type === 'current' ? 'active' : '')}>
                     <div style={{padding: "20px 20px 5px 20px"}}>
@@ -194,8 +194,8 @@ function QuestionContainer(props) {
                             {commentsElements}
                         </div>
                         <ReactionsToggle/>
-                        <div className='upvotes'>
-                            {props.question.votes} <ThumbUpRoundedIcon style={{verticalAlign: "text-top"}} fontSize='small'/>
+                        <div style={{color: props.question.type === 'current'? "white": "auto"}} className='upvotes'>
+                            {props.question.votes} <ThumbUpRoundedIcon color="inherit" style={{verticalAlign: "text-top"}} fontSize='small'/>
                         </div>
                     </div>
                     <Box p={1}>
