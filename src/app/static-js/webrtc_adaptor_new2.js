@@ -977,7 +977,7 @@ export function WebRTCAdaptor(initialValues)
 			}
 
 			thiz.remotePeerConnection[streamId].oniceconnectionstatechange = function (event) {
-                debugger;
+                // debugger;
 				var obj = {state:thiz.remotePeerConnection[streamId].iceConnectionState, streamId:streamId};
 				thiz.callback("ice_connection_state_changed",obj);
 

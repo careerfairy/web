@@ -17,7 +17,7 @@ const baseColors = [
 ]
 
 const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, selectedState}) => {
-    const theme = useTheme()
+        const theme = useTheme()
         const chartRef = useRef()
         const [chartHeight, setChartHeight] = useState(0)
         const [legendElements, setLegendElements] = useState([])
@@ -71,7 +71,6 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, 
         }
 
         const optionsObj = {
-            responsive: true,
             maintainAspectRatio: true,
             legend: {
                 display: false,
@@ -81,7 +80,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, 
                     fontColor: 'white',
                     render: 'value',
                     fontStyle: 'bold',
-                    arc: true,
+                    arc: false,
                 }]
             },
             cutoutPercentage: 70,
@@ -97,23 +96,22 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, 
                     afterLabel: (tooltipItem, data) => {
                         const dataset = data['datasets'][0];
                         const percent = Math.round((dataset['data'][tooltipItem['index']] / dataset["_meta"][0]?.['total']) * 100)
-                        return '(' + percent + '%)';
+                        return isNaN(percent) ? "" : '(' + percent + '%)';
                     }
                 }
             }
         }
 
-        return  (
+        return (
             <div style={{
                 background: "rgb(240, 240, 240)",
                 padding: 12,
                 height: "100%",
+                overflowY: "auto",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center"
             }}>
-                <Typography align="center" color="primary" style={{fontSize: "2.5em"}}
+                <Typography align="center" color="primary" style={{fontSize: "2.5em", marginTop: "auto"}}
                             variant="h3"
                             gutterBottom>{question}</Typography>
                 <List dense>
@@ -135,25 +133,25 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, 
                         )
                     })}
                 </List>
-                <div style={{position: "relative", width: "100%"}}>
+                <div style={{position: "relative", width: "100%", marginBottom: "auto"}}>
                     <Doughnut
                         data={chartData}
-                        width={1}
-                        height={1}
                         ref={chartRef}
+                        width={100}
+                        height={100}
                         options={optionsObj}/>
                     <div style={{
                         position: "absolute",
                         top: chartHeight / 2,
                         right: chartHeight / 2,
                         borderRadius: "50%",
-                        paddingTop: "7%",
                         zIndex: 1,
                         transform: "translateY(-50%) translateX(50%)"
                     }}>
-                        <Typography variant="h1" style={{fontWeight: 500, fontSize: "5.3rem", lineHeight: 0.6, }}
+                        <Typography variant="h1" style={{fontWeight: 500, fontSize: "4.2rem", lineHeight: 0.6,}}
                                     align="center">{getTotalVotes(options)}</Typography>
-                        <Typography variant="subtitle2" style={{fontSize: "2.4rem"}} align="center">votes</Typography>
+                        <Typography variant="subtitle2" style={{fontSize: "2rem"}}
+                                    align="center">vote{getTotalVotes(options) !== 1 && "s"}</Typography>
                     </div>
                 </div>
             </div>
