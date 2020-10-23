@@ -61,7 +61,7 @@ function QuestionCategory(props) {
     let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer livestream={ props.livestream } questions={props.upcomingQuestions} question={ question } user={authenticatedUser} userData={userData}/>
+                <QuestionContainer appear={props.selectedState === 'questions'} livestream={ props.livestream } questions={props.upcomingQuestions} question={ question } user={authenticatedUser} userData={userData}/>
             </div>       
         );
     });
@@ -69,7 +69,7 @@ function QuestionCategory(props) {
     let pastQuestionsElements = pastQuestions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer livestream={ props.livestream } questions={props.pastQuestions} question={ question } user={authenticatedUser} userData={userData}/>
+                <QuestionContainer appear={props.selectedState === 'questions'} livestream={ props.livestream } questions={props.pastQuestions} question={ question } user={authenticatedUser} userData={userData}/>
             </div>       
         );
     });

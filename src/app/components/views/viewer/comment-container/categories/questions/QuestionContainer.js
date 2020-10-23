@@ -1,17 +1,19 @@
 import React, {useState, useEffect, useContext} from 'react';
 import {Input, Icon, Button, Label} from "semantic-ui-react";
+import Slide from '@material-ui/core/Slide';
+
 import Linkify from 'react-linkify';
 
-import { withFirebase } from 'context/firebase';
+import {withFirebase} from 'context/firebase';
 import UserContext from 'context/user/UserContext';
 
 function QuestionContainer(props) {
-    
+
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
 
-    const { authenticatedUser, userData } = useContext(UserContext);
+    const {authenticatedUser, userData} = useContext(UserContext);
 
     useEffect(() => {
         if (props.livestream.id, props.question.id) {
@@ -47,9 +49,9 @@ function QuestionContainer(props) {
     }
 
     function addNewCommentOnEnter(target) {
-        if(target.charCode==13){
-            addNewComment();   
-        } 
+        if (target.charCode == 13) {
+            addNewComment();
+        }
     }
 
     function upvoteLivestreamQuestion() {
@@ -59,22 +61,22 @@ function QuestionContainer(props) {
 
     const componentDecorator = (href, text, key) => (
         <a href={href} key={key} target="_blank">
-          {text}
+            {text}
         </a>
-      );
+    );
 
-    
+
     let commentsElements = comments.map((comment, index) => {
         return (
             <div className='animated fadeInUp faster' key={comment.id}>
                 <div className='questionContainer'>
                     <div className='questionTitle'>
                         <Linkify componentDecorator={componentDecorator}>
-                            { comment.title }
+                            {comment.title}
                         </Linkify>
                     </div>
                     <div className='questionAuthor'>
-                        @{ comment.author }
+                        @{comment.author}
                     </div>
                 </div>
                 <style jsx>{`
@@ -113,7 +115,8 @@ function QuestionContainer(props) {
 
         return (
             <div className='reactions-toggle' onClick={() => setShowAllReactions(!showAllReactions)}>
-                <Icon name={ showAllReactions ? 'angle up' : 'angle down'} style={{ marginRight: '3px'}}/>{ showAllReactions ? 'Hide' : 'Show all reactions'}
+                <Icon name={showAllReactions ? 'angle up' : 'angle down'} style={{marginRight: '3px'}}/>
+                {showAllReactions ? 'Hide' : 'Show all reactions'}
                 <style jsx>{`
                     .reactions-toggle {
                         margin: 5px 0 0 0;
@@ -126,28 +129,33 @@ function QuestionContainer(props) {
                 `}</style>
             </div>
         )
-    } 
+    }
 
     return (
-        <div className='animated fadeInUp faster'>
-                <div className={'questionContainer ' + (props.question.type === 'current' ? 'active' : '') }>
+        <Slide in={props.appear} mountOnEnter unmountOnExit direction="right">
+            <div className='animated fadeInUp faster'>
+                <div className={'questionContainer ' + (props.question.type === 'current' ? 'active' : '')}>
                     <div className='questionTitle'>
-                        { props.question.title }
+                        {props.question.title}
                     </div>
                     <div className='bottom-element'>
                         <div className='comments'>
-                            <p className='comments-number'>{ comments.length } reactions</p>
+                            <p className='comments-number'>{comments.length} reactions</p>
                         </div>
                     </div>
                     <div>
-                        { commentsElements }
+                        {commentsElements}
                     </div>
                     <ReactionsToggle/>
                     <div className='comment-input'>
                         <Input
-                            icon={<Icon name='chevron circle right' inverted circular link onClick={() => addNewComment()} disabled={newCommentTitle.length < 4} color='teal'/>}
+                            icon={<Icon name='chevron circle right' inverted circular link
+                                        onClick={() => addNewComment()} disabled={newCommentTitle.length < 4}
+                                        color='teal'/>}
                             value={newCommentTitle}
-                            onChange={(event) => {setNewCommentTitle(event.target.value)}}
+                            onChange={(event) => {
+                                setNewCommentTitle(event.target.value)
+                            }}
                             onKeyPress={addNewCommentOnEnter}
                             maxLength='340'
                             placeholder='Send a reaction...'
@@ -155,17 +163,17 @@ function QuestionContainer(props) {
                         />
                     </div>
                     <div className='upvotes'>
-                        { props.question.votes } <Icon name='thumbs up' size='small'/>
+                        {props.question.votes} <Icon name='thumbs up' size='small'/>
                     </div>
                 </div>
-                <Button 
+                <Button
                     attached='bottom'
-                    icon='thumbs up' 
-                    content={ !props.livestream.test && (props.question.emailOfVoters && props.user && props.question.emailOfVoters.indexOf(props.user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'} 
-                    size='small' 
-                    primary 
-                    onClick={() => upvoteLivestreamQuestion()} 
-                    style={{ margin: '0 10px 10px 10px' }} 
+                    icon='thumbs up'
+                    content={!props.livestream.test && (props.question.emailOfVoters && props.user && props.question.emailOfVoters.indexOf(props.user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
+                    size='small'
+                    primary
+                    onClick={() => upvoteLivestreamQuestion()}
+                    style={{margin: '0 10px 10px 10px'}}
                     disabled={(props.question.type !== 'new' || (!props.user && !props.livestream.test) || (props.question.emailOfVoters ? props.question.emailOfVoters.indexOf(props.livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false))}/>
                 <style jsx>{`
                     .questionContainer {
@@ -259,6 +267,7 @@ function QuestionContainer(props) {
                     }
                 `}</style>
             </div>
+        </Slide>
     );
 }
 
