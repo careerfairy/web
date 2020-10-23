@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useContext} from 'react';
 import {Input, Icon, Header, Modal} from "semantic-ui-react";
 import UserContext from 'context/user/UserContext';
-import {Button, Typography} from "@material-ui/core";
+import {Button, fade, Typography} from "@material-ui/core";
 import QuestionContainer from './questions/QuestionContainer';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -11,6 +11,11 @@ import {TextField, Collapse} from "@material-ui/core";
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {withFirebase} from 'context/firebase';
 import AddIcon from '@material-ui/icons/Add';
+import IconButton from "@material-ui/core/IconButton";
+import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
+import {grey} from "@material-ui/core/colors";
+
+
 
 function QuestionCategory(props) {
     const [showNextQuestions, setShowNextQuestions] = useState(true);
@@ -94,6 +99,8 @@ function QuestionCategory(props) {
         );
     });
 
+
+
     return (
         <div style={{display: (props.selectedState !== 'questions' ? 'none' : 'block')}}>
             <div className='questionToggle'>
@@ -122,14 +129,15 @@ function QuestionCategory(props) {
                     {pastQuestionsElements}
                 </div>
             </div>
-            <Dialog PaperProps={{style:{background: "transparent", boxShadow: "none"}}} fullWidth onClose={handleClose} open={showQuestionModal} basic size='small'>
+            <Dialog PaperProps={{style: {background: "transparent", boxShadow: "none"}}} fullWidth onClose={handleClose}
+                    open={showQuestionModal} basic size='small'>
                 <DialogTitle style={{color: "white"}}>
                     Add a Question
                 </DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
-                        InputProps={{style:{background: "white"}}}
+                        InputProps={{style: {background: "white"}}}
                         error={Boolean(touched && newQuestionTitle.length < 5)}
                         onBlur={() => setTouched(true)}
                         variant="outlined" value={newQuestionTitle} placeholder='Your question goes here'
