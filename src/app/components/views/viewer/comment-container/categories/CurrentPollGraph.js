@@ -44,8 +44,10 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, 
         }, [options])
 
         useEffect(() => {
-            setChartHeight(chartRef.current.chartInstance.height)
-            setLegendElements(chartRef.current.chartInstance.legend.legendItems)
+            if (chartRef.current) {
+                setChartHeight(chartRef.current.chartInstance.height)
+                setLegendElements(chartRef.current.chartInstance.legend.legendItems)
+            }
 
         }, [chartRef.current])
 

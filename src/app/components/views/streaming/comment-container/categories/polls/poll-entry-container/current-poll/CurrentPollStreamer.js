@@ -2,6 +2,7 @@ import React, {useState, useEffect, Fragment} from 'react';
 import {Input, Icon, Button, Dropdown} from "semantic-ui-react";
 import { withFirebase } from 'context/firebase';
 import PollOptionResultViewer from './PollOptionResultViewer';
+import CurrentPollGraph from "../../../../../../viewer/comment-container/categories/CurrentPollGraph";
 
 
 function CurrentPollStreamer(props) {
@@ -20,16 +21,15 @@ function CurrentPollStreamer(props) {
             </Fragment>
         );
     });
+    console.log("-> props.poll", props.poll);
 
     return (
         <Fragment>
             <div className='animated fadeInUp faster'>
                 <div className='chat-entry-container'>
                     <div className='poll-label'>ACTIVE POLL</div>
-                    <div className='poll-entry-message'>
-                        { props.poll.question }
-                    </div>
-                    { optionElements }
+                    <CurrentPollGraph
+                    currentPoll={props.poll}/>
                 </div>           
                 <Button attached='bottom' content={ 'Close Poll' } primary onClick={() => setPollState('closed') } style={{ margin: '0 10px 10px 10px', border: 'none' }}/>
             </div>   
