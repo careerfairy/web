@@ -1,21 +1,36 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {Input, Icon, Button, Header, Modal} from "semantic-ui-react";
+import {Input, Icon, Header, Modal} from "semantic-ui-react";
 import UserContext from 'context/user/UserContext';
-
+import {Button, Typography} from "@material-ui/core";
 import QuestionContainer from './questions/QuestionContainer';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import {TextField, Collapse} from "@material-ui/core";
 
-import { withFirebase } from 'context/firebase';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import {withFirebase} from 'context/firebase';
+import AddIcon from '@material-ui/icons/Add';
 
 function QuestionCategory(props) {
     const [showNextQuestions, setShowNextQuestions] = useState(true);
     const [showQuestionModal, setShowQuestionModal] = useState(false);
+    const [touched, setTouched] = useState(false);
 
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [pastQuestions, setPastQuestions] = useState([]);
 
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
 
-    const { authenticatedUser, userData } = useContext(UserContext);
+    const {authenticatedUser, userData} = useContext(UserContext);
+    const handleOpen = () => {
+        setTouched(false)
+        setShowQuestionModal(true)
+    }
+    const handleClose = () => {
+        setTouched(false)
+        setShowQuestionModal(false)
+    }
 
     useEffect(() => {
         if (props.livestream.id) {
@@ -39,7 +54,8 @@ function QuestionCategory(props) {
     }, [props.livestream.id]);
 
     function addNewQuestion() {
-        if ( (!userData && !props.livestream.test) || !(newQuestionTitle.trim()) || newQuestionTitle.trim().length < 5) {
+        setTouched(true)
+        if ((!userData && !props.livestream.test) || !(newQuestionTitle.trim()) || newQuestionTitle.trim().length < 5) {
             return;
         }
 
@@ -52,66 +68,90 @@ function QuestionCategory(props) {
         props.firebase.putLivestreamQuestion(props.livestream.id, newQuestion)
             .then(() => {
                 setNewQuestionTitle("");
-                setShowQuestionModal(false);
+                handleClose()
             }, () => {
                 console.log("Error");
-        })
+            })
     }
 
     let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer appear={props.selectedState === 'questions'} livestream={ props.livestream } questions={props.upcomingQuestions} question={ question } user={authenticatedUser} userData={userData}/>
-            </div>       
+                <QuestionContainer appear={props.selectedState === 'questions'} livestream={props.livestream}
+                                   questions={props.upcomingQuestions} question={question} user={authenticatedUser}
+                                   userData={userData}/>
+            </div>
         );
     });
 
     let pastQuestionsElements = pastQuestions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer appear={props.selectedState === 'questions'} livestream={ props.livestream } questions={props.pastQuestions} question={ question } user={authenticatedUser} userData={userData}/>
-            </div>       
+                <QuestionContainer appear={props.selectedState === 'questions'} livestream={props.livestream}
+                                   questions={props.pastQuestions} question={question} user={authenticatedUser}
+                                   userData={userData}/>
+            </div>
         );
     });
 
     return (
-        <div style={{ display: (props.selectedState !== 'questions' ? 'none' : 'block')}}>
+        <div style={{display: (props.selectedState !== 'questions' ? 'none' : 'block')}}>
             <div className='questionToggle'>
                 <div className='questionToggleTitle'>
                     Questions
                 </div>
-                <Button content='Add a Question' icon='add' style={{ position: 'absolute', top: '45px', left: '50%', transform: 'translateX(-50%)'}} primary onClick={() => setShowQuestionModal(true)}/> 
+                <Button variant="contained" children='Add a Question' endIcon={<AddIcon fontSize="large"/>}
+                        style={{position: 'absolute', top: '45px', left: '50%', transform: 'translateX(-50%)'}}
+                        color="primary" onClick={handleOpen}/>
                 <div className='questionToggleSwitches'>
-                    <div className={'questionToggleSwitch ' + (showNextQuestions ? 'active'  : '')} onClick={() => setShowNextQuestions(true)}>
-                        Upcoming [{ upcomingQuestionsElements.length }]
+                    <div className={'questionToggleSwitch ' + (showNextQuestions ? 'active' : '')}
+                         onClick={() => setShowNextQuestions(true)}>
+                        Upcoming [{upcomingQuestionsElements.length}]
                     </div>
-                    <div className={'questionToggleSwitch ' + (showNextQuestions ? ''  : 'active')} onClick={() => setShowNextQuestions(false)}>
-                        Answered [{ pastQuestionsElements.length }]
+                    <div className={'questionToggleSwitch ' + (showNextQuestions ? '' : 'active')}
+                         onClick={() => setShowNextQuestions(false)}>
+                        Answered [{pastQuestionsElements.length}]
                     </div>
                 </div>
             </div>
             <div className='chat-container'>
-                <div className={'chat-scrollable ' + (showNextQuestions ? ''  : 'hidden')}>
-                    { upcomingQuestionsElements }
+                <div className={'chat-scrollable ' + (showNextQuestions ? '' : 'hidden')}>
+                    {upcomingQuestionsElements}
                 </div>
-                <div className={'chat-scrollable ' + (showNextQuestions ? 'hidden'  : '')}>
-                    { pastQuestionsElements }
+                <div className={'chat-scrollable ' + (showNextQuestions ? 'hidden' : '')}>
+                    {pastQuestionsElements}
                 </div>
             </div>
-            <Modal open={showQuestionModal} basic size='small'>
-                <Header content='Add a Question'/>
-                <Modal.Content>
-                    <Input type='text' size='huge' value={newQuestionTitle} onChange={(event, element) => {setNewQuestionTitle(element.value)}} placeholder='Your question goes here' fluid />
-                </Modal.Content>
-                <Modal.Actions>
-                    <Button primary size='large' onClick={() => addNewQuestion()}>
+            <Dialog PaperProps={{style:{background: "transparent", boxShadow: "none"}}} fullWidth onClose={handleClose} open={showQuestionModal} basic size='small'>
+                <DialogTitle style={{color: "white"}}>
+                    Add a Question
+                </DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        InputProps={{style:{background: "white"}}}
+                        error={Boolean(touched && newQuestionTitle.length < 5)}
+                        onBlur={() => setTouched(true)}
+                        variant="outlined" value={newQuestionTitle} placeholder='Your question goes here'
+                        onChange={({currentTarget: {value}}, element) => {
+                            setNewQuestionTitle(value)
+                        }} fullWidth/>
+                    <Collapse in={Boolean(touched && newQuestionTitle.length < 4)}>
+                        <Typography style={{paddingLeft: "1rem"}} color="error">
+                            Needs to be at least 5 characters
+                        </Typography>
+                    </Collapse>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="contained" color="primary" size='large'
+                            onClick={() => addNewQuestion()}>
                         Submit
                     </Button>
-                    <Button size='large' onClick={() => setShowQuestionModal(false)}>
+                    <Button variant="contained" size='large' onClick={handleClose}>
                         Cancel
                     </Button>
-                </Modal.Actions>
-            </Modal>
+                </DialogActions>
+            </Dialog>
             <style jsx>{`
 
                 .questionToggle {
@@ -148,16 +188,6 @@ function QuestionCategory(props) {
                     color: rgb(120,120,120);
                     background-color: rgb(240,240,240);
                     cursor: pointer;
-                }
-
-                .questionButton {
-                    position: absolute;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    width: 100%;
-                    height: 42px;
-                    box-shadow: 0 -4px 2px -2px rgb(200,200,200);
                 }
 
                 .questionToggleSwitch.active {
