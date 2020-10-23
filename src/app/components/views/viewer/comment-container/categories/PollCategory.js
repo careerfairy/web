@@ -96,7 +96,7 @@ function PollCategory({firebase, selectedState, livestream, setSelectedState, se
             );
         } else {
             return selectedState === 'polls' &&
-                <CurrentPollGraph
+                <CurrentPollGraph background="rgb(240,240,240)"
                     currentPoll={currentPoll}/>
         }
     } else {

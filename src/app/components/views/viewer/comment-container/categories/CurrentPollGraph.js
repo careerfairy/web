@@ -16,10 +16,9 @@ const baseColors = [
     '#B7950B',
 ]
 
-const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, selectedState}) => {
+const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, background}) => {
         const theme = useTheme()
         const chartRef = useRef()
-        const [chartHeight, setChartHeight] = useState(0)
         const [legendElements, setLegendElements] = useState([])
         const [legendLabels, setLegendLabels] = useState([])
         const [chartData, setChartData] = useState({
@@ -45,7 +44,6 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, 
 
         useEffect(() => {
             if (chartRef.current) {
-                setChartHeight(chartRef.current.chartInstance.height)
                 setLegendElements(chartRef.current.chartInstance.legend.legendItems)
             }
 
@@ -106,7 +104,7 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, 
 
         return (
             <div style={{
-                background: "rgb(240, 240, 240)",
+                background: background,
                 padding: 12,
                 height: "100%",
                 overflowY: "auto",
@@ -144,15 +142,19 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, 
                         options={optionsObj}/>
                     <div style={{
                         position: "absolute",
-                        top: chartHeight / 2,
-                        right: chartHeight / 2,
+                        top: "50%",
+                        right: "50%",
                         borderRadius: "50%",
                         zIndex: 1,
                         transform: "translateY(-50%) translateX(50%)"
                     }}>
-                        <Typography variant="h1" style={{fontWeight: 500, fontSize: "4.2rem", lineHeight: 0.6,}}
+                        <Typography variant="h2" style={{fontWeight: 500,
+                            // fontSize: "4.2rem",
+                            lineHeight: 0.6,}}
                                     align="center">{getTotalVotes(options)}</Typography>
-                        <Typography variant="subtitle2" style={{fontSize: "2rem"}}
+                        <Typography variant="h6" style={{
+                            // fontSize: "2rem"
+                        }}
                                     align="center">vote{getTotalVotes(options) !== 1 && "s"}</Typography>
                     </div>
                 </div>

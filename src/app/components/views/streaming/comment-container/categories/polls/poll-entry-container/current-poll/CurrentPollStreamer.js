@@ -1,38 +1,46 @@
 import React, {useState, useEffect, Fragment} from 'react';
 import {Input, Icon, Button, Dropdown} from "semantic-ui-react";
-import { withFirebase } from 'context/firebase';
+import {withFirebase} from 'context/firebase';
 import PollOptionResultViewer from './PollOptionResultViewer';
 import CurrentPollGraph from "../../../../../../viewer/comment-container/categories/CurrentPollGraph";
 
 
 function CurrentPollStreamer(props) {
+    const [currentPoll, setCurrentPoll] = useState(null)
+    console.log("-> props", props);
+
+    useEffect(() => {
+        if (props.poll) {
+            setCurrentPoll(props.poll)
+        }
+    }, [props.poll])
 
     function setPollState(state) {
         props.firebase.setPollState(props.livestream.id, props.poll.id, state);
     }
 
     let totalVotes = 0;
-    props.poll.options.forEach( option => totalVotes += option.votes );
-    
+    props.poll.options.forEach(option => totalVotes += option.votes);
+
     const optionElements = props.poll.options.map((option, index) => {
         return (
             <Fragment key={index}>
-                <PollOptionResultViewer option={option} index={index} totalVotes={totalVotes} />
+                <PollOptionResultViewer option={option} index={index} totalVotes={totalVotes}/>
             </Fragment>
         );
     });
-    console.log("-> props.poll", props.poll);
 
     return (
         <Fragment>
-            <div className='animated fadeInUp faster'>
+            <div>
                 <div className='chat-entry-container'>
                     <div className='poll-label'>ACTIVE POLL</div>
-                    <CurrentPollGraph
-                    currentPoll={props.poll}/>
-                </div>           
-                <Button attached='bottom' content={ 'Close Poll' } primary onClick={() => setPollState('closed') } style={{ margin: '0 10px 10px 10px', border: 'none' }}/>
-            </div>   
+                    {currentPoll && <CurrentPollGraph background="transparent"
+                        currentPoll={currentPoll}/>}
+                </div>
+                <Button attached='bottom' content={'Close Poll'} primary onClick={() => setPollState('closed')}
+                        style={{margin: '0 10px 10px 10px', border: 'none'}}/>
+            </div>
             <style jsx>{`
                 .chat-entry-container {
                     border-top-left-radius: 5px;
@@ -79,7 +87,7 @@ function CurrentPollStreamer(props) {
                 }
             `}</style>
         </Fragment>
-    );    
+    );
 }
 
 export default withFirebase(CurrentPollStreamer);
