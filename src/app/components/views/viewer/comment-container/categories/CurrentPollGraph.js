@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Doughnut} from "react-chartjs-2";
-import {Box, Checkbox, List, ListItem, Typography, useTheme} from "@material-ui/core";
+import {Checkbox, List, ListItem, Typography, useTheme} from "@material-ui/core";
 import 'chartjs-plugin-labels'
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -16,7 +16,7 @@ const baseColors = [
     '#B7950B',
 ]
 
-const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, background}) => {
+const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
         const theme = useTheme()
         const chartRef = useRef()
         const [legendElements, setLegendElements] = useState([])
@@ -148,14 +148,9 @@ const CurrentPollGraph = ({currentPoll: {options, question, timestamp, voters}, 
                         zIndex: 1,
                         transform: "translateY(-50%) translateX(50%)"
                     }}>
-                        <Typography variant="h2" style={{fontWeight: 500,
-                            // fontSize: "4.2rem",
-                            lineHeight: 0.6,}}
+                        <Typography variant="h2" style={{fontWeight: 500, lineHeight: 0.6}}
                                     align="center">{getTotalVotes(options)}</Typography>
-                        <Typography variant="h6" style={{
-                            // fontSize: "2rem"
-                        }}
-                                    align="center">vote{getTotalVotes(options) !== 1 && "s"}</Typography>
+                        <Typography variant="h6" align="center">vote{getTotalVotes(options) !== 1 && "s"}</Typography>
                     </div>
                 </div>
             </div>
