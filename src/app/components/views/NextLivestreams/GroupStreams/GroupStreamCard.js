@@ -14,6 +14,7 @@ import LogoElement from "./LogoElement";
 import {LazyLoadComponent} from "react-lazy-load-image-component";
 import TargetOptions from "../GroupsCarousel/TargetOptions";
 import GroupJoinToAttendModal from './GroupJoinToAttendModal';
+import DataAccessUtil from 'util/DataAccessUtil';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -235,20 +236,8 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
         router.push(route);
     }
 
-    function sendEmailRegistrationConfirmation() {
-        return axios({
-            method: 'post',
-            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendLivestreamRegistrationConfirmationEmail',
-            data: {
-                recipientEmail: user.email,
-                user_first_name: userData.firstName,
-                livestream_date: DateUtil.getPrettyDate(livestream.start.toDate()),
-                company_name: livestream.company,
-                company_logo_url: livestream.companyLogoUrl,
-                livestream_title: livestream.title,
-                livestream_link: ('https://careerfairy.io/upcoming-livestream/' + livestream.id)
-            }
-        });
+    function sendEmailRegistrationConfirmation() {    
+        return DataAccessUtil.sendRegistrationConfirmationEmail(user, userData, livestream);
     }
 
     const checkIfUserFollows = (careerCenter) => {
