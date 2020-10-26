@@ -68,7 +68,7 @@ function LivestreamCard(props) {
     }
 
     function sendEmailRegistrationConfirmation() {    
-        return DataAccessUtil.sendRegistrationConfirmationEmail(props.user, props.userData, props.livestream);}
+        return DataAccessUtil.sendRegistrationConfirmationEmail(props.user, props.userData, props.livestream);
     }
 
     let logoElements = props.careerCenters.map( (careerCenter, index) => {
