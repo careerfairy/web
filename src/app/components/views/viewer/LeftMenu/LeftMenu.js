@@ -95,7 +95,11 @@ const LeftMenu =
             if (!showMenu) {
                 setShowMenu(true);
             }
-            setSelectedState(state);
+            if (!disableSwitching) {
+                setSelectedState(state);
+            } else {
+                setSelectedState("polls")
+            }
         }
 
         const handleChange = (event, newValue) => {

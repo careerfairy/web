@@ -96,11 +96,9 @@ function PollCategory({firebase, selectedState, livestream, setSelectedState, di
                 </>
             );
         } else {
-            return <div className='handraise-container'>
-                <h1>sadad</h1>
-                <CurrentPollGraph background="rgb(240,240,240)"
+            return <CurrentPollGraph background="rgb(240,240,240)"
                                   currentPoll={currentPoll}/>
-            </div>
+
         }
     } else {
         return (
