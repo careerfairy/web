@@ -21,18 +21,15 @@ function HandRaisePriorRequest(props) {
             </div>  
             <style jsx>{`
                 .handraise-container {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
                     width: 100%;
                     height: 100%;
                     background-color: rgb(240,240,240);
                 }
 
                 .central-container {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
                     transform: translate(-50%,-50%);
                     text-align: center;
                     width: 90%;
