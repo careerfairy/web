@@ -7,7 +7,7 @@ import {useRouter} from 'next/router';
 import {withFirebasePage} from '../../../context/firebase';
 import ViewerHandRaiseComponent from 'components/views/viewer/viewer-hand-raise-component/ViewerHandRaiseComponent';
 import ViewerComponent from 'components/views/viewer/viewer-component/ViewerComponent';
-import NewCommentContainer from 'components/views/viewer/comment-container/NewCommentContainer';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import UserContext from 'context/user/UserContext';
 import MiniChatContainer from 'components/views/streaming/comment-container/categories/chat/MiniChatContainer';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
@@ -16,7 +16,7 @@ import React from 'react';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import {Fab, ClickAwayListener, Box, fade} from "@material-ui/core";
-import {amber, deepOrange, red} from "@material-ui/core/colors";
+import {amber, deepOrange, green, red} from "@material-ui/core/colors";
 import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
 
 const useStyles = makeStyles((theme) => ({
@@ -142,7 +142,19 @@ const useStyles = makeStyles((theme) => ({
         left: 0,
         bottom: 0,
         zIndex: 20
-    }
+    },
+    wrapper: {
+        position: 'relative',
+    },
+    fabProgress: {
+        color: green[500],
+        position: 'absolute',
+        zIndex: 1,
+        top: 0,
+        left: 0,
+        height: "36px !important",
+        width: "36px !important"
+    },
 
 }));
 
@@ -170,6 +182,8 @@ function ViewerPage({firebase}) {
     const classes = useStyles({handRaiseActive, showMenu, mobile: width < 768});
     const [open, setOpen] = React.useState(true);
     const [delayHandler, setDelayHandler] = useState(null)
+      const [progress, setProgress] = useState(10);
+
 
     const handleOpen = () => {
         setOpen(true);
@@ -257,10 +271,16 @@ function ViewerPage({firebase}) {
 
     useEffect(() => {
         if (iconsDisabled) {
-            let timeout = setTimeout(() => {
+            const timer = setInterval(() => {
+                setProgress((prevProgress) => (prevProgress >= 100 ? 10 : prevProgress + 10));
+            }, DELAY/10);
+            const timeout = setTimeout(() => {
                 setIconsDisabled(false);
-            }, 3000);
-            return () => clearTimeout(timeout);
+            }, DELAY);
+            return () => {
+                clearTimeout(timeout)
+                clearTimeout(timer)
+            };
         }
     }, [iconsDisabled]);
 
@@ -366,19 +386,28 @@ function ViewerPage({firebase}) {
                 <ClickAwayListener onClickAway={handleClose}>
                     <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className={classes.actionArea}>
                         <Box className={classes.miniButtons} classes={{root: open ? classes.cardHovered : ""}}>
-                            <Fab onClick={handleLike} disabled={iconsDisabled} className={classes.miniLike}
-                                 aria-label="like">
-                                <ThumbUpAltOutlinedIcon fontSize="inherit"/>
-                            </Fab>
-                            <Fab onClick={handleClap} disabled={iconsDisabled} className={classes.miniClap}
-                                 aria-label="clap">
-                                <img alt="clap button" style={{width: 15}} src='/clapping.png'
-                                     className={classes.image}/>
-                            </Fab>
-                            <Fab onClick={handleHeart} disabled={iconsDisabled} className={classes.miniHeart}
-                                 aria-label="heart">
-                                <FavoriteBorderOutlinedIcon fontSize="inherit"/>
-                            </Fab>
+                            <div className={classes.wrapper}>
+                                <Fab onClick={handleLike} disabled={iconsDisabled} className={classes.miniLike}
+                                     aria-label="like">
+                                    <ThumbUpAltOutlinedIcon fontSize="inherit"/>
+                                </Fab>
+                                {iconsDisabled && <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
+                            </div>
+                            <div className={classes.wrapper}>
+                                <Fab onClick={handleClap} disabled={iconsDisabled} className={classes.miniClap}
+                                     aria-label="clap">
+                                    <img alt="clap button" style={{width: 15}} src='/clapping.png'
+                                         className={classes.image}/>
+                                </Fab>
+                                {iconsDisabled && <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
+                            </div>
+                            <div className={classes.wrapper}>
+                                <Fab onClick={handleHeart} disabled={iconsDisabled} className={classes.miniHeart}
+                                     aria-label="heart">
+                                    <FavoriteBorderOutlinedIcon fontSize="inherit"/>
+                                </Fab>
+                                {iconsDisabled && <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
+                            </div>
                         </Box>
                     </div>
                 </ClickAwayListener>

@@ -11,7 +11,6 @@ import UserContext from 'context/user/UserContext';
 import HandRaiseInactive from './hand-raise/inactive/HandRaiseInactive';
 
 function HandRaiseCategory(props) {
-    console.log("-> !props.livestream.handRaiseActive", !props.livestream.handRaiseActive);
 
     if (!props.livestream.handRaiseActive) {
         return <HandRaiseInactive selectedState={props.selectedState}/>;

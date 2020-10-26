@@ -29,12 +29,6 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-function a11yProps(index) {
-    return {
-        id: `full-width-tab-${index}`,
-        'aria-controls': `full-width-tabpanel-${index}`,
-    };
-}
 
 function TabPanel({children, value, index, ...other}) {
 
@@ -56,7 +50,7 @@ function TabPanel({children, value, index, ...other}) {
     );
 }
 
-const states = ["questions", "polls", "chat", "hand"]
+const states = ["questions", "polls", "hand", "chat"]
 const LeftMenu =
     ({
          handRaiseActive,
@@ -76,20 +70,25 @@ const LeftMenu =
         const [value, setValue] = useState(0);
         const [selectedState, setSelectedState] = useState("questions");
         const [disableSwitching, setDisableSwitching] = useState(false)
-        console.log("-> selectedValue", value);
-        console.log("-> selectedState", selectedState);
 
         useEffect(() => {
             if (!disableSwitching && selectedState === "questions") {
                 setValue(0)
             } else if (selectedState === "polls") {
                 setValue(1)
-            } else if (!disableSwitching && selectedState === "chat") {
-                setValue(2)
             } else if (!disableSwitching && selectedState === "hand") {
+                setValue(2)
+            } else if (!disableSwitching && selectedState === "chat") {
                 setValue(3)
             }
-        }, [selectedState, disableSwitching])
+        }, [selectedState, disableSwitching, showMenu, isMobile])
+
+        useEffect(() => {
+            if (!disableSwitching && selectedState === "chat" && showMenu && !isMobile) {
+                setSelectedState("questions")
+                setValue(0)
+            }
+        }, [selectedState, disableSwitching, showMenu, isMobile])
 
         function handleStateChange(state) {
             if (!showMenu) {
@@ -119,15 +118,18 @@ const LeftMenu =
                               streamer={streamer} user={user} userData={userData}/>
             </TabPanel>,
             <TabPanel key={2} value={value} index={2} dir={theme.direction}>
-                <ChatCategory livestream={livestream} selectedState={selectedState} user={user}
-                              userData={userData} isStreamer={false}/>
-            </TabPanel>,
-            <TabPanel key={3} value={value} index={3} dir={theme.direction}>
                 <HandRaiseCategory livestream={livestream} selectedState={selectedState} user={user}
                                    userData={userData} handRaiseActive={handRaiseActive}
                                    setHandRaiseActive={setHandRaiseActive}/>
             </TabPanel>
         ]
+
+        if (showMenu && isMobile) {
+            views.push(<TabPanel key={3} value={value} index={3} dir={theme.direction}>
+                <ChatCategory livestream={livestream} selectedState={selectedState} user={user}
+                              userData={userData} isStreamer={false}/>
+            </TabPanel>)
+        }
 
 
         return (
