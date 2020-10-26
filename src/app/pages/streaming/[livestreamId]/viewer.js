@@ -17,6 +17,7 @@ import {makeStyles, useTheme} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import {Fab, ClickAwayListener, Box, fade} from "@material-ui/core";
 import {amber, deepOrange, red} from "@material-ui/core/colors";
+import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -131,6 +132,14 @@ const useStyles = makeStyles((theme) => ({
         height: "100%",
         width: "100%",
         touchAction: "manipulation"
+    },
+    menuLeft: {
+        position: "absolute",
+        width: ({mobile}) => mobile ? "100%" : 280,
+        top: ({mobile}) => mobile ? 0 : 55,
+        left: 0,
+        bottom: 0,
+        zIndex: 20
     }
 
 }));
@@ -152,8 +161,10 @@ function ViewerPage({firebase}) {
     const [showVideoButton, setShowVideoButton] = useState({paused: false, muted: false});
     const [unmute, setUnmute] = useState(false);
     const [play, setPlay] = useState(false);
+    const {width, height} = useWindowSize();
 
-    const classes = useStyles({handRaiseActive});
+
+    const classes = useStyles({handRaiseActive, showMenu, mobile: width < 768});
     const [open, setOpen] = React.useState(true);
     const [delayHandler, setDelayHandler] = useState(null)
 
@@ -186,11 +197,13 @@ function ViewerPage({firebase}) {
     const handleHeart = () => {
         postIcon('heart')
     }
+    const toggleShowMenu = () => {
+        setShowMenu(!showMenu)
+    }
 
     const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
 
     const {authenticatedUser, userData} = React.useContext(UserContext);
-    const {width, height} = useWindowSize();
 
     useEffect(() => {
         if (width < 768) {
@@ -367,11 +380,24 @@ function ViewerPage({firebase}) {
                     </div>
                 </ClickAwayListener>
             </div>
-            <div className={'video-menu-left ' + (showMenu ? 'withMenu' : '')}>
-                <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={false}
-                                     livestream={currentLivestream} handRaiseActive={handRaiseActive}
-                                     setHandRaiseActive={setHandRaiseActive} localId/>
-            </div>
+            {/*<div className={'video-menu-left ' + (showMenu ? 'withMenu' : '')}>*/}
+            {/*    <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={false}*/}
+            {/*                         livestream={currentLivestream} handRaiseActive={handRaiseActive}*/}
+            {/*                         setHandRaiseActive={setHandRaiseActive} localId/>*/}
+            {/*</div>*/}
+            {showMenu && <div className={classes.menuLeft}>
+                <LeftMenu
+                    handRaiseActive={handRaiseActive}
+                    setHandRaiseActive={setHandRaiseActive}
+                    streamer={false}
+                    userData={userData}
+                    user={authenticatedUser}
+                    livestream={currentLivestream}
+                    showMenu={showMenu}
+                    setShowMenu={setShowMenu}
+                    isMobile={width < 768}
+                    toggleShowMenu={toggleShowMenu}/>
+            </div>}
             <div className='icons-container'>
                 <IconsContainer livestreamId={currentLivestream.id}/>
             </div>
@@ -504,7 +530,6 @@ function ViewerPage({firebase}) {
                         top: 0;
                         left: 0;
                         width: 0;
-                        bottom 0;
                         z-index: 15;
                     }
 
