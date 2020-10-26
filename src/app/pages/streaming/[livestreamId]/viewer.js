@@ -135,7 +135,9 @@ const useStyles = makeStyles((theme) => ({
     },
     menuLeft: {
         position: "absolute",
-        width: ({mobile}) => mobile ? "100%" : 280,
+        transition: "width 0.3s",
+        transitionTimingFunction: theme.transitions.easeInOut,
+        width: ({showMenu, mobile}) => showMenu ? (mobile ? "100%" : 280) : 0,
         top: ({mobile}) => mobile ? 0 : 55,
         left: 0,
         bottom: 0,
@@ -152,6 +154,7 @@ function ViewerPage({firebase}) {
     const livestreamId = router.query.livestreamId;
 
     const [showMenu, setShowMenu] = useState(false);
+
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
 
@@ -385,7 +388,7 @@ function ViewerPage({firebase}) {
             {/*                         livestream={currentLivestream} handRaiseActive={handRaiseActive}*/}
             {/*                         setHandRaiseActive={setHandRaiseActive} localId/>*/}
             {/*</div>*/}
-            {showMenu && <div className={classes.menuLeft}>
+            {<div className={classes.menuLeft}>
                 <LeftMenu
                     handRaiseActive={handRaiseActive}
                     setHandRaiseActive={setHandRaiseActive}

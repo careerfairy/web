@@ -107,6 +107,7 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
 
     const ROOT_CSS = css({
         height: '100%',
+        zIndex: 9000,
         display: "flex",
         flexDirection: "column",
     });
@@ -118,10 +119,6 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
             </div>
         );
     });
-
-    if (selectedState !== 'chat') {
-        return null;
-    }
 
     const playIcon = (<div>
         <IconButton classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}} disabled={isEmpty}
@@ -163,14 +160,15 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
                     </Collapse>
                 </div>
             </div>
-            <div className='chat-container'>
+            <div>
                 <ScrollToBottom className={ROOT_CSS}>
                     {chatElements}
                 </ScrollToBottom>
             </div>
             <style jsx>{`
                 .questionToggle {
-                    position: relative;
+                    display: flex;
+                    flex-direction: column;
                     box-shadow: 0 4px 2px -2px rgb(200,200,200);
                     z-index: 9000;
                     padding: 10px;
@@ -189,15 +187,6 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
 
                 .hidden {
                     display: none;
-                }
-
-                .chat-container {
-                    position: absolute;
-                    top: 110px;
-                    left: 0;
-                    bottom: 0;
-                    width: 100%;
-                    background-color: rgb(220,220,220);
                 }
 
                 .chat-scrollable {

@@ -1,5 +1,4 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {Input, Icon, Header, Modal} from "semantic-ui-react";
 import UserContext from 'context/user/UserContext';
 import {Button, fade, Typography} from "@material-ui/core";
 import QuestionContainer from './questions/QuestionContainer';
@@ -11,10 +10,6 @@ import {TextField, Collapse} from "@material-ui/core";
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {withFirebase} from 'context/firebase';
 import AddIcon from '@material-ui/icons/Add';
-import IconButton from "@material-ui/core/IconButton";
-import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
-import {grey} from "@material-ui/core/colors";
-
 
 
 function QuestionCategory(props) {
@@ -100,9 +95,8 @@ function QuestionCategory(props) {
     });
 
 
-
     return (
-        <div style={{display: (props.selectedState !== 'questions' ? 'none' : 'block')}}>
+        <>
             <div className='questionToggle'>
                 <div className='questionToggleTitle'>
                     Questions
@@ -214,7 +208,6 @@ function QuestionCategory(props) {
                     left: 0;
                     bottom: 0;
                     width: 100%;
-                    background-color: rgb(220,220,220);
                 }
 
                 @media(max-width: 768px) {
@@ -228,7 +221,7 @@ function QuestionCategory(props) {
                         left: 0;
                         bottom: 0;
                         width: 100%;
-                        overflow-y: scroll;
+                        overflow-y: auto;
                         overflow-x: hidden;
                     }
                 }
@@ -241,7 +234,7 @@ function QuestionCategory(props) {
                     background-color: rgb(130,130,130);
                 }
           `}</style>
-        </div>
+        </>
     );
 }
 

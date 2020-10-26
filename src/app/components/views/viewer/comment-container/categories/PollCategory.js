@@ -5,7 +5,7 @@ import UserContext from 'context/user/UserContext';
 import CurrentPollGraph from "./CurrentPollGraph";
 import {Button, Typography} from "@material-ui/core";
 
-function PollCategory({firebase, selectedState, livestream, setSelectedState, setShowMenu}) {
+function PollCategory({firebase, selectedState, livestream, setSelectedState, disableSwitching, setShowMenu, setDisableSwitching}) {
 
     const {authenticatedUser, userData} = React.useContext(UserContext);
     const [currentPoll, setCurrentPoll] = useState(null);
@@ -32,6 +32,11 @@ function PollCategory({firebase, selectedState, livestream, setSelectedState, se
             setSelectedState("polls");
             setShowMenu(true);
             setCurrenPollId(currentPoll.id);
+            if (!disableSwitching) {
+                setDisableSwitching(true)
+            }
+        } else if (disableSwitching) {
+            setDisableSwitching(false)
         }
     }, [currentPoll]);
 
@@ -56,7 +61,7 @@ function PollCategory({firebase, selectedState, livestream, setSelectedState, se
                 );
             });
             return (
-                <div style={{display: (selectedState !== 'polls' ? 'none' : 'block')}}>
+                <>
                     <div className='handraise-container'>
                         <div className='central-container'>
                             <Typography style={{fontFamily: "Permanent Marker", fontSize: "2.5em"}} variant="h3"
@@ -68,19 +73,15 @@ function PollCategory({firebase, selectedState, livestream, setSelectedState, se
                     </div>
                     <style jsx>{`
                         .handraise-container {
-                            position: absolute;
-                            top: 0;
-                            left: 0;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
                             width: 100%;
                             height: 100%;
-                            background-color: rgb(240,240,240);
                         }
 
                         .central-container {
-                            position: absolute;
-                            top: 50%;
-                            left: 50%;
-                            transform: translate(-50%,-50%);
                             text-align: center;
                             width: 90%;
                             color: rgb(0, 210, 170);
@@ -92,35 +93,31 @@ function PollCategory({firebase, selectedState, livestream, setSelectedState, se
                             margin: 20px 0;
                         }
                 `}</style>
-                </div>
+                </>
             );
         } else {
-            return selectedState === 'polls' &&
+            return <div className='handraise-container'>
+                <h1>sadad</h1>
                 <CurrentPollGraph background="rgb(240,240,240)"
-                    currentPoll={currentPoll}/>
+                                  currentPoll={currentPoll}/>
+            </div>
         }
     } else {
-        return (<div style={{display: (selectedState !== 'polls' ? 'none' : 'block')}}>
-                <div className='handraise-container'>
-                    <div className='central-container'>
-                        <h2>No current poll</h2>
-                    </div>
+        return (
+            <div className='handraise-container'>
+                <div className='central-container'>
+                    <h2>No current poll</h2>
                 </div>
                 <style jsx>{`
                     .handraise-container {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
                         width: 100%;
                         height: 100%;
-                        background-color: rgb(240,240,240);
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
                     }
 
                     .central-container {
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%,-50%);
                         text-align: center;
                         width: 90%;
                         color: grey;

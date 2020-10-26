@@ -1,31 +1,26 @@
 import React, {useState, useEffect, Fragment} from 'react';
-import { Input, Icon, Button, Modal } from 'semantic-ui-react';
+import {Input, Icon, Button, Modal} from 'semantic-ui-react';
 
 function HandRaiseInactive(props) {
 
     return (
-        <div className='animated fadeIn' style={{ display: (props.selectedState !== 'hand' ? 'none' : 'block')}}>
+        <>
             <div className='handraise-container'>
                 <div className='central-container'>
                     <h2>Hand Raise is not active</h2>
                     <p>Please wait for the streamer to activate hand raise and join the stream!.</p>
                 </div>
-            </div>  
+            </div>
             <style jsx>{`
                 .handraise-container {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
                     width: 100%;
                     height: 100%;
-                    background-color: rgb(240,240,240);
                 }
 
                 .central-container {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%,-50%);
                     text-align: center;
                     width: 90%;
                     color: grey;
@@ -40,7 +35,7 @@ function HandRaiseInactive(props) {
                     margin: 20px 0 30px 0;
                 }
           `}</style>
-        </div>
+        </>
     );
 }
 

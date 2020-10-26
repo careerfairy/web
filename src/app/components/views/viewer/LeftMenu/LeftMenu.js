@@ -2,20 +2,23 @@ import React, {Fragment, useEffect, useState} from 'react';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
 import SwipeableViews from "react-swipeable-views";
-import {ButtonComponent} from "../comment-container/ButtonComponent";
 import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
 import {Fab} from "@material-ui/core";
 import ChatCategory from "../../streaming/comment-container/categories/ChatCategory";
 import QuestionCategory from "../comment-container/categories/QuestionCategory";
 import PollCategory from "../comment-container/categories/PollCategory";
 import HandRaiseCategory from "../comment-container/categories/HandRaiseCategory";
+import ButtonComponent from "./ButtonComponent";
 
 
 const useStyles = makeStyles(theme => ({
     root: {
         position: "relative",
         height: "100%",
-        width: "100%",
+        backgroundColor: "rgb(220,220,220)",
+        "& .react-swipeable-view-container": {
+            height: "100%"
+        }
     },
     closeBtn: {
         position: "fixed",
@@ -38,13 +41,14 @@ function TabPanel({children, value, index, ...other}) {
     return (
         <div
             role="tabpanel"
-            hidden={value !== index}
+            // hidden={value !== index}
             id={`full-width-tabpanel-${index}`}
+            style={{height: "100%"}}
             aria-labelledby={`full-width-tab-${index}`}
             {...other}
         >
-            {value === index && (
-                <Box>
+            {(
+                <Box style={{height: "100%"}}>
                     {children}
                 </Box>
             )}
@@ -52,7 +56,7 @@ function TabPanel({children, value, index, ...other}) {
     );
 }
 
-
+const states = ["questions", "polls", "chat", "hand"]
 const LeftMenu =
     ({
          handRaiseActive,
@@ -71,18 +75,21 @@ const LeftMenu =
         const classes = useStyles()
         const [value, setValue] = useState(0);
         const [selectedState, setSelectedState] = useState("questions");
+        const [disableSwitching, setDisableSwitching] = useState(false)
+        console.log("-> selectedValue", value);
+        console.log("-> selectedState", selectedState);
 
         useEffect(() => {
-            if (selectedState === "questions") {
+            if (!disableSwitching && selectedState === "questions") {
                 setValue(0)
             } else if (selectedState === "polls") {
                 setValue(1)
-            } else if (selectedState === "chat") {
+            } else if (!disableSwitching && selectedState === "chat") {
                 setValue(2)
-            } else if (selectedState === "hand") {
+            } else if (!disableSwitching && selectedState === "hand") {
                 setValue(3)
             }
-        }, [selectedState])
+        }, [selectedState, disableSwitching])
 
         function handleStateChange(state) {
             if (!showMenu) {
@@ -92,33 +99,26 @@ const LeftMenu =
         }
 
         const handleChange = (event, newValue) => {
-            setValue(newValue);
-        }
-
-
-        if (!showMenu) {
-            return (
-                <Fragment>
-                    <ButtonComponent isMobile={isMobile} handleStateChange={handleStateChange} {...props}/>
-                </Fragment>
-            );
+            setValue(event);
+            setSelectedState(states[event])
         }
 
         const views = [
-            <TabPanel value={value} index={0} dir={theme.direction}>
+            <TabPanel key={0} value={value} index={0} dir={theme.direction}>
                 <QuestionCategory livestream={livestream} selectedState={selectedState} user={user}
                                   userData={userData}/>
             </TabPanel>,
-            <TabPanel value={value} index={1} dir={theme.direction}>
+            <TabPanel key={1} value={value} index={1} dir={theme.direction}>
                 <PollCategory livestream={livestream} selectedState={selectedState}
+                              setDisableSwitching={setDisableSwitching} disableSwitching={disableSwitching}
                               setSelectedState={setSelectedState} setShowMenu={setShowMenu}
                               streamer={streamer} user={user} userData={userData}/>
             </TabPanel>,
-            <TabPanel value={value} index={2} dir={theme.direction}>
+            <TabPanel key={2} value={value} index={2} dir={theme.direction}>
                 <ChatCategory livestream={livestream} selectedState={selectedState} user={user}
                               userData={userData} isStreamer={false}/>
             </TabPanel>,
-            <TabPanel value={value} index={3} dir={theme.direction}>
+            <TabPanel key={3} value={value} index={3} dir={theme.direction}>
                 <HandRaiseCategory livestream={livestream} selectedState={selectedState} user={user}
                                    userData={userData} handRaiseActive={handRaiseActive}
                                    setHandRaiseActive={setHandRaiseActive}/>
@@ -128,19 +128,21 @@ const LeftMenu =
 
         return (
             <>
-                {isMobile && <Fab size='large' color='secondary' onClick={toggleShowMenu}>
+                {isMobile && showMenu &&
+                <Fab className={classes.closeBtn} size='large' color='secondary' onClick={toggleShowMenu}>
                     <ChevronLeftRoundedIcon/>
                 </Fab>}
                 <SwipeableViews
                     containerStyle={{WebkitOverflowScrolling: 'touch'}}
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                     index={value}
+                    disabled={disableSwitching}
                     className={classes.root}
                     onChangeIndex={handleChange}>
                     {views}
                 </SwipeableViews>
-                <ButtonComponent selectedState={selectedState} handleStateChange={handleStateChange}
-                                 isMobile={isMobile} {...props}/>
+                <ButtonComponent selectedState={selectedState} showMenu={showMenu} isMobile={isMobile}
+                                 handleStateChange={handleStateChange} {...props}/>
             </>
         );
     };
