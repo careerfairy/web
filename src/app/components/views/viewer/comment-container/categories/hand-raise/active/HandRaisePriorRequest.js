@@ -1,5 +1,6 @@
-import React, {useState, useEffect, Fragment} from 'react';
-import { Input, Icon, Button, Modal } from 'semantic-ui-react';
+import React from 'react';
+import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
+import {Button} from "@material-ui/core";
 
 function HandRaisePriorRequest(props) {
 
@@ -12,11 +13,11 @@ function HandRaisePriorRequest(props) {
             <div className='handraise-container'>
                 <div className='central-container'>
                     <div className='animated bounce infinite slow'>
-                        <Icon name='hand point up outline' size='huge' style={{ color: 'rgba(0, 210, 170)'}}/>
+                        <PanToolOutlinedIcon color="primary" style={{fontSize: 40}}/>
                     </div>
                     <h2>Raise your hand and join the stream!</h2>
                     <p>By raising your hand, you can request to join the stream with your computer's audio and video and ask your questions face-to-face.</p>
-                    <Button size='large' icon='hand pointer outline' content='Raise my hand' onClick={() => props.updateHandRaiseRequest("requested")} primary/>
+                    <Button variant="contained" size='large' startIcon={<PanToolOutlinedIcon fontSize="large"/>} children='Raise my hand' onClick={() => props.updateHandRaiseRequest("requested")} color="primary"/>
                 </div>
             </div>  
             <style jsx>{`

@@ -1,5 +1,6 @@
-import React, {useState, useEffect, Fragment} from 'react';
-import { Input, Icon, Button, Modal } from 'semantic-ui-react';
+import React from 'react';
+import {Button} from "@material-ui/core";
+import ClearRoundedIcon from '@material-ui/icons/ClearRounded';
 
 function HandRaiseRequested(props) {
 
@@ -13,7 +14,7 @@ function HandRaiseRequested(props) {
                 <div className='central-container'>
                     <h2 className='animated flash infinite slower'>You raised your&nbsp;hand!</h2>
                     <p>Please wait to be invited to join by the&nbsp;speaker.</p>
-                    <Button size='large' icon='delete' content='Cancel' onClick={() => props.updateHandRaiseRequest("unrequested")} />
+                    <Button size='large' startIcon={<ClearRoundedIcon/>} variant="contained" children='Cancel' onClick={() => props.updateHandRaiseRequest("unrequested")} />
                 </div>
             </div>  
             <style jsx>{`

@@ -1,5 +1,4 @@
-import React, {useState, useEffect, Fragment} from 'react';
-
+import React, {useState, useEffect} from 'react';
 import {withFirebase} from 'context/firebase';
 import HandRaisePriorRequest from './hand-raise/active/HandRaisePriorRequest';
 import HandRaiseRequested from './hand-raise/active/HandRaiseRequested';
@@ -9,9 +8,9 @@ import HandRaiseConnected from './hand-raise/active/HandRaiseConnected';
 import UserContext from 'context/user/UserContext';
 import HandRaiseInactive from './hand-raise/inactive/HandRaiseInactive';
 import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogActions from "@material-ui/core/DialogActions";
-import {Button, useTheme} from "@material-ui/core";
+import {Button, Typography, useTheme} from "@material-ui/core";
+import DialogContent from "@material-ui/core/DialogContent";
 
 function HandRaiseCategory(props) {
     const theme = useTheme()
@@ -65,34 +64,19 @@ function HandRaiseCategory(props) {
             <HandRaiseConnecting handRaiseState={handRaiseState} updateHandRaiseRequest={updateHandRaiseRequest}/>
             <HandRaiseConnected handRaiseState={handRaiseState} updateHandRaiseRequest={updateHandRaiseRequest}/>
             <Dialog open={handRaiseState && handRaiseState.state === "invited"}>
-
-                <DialogTitle style={{
+                <DialogContent >
+                    <Typography align="center" style={{
                     fontFamily: 'Permanent Marker',
                     fontSize: "2em",
                     color: theme.palette.primary.main,
-                    margin: "30px 0 50px 0"
-                }}>You've been invited to join the stream!</DialogTitle>
+                }}>You've been invited to join the stream!</Typography>
+                </DialogContent>
                 <DialogActions>
                     <Button variant="contained" children='Join now' icon='checkmark' size='huge' color="primary"
                             onClick={() => updateHandRaiseRequest('connecting')}/>
                     <Button variant="contained" children='Cancel' size='huge' icon='delete'
                             onClick={() => updateHandRaiseRequest('unrequested')}/>
                 </DialogActions>
-                <style jsx>{`
-                        .main-title {
-                            text-align: center;
-                            font-family: 'Permanent Marker';
-                            font-size: 2em;
-                            color: rgb(0, 210, 170);
-                            margin: 30px 0 50px 0;
-                        }
-
-                        .buttons {
-                            text-align: center;
-                            margin: 20px auto 10px auto;
-                        }
-                    `}</style>
-
             </Dialog>
         </>
     );
