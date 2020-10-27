@@ -2,11 +2,11 @@ import React, {useState, useEffect} from 'react';
 
 import QuestionContainer from './questions/question-container/QuestionContainer';
 
-import { withFirebase } from 'context/firebase';
-import { Icon } from 'semantic-ui-react';
+import {withFirebase} from 'context/firebase';
+import {Icon} from 'semantic-ui-react';
 
 function QuestionCategory(props) {
-    
+
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [pastQuestions, setPastQuestions] = useState([]);
 
@@ -36,44 +36,49 @@ function QuestionCategory(props) {
     let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer livestream={ props.livestream } questions={upcomingQuestions} question={ question } user={props.user} userData={props.userData}/>
-            </div>       
+                <QuestionContainer livestream={props.livestream} questions={upcomingQuestions} question={question}
+                                   user={props.user} userData={props.userData}/>
+            </div>
         );
     });
 
     let pastQuestionsElements = pastQuestions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer livestream={ props.livestream } questions={pastQuestions} question={ question } user={props.user} userData={props.userData}/>
-            </div>       
+                <QuestionContainer livestream={props.livestream} questions={pastQuestions} question={question}
+                                   user={props.user} userData={props.userData}/>
+            </div>
         );
     });
 
     return (
-        <div style={{ display: (props.selectedState !== 'questions' ? 'none' : 'block')}}>
+        <div style={{display: (props.selectedState !== 'questions' ? 'none' : 'block')}}>
             <div className='questionToggle'>
                 <div className='questionToggleTitle'>
                     <Icon name='question circle outline' color='teal'/> Q&A
                 </div>
                 <div className='questionToggleSwitches'>
-                    <div className={'questionToggleSwitch ' + (showNextQuestions ? 'active'  : '')} onClick={() => setShowNextQuestions(true)}>
-                        Upcoming [{ upcomingQuestions.length }]
+                    <div className={'questionToggleSwitch ' + (showNextQuestions ? 'active' : '')}
+                         onClick={() => setShowNextQuestions(true)}>
+                        Upcoming [{upcomingQuestions.length}]
                     </div>
-                    <div className={'questionToggleSwitch ' + (showNextQuestions ? ''  : 'active')} onClick={() => setShowNextQuestions(false)}>
-                        Answered [{ pastQuestions.length }]
+                    <div className={'questionToggleSwitch ' + (showNextQuestions ? '' : 'active')}
+                         onClick={() => setShowNextQuestions(false)}>
+                        Answered [{pastQuestions.length}]
                     </div>
                 </div>
             </div>
             <div className='chat-container'>
-                <div className={'chat-scrollable ' + (showNextQuestions ? ''  : 'hidden')}>
-                    { upcomingQuestionsElements }
+                <div className={'chat-scrollable ' + (showNextQuestions ? '' : 'hidden')}>
+                    {upcomingQuestionsElements}
                 </div>
-                <div className={'chat-scrollable ' + (showNextQuestions ? 'hidden'  : '')}>
-                    { pastQuestionsElements }
+                <div className={'chat-scrollable ' + (showNextQuestions ? 'hidden' : '')}>
+                    {pastQuestionsElements}
                 </div>
             </div>
             <style jsx>{`
                 .questionToggle {
+                    background-color: rgb(255,255,255);
                     position: relative;
                     height: 100px;
                     box-shadow: 0 4px 2px -2px rgb(200,200,200);

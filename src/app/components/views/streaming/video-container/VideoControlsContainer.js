@@ -118,7 +118,7 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
 
     if (!(viewer || joining)) {
         actions.push({
-            icon: <HearingIcon fontSize="large" color={automaticMode ? "primary" : "default"}/>,
+            icon: <HearingIcon fontSize="large" color={automaticMode ? "primary" : "inherit"}/>,
             name: automaticMode ? 'Deactivate automatic speaker Switch' : 'Activate automatic speaker Switch',
             onClick: () => setLivestreamSpeakerSwitchMode(automaticMode ? "manual" : "automatic")
         })
@@ -126,7 +126,7 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
 
     if (!viewer) {
         actions.push({
-            icon: <DynamicFeedIcon fontSize="large" color={presentMode ? "primary" : "default"}/>,
+            icon: <DynamicFeedIcon fontSize="large" color={presentMode ? "primary" : "inherit"}/>,
             name: presentMode ? 'Stop sharing slides' : 'Share slides',
             onClick: () => setLivestreamMode(presentMode ? "default" : "presentation")
         })
@@ -151,7 +151,7 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
                             icon={action.icon}
                             tooltipPlacement="left"
                             tooltipTitle={action.name}
-                            classes={{staticTooltipLabel:  classes.tooltip}}
+                            classes={{staticTooltipLabel: classes.tooltip}}
                             tooltipOpen={Boolean(action.name.length)}
                             FabProps={{
                                 size: "large",

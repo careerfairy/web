@@ -1,16 +1,13 @@
 import React, {useState, useEffect, Fragment, useContext} from 'react';
-import { Input, Icon, Button, Modal } from 'semantic-ui-react';
-import { withFirebase } from 'context/firebase';
+import {Input, Icon, Button, Modal} from 'semantic-ui-react';
+import {withFirebase} from 'context/firebase';
 import HandRaiseElement from './hand-raise-element/HandRaiseElement';
 import NotificationsContext from 'context/notifications/NotificationsContext';
 
 function HandRaiseActive(props) {
 
-    const { setNewNotification, setNotificationToRemove } = useContext(NotificationsContext);
+    const {setNewNotification, setNotificationToRemove} = useContext(NotificationsContext);
 
-    if (!props.livestream.handRaiseActive) {
-        return null;
-    }
 
     const [handRaises, setHandRaises] = useState([]);
 
@@ -26,7 +23,7 @@ function HandRaiseActive(props) {
                 setHandRaises(handRaiseList);
             });
         }
-    },[props.livestream]);
+    }, [props.livestream]);
 
     function setHandRaiseModeInactive() {
         props.firebase.setHandRaiseMode(props.livestream.id, false);
@@ -36,21 +33,28 @@ function HandRaiseActive(props) {
         props.firebase.updateHandRaiseRequest(props.livestream.id, handRaiseId, state);
     }
 
-    let handRaiseElements = handRaises.filter( handRaise => (handRaise.state !== 'unrequested' && handRaise.state !== 'denied')).map( handRaise => {
+    let handRaiseElements = handRaises.filter(handRaise => (handRaise.state !== 'unrequested' && handRaise.state !== 'denied')).map(handRaise => {
         return (
-            <HandRaiseElement request={handRaise} updateHandRaiseRequest={updateHandRaiseRequest} setNewNotification={setNewNotification} setNotificationToRemove={setNotificationToRemove}/>
+            <HandRaiseElement request={handRaise} updateHandRaiseRequest={updateHandRaiseRequest}
+                              setNewNotification={setNewNotification}
+                              setNotificationToRemove={setNotificationToRemove}/>
         );
     })
 
+    if (!props.livestream.handRaiseActive) {
+        return null;
+    }
+
     if (handRaiseElements.length > 0) {
-        return(
+        return (
             <div>
                 <div className='handraise-container'>
-                    { handRaiseElements }
+                    {handRaiseElements}
                     <div className='bottom-container'>
-                        <Button icon='delete' content='Deactivate Hand Raise' onClick={() => setHandRaiseModeInactive()}/>
+                        <Button icon='delete' content='Deactivate Hand Raise'
+                                onClick={() => setHandRaiseModeInactive()}/>
                     </div>
-                </div>  
+                </div>
                 <style jsx>{`
                     .handraise-container {
                         position: absolute;
@@ -76,16 +80,17 @@ function HandRaiseActive(props) {
     return (
         <div>
             <div className='handraise-container'>
-                { handRaiseElements }
+                {handRaiseElements}
                 <div className='central-container'>
                     <div className='animated bounce infinite slow'>
-                        <Icon name='hand point up outline' size='huge' style={{ color: 'rgba(0, 210, 170)'}}/>
+                        <Icon name='hand point up outline' size='huge' style={{color: 'rgba(0, 210, 170)'}}/>
                     </div>
                     <h2>Waiting for viewers to raise their hands...</h2>
                     <p>Your viewers can now request to join the stream. Don't forget to remind them to join in!</p>
-                    <Button icon='delete' size='small' content='Deactivate Hand Raise' onClick={() => setHandRaiseModeInactive()}/>
+                    <Button icon='delete' size='small' content='Deactivate Hand Raise'
+                            onClick={() => setHandRaiseModeInactive()}/>
                 </div>
-            </div>  
+            </div>
             <style jsx>{`
                 .handraise-container {
                     position: absolute;

@@ -412,7 +412,7 @@ function ViewerPage({firebase}) {
                     </div>
                 </ClickAwayListener>
             </div>
-            {<div className={classes.menuLeft}>
+            <div className={classes.menuLeft}>
                 <LeftMenu
                     handRaiseActive={handRaiseActive}
                     setHandRaiseActive={setHandRaiseActive}
@@ -424,7 +424,7 @@ function ViewerPage({firebase}) {
                     setShowMenu={setShowMenu}
                     isMobile={width < 768}
                     toggleShowMenu={toggleShowMenu}/>
-            </div>}
+            </div>
             <div className='icons-container'>
                 <IconsContainer livestreamId={currentLivestream.id}/>
             </div>

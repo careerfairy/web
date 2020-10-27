@@ -14,11 +14,6 @@ import DialogContent from "@material-ui/core/DialogContent";
 
 function HandRaiseCategory(props) {
     const theme = useTheme()
-
-    if (!props.livestream.handRaiseActive) {
-        return <HandRaiseInactive selectedState={props.selectedState}/>;
-    }
-
     const {authenticatedUser, userData} = React.useContext(UserContext);
     const [handRaiseState, setHandRaiseState] = useState(null);
 
@@ -56,6 +51,10 @@ function HandRaiseCategory(props) {
         }
     }
 
+    if (!props.livestream.handRaiseActive) {
+        return <HandRaiseInactive selectedState={props.selectedState}/>;
+    }
+
     return (
         <>
             <HandRaisePriorRequest handRaiseState={handRaiseState} updateHandRaiseRequest={updateHandRaiseRequest}/>
@@ -64,12 +63,12 @@ function HandRaiseCategory(props) {
             <HandRaiseConnecting handRaiseState={handRaiseState} updateHandRaiseRequest={updateHandRaiseRequest}/>
             <HandRaiseConnected handRaiseState={handRaiseState} updateHandRaiseRequest={updateHandRaiseRequest}/>
             <Dialog open={handRaiseState && handRaiseState.state === "invited"}>
-                <DialogContent >
+                <DialogContent>
                     <Typography align="center" style={{
-                    fontFamily: 'Permanent Marker',
-                    fontSize: "2em",
-                    color: theme.palette.primary.main,
-                }}>You've been invited to join the stream!</Typography>
+                        fontFamily: 'Permanent Marker',
+                        fontSize: "2em",
+                        color: theme.palette.primary.main,
+                    }}>You've been invited to join the stream!</Typography>
                 </DialogContent>
                 <DialogActions>
                     <Button variant="contained" children='Join now' icon='checkmark' size='huge' color="primary"

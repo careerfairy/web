@@ -9,6 +9,7 @@ import QuestionCategory from "./categories/QuestionCategory";
 import PollCategory from "./categories/PollCategory";
 import HandRaiseCategory from "./categories/HandRaiseCategory";
 import ChatCategory from "../../streaming/comment-container/categories/ChatCategory";
+import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 
 
 const useStyles = makeStyles(theme => ({
@@ -28,27 +29,6 @@ const useStyles = makeStyles(theme => ({
         zIndex: 9100,
     }
 }))
-
-
-function TabPanel({children, value, index, ...other}) {
-
-    return (
-        <div
-            role="tabpanel"
-            // hidden={value !== index}
-            id={`full-width-tabpanel-${index}`}
-            style={{height: "100%"}}
-            aria-labelledby={`full-width-tab-${index}`}
-            {...other}
-        >
-            {(
-                <Box style={{height: "100%"}}>
-                    {children}
-                </Box>
-            )}
-        </div>
-    );
-}
 
 const states = ["questions", "polls", "hand", "chat"]
 const LeftMenu =

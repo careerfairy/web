@@ -9,7 +9,9 @@ function SpeakerManagementModal(props) {
 
     return (
         <Modal open={props.open} onClose={() => props.setOpen(false)}>
-            <Modal.Header><Icon name='user plus' color='darkgrey' size='large' style={{ marginRight: '20px'}}/>Invite additional speakers</Modal.Header>
+            <Modal.Header><Icon name='user plus'
+                                // color='darkgrey'
+                                size='large' style={{ marginRight: '20px'}}/>Invite additional speakers</Modal.Header>
             <Modal.Content>
                 <p style={{ fontSize: '0.9em', margin: '0 0 20px 0' }}>You can invite up to 6 speakers to join your stream. You should do this before starting your stream, to ensure that all streamer have joined before the event starts. When an invited speaker has successfully joined, you will be able to see and hear him/her in the stream overview.</p>
                 <div style={{ margin: '0 0 30px 0', border: '2px solid rgb(0, 210, 170)', padding: '20px', borderRadius: '10px', backgroundColor: 'rgb(252,252,252)', boxShadow: '0 0 2px grey' }} className='animated fadeIn'>
