@@ -10,6 +10,7 @@ function PollCategory({firebase, selectedState, livestream, setSelectedState, di
     const {authenticatedUser, userData} = React.useContext(UserContext);
     const [currentPoll, setCurrentPoll] = useState(null);
     const [currentPollId, setCurrenPollId] = useState(null);
+    console.log("-> currentPoll", currentPoll);
 
     useEffect(() => {
         if (livestream) {
@@ -28,15 +29,18 @@ function PollCategory({firebase, selectedState, livestream, setSelectedState, di
     }, [livestream]);
 
     useEffect(() => {
+        if (currentPoll && !disableSwitching) {
+            setDisableSwitching(true)
+        } else if (!currentPoll && disableSwitching) {
+            setDisableSwitching(false)
+        }
+    }, [currentPoll])
+
+    useEffect(() => {
         if (currentPoll && currentPoll.id !== currentPollId) {
             setSelectedState("polls");
             setShowMenu(true);
             setCurrenPollId(currentPoll.id);
-            if (!disableSwitching) {
-                setDisableSwitching(true)
-            }
-        } else if (disableSwitching) {
-            setDisableSwitching(false)
         }
     }, [currentPoll]);
 
@@ -97,7 +101,7 @@ function PollCategory({firebase, selectedState, livestream, setSelectedState, di
             );
         } else {
             return <CurrentPollGraph background="rgb(240,240,240)"
-                                  currentPoll={currentPoll}/>
+                                     currentPoll={currentPoll}/>
 
         }
     } else {
@@ -112,6 +116,7 @@ function PollCategory({firebase, selectedState, livestream, setSelectedState, di
                         height: 100%;
                         display: flex;
                         flex-direction: column;
+                        align-items: center;
                         justify-content: center;
                     }
 

@@ -70,6 +70,7 @@ const LeftMenu =
         const [value, setValue] = useState(0);
         const [selectedState, setSelectedState] = useState("questions");
         const [disableSwitching, setDisableSwitching] = useState(false)
+        console.log("-> disableSwitching", disableSwitching);
 
         useEffect(() => {
             if (!disableSwitching && selectedState === "questions") {
