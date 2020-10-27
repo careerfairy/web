@@ -69,7 +69,9 @@ function HandRaiseActive(props) {
 
                     .bottom-container {
                         width: 100%;
+                        margin-top: auto;
                         text-align: center;
+                        margin-bottom: 2rem;
                     }
             `}</style>
 

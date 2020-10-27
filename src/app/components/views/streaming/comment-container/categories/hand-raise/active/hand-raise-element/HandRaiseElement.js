@@ -23,7 +23,7 @@ function RequestedHandRaiseElement(props) {
     }
 
     return (
-        <div>
+        <>
             <div className='handraise-container'>
                 <div className='label'>HAND RAISED</div>
                 <div className='name'>{ props.request.name }</div>
@@ -52,7 +52,7 @@ function RequestedHandRaiseElement(props) {
                     margin: 10px 0 0 0;
                 }
           `}</style>
-        </div>
+        </>
     )
 }
 
