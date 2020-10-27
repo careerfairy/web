@@ -8,7 +8,7 @@ function HandRaiseRequested(props) {
     }
 
     return (
-        <div className='animated fadeIn'>
+        <>
             <div className='handraise-container'>
                 <div className='central-container'>
                     <h2>Sorry we can't answer your question right now.</h2>
@@ -17,19 +17,16 @@ function HandRaiseRequested(props) {
             </div>  
             <style jsx>{`
                 .handraise-container {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
                     width: 100%;
                     height: 100%;
                     background-color: rgb(240,240,240);
                 }
 
                 .central-container {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%,-50%);
                     text-align: center;
                     width: 90%;
                     color: rgb(40,40,40);
@@ -46,7 +43,7 @@ function HandRaiseRequested(props) {
                 }
 
           `}</style>
-        </div>
+        </>
     );
 }
 

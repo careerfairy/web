@@ -8,7 +8,7 @@ function HandRaisePriorRequest(props) {
     }
 
     return (
-        <div className='animated fadeIn'>
+        <>
             <div className='handraise-container'>
                 <div className='central-container'>
                     <div className='animated bounce infinite slow'>
@@ -24,13 +24,13 @@ function HandRaisePriorRequest(props) {
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
+                    align-items: center;
                     width: 100%;
                     height: 100%;
                     background-color: rgb(240,240,240);
                 }
 
                 .central-container {
-                    transform: translate(-50%,-50%);
                     text-align: center;
                     width: 90%;
                     color: rgb(40,40,40);
@@ -46,7 +46,7 @@ function HandRaisePriorRequest(props) {
                     margin: 20px 0 30px 0;
                 }
           `}</style>
-        </div>
+        </>
     );
 }
 
