@@ -6,7 +6,7 @@ import { withFirebase } from 'context/firebase';
 import QuestionCategory from './categories/QuestionCategory';
 import PollCategory from './categories/PollCategory';
 import HandRaiseCategory from './categories/HandRaiseCategory';
-import {ButtonComponent} from "../../viewer/comment-container/ButtonComponent";
+import ButtonComponent from "../../viewer/LeftMenu/ButtonComponent";
 
 function CommentContainer(props) {
 

@@ -9,7 +9,6 @@ import ViewerHandRaiseComponent from 'components/views/viewer/viewer-hand-raise-
 import ViewerComponent from 'components/views/viewer/viewer-component/ViewerComponent';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import UserContext from 'context/user/UserContext';
-import MiniChatContainer from 'components/views/streaming/comment-container/categories/chat/MiniChatContainer';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 import {useWindowSize} from 'components/custom-hook/useWindowSize';
 import React from 'react';
@@ -18,6 +17,7 @@ import Button from '@material-ui/core/Button';
 import {Fab, ClickAwayListener, Box, fade} from "@material-ui/core";
 import {amber, deepOrange, green, red} from "@material-ui/core/colors";
 import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
+import MiniChatContainer from "../../../components/views/streaming/comment-container/categories/chat/MiniChatContainer";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -412,11 +412,6 @@ function ViewerPage({firebase}) {
                     </div>
                 </ClickAwayListener>
             </div>
-            {/*<div className={'video-menu-left ' + (showMenu ? 'withMenu' : '')}>*/}
-            {/*    <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={false}*/}
-            {/*                         livestream={currentLivestream} handRaiseActive={handRaiseActive}*/}
-            {/*                         setHandRaiseActive={setHandRaiseActive} localId/>*/}
-            {/*</div>*/}
             {<div className={classes.menuLeft}>
                 <LeftMenu
                     handRaiseActive={handRaiseActive}
