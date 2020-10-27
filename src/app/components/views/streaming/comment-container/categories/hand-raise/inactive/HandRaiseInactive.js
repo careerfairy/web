@@ -13,7 +13,7 @@ function HandRaiseInactive(props) {
     }
 
     return (
-        <div>
+        <>
             <div className='handraise-container'>
                 <div className='central-container'>
                     <h2>Hand Raise is not active</h2>
@@ -22,29 +22,17 @@ function HandRaiseInactive(props) {
                 </div>
             </div>  
             <style jsx>{`
-                .questionToggle {
-                    position: relative;
-                    height: 100px;
-                    box-shadow: 0 4px 2px -2px rgb(200,200,200);
-                    z-index: 9000;
-                    padding: 10px;
-                    text-align: center;
-                }
-
                 .handraise-container {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
                     width: 100%;
                     height: 100%;
                     background-color: rgb(240,240,240);
                 }
 
                 .central-container {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%,-50%);
                     text-align: center;
                     width: 90%;
                     color: rgb(40,40,40);
@@ -58,14 +46,6 @@ function HandRaiseInactive(props) {
 
                 .central-container p {
                     margin: 20px 0 30px 0;
-                }
-
-                .questionToggleTitle {
-                    width: 100%;
-                    font-size: 1.2em;
-                    font-weight: 500;
-                    text-align: center;
-                    margin: 5px 0 15px 0;
                 }
 
                 .hidden {
@@ -138,7 +118,7 @@ function HandRaiseInactive(props) {
                     background-color: rgb(130,130,130);
                 }
           `}</style>
-        </div>
+        </>
     );
 }
 

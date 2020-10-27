@@ -37,7 +37,7 @@ function PollCategory(props) {
     });
 
     return (
-        <div style={{ display: (props.selectedState !== 'polls' ? 'none' : 'block')}}>
+        <>
             <div className='questionToggle'>
                 <div className='questionToggleTitle'>
                     <Icon name='chart bar outline' color='teal'/> Polls
@@ -52,7 +52,7 @@ function PollCategory(props) {
             <PollCreationModal livestreamId={props.livestream.id} open={addNewPoll} initialPoll={null} initialOptions={null} onClose={() => setAddNewPoll(false)}/>
             <style jsx>{`
                 .questionToggle {
-                    position: relative;
+                    background-color: rgb(255,255,255);
                     height: 100px;
                     box-shadow: 0 4px 2px -2px rgb(200,200,200);
                     z-index: 9000;
@@ -73,21 +73,13 @@ function PollCategory(props) {
                 }
 
                 .chat-container {
-                    position: absolute;
-                    top: 100px;
-                    left: 0;
-                    bottom: 0;
                     width: 100%;
                     background-color: rgb(220,220,220);
                 }
 
                 .chat-scrollable {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    bottom: 0;
                     width: 100%;
-                    overflow-y: scroll;
+                    overflow-y: auto;
                     overflow-x: hidden;
                     padding: 0 0 10px 0;
                 }
@@ -138,7 +130,7 @@ function PollCategory(props) {
                     background-color: rgb(130,130,130);
                 }
           `}</style>
-        </div>
+        </>
     );
 }
 

@@ -52,7 +52,7 @@ function QuestionCategory(props) {
     });
 
     return (
-        <div style={{display: (props.selectedState !== 'questions' ? 'none' : 'block')}}>
+        <>
             <div className='questionToggle'>
                 <div className='questionToggleTitle'>
                     <Icon name='question circle outline' color='teal'/> Q&A
@@ -138,7 +138,7 @@ function QuestionCategory(props) {
                     left: 0;
                     bottom: 0;
                     width: 100%;
-                    overflow-y: scroll;
+                    overflow-y: auto;
                     overflow-x: hidden;
                 }
 
@@ -150,7 +150,7 @@ function QuestionCategory(props) {
                     background-color: rgb(130,130,130);
                 }
           `}</style>
-        </div>
+        </>
     );
 }
 
