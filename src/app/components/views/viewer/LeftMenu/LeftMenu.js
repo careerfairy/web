@@ -69,37 +69,31 @@ const LeftMenu =
         const classes = useStyles()
         const [value, setValue] = useState(0);
         const [selectedState, setSelectedState] = useState("questions");
-        const [disableSwitching, setDisableSwitching] = useState(false)
-        console.log("-> disableSwitching", disableSwitching);
 
         useEffect(() => {
-            if (!disableSwitching && selectedState === "questions") {
+            if (selectedState === "questions") {
                 setValue(0)
             } else if (selectedState === "polls") {
                 setValue(1)
-            } else if (!disableSwitching && selectedState === "hand") {
+            } else if (selectedState === "hand") {
                 setValue(2)
-            } else if (!disableSwitching && selectedState === "chat") {
+            } else if (selectedState === "chat") {
                 setValue(3)
             }
-        }, [selectedState, disableSwitching, showMenu, isMobile])
+        }, [selectedState, showMenu, isMobile])
 
         useEffect(() => {
-            if (!disableSwitching && selectedState === "chat" && showMenu && !isMobile) {
+            if (selectedState === "chat" && showMenu && !isMobile) {
                 setSelectedState("questions")
                 setValue(0)
             }
-        }, [selectedState, disableSwitching, showMenu, isMobile])
+        }, [selectedState, showMenu, isMobile])
 
         function handleStateChange(state) {
             if (!showMenu) {
                 setShowMenu(true);
             }
-            if (!disableSwitching) {
-                setSelectedState(state);
-            } else {
-                setSelectedState("polls")
-            }
+            setSelectedState(state);
         }
 
         const handleChange = (event, newValue) => {
@@ -114,7 +108,6 @@ const LeftMenu =
             </TabPanel>,
             <TabPanel key={1} value={value} index={1} dir={theme.direction}>
                 <PollCategory livestream={livestream} selectedState={selectedState}
-                              setDisableSwitching={setDisableSwitching} disableSwitching={disableSwitching}
                               setSelectedState={setSelectedState} setShowMenu={setShowMenu}
                               streamer={streamer} user={user} userData={userData}/>
             </TabPanel>,
@@ -143,7 +136,6 @@ const LeftMenu =
                     containerStyle={{WebkitOverflowScrolling: 'touch'}}
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                     index={value}
-                    disabled={disableSwitching}
                     className={classes.root}
                     onChangeIndex={handleChange}>
                     {views}

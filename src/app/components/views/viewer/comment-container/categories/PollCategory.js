@@ -5,12 +5,11 @@ import UserContext from 'context/user/UserContext';
 import CurrentPollGraph from "./CurrentPollGraph";
 import {Button, Typography} from "@material-ui/core";
 
-function PollCategory({firebase, selectedState, livestream, setSelectedState, disableSwitching, setShowMenu, setDisableSwitching}) {
+function PollCategory({firebase, selectedState, livestream, setSelectedState, disableSwitching, setShowMenu}) {
 
     const {authenticatedUser, userData} = React.useContext(UserContext);
     const [currentPoll, setCurrentPoll] = useState(null);
     const [currentPollId, setCurrenPollId] = useState(null);
-    console.log("-> currentPoll", currentPoll);
 
     useEffect(() => {
         if (livestream) {
@@ -29,14 +28,7 @@ function PollCategory({firebase, selectedState, livestream, setSelectedState, di
     }, [livestream]);
 
     useEffect(() => {
-        if (currentPoll && !disableSwitching) {
-            setDisableSwitching(true)
-        } else if (!currentPoll && disableSwitching) {
-            setDisableSwitching(false)
-        }
-    }, [currentPoll])
-
-    useEffect(() => {
+        // debugger
         if (currentPoll && currentPoll.id !== currentPollId) {
             setSelectedState("polls");
             setShowMenu(true);
@@ -101,7 +93,7 @@ function PollCategory({firebase, selectedState, livestream, setSelectedState, di
             );
         } else {
             return <CurrentPollGraph background="rgb(240,240,240)"
-                                     currentPoll={currentPoll}/>
+                                  currentPoll={currentPoll}/>
 
         }
     } else {
