@@ -4,11 +4,11 @@ import Box from "@material-ui/core/Box";
 import SwipeableViews from "react-swipeable-views";
 import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
 import {Fab} from "@material-ui/core";
-import ChatCategory from "../../streaming/comment-container/categories/ChatCategory";
-import QuestionCategory from "../comment-container/categories/QuestionCategory";
-import PollCategory from "../comment-container/categories/PollCategory";
-import HandRaiseCategory from "../comment-container/categories/HandRaiseCategory";
 import ButtonComponent from "./ButtonComponent";
+import QuestionCategory from "./categories/QuestionCategory";
+import PollCategory from "./categories/PollCategory";
+import HandRaiseCategory from "./categories/HandRaiseCategory";
+import ChatCategory from "../../streaming/comment-container/categories/ChatCategory";
 
 
 const useStyles = makeStyles(theme => ({
