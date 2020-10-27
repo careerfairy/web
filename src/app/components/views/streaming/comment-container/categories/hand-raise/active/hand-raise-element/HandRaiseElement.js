@@ -58,7 +58,7 @@ function RequestedHandRaiseElement(props) {
 
 function InvitedHandRaiseElement(props) {
     return (
-        <div>
+        <>
             <div className='handraise-container'>
                 <div className='label'>INVITED</div>
                 <div className='name'>{ props.request.name }</div>
@@ -87,7 +87,7 @@ function InvitedHandRaiseElement(props) {
                     margin: 10px 0 0 0;
                 }
           `}</style>
-        </div>
+        </>
     )
 }
 
@@ -112,7 +112,7 @@ function ConnectingHandRaiseElement(props) {
     }
 
     return (
-        <div>
+        <>
             <div className='handraise-container'>
                 <div className='label'>CONNECTING</div>
                 <div className='name'>{ props.request.name }</div>
@@ -141,7 +141,7 @@ function ConnectingHandRaiseElement(props) {
                     margin: 10px 0 0 0;
                 }
           `}</style>
-        </div>
+        </>
     )
 }
 
@@ -166,7 +166,7 @@ function ConnectedHandRaiseElement(props) {
     }
 
     return (
-        <div>
+        <>
             <div className='handraise-container'>
                 <div className='label'>CONNECTED</div>
                 <div className='name'>{ props.request.name }</div>
@@ -195,7 +195,7 @@ function ConnectedHandRaiseElement(props) {
                     margin: 10px 0 0 0;
                 }
           `}</style>
-        </div>
+        </>
     )
 }
 
