@@ -1,21 +1,21 @@
 import React from 'react';
 import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
 import {Button} from "@material-ui/core";
+import Grow from "@material-ui/core/Grow";
 
 function HandRaiseRequested(props) {
 
-    if (!props.handRaiseState || props.handRaiseState.state !== 'connected') {
-        return null;
-    }
-
     return (
         <>
-            <div className='handraise-container'>
-                <div className='central-container'>
-                    <h2>You are live!</h2>
-                    <Button size='large' startIcon={<ClearRoundedIcon/>} variant="contained" children='Stop Streaming' onClick={() => props.updateHandRaiseRequest("unrequested")} />
+            <Grow unmountOnExit in={Boolean(!(!props.handRaiseState || props.handRaiseState.state !== 'connected'))}>
+                <div className='handraise-container'>
+                    <div className='central-container'>
+                        <h2>You are live!</h2>
+                        <Button size='large' startIcon={<ClearRoundedIcon/>} variant="contained"
+                                children='Stop Streaming' onClick={() => props.updateHandRaiseRequest("unrequested")}/>
+                    </div>
                 </div>
-            </div>  
+            </Grow>
             <style jsx>{`
                 .handraise-container {
                     display: flex;
@@ -113,6 +113,7 @@ function HandRaiseRequested(props) {
                     background-color: rgb(130,130,130);
                 }
           `}</style>
+
         </>
     );
 }

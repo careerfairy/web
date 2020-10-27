@@ -1,21 +1,21 @@
 import React from 'react';
 import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
 import {Button} from "@material-ui/core";
+import Grow from "@material-ui/core/Grow";
 
 function HandRaiseRequested(props) {
 
-    if (!props.handRaiseState || (props.handRaiseState.state !== 'denied')) {
-        return null;
-    }
-
     return (
         <>
-            <div className='handraise-container'>
-                <div className='central-container'>
-                    <h2>Sorry we can't answer your question right now.</h2>
-                    <Button size='large' startIcon={<ClearRoundedIcon/>} variant="contained" children='Cancel' onClick={() => props.updateHandRaiseRequest("unrequested")} />
+            <Grow unmountOnExit in={!(!props.handRaiseState || (props.handRaiseState.state !== 'denied'))}>
+                <div className='handraise-container'>
+                    <div className='central-container'>
+                        <h2>Sorry we can't answer your question right now.</h2>
+                        <Button size='large' startIcon={<ClearRoundedIcon/>} variant="contained" children='Cancel'
+                                onClick={() => props.updateHandRaiseRequest("unrequested")}/>
+                    </div>
                 </div>
-            </div>  
+            </Grow>
             <style jsx>{`
                 .handraise-container {
                     display: flex;
@@ -44,6 +44,7 @@ function HandRaiseRequested(props) {
                 }
 
           `}</style>
+
         </>
     );
 }

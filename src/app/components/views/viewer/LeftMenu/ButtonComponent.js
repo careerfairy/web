@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import BarChartIcon from '@material-ui/icons/BarChart';
-import PanToolIcon from '@material-ui/icons/PanTool';
+import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
 import {makeStyles} from "@material-ui/core/styles";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
@@ -130,7 +130,7 @@ const ButtonComponent =
             })
         } else {
             actions.unshift({
-                icon: <PanToolIcon fontSize="large"/>,
+                icon: <PanToolOutlinedIcon fontSize="large"/>,
                 name: "Hand Raise",
                 disabled: showMenu && selectedState === 'hand',
                 onClick: () => handleStateChange("hand")
