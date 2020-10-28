@@ -2,15 +2,38 @@ import React, {useState, useEffect, Fragment} from 'react';
 import AddIcon from '@material-ui/icons/Add';
 import {withFirebase} from 'context/firebase';
 import {Input, Icon, Modal} from 'semantic-ui-react';
-import {DialogTitle, DialogContent, Dialog, Typography, ButtonGroup, Button, IconButton} from '@material-ui/core';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import {
+    DialogTitle,
+    DialogContent,
+    Dialog,
+    Typography,
+    ButtonGroup,
+    Button,
+    Paper,
+    Fab,
+    Box
+} from '@material-ui/core';
 import {BarChart, CloseRounded} from "@material-ui/icons";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import DialogActions from "@material-ui/core/DialogActions";
 import TextField from "@material-ui/core/TextField";
 import Grow from "@material-ui/core/Grow";
+import {makeStyles} from "@material-ui/core/styles";
+import Collapse from "@material-ui/core/Collapse";
+
+const useStyles = makeStyles(theme => ({
+    modalPaper: {
+        padding: theme.spacing(2)
+    },
+    dialog: {
+        background: theme.palette.primary.main
+    }
+}))
 
 
 function PollCreationModal({open, handleClose, livestreamId, initialOptions, initialPoll, firebase}) {
+    const classes = useStyles()
 
     const [question, setQuestion] = useState('');
     const [options, setOptions] = useState(['', '']);
@@ -76,78 +99,59 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
     const optionElements = options.map((option, index) => {
 
             return (
-                    <Grow in>
-                        <TextField value={option} error={(option.trim() === '') && (error)}
-                                   label={`Option ${index + 1}`}
-                                   helperText={(option.trim() === '') && (error) && "Please fill or remove"}
-                                   variant="outlined"
-                                   margin="dense"
-                                   onChange={({currentTarget: {value}}) => updateOption(index, value)}
-                                   placeholder='Write down your option'
-                                   InputProps={!options.length < 3 ? {
-                                       endAdornment: <IconButton onClick={() => removeOption(index)}>
-                                           <CloseRounded color="error"/>
-                                       </IconButton>
-                                   }: {}}
-                                   fullWidth/>
-                    </Grow>
+                <Collapse in>
+                    <TextField value={option} error={(option.trim() === '') && (error)}
+                               label={`Option ${index + 1}`}
+                               helperText={(option.trim() === '') && (error) && "Please fill or remove"}
+                               variant="outlined"
+                               margin="dense"
+                               onChange={({currentTarget: {value}}) => updateOption(index, value)}
+                               placeholder='Write down your option'
+                               InputProps={options.length >= 3 ? {
+                                   endAdornment: <Box p={1}>
+                                       <Fab onClick={() => removeOption(index)} size="small" color="primary"
+                                            style={{background: "red", width: 36, height: 36}}>
+                                           <DeleteForeverIcon/>
+                                       </Fab>
+                                   </Box>
+                               } : {}}
+                               fullWidth/>
+                </Collapse>
             );
-
-            return (
-                <div className='modal-content-option animated fadeInDown' key={index}>
-                    <div className='label'>Option {index + 1}</div>
-                    <Input value={option} error={(option.trim() === '') && (error)}
-                           onChange={() => updateOption(index, event.target.value)} placeholder='Write down your option'
-                           action={{icon: 'delete', color: 'red', onClick: () => removeOption(index)}} fluid/>
-                    <style jsx>{`
-                        .modal-content-option {
-                            margin: 5px 0 10px 0;
-                        }
-    
-                        .modal-content-option .label {
-                            font-weight: 700;
-                            margin-bottom: 3px;
-                            color: rgb(80,80,80);
-                        }
-                    `}</style>
-                </div>
-            );
-
         }
         )
     ;
 
     return (
         <Fragment>
-            <Dialog maxWidth="lg" fullWidth open={open} onClose={handleClose}>
+            <Dialog PaperProps={{className: classes.dialog}} maxWidth="sm" fullWidth open={open} onClose={handleClose}>
                 <DialogTitle disableTypography
                              style={{display: "flex", justifyContent: "center", alignItems: "flex-end"}} align="center">
-                    <BarChart color="primary" fontSize="large"/> <Typography
-                    style={{fontSize: "1.8em", fontWeight: 500, color: "rgb(80,80,80)"}} variant="h3">Create a
+                    <BarChart style={{color: "white"}} fontSize="large"/> <Typography
+                    style={{fontSize: "1.8em", fontWeight: 500, color: "white"}} variant="h3">Create a
                     Poll</Typography>
                 </DialogTitle>
                 <DialogContent>
-                    <div className='modal-content-question'>
-                        <TextField
-                            label="Your Question"
-                            value={question}
-                            fullWidth
-                            variant="outlined"
-                            onChange={({currentTarget: {value}}) => setQuestion(value)}
-                            placeholder='Write down your question or poll to your audience'
-                        />
-                    </div>
-                    <div className='modal-content-options'>
+                    <Paper className={classes.modalPaper}>
+                            <TextField
+                                label="Your Question"
+                                value={question}
+                                fullWidth
+                                variant="outlined"
+                                onChange={({currentTarget: {value}}) => setQuestion(value)}
+                                placeholder='Write down your question or poll to your audience'
+                            />
                         {optionElements}
-                    </div>
-                    <Button startIcon={<AddIcon/>} fullWidth variant="contained" color="secondary"
-                            children='Add an Option' onClick={increaseNumberOfOptions} style={{margin: '0 0 20px 0'}}
+                    </Paper>
+                    <Button startIcon={<AddIcon/>} variant="contained" color="secondary"
+                            style={{marginTop: "1rem", border: "2px solid white"}}
+                            children='Add an Option' onClick={increaseNumberOfOptions}
                             disabled={options.length > 3}/>
                     <DialogActions>
-                        <Button children='Cancel' variant="contained" onClick={handleClose}/>
+                        <Button children='Cancel' style={{border: "2px solid white"}} variant="contained" onClick={handleClose}/>
                         <Button startIcon={loading && <CircularProgress size={20} color="inherit"/>} disabled={loading}
                                 children={initialPoll ? 'Update Poll' : 'Create Poll'} color="primary"
-                                variant="contained" onClick={savePoll}/>
+                                variant="contained" onClick={savePoll} style={{border: "2px solid white"}}/>
                     </DialogActions>
                 </DialogContent>
             </Dialog>
