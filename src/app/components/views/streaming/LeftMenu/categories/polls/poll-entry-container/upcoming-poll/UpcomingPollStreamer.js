@@ -1,14 +1,29 @@
 import React, {useState, useEffect, Fragment} from 'react';
-import {Input, Icon, Button, Dropdown} from "semantic-ui-react";
-import Linkify from 'react-linkify';
-import { withFirebase } from 'context/firebase';
+import {Input, Icon, Dropdown} from "semantic-ui-react";
+import EditIcon from '@material-ui/icons/Edit';
+import {withFirebase} from 'context/firebase';
 import PollCreationModal from '../../poll-creation-modal/PollCreationModal';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import {Box, Button, IconButton, Menu, MenuItem} from "@material-ui/core";
+import {CloseRounded} from "@material-ui/icons";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
 
 
 function UpcomingPollStreamer(props) {
 
     const [editPoll, setEditPoll] = useState(false);
     const [showNotEditableMessage, setShowNotEditableMessage] = useState(false);
+
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
     function deletePoll() {
         props.firebase.deleteLivestreamPoll(props.livestream.id, props.poll.id);
@@ -26,18 +41,18 @@ function UpcomingPollStreamer(props) {
 
 
     let totalVotes = 0;
-    props.poll.options.forEach( option => totalVotes += option.votes );
-    
+    props.poll.options.forEach(option => totalVotes += option.votes);
+
     const colors = ['red', 'orange', 'pink', 'olive'];
     const optionElements = props.poll.options.map((option, index) => {
         return (
             <Fragment key={index}>
                 <div className='option-container'>
-                    <div className='option-container-index' style={{ backgroundColor: colors[index] }}>
-                        <div>{ index + 1 }</div>       
+                    <div className='option-container-index' style={{backgroundColor: colors[index]}}>
+                        <div>{index + 1}</div>
                     </div>
                     <div className='option-container-name'>
-                        { option.name }
+                        {option.name}
                     </div>
                 </div>
                 <style jsx>{`
@@ -89,43 +104,67 @@ function UpcomingPollStreamer(props) {
 
     return (
         <Fragment>
-            <div className='animated fadeInUp faster overall' onMouseEnter={ handleSetIsNotEditablePoll } onMouseLeave={ () => setShowNotEditableMessage(false) }>
+            <div className='animated fadeInUp faster overall' onMouseEnter={handleSetIsNotEditablePoll}
+                 onMouseLeave={() => setShowNotEditableMessage(false)}>
                 <div className='chat-entry-container'>
-                    <div className='poll-entry-message'>
-                        { props.poll.question }
-                    </div>
-                    { optionElements }
-                    <Dropdown icon={{ name: 'ellipsis vertical', fontSize: '1.1em', color: 'grey' }} direction='left' style={{ position: 'absolute', top: '15px', right: '20px', color: 'rgb(200,200,200)'}}>
-                        <Dropdown.Menu>
-                            <Dropdown.Item
-                                icon='edit'
-                                text='Edit'
-                                onClick={() => setEditPoll(true)}
-                            />
-                            <Dropdown.Item
-                                icon='delete'
-                                text='Delete'
-                                onClick={() => deletePoll()}
-                            />
-                        </Dropdown.Menu>
-                    </Dropdown>
-                    <PollCreationModal livestreamId={props.livestream.id}  initialPoll={props.poll} open={editPoll} onClose={() => setEditPoll(false)}/>
-                    
-                </div> 
-                <div className={'disabled-overlay ' + ( showNotEditableMessage ? '' : 'hidden')}>
+                    <Box p={2}>
+                        <div className='poll-entry-message'>
+                            {props.poll.question}
+                        </div>
+                        {optionElements}
+                        <IconButton onClick={handleClick} style={{position: 'absolute', top: '15px', right: '20px', color: 'rgb(200,200,200)'}}>
+                            <MoreVertIcon/>
+                        </IconButton>
+                        <Menu onClose={handleClose} anchorEl={anchorEl} open={Boolean(anchorEl)}>
+                            <MenuItem onClick={() => setEditPoll(true)}>
+                                <ListItemIcon>
+                                    <EditIcon/>
+                                </ListItemIcon>
+                                <ListItemText primary="Edit"/>
+                            </MenuItem>
+                            <MenuItem onClick={() => deletePoll()}>
+                                <ListItemIcon>
+                                    <CloseRounded/>
+                                </ListItemIcon>
+                                <ListItemText primary="Delete"/>
+                            </MenuItem>
+                        </Menu>
+                        {/*<Dropdown icon={{name: 'ellipsis vertical', fontSize: '1.1em', color: 'grey'}} direction='left'*/}
+                        {/*          >*/}
+                        {/*    <Dropdown.Menu>*/}
+                        {/*        <Dropdown.Item*/}
+                        {/*            icon='edit'*/}
+                        {/*            text='Edit'*/}
+                        {/*            onClick={() => setEditPoll(true)}*/}
+                        {/*        />*/}
+                        {/*        <Dropdown.Item*/}
+                        {/*            icon='delete'*/}
+                        {/*            text='Delete'*/}
+                        {/*            onClick={() => deletePoll()}*/}
+                        {/*        />*/}
+                        {/*    </Dropdown.Menu>*/}
+                        {/*</Dropdown>*/}
+                    </Box>
+                    <PollCreationModal livestreamId={props.livestream.id} initialPoll={props.poll} open={editPoll}
+                                       onClose={() => setEditPoll(false)}/>
+
+                    <Button fullWidth disableElevation attached='bottom' variant="contained" color="primary"
+                            children={'Ask the Audience Now'} disabled={props.somePollIsCurrent}
+                            onClick={() => setPollState('current')}
+                            style={{borderRadius: '0 0 5px 5px'}}/>
+                </div>
+                <div className={'disabled-overlay ' + (showNotEditableMessage ? '' : 'hidden')}>
                     <div>
                         Please close the active poll before activating this one.
                     </div>
-                </div>          
-                <Button attached='bottom' content={ 'Ask the Audience Now' } disabled={props.somePollIsCurrent} onClick={() => setPollState('current') } primary style={{ margin: '0 10px 10px 10px', border: 'none' }}/>
-            </div>   
+                </div>
+            </div>
             <style jsx>{`
                 .chat-entry-container {
-                    border-top-left-radius: 5px;
-                    border-top-right-radius: 5px;
+                    border-radius: 5px;
                     box-shadow: 0 0 5px rgb(180,180,180);
                     margin: 10px 10px 0 10px;
-                    padding: 40px 20px 20px 20px;
+                    padding-top: 40px;
                     background-color: white;
                 }
 
