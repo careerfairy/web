@@ -1,8 +1,9 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useContext} from 'react';
 import Linkify from 'react-linkify';
 import {makeStyles} from "@material-ui/core/styles";
 import UserContext from "../../../../../../../context/user/UserContext";
-import {Typography} from "@material-ui/core";
+import {Box, Card, Typography} from "@material-ui/core";
+import Slide from "@material-ui/core/Slide";
 
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
@@ -13,7 +14,6 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: ({isMe}) => isMe ? "23px 23px 5px 23px" : "23px 23px 23px 5px",
         maxWidth: "80%",
         width: "max-content",
-        boxShadow: "0 0 5px rgb(180,180,180)",
         marginLeft: ({isMe}) => isMe ? "auto" : 8,
         margin: 8,
         padding: "10px 15px",
@@ -38,9 +38,11 @@ function ChatEntryContainer({chatEntry}) {
     const timeAgo = chatEntry?.timestamp ? dayjs(chatEntry.timestamp.toDate()).fromNow() : ""
 
     const {authenticatedUser} = useContext(UserContext);
+    const isMe = chatEntry?.authorEmail === authenticatedUser?.email
+    const isStreamer = chatEntry?.authorEmail === "Streamer"
     const classes = useStyles({
-        isMe: chatEntry?.authorEmail === authenticatedUser?.email,
-        isStreamer: chatEntry?.authorEmail === "Streamer"
+        isMe,
+        isStreamer
     })
 
     const componentDecorator = (href, text, key) => (
@@ -50,8 +52,8 @@ function ChatEntryContainer({chatEntry}) {
     );
 
     return (
-        <div className='animated fadeInUp faster'>
-            <div className={classes.chatBubble}>
+        <Slide in direction={isMe ? "left" : "right"}>
+            <Box component={Card} className={classes.chatBubble}>
                 <Linkify componentDecorator={componentDecorator}>
                     {chatEntry.message}
                 </Linkify>
@@ -61,8 +63,8 @@ function ChatEntryContainer({chatEntry}) {
                 <Typography align="right" className={classes.stamp}>
                     {timeAgo}
                 </Typography>
-            </div>
-        </div>
+            </Box>
+        </Slide>
     );
 }
 
