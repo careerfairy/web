@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import {Grid, Icon, Button} from "semantic-ui-react";
-
+import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import {withFirebasePage} from 'context/firebase';
 import ButtonWithConfirm from 'components/views/common/ButtonWithConfirm';
-import {SnackbarProvider, useSnackbar} from 'notistack';
+import {SnackbarProvider} from 'notistack';
 import {useRouter} from 'next/router';
 import SpeakerManagementModal from 'components/views/streaming/modal/SpeakerManagementModal';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
@@ -14,6 +14,7 @@ import NotificationsContainer from 'components/views/streaming/notifications-con
 import NotificationsContext from 'context/notifications/NotificationsContext';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import LeftMenu from "../../../components/views/streaming/LeftMenu/LeftMenu";
+import {Button} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {
@@ -123,24 +124,20 @@ function StreamingPage(props) {
                                 confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'}
                                 buttonLabel={currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming'}/>
                         </div>
-                        <div style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '220px',
-                            transform: 'translateY(-50%)',
-                            verticalAlign: 'middle',
-                            cursor: 'pointer',
-                            color: 'rgb(80,80,80)'
-                        }} onClick={() => {
-                            setSpeakerManagementOpen(true)
-                        }}>
-                            <Icon name='user plus'
-                                // color='darkgrey'
-                                  size='large'/>
-                            <div style={{fontSize: '0.7em'}}>
-                                Invite additional streamer
-                            </div>
-                        </div>
+                        <Button
+                            children="Invite additional streamer"
+                            startIcon={<PersonAddIcon color="inherit"/>}
+                            onClick={() => {
+                                setSpeakerManagementOpen(true)
+                            }}
+                            style={{
+                                position: 'absolute',
+                                top: '50%',
+                                color: 'rgb(80,80,80)',
+                                left: '220px',
+                                transform: 'translateY(-50%)',
+                            }}
+                        />
                         <div style={{
                             position: 'absolute',
                             top: '50%',
@@ -154,22 +151,18 @@ function StreamingPage(props) {
                             <h3 style={{color: (currentLivestream.hasStarted ? 'rgb(0, 210, 170)' : 'orange')}}>{currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}</h3>
                             {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
                         </div>
-                        <div style={{
-                            position: 'absolute',
-                            top: '50%',
-                            right: '130px',
-                            transform: 'translateY(-50%)',
-                            verticalAlign: 'middle',
-                            cursor: 'pointer',
-                            color: 'rgb(80,80,80)'
-                        }} onClick={openStudentView}>
-                            <Icon name='film'
-                                // color='darkgrey'
-                                  size='large'/>
-                            <div style={{fontSize: '0.7em'}}>
-                                Open Student View
-                            </div>
-                        </div>
+                        <Button
+                            onClick={openStudentView}
+                            children="Open Student View"
+                            startIcon={<OpenInBrowserIcon color="inherit"/>}
+                            style={{
+                                color: 'rgb(80,80,80)',
+                                position: 'absolute',
+                                top: '50%',
+                                right: '130px',
+                                transform: 'translateY(-50%)'
+                            }}
+                        />
                         <div style={{
                             float: 'right',
                             margin: '0 20px',
@@ -280,7 +273,8 @@ function StreamingPage(props) {
                 </div>
             </NotificationsContext.Provider>
         </SnackbarProvider>
-    );
+    )
+        ;
 }
 
 export default withFirebasePage(StreamingPage);
