@@ -24,7 +24,7 @@ function Notification({ notification, index }) {
             <div className='notification-box'>
                 <div className='notification-message'>{ notification.message }</div>        
                 <div className='notification-buttons'>
-                    <Button size='small' variant="contained" onClick={onCancel}>{notification.cancelMessage}</Button>
+                    <Button size='small' variant="contained" style={{marginRight: "1rem"}} onClick={onCancel}>{notification.cancelMessage}</Button>
                     <Button size='small' variant="contained" onClick={onConfirm} color="primary">{notification.confirmMessage}</Button>
                 </div>
             </div>
