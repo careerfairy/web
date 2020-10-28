@@ -115,22 +115,24 @@ function SignUpPage({firebase}) {
     useEffect(() => {
         if (user && user.emailVerified) {
             router.push('/next-livestreams')
-        } else if (user && !user.emailVerified) {
+        } else if (user && !user.emailVerified && userData) {
             setActiveStep(1)
         }
-    }, [user])
+    }, [user, userData])
 
     function getStepContent(stepIndex) {
         switch (stepIndex) {
             case 0:
                 return <SignUpForm
                     user={user}
+                    userData={userData}
                     emailVerificationSent={emailVerificationSent}
                     setActiveStep={setActiveStep}
                     setEmailVerificationSent={(bool) => setEmailVerificationSent(bool)}/>;
             case 1:
                 return <SignUpFormSent
                     user={user}
+                    userData={userData}
                     absolutePath={absolutePath}
                     setActiveStep={setActiveStep}
                     emailVerificationSent={emailVerificationSent}/>
@@ -189,7 +191,7 @@ const SignUpForm = withFirebase(SignUpFormBase);
 
 const SignUpFormSent = SignUpFormValidate;
 
-function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerificationSent, setActiveStep}) {
+function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEmailVerificationSent, setActiveStep}) {
     const classes = useStyles()
 
     const [emailSent, setEmailSent] = useState(false);
@@ -211,9 +213,14 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                     universityCountryCode: formData.universityCountryCode,
                 }
             }).then(response => {
-                setEmailVerificationSent(true);
-                setGeneralLoading(false);
-                setActiveStep(1)
+                if (response.status === 200) {
+                    setEmailVerificationSent(true);
+                    setGeneralLoading(false);
+                    setActiveStep(1)
+                } else {
+                    setErrorMessageShown(true);
+                    setGeneralLoading(false);
+                }    
             }).catch(error => {
                 console.log("error in signup base", error);
                 setGeneralLoading(false);
@@ -224,7 +231,6 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
     const submitting = (isSubmitting) => {
         return isSubmitting || emailSent || generalLoading
     }
-
 
     const handleClose = () => {
         setOpen(false);
@@ -299,9 +305,15 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
                             setSubmitting(false);
                             setEmailSent(true);
                         }).catch(error => {
-                        setErrorMessageShown(true);
-                        setSubmitting(false);
-                        setGeneralLoading(false);
+                            if (error.code === 'auth/email-already-in-use' && !user.emailVerified && !userData) {
+                                //This error case accounts for the edge case when user was created by subsequent call to create userData failed
+                                setSubmitting(false);
+                                setEmailSent(true);
+                            } else {
+                                setErrorMessageShown(true);
+                                setSubmitting(false);
+                                setGeneralLoading(false);
+                            }                       
                     })
                 }}
             >
@@ -511,7 +523,7 @@ function SignUpFormBase({firebase, user, emailVerificationSent, setEmailVerifica
     )
 }
 
-function SignUpFormValidate({user, setEmailVerificationSent, setActiveStep, absolutePath}) {
+function SignUpFormValidate({user, userData, setEmailVerificationSent, setActiveStep, absolutePath}) {
     const classes = useStyles()
     const router = useRouter()
 
