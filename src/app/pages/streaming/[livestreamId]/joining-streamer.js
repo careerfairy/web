@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 
 import {withFirebasePage} from 'context/firebase';
 
@@ -13,22 +13,24 @@ import NotificationsContext from 'context/notifications/NotificationsContext';
 import NotificationsContainer from 'components/views/streaming/notifications-container/NotificationsContainer';
 import {v4 as uuidv4} from 'uuid';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
+import LeftMenu from "../../../components/views/streaming/LeftMenu/LeftMenu";
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {
         position: "absolute",
         transition: "width 0.3s",
         transitionTimingFunction: theme.transitions.easeInOut,
-        width: ({showMenu, }) => showMenu ? 280: 0,
+        width: ({showMenu,}) => showMenu ? 280 : 0,
         top: 55,
         left: 0,
         bottom: 0,
         zIndex: 20
     },
 }));
+
 function StreamingPage(props) {
 
-const theme = useTheme()
+    const theme = useTheme()
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
     const [streamerId, setStreamerId] = useState(uuidv4())
@@ -73,6 +75,10 @@ const theme = useTheme()
 
     function setStreamingStarted(started) {
         props.firebase.setLivestreamHasStarted(started, currentLivestream.id);
+    }
+
+    const toggleShowMenu = () => {
+        setShowMenu(!showMenu)
     }
 
     return (
@@ -120,9 +126,17 @@ const theme = useTheme()
                 <div className='black-frame' style={{left: showMenu ? '280px' : '0'}}>
                     <VideoContainer currentLivestream={currentLivestream} streamerId={streamerId} viewer={false}/>
                 </div>
-                <div className='video-menu-left' style={{width: showMenu ? '280px' : '0'}}>
-                    <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={true}
-                                         livestream={currentLivestream}/>
+                {/*<div className='video-menu-left' style={{width: showMenu ? '280px' : '0'}}>*/}
+                {/*    <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={true}*/}
+                {/*                         livestream={currentLivestream}/>*/}
+                {/*</div>*/}
+                <div className={classes.menuLeft}>
+                    <LeftMenu
+                        streamer
+                        livestream={currentLivestream}
+                        showMenu={showMenu}
+                        setShowMenu={setShowMenu}
+                        toggleShowMenu={toggleShowMenu}/>
                 </div>
                 <div className='mini-chat-container'>
                     <MiniChatContainer livestream={currentLivestream} isStreamer={true}/>
