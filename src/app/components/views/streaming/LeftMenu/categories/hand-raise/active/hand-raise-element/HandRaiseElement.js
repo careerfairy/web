@@ -1,6 +1,6 @@
 import React, {useState, useEffect, Fragment, useContext} from 'react';
-import { Input, Icon, Button, Modal } from 'semantic-ui-react';
 import { v4 as uuidv4 } from 'uuid';
+import {Button} from "@material-ui/core";
 
 function RequestedHandRaiseElement(props) {
 
@@ -28,8 +28,8 @@ function RequestedHandRaiseElement(props) {
                 <div className='label'>HAND RAISED</div>
                 <div className='name'>{ props.request.name }</div>
                 <div className='button-group'>
-                    <Button content='Invite to speak' size='mini' onClick={() => updateHandRaiseRequest('invited')} primary/>
-                    <Button content='Deny' size='mini'  onClick={() => updateHandRaiseRequest('denied')}/>
+                    <Button variant="contained" style={{marginRight: "1rem"}}  children='Invite to speak' size='small' onClick={() => updateHandRaiseRequest('invited')} color="primary"/>
+                    <Button variant="contained" children='Deny' size='small'  onClick={() => updateHandRaiseRequest('denied')}/>
                 </div>
             </div>  
             <style jsx>{`
@@ -63,7 +63,7 @@ function InvitedHandRaiseElement(props) {
                 <div className='label'>INVITED</div>
                 <div className='name'>{ props.request.name }</div>
                 <div className='button-group'>
-                    <Button content='Remove' size='mini'  onClick={() => props.updateHandRaiseRequest(props.request.id, 'denied')}/>
+                    <Button variant="contained" children='Remove' size='small'  onClick={() => props.updateHandRaiseRequest(props.request.id, 'denied')}/>
                 </div>
             </div>  
             <style jsx>{`
@@ -117,7 +117,7 @@ function ConnectingHandRaiseElement(props) {
                 <div className='label'>CONNECTING</div>
                 <div className='name'>{ props.request.name }</div>
                 <div className='button-group'>
-                    <Button content='Remove' size='mini'  onClick={() => updateHandRaiseRequest('denied')}/>
+                    <Button variant="contained" children='Remove' size='small'  onClick={() => updateHandRaiseRequest('denied')}/>
                 </div>
             </div>  
             <style jsx>{`
@@ -171,7 +171,7 @@ function ConnectedHandRaiseElement(props) {
                 <div className='label'>CONNECTED</div>
                 <div className='name'>{ props.request.name }</div>
                 <div className='button-group'>
-                    <Button content='Remove' size='mini'  onClick={() => updateHandRaiseRequest('denied')}/>
+                    <Button variant="contained" children='Remove' size='small'  onClick={() => updateHandRaiseRequest('denied')}/>
                 </div>
             </div>  
             <style jsx>{`
