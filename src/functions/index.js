@@ -455,7 +455,7 @@ exports.sendPostmarkEmailUserDataAndUni = functions.https.onRequest(async (req, 
     const recipient_university_country_code = req.body.universityCountryCode;
     const pinCode = getRandomInt(9999);
 
-    await admin.firestore().collection("userData").doc(recipient_email).set(
+    admin.firestore().collection("userData").doc(recipient_email).set(
         {
             id: recipient_email,
             validationPin: pinCode,
@@ -464,20 +464,25 @@ exports.sendPostmarkEmailUserDataAndUni = functions.https.onRequest(async (req, 
             userEmail: recipient_email,
             universityCode: recipient_university,
             universityCountryCode: recipient_university_country_code,
-        });
-
-    const email = {
-        "TemplateId": 17669843,
-        "From": 'CareerFairy <noreply@careerfairy.io>',
-        "To": recipient_email,
-        "TemplateModel": { pinCode: pinCode }
-    };
-
-    return client.sendEmailWithTemplate(email).then(response => {
-        res.sendStatus(200);
-    }, error => {
-        res.sendStatus(500);
-    });
+        }).then(() => {
+            const email = {
+                "TemplateId": 17669843,
+                "From": 'CareerFairy <noreply@careerfairy.io>',
+                "To": recipient_email,
+                "TemplateModel": { pinCode: pinCode }
+            };
+        
+            return client.sendEmailWithTemplate(email).then(response => {
+                console.log(`Successfully sent PIN email to ${recipient_email}`);
+                res.sendStatus(200);
+            }, error => {
+                console.error(`Error sending PIN email to ${recipient_email}`, error);
+                res.sendStatus(500);
+            });
+        }).catch((error) => {
+            console.error(`Error creating user ${recipient_email}`, error);
+            res.sendStatus(500);
+        });   
 });
 
 exports.sendReminderEmailToRegistrants = functions.https.onRequest(async (req, res) => {
@@ -578,6 +583,7 @@ exports.getNumberOfViewers = functions.https.onRequest(async (req, res) => {
 });
 
 exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 45 minutes').timeZone('Europe/Zurich').onRun((context) => {
+    let messageSender = mailgun.messages();
     const dateStart = new Date(Date.now() + 1000 * 60 * 60 * 1);
     const dateEnd =  new Date(Date.now() + 1000 * 60 * 60 * 1.75);
     admin.firestore().collection("livestreams")
@@ -592,9 +598,7 @@ exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 45
                 console.log("number of emails: " + livestream.registeredUsers.length);
                 livestream.registeredUsers.forEach( (email, index) => {
                     var data = generateEmailData(email, livestream, false);
-                    setTimeout(() => {
-                        mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
-                    }, (1000 * index));
+                    messageSender.send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
                 });
             });
         }).catch((error) => {
@@ -606,20 +610,36 @@ exports.sendReminderEmailsWhenLivestreamStarts = functions.firestore
     .document('livestreams/{livestreamId}')
     .onUpdate((change, context) => {
         console.log("onUpdate")
+        let mailgunSender = mailgun.messages();
         const previousValue = change.before.data();
         const newValue = change.after.data();
         if (newValue.test === false) {
             if (!previousValue.hasStarted && !previousValue.hasSentEmails && newValue.hasStarted === true) {
                 console.log("sendEmail")
                 admin.firestore().collection("livestreams").doc(context.params.livestreamId).update({ hasSentEmails: true }).then(() => {
-                    newValue.registeredUsers.forEach( email => {
-                        var data = generateEmailData(email, newValue, true);
-                        mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
-                    });
+                    let chunkedRegisteredUsers = chunk(newValue.registeredUsers, 100);
+                    chunkedRegisteredUsers.forEach( (registeredUsersSubarray, index) => {
+                        setTimeout(() => {
+                            registeredUsersSubarray.forEach( email => {
+                                var data = generateEmailData(email, newValue, true);
+                                mailgunSender.send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
+                            });
+                        }, index * (4 * 60 * 1000));
+                    })
                 })
             }
         }    
     });
+
+function chunk(array, size) {
+    const chunked_arr = [];
+    let index = 0;
+    while (index < array.length) {
+        chunked_arr.push(array.slice(index, size + index));
+        index += size;
+    }
+    return chunked_arr;
+}     
 
 function generateEmailData(recipientEmail, livestream, startingNow) {
     var luxonStartDateTime = DateTime.fromJSDate(livestream.start.toDate(), { zone: 'Europe/Zurich' });
