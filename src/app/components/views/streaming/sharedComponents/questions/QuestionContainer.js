@@ -75,10 +75,10 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
     }, [livestream.id, question.id]);
 
     useEffect(() => {
-        if (active) {
+        if (active && !showAllReactions) {
             setShowAllReactions(true)
         }
-    }, [active])
+    }, [active, question.type])
 
     function addNewComment() {
         if (!(newCommentTitle.trim()) || (!userData && !livestream.test && !streamer)) {
