@@ -11,6 +11,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import {withFirebase} from 'context/firebase';
 import AddIcon from '@material-ui/icons/Add';
 import Fab from "@material-ui/core/Fab";
+import Box from "@material-ui/core/Box";
 
 
 function QuestionCategory({livestream, selectedState, user, streamer, firebase}) {
@@ -105,7 +106,8 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
                     Questions
                 </div>
                 {!streamer &&
-                <Button variant="contained" style={{marginTop: "1rem"}} children='Add a Question' endIcon={<AddIcon fontSize="large"/>}
+                <Button variant="contained" style={{marginTop: "1rem"}} children='Add a Question'
+                        endIcon={<AddIcon fontSize="large"/>}
                         color="primary" onClick={handleOpen}/>}
                 <div style={{display: "flex", justifyContent: "center"}}>
                     <Fab size="small" variant="extended" onClick={() => setShowNextQuestions(true)} value="left"
@@ -114,7 +116,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
                              marginRight: "0.5rem",
                              color: showNextQuestions ? "white" : "black"
                          }}>
-                        Upcoming [{upcomingQuestionsElements.length}]
+                        <Box fontSize={10}>Upcoming [{upcomingQuestionsElements.length}]</Box>
                     </Fab>
                     <Fab size="small" variant="extended" onClick={() => setShowNextQuestions(false)} value="center"
                          style={{
@@ -122,7 +124,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
                              marginLeft: "0.5rem",
                              color: showNextQuestions ? "black" : "white"
                          }}>
-                        Answered [{pastQuestionsElements.length}]
+                        <Box fontSize={10}>Answered [{pastQuestionsElements.length}]</Box>
                     </Fab>
                 </div>
             </div>

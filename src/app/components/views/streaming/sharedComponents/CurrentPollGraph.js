@@ -110,14 +110,14 @@ const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
                 display: "flex",
                 flexDirection: "column",
             }}>
-                <Typography align="center" color="primary" style={{fontSize: "2.5em", marginTop: "auto", overflowWrap: "break-word"}}
-                            variant="h3"
+                <Typography align="center" color="primary" style={{fontSize: "2em", marginTop: "auto", overflowWrap: "break-word"}}
+                            variant="h4"
                             gutterBottom>{question}</Typography>
                 <List dense>
                     {legendElements.map((item) => {
                         const votesNum = chartData.datasets[0].data[item.index]
                         return (
-                            <ListItem dense key={item.index} onClick={(e) => handleClickLegend(e, item)} button>
+                            <ListItem style={{paddingRight: 0}} dense key={item.index} onClick={(e) => handleClickLegend(e, item)} button>
                                 <ListItemIcon style={{minWidth: 0}}>
                                     <Checkbox
                                         edge="start"
