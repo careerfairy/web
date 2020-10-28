@@ -1,18 +1,32 @@
-import {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {Grid, Icon} from "semantic-ui-react";
 
-import { withFirebasePage } from 'context/firebase';
+import {withFirebasePage} from 'context/firebase';
 
-import { useRouter } from 'next/router';
-import NewCommentContainer from 'components/views/streaming/comment-container/NewCommentContainer';
+import {useRouter} from 'next/router';
 import SpeakerManagementModal from 'components/views/streaming/modal/SpeakerManagementModal';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
 import MiniChatContainer from 'components/views/streaming/LeftMenu/categories/chat/MiniChatContainer';
 import ButtonWithConfirm from 'components/views/common/ButtonWithConfirm';
-import { useNumberOfViewers } from 'components/custom-hook/useNumberOfViewers';
+import {useNumberOfViewers} from 'components/custom-hook/useNumberOfViewers';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 import NotificationsContext from 'context/notifications/NotificationsContext';
 import NotificationsContainer from 'components/views/streaming/notifications-container/NotificationsContainer';
+import LeftMenu from "../../../../components/views/streaming/LeftMenu/LeftMenu";
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme) => ({
+    menuLeft: {
+        position: "absolute",
+        transition: "width 0.3s",
+        transitionTimingFunction: theme.transitions.easeInOut,
+        width: ({showMenu}) => showMenu ? 280 : 0,
+        top: 55,
+        left: 0,
+        bottom: 0,
+        zIndex: 20
+    },
+}));
 
 function StreamingPage(props) {
 
@@ -25,6 +39,7 @@ function StreamingPage(props) {
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const [showSpeakersModal, setShowSpeakersModal] = useState(false);
     const [showMenu, setShowMenu] = useState(true);
+    const classes = useStyles({showMenu})
 
     const [newNotification, setNewNotification] = useState(null);
     const [notifications, setNotifications] = useState([]);
@@ -38,7 +53,7 @@ function StreamingPage(props) {
                     let livestream = querySnapshot.data();
                     livestream.id = querySnapshot.id;
                     setCurrentLivestream(livestream);
-                }   
+                }
             });
         }
     }, [livestreamId]);
@@ -55,7 +70,7 @@ function StreamingPage(props) {
     }, [currentLivestream.start]);
 
     function dateIsInUnder2Minutes(date) {
-        return new Date(date).getTime() - Date.now() < 1000*60*2 || Date.now() > new Date(date).getTime();
+        return new Date(date).getTime() - Date.now() < 1000 * 60 * 2 || Date.now() > new Date(date).getTime();
     }
 
     function toggleMicrophone() {
@@ -67,33 +82,57 @@ function StreamingPage(props) {
         setIsLocalMicMuted(!isLocalMicMuted);
     }
 
+    const toggleShowMenu = () => {
+        setShowMenu(!showMenu)
+    }
+
 
     return (
-        <NotificationsContext.Provider value={{ setNewNotification: setNewNotification }}>
+        <NotificationsContext.Provider value={{setNewNotification: setNewNotification}}>
             <div className='topLevelContainer'>
                 <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
-                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', display: 'inline-block', padding: '10px', verticalAlign: 'middle', fontSize: '0.8em'}}>
-                        <h3 style={{ color: (currentLivestream.hasStarted ?  'teal' : 'orange') }}>{ currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}</h3>
-                        { currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
+                    <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        display: 'inline-block',
+                        padding: '10px',
+                        verticalAlign: 'middle',
+                        fontSize: '0.8em'
+                    }}>
+                        <h3 style={{color: (currentLivestream.hasStarted ? 'teal' : 'orange')}}>{currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}</h3>
+                        {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
                     </div>
-                    <div style={{ float: 'right', margin: '0 20px', fontSize: '1em', padding: '3px', verticalAlign: 'middle'}}>
-                        Viewers: { numberOfViewers }
+                    <div style={{
+                        float: 'right',
+                        margin: '0 20px',
+                        fontSize: '1em',
+                        padding: '3px',
+                        verticalAlign: 'middle'
+                    }}>
+                        Viewers: {numberOfViewers}
                     </div>
                 </div>
-                <div className='black-frame' style={{ left: showMenu ? '280px' : '0'}}>
-                    <VideoContainer currentLivestream={ currentLivestream } streamerId={ streamerId } viewer={ false }/>
+                <div className='black-frame' style={{left: showMenu ? '280px' : '0'}}>
+                    <VideoContainer currentLivestream={currentLivestream} streamerId={streamerId} viewer={false}/>
                 </div>
-                <div className='video-menu-left' style={{ width: showMenu ? '280px' : '0'}}> 
-                    <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={true} livestream={ currentLivestream }/>
+                <div className={classes.menuLeft}>
+                    <LeftMenu
+                        streamer
+                        livestream={currentLivestream}
+                        showMenu={showMenu}
+                        setShowMenu={setShowMenu}
+                        toggleShowMenu={toggleShowMenu}/>
                 </div>
                 <div className='mini-chat-container'>
-                    <MiniChatContainer livestream={ currentLivestream } isStreamer={true}/>
+                    <MiniChatContainer livestream={currentLivestream} isStreamer={true}/>
                 </div>
                 <div className='icons-container'>
-                    <IconsContainer livestreamId={ currentLivestream.id } />
+                    <IconsContainer livestreamId={currentLivestream.id}/>
                 </div>
                 <div className='notifications-container'>
-                    <NotificationsContainer notifications={notifications} />
+                    <NotificationsContainer notifications={notifications}/>
                 </div>
                 <style jsx>{`
                     .top-menu {
