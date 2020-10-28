@@ -5,7 +5,7 @@ import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import CheckIcon from '@material-ui/icons/Check';
 import Dialog from '@material-ui/core/Dialog';
 import {withFirebase} from 'context/firebase';
-import {DialogContentText, DialogTitle, Typography} from "@material-ui/core";
+import {DialogContentText, DialogTitle, Typography, Slide} from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 
@@ -14,11 +14,11 @@ function SpeakerManagementModal({livestreamId, open, setOpen}) {
     const link = `https://careerfairy.io/streaming/${livestreamId}/joining-streamer?pwd=qdhwuiehd7qw789d79w8e8dheiuhiqwdu`;
 
     return (
-        <Dialog fullWidth onClose={setOpen(false)} open={open}>
+        <Dialog TransitionComponent={Slide} fullWidth onClose={() => setOpen(false)} open={open}>
             <DialogTitle disableTypography
                          style={{display: "flex", justifyContent: "center", alignItems: "flex-end"}} align="center">
-                <PersonAddIcon style={{color: "white"}} fontSize="large"/> <Typography
-                style={{fontSize: "1.8em", fontWeight: 500, color: "white"}} variant="h3">Invite additional
+                <PersonAddIcon style={{marginRight: "1rem"}} fontSize="large"/> <Typography
+                style={{fontSize: "1.8em", fontWeight: 500}} variant="h3">Invite additional
                 speakers</Typography>
             </DialogTitle>
             <MuiDialogContent dividers>
