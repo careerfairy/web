@@ -44,7 +44,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 
-function QuestionContainer({userData, user, livestream, streamer, appear, question, questions}) {
+function QuestionContainer({user, livestream, streamer, appear, question, questions, firebase}) {
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
@@ -70,15 +70,19 @@ function QuestionContainer({userData, user, livestream, streamer, appear, questi
     }, [livestream.id, question.id]);
 
     function addNewComment() {
-        if (!(newCommentTitle.trim()) || (!userData && !livestream.test)) {
+        if (!(newCommentTitle.trim()) || (!userData && !livestream.test && !streamer)) {
             return;
         }
 
 
-        const newComment = {
+        const newComment = streamer ? {
             title: newCommentTitle,
             author: userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous',
+        } : {
+            title: newCommentTitle,
+            author: 'Streamer',
         }
+
         firebase.putQuestionComment(livestream.id, question.id, newComment)
             .then(() => {
                 setNewCommentTitle("");
@@ -155,7 +159,7 @@ function QuestionContainer({userData, user, livestream, streamer, appear, questi
         </IconButton>
     </div>)
 
-    const ReactionsToggle = ( => {
+    const ReactionsToggle = () => {
         if (comments.length < 2) {
             return null;
         }
@@ -202,8 +206,8 @@ function QuestionContainer({userData, user, livestream, streamer, appear, questi
                         <ReactionsToggle/>
                         <div style={{color: question.type === 'current' ? "white" : "auto"}} className='upvotes'>
                             {question.votes} <ThumbUpRoundedIcon color="inherit"
-                                                                       style={{verticalAlign: "text-top"}}
-                                                                       fontSize='small'/>
+                                                                 style={{verticalAlign: "text-top"}}
+                                                                 fontSize='small'/>
                         </div>
                     </div>
                     <Box p={1}>
@@ -224,7 +228,7 @@ function QuestionContainer({userData, user, livestream, streamer, appear, questi
                             }}
                         />
                     </Box>
-                    <Button
+                    {!!streamer && <Button
                         startIcon={<ThumbUpRoundedIcon/>}
                         children={!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
                         size='small'
@@ -234,7 +238,7 @@ function QuestionContainer({userData, user, livestream, streamer, appear, questi
                         fullWidth
                         variant="contained"
                         onClick={() => upvoteLivestreamQuestion()}
-                        disabled={(question.type !== 'new' || (!user && !livestream.test) || (question.emailOfVoters ? question.emailOfVoters.indexOf(livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false))}/>
+                        disabled={(question.type !== 'new' || (!user && !livestream.test) || (question.emailOfVoters ? question.emailOfVoters.indexOf(livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false))}/>}
                 </div>
                 <style jsx>{`
                     .questionContainer {

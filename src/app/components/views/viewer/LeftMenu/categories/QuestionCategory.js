@@ -12,7 +12,7 @@ import {withFirebase} from 'context/firebase';
 import AddIcon from '@material-ui/icons/Add';
 
 
-function QuestionCategory({ livestream, selectedState, user, userData, streamer}) {
+function QuestionCategory({ livestream, selectedState, user, streamer, firebase}) {
     const [showNextQuestions, setShowNextQuestions] = useState(true);
     const [showQuestionModal, setShowQuestionModal] = useState(false);
     const [touched, setTouched] = useState(false);
@@ -31,7 +31,7 @@ function QuestionCategory({ livestream, selectedState, user, userData, streamer}
         setTouched(false)
         setShowQuestionModal(false)
     }
-
+//
     useEffect(() => {
         if (livestream.id) {
             const unsubscribe = firebase.listenToLivestreamQuestions(livestream.id, querySnapshot => {
@@ -77,7 +77,7 @@ function QuestionCategory({ livestream, selectedState, user, userData, streamer}
     let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer streamer={streamer} appear={selectedState === 'questions'} livestream={livestream}
+                <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} appear={showNextQuestions} livestream={livestream}
                                    questions={upcomingQuestions} question={question} user={authenticatedUser}
                                    userData={userData}/>
             </div>
@@ -87,7 +87,7 @@ function QuestionCategory({ livestream, selectedState, user, userData, streamer}
     let pastQuestionsElements = pastQuestions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer streamer={streamer} appear={selectedState === 'questions'} livestream={livestream}
+                <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} appear={!showNextQuestions} livestream={livestream}
                                    questions={pastQuestions} question={question} user={authenticatedUser}
                                    userData={userData}/>
             </div>
@@ -101,8 +101,7 @@ function QuestionCategory({ livestream, selectedState, user, userData, streamer}
                 <div className='questionToggleTitle'>
                     Questions
                 </div>
-                {streamer && <Button variant="contained" children='Add a Question' endIcon={<AddIcon fontSize="large"/>}
-                         style={{position: 'absolute', top: '45px', left: '50%', transform: 'translateX(-50%)'}}
+                {!streamer && <Button variant="contained" children='Add a Question' endIcon={<AddIcon fontSize="large"/>}
                          color="primary" onClick={handleOpen}/>}
                 <div className='questionToggleSwitches'>
                     <div className={'questionToggleSwitch ' + (showNextQuestions ? 'active' : '')}
@@ -115,11 +114,11 @@ function QuestionCategory({ livestream, selectedState, user, userData, streamer}
                     </div>
                 </div>
             </div>
-            <div className='chat-container'>
-                <div className={'chat-scrollable ' + (showNextQuestions ? '' : 'hidden')}>
+            <div>
+                <div>
                     {upcomingQuestionsElements}
                 </div>
-                <div className={'chat-scrollable ' + (showNextQuestions ? 'hidden' : '')}>
+                <div unmountOnExit in={!showNextQuestions}>
                     {pastQuestionsElements}
                 </div>
             </div>
@@ -157,16 +156,24 @@ function QuestionCategory({ livestream, selectedState, user, userData, streamer}
             <style jsx>{`
 
                 .questionToggle {
-                    position: relative;
-                    height: 150px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: space-around;
                     box-shadow: 0 4px 2px -2px rgb(200,200,200);
                     z-index: 9000;
                     background-color: white;
                 }
+                
+                .questionToggle > * {
+                  margin-top: 1rem;
+                }
+                
+                .questionToggle > *:not(:first-child) {
+                  margin-bottom: 1rem;
+                }
 
                 .questionToggleTitle {
-                    position: absolute;
-                    top: 15px;
                     width: 100%;
                     font-size: 1.2em;
                     font-weight: 500;
@@ -174,8 +181,6 @@ function QuestionCategory({ livestream, selectedState, user, userData, streamer}
                 }
 
                 .questionToggleSwitches {
-                    position: absolute;
-                    bottom: 10px;
                     width: 100%;
                     text-align: center;
                 }
@@ -200,30 +205,6 @@ function QuestionCategory({ livestream, selectedState, user, userData, streamer}
 
                 .hidden {
                     display: none;
-                }
-
-                .chat-container {
-                    position: absolute;
-                    top: 150px;
-                    left: 0;
-                    bottom: 0;
-                    width: 100%;
-                }
-
-                @media(max-width: 768px) {
-
-                }
-
-                @media(min-width: 768px) {
-                    .chat-scrollable {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        bottom: 0;
-                        width: 100%;
-                        overflow-y: auto;
-                        overflow-x: hidden;
-                    }
                 }
 
                 ::-webkit-scrollbar {

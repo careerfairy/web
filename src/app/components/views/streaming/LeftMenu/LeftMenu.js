@@ -1,12 +1,12 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {withFirebase} from "../../../../context/firebase";
 import ButtonComponent from "../../viewer/LeftMenu/ButtonComponent";
-import QuestionCategory from "../comment-container/categories/QuestionCategory";
 import PollCategory from "../comment-container/categories/PollCategory";
 import HandRaiseCategory from "../comment-container/categories/HandRaiseCategory";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import SwipeableViews from "react-swipeable-views";
+import QuestionCategory from "../../viewer/LeftMenu/categories/QuestionCategory";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -77,7 +77,7 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
 
     const views = [
         <TabPanel key={0} value={value} index={0} dir={theme.direction}>
-            <QuestionCategory livestream={livestream} selectedState={selectedState}/>
+            <QuestionCategory streamer={streamer} {...props} livestream={livestream} selectedState={selectedState}/>
         </TabPanel>,
         <TabPanel key={1} value={value} index={1} dir={theme.direction}>
             <PollCategory livestream={livestream} selectedState={selectedState} streamer={streamer}/>
