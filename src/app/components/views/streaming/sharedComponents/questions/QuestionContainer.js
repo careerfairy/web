@@ -124,7 +124,7 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
 
     let commentsElements = comments.map((comment, index) => {
         return (
-            <div className='animated fadeInUp faster' key={comment.id}>
+            <div style={{paddingBottom: 10}} className='animated fadeInUp faster' key={comment.id}>
                 <div className='questionContainer'>
                     <div className='questionTitle'>
                         <Linkify componentDecorator={componentDecorator}>
