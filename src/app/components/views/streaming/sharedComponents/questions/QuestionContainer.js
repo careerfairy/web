@@ -6,12 +6,14 @@ import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import ExpandMoreRoundedIcon from '@material-ui/icons/ExpandMoreRounded';
 import {withFirebase} from 'context/firebase';
 import UserContext from 'context/user/UserContext';
-import {Box, Button, fade, TextField} from "@material-ui/core";
+import {Box, Button, fade, Slide, TextField} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {grey} from "@material-ui/core/colors";
 import IconButton from "@material-ui/core/IconButton";
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import Typography from "@material-ui/core/Typography";
+import Collapse from "@material-ui/core/Collapse";
+import Card from "@material-ui/core/Card";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -130,45 +132,20 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
 
     let commentsElements = comments.map((comment, index) => {
         return (
-            <div style={{paddingBottom: 10}} className='animated fadeInUp faster' key={comment.id}>
-                <div className='questionContainer'>
-                    <div className='questionTitle'>
+            <Slide key={comment.id} in direction="right">
+                <Box borderRadius={8} mb={1} p={1} component={Card}>
+                    <div style={{wordBreak: "break-word"}}>
                         <Linkify componentDecorator={componentDecorator}>
                             {comment.title}
                         </Linkify>
                     </div>
-                    <div className='questionAuthor'>
+                    <div style={{fontSize: "0.8em", color: "rgb(160,160,160)"}}>
                         @{comment.author}
                     </div>
-                </div>
-                <style jsx>{`
-                    .questionContainer {
-                        position: relative;
-                        padding: 10px;
-                        margin: 6px 0 3px 0;
-                        background-color: white;
-                        color: black;
-                        border-radius: 10px;
-                        box-shadow: 0 0 5px rgb(180,180,180);
-                        font-size: 0.9em;
-                    }
-
-                    .questionTitle {
-                        word-break: break-word;
-                    }
-
-                    .questionAuthor {
-                        font-size: 0.8em;
-                        color: rgb(160,160,160);
-                    }
-                `}</style>
-            </div>
+                </Box>
+            </Slide>
         );
     });
-
-    if (!showAllReactions) {
-        commentsElements = commentsElements.slice(0, 1);
-    }
 
     const playIcon = (<div>
         <IconButton classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}} disabled={isEmpty}
@@ -193,7 +170,6 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
                 }}>{showAllReactions ? 'Hide' : 'Show all reactions'}</Typography>
                 <style jsx>{`
                     .reactions-toggle {
-                        margin: 5px 0 0 0;
                         text-transform: uppercase;
                         cursor: pointer;
                         color: rgb(210,210,210);
@@ -206,8 +182,8 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
     }
 
     return (
-        <Grow appear={appear} mountOnEnter unmountOnExit in={appear}>
-            <div className='animated fadeInUp faster'>
+        <>
+            <Grow appear={appear} mountOnEnter unmountOnExit in={appear}>
                 <div className={'questionContainer ' + (active ? 'active' : '')}>
                     <div style={{padding: "20px 20px 5px 20px"}}>
                         <div className='questionTitle'>
@@ -218,9 +194,10 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
                                 <p className='comments-number'>{comments.length} reactions</p>
                             </div>
                         </div>
-                        <div>
-                            {commentsElements}
-                        </div>
+                        {commentsElements[0]}
+                        <Collapse style={{width: "100%"}} in={showAllReactions}>
+                            {commentsElements.slice(1)}
+                        </Collapse>
                         <ReactionsToggle/>
                         <div style={{color: active ? "white" : "auto"}} className='upvotes'>
                             {question.votes} <ThumbUpRoundedIcon color="inherit"
@@ -271,7 +248,8 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
                             onClick={() => upvoteLivestreamQuestion()}
                             disabled={old || upvoted}/>}
                 </div>
-                <style jsx>{`
+            </Grow>
+            <style jsx>{`
                     .questionContainer {
                         position: relative;
                         padding: 20px 0 0 0;
@@ -317,7 +295,7 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
                     }
 
                     .bottom-element {
-                        margin-top: 5px;
+                        margin: 5px 0;
                         color: rgb(200,200,200);
                         font-size: 0.9em;  
                         font-weight: 700; 
@@ -357,8 +335,7 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
                         color: rgba(0, 210, 170, 1);
                     }
                 `}</style>
-            </div>
-        </Grow>
+        </>
     );
 }
 
