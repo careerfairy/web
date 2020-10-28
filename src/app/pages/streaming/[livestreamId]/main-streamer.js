@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
         position: "absolute",
         transition: "width 0.3s",
         transitionTimingFunction: theme.transitions.easeInOut,
-        width: ({showMenu,}) => showMenu ? 280 : 0,
+        width: ({showMenu}) => showMenu ? 280 : 0,
         top: 55,
         left: 0,
         bottom: 0,
@@ -178,10 +178,6 @@ function StreamingPage(props) {
                         <VideoContainer currentLivestream={currentLivestream} streamerId={currentLivestream.id}
                                         showMenu={showMenu} viewer={false}/>
                     </div>
-                    {/*<div className='video-menu-left' style={{width: showMenu ? '280px' : '0'}}>*/}
-                    {/*    <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={true}*/}
-                    {/*                         livestream={currentLivestream}/>*/}
-                    {/*</div>*/}
                     <div className={classes.menuLeft}>
                         <LeftMenu
                             streamer

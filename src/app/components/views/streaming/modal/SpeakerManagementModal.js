@@ -1,34 +1,54 @@
 import React from 'react';
+import MuiDialogContent from '@material-ui/core/DialogContent';
+import MuiDialogActions from '@material-ui/core/DialogActions';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import CheckIcon from '@material-ui/icons/Check';
+import Dialog from '@material-ui/core/Dialog';
 
-import { Modal, Input, Icon, Button, Form } from 'semantic-ui-react';
-import { withFirebase } from 'context/firebase';
+import {Modal, Input, Icon, Form} from 'semantic-ui-react';
+import {withFirebase} from 'context/firebase';
+import {DialogContentText, DialogTitle, Slide, Typography} from "@material-ui/core";
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
 
-function SpeakerManagementModal(props) {
+function SpeakerManagementModal({livestreamId, open, setOpen}) {
 
-    const link = `https://careerfairy.io/streaming/${props.livestreamId}/joining-streamer?pwd=qdhwuiehd7qw789d79w8e8dheiuhiqwdu`;
+    const link = `https://careerfairy.io/streaming/${livestreamId}/joining-streamer?pwd=qdhwuiehd7qw789d79w8e8dheiuhiqwdu`;
 
     return (
-        <Modal open={props.open} onClose={() => props.setOpen(false)}>
-            <Modal.Header><Icon name='user plus'
-                                // color='darkgrey'
-                                size='large' style={{ marginRight: '20px'}}/>Invite additional speakers</Modal.Header>
-            <Modal.Content>
-                <p style={{ fontSize: '0.9em', margin: '0 0 20px 0' }}>You can invite up to 6 speakers to join your stream. You should do this before starting your stream, to ensure that all streamer have joined before the event starts. When an invited speaker has successfully joined, you will be able to see and hear him/her in the stream overview.</p>
-                <div style={{ margin: '0 0 30px 0', border: '2px solid rgb(0, 210, 170)', padding: '20px', borderRadius: '10px', backgroundColor: 'rgb(252,252,252)', boxShadow: '0 0 2px grey' }} className='animated fadeIn'>
-                    <Input type='text' value={link} readOnly style={{ margin: '0 0 5px 0', color: 'red', cursor: 'text'}} fluid />
-                    <p style={{ marginBottom: '10px', color: 'rgb(80,80,80)', fontSize: '0.8em'}}>Please send this link to all individuals who should join your live stream.</p>
-                </div>
-            </Modal.Content>
-            <Modal.Actions>
-                <Button
-                    content="OK"
-                    icon='checkmark'
-                    onClick={() => props.setOpen(false)}
-                    primary
+        <Dialog fullWidth onClose={setOpen(false)} TransitionComponent={Slide} open={open}>
+            <DialogTitle disableTypography
+                         style={{display: "flex", justifyContent: "center", alignItems: "flex-end"}} align="center">
+                <PersonAddIcon style={{color: "white"}} fontSize="large"/> <Typography
+                style={{fontSize: "1.8em", fontWeight: 500, color: "white"}} variant="h3">Invite additional
+                speakers</Typography>
+            </DialogTitle>
+            <MuiDialogContent dividers>
+                <DialogContentText>
+                    You can invite up to 6 speakers to join your
+                    stream. You should do this before starting your stream, to ensure that all streamer have joined
+                    before the event starts. When an invited speaker has successfully joined, you will be able to see
+                    and hear him/her in the stream overview.
+                </DialogContentText>
+                <TextField
+                    variant="outlined"
+                    fullWidth
+                    autoFocus
+                    InputProps={{readOnly: true}}
+                    value={link}
                 />
-            </Modal.Actions>
-        </Modal>
-    );
+            </MuiDialogContent>
+            <MuiDialogActions>
+                <Button
+                    children="OK"
+                    variant="contained"
+                    color="primary"
+                    startIcon={<CheckIcon/>}
+                    onClick={() => setOpen(false)}
+                />
+            </MuiDialogActions>
+        </Dialog>
+    )
 }
 
 export default withFirebase(SpeakerManagementModal);
