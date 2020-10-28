@@ -596,10 +596,8 @@ exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 45
                 livestream.id = doc.id;
                 console.log("livestream company: " + livestream.company);
                 console.log("number of emails: " + livestream.registeredUsers.length);
-                livestream.registeredUsers.forEach( (email, index) => {
-                    var data = generateEmailData(email, livestream, false);
-                    messageSender.send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
-                });
+                var data = generateEmailData(livestream.id, livestream, false);
+                messageSender.send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
             });
         }).catch((error) => {
             console.log("error: " + error);
@@ -617,47 +615,37 @@ exports.sendReminderEmailsWhenLivestreamStarts = functions.firestore
             if (!previousValue.hasStarted && !previousValue.hasSentEmails && newValue.hasStarted === true) {
                 console.log("sendEmail")
                 admin.firestore().collection("livestreams").doc(context.params.livestreamId).update({ hasSentEmails: true }).then(() => {
-                    let chunkedRegisteredUsers = chunk(newValue.registeredUsers, 100);
-                    chunkedRegisteredUsers.forEach( (registeredUsersSubarray, index) => {
-                        setTimeout(() => {
-                            registeredUsersSubarray.forEach( email => {
-                                var data = generateEmailData(email, newValue, true);
-                                mailgunSender.send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
-                            });
-                        }, index * (4 * 60 * 1000));
-                    })
+                    var data = generateEmailData(context.params.livestreamId, newValue, true);
+                    console.log(data);
+                    mailgunSender.send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
                 })
             }
         }    
-    });
+    });  
 
-function chunk(array, size) {
-    const chunked_arr = [];
-    let index = 0;
-    while (index < array.length) {
-        chunked_arr.push(array.slice(index, size + index));
-        index += size;
-    }
-    return chunked_arr;
-}     
-
-function generateEmailData(recipientEmail, livestream, startingNow) {
+function generateEmailData(livestreamId, livestream, startingNow) {
+    let recipientEmails = livestream.registeredUsers.join();
     var luxonStartDateTime = DateTime.fromJSDate(livestream.start.toDate(), { zone: 'Europe/Zurich' });
+    const mailgunVariables = { "company": livestream.company, "startTime": formatHour(luxonStartDateTime), "streamLink": getStreamLink(livestreamId), "german": livestream.language === "DE" ? true : false };
+    let recipientVariablesObj = {};
+    livestream.registeredUsers.forEach( email => {
+        recipientVariablesObj[email] = mailgunVariables;
+    })
     if (startingNow) {
         return {
             from: "CareerFairy <noreply@careerfairy.io>",
-            to: recipientEmail,
+            to: recipientEmails,
             subject:  'NOW: Live Stream with ' + livestream.company + ' ' + getLivestreamTimeInterval(livestream.start),
             template: 'registration-reminder',
-            "h:X-Mailgun-Variables": JSON.stringify({ "company": livestream.company, "startTime": formatHour(luxonStartDateTime), "streamLink": getStreamLink(livestream.id), "german": livestream.language === "DE" ? true : false }),
+            "recipient-variables": JSON.stringify(recipientVariablesObj)
         }
     } else {
         return {
             from: "CareerFairy <noreply@careerfairy.io>",
-            to: recipientEmail,
+            to: recipientEmails,
             subject: 'Reminder: Live Stream with ' + livestream.company + ' ' + getLivestreamTimeInterval(livestream.start),
             template: 'registration-reminder',
-            "h:X-Mailgun-Variables": JSON.stringify({ "company": livestream.company, "startTime": formatHour(luxonStartDateTime), "streamLink": getStreamLink(livestream.id), "german": livestream.language === "DE" ? true : false }),
+            "recipient-variables": JSON.stringify(recipientVariablesObj),
             "o:deliverytime": luxonStartDateTime.minus({ minutes: 45 }).toRFC2822()
         }
     }  
