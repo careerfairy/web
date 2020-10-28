@@ -12,7 +12,7 @@ import IconsContainer from 'components/views/streaming/icons-container/IconsCont
 import NotificationsContext from 'context/notifications/NotificationsContext';
 import NotificationsContainer from 'components/views/streaming/notifications-container/NotificationsContainer';
 import {v4 as uuidv4} from 'uuid';
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 function StreamingPage(props) {
 
-
+const theme = useTheme()
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
     const [streamerId, setStreamerId] = useState(uuidv4())
@@ -87,7 +87,7 @@ function StreamingPage(props) {
                         verticalAlign: 'middle'
                     }}>
                         <ButtonWithConfirm
-                            color={currentLivestream.hasStarted ? 'red' : 'teal'}
+                            color={currentLivestream.hasStarted ? theme.palette.error.main : theme.palette.primary.main}
                             fluid
                             disabled={!streamStartTimeIsNow}
                             buttonAction={() => setStreamingStarted(!currentLivestream.hasStarted)}

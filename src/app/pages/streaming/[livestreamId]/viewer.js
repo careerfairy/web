@@ -4,6 +4,7 @@ import PlayArrowRoundedIcon from '@material-ui/icons/PlayArrowRounded';
 import ThumbUpAltOutlinedIcon from '@material-ui/icons/ThumbUpAltOutlined';
 import FavoriteBorderOutlinedIcon from '@material-ui/icons/FavoriteBorderOutlined';
 import {useRouter} from 'next/router';
+import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import {withFirebasePage} from '../../../context/firebase';
 import ViewerHandRaiseComponent from 'components/views/viewer/viewer-hand-raise-component/ViewerHandRaiseComponent';
 import ViewerComponent from 'components/views/viewer/viewer-component/ViewerComponent';
@@ -366,6 +367,7 @@ function ViewerPage({firebase}) {
                         <Button
                             children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
                             variant="contained"
+                            startIcon={<PeopleAltIcon/>}
                             icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
                             onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
                             color={userIsInTalentPool ? "default" : "primary"}/> : null}

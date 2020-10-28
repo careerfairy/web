@@ -96,8 +96,8 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
     const optionElements = options.map((option, index) => {
 
             return (
-                <Grow in>
-                    <TextField value={option} error={(option.trim() === '') && (error)}
+                <Grow key={index} in>
+                    <TextField key={index} value={option} error={(option.trim() === '') && (error)}
                                label={`Option ${index + 1}`}
                                helperText={(option.trim() === '') && (error) && "Please fill or remove"}
                                variant="outlined"

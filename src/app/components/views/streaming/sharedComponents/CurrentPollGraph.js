@@ -17,7 +17,6 @@ const baseColors = [
 ]
 
 const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
-        const theme = useTheme()
         const chartRef = useRef()
         const [legendElements, setLegendElements] = useState([])
         const [legendLabels, setLegendLabels] = useState([])
@@ -111,7 +110,7 @@ const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
                 display: "flex",
                 flexDirection: "column",
             }}>
-                <Typography align="center" color="primary" style={{fontSize: "2.5em", marginTop: "auto"}}
+                <Typography align="center" color="primary" style={{fontSize: "2.5em", marginTop: "auto", overflowWrap: "break-word"}}
                             variant="h3"
                             gutterBottom>{question}</Typography>
                 <List dense>
@@ -119,7 +118,7 @@ const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
                         const votesNum = chartData.datasets[0].data[item.index]
                         return (
                             <ListItem dense key={item.index} onClick={(e) => handleClickLegend(e, item)} button>
-                                <ListItemIcon>
+                                <ListItemIcon style={{minWidth: 0}}>
                                     <Checkbox
                                         edge="start"
                                         style={{color: item.fillStyle}}
@@ -127,7 +126,7 @@ const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
                                     />
                                 </ListItemIcon>
                                 <ListItemText>
-                                    {item.text}<strong> - {votesNum} Votes</strong>
+                                    {item.text} <br/><strong>[{votesNum} Vote{votesNum !== 1 && "s"}]</strong>
                                 </ListItemText>
                             </ListItem>
                         )

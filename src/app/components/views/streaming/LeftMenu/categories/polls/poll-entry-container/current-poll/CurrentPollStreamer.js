@@ -1,13 +1,12 @@
 import React, {useState, useEffect, Fragment} from 'react';
-import {Input, Icon, Button, Dropdown} from "semantic-ui-react";
 import {withFirebase} from 'context/firebase';
 import PollOptionResultViewer from './PollOptionResultViewer';
 import CurrentPollGraph from "../../../../../sharedComponents/CurrentPollGraph";
+import {Button} from "@material-ui/core";
 
 
 function CurrentPollStreamer(props) {
     const [currentPoll, setCurrentPoll] = useState(null)
-    console.log("-> props", props);
 
     useEffect(() => {
         if (props.poll) {
@@ -37,17 +36,16 @@ function CurrentPollStreamer(props) {
                     <div className='poll-label'>ACTIVE POLL</div>
                     {currentPoll && <CurrentPollGraph background="transparent"
                         currentPoll={currentPoll}/>}
+                <Button fullWidth children={'Close Poll'} variant="contained" color="primary" onClick={() => setPollState('closed')}
+                        style={{borderRadius: '0 0 5px 5px'}}/>
                 </div>
-                <Button attached='bottom' content={'Close Poll'} primary onClick={() => setPollState('closed')}
-                        style={{margin: '0 10px 10px 10px', border: 'none'}}/>
             </div>
             <style jsx>{`
                 .chat-entry-container {
-                    border-top-left-radius: 5px;
-                    border-top-right-radius: 5px;
+                    border-radius: 15px;
                     box-shadow: 0 0 5px rgb(180,180,180);
                     margin: 10px 10px 0 10px;
-                    padding: 20px 0;
+                    padding-top: 12px;
                     background-color: white;
                     border: 10px solid rgb(0, 210, 170);
                 }

@@ -137,7 +137,7 @@ function UpcomingPollStreamer(props) {
                     <PollCreationModal livestreamId={props.livestream.id} initialPoll={props.poll} open={editPoll}
                                        handleClose={() => setEditPoll(false)}/>
 
-                    <Button fullWidth disableElevation attached='bottom' variant="contained" color="primary"
+                    <Button fullWidth disableElevation variant="contained" color="primary"
                             children={'Ask the Audience Now'} disabled={props.somePollIsCurrent}
                             onClick={() => setPollState('current')}
                             style={{borderRadius: '0 0 5px 5px'}}/>
