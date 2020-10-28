@@ -2,8 +2,10 @@ import React, {useState, useEffect, Fragment} from 'react';
 
 import { withFirebase } from 'context/firebase';
 import { Input, Icon, Button, Modal } from 'semantic-ui-react';
+import Dialog from "@material-ui/core/Dialog";
+import DialogContent from "@material-ui/core/DialogContent";
 
-function PollCreationModal(props) {
+function PollCreationModal({open, handleClose, livestreamId, initialOptions, initialPoll, firebase}) {
 
     const [question, setQuestion] = useState('');
     const [options, setOptions] = useState(['','']);
@@ -11,11 +13,11 @@ function PollCreationModal(props) {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (props.initialPoll) {
-            setQuestion(props.initialPoll.question);
-            setOptions(props.initialPoll.options.map(option => option.name));
+        if (initialPoll) {
+            setQuestion(initialPoll.question);
+            setOptions(initialPoll.options.map(option => option.name));
         }
-    }, [props.initalPoll, props.open]);
+    }, [initalPoll, open]);
 
     function increaseNumberOfOptions() {
         if (options.length > 3) {
@@ -47,17 +49,17 @@ function PollCreationModal(props) {
         }  
 
         setLoading(true);
-        if (props.initialPoll) {
-            props.firebase.updateLivestreamPoll(props.livestreamId, props.initialPoll.id, question, options).then(() => {
-                props.onClose();
+        if (initialPoll) {
+            firebase.updateLivestreamPoll(livestreamId, initialPoll.id, question, options).then(() => {
+                handleClose();
                 setError(false);
                 setQuestion('');
                 setOptions(['','']);
                 return setLoading(false);
             });
         } else {
-            props.firebase.createLivestreamPoll(props.livestreamId, question, options).then(() => {
-                props.onClose();
+            firebase.createLivestreamPoll(livestreamId, question, options).then(() => {
+                handleClose();
                 setError(false);
                 setQuestion('');
                 setOptions(['','']);
@@ -108,8 +110,8 @@ function PollCreationModal(props) {
 
     return (
         <Fragment>
-            <Modal open={props.open} onClose={props.onClose}>
-                <Modal.Content>
+            <Dialog open={open} onClose={handleClose}>
+                <DialogContent>
                     <div className='modal-title'><Icon name='chart bar outline' color='teal'/> Create a Poll</div>
                     <div className='modal-content'>
                         <div className='modal-content-question'>
@@ -121,12 +123,12 @@ function PollCreationModal(props) {
                         </div>
                         <Button icon='add' content='Add an Option' onClick={increaseNumberOfOptions} style={{ margin: '0 0 20px 0'}} disabled={options.length > 3} secondary/>
                         <Button.Group fluid  widths='2' size='large'>
-                            <Button content='Cancel' onClick={props.onClose}/>
-                            <Button loading={loading} content={props.initialPoll ? 'Update Poll' : 'Create Poll'} primary onClick={savePoll}/>
+                            <Button content='Cancel' onClick={handleClose}/>
+                            <Button loading={loading} content={initialPoll ? 'Update Poll' : 'Create Poll'} primary onClick={savePoll}/>
                         </Button.Group>
                     </div>
-                </Modal.Content>
-            </Modal>
+                </DialogContent>
+            </Dialog>
             <style jsx>{`
                 .modal-title {
                     font-size: 1.8em;

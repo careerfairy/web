@@ -1,5 +1,4 @@
-import React, {useState, useEffect, Fragment} from 'react';
-import {Input, Icon, Dropdown} from "semantic-ui-react";
+import React, {useState, Fragment} from 'react';
 import EditIcon from '@material-ui/icons/Edit';
 import {withFirebase} from 'context/firebase';
 import PollCreationModal from '../../poll-creation-modal/PollCreationModal';
@@ -24,6 +23,11 @@ function UpcomingPollStreamer(props) {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    const handleOpenPollModal =() => {
+        setEditPoll(true)
+        handleClose()
+    }
 
     function deletePoll() {
         props.firebase.deleteLivestreamPoll(props.livestream.id, props.poll.id);
@@ -116,37 +120,22 @@ function UpcomingPollStreamer(props) {
                             <MoreVertIcon/>
                         </IconButton>
                         <Menu onClose={handleClose} anchorEl={anchorEl} open={Boolean(anchorEl)}>
-                            <MenuItem onClick={() => setEditPoll(true)}>
+                            <MenuItem dense onClick={handleOpenPollModal}>
                                 <ListItemIcon>
                                     <EditIcon/>
                                 </ListItemIcon>
                                 <ListItemText primary="Edit"/>
                             </MenuItem>
-                            <MenuItem onClick={() => deletePoll()}>
+                            <MenuItem dense onClick={deletePoll}>
                                 <ListItemIcon>
                                     <CloseRounded/>
                                 </ListItemIcon>
                                 <ListItemText primary="Delete"/>
                             </MenuItem>
                         </Menu>
-                        {/*<Dropdown icon={{name: 'ellipsis vertical', fontSize: '1.1em', color: 'grey'}} direction='left'*/}
-                        {/*          >*/}
-                        {/*    <Dropdown.Menu>*/}
-                        {/*        <Dropdown.Item*/}
-                        {/*            icon='edit'*/}
-                        {/*            text='Edit'*/}
-                        {/*            onClick={() => setEditPoll(true)}*/}
-                        {/*        />*/}
-                        {/*        <Dropdown.Item*/}
-                        {/*            icon='delete'*/}
-                        {/*            text='Delete'*/}
-                        {/*            onClick={() => deletePoll()}*/}
-                        {/*        />*/}
-                        {/*    </Dropdown.Menu>*/}
-                        {/*</Dropdown>*/}
                     </Box>
                     <PollCreationModal livestreamId={props.livestream.id} initialPoll={props.poll} open={editPoll}
-                                       onClose={() => setEditPoll(false)}/>
+                                       handleClose={() => setEditPoll(false)}/>
 
                     <Button fullWidth disableElevation attached='bottom' variant="contained" color="primary"
                             children={'Ask the Audience Now'} disabled={props.somePollIsCurrent}

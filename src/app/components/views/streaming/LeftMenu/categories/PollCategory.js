@@ -50,7 +50,7 @@ function PollCategory(props) {
                     { pollElements }
                 </div>
             </div>  
-            <PollCreationModal livestreamId={props.livestream.id} open={addNewPoll} initialPoll={null} initialOptions={null} onClose={() => setAddNewPoll(false)}/>
+            <PollCreationModal livestreamId={props.livestream.id} open={addNewPoll} initialPoll={null} initialOptions={null} handleClose={() => setAddNewPoll(false)}/>
             <style jsx>{`
                 .questionToggle {
                     background-color: rgb(255,255,255);

@@ -60,6 +60,11 @@ const useStyles = makeStyles(theme => ({
         flexDirection: "column",
         padding: 0,
         backgroundColor: "rgb(245,245,245)"
+    },
+    scrollToBottom: {
+        display: "flex",
+        flexDirection: "column",
+        height: "240px"
     }
 }))
 
@@ -149,12 +154,6 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
         }
     }
 
-    const ROOT_CSS = css({
-        display: "flex",
-        flexDirection: "column",
-        height: "240px"
-    });
-
     let chatElements = chatEntries.map((chatEntry, index) => {
         return (
             <div key={index}>
@@ -188,7 +187,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
                     </Typography>
                 </AccordionSummary>
                 <AccordionDetails className={classes.chatRoom}>
-                    <ScrollToBottom className={ROOT_CSS}>
+                    <ScrollToBottom className={classes.scrollToBottom}>
                         {chatElements}
                     </ScrollToBottom>
                     <div style={{margin: 5}}>
