@@ -3,7 +3,6 @@ import React, {useState, useEffect} from 'react';
 import {withFirebasePage} from 'context/firebase';
 
 import {useRouter} from 'next/router';
-import NewCommentContainer from 'components/views/streaming/comment-container/NewCommentContainer';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
 import MiniChatContainer from 'components/views/streaming/LeftMenu/categories/chat/MiniChatContainer';
 import ButtonWithConfirm from 'components/views/common/ButtonWithConfirm';
