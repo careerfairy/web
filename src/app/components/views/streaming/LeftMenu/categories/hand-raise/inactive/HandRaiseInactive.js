@@ -1,6 +1,6 @@
-import React, {useState, useEffect, Fragment} from 'react';
-import { Input, Icon, Button, Modal } from 'semantic-ui-react';
+import React from 'react';
 import { withFirebase } from 'context/firebase';
+import {Button} from "@material-ui/core";
 
 function HandRaiseInactive(props) {
 
@@ -18,7 +18,7 @@ function HandRaiseInactive(props) {
                 <div className='central-container'>
                     <h2>Hand Raise is not active</h2>
                     <p>Allow viewers to join in your stream by activating hand raise.</p>
-                    <Button size='large' content='Activate Hand Raise' onClick={() => setHandRaiseModeActive()} primary/>
+                    <Button variant="contained" color="primary" size='large' children='Activate Hand Raise' onClick={() => setHandRaiseModeActive()}/>
                 </div>
             </div>  
             <style jsx>{`

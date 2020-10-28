@@ -1,10 +1,11 @@
 import React, {useState, useEffect, Fragment} from 'react';
 
 import { withFirebase } from 'context/firebase';
-import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
-import { Input, Icon, Button, Modal } from 'semantic-ui-react';
+import BarChartIcon from '@material-ui/icons/BarChart';
+import AddIcon from '@material-ui/icons/Add';
 import PollCreationModal from './polls/poll-creation-modal/PollCreationModal';
 import PollEntryContainer from './polls/poll-entry-container/PollEntryContainer';
+import {Button} from "@material-ui/core";
 
 function PollCategory(props) {
     
@@ -40,9 +41,9 @@ function PollCategory(props) {
         <>
             <div className='questionToggle'>
                 <div className='questionToggleTitle'>
-                    <Icon name='chart bar outline' color='teal'/> Polls
+                    <BarChartIcon fontSize="large" color="primary"/> Polls
                 </div>
-                <Button icon='add' content='Create Poll' onClick={() => setAddNewPoll(true)} primary/>
+                <Button style={{marginBottom: "1rem"}} startIcon={<AddIcon/>} children='Create Poll' onClick={() => setAddNewPoll(true)} variant="contained" color="primary"/>
             </div>
             <div className='chat-container'>
                 <div className='chat-scrollable'>
@@ -53,19 +54,26 @@ function PollCategory(props) {
             <style jsx>{`
                 .questionToggle {
                     background-color: rgb(255,255,255);
-                    height: 100px;
                     box-shadow: 0 4px 2px -2px rgb(200,200,200);
                     z-index: 9000;
-                    padding: 10px;
-                    text-align: center;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-around;
+                    align-items: center;
+                }
+                
+                .questionToggle > * {
+                  margin: 1rem 0;
                 }
 
                 .questionToggleTitle {
                     width: 100%;
+                    display: flex;
+                    align-items: flex-end;
+                    justify-content: center;
                     font-size: 1.2em;
                     font-weight: 500;
                     text-align: center;
-                    margin: 5px 0 15px 0;
                 }
 
                 .hidden {

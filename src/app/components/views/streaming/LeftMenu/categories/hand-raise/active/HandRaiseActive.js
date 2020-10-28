@@ -1,9 +1,12 @@
 import React, {useState, useEffect, Fragment, useContext} from 'react';
-import {Input, Icon, Button, Modal} from 'semantic-ui-react';
 import {withFirebase} from 'context/firebase';
 import HandRaiseElement from './hand-raise-element/HandRaiseElement';
 import NotificationsContext from 'context/notifications/NotificationsContext';
 import Grow from "@material-ui/core/Grow";
+import CloseRoundedIcon from '@material-ui/icons/CloseRounded';
+import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
+
+import {Button} from "@material-ui/core";
 
 function HandRaiseActive(props) {
 
@@ -51,7 +54,7 @@ function HandRaiseActive(props) {
                 <div className='handraise-container'>
                     {handRaiseElements}
                     <div className='bottom-container'>
-                        <Button icon='delete' content='Deactivate Hand Raise'
+                        <Button startIcon={<CloseRoundedIcon/>} variant="contained" children='Deactivate Hand Raise'
                                 onClick={() => setHandRaiseModeInactive()}/>
                     </div>
                 </div>
@@ -80,11 +83,11 @@ function HandRaiseActive(props) {
                     {handRaiseElements}
                     <div className='central-container'>
                         <div className='animated bounce infinite slow'>
-                            <Icon name='hand point up outline' size='huge' style={{color: 'rgba(0, 210, 170)'}}/>
+                            <PanToolOutlinedIcon color="primary" fontSize="large"/>
                         </div>
                         <h2>Waiting for viewers to raise their hands...</h2>
                         <p>Your viewers can now request to join the stream. Don't forget to remind them to join in!</p>
-                        <Button icon='delete' size='small' content='Deactivate Hand Raise'
+                        <Button variant="contained" startIcon={<CloseRoundedIcon/>} children='Deactivate Hand Raise'
                                 onClick={() => setHandRaiseModeInactive()}/>
                     </div>
                 </div>
