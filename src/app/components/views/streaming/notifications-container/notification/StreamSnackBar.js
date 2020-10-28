@@ -14,19 +14,19 @@ import {Button} from "@material-ui/core";
 // }
 const StreamSnackBar = ({index, notification}) => {
     console.log("-> notification", notification);
-    const {enqueueSnackbar} = useSnackbar();
+    const {enqueueSnackbar, closeSnackbar} = useSnackbar();
     useEffect(() => {
         const action = key => (
             <>
                 <Button style={{marginRight: "1rem"}} color="primary" variant="contained" size="small" onClick={() => {
                     notification.confirm()
-                    this.props.closeSnackbar(key)
+                    closeSnackbar(key)
                 }}>
                     {notification.confirmMessage}
                 </Button>
                 <Button variant="contained" size="small" onClick={() => {
                     notification.cancel()
-                    this.props.closeSnackbar(key)
+                    closeSnackbar(key)
                 }}>
                     {notification.cancelMessage}
                 </Button>
@@ -34,8 +34,8 @@ const StreamSnackBar = ({index, notification}) => {
         );
 
         enqueueSnackbar(notification.message, {
-            variant: "info",
-            autoHideDuration: 3000,
+            variant: "default",
+            persist: true,
             action
         })
 
