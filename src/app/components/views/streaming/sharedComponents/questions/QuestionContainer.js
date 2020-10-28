@@ -52,6 +52,9 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
 
     const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream.test)
     const classes = useStyles({isEmpty})
+    const active = question.type === 'current'
+    const old = question.type !== 'new'
+    const upvoted = (!user && !livestream.test) || (question.emailOfVoters ? question.emailOfVoters.indexOf(livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false)
 
 
     useEffect(() => {
@@ -68,6 +71,12 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
             return () => unsubscribe();
         }
     }, [livestream.id, question.id]);
+
+    useEffect(() => {
+        if (active) {
+            setShowAllReactions(true)
+        }
+    }, [active])
 
     function addNewComment() {
         if (!(newCommentTitle.trim()) || (!userData && !livestream.test && !streamer)) {
@@ -118,9 +127,6 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
         </a>
     );
 
-    const active = question.type === 'current'
-    const old = question.type !== 'new'
-    const upvoted = (!user && !livestream.test) || (question.emailOfVoters ? question.emailOfVoters.indexOf(livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false)
 
     let commentsElements = comments.map((comment, index) => {
         return (
