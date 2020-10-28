@@ -36,7 +36,7 @@ function QuestionCategory(props) {
     let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer livestream={props.livestream} questions={upcomingQuestions} question={question}
+                <QuestionContainer streamer livestream={props.livestream} questions={upcomingQuestions} question={question}
                                    user={props.user} userData={props.userData}/>
             </div>
         );

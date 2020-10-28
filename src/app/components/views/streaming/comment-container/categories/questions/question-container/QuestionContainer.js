@@ -1,15 +1,55 @@
-
 import React, {useState, useEffect, useContext} from 'react';
 import {Input, Icon, Button, Label} from "semantic-ui-react";
 import Linkify from 'react-linkify';
 
-import { withFirebase } from 'context/firebase';
+import {withFirebase} from 'context/firebase';
+import {makeStyles} from "@material-ui/core/styles";
+import {fade} from "@material-ui/core";
+import {grey} from "@material-ui/core/colors";
+import IconButton from "@material-ui/core/IconButton";
+import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
+import ExpandLessRoundedIcon from "@material-ui/icons/ExpandLessRounded";
+import ExpandMoreRoundedIcon from "@material-ui/icons/ExpandMoreRounded";
+import Typography from "@material-ui/core/Typography";
+
+const useStyles = makeStyles(theme => ({
+    sendIcon: {
+        background: "white",
+        color: ({isEmpty}) => isEmpty ? "grey" : theme.palette.primary.main,
+        borderRadius: "50%",
+        fontSize: 15
+    },
+    sendBtn: {
+        width: 30,
+        height: 30,
+        background: fade(theme.palette.primary.main, 0.5),
+        "&$buttonDisabled": {
+            color: grey[800]
+        },
+        "&:hover": {
+            backgroundColor: theme.palette.primary.main,
+        },
+        margin: "0.5rem"
+    },
+    buttonDisabled: {},
+    chatInput: {
+        borderRadius: 10,
+        "& .MuiInputBase-root": {
+            paddingRight: "0 !important",
+            borderRadius: 10,
+        },
+        background: "white"
+    },
+}))
 
 function QuestionContainer(props) {
-    
+
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
+
+    const isEmpty = !(newCommentTitle.trim())
+    const classes = useStyles({isEmpty})
 
     useEffect(() => {
         if (props.livestream.id, props.question.id) {
@@ -54,29 +94,29 @@ function QuestionContainer(props) {
     }
 
     function addNewCommentOnEnter(target) {
-        if(target.charCode==13){
-            addNewComment();   
-        } 
+        if (target.charCode == 13) {
+            addNewComment();
+        }
     }
 
     const componentDecorator = (href, text, key) => (
         <a href={href} key={key} target="_blank">
-          {text}
+            {text}
         </a>
-      );
+    );
 
-    
+
     let commentsElements = comments.map((comment, index) => {
         return (
             <div className='animated fadeInUp faster' key={comment.id}>
                 <div className='questionContainer'>
                     <div className='questionTitle'>
                         <Linkify componentDecorator={componentDecorator}>
-                            { comment.title }
+                            {comment.title}
                         </Linkify>
                     </div>
                     <div className='questionAuthor'>
-                        @{ comment.author }
+                        @{comment.author}
                     </div>
                 </div>
                 <style jsx>{`
@@ -108,6 +148,13 @@ function QuestionContainer(props) {
         commentsElements = commentsElements.slice(0, 1);
     }
 
+    const playIcon = (<div>
+        <IconButton classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}} disabled={isEmpty}
+                    onClick={() => addNewComment()}>
+            <ChevronRightRoundedIcon className={classes.sendIcon}/>
+        </IconButton>
+    </div>)
+
     const ReactionsToggle = (props) => {
         if (comments.length < 2) {
             return null;
@@ -115,54 +162,65 @@ function QuestionContainer(props) {
 
         return (
             <div className='reactions-toggle' onClick={() => setShowAllReactions(!showAllReactions)}>
-                <Icon name={ showAllReactions ? 'angle up' : 'angle down'} style={{ marginRight: '3px'}}/>{ showAllReactions ? 'Hide' : 'Show all reactions'}
+                {showAllReactions ? <ExpandLessRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/> :
+                    <ExpandMoreRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/>}
+                <Typography style={{
+                    color: "rgb(210,210,210)",
+                    fontSize: "0.8em",
+                    fontWeight: 500
+                }}>{showAllReactions ? 'Hide' : 'Show all reactions'}</Typography>
                 <style jsx>{`
                     .reactions-toggle {
-                        margin: 5px 0 0 0;
-                        font-size: 0.8em;
-                        font-weight: 500;
+                         margin: 5px 0 0 0;
                         text-transform: uppercase;
                         cursor: pointer;
                         color: rgb(210,210,210);
+                        display: flex;
+                        align-items: center;
                     }
                 `}</style>
             </div>
         )
-    } 
+    }
 
     return (
         <div className='animated fadeInUp faster'>
-                <div className={'questionContainer ' + (props.question.type === 'current' ? 'active' : '') }>
-                    <div className='questionTitle'>
-                        { props.question.title }
-                    </div>
-                    <div className='bottom-element'>
-                        <div className='comments'>
-                            <p className='comments-number'>{ comments.length } reactions</p>
-                        </div>
-                    </div>
-                    <div>
-                        { commentsElements }
-                    </div>
-                    <ReactionsToggle/>
-                    <div className='comment-input'>
-                        <Input
-                            icon={<Icon name='chevron circle right' inverted circular link onClick={() => addNewComment()} disabled={newCommentTitle.length < 4} color='teal'/>}
-                            value={newCommentTitle}
-                            onChange={(event) => {setNewCommentTitle(event.target.value)}}
-                            onKeyPress={addNewCommentOnEnter}
-                            maxLength='340'
-                            placeholder='Send a reaction...'
-                            fluid
-                        />
-                    </div>
-                    <div className={'upvotes ' + (props.question.type === 'current' ? 'active' : '') }>
-                        { props.question.votes } <Icon name='thumbs up' size='small'/>
+            <div className={'questionContainer ' + (props.question.type === 'current' ? 'active' : '')}>
+                <div className='questionTitle'>
+                    {props.question.title}
+                </div>
+                <div className='bottom-element'>
+                    <div className='comments'>
+                        <p className='comments-number'>{comments.length} reactions</p>
                     </div>
                 </div>
-                <Button attached='bottom' icon='thumbs up' content={ 'Answer Now' } primary onClick={() => goToThisQuestion(props.question.id)} style={{ margin: '0 10px 10px 10px' }} disabled={props.question.type !== 'new'}/>
+                <div>
+                    {commentsElements}
+                </div>
+                <ReactionsToggle/>
+                <div className='comment-input'>
+                    <Input
+                        icon={<Icon name='chevron circle right' inverted circular link onClick={() => addNewComment()}
+                                    disabled={newCommentTitle.length < 4} color='teal'/>}
+                        value={newCommentTitle}
+                        onChange={(event) => {
+                            setNewCommentTitle(event.target.value)
+                        }}
+                        onKeyPress={addNewCommentOnEnter}
+                        maxLength='340'
+                        placeholder='Send a reaction...'
+                        fluid
+                    />
+                </div>
+                <div className={'upvotes ' + (props.question.type === 'current' ? 'active' : '')}>
+                    {props.question.votes} <Icon name='thumbs up' size='small'/>
+                </div>
+            </div>
+            <Button attached='bottom' icon='thumbs up' content={'Answer Now'} primary
+                    onClick={() => goToThisQuestion(props.question.id)} style={{margin: '0 10px 10px 10px'}}
+                    disabled={props.question.type !== 'new'}/>
 
-                <style jsx>{`
+            <style jsx>{`
                     .questionContainer {
                         position: relative;
                         padding: 20px 20px 60px 20px;
@@ -257,7 +315,7 @@ function QuestionContainer(props) {
                         right: 5px;
                     }
                 `}</style>
-            </div>
+        </div>
     );
 }
 

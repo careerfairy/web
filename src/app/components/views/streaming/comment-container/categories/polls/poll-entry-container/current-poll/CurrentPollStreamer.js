@@ -47,7 +47,7 @@ function CurrentPollStreamer(props) {
                     border-top-right-radius: 5px;
                     box-shadow: 0 0 5px rgb(180,180,180);
                     margin: 10px 10px 0 10px;
-                    padding: 20px 20px 20px 20px;
+                    padding: 20px 0;
                     background-color: white;
                     border: 10px solid rgb(0, 210, 170);
                 }
@@ -73,6 +73,7 @@ function CurrentPollStreamer(props) {
                 .poll-label {
                     color: grey;
                     font-weight: 700;
+                    text-align: center;
                 }
 
                 .poll-entry-message {

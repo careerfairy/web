@@ -44,19 +44,19 @@ const useStyles = makeStyles(theme => ({
 }))
 
 
-function QuestionContainer(props) {
+function QuestionContainer({userData, user, livestream, streamer, appear, question, questions}) {
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
     const {authenticatedUser, userData} = useContext(UserContext);
 
-    const isEmpty = !(newCommentTitle.trim()) || (!userData && !props.livestream.test)
+    const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream.test)
     const classes = useStyles({isEmpty})
 
 
     useEffect(() => {
-        if (props.livestream.id, props.question.id) {
-            const unsubscribe = props.firebase.listenToQuestionComments(props.livestream.id, props.question.id, querySnapshot => {
+        if (livestream.id && question.id) {
+            const unsubscribe = firebase.listenToQuestionComments(livestream.id, question.id, querySnapshot => {
                 var commentsList = [];
                 querySnapshot.forEach(doc => {
                     let comment = doc.data();
@@ -67,18 +67,19 @@ function QuestionContainer(props) {
             });
             return () => unsubscribe();
         }
-    }, [props.livestream.id, props.question.id]);
+    }, [livestream.id, question.id]);
 
     function addNewComment() {
-        if (!(newCommentTitle.trim()) || (!userData && !props.livestream.test)) {
+        if (!(newCommentTitle.trim()) || (!userData && !livestream.test)) {
             return;
         }
+
 
         const newComment = {
             title: newCommentTitle,
             author: userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous',
         }
-        props.firebase.putQuestionComment(props.livestream.id, props.question.id, newComment)
+        firebase.putQuestionComment(livestream.id, question.id, newComment)
             .then(() => {
                 setNewCommentTitle("");
                 setShowAllReactions(true);
@@ -94,8 +95,8 @@ function QuestionContainer(props) {
     }
 
     function upvoteLivestreamQuestion() {
-        let authEmail = props.livestream.test ? 'streamerEmail' : authenticatedUser.email;
-        props.firebase.upvoteLivestreamQuestion(props.livestream.id, props.question, authEmail);
+        let authEmail = livestream.test ? 'streamerEmail' : authenticatedUser.email;
+        firebase.upvoteLivestreamQuestion(livestream.id, question, authEmail);
     }
 
     const componentDecorator = (href, text, key) => (
@@ -154,15 +155,20 @@ function QuestionContainer(props) {
         </IconButton>
     </div>)
 
-    const ReactionsToggle = (props) => {
+    const ReactionsToggle = ( => {
         if (comments.length < 2) {
             return null;
         }
 
         return (
             <div className='reactions-toggle' onClick={() => setShowAllReactions(!showAllReactions)}>
-                {showAllReactions? <ExpandLessRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/>: <ExpandMoreRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/>}
-                <Typography style={{color: "rgb(210,210,210)", fontSize: "0.8em", fontWeight: 500}}>{showAllReactions ? 'Hide' : 'Show all reactions'}</Typography>
+                {showAllReactions ? <ExpandLessRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/> :
+                    <ExpandMoreRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/>}
+                <Typography style={{
+                    color: "rgb(210,210,210)",
+                    fontSize: "0.8em",
+                    fontWeight: 500
+                }}>{showAllReactions ? 'Hide' : 'Show all reactions'}</Typography>
                 <style jsx>{`
                     .reactions-toggle {
                         margin: 5px 0 0 0;
@@ -178,12 +184,12 @@ function QuestionContainer(props) {
     }
 
     return (
-        <Slide in={props.appear} direction="right">
+        <Slide in={appear} direction="right">
             <div className='animated fadeInUp faster'>
-                <div className={'questionContainer ' + (props.question.type === 'current' ? 'active' : '')}>
+                <div className={'questionContainer ' + (question.type === 'current' ? 'active' : '')}>
                     <div style={{padding: "20px 20px 5px 20px"}}>
                         <div className='questionTitle'>
-                            {props.question.title}
+                            {question.title}
                         </div>
                         <div className='bottom-element'>
                             <div className='comments'>
@@ -194,8 +200,10 @@ function QuestionContainer(props) {
                             {commentsElements}
                         </div>
                         <ReactionsToggle/>
-                        <div style={{color: props.question.type === 'current'? "white": "auto"}} className='upvotes'>
-                            {props.question.votes} <ThumbUpRoundedIcon color="inherit" style={{verticalAlign: "text-top"}} fontSize='small'/>
+                        <div style={{color: question.type === 'current' ? "white" : "auto"}} className='upvotes'>
+                            {question.votes} <ThumbUpRoundedIcon color="inherit"
+                                                                       style={{verticalAlign: "text-top"}}
+                                                                       fontSize='small'/>
                         </div>
                     </div>
                     <Box p={1}>
@@ -218,7 +226,7 @@ function QuestionContainer(props) {
                     </Box>
                     <Button
                         startIcon={<ThumbUpRoundedIcon/>}
-                        children={!props.livestream.test && (props.question.emailOfVoters && props.user && props.question.emailOfVoters.indexOf(props.user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
+                        children={!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
                         size='small'
                         style={{borderRadius: "0 0 5px 5px"}}
                         disableElevation
@@ -226,7 +234,7 @@ function QuestionContainer(props) {
                         fullWidth
                         variant="contained"
                         onClick={() => upvoteLivestreamQuestion()}
-                        disabled={(props.question.type !== 'new' || (!props.user && !props.livestream.test) || (props.question.emailOfVoters ? props.question.emailOfVoters.indexOf(props.livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false))}/>
+                        disabled={(question.type !== 'new' || (!user && !livestream.test) || (question.emailOfVoters ? question.emailOfVoters.indexOf(livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false))}/>
                 </div>
                 <style jsx>{`
                     .questionContainer {

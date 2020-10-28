@@ -12,7 +12,7 @@ import {withFirebase} from 'context/firebase';
 import AddIcon from '@material-ui/icons/Add';
 
 
-function QuestionCategory(props) {
+function QuestionCategory({ livestream, selectedState, user, userData, streamer}) {
     const [showNextQuestions, setShowNextQuestions] = useState(true);
     const [showQuestionModal, setShowQuestionModal] = useState(false);
     const [touched, setTouched] = useState(false);
@@ -33,8 +33,8 @@ function QuestionCategory(props) {
     }
 
     useEffect(() => {
-        if (props.livestream.id) {
-            const unsubscribe = props.firebase.listenToLivestreamQuestions(props.livestream.id, querySnapshot => {
+        if (livestream.id) {
+            const unsubscribe = firebase.listenToLivestreamQuestions(livestream.id, querySnapshot => {
                 var upcomingQuestionsList = [];
                 var pastQuestionsList = [];
                 querySnapshot.forEach(doc => {
@@ -51,11 +51,11 @@ function QuestionCategory(props) {
             });
             return () => unsubscribe();
         }
-    }, [props.livestream.id]);
+    }, [livestream.id]);
 
     function addNewQuestion() {
         setTouched(true)
-        if ((!userData && !props.livestream.test) || !(newQuestionTitle.trim()) || newQuestionTitle.trim().length < 5) {
+        if ((!userData && !livestream.test) || !(newQuestionTitle.trim()) || newQuestionTitle.trim().length < 5) {
             return;
         }
 
@@ -63,9 +63,9 @@ function QuestionCategory(props) {
             title: newQuestionTitle,
             votes: 0,
             type: "new",
-            author: !props.livestream.test ? authenticatedUser.email : 'test@careerfairy.io'
+            author: !livestream.test ? authenticatedUser.email : 'test@careerfairy.io'
         }
-        props.firebase.putLivestreamQuestion(props.livestream.id, newQuestion)
+        firebase.putLivestreamQuestion(livestream.id, newQuestion)
             .then(() => {
                 setNewQuestionTitle("");
                 handleClose()
@@ -77,8 +77,8 @@ function QuestionCategory(props) {
     let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer appear={props.selectedState === 'questions'} livestream={props.livestream}
-                                   questions={props.upcomingQuestions} question={question} user={authenticatedUser}
+                <QuestionContainer streamer={streamer} appear={selectedState === 'questions'} livestream={livestream}
+                                   questions={upcomingQuestions} question={question} user={authenticatedUser}
                                    userData={userData}/>
             </div>
         );
@@ -87,8 +87,8 @@ function QuestionCategory(props) {
     let pastQuestionsElements = pastQuestions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer appear={props.selectedState === 'questions'} livestream={props.livestream}
-                                   questions={props.pastQuestions} question={question} user={authenticatedUser}
+                <QuestionContainer streamer={streamer} appear={selectedState === 'questions'} livestream={livestream}
+                                   questions={pastQuestions} question={question} user={authenticatedUser}
                                    userData={userData}/>
             </div>
         );
@@ -101,9 +101,9 @@ function QuestionCategory(props) {
                 <div className='questionToggleTitle'>
                     Questions
                 </div>
-                <Button variant="contained" children='Add a Question' endIcon={<AddIcon fontSize="large"/>}
-                        style={{position: 'absolute', top: '45px', left: '50%', transform: 'translateX(-50%)'}}
-                        color="primary" onClick={handleOpen}/>
+                {streamer && <Button variant="contained" children='Add a Question' endIcon={<AddIcon fontSize="large"/>}
+                         style={{position: 'absolute', top: '45px', left: '50%', transform: 'translateX(-50%)'}}
+                         color="primary" onClick={handleOpen}/>}
                 <div className='questionToggleSwitches'>
                     <div className={'questionToggleSwitch ' + (showNextQuestions ? 'active' : '')}
                          onClick={() => setShowNextQuestions(true)}>
