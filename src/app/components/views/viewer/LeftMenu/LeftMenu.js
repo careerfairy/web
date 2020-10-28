@@ -4,11 +4,11 @@ import Box from "@material-ui/core/Box";
 import SwipeableViews from "react-swipeable-views";
 import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
 import {Fab} from "@material-ui/core";
-import ButtonComponent from "./ButtonComponent";
-import QuestionCategory from "./categories/QuestionCategory";
+import ButtonComponent from "../../streaming/sharedComponents/ButtonComponent";
+import QuestionCategory from "../../streaming/sharedComponents/QuestionCategory";
 import PollCategory from "./categories/PollCategory";
 import HandRaiseCategory from "./categories/HandRaiseCategory";
-import ChatCategory from "../../streaming/comment-container/categories/ChatCategory";
+import ChatCategory from "../../streaming/LeftMenu/categories/ChatCategory";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 
 

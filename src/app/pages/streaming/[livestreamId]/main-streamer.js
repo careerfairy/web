@@ -5,10 +5,9 @@ import {withFirebasePage} from 'context/firebase';
 import ButtonWithConfirm from 'components/views/common/ButtonWithConfirm';
 
 import {useRouter} from 'next/router';
-import NewCommentContainer from 'components/views/streaming/comment-container/NewCommentContainer';
 import SpeakerManagementModal from 'components/views/streaming/modal/SpeakerManagementModal';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
-import MiniChatContainer from 'components/views/streaming/comment-container/categories/chat/MiniChatContainer';
+import MiniChatContainer from 'components/views/streaming/LeftMenu/categories/chat/MiniChatContainer';
 import {useNumberOfViewers} from 'components/custom-hook/useNumberOfViewers';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 import NotificationsContainer from 'components/views/streaming/notifications-container/NotificationsContainer';

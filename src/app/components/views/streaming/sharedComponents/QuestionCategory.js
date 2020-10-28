@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react';
 import UserContext from 'context/user/UserContext';
-import {Button, fade, Typography} from "@material-ui/core";
+import {Button, Typography} from "@material-ui/core";
 import QuestionContainer from './questions/QuestionContainer';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -10,9 +10,10 @@ import {TextField, Collapse} from "@material-ui/core";
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {withFirebase} from 'context/firebase';
 import AddIcon from '@material-ui/icons/Add';
+import Fab from "@material-ui/core/Fab";
 
 
-function QuestionCategory({ livestream, selectedState, user, streamer, firebase}) {
+function QuestionCategory({livestream, selectedState, user, streamer, firebase}) {
     const [showNextQuestions, setShowNextQuestions] = useState(true);
     const [showQuestionModal, setShowQuestionModal] = useState(false);
     const [touched, setTouched] = useState(false);
@@ -77,7 +78,8 @@ function QuestionCategory({ livestream, selectedState, user, streamer, firebase}
     let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} appear={showNextQuestions} livestream={livestream}
+                <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} appear={showNextQuestions}
+                                   livestream={livestream}
                                    questions={upcomingQuestions} question={question} user={authenticatedUser}
                                    userData={userData}/>
             </div>
@@ -87,7 +89,8 @@ function QuestionCategory({ livestream, selectedState, user, streamer, firebase}
     let pastQuestionsElements = pastQuestions.map((question, index) => {
         return (
             <div key={index}>
-                <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} appear={!showNextQuestions} livestream={livestream}
+                <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} appear={!showNextQuestions}
+                                   livestream={livestream}
                                    questions={pastQuestions} question={question} user={authenticatedUser}
                                    userData={userData}/>
             </div>
@@ -101,24 +104,33 @@ function QuestionCategory({ livestream, selectedState, user, streamer, firebase}
                 <div className='questionToggleTitle'>
                     Questions
                 </div>
-                {!streamer && <Button variant="contained" children='Add a Question' endIcon={<AddIcon fontSize="large"/>}
-                         color="primary" onClick={handleOpen}/>}
-                <div className='questionToggleSwitches'>
-                    <div className={'questionToggleSwitch ' + (showNextQuestions ? 'active' : '')}
-                         onClick={() => setShowNextQuestions(true)}>
+                {!streamer &&
+                <Button variant="contained" style={{marginTop: "1rem"}} children='Add a Question' endIcon={<AddIcon fontSize="large"/>}
+                        color="primary" onClick={handleOpen}/>}
+                <div style={{display: "flex", justifyContent: "center"}}>
+                    <Fab size="small" variant="extended" onClick={() => setShowNextQuestions(true)} value="left"
+                         style={{
+                             background: showNextQuestions ? "Gray" : "#e0e0e0",
+                             marginRight: "0.5rem",
+                             color: showNextQuestions ? "white" : "black"
+                         }}>
                         Upcoming [{upcomingQuestionsElements.length}]
-                    </div>
-                    <div className={'questionToggleSwitch ' + (showNextQuestions ? '' : 'active')}
-                         onClick={() => setShowNextQuestions(false)}>
+                    </Fab>
+                    <Fab size="small" variant="extended" onClick={() => setShowNextQuestions(false)} value="center"
+                         style={{
+                             background: showNextQuestions ? "#E0E0E0" : "Gray",
+                             marginLeft: "0.5rem",
+                             color: showNextQuestions ? "black" : "white"
+                         }}>
                         Answered [{pastQuestionsElements.length}]
-                    </div>
+                    </Fab>
                 </div>
             </div>
             <div>
                 <div>
                     {upcomingQuestionsElements}
                 </div>
-                <div unmountOnExit in={!showNextQuestions}>
+                <div>
                     {pastQuestionsElements}
                 </div>
             </div>
@@ -205,10 +217,6 @@ function QuestionCategory({ livestream, selectedState, user, streamer, firebase}
 
                 .hidden {
                     display: none;
-                }
-
-                ::-webkit-scrollbar {
-                    width: 5px;
                 }
 
                 ::-webkit-scrollbar-thumb {

@@ -1,12 +1,12 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, { useEffect, useState} from 'react';
 import {withFirebase} from "../../../../context/firebase";
-import ButtonComponent from "../../viewer/LeftMenu/ButtonComponent";
-import PollCategory from "../comment-container/categories/PollCategory";
-import HandRaiseCategory from "../comment-container/categories/HandRaiseCategory";
+import ButtonComponent from "../sharedComponents/ButtonComponent";
+import PollCategory from "./categories/PollCategory";
+import HandRaiseCategory from "./categories/HandRaiseCategory";
+import QuestionCategory from "../sharedComponents/QuestionCategory";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import SwipeableViews from "react-swipeable-views";
-import QuestionCategory from "../../viewer/LeftMenu/categories/QuestionCategory";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -70,7 +70,7 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
         setSelectedState(state);
     }
 
-    const handleChange = (event, newValue) => {
+    const handleChange = (event) => {
         setValue(event);
         setSelectedState(states[event])
     }
@@ -86,15 +86,6 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
             <HandRaiseCategory livestream={livestream} selectedState={selectedState}/>
         </TabPanel>
     ]
-
-
-    // if (!showMenu) {
-    //     return (
-    //         <Fragment>
-    //             <ButtonComponent selectedState={selectedState} handleStateChange={handleStateChange} {...props}/>
-    //         </Fragment>
-    //     );
-    // }
 
     return (
         <>
@@ -114,32 +105,6 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
                 handleStateChange={handleStateChange} {...props}/>
         </>
     )
-
-    return (
-        <div className='interaction-container'>
-            <div className='interaction-category'>
-                <QuestionCategory livestream={livestream} selectedState={selectedState}/>
-                <PollCategory livestream={livestream} selectedState={selectedState} streamer={streamer}/>
-                <HandRaiseCategory livestream={livestream} selectedState={selectedState}/>
-            </div>
-            <ButtonComponent
-                setShowMenu={setShowMenu}
-                streamer={streamer}
-                showMenu={showMenu}
-                selectedState={selectedState}
-                handleStateChange={handleStateChange}
-                {...props}/>
-            <style jsx>{`
-                .interaction-category {
-                    position: absolute;
-                    left: 0;
-                    right: 0;
-                    top: 0;
-                    bottom: 0;
-                }
-          `}</style>
-        </div>
-    );
 };
 
 export default withFirebase(LeftMenu);

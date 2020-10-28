@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { withFirebasePage } from 'context/firebase';
 import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
 import SmallStreamerVideoDisplayer from 'components/views/streaming/video-container/SmallStreamerVideoDisplayer';
-import NewCommentContainer from 'components/views/streaming/comment-container/NewCommentContainer';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
 import UserContext from 'context/user/UserContext';
 import useUserMedia from '../../../custom-hook/useDevices';

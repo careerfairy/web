@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
-import Slide from '@material-ui/core/Slide';
+import Grow from '@material-ui/core/Grow';
 import ThumbUpRoundedIcon from '@material-ui/icons/ThumbUpRounded';
 import Linkify from 'react-linkify';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
@@ -103,12 +103,24 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
         firebase.upvoteLivestreamQuestion(livestream.id, question, authEmail);
     }
 
+    function goToThisQuestion(nextQuestionId) {
+        const currentQuestion = questions.find(question => question.type === 'current');
+        if (currentQuestion) {
+            firebase.goToNextLivestreamQuestion(currentQuestion.id, nextQuestionId, livestream.id);
+        } else {
+            firebase.goToNextLivestreamQuestion(null, nextQuestionId, livestream.id);
+        }
+    }
+
     const componentDecorator = (href, text, key) => (
         <a href={href} key={key} target="_blank">
             {text}
         </a>
     );
 
+    const active = question.type === 'current'
+    const old = question.type !== 'new'
+    const upvoted = (!user && !livestream.test) || (question.emailOfVoters ? question.emailOfVoters.indexOf(livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false)
 
     let commentsElements = comments.map((comment, index) => {
         return (
@@ -188,9 +200,9 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
     }
 
     return (
-        <Slide in={appear} direction="right">
+        <Grow appear={appear} mountOnEnter unmountOnExit in={appear}>
             <div className='animated fadeInUp faster'>
-                <div className={'questionContainer ' + (question.type === 'current' ? 'active' : '')}>
+                <div className={'questionContainer ' + (active ? 'active' : '')}>
                     <div style={{padding: "20px 20px 5px 20px"}}>
                         <div className='questionTitle'>
                             {question.title}
@@ -204,7 +216,7 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
                             {commentsElements}
                         </div>
                         <ReactionsToggle/>
-                        <div style={{color: question.type === 'current' ? "white" : "auto"}} className='upvotes'>
+                        <div style={{color: active ? "white" : "auto"}} className='upvotes'>
                             {question.votes} <ThumbUpRoundedIcon color="inherit"
                                                                  style={{verticalAlign: "text-top"}}
                                                                  fontSize='small'/>
@@ -228,17 +240,30 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
                             }}
                         />
                     </Box>
-                    {!!streamer && <Button
-                        startIcon={<ThumbUpRoundedIcon/>}
-                        children={!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
-                        size='small'
-                        style={{borderRadius: "0 0 5px 5px"}}
-                        disableElevation
-                        color="primary"
-                        fullWidth
-                        variant="contained"
-                        onClick={() => upvoteLivestreamQuestion()}
-                        disabled={(question.type !== 'new' || (!user && !livestream.test) || (question.emailOfVoters ? question.emailOfVoters.indexOf(livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false))}/>}
+                    {streamer ?
+                        <Button
+                            startIcon={<ThumbUpRoundedIcon/>}
+                            children={active ? "Answering" : old ? "Answered" : "Answer Now"}
+                            size='small'
+                            disableElevation
+                            disabled={old}
+                            style={{borderRadius: "0 0 5px 5px"}}
+                            fullWidth
+                            color="primary"
+                            onClick={() => goToThisQuestion(question.id)}
+                            variant="contained"
+                        />
+                        : <Button
+                            startIcon={<ThumbUpRoundedIcon/>}
+                            children={!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
+                            size='small'
+                            style={{borderRadius: "0 0 5px 5px"}}
+                            disableElevation
+                            color="primary"
+                            fullWidth
+                            variant="contained"
+                            onClick={() => upvoteLivestreamQuestion()}
+                            disabled={old || upvoted}/>}
                 </div>
                 <style jsx>{`
                     .questionContainer {
@@ -327,7 +352,7 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
                     }
                 `}</style>
             </div>
-        </Slide>
+        </Grow>
     );
 }
 

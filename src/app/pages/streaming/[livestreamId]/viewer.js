@@ -17,7 +17,7 @@ import Button from '@material-ui/core/Button';
 import {Fab, ClickAwayListener, Box, fade} from "@material-ui/core";
 import {amber, deepOrange, green, red} from "@material-ui/core/colors";
 import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
-import MiniChatContainer from "../../../components/views/streaming/comment-container/categories/chat/MiniChatContainer";
+import MiniChatContainer from "../../../components/views/streaming/LeftMenu/categories/chat/MiniChatContainer";
 
 const useStyles = makeStyles((theme) => ({
     image: {

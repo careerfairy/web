@@ -2,7 +2,7 @@ import React, {useState, useEffect, Fragment} from 'react';
 import {Input, Icon, Button, Dropdown} from "semantic-ui-react";
 import {withFirebase} from 'context/firebase';
 import PollOptionResultViewer from './PollOptionResultViewer';
-import CurrentPollGraph from "../../../../../../viewer/LeftMenu/categories/CurrentPollGraph";
+import CurrentPollGraph from "../../../../../sharedComponents/CurrentPollGraph";
 
 
 function CurrentPollStreamer(props) {

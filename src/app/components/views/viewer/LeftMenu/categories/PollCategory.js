@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 
 import {withFirebase} from 'context/firebase';
 import UserContext from 'context/user/UserContext';
-import CurrentPollGraph from "./CurrentPollGraph";
+import CurrentPollGraph from "../../../streaming/sharedComponents/CurrentPollGraph";
 import {Button, Typography} from "@material-ui/core";
 
 function PollCategory({firebase, selectedState, livestream, setSelectedState, disableSwitching, setShowMenu}) {

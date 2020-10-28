@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import NewCommentContainer from 'components/views/streaming/comment-container/NewCommentContainer';
 import SpeakerManagementModal from 'components/views/streaming/modal/SpeakerManagementModal';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
-import MiniChatContainer from 'components/views/streaming/comment-container/categories/chat/MiniChatContainer';
+import MiniChatContainer from 'components/views/streaming/LeftMenu/categories/chat/MiniChatContainer';
 import ButtonWithConfirm from 'components/views/common/ButtonWithConfirm';
 import { useNumberOfViewers } from 'components/custom-hook/useNumberOfViewers';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
