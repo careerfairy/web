@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react';
 import UserContext from 'context/user/UserContext';
-import {Button, Typography} from "@material-ui/core";
+import {Button, Typography, useTheme} from "@material-ui/core";
 import QuestionContainer from './questions/QuestionContainer';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -17,13 +17,28 @@ import {
     QuestionContainerHeader,
     QuestionContainerTitle
 } from "../../../../materialUI/GlobalContainers";
-import Slide from "@material-ui/core/Slide";
+import SwipeableViews from "react-swipeable-views";
+import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
+import {makeStyles} from "@material-ui/core/styles";
 
+const useStyles = makeStyles(theme => ({
+    view: {
+        position: "relative",
+        height: "100%",
+        width: "100%",
+        "& .react-swipeable-view-container": {
+            height: "100%"
+        }
+    },
+}))
 
 function QuestionCategory({livestream, selectedState, user, streamer, firebase}) {
+    const theme = useTheme()
+    const classes = useStyles()
     const [showNextQuestions, setShowNextQuestions] = useState(true);
     const [showQuestionModal, setShowQuestionModal] = useState(false);
     const [touched, setTouched] = useState(false);
+    const [value, setValue] = useState(0)
 
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [pastQuestions, setPastQuestions] = useState([]);
@@ -38,6 +53,10 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
     const handleClose = () => {
         setTouched(false)
         setShowQuestionModal(false)
+    }
+
+    const handleChange = (event) => {
+        setValue(showNextQuestions ? 0 : 1);
     }
 //
     useEffect(() => {
@@ -61,6 +80,16 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
         }
     }, [livestream.id]);
 
+    const handleClickUpcoming = () => {
+        setShowNextQuestions(true)
+        setValue(0)
+    }
+
+    const handleClickPast = () => {
+        setShowNextQuestions(false)
+        setValue(1)
+    }
+
     function addNewQuestion() {
         setTouched(true)
         if ((!userData && !livestream.test) || !(newQuestionTitle.trim()) || newQuestionTitle.trim().length < 5) {
@@ -83,25 +112,18 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
     }
 
     let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
-        return (
-            <div key={index}>
-                <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} appear={showNextQuestions}
-                                   livestream={livestream}
-                                   questions={upcomingQuestions} question={question} user={authenticatedUser}
-                                   userData={userData}/>
-            </div>
-        );
+        return <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} appear={showNextQuestions}
+                                  livestream={livestream} key={index}
+                                  questions={upcomingQuestions} question={question} user={authenticatedUser}
+                                  userData={userData}/>
+
     });
 
     let pastQuestionsElements = pastQuestions.map((question, index) => {
-        return (
-            <div key={index}>
-                <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} appear={!showNextQuestions}
-                                   livestream={livestream}
-                                   questions={pastQuestions} question={question} user={authenticatedUser}
-                                   userData={userData}/>
-            </div>
-        );
+        return <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} appear={!showNextQuestions}
+                                  livestream={livestream} key={index}
+                                  questions={pastQuestions} question={question} user={authenticatedUser}
+                                  userData={userData}/>
     });
 
 
@@ -116,7 +138,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
                         endIcon={<AddIcon fontSize="large"/>}
                         color="primary" onClick={handleOpen}/>}
                 <div style={{display: "flex", justifyContent: "center"}}>
-                    <Fab size="small" variant="extended" onClick={() => setShowNextQuestions(true)} value="left"
+                    <Fab size="small" variant="extended" onClick={handleClickUpcoming} value="left"
                          style={{
                              background: showNextQuestions ? "Gray" : "#e0e0e0",
                              marginRight: "0.5rem",
@@ -124,7 +146,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
                          }}>
                         <Box fontSize={10}>Upcoming [{upcomingQuestionsElements.length}]</Box>
                     </Fab>
-                    <Fab size="small" variant="extended" onClick={() => setShowNextQuestions(false)} value="center"
+                    <Fab size="small" variant="extended" onClick={handleClickPast} value="center"
                          style={{
                              background: showNextQuestions ? "#E0E0E0" : "Gray",
                              marginLeft: "0.5rem",
@@ -134,12 +156,18 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
                     </Fab>
                 </div>
             </QuestionContainerHeader>
-            <Slide>
-                {upcomingQuestionsElements}
-            </Slide>
-            <Slide>
-                {pastQuestionsElements}
-            </Slide>
+            <SwipeableViews
+                containerStyle={{WebkitOverflowScrolling: 'touch'}}
+                className={classes.view}
+                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                index={value} onChangeIndex={handleChange}>
+                <TabPanel height="auto" value={value} index={0} dir={theme.direction}>
+                    {upcomingQuestionsElements}
+                </TabPanel>
+                <TabPanel height="auto"  value={value} index={1} dir={theme.direction}>
+                    {pastQuestionsElements}
+                </TabPanel>
+            </SwipeableViews>
             <Dialog PaperProps={{style: {background: "transparent", boxShadow: "none"}}} fullWidth onClose={handleClose}
                     open={showQuestionModal} basic size='small'>
                 <DialogTitle style={{color: "white"}}>
