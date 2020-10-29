@@ -31,12 +31,9 @@ const useStyles = makeStyles((theme) => ({
     },
     imageContainer: {
         position: "relative",
-        height: "160px",
-        width: "160px",
-        border: "6px solid #00d2aa",
+        height: "180px",
+        width: "250px",
         borderRadius: "50%",
-        boxShadow: "0 0 4px rgb(100,100,100)",
-        background: "rgb(250,250,250)"
     },
     image: {
         position: "absolute",
@@ -44,7 +41,8 @@ const useStyles = makeStyles((theme) => ({
         left: "50%",
         transform: "translate(-50%,-50%)",
         objectFit: "contain",
-        maxWidth: "55%",
+        maxWidth: "90%",
+        maxHeight: "60%"
     },
 }));
 
