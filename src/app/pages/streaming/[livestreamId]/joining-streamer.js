@@ -25,6 +25,18 @@ const useStyles = makeStyles((theme) => ({
         bottom: 0,
         zIndex: 20
     },
+    blackFrame: {
+        left: ({showMenu}) => showMenu ? 280 : 0,
+        transition: "left 0.3s",
+        transitionTimingFunction: theme.transitions.easeInOut,
+        position: "absolute",
+        top: 55,
+        right: 0,
+        minWidth: 400,
+        height: "calc(100% - 55px)",
+        zIndex: 10,
+        backgroundColor: "black",
+    }
 }));
 
 function StreamingPage(props) {
@@ -122,7 +134,7 @@ function StreamingPage(props) {
                         Viewers: {numberOfViewers}
                     </div>
                 </div>
-                <div className='black-frame' style={{left: showMenu ? '280px' : '0'}}>
+                <div className={classes.blackFrame}>
                     <VideoContainer currentLivestream={currentLivestream} streamerId={streamerId} viewer={false}/>
                 </div>
                 <div className={classes.menuLeft}>
@@ -169,17 +181,6 @@ function StreamingPage(props) {
 
                     .side-button {
                         cursor: pointer;
-                    }
-
-                    .black-frame {
-                        position: absolute;
-                        top: 55px;
-                        right: 0;
-                        min-width: 400px;
-                        height: calc(100% - 55px);
-                        min-height: 600px;
-                        z-index: 10;
-                        background-color: black;
                     }
 
                     .mini-chat-container {
