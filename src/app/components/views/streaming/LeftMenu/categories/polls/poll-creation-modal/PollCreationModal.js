@@ -8,24 +8,20 @@ import {
     Dialog,
     Typography,
     Button,
-    Paper,
     Fab,
-    Box
+    Box, Slide
 } from '@material-ui/core';
 import {BarChart} from "@material-ui/icons";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import DialogActions from "@material-ui/core/DialogActions";
 import TextField from "@material-ui/core/TextField";
-import Grow from "@material-ui/core/Grow";
 import {makeStyles} from "@material-ui/core/styles";
+import Grow from "@material-ui/core/Grow";
 
 const useStyles = makeStyles(theme => ({
     modalPaper: {
         padding: theme.spacing(2)
     },
-    dialog: {
-        background: theme.palette.primary.main
-    }
 }))
 
 
@@ -120,35 +116,34 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
     ;
 
     return (
-        <Dialog PaperProps={{className: classes.dialog}} maxWidth="sm" fullWidth open={open} onClose={handleClose}>
+        <Dialog TransitionComponent={Slide} maxWidth="sm" fullWidth open={open} onClose={handleClose}>
             <DialogTitle disableTypography
                          style={{display: "flex", justifyContent: "center", alignItems: "flex-end"}} align="center">
-                <BarChart style={{color: "white"}} fontSize="large"/> <Typography
-                style={{fontSize: "1.8em", fontWeight: 500, color: "white"}} variant="h3">Create a
+                <BarChart color="primary" fontSize="large"/> <Typography color="primary"
+                                                                         style={{fontSize: "1.8em", fontWeight: 500}}
+                                                                         variant="h3">Create a
                 Poll</Typography>
             </DialogTitle>
-            <DialogContent style={{padding: "0 24px 8px 24px"}}>
-                <Paper className={classes.modalPaper}>
-                    <TextField
-                        label="Your Question"
-                        value={question}
-                        fullWidth
-                        variant="outlined"
-                        onChange={({currentTarget: {value}}) => setQuestion(value)}
-                        placeholder='Write down your question or poll to your audience'
-                    />
-                    {optionElements}
-                </Paper>
+            <DialogContent>
+                <TextField
+                    label="Your Question"
+                    value={question}
+                    fullWidth
+                    variant="outlined"
+                    onChange={({currentTarget: {value}}) => setQuestion(value)}
+                    placeholder='Write down your question or poll to your audience'
+                />
+                {optionElements}
                 <Button startIcon={<AddIcon/>} variant="contained" color="secondary"
-                        style={{marginTop: "1rem", border: "2px solid white"}}
+                        style={{marginTop: "1rem"}}
                         children='Add an Option' onClick={increaseNumberOfOptions}
                         disabled={options.length > 3}/>
                 <DialogActions>
-                    <Button children='Cancel' style={{border: "2px solid white"}} variant="contained"
+                    <Button children='Cancel' variant="contained"
                             onClick={handleClose}/>
                     <Button startIcon={loading && <CircularProgress size={20} color="inherit"/>} disabled={loading}
                             children={initialPoll ? 'Update Poll' : 'Create Poll'} color="primary"
-                            variant="contained" onClick={savePoll} style={{border: "2px solid white"}}/>
+                            variant="contained" onClick={savePoll}/>
                 </DialogActions>
             </DialogContent>
         </Dialog>
