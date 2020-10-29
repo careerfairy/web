@@ -3,8 +3,8 @@ import {withFirebase} from 'context/firebase';
 import UserContext from 'context/user/UserContext';
 import CurrentPollGraph from "../../../streaming/sharedComponents/CurrentPollGraph";
 import {Button, Paper, useTheme, withStyles} from "@material-ui/core";
-import {CategoryContainer} from "../../../../../materialUI/GlobalContainers";
 import {GreyPermanentMarker, PollQuestion} from "../../../../../materialUI/GlobalTitles";
+import {CategoryContainerCentered} from "../../../../../materialUI/GlobalContainers";
 
 const PollWrapper = withStyles(theme => ({
     root: {
@@ -70,7 +70,7 @@ function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
                 );
             });
             return (
-                <CategoryContainer>
+                <CategoryContainerCentered>
                     <PollWrapper style={{padding: theme.spacing(2)}}>
                         <PollQuestion>
                             {currentPoll.question}
@@ -79,25 +79,25 @@ function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
                             {optionElementsLarge}
                         </div>
                     </PollWrapper>
-                </CategoryContainer>
+                </CategoryContainerCentered>
             );
         } else {
             return (
-                <CategoryContainer>
+                <CategoryContainerCentered>
                     <PollWrapper>
                         <CurrentPollGraph currentPoll={currentPoll}/>
                     </PollWrapper>
-                </CategoryContainer>
+                </CategoryContainerCentered>
             )
 
         }
     } else {
         return (
-            <CategoryContainer>
+            <CategoryContainerCentered>
                 <GreyPermanentMarker>
                     No current poll
                 </GreyPermanentMarker>
-            </CategoryContainer>
+            </CategoryContainerCentered>
         );
     }
 }

@@ -22,5 +22,4 @@ export const PollQuestion = withStyles(theme => ({
         marginBottom: "35",
         overflowWrap: "break-word"
     },
-
 }))(Typography);

@@ -12,6 +12,11 @@ import {withFirebase} from 'context/firebase';
 import AddIcon from '@material-ui/icons/Add';
 import Fab from "@material-ui/core/Fab";
 import Box from "@material-ui/core/Box";
+import {
+    CategoryContainerTopAligned,
+    QuestionContainerHeader,
+    QuestionContainerTitle
+} from "../../../../materialUI/GlobalContainers";
 
 
 function QuestionCategory({livestream, selectedState, user, streamer, firebase}) {
@@ -100,11 +105,11 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
 
 
     return (
-        <>
-            <div className='questionToggle'>
-                <div className='questionToggleTitle'>
+        <CategoryContainerTopAligned>
+            <QuestionContainerHeader>
+                <QuestionContainerTitle>
                     Questions
-                </div>
+                </QuestionContainerTitle>
                 {!streamer &&
                 <Button variant="contained" style={{marginTop: "1rem"}} children='Add a Question'
                         endIcon={<AddIcon fontSize="large"/>}
@@ -127,7 +132,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
                         <Box fontSize={10}>Answered [{pastQuestionsElements.length}]</Box>
                     </Fab>
                 </div>
-            </div>
+            </QuestionContainerHeader>
             <div>
                 <div>
                     {upcomingQuestionsElements}
@@ -167,65 +172,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
                     </Button>
                 </DialogActions>
             </Dialog>
-            <style jsx>{`
-
-                .questionToggle {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: space-around;
-                    box-shadow: 0 4px 2px -2px rgb(200,200,200);
-                    z-index: 9000;
-                    background-color: white;
-                }
-                
-                .questionToggle > * {
-                  margin-top: 1rem;
-                }
-                
-                .questionToggle > *:not(:first-child) {
-                  margin-bottom: 1rem;
-                }
-
-                .questionToggleTitle {
-                    width: 100%;
-                    font-size: 1.2em;
-                    font-weight: 500;
-                    text-align: center;
-                }
-
-                .questionToggleSwitches {
-                    width: 100%;
-                    text-align: center;
-                }
-
-                .questionToggleSwitch {
-                    display: inline-block;
-                    padding: 8px 12px;
-                    border-radius: 20px;
-                    margin: 0 5px;
-                    font-weight: 600;
-                    font-size: 0.8em;
-                    color: rgb(120,120,120);
-                    background-color: rgb(240,240,240);
-                    cursor: pointer;
-                }
-
-                .questionToggleSwitch.active {
-                    background-color: rgb(120, 120, 120);
-                    color: white;
-                    cursor: default;
-                }
-
-                .hidden {
-                    display: none;
-                }
-
-                ::-webkit-scrollbar-thumb {
-                    background-color: rgb(130,130,130);
-                }
-          `}</style>
-        </>
+        </CategoryContainerTopAligned>
     );
 }
 

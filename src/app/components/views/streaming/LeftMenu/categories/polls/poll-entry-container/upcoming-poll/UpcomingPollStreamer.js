@@ -7,6 +7,7 @@ import {Box, Button, IconButton, Menu, MenuItem} from "@material-ui/core";
 import {CloseRounded} from "@material-ui/icons";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
+import Paper from "@material-ui/core/Paper";
 
 
 function UpcomingPollStreamer(props) {
@@ -108,7 +109,7 @@ function UpcomingPollStreamer(props) {
 
     return (
         <Fragment>
-            <div className='animated fadeInUp faster overall' onMouseEnter={handleSetIsNotEditablePoll}
+            <Paper onMouseEnter={handleSetIsNotEditablePoll}
                  onMouseLeave={() => setShowNotEditableMessage(false)}>
                 <div className='chat-entry-container'>
                     <Box p={2}>
@@ -147,7 +148,7 @@ function UpcomingPollStreamer(props) {
                         Please close the active poll before activating this one.
                     </div>
                 </div>
-            </div>
+            </Paper>
             <style jsx>{`
                 .chat-entry-container {
                     border-radius: 5px;
