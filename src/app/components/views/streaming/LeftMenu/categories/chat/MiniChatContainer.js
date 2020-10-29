@@ -133,13 +133,6 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
             votes: 0
         }
 
-        // const newChatEntryObject = {// only use this mode to check chat ui in Development
-        //     message: newChatEntry,
-        //     authorName: isStreamer  ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
-        //     authorEmail: isStreamer  ? 'Streamer' : authenticatedUser.email,
-        //     votes: 0
-        // }
-
         firebase.putChatEntry(livestream.id, newChatEntryObject)
             .then(() => {
                 setNewChatEntry('');
@@ -170,52 +163,50 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
     </div>)
 
     return (
-        <>
-            <Accordion TransitionProps={{unmountOnExit: true}} onChange={() => setOpen(!open)} expanded={open}>
-                <AccordionSummary className={classes.header}
-                                  expandIcon={<ExpandLessRoundedIcon/>}
-                                  aria-controls="chat-header"
-                                  id="chat-header"
-                                  classes={{expanded: classes.expanded}}
-                                  style={{boxShadow: "0 0 2px grey"}}
-                >
-                    <Badge badgeContent={numberOfMissedEntries} color="error">
-                        <ForumOutlinedIcon fontSize="small"/>
-                    </Badge>
-                    <Typography style={{marginLeft: "0.6rem"}}>
-                        Chat
-                    </Typography>
-                </AccordionSummary>
-                <AccordionDetails className={classes.chatRoom}>
-                    <ScrollToBottom className={classes.scrollToBottom}>
-                        {chatElements}
-                    </ScrollToBottom>
-                    <div style={{margin: 5}}>
-                        <TextField
-                            variant="outlined"
-                            fullWidth
-                            autoFocus
-                            onBlur={() => setFocused(false)}
-                            onFocus={() => setFocused(true)}
-                            className={classes.chatInput}
-                            size="small"
-                            onKeyPress={addNewChatEntryOnEnter}
-                            value={newChatEntry}
-                            onChange={() => setNewChatEntry(event.target.value)}
-                            placeholder='Post in the chat...'
-                            InputProps={{
-                                maxLength: 340,
-                                endAdornment: playIcon,
-                            }}/>
-                        <Collapse align="center"
-                                  style={{color: "grey", fontSize: "0.8em", marginTop: 3, padding: "0 0.8em"}}
-                                  in={focused && !isStreamer}>
-                            For questions, please use the Q&A tool!
-                        </Collapse>
-                    </div>
-                </AccordionDetails>
-            </Accordion>
-        </>
+        <Accordion TransitionProps={{unmountOnExit: true}} onChange={() => setOpen(!open)} expanded={open}>
+            <AccordionSummary className={classes.header}
+                              expandIcon={<ExpandLessRoundedIcon/>}
+                              aria-controls="chat-header"
+                              id="chat-header"
+                              classes={{expanded: classes.expanded}}
+                              style={{boxShadow: "0 0 2px grey"}}
+            >
+                <Badge badgeContent={numberOfMissedEntries} color="error">
+                    <ForumOutlinedIcon fontSize="small"/>
+                </Badge>
+                <Typography style={{marginLeft: "0.6rem"}}>
+                    Chat
+                </Typography>
+            </AccordionSummary>
+            <AccordionDetails className={classes.chatRoom}>
+                <ScrollToBottom className={classes.scrollToBottom}>
+                    {chatElements}
+                </ScrollToBottom>
+                <div style={{margin: 5}}>
+                    <TextField
+                        variant="outlined"
+                        fullWidth
+                        autoFocus
+                        onBlur={() => setFocused(false)}
+                        onFocus={() => setFocused(true)}
+                        className={classes.chatInput}
+                        size="small"
+                        onKeyPress={addNewChatEntryOnEnter}
+                        value={newChatEntry}
+                        onChange={() => setNewChatEntry(event.target.value)}
+                        placeholder='Post in the chat...'
+                        InputProps={{
+                            maxLength: 340,
+                            endAdornment: playIcon,
+                        }}/>
+                    <Collapse align="center"
+                              style={{color: "grey", fontSize: "0.8em", marginTop: 3, padding: "0 0.8em"}}
+                              in={focused && !isStreamer}>
+                        For questions, please use the Q&A tool!
+                    </Collapse>
+                </div>
+            </AccordionDetails>
+        </Accordion>
     );
 }
 

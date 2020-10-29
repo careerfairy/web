@@ -1,24 +1,23 @@
 import {useState, useEffect, Fragment} from 'react';
 import VolumeUpRoundedIcon from '@material-ui/icons/VolumeUpRounded';
 import PlayArrowRoundedIcon from '@material-ui/icons/PlayArrowRounded';
-import ThumbUpAltOutlinedIcon from '@material-ui/icons/ThumbUpAltOutlined';
-import FavoriteBorderOutlinedIcon from '@material-ui/icons/FavoriteBorderOutlined';
+
 import {useRouter} from 'next/router';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import {withFirebasePage} from '../../../context/firebase';
 import ViewerHandRaiseComponent from 'components/views/viewer/viewer-hand-raise-component/ViewerHandRaiseComponent';
 import ViewerComponent from 'components/views/viewer/viewer-component/ViewerComponent';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import UserContext from 'context/user/UserContext';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 import {useWindowSize} from 'components/custom-hook/useWindowSize';
 import React from 'react';
-import {makeStyles, useTheme} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import {Fab, ClickAwayListener, Box, fade} from "@material-ui/core";
+import {fade} from "@material-ui/core";
 import {amber, deepOrange, green, red} from "@material-ui/core/colors";
 import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
 import MiniChatContainer from "../../../components/views/streaming/LeftMenu/categories/chat/MiniChatContainer";
+import EmoteButtons from "../../../components/views/viewer/EmoteButtons";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -27,105 +26,6 @@ const useStyles = makeStyles((theme) => ({
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: '28px'
-    },
-    miniLike: {
-        width: "36px !important",
-        height: "36px !important",
-        backgroundColor: red["A400"],
-        color: "white",
-        "&:disabled": {
-            backgroundColor: fade(red["A400"], 0.5),
-            color: "white",
-        },
-        "&:hover": {
-            backgroundColor: red["A700"],
-        }
-    },
-    miniClap: {
-        width: "36px !important",
-        height: "36px !important",
-        backgroundColor: deepOrange[400],
-        color: "white",
-        "&:disabled": {
-            backgroundColor: fade(deepOrange[400], 0.5),
-            color: "white",
-        },
-        "&:hover": {
-            backgroundColor: deepOrange[700],
-        }
-    },
-    miniHeart: {
-        width: "36px !important",
-        height: "36px !important",
-        backgroundColor: amber[400],
-        color: "white",
-        "&:disabled": {
-            backgroundColor: fade(amber[400], 0.5),
-            color: "white",
-        },
-        "&:hover": {
-            backgroundColor: amber[600],
-        }
-    },
-    miniButtons: {
-        "& > *": {
-            margin: "0.2rem"
-        },
-        transition: "transform 0.3s",
-        transitionTimingFunction: theme.transitions.easeInOut,
-        "@media(min-width: 768px)": {
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            transform: "translate(-90px, 0)" // prevent the icons from being overlapped by the chat box when shrunk
-        },
-        "@media(max-width: 768px)": {
-            flexDirection: "column",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-        }
-    },
-    cardHovered: {
-        "@media(min-width: 768px)": {
-            transform: "translate(0, -70px) scale3d(2.4, 2.4, 2.4)",
-            "-moz-transform": "translate(0, -70px) scale3d(2.4, 2.4, 2.4)",
-            "-o-transform": "translate(0, -70px) scale3d(2.4, 2.4, 2.4)",
-            "-webkit-transform": "translate(0, -70px) scale3d(2.4, 2.4, 2.4)",
-        },
-        "@media(max-width: 768px)": {
-            transform: "translate(-50px, 0) scale3d(2.4, 2.4, 2.4)",
-            "-moz-transform": "translate(-50px, 0) scale3d(2.4, 2.4, 2.4)",
-            "-o-transform": "translate(-50px, 0) scale3d(2.4, 2.4, 2.4)",
-            "-webkit-transform": "translate(-50px, 0) scale3d(2.4, 2.4, 2.4)",
-        }
-    },
-    actionArea: {
-        display: ({handRaiseActive}) => handRaiseActive ? "none" : "flex",
-        "@media(min-width: 768px)": {
-            position: "absolute",
-            width: "100%",
-            bottom: 5,
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 150,
-            height: 120,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "flex-end"
-        },
-        "@media(max-width: 768px)": {
-            position: "absolute",
-            right: 15,
-            top: "50%",
-            transform: "translateY(-50%)",
-            zIndex: 150,
-            width: 100,
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "center",
-        }
     },
     root: {
         position: "relative",
@@ -144,19 +44,6 @@ const useStyles = makeStyles((theme) => ({
         bottom: 0,
         zIndex: 20
     },
-    wrapper: {
-        position: 'relative',
-    },
-    fabProgress: {
-        color: green[500],
-        position: 'absolute',
-        zIndex: 1,
-        top: 0,
-        left: 0,
-        height: "36px !important",
-        width: "36px !important"
-    },
-
 }));
 
 
@@ -180,10 +67,10 @@ function ViewerPage({firebase}) {
     const {width, height} = useWindowSize();
 
 
-    const classes = useStyles({handRaiseActive, showMenu, mobile: width < 768});
+    const classes = useStyles({showMenu, mobile: width < 768});
     const [open, setOpen] = React.useState(true);
     const [delayHandler, setDelayHandler] = useState(null)
-      const [progress, setProgress] = useState(10);
+    const [progress, setProgress] = useState(10);
 
 
     const handleOpen = () => {
@@ -274,7 +161,7 @@ function ViewerPage({firebase}) {
         if (iconsDisabled) {
             const timer = setInterval(() => {
                 setProgress((prevProgress) => (prevProgress >= 100 ? 10 : prevProgress + 10));
-            }, DELAY/10);
+            }, DELAY / 10);
             const timeout = setTimeout(() => {
                 setIconsDisabled(false);
             }, DELAY);
@@ -385,34 +272,18 @@ function ViewerPage({firebase}) {
                 <div className='mini-chat-container'>
                     <MiniChatContainer livestream={currentLivestream} isStreamer={false}/>
                 </div>
-                <ClickAwayListener onClickAway={handleClose}>
-                    <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className={classes.actionArea}>
-                        <Box className={classes.miniButtons} classes={{root: open ? classes.cardHovered : ""}}>
-                            <div className={classes.wrapper}>
-                                <Fab onClick={handleLike} disabled={iconsDisabled} className={classes.miniLike}
-                                     aria-label="like">
-                                    <ThumbUpAltOutlinedIcon fontSize="inherit"/>
-                                </Fab>
-                                {iconsDisabled && <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
-                            </div>
-                            <div className={classes.wrapper}>
-                                <Fab onClick={handleClap} disabled={iconsDisabled} className={classes.miniClap}
-                                     aria-label="clap">
-                                    <img alt="clap button" style={{width: 15}} src='/clapping.png'
-                                         className={classes.image}/>
-                                </Fab>
-                                {iconsDisabled && <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
-                            </div>
-                            <div className={classes.wrapper}>
-                                <Fab onClick={handleHeart} disabled={iconsDisabled} className={classes.miniHeart}
-                                     aria-label="heart">
-                                    <FavoriteBorderOutlinedIcon fontSize="inherit"/>
-                                </Fab>
-                                {iconsDisabled && <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
-                            </div>
-                        </Box>
-                    </div>
-                </ClickAwayListener>
+                <EmoteButtons
+                    handRaiseActive={handRaiseActive}
+                    handleClose={handleClose}
+                    handleClap={handleClap}
+                    handleHeart={handleHeart}
+                    handleLike={handleLike}
+                    handleMouseEnter={handleMouseEnter}
+                    handleMouseLeave={handleMouseLeave}
+                    iconsDisabled={iconsDisabled}
+                    open={open}
+                    progress={progress}
+                />
             </div>
             <div className={classes.menuLeft}>
                 <LeftMenu
