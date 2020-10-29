@@ -305,7 +305,7 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                             setSubmitting(false);
                             setEmailSent(true);
                         }).catch(error => {
-                            if (error.code === 'auth/email-already-in-use' && !user.emailVerified && !userData) {
+                            if (error.code === 'auth/email-already-in-use' && user && !user.emailVerified && !userData) {
                                 //This error case accounts for the edge case when user was created by subsequent call to create userData failed
                                 setSubmitting(false);
                                 setEmailSent(true);
