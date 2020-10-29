@@ -43,6 +43,17 @@ const useStyles = makeStyles(theme => ({
         },
         background: "white"
     },
+    questionContainer: {
+        position: "relative",
+        padding: "20px 0 0 0",
+        margin: "10px 10px 0 10px",
+        backgroundColor: "rgb(250,250,250)",
+        borderRadius: "5px",
+        boxShadow: "0 0 5px rgb(180,180,180)",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+    }
 }))
 
 
@@ -53,10 +64,10 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
     const {authenticatedUser, userData} = useContext(UserContext);
 
     const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream.test)
-    const classes = useStyles({isEmpty})
     const active = question.type === 'current'
     const old = question.type !== 'new'
     const upvoted = (!user && !livestream.test) || (question.emailOfVoters ? question.emailOfVoters.indexOf(livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false)
+    const classes = useStyles({isEmpty, active})
 
 
     useEffect(() => {

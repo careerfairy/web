@@ -1,8 +1,9 @@
-import {Typography, withStyles} from "@material-ui/core";
+import {Typography} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
+import React from "react";
 
-
-export const GreyPermanentMarker = withStyles(theme => ({
-    root: {
+const useStyles = makeStyles(theme => ({
+    greyPermanentMarkerStyles: {
         fontFamily: 'Permanent Marker',
         fontSize: "2.6em",
         color: "grey",
@@ -10,10 +11,7 @@ export const GreyPermanentMarker = withStyles(theme => ({
         textAlign: "center",
         fontWeight: 700,
     },
-}))(Typography);
-
-export const ThemedPermanentMarker = withStyles(theme => ({
-    root: {
+    themedPermanentMarkerStyles: {
         fontFamily: 'Permanent Marker',
         fontSize: "2em",
         color: theme.palette.primary.main,
@@ -21,15 +19,28 @@ export const ThemedPermanentMarker = withStyles(theme => ({
         textAlign: "center",
         fontWeight: 700,
     },
-}))(Typography);
-
-export const PollQuestion = withStyles(theme => ({
-    root: {
+    pollQuestionStyles: {
         textAlign: "center",
         fontWeight: 500,
         fontSize: "2.5em",
         color: theme.palette.primary.main,
         marginBottom: "35",
         overflowWrap: "break-word"
-    },
-}))(Typography);
+    }
+}))
+
+
+export const GreyPermanentMarker = ({...props}) => {
+    const classes = useStyles()
+    return <Typography className={classes.greyPermanentMarkerStyles} {...props}/>
+}
+
+export const ThemedPermanentMarker = ({...props}) => {
+    const classes = useStyles()
+    return <Typography className={classes.themedPermanentMarkerStyles} {...props}/>
+}
+
+export const PollQuestion = ({...props}) => {
+    const classes = useStyles()
+    return <Typography className={classes.pollQuestionStyles} {...props}/>
+}

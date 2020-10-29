@@ -1,18 +1,15 @@
 import React, {useState, useEffect, useContext} from 'react';
-
 import {withFirebase} from '../../../../../context/firebase';
-import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
-import {Icon} from 'semantic-ui-react';
-
+import {grey} from "@material-ui/core/colors";
 import {css} from 'glamor';
+import {Collapse, fade, TextField, Typography} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
 import ScrollToBottom from 'react-scroll-to-bottom';
-import UserContext from 'context/user/UserContext';
-import {AccordionSummary, Collapse, fade, TextField, Typography} from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
-import {makeStyles} from "@material-ui/core/styles";
-import {grey} from "@material-ui/core/colors";
 import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
+import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
+import UserContext from 'context/user/UserContext';
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {

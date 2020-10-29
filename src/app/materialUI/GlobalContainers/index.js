@@ -1,26 +1,22 @@
-import {Box, withStyles} from "@material-ui/core";
+import {Box} from "@material-ui/core";
+import {makeStyles} from '@material-ui/core/styles';
+import React from "react";
 
-export const CategoryContainerCentered = withStyles(theme => ({
-    root: {
+const useStyles = makeStyles(theme => ({
+    categoryContainerCenteredStyle: {
         display: "grid",
         placeItems: "center",
         width: "100%",
         height: "100%",
     },
-}))(Box);
-
-export const CategoryContainerTopAligned = withStyles(theme => ({
-    root: {
+    categoryContainerTopAlignedStyles: {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         width: "100%",
         height: "100%",
     },
-}))(Box);
-
-export const QuestionContainerHeader = withStyles(theme => ({
-    root: {
+    questionContainerHeaderStyle: {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -36,11 +32,8 @@ export const QuestionContainerHeader = withStyles(theme => ({
         "& > * :not(:first-child)": {
             marginBottom: theme.spacing(2)
         },
-    }
-}))(Box);
-
-export const QuestionContainerTitle = withStyles(theme => ({
-    root: {
+    },
+    questionContainerTitleStyle: {
         width: "100%",
         display: "flex",
         alignItems: "flex-end",
@@ -49,6 +42,27 @@ export const QuestionContainerTitle = withStyles(theme => ({
         fontWeight: 500,
         textAlign: "center",
     }
-}))(Box);
+}))
+
+export const CategoryContainerCentered = ({...props}) => {
+    const classes = useStyles()
+    return <Box className={classes.categoryContainerCenteredStyle} {...props}/>
+}
+
+export const CategoryContainerTopAligned = ({...props}) => {
+    const classes = useStyles()
+    return <Box className={classes.categoryContainerTopAlignedStyles} {...props}/>
+}
+
+export const QuestionContainerHeader = ({...props}) => {
+    const classes = useStyles()
+    return <Box className={classes.questionContainerHeaderStyle} {...props}/>
+}
+
+export const QuestionContainerTitle = ({...props}) => {
+    const classes = useStyles()
+    return <Box className={classes.questionContainerTitleStyle} {...props}/>
+}
+
 
 
