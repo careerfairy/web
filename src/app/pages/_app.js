@@ -17,6 +17,8 @@ import Head from 'next/head';
 import {theme} from "../materialUI";
 import UserContext from 'context/user/UserContext';
 import TagManager from 'react-gtm-module'
+import ErrorSnackBar from "../components/views/common/ErrorSnackBar/ErrorSnackBar";
+import ErrorContext from "../context/error/ErrorContext";
 
 function MyApp({Component, pageProps}) {
 
@@ -28,6 +30,9 @@ function MyApp({Component, pageProps}) {
     const [authenticatedUser, setAuthenticatedUser] = useState(undefined);
     const [userData, setUserData] = useState(undefined);
     const [loading, setLoading] = useState(false)
+    const [hideLoader, setHideLoader] = useState(false)
+    const [generalError, setGeneralError] = useState("");
+
 
     useEffect(() => {
         // Remove the server-side injected CSS.
@@ -73,18 +78,29 @@ function MyApp({Component, pageProps}) {
         }
     }, [authenticatedUser]);
 
+    useEffect(() => {
+        if (authenticatedUser === null || userData === null || loading === true) {
+            setHideLoader(true)
+        }
+
+    }, [authenticatedUser, userData, loading])
+
+
     return (
         <Fragment>
             <Head>
                 <title>CareerFairy | Watch live streams. Get hired.</title>
             </Head>
             <FirebaseContext.Provider value={firebase}>
-                <UserContext.Provider value={{authenticatedUser, userData, setUserData, loading}}>
-                    <ThemeProvider theme={theme}>
-                        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                        <CssBaseline/>
-                        <Component {...pageProps} />
-                    </ThemeProvider>
+                <UserContext.Provider value={{authenticatedUser, userData, setUserData, loading, hideLoader}}>
+                    <ErrorContext.Provider value={{generalError, setGeneralError}}>
+                        <ThemeProvider theme={theme}>
+                            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                            <CssBaseline/>
+                            <Component {...pageProps} />
+                            <ErrorSnackBar handleClose={() => setGeneralError("")} errorMessage={generalError}/>
+                        </ThemeProvider>
+                    </ErrorContext.Provider>
                 </UserContext.Provider>
             </FirebaseContext.Provider>
         </Fragment>

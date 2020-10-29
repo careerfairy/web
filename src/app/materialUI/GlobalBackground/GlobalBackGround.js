@@ -28,7 +28,9 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: theme.palette.main,
         height: "100%",
         minHeight: "100vh",
-        padding: "0 0 40px 0"
+        padding: "0 0 40px 0",
+        display: "flex",
+        flexDirection: "column"
     },
     themedBackgroundStyles: {
         backgroundColor: "rgb(0, 210, 170)",

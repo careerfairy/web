@@ -22,6 +22,7 @@ import TargetOptions from "../../components/views/NextLivestreams/GroupsCarousel
 import UserContext from "../../context/user/UserContext";
 import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
 import axios from "axios";
+import DataAccessUtil from "util/DataAccessUtil";
 
 function UpcomingLivestream(props) {
     const router = useRouter();
@@ -227,20 +228,8 @@ function UpcomingLivestream(props) {
         return currentLivestream.registeredUsers.indexOf(user.email) > -1;
     }
 
-    function sendEmailRegistrationConfirmation() {
-        return axios({
-            method: 'post',
-            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendLivestreamRegistrationConfirmationEmail',
-            data: {
-                recipientEmail: user.email,
-                user_first_name: userData.firstName,
-                livestream_date: DateUtil.getPrettyDate(currentLivestream.start.toDate()),
-                company_name: currentLivestream.company,
-                company_logo_url: currentLivestream.companyLogoUrl,
-                livestream_title: currentLivestream.title,
-                livestream_link: ('https://careerfairy.io/upcoming-livestream/' + currentLivestream.id)
-            }
-        });
+    function sendEmailRegistrationConfirmation() {    
+        return DataAccessUtil.sendRegistrationConfirmationEmail(user, userData, currentLivestream);
     }
 
     function userFollowsSomeCareerCenter() {

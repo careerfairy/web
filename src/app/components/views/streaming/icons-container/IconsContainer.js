@@ -25,9 +25,13 @@ function IconsContainer({ livestreamId, firebase }) {
     useEffect(() => {
         if (postedIcons.length) {
             if (filteredIcons.length < 250) {
-                setFilteredIcons([...filteredIcons, postedIcons[postedIcons.length - 1]]);
+                if (!filteredIcons.some( icon => icon.id === postedIcons[postedIcons.length - 1].id)) {
+                    setFilteredIcons([...filteredIcons, postedIcons[postedIcons.length - 1]]);
+                }
             } else {
-                setFilteredIcons([...filteredIcons.slice(filteredIcons.length - 150), postedIcons[postedIcons.length - 1]]);
+                if (!filteredIcons.some( icon => icon.id === postedIcons[postedIcons.length - 1].id)) {
+                    setFilteredIcons([...filteredIcons.slice(filteredIcons.length - 150), postedIcons[postedIcons.length - 1]]);
+                }
             }
         }
     }, [postedIcons]);

@@ -74,6 +74,13 @@ class Firebase {
         });
     };
 
+    setUserUnsubscribed = (userEmail) => {
+        let ref = this.firestore.collection("userData").doc(userEmail);
+        return ref.update({
+            unsubscribed: true
+        });
+    }
+
     updateUserGroups = (userEmail, groupIds, registeredGroups) => {
         let ref = this.firestore.collection("userData").doc(userEmail);
         return ref.update({
@@ -252,6 +259,114 @@ class Firebase {
         });
     };
 
+    // CREATE_LIVESTREAMS
+
+    addLivestream = async (livestream, speakers) => {
+        try {
+            let batch = this.firestore.batch();
+            let livestreamsRef = this.firestore
+                .collection("livestreams")
+                .doc()
+            livestream.currentSpeakerId = livestreamsRef.id
+            batch.set(livestreamsRef, livestream)
+
+            speakers.forEach(speaker => {
+                let speakersRef = this.firestore
+                    .collection("livestreams")
+                    .doc(livestreamsRef.id)
+                    .collection("speakers")
+                    .doc();
+                batch.set(speakersRef, speaker)
+            })
+
+            await batch.commit()
+            return {status: "OK", data: livestreamsRef.id}
+
+        } catch (e) {
+            return {status: "ERROR", message: "Something went wrong"}
+        }
+    }
+
+    addDraftLivestream = async (livestream, speakers) => {
+
+        let batch = this.firestore.batch();
+        let livestreamsRef = this.firestore
+            .collection("draftLivestreams")
+            .doc()
+        livestream.currentSpeakerId = livestreamsRef.id
+        batch.set(livestreamsRef, livestream)
+        speakers.forEach(speaker => {
+            let speakersRef = this.firestore
+                .collection("draftLivestreams")
+                .doc(livestreamsRef.id)
+                .collection("speakers")
+                .doc();
+            batch.set(speakersRef, speaker)
+        })
+        await batch.commit()
+        return livestreamsRef.id
+    }
+
+    updateLivestream = async (livestream, speakers) => {
+        try {
+            let batch = this.firestore.batch();
+            let livestreamsRef = this.firestore
+                .collection("livestreams")
+                .doc(livestream.id)
+            let speakersRef = this.firestore
+                .collection("livestreams")
+                .doc(livestreamsRef.id)
+                .collection("speakers")
+
+            batch.update(livestreamsRef, livestream)
+
+            speakers.forEach(speaker => {
+                let ref = speakersRef.doc()
+                batch.set(ref, speaker)
+            })
+            const docs = await speakersRef.get()
+            docs.forEach(doc => {
+                let docRef = doc.ref
+                batch.delete(docRef)
+            })
+            await batch.commit()
+            return {status: "OK", data: livestream.id}
+        } catch (e) {
+            return {status: "ERROR", message: "Something went wrong"}
+        }
+    }
+
+    addLivestreamSpeaker = (livestreamId, speaker) => {
+        let speakersRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("speakers");
+
+        return speakersRef.add(speaker);
+    }
+
+    getLivestreamById = (livestreamId) => {
+        let livestreamsRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+        return livestreamsRef.get()
+    }
+
+    getStreamById = (streamId, collection) => {
+        let livestreamsRef = this.firestore
+            .collection(collection)
+            .doc(streamId)
+        return livestreamsRef.get()
+    }
+
+    getStreamSpeakers = (streamId, collection) => {
+        let ref = this.firestore
+            .collection(collection)
+            .doc(streamId)
+            .collection("speakers");
+        return ref.get();
+    };
+
     //TEST_LIVESTREAMS
 
     createTestLivestream = () => {
@@ -428,15 +543,15 @@ class Firebase {
     }
 
     listenToPastLiveStreamsByGroupId = (groupId, callback) => {
-      var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
-      let ref = this.firestore
-          .collection("livestreams")
-          .where("groupIds", "array-contains", groupId)
-          .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
-          .where("start", ">", new Date(2020, 9, 1, 0, 0, 0))
-          .orderBy("start", "desc")
-      return ref.onSnapshot(callback)
-  }
+        var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
+        let ref = this.firestore
+            .collection("livestreams")
+            .where("groupIds", "array-contains", groupId)
+            .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
+            .where("start", ">", new Date(2020, 9, 1, 0, 0, 0))
+            .orderBy("start", "desc")
+        return ref.onSnapshot(callback)
+    }
 
     getLivestreamSpeakers = (livestreamId) => {
         let ref = this.firestore
@@ -465,13 +580,13 @@ class Firebase {
     };
 
     listLivestreamQuestions = (livestreamId, callback) => {
-      let ref = this.firestore
-          .collection("livestreams")
-          .doc(livestreamId)
-          .collection("questions")
-          .orderBy("votes", "desc")
-      return ref.onSnapshot(callback);
-  };
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("questions")
+            .orderBy("votes", "desc")
+        return ref.onSnapshot(callback);
+    };
 
     listenToQuestionComments = (livestreamId, questionId, callback) => {
         let ref = this.firestore
@@ -636,12 +751,12 @@ class Firebase {
     }
 
     getLivestreamParticipatingStudents = (livestreamId) => {
-      let ref = this.firestore
-          .collection("livestreams")
-          .doc(livestreamId)
-          .collection("participatingStudents");
-      return ref.get();
-  }
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("participatingStudents");
+        return ref.get();
+    }
 
     getLivestreamTalentPoolMembers = (companyId) => {
         let ref = this.firestore
@@ -651,10 +766,10 @@ class Firebase {
     }
 
     deleteCareerCenter = (careerCenterId) => {
-      let careerCenterRef = this.firestore
-        .collection("careerCenterData")
-        .doc(careerCenterId);
-      return careerCenterRef.delete();
+        let careerCenterRef = this.firestore
+            .collection("careerCenterData")
+            .doc(careerCenterId);
+        return careerCenterRef.delete();
     };
 
     getCareerCenterById = (careerCenterId) => {
@@ -676,18 +791,30 @@ class Firebase {
     };
 
     getAllCareerCenters = () => {
-      let ref = this.firestore
-          .collection("careerCenterData")
-          .where("test", "==", false);
-      return ref.get();
-  };
+        let ref = this.firestore
+            .collection("careerCenterData")
+            .where("test", "==", false);
+        return ref.get();
+    };
 
     listenCareerCenters = (callback) => {
-      let ref = this.firestore
-          .collection("careerCenterData")
-          .where("test", "==", false);
-      return ref.onSnapshot(callback);
-  };
+        let ref = this.firestore
+            .collection("careerCenterData")
+            .where("test", "==", false);
+        return ref.onSnapshot(callback);
+    };
+    getCareerCentersByGroupId = async (arrayOfIds) => {
+        let groups = []
+        for (const id of arrayOfIds) {
+            const snapshot = await this.firestore.collection("careerCenterData").doc(id).get()
+            if (snapshot.exists) {
+                let group = snapshot.data()
+                group.id = snapshot.id
+                groups.push(group)
+            }
+        }
+        return groups;
+    };
 
     listenCareerCentersByAdminEmail = (email, callback) => {
         let ref = this.firestore
@@ -1010,7 +1137,7 @@ class Firebase {
     };
 
     setUserIsParticipating = (livestreamId, userData) => {
-      let ref = this.firestore
+        let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("participatingStudents")

@@ -21,7 +21,7 @@ let baseTheme = createMuiTheme({
     },
     overrides: {
         MuiButton: {
-            root:{
+            root: {
                 fontWeight: 600
             }
         },
@@ -34,7 +34,12 @@ let baseTheme = createMuiTheme({
                 margin: "0.5em",
                 marginLeft: 0,
             }
-        }
+        },
+        MuiInputBase: {
+            root: {
+                backgroundColor: "white"
+            }
+        },
     },
 
     typography: {
