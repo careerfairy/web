@@ -14,27 +14,10 @@ import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import Typography from "@material-ui/core/Typography";
 import Collapse from "@material-ui/core/Collapse";
 import Card from "@material-ui/core/Card";
+import {PlayIconButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
+import Paper from "@material-ui/core/Paper";
 
 const useStyles = makeStyles(theme => ({
-    sendIcon: {
-        background: "white",
-        color: ({isEmpty}) => isEmpty ? "grey" : theme.palette.primary.main,
-        borderRadius: "50%",
-        fontSize: 15
-    },
-    sendBtn: {
-        width: 30,
-        height: 30,
-        background: fade(theme.palette.primary.main, 0.5),
-        "&$buttonDisabled": {
-            color: grey[800]
-        },
-        "&:hover": {
-            backgroundColor: theme.palette.primary.main,
-        },
-        margin: "0.5rem"
-    },
-    buttonDisabled: {},
     chatInput: {
         borderRadius: 10,
         "& .MuiInputBase-root": {
@@ -44,17 +27,58 @@ const useStyles = makeStyles(theme => ({
         background: "white"
     },
     questionContainer: {
+        backgroundColor: ({active}) => active ? theme.palette.primary.main : "rgb(250,250,250)",
+        color: ({active}) => active ? "white" : "inherit",
         position: "relative",
         padding: "20px 0 0 0",
         margin: "10px 10px 0 10px",
-        backgroundColor: "rgb(250,250,250)",
-        borderRadius: "5px",
-        boxShadow: "0 0 5px rgb(180,180,180)",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
+    },
+    reactionsQuestion: {
+        fontWeight: 700,
+        fontSize: "1.3em",
+        lineHeight: "1.3em",
+        color: ({active}) => active ? "white" : "rgb(50,50,50)",
+        margin: "5px 0",
+        width: "85%",
+        wordBreak: "break-word",
+    },
+    reactionsToggle: {
+        textTransform: "uppercase",
+        cursor: "pointer",
+        color: "rgb(210,210,210)",
+        display: "flex",
+        alignItems: "center"
+    },
+    showText: {
+        color: "rgb(210,210,210)",
+        fontSize: "0.8em",
+        fontWeight: 500
+    },
+    upVotes: {
+        position: "absolute",
+        top: 10,
+        right: 10,
+        fontSize: "1.2em",
+        display: "inline-block",
+        margin: "0 0 0 30px",
+        fontWeight: 700,
+        color: ({active}) => active ? "white" : theme.palette.primary.main,
     }
 }))
+
+const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
+    const classes = useStyles()
+    return (
+        <div className={classes.reactionsToggle} onClick={() => setShowAllReactions(!showAllReactions)}>
+            {showAllReactions ? <ExpandLessRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/> :
+                <ExpandMoreRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/>}
+            <Typography className={classes.showText}>{showAllReactions ? 'Hide' : 'Show all reactions'}</Typography>
+        </div>
+    )
+}
 
 
 function QuestionContainer({user, livestream, streamer, appear, question, questions, firebase}) {
@@ -67,7 +91,7 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
     const active = question.type === 'current'
     const old = question.type !== 'new'
     const upvoted = (!user && !livestream.test) || (question.emailOfVoters ? question.emailOfVoters.indexOf(livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false)
-    const classes = useStyles({isEmpty, active})
+    const classes = useStyles({active})
 
 
     useEffect(() => {
@@ -158,195 +182,81 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
         );
     });
 
-    const playIcon = (<div>
-        <IconButton classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}} disabled={isEmpty}
-                    onClick={() => addNewComment()}>
-            <ChevronRightRoundedIcon className={classes.sendIcon}/>
-        </IconButton>
-    </div>)
-
-    const ReactionsToggle = () => {
-        if (comments.length < 2) {
-            return null;
-        }
-
-        return (
-            <div className='reactions-toggle' onClick={() => setShowAllReactions(!showAllReactions)}>
-                {showAllReactions ? <ExpandLessRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/> :
-                    <ExpandMoreRoundedIcon style={{marginRight: '3px', fontSize: "1.8em"}}/>}
-                <Typography style={{
-                    color: "rgb(210,210,210)",
-                    fontSize: "0.8em",
-                    fontWeight: 500
-                }}>{showAllReactions ? 'Hide' : 'Show all reactions'}</Typography>
-                <style jsx>{`
-                    .reactions-toggle {
-                        text-transform: uppercase;
-                        cursor: pointer;
-                        color: rgb(210,210,210);
-                        display: flex;
-                        align-items: center;
-                    }
-                `}</style>
-            </div>
-        )
-    }
-
     return (
-        <>
-            <Grow appear={appear} mountOnEnter unmountOnExit in={appear}>
-                <div className={'questionContainer ' + (active ? 'active' : '')}>
-                    <div style={{padding: "20px 20px 5px 20px"}}>
-                        <div className='questionTitle'>
-                            {question.title}
-                        </div>
-                        <div className='bottom-element'>
-                            <div className='comments'>
-                                <p className='comments-number'>{comments.length} reactions</p>
-                            </div>
-                        </div>
-                        {commentsElements[0]}
-                        <Collapse style={{width: "100%"}} in={showAllReactions}>
-                            {commentsElements.slice(1)}
-                        </Collapse>
-                        <ReactionsToggle/>
-                        <div style={{color: active ? "white" : "auto"}} className='upvotes'>
-                            {question.votes} <ThumbUpRoundedIcon color="inherit"
-                                                                 style={{verticalAlign: "text-top"}}
-                                                                 fontSize='small'/>
-                        </div>
+        <Grow appear={appear} mountOnEnter unmountOnExit in={appear}>
+            <Paper className={classes.questionContainer}>
+                <div style={{padding: "20px 20px 5px 20px"}}>
+                    <div className={classes.upVotes}>
+                        {question.votes} <ThumbUpRoundedIcon color="inherit"
+                                                             style={{verticalAlign: "text-top"}}
+                                                             fontSize='small'/>
                     </div>
-                    <Box p={1}>
-                        <TextField
-                            value={newCommentTitle}
-                            className={classes.chatInput}
-                            onKeyPress={addNewCommentOnEnter}
-                            placeholder='Send a reaction...'
-                            fullWidth
-                            size="small"
-                            variant="outlined"
-                            InputProps={{
-                                maxLength: 340,
-                                endAdornment: playIcon,
-                            }}
-                            onChange={(event) => {
-                                setNewCommentTitle(event.currentTarget.value)
-                            }}
-                        />
-                    </Box>
-                    {streamer ?
-                        <Button
-                            startIcon={<ThumbUpRoundedIcon/>}
-                            children={active ? "Answering" : old ? "Answered" : "Answer Now"}
-                            size='small'
-                            disableElevation
-                            disabled={old}
-                            style={{borderRadius: "0 0 5px 5px"}}
-                            fullWidth
-                            color="primary"
-                            onClick={() => goToThisQuestion(question.id)}
-                            variant="contained"
-                        />
-                        : <Button
-                            startIcon={<ThumbUpRoundedIcon/>}
-                            children={!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
-                            size='small'
-                            style={{borderRadius: "0 0 5px 5px"}}
-                            disableElevation
-                            color="primary"
-                            fullWidth
-                            variant="contained"
-                            onClick={() => upvoteLivestreamQuestion()}
-                            disabled={old || upvoted}/>}
+                    <div className={classes.reactionsQuestion}>
+                        {question.title}
+                    </div>
+                    <Typography style={{
+                        fontSize: "1em",
+                        verticalAlign: "middle",
+                        fontWeight: 700,
+                        color: active ? "white" : "rgb(200,200,200)",
+                        marginBottom: "1rem"
+                    }}>
+                        {comments.length} reactions
+                    </Typography>
+                    {commentsElements[0]}
+                    <Collapse style={{width: "100%"}} in={showAllReactions}>
+                        {commentsElements.slice(1)}
+                    </Collapse>
+                    <ReactionsToggle
+                        setShowAllReactions={setShowAllReactions}
+                        showAllReactions={showAllReactions}/>
                 </div>
-            </Grow>
-            <style jsx>{`
-                    .questionContainer {
-                        position: relative;
-                        padding: 20px 0 0 0;
-                        margin: 10px 10px 0 10px;
-                        background-color: rgb(250,250,250);
-                        border-radius: 5px;
-                        box-shadow: 0 0 5px rgb(180,180,180);
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: space-between;
-                    }
-
-                    .questionContainer.active {
-                        background-color: rgb(0, 210, 170);
-                        color: white;
-                    }
-
-                    .questionContainer.past {
-                        opacity: 0.6;
-                    }
-
-                    .questionTitle {
-                        font-weight: 700;
-                        font-size: 1.3em;
-                        line-height: 1.3em;
-                        color: rgb(50,50,50);
-                        margin: 5px 0;
-                        width: 85%;
-                        word-break: break-word;
-                    }
-
-                    .questionContainer.active .questionTitle {
-                        color: white;
-                    }
-
-                    .questionAuthor {
-                        font-size: 0.8em;
-                        color: rgb(130,130,130);
-                    }
-
-                    .questionContainer.active .questionAuthor {
-                        color: white;
-                    }
-
-                    .bottom-element {
-                        margin: 5px 0;
-                        color: rgb(200,200,200);
-                        font-size: 0.9em;  
-                        font-weight: 700; 
-                    }
-
-                    .questionContainer.active .bottom-element {
-                        color: white;
-                    }
-
-                    .comments {
-                        font-size: 1em;     
-                        display: inline-block;
-                        text-transform: uppercase;
-                    }
-
-                    .comments-number {
-                        font-size: 1em;    
-                        vertical-align: middle;
-                        margin: 0;
-                    }
-
-                    .comments-add {
-                        font-size: 0.9em;    
-                        margin: 0;
-                        color: rgb(0, 210, 170);
-                        cursor: pointer;
-                    }
-
-                    .upvotes {
-                        position: absolute;
-                        top: 10px;
-                        right: 10px;
-                        font-size: 1.2em;
-                        display: inline-block;
-                        margin: 0 0 0 30px;
-                        font-weight: 700; 
-                        color: rgba(0, 210, 170, 1);
-                    }
-                `}</style>
-        </>
+                <Box p={1}>
+                    <TextField
+                        value={newCommentTitle}
+                        className={classes.chatInput}
+                        onKeyPress={addNewCommentOnEnter}
+                        placeholder='Send a reaction...'
+                        fullWidth
+                        size="small"
+                        variant="outlined"
+                        InputProps={{
+                            maxLength: 340,
+                            endAdornment: <PlayIconButton
+                                isEmpty={isEmpty}
+                                addNewComment={addNewComment}/>,
+                        }}
+                        onChange={(event) => {
+                            setNewCommentTitle(event.currentTarget.value)
+                        }}
+                    />
+                </Box>
+                {streamer ?
+                    <Button
+                        startIcon={<ThumbUpRoundedIcon/>}
+                        children={active ? "Answering" : old ? "Answered" : "Answer Now"}
+                        size='small'
+                        disableElevation
+                        disabled={old}
+                        style={{borderRadius: "0 0 5px 5px"}}
+                        fullWidth
+                        color="primary"
+                        onClick={() => goToThisQuestion(question.id)}
+                        variant="contained"
+                    />
+                    : <Button
+                        startIcon={<ThumbUpRoundedIcon/>}
+                        children={!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
+                        size='small'
+                        style={{borderRadius: "0 0 5px 5px"}}
+                        disableElevation
+                        color="primary"
+                        fullWidth
+                        variant="contained"
+                        onClick={() => upvoteLivestreamQuestion()}
+                        disabled={old || upvoted}/>}
+            </Paper>
+        </Grow>
     );
 }
 
