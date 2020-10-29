@@ -4,6 +4,7 @@ import {Checkbox, List, ListItem, Typography, useTheme} from "@material-ui/core"
 import 'chartjs-plugin-labels'
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import {PollQuestion} from "../../../../materialUI/GlobalTitles";
 
 const baseColors = [
     '#E74C3C',
@@ -103,21 +104,17 @@ const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
 
         return (
             <div style={{
-                background: background,
-                padding: 12,
-                height: "100%",
+                width: "inherit",
                 overflowY: "auto",
                 display: "flex",
                 flexDirection: "column",
             }}>
-                <Typography align="center" color="primary" style={{fontSize: "2em", marginTop: "auto", overflowWrap: "break-word"}}
-                            variant="h4"
-                            gutterBottom>{question}</Typography>
+                <PollQuestion style={{ marginTop: "auto", overflowWrap: "break-word", padding: "0 0.5rem"}}>{question}</PollQuestion>
                 <List dense>
                     {legendElements.map((item) => {
                         const votesNum = chartData.datasets[0].data[item.index]
                         return (
-                            <ListItem style={{paddingRight: 0}} dense key={item.index} onClick={(e) => handleClickLegend(e, item)} button>
+                            <ListItem dense key={item.index} onClick={(e) => handleClickLegend(e, item)} button>
                                 <ListItemIcon style={{minWidth: 0}}>
                                     <Checkbox
                                         edge="start"
@@ -132,7 +129,7 @@ const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
                         )
                     })}
                 </List>
-                <div style={{position: "relative", width: "100%", marginBottom: "auto"}}>
+                <div style={{position: "relative", padding: "0 1rem", marginBottom: "auto"}}>
                     <Doughnut
                         data={chartData}
                         ref={chartRef}

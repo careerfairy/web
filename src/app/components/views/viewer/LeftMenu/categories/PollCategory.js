@@ -1,15 +1,31 @@
 import React, {useState, useEffect} from 'react';
-
 import {withFirebase} from 'context/firebase';
 import UserContext from 'context/user/UserContext';
 import CurrentPollGraph from "../../../streaming/sharedComponents/CurrentPollGraph";
-import {Button, Typography} from "@material-ui/core";
+import {Button, Paper, useTheme, withStyles} from "@material-ui/core";
+import {CategoryContainer} from "../../../../../materialUI/GlobalContainers";
+import {GreyPermanentMarker, PollQuestion} from "../../../../../materialUI/GlobalTitles";
 
-function PollCategory({firebase, selectedState, livestream, setSelectedState, disableSwitching, setShowMenu}) {
+const PollWrapper = withStyles(theme => ({
+    root: {
+        borderRadius: 15,
+        margin: 10,
+        backgroundColor: "white",
+        display: "flex",
+        width: "90%",
+        flexDirection: "column",
+        alignItems: "center",
+        textAlign: "center",
+        padding: theme.spacing(2, 0)
+    },
+}))(Paper);
 
-    const {authenticatedUser, userData} = React.useContext(UserContext);
+
+function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
+    const theme = useTheme()
+    const {authenticatedUser} = React.useContext(UserContext);
     const [currentPoll, setCurrentPoll] = useState(null);
-    const [currentPollId, setCurrenPollId] = useState(null);
+    const [currentPollId, setCurrentPollId] = useState(null);
 
     useEffect(() => {
         if (livestream) {
@@ -28,11 +44,10 @@ function PollCategory({firebase, selectedState, livestream, setSelectedState, di
     }, [livestream]);
 
     useEffect(() => {
-        // debugger
         if (currentPoll && currentPoll.id !== currentPollId) {
             setSelectedState("polls");
             setShowMenu(true);
-            setCurrenPollId(currentPoll.id);
+            setCurrentPollId(currentPoll.id);
         }
     }, [currentPoll]);
 
@@ -48,86 +63,41 @@ function PollCategory({firebase, selectedState, livestream, setSelectedState, di
             const colors = ['#E74C3C', '#E67E22', '#FFCE56', '#27AE60'];
             let optionElementsLarge = currentPoll.options.map((option, index) => {
                 return (
-                    <div key={index} style={{margin: "10px 10px 0 0"}}>
-                        <Button variant="contained" children={option.name} fullWidth
-                                style={{background: colors[index], color: "white"}}
-                                onClick={() => voteForPollOption(index)}
-                                size='small'/>
-                    </div>
+                    <Button key={index} variant="contained" children={option.name} fullWidth
+                            style={{background: colors[index], color: "white", marginTop: "0.5rem"}}
+                            onClick={() => voteForPollOption(index)}
+                            size='small'/>
                 );
             });
             return (
-                <>
-                    <div className='handraise-container'>
-                        <div className='central-container'>
-                            <Typography style={{fontFamily: "Permanent Marker", fontSize: "2.5em"}} variant="h3"
-                                        gutterBottom>{currentPoll.question}</Typography>
-                            <div>
-                                {optionElementsLarge}
-                            </div>
+                <CategoryContainer>
+                    <PollWrapper style={{padding: theme.spacing(2)}}>
+                        <PollQuestion>
+                            {currentPoll.question}
+                        </PollQuestion>
+                        <div>
+                            {optionElementsLarge}
                         </div>
-                    </div>
-                    <style jsx>{`
-                        .handraise-container {
-                            display: flex;
-                            flex-direction: column;
-                            align-items: center;
-                            justify-content: center;
-                            width: 100%;
-                            height: 100%;
-                        }
-
-                        .central-container {
-                            text-align: center;
-                            width: 90%;
-                            color: rgb(0, 210, 170);
-                        }
-
-                        .central-container h2 {
-                            font-family: 'Permanent Marker';
-                            font-size: 2.5em;
-                            margin: 20px 0;
-                        }
-                `}</style>
-                </>
+                    </PollWrapper>
+                </CategoryContainer>
             );
         } else {
-            return <CurrentPollGraph background="rgb(240,240,240)"
-                                  currentPoll={currentPoll}/>
+            return (
+                <CategoryContainer>
+                    <PollWrapper>
+                        <CurrentPollGraph currentPoll={currentPoll}/>
+                    </PollWrapper>
+                </CategoryContainer>
+            )
 
         }
     } else {
         return (
-            <div className='handraise-container'>
-                <div className='central-container'>
-                    <h2>No current poll</h2>
-                </div>
-                <style jsx>{`
-                    .handraise-container {
-                        width: 100%;
-                        height: 100%;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                    }
-
-                    .central-container {
-                        text-align: center;
-                        width: 90%;
-                        color: grey;
-                    }
-
-                    .central-container h2 {
-                        font-family: 'Permanent Marker';
-                        font-size: 2.6em;
-                    }
-
-                    .central-container p {
-                        margin: 20px 0 30px 0;
-                    }
-            `}</style>
-            </div>
+            <CategoryContainer>
+                <GreyPermanentMarker>
+                    No current poll
+                </GreyPermanentMarker>
+            </CategoryContainer>
         );
     }
 }

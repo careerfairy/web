@@ -34,10 +34,9 @@ function CurrentPollStreamer(props) {
             <div>
                 <div className='chat-entry-container'>
                     <div className='poll-label'>ACTIVE POLL</div>
-                    {currentPoll && <CurrentPollGraph background="transparent"
-                        currentPoll={currentPoll}/>}
+                    {currentPoll && <CurrentPollGraph currentPoll={currentPoll}/>}
                 <Button fullWidth children={'Close Poll'} variant="contained" color="primary" onClick={() => setPollState('closed')}
-                        style={{borderRadius: '0 0 5px 5px'}}/>
+                        style={{borderRadius: '0 0 5px 5px', marginTop: 12}}/>
                 </div>
             </div>
             <style jsx>{`
@@ -45,7 +44,7 @@ function CurrentPollStreamer(props) {
                     border-radius: 15px;
                     box-shadow: 0 0 5px rgb(180,180,180);
                     margin: 10px 10px 0 10px;
-                    padding-top: 12px;
+                    padding: 12px 0 0 0;
                     background-color: white;
                     border: 10px solid rgb(0, 210, 170);
                 }
