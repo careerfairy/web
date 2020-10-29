@@ -6,11 +6,8 @@ import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import ExpandMoreRoundedIcon from '@material-ui/icons/ExpandMoreRounded';
 import {withFirebase} from 'context/firebase';
 import UserContext from 'context/user/UserContext';
-import {Box, Button, fade, Slide, TextField} from "@material-ui/core";
+import {Box, Button, Slide, TextField} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import {grey} from "@material-ui/core/colors";
-import IconButton from "@material-ui/core/IconButton";
-import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import Typography from "@material-ui/core/Typography";
 import Collapse from "@material-ui/core/Collapse";
 import Card from "@material-ui/core/Card";
@@ -80,8 +77,7 @@ const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
     )
 }
 
-
-function QuestionContainer({user, livestream, streamer, appear, question, questions, firebase}) {
+const QuestionContainer = ({user, livestream, streamer, question, questions, firebase}) => {
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
@@ -183,7 +179,7 @@ function QuestionContainer({user, livestream, streamer, appear, question, questi
     });
 
     return (
-        <Grow appear={appear} mountOnEnter unmountOnExit in={appear}>
+        <Grow in>
             <Paper className={classes.questionContainer}>
                 <div style={{padding: "20px 20px 5px 20px"}}>
                     <div className={classes.upVotes}>

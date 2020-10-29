@@ -17,6 +17,7 @@ import {
     QuestionContainerHeader,
     QuestionContainerTitle
 } from "../../../../materialUI/GlobalContainers";
+import Slide from "@material-ui/core/Slide";
 
 
 function QuestionCategory({livestream, selectedState, user, streamer, firebase}) {
@@ -133,14 +134,12 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
                     </Fab>
                 </div>
             </QuestionContainerHeader>
-            <div>
-                <div>
-                    {upcomingQuestionsElements}
-                </div>
-                <div>
-                    {pastQuestionsElements}
-                </div>
-            </div>
+            <Slide>
+                {upcomingQuestionsElements}
+            </Slide>
+            <Slide>
+                {pastQuestionsElements}
+            </Slide>
             <Dialog PaperProps={{style: {background: "transparent", boxShadow: "none"}}} fullWidth onClose={handleClose}
                     open={showQuestionModal} basic size='small'>
                 <DialogTitle style={{color: "white"}}>
