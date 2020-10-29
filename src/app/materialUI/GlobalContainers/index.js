@@ -11,8 +11,9 @@ export const CategoryContainerCentered = withStyles(theme => ({
 
 export const CategoryContainerTopAligned = withStyles(theme => ({
     root: {
-        display: "grid",
-        placeItems: "start center",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
         width: "100%",
         height: "100%",
     },

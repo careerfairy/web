@@ -5,17 +5,7 @@ import 'chartjs-plugin-labels'
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import {PollQuestion} from "../../../../materialUI/GlobalTitles";
-
-const baseColors = [
-    '#E74C3C',
-    '#E67E22',
-    '#FFCE56',
-    '#27AE60',
-    '#145A32',
-    '#36A2EB',
-    '#8E44AD',
-    '#B7950B',
-]
+import {colorsArray} from "../../../util/colors";
 
 const GraphWrapper = withStyles(theme => ({
     root: {
@@ -56,8 +46,8 @@ const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
             datasets: [{
                 label: question,
                 data: options.map(option => option.votes),
-                backgroundColor: options.map((option, index) => baseColors[index]),
-                hoverBackgroundColor: options.map((option, index) => baseColors[index])
+                backgroundColor: options.map((option, index) => colorsArray[index]),
+                hoverBackgroundColor: options.map((option, index) => colorsArray[index])
             }],
         })
     }, [options])

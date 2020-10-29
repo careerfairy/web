@@ -5,6 +5,7 @@ import CurrentPollGraph from "../../../streaming/sharedComponents/CurrentPollGra
 import {Button, Paper, useTheme, withStyles} from "@material-ui/core";
 import {GreyPermanentMarker, PollQuestion} from "../../../../../materialUI/GlobalTitles";
 import {CategoryContainerCentered} from "../../../../../materialUI/GlobalContainers";
+import {colorsArray} from "../../../../util/colors";
 
 const PollWrapper = withStyles(theme => ({
     root: {
@@ -60,11 +61,10 @@ function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
 
     if (currentPoll && authEmail) {
         if (currentPoll.voters.indexOf(authEmail) === -1) {
-            const colors = ['#E74C3C', '#E67E22', '#FFCE56', '#27AE60'];
             let optionElementsLarge = currentPoll.options.map((option, index) => {
                 return (
                     <Button key={index} variant="contained" children={option.name} fullWidth
-                            style={{background: colors[index], color: "white", marginTop: "0.5rem"}}
+                            style={{background: colorsArray[index], color: "white", marginTop: "0.5rem"}}
                             onClick={() => voteForPollOption(index)}
                             size='small'/>
                 );

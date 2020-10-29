@@ -100,7 +100,7 @@ function HandRaiseActive(props) {
                     align-items: center;
                     width: 100%;
                     height: 100%;
-                    background-color: rgb(240,240,240);
+                    //background-color: rgb(240,240,240);
                 }
 
                 .central-container {
