@@ -19,7 +19,8 @@ export const PollQuestion = withStyles(theme => ({
         fontWeight: 500,
         fontSize: "2.5em",
         color: theme.palette.primary.main,
-        marginBottom: "35"
+        marginBottom: "35",
+        overflowWrap: "break-word"
     },
 
 }))(Typography);
