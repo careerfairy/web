@@ -49,7 +49,6 @@ const useStyles = makeStyles((theme) => ({
 
 function ViewerPage({firebase}) {
     const DELAY = 3000; //3 seconds
-
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
 
@@ -70,41 +69,7 @@ function ViewerPage({firebase}) {
     const classes = useStyles({showMenu, mobile: width < 768});
     const [open, setOpen] = React.useState(true);
     const [delayHandler, setDelayHandler] = useState(null)
-    const [progress, setProgress] = useState(10);
 
-
-    const handleOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-    const handleMouseEnter = event => {
-        clearTimeout(delayHandler)
-        handleOpen()
-    }
-
-    const handleMouseLeave = () => {
-        setDelayHandler(setTimeout(() => {
-            handleClose()
-        }, DELAY))
-    }
-
-    const handleClap = () => {
-        postIcon('clapping')
-    }
-
-    const handleLike = () => {
-        postIcon('like')
-    }
-    const handleHeart = () => {
-        postIcon('heart')
-    }
-    const toggleShowMenu = () => {
-        setShowMenu(!showMenu)
-    }
 
     const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
 
@@ -157,20 +122,39 @@ function ViewerPage({firebase}) {
         }
     }, [currentLivestream, userData]);
 
-    useEffect(() => {
-        if (iconsDisabled) {
-            const timer = setInterval(() => {
-                setProgress((prevProgress) => (prevProgress >= 100 ? 10 : prevProgress + 10));
-            }, DELAY / 10);
-            const timeout = setTimeout(() => {
-                setIconsDisabled(false);
-            }, DELAY);
-            return () => {
-                clearTimeout(timeout)
-                clearTimeout(timer)
-            };
-        }
-    }, [iconsDisabled]);
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleMouseEnter = event => {
+        clearTimeout(delayHandler)
+        handleOpen()
+    }
+
+    const handleMouseLeave = () => {
+        setDelayHandler(setTimeout(() => {
+            handleClose()
+        }, DELAY))
+    }
+
+    const handleClap = () => {
+        postIcon('clapping')
+    }
+
+    const handleLike = () => {
+        postIcon('like')
+    }
+    const handleHeart = () => {
+        postIcon('heart')
+    }
+    const toggleShowMenu = () => {
+        setShowMenu(!showMenu)
+    }
 
     function joinTalentPool() {
         if (!authenticatedUser) {
@@ -281,8 +265,10 @@ function ViewerPage({firebase}) {
                     handleMouseEnter={handleMouseEnter}
                     handleMouseLeave={handleMouseLeave}
                     iconsDisabled={iconsDisabled}
+                    setIconsDisabled={setIconsDisabled}
+                    delay={DELAY}
+                    smoothness={2}
                     open={open}
-                    progress={progress}
                 />
             </div>
             <div className={classes.menuLeft}>

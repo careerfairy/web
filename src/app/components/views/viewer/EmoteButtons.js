@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Box, ClickAwayListener, Fab, fade} from "@material-ui/core";
 import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
 import {makeStyles} from "@material-ui/core/styles";
-import {amber, deepOrange, green, red} from "@material-ui/core/colors";
+import {amber, deepOrange, green, grey, red} from "@material-ui/core/colors";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -124,7 +124,7 @@ const useStyles = makeStyles((theme) => ({
         position: 'relative',
     },
     fabProgress: {
-        color: green[500],
+        color: fade(grey[500], 0.5),
         position: 'absolute',
         zIndex: 1,
         top: 0,
@@ -143,13 +143,35 @@ const EmoteButtons =
          handleMouseLeave,
          handleLike,
          iconsDisabled,
-         progress,
          handleClap,
          handleHeart,
-         open
+         open,
+         delay,
+         smoothness,
+         setIconsDisabled
      }) => {
-
         const classes = useStyles({handRaiseActive});
+        const SPEED = isNaN(smoothness) ? 2 : smoothness
+        const DELAY = isNaN(delay) ? 3000 : delay
+        const INTERVAL = 10 / SPEED
+        const TICK_RATE = (DELAY / (INTERVAL * SPEED)) / SPEED
+
+        const [progress, setProgress] = useState(INTERVAL);
+
+        useEffect(() => {
+            if (iconsDisabled) {
+                const timer = setInterval(() => {
+                    setProgress((prevProgress) => (prevProgress >= 100 ? INTERVAL : prevProgress + INTERVAL));
+                }, TICK_RATE);
+                const timeout = setTimeout(() => {
+                    setIconsDisabled(false);
+                }, DELAY);
+                return () => {
+                    clearTimeout(timeout)
+                    clearInterval(timer)
+                };
+            }
+        }, [iconsDisabled]);
 
         return (
             <ClickAwayListener onClickAway={handleClose}>
