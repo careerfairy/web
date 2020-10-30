@@ -10,6 +10,8 @@ import {ClickAwayListener, fade} from "@material-ui/core";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
+import ScreenShareIcon from '@material-ui/icons/ScreenShare';
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -57,12 +59,15 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode}, webRTCAdaptor, viewer, joining, firebase}) {
+function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode, screenSharerId}, webRTCAdaptor, viewer, joining, firebase, streamerId, isMainStreamer, setLivestreamCurrentSpeakerId}) {
     const DELAY = 3000; //3 seconds
     const [open, setOpen] = useState(true);
     const classes = useStyles({open});
     const [delayHandler, setDelayHandler] = useState(null)
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
+    const presentMode = mode === "presentation"
+    const automaticMode = speakerSwitchMode === "automatic"
+    const desktopMode = mode === "desktop"
 
     const handleMouseEnter = event => {
         clearTimeout(delayHandler)
@@ -105,8 +110,21 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
         setIsLocalMicMuted(!isLocalMicMuted);
     }
 
-    const presentMode = mode === "presentation"
-    const automaticMode = speakerSwitchMode === "automatic"
+    const showShareDesktopButton = () => {
+        if (desktopMode) {
+            return (isMainStreamer || streamerId === screenSharerId);
+        } else {
+            return true
+        }
+    }
+    const setDesktopMode = async (mode, initiatorId) => {
+        await firebase.setDesktopMode(id, mode, initiatorId);
+        setLivestreamCurrentSpeakerId(initiatorId)
+        if (speakerSwitchMode === "automatic") {
+            await firebase.setLivestreamSpeakerSwitchMode(id, "manual");
+        }
+    }
+
 
     const actions = [
         {
@@ -129,6 +147,14 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
             icon: <DynamicFeedIcon fontSize="large" color={presentMode ? "primary" : "inherit"}/>,
             name: presentMode ? 'Stop sharing slides' : 'Share slides',
             onClick: () => setLivestreamMode(presentMode ? "default" : "presentation")
+        })
+    }
+
+    if (showShareDesktopButton()) {
+        actions.push({
+            icon: <ScreenShareIcon color={desktopMode ? "primary" : "inherit"}/>,
+            name: desktopMode ? 'Stop Sharing Desktop' : 'Share Desktop',
+            onClick: () => setDesktopMode(desktopMode ? "default" : "desktop", streamerId)
         })
     }
 

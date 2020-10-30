@@ -452,6 +452,14 @@ class Firebase {
         });
     };
 
+    setDesktopMode = (livestreamId, mode, screenSharerId) => {
+        let ref = this.firestore.collection("livestreams").doc(livestreamId);
+        return ref.update({
+            mode,
+            screenSharerId
+        });
+    };
+
     setLivestreamSpeakerSwitchMode = (livestreamId, mode) => {
         let ref = this.firestore.collection("livestreams").doc(livestreamId);
         return ref.update({
