@@ -44,7 +44,7 @@ function StreamingPage(props) {
     const theme = useTheme()
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
-    const [streamerId, setStreamerId] = useState(uuidv4())
+    const [streamerId, setStreamerId] = useState(null) 
 
     const [currentLivestream, setCurrentLivestream] = useState(false);
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
@@ -56,6 +56,12 @@ function StreamingPage(props) {
     const [notifications, setNotifications] = useState([]);
 
     const numberOfViewers = useNumberOfViewers(currentLivestream);
+
+    useEffect(() => {
+        if (livestreamId) {
+            setStreamerId(livestreamId + uuidv4())
+        }
+    },[livestreamId])
 
     useEffect(() => {
         if (livestreamId) {
