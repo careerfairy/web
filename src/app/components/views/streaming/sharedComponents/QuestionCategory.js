@@ -57,6 +57,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
 
     const handleChange = (event) => {
         setValue(showNextQuestions ? 0 : 1);
+        setShowNextQuestions(!showNextQuestions);
     }
 //
     useEffect(() => {
@@ -164,7 +165,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
                 <TabPanel height="auto" value={value} index={0} dir={theme.direction}>
                     {upcomingQuestionsElements}
                 </TabPanel>
-                <TabPanel height="auto"  value={value} index={1} dir={theme.direction}>
+                <TabPanel height="auto" value={value} index={1} dir={theme.direction}>
                     {pastQuestionsElements}
                 </TabPanel>
             </SwipeableViews>
