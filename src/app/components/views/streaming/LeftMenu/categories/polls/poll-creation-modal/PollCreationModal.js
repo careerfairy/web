@@ -15,18 +15,9 @@ import {BarChart} from "@material-ui/icons";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import DialogActions from "@material-ui/core/DialogActions";
 import TextField from "@material-ui/core/TextField";
-import {makeStyles} from "@material-ui/core/styles";
 import Grow from "@material-ui/core/Grow";
 
-const useStyles = makeStyles(theme => ({
-    modalPaper: {
-        padding: theme.spacing(2)
-    },
-}))
-
-
 function PollCreationModal({open, handleClose, livestreamId, initialOptions, initialPoll, firebase}) {
-    const classes = useStyles()
 
     const [question, setQuestion] = useState('');
     const [options, setOptions] = useState(['', '']);
@@ -90,25 +81,27 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
     }
 
     const optionElements = options.map((option, index) => {
-
             return (
                 <Grow key={index} in>
-                    <TextField key={index} value={option} error={(option.trim() === '') && (error)}
-                               label={`Option ${index + 1}`}
-                               helperText={(option.trim() === '') && (error) && "Please fill or remove"}
-                               variant="outlined"
-                               margin="dense"
-                               onChange={({currentTarget: {value}}) => updateOption(index, value)}
-                               placeholder='Write down your option'
-                               InputProps={options.length >= 3 ? {
-                                   endAdornment: <Box p={1}>
-                                       <Fab onClick={() => removeOption(index)} size="small" color="primary"
-                                            style={{background: "red", width: 36, height: 36}}>
-                                           <DeleteForeverIcon/>
-                                       </Fab>
-                                   </Box>
-                               } : {}}
-                               fullWidth/>
+                    <TextField
+                        key={index}
+                        value={option}
+                        error={(option.trim() === '') && (error)}
+                        label={`Option ${index + 1}`}
+                        helperText={(option.trim() === '') && (error) && "Please fill or remove"}
+                        variant="outlined"
+                        margin="dense"
+                        fullWidth
+                        onChange={({currentTarget: {value}}) => updateOption(index, value)}
+                        placeholder='Write down your option'
+                        InputProps={options.length >= 3 ? {
+                            endAdornment: <Box p={1}>
+                                <Fab onClick={() => removeOption(index)} size="small" color="primary"
+                                     style={{background: "red", width: 36, height: 36}}>
+                                    <DeleteForeverIcon/>
+                                </Fab>
+                            </Box>
+                        } : {}}/>
                 </Grow>
             );
         }

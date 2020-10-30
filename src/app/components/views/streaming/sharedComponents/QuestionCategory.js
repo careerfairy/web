@@ -159,6 +159,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
             </QuestionContainerHeader>
             <SwipeableViews
                 containerStyle={{WebkitOverflowScrolling: 'touch'}}
+                disabled
                 className={classes.view}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value} onChangeIndex={handleChange}>

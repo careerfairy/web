@@ -197,15 +197,15 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
                         color: active ? "white" : "rgb(200,200,200)",
                         marginBottom: "1rem"
                     }}>
-                        {comments.length} reactions
+                        {comments.length} reaction{comments.length !== 1 && "s"}
                     </Typography>
                     {commentsElements[0]}
                     <Collapse style={{width: "100%"}} in={showAllReactions}>
                         {commentsElements.slice(1)}
                     </Collapse>
-                    <ReactionsToggle
+                    {comments.length > 1 && <ReactionsToggle
                         setShowAllReactions={setShowAllReactions}
-                        showAllReactions={showAllReactions}/>
+                        showAllReactions={showAllReactions}/>}
                 </div>
                 <Box p={1}>
                     <TextField

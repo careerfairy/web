@@ -1,4 +1,4 @@
-import {Fragment, useState, useEffect} from 'react';
+import React, {Fragment, useState, useEffect} from 'react';
 import 'semantic/dist/semantic.min.css';
 import 'styles.css';
 import FirebaseContext from 'context/firebase/FirebaseContext';
@@ -19,6 +19,7 @@ import UserContext from 'context/user/UserContext';
 import TagManager from 'react-gtm-module'
 import ErrorSnackBar from "../components/views/common/ErrorSnackBar/ErrorSnackBar";
 import ErrorContext from "../context/error/ErrorContext";
+import {SnackbarProvider} from "notistack";
 
 function MyApp({Component, pageProps}) {
 
@@ -92,16 +93,18 @@ function MyApp({Component, pageProps}) {
                 <title>CareerFairy | Watch live streams. Get hired.</title>
             </Head>
             <FirebaseContext.Provider value={firebase}>
-                <UserContext.Provider value={{authenticatedUser, userData, setUserData, loading, hideLoader}}>
-                    <ErrorContext.Provider value={{generalError, setGeneralError}}>
-                        <ThemeProvider theme={theme}>
-                            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                            <CssBaseline/>
-                            <Component {...pageProps} />
-                            <ErrorSnackBar handleClose={() => setGeneralError("")} errorMessage={generalError}/>
-                        </ThemeProvider>
-                    </ErrorContext.Provider>
-                </UserContext.Provider>
+                <ThemeProvider theme={theme}>
+                    <SnackbarProvider maxSnack={3}>
+                        <UserContext.Provider value={{authenticatedUser, userData, setUserData, loading, hideLoader}}>
+                            <ErrorContext.Provider value={{generalError, setGeneralError}}>
+                                {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                                <CssBaseline/>
+                                <Component {...pageProps} />
+                                <ErrorSnackBar handleClose={() => setGeneralError("")} errorMessage={generalError}/>
+                            </ErrorContext.Provider>
+                        </UserContext.Provider>
+                    </SnackbarProvider>
+                </ThemeProvider>
             </FirebaseContext.Provider>
         </Fragment>
     );
