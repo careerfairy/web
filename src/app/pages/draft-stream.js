@@ -28,7 +28,7 @@ const draftStream = () => {
     }, [user, userData]);
 
 
-    return hideLoader && userData && userData.isAdmin ? (
+    return hideLoader && userData ? (
         <TealBackground style={{paddingBottom: 0}}>
             <Head>
                 <title key="title">CareerFairy | Draft a Livestream</title>
