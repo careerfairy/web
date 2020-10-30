@@ -1,68 +1,57 @@
-import React, {useState, useEffect, useContext, Fragment} from 'react';
-
+import React, {useState, useEffect, useContext} from 'react';
 import {withFirebasePage} from 'context/firebase';
-import {IconButton} from '@material-ui/core';
-import CloseIcon from '@material-ui/icons/Close';
 import {Rating} from '@material-ui/lab';
 import UserContext from 'context/user/UserContext';
 import {useSnackbar} from "notistack";
 
-function RatingComponent({rating, livestreamId}) {
-    const {enqueueSnackbar, closeSnackbar} = useSnackbar();
 
-    const {authenticatedUser, userData} = useContext(UserContext);
+const ActionComponent = ({snackKey, firebase, typeOfRating, livestreamId, email}) => {
+    const {closeSnackbar} = useSnackbar();
+    console.log("-> snackKey", snackKey);
+    console.log("-> email", email);
+    console.log("-> livestreamId", livestreamId);
+    console.log("-> typeOfRating", typeOfRating);
+    console.log("-> firebase", firebase);
 
-    useEffect(() => {
-        enqueueSnackbar(rating.text, {
-            variant: "default",
-            persist: true,
-            action
-        })
-    }, [])
-
-    const action = key => (
-        <>
-            <Rating
-                name="customized-icons"
-                style={{marginRight: '20px'}}
-                onChange={(event, value) => {
-                    rating.onRating(livestreamId, authenticatedUser, value);
-                }}
-                size="large"
-                max={5}
-            />
-            <IconButton size="small" aria-label="close" color="inherit" onClick={() => closeSnackbar(key)}>
-                <CloseIcon fontSize="small"/>
-            </IconButton>
-        </>
-    );
+    const handleChange = async (event, value) => {
+        await firebase.rateLivestream(livestreamId, email, value, typeOfRating)
+        closeSnackbar(snackKey)
+    }
+    return (
+        <Rating
+            name={snackKey}
+            style={{marginRight: '20px'}}
+            size="large"
+            max={5}
+            onChange={handleChange}/>
+    )
 }
 
-const ActionComponent = (key, livestreamId, userEmail, firebase, typeOfRating) => {
-    console.log("-> key", key);
-    const {closeSnackbar} = useSnackbar();
-
-    return (
-        <>
-            <Rating
-                name="customized-icons"
-                style={{marginRight: '20px'}}
-                size="large"
-                max={5}
-                onChange={(event, value) => {
-                    firebase.rateLivestream(livestreamId, userEmail, value, typeOfRating)
-                }}/>
-            <IconButton size="small" aria-label="close" color="inherit" onClick={() => closeSnackbar(key)}>
-                <CloseIcon fontSize="small"/>
-            </IconButton>
-        </>
-    )
-};
 
 const RatingContainer = ({firebase, livestream, livestreamId}) => {
     const {authenticatedUser} = useContext(UserContext);
     const {enqueueSnackbar} = useSnackbar();
     const [minutesPassed, setMinutesPassed] = useState(null)
+    const [ratings, setRatings] = useState([
+        {
+            message: "How would you rate this live stream?",
+            type: "overall",
+            appearAfter: 1,
+            hasRated: false
+        },
+        {
+            message: `How happy are you with the content shared by ${livestream.company}?`,
+            type: "company",
+            appearAfter: 2,
+            hasRated: false
+        },
+        {
+            message: `After this stream, are you more likely to apply to ${livestream.company}?`,
+            type: "willingnessToApply",
+            appearAfter: 3,
+            hasRated: false
+        },
+    ])
     console.log("-> minutesPassed", minutesPassed);
 
     useEffect(() => {
@@ -73,59 +62,81 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
     }, [livestream.start]);
 
     useEffect(() => {
-        handleRatings()
+        handleCheckRatings()
     }, [minutesPassed])
 
-    const handleRatings = async () => {
-        if (minutesPassed > 1) {
-            const hasRatedOverall = await firebase.checkIfUserRated(livestreamId, authenticatedUser.email, "overall")
-            if (!hasRatedOverall) {
-                enqueueSnackbar("How would you rate this live stream?", {
-                    variant: "default",
-                    persist: true,
-                    action: (snackbarKey) => <ActionComponent
-                        firebase={firebase}
-                        key={snackbarKey}
-                        typeOfRating={"overall"}
-                        livestreamId={livestreamId}
-                        userEmail={authenticatedUser.email}
-                    />
-                })
+    const handleCheckRatings = async () => {
+        for (const [index, rating] of ratings.entries()) { // this loop allows for easy async functions along with index
+            if (!rating.hasRated && minutesPassed > rating.appearAfter) { // if you've already rated, dont bother making an api call
+                const hasRated = await firebase.checkIfUserRated(livestreamId, authenticatedUser.email, rating.type)
+                if (hasRated) {
+                    const newRatings = [...ratings]
+                    newRatings[index].hasRated = true // mark that particular rating as already rated
+                    setRatings(newRatings) // set updated ratings with new has rated status
+                } else {
+                    enqueueSnackbar(rating.message, {
+                        variant: "default",
+                        persist: true,
+                        preventDuplicate: true,
+                        key: rating.message,
+                        action: <ActionComponent snackKey={rating.message} firebase={firebase} email={authenticatedUser.email}
+                                                 livestreamId={livestreamId}
+                                                 typeOfRating={rating.type}/>,
+                    })
+                }
             }
         }
-        if (minutesPassed > 2) {
-            const hasRatedCompany = await firebase.checkIfUserRated(livestreamId, authenticatedUser.email, "company")
-            if (!hasRatedCompany) {
-                enqueueSnackbar(`How happy are you with the content shared by ${livestream.company}?`, {
-                    variant: "default",
-                    persist: true,
-                    action: (snackbarKey) => <ActionComponent
-                        firebase={firebase}
-                        key={snackbarKey}
-                        typeOfRating={"company"}
-                        livestreamId={livestreamId}
-                        userEmail={authenticatedUser.email}
-                    />
-                })
-            }
-        }
-        if (minutesPassed > 3) {
-            const hasRatedWillingness = await firebase.checkIfUserRated(livestreamId, authenticatedUser.email, "willingnessToApply")
-            if (!hasRatedWillingness) {
-                enqueueSnackbar(`After this stream, are you more likely to apply to ${livestream.company}?`, {
-                    variant: "default",
-                    persist: true,
-                    action: (snackbarKey) => <ActionComponent
-                        firebase={firebase}
-                        key={snackbarKey}
-                        typeOfRating={"willingnessToApply"}
-                        livestreamId={livestreamId}
-                        userEmail={authenticatedUser.email}
-                    />
-                })
-            }
-        }
+
     }
+
+    // const handleRatings = async () => {
+    //     if (minutesPassed > 1) {
+    //         const hasRatedOverall = await firebase.checkIfUserRated(livestreamId, authenticatedUser.email, "overall")
+    //         if (!hasRatedOverall) {
+    //             const message = "How would you rate this live stream?"
+    //             enqueueSnackbar(message, {
+    //                 variant: "default",
+    //                 persist: true,
+    //                 preventDuplicate: true,
+    //                 key: message,
+    //                 action: <ActionComponent snackKey={message} firebase={firebase} email={authenticatedUser.email}
+    //                                          livestreamId={livestreamId}
+    //                                          typeOfRating="overall"/>,
+    //             })
+    //         }
+    //     }
+    //     if (minutesPassed > 2) {
+    //         const hasRatedCompany = await firebase.checkIfUserRated(livestreamId, authenticatedUser.email, "company")
+    //         if (!hasRatedCompany) {
+    //             const message = `How happy are you with the content shared by ${livestream.company}?`
+    //             enqueueSnackbar(message, {
+    //                 variant: "default",
+    //                 persist: true,
+    //                 key: message,
+    //                 preventDuplicate: true,
+    //                 action: <ActionComponent snackKey={message} firebase={firebase} email={authenticatedUser.email}
+    //                                          livestreamId={livestreamId}
+    //                                          typeOfRating="company"/>,
+    //             })
+    //         }
+    //     }
+    //     if (minutesPassed > 3) {
+    //
+    //         const hasRatedWillingness = await firebase.checkIfUserRated(livestreamId, authenticatedUser.email, "willingnessToApply")
+    //         if (!hasRatedWillingness) {
+    //             const message = `After this stream, are you more likely to apply to ${livestream.company}?`
+    //             enqueueSnackbar(message, {
+    //                 variant: "default",
+    //                 persist: true,
+    //                 preventDuplicate: true,
+    //                 key: message,
+    //                 action: <ActionComponent snackKey={message} firebase={firebase} email={authenticatedUser.email}
+    //                                          livestreamId={livestreamId}
+    //                                          typeOfRating="willingnessToApply"/>,
+    //             })
+    //         }
+    //     }
+    // }
 
     const getMinutesPassed = () => {
         const now = new Date()
@@ -137,10 +148,8 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
         }
     }
 
-    return (
-        <Fragment>
-        </Fragment>
-    );
+
+    return null
 }
 
 export default withFirebasePage(RatingContainer);
