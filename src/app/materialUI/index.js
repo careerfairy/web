@@ -19,11 +19,6 @@ let baseTheme = createMuiTheme({
                 marginLeft: 0,
             }
         },
-        MuiInputBase: {
-            root: {
-                backgroundColor: "white"
-            }
-        },
     },
 
     typography: {
