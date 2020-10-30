@@ -158,9 +158,7 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
         })
     }
 
-    const test = true
-
-    return test ?
+    return (
         <ClickAwayListener onClickAway={handleClose}>
             <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className={classes.root}>
                 <SpeedDial
@@ -189,82 +187,7 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
                 </SpeedDial>
             </div>
         </ClickAwayListener>
-        :
-        (
-            <Fragment>
-                <div className='right-container'>
-                    <Grid columns={1}>
-                        <Grid.Row style={{margin: '10px 0'}}>
-                            <Grid.Column textAlign='center'>
-                                <div className='side-button' onClick={() => toggleMicrophone()}
-                                     style={{color: isLocalMicMuted ? 'red' : 'white'}}>
-                                    <Icon name='microphone slash' size='large' style={{margin: '0 0 5px 0'}}/>
-                                    <p style={{fontSize: '0.8em'}}>{isLocalMicMuted ? 'Unmute' : 'Mute'}</p>
-                                </div>
-                            </Grid.Column>
-                        </Grid.Row>
-                        <Grid.Row style={{margin: '10px 0', display: viewer ? 'none' : 'block'}}>
-                            <Grid.Column textAlign='center'>
-                                <div className='side-button'
-                                     onClick={() => setLivestreamMode(mode === "presentation" ? "default" : "presentation")}
-                                     style={{color: mode === "presentation" ? 'red' : 'white'}}>
-                                    <Icon name='clone outline' size='large' style={{
-                                        margin: '0 0 5px 0',
-                                        color: mode === "presentation" ? 'red' : 'white'
-                                    }}/>
-                                    <p style={{
-                                        fontSize: '0.8em',
-                                        color: mode === "presentation" ? 'red' : 'white'
-                                    }}>{mode === "presentation" ? 'Stop Sharing Slides' : 'Share Slides'}</p>
-                                </div>
-                            </Grid.Column>
-                        </Grid.Row>
-                        <Grid.Row style={{margin: '10px 0', display: viewer || joining ? 'none' : 'block'}}>
-                            <Grid.Column textAlign='center'>
-                                <div className='side-button'
-                                     onClick={() => setLivestreamSpeakerSwitchMode(speakerSwitchMode === "automatic" ? "manual" : "automatic")}
-                                     style={{color: speakerSwitchMode === "automatic" ? 'red' : 'white'}}>
-                                    <Icon name='assistive listening systems' size='large'
-                                          style={{margin: '0 0 5px 0'}}/>
-                                    <p style={{fontSize: '0.8em'}}>{speakerSwitchMode === "automatic" ? 'Automatic Speaker Switch' : 'Manual Speaker Switch'}</p>
-                                </div>
-                            </Grid.Column>
-                        </Grid.Row>
-                        {/* <Grid.Row style={{ margin: '10px 0'}}>
-                            <Grid.Column textAlign='center'>
-                                <div className='side-button' onClick={() => setShowSpeakersModal(true)}>
-                                    <Icon name='user plus' size='large' style={{ margin: '0 0 5px 0', color: 'white'}}/>
-                                    <p style={{ fontSize: '0.8em', color: 'white' }}>Invite Speakers</p>
-                                </div>
-                            </Grid.Column>
-                        </Grid.Row> */}
-                        {/* <Grid.Row style={{ margin: '10px 0'}}>
-                            <Grid.Column textAlign='center'>
-                                <div className='side-button' onClick={() => setLivestreamMode(mode === "desktop" ? "default" : "desktop")}  style={{  color: mode === "desktop" ? 'red' : 'white' }}>
-                                    <Icon name='tv' size='large' style={{ margin: '0 0 5px 0', color: mode === "desktop" ? 'red' : 'white'}}/>
-                                    <p style={{ fontSize: '0.8em', color: mode === "desktop" ? 'red' : 'white' }}>{ mode === "desktop" ? 'Stop Sharing Desktop' : 'Share Desktop' }</p>
-                                </div>
-                            </Grid.Column>
-                        </Grid.Row> */}
-                    </Grid>
-                </div>
-                <style jsx>{`
-                    .side-button {
-                        cursor: pointer;
-                    }
-
-                    .right-container {
-                        position: absolute;
-                        right: 0;
-                        top: 0;
-                        height: 100%;
-                        width: 120px;
-                        padding: 20px;
-                        background-color: transparent;
-                    }
-                `}</style>
-            </Fragment>
-        );
+    )
 }
 
 export default withFirebasePage(VideoControlsContainer);
