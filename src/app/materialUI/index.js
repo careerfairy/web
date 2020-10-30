@@ -17,6 +17,12 @@ let baseTheme = createMuiTheme({
             main: "#e70026",
             dark: "#b00024",
             contrastText: "#FFFFFF"
+        },
+        info: {
+            light: "#FFFFFF",
+            main: "#00d2aa",
+            contrastText: "#FFFFFF",
+            dark: "#00b08f",
         }
     },
     overrides: {
@@ -34,6 +40,9 @@ let baseTheme = createMuiTheme({
                 margin: "0.5em",
                 marginLeft: 0,
             }
+        },
+        MuiSnackbar:{
+
         },
         MuiInputBase: {
             root: {

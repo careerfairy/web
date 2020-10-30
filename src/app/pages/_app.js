@@ -4,7 +4,7 @@ import 'styles.css';
 import FirebaseContext from 'context/firebase/FirebaseContext';
 import Firebase from 'context/firebase';
 import * as Sentry from '@sentry/browser';
-import {ThemeProvider} from '@material-ui/core/styles';
+import {makeStyles, ThemeProvider} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import config from 'react-reveal/globals';
 
@@ -21,8 +21,16 @@ import ErrorSnackBar from "../components/views/common/ErrorSnackBar/ErrorSnackBa
 import ErrorContext from "../context/error/ErrorContext";
 import {SnackbarProvider} from "notistack";
 
-function MyApp({Component, pageProps}) {
+const useStyles = makeStyles(({
+    info: {
+        background: `${theme.palette.info.contrastText} !important`,
+        color: `black !important`,
+    },
+}))
 
+
+function MyApp({Component, pageProps}) {
+    const classes = useStyles()
     Sentry.init({dsn: "https://6852108b71ce4fbab24839792f82fa90@sentry.io/4261031"});
 
 
@@ -86,7 +94,6 @@ function MyApp({Component, pageProps}) {
 
     }, [authenticatedUser, userData, loading])
 
-
     return (
         <Fragment>
             <Head>
@@ -94,7 +101,9 @@ function MyApp({Component, pageProps}) {
             </Head>
             <FirebaseContext.Provider value={firebase}>
                 <ThemeProvider theme={theme}>
-                    <SnackbarProvider maxSnack={3}>
+                    <SnackbarProvider classes={{
+                        variantInfo: classes.info
+                    }} maxSnack={3}>
                         <UserContext.Provider value={{authenticatedUser, userData, setUserData, loading, hideLoader}}>
                             <ErrorContext.Provider value={{generalError, setGeneralError}}>
                                 {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}

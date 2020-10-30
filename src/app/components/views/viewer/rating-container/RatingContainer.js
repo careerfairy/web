@@ -7,11 +7,6 @@ import {useSnackbar} from "notistack";
 
 const ActionComponent = ({snackKey, firebase, typeOfRating, livestreamId, email}) => {
     const {closeSnackbar} = useSnackbar();
-    console.log("-> snackKey", snackKey);
-    console.log("-> email", email);
-    console.log("-> livestreamId", livestreamId);
-    console.log("-> typeOfRating", typeOfRating);
-    console.log("-> firebase", firebase);
 
     const handleChange = async (event, value) => {
         await firebase.rateLivestream(livestreamId, email, value, typeOfRating)
@@ -75,7 +70,7 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
                     setRatings(newRatings) // set updated ratings with new has rated status
                 } else {
                     enqueueSnackbar(rating.message, {
-                        variant: "default",
+                        variant: "info",
                         persist: true,
                         preventDuplicate: true,
                         key: rating.message,
