@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode, screenSharerId}, webRTCAdaptor, viewer, joining, firebase, streamerId, isMainStreamer, setLivestreamCurrentSpeakerId}) {
+function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode, screenSharerId}, webRTCAdaptor, viewer, joining, firebase, streamerId, isMainStreamer, setDesktopMode}) {
     const DELAY = 3000; //3 seconds
     const [open, setOpen] = useState(true);
     const classes = useStyles({open});
@@ -115,13 +115,6 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
             return (isMainStreamer || streamerId === screenSharerId);
         } else {
             return true
-        }
-    }
-    const setDesktopMode = async (mode, initiatorId) => {
-        await firebase.setDesktopMode(id, mode, initiatorId);
-        setLivestreamCurrentSpeakerId(initiatorId)
-        if (speakerSwitchMode === "automatic") {
-            await firebase.setLivestreamSpeakerSwitchMode(id, "manual");
         }
     }
 

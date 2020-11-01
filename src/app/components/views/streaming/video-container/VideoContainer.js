@@ -71,8 +71,9 @@ function VideoContainer(props) {
     let errorCallbacks = {
         onScreenSharePermissionDenied: () => {
             if (isExistingCallback('onScreenSharePermissionDenied')) {
-                props.additionalCallbacks.onScreenSharePermissionDenied(infoObj);
+                props.additionalCallbacks.onScreenSharePermissionDenied();
             }
+            setDesktopMode("default", props.streamerId);
         },
         onOtherError: (error) => {
             if (typeof error === "string") {
@@ -144,6 +145,14 @@ function VideoContainer(props) {
         }
     }, [props.currentLivestream.mode]);
 
+    const setDesktopMode = async (mode, initiatorId) => {
+        await props.firebase.setDesktopMode(props.currentLivestream.id, mode, initiatorId);
+        setLivestreamCurrentSpeakerId(initiatorId)
+        if (props.currentLivestream.speakerSwitchMode === "automatic") {
+            await props.firebase.setLivestreamSpeakerSwitchMode(props.currentLivestream.id, "manual");
+        }
+    }
+
     function setLivestreamCurrentSpeakerId(id) {
         props.firebase.setLivestreamCurrentSpeakerId(props.currentLivestream.id, id);
     }
@@ -182,8 +191,8 @@ function VideoContainer(props) {
                 }
             </div>
             <div className='controls-container'>
-                <VideoControlsContainer setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId}
-                                        streamerId={props.streamerId} webRTCAdaptor={webRTCAdaptor}
+                <VideoControlsContainer setDesktopMode={setDesktopMode}
+                                        streamerId={props.streamerId} webRTCAdaptor={webRTCAdaptor} 
                                         isMainStreamer={isMainStreamer} currentLivestream={props.currentLivestream}
                                         viewer={props.viewer} joining={!isMainStreamer}/>
             </div>
