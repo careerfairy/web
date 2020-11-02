@@ -4,7 +4,7 @@ import {Button, Grid, Icon, Input, Modal} from "semantic-ui-react";
 import {withFirebasePage} from 'context/firebase';
 
 import CountdownTimer from 'components/views/common/Countdown';
-import {useLocalStream} from 'components/custom-hook/useLocalStream';
+
 import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
 import CurrentSpeakerDisplayer from './CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
@@ -21,15 +21,16 @@ function VideoContainer(props) {
 
     const [isStreaming, setIsStreaming] = useState(false);
 
-    const [mediaConstraints, setMediaConstraints] = useState(null);
-    const [audioSource, setAudioSource] = useState(null);
-    const [speakerSource, setSpeakerSource] = useState(null);
-    const [videoSource, setVideoSource] = useState(null);
+    const [mediaConstraints, setMediaConstraints] = useState({
+        audio: true,
+        video: { 
+            width: { ideal: 1920, max: 1920 },
+            height: { ideal: 1080, max: 1080 },
+            aspectRatio: 1.77,   
+        }
+    });
 
-
-    const { permissionGranted, userMediaError, localStream } = useLocalStream(mediaConstraints);
     const [audioCounter, setAudioCounter] = useState(0);
-
     const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
 
     const localVideoId = 'localVideo';
@@ -87,7 +88,7 @@ function VideoContainer(props) {
     }
 
 
-    const { webRTCAdaptor, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels } = 
+    const { webRTCAdaptor, localMediaStream, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels } = 
         useWebRTCAdaptor(
             streamerReady,
             isPlayMode,
@@ -124,19 +125,6 @@ function VideoContainer(props) {
             return () => clearTimeout(timeout);
         }
     }, [audioCounter, props.currentLivestream.speakerSwitchMode]);
-
-    useEffect(() => {
-        const constraints = {
-            audio: {deviceId: audioSource ? audioSource : undefined},
-            video: {
-                width: {ideal: 1920, max: 1920},
-                height: {ideal: 1080, max: 1080},
-                aspectRatio: 1.77,
-                deviceId: videoSource ? videoSource : undefined
-            }
-        };
-        setMediaConstraints(constraints);
-    }, [audioSource, videoSource]);
 
     useEffect(() => {
         if (webRTCAdaptor) {
@@ -179,28 +167,28 @@ function VideoContainer(props) {
         <Fragment>
             <div className='screen-container'>
                 <div>
-                <CurrentSpeakerDisplayer isPlayMode={false}
-                                            smallScreenMode={props.currentLivestream.mode === 'presentation'}
-                                            speakerSwitchModeActive={isMainStreamer}
-                                            setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId}
-                                            removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
-                                            localId={props.streamerId}
-                                            localStream={localStream}
-                                            speakerSource={speakerSource}
-                                            attachSinkId={attachSinkId}
-                                            streams={externalMediaStreams}
-                                            mediaConstraints={mediaConstraints}
-                                            currentSpeaker={props.currentLivestream.currentSpeakerId}
-                                            {...props}
-                                            muted={false}/>
+                    <CurrentSpeakerDisplayer isPlayMode={false} 
+                        smallScreenMode={props.currentLivestream.mode === 'presentation'} 
+                        speakerSwitchModeActive={isMainStreamer} 
+                        setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId} 
+                        removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
+                        localId={props.streamerId} 
+                        localStream={localMediaStream} 
+                        speakerSource={speakerSource}
+                        attachSinkId={attachSinkId}
+                        streams={externalMediaStreams} 
+                        mediaConstraints={mediaConstraints} 
+                        currentSpeaker={props.currentLivestream.currentSpeakerId} 
+                        {...props}
+                        muted={false}/>
                 </div>
-                {props.currentLivestream.mode === 'presentation' ?
-                    <SmallStreamerVideoDisplayer
-                        isPlayMode={false}
-                        localStream={localStream}
-                        streams={externalMediaStreams}
-                        mediaConstraints={mediaConstraints}
-                        livestreamId={props.currentLivestream.id}
+                { props.currentLivestream.mode === 'presentation' ?
+                    <SmallStreamerVideoDisplayer 
+                        isPlayMode={false} 
+                        localStream={localMediaStream} 
+                        streams={externalMediaStreams} 
+                        mediaConstraints={mediaConstraints} 
+                        livestreamId={props.currentLivestream.id} 
                         showMenu={props.showMenu}
                         presenter={true}/>
                     : null

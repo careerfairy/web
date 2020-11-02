@@ -8,6 +8,8 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
     const [streamsList, setStreamsList] = useState([]);
+    const [localMediaStream, setLocalMediaStream] = useState(null);
+
     const [addedStream, setAddedStream] = useState(null);
     const [externalMediaStreams, setExternalMediaStreams] = useState([]);
 
@@ -35,12 +37,23 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         }
     }, [addedStream]);
 
+
     useEffect(() => {
-        if (streamerReady && document && mediaConstraints && nsToken && nsToken.iceServers) {
+        if (document && mediaConstraints && nsToken && nsToken.iceServers) {
             const adaptor = getWebRTCAdaptor();
             setWebRTCAdaptor(adaptor);
         }
-    }, [streamerReady, mediaConstraints, document, nsToken, isPlayMode]);
+    }, [mediaConstraints, document, nsToken, isPlayMode]);
+
+    useEffect(() => {
+        if (webRTCAdaptor && streamerReady) {
+            if (!isPlayMode) {
+                webRTCAdaptor.joinRoom(roomId, streamId);
+            } else {
+                webRTCAdaptor.joinRoom(roomId);
+            }
+        }
+    }, [webRTCAdaptor, streamerReady]);
 
     useEffect(() => {
         if (latestAudioLevel) {
@@ -149,8 +162,8 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             console.log("joiningTheRoom");
                         } else {
                             this.joinRoom(roomId);
-                        }
-                                               
+                        }                                     
+                        setLocalMediaStream(this.getLocalStream());                        
                         break;
                     }
                     case "joinedTheRoom": {
@@ -300,5 +313,5 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         return newAdaptor;
     }
   
-    return { webRTCAdaptor, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels };
+    return { webRTCAdaptor, localMediaStream, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels };
 }

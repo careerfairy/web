@@ -10,7 +10,7 @@ function ViewerComponent(props) {
     const [mediaConstraints, setMediaConstraints] = useState({ audio: true, video: true});
 
     const streamerReady = true;
-    const isPlayMode = false;
+    const isPlayMode = true;
     const streamingCallbacks = {};
     const errorCallbacks = {
         onOtherError: (error) => {}
@@ -19,7 +19,7 @@ function ViewerComponent(props) {
     const { webRTCAdaptor, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels } = 
         useWebRTCAdaptor(
             streamerReady,
-            true,
+            isPlayMode,
             'videoElement',
             mediaConstraints,
             streamingCallbacks,

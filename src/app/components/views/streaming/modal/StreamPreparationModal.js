@@ -11,28 +11,45 @@ import useUserMedia from 'components/custom-hook/useDevices';
 function StreamPreparationModal(props) {
 
     const [showAudioVideo, setShowAudioVideo] = useState(false);
+    const [audioSource, setAudioSource] = useState(null);
+    const [videoSource, setVideoSource] = useState(null);
+
     const testVideoRef = useRef(null);
+    const [value, setValue] = useState(0);
 
     const devices = useUserMedia(showAudioVideo);
-    const audioLevel = useSoundMeter(showAudioVideo, props.localStream);
+    const audioLevel = useSoundMeter(showAudioVideo, props.localStream, value);
 
     const [playSound, setPlaySound] = useState(true);
 
 
 
     useEffect(() => {
-        if (!props.audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
-            props.setAudioSource(devices.audioInputList[0].value);
+        if (devices.audioInputList && devices.audioInputList.length > 0) {
+            updateAudioSource(devices.audioInputList[0].value)
         }
-        if (!props.videoSource && devices.videoDeviceList && devices.videoDeviceList.length > 0) {
-            props.setVideoSource(devices.videoDeviceList[0].value);
+        if (devices.videoDeviceList && devices.videoDeviceList.length > 0) {
+            updateVideoSource(devices.videoDeviceList[0].value)
         }
     },[devices]);
+
+    function updateAudioSource(deviceId) {
+        props.webRTCAdaptor.switchAudioInputSource(props.streamId, deviceId)
+        setAudioSource(deviceId);
+        setTimeout(() => {
+            setValue(value + 1);
+        }, 500);
+    }
+
+    function updateVideoSource(deviceId) {
+        props.webRTCAdaptor.switchVideoCameraCapture(props.streamId, deviceId)
+        setVideoSource(deviceId);
+    }
 
     return (
         <Modal open={!props.streamerReady || !props.connectionEstablished}>
             <Modal.Header style={{ display: (!props.streamerReady && !props.connectionEstablished) ? 'block' : 'none' }}><h3 style={{ color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3></Modal.Header>
-            <Modal.Content style={{ display: (!props.streamerReady && !showAudioVideo && !props.connectionEstablished) ? 'block' : 'none' }}>
+            <Modal.Content style={{ display: (!props.streamerReady && !showAudioVideo && !props.connectionEstablished && !props.errorMessage) ? 'block' : 'none' }}>
                 <h3>Preparation</h3>
                 <p>Please follow these couple of instructions to ensure a smooth streaming experience:</p>
                 <ul className='list'>
@@ -41,21 +58,21 @@ function StreamPreparationModal(props) {
                     <li><Icon name='microphone'/>Make sure that your webcam and/or microphone are not currently used by any other application.</li>
                     <li><Icon name='wifi'/>If possible, avoid connecting through any VPN or corporate network with restrictive firewall rules.</li>
                 </ul>
-                <Button content='Next' primary fluid style={{ margin: '40px 0 10px 0'}} onClick={() => setShowAudioVideo(true) }/>
+                <Button content='Next' primary fluid style={{ margin: '40px 0 10px 0'}} onClick={() => setShowAudioVideo(true)} loading={!props.localStream} disabled={!props.localStream}/>
                 <p style={{ fontSize: '0.8em', color: 'grey'}}>If anything is unclear or not working, please <a href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
             </Modal.Content>
-            <Modal.Content style={{ display: (!props.streamerReady && showAudioVideo && !props.connectionEstablished) ? 'block' : 'none' }}>
+            <Modal.Content style={{ display: (!props.streamerReady && showAudioVideo && !props.connectionEstablished && !props.errorMessage) ? 'block' : 'none' }}>
                 <h3>Audio & Video</h3>
                 <p>Please select your camera and microphone for this stream:</p>
                 <Grid columns={2}>
                     <Grid.Column>
-                        <Dropdown fluid selection value={props.videoSource} onChange={(event, {value}) => props.setVideoSource(value)} options={devices.videoDeviceList} style={{ margin: '0 0 15px 0'}}/>
+                        <Dropdown fluid selection value={videoSource} onChange={(event, {value}) => updateVideoSource(value)} options={devices.videoDeviceList} style={{ margin: '0 0 15px 0'}}/>
                         <div>
                             <video style={{ boxShadow: '0 0 3px rgb(200,200,200)', borderRadius: '5px'}} ref={testVideoRef} muted={playSound} autoPlay width={'100%'}></video> 
                         </div>
                     </Grid.Column>
                     <Grid.Column>
-                        <Dropdown fluid selection value={props.audioSource} onChange={(event, {value}) => props.setAudioSource(value)} options={devices.audioInputList} style={{ margin: '0 0 15px 0'}}/>
+                        <Dropdown fluid selection value={audioSource} onChange={(event, {value}) => updateAudioSource(value)} options={devices.audioInputList} style={{ margin: '0 0 15px 0'}}/>
                         <div style={{ padding: '20px 0', textAlign: 'center'}}>
                             <div style={{ fontWeight: '600', marginBottom: '10px', color: 'pink'}}>Microphone Volume</div>
                             <p style={{ fontWeight: '300', marginBottom: '15px', fontSize: '0.8em'}}>Please speak into the microphone to test the audio capture</p>
@@ -72,7 +89,7 @@ function StreamPreparationModal(props) {
                 <p>Don't worry, your stream will not start until you decide to.</p>
                 <p style={{ fontSize: '0.8em', color: 'grey'}}>If anything is unclear or not working, please <a href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
             </Modal.Content>    
-            <Modal.Content style={{ display: (props.streamerReady && !props.connectionEstablished) ? 'block' : 'none', textAlign: 'center', padding: '40px' }}>
+            <Modal.Content style={{ display: ((props.streamerReady && !props.connectionEstablished) || props.errorMessage) ? 'block' : 'none', textAlign: 'center', padding: '40px' }}>
                 <div style={{ display: (props.streamerReady && !props.isStreaming && !props.errorMessage) ? 'block' : 'none' }}>
                     <Image src='/loader.gif' style={{ width: '50px', height: 'auto', margin: '0 auto' }} />
                     <div>Attempting to connect...</div>
@@ -83,7 +100,7 @@ function StreamPreparationModal(props) {
                     <div>Your stream will go live once you press "Start Streaming".</div>
                     <Button content='Continue' style={{ marginTop: '20px'}} primary onClick={() => props.setConnectionEstablished(true)}/>
                 </div>
-                <div style={{ display: props.errorMessage ? 'block' : 'none' }}>
+                <div style={{ display: !props.isStreaming && props.errorMessage ? 'block' : 'none' }}>
                     <Icon name='frown outline' style={{ color: 'rgb(240, 30, 0)', fontSize: '3em', margin: '0 auto' }} />
                     <h3>An error occured with the following message:</h3>
                     <div>{ props.errorMessage }</div>

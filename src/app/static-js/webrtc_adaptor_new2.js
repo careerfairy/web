@@ -460,6 +460,11 @@ export function WebRTCAdaptor(initialValues)
 				thiz.micGainNode.gain.value = 0;
 			}
 		}
+    }
+    
+    this.getLocalStream = function() {
+        debugger;
+        return thiz.localStream;
 	}
 
 	this.publish = function (streamId, token) {
@@ -500,7 +505,6 @@ export function WebRTCAdaptor(initialValues)
 		}
 
 		thiz.webSocketAdaptor.send(JSON.stringify(jsCmd));
-
 	}
 
 	this.play = function (streamId, token, roomId, enableTracks) {
@@ -526,7 +530,7 @@ export function WebRTCAdaptor(initialValues)
 		};
 
 		thiz.webSocketAdaptor.send(JSON.stringify(jsCmd));
-	}
+    }
 
 	this.join = function(streamId) {
 		var jsCmd = {
@@ -661,7 +665,12 @@ export function WebRTCAdaptor(initialValues)
 		thiz.publishMode = "camera";
 
 		if (typeof deviceId != "undefined" ) {
-			thiz.mediaConstraints.video = { "deviceId": deviceId };
+			thiz.mediaConstraints.video = { 
+				"deviceId": deviceId,
+				"width": { ideal: 1920, max: 1920 },
+				"height": { ideal: 1080, max: 1080 },
+				"aspectRatio": 1.77
+			};
 		}
 		thiz.setVideoCameraSource(streamId, thiz.mediaConstraints, null, true, deviceId);
 	}
@@ -1382,8 +1391,10 @@ export function WebRTCAdaptor(initialValues)
 			thiz.remotePeerConnection[key].close();
 		}
 		//free the remote peer connection by initializing again
-		thiz.remotePeerConnection = new Array();
-		thiz.webSocketAdaptor.close();
+        thiz.remotePeerConnection = new Array();
+        if (thiz.webSocketAdaptor) {
+            thiz.webSocketAdaptor.close();
+        }
 	}
 
 	this.peerMessage = function (streamId, definition, data) {
