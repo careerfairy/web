@@ -108,9 +108,10 @@ function UpcomingPollStreamer(props) {
                 </List>
                 <IconButton size="small" onClick={handleClick} style={{
                     position: 'absolute',
-                    top: '15px',
-                    right: '20px',
-                    color: 'rgb(200,200,200)'
+                    top: 5,
+                    right: 0,
+                    color: 'rgb(200,200,200)',
+                    zIndex: 301
                 }}>
                     <MoreVertIcon/>
                 </IconButton>

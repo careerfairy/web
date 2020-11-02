@@ -18,6 +18,7 @@ import {amber, deepOrange, green, red} from "@material-ui/core/colors";
 import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
 import MiniChatContainer from "../../../components/views/streaming/LeftMenu/categories/chat/MiniChatContainer";
 import EmoteButtons from "../../../components/views/viewer/EmoteButtons";
+import RatingContainer from "../../../components/views/viewer/rating-container/RatingContainer";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -287,6 +288,8 @@ function ViewerPage({firebase}) {
             <div className='icons-container'>
                 <IconsContainer livestreamId={currentLivestream.id}/>
             </div>
+            {currentLivestream && <RatingContainer livestreamId={currentLivestream.id}
+                              livestream={currentLivestream}/>}
             <div className={'playButtonContent ' + (showVideoButton.muted ? '' : 'hidden')} onClick={unmuteVideos}>
                 <div className='playButton'>
                     <VolumeUpRoundedIcon style={{fontSize: '3rem'}}/>

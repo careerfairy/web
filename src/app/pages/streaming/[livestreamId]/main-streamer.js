@@ -115,101 +115,99 @@ function StreamingPage(props) {
     }
 
     return (
-        <SnackbarProvider
-            maxSnack={3}>
-            <NotificationsContext.Provider
-                value={{setNewNotification, setNotificationToRemove}}>
-                <div>
-                    <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
-                        <div style={{
+        <NotificationsContext.Provider
+            value={{setNewNotification, setNotificationToRemove}}>
+            <div>
+                <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
+                    <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '20px',
+                        transform: 'translateY(-50%)',
+                        verticalAlign: 'middle'
+                    }}>
+                        <ButtonWithConfirm
+                            color={currentLivestream.hasStarted ? theme.palette.error.main : theme.palette.primary.main}
+                            fluid
+                            disabled={!streamStartTimeIsNow}
+                            buttonAction={() => setStreamingStarted(!currentLivestream.hasStarted)}
+                            confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'}
+                            buttonLabel={currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming'}/>
+                    </div>
+                    <Button
+                        children="Invite additional streamer"
+                        startIcon={<PersonAddIcon color="inherit"/>}
+                        onClick={() => {
+                            setSpeakerManagementOpen(true)
+                        }}
+                        style={{
                             position: 'absolute',
                             top: '50%',
-                            left: '20px',
+                            color: 'rgb(80,80,80)',
+                            left: '220px',
                             transform: 'translateY(-50%)',
-                            verticalAlign: 'middle'
-                        }}>
-                            <ButtonWithConfirm
-                                color={currentLivestream.hasStarted ? theme.palette.error.main : theme.palette.primary.main}
-                                fluid
-                                disabled={!streamStartTimeIsNow}
-                                buttonAction={() => setStreamingStarted(!currentLivestream.hasStarted)}
-                                confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'}
-                                buttonLabel={currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming'}/>
-                        </div>
-                        <Button
-                            children="Invite additional streamer"
-                            startIcon={<PersonAddIcon color="inherit"/>}
-                            onClick={() => {
-                                setSpeakerManagementOpen(true)
-                            }}
-                            style={{
-                                position: 'absolute',
-                                top: '50%',
-                                color: 'rgb(80,80,80)',
-                                left: '220px',
-                                transform: 'translateY(-50%)',
-                            }}
-                        />
-                        <div style={{
+                        }}
+                    />
+                    <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        display: 'inline-block',
+                        padding: '10px',
+                        verticalAlign: 'middle',
+                        fontSize: '0.9em'
+                    }}>
+                        <h3 style={{color: (currentLivestream.hasStarted ? 'rgb(0, 210, 170)' : 'orange')}}>{currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}</h3>
+                        {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
+                    </div>
+                    <Button
+                        onClick={openStudentView}
+                        children="Open Student View"
+                        startIcon={<OpenInBrowserIcon color="inherit"/>}
+                        style={{
+                            color: 'rgb(80,80,80)',
                             position: 'absolute',
                             top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            display: 'inline-block',
-                            padding: '10px',
-                            verticalAlign: 'middle',
-                            fontSize: '0.9em'
-                        }}>
-                            <h3 style={{color: (currentLivestream.hasStarted ? 'rgb(0, 210, 170)' : 'orange')}}>{currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}</h3>
-                            {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
-                        </div>
-                        <Button
-                            onClick={openStudentView}
-                            children="Open Student View"
-                            startIcon={<OpenInBrowserIcon color="inherit"/>}
-                            style={{
-                                color: 'rgb(80,80,80)',
-                                position: 'absolute',
-                                top: '50%',
-                                right: '130px',
-                                transform: 'translateY(-50%)'
-                            }}
-                        />
-                        <div style={{
-                            float: 'right',
-                            margin: '0 20px',
-                            fontSize: '1em',
-                            padding: '3px',
-                            verticalAlign: 'middle',
-                            fontWeight: '700'
-                        }}>
-                            Viewers: {numberOfViewers}
-                        </div>
+                            right: '130px',
+                            transform: 'translateY(-50%)'
+                        }}
+                    />
+                    <div style={{
+                        float: 'right',
+                        margin: '0 20px',
+                        fontSize: '1em',
+                        padding: '3px',
+                        verticalAlign: 'middle',
+                        fontWeight: '700'
+                    }}>
+                        Viewers: {numberOfViewers}
                     </div>
-                    <div className={classes.blackFrame}>
-                        <VideoContainer currentLivestream={currentLivestream} streamerId={currentLivestream.id}
-                                        showMenu={showMenu} viewer={false}/>
-                    </div>
-                    <div className={classes.menuLeft}>
-                        <LeftMenu
-                            streamer
-                            livestream={currentLivestream}
-                            showMenu={showMenu}
-                            setShowMenu={setShowMenu}
-                            toggleShowMenu={toggleShowMenu}/>
-                    </div>
-                    <div className='mini-chat-container'>
-                        <MiniChatContainer livestream={currentLivestream} isStreamer={true}/>
-                    </div>
-                    <div className='icons-container'>
-                        <IconsContainer livestreamId={currentLivestream.id}/>
-                    </div>
-                    <div className='notifications-container'>
-                        <NotificationsContainer notifications={notifications}/>
-                    </div>
-                    <SpeakerManagementModal livestreamId={currentLivestream.id} open={speakerManagementOpen}
-                                            setOpen={setSpeakerManagementOpen}/>
-                    <style jsx>{`
+                </div>
+                <div className={classes.blackFrame}>
+                    <VideoContainer currentLivestream={currentLivestream} streamerId={currentLivestream.id}
+                                    showMenu={showMenu} viewer={false}/>
+                </div>
+                <div className={classes.menuLeft}>
+                    <LeftMenu
+                        streamer
+                        livestream={currentLivestream}
+                        showMenu={showMenu}
+                        setShowMenu={setShowMenu}
+                        toggleShowMenu={toggleShowMenu}/>
+                </div>
+                <div className='mini-chat-container'>
+                    <MiniChatContainer livestream={currentLivestream} isStreamer={true}/>
+                </div>
+                <div className='icons-container'>
+                    <IconsContainer livestreamId={currentLivestream.id}/>
+                </div>
+                <div className='notifications-container'>
+                    <NotificationsContainer notifications={notifications}/>
+                </div>
+                <SpeakerManagementModal livestreamId={currentLivestream.id} open={speakerManagementOpen}
+                                        setOpen={setSpeakerManagementOpen}/>
+                <style jsx>{`
                     .top-menu {
                         position: relative;
                         background-color: rgba(245,245,245,1);
@@ -256,9 +254,8 @@ function StreamingPage(props) {
                         padding: 10px 0;
                     }
                 `}</style>
-                </div>
-            </NotificationsContext.Provider>
-        </SnackbarProvider>
+            </div>
+        </NotificationsContext.Provider>
     )
         ;
 }

@@ -888,6 +888,74 @@ class Firebase {
         return batch.commit();
     };
 
+    rateLivestreamOverallQuality = (livestreamId, userEmail, rating) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc("overall")
+            .collection("voters")
+            .doc(userEmail);
+        return ref.set({
+            rating: rating,
+            timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+        });
+    }
+
+    rateLivestream = (livestreamId, userEmail, rating, typeOfRating) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc(typeOfRating)
+            .collection("voters")
+            .doc(userEmail);
+        return ref.set({
+            rating: rating,
+            timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+        });
+    }
+
+    rateStreamingCompany = (livestreamId, userEmail, rating) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc("company")
+            .collection("voters")
+            .doc(userEmail);
+        return ref.set({
+            rating: rating,
+            timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+        });
+    }
+
+    rateStreamWillingnessToApply = (livestreamId, userEmail, rating) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc("willingnessToApply")
+            .collection("voters")
+            .doc(userEmail);
+        return ref.set({
+            rating: rating,
+            timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+        });
+    }
+
+    checkIfUserRated = async (livestreamId, userEmail, typeOfRating) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc(typeOfRating)
+            .collection("voters")
+            .doc(userEmail);
+        const docSnapshot = await ref.get()
+        return docSnapshot.exists
+    }
+
     createLivestreamPoll = (livestreamId, pollQuestion, pollOptions) => {
         let ref = this.firestore
             .collection("livestreams")
