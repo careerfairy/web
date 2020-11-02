@@ -2,7 +2,6 @@ import React, {Fragment} from 'react';
 import StreamSnackBar from "./notification/StreamSnackBar";
 
 function NotificationsContainer({notifications}) {
-    console.log("-> notifications", notifications);
 
     let streamSnackElements = notifications.map((notification, index) => {
         return (
