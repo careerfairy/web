@@ -33,8 +33,12 @@ function VideoContainer(props) {
     const isPlayMode = false;
 
     useEffect(() => {
-        return () => console.log('VideoContainer destroyed');
-    }, []);
+        if (props.streamerId && props.currentLivestream.id ) {
+            if (props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
+                setDesktopMode("default", props.streamerId);
+            }
+        }
+    },[props.streamerId, props.currentLivestream.id])
 
     function isExistingCallback(callbackName) {
         return props.additionalCallbacks && typeof props.additionalCallbacks[callbackName] === 'function';
