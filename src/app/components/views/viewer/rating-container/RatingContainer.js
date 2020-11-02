@@ -47,22 +47,17 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
             hasRated: false
         },
     ])
+    console.log("-> minutesPassed", minutesPassed);
 
     useEffect(() => {
-        if (livestream.start) {
-            const interval = setInterval(() => {
-                console.log("-> livestream.start", livestream.start);
-                setMinutesPassed(getMinutesPassed())
-            }, 60 * 1000);// check for minutes passed every minute
-            return () => clearInterval(interval)
-        }
+        var interval = setInterval(() => {
+            setMinutesPassed(getMinutesPassed())
+        }, 10 * 1000);// check for minutes passed every 10 seconds
+        return () => clearInterval(interval)
     }, [livestream.start]);
 
     useEffect(() => {
-        if (minutesPassed) {
-        console.log("-> minutesPassed", minutesPassed);
-            handleCheckRatings()
-        }
+        handleCheckRatings()
     }, [minutesPassed])
 
     const handleCheckRatings = async () => {
@@ -79,8 +74,7 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
                         persist: true,
                         preventDuplicate: true,
                         key: rating.message,
-                        action: <ActionComponent snackKey={rating.message} firebase={firebase}
-                                                 email={authenticatedUser.email}
+                        action: <ActionComponent snackKey={rating.message} firebase={firebase} email={authenticatedUser.email}
                                                  livestreamId={livestreamId}
                                                  typeOfRating={rating.type}/>,
                     })
@@ -148,7 +142,6 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
             return null
         }
     }
-
 
     return null
 }

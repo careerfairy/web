@@ -100,7 +100,7 @@ function UpcomingPollStreamer(props) {
         <Paper style={{margin: 10, position: "relative"}} onMouseEnter={handleSetIsNotEditablePoll}
                onMouseLeave={() => setShowNotEditableMessage(false)}>
             <Box p={2}>
-                <Typography gutterBottom variant="h6">
+                <Typography gutterBottom variant="h6" style={{ margin: "1.5rem 0 0.5rem 0"}}>
                     {props.poll.question}
                 </Typography>
                 <List dense>

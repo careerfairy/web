@@ -72,7 +72,7 @@ function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
             return (
                 <CategoryContainerCentered>
                     <PollWrapper style={{padding: theme.spacing(2)}}>
-                        <PollQuestion>
+                        <PollQuestion style={{ margin: "1.5rem 0"}}>
                             {currentPoll.question}
                         </PollQuestion>
                         <div>
