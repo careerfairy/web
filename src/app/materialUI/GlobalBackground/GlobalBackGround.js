@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
         height: "100%"
     },
     tealBackgroundStyles: {
-        backgroundColor: theme.palette.main,
+        backgroundColor: "rgb(0, 210, 170)",
         height: "100%",
         minHeight: "100vh",
         padding: "0 0 40px 0",
