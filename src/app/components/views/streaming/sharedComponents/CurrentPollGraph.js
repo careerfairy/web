@@ -62,7 +62,7 @@ const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
 
     useEffect(() => {
         setOptionsObj({
-            ...options,
+            ...optionsObj,
             plugins: {
                 labels: [{
                     fontColor: 'white',
