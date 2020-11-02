@@ -41,15 +41,9 @@ let baseTheme = createMuiTheme({
                 marginLeft: 0,
             }
         },
-
         MuiSnackbar:{
 
-        },
-        MuiInputBase: {
-            root: {
-                backgroundColor: "white"
-            }
-        },
+        }
     },
 
     typography: {
