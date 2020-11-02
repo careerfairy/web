@@ -10,6 +10,7 @@ import axios from 'axios';
 
 import Link from 'next/link';
 import UserUtil from 'data/util/UserUtil';
+import DataAccessUtil from 'util/DataAccessUtil';
 
 
 function LivestreamCard(props) {
@@ -66,20 +67,8 @@ function LivestreamCard(props) {
         router.push(route);
     }
 
-    function sendEmailRegistrationConfirmation() {
-        return axios({
-            method: 'post',
-            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendLivestreamRegistrationConfirmationEmail',
-            data: {
-                recipientEmail: props.user.email,
-                user_first_name: props.userData.firstName,
-                livestream_date: DateUtil.getPrettyDate(props.livestream.start.toDate()),
-                company_name: props.livestream.company,
-                company_logo_url: props.livestream.companyLogoUrl,
-                livestream_title: props.livestream.title,
-                livestream_link: ('https://careerfairy.io/upcoming-livestream/' + props.livestream.id)
-            }
-        });
+    function sendEmailRegistrationConfirmation() {    
+        return DataAccessUtil.sendRegistrationConfirmationEmail(props.user, props.userData, props.livestream);
     }
 
     let logoElements = props.careerCenters.map( (careerCenter, index) => {

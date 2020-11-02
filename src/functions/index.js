@@ -376,6 +376,41 @@ exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onRequest(
     });
 });
 
+exports.sendPhysicalEventRegistrationConfirmationEmail = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    const email = {
+        "TemplateId": 20754935,
+        "From": 'CareerFairy <noreply@careerfairy.io>',
+        "To": req.body.recipientEmail,
+        "TemplateModel": { 
+            user_first_name: req.body.user_first_name,
+            event_date: req.body.event_date,
+            company_name: req.body.company_name,
+            company_logo_url: req.body.company_logo_url,
+            event_title: req.body.event_title,
+            event_address: req.body.event_address
+        }
+    };
+
+    client.sendEmailWithTemplate(email).then(response => {
+        return res.send(200);
+    }, error => {
+        console.log('error:' + error);
+        return res.status(400).send(error);
+    });
+});
+
 exports.updateFakeUser = functions.https.onRequest(async (req, res) => {
 
     res.set('Access-Control-Allow-Origin', '*');
@@ -420,7 +455,7 @@ exports.sendPostmarkEmailUserDataAndUni = functions.https.onRequest(async (req, 
     const recipient_university_country_code = req.body.universityCountryCode;
     const pinCode = getRandomInt(9999);
 
-    await admin.firestore().collection("userData").doc(recipient_email).set(
+    admin.firestore().collection("userData").doc(recipient_email).set(
         {
             id: recipient_email,
             validationPin: pinCode,
@@ -429,20 +464,25 @@ exports.sendPostmarkEmailUserDataAndUni = functions.https.onRequest(async (req, 
             userEmail: recipient_email,
             universityCode: recipient_university,
             universityCountryCode: recipient_university_country_code,
-        });
-
-    const email = {
-        "TemplateId": 17669843,
-        "From": 'CareerFairy <noreply@careerfairy.io>',
-        "To": recipient_email,
-        "TemplateModel": { pinCode: pinCode }
-    };
-
-    return client.sendEmailWithTemplate(email).then(response => {
-        res.sendStatus(200);
-    }, error => {
-        res.sendStatus(500);
-    });
+        }).then(() => {
+            const email = {
+                "TemplateId": 17669843,
+                "From": 'CareerFairy <noreply@careerfairy.io>',
+                "To": recipient_email,
+                "TemplateModel": { pinCode: pinCode }
+            };
+        
+            return client.sendEmailWithTemplate(email).then(response => {
+                console.log(`Successfully sent PIN email to ${recipient_email}`);
+                res.sendStatus(200);
+            }, error => {
+                console.error(`Error sending PIN email to ${recipient_email}`, error);
+                res.sendStatus(500);
+            });
+        }).catch((error) => {
+            console.error(`Error creating user ${recipient_email}`, error);
+            res.sendStatus(500);
+        });   
 });
 
 exports.sendReminderEmailToRegistrants = functions.https.onRequest(async (req, res) => {
@@ -533,7 +573,7 @@ exports.getNumberOfViewers = functions.https.onRequest(async (req, res) => {
 
     axios({
         method: 'get',
-        url: 'https://thrillin.work/WebRTCAppEE/rest/v2/broadcasts/' + req.query.livestreamId + '/broadcast-statistics',
+        url: 'https://streaming.careerfairy.io/WebRTCAppEE/rest/v2/broadcasts/' + req.query.livestreamId + '/broadcast-statistics',
     }).then( response => { 
             console.log(response.data);
             return res.status(200).send(response.data);
@@ -543,6 +583,7 @@ exports.getNumberOfViewers = functions.https.onRequest(async (req, res) => {
 });
 
 exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 45 minutes').timeZone('Europe/Zurich').onRun((context) => {
+    let messageSender = mailgun.messages();
     const dateStart = new Date(Date.now() + 1000 * 60 * 60 * 1);
     const dateEnd =  new Date(Date.now() + 1000 * 60 * 60 * 1.75);
     admin.firestore().collection("livestreams")
@@ -555,27 +596,59 @@ exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 45
                 livestream.id = doc.id;
                 console.log("livestream company: " + livestream.company);
                 console.log("number of emails: " + livestream.registeredUsers.length);
-                var data = generateEmailData("link.aerospace@gmail.com", livestream);
-                mailgun.messages().send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
+                var data = generateEmailData(livestream.id, livestream, false);
+                messageSender.send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
             });
-            res.send(200);
         }).catch((error) => {
             console.log("error: " + error);
-            res.send(400);
         });
 });
 
-function generateEmailData(recipientEmail, livestream) {
+exports.sendReminderEmailsWhenLivestreamStarts = functions.firestore
+    .document('livestreams/{livestreamId}')
+    .onUpdate((change, context) => {
+        console.log("onUpdate")
+        let mailgunSender = mailgun.messages();
+        const previousValue = change.before.data();
+        const newValue = change.after.data();
+        if (newValue.test === false) {
+            if (!previousValue.hasStarted && !previousValue.hasSentEmails && newValue.hasStarted === true) {
+                console.log("sendEmail")
+                admin.firestore().collection("livestreams").doc(context.params.livestreamId).update({ hasSentEmails: true }).then(() => {
+                    var data = generateEmailData(context.params.livestreamId, newValue, true);
+                    console.log(data);
+                    mailgunSender.send(data, (error, body) => {console.log("error:" + error); console.log("body:" + JSON.stringify(body));})
+                })
+            }
+        }    
+    });  
+
+function generateEmailData(livestreamId, livestream, startingNow) {
+    let recipientEmails = livestream.registeredUsers.join();
     var luxonStartDateTime = DateTime.fromJSDate(livestream.start.toDate(), { zone: 'Europe/Zurich' });
-    return {
-        //Specify email data
-        from: "CareerFairy <noreply@careerfairy.io>",
-        to: recipientEmail,
-        subject: 'Reminder: TODAY - Live Stream with ' + livestream.company + ' ' + getLivestreamTimeInterval(livestream.start),
-        template: 'registration-reminder',
-        "h:X-Mailgun-Variables": JSON.stringify({ "company": livestream.company, "startTime": formatHour(luxonStartDateTime), "streamLink": getStreamLink(livestream.id), "german": livestream.language === "DE" ? true : false }),
-        "o:deliverytime": luxonStartDateTime.minus({ minutes: 45 }).toRFC2822()
-    }
+    const mailgunVariables = { "company": livestream.company, "startTime": formatHour(luxonStartDateTime), "streamLink": getStreamLink(livestreamId), "german": livestream.language === "DE" ? true : false };
+    let recipientVariablesObj = {};
+    livestream.registeredUsers.forEach( email => {
+        recipientVariablesObj[email] = mailgunVariables;
+    })
+    if (startingNow) {
+        return {
+            from: "CareerFairy <noreply@careerfairy.io>",
+            to: recipientEmails,
+            subject:  'NOW: Live Stream with ' + livestream.company + ' ' + getLivestreamTimeInterval(livestream.start),
+            template: 'registration-reminder',
+            "recipient-variables": JSON.stringify(recipientVariablesObj)
+        }
+    } else {
+        return {
+            from: "CareerFairy <noreply@careerfairy.io>",
+            to: recipientEmails,
+            subject: 'Reminder: Live Stream with ' + livestream.company + ' ' + getLivestreamTimeInterval(livestream.start),
+            template: 'registration-reminder',
+            "recipient-variables": JSON.stringify(recipientVariablesObj),
+            "o:deliverytime": luxonStartDateTime.minus({ minutes: 45 }).toRFC2822()
+        }
+    }  
 }
 
 function getStreamLink(streamId) {
@@ -619,7 +692,7 @@ exports.exportFirestoreBackup = functions.pubsub.schedule('every 1 hours').timeZ
     });
 });
 
-exports.scheduleTestLivestreamDeletion = functions.pubsub.schedule('every 6 hours').timeZone('Europe/Zurich').onRun((context) => {
+exports.scheduleTestLivestreamDeletion = functions.pubsub.schedule('every sunday 09:00').timeZone('Europe/Zurich').onRun((context) => {
     admin.firestore().collection("livestreams")
         .where("test", "==", true)
         .get().then((querySnapshot) => {
@@ -629,3 +702,60 @@ exports.scheduleTestLivestreamDeletion = functions.pubsub.schedule('every 6 hour
             })
         });
 });
+
+exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(async (req, res) => {
+
+    console.log("running");
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    let counter = 0;
+
+    let groupId = req.body.groupId;
+    let categoryId = req.body.categoryId;
+    let categoryValueId = req.body.categoryValueId;
+
+    let collectionRef = admin.firestore().collection("userData")
+    .where("groupIds", "array-contains", groupId);
+
+    collectionRef.get()
+    .then((querySnapshot) => {
+        console.log("snapshotSize:" + querySnapshot.size);
+        querySnapshot.forEach(doc => {
+            var id = doc.id;
+            var userData = doc.data()
+            let groupCategory = userData.registeredGroups.find(group => group.groupId === groupId);
+            if (groupCategory) {
+                let filteringCategory = groupCategory.categories.find(category => category.id === categoryId);
+                if (filteringCategory && filteringCategory.selectedValueId === categoryValueId) {
+                    console.log(userData.userEmail)
+                    counter++;
+                    const email = {
+                        "TemplateId": req.body.templateId,
+                        "From": 'CareerFairy <noreply@careerfairy.io>',
+                        "To": userData.userEmail,
+                        "TemplateModel": {       
+                            userEmail: userData.userEmail
+                        }
+                    };
+                    client.sendEmailWithTemplate(email).then(() => {
+                        console.log("email sent to: " + userData.userEmail);                        
+                    }, error => {
+                        console.log('error:' + error);
+                    });
+                }
+            }
+        });
+    }).catch(error => {
+        console.log('error:' + error);
+        return res.status(400).send();
+    })});

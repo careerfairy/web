@@ -6,9 +6,16 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import {makeStyles} from "@material-ui/core/styles";
 
+const useStyles = makeStyles(theme => ({
+    errorButton: {
+        background: theme.palette.error.main,
+        color: theme.palette.error.contrastText
+    }
+}))
 const AreYouSureModal = ({title, message, handleConfirm, open, handleClose, loading}) => {
-
+    const classes = useStyles()
 
     return (
         <div>
@@ -25,10 +32,11 @@ const AreYouSureModal = ({title, message, handleConfirm, open, handleClose, load
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button disabled={loading} endIcon={loading && <CircularProgress color="inherit" size={20}/>} onClick={handleConfirm} variant="contained" color="primary">
+                    <Button disabled={loading} endIcon={loading && <CircularProgress color="inherit" size={20}/>}
+                            onClick={handleConfirm} variant="contained" color="primary">
                         Confirm
                     </Button>
-                    <Button onClick={handleClose}  color="secondary">
+                    <Button onClick={handleClose} className={classes.errorButton}>
                         Cancel
                     </Button>
                 </DialogActions>

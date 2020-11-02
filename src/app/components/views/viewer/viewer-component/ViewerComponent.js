@@ -1,12 +1,8 @@
 import {useState, useEffect, useRef, Fragment} from 'react';
-import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Dropdown} from "semantic-ui-react";
-
-import { useRouter } from 'next/router';
 import { withFirebasePage } from 'context/firebase';
 import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
 import CurrentSpeakerDisplayer from 'components/views/streaming/video-container/CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from 'components/views/streaming/video-container/SmallStreamerVideoDisplayer';
-import NewCommentContainer from 'components/views/streaming/comment-container/NewCommentContainer';
 
 
 function ViewerComponent(props) {

@@ -1,10 +1,10 @@
-import {Fragment, useState, useEffect} from 'react';
+import React, {Fragment, useState, useEffect} from 'react';
 import 'semantic/dist/semantic.min.css';
 import 'styles.css';
 import FirebaseContext from 'context/firebase/FirebaseContext';
 import Firebase from 'context/firebase';
 import * as Sentry from '@sentry/browser';
-import {ThemeProvider} from '@material-ui/core/styles';
+import {makeStyles, ThemeProvider} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import config from 'react-reveal/globals';
 
@@ -17,9 +17,20 @@ import Head from 'next/head';
 import {theme} from "../materialUI";
 import UserContext from 'context/user/UserContext';
 import TagManager from 'react-gtm-module'
+import ErrorSnackBar from "../components/views/common/ErrorSnackBar/ErrorSnackBar";
+import ErrorContext from "../context/error/ErrorContext";
+import {SnackbarProvider} from "notistack";
+
+const useStyles = makeStyles(({
+    info: {
+        background: `${theme.palette.info.contrastText} !important`,
+        color: `black !important`,
+    },
+}))
+
 
 function MyApp({Component, pageProps}) {
-
+    const classes = useStyles()
     Sentry.init({dsn: "https://6852108b71ce4fbab24839792f82fa90@sentry.io/4261031"});
 
 
@@ -28,6 +39,9 @@ function MyApp({Component, pageProps}) {
     const [authenticatedUser, setAuthenticatedUser] = useState(undefined);
     const [userData, setUserData] = useState(undefined);
     const [loading, setLoading] = useState(false)
+    const [hideLoader, setHideLoader] = useState(false)
+    const [generalError, setGeneralError] = useState("");
+
 
     useEffect(() => {
         // Remove the server-side injected CSS.
@@ -73,19 +87,33 @@ function MyApp({Component, pageProps}) {
         }
     }, [authenticatedUser]);
 
+    useEffect(() => {
+        if (authenticatedUser === null || userData === null || loading === true) {
+            setHideLoader(true)
+        }
+
+    }, [authenticatedUser, userData, loading])
+
     return (
         <Fragment>
             <Head>
                 <title>CareerFairy | Watch live streams. Get hired.</title>
             </Head>
             <FirebaseContext.Provider value={firebase}>
-                <UserContext.Provider value={{authenticatedUser, userData, setUserData, loading}}>
-                    <ThemeProvider theme={theme}>
-                        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                        <CssBaseline/>
-                        <Component {...pageProps} />
-                    </ThemeProvider>
-                </UserContext.Provider>
+                <ThemeProvider theme={theme}>
+                    <SnackbarProvider classes={{
+                        variantInfo: classes.info
+                    }} maxSnack={3}>
+                        <UserContext.Provider value={{authenticatedUser, userData, setUserData, loading, hideLoader}}>
+                            <ErrorContext.Provider value={{generalError, setGeneralError}}>
+                                {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                                <CssBaseline/>
+                                <Component {...pageProps} />
+                                <ErrorSnackBar handleClose={() => setGeneralError("")} errorMessage={generalError}/>
+                            </ErrorContext.Provider>
+                        </UserContext.Provider>
+                    </SnackbarProvider>
+                </ThemeProvider>
             </FirebaseContext.Provider>
         </Fragment>
     );

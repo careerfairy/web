@@ -1,19 +1,20 @@
-import { Fragment} from 'react';
-import Notification from './notification/Notification'
+import React, {Fragment} from 'react';
+import StreamSnackBar from "./notification/StreamSnackBar";
 
-function NotificationsContainer({ notifications }) {
+function NotificationsContainer({notifications}) {
 
-    let notificationElements = notifications.map((notification, index) => {
+    let streamSnackElements = notifications.map((notification, index) => {
         return (
-            <Notification notification={notification} index={index} />
-        );
+            <StreamSnackBar key={index} notification={notification} index={index}/>
+        )
     })
 
     return (
         <Fragment>
-            { notificationElements }
+            {streamSnackElements}
         </Fragment>
-    );
+    )
+
 }
 
 export default NotificationsContainer;

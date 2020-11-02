@@ -1,5 +1,5 @@
 import { Fragment, useState, useEffect} from 'react';
-import { Button } from "semantic-ui-react";
+import {Button} from "@material-ui/core";
 
 function Notification({ notification, index }) {
 
@@ -24,8 +24,8 @@ function Notification({ notification, index }) {
             <div className='notification-box'>
                 <div className='notification-message'>{ notification.message }</div>        
                 <div className='notification-buttons'>
-                    <Button size='mini' onClick={onCancel}>{notification.cancelMessage}</Button>
-                    <Button size='mini' onClick={onConfirm} primary>{notification.confirmMessage}</Button>
+                    <Button size='small' variant="contained" style={{marginRight: "1rem"}} onClick={onCancel}>{notification.cancelMessage}</Button>
+                    <Button size='small' variant="contained" onClick={onConfirm} color="primary">{notification.confirmMessage}</Button>
                 </div>
             </div>
             <style jsx>{`

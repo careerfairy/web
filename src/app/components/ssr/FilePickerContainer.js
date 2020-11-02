@@ -4,7 +4,7 @@ import { Button } from 'semantic-ui-react';
 function FilePickerContainer (props) {
     if (window) {
         var { FilePicker } = require('react-file-picker');
-        return <FilePicker {...props}/>
+        return <FilePicker  {...props}/>
     } else {
         return ( 
             <div>

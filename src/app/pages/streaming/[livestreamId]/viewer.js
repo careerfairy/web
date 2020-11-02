@@ -1,39 +1,83 @@
-import {useState, useEffect, useRef, Fragment} from 'react';
-import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, Modal, Transition, Dropdown} from "semantic-ui-react";
+import {useState, useEffect, Fragment} from 'react';
+import VolumeUpRoundedIcon from '@material-ui/icons/VolumeUpRounded';
+import PlayArrowRoundedIcon from '@material-ui/icons/PlayArrowRounded';
 
-import { useRouter } from 'next/router';
-import { withFirebasePage } from '../../../context/firebase';
+import {useRouter} from 'next/router';
+import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
+import {withFirebasePage} from '../../../context/firebase';
 import ViewerHandRaiseComponent from 'components/views/viewer/viewer-hand-raise-component/ViewerHandRaiseComponent';
 import ViewerComponent from 'components/views/viewer/viewer-component/ViewerComponent';
-import NewCommentContainer from 'components/views/viewer/comment-container/NewCommentContainer';
 import UserContext from 'context/user/UserContext';
-import MiniChatContainer from 'components/views/streaming/comment-container/categories/chat/MiniChatContainer';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
-import { useWindowSize } from 'components/custom-hook/useWindowSize';
+import {useWindowSize} from 'components/custom-hook/useWindowSize';
+import React from 'react';
+import {makeStyles} from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import {fade} from "@material-ui/core";
+import {amber, deepOrange, green, red} from "@material-ui/core/colors";
+import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
+import MiniChatContainer from "../../../components/views/streaming/LeftMenu/categories/chat/MiniChatContainer";
+import EmoteButtons from "../../../components/views/viewer/EmoteButtons";
+import RatingContainer from "../../../components/views/viewer/rating-container/RatingContainer";
 
-function ViewerPage(props) {
+const useStyles = makeStyles((theme) => ({
+    image: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '28px'
+    },
+    root: {
+        position: "relative",
+        minHeight: "100vh",
+        height: "100%",
+        width: "100%",
+        touchAction: "manipulation"
+    },
+    menuLeft: {
+        position: "absolute",
+        transition: "width 0.3s",
+        transitionTimingFunction: theme.transitions.easeInOut,
+        width: ({showMenu, mobile}) => showMenu ? (mobile ? "100%" : 280) : 0,
+        top: ({mobile}) => mobile ? 0 : 55,
+        left: 0,
+        bottom: 0,
+        zIndex: 20
+    },
+}));
 
+
+function ViewerPage({firebase}) {
+    const DELAY = 3000; //3 seconds
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
 
     const [showMenu, setShowMenu] = useState(false);
+
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
-    
+
     const [careerCenters, setCareerCenters] = useState([]);
     const [handRaiseActive, setHandRaiseActive] = useState(false);
     const [iconsDisabled, setIconsDisabled] = useState(false);
-    const [showVideoButton, setShowVideoButton] = useState({ paused: false, muted: false});
+    const [showVideoButton, setShowVideoButton] = useState({paused: false, muted: false});
     const [unmute, setUnmute] = useState(false);
     const [play, setPlay] = useState(false);
+    const {width, height} = useWindowSize();
+
+
+    const classes = useStyles({showMenu, mobile: width < 768});
+    const [open, setOpen] = React.useState(true);
+    const [delayHandler, setDelayHandler] = useState(null)
+
 
     const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
 
-    const { authenticatedUser, userData } = React.useContext(UserContext);
-    const { width, height } = useWindowSize();
+    const {authenticatedUser, userData} = React.useContext(UserContext);
 
     useEffect(() => {
-        if ( width < 768) {
+        if (width < 768) {
             setShowMenu(false)
         } else {
             setShowMenu(true);
@@ -42,13 +86,13 @@ function ViewerPage(props) {
 
     useEffect(() => {
         if (userData && livestreamId) {
-            props.firebase.setUserIsParticipating(livestreamId, userData);
+            firebase.setUserIsParticipating(livestreamId, userData);
         }
     }, [livestreamId, userData]);
 
     useEffect(() => {
         if (livestreamId) {
-            props.firebase.listenToScheduledLivestreamById(livestreamId, querySnapshot => {
+            firebase.listenToScheduledLivestreamById(livestreamId, querySnapshot => {
                 let livestream = querySnapshot.data();
                 livestream.id = querySnapshot.id;
                 setCurrentLivestream(livestream);
@@ -57,8 +101,8 @@ function ViewerPage(props) {
     }, [livestreamId]);
 
     useEffect(() => {
-        if (currentLivestream && currentLivestream.groupIds && currentLivestream.groupIds.length) {
-            props.firebase.getDetailLivestreamCareerCenters(currentLivestream.groupIds)
+        if (currentLivestream?.groupIds?.length) {
+            firebase.getDetailLivestreamCareerCenters(currentLivestream.groupIds)
                 .then((querySnapshot) => {
                     let groupList = [];
                     querySnapshot.forEach((doc) => {
@@ -72,28 +116,53 @@ function ViewerPage(props) {
     }, [currentLivestream]);
 
     useEffect(() => {
-        if (userData && currentLivestream && userData.talentPools && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
+        if (userData?.talentPools && currentLivestream && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
             setUserIsInTalentPool(true);
         } else {
             setUserIsInTalentPool(false);
         }
     }, [currentLivestream, userData]);
 
-    useEffect(() => {
-        if (iconsDisabled) {
-            let timeout = setTimeout(() => {
-                setIconsDisabled(false);
-            }, 3000);
-            return () => clearTimeout(timeout);
-        }
-    }, [iconsDisabled]);
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleMouseEnter = event => {
+        clearTimeout(delayHandler)
+        handleOpen()
+    }
+
+    const handleMouseLeave = () => {
+        setDelayHandler(setTimeout(() => {
+            handleClose()
+        }, DELAY))
+    }
+
+    const handleClap = () => {
+        postIcon('clapping')
+    }
+
+    const handleLike = () => {
+        postIcon('like')
+    }
+    const handleHeart = () => {
+        postIcon('heart')
+    }
+    const toggleShowMenu = () => {
+        setShowMenu(!showMenu)
+    }
 
     function joinTalentPool() {
         if (!authenticatedUser) {
             return router.replace('/signup');
         }
 
-        props.firebase.joinCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email);
+        firebase.joinCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email);
     }
 
     function leaveTalentPool() {
@@ -101,31 +170,36 @@ function ViewerPage(props) {
             return router.replace('/signup');
         }
 
-        props.firebase.leaveCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email);
+        firebase.leaveCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email);
     }
 
     function postIcon(iconName) {
         if (!iconsDisabled) {
             setIconsDisabled(true);
             let email = currentLivestream.test ? 'streamerEmail' : authenticatedUser.email;
-            props.firebase.postIcon(currentLivestream.id, iconName, email);
-        }  
+            firebase.postIcon(currentLivestream.id, iconName, email);
+        }
     }
 
     function unmuteVideos() {
-        setShowVideoButton(prevState => { return { paused: prevState.paused, muted: false }});
+        setShowVideoButton(prevState => {
+            return {paused: prevState.paused, muted: false}
+        });
         setUnmute(true);
     }
 
     function playVideos() {
-        setShowVideoButton(prevState => { return { paused: false, muted: false }});
+        setShowVideoButton(prevState => {
+            return {paused: false, muted: false}
+        });
         setPlay(true);
     }
 
-    let logoElements = careerCenters.map( (careerCenter, index) => {
+    let logoElements = careerCenters.map((careerCenter, index) => {
         return (
             <Fragment key={index}>
-                <Image src={ careerCenter.logoUrl } style={{ maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block' }}/>
+                <img src={careerCenter.logoUrl}
+                     style={{maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block'}}/>
             </Fragment>
         );
     });
@@ -135,73 +209,102 @@ function ViewerPage(props) {
     }
 
     return (
-        <div className='topLevelContainer'>
+        <div className={classes.root}>
             <div className='top-menu'>
-                <div className='top-menu-left'>    
-                    <Image src='/logo_teal.png' style={{ maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
-                    { logoElements }
-                    <div style={{ position: 'absolute', bottom: '13px', left: '120px', fontSize: '7em', fontWeight: '700', color: 'rgba(0, 210, 170, 0.2)', zIndex: '50'}}>&</div>
+                <div className='top-menu-left'>
+                    <img src='/logo_teal.png'
+                         style={{maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
+                    {logoElements}
+                    <div style={{
+                        position: 'absolute',
+                        bottom: '13px',
+                        left: '120px',
+                        fontSize: '7em',
+                        fontWeight: '700',
+                        color: 'rgba(0, 210, 170, 0.2)',
+                        zIndex: '50'
+                    }}>&
+                    </div>
                 </div>
                 <div className={'top-menu-right'}>
-                    <Image src={ currentLivestream.companyLogoUrl } style={{ position: 'relative', zIndex: '100', maxHeight: '50px', maxWidth: '150px', display: 'inline-block', margin: '0 10px'}}/>
-                    <Button style={{ display: currentLivestream.hasNoTalentPool ? 'none' : 'inline-block' }} content={ userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'} icon={ userIsInTalentPool ? 'delete' : 'handshake outline'} onClick={ userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()} primary={!userIsInTalentPool}/> 
+                    <img src={currentLivestream.companyLogoUrl} style={{
+                        position: 'relative',
+                        zIndex: '100',
+                        maxHeight: '50px',
+                        maxWidth: '150px',
+                        display: 'inline-block',
+                        margin: '0 10px'
+                    }}/>
+                    {!currentLivestream.hasNoTalentPool ?
+                        <Button
+                            children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
+                            variant="contained"
+                            startIcon={<PeopleAltIcon/>}
+                            icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
+                            onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
+                            color={userIsInTalentPool ? "default" : "primary"}/> : null}
                 </div>
             </div>
             <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
-                { handRaiseActive ? 
-                    <ViewerHandRaiseComponent currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive}/> :
-                    <ViewerComponent livestreamId={livestreamId} streamerId={streamerId}  currentLivestream={currentLivestream} handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton} setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>
+                {handRaiseActive ?
+                    <ViewerHandRaiseComponent currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
+                                              setHandRaiseActive={setHandRaiseActive}/> :
+                    <ViewerComponent livestreamId={livestreamId} streamerId={streamerId}
+                                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
+                                     setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton}
+                                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>
                 }
                 <div className='mini-chat-container'>
-                    <MiniChatContainer livestream={ currentLivestream }  isStreamer={false}/>
+                    <MiniChatContainer livestream={currentLivestream} isStreamer={false}/>
                 </div>
-                <div className='action-buttons'>
-                    <div className='action-container'>
-                        <div className='button action-button red' onClick={() => postIcon('like')}>
-                            <Image src='/like.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
-                        </div>
-                    </div>
-                    <div className='action-container'>
-                        <div className='button action-button orange' onClick={() => postIcon('clapping')}>
-                            <Image src='/clapping.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
-                        </div>
-                    </div>
-                    <div className='action-container'>
-                        <div className='button action-button yellow' onClick={() => postIcon('heart')}>
-                            <Image src='/heart.png' disabled={iconsDisabled} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '28px'}}/>
-                        </div>
-                    </div>            
-                </div>
+                <EmoteButtons
+                    handRaiseActive={handRaiseActive}
+                    handleClose={handleClose}
+                    handleClap={handleClap}
+                    handleHeart={handleHeart}
+                    handleLike={handleLike}
+                    handleMouseEnter={handleMouseEnter}
+                    handleMouseLeave={handleMouseLeave}
+                    iconsDisabled={iconsDisabled}
+                    setIconsDisabled={setIconsDisabled}
+                    delay={DELAY}
+                    smoothness={2}
+                    open={open}
+                />
             </div>
-            <div className={'video-menu-left ' + (showMenu ? 'withMenu' : '')}>
-                <NewCommentContainer showMenu={showMenu} setShowMenu={setShowMenu} streamer={false} livestream={ currentLivestream } handRaiseActive={handRaiseActive} setHandRaiseActive={setHandRaiseActive} localId/>
+            <div className={classes.menuLeft}>
+                <LeftMenu
+                    handRaiseActive={handRaiseActive}
+                    setHandRaiseActive={setHandRaiseActive}
+                    streamer={false}
+                    userData={userData}
+                    user={authenticatedUser}
+                    livestream={currentLivestream}
+                    showMenu={showMenu}
+                    setShowMenu={setShowMenu}
+                    isMobile={width < 768}
+                    toggleShowMenu={toggleShowMenu}/>
             </div>
             <div className='icons-container'>
-                <IconsContainer livestreamId={ currentLivestream.id } />
+                <IconsContainer livestreamId={currentLivestream.id}/>
             </div>
-            <div className={ 'playButtonContent ' + (showVideoButton.muted ? '' : 'hidden')} onClick={unmuteVideos}>
+            {currentLivestream && <RatingContainer livestreamId={currentLivestream.id}
+                              livestream={currentLivestream}/>}
+            <div className={'playButtonContent ' + (showVideoButton.muted ? '' : 'hidden')} onClick={unmuteVideos}>
                 <div className='playButton'>
-                    <Icon name='volume up' style={{ fontSize: '3rem' }}/>
+                    <VolumeUpRoundedIcon style={{fontSize: '3rem'}}/>
                     <div>Click to unmute</div>
-                </div>     
+                </div>
             </div>
-            <div className={ 'playButtonContent ' + (showVideoButton.paused ? '' : 'hidden')} onClick={playVideos}>
+            <div className={'playButtonContent ' + (showVideoButton.paused ? '' : 'hidden')} onClick={playVideos}>
                 <div className='playButton'>
-                    <Icon name='play' style={{ fontSize: '3rem' }}/>
+                    <PlayArrowRoundedIcon style={{fontSize: '3rem'}}/>
                     <div>Click to play</div>
-                </div>     
+                </div>
             </div>
             <style jsx>{`
                 .hidden {
                     display: none
-                }
-
-                .topLevelContainer {
-                    position: relative;
-                    min-height: 100vh;
-                    height: 100%;
-                    width: 100%;
-                    touch-action: manipulation;
                 }
 
                 .top-menu {
@@ -246,97 +349,17 @@ function ViewerPage(props) {
 
                 .top-menu-right {
                     position: absolute;
+                    display: flex !important;
+                    align-items: center;
                     top: 50%;
                     right: 20px;
                     transform: translateY(-50%);
                 }
 
-                @media(max-width: 768px) {
-                    .action-buttons {
-                        position: absolute;
-                        right: 10px;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        z-index: 150;
-                    }
-    
-                    .action-button {
-                        position: relative;
-                        border-radius: 50%;
-                        background-color: rgb(0, 210, 170);
-                        width: 50px;
-                        height: 50px;
-                        margin: 15px;
-                        cursor: pointer;
-                        box-shadow: 0 0 8px rgb(120,120,120);
-                    }
-                }
-
-                @media(min-width: 768px) {
-                    .action-buttons {
-                        position: absolute;
-                        bottom: 30px;
-                        left: 50%;
-                        transform: translateX(-50%);
-                        z-index: 150;
-                    }
-
-                    .action-container {
-                        display: inline-block;
-                    }
-    
-                    .action-button {
-                        position: relative;
-                        border-radius: 50%;
-                        background-color: rgb(0, 210, 170);
-                        width: 70px;
-                        height: 70px;
-                        margin: 15px;
-                        cursor: pointer;
-                        box-shadow: 0 0 8px rgb(120,120,120);
-                    }
-                }
-
-                .action-button.red {
-                    background-color: #e01a4f;
-                }
-                .button.action-button.red:hover {
-                    background-color: #c91847;
-                    transition: all ease-in-out 0.2s;
-                }
-                .button.action-button.red:active {
-                    background-color: #a4133a;
-                    transition: all ease-in-out 0.2s;
-                }
-
-                .action-button.orange {
-                    background-color: #f15946;
-                }
-                .button.action-button.orange:hover {
-                    background-color: #ef452e;
-                    transition: all ease-in-out 0.2s;
-                }
-                .button.action-button.orange:active {
-                    background-color: #e42a11;
-                    transition: all ease-in-out 0.2s;
-                }
-
-                .action-button.yellow {
-                    background-color: #f9c22e;
-                }
-                .button.action-button.yellow:hover {
-                    background-color: #f8ba12;
-                    transition: all ease-in-out 0.2s;
-                }
-                .button.action-button.yellow:active {
-                    background-color: #daa107;
-                    transition: all ease-in-out 0.2s;
-                }
-
                 .mini-chat-container {
                     position: absolute;
                     bottom: 0;
-                    right: 20px;
+                    right: 120px;
                     width: 20%;
                     min-width: 250px;
                     z-index: 7250;
@@ -396,7 +419,6 @@ function ViewerPage(props) {
                         top: 0;
                         left: 0;
                         width: 0;
-                        bottom 0;
                         z-index: 15;
                     }
 
@@ -441,7 +463,7 @@ function ViewerPage(props) {
                     z-index: 200;
                 }
             `}</style>
-             <style jsx global>{`
+            <style jsx global>{`
                 body {
                     min-height: 100vh;
                     min-height: -webkit-fill-available;

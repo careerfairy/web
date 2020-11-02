@@ -4,10 +4,13 @@ import { Document, Page } from 'react-pdf';
 import * as PDFJS from 'pdfjs-dist/build/pdf';
 
 import { useWindowSize } from 'components/custom-hook/useWindowSize';
+import { IconButton } from '@material-ui/core';
 import { Button, Modal, Progress, Icon } from 'semantic-ui-react';
 
 import FilePickerContainer from 'components/ssr/FilePickerContainer';
 import { withFirebase } from 'context/firebase';
+import { CircularProgress } from '@material-ui/core';
+import { Fragment } from 'react';
 
 function LivestreamPdfViewer (props) {
 
@@ -15,6 +18,10 @@ function LivestreamPdfViewer (props) {
 
     const windowSize = useWindowSize();
     const [pdfObject, setPdfObject] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    const [goingToPreviousPage, setGoingToPreviousPage] = useState(false)
+    const [goingToNextPage, setGoingToNextPage] = useState(false)
 
     const [pdfNumberOfPages, setPdfNumberOfPages] = useState(1);
     
@@ -23,15 +30,19 @@ function LivestreamPdfViewer (props) {
 
     useEffect(() => {
         if (props.livestreamId) {
+            setLoading(true);
             props.firebase.listenToLivestreamPresentation(props.livestreamId, querySnapshot => {
-                if (!querySnapshot.isEmpty) {
+                if (querySnapshot.exists) {
                     setPdfObject(querySnapshot.data());
+                } else {
+                    setLoading(false);
                 }
             });
         }      
     },[props.livestreamId]);
 
     function uploadLogo(logoFile) {
+        setLoading(true);
         setUploadingPresentation(true);
         var storageRef = props.firebase.getStorageRef();
         let presentationRef = storageRef.child( 'company_documents/' + props.livestreamId + '.pdf');
@@ -96,71 +107,88 @@ function LivestreamPdfViewer (props) {
     }
 
     function increasePdfPageNumber() {
-        props.firebase.increaseLivestreamPresentationPageNumber(props.livestreamId);
+        setGoingToNextPage(true)
+        props.firebase.increaseLivestreamPresentationPageNumber(props.livestreamId).then(() => {
+            setGoingToNextPage(false)
+        });
     }
 
     function decreasePdfPageNumber() {
-        props.firebase.decreaseLivestreamPresentationPageNumber(props.livestreamId);
+        setGoingToPreviousPage(true)
+        props.firebase.decreaseLivestreamPresentationPageNumber(props.livestreamId).then(() => {
+            setGoingToPreviousPage(false)
+        });
     }
     
     return (
-        <div style={{ position: 'relative', width: '100%', height: 'calc(80vh - 55px)' }}>
-            <div style={{ position: 'absolute', top: '0', left: '50%', transform: 'translate(-50%)', display: ( pdfObject ? 'block' : 'none'), overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', bottom: '0', left: '0', zIndex: '1000', width: '100%', padding: '30px', display: props.presenter ? 'block' : 'none', backgroundColor: 'rgba(110,110,110, 0.8)'}}>
-                    <div style={{ display: 'inline-block', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
-                        <Button circular icon='angle left' onClick={() => decreasePdfPageNumber()} disabled={pdfObject ? pdfObject.page === 1 : false}/>
-                        <Button circular icon='angle right' onClick={() => increasePdfPageNumber()} disabled={pdfObject ? pdfObject.page === pdfNumberOfPages : false}/>
-                    </div>
-                </div>
-                <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: '1000', display: props.presenter ? 'block' : 'none'}}>
-                    <FilePickerContainer
-                        extensions={['pdf']}
-                        onChange={fileObject => { uploadLogo(fileObject)}}
-                        maxSize={20}
-                        onError={errMsg => ( console.log(errMsg) )}>
-                        <Button primary icon='upload' size='mini' content='Upload Slides [.pdf]' />
-                    </FilePickerContainer>
-                </div>
-                <div style={{ position: 'relative', textAlign: 'center'}}>
-                    <Document
-                        onLoadSuccess={({ numPages }) => setPdfNumberOfPages(numPages)}
-                        file={ pdfObject ? pdfObject.downloadUrl : ''}>
-                        <Page 
-                        height={ getPageHeight() } 
-                        renderTextLayer={false} 
-                        renderAnnotationLayer={false} 
-                        pageNumber={pdfObject ? pdfObject.page : 1} />
-                    </Document>
+        <Fragment>
+            <div style={{ display: loading ? 'block': 'none', position: 'relative', width: '100%', height: 'calc(80vh - 55px)' }}>
+                <div style={{ position: 'absolute', width: '30%', maxWidth: '30px', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
+                    <CircularProgress style={{ maxWidth: '30px', height: 'auto'}} />
                 </div>
             </div>
-            <div style={{ position: 'absolute', top: '150px', left: '50%', transform: 'translate(-50%)', display: ( pdfObject ? 'none' : 'block') }}>
-                <div style={{ marginBottom: '20px', zIndex: '9999'}}>
-                    <div style={{ display: 'inline-block', textAlign: 'center', display: props.presenter ? 'block' : 'none'}}>
-                        <div style={{ color: 'white', marginBottom: '40px'}}>
-                            <p>You currently have no slides to share</p>
-                            <div>
-                                <FilePickerContainer
-                                    extensions={['pdf']}
-                                    onChange={fileObject => { uploadLogo(fileObject)}}
-                                    maxSize={20}
-                                    onError={errMsg => ( console.log(errMsg) )}>
-                                    <Button primary icon='upload' content='Upload Slides [.pdf]' />
-                                </FilePickerContainer>
-                            </div>
+            <div style={{  display: loading ? 'none': 'block', position: 'relative', width: '100%', height: 'calc(80vh - 55px)' }}>
+                <div style={{ position: 'absolute', top: '0', left: '50%', transform: 'translate(-50%)', display: ( pdfObject ? 'block' : 'none'), overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', bottom: '0', left: '0', zIndex: '1000', width: '100%', padding: '30px', display: props.presenter ? 'block' : 'none', backgroundColor: 'rgba(110,110,110, 0.8)'}}>
+                        <div style={{ display: 'inline-block', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
+                            
+                            <Button circular icon='angle left' disabled={goingToNextPage || goingToPreviousPage || (pdfObject ? pdfObject.page === 1 : false)} loading={goingToPreviousPage} onClick={() => decreasePdfPageNumber()}/>
+                            <Button circular icon='angle right' disabled={goingToNextPage || goingToPreviousPage || (pdfObject ? pdfObject.page === pdfNumberOfPages : false)} loading={goingToNextPage} onClick={() => increasePdfPageNumber()}/>
                         </div>
                     </div>
-                    <div style={{ display: 'inline-block', textAlign: 'center', display: props.presenter ? 'none' : 'block'}}>
-                        <div style={{ color: 'white', marginBottom: '40px'}}>Please wait for the presenter to upload slides.</div>
+                    <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: '1000', display: props.presenter ? 'block' : 'none'}}>
+                        <FilePickerContainer
+                            extensions={['pdf']}
+                            onChange={fileObject => { uploadLogo(fileObject)}}
+                            maxSize={20}
+                            onError={errMsg => ( console.log(errMsg) )}>
+                            <Button primary icon='upload' size='mini' content='Upload Slides [.pdf]' />
+                        </FilePickerContainer>
+                    </div>
+                    <div style={{ position: 'relative', textAlign: 'center'}}>
+                        <Document
+                            onLoadSuccess={({ numPages }) => {
+                                setPdfNumberOfPages(numPages);
+                                setLoading(false);
+                            }}
+                            file={ pdfObject ? pdfObject.downloadUrl : ''}>
+                            <Page 
+                            height={ getPageHeight() } 
+                            renderTextLayer={false} 
+                            renderAnnotationLayer={false} 
+                            pageNumber={pdfObject ? pdfObject.page : 1} />
+                        </Document>
                     </div>
                 </div>
+                <div style={{ position: 'absolute', top: '150px', left: '50%', transform: 'translate(-50%)', display: ( pdfObject ? 'none' : 'block') }}>
+                    <div style={{ marginBottom: '20px', zIndex: '9999'}}>
+                        <div style={{ display: 'inline-block', textAlign: 'center', display: props.presenter ? 'block' : 'none'}}>
+                            <div style={{ color: 'white', marginBottom: '40px'}}>
+                                <p>You currently have no slides to share</p>
+                                <div>
+                                    <FilePickerContainer
+                                        extensions={['pdf']}
+                                        onChange={fileObject => { uploadLogo(fileObject)}}
+                                        maxSize={20}
+                                        onError={errMsg => ( console.log(errMsg) )}>
+                                        <Button primary icon='upload' content='Upload Slides [.pdf]' />
+                                    </FilePickerContainer>
+                                </div>
+                            </div>
+                        </div>
+                        <div style={{ display: 'inline-block', textAlign: 'center', display: props.presenter ? 'none' : 'block'}}>
+                            <div style={{ color: 'white', marginBottom: '40px'}}>Please wait for the presenter to upload slides.</div>
+                        </div>
+                    </div>
+                </div>
+                <Modal open={uploadingPresentation}>
+                    <Modal.Content>
+                        <h3>Uploading presentation...</h3>
+                        <Progress percent={progress} indicating/>
+                    </Modal.Content>
+                </Modal>
             </div>
-            <Modal open={uploadingPresentation}>
-                <Modal.Content>
-                    <h3>Uploading presentation...</h3>
-                    <Progress percent={progress} indicating/>
-                </Modal.Content>
-            </Modal>
-        </div>
+        </Fragment>
     )
 }
 

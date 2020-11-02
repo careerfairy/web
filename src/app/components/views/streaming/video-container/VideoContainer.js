@@ -239,7 +239,7 @@ function VideoContainer(props) {
                     top: 0;
                     bottom: 0;
                     left: 0;
-                    right: 120px;
+                    right: 0;
                 }
 
                 .button-container {

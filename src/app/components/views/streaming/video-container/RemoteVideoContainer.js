@@ -1,3 +1,4 @@
+import { CircularProgress } from '@material-ui/core';
 import React, {useState, useEffect, useRef} from 'react';
 import {Icon, Image} from "semantic-ui-react";
 
@@ -56,6 +57,11 @@ function RemoteVideoContainer(props) {
         }).catch((e) => console.log("Video Error:", e));
     }
 
+    function handleVideoError(error) {
+        handleVideoLoss();
+        throw error;
+    }
+
     function handleVideoLoss() {
         if (!videoElement.current.srcObject.active) {
             props.removeStreamFromExternalMediaStreams(props.stream.streamId)
@@ -76,10 +82,12 @@ function RemoteVideoContainer(props) {
     return (
         <div>
             <div className='videoContainer' style={{ height: props.height }}>
-                <video id='videoElement' ref={videoElement} width={ '100%' } onCanPlay={() => setCanPlay(true) } controls={false} muted={props.muted} onEnded={handleVideoLoss} onError={(e) => handleVideoError(e)} onSuspend={handleVideoLoss} playsInline>
+                <video id='videoElement' ref={videoElement} width={ '100%' } onCanPlay={() => setCanPlay(true) } controls={false} muted={props.muted} onEnded={(e) => handleVideoError(e)} onError={handleVideoLoss} onSuspend={handleVideoLoss} playsInline>
                 </video>
                 <div className={ 'loader ' + (canPlay ? 'hidden' : '')}>
-                    <Image src='/loader.gif' style={{ width: '30%', maxWidth: '80px', height: 'auto', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}} />
+                    <div style={{ position: 'absolute', width: '30%', maxWidth: '30px', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
+                        <CircularProgress style={{ maxWidth: '30px', height: 'auto'}} />
+                    </div>
                 </div>
                 <div className={ 'loader clickable ' + (stoppedByUserAgent ? '' : 'hidden')} onClick={(e) => {playVideo(); e.preventDefault();}}>
                     <Icon name='play' size='big' style={{ color: 'white', width: '30%', maxWidth: '80px', height: 'auto', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}} />

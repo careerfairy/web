@@ -1,35 +1,44 @@
-import {Fragment, useState} from 'react'
-import { Icon, Button, Modal, Header } from "semantic-ui-react";
+import React, {Fragment, useState} from 'react'
+import {Button, DialogContentText} from "@material-ui/core";
+import Dialog from "@material-ui/core/Dialog";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogActions from "@material-ui/core/DialogActions";
+import CheckIcon from '@material-ui/icons/Check';
+import ClearIcon from '@material-ui/icons/Clear';
 
-
-function ButtonWithConfirm(props) {
+function ButtonWithConfirm({color, disabled, buttonAction, buttonLabel, confirmDescription, fluid}) {
 
     const [modalOpen, setModalOpen] = useState(false);
 
     function performConfirmAction() {
-        props.buttonAction();
+        buttonAction();
         setModalOpen(false);
     }
 
     return (
         <Fragment>
-            <Button id={props.elementId} color={props.color} onClick={() => setModalOpen(true)} style={props.style} size={props.size} disabled={props.disabled} fluid={props.fluid}>{ props.buttonLabel }</Button>
-            <Modal style={{ zIndex: '9999' }} open={modalOpen} onClose={() => setModalOpen(false)} centered={false}>
-                <Modal.Content>
-                    <Header>Just making sure</Header>
-                    <Modal.Description>
-                        <p>{props.confirmDescription}</p>
-                    </Modal.Description>
-                </Modal.Content>
-                <Modal.Actions>
-                    <Button basic color='grey' onClick={() => setModalOpen(false)}>
-                        <Icon name='remove' /> Cancel
+            <Button style={{background: color}} color="primary" variant="contained" onClick={() => setModalOpen(true)}
+                    disabled={disabled}>{buttonLabel}</Button>
+            <Dialog open={modalOpen} onClose={() => setModalOpen(false)} centered={false}>
+                <DialogTitle>
+                    Just making sure
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        {confirmDescription}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button startIcon={<ClearIcon/>} variant="contained" basic color='grey'
+                            onClick={() => setModalOpen(false)}>
+                        Cancel
                     </Button>
-                    <Button color='teal' onClick={performConfirmAction}>
-                        <Icon name='checkmark'/> Confirm
+                    <Button startIcon={<CheckIcon/>} variant="contained" color="primary" onClick={performConfirmAction}>
+                        Confirm
                     </Button>
-                </Modal.Actions>
-            </Modal>
+                </DialogActions>
+            </Dialog>
         </Fragment>
     );
 }

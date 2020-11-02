@@ -262,11 +262,11 @@ export function LogInFormBase({userEmailNotValidated, absolutePath, setGeneralLo
                                         } : '/signup'}><a> Sign up</a></Link>
                                     </Grid>
                                 </Grid>
-                                <Typography gutterBottom variant="subtitle1" align="center" color="secondary"
+                                <Typography gutterBottom variant="subtitle1" align="center" color="error"
                                             hidden={!errorMessageShown}>
                                     An error occurred while logging in to your account
                                 </Typography>
-                                <Typography gutterBottom variant="subtitle1" align="center" color="secondary"
+                                <Typography gutterBottom variant="subtitle1" align="center" color="error"
                                             hidden={!noAccountMessageShown}>
                                     No account associated with this email address.
                                 </Typography>
