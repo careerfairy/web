@@ -35,6 +35,44 @@ const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
         labels: [],
         datasets: [],
     })
+    const [optionsObj, setOptionsObj] = useState({
+        maintainAspectRatio: true,
+        legend: {
+            display: false,
+        },
+        cutoutPercentage: 70,
+        redraw: true,
+        tooltips: {
+            callbacks: {
+                title: (tooltipItem, data) => {
+                    return data['labels'][tooltipItem[0]['index']];
+                },
+                label: (tooltipItem, data) => {
+                    return data['datasets'][0]['data'][tooltipItem['index']] + " votes";
+                },
+                afterLabel: (tooltipItem, data) => {
+                    const dataset = data['datasets'][0];
+                    const percent = Math.round((dataset['data'][tooltipItem['index']] / dataset["_meta"][0]?.['total']) * 100)
+                    return isNaN(percent) ? "" : '(' + percent + '%)';
+                }
+            },
+            enabled: false
+        }
+    })
+
+    useEffect(() => {
+        setOptionsObj({
+            ...options,
+            plugins: {
+                labels: [{
+                    fontColor: 'white',
+                    render: 'value',
+                    fontStyle: 'bold',
+                    arc: false,
+                }]
+            },
+        })
+    }, [])
 
     useEffect(() => {
         setLegendLabels(options.map(option => ({name: option.name, hidden: false})))
@@ -80,39 +118,6 @@ const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
         chart.update();
     }
 
-    const optionsObj = {
-        maintainAspectRatio: true,
-        legend: {
-            display: false,
-        },
-        plugins: {
-            labels: [{
-                fontColor: 'white',
-                render: 'value',
-                fontStyle: 'bold',
-                arc: false,
-            }]
-        },
-        cutoutPercentage: 70,
-        redraw: true,
-        tooltips: {
-            callbacks: {
-                title: (tooltipItem, data) => {
-                    return data['labels'][tooltipItem[0]['index']];
-                },
-                label: (tooltipItem, data) => {
-                    return data['datasets'][0]['data'][tooltipItem['index']] + " votes";
-                },
-                afterLabel: (tooltipItem, data) => {
-                    const dataset = data['datasets'][0];
-                    const percent = Math.round((dataset['data'][tooltipItem['index']] / dataset["_meta"][0]?.['total']) * 100)
-                    return isNaN(percent) ? "" : '(' + percent + '%)';
-                }
-            },
-            enabled: false
-        }
-    }
-
     const renderLegendElements = legendElements.map((item) => {
         const votesNum = chartData.datasets[0].data[item.index]
         return (
@@ -133,7 +138,7 @@ const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
 
     return (
         <GraphWrapper>
-            <PollQuestion style={{marginTop: "auto", padding: "0 1rem" }}>
+            <PollQuestion style={{marginTop: "auto", padding: "0 1rem"}}>
                 {question}
             </PollQuestion>
             <List dense>
