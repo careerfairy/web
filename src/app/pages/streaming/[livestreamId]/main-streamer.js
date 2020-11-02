@@ -43,7 +43,6 @@ const useStyles = makeStyles((theme) => ({
 function StreamingPage(props) {
     const theme = useTheme()
 
-
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
 
