@@ -17,12 +17,12 @@ const useStyles = makeStyles((theme) => ({
         overflow: "auto",
         position: ({mobile}) => mobile ? "static" : "sticky",
         top: ({mobile}) => mobile ? "auto" : 165,
-        maxHeight: ({mobile}) => mobile? "auto": "calc(100vh - 180px)"
+        maxHeight: ({mobile}) => mobile ? "auto" : "calc(100vh - 180px)"
     },
     actions: {
         display: "flex",
         flexFlow: "column",
-    }, 
+    },
     media: {
         display: "flex",
         justifyContent: "center",
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile}) => {
+const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, hasCategories}) => {
 
     const classes = useStyles({mobile});
     const [grid, setGrid] = useState(null);
@@ -67,40 +67,39 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile})
 
         return (
             <div className={classes.root}>
-                <Card className={classes.card} style={{ padding: '40px 0' }}>
+                <Card className={classes.card} style={{padding: '40px 0'}}>
                     <CardContent>
-                            <div style={{ position: 'relative', padding: '40px', marginBottom: '30px' }}>
-                                <img src={groupData.logoUrl} style={{ maxWidth: '100%' }}
-                                    alt={`${groupData.universityName} logo`}/>
-                            </div>
-                            <div style={{ position: 'relative', padding: '40px', marginBottom: '30px'}}>
-                                <div style={{ marginBottom: '20px', fontWeight: '800'}}>Gewinnspiel gesponsert von:</div>
-                                <img src={murparkLogo} style={{ maxWidth: '70%' }}
-                                    alt={`${groupData.universityName} logo`}/>
-                            </div>
-                            <div style={{ position: 'relative', padding: '40px', marginBottom: '30px'}}>
-                                <div style={{ marginBottom: '20px', fontWeight: '800'}}>Medienpartner:</div>
-                                <img src={soundportalLogo} style={{ maxWidth: '70%' }}
-                                    alt={`${groupData.universityName} logo`}/>
-                            </div>
+                        <div style={{position: 'relative', padding: '40px', marginBottom: '30px'}}>
+                            <img src={groupData.logoUrl} style={{maxWidth: '100%'}}
+                                 alt={`${groupData.universityName} logo`}/>
+                        </div>
+                        <div style={{position: 'relative', padding: '40px', marginBottom: '30px'}}>
+                            <div style={{marginBottom: '20px', fontWeight: '800'}}>Gewinnspiel gesponsert von:</div>
+                            <img src={murparkLogo} style={{maxWidth: '70%'}}
+                                 alt={`${groupData.universityName} logo`}/>
+                        </div>
+                        <div style={{position: 'relative', padding: '40px', marginBottom: '30px'}}>
+                            <div style={{marginBottom: '20px', fontWeight: '800'}}>Medienpartner:</div>
+                            <img src={soundportalLogo} style={{maxWidth: '70%'}}
+                                 alt={`${groupData.universityName} logo`}/>
+                        </div>
                     </CardContent>
                 </Card>
-        </div>
+            </div>
         )
     }
 
     return (
         <div className={classes.root}>
-            {groupData.categories?.length &&
             <Grow in={Boolean(groupData.categories?.length)}>
                 <Card className={classes.card}>
-                    <CardContent>
-                        <CardMedia className={classes.media}>
-                            <div className={classes.imageContainer }>
-                                <img src={groupData.logoUrl} className={classes.image}
-                                    alt={`${groupData.universityName} logo`}/>
-                            </div>
-                        </CardMedia>
+                    <CardMedia className={classes.media}>
+                        <div className={classes.imageContainer}>
+                            <img src={groupData.logoUrl} className={classes.image}
+                                 alt={`${groupData.universityName} logo`}/>
+                        </div>
+                    </CardMedia>
+                    {!!hasCategories() && <CardContent>
                         <Box className={classes.actions}>
                             <SizeMe>{({size}) => (
                                 <StackGrid
@@ -112,18 +111,17 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile})
                                         if (category.name.toLowerCase() !== "level of study") {
                                             return (
                                                 <CategoryCard width={size.width} mobile={mobile} key={category.id}
-                                                    category={category}
-                                                    handleToggleActive={handleToggleActive}/>
+                                                              category={category}
+                                                              handleToggleActive={handleToggleActive}/>
                                             )
                                         }
                                     })}
                                 </StackGrid>
                             )}</SizeMe>
                         </Box>
-                    </CardContent>
+                    </CardContent>}
                 </Card>
             </Grow>
-            }
         </div>
     )
 };
