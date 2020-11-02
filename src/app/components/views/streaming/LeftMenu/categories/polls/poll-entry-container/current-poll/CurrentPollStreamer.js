@@ -1,18 +1,74 @@
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {withFirebase} from 'context/firebase';
-import PollOptionResultViewer from './PollOptionResultViewer';
 import CurrentPollGraph from "../../../../../sharedComponents/CurrentPollGraph";
-import {Button} from "@material-ui/core";
+import {Box, Button, Fab} from "@material-ui/core";
+import Grow from "@material-ui/core/Grow";
+import Tooltip from "@material-ui/core/Tooltip";
+import AllInclusiveIcon from "@material-ui/icons/AllInclusive";
+import Switch from "@material-ui/core/Switch";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
+function getRandomInt(min, max, index) {
+    return (Math.floor((Math.random() * (max - min + 1) + min) / (index + 1)));
+}
+
+// const options = {
+//     labels: options.map(option => option.name),
+//     datasets: [{
+//         label: question,
+//         data: options.map(option => option.votes),
+//         backgroundColor: options.map((option, index) => colorsArray[index]),
+//         hoverBackgroundColor: options.map((option, index) => colorsArray[index])
+//     }],
+// }
+
+// {currentPoll: {options, question}, background}
+const getState = () => ({
+    options: [
+        {
+            index: 0,
+            name: "Our next product",
+            votes: getRandomInt(10, 49)
+        },
+        {
+            index: 1,
+            name: "What our internships look like",
+            votes: getRandomInt(34, 78)
+        },
+        {
+            index: 2,
+            name: "What should we discuss next?",
+            votes: getRandomInt(8, 24)
+        }
+    ],
+    question: "What should we discuss next?"
+});
 
 function CurrentPollStreamer(props) {
     const [currentPoll, setCurrentPoll] = useState(null)
+    const [demoMode, setDemoMode] = useState(false)
+    const [numberOfTimes, setNumberOfTimes] = useState(0)
 
     useEffect(() => {
-        if (props.poll) {
+        if (props.poll && !demoMode) {
             setCurrentPoll(props.poll)
         }
     }, [props.poll])
+
+    useEffect(() => {
+        if (numberOfTimes >= 20) {
+            setDemoMode(false)
+        }
+    }, [numberOfTimes])
+
+    useEffect(() => {
+        if (demoMode) {
+            const interval = setInterval(() => {
+                simulatePollVotes()
+            }, 100);
+            return () => clearInterval(interval)
+        }
+    }, [demoMode])
 
     function setPollState(state) {
         props.firebase.setPollState(props.livestream.id, props.poll.id, state);
@@ -21,22 +77,53 @@ function CurrentPollStreamer(props) {
     let totalVotes = 0;
     props.poll.options.forEach(option => totalVotes += option.votes);
 
-    const optionElements = props.poll.options.map((option, index) => {
-        return (
-            <Fragment key={index}>
-                <PollOptionResultViewer option={option} index={index} totalVotes={totalVotes}/>
-            </Fragment>
-        );
-    });
+    const resetPoll = () => {
+        const newCurrentPoll = {...currentPoll}
+        newCurrentPoll.options = newCurrentPoll.options.map((option, index) => ({
+            ...option,
+            votes: 0
+        }))
+        setCurrentPoll(newCurrentPoll)
+    }
+
+    const simulatePollVotes = () => {
+        const newCurrentPoll = {...currentPoll}
+        newCurrentPoll.options = newCurrentPoll.options.map((option, index) => ({
+            ...option,
+            votes: option.votes += getRandomInt(1, 4, index)
+        }))
+        setNumberOfTimes(count => count + 1)
+        setCurrentPoll(newCurrentPoll)
+    }
+
+    const handleToggle = () => {
+        resetPoll()
+        setNumberOfTimes(0)
+        setDemoMode(!demoMode)
+    }
+
+    const DemoPollsButton = (
+        <Grow in>
+            <Box component={FormControlLabel}
+                 elevation={2}
+                 style={{position: "absolute", top: 0, right: 0}}
+                 labelPlacement="top"
+                 control={<Switch color="secondary" checked={demoMode} onChange={handleToggle} name="Demo Toggle"/>}
+                 label="Demo Polls"
+            />
+        </Grow>
+    )
 
     return (
         <Fragment>
             <div>
                 <div className='chat-entry-container'>
                     <div className='poll-label'>ACTIVE POLL</div>
+                    {DemoPollsButton}
                     {currentPoll && <CurrentPollGraph currentPoll={currentPoll}/>}
-                <Button fullWidth children={'Close Poll'} variant="contained" color="primary" onClick={() => setPollState('closed')}
-                        style={{borderRadius: '0 0 5px 5px', marginTop: 12}}/>
+                    <Button fullWidth children={'Close Poll'} variant="contained" color="primary"
+                            onClick={() => setPollState('closed')}
+                            style={{borderRadius: '0 0 5px 5px', marginTop: 12}}/>
                 </div>
             </div>
             <style jsx>{`
@@ -46,6 +133,7 @@ function CurrentPollStreamer(props) {
                     margin: 10px 10px 0 10px;
                     padding: 12px 0 0 0;
                     background-color: white;
+                    position: relative;
                 }
 
                 .popup {

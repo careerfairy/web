@@ -1,7 +1,6 @@
 import {useState, useEffect, Fragment} from 'react';
 import VolumeUpRoundedIcon from '@material-ui/icons/VolumeUpRounded';
 import PlayArrowRoundedIcon from '@material-ui/icons/PlayArrowRounded';
-
 import {useRouter} from 'next/router';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import {withFirebasePage} from '../../../context/firebase';
@@ -13,8 +12,6 @@ import {useWindowSize} from 'components/custom-hook/useWindowSize';
 import React from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import {fade} from "@material-ui/core";
-import {amber, deepOrange, green, red} from "@material-ui/core/colors";
 import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
 import MiniChatContainer from "../../../components/views/streaming/LeftMenu/categories/chat/MiniChatContainer";
 import EmoteButtons from "../../../components/views/viewer/EmoteButtons";
