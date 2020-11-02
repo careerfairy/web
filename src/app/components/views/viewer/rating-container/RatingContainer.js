@@ -31,37 +31,39 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
         {
             message: "How would you rate this live stream?",
             type: "overall",
-            appearAfter: 1,
-            hasRated: false
+            appearAfter: 20,
+            hasRated: false,
+            isForEnd: false
         },
         {
             message: `How happy are you with the content shared by ${livestream.company}?`,
             type: "company",
-            appearAfter: 2,
-            hasRated: false
+            appearAfter: 30,
+            hasRated: false,
+            isForEnd: false
         },
         {
             message: `After this stream, are you more likely to apply to ${livestream.company}?`,
             type: "willingnessToApply",
-            appearAfter: 3,
-            hasRated: false
+            appearAfter: 25,
+            hasRated: false,
+            isForEnd: true
         },
     ])
 
     useEffect(() => {
-        if (livestream.start) {
-            const interval = setInterval(() => {
-                setMinutesPassed(getMinutesPassed())
-            }, 10 * 1000);// check for minutes passed every 10 seconds
-            return () => clearInterval(interval)
-        }
+        const interval = setInterval(() => {
+            setMinutesPassed(getMinutesPassed())
+        }, 10 * 1000);// check for minutes passed every 10 seconds
+        return () => clearInterval(interval)
+
     }, [livestream.start]);
 
     useEffect(() => {
         if (minutesPassed) {
             handleCheckRatings()
         }
-    }, [minutesPassed])
+    }, [minutesPassed, livestream.hasEnded])
 
     const handleCheckRatings = async () => {
         for (const [index, rating] of ratings.entries()) { // this loop allows for easy async functions along with index
@@ -72,70 +74,25 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
                     newRatings[index].hasRated = true // mark that particular rating as already rated
                     setRatings(newRatings) // set updated ratings with new has rated status
                 } else {
-                    enqueueSnackbar(rating.message, {
-                        variant: "info",
-                        persist: true,
-                        preventDuplicate: true,
-                        key: rating.message,
-                        action: <ActionComponent snackKey={rating.message} firebase={firebase}
-                                                 email={authenticatedUser.email}
-                                                 livestreamId={livestreamId}
-                                                 typeOfRating={rating.type}/>,
-                    })
+                    if ((rating.isForEnd && livestream.hasEnded) || !rating.isForEnd) { // dispatch snackbar if the rating isn't for the end OR is for the end and the livstream has ender
+                        enqueueSnackbar(rating.message, {
+                            variant: "info",
+                            persist: true,
+                            preventDuplicate: true,
+                            key: rating.message,
+                            action: <ActionComponent
+                                snackKey={rating.message}
+                                firebase={firebase}
+                                email={authenticatedUser.email}
+                                livestreamId={livestreamId}
+                                typeOfRating={rating.type}/>,
+                        })
+                    }
                 }
             }
         }
 
     }
-
-    // const handleRatings = async () => {
-    //     if (minutesPassed > 1) {
-    //         const hasRatedOverall = await firebase.checkIfUserRated(livestreamId, authenticatedUser.email, "overall")
-    //         if (!hasRatedOverall) {
-    //             const message = "How would you rate this live stream?"
-    //             enqueueSnackbar(message, {
-    //                 variant: "default",
-    //                 persist: true,
-    //                 preventDuplicate: true,
-    //                 key: message,
-    //                 action: <ActionComponent snackKey={message} firebase={firebase} email={authenticatedUser.email}
-    //                                          livestreamId={livestreamId}
-    //                                          typeOfRating="overall"/>,
-    //             })
-    //         }
-    //     }
-    //     if (minutesPassed > 2) {
-    //         const hasRatedCompany = await firebase.checkIfUserRated(livestreamId, authenticatedUser.email, "company")
-    //         if (!hasRatedCompany) {
-    //             const message = `How happy are you with the content shared by ${livestream.company}?`
-    //             enqueueSnackbar(message, {
-    //                 variant: "default",
-    //                 persist: true,
-    //                 key: message,
-    //                 preventDuplicate: true,
-    //                 action: <ActionComponent snackKey={message} firebase={firebase} email={authenticatedUser.email}
-    //                                          livestreamId={livestreamId}
-    //                                          typeOfRating="company"/>,
-    //             })
-    //         }
-    //     }
-    //     if (minutesPassed > 3) {
-    //
-    //         const hasRatedWillingness = await firebase.checkIfUserRated(livestreamId, authenticatedUser.email, "willingnessToApply")
-    //         if (!hasRatedWillingness) {
-    //             const message = `After this stream, are you more likely to apply to ${livestream.company}?`
-    //             enqueueSnackbar(message, {
-    //                 variant: "default",
-    //                 persist: true,
-    //                 preventDuplicate: true,
-    //                 key: message,
-    //                 action: <ActionComponent snackKey={message} firebase={firebase} email={authenticatedUser.email}
-    //                                          livestreamId={livestreamId}
-    //                                          typeOfRating="willingnessToApply"/>,
-    //             })
-    //         }
-    //     }
-    // }
 
     const getMinutesPassed = () => {
         const now = new Date()

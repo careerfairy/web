@@ -90,10 +90,6 @@ function StreamingPage(props) {
         return new Date(date).getTime() - Date.now() < 1000 * 60 * 2 || Date.now() > new Date(date).getTime();
     }
 
-    function setStreamingStarted(started) {
-        props.firebase.setLivestreamHasStarted(started, currentLivestream.id);
-    }
-
     const toggleShowMenu = () => {
         setShowMenu(!showMenu)
     }
@@ -109,13 +105,6 @@ function StreamingPage(props) {
                         transform: 'translateY(-50%)',
                         verticalAlign: 'middle'
                     }}>
-                        <ButtonWithConfirm
-                            color={currentLivestream.hasStarted ? theme.palette.error.main : theme.palette.primary.main}
-                            fluid
-                            disabled={!streamStartTimeIsNow}
-                            buttonAction={() => setStreamingStarted(!currentLivestream.hasStarted)}
-                            confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'}
-                            buttonLabel={currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming'}/>
                     </div>
                     <div style={{
                         position: 'absolute',
