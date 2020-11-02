@@ -160,6 +160,7 @@ const EmoteButtons =
 
         useEffect(() => {
             if (iconsDisabled) {
+                setProgress(INTERVAL)
                 const timer = setInterval(() => {
                     setProgress((prevProgress) => (prevProgress >= 100 ? INTERVAL : prevProgress + INTERVAL));
                 }, TICK_RATE);
