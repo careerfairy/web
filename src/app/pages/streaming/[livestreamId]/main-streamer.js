@@ -3,7 +3,6 @@ import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import {withFirebasePage} from 'context/firebase';
 import ButtonWithConfirm from 'components/views/common/ButtonWithConfirm';
-import {SnackbarProvider} from 'notistack';
 import {useRouter} from 'next/router';
 import SpeakerManagementModal from 'components/views/streaming/modal/SpeakerManagementModal';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
