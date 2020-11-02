@@ -46,7 +46,6 @@ function CurrentPollStreamer(props) {
                     margin: 10px 10px 0 10px;
                     padding: 12px 0 0 0;
                     background-color: white;
-                    border: 10px solid rgb(0, 210, 170);
                 }
 
                 .popup {
@@ -71,6 +70,7 @@ function CurrentPollStreamer(props) {
                     color: grey;
                     font-weight: 700;
                     text-align: center;
+                    margin-bottom: 10px;
                 }
 
                 .poll-entry-message {

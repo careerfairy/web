@@ -133,21 +133,21 @@ const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
 
     return (
         <GraphWrapper>
-            <PollQuestion style={{marginTop: "auto", padding: "0 0.5rem"}}>
+            <PollQuestion style={{marginTop: "auto", padding: "0 1rem" }}>
                 {question}
             </PollQuestion>
             <List dense>
                 {renderLegendElements}
             </List>
-            <div style={{position: "relative", marginBottom: "auto", padding: "0 0.5rem"}}>
+            <div style={{position: "relative", marginBottom: "auto", padding: "1rem 2rem"}}>
                 <Doughnut
                     data={chartData}
                     ref={chartRef}
-                    width={100}
-                    height={100}
+                    width={1}
+                    height={1}
                     options={optionsObj}/>
                 <CountWrapper>
-                    <Typography variant="h2" style={{fontWeight: 500, lineHeight: 0.6}}
+                    <Typography variant="h3" style={{fontWeight: 500, lineHeight: 0.6, marginBottom: "10px"}}
                                 align="center">{getTotalVotes(options)}</Typography>
                     <Typography variant="h6" align="center">vote{getTotalVotes(options) !== 1 && "s"}</Typography>
                 </CountWrapper>
