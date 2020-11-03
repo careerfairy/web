@@ -121,7 +121,6 @@ function IconsContainer({livestreamId, firebase, isTest}) {
             let count = 0
             const interval = setInterval(() => {
                 count = count + 1
-                console.log("-> count", count);
                 if (count === 10) {
                     setDemoMode(false)
                 }
