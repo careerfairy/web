@@ -61,7 +61,11 @@ function StreamingPage(props) {
     const [joiningStreamerLink, setJoiningStreamerLink] = useState("")
 
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
-    const [streamerStep, setStreamerStep] = useState(0)
+    const [streamerSteps, setStreamerSteps] = useState({
+        generalQAndA: false,
+        answerNow: false,
+        sendReaction: false
+    })
 
     const numberOfViewers = useNumberOfViewers(currentLivestream);
 
@@ -125,7 +129,7 @@ function StreamingPage(props) {
     }
 
     return (
-        <StreamerTutorialContext.Provider value={{streamerStep, setStreamerStep}}>
+        <StreamerTutorialContext.Provider value={{streamerSteps, setStreamerSteps}}>
             <NotificationsContext.Provider value={{setNewNotification, setNotificationToRemove}}>
                 <div>
                     <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>

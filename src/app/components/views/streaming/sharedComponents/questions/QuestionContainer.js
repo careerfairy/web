@@ -13,7 +13,13 @@ import Collapse from "@material-ui/core/Collapse";
 import Card from "@material-ui/core/Card";
 import {PlayIconButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import Paper from "@material-ui/core/Paper";
-import {WhiteTooltip} from "../../../../../materialUI/GlobalTooltips";
+import {
+    TooltipButtonComponent,
+    TooltipText,
+    TooltipTitle,
+    WhiteTooltip
+} from "../../../../../materialUI/GlobalTooltips";
+import StreamerTutorialContext from "../../../../../context/tutorials/StreamerTutorialContext";
 
 const useStyles = makeStyles(theme => ({
     chatInput: {
@@ -83,6 +89,7 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
     const {authenticatedUser, userData} = useContext(UserContext);
+    const {streamerSteps, setStreamerSteps} = useContext(StreamerTutorialContext);
 
     const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream.test)
     const active = question.type === 'current'
@@ -156,7 +163,14 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
     }
 
     const isGeneralOpen = () => {
-        return index === 0
+        return index === 0 && !streamerSteps.generalQAndA
+    }
+
+    const handleGeneral = () => {
+        setStreamerSteps({
+            ...streamerSteps,
+            generalQAndA: true
+        })
     }
 
     const componentDecorator = (href, text, key) => (
@@ -187,14 +201,15 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
         <Grow in>
             <WhiteTooltip
                 arrow
+                interactive
                 placement="right-start"
                 title={
                     <React.Fragment>
-                        <Typography variant="subtitle1" color="inherit">Student Questions</Typography>
-                        <Typography>
+                        <TooltipTitle>Student Questions</TooltipTitle>
+                        <TooltipText>
                             All student questions are posted here
-                        </Typography>
-                        <Button children="Ok" color="primary"/>
+                        </TooltipText>
+                        <TooltipButtonComponent onConfirm={handleGeneral} buttonText="Ok"/>
                     </React.Fragment>
                 } open={isGeneralOpen()}>
                 <Paper className={classes.questionContainer}>
