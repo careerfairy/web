@@ -9,9 +9,7 @@ import {DialogContentText, DialogTitle, Typography, Slide} from "@material-ui/co
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 
-function SpeakerManagementModal({livestreamId, open, setOpen}) {
-
-    const link = `https://careerfairy.io/streaming/${livestreamId}/joining-streamer?pwd=qdhwuiehd7qw789d79w8e8dheiuhiqwdu`;
+function SpeakerManagementModal({open, setOpen, joiningStreamerLink}) {
 
     return (
         <Dialog TransitionComponent={Slide} fullWidth onClose={() => setOpen(false)} open={open}>
@@ -33,7 +31,7 @@ function SpeakerManagementModal({livestreamId, open, setOpen}) {
                     fullWidth
                     autoFocus
                     InputProps={{readOnly: true}}
-                    value={link}
+                    value={joiningStreamerLink}
                 />
             </MuiDialogContent>
             <MuiDialogActions>

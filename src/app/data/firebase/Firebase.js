@@ -673,9 +673,13 @@ class Firebase {
 
     setLivestreamHasStarted = (hasStarted, livestreamId) => {
         let ref = this.firestore.collection("livestreams").doc(livestreamId);
-        return ref.update({
-            hasStarted: hasStarted,
-        });
+        const data = {
+            hasStarted,
+        }
+        if (!hasStarted) {
+            data.hasEnded = true
+        }
+        return ref.update(data);
     };
 
     getLivestreamCareerCenters = (universityIds) => {

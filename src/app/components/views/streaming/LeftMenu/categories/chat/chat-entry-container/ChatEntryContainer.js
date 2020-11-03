@@ -14,6 +14,7 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: ({isMe}) => isMe ? "23px 23px 5px 23px" : "23px 23px 23px 5px",
         maxWidth: "80%",
         width: "max-content",
+        minWidth: 140,
         marginLeft: ({isMe}) => isMe ? "auto" : 8,
         margin: 8,
         padding: "10px 15px",
@@ -29,8 +30,9 @@ const useStyles = makeStyles((theme) => ({
         whiteSpace: "nowrap"
     },
     stamp: {
-        fontSize: "0.8em",
-        marginBottom: 0
+        fontSize: "0.7em",
+        marginBottom: 0,
+        color: "rgb(180,180,180)"
     }
 }));
 

@@ -256,6 +256,16 @@ const NextLivestreams = ({firebase}) => {
         }
     };
 
+
+    const hasCategories = () => {
+        if (groupData?.categories?.length) {
+            const filteredCategories = groupData.categories.filter(category => category.name.toLowerCase() !== "level of study")
+            return filteredCategories.length
+        } else {
+            return 0
+        }
+    }
+
     return (
         <>
             <GroupsCarousel
@@ -273,6 +283,7 @@ const NextLivestreams = ({firebase}) => {
             {mobile ? (
                 <MobileFeed
                     groupData={groupData}
+                    hasCategories={hasCategories}
                     user={authenticatedUser}
                     selectedOptions={selectedOptions}
                     scrollToTop={scrollToTop}
@@ -291,6 +302,7 @@ const NextLivestreams = ({firebase}) => {
                     alreadyJoined={groupData.alreadyJoined}
                     handleToggleActive={handleToggleActive}
                     userData={userData}
+                    hasCategories={hasCategories}
                     listenToUpcoming={listenToUpcoming}
                     livestreamId={livestreamId}
                     searching={searching}
