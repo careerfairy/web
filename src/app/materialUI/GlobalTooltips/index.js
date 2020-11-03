@@ -26,6 +26,20 @@ const useStyles = makeStyles(theme => {
             width: "100%",
             display: "flex",
             justifyContent: "flex-end"
+        },
+        "@-webkit-keyframes blink": {
+            "50%": {
+                borderColor: "#ff0000"
+            }
+        },
+        "@keyframes blink": {
+            "50%": {
+                borderColor: "#ff0000"
+            }
+        },
+        highlight: {
+            animation: "$blink .5s step-end infinite alternate",
+            "-webkit-animation": "$blink .5s step-end infinite alternate",
         }
     }
 })

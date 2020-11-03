@@ -145,6 +145,7 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
     function addNewCommentOnEnter(target) {
         if (target.charCode == 13) {
             addNewComment();
+             isOpen(2) && handleConfirm(2)
         }
     }
 
@@ -207,7 +208,7 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
                     <React.Fragment>
                         <TooltipTitle>Student Questions (1/3)</TooltipTitle>
                         <TooltipText>
-                            All student questions are posted here
+                            All student generated questions can be found here
                         </TooltipText>
                         <TooltipButtonComponent onConfirm={() => handleConfirm(0)} buttonText="Ok"/>
                     </React.Fragment>
@@ -245,7 +246,9 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
                                 <React.Fragment>
                                     <TooltipTitle>Student Questions (3/3)</TooltipTitle>
                                     <TooltipText>
-                                        You or one of your colleagues is also abl to react to the questions via text
+                                        In the recruiter-chat a company HR representative can respond to
+                                        recruiting related questions via text messages
+                                        , try and type a comment.
                                     </TooltipText>
                                 </React.Fragment>
                             } open={isOpen(2)}>
@@ -253,10 +256,7 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
                         <TextField
                             value={newCommentTitle}
                             className={classes.chatInput}
-                            onKeyPress={() => {
-                                addNewCommentOnEnter()
-                                isOpen(2) && handleConfirm(2)
-                            }}
+                            onKeyPress={addNewCommentOnEnter}
                             placeholder='Send a reaction...'
                             fullWidth
                             size="small"
@@ -283,7 +283,8 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
                                 <React.Fragment>
                                     <TooltipTitle>Student Questions (2/3)</TooltipTitle>
                                     <TooltipText>
-                                        If you plan to respond toa question you can click here
+                                        If you would like to let the student know which question
+                                        you are currently answering please click on Answer Now
                                     </TooltipText>
                                     <TooltipButtonComponent onConfirm={() => {
                                         goToThisQuestion(question.id)
