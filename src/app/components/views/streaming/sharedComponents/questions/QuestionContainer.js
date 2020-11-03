@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
         color: ({active}) => active ? "white" : "inherit",
         position: "relative",
         padding: "20px 0 0 0",
-        margin: "10px 10px 0 10px",
+        margin: 10,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -84,7 +84,7 @@ const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
     )
 }
 
-const QuestionContainer = ({user, livestream, streamer, question, questions, firebase, index}) => {
+const QuestionContainer = ({user, livestream, streamer, question, questions, firebase, index, isNextQuestions}) => {
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
@@ -164,7 +164,7 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
     }
 
     const isOpen = (property) => {
-        return streamerSteps.streamerReady && index === 0 && streamerSteps[property]
+        return streamerSteps.streamerReady && index === 0 && streamerSteps[property] && isNextQuestions
     }
 
 

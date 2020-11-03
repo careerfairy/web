@@ -29,15 +29,17 @@ const useStyles = makeStyles(theme => {
         },
         "@-webkit-keyframes blink": {
             "50%": {
-                borderColor: "#ff0000"
+                borderColor: theme.palette.secondary.main
             }
         },
         "@keyframes blink": {
             "50%": {
-                borderColor: "#ff0000"
+                borderColor: theme.palette.secondary.main
             }
         },
         highlight: {
+            borderRadius: 10,
+            border: "4px solid transparent",
             animation: "$blink .5s step-end infinite alternate",
             "-webkit-animation": "$blink .5s step-end infinite alternate",
         }
@@ -48,6 +50,7 @@ export const WhiteTooltip = (
     {
         title,
         children,
+        open,
         ...props
     }) => {
 
@@ -56,11 +59,14 @@ export const WhiteTooltip = (
     return (
         <Tooltip
             arrow
+            open={open}
             interactive
             {...props}
             classes={{arrow: classes.arrow, tooltip: classes.tooltip}}
             title={title}>
-            {children}
+            <div className={open ? classes.highlight : {}}>
+                {children}
+            </div>
         </Tooltip>
     )
 }
