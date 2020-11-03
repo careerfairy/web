@@ -77,7 +77,7 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
 
     const views = [
         <TabPanel key={0} value={value} index={0} dir={theme.direction}>
-            <QuestionCategory streamer={streamer} {...props} livestream={livestream} selectedState={selectedState}/>
+            <QuestionCategory showMenu={showMenu} streamer={streamer} {...props} livestream={livestream} selectedState={selectedState}/>
         </TabPanel>,
         <TabPanel key={1} value={value} index={1} dir={theme.direction}>
             <PollCategory livestream={livestream} selectedState={selectedState} streamer={streamer}/>

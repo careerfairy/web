@@ -84,7 +84,7 @@ const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
     )
 }
 
-const QuestionContainer = ({user, livestream, streamer, question, questions, firebase, index, isNextQuestions, selectedState}) => {
+const QuestionContainer = ({user, livestream, streamer, question, questions, firebase, index, isNextQuestions, selectedState, showMenu}) => {
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
@@ -164,7 +164,7 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
     }
 
     const isOpen = (property) => {
-        return tutorialSteps.streamerReady && index === 0 && tutorialSteps[property] && isNextQuestions && selectedState === "questions"
+        return livestream.test && showMenu && tutorialSteps.streamerReady && index === 0 && tutorialSteps[property] && isNextQuestions && selectedState === "questions"
     }
 
 
