@@ -18,7 +18,10 @@ const useStyles = makeStyles(theme => ({
         position: "absolute",
         top: 3,
         right: 3,
-        background: ({demoMode}) => demoMode ? "white" : theme.palette.secondary.main
+        background: ({demoMode}) => demoMode ? "white" : theme.palette.secondary.main,
+        "&:hover": {
+            background: ({demoMode}) => demoMode ? "white" : theme.palette.secondary.dark,
+        }
     },
     demoIcon: {
         color: ({demoMode}) => demoMode ? theme.palette.secondary.main : "white"
