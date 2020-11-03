@@ -7,47 +7,29 @@ import Tooltip from "@material-ui/core/Tooltip";
 import AllInclusiveIcon from "@material-ui/icons/AllInclusive";
 import Switch from "@material-ui/core/Switch";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+import {makeStyles} from "@material-ui/core/styles";
 
 function getRandomInt(min, max, index) {
     return (Math.floor((Math.random() * (max - min + 1) + min) / (index + 1)));
 }
 
-// const options = {
-//     labels: options.map(option => option.name),
-//     datasets: [{
-//         label: question,
-//         data: options.map(option => option.votes),
-//         backgroundColor: options.map((option, index) => colorsArray[index]),
-//         hoverBackgroundColor: options.map((option, index) => colorsArray[index])
-//     }],
-// }
-
-// {currentPoll: {options, question}, background}
-const getState = () => ({
-    options: [
-        {
-            index: 0,
-            name: "Our next product",
-            votes: getRandomInt(10, 49)
-        },
-        {
-            index: 1,
-            name: "What our internships look like",
-            votes: getRandomInt(34, 78)
-        },
-        {
-            index: 2,
-            name: "What should we discuss next?",
-            votes: getRandomInt(8, 24)
-        }
-    ],
-    question: "What should we discuss next?"
-});
+const useStyles = makeStyles(theme => ({
+    demoFab: {
+        position: "absolute",
+        top: 3,
+        right: 3,
+        background: ({demoMode}) => demoMode ? "white" : theme.palette.secondary.main
+    },
+    demoIcon: {
+        color: ({demoMode}) => demoMode ? theme.palette.secondary.main : "white"
+    }
+}))
 
 function CurrentPollStreamer(props) {
     const [currentPoll, setCurrentPoll] = useState(null)
     const [demoMode, setDemoMode] = useState(false)
     const [numberOfTimes, setNumberOfTimes] = useState(0)
+    const classes = useStyles({demoMode})
 
     useEffect(() => {
         if (props.poll && !demoMode) {
@@ -101,17 +83,24 @@ function CurrentPollStreamer(props) {
         setNumberOfTimes(0)
         setDemoMode(!demoMode)
     }
+    const fab = true
 
-    const DemoPollsButton = (
+    const DemoPollsButton = !fab ? (
         <Grow in>
-            <Box component={FormControlLabel}
-                 elevation={2}
-                 style={{position: "absolute", top: 0, right: 0}}
-                 labelPlacement="top"
-                 control={<Switch color="secondary" checked={demoMode} onChange={handleToggle} name="Demo Toggle"/>}
-                 label="Demo Polls"
+            <FormControlLabel
+                style={{position: "absolute", top: 0, right: 0}}
+                labelPlacement="top"
+                control={<Switch color="secondary" size="small" checked={demoMode} onChange={handleToggle}
+                                 name="Demo Toggle"/>}
+                label="Demo"
             />
         </Grow>
+    ) : (
+        <Tooltip title="Demo Polls">
+            <Fab className={classes.demoFab} onClick={handleToggle} color="secondary" size="small">
+                <AllInclusiveIcon className={classes.demoIcon}/>
+            </Fab>
+        </Tooltip>
     )
 
     return (
