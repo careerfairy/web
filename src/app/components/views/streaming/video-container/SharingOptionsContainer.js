@@ -3,6 +3,9 @@ import {Grid, Icon, Button} from "semantic-ui-react";
 import MicOffIcon from '@material-ui/icons/MicOff';
 import MicIcon from '@material-ui/icons/Mic';
 import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
+import VideocamIcon from '@material-ui/icons/Videocam';
+import VideocamOffIcon from '@material-ui/icons/VideocamOff';
+import SettingsOff from '@material-ui/icons/Settings';
 import HearingIcon from '@material-ui/icons/Hearing';
 import {withFirebasePage} from 'context/firebase';
 import {makeStyles} from "@material-ui/core/styles";
@@ -63,6 +66,7 @@ function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMod
     const classes = useStyles({open});
     const [delayHandler, setDelayHandler] = useState(null)
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
+    const [isVideoInactive, setIsVideoInactive] = useState(false);
 
     const handleMouseEnter = event => {
         clearTimeout(delayHandler)
@@ -87,15 +91,6 @@ function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMod
         setOpen(false);
     };
 
-
-    function setLivestreamMode(mode) {
-        firebase.setLivestreamMode(id, mode);
-    }
-
-    function setLivestreamSpeakerSwitchMode(mode) {
-        firebase.setLivestreamSpeakerSwitchMode(id, mode);
-    }
-
     function toggleMicrophone() {
         if (isLocalMicMuted) {
             webRTCAdaptor.unmuteLocalMic();
@@ -105,19 +100,38 @@ function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMod
         setIsLocalMicMuted(!isLocalMicMuted);
     }
 
+    function toggleVideo() {
+        if (isVideoInactive) {
+            webRTCAdaptor.turnOnLocalCamera();
+        } else {
+            webRTCAdaptor.turnOffLocalCamera();
+        }
+        setIsVideoInactive(!isVideoInactive);
+    }
+
+    function setLivestreamMode(mode) {
+        firebase.setLivestreamMode(id, mode);
+    }
+
+    function setLivestreamSpeakerSwitchMode(mode) {
+        firebase.setLivestreamSpeakerSwitchMode(id, mode);
+    }
+
     const presentMode = mode === "presentation"
     const automaticMode = speakerSwitchMode === "automatic"
 
-    const actions = [
-        {
-            icon: isLocalMicMuted ? <MicOffIcon fontSize="large"/> : <MicIcon fontSize="large" color="primary"/>,
-            name: isLocalMicMuted ? 'Turn mic on' : 'Turn mic off',
-            onClick: toggleMicrophone,
-        }
-    ];
+    const actions = [{
+        icon: isLocalMicMuted ? <MicOffIcon fontSize="large" style={{ color: "red" }}/> : <MicIcon fontSize="large" color="primary"/>,
+        name: isLocalMicMuted ? 'Unmute microphone' : 'Mute microphone',
+        onClick: toggleMicrophone,
+    },{
+        icon: isVideoInactive ? <VideocamIconOff fontSize="large" style={{ color: "red" }}/> : <VideocamIcon fontSize="large" color="primary"/>,
+        name: isVideoInactive ? 'Switch camera on' : 'Switch camera off',
+        onClick: toggleVideo,
+    }];
 
     if (!(viewer || joining)) {
-        actions.push({
+        actions.unshift({
             icon: <HearingIcon fontSize="large" color={automaticMode ? "primary" : "inherit"}/>,
             name: automaticMode ? 'Deactivate automatic speaker Switch' : 'Activate automatic speaker Switch',
             onClick: () => setLivestreamSpeakerSwitchMode(automaticMode ? "manual" : "automatic")
@@ -125,7 +139,15 @@ function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMod
     }
 
     if (!viewer) {
-        actions.push({
+        actions.unshift({
+            icon: <DynamicFeedIcon fontSize="large" color={presentMode ? "primary" : "inherit"}/>,
+            name: presentMode ? 'Stop sharing slides' : 'Share slides',
+            onClick: () => setLivestreamMode(presentMode ? "default" : "presentation")
+        })
+    }
+
+    if (!viewer) {
+        actions.unshift({
             icon: <DynamicFeedIcon fontSize="large" color={presentMode ? "primary" : "inherit"}/>,
             name: presentMode ? 'Stop sharing slides' : 'Share slides',
             onClick: () => setLivestreamMode(presentMode ? "default" : "presentation")

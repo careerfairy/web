@@ -175,7 +175,6 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         if (typeof streamingCallbackObject.onJoinedTheRoom === 'function') {
                             streamingCallbackObject.onJoinedTheRoom(infoObj);
                         }
-                        debugger;
                         if (!isPlayMode) {
                             publishNewStream(this, infoObj);
                         }

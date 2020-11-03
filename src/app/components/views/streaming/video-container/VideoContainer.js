@@ -12,6 +12,7 @@ import SharingOptionsContainer from './SharingOptionsContainer';
 import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
 import ErrorMessageModal from "../modal/StreamPreparationModalV2/ErrorMessageModal";
 import useDevices from 'components/custom-hook/useDevices';
+import VideoControlsContainer from './VideoControlsContainer';
 
 function VideoContainer(props) {
 
@@ -197,10 +198,6 @@ function VideoContainer(props) {
             </div>
             <div className='controls-container'>
                 <SharingOptionsContainer webRTCAdaptor={webRTCAdaptor} currentLivestream={props.currentLivestream}
-                                        viewer={props.viewer} joining={!isMainStreamer}/>
-            </div>
-            <div className='controls-container'>
-                <VideoControlsContainer webRTCAdaptor={webRTCAdaptor} currentLivestream={props.currentLivestream}
                                         viewer={props.viewer} joining={!isMainStreamer}/>
             </div>
             <Modal open={showDisconnectionModal}>
