@@ -17,6 +17,10 @@ const useStyles = makeStyles(theme => ({
         height: 50,
         cursor: "pointer",
         boxShadow: "0 0 8px rgb(120,120,120)",
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
 
     },
     image: {
@@ -35,7 +39,6 @@ const useStyles = makeStyles(theme => ({
         "-moz-transform": ({distance}) => `translateY(${distance}vh)`,
         "-o-transform": ({distance}) => `translateY(${distance}vh)`,
         "-webkit-transform": ({distance}) => `translateY(${distance}vh)`,
-        zIndex: 90, //appear behind the chat box
     },
     demoFab: {
         position: "absolute",
@@ -51,7 +54,11 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const ActionButton = ({icon, right, color, durationTransform}) => {
+
+const ActionButton = React.memo(({icon, right, color, durationTransform, index}) => {
+    if (index === 0) {
+        console.log("--> I was rendered")
+    }
 
     const [distance, setDistance] = useState(0)
     const [opacity, setOpacity] = useState(1)
@@ -63,14 +70,14 @@ const ActionButton = ({icon, right, color, durationTransform}) => {
 
     return (
         <div className={classes.animatedBox}>
-                <RubberBand>
-                    <div className={classes.actionBtn}>
-                        <Image className={classes.image} src={'/' + icon.iconName + '.png'}/>
-                    </div>
-                </RubberBand>
+            <RubberBand>
+                <div className={classes.actionBtn}>
+                    <Image className={classes.image} src={'/' + icon.iconName + '.png'}/>
+                </div>
+            </RubberBand>
         </div>
     )
-}
+})
 
 const randomInteger = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -115,7 +122,7 @@ function IconsContainer({livestreamId, firebase, isTest}) {
     }, [postedIcons]);
 
     useEffect(() => {
-        if (numberOfTimes >= 100) {
+        if (numberOfTimes >= 20) {
             setDemoMode(false)
         }
     }, [numberOfTimes])
@@ -175,6 +182,7 @@ function IconsContainer({livestreamId, firebase, isTest}) {
     let postedIconsElements = filteredIcons.map((icon, index) => {
         return (<ActionButton
                 key={icon.id}
+                index={index}
                 right={getRandomHorizontalPosition(icon, 90)}
                 icon={icon}
                 durationTransform={getRandomDuration(2000, 3000)}
