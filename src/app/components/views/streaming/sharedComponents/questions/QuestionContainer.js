@@ -166,10 +166,16 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
         return index === 0 && !streamerSteps.generalQAndA
     }
 
-    const handleGeneral = () => {
+    const isOpen = (property) => {
+        return index === 0 && !streamerSteps[property]
+    }
+
+
+
+    const handleConfirm = (property) => {
         setStreamerSteps({
             ...streamerSteps,
-            generalQAndA: true
+            [property]: true
         })
     }
 
@@ -200,8 +206,6 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
     return (
         <Grow in>
             <WhiteTooltip
-                arrow
-                interactive
                 placement="right-start"
                 title={
                     <React.Fragment>
@@ -209,9 +213,9 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
                         <TooltipText>
                             All student questions are posted here
                         </TooltipText>
-                        <TooltipButtonComponent onConfirm={handleGeneral} buttonText="Ok"/>
+                        <TooltipButtonComponent onConfirm={() => handleConfirm("generalQAndA")} buttonText="Ok"/>
                     </React.Fragment>
-                } open={isGeneralOpen()}>
+                } open={isOpen("generalQAndA")}>
                 <Paper className={classes.questionContainer}>
                     <div style={{padding: "20px 20px 5px 20px"}}>
                         <div className={classes.upVotes}>

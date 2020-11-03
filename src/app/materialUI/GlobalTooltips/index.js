@@ -41,6 +41,8 @@ export const WhiteTooltip = (
 
     return (
         <Tooltip
+            arrow
+            interactive
             {...props}
             classes={{arrow: classes.arrow, tooltip: classes.tooltip}}
             title={title}>
