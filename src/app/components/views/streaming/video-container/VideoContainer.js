@@ -10,10 +10,10 @@ import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
 import StreamPreparationModal from 'components/views/streaming/modal/StreamPreparationModal';
 import VideoControlsContainer from './VideoControlsContainer';
 
-import StreamerTutorialContext from "../../../../context/tutorials/StreamerTutorialContext";
+import TutorialContext from "../../../../context/tutorials/TutorialContext";
 
 function VideoContainer(props) {
-    const {streamerStep, setStreamerStep} = useContext(StreamerTutorialContext);
+    const {tutorialStep, setTutorialStep} = useContext(TutorialContext);
     const [errorMessage, setErrorMessage] = useState(null);
 
     const [streamerReady, setStreamerReady] = useState(false);

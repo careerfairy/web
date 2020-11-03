@@ -19,7 +19,7 @@ import {
     TooltipTitle,
     WhiteTooltip
 } from "../../../../../materialUI/GlobalTooltips";
-import StreamerTutorialContext from "../../../../../context/tutorials/StreamerTutorialContext";
+import TutorialContext from "../../../../../context/tutorials/TutorialContext";
 
 const useStyles = makeStyles(theme => ({
     chatInput: {
@@ -84,12 +84,12 @@ const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
     )
 }
 
-const QuestionContainer = ({user, livestream, streamer, question, questions, firebase, index, isNextQuestions}) => {
+const QuestionContainer = ({user, livestream, streamer, question, questions, firebase, index, isNextQuestions, selectedState}) => {
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
     const {authenticatedUser, userData} = useContext(UserContext);
-    const {streamerSteps, setStreamerSteps} = useContext(StreamerTutorialContext);
+    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
     const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream.test)
     const active = question.type === 'current'
@@ -164,13 +164,13 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
     }
 
     const isOpen = (property) => {
-        return streamerSteps.streamerReady && index === 0 && streamerSteps[property] && isNextQuestions
+        return tutorialSteps.streamerReady && index === 0 && tutorialSteps[property] && isNextQuestions && selectedState === "questions"
     }
 
 
     const handleConfirm = (property) => {
-        setStreamerSteps({
-            ...streamerSteps,
+        setTutorialSteps({
+            ...tutorialSteps,
             [property]: false,
             [property + 1]: true,
         })

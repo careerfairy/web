@@ -7,10 +7,10 @@ import {Formik} from 'formik';
 import {useSoundMeter} from 'components/custom-hook/useSoundMeter';
 import SoundLevelDisplayer from 'components/views/common/SoundLevelDisplayer';
 import useUserMedia from 'components/custom-hook/useDevices';
-import StreamerTutorialContext from "../../../../context/tutorials/StreamerTutorialContext";
+import TutorialContext from "../../../../context/tutorials/TutorialContext";
 
 function StreamPreparationModal(props) {
-    const {streamerSteps, setStreamerSteps} = useContext(StreamerTutorialContext);
+    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
     const [showAudioVideo, setShowAudioVideo] = useState(false);
     const testVideoRef = useRef(null);
@@ -126,7 +126,7 @@ function StreamPreparationModal(props) {
                     <Button content='Continue' style={{marginTop: '20px'}} primary
                             onClick={() => {
                                 props.setConnectionEstablished(true)
-                                setStreamerSteps({...streamerSteps, streamerReady: true})
+                                setTutorialSteps({...tutorialSteps, streamerReady: true})
                             }}/>
                 </div>
                 <div style={{display: props.errorMessage ? 'block' : 'none'}}>

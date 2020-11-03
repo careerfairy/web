@@ -116,6 +116,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
         return <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} isNextQuestions={showNextQuestions}
                                   livestream={livestream} key={index}
                                   index={index}
+                                  selectedState={selectedState}
                                   questions={upcomingQuestions} question={question} user={authenticatedUser}
                                   userData={userData}/>
 
@@ -125,6 +126,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
         return <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} isNextQuestions={!showNextQuestions}
                                   livestream={livestream} key={index}
                                   index={index}
+                                  selectedState={selectedState}
                                   questions={pastQuestions} question={question} user={authenticatedUser}
                                   userData={userData}/>
     });
