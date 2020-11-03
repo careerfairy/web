@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
         height: "100%"
     },
     tealBackgroundStyles: {
-        backgroundColor: theme.palette.main,
+        backgroundColor: "rgb(0, 210, 170)",
         height: "100%",
         minHeight: "100vh",
         padding: "0 0 40px 0",
@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
         flexDirection: "column"
     },
     themedBackgroundStyles: {
-        backgroundColor: "rgb(0, 210, 170)",
+        backgroundColor: theme.palette.primary.main,
         height: "100%",
         minHeight: "100vh",
         padding: "0 0 40px 0"
@@ -50,7 +50,6 @@ export const GreyBackground = ({...props}) => {
     return <Box className={classes.greyBackgroundStyles} {...props}/>
 }
 
-
 export const DarkBackground = ({...props}) => {
     const classes = useStyles()
     return <Box className={classes.darkBackgroundStyles} {...props}/>
@@ -60,7 +59,6 @@ export const MobileBackground = ({...props}) => {
     const classes = useStyles()
     return <Box className={classes.mobileBackgroundStyles} {...props}/>
 }
-
 
 export const TealBackground = ({...props}) => {
     const classes = useStyles()

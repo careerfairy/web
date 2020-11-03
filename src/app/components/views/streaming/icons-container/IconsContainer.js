@@ -1,16 +1,70 @@
 import {useState, useEffect} from 'react';
-import {Header as SemanticHeader, Image} from "semantic-ui-react";
+import {Image} from "semantic-ui-react";
+import RubberBand from 'react-reveal/RubberBand';
+import {withFirebasePage} from 'context/firebase';
+import React, {memo} from "react";
+import {makeStyles} from "@material-ui/core/styles";
+import Fade from 'react-reveal/Fade';
 
-import { withFirebasePage } from 'context/firebase';
+const useStyles = makeStyles(theme => ({
+    actionBtn: {
+        borderRadius: "50%",
+        backgroundColor: ({color}) => color,
+        width: 50,
+        height: 50,
+        cursor: "pointer",
+        boxShadow: "0 0 8px rgb(120,120,120)",
+        bottom: 0,
+    },
+    image: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '25px'
+    },
+    animatedBox: {
+        transition: ({durationTransform}) => `transform ${durationTransform}ms ease-in, opacity ${durationTransform}ms cubic-bezier(1,0,.83,.67)`,
+        position: "absolute",
+        opacity: ({opacity}) => opacity,
+        right: ({right}) => right,
+        transform: ({distance}) => `translateY(${distance}vh)`,
+        "-moz-transform": ({distance}) => `translateY(${distance}vh)`,
+        "-o-transform": ({distance}) => `translateY(${distance}vh)`,
+        "-webkit-transform": ({distance}) => `translateY(${distance}vh)`,
+    },
+}))
 
-function IconsContainer({ livestreamId, firebase }) {
-    
+const ActionButton = ({icon, right, color, durationBubble, durationTransform}) => {
+
+    const [distance, setDistance] = useState(0)
+    const [opacity, setOpacity] = useState(1)
+    useEffect(() => {
+        setDistance(-100)
+        setOpacity(0)
+    }, [])
+    const classes = useStyles({color, distance, right, durationTransform, opacity})
+
+    return (
+        <div className={classes.animatedBox}>
+            <Fade duration={durationTransform/3}>
+                <RubberBand duration={durationBubble}>
+                    <div className={classes.actionBtn}>
+                        <Image className={classes.image} src={'/' + icon.iconName + '.png'}/>
+                    </div>
+                </RubberBand>
+            </Fade>
+        </div>
+    )
+}
+
+function IconsContainer({livestreamId, firebase}) {
     const [postedIcons, setPostedIcons] = useState([]);
     const [filteredIcons, setFilteredIcons] = useState([]);
 
     useEffect(() => {
         if (livestreamId) {
-            firebase.listenToLivestreamIcons(livestreamId, querySnapshot => {
+            const unsubscribe = firebase.listenToLivestreamIcons(livestreamId, querySnapshot => {
                 let iconsList = [];
                 querySnapshot.forEach(doc => {
                     let icon = doc.data();
@@ -19,17 +73,19 @@ function IconsContainer({ livestreamId, firebase }) {
                 });
                 setPostedIcons(iconsList);
             });
+
+            return () => unsubscribe()
         }
     }, [livestreamId]);
 
     useEffect(() => {
         if (postedIcons.length) {
             if (filteredIcons.length < 250) {
-                if (!filteredIcons.some( icon => icon.id === postedIcons[postedIcons.length - 1].id)) {
+                if (!filteredIcons.some(icon => icon.id === postedIcons[postedIcons.length - 1].id)) {
                     setFilteredIcons([...filteredIcons, postedIcons[postedIcons.length - 1]]);
                 }
             } else {
-                if (!filteredIcons.some( icon => icon.id === postedIcons[postedIcons.length - 1].id)) {
+                if (!filteredIcons.some(icon => icon.id === postedIcons[postedIcons.length - 1].id)) {
                     setFilteredIcons([...filteredIcons.slice(filteredIcons.length - 150), postedIcons[postedIcons.length - 1]]);
                 }
             }
@@ -38,13 +94,13 @@ function IconsContainer({ livestreamId, firebase }) {
 
     function getIconColor(icon) {
         if (icon.iconName === 'like') {
-            return 'red'
+            return '#e01a4f'
         }
         if (icon.iconName === 'clapping') {
-            return 'orange'
+            return '#f15946'
         }
         if (icon.iconName === 'heart') {
-            return 'yellow'
+            return '#f9c22e'
         }
     }
 
@@ -52,54 +108,25 @@ function IconsContainer({ livestreamId, firebase }) {
         return icon.randomPosition * maxDistance;
     }
 
-    let postedIconsElements = filteredIcons.map( (icon, index) => {
-        return (
-            <div key={icon.id} className='animate__animated animate__fadeOutUpBig animate__slower' style={{ position: 'absolute', right: getRandomHorizontalPosition(icon, 90) + 'px' }}>
-                <div className='action-container'>
-                    <div className={'button action-button ' + getIconColor(icon)}>
-                        <Image src={'/' + icon.iconName + '.png'}  style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '25px'}}/>
-                    </div>
-                </div>
-                <style jsx>{`
-                    .animate__animated.animate__fadeOutUpBig {
-                        --animate-duration: 4s;
-                    }
+    function getRandomDuration(min, max) {
+        return Math.random() * (max - min) + min //returns int between min and max
+    }
 
-                    .action-button {
-                        border-radius: 50%;
-                        background-color: rgb(0, 210, 170);
-                        width: 50px;
-                        height: 50px;
-                        cursor: pointer;
-                        box-shadow: 0 0 8px rgb(120,120,120);
-                    }
-
-                    .action-button.red {
-                        background-color: #e01a4f;
-                    }
-
-                    .action-button.orange {
-                        background-color: #f15946;
-                    }
-
-                    .action-button.yellow {
-                        background-color: #f9c22e;
-                    }
-                `}</style>
-            </div>
+    let postedIconsElements = filteredIcons.map((icon, index) => {
+        return (<ActionButton
+                key={icon.id}
+                right={getRandomHorizontalPosition(icon, 90)} icon={icon}
+                durationBubble={getRandomDuration(500, 2000)}
+                durationTransform={getRandomDuration(2000, 3000)}
+                color={getIconColor(icon)}/>
         );
     });
 
     return (
         <div className='topLevelContainer'>
-            <div className='icons-container'>
-                { postedIconsElements }
-            </div>
-            <style jsx>{`
-
-            `}</style>
+            {postedIconsElements}
         </div>
     );
 }
 
-export default withFirebasePage(IconsContainer);
+export default memo(withFirebasePage(IconsContainer));

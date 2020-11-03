@@ -3,7 +3,6 @@ import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import {withFirebasePage} from 'context/firebase';
 import ButtonWithConfirm from 'components/views/common/ButtonWithConfirm';
-import {SnackbarProvider} from 'notistack';
 import {useRouter} from 'next/router';
 import SpeakerManagementModal from 'components/views/streaming/modal/SpeakerManagementModal';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
@@ -44,7 +43,6 @@ const useStyles = makeStyles((theme) => ({
 function StreamingPage(props) {
     const theme = useTheme()
 
-
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
 
@@ -56,10 +54,22 @@ function StreamingPage(props) {
     const [newNotification, setNewNotification] = useState(null);
     const [notificationToRemove, setNotificationToRemove] = useState(null);
     const [notifications, setNotifications] = useState([]);
+    const [joiningStreamerLink, setJoiningStreamerLink] = useState("")
 
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
 
     const numberOfViewers = useNumberOfViewers(currentLivestream);
+
+    useEffect(() => {
+        if (livestreamId) {
+            let baseUrl = "https://careerfairy.io"
+            if (window?.location?.origin) {
+                baseUrl = window.location.origin
+            }
+            const link = `${baseUrl}/streaming/${livestreamId}/joining-streamer?pwd=qdhwuiehd7qw789d79w8e8dheiuhiqwdu`;
+            setJoiningStreamerLink(link)
+        }
+    }, [livestreamId])
 
     useEffect(() => {
         if (livestreamId) {
@@ -103,11 +113,6 @@ function StreamingPage(props) {
 
     function setStreamingStarted(started) {
         props.firebase.setLivestreamHasStarted(started, currentLivestream.id);
-    }
-
-    function openStudentView() {
-        const studentLink = `https://careerfairy.io/streaming/${currentLivestream.id}/viewer`
-        window.open(studentLink, '_blank');
     }
 
     const toggleShowMenu = () => {
@@ -162,7 +167,8 @@ function StreamingPage(props) {
                         {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
                     </div>
                     <Button
-                        onClick={openStudentView}
+                        href={`/streaming/${currentLivestream.id}/viewer`}
+                        target="_blank"
                         children="Open Student View"
                         startIcon={<OpenInBrowserIcon color="inherit"/>}
                         style={{
@@ -206,6 +212,7 @@ function StreamingPage(props) {
                     <NotificationsContainer notifications={notifications}/>
                 </div>
                 <SpeakerManagementModal livestreamId={currentLivestream.id} open={speakerManagementOpen}
+                                        joiningStreamerLink={joiningStreamerLink}
                                         setOpen={setSpeakerManagementOpen}/>
                 <style jsx>{`
                     .top-menu {

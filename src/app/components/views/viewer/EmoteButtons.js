@@ -4,7 +4,7 @@ import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
 import {makeStyles} from "@material-ui/core/styles";
-import {amber, deepOrange, green, grey, red} from "@material-ui/core/colors";
+import {amber, deepOrange, grey, red} from "@material-ui/core/colors";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -160,6 +160,7 @@ const EmoteButtons =
 
         useEffect(() => {
             if (iconsDisabled) {
+                setProgress(INTERVAL)
                 const timer = setInterval(() => {
                     setProgress((prevProgress) => (prevProgress >= 100 ? INTERVAL : prevProgress + INTERVAL));
                 }, TICK_RATE);

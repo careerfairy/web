@@ -83,10 +83,10 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
     const [showAllReactions, setShowAllReactions] = useState(false);
     const {authenticatedUser, userData} = useContext(UserContext);
 
-    const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream.test)
-    const active = question.type === 'current'
-    const old = question.type !== 'new'
-    const upvoted = (!user && !livestream.test) || (question.emailOfVoters ? question.emailOfVoters.indexOf(livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false)
+    const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream?.test)
+    const active = question?.type === 'current'
+    const old = question?.type !== 'new'
+    const upvoted = (!user && !livestream?.test) || (question?.emailOfVoters ? question?.emailOfVoters.indexOf(livestream?.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false)
     const classes = useStyles({active})
 
 
@@ -112,7 +112,7 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
     }, [active, question.type])
 
     function addNewComment() {
-        if (!(newCommentTitle.trim()) || (!userData && !livestream.test && !streamer)) {
+        if (!(newCommentTitle.trim()) || (!userData && !livestream?.test && !streamer)) {
             return;
         }
 
@@ -234,7 +234,7 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
                         size='small'
                         disableElevation
                         disabled={old}
-                        style={{borderRadius: "0 0 5px 5px"}}
+                        style={{borderRadius: "0 0 5px 5px", padding: "10px 0"}}
                         fullWidth
                         color="primary"
                         onClick={() => goToThisQuestion(question.id)}
@@ -244,7 +244,7 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
                         startIcon={<ThumbUpRoundedIcon/>}
                         children={!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
                         size='small'
-                        style={{borderRadius: "0 0 5px 5px"}}
+                        style={{borderRadius: "0 0 5px 5px", padding: "10px 0"}}
                         disableElevation
                         color="primary"
                         fullWidth

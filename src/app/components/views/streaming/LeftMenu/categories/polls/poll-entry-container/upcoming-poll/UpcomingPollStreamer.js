@@ -100,7 +100,7 @@ function UpcomingPollStreamer(props) {
         <Paper style={{margin: 10, position: "relative"}} onMouseEnter={handleSetIsNotEditablePoll}
                onMouseLeave={() => setShowNotEditableMessage(false)}>
             <Box p={2}>
-                <Typography gutterBottom variant="h6">
+                <Typography gutterBottom variant="h6" style={{ margin: "1.5rem 0 0.5rem 0"}}>
                     {props.poll.question}
                 </Typography>
                 <List dense>
@@ -108,9 +108,10 @@ function UpcomingPollStreamer(props) {
                 </List>
                 <IconButton size="small" onClick={handleClick} style={{
                     position: 'absolute',
-                    top: '15px',
-                    right: '20px',
-                    color: 'rgb(200,200,200)'
+                    top: 5,
+                    right: 0,
+                    color: 'rgb(200,200,200)',
+                    zIndex: 301
                 }}>
                     <MoreVertIcon/>
                 </IconButton>

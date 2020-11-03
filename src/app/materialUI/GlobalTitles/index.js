@@ -22,9 +22,7 @@ const useStyles = makeStyles(theme => ({
     pollQuestionStyles: {
         textAlign: "center",
         fontWeight: 500,
-        fontSize: "2.5em",
-        color: theme.palette.primary.main,
-        marginBottom: "35",
+        fontSize: "2.2em",
         overflowWrap: "break-word"
     }
 }))

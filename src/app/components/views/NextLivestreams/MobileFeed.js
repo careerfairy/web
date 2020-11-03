@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, user, livestreams, searching, scrollToTop, livestreamId, careerCenterId, listenToUpcoming, selectedOptions}) => {
+const MobileFeed = ({handleToggleActive, hasCategories, groupData, userData, alreadyJoined, user, livestreams, searching, scrollToTop, livestreamId, careerCenterId, listenToUpcoming, selectedOptions}) => {
     const classes = useStyles();
     const theme = useTheme();
     const router = useRouter()
@@ -122,7 +122,7 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                 >
                     <Tab wrapped value={0}  {...a11yProps(0)} fullWidth
                          label={<Typography variant="h5">Events</Typography>}/>
-                    {groupData.categories ?
+                    {hasCategories() ?
                         <Tab value={1} wrapped fullWidth disabled={!groupData.categories}
                              {...a11yProps(1)}
                              label={<Typography variant="h5">Filter</Typography>}/>
@@ -169,6 +169,7 @@ const MobileFeed = ({handleToggleActive, groupData, userData, alreadyJoined, use
                     <GroupCategories alreadyJoined={alreadyJoined}
                                      groupData={groupData}
                                      user={user}
+                                     hasCategories={hasCategories}
                                      livestreams={livestreams}
                                      userData={userData}
                                      handleToggleActive={handleToggleActive}
