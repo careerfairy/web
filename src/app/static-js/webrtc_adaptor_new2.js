@@ -463,7 +463,6 @@ export function WebRTCAdaptor(initialValues)
     }
     
     this.getLocalStream = function() {
-        debugger;
         return thiz.localStream;
 	}
 

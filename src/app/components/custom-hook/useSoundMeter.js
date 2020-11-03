@@ -17,7 +17,6 @@ export function useSoundMeter(isShowAudioVideo, localStream, update) {
             if (soundMeter) {
                 soundMeter.stop();
             }
-            debugger;
             connectStream(localStream);
         }
     },[localStream, navigator, update]);

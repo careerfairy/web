@@ -8,10 +8,10 @@ import CountdownTimer from 'components/views/common/Countdown';
 import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
 import CurrentSpeakerDisplayer from './CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
-import StreamPreparationModal from 'components/views/streaming/modal/StreamPreparationModal';
-import VideoControlsContainer from './VideoControlsContainer';
+import SharingOptionsContainer from './SharingOptionsContainer';
 import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
 import ErrorMessageModal from "../modal/StreamPreparationModalV2/ErrorMessageModal";
+import useDevices from 'components/custom-hook/useDevices';
 
 function VideoContainer(props) {
 
@@ -20,6 +20,7 @@ function VideoContainer(props) {
     const [connectionEstablished, setConnectionEstablished] = useState(false);
 
     const [isStreaming, setIsStreaming] = useState(false);
+    const [speakerSource, setSpeakerSource] = useState(null);
 
     const [mediaConstraints, setMediaConstraints] = useState({
         audio: true,
@@ -33,6 +34,7 @@ function VideoContainer(props) {
     const [audioCounter, setAudioCounter] = useState(0);
     const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
 
+    const devices = useDevices();
     const localVideoId = 'localVideo';
     const isPlayMode = false;
 
@@ -113,7 +115,6 @@ function VideoContainer(props) {
     useEffect(() => {
         if (isMainStreamer && props.currentLivestream.speakerSwitchMode === 'automatic') {
             let timeout = setTimeout(() => {
-                console.log(audioLevels)
                 if (audioLevels && audioLevels.length > 0) {
                     const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
                     if (maxEntry.audioLevel > 0.05) {
@@ -195,6 +196,10 @@ function VideoContainer(props) {
                 }
             </div>
             <div className='controls-container'>
+                <SharingOptionsContainer webRTCAdaptor={webRTCAdaptor} currentLivestream={props.currentLivestream}
+                                        viewer={props.viewer} joining={!isMainStreamer}/>
+            </div>
+            <div className='controls-container'>
                 <VideoControlsContainer webRTCAdaptor={webRTCAdaptor} currentLivestream={props.currentLivestream}
                                         viewer={props.viewer} joining={!isMainStreamer}/>
             </div>
@@ -212,13 +217,12 @@ function VideoContainer(props) {
             {/*<StreamPreparationModal streamerReady={streamerReady} setStreamerReady={setStreamerReady} localStream={localStream} mediaConstraints={mediaConstraints} connectionEstablished={connectionEstablished} setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage} isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource} videoSource={videoSource} setVideoSource={setVideoSource}/>*/}
             <StreamPreparationModalV2 speakerSource={speakerSource} setSpeakerSource={setSpeakerSource}
                                       streamerReady={streamerReady} setStreamerReady={setStreamerReady}
-                                      localStream={localStream} mediaConstraints={mediaConstraints}
+                                      localStream={localMediaStream} mediaConstraints={mediaConstraints}
                                       connectionEstablished={connectionEstablished}
-                                      attachSinkId={attachSinkId}
+                                      attachSinkId={attachSinkId} devices={devices}
                                       setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
-                                      isStreaming={isStreaming} audioSource={audioSource}
-                                      setAudioSource={setAudioSource} videoSource={videoSource}
-                                      setVideoSource={setVideoSource}/>
+                                      webRTCAdaptor={webRTCAdaptor} streamId={props.streamerId}
+                                      isStreaming={isStreaming}/>
             <ErrorMessageModal isStreaming={isStreaming} connectionEstablished={connectionEstablished}
                                errorMessage={errorMessage} streamerReady={streamerReady}/>
             <style jsx>{`

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { navigator, document } from 'global';
+import window, { navigator, document } from 'global';
 import axios from 'axios';
 import { WebRTCAdaptor } from 'static-js/webrtc_adaptor_new2.js';
 import { WEBRTC_ERRORS } from 'data/errors/StreamingErrors.js';
@@ -18,6 +18,8 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
     const [latestAudioLevel, setLatestAudioLevel] = useState(null);
 
     const [nsToken, setNsToken] = useState(null);
+
+    var isChromium = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
 
     useEffect(() => {
         axios({
@@ -39,21 +41,26 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
 
 
     useEffect(() => {
-        if (document && mediaConstraints && nsToken && nsToken.iceServers) {
-            const adaptor = getWebRTCAdaptor();
-            setWebRTCAdaptor(adaptor);
-        }
-    }, [mediaConstraints, document, nsToken, isPlayMode]);
+        if (!isPlayMode) {
+            if (document && mediaConstraints && nsToken && nsToken.iceServers && roomId && streamId && isChromium) {
+                const adaptor = getWebRTCAdaptor();
+                setWebRTCAdaptor(adaptor);
+            }
+        } else {
+            if (document && mediaConstraints && nsToken && nsToken.iceServers && roomId) {
+                const adaptor = getWebRTCAdaptor();
+                setWebRTCAdaptor(adaptor);
+            }
+        }     
+    }, [mediaConstraints, document, nsToken, isPlayMode, roomId, streamId]);
 
     useEffect(() => {
-        if (webRTCAdaptor && streamerReady) {
+        if (webRTCAdaptor && streamerReady && roomId && streamId) {
             if (!isPlayMode) {
                 webRTCAdaptor.joinRoom(roomId, streamId);
-            } else {
-                webRTCAdaptor.joinRoom(roomId);
-            }
+            } 
         }
-    }, [webRTCAdaptor, streamerReady]);
+    }, [webRTCAdaptor, streamerReady, roomId, streamId]);
 
     useEffect(() => {
         if (latestAudioLevel) {
@@ -156,20 +163,19 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                     case "initialized": {
                         if (typeof streamingCallbackObject.onInitialized === 'function') {
                             streamingCallbackObject.onInitialized(infoObj);
-                        }
+                        }                               
                         if (!isPlayMode) {
-                            this.joinRoom(roomId, streamId);
-                            console.log("joiningTheRoom");
+                            setLocalMediaStream(this.getLocalStream());                        
                         } else {
                             this.joinRoom(roomId);
-                        }                                     
-                        setLocalMediaStream(this.getLocalStream());                        
+                        }
                         break;
                     }
                     case "joinedTheRoom": {
                         if (typeof streamingCallbackObject.onJoinedTheRoom === 'function') {
                             streamingCallbackObject.onJoinedTheRoom(infoObj);
                         }
+                        debugger;
                         if (!isPlayMode) {
                             publishNewStream(this, infoObj);
                         }

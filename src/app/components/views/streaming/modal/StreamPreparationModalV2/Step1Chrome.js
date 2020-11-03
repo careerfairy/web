@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
         marginRight: "5px"
     }
 }));
-const Step1Chrome = ({isCompleted, handleMarkComplete, isChromium}) => {
+const Step1Chrome = ({isCompleted, handleMarkComplete, isChromium, localStream}) => {
     const classes = useStyles()
 
     if (!isChromium) {
@@ -63,9 +63,6 @@ const Step1Chrome = ({isCompleted, handleMarkComplete, isChromium}) => {
             {/*<Typography gutterBottom align="center" variant="h4"><b>Preparation</b></Typography>*/}
             <Typography align="left" variant="subtitle1">Please follow these couple of instructions:</Typography>
             <ul className={classes.list} >
-                <li><Icon name='video' style={{ marginRight: '10px' }}/>Make sure that your browser is authorized to access your webcam and
-                    microphone.
-                </li>
                 <li><Icon name='microphone' style={{ marginRight: '10px' }}/>Make sure that your webcam and/or microphone are not currently used
                     by
                     any other application.
@@ -85,6 +82,10 @@ const Step1Chrome = ({isCompleted, handleMarkComplete, isChromium}) => {
                               />}
                               label={<Typography>I have understood and will follow these instructions</Typography>}
             />
+            {
+                !localStream && 
+                <Typography style={{ margin: '20px auto', textAlign: 'center', color: '#00d2aa', width: '70%', fontWeight: 'bold' }}>Please allow CareerFairy to access your camera and microphone in order to proceed.</Typography>
+            }
             {/*<Button onClick={handleComplete} color="primary" variant="contained" fullWidth>*/}
             {/*    I agree to use Google Chrome as a browser*/}
             {/*</Button>*/}

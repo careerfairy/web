@@ -2,17 +2,21 @@ import {useState, useEffect} from 'react';
 import {navigator} from 'global';
 import {isEmptyArray} from 'formik';
 
-export default function useDevices(showAudioVideo) {
+export default function useDevices() {
 
     const [deviceList, setDeviceList] = useState({audioInputList: [], audioOutputList: [], videoDeviceList: []});
 
     useEffect(() => {
-        if (showAudioVideo && navigator && isEmpty(deviceList)) {
+        if (navigator && isEmpty(deviceList)) {
             navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
+            navigator.mediaDevices.ondevicechange = () => {
+                navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
+            }
         }
-    }, [showAudioVideo])
+    },[]);
 
     function gotDevices(deviceInfos) {
+        
         let audioInputList = [];
         let audioOutputList = [];
         let videoDeviceList = [];

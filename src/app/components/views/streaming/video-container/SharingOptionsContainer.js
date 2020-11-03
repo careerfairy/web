@@ -241,4 +241,4 @@ function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMod
         );
 }
 
-export default withFirebasePage(VideoControlsContainer);
+export default withFirebasePage(SharingOptionsContainer);

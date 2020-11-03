@@ -12,8 +12,6 @@ import {
     Button, useMediaQuery, useTheme
 } from '@material-ui/core'
 import {useSoundMeter} from 'components/custom-hook/useSoundMeter';
-import SoundLevelDisplayer from 'components/views/common/SoundLevelDisplayer';
-import useUserMedia from 'components/custom-hook/useDevices';
 import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
 import Step1Chrome from "./Step1Chrome";
@@ -51,39 +49,56 @@ const StreamPreparationModalV2 = ({
                                       connectionEstablished,
                                       setConnectionEstablished,
                                       isStreaming,
-                                      audioSource,
-                                      setAudioSource,
                                       errorMessage,
-                                      videoSource,
-                                      setVideoSource,
                                       setSpeakerSource,
                                       speakerSource,
+                                      webRTCAdaptor,
+                                      devices,
+                                      streamId,
                                       attachSinkId
                                   }) => {
     const classes = useStyles()
     const theme = useTheme()
+
     const [showAudioVideo, setShowAudioVideo] = useState(false);
+    const [audioSource, setAudioSource] = useState(null);
+    const [videoSource, setVideoSource] = useState(null);
+    const [value, setValue] = useState(0);
+
     const [playSound, setPlaySound] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
     const [completed, setCompleted] = useState(new Set());
     const [skipped, setSkipped] = useState(new Set());
-    const devices = useUserMedia(activeStep);
-    const audioLevel = useSoundMeter(showAudioVideo, localStream);
+    const audioLevel = useSoundMeter(showAudioVideo, localStream, value);
     const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
-
     const steps = getSteps();
 
     useEffect(() => {
-        if (!audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
-            setAudioSource(devices.audioInputList[0].value);
-        }
-        if (!audioSource && devices.audioOutputList && devices.audioOutputList.length > 0) {
-            setSpeakerSource(devices.audioOutputList[0].value);
-        }
-        if (!videoSource && devices.videoDeviceList && devices.videoDeviceList.length > 0) {
-            setVideoSource(devices.videoDeviceList[0].value);
-        }
-    }, [devices]);
+        if (localStream) {
+            if (devices.audioInputList && devices.audioInputList.length > 0 && (!audioSource || !devices.audioInputList.some(device => device.value === audioSource))) {
+                updateAudioSource(devices.audioInputList[0].value)
+            }
+            if (devices.videoDeviceList && devices.videoDeviceList.length > 0 && (!videoSource || !devices.videoDeviceList.some(device => device.value === videoSource))) {
+                updateVideoSource(devices.videoDeviceList[0].value)
+            }
+            if (devices.audioOutputList && devices.audioOutputList.length > 0 && (!speakerSource || !devices.audioOutputList.some(device => device.value === speakerSource))) {
+                setSpeakerSource(devices.audioOutputList[0].value);
+            }
+        }   
+    },[devices, localStream]);
+
+    function updateAudioSource(deviceId) {
+        webRTCAdaptor.switchAudioInputSource(streamId, deviceId)
+        setAudioSource(deviceId);
+        setTimeout(() => {
+            setValue(value + 1);
+        }, 500);
+    }
+
+    function updateVideoSource(deviceId) {
+        webRTCAdaptor.switchVideoCameraCapture(streamId, deviceId)
+        setVideoSource(deviceId);
+    }
 
     const totalSteps = () => {
         return getSteps().length;
@@ -183,6 +198,9 @@ const StreamPreparationModalV2 = ({
     };
 
     const isStepComplete = (step) => {
+        if (step === 0) {
+            return completed.has(step) && localStream;
+        }
         return completed.has(step);
     }
 
@@ -203,7 +221,8 @@ const StreamPreparationModalV2 = ({
         switch (stepIndex) {
             case 0:
                 return <Step1Chrome handleMarkComplete={handleMarkComplete}
-                                    isChromium={isChromium}
+                                    isChromium={isChromium}                                    
+                                    localStream={localStream}
                                     isCompleted={isCompleted()}/>;
             case 1:
                 return <Step2Camera audioLevel={audioLevel}
@@ -214,10 +233,10 @@ const StreamPreparationModalV2 = ({
                                     isCompleted={isCompleted()}
                                     localStream={localStream}
                                     playSound={playSound}
-                                    setAudioSource={setAudioSource}
+                                    setAudioSource={updateAudioSource}
                                     setPlaySound={setPlaySound}
                                     setStreamerReady={setStreamerReady}
-                                    setVideoSource={setVideoSource}
+                                    setVideoSource={updateVideoSource}
                                     videoSource={videoSource}/>;
             case 2:
                 return <Step3Speakers setSpeakerSource={setSpeakerSource}
@@ -229,7 +248,7 @@ const StreamPreparationModalV2 = ({
                                       localStream={localStream}
                                       speakerSource={speakerSource}/>
             case 3:
-                return <Step4Mic setAudioSource={setAudioSource}
+                return <Step4Mic setAudioSource={updateAudioSource}
                                  audioLevel={audioLevel}
                                  devices={devices}
                                  attachSinkId={attachSinkId}
