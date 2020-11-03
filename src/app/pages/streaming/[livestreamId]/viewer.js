@@ -283,7 +283,7 @@ function ViewerPage({firebase}) {
                     toggleShowMenu={toggleShowMenu}/>
             </div>
             <div className='icons-container'>
-                <IconsContainer livestreamId={currentLivestream.id}/>
+                <IconsContainer isTest={currentLivestream.test} livestreamId={currentLivestream.id}/>
             </div>
             {currentLivestream && <RatingContainer livestreamId={currentLivestream.id}
                               livestream={currentLivestream}/>}

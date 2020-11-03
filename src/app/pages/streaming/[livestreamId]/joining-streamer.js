@@ -144,7 +144,7 @@ function StreamingPage(props) {
                     <MiniChatContainer livestream={currentLivestream} isStreamer={true}/>
                 </div>
                 <div className='icons-container'>
-                    <IconsContainer livestreamId={currentLivestream.id}/>
+                    <IconsContainer isTest={currentLivestream.test} livestreamId={currentLivestream.id}/>
                 </div>
                 <div className='notifications-container'>
                     <NotificationsContainer notifications={notifications}/>

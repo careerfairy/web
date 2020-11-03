@@ -5,6 +5,10 @@ import {withFirebasePage} from 'context/firebase';
 import React, {memo} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import Fade from 'react-reveal/Fade';
+import {v4 as uuidv4} from "uuid";
+import Tooltip from "@material-ui/core/Tooltip";
+import {Fab} from "@material-ui/core";
+import AllInclusiveIcon from "@material-ui/icons/AllInclusive";
 
 const useStyles = makeStyles(theme => ({
     actionBtn: {
@@ -33,6 +37,18 @@ const useStyles = makeStyles(theme => ({
         "-o-transform": ({distance}) => `translateY(${distance}vh)`,
         "-webkit-transform": ({distance}) => `translateY(${distance}vh)`,
     },
+    demoFab: {
+        position: "absolute",
+        bottom: 3,
+        right: 3,
+        background: ({demoMode}) => demoMode ? "white" : theme.palette.secondary.main,
+        "&:hover": {
+            background: ({demoMode}) => demoMode ? "white" : theme.palette.secondary.dark,
+        }
+    },
+    demoIcon: {
+        color: ({demoMode}) => demoMode ? theme.palette.secondary.main : "white"
+    }
 }))
 
 const ActionButton = ({icon, right, color, durationBubble, durationTransform}) => {
@@ -47,7 +63,7 @@ const ActionButton = ({icon, right, color, durationBubble, durationTransform}) =
 
     return (
         <div className={classes.animatedBox}>
-            <Fade duration={durationTransform/3}>
+            <Fade duration={durationTransform / 3}>
                 <RubberBand duration={durationBubble}>
                     <div className={classes.actionBtn}>
                         <Image className={classes.image} src={'/' + icon.iconName + '.png'}/>
@@ -58,12 +74,27 @@ const ActionButton = ({icon, right, color, durationBubble, durationTransform}) =
     )
 }
 
-function IconsContainer({livestreamId, firebase}) {
+const icon = {
+    id: uuidv4(),
+    iconName: "clap",
+    randomPosition: 23
+}
+
+const randomInteger = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+const emotes = ["clapping", "like", "heart"]
+
+function IconsContainer({livestreamId, firebase, isTest}) {
     const [postedIcons, setPostedIcons] = useState([]);
     const [filteredIcons, setFilteredIcons] = useState([]);
+    console.log("-> filteredIcons", filteredIcons);
+    const [demoMode, setDemoMode] = useState(false)
+    const [numberOfTimes, setNumberOfTimes] = useState(0)
+    const classes = useStyles({demoMode})
 
     useEffect(() => {
-        if (livestreamId) {
+        if (livestreamId && !demoMode) {
             const unsubscribe = firebase.listenToLivestreamIcons(livestreamId, querySnapshot => {
                 let iconsList = [];
                 querySnapshot.forEach(doc => {
@@ -76,7 +107,7 @@ function IconsContainer({livestreamId, firebase}) {
 
             return () => unsubscribe()
         }
-    }, [livestreamId]);
+    }, [livestreamId, demoMode]);
 
     useEffect(() => {
         if (postedIcons.length) {
@@ -92,6 +123,21 @@ function IconsContainer({livestreamId, firebase}) {
         }
     }, [postedIcons]);
 
+    useEffect(() => {
+        if (numberOfTimes >= 100) {
+            setDemoMode(false)
+        }
+    }, [numberOfTimes])
+
+    useEffect(() => {
+        if (demoMode) {
+            const interval = setInterval(() => {
+                simulateEmotes()
+            }, 200);
+            return () => clearInterval(interval)
+        }
+    }, [demoMode])
+
     function getIconColor(icon) {
         if (icon.iconName === 'like') {
             return '#e01a4f'
@@ -102,6 +148,29 @@ function IconsContainer({livestreamId, firebase}) {
         if (icon.iconName === 'heart') {
             return '#f9c22e'
         }
+    }
+
+    const simulateEmotes = () => {
+        const newPostedIcons = [...postedIcons]
+        const index = randomInteger(1, 3)
+        newPostedIcons.push({
+            id: uuidv4(),
+            iconName: emotes[index - 1],
+            randomPosition: Math.random()
+        })
+        setNumberOfTimes(count => count + 1)
+        setPostedIcons(newPostedIcons)
+    }
+
+    const handleToggle = () => {
+        resetIcons()
+        setNumberOfTimes(0)
+        setDemoMode(!demoMode)
+    }
+
+    const resetIcons = () => {
+        const newPostedIcons = [...postedIcons]
+        setPostedIcons(newPostedIcons)
     }
 
     function getRandomHorizontalPosition(icon, maxDistance) {
@@ -122,8 +191,17 @@ function IconsContainer({livestreamId, firebase}) {
         );
     });
 
+    const DemoPollsButton = isTest ? (
+        <Tooltip title="Demo Emotes">
+            <Fab className={classes.demoFab} onClick={handleToggle} color="secondary" size="small">
+                <AllInclusiveIcon className={classes.demoIcon}/>
+            </Fab>
+        </Tooltip>
+    ) : null
+
     return (
-        <div className='topLevelContainer'>
+        <div style={{position: "relative"}} className='topLevelContainer'>
+            {DemoPollsButton}
             {postedIconsElements}
         </div>
     );

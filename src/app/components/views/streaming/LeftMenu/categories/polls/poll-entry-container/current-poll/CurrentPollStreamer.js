@@ -86,25 +86,14 @@ function CurrentPollStreamer(props) {
         setNumberOfTimes(0)
         setDemoMode(!demoMode)
     }
-    const fab = true
 
-    const DemoPollsButton = !fab ? (
-        <Grow in>
-            <FormControlLabel
-                style={{position: "absolute", top: 0, right: 0}}
-                labelPlacement="top"
-                control={<Switch color="secondary" size="small" checked={demoMode} onChange={handleToggle}
-                                 name="Demo Toggle"/>}
-                label="Demo"
-            />
-        </Grow>
-    ) : (
+    const DemoPollsButton = props.livestream.test ? (
         <Tooltip title="Demo Polls">
             <Fab className={classes.demoFab} onClick={handleToggle} color="secondary" size="small">
                 <AllInclusiveIcon className={classes.demoIcon}/>
             </Fab>
         </Tooltip>
-    )
+    ) : null
 
     return (
         <Fragment>
