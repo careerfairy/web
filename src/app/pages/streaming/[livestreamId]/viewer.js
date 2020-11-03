@@ -359,7 +359,7 @@ function ViewerPage({firebase}) {
                 .mini-chat-container {
                     position: absolute;
                     bottom: 0;
-                    right: 120px;
+                    right: 0;
                     width: 20%;
                     min-width: 250px;
                     z-index: 7250;
