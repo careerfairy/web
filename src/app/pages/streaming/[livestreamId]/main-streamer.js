@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, Fragment} from 'react';
 import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import {withFirebasePage} from 'context/firebase';
@@ -38,7 +38,10 @@ const useStyles = makeStyles((theme) => ({
         height: "calc(100% - 55px)",
         zIndex: 10,
         backgroundColor: "black",
-    }
+    },
+    typography: {
+        padding: theme.spacing(2),
+    },
 }));
 
 function StreamingPage(props) {
