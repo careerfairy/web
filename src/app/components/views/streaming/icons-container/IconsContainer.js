@@ -56,10 +56,6 @@ const useStyles = makeStyles(theme => ({
 
 
 const ActionButton = React.memo(({icon, right, color, durationTransform, index}) => {
-    if (index === 0) {
-        console.log("--> I was rendered")
-    }
-
     const [distance, setDistance] = useState(0)
     const [opacity, setOpacity] = useState(1)
     useEffect(() => {
@@ -88,7 +84,6 @@ function IconsContainer({livestreamId, firebase, isTest}) {
     const [postedIcons, setPostedIcons] = useState([]);
     const [filteredIcons, setFilteredIcons] = useState([]);
     const [demoMode, setDemoMode] = useState(false)
-    const [numberOfTimes, setNumberOfTimes] = useState(0)
     const classes = useStyles({demoMode})
 
     useEffect(() => {
@@ -122,14 +117,14 @@ function IconsContainer({livestreamId, firebase, isTest}) {
     }, [postedIcons]);
 
     useEffect(() => {
-        if (numberOfTimes >= 20) {
-            setDemoMode(false)
-        }
-    }, [numberOfTimes])
-
-    useEffect(() => {
         if (demoMode) {
+            let count = 0
             const interval = setInterval(() => {
+                count = count + 1
+                console.log("-> count", count);
+                if (count === 10) {
+                    setDemoMode(false)
+                }
                 simulateEmotes()
             }, 200);
             return () => clearInterval(interval)
@@ -156,13 +151,11 @@ function IconsContainer({livestreamId, firebase, isTest}) {
             iconName: emotes[index - 1],
             randomPosition: Math.random()
         })
-        setNumberOfTimes(count => count + 1)
         setPostedIcons(newPostedIcons)
     }
 
     const handleToggle = () => {
         resetIcons()
-        setNumberOfTimes(0)
         setDemoMode(!demoMode)
     }
 
