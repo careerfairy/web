@@ -18,7 +18,7 @@ const useStyles = makeStyles(theme => ({
         height: 50,
         cursor: "pointer",
         boxShadow: "0 0 8px rgb(120,120,120)",
-        bottom: 0,
+
     },
     image: {
         position: 'absolute',
@@ -36,6 +36,7 @@ const useStyles = makeStyles(theme => ({
         "-moz-transform": ({distance}) => `translateY(${distance}vh)`,
         "-o-transform": ({distance}) => `translateY(${distance}vh)`,
         "-webkit-transform": ({distance}) => `translateY(${distance}vh)`,
+        zIndex: 90, //appear behind the chat box
     },
     demoFab: {
         position: "absolute",
@@ -63,8 +64,10 @@ const ActionButton = ({icon, right, color, durationBubble, durationTransform}) =
 
     return (
         <div className={classes.animatedBox}>
-            <Fade duration={durationTransform / 3}>
-                <RubberBand duration={durationBubble}>
+            <Fade duration={durationTransform / 10}>
+                <RubberBand
+                    // duration={durationBubble}
+                >
                     <div className={classes.actionBtn}>
                         <Image className={classes.image} src={'/' + icon.iconName + '.png'}/>
                     </div>
@@ -72,12 +75,6 @@ const ActionButton = ({icon, right, color, durationBubble, durationTransform}) =
             </Fade>
         </div>
     )
-}
-
-const icon = {
-    id: uuidv4(),
-    iconName: "clap",
-    randomPosition: 23
 }
 
 const randomInteger = (min, max) => {
@@ -88,7 +85,6 @@ const emotes = ["clapping", "like", "heart"]
 function IconsContainer({livestreamId, firebase, isTest}) {
     const [postedIcons, setPostedIcons] = useState([]);
     const [filteredIcons, setFilteredIcons] = useState([]);
-    console.log("-> filteredIcons", filteredIcons);
     const [demoMode, setDemoMode] = useState(false)
     const [numberOfTimes, setNumberOfTimes] = useState(0)
     const classes = useStyles({demoMode})
