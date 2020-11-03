@@ -4,15 +4,14 @@ import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => {
     return {
-        root: {
+        tooltip: {
             backgroundColor: theme.palette.common.white,
             color: theme.palette.common.black,
             boxShadow: theme.shadows[1],
             fontSize: 11,
         },
         arrow: {
-            backgroundColor: theme.palette.common.white,
-            boxShadow: theme.shadows[1],
+            color: theme.palette.common.white,
         }
     }
 })
@@ -29,8 +28,7 @@ export const WhiteTooltip = (
     return (
         <Tooltip
             {...props}
-            classes={{arrow: classes.arrow}}
-            className={classes.root}
+            classes={{arrow: classes.arrow, tooltip: classes.tooltip}}
             title={title}>
             {children}
         </Tooltip>

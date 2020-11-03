@@ -115,6 +115,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
     let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
         return <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} appear={showNextQuestions}
                                   livestream={livestream} key={index}
+                                  index={index}
                                   questions={upcomingQuestions} question={question} user={authenticatedUser}
                                   userData={userData}/>
 
@@ -123,6 +124,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
     let pastQuestionsElements = pastQuestions.map((question, index) => {
         return <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} appear={!showNextQuestions}
                                   livestream={livestream} key={index}
+                                  index={index}
                                   questions={pastQuestions} question={question} user={authenticatedUser}
                                   userData={userData}/>
     });
