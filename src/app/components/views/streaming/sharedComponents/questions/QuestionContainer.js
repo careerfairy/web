@@ -163,7 +163,7 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
     }
 
     const isOpen = (property) => {
-        return index === 0 && streamerSteps[property]
+        return streamerSteps.streamerReady && index === 0 && streamerSteps[property]
     }
 
 
