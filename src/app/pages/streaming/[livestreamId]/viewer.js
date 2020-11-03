@@ -174,10 +174,10 @@ function ViewerPage({firebase}) {
     }
 
     function postIcon(iconName) {
+        let email = currentLivestream.test ? 'streamerEmail' : authenticatedUser.email;
+        firebase.postIcon(currentLivestream.id, iconName, email);
         if (!iconsDisabled) {
             setIconsDisabled(true);
-            let email = currentLivestream.test ? 'streamerEmail' : authenticatedUser.email;
-            firebase.postIcon(currentLivestream.id, iconName, email);
         }
     }
 

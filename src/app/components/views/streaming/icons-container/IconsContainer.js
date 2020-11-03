@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
     },
 }))
 
-const ActionButton = ({icon, right, color, durationBubble, durationTransform}) => {
+const ActionButton = ({icon, right, color, durationTransform}) => {
 
     const [distance, setDistance] = useState(0)
     const [opacity, setOpacity] = useState(1)
@@ -47,13 +47,11 @@ const ActionButton = ({icon, right, color, durationBubble, durationTransform}) =
 
     return (
         <div className={classes.animatedBox}>
-            <Fade duration={durationTransform/3}>
-                <RubberBand duration={durationBubble}>
-                    <div className={classes.actionBtn}>
-                        <Image className={classes.image} src={'/' + icon.iconName + '.png'}/>
-                    </div>
-                </RubberBand>
-            </Fade>
+            <RubberBand>
+                <div className={classes.actionBtn}>
+                    <Image className={classes.image} src={'/' + icon.iconName + '.png'}/>
+                </div>
+            </RubberBand>
         </div>
     )
 }
@@ -116,8 +114,7 @@ function IconsContainer({livestreamId, firebase}) {
         return (<ActionButton
                 key={icon.id}
                 right={getRandomHorizontalPosition(icon, 90)} icon={icon}
-                durationBubble={getRandomDuration(500, 2000)}
-                durationTransform={getRandomDuration(2000, 3000)}
+                durationTransform={getRandomDuration(3500, 4200)}
                 color={getIconColor(icon)}/>
         );
     });

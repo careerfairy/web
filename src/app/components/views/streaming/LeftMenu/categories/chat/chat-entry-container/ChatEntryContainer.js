@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
     stamp: {
         fontSize: "0.7em",
         marginBottom: 0,
-        color: "rgb(180,180,180)"
+        color: ({isMe, isStreamer}) => isMe || isStreamer ? "white" : "rgb(180,180,180)",
     }
 }));
 
