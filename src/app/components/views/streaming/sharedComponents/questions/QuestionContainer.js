@@ -83,10 +83,10 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
     const [showAllReactions, setShowAllReactions] = useState(false);
     const {authenticatedUser, userData} = useContext(UserContext);
 
-    const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream.test)
-    const active = question.type === 'current'
-    const old = question.type !== 'new'
-    const upvoted = (!user && !livestream.test) || (question.emailOfVoters ? question.emailOfVoters.indexOf(livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false)
+    const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream?.test)
+    const active = question?.type === 'current'
+    const old = question?.type !== 'new'
+    const upvoted = (!user && !livestream?.test) || (question?.emailOfVoters ? question?.emailOfVoters.indexOf(livestream?.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false)
     const classes = useStyles({active})
 
 
@@ -112,7 +112,7 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
     }, [active, question.type])
 
     function addNewComment() {
-        if (!(newCommentTitle.trim()) || (!userData && !livestream.test && !streamer)) {
+        if (!(newCommentTitle.trim()) || (!userData && !livestream?.test && !streamer)) {
             return;
         }
 
