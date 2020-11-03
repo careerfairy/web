@@ -162,20 +162,16 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
         }
     }
 
-    const isGeneralOpen = () => {
-        return index === 0 && !streamerSteps.generalQAndA
-    }
-
     const isOpen = (property) => {
-        return index === 0 && !streamerSteps[property]
+        return index === 0 && streamerSteps[property]
     }
-
 
 
     const handleConfirm = (property) => {
         setStreamerSteps({
             ...streamerSteps,
-            [property]: true
+            [property]: false,
+            [property + 1]: true,
         })
     }
 
@@ -209,13 +205,13 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
                 placement="right-start"
                 title={
                     <React.Fragment>
-                        <TooltipTitle>Student Questions</TooltipTitle>
+                        <TooltipTitle>Student Questions (1/3)</TooltipTitle>
                         <TooltipText>
                             All student questions are posted here
                         </TooltipText>
-                        <TooltipButtonComponent onConfirm={() => handleConfirm("generalQAndA")} buttonText="Ok"/>
+                        <TooltipButtonComponent onConfirm={() => handleConfirm(0)} buttonText="Ok"/>
                     </React.Fragment>
-                } open={isOpen("generalQAndA")}>
+                } open={isOpen(0)}>
                 <Paper className={classes.questionContainer}>
                     <div style={{padding: "20px 20px 5px 20px"}}>
                         <div className={classes.upVotes}>
@@ -243,11 +239,24 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
                             setShowAllReactions={setShowAllReactions}
                             showAllReactions={showAllReactions}/>}
                     </div>
+                    <WhiteTooltip
+                            placement="right-start"
+                            title={
+                                <React.Fragment>
+                                    <TooltipTitle>Student Questions (3/3)</TooltipTitle>
+                                    <TooltipText>
+                                        You or one of your colleagues is also abl to react to the questions via text
+                                    </TooltipText>
+                                </React.Fragment>
+                            } open={isOpen(2)}>
                     <Box p={1}>
                         <TextField
                             value={newCommentTitle}
                             className={classes.chatInput}
-                            onKeyPress={addNewCommentOnEnter}
+                            onKeyPress={() => {
+                                addNewCommentOnEnter()
+                                isOpen(2) && handleConfirm(2)
+                            }}
                             placeholder='Send a reaction...'
                             fullWidth
                             size="small"
@@ -256,26 +265,48 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
                                 maxLength: 340,
                                 endAdornment: <PlayIconButton
                                     isEmpty={isEmpty}
-                                    addNewComment={addNewComment}/>,
+                                    addNewComment={() => {
+                                        addNewComment()
+                                        isOpen(2) && handleConfirm(2)
+                                    }}/>,
                             }}
                             onChange={(event) => {
                                 setNewCommentTitle(event.currentTarget.value)
                             }}
                         />
                     </Box>
+                    </WhiteTooltip>
                     {streamer ?
-                        <Button
-                            startIcon={<ThumbUpRoundedIcon/>}
-                            children={active ? "Answering" : old ? "Answered" : "Answer Now"}
-                            size='small'
-                            disableElevation
-                            disabled={old}
-                            style={{borderRadius: "0 0 5px 5px", padding: "10px 0"}}
-                            fullWidth
-                            color="primary"
-                            onClick={() => goToThisQuestion(question.id)}
-                            variant="contained"
-                        />
+                        <WhiteTooltip
+                            placement="right-start"
+                            title={
+                                <React.Fragment>
+                                    <TooltipTitle>Student Questions (2/3)</TooltipTitle>
+                                    <TooltipText>
+                                        If you plan to respond toa question you can click here
+                                    </TooltipText>
+                                    <TooltipButtonComponent onConfirm={() => {
+                                        goToThisQuestion(question.id)
+                                        handleConfirm(1)
+                                    }} buttonText="Ok"/>
+                                </React.Fragment>
+                            } open={isOpen(1)}>
+                            <Button
+                                startIcon={<ThumbUpRoundedIcon/>}
+                                children={active ? "Answering" : old ? "Answered" : "Answer Now"}
+                                size='small'
+                                disableElevation
+                                disabled={old}
+                                style={{borderRadius: "0 0 5px 5px", padding: "10px 0"}}
+                                fullWidth
+                                color="primary"
+                                onClick={() => {
+                                    goToThisQuestion(question.id)
+                                    isOpen(1) && handleConfirm(1)
+                                }}
+                                variant="contained"
+                            />
+                        </WhiteTooltip>
                         : <Button
                             startIcon={<ThumbUpRoundedIcon/>}
                             children={!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
