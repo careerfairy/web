@@ -4,7 +4,6 @@ import RubberBand from 'react-reveal/RubberBand';
 import {withFirebasePage} from 'context/firebase';
 import React, {memo} from "react";
 import {makeStyles} from "@material-ui/core/styles";
-import Fade from 'react-reveal/Fade';
 import {v4 as uuidv4} from "uuid";
 import Tooltip from "@material-ui/core/Tooltip";
 import {Fab} from "@material-ui/core";
@@ -64,7 +63,6 @@ const ActionButton = ({icon, right, color, durationBubble, durationTransform}) =
 
     return (
         <div className={classes.animatedBox}>
-            <Fade duration={durationTransform / 10}>
                 <RubberBand
                     // duration={durationBubble}
                 >
@@ -72,7 +70,6 @@ const ActionButton = ({icon, right, color, durationBubble, durationTransform}) =
                         <Image className={classes.image} src={'/' + icon.iconName + '.png'}/>
                     </div>
                 </RubberBand>
-            </Fade>
         </div>
     )
 }
