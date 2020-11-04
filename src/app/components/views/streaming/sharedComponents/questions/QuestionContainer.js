@@ -250,6 +250,7 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
                                         recruiting related questions via text messages
                                         , try and type a comment.
                                     </TooltipText>
+                                    <TooltipButtonComponent onConfirm={() => handleConfirm(2)} buttonText="Ok"/>
                                 </React.Fragment>
                             } open={isOpen(2)}>
                     <Box p={1}>

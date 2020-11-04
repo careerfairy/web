@@ -1,4 +1,4 @@
-import React, {useState, Fragment} from 'react';
+import React, {useState, Fragment, useContext} from 'react';
 import EditIcon from '@material-ui/icons/Edit';
 import {withFirebase} from 'context/firebase';
 import PollCreationModal from '../../poll-creation-modal/PollCreationModal';
@@ -9,6 +9,17 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import Paper from "@material-ui/core/Paper";
 import {colorsArray} from "../../../../../../../util/colors";
+import TutorialContext from "../../../../../../../../context/tutorials/TutorialContext";
+import {
+    TooltipButtonComponent,
+    TooltipText,
+    TooltipTitle,
+    WhiteTooltip
+} from "../../../../../../../../materialUI/GlobalTooltips";
+import {
+    CategoryContainerTopAligned,
+    QuestionContainerHeader
+} from "../../../../../../../../materialUI/GlobalContainers";
 
 const Overlay = withStyles(theme => ({
     root: {
@@ -43,12 +54,13 @@ const ListNumber = withStyles(theme => ({
     }
 }))(Box)
 
-function UpcomingPollStreamer(props) {
+function UpcomingPollStreamer({firebase, somePollIsCurrent, livestream, poll, showMenu, selectedState, index}) {
 
     const [editPoll, setEditPoll] = useState(false);
     const [showNotEditableMessage, setShowNotEditableMessage] = useState(false);
 
     const [anchorEl, setAnchorEl] = useState(null);
+    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -81,6 +93,20 @@ function UpcomingPollStreamer(props) {
     let totalVotes = 0;
     props.poll.options.forEach(option => totalVotes += option.votes);
 
+    const isOpen = (property) => {
+        return livestream.test && index === 0 && showMenu && tutorialSteps.streamerReady && tutorialSteps[property] && selectedState === "polls"
+    }
+    console.log("-> isOpen(4)", isOpen(4));
+
+
+    const handleConfirm = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
+    }
+
     const optionElements = props.poll.options.map((option, index) => {
         return (
             <ListItem disableGutters dense key={index}>
@@ -97,51 +123,63 @@ function UpcomingPollStreamer(props) {
     });
 
     return (
-        <Paper style={{margin: 10, position: "relative"}} onMouseEnter={handleSetIsNotEditablePoll}
-               onMouseLeave={() => setShowNotEditableMessage(false)}>
-            <Box p={2}>
-                <Typography gutterBottom variant="h6" style={{ margin: "1.5rem 0 0.5rem 0"}}>
-                    {props.poll.question}
-                </Typography>
-                <List dense>
-                    {optionElements}
-                </List>
-                <IconButton size="small" onClick={handleClick} style={{
-                    position: 'absolute',
-                    top: 5,
-                    right: 0,
-                    color: 'rgb(200,200,200)',
-                    zIndex: 301
-                }}>
-                    <MoreVertIcon/>
-                </IconButton>
-                <Menu onClose={handleClose} anchorEl={anchorEl} open={Boolean(anchorEl)}>
-                    <MenuItem dense onClick={handleOpenPollModal}>
-                        <ListItemIcon>
-                            <EditIcon/>
-                        </ListItemIcon>
-                        <ListItemText primary="Edit"/>
-                    </MenuItem>
-                    <MenuItem dense onClick={deletePoll}>
-                        <ListItemIcon>
-                            <CloseRounded/>
-                        </ListItemIcon>
-                        <ListItemText primary="Delete"/>
-                    </MenuItem>
-                </Menu>
-            </Box>
-            <Button fullWidth disableElevation variant="contained" color="primary"
-                    children={'Ask the Audience Now'} disabled={props.somePollIsCurrent}
-                    onClick={() => setPollState('current')}
-                    style={{borderRadius: '0 0 5px 5px'}}/>
-            {showNotEditableMessage && <Overlay>
-                <div>
-                    Please close the active poll before activating this one.
-                </div>
-            </Overlay>}
-            <PollCreationModal livestreamId={props.livestream.id} initialPoll={props.poll} open={editPoll}
-                               handleClose={() => setEditPoll(false)}/>
-        </Paper>
+       <WhiteTooltip
+                    placement="right-start"
+                    title={
+                        <React.Fragment>
+                            <TooltipTitle>Polls (1/3)</TooltipTitle>
+                            <TooltipText>
+                                You are able to Generate Polls for in order to gage the audience
+                            </TooltipText>
+                            <TooltipButtonComponent onConfirm={() => handleConfirm(4)} buttonText="Ok"/>
+                        </React.Fragment>
+                    } open={isOpen(4)}>
+            <Paper style={{margin: 10, position: "relative"}} onMouseEnter={handleSetIsNotEditablePoll}
+                   onMouseLeave={() => setShowNotEditableMessage(false)}>
+                <Box p={2}>
+                    <Typography gutterBottom variant="h6" style={{margin: "1.5rem 0 0.5rem 0"}}>
+                        {props.poll.question}
+                    </Typography>
+                    <List dense>
+                        {optionElements}
+                    </List>
+                    <IconButton size="small" onClick={handleClick} style={{
+                        position: 'absolute',
+                        top: 5,
+                        right: 0,
+                        color: 'rgb(200,200,200)',
+                        zIndex: 301
+                    }}>
+                        <MoreVertIcon/>
+                    </IconButton>
+                    <Menu onClose={handleClose} anchorEl={anchorEl} open={Boolean(anchorEl)}>
+                        <MenuItem dense onClick={handleOpenPollModal}>
+                            <ListItemIcon>
+                                <EditIcon/>
+                            </ListItemIcon>
+                            <ListItemText primary="Edit"/>
+                        </MenuItem>
+                        <MenuItem dense onClick={deletePoll}>
+                            <ListItemIcon>
+                                <CloseRounded/>
+                            </ListItemIcon>
+                            <ListItemText primary="Delete"/>
+                        </MenuItem>
+                    </Menu>
+                </Box>
+                <Button fullWidth disableElevation variant="contained" color="primary"
+                        children={'Ask the Audience Now'} disabled={props.somePollIsCurrent}
+                        onClick={() => setPollState('current')}
+                        style={{borderRadius: '0 0 5px 5px'}}/>
+                {showNotEditableMessage && <Overlay>
+                    <div>
+                        Please close the active poll before activating this one.
+                    </div>
+                </Overlay>}
+                <PollCreationModal livestreamId={props.livestream.id} initialPoll={props.poll} open={editPoll}
+                                   handleClose={() => setEditPoll(false)}/>
+            </Paper>
+        </WhiteTooltip>
     );
 }
 

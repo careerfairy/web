@@ -40,13 +40,9 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
     }, [livestream.id]);
 
     const somePollIsCurrent = pollEntries.some(poll => poll.state === 'current');
-
     const isOpen = (property) => {
         return livestream.test && showMenu && tutorialSteps.streamerReady && tutorialSteps[property] && selectedState === "polls"
     }
-    console.log("-> isOpen(4)", isOpen(4));
-
-
     const handleConfirm = (property) => {
         setTutorialSteps({
             ...tutorialSteps,
@@ -54,12 +50,19 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
             [property + 1]: true,
         })
     }
-
     const pollElements = pollEntries.filter(poll => poll.state !== 'closed').map((poll, index) => {
         return (
             <Fragment key={index}>
-                <PollEntryContainer poll={poll} streamer={streamer} user={user} userData={userData}
-                                    livestream={livestream} somePollIsCurrent={somePollIsCurrent}/>
+                <PollEntryContainer
+                    selectedState={selectedState}
+                    showMenu={showMenu}
+                    poll={poll}
+                    index={index}
+                    streamer={streamer}
+                    user={user}
+                    userData={userData}
+                    livestream={livestream}
+                    somePollIsCurrent={somePollIsCurrent}/>
             </Fragment>
         );
     });
@@ -89,19 +92,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
                 </WhiteTooltip>
             </QuestionContainerHeader>
             <div style={{width: "100%"}}>
-                <WhiteTooltip
-                    placement="right-start"
-                    title={
-                        <React.Fragment>
-                            <TooltipTitle>Polls (1/3)</TooltipTitle>
-                            <TooltipText>
-                                You are able to Generate Polls for in order to gage the audience
-                            </TooltipText>
-                            <TooltipButtonComponent onConfirm={() => handleConfirm(4)} buttonText="Ok"/>
-                        </React.Fragment>
-                    } open={isOpen(4)}>
-                    {pollElements}
-                </WhiteTooltip>
+                {pollElements}
             </div>
             <PollCreationModal livestreamId={livestream.id} open={addNewPoll} initialPoll={null}
                                initialOptions={null} handleClose={() => setAddNewPoll(false)}/>
