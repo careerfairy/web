@@ -18,29 +18,29 @@ const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
             authorEmail: 'john@ethz.ch',
             authorName: 'John C',
             message: 'Hello!',
-            timestamp: props.firebase.getFirebaseTimestamp('March 17, 2020 03:24:00')
+            timestamp: firebase.getFirebaseTimestamp('March 17, 2020 03:24:00')
         }, {
             authorEmail: 'marco@ethz.ch',
             authorName: 'Marco D',
             message: 'Thank you for having us!',
-            timestamp: props.firebase.getFirebaseTimestamp('March 17, 2020 03:34:00')
+            timestamp: firebase.getFirebaseTimestamp('March 17, 2020 03:34:00')
         }, {
             authorEmail: 'david@ethz.ch',
             authorName: 'David P',
             message: 'Hi there!',
-            timestamp: props.firebase.getFirebaseTimestamp('March 17, 2020 03:44:00')
+            timestamp: firebase.getFirebaseTimestamp('March 17, 2020 03:44:00')
         }];
         const testQuestionsEntries = [{
             author: 'john@ethz.ch',
             type: 'new',
             title: 'What is your interview process like?',
-            timestamp: props.firebase.getFirebaseTimestamp('March 17, 2020 03:24:00'),
+            timestamp: firebase.getFirebaseTimestamp('March 17, 2020 03:24:00'),
             votes: 24
         }, {
             author: 'john@ethz.ch',
             type: 'new',
             title: 'How has the company changed due to COVID?',
-            timestamp: props.firebase.getFirebaseTimestamp('March 17, 2020 03:34:00'),
+            timestamp: firebase.getFirebaseTimestamp('March 17, 2020 03:34:00'),
             votes: 20
         }];
         const testPolls = [{
@@ -59,7 +59,7 @@ const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
                 name: 'Our personal story',
                 votes: 0
             }],
-            timestamp: props.firebase.getFirebaseTimestamp('March 17, 2020 03:24:00'),
+            timestamp: firebase.getFirebaseTimestamp('March 17, 2020 03:24:00'),
             voters: []
         }];
         try {
@@ -86,7 +86,7 @@ const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
                     Would you like to partake in the tutorial?
                 </DialogContentText>
                 <DialogActions>
-                    <Button onClick={handleStartDemo} startIcon={<CircularProgress size={20} color="inherit"/>}
+                    <Button onClick={handleStartDemo} startIcon={loading && <CircularProgress size={20} color="inherit"/>}
                             disabled={loading}
                             variant="contained" color="primary">
                         Yes Please
