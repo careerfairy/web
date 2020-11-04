@@ -212,6 +212,7 @@ function VideoContainer(props) {
             <StreamPreparationModal streamerReady={streamerReady} setStreamerReady={setStreamerReady}
                                     localStream={localStream} mediaConstraints={mediaConstraints}
                                     connectionEstablished={connectionEstablished}
+                                    handleOpenDemoIntroModal={handleOpenDemoIntroModal}
                                     setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
                                     isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource}
                                     videoSource={videoSource} setVideoSource={setVideoSource}/>

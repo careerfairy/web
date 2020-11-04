@@ -2,15 +2,12 @@ import React, {useState, useEffect, useRef, useContext} from 'react';
 
 import {withFirebase} from 'context/firebase';
 import {Modal, Input, Icon, Button, Form, Image, Grid, Dropdown} from 'semantic-ui-react';
-import {Formik} from 'formik';
 
 import {useSoundMeter} from 'components/custom-hook/useSoundMeter';
 import SoundLevelDisplayer from 'components/views/common/SoundLevelDisplayer';
 import useUserMedia from 'components/custom-hook/useDevices';
-import TutorialContext from "../../../../context/tutorials/TutorialContext";
 
 function StreamPreparationModal(props) {
-    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
     const [showAudioVideo, setShowAudioVideo] = useState(false);
     const testVideoRef = useRef(null);
@@ -126,7 +123,7 @@ function StreamPreparationModal(props) {
                     <Button content='Continue' style={{marginTop: '20px'}} primary
                             onClick={() => {
                                 props.setConnectionEstablished(true)
-                                setTutorialSteps({...tutorialSteps, streamerReady: true})
+                                props.handleOpenDemoIntroModal()
                             }}/>
                 </div>
                 <div style={{display: props.errorMessage ? 'block' : 'none'}}>

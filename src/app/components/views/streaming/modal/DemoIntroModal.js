@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {withFirebase} from "../../../../context/firebase";
 import Dialog from "@material-ui/core/Dialog";
 import {Button, DialogContentText} from "@material-ui/core";
@@ -6,8 +6,11 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import TutorialContext from "../../../../context/tutorials/TutorialContext";
 
 const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
+
+    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
     const [loading, setLoading] = useState(false)
 
     const createTestLivestream = async () => {
@@ -62,7 +65,7 @@ const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
         try {
             setLoading(true);
             await firebase.resetTestStream(livestreamId, testChatEntries, testQuestionsEntries, testPolls)
-            // close modal and start demo mode..
+            setTutorialSteps({...tutorialSteps, streamerReady: true})
             handleClose() // handleClose should trigger some emotes
         } catch (e) {
             console.log(e)
