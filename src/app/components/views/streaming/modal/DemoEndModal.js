@@ -23,6 +23,11 @@ const DemoEndModal = ({open, handleClose}) => {
         setActivePage(prevState => prevState + 1)
     }
 
+    const handleDownload = () => {
+        setHasClickedDownload(true)
+        handleNext()
+    }
+
     const handleComplete = () => {
         handleNext()
         setTutorialSteps({
@@ -68,7 +73,7 @@ const DemoEndModal = ({open, handleClose}) => {
                         <Button
                             download
                             href={pdfLink}
-                            onClick={handleNext}
+                            onClick={handleDownload}
                             children={'Download Analytics'}
                             startIcon={<CloudDownloadIcon/>}
                             color={"primary"}/>
