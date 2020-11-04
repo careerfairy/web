@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const initialTutorialState = {
+export const initialTutorialState = {
     0: true,
     1: false,
     2: false,

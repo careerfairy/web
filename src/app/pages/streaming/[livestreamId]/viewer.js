@@ -17,6 +17,7 @@ import MiniChatContainer from "../../../components/views/streaming/LeftMenu/cate
 import EmoteButtons from "../../../components/views/viewer/EmoteButtons";
 import RatingContainer from "../../../components/views/viewer/rating-container/RatingContainer";
 import TutorialContext from "../../../context/tutorials/TutorialContext";
+import {initialTutorialState} from "./main-streamer";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -69,16 +70,8 @@ function ViewerPage({firebase}) {
     const [open, setOpen] = React.useState(true);
     const [delayHandler, setDelayHandler] = useState(null)
 
-    const [tutorialSteps, setTutorialSteps] = useState({
-        streamerReady: true,
-        0: true,
-        1: false,
-        2: false,
-        3: false,
-        4: false,
-        5: false,
-        6: false,
-    })
+    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
+    const [showBubbles, setShowBubbles] = useState(false)
 
 
     const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
@@ -218,7 +211,7 @@ function ViewerPage({firebase}) {
     }
 
     return (
-        <TutorialContext.Provider value={{tutorialSteps, setTutorialSteps}}>
+         <TutorialContext.Provider value={{tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles}}>
             <div className={classes.root}>
                 <div className='top-menu'>
                     <div className='top-menu-left'>
