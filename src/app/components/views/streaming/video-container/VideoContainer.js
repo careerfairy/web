@@ -13,6 +13,17 @@ import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPr
 import ErrorMessageModal from "../modal/StreamPreparationModalV2/ErrorMessageModal";
 import useDevices from 'components/custom-hook/useDevices';
 import VideoControlsContainer from './VideoControlsContainer';
+import { makeStyles } from '@material-ui/core';
+
+const useStyles = makeStyles((theme) => ({
+    blackFrame: {
+        position: "absolute",                
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+    }
+}));
 
 function VideoContainer(props) {
 
@@ -34,6 +45,8 @@ function VideoContainer(props) {
 
     const [audioCounter, setAudioCounter] = useState(0);
     const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
+    const [showRightMenu, setShowRightMenu] = useState(true);
+    const classes = useStyles({showRightMenu});
 
     const devices = useDevices();
     const localVideoId = 'localVideo';
@@ -128,16 +141,6 @@ function VideoContainer(props) {
         }
     }, [audioCounter, props.currentLivestream.speakerSwitchMode]);
 
-    useEffect(() => {
-        if (webRTCAdaptor) {
-            if (props.currentLivestream.mode === 'desktop') {
-                webRTCAdaptor.switchDesktopCaptureWithCamera(props.streamerId);
-            } else {
-                webRTCAdaptor.switchVideoCameraCapture(props.streamerId);
-            }
-        }
-    }, [props.currentLivestream.mode]);
-
     function setLivestreamCurrentSpeakerId(id) {
         props.firebase.setLivestreamCurrentSpeakerId(props.currentLivestream.id, id);
     }
@@ -167,7 +170,7 @@ function VideoContainer(props) {
 
     return (
         <Fragment>
-            <div className='screen-container'>
+            <div className={classes.blackFrame}>
                 <div>
                     <CurrentSpeakerDisplayer isPlayMode={false} 
                         smallScreenMode={props.currentLivestream.mode === 'presentation'} 
@@ -187,7 +190,7 @@ function VideoContainer(props) {
                 { props.currentLivestream.mode === 'presentation' ?
                     <SmallStreamerVideoDisplayer 
                         isPlayMode={false} 
-                        localStream={localMediaStream} 
+                        localStream={localMediaStream} rn
                         streams={externalMediaStreams} 
                         mediaConstraints={mediaConstraints} 
                         livestreamId={props.currentLivestream.id} 
@@ -195,10 +198,14 @@ function VideoContainer(props) {
                         presenter={true}/>
                     : null
                 }
-            </div>
-            <div className='controls-container'>
-                <SharingOptionsContainer webRTCAdaptor={webRTCAdaptor} currentLivestream={props.currentLivestream}
-                                        viewer={props.viewer} joining={!isMainStreamer}/>
+                <SharingOptionsContainer webRTCAdaptor={webRTCAdaptor} 
+                    currentLivestream={props.currentLivestream}
+                    viewer={props.viewer} 
+                    streamerId={props.streamerId}
+                    joining={!isMainStreamer}
+                    showRightMenu={showRightMenu}
+                    setShowRightMenu={setShowRightMenu}
+                    />
             </div>
             <Modal open={showDisconnectionModal}>
                 <Modal.Header>You have been disconnected</Modal.Header>
@@ -229,6 +236,7 @@ function VideoContainer(props) {
                     bottom: 0;
                     left: 0;
                     right: 0;
+                    border: 2px solid red;
                 }
 
                 .button-container {

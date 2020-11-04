@@ -5,7 +5,7 @@ import MicIcon from '@material-ui/icons/Mic';
 import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
-import SettingsOff from '@material-ui/icons/Settings';
+import SettingsIcon from '@material-ui/icons/Settings';
 import HearingIcon from '@material-ui/icons/Hearing';
 import {withFirebasePage} from 'context/firebase';
 import {makeStyles} from "@material-ui/core/styles";
@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMode}, webRTCAdaptor, viewer, joining, firebase}) {
+function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMode}, webRTCAdaptor, streamerId, viewer, joining, setShowRightMenu, showRightMenu, firebase}) {
     const DELAY = 3000; //3 seconds
     const [open, setOpen] = useState(true);
     const classes = useStyles({open});
@@ -125,7 +125,7 @@ function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMod
         name: isLocalMicMuted ? 'Unmute microphone' : 'Mute microphone',
         onClick: toggleMicrophone,
     },{
-        icon: isVideoInactive ? <VideocamIconOff fontSize="large" style={{ color: "red" }}/> : <VideocamIcon fontSize="large" color="primary"/>,
+        icon: isVideoInactive ? <VideocamOffIcon fontSize="large" style={{ color: "red" }}/> : <VideocamIcon fontSize="large" color="primary"/>,
         name: isVideoInactive ? 'Switch camera on' : 'Switch camera off',
         onClick: toggleVideo,
     }];
@@ -148,9 +148,9 @@ function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMod
 
     if (!viewer) {
         actions.unshift({
-            icon: <DynamicFeedIcon fontSize="large" color={presentMode ? "primary" : "inherit"}/>,
-            name: presentMode ? 'Stop sharing slides' : 'Share slides',
-            onClick: () => setLivestreamMode(presentMode ? "default" : "presentation")
+            icon: <SettingsIcon fontSize="large"/>,
+            name: "Settings",
+            onClick: () => setShowRightMenu(!showRightMenu)
         })
     }
 
