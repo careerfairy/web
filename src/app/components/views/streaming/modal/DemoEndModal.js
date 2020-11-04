@@ -44,7 +44,7 @@ const DemoEndModal = ({open, handleClose}) => {
                         willingly give their details by clicking on the button
                         Join Talent pool below (this will button will be present on their UI).
                     </DialogContentText>
-                    <Box display="flex" flexFlow="column" alignItems="center" style={{width: "100%"}} my={2}>
+                    <Box display="flex" flexDirection="column" alignItems="center" style={{width: "100%"}} my={2}>
                         <Button
                             onClick={handleClickJoinTalentPool}
                             children={hasJoinedTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
@@ -52,7 +52,7 @@ const DemoEndModal = ({open, handleClose}) => {
                             startIcon={<PeopleAltIcon/>}
                             color={hasJoinedTalentPool ? "default" : "primary"}/>
                         <Collapse in={hasJoinedTalentPool}>
-                            <Typography color="primary">
+                            <Typography algin="center" color="primary">
                                 Thanks for joining the talent pool!
                             </Typography>
                         </Collapse>
