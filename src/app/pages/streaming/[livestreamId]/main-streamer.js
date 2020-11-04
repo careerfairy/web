@@ -45,8 +45,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const initialTutorialState = {
-    streamerReady: false,
-    showBubbles: false,
     0: true,
     1: false,
     2: false,
@@ -62,6 +60,13 @@ const initialTutorialState = {
     12: false,
     13: false,
     14: false,
+    streamerReady: false,
+    showBubbles: false,
+    callback: (setCallback, property, object) => setCallback({
+        ...object,
+        [property]: false,
+        [property + 1]: true,
+    }),
 }
 
 function StreamingPage(props) {
