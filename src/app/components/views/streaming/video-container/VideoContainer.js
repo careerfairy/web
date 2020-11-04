@@ -11,10 +11,12 @@ import StreamPreparationModal from 'components/views/streaming/modal/StreamPrepa
 import VideoControlsContainer from './VideoControlsContainer';
 
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
+import DemoIntroModal from "../modal/DemoIntroModal";
 
 function VideoContainer(props) {
     const {tutorialStep, setTutorialStep} = useContext(TutorialContext);
     const [errorMessage, setErrorMessage] = useState(null);
+    const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
 
     const [streamerReady, setStreamerReady] = useState(false);
     const [connectionEstablished, setConnectionEstablished] = useState(false);
@@ -153,6 +155,16 @@ function VideoContainer(props) {
         location.reload();
     }
 
+    const handleCloseDemoIntroModal = () => {
+        setShowDemoIntroModal(false)
+        // then trigger some bubbles
+    }
+
+    const handleOpenDemoIntroModal = () => {
+        setShowDemoIntroModal(true)
+        // then trigger some bubbles
+    }
+
     return (
         <Fragment>
             <div className='screen-container'>
@@ -203,6 +215,8 @@ function VideoContainer(props) {
                                     setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
                                     isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource}
                                     videoSource={videoSource} setVideoSource={setVideoSource}/>
+            <DemoIntroModal livestreamId={props.currentLivestream.id} open={showDemoIntroModal}
+                            handleClose={handleCloseDemoIntroModal}/>
             <style jsx>{`
                 .screen-container {
                     position: absolute;                 
