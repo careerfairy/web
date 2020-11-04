@@ -74,8 +74,6 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
 
     const isOpen = (property) => {
         const activeStep = getActiveTutorialStepKey()
-        console.log("-> activeStep", activeStep);
-        console.log("-> property", property);
         return Boolean(livestream.test
             && showMenu
             && !addNewPoll

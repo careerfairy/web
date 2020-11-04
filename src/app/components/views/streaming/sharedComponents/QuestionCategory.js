@@ -59,7 +59,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
         setValue(showNextQuestions ? 0 : 1);
         setShowNextQuestions(!showNextQuestions);
     }
-//
+
     useEffect(() => {
         if (livestream.id) {
             const unsubscribe = firebase.listenToLivestreamQuestions(livestream.id, querySnapshot => {

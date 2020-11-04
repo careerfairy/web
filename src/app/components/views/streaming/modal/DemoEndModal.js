@@ -1,11 +1,10 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {withFirebase} from "../../../../context/firebase";
 import Dialog from "@material-ui/core/Dialog";
 import {Box, Button, DialogContentText, Fade} from "@material-ui/core";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
-import TutorialContext from "../../../../context/tutorials/TutorialContext";
 import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import Grow from "@material-ui/core/Grow";
@@ -15,7 +14,6 @@ import Collapse from "@material-ui/core/Collapse";
 const pdfLink = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-documents%2FExampleReport.pdf?alt=media&token=be44d8be-d914-4074-9197-77d5ab830719"
 const DemoEndModal = ({open, handleClose}) => {
 
-    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
     const [activePage, setActivePage] = useState(0)
     const [hasClickedDownload, setHasClickedDownload] = useState(false)
 

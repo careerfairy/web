@@ -16,17 +16,7 @@ function HandRaiseInactive({firebase, livestream, showMenu, selectedState, slidi
 
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
-    const getActiveTutorialStepKey = () => {
-        const activeStep = Object.keys(tutorialSteps).find((key) => {
-            if (tutorialSteps[key]) {
-                return key
-            }
-        })
-        return Number(activeStep)
-    }
-
     const isOpen = (property) => {
-        const activeStep = getActiveTutorialStepKey()
         return Boolean(livestream.test
             && showMenu
             && tutorialSteps.streamerReady
