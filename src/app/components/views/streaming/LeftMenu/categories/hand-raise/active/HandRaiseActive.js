@@ -1,4 +1,4 @@
-import React, {useState, useEffect, Fragment, useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import HandRaiseElement from './hand-raise-element/HandRaiseElement';
 import NotificationsContext from 'context/notifications/NotificationsContext';
@@ -6,9 +6,9 @@ import Grow from "@material-ui/core/Grow";
 import CloseRoundedIcon from '@material-ui/icons/CloseRounded';
 import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
 
-import {Box, Button, Typography, useTheme} from "@material-ui/core";
+import {Box, Button, Typography} from "@material-ui/core";
 import {CategoryContainerCentered, CategoryContainerTopAligned} from "../../../../../../../materialUI/GlobalContainers";
-import {GreyPermanentMarker, ThemedPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
+import {ThemedPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
 import Paper from "@material-ui/core/Paper";
 import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";
 import {
@@ -37,11 +37,20 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
         }
     }, [livestream]);
 
+    const getActiveTutorialStepKey = () => {
+        return Object.keys(tutorialSteps).find((key) => {
+            if (tutorialSteps[key]) {
+                return key
+            }
+        })
+    }
+
     const isOpen = (property) => {
+        const activeStep = Number(getActiveTutorialStepKey())
         return Boolean(livestream.test
             && showMenu
             && tutorialSteps.streamerReady
-            && tutorialSteps[property]
+            && (tutorialSteps[property] || property < activeStep)
             && selectedState === "hand"
             && !sliding
         )
@@ -93,7 +102,8 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
                         <PanToolOutlinedIcon color="primary" style={{fontSize: 40}}/>
                         <ThemedPermanentMarker gutterBottom>Waiting for viewers to raise their
                             hands...</ThemedPermanentMarker>
-                        <Typography align="center">Your viewers can now request to join the stream. Don't forget to
+                        <Typography style={{marginBottom: "1rem"}} align="center">Your viewers can now request to join
+                            the stream. Don't forget to
                             remind them
                             to join in!</Typography>
                         <WhiteTooltip
@@ -112,7 +122,7 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
                                     }} buttonText="Ok"/>
                                 </React.Fragment>
                             } open={isOpen(10)}>
-                            <Button style={{marginTop: "1rem"}} variant="contained" startIcon={<CloseRoundedIcon/>}
+                            <Button variant="contained" startIcon={<CloseRoundedIcon/>}
                                     children='Deactivate Hand Raise'
                                     onClick={() => {
                                         setHandRaiseModeInactive()

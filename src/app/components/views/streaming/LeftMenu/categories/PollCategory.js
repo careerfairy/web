@@ -41,11 +41,22 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
     }, [livestream.id]);
 
     const somePollIsCurrent = pollEntries.some(poll => poll.state === 'current');
+    const getActiveTutorialStepKey = () => {
+        return Object.keys(tutorialSteps).find((key) => {
+            if (tutorialSteps[key]) {
+                return key
+            }
+        })
+    }
+
     const isOpen = (property) => {
+        const activeStep = Number(getActiveTutorialStepKey())
+        console.log("-> activeStep", activeStep);
+        console.log("-> property", property);
         return Boolean(livestream.test
             && showMenu
             && tutorialSteps.streamerReady
-            && tutorialSteps[property]
+            && (tutorialSteps[property] || property < activeStep)
             && selectedState === "polls"
             && !sliding
         )
