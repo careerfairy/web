@@ -63,6 +63,7 @@ const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
             setLoading(true);
             await firebase.resetTestStream(livestreamId, testChatEntries, testQuestionsEntries, testPolls)
             // close modal and start demo mode..
+            handleClose() // handleClose should trigger some emotes
         } catch (e) {
             console.log(e)
         }
