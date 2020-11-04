@@ -49,10 +49,9 @@ function StreamingPage(props) {
     const [streamerId, setStreamerId] = useState(null)
 
     const [currentLivestream, setCurrentLivestream] = useState(false);
-    const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
-    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
     const [showBubbles, setShowBubbles] = useState(false)
+    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
 
     const [showMenu, setShowMenu] = useState(true);
     const classes = useStyles({showMenu})

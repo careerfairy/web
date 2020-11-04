@@ -79,11 +79,10 @@ function StreamingPage(props) {
     const [notificationToRemove, setNotificationToRemove] = useState(null);
     const [notifications, setNotifications] = useState([]);
     const [joiningStreamerLink, setJoiningStreamerLink] = useState("")
-    const [showBubbles, setShowBubbles] = useState(false)
 
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
+    const [showBubbles, setShowBubbles] = useState(false)
     const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
-    console.log("-> tutorialSteps", tutorialSteps);
 
     const numberOfViewers = useNumberOfViewers(currentLivestream);
 
