@@ -60,6 +60,7 @@ const initialTutorialState = {
     12: false,
     13: false,
     14: false,
+    15: false,
     streamerReady: false,
     showBubbles: false,
     callback: (setCallback, property, object) => setCallback({

@@ -37,76 +37,82 @@ const DemoEndModal = ({open, handleClose}) => {
 
     return (
         <Dialog open={open}>
-            <Grow in={activePage === 0}>
-                <DialogTitle>
-                    What makes us different
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        During the stream, at any time, your viewer are able
-                        willingly give their details by clicking on the button
-                        Join Talent pool below (this will button will be present on their UI).
-                    </DialogContentText>
-                    <Box fullWidth m={2}>
-                        <Button
-                            onClick={handleNext}
-                            children={'Join Talent Pool'}
-                            variant="contained"
-                            startIcon={<PeopleAltIcon/>}
-                            color={"primary"}/>
-                    </Box>
-                </DialogContent>
+            <Grow mountOnEnter unmountOnExit in={activePage === 0}>
+                <>
+                    <DialogTitle>
+                        What makes us different
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            During the stream, at any time, your viewer are able
+                            willingly give their details by clicking on the button
+                            Join Talent pool below (this will button will be present on their UI).
+                        </DialogContentText>
+                        <Box fullWidth m={2}>
+                            <Button
+                                onClick={handleNext}
+                                children={'Join Talent Pool'}
+                                variant="contained"
+                                startIcon={<PeopleAltIcon/>}
+                                color={"primary"}/>
+                        </Box>
+                    </DialogContent>
+                </>
             </Grow>
-            <Grow in={activePage === 1}>
-                <DialogTitle>
-                    What makes us different
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Once your stream has ended, you will be able to
-                        to download analytics of the stream, giving you vital information like
-                        like how many student registered, what they study and their universities,
-                        to name a few
-                    </DialogContentText>
-                    <Box fullWidth m={2}>
+            <Grow mountOnEnter unmountOnExit in={activePage === 1}>
+                <>
+                    <DialogTitle>
+                        What makes us different
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Once your stream has ended, you will be able to
+                            to download analytics of the stream, giving you vital information like
+                            like how many student registered, what they study and their universities,
+                            to name a few
+                        </DialogContentText>
+                        <Box display="flex" justifyContent="center" style={{width: "100%"}} m={2}>
+                            <Button
+                                download
+                                href={pdfLink}
+                                onClick={handleDownload}
+                                children={'Download Analytics'}
+                                startIcon={<CloudDownloadIcon/>}
+                                color={"primary"}/>
+                        </Box>
+                    </DialogContent>
+                    <DialogActions>
                         <Button
                             download
-                            href={pdfLink}
-                            onClick={handleDownload}
-                            children={'Download Analytics'}
-                            startIcon={<CloudDownloadIcon/>}
+                            disabled={!hasClickedDownload}
+                            variant="contained"
+                            onClick={handleComplete}
+                            children={'Next'}
                             color={"primary"}/>
-                    </Box>
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        download
-                        disabled={!hasClickedDownload}
-                        variant="contained"
-                        onClick={handleComplete}
-                        children={'Next'}
-                        color={"primary"}/>
-                </DialogActions>
+                    </DialogActions>
+                </>
             </Grow>
-            <Grow in={activePage === 2}>
-                <DialogTitle>
-                    Congratulations!!
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        You've now completed the tutorial :).
-                        We believe you're now ready to venture into the world of streaming!
-                        Good luck!
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        disabled={!hasClickedDownload}
-                        variant="contained"
-                        onClick={handleClose}
-                        children={'Back to Stream'}
-                        color={"primary"}/>
-                </DialogActions>
+            <Grow mountOnEnter unmountOnExit in={activePage === 2}>
+                <>
+                    <DialogTitle>
+                        Congratulations!!
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            You've now completed the tutorial :).
+                            We believe you're now ready to venture into the world of streaming!
+                            Good luck!
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            disabled={!hasClickedDownload}
+                            variant="contained"
+                            onClick={handleClose}
+                            children={'Back to Stream'}
+                            color={"primary"}/>
+                    </DialogActions>
+                </>
             </Grow>
         </Dialog>
     );
