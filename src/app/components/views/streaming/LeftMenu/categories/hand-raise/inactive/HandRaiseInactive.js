@@ -16,11 +16,21 @@ function HandRaiseInactive({firebase, livestream, showMenu, selectedState, slidi
 
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
+    const getActiveTutorialStepKey = () => {
+        const activeStep = Object.keys(tutorialSteps).find((key) => {
+            if (tutorialSteps[key]) {
+                return key
+            }
+        })
+        return Number(activeStep)
+    }
+
     const isOpen = (property) => {
+        const activeStep = getActiveTutorialStepKey()
         return Boolean(livestream.test
             && showMenu
             && tutorialSteps.streamerReady
-            && tutorialSteps[property]
+            && (tutorialSteps[property] || property > activeStep)
             && selectedState === "hand"
             && !sliding
         )
@@ -47,7 +57,8 @@ function HandRaiseInactive({firebase, livestream, showMenu, selectedState, slidi
             <CategoryContainerCentered>
                 <div style={{width: "90%", display: "grid", placeItems: "center"}}>
                     <GreyPermanentMarker>Hand Raise is not active</GreyPermanentMarker>
-                    <Typography style={{marginBottom: "1rem"}} align="center" gutterBottom>Allow viewers to join in your stream by activating hand
+                    <Typography style={{marginBottom: "1rem"}} align="center" gutterBottom>Allow viewers to join in your
+                        stream by activating hand
                         raise.</Typography>
                     <WhiteTooltip
                         placement="right-start"

@@ -38,19 +38,20 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
     }, [livestream]);
 
     const getActiveTutorialStepKey = () => {
-        return Object.keys(tutorialSteps).find((key) => {
+        const activeStep = Object.keys(tutorialSteps).find((key) => {
             if (tutorialSteps[key]) {
                 return key
             }
         })
+        return Number(activeStep)
     }
 
     const isOpen = (property) => {
-        const activeStep = Number(getActiveTutorialStepKey())
+        const activeStep = getActiveTutorialStepKey()
         return Boolean(livestream.test
             && showMenu
             && tutorialSteps.streamerReady
-            && (tutorialSteps[property] || property < activeStep)
+            && (tutorialSteps[property] || property > activeStep)
             && selectedState === "hand"
             && !sliding
         )

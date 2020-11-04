@@ -42,32 +42,15 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
 
     const somePollIsCurrent = pollEntries.some(poll => poll.state === 'current');
     const getActiveTutorialStepKey = () => {
-        return Object.keys(tutorialSteps).find((key) => {
+        const activeStep = Object.keys(tutorialSteps).find((key) => {
             if (tutorialSteps[key]) {
                 return key
             }
         })
+        return Number(activeStep)
     }
 
-    const isOpen = (property) => {
-        const activeStep = Number(getActiveTutorialStepKey())
-        console.log("-> activeStep", activeStep);
-        console.log("-> property", property);
-        return Boolean(livestream.test
-            && showMenu
-            && tutorialSteps.streamerReady
-            && (tutorialSteps[property] || property < activeStep)
-            && selectedState === "polls"
-            && !sliding
-        )
-    }
-    const handleConfirm = (property) => {
-        setTutorialSteps({
-            ...tutorialSteps,
-            [property]: false,
-            [property + 1]: true,
-        })
-    }
+
     const pollElements = pollEntries.filter(poll => poll.state !== 'closed').map((poll, index) => {
         return (
             <Fragment key={index}>
@@ -89,6 +72,28 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
         );
     });
 
+    const isOpen = (property) => {
+        const activeStep = getActiveTutorialStepKey()
+        console.log("-> activeStep", activeStep);
+        console.log("-> property", property);
+        return Boolean(livestream.test
+            && showMenu
+            && !addNewPoll
+            && tutorialSteps.streamerReady
+            && (tutorialSteps[property] || !pollElements.length && activeStep !== 8)
+            && selectedState === "polls"
+            && !sliding
+        )
+    }
+
+    const handleConfirm = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
+    }
+
     return (
         <CategoryContainerTopAligned>
             <QuestionContainerHeader>
@@ -99,19 +104,21 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
                     placement="right-start"
                     title={
                         <React.Fragment>
-                            <TooltipTitle>Polls (2/3)</TooltipTitle>
+                            <TooltipTitle>Polls (1/3)</TooltipTitle>
                             <TooltipText>
                                 Your able to create polls here
+                                Which can then be asked to the audience.
                             </TooltipText>
                             <TooltipButtonComponent onConfirm={() => {
-                                handleConfirm(5)
+                                !pollElements.length && setAddNewPoll(true)
+                                handleConfirm(4)
                             }} buttonText="Ok"/>
                         </React.Fragment>
-                    } open={isOpen(5)}>
+                    } open={isOpen(4)}>
                     <Button startIcon={<AddIcon/>} children='Create Poll'
                             onClick={() => {
                                 setAddNewPoll(true)
-                                isOpen(5) && handleConfirm(5)
+                                isOpen(4) && handleConfirm(4)
                             }} variant="contained" color="primary"/>
                 </WhiteTooltip>
             </QuestionContainerHeader>

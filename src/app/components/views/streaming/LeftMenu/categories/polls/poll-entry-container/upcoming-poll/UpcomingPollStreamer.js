@@ -133,13 +133,13 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
             placement="right-start"
             title={
                 <React.Fragment>
-                    <TooltipTitle>Polls (1/3)</TooltipTitle>
+                    <TooltipTitle>Polls (2/3)</TooltipTitle>
                     <TooltipText>
-                        You are able to Generate Polls for in order to gage the audience
+                        All your created polls will be stored here
                     </TooltipText>
-                    <TooltipButtonComponent onConfirm={() => handleConfirm(4)} buttonText="Ok"/>
+                    <TooltipButtonComponent onConfirm={() => handleConfirm(5)} buttonText="Ok"/>
                 </React.Fragment>
-            } open={isOpen(4)}>
+            } open={isOpen(5)}>
             <Paper style={{margin: 10, position: "relative"}} onMouseEnter={handleSetIsNotEditablePoll}
                    onMouseLeave={() => setShowNotEditableMessage(false)}>
                 <Box p={2}>
