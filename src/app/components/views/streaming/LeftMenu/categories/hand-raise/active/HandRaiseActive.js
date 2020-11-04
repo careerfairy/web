@@ -127,7 +127,7 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
                                     children='Deactivate Hand Raise'
                                     onClick={() => {
                                         setHandRaiseModeInactive()
-                                        isOpen(10) && handleConfirm()
+                                        isOpen(10) && handleConfirm(10)
                                     }}/>
                         </WhiteTooltip>
                     </Box>
