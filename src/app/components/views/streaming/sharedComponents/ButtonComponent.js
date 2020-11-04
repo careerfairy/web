@@ -192,7 +192,8 @@ const ButtonComponent =
                 icon: <ChevronLeftRoundedIcon fontSize="large"/>,
                 name: "",
                 disabled: false,
-                onClick: () => setShowMenu(!showMenu)
+                onClick: () => setShowMenu(!showMenu),
+                tutorialNum: 9999999
             })
         }
 
