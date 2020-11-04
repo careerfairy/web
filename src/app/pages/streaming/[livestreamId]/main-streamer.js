@@ -83,7 +83,6 @@ function StreamingPage(props) {
 
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
     const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
-    console.log("-> tutorialSteps", tutorialSteps);
 
     const numberOfViewers = useNumberOfViewers(currentLivestream);
 
