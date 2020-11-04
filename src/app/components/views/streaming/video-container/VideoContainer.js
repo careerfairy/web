@@ -12,6 +12,7 @@ import VideoControlsContainer from './VideoControlsContainer';
 
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
 import DemoIntroModal from "../modal/DemoIntroModal";
+import DemoEndModal from "../modal/DemoEndModal";
 
 function VideoContainer(props) {
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
@@ -155,6 +156,21 @@ function VideoContainer(props) {
         location.reload();
     }
 
+    const isOpen = (property) => {
+        return Boolean(props.currentLivestream.test
+            && tutorialSteps.streamerReady
+            && tutorialSteps[property]
+        )
+    }
+
+    const handleConfirm = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
+    }
+
     const handleCloseDemoIntroModal = (wantsDemo) => {
         setShowDemoIntroModal(false)
         if (wantsDemo) {
@@ -172,6 +188,15 @@ function VideoContainer(props) {
 
     const handleOpenDemoIntroModal = () => {
         setShowDemoIntroModal(true)
+    }
+
+    const handleCloseDemoEndModal = () => {
+        handleConfirm(14)
+        setTutorialSteps({
+            ...tutorialSteps,
+            showBubbles: true
+        })
+
     }
 
     return (
@@ -227,6 +252,7 @@ function VideoContainer(props) {
                                     videoSource={videoSource} setVideoSource={setVideoSource}/>
             <DemoIntroModal livestreamId={props.currentLivestream.id} open={showDemoIntroModal}
                             handleClose={handleCloseDemoIntroModal}/>
+            <DemoEndModal open={isOpen(14)} handleClose={handleCloseDemoEndModal}/>
             <style jsx>{`
                 .screen-container {
                     position: absolute;                 

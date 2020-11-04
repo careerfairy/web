@@ -15,7 +15,6 @@ const pdfLink = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.a
 const DemoEndModal = ({open, handleClose}) => {
 
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
-    const [loading, setLoading] = useState(false)
     const [activePage, setActivePage] = useState(0)
     const [hasClickedDownload, setHasClickedDownload] = useState(false)
 
