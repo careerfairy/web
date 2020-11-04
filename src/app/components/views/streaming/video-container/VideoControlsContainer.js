@@ -70,10 +70,10 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
 
     useEffect(() => {
-        if(isOpen(13)){
+        if (isOpen(13)) {
             setOpen(true)
         }
-    },[tutorialSteps[13]])
+    }, [tutorialSteps])
 
     const isOpen = (property) => {
         return Boolean(test

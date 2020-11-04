@@ -168,7 +168,10 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
     function addNewChatEntryOnEnter(target) {
         if (target.charCode == 13) {
             addNewChatEntry();
-            isOpen(12) && handleConfirm(12)
+            if (isOpen(12)) {
+                handleConfirm(12)
+                setOpen(false)
+            }
         }
     }
 
