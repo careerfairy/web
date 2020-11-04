@@ -54,7 +54,7 @@ const ListNumber = withStyles(theme => ({
     }
 }))(Box)
 
-function UpcomingPollStreamer({firebase, somePollIsCurrent, livestream, poll, showMenu, selectedState, index, setDemoPolls}) {
+function UpcomingPollStreamer({firebase, somePollIsCurrent, livestream, poll, showMenu, selectedState, index, setDemoPolls, addNewPoll}) {
 
     const [editPoll, setEditPoll] = useState(false);
     const [showNotEditableMessage, setShowNotEditableMessage] = useState(false);
@@ -63,7 +63,12 @@ function UpcomingPollStreamer({firebase, somePollIsCurrent, livestream, poll, sh
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
     const isOpen = (property) => {
-        return Boolean(livestream.test && index === 0 && showMenu && tutorialSteps.streamerReady && tutorialSteps[property] && selectedState === "polls")
+        return Boolean(livestream.test && index === 0
+            && showMenu && tutorialSteps.streamerReady
+            && tutorialSteps[property]
+            && selectedState === "polls"
+            && !addNewPoll
+        )
     }
 
     const handleConfirm = (property) => {

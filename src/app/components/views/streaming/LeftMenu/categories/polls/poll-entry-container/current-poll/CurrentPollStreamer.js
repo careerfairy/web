@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {Fragment, useContext, useEffect, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import CurrentPollGraph from "../../../../../sharedComponents/CurrentPollGraph";
 import {Box, Button, Fab} from "@material-ui/core";
@@ -8,6 +8,13 @@ import AllInclusiveIcon from "@material-ui/icons/AllInclusive";
 import Switch from "@material-ui/core/Switch";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import {makeStyles} from "@material-ui/core/styles";
+import TutorialContext from "../../../../../../../../context/tutorials/TutorialContext";
+import {
+    TooltipButtonComponent,
+    TooltipText,
+    TooltipTitle,
+    WhiteTooltip
+} from "../../../../../../../../materialUI/GlobalTooltips";
 
 function getRandomInt(min, max, index) {
     return (Math.floor((Math.random() * (max - min + 1) + min) / (index + 1)));
@@ -28,23 +35,44 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-function CurrentPollStreamer(props) {
+function CurrentPollStreamer({demoPolls, firebase, livestream, showMenu, selectedState, addNewPoll, poll}) {
     const [currentPoll, setCurrentPoll] = useState(null)
     const [demoMode, setDemoMode] = useState(false)
     const [numberOfTimes, setNumberOfTimes] = useState(0)
     const classes = useStyles({demoMode})
 
-    useEffect(() => {
-        if (props.demoPolls) {
-            setDemoMode(true)
-        }
-    }, [props.demoPolls])
+    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
+
+    const isOpen = (property) => {
+        return Boolean(livestream.test
+            && index === 0
+            && showMenu
+            && tutorialSteps.streamerReady
+            && tutorialSteps[property]
+            && selectedState === "polls"
+            && !addNewPoll
+        )
+    }
+
+    const handleConfirm = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
+    }
 
     useEffect(() => {
-        if (props.poll && !demoMode) {
-            setCurrentPoll(props.poll)
+        if (demoPolls) {
+            setDemoMode(true)
         }
-    }, [props.poll])
+    }, [demoPolls])
+
+    useEffect(() => {
+        if (poll && !demoMode) {
+            setCurrentPoll(poll)
+        }
+    }, [poll])
 
     useEffect(() => {
         if (numberOfTimes >= 20) {
@@ -62,11 +90,11 @@ function CurrentPollStreamer(props) {
     }, [demoMode])
 
     function setPollState(state) {
-        props.firebase.setPollState(props.livestream.id, props.poll.id, state);
+        firebase.setPollState(livestream.id, poll.id, state);
     }
 
     let totalVotes = 0;
-    props.poll.options.forEach(option => totalVotes += option.votes);
+    poll.options.forEach(option => totalVotes += option.votes);
 
     const resetPoll = () => {
         const newCurrentPoll = {...currentPoll}
@@ -93,7 +121,7 @@ function CurrentPollStreamer(props) {
         setDemoMode(!demoMode)
     }
 
-    // const DemoPollsButton = props.livestream.test ? (
+    // const DemoPollsButton = livestream.test ? (
     //     <Tooltip title="Demo Polls">
     //         <Fab className={classes.demoFab} onClick={handleToggle} color="secondary" size="small">
     //             <AllInclusiveIcon className={classes.demoIcon}/>
@@ -106,11 +134,28 @@ function CurrentPollStreamer(props) {
             <div>
                 <div className='chat-entry-container'>
                     <div className='poll-label'>ACTIVE POLL</div>
-                    {/*{DemoPollsButton}*/}
                     {currentPoll && <CurrentPollGraph currentPoll={currentPoll}/>}
-                    <Button fullWidth children={'Close Poll'} variant="contained" color="primary"
-                            onClick={() => setPollState('closed')}
-                            style={{borderRadius: '0 0 5px 5px', marginTop: 12}}/>
+                    <WhiteTooltip
+                        placement="right-start"
+                        title={
+                            <React.Fragment>
+                                <TooltipTitle>Polls (4/4)</TooltipTitle>
+                                <TooltipText>
+                                    One your audience has voted you can now close the poll.
+                                </TooltipText>
+                                <TooltipButtonComponent onConfirm={() => {
+                                    setPollState('closed')
+                                    handleConfirm(7)
+                                }} buttonText="Ok"/>
+                            </React.Fragment>
+                        } open={isOpen(7)}>
+                        <Button fullWidth children={'Close Poll'} variant="contained" color="primary"
+                                onClick={() => {
+                                    setPollState('closed')
+                                    isOpen(7) && handleConfirm(7)
+                                }}
+                                style={{borderRadius: '0 0 5px 5px', marginTop: 12}}/>
+                    </WhiteTooltip>
                 </div>
             </div>
             <style jsx>{`

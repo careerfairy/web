@@ -58,6 +58,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
                     selectedState={selectedState}
                     showMenu={showMenu}
                     poll={poll}
+                    addNewPoll={addNewPoll}
                     setDemoPolls={setDemoPolls}
                     index={index}
                     streamer={streamer}
