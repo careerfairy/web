@@ -13,6 +13,7 @@ import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPr
 import ErrorMessageModal from "../modal/StreamPreparationModalV2/ErrorMessageModal";
 import useDevices from 'components/custom-hook/useDevices';
 import VideoControlsContainer from './VideoControlsContainer';
+import SettingsModal from './SettingsModal';
 import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -198,7 +199,8 @@ function VideoContainer(props) {
                         presenter={true}/>
                     : null
                 }
-                <SharingOptionsContainer webRTCAdaptor={webRTCAdaptor} 
+                <SharingOptionsContainer 
+                    webRTCAdaptor={webRTCAdaptor} 
                     currentLivestream={props.currentLivestream}
                     viewer={props.viewer} 
                     streamerId={props.streamerId}
@@ -207,6 +209,8 @@ function VideoContainer(props) {
                     setShowRightMenu={setShowRightMenu}
                     />
             </div>
+            <SettingsModal webRTCAdaptor={webRTCAdaptor} streamId={props.streamerId} devices={devices} localStream={localMediaStream}
+                speakerSource={speakerSource} setSpeakerSource={setSpeakerSource} attachSinkId={attachSinkId} sinkId={sinkId}/>
             <Modal open={showDisconnectionModal}>
                 <Modal.Header>You have been disconnected</Modal.Header>
                 <Modal.Content>
@@ -219,14 +223,14 @@ function VideoContainer(props) {
                 </Modal.Content>
             </Modal>
             {/*<StreamPreparationModal streamerReady={streamerReady} setStreamerReady={setStreamerReady} localStream={localStream} mediaConstraints={mediaConstraints} connectionEstablished={connectionEstablished} setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage} isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource} videoSource={videoSource} setVideoSource={setVideoSource}/>*/}
-            <StreamPreparationModalV2 speakerSource={speakerSource} setSpeakerSource={setSpeakerSource}
+            {/* <StreamPreparationModalV2 speakerSource={speakerSource} setSpeakerSource={setSpeakerSource}
                                       streamerReady={streamerReady} setStreamerReady={setStreamerReady}
                                       localStream={localMediaStream} mediaConstraints={mediaConstraints}
                                       connectionEstablished={connectionEstablished}
                                       attachSinkId={attachSinkId} devices={devices}
                                       setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
                                       webRTCAdaptor={webRTCAdaptor} streamId={props.streamerId}
-                                      isStreaming={isStreaming}/>
+                                      isStreaming={isStreaming}/> */}
             <ErrorMessageModal isStreaming={isStreaming} connectionEstablished={connectionEstablished}
                                errorMessage={errorMessage} streamerReady={streamerReady}/>
             <style jsx>{`

@@ -8,6 +8,7 @@ export function useSoundMeter(isShowAudioVideo, localStream, update) {
 
     useEffect(() => {
         if (navigator && localStream) {
+            debugger;
             try {
                 window.AudioContext = window.AudioContext || window.webkitAudioContext;
                 window.audioContext = new AudioContext();
@@ -77,9 +78,6 @@ export function useSoundMeter(isShowAudioVideo, localStream, update) {
     };
 
     function connectStream(stream) {
-        // Put variables in global scope to make them available to the
-        // browser console.
-
         let zeroCounter = 0;
         const soundMeter = new SoundMeter(window.audioContext);
         soundMeter.connectToSource(stream, function(e) {
