@@ -9,6 +9,7 @@ import TutorialContext from "../../../../context/tutorials/TutorialContext";
 import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import Grow from "@material-ui/core/Grow";
+import Collapse from "@material-ui/core/Collapse";
 
 
 const pdfLink = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-documents%2FExampleReport.pdf?alt=media&token=be44d8be-d914-4074-9197-77d5ab830719"
@@ -48,7 +49,7 @@ const DemoEndModal = ({open, handleClose}) => {
                             willingly give their details by clicking on the button
                             Join Talent pool below (this will button will be present on their UI).
                         </DialogContentText>
-                        <Box fullWidth m={2}>
+                        <Box display="flex" justifyContent="center" style={{width: "100%"}} my={2}>
                             <Button
                                 onClick={handleNext}
                                 children={'Join Talent Pool'}
@@ -71,7 +72,7 @@ const DemoEndModal = ({open, handleClose}) => {
                             like how many student registered, what they study and their universities,
                             to name a few
                         </DialogContentText>
-                        <Box display="flex" justifyContent="center" style={{width: "100%"}} m={2}>
+                        <Box display="flex" justifyContent="center" style={{width: "100%"}} my={2}>
                             <Button
                                 download
                                 href={pdfLink}
@@ -81,15 +82,17 @@ const DemoEndModal = ({open, handleClose}) => {
                                 color={"primary"}/>
                         </Box>
                     </DialogContent>
-                    <DialogActions>
-                        <Button
-                            download
-                            disabled={!hasClickedDownload}
-                            variant="contained"
-                            onClick={handleComplete}
-                            children={'Next'}
-                            color={"primary"}/>
-                    </DialogActions>
+                    <Collapse in={hasClickedDownload}>
+                        <DialogActions>
+                            <Button
+                                download
+                                disabled={!hasClickedDownload}
+                                variant="contained"
+                                onClick={handleComplete}
+                                children={'Next'}
+                                color={"primary"}/>
+                        </DialogActions>
+                    </Collapse>
                 </>
             </Grow>
             <Grow mountOnEnter unmountOnExit in={activePage === 2}>
