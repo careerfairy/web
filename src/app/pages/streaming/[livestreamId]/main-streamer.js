@@ -44,6 +44,26 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const initialTutorialState = {
+    streamerReady: false,
+    showBubbles: false,
+    0: true,
+    1: false,
+    2: false,
+    3: false,
+    4: false,
+    5: false,
+    6: false,
+    7: false,
+    8: false,
+    9: false,
+    10: false,
+    11: false,
+    12: false,
+    13: false,
+    14: false,
+}
+
 function StreamingPage(props) {
     const theme = useTheme()
 
@@ -61,25 +81,7 @@ function StreamingPage(props) {
     const [joiningStreamerLink, setJoiningStreamerLink] = useState("")
 
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
-    const [tutorialSteps, setTutorialSteps] = useState({
-        streamerReady: false,
-        showBubbles: false,
-        0: true,
-        1: false,
-        2: false,
-        3: false,
-        4: false,
-        5: false,
-        6: false,
-        7: false,
-        8: false,
-        9: false,
-        10: false,
-        11: false,
-        12: false,
-        13: false,
-        14: false,
-    })
+    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
     console.log("-> tutorialSteps", tutorialSteps);
 
     const numberOfViewers = useNumberOfViewers(currentLivestream);

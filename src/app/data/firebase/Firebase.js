@@ -416,9 +416,6 @@ class Firebase {
         let livestreamRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId);
-        batch.update(livestreamRef, {
-            currentSpeakerId: livestreamId
-        });
 
         // Declare all the refs
         let chatsRef = livestreamRef
