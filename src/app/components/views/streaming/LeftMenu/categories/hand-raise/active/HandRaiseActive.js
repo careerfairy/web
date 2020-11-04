@@ -18,7 +18,7 @@ import {
     WhiteTooltip
 } from "../../../../../../../materialUI/GlobalTooltips";
 
-function HandRaiseActive({firebase, livestream, showMenu, selectedState}) {
+function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding}) {
 
     const {setNewNotification, setNotificationToRemove} = useContext(NotificationsContext);
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
@@ -43,6 +43,7 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState}) {
             && tutorialSteps.streamerReady
             && tutorialSteps[property]
             && selectedState === "hand"
+            && !sliding
         )
     }
 
