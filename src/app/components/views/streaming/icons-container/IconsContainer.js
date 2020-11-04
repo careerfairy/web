@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useContext} from 'react';
 import {Image} from "semantic-ui-react";
 import RubberBand from 'react-reveal/RubberBand';
 import {withFirebasePage} from 'context/firebase';
@@ -8,6 +8,7 @@ import {v4 as uuidv4} from "uuid";
 import Tooltip from "@material-ui/core/Tooltip";
 import {Fab} from "@material-ui/core";
 import AllInclusiveIcon from "@material-ui/icons/AllInclusive";
+import TutorialContext from "../../../../context/tutorials/TutorialContext";
 
 const useStyles = makeStyles(theme => ({
     actionBtn: {
@@ -40,18 +41,6 @@ const useStyles = makeStyles(theme => ({
         "-o-transform": ({distance}) => `translateY(${distance}vh)`,
         "-webkit-transform": ({distance}) => `translateY(${distance}vh)`,
     },
-    demoFab: {
-        position: "absolute",
-        bottom: 3,
-        right: 3,
-        background: ({demoMode}) => demoMode ? "white" : theme.palette.secondary.main,
-        "&:hover": {
-            background: ({demoMode}) => demoMode ? "white" : theme.palette.secondary.dark,
-        }
-    },
-    demoIcon: {
-        color: ({demoMode}) => demoMode ? theme.palette.secondary.main : "white"
-    }
 }))
 
 
@@ -83,11 +72,12 @@ const emotes = ["clapping", "like", "heart"]
 function IconsContainer({livestreamId, firebase, isTest}) {
     const [postedIcons, setPostedIcons] = useState([]);
     const [filteredIcons, setFilteredIcons] = useState([]);
-    const [demoMode, setDemoMode] = useState(false)
-    const classes = useStyles({demoMode})
+    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
+
+    const classes = useStyles()
 
     useEffect(() => {
-        if (livestreamId && !demoMode) {
+        if (livestreamId && !tutorialSteps.showBubbles) {
             const unsubscribe = firebase.listenToLivestreamIcons(livestreamId, querySnapshot => {
                 let iconsList = [];
                 querySnapshot.forEach(doc => {
@@ -100,7 +90,7 @@ function IconsContainer({livestreamId, firebase, isTest}) {
 
             return () => unsubscribe()
         }
-    }, [livestreamId, demoMode]);
+    }, [livestreamId, tutorialSteps.showBubbles]);
 
     useEffect(() => {
         if (postedIcons.length) {
@@ -117,18 +107,21 @@ function IconsContainer({livestreamId, firebase, isTest}) {
     }, [postedIcons]);
 
     useEffect(() => {
-        if (demoMode) {
+        if (tutorialSteps.showBubbles) {
             let count = 0
             const interval = setInterval(() => {
                 count = count + 1
                 if (count === 10) {
-                    setDemoMode(false)
+                    setTutorialSteps({
+                        ...tutorialSteps,
+                        showBubbles: false
+                    })
                 }
                 simulateEmotes()
             }, 200);
             return () => clearInterval(interval)
         }
-    }, [demoMode])
+    }, [tutorialSteps.showBubbles])
 
     function getIconColor(icon) {
         if (icon.iconName === 'like') {
@@ -155,7 +148,10 @@ function IconsContainer({livestreamId, firebase, isTest}) {
 
     const handleToggle = () => {
         resetIcons()
-        setDemoMode(!demoMode)
+        setTutorialSteps({
+            ...tutorialSteps,
+            showBubbles: !tutorialSteps.showBubbles
+        })
     }
 
     const resetIcons = () => {
@@ -182,17 +178,16 @@ function IconsContainer({livestreamId, firebase, isTest}) {
         );
     });
 
-    const DemoPollsButton = isTest ? (
-        <Tooltip title="Demo Emotes">
-            <Fab className={classes.demoFab} onClick={handleToggle} color="secondary" size="small">
-                <AllInclusiveIcon className={classes.demoIcon}/>
-            </Fab>
-        </Tooltip>
-    ) : null
+    // const DemoPollsButton = isTest ? (
+    //     <Tooltip title="Demo Emotes">
+    //         <Fab className={classes.demoFab} onClick={handleToggle} color="secondary" size="small">
+    //             <AllInclusiveIcon className={classes.demoIcon}/>
+    //         </Fab>
+    //     </Tooltip>
+    // ) : null
 
     return (
         <div style={{position: "relative"}} className='topLevelContainer'>
-            {DemoPollsButton}
             {postedIconsElements}
         </div>
     );

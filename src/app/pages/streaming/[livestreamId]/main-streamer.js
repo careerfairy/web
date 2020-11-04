@@ -63,6 +63,7 @@ function StreamingPage(props) {
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
     const [tutorialSteps, setTutorialSteps] = useState({
         streamerReady: false,
+        showBubbles: false,
         0: true,
         1: false,
         2: false,
@@ -75,6 +76,9 @@ function StreamingPage(props) {
         9: false,
         10: false,
         11: false,
+        12: false,
+        13: false,
+        14: false,
     })
     console.log("-> tutorialSteps", tutorialSteps);
 
