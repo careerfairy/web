@@ -141,7 +141,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase, 
                     Questions
                 </QuestionContainerTitle>
                 {!streamer &&
-                <Button variant="contained" style={{marginTop: "1rem"}} children='Add a Question'
+                <Button variant="contained" children='Add a Question'
                         endIcon={<AddIcon fontSize="large"/>}
                         color="primary" onClick={handleOpen}/>}
                 <div style={{display: "flex", justifyContent: "center"}}>

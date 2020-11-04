@@ -54,13 +54,26 @@ const ListNumber = withStyles(theme => ({
     }
 }))(Box)
 
-function UpcomingPollStreamer({firebase, somePollIsCurrent, livestream, poll, showMenu, selectedState, index}) {
+function UpcomingPollStreamer({firebase, somePollIsCurrent, livestream, poll, showMenu, selectedState, index, setDemoPolls}) {
 
     const [editPoll, setEditPoll] = useState(false);
     const [showNotEditableMessage, setShowNotEditableMessage] = useState(false);
 
     const [anchorEl, setAnchorEl] = useState(null);
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
+
+    const isOpen = (property) => {
+        return Boolean(livestream.test && index === 0 && showMenu && tutorialSteps.streamerReady && tutorialSteps[property] && selectedState === "polls")
+    }
+
+    const handleConfirm = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
+    }
+
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -93,19 +106,6 @@ function UpcomingPollStreamer({firebase, somePollIsCurrent, livestream, poll, sh
     let totalVotes = 0;
     poll.options.forEach(option => totalVotes += option.votes);
 
-    const isOpen = (property) => {
-        return livestream.test && index === 0 && showMenu && tutorialSteps.streamerReady && tutorialSteps[property] && selectedState === "polls"
-    }
-    console.log("-> isOpen(4)", isOpen(4));
-
-
-    const handleConfirm = (property) => {
-        setTutorialSteps({
-            ...tutorialSteps,
-            [property]: false,
-            [property + 1]: true,
-        })
-    }
 
     const optionElements = poll.options.map((option, index) => {
         return (
@@ -123,17 +123,17 @@ function UpcomingPollStreamer({firebase, somePollIsCurrent, livestream, poll, sh
     });
 
     return (
-       <WhiteTooltip
-                    placement="right-start"
-                    title={
-                        <React.Fragment>
-                            <TooltipTitle>Polls (1/3)</TooltipTitle>
-                            <TooltipText>
-                                You are able to Generate Polls for in order to gage the audience
-                            </TooltipText>
-                            <TooltipButtonComponent onConfirm={() => handleConfirm(4)} buttonText="Ok"/>
-                        </React.Fragment>
-                    } open={isOpen(4)}>
+        <WhiteTooltip
+            placement="right-start"
+            title={
+                <React.Fragment>
+                    <TooltipTitle>Polls (1/3)</TooltipTitle>
+                    <TooltipText>
+                        You are able to Generate Polls for in order to gage the audience
+                    </TooltipText>
+                    <TooltipButtonComponent onConfirm={() => handleConfirm(4)} buttonText="Ok"/>
+                </React.Fragment>
+            } open={isOpen(4)}>
             <Paper style={{margin: 10, position: "relative"}} onMouseEnter={handleSetIsNotEditablePoll}
                    onMouseLeave={() => setShowNotEditableMessage(false)}>
                 <Box p={2}>
@@ -167,10 +167,29 @@ function UpcomingPollStreamer({firebase, somePollIsCurrent, livestream, poll, sh
                         </MenuItem>
                     </Menu>
                 </Box>
-                <Button fullWidth disableElevation variant="contained" color="primary"
-                        children={'Ask the Audience Now'} disabled={somePollIsCurrent}
-                        onClick={() => setPollState('current')}
-                        style={{borderRadius: '0 0 5px 5px'}}/>
+                <WhiteTooltip
+                    placement="right-start"
+                    title={
+                        <React.Fragment>
+                            <TooltipTitle>Polls (3/3)</TooltipTitle>
+                            <TooltipText>
+                                Once you are ready, click here to ask the audience
+                            </TooltipText>
+                            <TooltipButtonComponent onConfirm={() => {
+                                setDemoPolls(true)
+                                setPollState('current')
+                                handleConfirm(6)
+                            }} buttonText="Ok"/>
+                        </React.Fragment>
+                    } open={isOpen(6)}>
+                    <Button fullWidth disableElevation variant="contained" color="primary"
+                            children={'Ask the Audience Now'} disabled={somePollIsCurrent}
+                            onClick={() => {
+                                isOpen(6) && setDemoPolls(true)
+                                setPollState('current')
+                            }}
+                            style={{borderRadius: '0 0 5px 5px'}}/>
+                </WhiteTooltip>
                 {showNotEditableMessage && <Overlay>
                     <div>
                         Please close the active poll before activating this one.

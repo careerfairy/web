@@ -4,7 +4,7 @@ import BarChartIcon from '@material-ui/icons/BarChart';
 import AddIcon from '@material-ui/icons/Add';
 import PollCreationModal from './polls/poll-creation-modal/PollCreationModal';
 import PollEntryContainer from './polls/poll-entry-container/PollEntryContainer';
-import {Button, Fab} from "@material-ui/core";
+import {Button} from "@material-ui/core";
 import {
     CategoryContainerTopAligned,
     QuestionContainerHeader,
@@ -22,6 +22,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
 
     const [addNewPoll, setAddNewPoll] = useState(false);
     const [pollEntries, setPollEntries] = useState([]);
+    const [demoPolls, setDemoPolls] = useState(false);
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
     useEffect(() => {
@@ -57,9 +58,11 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
                     selectedState={selectedState}
                     showMenu={showMenu}
                     poll={poll}
+                    setDemoPolls={setDemoPolls}
                     index={index}
                     streamer={streamer}
                     user={user}
+                    demoPolls={demoPolls}
                     userData={userData}
                     livestream={livestream}
                     somePollIsCurrent={somePollIsCurrent}/>
@@ -68,7 +71,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
     });
 
     return (
-        <div>
+        <CategoryContainerTopAligned>
             <QuestionContainerHeader>
                 <QuestionContainerTitle>
                     <BarChartIcon fontSize="large" color="primary"/> Polls
@@ -79,12 +82,14 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
                         <React.Fragment>
                             <TooltipTitle>Polls (2/3)</TooltipTitle>
                             <TooltipText>
-                                Your able to create polls hear
+                                Your able to create polls here
                             </TooltipText>
-                            <TooltipButtonComponent onConfirm={() => handleConfirm(5)} buttonText="Ok"/>
+                            <TooltipButtonComponent onConfirm={() => {
+                                handleConfirm(5)
+                            }} buttonText="Ok"/>
                         </React.Fragment>
                     } open={isOpen(5)}>
-                    <Button style={{marginBottom: "1rem"}} startIcon={<AddIcon/>} children='Create Poll'
+                    <Button startIcon={<AddIcon/>} children='Create Poll'
                             onClick={() => {
                                 setAddNewPoll(true)
                                 isOpen(5) && handleConfirm(5)
@@ -96,7 +101,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
             </div>
             <PollCreationModal livestreamId={livestream.id} open={addNewPoll} initialPoll={null}
                                initialOptions={null} handleClose={() => setAddNewPoll(false)}/>
-        </div>
+        </CategoryContainerTopAligned>
     );
 }
 

@@ -35,6 +35,12 @@ function CurrentPollStreamer(props) {
     const classes = useStyles({demoMode})
 
     useEffect(() => {
+        if (props.demoPolls) {
+            setDemoMode(true)
+        }
+    }, [props.demoPolls])
+
+    useEffect(() => {
         if (props.poll && !demoMode) {
             setCurrentPoll(props.poll)
         }
@@ -87,20 +93,20 @@ function CurrentPollStreamer(props) {
         setDemoMode(!demoMode)
     }
 
-    const DemoPollsButton = props.livestream.test ? (
-        <Tooltip title="Demo Polls">
-            <Fab className={classes.demoFab} onClick={handleToggle} color="secondary" size="small">
-                <AllInclusiveIcon className={classes.demoIcon}/>
-            </Fab>
-        </Tooltip>
-    ) : null
+    // const DemoPollsButton = props.livestream.test ? (
+    //     <Tooltip title="Demo Polls">
+    //         <Fab className={classes.demoFab} onClick={handleToggle} color="secondary" size="small">
+    //             <AllInclusiveIcon className={classes.demoIcon}/>
+    //         </Fab>
+    //     </Tooltip>
+    // ) : null
 
     return (
         <Fragment>
             <div>
                 <div className='chat-entry-container'>
                     <div className='poll-label'>ACTIVE POLL</div>
-                    {DemoPollsButton}
+                    {/*{DemoPollsButton}*/}
                     {currentPoll && <CurrentPollGraph currentPoll={currentPoll}/>}
                     <Button fullWidth children={'Close Poll'} variant="contained" color="primary"
                             onClick={() => setPollState('closed')}
