@@ -429,9 +429,9 @@ class Firebase {
             .collection("polls");
 
         // Delete all existing docs
-
+        debugger
         const questionsDocs = await questionsRef.get()
-        if (questionsDocs.length) {
+        if (!questionsDocs.empty) {
             questionsDocs.forEach(doc => {
                 let docRef = doc.ref
                 batch.delete(docRef)
@@ -439,7 +439,7 @@ class Firebase {
         }
 
         const chatsDocs = await chatsRef.get()
-        if (chatsDocs.length) {
+        if (!chatsDocs.empty) {
             chatsDocs.forEach(doc => {
                 let docRef = doc.ref
                 batch.delete(docRef)
@@ -447,7 +447,7 @@ class Firebase {
         }
 
         const pollsDocs = await pollsRef.get()
-        if (pollsDocs.length) {
+        if (!pollsDocs.empty) {
             pollsDocs.forEach(doc => {
                 let docRef = doc.ref
                 batch.delete(docRef)
