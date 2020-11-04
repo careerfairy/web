@@ -51,7 +51,7 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
         return Boolean(livestream.test
             && showMenu
             && tutorialSteps.streamerReady
-            && (tutorialSteps[property] || property > activeStep)
+            && (tutorialSteps[property] || activeStep === 9)
             && selectedState === "hand"
             && !sliding
         )
