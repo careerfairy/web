@@ -191,7 +191,10 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
                     <Button fullWidth disableElevation variant="contained" color="primary"
                             children={'Ask the Audience Now'} disabled={somePollIsCurrent}
                             onClick={() => {
-                                isOpen(6) && setDemoPolls(true)
+                                if (isOpen(6)) {
+                                    handleConfirm(6)
+                                    setDemoPolls(true)
+                                }
                                 setPollState('current')
                             }}
                             style={{borderRadius: '0 0 5px 5px'}}/>
