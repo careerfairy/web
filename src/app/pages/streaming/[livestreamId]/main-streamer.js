@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const initialTutorialState = {
-    0: false,
+    0: true,
     1: false,
     2: false,
     3: false,
@@ -57,7 +57,7 @@ export const initialTutorialState = {
     9: false,
     10: false,
     11: false,
-    12: true,
+    12: false,
     13: false,
     14: false,
     15: false,

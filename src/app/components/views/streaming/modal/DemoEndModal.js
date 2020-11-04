@@ -52,7 +52,7 @@ const DemoEndModal = ({open, handleClose}) => {
                             startIcon={<PeopleAltIcon/>}
                             color={hasJoinedTalentPool ? "default" : "primary"}/>
                         <Collapse in={hasJoinedTalentPool}>
-                            <Typography algin="center" color="primary">
+                            <Typography style={{margin: "0.5rem 0"}} algin="center" color="primary">
                                 Thanks for joining the talent pool!
                             </Typography>
                         </Collapse>

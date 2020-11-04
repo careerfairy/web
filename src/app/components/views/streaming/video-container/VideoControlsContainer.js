@@ -163,7 +163,7 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
         <ClickAwayListener onClickAway={handleClose}>
             <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className={classes.root}>
                 <WhiteTooltip
-                    placement="left-start"
+                    placement="top"
                     style={{
                         transition: "transform 0.2s",
                         transitionTimingFunction: theme.transitions.easeInOut,
