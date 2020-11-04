@@ -135,12 +135,12 @@ const ButtonComponent =
             return null;
         }
 
-        const isPolls = (actionName) => {
-            return actionName === "Polls" && tutorialSteps[3] && selectedState !== "polls"
+        const isValid = (actionTutorialNum, actionDisabled) => {
+            return tutorialSteps[actionTutorialNum] && !actionDisabled
         }
 
-        const isOpen = (actionName) => {
-            return tutorialSteps.streamerReady && isPolls(actionName)
+        const isOpen = (actionTutorialNum, actionDisabled) => {
+            return tutorialSteps.streamerReady && isValid(actionTutorialNum, actionDisabled)
         }
 
 
@@ -157,13 +157,15 @@ const ButtonComponent =
                 icon: <BarChartIcon fontSize="large"/>,
                 name: "Polls",
                 disabled: showMenu && selectedState === 'polls',
-                onClick: () => handleStateChange("polls")
+                onClick: () => handleStateChange("polls"),
+                tutorialNum: 3
             },
             {
                 icon: <HelpOutlineIcon fontSize="large"/>,
                 name: "Q&A",
                 disabled: showMenu && selectedState === 'questions',
-                onClick: () => handleStateChange("questions")
+                onClick: () => handleStateChange("questions"),
+                tutorialNum: 2334
             },
         ];
 
@@ -172,14 +174,16 @@ const ButtonComponent =
                 icon: <ForumOutlinedIcon fontSize="large"/>,
                 name: "Chat",
                 disabled: showMenu && selectedState === 'chat',
-                onClick: () => handleStateChange("chat")
+                onClick: () => handleStateChange("chat"),
+                tutorialNum: 234
             })
         } else {
             actions.unshift({
                 icon: <PanToolOutlinedIcon fontSize="large"/>,
                 name: "Hand Raise",
                 disabled: showMenu && selectedState === 'hand',
-                onClick: () => handleStateChange("hand")
+                onClick: () => handleStateChange("hand"),
+                tutorialNum: 23423
             })
         }
 
@@ -204,7 +208,6 @@ const ButtonComponent =
                         open
                     >
                         {actions.map((action) => {
-                            console.log("-> isOpen(action)", isOpen(action));
                             return (
                                 <SpeedDialAction
                                     key={action.name}
@@ -213,10 +216,13 @@ const ButtonComponent =
                                     tooltipTitle={action.name}
                                     classes={{staticTooltipLabel: classes.tooltip}}
                                     tooltipOpen={Boolean(action.name.length)}
-                                    onClick={action.onClick}
+                                    onClick={() => {
+                                        action.onClick()
+                                        isOpen(action.tutorialNum, action.disabled) && handleConfirm(action.tutorialNum)
+                                    }}
                                     FabProps={{
                                         size: "large",
-                                        classes: {root: action.name.length ? isOpen(action.name) ? classes.actionButtonHighlight : classes.actionButton : classes.actionButtonPink},
+                                        classes: {root: action.name.length ? isOpen(action.tutorialNum, action.disabled) ? classes.actionButtonHighlight : classes.actionButton : classes.actionButtonPink},
                                         disabled: action.disabled,
                                     }}
                                 />

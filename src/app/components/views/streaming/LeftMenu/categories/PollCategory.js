@@ -1,4 +1,4 @@
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {useState, useEffect, Fragment, useContext} from 'react';
 import {withFirebase} from 'context/firebase';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import AddIcon from '@material-ui/icons/Add';
@@ -10,11 +10,19 @@ import {
     QuestionContainerHeader,
     QuestionContainerTitle
 } from "../../../../../materialUI/GlobalContainers";
+import TutorialContext from "../../../../../context/tutorials/TutorialContext";
+import {
+    TooltipButtonComponent,
+    TooltipText,
+    TooltipTitle,
+    WhiteTooltip
+} from "../../../../../materialUI/GlobalTooltips";
 
-function PollCategory({firebase, streamer, livestream, selectedState, setShowMenu, user, userData}) {
+function PollCategory({firebase, streamer, livestream, selectedState, showMenu, user, userData}) {
 
     const [addNewPoll, setAddNewPoll] = useState(false);
     const [pollEntries, setPollEntries] = useState([]);
+    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
     useEffect(() => {
         if (livestream.id) {
@@ -33,6 +41,20 @@ function PollCategory({firebase, streamer, livestream, selectedState, setShowMen
 
     const somePollIsCurrent = pollEntries.some(poll => poll.state === 'current');
 
+    const isOpen = (property) => {
+        return livestream.test && showMenu && tutorialSteps.streamerReady && tutorialSteps[property] && selectedState === "polls"
+    }
+    console.log("-> isOpen(4)", isOpen(4));
+
+
+    const handleConfirm = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
+    }
+
     const pollElements = pollEntries.filter(poll => poll.state !== 'closed').map((poll, index) => {
         return (
             <Fragment key={index}>
@@ -48,11 +70,38 @@ function PollCategory({firebase, streamer, livestream, selectedState, setShowMen
                 <QuestionContainerTitle>
                     <BarChartIcon fontSize="large" color="primary"/> Polls
                 </QuestionContainerTitle>
-                <Button style={{marginBottom: "1rem"}} startIcon={<AddIcon/>} children='Create Poll'
-                        onClick={() => setAddNewPoll(true)} variant="contained" color="primary"/>
+                <WhiteTooltip
+                    placement="right-start"
+                    title={
+                        <React.Fragment>
+                            <TooltipTitle>Polls (2/3)</TooltipTitle>
+                            <TooltipText>
+                                Your able to create polls hear
+                            </TooltipText>
+                            <TooltipButtonComponent onConfirm={() => handleConfirm(5)} buttonText="Ok"/>
+                        </React.Fragment>
+                    } open={isOpen(5)}>
+                    <Button style={{marginBottom: "1rem"}} startIcon={<AddIcon/>} children='Create Poll'
+                            onClick={() => {
+                                setAddNewPoll(true)
+                                isOpen(5) && handleConfirm(5)
+                            }} variant="contained" color="primary"/>
+                </WhiteTooltip>
             </QuestionContainerHeader>
             <div style={{width: "100%"}}>
-                {pollElements}
+                <WhiteTooltip
+                    placement="right-start"
+                    title={
+                        <React.Fragment>
+                            <TooltipTitle>Polls (1/3)</TooltipTitle>
+                            <TooltipText>
+                                You are able to Generate Polls for in order to gage the audience
+                            </TooltipText>
+                            <TooltipButtonComponent onConfirm={() => handleConfirm(4)} buttonText="Ok"/>
+                        </React.Fragment>
+                    } open={isOpen(4)}>
+                    {pollElements}
+                </WhiteTooltip>
             </div>
             <PollCreationModal livestreamId={livestream.id} open={addNewPoll} initialPoll={null}
                                initialOptions={null} handleClose={() => setAddNewPoll(false)}/>
