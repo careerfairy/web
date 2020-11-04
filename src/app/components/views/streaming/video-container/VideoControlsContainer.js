@@ -1,4 +1,4 @@
-import React, {useState, useContext, Fragment} from 'react';
+import React, {useState, useContext, Fragment, useEffect} from 'react';
 import {Grid, Icon, Button} from "semantic-ui-react";
 import MicOffIcon from '@material-ui/icons/MicOff';
 import MicIcon from '@material-ui/icons/Mic';
@@ -68,6 +68,12 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
     const classes = useStyles({open});
     const [delayHandler, setDelayHandler] = useState(null)
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
+
+    useEffect(() => {
+        if(isOpen(13)){
+            setOpen(true)
+        }
+    },[tutorialSteps[13]])
 
     const isOpen = (property) => {
         return Boolean(test
