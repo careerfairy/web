@@ -7,7 +7,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-const DemoIntroModal = ({firebase, livestreamId, open}) => {
+const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
     const [loading, setLoading] = useState(false)
 
     const createTestLivestream = async () => {
@@ -75,23 +75,23 @@ const DemoIntroModal = ({firebase, livestreamId, open}) => {
     return (
         <Dialog open={open}>
             <DialogTitle>
-
+                Welcome to the Testing platform
             </DialogTitle>
             <DialogContent>
                 <DialogContentText>
-
+                    Would you like to partake in the tutorial?
                 </DialogContentText>
                 <DialogActions>
-                    <Button startIcon={<CircularProgress size={20} color="inherit"/>} disabled={loading}
+                    <Button onClick={handleStartDemo} startIcon={<CircularProgress size={20} color="inherit"/>}
+                            disabled={loading}
                             variant="contained" color="primary">
                         Yes Please
                     </Button>
-                    <Button disabled={loading} variant="contained">
+                    <Button onClick={handleClose} disabled={loading} variant="contained">
                         No Thanks
                     </Button>
                 </DialogActions>
             </DialogContent>
-
         </Dialog>
     );
 };
