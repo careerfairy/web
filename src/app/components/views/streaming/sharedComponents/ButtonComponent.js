@@ -183,7 +183,7 @@ const ButtonComponent =
                 name: "Hand Raise",
                 disabled: showMenu && selectedState === 'hand',
                 onClick: () => handleStateChange("hand"),
-                tutorialNum: 23423
+                tutorialNum: 8
             })
         }
 

@@ -154,7 +154,7 @@ function CurrentPollStreamer({demoPolls, firebase, livestream, showMenu, selecte
                                     setPollState('closed')
                                     isOpen(7) && handleConfirm(7)
                                 }}
-                                style={{borderRadius: '0 0 5px 5px', marginTop: 12}}/>
+                                style={{borderRadius: '0 0 15px 15px'}}/>
                     </WhiteTooltip>
                 </div>
             </div>
