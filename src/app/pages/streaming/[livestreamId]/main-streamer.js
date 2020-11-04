@@ -62,12 +62,6 @@ const initialTutorialState = {
     14: false,
     15: false,
     streamerReady: false,
-    showBubbles: false,
-    callback: (setCallback, property, object) => setCallback({
-        ...object,
-        [property]: false,
-        [property + 1]: true,
-    }),
 }
 
 function StreamingPage(props) {
@@ -85,6 +79,7 @@ function StreamingPage(props) {
     const [notificationToRemove, setNotificationToRemove] = useState(null);
     const [notifications, setNotifications] = useState([]);
     const [joiningStreamerLink, setJoiningStreamerLink] = useState("")
+    const [showBubbles, setShowBubbles] = useState(false)
 
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
     const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
@@ -152,7 +147,7 @@ function StreamingPage(props) {
     }
 
     return (
-        <TutorialContext.Provider value={{tutorialSteps, setTutorialSteps}}>
+        <TutorialContext.Provider value={{tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles}}>
             <NotificationsContext.Provider value={{setNewNotification, setNotificationToRemove}}>
                 <div>
                     <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>

@@ -72,12 +72,12 @@ const emotes = ["clapping", "like", "heart"]
 function IconsContainer({livestreamId, firebase, isTest}) {
     const [postedIcons, setPostedIcons] = useState([]);
     const [filteredIcons, setFilteredIcons] = useState([]);
-    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
+    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
 
     const classes = useStyles()
 
     useEffect(() => {
-        if (livestreamId && !tutorialSteps.showBubbles) {
+        if (livestreamId && !showBubbles) {
             const unsubscribe = firebase.listenToLivestreamIcons(livestreamId, querySnapshot => {
                 let iconsList = [];
                 querySnapshot.forEach(doc => {
@@ -90,7 +90,7 @@ function IconsContainer({livestreamId, firebase, isTest}) {
 
             return () => unsubscribe()
         }
-    }, [livestreamId, tutorialSteps.showBubbles]);
+    }, [livestreamId, showBubbles]);
 
     useEffect(() => {
         if (postedIcons.length) {
@@ -107,21 +107,18 @@ function IconsContainer({livestreamId, firebase, isTest}) {
     }, [postedIcons]);
 
     useEffect(() => {
-        if (tutorialSteps.showBubbles) {
+        if (showBubbles) {
             let count = 0
             const interval = setInterval(() => {
                 count = count + 1
                 if (count === 10) {
-                    setTutorialSteps({
-                        ...tutorialSteps,
-                        showBubbles: false
-                    })
+                    setShowBubbles(false)
                 }
                 simulateEmotes()
             }, 200);
             return () => clearInterval(interval)
         }
-    }, [tutorialSteps.showBubbles])
+    }, [showBubbles])
 
     function getIconColor(icon) {
         if (icon.iconName === 'like') {
@@ -148,10 +145,7 @@ function IconsContainer({livestreamId, firebase, isTest}) {
 
     const handleToggle = () => {
         resetIcons()
-        setTutorialSteps({
-            ...tutorialSteps,
-            showBubbles: !tutorialSteps.showBubbles
-        })
+        setShowBubbles(!showBubbles)
     }
 
     const resetIcons = () => {

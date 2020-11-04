@@ -15,7 +15,7 @@ import DemoIntroModal from "../modal/DemoIntroModal";
 import DemoEndModal from "../modal/DemoEndModal";
 
 function VideoContainer(props) {
-    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
+    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
     const [errorMessage, setErrorMessage] = useState(null);
     const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
 
@@ -174,16 +174,15 @@ function VideoContainer(props) {
     const handleCloseDemoIntroModal = (wantsDemo) => {
         setShowDemoIntroModal(false)
         if (wantsDemo) {
-            return setTutorialSteps({
+            setShowBubbles(true)
+            setTutorialSteps({
                 ...tutorialSteps,
-                showBubbles: true,
                 streamerReady: true,
             })
+        } else {
+            setShowBubbles(true)
         }
-        setTutorialSteps({
-            ...tutorialSteps,
-            showBubbles: true
-        })
+
     }
 
     const handleOpenDemoIntroModal = () => {
@@ -192,10 +191,7 @@ function VideoContainer(props) {
 
     const handleCloseDemoEndModal = () => {
         handleConfirm(14)
-        setTutorialSteps({
-            ...tutorialSteps,
-            showBubbles: true
-        })
+        setShowBubbles(true)
 
     }
 

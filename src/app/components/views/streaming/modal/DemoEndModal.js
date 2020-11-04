@@ -30,10 +30,6 @@ const DemoEndModal = ({open, handleClose}) => {
 
     const handleComplete = () => {
         handleNext()
-        setTutorialSteps({
-            ...tutorialSteps,
-            showBubbles: true
-        })
     }
 
     return (
