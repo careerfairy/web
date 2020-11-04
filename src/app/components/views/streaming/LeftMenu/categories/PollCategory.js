@@ -18,7 +18,7 @@ import {
     WhiteTooltip
 } from "../../../../../materialUI/GlobalTooltips";
 
-function PollCategory({firebase, streamer, livestream, selectedState, showMenu, user, userData}) {
+function PollCategory({firebase, streamer, livestream, selectedState, showMenu, user, userData, sliding}) {
 
     const [addNewPoll, setAddNewPoll] = useState(false);
     const [pollEntries, setPollEntries] = useState([]);
@@ -42,7 +42,13 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
 
     const somePollIsCurrent = pollEntries.some(poll => poll.state === 'current');
     const isOpen = (property) => {
-        return Boolean(livestream.test && showMenu && tutorialSteps.streamerReady && tutorialSteps[property] && selectedState === "polls")
+        return Boolean(livestream.test
+            && showMenu
+            && tutorialSteps.streamerReady
+            && tutorialSteps[property]
+            && selectedState === "polls"
+            && !sliding
+        )
     }
     const handleConfirm = (property) => {
         setTutorialSteps({
@@ -58,6 +64,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
                     selectedState={selectedState}
                     showMenu={showMenu}
                     poll={poll}
+                    sliding={sliding}
                     addNewPoll={addNewPoll}
                     setDemoPolls={setDemoPolls}
                     index={index}

@@ -21,7 +21,7 @@ function HandRaiseInactive({firebase, livestream, showMenu, selectedState}) {
             && showMenu
             && tutorialSteps.streamerReady
             && tutorialSteps[property]
-            && selectedState === "polls"
+            && selectedState === "hand"
         )
     }
 
@@ -52,9 +52,9 @@ function HandRaiseInactive({firebase, livestream, showMenu, selectedState}) {
                         placement="right-start"
                         title={
                             <React.Fragment>
-                                <TooltipTitle>Polls (1/2)</TooltipTitle>
+                                <TooltipTitle>Hand Raise (1/2)</TooltipTitle>
                                 <TooltipText>
-                                    If you would like to invite one of your viewer to join as a streamer
+                                    If you would like to invite one of your viewers to join as a streamer
                                     You can activate the hand raise mode which will allow them to join
                                 </TooltipText>
                                 <TooltipButtonComponent onConfirm={() => {

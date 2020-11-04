@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-function CurrentPollStreamer({demoPolls, firebase, livestream, showMenu, selectedState, addNewPoll, poll, index}) {
+function CurrentPollStreamer({demoPolls, sliding, firebase, livestream, showMenu, selectedState, addNewPoll, poll, index}) {
     const [currentPoll, setCurrentPoll] = useState(null)
     const [demoMode, setDemoMode] = useState(false)
     const [numberOfTimes, setNumberOfTimes] = useState(0)
@@ -51,6 +51,7 @@ function CurrentPollStreamer({demoPolls, firebase, livestream, showMenu, selecte
             && tutorialSteps[property]
             && selectedState === "polls"
             && !addNewPoll
+            && !sliding
         )
     }
 

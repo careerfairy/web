@@ -27,11 +27,6 @@ const useStyles = makeStyles(theme => {
             display: "flex",
             justifyContent: "flex-end"
         },
-        "@-webkit-keyframes blink": {
-            "50%": {
-                borderColor: theme.palette.secondary.main
-            }
-        },
         "@keyframes blink": {
             "50%": {
                 borderColor: theme.palette.secondary.main
@@ -41,11 +36,10 @@ const useStyles = makeStyles(theme => {
             borderRadius: 10,
             border: "4px solid transparent",
             animation: "$blink .5s step-end infinite alternate",
-            "-webkit-animation": "$blink .5s step-end infinite alternate",
         }
     }
 })
-
+//
 export const WhiteTooltip = (
     {
         title,

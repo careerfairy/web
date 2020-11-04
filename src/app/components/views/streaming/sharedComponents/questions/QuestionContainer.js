@@ -84,7 +84,7 @@ const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
     )
 }
 
-const QuestionContainer = ({user, livestream, streamer, question, questions, firebase, index, isNextQuestions, selectedState, showMenu}) => {
+const QuestionContainer = ({sliding, user, livestream, streamer, question, questions, firebase, index, isNextQuestions, selectedState, showMenu}) => {
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
@@ -145,7 +145,7 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
     function addNewCommentOnEnter(target) {
         if (target.charCode == 13) {
             addNewComment();
-             isOpen(2) && handleConfirm(2)
+            isOpen(2) && handleConfirm(2)
         }
     }
 
@@ -164,7 +164,14 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
     }
 
     const isOpen = (property) => {
-        return livestream.test && showMenu && tutorialSteps.streamerReady && index === 0 && tutorialSteps[property] && isNextQuestions && selectedState === "questions"
+        return Boolean(livestream.test
+            && showMenu
+            && tutorialSteps.streamerReady
+            && index === 0
+            && tutorialSteps[property]
+            && isNextQuestions
+            && selectedState === "questions"
+            && !sliding)
     }
 
 
@@ -241,41 +248,41 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
                             showAllReactions={showAllReactions}/>}
                     </div>
                     <WhiteTooltip
-                            placement="right-start"
-                            title={
-                                <React.Fragment>
-                                    <TooltipTitle>Student Questions (3/3)</TooltipTitle>
-                                    <TooltipText>
-                                        In the recruiter-chat a company HR representative can respond to
-                                        recruiting related questions via text messages
-                                        , try and type a comment.
-                                    </TooltipText>
-                                    <TooltipButtonComponent onConfirm={() => handleConfirm(2)} buttonText="Ok"/>
-                                </React.Fragment>
-                            } open={isOpen(2)}>
-                    <Box p={1}>
-                        <TextField
-                            value={newCommentTitle}
-                            className={classes.chatInput}
-                            onKeyPress={addNewCommentOnEnter}
-                            placeholder='Send a reaction...'
-                            fullWidth
-                            size="small"
-                            variant="outlined"
-                            InputProps={{
-                                maxLength: 340,
-                                endAdornment: <PlayIconButton
-                                    isEmpty={isEmpty}
-                                    addNewComment={() => {
-                                        addNewComment()
-                                        isOpen(2) && handleConfirm(2)
-                                    }}/>,
-                            }}
-                            onChange={(event) => {
-                                setNewCommentTitle(event.currentTarget.value)
-                            }}
-                        />
-                    </Box>
+                        placement="right-start"
+                        title={
+                            <React.Fragment>
+                                <TooltipTitle>Student Questions (3/3)</TooltipTitle>
+                                <TooltipText>
+                                    In the recruiter-chat a company HR representative can respond to
+                                    recruiting related questions via text messages
+                                    , try and type a comment.
+                                </TooltipText>
+                                <TooltipButtonComponent onConfirm={() => handleConfirm(2)} buttonText="Ok"/>
+                            </React.Fragment>
+                        } open={isOpen(2)}>
+                        <Box p={1}>
+                            <TextField
+                                value={newCommentTitle}
+                                className={classes.chatInput}
+                                onKeyPress={addNewCommentOnEnter}
+                                placeholder='Send a reaction...'
+                                fullWidth
+                                size="small"
+                                variant="outlined"
+                                InputProps={{
+                                    maxLength: 340,
+                                    endAdornment: <PlayIconButton
+                                        isEmpty={isEmpty}
+                                        addNewComment={() => {
+                                            addNewComment()
+                                            isOpen(2) && handleConfirm(2)
+                                        }}/>,
+                                }}
+                                onChange={(event) => {
+                                    setNewCommentTitle(event.currentTarget.value)
+                                }}
+                            />
+                        </Box>
                     </WhiteTooltip>
                     {streamer ?
                         <WhiteTooltip

@@ -10,17 +10,22 @@ import {Box, Button, Typography, useTheme} from "@material-ui/core";
 import {CategoryContainerCentered, CategoryContainerTopAligned} from "../../../../../../../materialUI/GlobalContainers";
 import {GreyPermanentMarker, ThemedPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
 import Paper from "@material-ui/core/Paper";
+import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";
+import {
+    TooltipButtonComponent,
+    TooltipText,
+    TooltipTitle,
+    WhiteTooltip
+} from "../../../../../../../materialUI/GlobalTooltips";
 
-function HandRaiseActive(props) {
+function HandRaiseActive({firebase, livestream, showMenu, selectedState}) {
 
     const {setNewNotification, setNotificationToRemove} = useContext(NotificationsContext);
-
-
-    const [handRaises, setHandRaises] = useState([]);
+    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
     useEffect(() => {
-        if (props.livestream) {
-            props.firebase.listenToHandRaises(props.livestream.id, querySnapshot => {
+        if (livestream) {
+            firebase.listenToHandRaises(livestream.id, querySnapshot => {
                 var handRaiseList = [];
                 querySnapshot.forEach(doc => {
                     let handRaise = doc.data();
@@ -30,14 +35,34 @@ function HandRaiseActive(props) {
                 setHandRaises(handRaiseList);
             });
         }
-    }, [props.livestream]);
+    }, [livestream]);
+
+    const isOpen = (property) => {
+        return Boolean(livestream.test
+            && showMenu
+            && tutorialSteps.streamerReady
+            && tutorialSteps[property]
+            && selectedState === "hand"
+        )
+    }
+
+    const handleConfirm = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
+    }
+
+    const [handRaises, setHandRaises] = useState([]);
+
 
     function setHandRaiseModeInactive() {
-        props.firebase.setHandRaiseMode(props.livestream.id, false);
+        firebase.setHandRaiseMode(livestream.id, false);
     }
 
     function updateHandRaiseRequest(handRaiseId, state) {
-        props.firebase.updateHandRaiseRequest(props.livestream.id, handRaiseId, state);
+        firebase.updateHandRaiseRequest(livestream.id, handRaiseId, state);
     }
 
     let handRaiseElements = handRaises.filter(handRaise => (handRaise.state !== 'unrequested' && handRaise.state !== 'denied')).map(handRaise => {
@@ -48,7 +73,7 @@ function HandRaiseActive(props) {
         );
     })
 
-    if (!props.livestream.handRaiseActive) {
+    if (!livestream.handRaiseActive) {
         return null;
     }
     return (<>
@@ -70,9 +95,29 @@ function HandRaiseActive(props) {
                         <Typography align="center">Your viewers can now request to join the stream. Don't forget to
                             remind them
                             to join in!</Typography>
-                        <Button style={{marginTop: "1rem"}} variant="contained" startIcon={<CloseRoundedIcon/>}
-                                children='Deactivate Hand Raise'
-                                onClick={() => setHandRaiseModeInactive()}/>
+                        <WhiteTooltip
+                            placement="right-start"
+                            title={
+                                <React.Fragment>
+                                    <TooltipTitle>Hand Raise (2/2)</TooltipTitle>
+                                    <TooltipText>
+                                        Once you are have finished your interaction with the speaker
+                                        you can now de-activate the Hand Raise mode to prevent viewers
+                                        from making subsequent requests.
+                                    </TooltipText>
+                                    <TooltipButtonComponent onConfirm={() => {
+                                        setHandRaiseModeInactive()
+                                        handleConfirm(10)
+                                    }} buttonText="Ok"/>
+                                </React.Fragment>
+                            } open={isOpen(10)}>
+                            <Button style={{marginTop: "1rem"}} variant="contained" startIcon={<CloseRoundedIcon/>}
+                                    children='Deactivate Hand Raise'
+                                    onClick={() => {
+                                        setHandRaiseModeInactive()
+                                        isOpen(10) && handleConfirm()
+                                    }}/>
+                        </WhiteTooltip>
                     </Box>
                 </CategoryContainerCentered>
             </Grow>

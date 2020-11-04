@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
     },
 }))
 
-function QuestionCategory({livestream, selectedState, user, streamer, firebase, showMenu}) {
+function QuestionCategory({livestream, selectedState, sliding, streamer, firebase, showMenu}) {
     const theme = useTheme()
     const classes = useStyles()
     const [showNextQuestions, setShowNextQuestions] = useState(true);
@@ -115,7 +115,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase, 
     let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
         return <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} isNextQuestions={showNextQuestions}
                                   livestream={livestream} key={index}
-                                  index={index}
+                                  index={index} sliding={sliding}
                                   showMenu={showMenu}
                                   selectedState={selectedState}
                                   questions={upcomingQuestions} question={question} user={authenticatedUser}
