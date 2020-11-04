@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-function CurrentPollStreamer({demoPolls, firebase, livestream, showMenu, selectedState, addNewPoll, poll}) {
+function CurrentPollStreamer({demoPolls, firebase, livestream, showMenu, selectedState, addNewPoll, poll, index}) {
     const [currentPoll, setCurrentPoll] = useState(null)
     const [demoMode, setDemoMode] = useState(false)
     const [numberOfTimes, setNumberOfTimes] = useState(0)
