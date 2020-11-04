@@ -14,6 +14,13 @@ import {
 import IconButton from "@material-ui/core/IconButton";
 import {makeStyles} from "@material-ui/core/styles";
 import {grey} from "@material-ui/core/colors";
+import TutorialContext from "../../../../../../context/tutorials/TutorialContext";
+import {
+    TooltipButtonComponent,
+    TooltipText,
+    TooltipTitle,
+    WhiteTooltip
+} from "../../../../../../materialUI/GlobalTooltips";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -70,6 +77,7 @@ const useStyles = makeStyles(theme => ({
 
 function MiniChatContainer({isStreamer, livestream, firebase}) {
     const {authenticatedUser, userData} = useContext(UserContext);
+    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
     const [chatEntries, setChatEntries] = useState([]);
     const [focused, setFocused] = useState(false);
@@ -120,6 +128,21 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
         }
     }, [open])
 
+    const isOpen = (property) => {
+        return Boolean(livestream.test
+            && tutorialSteps.streamerReady
+            && tutorialSteps[property]
+        )
+    }
+
+    const handleConfirm = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
+    }
+
 
     function addNewChatEntry() {
         if (isEmpty) {
@@ -133,6 +156,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
             votes: 0
         }
 
+        isOpen(12) && handleConfirm(12)
         firebase.putChatEntry(livestream.id, newChatEntryObject)
             .then(() => {
                 setNewChatEntry('');
@@ -144,6 +168,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
     function addNewChatEntryOnEnter(target) {
         if (target.charCode == 13) {
             addNewChatEntry();
+            isOpen(12) && handleConfirm(12)
         }
     }
 
@@ -163,50 +188,80 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
     </div>)
 
     return (
-        <Accordion TransitionProps={{unmountOnExit: true}} onChange={() => setOpen(!open)} expanded={open}>
-            <AccordionSummary className={classes.header}
-                              expandIcon={<ExpandLessRoundedIcon/>}
-                              aria-controls="chat-header"
-                              id="chat-header"
-                              classes={{expanded: classes.expanded}}
-                              style={{boxShadow: "0 0 2px grey"}}
-            >
-                <Badge badgeContent={numberOfMissedEntries} color="error">
-                    <ForumOutlinedIcon fontSize="small"/>
-                </Badge>
-                <Typography style={{marginLeft: "0.6rem"}}>
-                    Chat
-                </Typography>
-            </AccordionSummary>
-            <AccordionDetails className={classes.chatRoom}>
-                <ScrollToBottom className={classes.scrollToBottom}>
-                    {chatElements}
-                </ScrollToBottom>
-                <div style={{margin: 5}}>
-                    <TextField
-                        variant="outlined"
-                        fullWidth
-                        autoFocus
-                        onBlur={() => setFocused(false)}
-                        onFocus={() => setFocused(true)}
-                        className={classes.chatInput}
-                        size="small"
-                        onKeyPress={addNewChatEntryOnEnter}
-                        value={newChatEntry}
-                        onChange={() => setNewChatEntry(event.target.value)}
-                        placeholder='Post in the chat...'
-                        InputProps={{
-                            maxLength: 340,
-                            endAdornment: playIcon,
-                        }}/>
-                    <Collapse align="center"
-                              style={{color: "grey", fontSize: "0.8em", marginTop: 3, padding: "0 0.8em"}}
-                              in={focused && !isStreamer}>
-                        For questions, please use the Q&A tool!
-                    </Collapse>
-                </div>
-            </AccordionDetails>
-        </Accordion>
+        <WhiteTooltip
+            placement="right-start"
+            title={
+                <React.Fragment>
+                    <TooltipTitle>Chat (1/2)</TooltipTitle>
+                    <TooltipText>
+                        Dont forget you can also interact with your audience
+                        through the direct chat room
+                    </TooltipText>
+                    <TooltipButtonComponent onConfirm={() => {
+                        setOpen(true)
+                        handleConfirm(11)
+                    }} buttonText="Ok"/>
+                </React.Fragment>
+            } open={isOpen(11)}>
+            <Accordion TransitionProps={{unmountOnExit: true}} onChange={() => {
+                !open && isOpen(11) && handleConfirm(11)
+                setOpen(!open)
+            }} expanded={open}>
+                <AccordionSummary className={classes.header}
+                                  expandIcon={<ExpandLessRoundedIcon/>}
+                                  aria-controls="chat-header"
+                                  id="chat-header"
+                                  classes={{expanded: classes.expanded}}
+                                  style={{boxShadow: "0 0 2px grey"}}
+                >
+                    <Badge badgeContent={numberOfMissedEntries} color="error">
+                        <ForumOutlinedIcon fontSize="small"/>
+                    </Badge>
+                    <Typography style={{marginLeft: "0.6rem"}}>
+                        Chat
+                    </Typography>
+                </AccordionSummary>
+                <AccordionDetails className={classes.chatRoom}>
+                    <ScrollToBottom className={classes.scrollToBottom}>
+                        {chatElements}
+                    </ScrollToBottom>
+                    <WhiteTooltip
+                        placement="right-start"
+                        title={
+                            <React.Fragment>
+                                <TooltipTitle>Chat (2/2)</TooltipTitle>
+                                <TooltipText>
+                                    Give it a shot!
+                                </TooltipText>
+                            </React.Fragment>
+                        } open={isOpen(12)}>
+                        <div style={{margin: 5}}>
+                            <TextField
+                                variant="outlined"
+                                fullWidth
+                                autoFocus
+                                onBlur={() => setFocused(false)}
+                                onFocus={() => setFocused(true)}
+                                className={classes.chatInput}
+                                size="small"
+                                onKeyPress={addNewChatEntryOnEnter}
+                                value={newChatEntry}
+                                onChange={() => setNewChatEntry(event.target.value)}
+                                placeholder='Post in the chat...'
+                                InputProps={{
+                                    maxLength: 340,
+                                    endAdornment: playIcon,
+                                }}/>
+                            <Collapse align="center"
+                                      style={{color: "grey", fontSize: "0.8em", marginTop: 3, padding: "0 0.8em"}}
+                                      in={focused && !isStreamer}>
+                                For questions, please use the Q&A tool!
+                            </Collapse>
+                        </div>
+                    </WhiteTooltip>
+                </AccordionDetails>
+            </Accordion>
+        </WhiteTooltip>
     );
 }
 
