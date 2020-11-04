@@ -12,6 +12,7 @@ import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
 import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "../../../../materialUI/GlobalTooltips";
+import useTheme from "@material-ui/core/styles/useTheme";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -61,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
 
 function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode, test}, webRTCAdaptor, viewer, joining, firebase}) {
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
-
+    const theme = useTheme()
     const DELAY = 3000; //3 seconds
     const [open, setOpen] = useState(true);
     const classes = useStyles({open});
@@ -156,7 +157,12 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
         <ClickAwayListener onClickAway={handleClose}>
             <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className={classes.root}>
                 <WhiteTooltip
-                    placement="right-start"
+                    placement="left-start"
+                    style={{
+                        transition: "transform 0.2s",
+                        transitionTimingFunction: theme.transitions.easeInOut,
+                        transform: open ? "" : "translate(20px, 0) scale3d(0.8, 0.8, 0.8)",
+                    }}
                     title={
                         <React.Fragment>
                             <TooltipTitle>Video Controls</TooltipTitle>

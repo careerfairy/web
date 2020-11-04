@@ -189,7 +189,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
 
     return (
         <WhiteTooltip
-            placement="right-start"
+            placement="top"
             title={
                 <React.Fragment>
                     <TooltipTitle>Chat (1/2)</TooltipTitle>
