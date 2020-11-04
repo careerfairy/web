@@ -155,8 +155,15 @@ function VideoContainer(props) {
         location.reload();
     }
 
-    const handleCloseDemoIntroModal = () => {
+    const handleCloseDemoIntroModal = (wantsDemo) => {
         setShowDemoIntroModal(false)
+        if (wantsDemo) {
+            return setTutorialSteps({
+                ...tutorialSteps,
+                showBubbles: true,
+                streamerReady: true,
+            })
+        }
         setTutorialSteps({
             ...tutorialSteps,
             showBubbles: true

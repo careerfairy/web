@@ -65,8 +65,7 @@ const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
         try {
             setLoading(true);
             await firebase.resetTestStream(livestreamId, testChatEntries, testQuestionsEntries, testPolls)
-            setTutorialSteps({...tutorialSteps, streamerReady: true})
-            handleClose() // handleClose should trigger some emotes
+            handleClose(true) // handleClose should trigger some emotes
         } catch (e) {
             console.log(e)
         }
@@ -91,7 +90,7 @@ const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
                             variant="contained" color="primary">
                         Yes Please
                     </Button>
-                    <Button onClick={handleClose} disabled={loading} variant="contained">
+                    <Button onClick={() =>handleClose(false)} disabled={loading} variant="contained">
                         No Thanks
                     </Button>
                 </DialogActions>
