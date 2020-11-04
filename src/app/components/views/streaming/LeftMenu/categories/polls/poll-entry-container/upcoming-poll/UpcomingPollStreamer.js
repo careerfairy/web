@@ -76,22 +76,22 @@ function UpcomingPollStreamer({firebase, somePollIsCurrent, livestream, poll, sh
     }
 
     function deletePoll() {
-        props.firebase.deleteLivestreamPoll(props.livestream.id, props.poll.id);
+        firebase.deleteLivestreamPoll(livestream.id, poll.id);
     }
 
     function setPollState(state) {
-        props.firebase.setPollState(props.livestream.id, props.poll.id, state);
+        firebase.setPollState(livestream.id, poll.id, state);
     }
 
     function handleSetIsNotEditablePoll() {
-        if (props.somePollIsCurrent) {
+        if (somePollIsCurrent) {
             setShowNotEditableMessage(true);
         }
     }
 
 
     let totalVotes = 0;
-    props.poll.options.forEach(option => totalVotes += option.votes);
+    poll.options.forEach(option => totalVotes += option.votes);
 
     const isOpen = (property) => {
         return livestream.test && index === 0 && showMenu && tutorialSteps.streamerReady && tutorialSteps[property] && selectedState === "polls"
@@ -107,7 +107,7 @@ function UpcomingPollStreamer({firebase, somePollIsCurrent, livestream, poll, sh
         })
     }
 
-    const optionElements = props.poll.options.map((option, index) => {
+    const optionElements = poll.options.map((option, index) => {
         return (
             <ListItem disableGutters dense key={index}>
                 <ListItemIcon>
@@ -138,7 +138,7 @@ function UpcomingPollStreamer({firebase, somePollIsCurrent, livestream, poll, sh
                    onMouseLeave={() => setShowNotEditableMessage(false)}>
                 <Box p={2}>
                     <Typography gutterBottom variant="h6" style={{margin: "1.5rem 0 0.5rem 0"}}>
-                        {props.poll.question}
+                        {poll.question}
                     </Typography>
                     <List dense>
                         {optionElements}
@@ -168,7 +168,7 @@ function UpcomingPollStreamer({firebase, somePollIsCurrent, livestream, poll, sh
                     </Menu>
                 </Box>
                 <Button fullWidth disableElevation variant="contained" color="primary"
-                        children={'Ask the Audience Now'} disabled={props.somePollIsCurrent}
+                        children={'Ask the Audience Now'} disabled={somePollIsCurrent}
                         onClick={() => setPollState('current')}
                         style={{borderRadius: '0 0 5px 5px'}}/>
                 {showNotEditableMessage && <Overlay>
@@ -176,7 +176,7 @@ function UpcomingPollStreamer({firebase, somePollIsCurrent, livestream, poll, sh
                         Please close the active poll before activating this one.
                     </div>
                 </Overlay>}
-                <PollCreationModal livestreamId={props.livestream.id} initialPoll={props.poll} open={editPoll}
+                <PollCreationModal livestreamId={livestream.id} initialPoll={poll} open={editPoll}
                                    handleClose={() => setEditPoll(false)}/>
             </Paper>
         </WhiteTooltip>

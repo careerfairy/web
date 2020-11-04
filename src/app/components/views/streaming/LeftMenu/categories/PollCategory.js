@@ -41,7 +41,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
 
     const somePollIsCurrent = pollEntries.some(poll => poll.state === 'current');
     const isOpen = (property) => {
-        return livestream.test && showMenu && tutorialSteps.streamerReady && tutorialSteps[property] && selectedState === "polls"
+        return Boolean(livestream.test && showMenu && tutorialSteps.streamerReady && tutorialSteps[property] && selectedState === "polls")
     }
     const handleConfirm = (property) => {
         setTutorialSteps({
@@ -68,7 +68,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
     });
 
     return (
-        <CategoryContainerTopAligned>
+        <div>
             <QuestionContainerHeader>
                 <QuestionContainerTitle>
                     <BarChartIcon fontSize="large" color="primary"/> Polls
@@ -96,7 +96,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
             </div>
             <PollCreationModal livestreamId={livestream.id} open={addNewPoll} initialPoll={null}
                                initialOptions={null} handleClose={() => setAddNewPoll(false)}/>
-        </CategoryContainerTopAligned>
+        </div>
     );
 }
 
