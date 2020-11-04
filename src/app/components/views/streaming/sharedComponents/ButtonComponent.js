@@ -64,11 +64,6 @@ const useStyles = makeStyles((theme) => ({
     dialButton: {
         display: "none"
     },
-    "@-webkit-keyframes blink": {
-        "50%": {
-            borderColor: theme.palette.secondary.main
-        }
-    },
     "@keyframes blink": {
         "50%": {
             borderColor: theme.palette.secondary.main
@@ -79,7 +74,6 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: theme.palette.primary.main,
         border: "4px solid transparent",
         animation: "$blink .5s step-end infinite alternate",
-        "-webkit-animation": "$blink .5s step-end infinite alternate",
         color: "white",
         "&:disabled": {
             backgroundColor: fade(theme.palette.primary.main, 0.5),
