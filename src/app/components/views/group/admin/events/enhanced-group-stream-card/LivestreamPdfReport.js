@@ -97,7 +97,7 @@ const LargeNumber = styled.Text`
 
 const LargeText = styled.Text`
     font-size: 9px;
-    width: 40vw;
+    width: 30vw;
     padding: 2px;
     font-weight: bold;
     margin-right: 10vw;
@@ -173,6 +173,7 @@ const SmallView = styled.View`
     font-family: 'Poppins';
     font-size: 10px;
     width: 10vw;
+    height: 30px;
 `;
 
 const SpecializedSubCategoryElement = ({ subOption }) => {
@@ -192,7 +193,7 @@ const SpecializedCategoryElement = ({ option, index }) => {
             <LargeText>{ option.name }</LargeText> 
             <LargeNumber>{ option.entries }</LargeNumber>
             <SubCategoryParent>
-                {subCategoryElements }
+                { subCategoryElements }
             </SubCategoryParent>
         </Border>
     );
@@ -260,6 +261,7 @@ const SpeakersViewElement = ({ speakers }) => {
 const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromETH, totalViewerFromOutsideETH, totalStudentsInTalentPool, questions, polls, icons, speakers }) => {
 
     let categoryElements = [];
+    let nameElements = [];
     let questionElements = [];
     let pollElements = [];
 
@@ -268,6 +270,13 @@ const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromE
     }
 
     if (studentStats && studentStats.type === 'specialized') {
+        nameElements = studentStats.names.map( name => {
+            return (
+                <SmallView>
+                    <SmallText>{ name }</SmallText>
+                </SmallView>
+            )
+        })
         categoryElements = Object.keys(studentStats.options).sort(compareOptions).map( (option, index) => {
             return <SpecializedCategoryElement option={studentStats.options[option]} index={index}/>
         })
@@ -319,15 +328,7 @@ const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromE
                             <LargeText style={{ color: 'grey'}}>Faculty</LargeText> 
                             <LargeNumber style={{ color: 'grey'}}>#</LargeNumber>
                             <SubCategoryParent>
-                            <SmallView>
-                                <SmallText>Bachelor</SmallText>
-                            </SmallView>
-                            <SmallView>
-                                <SmallText>Master</SmallText>
-                            </SmallView>
-                            <SmallView>
-                                <SmallText>PhD</SmallText>
-                            </SmallView>
+                                { nameElements }
                             </SubCategoryParent>
                         </Border>
                         { categoryElements }

@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme) => {
             width: "max-content",
             marginLeft: ({isMe}) => isMe ? "auto" : 8,
             margin: 8,
+            minWidth: 140,
             padding: "10px 15px",
             paddingBottom: 5,
             backgroundColor: ({isMe, isStreamer}) => isMe ? theme.palette.primary.main : isStreamer ? "#ff1493" : paperColor,
@@ -31,11 +32,14 @@ const useStyles = makeStyles((theme) => {
             whiteSpace: "nowrap"
         },
         stamp: {
-            fontSize: "0.8em",
-            marginBottom: 0
+            fontSize: "0.7em",
+            marginBottom: 0,
+            color: ({isMe, isStreamer}) => isMe || isStreamer ? "white" : "rgb(180,180,180)",
         }
     }
-});
+})
+)
+;
 
 function ChatEntryContainer({chatEntry}) {
     const timeAgo = chatEntry?.timestamp ? dayjs(chatEntry.timestamp.toDate()).fromNow() : ""

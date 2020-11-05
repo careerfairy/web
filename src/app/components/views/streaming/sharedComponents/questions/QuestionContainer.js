@@ -91,10 +91,10 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
     const {authenticatedUser, userData} = useContext(UserContext);
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
-    const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream.test)
-    const active = question.type === 'current'
-    const old = question.type !== 'new'
-    const upvoted = (!user && !livestream.test) || (question.emailOfVoters ? question.emailOfVoters.indexOf(livestream.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false)
+    const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream?.test)
+    const active = question?.type === 'current'
+    const old = question?.type !== 'new'
+    const upvoted = (!user && !livestream?.test) || (question?.emailOfVoters ? question?.emailOfVoters.indexOf(livestream?.test ? 'streamerEmail' : authenticatedUser.email) > -1 : false)
     const classes = useStyles({active})
 
 
@@ -120,7 +120,7 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
     }, [active, question.type])
 
     function addNewComment() {
-        if (!(newCommentTitle.trim()) || (!userData && !livestream.test && !streamer)) {
+        if (!(newCommentTitle.trim()) || (!userData && !livestream?.test && !streamer)) {
             return;
         }
 
