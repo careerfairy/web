@@ -21,17 +21,13 @@ const useStyles = makeStyles(theme => ({
         flexDirection: "column",
         alignItems: "center",
         width: "100%",
-        justifyContent: "space-around",
+        justifyContent: "space-evenly",
         boxShadow: "0 4px 2px -2px rgb(200,200,200)",
         zIndex: 9000,
         backgroundColor: "white",
-        "& > *": {
-            marginTop: theme.spacing(2),
+        padding: theme.spacing(2),
+        height: 130,
 
-        },
-        "& > * :not(:first-child)": {
-            marginBottom: theme.spacing(2)
-        },
     },
     questionContainerTitleStyle: {
         width: "100%",

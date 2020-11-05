@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {withFirebase} from "../../../../context/firebase";
 import ButtonComponent from "../sharedComponents/ButtonComponent";
 import PollCategory from "./categories/PollCategory";
@@ -33,6 +33,7 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
     const classes = useStyles()
     const [selectedState, setSelectedState] = useState("questions");
     const [value, setValue] = useState(0);
+    const [sliding, setSliding] = useState(false);
 
 
     useEffect(() => {
@@ -67,23 +68,29 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
         if (!showMenu) {
             setShowMenu(true);
         }
+        if (streamer) {
+            setSliding(true)
+        }
         setSelectedState(state);
     }
 
     const handleChange = (event) => {
+        setSliding(true)
         setValue(event);
         setSelectedState(states[event])
     }
 
     const views = [
         <TabPanel key={0} value={value} index={0} dir={theme.direction}>
-            <QuestionCategory streamer={streamer} {...props} livestream={livestream} selectedState={selectedState}/>
+            <QuestionCategory sliding={sliding} showMenu={showMenu} streamer={streamer} {...props} livestream={livestream}
+                              selectedState={selectedState}/>
         </TabPanel>,
         <TabPanel key={1} value={value} index={1} dir={theme.direction}>
-            <PollCategory livestream={livestream} selectedState={selectedState} streamer={streamer}/>
+            <PollCategory sliding={sliding} showMenu={showMenu} livestream={livestream} selectedState={selectedState}
+                          streamer={streamer}/>
         </TabPanel>,
         <TabPanel key={2} value={value} index={2} dir={theme.direction}>
-            <HandRaiseCategory livestream={livestream} selectedState={selectedState}/>
+            <HandRaiseCategory sliding={sliding} showMenu={showMenu} livestream={livestream} selectedState={selectedState}/>
         </TabPanel>
     ]
 
@@ -93,6 +100,7 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
                 containerStyle={{WebkitOverflowScrolling: 'touch'}}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
+                onTransitionEnd={() => setSliding(false)}
                 className={classes.root}
                 onChangeIndex={handleChange}>
                 {views}
@@ -100,6 +108,7 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
             <ButtonComponent
                 setShowMenu={setShowMenu}
                 streamer={streamer}
+                setSliding={setSliding}
                 selectedState={selectedState}
                 showMenu={showMenu}
                 handleStateChange={handleStateChange} {...props}/>

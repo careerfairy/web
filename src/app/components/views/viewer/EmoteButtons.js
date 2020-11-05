@@ -15,8 +15,8 @@ const useStyles = makeStyles((theme) => ({
         width: '28px'
     },
     miniLike: {
-        width: "36px !important",
-        height: "36px !important",
+        width: "50px !important",
+        height: "50px !important",
         backgroundColor: red["A400"],
         color: "white",
         "&:disabled": {
@@ -28,8 +28,8 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     miniClap: {
-        width: "36px !important",
-        height: "36px !important",
+        width: "50px !important",
+        height: "50px !important",
         backgroundColor: deepOrange[400],
         color: "white",
         "&:disabled": {
@@ -41,8 +41,8 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     miniHeart: {
-        width: "36px !important",
-        height: "36px !important",
+        width: "50px !important",
+        height: "50px !important",
         backgroundColor: amber[400],
         color: "white",
         "&:disabled": {
@@ -57,8 +57,8 @@ const useStyles = makeStyles((theme) => ({
         "& > *": {
             margin: "0.2rem"
         },
-        transition: "transform 0.3s",
-        transitionTimingFunction: theme.transitions.easeInOut,
+        transition: "transform 0.7s",
+        transitionTimingFunction: theme.transitions.easeOut,
         "@media(min-width: 768px)": {
             display: "flex",
             alignItems: "center",
@@ -74,16 +74,16 @@ const useStyles = makeStyles((theme) => ({
     },
     cardHovered: {
         "@media(min-width: 768px)": {
-            transform: "translate(0, -70px) scale3d(2.4, 2.4, 2.4)",
-            "-moz-transform": "translate(0, -70px) scale3d(2.4, 2.4, 2.4)",
-            "-o-transform": "translate(0, -70px) scale3d(2.4, 2.4, 2.4)",
-            "-webkit-transform": "translate(0, -70px) scale3d(2.4, 2.4, 2.4)",
+            transform: "translate(0, -70px) scale3d(1.7, 1.7, 1.7)",
+            "-moz-transform": "translate(0, -70px) scale3d(1.7, 1.7, 1.7)",
+            "-o-transform": "translate(0, -70px) scale3d(1.7, 1.7, 1.7)",
+            "-webkit-transform": "translate(0, -70px) scale3d(1.7, 1.7, 1.7)",
         },
         "@media(max-width: 768px)": {
-            transform: "translate(-50px, 0) scale3d(2.4, 2.4, 2.4)",
-            "-moz-transform": "translate(-50px, 0) scale3d(2.4, 2.4, 2.4)",
-            "-o-transform": "translate(-50px, 0) scale3d(2.4, 2.4, 2.4)",
-            "-webkit-transform": "translate(-50px, 0) scale3d(2.4, 2.4, 2.4)",
+            transform: "translate(-50px, 0) scale3d(1.7, 1.7, 1.7)",
+            "-moz-transform": "translate(-50px, 0) scale3d(1.7, 1.7, 1.7)",
+            "-o-transform": "translate(-50px, 0) scale3d(1.7, 1.7, 1.7)",
+            "-webkit-transform": "translate(-50px, 0) scale3d(1.7, 1.7, 1.7)",
         }
     },
     actionArea: {
@@ -129,8 +129,8 @@ const useStyles = makeStyles((theme) => ({
         zIndex: 1,
         top: 0,
         left: 0,
-        height: "36px !important",
-        width: "36px !important"
+        height: "50px !important",
+        width: "50px !important"
     },
 
 }));
@@ -181,7 +181,7 @@ const EmoteButtons =
                         <div className={classes.wrapper}>
                             <Fab onClick={handleLike} disabled={iconsDisabled} className={classes.miniLike}
                                  aria-label="like">
-                                <ThumbUpAltOutlinedIcon fontSize="inherit"/>
+                                <ThumbUpAltOutlinedIcon fontSize="default"/>
                             </Fab>
                             {iconsDisabled &&
                             <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
@@ -189,7 +189,7 @@ const EmoteButtons =
                         <div className={classes.wrapper}>
                             <Fab onClick={handleClap} disabled={iconsDisabled} className={classes.miniClap}
                                  aria-label="clap">
-                                <img alt="clap button" style={{width: 15}} src='/clapping.png'
+                                <img alt="clap button" style={{width: 23}} src='/clapping.png'
                                      className={classes.image}/>
                             </Fab>
                             {iconsDisabled &&
@@ -198,7 +198,7 @@ const EmoteButtons =
                         <div className={classes.wrapper}>
                             <Fab onClick={handleHeart} disabled={iconsDisabled} className={classes.miniHeart}
                                  aria-label="heart">
-                                <FavoriteBorderOutlinedIcon fontSize="inherit"/>
+                                <FavoriteBorderOutlinedIcon fontSize="default"/>
                             </Fab>
                             {iconsDisabled &&
                             <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}

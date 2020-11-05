@@ -9,32 +9,37 @@ const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
 dayjs.extend(relativeTime)
 
-const useStyles = makeStyles((theme) => ({
-    chatBubble: {
-        borderRadius: ({isMe}) => isMe ? "23px 23px 5px 23px" : "23px 23px 23px 5px",
-        maxWidth: "80%",
-        width: "max-content",
-        minWidth: 140,
-        marginLeft: ({isMe}) => isMe ? "auto" : 8,
-        margin: 8,
-        padding: "10px 15px",
-        paddingBottom: 5,
-        backgroundColor: ({isMe, isStreamer}) => isMe ? theme.palette.primary.main : isStreamer ? "#ff1493" : "rgba(255,255,255,0.90)",
-        color: ({isMe, isStreamer}) => isMe || isStreamer ? "white" : "inherit",
-        overflowWrap: "break-word",
-    },
-    author: {
-        fontSize: "0.8em",
-        color: ({isMe, isStreamer}) => isMe || isStreamer ? "white" : "rgb(180,180,180)",
-        overflowWrap: "break-word",
-        whiteSpace: "nowrap"
-    },
-    stamp: {
-        fontSize: "0.7em",
-        marginBottom: 0,
-        color: "rgb(180,180,180)"
-    }
-}));
+const useStyles = makeStyles((theme) => {
+        const paperColor = theme.palette.background.paper;
+        return {
+            chatBubble: {
+                borderRadius: ({isMe}) => isMe ? "23px 23px 5px 23px" : "23px 23px 23px 5px",
+                maxWidth: "80%",
+                width: "max-content",
+                marginLeft: ({isMe}) => isMe ? "auto" : 8,
+                margin: 8,
+                minWidth: 140,
+                padding: "10px 15px",
+                paddingBottom: 5,
+                backgroundColor: ({isMe, isStreamer}) => isMe ? theme.palette.primary.main : isStreamer ? "#ff1493" : paperColor,
+                color: ({isMe, isStreamer}) => isMe || isStreamer ? "white" : "inherit",
+                overflowWrap: "break-word",
+            },
+            author: {
+                fontSize: "0.8em",
+                color: ({isMe, isStreamer}) => isMe || isStreamer ? "white" : "rgb(180,180,180)",
+                overflowWrap: "break-word",
+                whiteSpace: "nowrap"
+            },
+            stamp: {
+                fontSize: "0.7em",
+                marginBottom: 0,
+                color: ({isMe, isStreamer}) => isMe || isStreamer ? "white" : "rgb(180,180,180)",
+            }
+        }
+    })
+
+;
 
 function ChatEntryContainer({chatEntry}) {
     const timeAgo = chatEntry?.timestamp ? dayjs(chatEntry.timestamp.toDate()).fromNow() : ""

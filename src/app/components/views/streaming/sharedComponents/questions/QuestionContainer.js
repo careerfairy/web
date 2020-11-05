@@ -13,6 +13,13 @@ import Collapse from "@material-ui/core/Collapse";
 import Card from "@material-ui/core/Card";
 import {PlayIconButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import Paper from "@material-ui/core/Paper";
+import {
+    TooltipButtonComponent,
+    TooltipText,
+    TooltipTitle,
+    WhiteTooltip
+} from "../../../../../materialUI/GlobalTooltips";
+import TutorialContext from "../../../../../context/tutorials/TutorialContext";
 
 const useStyles = makeStyles(theme => ({
     chatInput: {
@@ -28,7 +35,7 @@ const useStyles = makeStyles(theme => ({
         color: ({active}) => active ? "white" : "inherit",
         position: "relative",
         padding: "20px 0 0 0",
-        margin: "10px 10px 0 10px",
+        margin: 10,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -77,11 +84,12 @@ const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
     )
 }
 
-const QuestionContainer = ({user, livestream, streamer, question, questions, firebase}) => {
+const QuestionContainer = ({sliding, user, livestream, streamer, question, questions, firebase, index, isNextQuestions, selectedState, showMenu}) => {
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
     const {authenticatedUser, userData} = useContext(UserContext);
+    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
     const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream?.test)
     const active = question?.type === 'current'
@@ -137,6 +145,7 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
     function addNewCommentOnEnter(target) {
         if (target.charCode == 13) {
             addNewComment();
+            isOpen(2) && handleConfirm(2)
         }
     }
 
@@ -152,6 +161,26 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
         } else {
             firebase.goToNextLivestreamQuestion(null, nextQuestionId, livestream.id);
         }
+    }
+
+    const isOpen = (property) => {
+        return Boolean(livestream.test
+            && showMenu
+            && tutorialSteps.streamerReady
+            && index === 0
+            && tutorialSteps[property]
+            && isNextQuestions
+            && selectedState === "questions"
+            && !sliding)
+    }
+
+
+    const handleConfirm = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
     }
 
     const componentDecorator = (href, text, key) => (
@@ -180,78 +209,126 @@ const QuestionContainer = ({user, livestream, streamer, question, questions, fir
 
     return (
         <Grow in>
-            <Paper className={classes.questionContainer}>
-                <div style={{padding: "20px 20px 5px 20px"}}>
-                    <div className={classes.upVotes}>
-                        {question.votes} <ThumbUpRoundedIcon color="inherit"
-                                                             style={{verticalAlign: "text-top"}}
-                                                             fontSize='small'/>
+            <WhiteTooltip
+                placement="right-start"
+                title={
+                    <React.Fragment>
+                        <TooltipTitle>Student Questions (1/3)</TooltipTitle>
+                        <TooltipText>
+                            These are the questions that students
+                            already asked and upvoted before your event
+                        </TooltipText>
+                        <TooltipButtonComponent onConfirm={() => handleConfirm(0)} buttonText="Ok"/>
+                    </React.Fragment>
+                } open={isOpen(0)}>
+                <Paper className={classes.questionContainer}>
+                    <div style={{padding: "20px 20px 5px 20px"}}>
+                        <div className={classes.upVotes}>
+                            {question.votes} <ThumbUpRoundedIcon color="inherit"
+                                                                 style={{verticalAlign: "text-top"}}
+                                                                 fontSize='small'/>
+                        </div>
+                        <div className={classes.reactionsQuestion}>
+                            {question.title}
+                        </div>
+                        <Typography style={{
+                            fontSize: "1em",
+                            verticalAlign: "middle",
+                            fontWeight: 700,
+                            color: active ? "white" : "rgb(200,200,200)",
+                            marginBottom: "1rem"
+                        }}>
+                            {comments.length} reaction{comments.length !== 1 && "s"}
+                        </Typography>
+                        {commentsElements[0]}
+                        <Collapse style={{width: "100%"}} in={showAllReactions}>
+                            {commentsElements.slice(1)}
+                        </Collapse>
+                        {comments.length > 1 && <ReactionsToggle
+                            setShowAllReactions={setShowAllReactions}
+                            showAllReactions={showAllReactions}/>}
                     </div>
-                    <div className={classes.reactionsQuestion}>
-                        {question.title}
-                    </div>
-                    <Typography style={{
-                        fontSize: "1em",
-                        verticalAlign: "middle",
-                        fontWeight: 700,
-                        color: active ? "white" : "rgb(200,200,200)",
-                        marginBottom: "1rem"
-                    }}>
-                        {comments.length} reaction{comments.length !== 1 && "s"}
-                    </Typography>
-                    {commentsElements[0]}
-                    <Collapse style={{width: "100%"}} in={showAllReactions}>
-                        {commentsElements.slice(1)}
-                    </Collapse>
-                    {comments.length > 1 && <ReactionsToggle
-                        setShowAllReactions={setShowAllReactions}
-                        showAllReactions={showAllReactions}/>}
-                </div>
-                <Box p={1}>
-                    <TextField
-                        value={newCommentTitle}
-                        className={classes.chatInput}
-                        onKeyPress={addNewCommentOnEnter}
-                        placeholder='Send a reaction...'
-                        fullWidth
-                        size="small"
-                        variant="outlined"
-                        InputProps={{
-                            maxLength: 340,
-                            endAdornment: <PlayIconButton
-                                isEmpty={isEmpty}
-                                addNewComment={addNewComment}/>,
-                        }}
-                        onChange={(event) => {
-                            setNewCommentTitle(event.currentTarget.value)
-                        }}
-                    />
-                </Box>
-                {streamer ?
-                    <Button
-                        startIcon={<ThumbUpRoundedIcon/>}
-                        children={active ? "Answering" : old ? "Answered" : "Answer Now"}
-                        size='small'
-                        disableElevation
-                        disabled={old}
-                        style={{borderRadius: "0 0 5px 5px", padding: "10px 0"}}
-                        fullWidth
-                        color="primary"
-                        onClick={() => goToThisQuestion(question.id)}
-                        variant="contained"
-                    />
-                    : <Button
-                        startIcon={<ThumbUpRoundedIcon/>}
-                        children={!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
-                        size='small'
-                        style={{borderRadius: "0 0 5px 5px", padding: "10px 0"}}
-                        disableElevation
-                        color="primary"
-                        fullWidth
-                        variant="contained"
-                        onClick={() => upvoteLivestreamQuestion()}
-                        disabled={old || upvoted}/>}
-            </Paper>
+                    <WhiteTooltip
+                        placement="right-start"
+                        title={
+                            <React.Fragment>
+                                <TooltipTitle>Student Questions (3/3)</TooltipTitle>
+                                <TooltipText>
+                                    In the recruiter-chat a company HR representative can answer
+                                    recruiting related questions. Try and type a comment.
+                                </TooltipText>
+                                <TooltipButtonComponent onConfirm={() => handleConfirm(2)} buttonText="Ok"/>
+                            </React.Fragment>
+                        } open={isOpen(2)}>
+                        <Box p={1}>
+                            <TextField
+                                value={newCommentTitle}
+                                className={classes.chatInput}
+                                onKeyPress={addNewCommentOnEnter}
+                                placeholder='Send a reaction...'
+                                fullWidth
+                                size="small"
+                                variant="outlined"
+                                InputProps={{
+                                    maxLength: 340,
+                                    endAdornment: <PlayIconButton
+                                        isEmpty={isEmpty}
+                                        addNewComment={() => {
+                                            addNewComment()
+                                            isOpen(2) && handleConfirm(2)
+                                        }}/>,
+                                }}
+                                onChange={(event) => {
+                                    setNewCommentTitle(event.currentTarget.value)
+                                }}
+                            />
+                        </Box>
+                    </WhiteTooltip>
+                    {streamer ?
+                        <WhiteTooltip
+                            placement="right-start"
+                            title={
+                                <React.Fragment>
+                                    <TooltipTitle>Student Questions (2/3)</TooltipTitle>
+                                    <TooltipText>
+                                        Before answering a question verbally, make
+                                        sure to highlight the question with Answer Now
+                                    </TooltipText>
+                                    <TooltipButtonComponent onConfirm={() => {
+                                        goToThisQuestion(question.id)
+                                        handleConfirm(1)
+                                    }} buttonText="Ok"/>
+                                </React.Fragment>
+                            } open={isOpen(1)}>
+                            <Button
+                                startIcon={<ThumbUpRoundedIcon/>}
+                                children={active ? "Answering" : old ? "Answered" : "Answer Now"}
+                                size='small'
+                                disableElevation
+                                disabled={old}
+                                style={{borderRadius: "0 0 5px 5px", padding: "10px 0"}}
+                                fullWidth
+                                color="primary"
+                                onClick={() => {
+                                    goToThisQuestion(question.id)
+                                    isOpen(1) && handleConfirm(1)
+                                }}
+                                variant="contained"
+                            />
+                        </WhiteTooltip>
+                        : <Button
+                            startIcon={<ThumbUpRoundedIcon/>}
+                            children={!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
+                            size='small'
+                            style={{borderRadius: "0 0 5px 5px", padding: "10px 0"}}
+                            disableElevation
+                            color="primary"
+                            fullWidth
+                            variant="contained"
+                            onClick={() => upvoteLivestreamQuestion()}
+                            disabled={old || upvoted}/>}
+                </Paper>
+            </WhiteTooltip>
         </Grow>
     );
 }

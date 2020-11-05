@@ -1,7 +1,5 @@
 import React, {useState} from 'react';
-import LazyLoad from "react-lazyload";
 import {Box, Button} from "@material-ui/core";
-import Skeleton from "@material-ui/lab/Skeleton";
 import GroupJoinModal from "../../profile/GroupJoinModal";
 import {Image} from "semantic-ui-react";
 import {useRouter} from "next/router";

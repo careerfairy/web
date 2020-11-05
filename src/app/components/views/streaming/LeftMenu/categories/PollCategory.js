@@ -1,5 +1,4 @@
-import React, {useState, useEffect, Fragment} from 'react';
-
+import React, {useState, useEffect, Fragment, useContext} from 'react';
 import {withFirebase} from 'context/firebase';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import AddIcon from '@material-ui/icons/Add';
@@ -11,15 +10,24 @@ import {
     QuestionContainerHeader,
     QuestionContainerTitle
 } from "../../../../../materialUI/GlobalContainers";
+import TutorialContext from "../../../../../context/tutorials/TutorialContext";
+import {
+    TooltipButtonComponent,
+    TooltipText,
+    TooltipTitle,
+    WhiteTooltip
+} from "../../../../../materialUI/GlobalTooltips";
 
-function PollCategory(props) {
+function PollCategory({firebase, streamer, livestream, selectedState, showMenu, user, userData, sliding}) {
 
     const [addNewPoll, setAddNewPoll] = useState(false);
     const [pollEntries, setPollEntries] = useState([]);
+    const [demoPolls, setDemoPolls] = useState(false);
+    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
     useEffect(() => {
-        if (props.livestream.id) {
-            const unsubscribe = props.firebase.listenToPollEntries(props.livestream.id, querySnapshot => {
+        if (livestream.id) {
+            const unsubscribe = firebase.listenToPollEntries(livestream.id, querySnapshot => {
                 var pollEntries = [];
                 querySnapshot.forEach(doc => {
                     let poll = doc.data();
@@ -30,18 +38,60 @@ function PollCategory(props) {
             });
             return () => unsubscribe();
         }
-    }, [props.livestream.id]);
+    }, [livestream.id]);
 
     const somePollIsCurrent = pollEntries.some(poll => poll.state === 'current');
+    const getActiveTutorialStepKey = () => {
+        const activeStep = Object.keys(tutorialSteps).find((key) => {
+            if (tutorialSteps[key]) {
+                return key
+            }
+        })
+        return Number(activeStep)
+    }
+
 
     const pollElements = pollEntries.filter(poll => poll.state !== 'closed').map((poll, index) => {
         return (
             <Fragment key={index}>
-                <PollEntryContainer poll={poll} streamer={props.streamer} user={props.user} userData={props.userData}
-                                    livestream={props.livestream} somePollIsCurrent={somePollIsCurrent}/>
+                <PollEntryContainer
+                    selectedState={selectedState}
+                    showMenu={showMenu}
+                    poll={poll}
+                    sliding={sliding}
+                    addNewPoll={addNewPoll}
+                    setDemoPolls={setDemoPolls}
+                    index={index}
+                    streamer={streamer}
+                    user={user}
+                    demoPolls={demoPolls}
+                    userData={userData}
+                    livestream={livestream}
+                    somePollIsCurrent={somePollIsCurrent}/>
             </Fragment>
         );
     });
+
+    const isOpen = (property) => {
+        const activeStep = getActiveTutorialStepKey()
+        return Boolean(livestream.test
+            && showMenu
+            && !addNewPoll
+            && tutorialSteps.streamerReady
+            && tutorialSteps[property]
+            && selectedState === "polls"
+            && !sliding
+        )
+    }
+
+    const handleConfirm = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
+    }
+
 
     return (
         <CategoryContainerTopAligned>
@@ -49,13 +99,32 @@ function PollCategory(props) {
                 <QuestionContainerTitle>
                     <BarChartIcon fontSize="large" color="primary"/> Polls
                 </QuestionContainerTitle>
-                <Button style={{marginBottom: "1rem"}} startIcon={<AddIcon/>} children='Create Poll'
-                        onClick={() => setAddNewPoll(true)} variant="contained" color="primary"/>
+                <WhiteTooltip
+                    placement="right-start"
+                    title={
+                        <React.Fragment>
+                            <TooltipTitle>Polls (1/4)</TooltipTitle>
+                            <TooltipText>
+                                Engage your audience by
+                                creating and asking polls
+                            </TooltipText>
+                            <TooltipButtonComponent onConfirm={() => {
+                                !pollElements.length && setAddNewPoll(true)
+                                handleConfirm(4)
+                            }} buttonText="Ok"/>
+                        </React.Fragment>
+                    } open={isOpen(4)}>
+                    <Button startIcon={<AddIcon/>} children='Create Poll'
+                            onClick={() => {
+                                setAddNewPoll(true)
+                                isOpen(4) && handleConfirm(4)
+                            }} variant="contained" color="primary"/>
+                </WhiteTooltip>
             </QuestionContainerHeader>
             <div style={{width: "100%"}}>
                 {pollElements}
             </div>
-            <PollCreationModal livestreamId={props.livestream.id} open={addNewPoll} initialPoll={null}
+            <PollCreationModal livestreamId={livestream.id} open={addNewPoll} initialPoll={null}
                                initialOptions={null} handleClose={() => setAddNewPoll(false)}/>
         </CategoryContainerTopAligned>
     );
