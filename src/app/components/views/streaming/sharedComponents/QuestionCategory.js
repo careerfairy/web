@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
     },
 }))
 
-function QuestionCategory({livestream, selectedState, user, streamer, firebase}) {
+function QuestionCategory({livestream, selectedState, sliding, streamer, firebase, showMenu}) {
     const theme = useTheme()
     const classes = useStyles()
     const [showNextQuestions, setShowNextQuestions] = useState(true);
@@ -59,7 +59,7 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
         setValue(showNextQuestions ? 0 : 1);
         setShowNextQuestions(!showNextQuestions);
     }
-//
+
     useEffect(() => {
         if (livestream.id) {
             const unsubscribe = firebase.listenToLivestreamQuestions(livestream.id, querySnapshot => {
@@ -113,16 +113,24 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
     }
 
     let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
-        return <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} appear={showNextQuestions}
+        return <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer}
+                                  isNextQuestions={showNextQuestions}
                                   livestream={livestream} key={index}
+                                  index={index} sliding={sliding}
+                                  showMenu={showMenu}
+                                  selectedState={selectedState}
                                   questions={upcomingQuestions} question={question} user={authenticatedUser}
                                   userData={userData}/>
 
     });
 
     let pastQuestionsElements = pastQuestions.map((question, index) => {
-        return <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} appear={!showNextQuestions}
+        return <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer}
+                                  isNextQuestions={!showNextQuestions}
                                   livestream={livestream} key={index}
+                                  index={index}
+                                  showMenu={showMenu}
+                                  selectedState={selectedState}
                                   questions={pastQuestions} question={question} user={authenticatedUser}
                                   userData={userData}/>
     });
@@ -130,12 +138,12 @@ function QuestionCategory({livestream, selectedState, user, streamer, firebase})
 
     return (
         <CategoryContainerTopAligned>
-            <QuestionContainerHeader>
+            <QuestionContainerHeader style={streamer ? {} : {height: 180, padding: 8}}>
                 <QuestionContainerTitle>
                     Questions
                 </QuestionContainerTitle>
                 {!streamer &&
-                <Button variant="contained" style={{marginTop: "1rem"}} children='Add a Question'
+                <Button variant="contained" children='Add a Question'
                         endIcon={<AddIcon fontSize="large"/>}
                         color="primary" onClick={handleOpen}/>}
                 <div style={{display: "flex", justifyContent: "center"}}>

@@ -13,6 +13,8 @@ import NotificationsContainer from 'components/views/streaming/notifications-con
 import {v4 as uuidv4} from 'uuid';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import LeftMenu from "../../../components/views/streaming/LeftMenu/LeftMenu";
+import {initialTutorialState} from "./main-streamer";
+import TutorialContext from "../../../context/tutorials/TutorialContext";
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {
@@ -44,11 +46,13 @@ function StreamingPage(props) {
     const theme = useTheme()
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
-    const [streamerId, setStreamerId] = useState(null) 
+    const [streamerId, setStreamerId] = useState(null)
 
     const [currentLivestream, setCurrentLivestream] = useState(false);
-    const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
+    const [showBubbles, setShowBubbles] = useState(false)
+    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
+
     const [showMenu, setShowMenu] = useState(true);
     const classes = useStyles({showMenu})
 
@@ -61,7 +65,7 @@ function StreamingPage(props) {
         if (livestreamId) {
             setStreamerId(livestreamId + uuidv4())
         }
-    },[livestreamId])
+    }, [livestreamId])
 
     useEffect(() => {
         if (livestreamId) {
@@ -95,61 +99,62 @@ function StreamingPage(props) {
     }
 
     return (
-        <NotificationsContext.Provider value={{setNewNotification: setNewNotification}}>
-            <div className='topLevelContainer'>
-                <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
-                    <div style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '20px',
-                        transform: 'translateY(-50%)',
-                        verticalAlign: 'middle'
-                    }}>
+        <TutorialContext.Provider value={{tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles}}>
+            <NotificationsContext.Provider value={{setNewNotification: setNewNotification}}>
+                <div className='topLevelContainer'>
+                    <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
+                        <div style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '20px',
+                            transform: 'translateY(-50%)',
+                            verticalAlign: 'middle'
+                        }}>
+                        </div>
+                        <div style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            display: 'inline-block',
+                            padding: '10px',
+                            verticalAlign: 'middle',
+                            fontSize: '0.8em'
+                        }}>
+                            <h3 style={{color: (currentLivestream.hasStarted ? 'teal' : 'orange')}}>{currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}</h3>
+                            {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
+                        </div>
+                        <div style={{
+                            float: 'right',
+                            margin: '0 20px',
+                            fontSize: '1em',
+                            padding: '3px',
+                            verticalAlign: 'middle'
+                        }}>
+                            Viewers: {numberOfViewers}
+                        </div>
                     </div>
-                    <div style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        display: 'inline-block',
-                        padding: '10px',
-                        verticalAlign: 'middle',
-                        fontSize: '0.8em'
-                    }}>
-                        <h3 style={{color: (currentLivestream.hasStarted ? 'teal' : 'orange')}}>{currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}</h3>
-                        {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
+                    <div className={classes.blackFrame}>
+                        <VideoContainer currentLivestream={currentLivestream} streamerId={streamerId} viewer={false}/>
                     </div>
-                    <div style={{
-                        float: 'right',
-                        margin: '0 20px',
-                        fontSize: '1em',
-                        padding: '3px',
-                        verticalAlign: 'middle'
-                    }}>
-                        Viewers: {numberOfViewers}
+                    <div className={classes.menuLeft}>
+                        <LeftMenu
+                            streamer
+                            livestream={currentLivestream}
+                            showMenu={showMenu}
+                            setShowMenu={setShowMenu}
+                            toggleShowMenu={toggleShowMenu}/>
                     </div>
-                </div>
-                <div className={classes.blackFrame}>
-                    <VideoContainer currentLivestream={currentLivestream} streamerId={streamerId} viewer={false}/>
-                </div>
-                <div className={classes.menuLeft}>
-                    <LeftMenu
-                        streamer
-                        livestream={currentLivestream}
-                        showMenu={showMenu}
-                        setShowMenu={setShowMenu}
-                        toggleShowMenu={toggleShowMenu}/>
-                </div>
-                <div className='mini-chat-container'>
-                    <MiniChatContainer livestream={currentLivestream} isStreamer={true}/>
-                </div>
-                <div className='icons-container'>
-                    <IconsContainer livestreamId={currentLivestream.id}/>
-                </div>
-                <div className='notifications-container'>
-                    <NotificationsContainer notifications={notifications}/>
-                </div>
-                <style jsx>{`
+                    <div className='mini-chat-container'>
+                        <MiniChatContainer livestream={currentLivestream} isStreamer={true}/>
+                    </div>
+                    <div className='icons-container'>
+                        <IconsContainer isTest={currentLivestream.test} livestreamId={currentLivestream.id}/>
+                    </div>
+                    <div className='notifications-container'>
+                        <NotificationsContainer notifications={notifications}/>
+                    </div>
+                    <style jsx>{`
                     .top-menu {
                         position: relative;
                         background-color: rgba(245,245,245,1);
@@ -206,8 +211,9 @@ function StreamingPage(props) {
                         padding: 10px 0;
                     }
                 `}</style>
-            </div>
-        </NotificationsContext.Provider>
+                </div>
+            </NotificationsContext.Provider>
+        </TutorialContext.Provider>
     );
 }
 
