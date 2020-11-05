@@ -31,18 +31,16 @@ const useStyles = makeStyles((theme) => ({
     },
     imageContainer: {
         position: "relative",
-        height: "180px",
-        width: "250px",
-        borderRadius: "50%",
+        width: "90%",
+        height: "250px"
     },
     image: {
         position: "absolute",
         top: "50%",
         left: "50%",
         transform: "translate(-50%,-50%)",
-        objectFit: "contain",
         maxWidth: "90%",
-        maxHeight: "60%"
+        maxHeight: "100%"
     },
 }));
 
