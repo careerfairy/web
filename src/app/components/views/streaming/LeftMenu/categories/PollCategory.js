@@ -78,7 +78,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
             && showMenu
             && !addNewPoll
             && tutorialSteps.streamerReady
-            && (tutorialSteps[property] || !pollElements.length && activeStep !== 8)
+            && tutorialSteps[property]
             && selectedState === "polls"
             && !sliding
         )
@@ -103,7 +103,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
                     placement="right-start"
                     title={
                         <React.Fragment>
-                            <TooltipTitle>Polls (1/3)</TooltipTitle>
+                            <TooltipTitle>Polls (1/4)</TooltipTitle>
                             <TooltipText>
                                 Engage your audience by
                                 creating and asking polls

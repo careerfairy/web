@@ -72,6 +72,17 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
         )
     }
 
+    const isOtherOpen = (property) => {
+        return Boolean(livestream.test
+            && showMenu
+            && tutorialSteps.streamerReady
+            && tutorialSteps[property]
+            && selectedState === "polls"
+            && !addNewPoll
+            && !sliding
+        )
+    }
+
     const handleConfirm = (property) => {
         setTutorialSteps({
             ...tutorialSteps,
@@ -81,7 +92,7 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
     }
 
     const tutorialActive = () => {
-        return Boolean(isOpen(4) || isOpen(5))
+        return Boolean(isOtherOpen(4) || isOtherOpen(5))
     }
 
     const handleClick = (event) => {
@@ -136,7 +147,7 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
             placement="right-start"
             title={
                 <React.Fragment>
-                    <TooltipTitle>Polls (2/3)</TooltipTitle>
+                    <TooltipTitle>Polls (2/4)</TooltipTitle>
                     <TooltipText>
                         All your created polls will be stored here
                     </TooltipText>
@@ -180,7 +191,7 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
                     placement="right-start"
                     title={
                         <React.Fragment>
-                            <TooltipTitle>Polls (3/3)</TooltipTitle>
+                            <TooltipTitle>Polls (3/4)</TooltipTitle>
                             <TooltipText>
                                 Once you are ready, click here to ask the audience
                             </TooltipText>
