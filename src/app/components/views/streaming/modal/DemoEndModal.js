@@ -83,12 +83,14 @@ const DemoEndModal = ({open, handleClose}) => {
                         which they can then send to the company.
                     </DialogContentText>
                     <Box display="flex" justifyContent="center" style={{width: "100%"}} my={2}>
-                        <a target="_blank" href={pdfLink} onClick={handleDownload} download>
-                            <Button
-                                children={'Download Analytics'}
-                                startIcon={<CloudDownloadIcon/>}
-                                color={"primary"}/>
-                        </a>
+                        <TooltipHighlight open={!hasClickedDownload}>
+                            <a target="_blank" href={pdfLink} onClick={handleDownload} download>
+                                <Button
+                                    children={'Download Analytics'}
+                                    startIcon={<CloudDownloadIcon/>}
+                                    color={"primary"}/>
+                            </a>
+                        </TooltipHighlight>
                     </Box>
                 </DialogContent>
                 <Collapse in={hasClickedDownload}>
