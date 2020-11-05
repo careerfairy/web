@@ -9,6 +9,7 @@ import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import Grow from "@material-ui/core/Grow";
 import Collapse from "@material-ui/core/Collapse";
+import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "../../../../materialUI/GlobalTooltips";
 
 
 const pdfLink = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-documents%2FExampleReport.pdf?alt=media&token=be44d8be-d914-4074-9197-77d5ab830719"
@@ -45,12 +46,20 @@ const DemoEndModal = ({open, handleClose}) => {
                         Join Talent pool below (this will button will be present on their UI).
                     </DialogContentText>
                     <Box display="flex" flexDirection="column" alignItems="center" style={{width: "100%"}} my={2}>
-                        <Button
-                            onClick={handleClickJoinTalentPool}
-                            children={hasJoinedTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
-                            variant="contained"
-                            startIcon={<PeopleAltIcon/>}
-                            color={hasJoinedTalentPool ? "default" : "primary"}/>
+                        <WhiteTooltip
+                            placement="right-start"
+                            title={
+                                    <TooltipText>
+                                       Give it a shot!
+                                    </TooltipText>
+                            } open={!hasJoinedTalentPool}>
+                            <Button
+                                onClick={handleClickJoinTalentPool}
+                                children={hasJoinedTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
+                                variant="contained"
+                                startIcon={<PeopleAltIcon/>}
+                                color={hasJoinedTalentPool ? "default" : "primary"}/>
+                        </WhiteTooltip>
                         <Collapse in={hasJoinedTalentPool}>
                             <Typography style={{margin: "0.5rem 0"}} algin="center" color="primary">
                                 Thanks for joining the talent pool!
@@ -79,14 +88,12 @@ const DemoEndModal = ({open, handleClose}) => {
                         to name a few
                     </DialogContentText>
                     <Box display="flex" justifyContent="center" style={{width: "100%"}} my={2}>
-                        <Button
-                            download
-                            onClick={handleDownload}
-                            href={pdfLink}
-                            target="_blank"
-                            children={'Download Analytics'}
-                            startIcon={<CloudDownloadIcon/>}
-                            color={"primary"}/>
+                        <a target="_blank" href={pdfLink} onClick={handleDownload} download>
+                            <Button
+                                children={'Download Analytics'}
+                                startIcon={<CloudDownloadIcon/>}
+                                color={"primary"}/>
+                        </a>
                     </Box>
                 </DialogContent>
                 <Collapse in={hasClickedDownload}>
