@@ -5,9 +5,6 @@ import {withFirebasePage} from 'context/firebase';
 import React, {memo} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {v4 as uuidv4} from "uuid";
-import Tooltip from "@material-ui/core/Tooltip";
-import {Fab} from "@material-ui/core";
-import AllInclusiveIcon from "@material-ui/icons/AllInclusive";
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
 
 const useStyles = makeStyles(theme => ({
@@ -171,14 +168,6 @@ function IconsContainer({livestreamId, firebase, isTest}) {
                 color={getIconColor(icon)}/>
         );
     });
-
-    // const DemoPollsButton = isTest ? (
-    //     <Tooltip title="Demo Emotes">
-    //         <Fab className={classes.demoFab} onClick={handleToggle} color="secondary" size="small">
-    //             <AllInclusiveIcon className={classes.demoIcon}/>
-    //         </Fab>
-    //     </Tooltip>
-    // ) : null
 
     return (
         <div style={{position: "relative"}} className='topLevelContainer'>
