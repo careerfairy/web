@@ -45,6 +45,7 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
         })
         return Number(activeStep)
     }
+    const activeStep = getActiveTutorialStepKey()
 
     const isOpen = (property) => {
         const activeStep = getActiveTutorialStepKey()
@@ -116,17 +117,17 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
                                         You can de-activate the Hand Raise mode to
                                         prevent viewers from making subsequent requests.
                                     </TooltipText>
-                                    <TooltipButtonComponent onConfirm={() => {
+                                    {activeStep === 10 && < TooltipButtonComponent onConfirm={() => {
                                         setHandRaiseModeInactive()
                                         handleConfirm(10)
-                                    }} buttonText="Ok"/>
+                                    }} buttonText="Ok"/>}
                                 </React.Fragment>
                             } open={isOpen(10)}>
                             <Button variant="contained" startIcon={<CloseRoundedIcon/>}
                                     children='Deactivate Hand Raise'
                                     onClick={() => {
                                         setHandRaiseModeInactive()
-                                        isOpen(10) && handleConfirm(10)
+                                        isOpen(10) && activeStep === 10 && handleConfirm(10)
                                     }}/>
                         </WhiteTooltip>
                     </Box>

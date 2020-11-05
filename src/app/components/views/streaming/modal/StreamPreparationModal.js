@@ -125,7 +125,7 @@ function StreamPreparationModal(props) {
                     <Button content='Continue' style={{marginTop: '20px'}} primary
                             onClick={() => {
                                 props.setConnectionEstablished(true)
-                                if (props.isTest) {
+                                if (props.isTest && !props.viewer) {
                                     props.handleOpenDemoIntroModal()
                                 }
                             }}/>

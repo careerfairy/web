@@ -243,6 +243,7 @@ function VideoContainer(props) {
                                     localStream={localStream} mediaConstraints={mediaConstraints}
                                     connectionEstablished={connectionEstablished}
                                     isTest={props.currentLivestream.test}
+                                    viewer={props.viewer}
                                     handleOpenDemoIntroModal={handleOpenDemoIntroModal}
                                     setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
                                     isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource}

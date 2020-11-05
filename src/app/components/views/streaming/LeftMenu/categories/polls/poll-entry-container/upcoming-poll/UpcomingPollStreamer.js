@@ -206,6 +206,7 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
                             children={'Ask the Audience Now'} disabled={somePollIsCurrent || tutorialActive()}
                             onClick={() => {
                                 if (isOpen(6)) {
+                                    debugger
                                     handleConfirm(6)
                                     setDemoPolls(true)
                                 }

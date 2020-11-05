@@ -113,7 +113,8 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     }
 
     let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
-        return <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} isNextQuestions={showNextQuestions}
+        return <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer}
+                                  isNextQuestions={showNextQuestions}
                                   livestream={livestream} key={index}
                                   index={index} sliding={sliding}
                                   showMenu={showMenu}
@@ -124,7 +125,8 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     });
 
     let pastQuestionsElements = pastQuestions.map((question, index) => {
-        return <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer} isNextQuestions={!showNextQuestions}
+        return <QuestionContainer showNextQuestions={showNextQuestions} streamer={streamer}
+                                  isNextQuestions={!showNextQuestions}
                                   livestream={livestream} key={index}
                                   index={index}
                                   showMenu={showMenu}
@@ -136,7 +138,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
 
     return (
         <CategoryContainerTopAligned>
-            <QuestionContainerHeader>
+            <QuestionContainerHeader style={streamer ? {} : {height: 180, padding: 8}}>
                 <QuestionContainerTitle>
                     Questions
                 </QuestionContainerTitle>
