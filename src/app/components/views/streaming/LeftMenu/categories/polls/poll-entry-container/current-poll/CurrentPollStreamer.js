@@ -137,7 +137,7 @@ function CurrentPollStreamer({demoPolls, sliding, firebase, livestream, showMenu
                     <div className='poll-label'>ACTIVE POLL</div>
                     {currentPoll && <CurrentPollGraph currentPoll={currentPoll}/>}
                     <WhiteTooltip
-                        placement="right-start"
+                        placement="right-end"
                         title={
                             <React.Fragment>
                                 <TooltipTitle>Polls (4/4)</TooltipTitle>

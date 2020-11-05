@@ -9,7 +9,13 @@ import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import Grow from "@material-ui/core/Grow";
 import Collapse from "@material-ui/core/Collapse";
-import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "../../../../materialUI/GlobalTooltips";
+import {
+    TooltipButtonComponent,
+    TooltipHighlight,
+    TooltipText,
+    TooltipTitle,
+    WhiteTooltip
+} from "../../../../materialUI/GlobalTooltips";
 
 
 const pdfLink = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-documents%2FExampleReport.pdf?alt=media&token=be44d8be-d914-4074-9197-77d5ab830719"
@@ -35,100 +41,95 @@ const DemoEndModal = ({open, handleClose}) => {
 
     return (
         <>
-            <Dialog TransitionComponent={Grow} open={Boolean(activePage === 0 && open)}>
-                <DialogTitle>
-                    What makes us different
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        During the stream, at any time, your viewer are able
-                        willingly give their details by clicking on the button
-                        Join Talent pool below (this will button will be present on their UI).
-                    </DialogContentText>
-                    <Box display="flex" flexDirection="column" alignItems="center" style={{width: "100%"}} my={2}>
-                        <WhiteTooltip
-                            placement="right-start"
-                            title={
-                                    <TooltipText>
-                                       Give it a shot!
-                                    </TooltipText>
-                            } open={!hasJoinedTalentPool}>
-                            <Button
-                                onClick={handleClickJoinTalentPool}
-                                children={hasJoinedTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
-                                variant="contained"
-                                startIcon={<PeopleAltIcon/>}
-                                color={hasJoinedTalentPool ? "default" : "primary"}/>
-                        </WhiteTooltip>
-                        <Collapse in={hasJoinedTalentPool}>
-                            <Typography style={{margin: "0.5rem 0"}} algin="center" color="primary">
-                                Thanks for joining the talent pool!
-                            </Typography>
-                        </Collapse>
-                    </Box>
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        disabled={!hasJoinedTalentPool}
-                        variant="contained"
-                        onClick={handleNext}
-                        children={'Next'}
-                        color={"primary"}/>
-                </DialogActions>
-            </Dialog>
-            <Dialog TransitionComponent={Grow} open={Boolean(activePage === 1 && open)}>
-                <DialogTitle>
-                    What makes us different
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Once your stream has ended, you will be able to
-                        to download analytics of the stream, giving you vital information like
-                        like how many student registered, what they study and their universities,
-                        to name a few
-                    </DialogContentText>
-                    <Box display="flex" justifyContent="center" style={{width: "100%"}} my={2}>
-                        <a target="_blank" href={pdfLink} onClick={handleDownload} download>
-                            <Button
-                                children={'Download Analytics'}
-                                startIcon={<CloudDownloadIcon/>}
-                                color={"primary"}/>
-                        </a>
-                    </Box>
-                </DialogContent>
-                <Collapse in={hasClickedDownload}>
-                    <DialogActions>
+        <Dialog TransitionComponent={Grow} open={Boolean(activePage === 0 && open)}>
+            <DialogTitle>
+                What makes us different
+            </DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    During the stream, at any time, your viewer are able
+                    willingly give their details by clicking on the button
+                    Join Talent pool below (this will button will be present on their UI).
+                </DialogContentText>
+                <Box display="flex" flexDirection="column" alignItems="center" style={{width: "100%"}} my={2}>
+                    <TooltipHighlight open>
                         <Button
-                            disabled={!hasClickedDownload}
+                            onClick={handleClickJoinTalentPool}
+                            children={hasJoinedTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
                             variant="contained"
-                            onClick={handleNext}
-                            children={'Next'}
-                            color={"primary"}/>
-                    </DialogActions>
+                            startIcon={<PeopleAltIcon/>}
+                            color={hasJoinedTalentPool ? "default" : "primary"}/>
+                    </TooltipHighlight>
+                <Collapse in={hasJoinedTalentPool}>
+                    <Typography style={{margin: "0.5rem 0"}} algin="center" color="primary">
+                        You've now been added to the Talent Pool!
+                    </Typography>
                 </Collapse>
-            </Dialog>
-            <Dialog TransitionComponent={Grow} open={Boolean(activePage === 2 && open)}>
-                <DialogTitle>
-                    Congratulations!!
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        You've now completed the tutorial :).
-                        We believe you're now ready to venture into the world of streaming!
-                        Good luck!
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
+            </Box>
+        </DialogContent>
+        <DialogActions>
+            <Button
+                disabled={!hasJoinedTalentPool}
+                variant="contained"
+                onClick={handleNext}
+                children={'Next'}
+                color={"primary"}/>
+        </DialogActions>
+        </Dialog>
+    <Dialog TransitionComponent={Grow} open={Boolean(activePage === 1 && open)}>
+        <DialogTitle>
+            What makes us different
+        </DialogTitle>
+        <DialogContent>
+            <DialogContentText>
+                Once your stream has ended, you will be able to
+                to download analytics of the stream, giving you vital information like
+                like how many student registered, what they study and their universities,
+                to name a few
+            </DialogContentText>
+            <Box display="flex" justifyContent="center" style={{width: "100%"}} my={2}>
+                <a target="_blank" href={pdfLink} onClick={handleDownload} download>
                     <Button
-                        disabled={!hasClickedDownload}
-                        variant="contained"
-                        onClick={handleClose}
-                        children={'Back to Stream'}
+                        children={'Download Analytics'}
+                        startIcon={<CloudDownloadIcon/>}
                         color={"primary"}/>
-                </DialogActions>
-            </Dialog>
-        </>
-    );
+                </a>
+            </Box>
+        </DialogContent>
+        <Collapse in={hasClickedDownload}>
+            <DialogActions>
+                <Button
+                    disabled={!hasClickedDownload}
+                    variant="contained"
+                    onClick={handleNext}
+                    children={'Next'}
+                    color={"primary"}/>
+            </DialogActions>
+        </Collapse>
+    </Dialog>
+    <Dialog TransitionComponent={Grow} open={Boolean(activePage === 2 && open)}>
+        <DialogTitle>
+            Congratulations!!
+        </DialogTitle>
+        <DialogContent>
+            <DialogContentText>
+                You've now completed the tutorial :).
+                We believe you're now ready to venture into the world of streaming!
+                Good luck!
+            </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+            <Button
+                disabled={!hasClickedDownload}
+                variant="contained"
+                onClick={handleClose}
+                children={'Back to Stream'}
+                color={"primary"}/>
+        </DialogActions>
+    </Dialog>
+</>
+)
+    ;
 };
 
 export default withFirebase(DemoEndModal);
