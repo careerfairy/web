@@ -80,6 +80,9 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
         })
     }
 
+    const tutorialActive = () => {
+        return Boolean(isOpen(4) || isOpen(5))
+    }
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -189,7 +192,7 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
                         </React.Fragment>
                     } open={isOpen(6)}>
                     <Button fullWidth disableElevation variant="contained" color="primary"
-                            children={'Ask the Audience Now'} disabled={somePollIsCurrent}
+                            children={'Ask the Audience Now'} disabled={somePollIsCurrent || tutorialActive()}
                             onClick={() => {
                                 if (isOpen(6)) {
                                     handleConfirm(6)

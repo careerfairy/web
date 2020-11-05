@@ -128,6 +128,12 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
         }
     }, [open])
 
+    useEffect(() => {
+        if (tutorialSteps.streamerReady) {
+            setNumberOfMissedEntries(3); // resets the missed entries back to 3
+        }
+    }, [tutorialSteps.streamerReady])
+
     const isOpen = (property) => {
         return Boolean(livestream.test
             && tutorialSteps.streamerReady

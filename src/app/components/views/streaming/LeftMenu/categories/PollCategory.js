@@ -92,6 +92,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
         })
     }
 
+
     return (
         <CategoryContainerTopAligned>
             <QuestionContainerHeader>
