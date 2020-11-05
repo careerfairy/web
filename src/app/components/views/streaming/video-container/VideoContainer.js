@@ -246,7 +246,9 @@ function VideoContainer(props) {
                                     setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
                                     isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource}
                                     videoSource={videoSource} setVideoSource={setVideoSource}/>
-            <DemoIntroModal livestreamId={props.currentLivestream.id} open={showDemoIntroModal}
+            <DemoIntroModal livestreamId={props.currentLivestream.id}
+                            open={showDemoIntroModal}
+                            isTest={props.currentLivestream.test}
                             handleClose={handleCloseDemoIntroModal}/>
             <DemoEndModal open={isOpen(14)} handleClose={handleCloseDemoEndModal}/>
             <style jsx>{`

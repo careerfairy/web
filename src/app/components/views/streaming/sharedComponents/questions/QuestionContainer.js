@@ -215,7 +215,8 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
                     <React.Fragment>
                         <TooltipTitle>Student Questions (1/3)</TooltipTitle>
                         <TooltipText>
-                            All student generated questions can be found here
+                            These are the questions that students
+                            already asked and upvoted before your event
                         </TooltipText>
                         <TooltipButtonComponent onConfirm={() => handleConfirm(0)} buttonText="Ok"/>
                     </React.Fragment>
@@ -253,9 +254,8 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
                             <React.Fragment>
                                 <TooltipTitle>Student Questions (3/3)</TooltipTitle>
                                 <TooltipText>
-                                    In the recruiter-chat a company HR representative can respond to
-                                    recruiting related questions via text messages
-                                    , try and type a comment.
+                                    In the recruiter-chat a company HR representative can
+                                    answer recruiting related questions. Try and type a comment.
                                 </TooltipText>
                                 <TooltipButtonComponent onConfirm={() => handleConfirm(2)} buttonText="Ok"/>
                             </React.Fragment>
@@ -291,8 +291,8 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
                                 <React.Fragment>
                                     <TooltipTitle>Student Questions (2/3)</TooltipTitle>
                                     <TooltipText>
-                                        If you would like to let the student know which question
-                                        you are currently answering please click on Answer Now
+                                        Before answering a question verbally, make
+                                        sure to highlight the question with Answer Now
                                     </TooltipText>
                                     <TooltipButtonComponent onConfirm={() => {
                                         goToThisQuestion(question.id)

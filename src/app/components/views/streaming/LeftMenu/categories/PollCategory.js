@@ -104,8 +104,8 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
                         <React.Fragment>
                             <TooltipTitle>Polls (1/3)</TooltipTitle>
                             <TooltipText>
-                                Your able to create polls here
-                                Which can then be asked to the audience.
+                                Engage your audience by
+                                creating and asking polls
                             </TooltipText>
                             <TooltipButtonComponent onConfirm={() => {
                                 !pollElements.length && setAddNewPoll(true)

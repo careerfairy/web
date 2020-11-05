@@ -56,8 +56,8 @@ function HandRaiseInactive({firebase, livestream, showMenu, selectedState, slidi
                             <React.Fragment>
                                 <TooltipTitle>Hand Raise (1/2)</TooltipTitle>
                                 <TooltipText>
-                                    If you would like to invite one of your viewers to join as a streamer
-                                    You can activate the hand raise mode which will allow them to join
+                                    Invite your viewers to also ask you
+                                    questions via video and audio
                                 </TooltipText>
                                 <TooltipButtonComponent onConfirm={() => {
                                     setHandRaiseModeActive()

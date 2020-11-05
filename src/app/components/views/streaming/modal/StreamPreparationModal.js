@@ -100,7 +100,9 @@ function StreamPreparationModal(props) {
                     </Grid.Column>
                 </Grid>
                 <Button content='Connect to CareerFairy' primary fluid style={{margin: '10px 0 10px 0'}}
-                        onClick={() => {props.setStreamerReady(true)}}/>
+                        onClick={() => {
+                            props.setStreamerReady(true)
+                        }}/>
                 <p>Don't worry, your stream will not start until you decide to.</p>
                 <p style={{fontSize: '0.8em', color: 'grey'}}>If anything is unclear or not working, please <a
                     href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
@@ -123,7 +125,9 @@ function StreamPreparationModal(props) {
                     <Button content='Continue' style={{marginTop: '20px'}} primary
                             onClick={() => {
                                 props.setConnectionEstablished(true)
-                                props.handleOpenDemoIntroModal()
+                                if (props.isTest) {
+                                    props.handleOpenDemoIntroModal()
+                                }
                             }}/>
                 </div>
                 <div style={{display: props.errorMessage ? 'block' : 'none'}}>

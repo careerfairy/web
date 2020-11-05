@@ -113,9 +113,8 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
                                 <React.Fragment>
                                     <TooltipTitle>Hand Raise (2/2)</TooltipTitle>
                                     <TooltipText>
-                                        Once you are have finished your interaction with the speaker
-                                        you can now de-activate the Hand Raise mode to prevent viewers
-                                        from making subsequent requests.
+                                        You can de-activate the Hand Raise mode to prevent
+                                        viewers from making subsequent requests.
                                     </TooltipText>
                                     <TooltipButtonComponent onConfirm={() => {
                                         setHandRaiseModeInactive()

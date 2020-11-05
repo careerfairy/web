@@ -167,7 +167,7 @@ function IconsContainer({livestreamId, firebase, isTest}) {
                 index={index}
                 right={getRandomHorizontalPosition(icon, 90)}
                 icon={icon}
-                durationTransform={getRandomDuration(2000, 3000)}
+                durationTransform={getRandomDuration(3500, 4500)}
                 color={getIconColor(icon)}/>
         );
     });

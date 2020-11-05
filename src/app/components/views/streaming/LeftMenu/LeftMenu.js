@@ -76,7 +76,6 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
 
     const handleChange = (event) => {
         setSliding(true)
-        console.log("-> sliding", sliding);
         setValue(event);
         setSelectedState(states[event])
     }
