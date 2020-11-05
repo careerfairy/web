@@ -41,95 +41,94 @@ const DemoEndModal = ({open, handleClose}) => {
 
     return (
         <>
-        <Dialog TransitionComponent={Grow} open={Boolean(activePage === 0 && open)}>
-            <DialogTitle>
-                What makes us different
-            </DialogTitle>
-            <DialogContent>
-                <DialogContentText>
-                    During the stream, at any time, your viewer are able
-                    willingly give their details by clicking on the button
-                    Join Talent pool below (this will button will be present on their UI).
-                </DialogContentText>
-                <Box display="flex" flexDirection="column" alignItems="center" style={{width: "100%"}} my={2}>
-                    <TooltipHighlight open>
-                        <Button
-                            onClick={handleClickJoinTalentPool}
-                            children={hasJoinedTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
-                            variant="contained"
-                            startIcon={<PeopleAltIcon/>}
-                            color={hasJoinedTalentPool ? "default" : "primary"}/>
-                    </TooltipHighlight>
-                <Collapse in={hasJoinedTalentPool}>
-                    <Typography style={{margin: "0.5rem 0"}} algin="center" color="primary">
-                        You've now been added to the Talent Pool!
-                    </Typography>
-                </Collapse>
-            </Box>
-        </DialogContent>
-        <DialogActions>
-            <Button
-                disabled={!hasJoinedTalentPool}
-                variant="contained"
-                onClick={handleNext}
-                children={'Next'}
-                color={"primary"}/>
-        </DialogActions>
-        </Dialog>
-    <Dialog TransitionComponent={Grow} open={Boolean(activePage === 1 && open)}>
-        <DialogTitle>
-            What makes us different
-        </DialogTitle>
-        <DialogContent>
-            <DialogContentText>
-                Once your stream has ended, you will be able to
-                to download analytics of the stream, giving you vital information like
-                like how many student registered, what they study and their universities,
-                to name a few
-            </DialogContentText>
-            <Box display="flex" justifyContent="center" style={{width: "100%"}} my={2}>
-                <a target="_blank" href={pdfLink} onClick={handleDownload} download>
+            <Dialog TransitionComponent={Grow} open={Boolean(activePage === 0 && open)}>
+                <DialogTitle>
+                    Talent Pool
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        By joining a company's Talent Pool during the stream,
+                        students can ask their Career Center to submit their
+                        profile data to the company after the event.
+                    </DialogContentText>
+                    <Box display="flex" flexDirection="column" alignItems="center" style={{width: "100%"}} my={2}>
+                        <TooltipHighlight open>
+                            <Button
+                                onClick={handleClickJoinTalentPool}
+                                children={hasJoinedTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
+                                variant="contained"
+                                startIcon={<PeopleAltIcon/>}
+                                color={hasJoinedTalentPool ? "default" : "primary"}/>
+                        </TooltipHighlight>
+                        <Collapse in={hasJoinedTalentPool}>
+                            <Typography style={{margin: "0.5rem 0"}} algin="center" color="primary">
+                                You've now been added to the Talent Pool!
+                            </Typography>
+                        </Collapse>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
                     <Button
-                        children={'Download Analytics'}
-                        startIcon={<CloudDownloadIcon/>}
+                        disabled={!hasJoinedTalentPool}
+                        variant="contained"
+                        onClick={handleNext}
+                        children={'Next'}
                         color={"primary"}/>
-                </a>
-            </Box>
-        </DialogContent>
-        <Collapse in={hasClickedDownload}>
-            <DialogActions>
-                <Button
-                    disabled={!hasClickedDownload}
-                    variant="contained"
-                    onClick={handleNext}
-                    children={'Next'}
-                    color={"primary"}/>
-            </DialogActions>
-        </Collapse>
-    </Dialog>
-    <Dialog TransitionComponent={Grow} open={Boolean(activePage === 2 && open)}>
-        <DialogTitle>
-            Congratulations!!
-        </DialogTitle>
-        <DialogContent>
-            <DialogContentText>
-                You've now completed the tutorial :).
-                We believe you're now ready to venture into the world of streaming!
-                Good luck!
-            </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-            <Button
-                disabled={!hasClickedDownload}
-                variant="contained"
-                onClick={handleClose}
-                children={'Back to Stream'}
-                color={"primary"}/>
-        </DialogActions>
-    </Dialog>
-</>
-)
-    ;
+                </DialogActions>
+            </Dialog>
+            <Dialog TransitionComponent={Grow} open={Boolean(activePage === 1 && open)}>
+                <DialogTitle>
+                    Analytics Report
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        After the event, Career Centers can download an extensive
+                        Analytics Report in their CareerFairy dashboard,
+                        which they can then send to the company.
+                    </DialogContentText>
+                    <Box display="flex" justifyContent="center" style={{width: "100%"}} my={2}>
+                        <a target="_blank" href={pdfLink} onClick={handleDownload} download>
+                            <Button
+                                children={'Download Analytics'}
+                                startIcon={<CloudDownloadIcon/>}
+                                color={"primary"}/>
+                        </a>
+                    </Box>
+                </DialogContent>
+                <Collapse in={hasClickedDownload}>
+                    <DialogActions>
+                        <Button
+                            disabled={!hasClickedDownload}
+                            variant="contained"
+                            onClick={handleNext}
+                            children={'Next'}
+                            color={"primary"}/>
+                    </DialogActions>
+                </Collapse>
+            </Dialog>
+            <Dialog TransitionComponent={Grow} open={Boolean(activePage === 2 && open)}>
+                <DialogTitle>
+                    Congratulations!!
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        You've now completed the tutorial :).
+                        We believe you're now ready to venture into the world of streaming!
+                        Good luck!
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        disabled={!hasClickedDownload}
+                        variant="contained"
+                        onClick={handleClose}
+                        children={'Back to Stream'}
+                        color={"primary"}/>
+                </DialogActions>
+            </Dialog>
+        </>
+    )
+        ;
 };
 
 export default withFirebase(DemoEndModal);

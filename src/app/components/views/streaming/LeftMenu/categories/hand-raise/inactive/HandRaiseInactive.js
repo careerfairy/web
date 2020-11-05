@@ -56,8 +56,8 @@ function HandRaiseInactive({firebase, livestream, showMenu, selectedState, slidi
                             <React.Fragment>
                                 <TooltipTitle>Hand Raise (1/2)</TooltipTitle>
                                 <TooltipText>
-                                    Invite your viewers to also ask you
-                                    questions via video and audio
+                                    Invite your viewers to also ask
+                                    you questions via video and audio
                                 </TooltipText>
                                 <TooltipButtonComponent onConfirm={() => {
                                     setHandRaiseModeActive()

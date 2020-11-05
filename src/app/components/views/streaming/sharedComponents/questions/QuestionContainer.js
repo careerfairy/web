@@ -254,8 +254,8 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
                             <React.Fragment>
                                 <TooltipTitle>Student Questions (3/3)</TooltipTitle>
                                 <TooltipText>
-                                    In the recruiter-chat a company HR representative can
-                                    answer recruiting related questions. Try and type a comment.
+                                    In the recruiter-chat a company HR representative can answer
+                                    recruiting related questions. Try and type a comment.
                                 </TooltipText>
                                 <TooltipButtonComponent onConfirm={() => handleConfirm(2)} buttonText="Ok"/>
                             </React.Fragment>
