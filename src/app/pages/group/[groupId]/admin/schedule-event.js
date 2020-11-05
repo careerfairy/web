@@ -40,7 +40,6 @@ const ScheduleEvent = (props) => {
     }, [groupId]);
 
     useEffect(() => {
-        debugger;
         if (livestreamRequest.company) {
             setSchedulingStep(1);
         }        

@@ -48,7 +48,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySound, localStream, speakerSource, attachSinkId, handleMarkIncomplete, handleMarkComplete, isCompleted}) => {
+const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySound, localStream, speakerSource, attachSinkId, streamerReady, handleMarkIncomplete, handleMarkComplete, isCompleted}) => {
     const classes = useStyles()
     const [localMicrophones, setLocalMicrophones] = useState([])
     const [clickedNo, setClickedNo] = useState(false)
@@ -58,7 +58,7 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
         if (devices && devices.audioInputList && devices.audioInputList.length) {
             const mappedMicrophones = devices.audioInputList.map(speaker => (
                 {...speaker, hasBeenChecked: false}
-            ))// first speaker in device array is allways selected by default
+            ))
             mappedMicrophones[0].hasBeenChecked = true
             setLocalMicrophones(mappedMicrophones)
         }
@@ -131,7 +131,9 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
 
     return (
         <Grid container spacing={4}>
-            <audio ref={testAudioRef} autoPlay/>       
+            { !streamerReady &&
+                <audio ref={testAudioRef} autoPlay/>      
+            }
             {localMicrophones.length && 
             <Grid item lg={12} md={12} sm={12} xs={12}>
                 <FormControl style={{marginBottom: 10}} disabled={!devices.audioInputList.length} fullWidth variant="outlined">

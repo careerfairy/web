@@ -5,17 +5,21 @@ import {Icon, Image} from "semantic-ui-react";
 function RemoteVideoContainer(props) {
 
     const videoElement = useRef({ current: {} });
+    console.log("videoElement", videoElement);
 
     const [canPlay, setCanPlay] = useState(false);
     const [stoppedByUserAgent, setStoppedByUserAgent] = useState(false);
 
     useEffect(() => {
         videoElement.current.srcObject = props.stream.stream;
-        debugger;
         if (!props.isPlayMode) {
             props.attachSinkId(videoElement.current, props.speakerSource)
         }
     },[props.stream.streamId]);
+
+    useEffect(() => {
+        props.attachSinkId(videoElement.current, props.speakerSource)
+    },[props.speakerSource])
 
     useEffect(() => {
         if (videoElement.current && videoElement.current.srcObject && videoElement.current.paused) {

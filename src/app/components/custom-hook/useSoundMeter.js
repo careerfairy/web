@@ -8,7 +8,6 @@ export function useSoundMeter(isShowAudioVideo, localStream, update) {
 
     useEffect(() => {
         if (navigator && localStream) {
-            debugger;
             try {
                 window.AudioContext = window.AudioContext || window.webkitAudioContext;
                 window.audioContext = new AudioContext();

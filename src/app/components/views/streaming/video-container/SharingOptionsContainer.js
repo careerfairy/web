@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMode}, webRTCAdaptor, devices, viewer, joining, setShowRightMenu, showRightMenu, firebase}) {
+function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMode}, webRTCAdaptor, devices, viewer, joining, setShowSettings, showSettings, firebase}) {
     const DELAY = 3000; //3 seconds
     const [open, setOpen] = useState(true);
     const classes = useStyles({open});
@@ -150,7 +150,7 @@ function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMod
         actions.unshift({
             icon: <SettingsIcon fontSize="large"/>,
             name: "Settings",
-            onClick: () => setShowRightMenu(!showRightMenu)
+            onClick: () => setShowSettings(!showSettings)
         })
     }
 

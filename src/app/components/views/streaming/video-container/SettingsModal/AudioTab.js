@@ -46,31 +46,17 @@ const useStyles = makeStyles(theme => ({
         "& <": {
             margin: "0 5px"
         }
+    },
+    button: {
+        margin: "10px 0"
     }
 }))
 
 const AudioTab = ({audioLevel, audioSource, devices, setAudioSource, setSpeakerSource, localStream, speakerSource, attachSinkId, sinkId}) => {
     const classes = useStyles()
-    const [localMicrophones, setLocalMicrophones] = useState([])
     const [playing, toggle, audio] = useAudio("https://www.kozco.com/tech/piano2-CoolEdit.mp3")
 
-
-    useEffect(() => {
-        if (devices && devices.audioInputList && devices.audioInputList.length) {
-            const mappedMicrophones = devices.audioInputList.map(speaker => (
-                {...speaker, hasBeenChecked: false}
-            ))// first speaker in device array is allways selected by default
-            mappedMicrophones[0].hasBeenChecked = true
-            setLocalMicrophones(mappedMicrophones)
-        }
-    }, [devices])
-
     const testAudioRef = useRef(null);
-    useEffect(() => {
-        if (localStream) {
-            testAudioRef.current.srcObject = localStream;
-        }
-    }, [localStream]);
 
     useEffect(() => {
         if (speakerSource) {
@@ -78,26 +64,17 @@ const AudioTab = ({audioLevel, audioSource, devices, setAudioSource, setSpeakerS
         }
     }, [speakerSource])
 
-    useEffect(() => {
-        if (speakerSource && testAudioRef) {
-            attachSinkId(testAudioRef.current, speakerSource)
-        }
-    }, [speakerSource, testAudioRef])
-
     const handleChangeMic = (event) => {
         setAudioSource(event.target.value)
     }
 
     const handleChangeSpeaker = async (event) => {
-        const value = event.target.value
-        setSpeakerSource(value)
-        const targetIndex = devices.audioInputList.findIndex(device => device.value === value)
-        attachSinkId(audio, event.target.value);
+        setSpeakerSource(event.target.value)
     }
 
     return (
         <Grid container spacing={4}>
-            <audio ref={testAudioRef} sinkIdautoPlay/>       
+            <audio ref={testAudioRef} sinkId autoPlay loop/>       
             {devices.audioInputList.length && 
             <Grid item lg={12} md={12} sm={12} xs={12}>
                 <FormControl style={{marginBottom: 10}} disabled={!devices.audioInputList.length} fullWidth variant="outlined">
@@ -139,6 +116,10 @@ const AudioTab = ({audioLevel, audioSource, devices, setAudioSource, setSpeakerS
                         })}
                     </Select>
                 </FormControl>
+                <Button variant='outlined' onClick={toggle} className={classes.button}>{ playing ? 'Stop playing' : 'Play some music'}</Button>
+                { playing &&
+                    <Typography>If you cannot hear the music, try another speaker or increase the volume on your device.</Typography>
+                }
             </Grid>}
         </Grid>
     );

@@ -33,7 +33,10 @@ function VideoContainer(props) {
     const [connectionEstablished, setConnectionEstablished] = useState(false);
 
     const [isStreaming, setIsStreaming] = useState(false);
+
     const [speakerSource, setSpeakerSource] = useState(null);
+    const [audioSource, setAudioSource] = useState(null);
+    const [videoSource, setVideoSource] = useState(null);
 
     const [mediaConstraints, setMediaConstraints] = useState({
         audio: true,
@@ -46,8 +49,9 @@ function VideoContainer(props) {
 
     const [audioCounter, setAudioCounter] = useState(0);
     const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
-    const [showRightMenu, setShowRightMenu] = useState(true);
-    const classes = useStyles({showRightMenu});
+    const [showSettings, setShowSettings] = useState(false);
+
+    const classes = useStyles();
 
     const devices = useDevices();
     const localVideoId = 'localVideo';
@@ -205,12 +209,17 @@ function VideoContainer(props) {
                     viewer={props.viewer} 
                     streamerId={props.streamerId}
                     joining={!isMainStreamer}
-                    showRightMenu={showRightMenu}
-                    setShowRightMenu={setShowRightMenu}
+                    showSettings={showSettings}
+                    setShowSettings={setShowSettings}
                     />
             </div>
-            <SettingsModal webRTCAdaptor={webRTCAdaptor} streamId={props.streamerId} devices={devices} localStream={localMediaStream}
-                speakerSource={speakerSource} setSpeakerSource={setSpeakerSource} attachSinkId={attachSinkId} sinkId={sinkId}/>
+            <SettingsModal open={showSettings} close={() => setShowSettings(false)} 
+                webRTCAdaptor={webRTCAdaptor} streamId={props.streamerId} 
+                devices={devices} localStream={localMediaStream}
+                audioSource={audioSource} setAudioSource={setAudioSource} 
+                videoSource={videoSource} setVideoSource={setVideoSource} 
+                speakerSource={speakerSource} setSpeakerSource={setSpeakerSource} 
+                attachSinkId={attachSinkId}/>
             <Modal open={showDisconnectionModal}>
                 <Modal.Header>You have been disconnected</Modal.Header>
                 <Modal.Content>
@@ -222,15 +231,16 @@ function VideoContainer(props) {
                             onClick={() => reloadPage()}/>
                 </Modal.Content>
             </Modal>
-            {/*<StreamPreparationModal streamerReady={streamerReady} setStreamerReady={setStreamerReady} localStream={localStream} mediaConstraints={mediaConstraints} connectionEstablished={connectionEstablished} setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage} isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource} videoSource={videoSource} setVideoSource={setVideoSource}/>*/}
-            {/* <StreamPreparationModalV2 speakerSource={speakerSource} setSpeakerSource={setSpeakerSource}
-                                      streamerReady={streamerReady} setStreamerReady={setStreamerReady}
-                                      localStream={localMediaStream} mediaConstraints={mediaConstraints}
-                                      connectionEstablished={connectionEstablished}
-                                      attachSinkId={attachSinkId} devices={devices}
-                                      setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
-                                      webRTCAdaptor={webRTCAdaptor} streamId={props.streamerId}
-                                      isStreaming={isStreaming}/> */}
+            <StreamPreparationModalV2 audioSource={audioSource} setAudioSource={setAudioSource}
+                                    videoSource={videoSource} setVideoSource={setVideoSource}
+                                    speakerSource={speakerSource} setSpeakerSource={setSpeakerSource}
+                                    streamerReady={streamerReady} setStreamerReady={setStreamerReady}
+                                    localStream={localMediaStream} mediaConstraints={mediaConstraints}
+                                    connectionEstablished={connectionEstablished}
+                                    attachSinkId={attachSinkId} devices={devices}
+                                    setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
+                                    webRTCAdaptor={webRTCAdaptor} streamId={props.streamerId}
+                                    isStreaming={isStreaming}/>
             <ErrorMessageModal isStreaming={isStreaming} connectionEstablished={connectionEstablished}
                                errorMessage={errorMessage} streamerReady={streamerReady}/>
             <style jsx>{`

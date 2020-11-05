@@ -45,11 +45,13 @@ const StreamPreparationModalV2 = ({
                                       streamerReady,
                                       setStreamerReady,
                                       localStream,
-                                      mediaConstraints,
                                       connectionEstablished,
                                       setConnectionEstablished,
                                       isStreaming,
-                                      errorMessage,
+                                      audioSource,
+                                      setAudioSource,
+                                      videoSource,
+                                      setVideoSource,
                                       setSpeakerSource,
                                       speakerSource,
                                       webRTCAdaptor,
@@ -61,9 +63,8 @@ const StreamPreparationModalV2 = ({
     const theme = useTheme()
 
     const [showAudioVideo, setShowAudioVideo] = useState(false);
-    const [audioSource, setAudioSource] = useState(null);
-    const [videoSource, setVideoSource] = useState(null);
     const [value, setValue] = useState(0);
+    const [initialDevicesSet, setInitialDevicesSet] = useState(false);
 
     const [playSound, setPlaySound] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
@@ -74,7 +75,7 @@ const StreamPreparationModalV2 = ({
     const steps = getSteps();
 
     useEffect(() => {
-        if (localStream) {
+        if (localStream && !initialDevicesSet) {
             if (devices.audioInputList && devices.audioInputList.length > 0 && (!audioSource || !devices.audioInputList.some(device => device.value === audioSource))) {
                 updateAudioSource(devices.audioInputList[0].value)
             }
@@ -84,8 +85,15 @@ const StreamPreparationModalV2 = ({
             if (devices.audioOutputList && devices.audioOutputList.length > 0 && (!speakerSource || !devices.audioOutputList.some(device => device.value === speakerSource))) {
                 setSpeakerSource(devices.audioOutputList[0].value);
             }
+            setInitialDevicesSet(true);
         }   
     },[devices, localStream]);
+
+    useEffect(() => {
+        if (initialDevicesSet) {
+            setDevicesFromLocalStorage()
+        }
+    },[initialDevicesSet]);
 
     function updateAudioSource(deviceId) {
         webRTCAdaptor.switchAudioInputSource(streamId, deviceId)
@@ -183,6 +191,7 @@ const StreamPreparationModalV2 = ({
     };
 
     const handleFinalize = () => {
+        storeDevices()
         setStreamerReady(true)
         setConnectionEstablished(true)
     }
@@ -215,6 +224,44 @@ const StreamPreparationModalV2 = ({
         const newCompleted = new Set(completed);
         newCompleted.delete(activeStep);
         setCompleted(newCompleted);
+    }
+
+    const setDevicesFromLocalStorage = () => {
+        const devices = JSON.parse(localStorage.getItem('selectedDevices'));
+        if (devices) {
+            setDevice(devices.videoSource, "video");
+            setDevice(devices.audioSource, "audioInput");
+            setDevice(devices.speakerSource, "audioOutput");
+        }
+    }
+
+    const storeDevices = () => {
+        localStorage.setItem('selectedDevices', JSON.stringify({
+            videoSource,
+            audioSource,
+            speakerSource
+        }));
+    }
+
+    const setDevice = (deviceId, deviceType) => {
+        if (deviceType === 'video') {
+            const deviceExists = devices.videoDeviceList.some( device => device.value === deviceId );
+            if (deviceExists) {
+                updateVideoSource(deviceId);
+            }
+        }
+        if (deviceType === 'audioInput') {
+            const deviceExists = devices.audioInputList.some( device => device.value === deviceId );
+            if (deviceExists) {
+                updateAudioSource(deviceId);
+            }        
+        }
+        if (deviceType === 'audioOutput') {
+            const deviceExists = devices.audioOutputList.some( device => device.value === deviceId );
+            if (deviceExists) {
+                setSpeakerSource(deviceId);
+            }             
+        }
     }
 
     function getStepContent(stepIndex) {
@@ -257,6 +304,7 @@ const StreamPreparationModalV2 = ({
                                  handleMarkComplete={handleMarkComplete}
                                  isCompleted={isCompleted()}
                                  playSound={playSound}
+                                 streamerReady={streamerReady}
                                  speakerSource={speakerSource}
                                  setPlaySound={setPlaySound}
                                  audioSource={audioSource}/>
@@ -308,8 +356,6 @@ const StreamPreparationModalV2 = ({
                         Back
                     </Button>
                     <Button
-                        variant="contained"
-                        color="primary"
                         disabled={!isStepComplete(activeStep)}
                         onClick={handleNext}
                         className={classes.button}
@@ -326,6 +372,14 @@ const StreamPreparationModalV2 = ({
                             Skip
                         </Button>
                     )}
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => handleFinalize()}
+                            className={classes.button}
+                        >
+                            Connect Directly
+                        </Button>
 
                     {completedSteps() === totalSteps() - 1 && activeStep === 4 &&
                     <Button variant="contained" color="primary" onClick={handleFinalize}>

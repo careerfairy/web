@@ -2,6 +2,7 @@ import React, {useEffect, Fragment, useRef, useState} from 'react';
 import {Grid, Icon} from "semantic-ui-react";
 import RemoteVideoContainer from './RemoteVideoContainer';
 import { useWindowSize } from '../../../custom-hook/useWindowSize';
+import CreateLivestreamProposalStep from 'components/views/group/admin/schedule-events/create-livestream-proposal-step/CreateLivestreamProposalStep';
 
 function CurrentSpeakerDisplayer(props) {
 

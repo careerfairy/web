@@ -47,14 +47,25 @@ function TabPanel(props) {
   }
   
 
-function SettingsModal({ webRTCAdaptor, streamId, devices, localStream, speakerSource, setSpeakerSource, attachSinkId }) {
+function SettingsModal({ open, 
+                        close, 
+                        webRTCAdaptor, 
+                        streamId, 
+                        devices, 
+                        localStream, 
+                        audioSource,
+                        setAudioSource,
+                        videoSource,
+                        setVideoSource,
+                        speakerSource, 
+                        setSpeakerSource, 
+                        attachSinkId 
+                    }) {
 
     const classes = useStyles();
     const [value, setValue] = React.useState(0);
     const [audioValue, setAudioValue] = React.useState(0);
 
-    const [audioSource, setAudioSource] = useState(null);
-    const [videoSource, setVideoSource] = useState(null);
     const audioLevel = useSoundMeter(true, localStream, audioValue);
 
     useEffect(() => {
@@ -72,7 +83,6 @@ function SettingsModal({ webRTCAdaptor, streamId, devices, localStream, speakerS
     },[devices, localStream]);
 
     function updateAudioSource(deviceId) {
-        debugger
         webRTCAdaptor.switchAudioInputSource(streamId, deviceId)
         setAudioSource(deviceId);
         setTimeout(() => {
@@ -90,14 +100,14 @@ function SettingsModal({ webRTCAdaptor, streamId, devices, localStream, speakerS
     };
 
     return (
-        <Dialog fullScreen={false} fullWidth maxWidth="sm" open={true} style={{ minHeight: 600}}>
+        <Dialog fullScreen={false} fullWidth maxWidth="sm" open={open} PaperProps={{ style: { minHeight: 500 }}}>
             <DialogTitle>
-                <h3 style={{ color: 'lightgrey'}}>
+                <div style={{ color: 'lightgrey'}}>
                     <SettingsIcon style={{ verticalAlign: "middle", marginRight: "10px" }}/>
                     <span style={{ verticalAlign: "middle", marginRight: "10px" }}>Settings</span>
-                </h3>
+                </div>
             </DialogTitle>
-            <DialogContent>
+            <DialogContent dividers>
                 <div className={classes.grid}>
                     <Grid container spacing={3} >
                         <Grid xs={3} item>
@@ -123,13 +133,13 @@ function SettingsModal({ webRTCAdaptor, streamId, devices, localStream, speakerS
                             </TabPanel>
                         </Grid>
                     </Grid>
-                </div>
-                <DialogActions>
-                    <Button>
-                        Back
-                    </Button>
-                </DialogActions>
+                </div>   
             </DialogContent>
+            <DialogActions>
+                <Button onClick={close}>
+                    Close
+                </Button>
+            </DialogActions>
         </Dialog>
     );
 }
