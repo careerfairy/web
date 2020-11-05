@@ -98,9 +98,21 @@ const ButtonComponent =
      }) => {
         const DELAY = 3000; //3 seconds
         const [open, setOpen] = useState(true);
-        const classes = useStyles({open, showMenu, isMobile});
         const [delayHandler, setDelayHandler] = useState(null)
         const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
+
+        const tutorialStepActive = () => {
+            return Boolean(isOpen(3) || isOpen(8))
+        }
+        const isValid = (actionTutorialNum, actionDisabled) => {
+            return tutorialSteps[actionTutorialNum] && !actionDisabled
+        }
+
+        const isOpen = (actionTutorialNum, actionDisabled) => {
+            return tutorialSteps.streamerReady && isValid(actionTutorialNum, actionDisabled)
+        }
+        const classes = useStyles({open: open || tutorialStepActive(), showMenu, isMobile});
+
 
         const handleMouseEnter = event => {
             clearTimeout(delayHandler)
@@ -127,14 +139,6 @@ const ButtonComponent =
 
         if (isMobile && showMenu) {
             return null;
-        }
-
-        const isValid = (actionTutorialNum, actionDisabled) => {
-            return tutorialSteps[actionTutorialNum] && !actionDisabled
-        }
-
-        const isOpen = (actionTutorialNum, actionDisabled) => {
-            return tutorialSteps.streamerReady && isValid(actionTutorialNum, actionDisabled)
         }
 
 

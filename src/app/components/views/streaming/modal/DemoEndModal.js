@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {withFirebase} from "../../../../context/firebase";
 import Dialog from "@material-ui/core/Dialog";
-import {Box, Button, DialogContentText, Fade, Typography} from "@material-ui/core";
+import {Box, Button, DialogContentText, Typography} from "@material-ui/core";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -10,15 +10,11 @@ import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import Grow from "@material-ui/core/Grow";
 import Collapse from "@material-ui/core/Collapse";
 import {
-    TooltipButtonComponent,
     TooltipHighlight,
-    TooltipText,
-    TooltipTitle,
-    WhiteTooltip
 } from "../../../../materialUI/GlobalTooltips";
 
 
-const pdfLink = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-documents%2FExampleReport.pdf?alt=media&token=be44d8be-d914-4074-9197-77d5ab830719"
+const pdfLink = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-documents%2FExampleReport.pdf?alt=media&token=bbec2b79-a30d-48f7-927f-bd0941ec5d73"
 const DemoEndModal = ({open, handleClose}) => {
 
     const [activePage, setActivePage] = useState(0)
@@ -52,7 +48,7 @@ const DemoEndModal = ({open, handleClose}) => {
                         profile data to the company after the event.
                     </DialogContentText>
                     <Box display="flex" flexDirection="column" alignItems="center" style={{width: "100%"}} my={2}>
-                        <TooltipHighlight open>
+                        <TooltipHighlight open={!hasJoinedTalentPool}>
                             <Button
                                 onClick={handleClickJoinTalentPool}
                                 children={hasJoinedTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
