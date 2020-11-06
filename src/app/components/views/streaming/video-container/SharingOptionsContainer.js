@@ -130,14 +130,6 @@ function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMod
         onClick: toggleVideo,
     }];
 
-    if (!(viewer || joining)) {
-        actions.unshift({
-            icon: <HearingIcon fontSize="large" color={automaticMode ? "primary" : "inherit"}/>,
-            name: automaticMode ? 'Deactivate automatic speaker Switch' : 'Activate automatic speaker Switch',
-            onClick: () => setLivestreamSpeakerSwitchMode(automaticMode ? "manual" : "automatic")
-        })
-    }
-
     if (!viewer) {
         actions.unshift({
             icon: <DynamicFeedIcon fontSize="large" color={presentMode ? "primary" : "inherit"}/>,
