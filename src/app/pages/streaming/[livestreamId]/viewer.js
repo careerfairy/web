@@ -1,7 +1,6 @@
 import {useState, useEffect, Fragment} from 'react';
 import VolumeUpRoundedIcon from '@material-ui/icons/VolumeUpRounded';
 import PlayArrowRoundedIcon from '@material-ui/icons/PlayArrowRounded';
-
 import {useRouter} from 'next/router';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import {withFirebasePage} from '../../../context/firebase';
@@ -13,12 +12,12 @@ import {useWindowSize} from 'components/custom-hook/useWindowSize';
 import React from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import {fade} from "@material-ui/core";
-import {amber, deepOrange, green, red} from "@material-ui/core/colors";
 import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
 import MiniChatContainer from "../../../components/views/streaming/LeftMenu/categories/chat/MiniChatContainer";
 import EmoteButtons from "../../../components/views/viewer/EmoteButtons";
 import RatingContainer from "../../../components/views/viewer/rating-container/RatingContainer";
+import TutorialContext from "../../../context/tutorials/TutorialContext";
+import {initialTutorialState} from "./main-streamer";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -70,6 +69,9 @@ function ViewerPage({firebase}) {
     const classes = useStyles({showMenu, mobile: width < 768});
     const [open, setOpen] = React.useState(true);
     const [delayHandler, setDelayHandler] = useState(null)
+
+    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
+    const [showBubbles, setShowBubbles] = useState(false)
 
 
     const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
@@ -174,10 +176,10 @@ function ViewerPage({firebase}) {
     }
 
     function postIcon(iconName) {
+        let email = currentLivestream.test ? 'streamerEmail' : authenticatedUser.email;
+        firebase.postIcon(currentLivestream.id, iconName, email);
         if (!iconsDisabled) {
             setIconsDisabled(true);
-            let email = currentLivestream.test ? 'streamerEmail' : authenticatedUser.email;
-            firebase.postIcon(currentLivestream.id, iconName, email);
         }
     }
 
@@ -209,100 +211,107 @@ function ViewerPage({firebase}) {
     }
 
     return (
-        <div className={classes.root}>
-            <div className='top-menu'>
-                <div className='top-menu-left'>
-                    <img src='/logo_teal.png'
-                         style={{maxHeight: '50px', maxWidth: '150px', display: 'inline-block', marginRight: '2px'}}/>
-                    {logoElements}
-                    <div style={{
-                        position: 'absolute',
-                        bottom: '13px',
-                        left: '120px',
-                        fontSize: '7em',
-                        fontWeight: '700',
-                        color: 'rgba(0, 210, 170, 0.2)',
-                        zIndex: '50'
-                    }}>&
+         <TutorialContext.Provider value={{tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles}}>
+            <div className={classes.root}>
+                <div className='top-menu'>
+                    <div className='top-menu-left'>
+                        <img src='/logo_teal.png'
+                             style={{
+                                 maxHeight: '50px',
+                                 maxWidth: '150px',
+                                 display: 'inline-block',
+                                 marginRight: '2px'
+                             }}/>
+                        {logoElements}
+                        <div style={{
+                            position: 'absolute',
+                            bottom: '13px',
+                            left: '120px',
+                            fontSize: '7em',
+                            fontWeight: '700',
+                            color: 'rgba(0, 210, 170, 0.2)',
+                            zIndex: '50'
+                        }}>&
+                        </div>
+                    </div>
+                    <div className={'top-menu-right'}>
+                        <img src={currentLivestream.companyLogoUrl} style={{
+                            position: 'relative',
+                            zIndex: '100',
+                            maxHeight: '50px',
+                            maxWidth: '150px',
+                            display: 'inline-block',
+                            margin: '0 10px'
+                        }}/>
+                        {!currentLivestream.hasNoTalentPool ?
+                            <Button
+                                children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
+                                variant="contained"
+                                startIcon={<PeopleAltIcon/>}
+                                icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
+                                onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
+                                color={userIsInTalentPool ? "default" : "primary"}/> : null}
                     </div>
                 </div>
-                <div className={'top-menu-right'}>
-                    <img src={currentLivestream.companyLogoUrl} style={{
-                        position: 'relative',
-                        zIndex: '100',
-                        maxHeight: '50px',
-                        maxWidth: '150px',
-                        display: 'inline-block',
-                        margin: '0 10px'
-                    }}/>
-                    {!currentLivestream.hasNoTalentPool ?
-                        <Button
-                            children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
-                            variant="contained"
-                            startIcon={<PeopleAltIcon/>}
-                            icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
-                            onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
-                            color={userIsInTalentPool ? "default" : "primary"}/> : null}
+                <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
+                    {handRaiseActive ?
+                        <ViewerHandRaiseComponent currentLivestream={currentLivestream}
+                                                  handRaiseActive={handRaiseActive}
+                                                  setHandRaiseActive={setHandRaiseActive}/> :
+                        <ViewerComponent livestreamId={livestreamId} streamerId={streamerId}
+                                         currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
+                                         setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton}
+                                         setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>
+                    }
+                    <div className='mini-chat-container'>
+                        <MiniChatContainer livestream={currentLivestream} isStreamer={false}/>
+                    </div>
+                    <EmoteButtons
+                        handRaiseActive={handRaiseActive}
+                        handleClose={handleClose}
+                        handleClap={handleClap}
+                        handleHeart={handleHeart}
+                        handleLike={handleLike}
+                        handleMouseEnter={handleMouseEnter}
+                        handleMouseLeave={handleMouseLeave}
+                        iconsDisabled={iconsDisabled}
+                        setIconsDisabled={setIconsDisabled}
+                        delay={DELAY}
+                        smoothness={2}
+                        open={open}
+                    />
                 </div>
-            </div>
-            <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
-                {handRaiseActive ?
-                    <ViewerHandRaiseComponent currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
-                                              setHandRaiseActive={setHandRaiseActive}/> :
-                    <ViewerComponent livestreamId={livestreamId} streamerId={streamerId}
-                                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
-                                     setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton}
-                                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>
-                }
-                <div className='mini-chat-container'>
-                    <MiniChatContainer livestream={currentLivestream} isStreamer={false}/>
+                <div className={classes.menuLeft}>
+                    <LeftMenu
+                        handRaiseActive={handRaiseActive}
+                        setHandRaiseActive={setHandRaiseActive}
+                        streamer={false}
+                        userData={userData}
+                        user={authenticatedUser}
+                        livestream={currentLivestream}
+                        showMenu={showMenu}
+                        setShowMenu={setShowMenu}
+                        isMobile={width < 768}
+                        toggleShowMenu={toggleShowMenu}/>
                 </div>
-                <EmoteButtons
-                    handRaiseActive={handRaiseActive}
-                    handleClose={handleClose}
-                    handleClap={handleClap}
-                    handleHeart={handleHeart}
-                    handleLike={handleLike}
-                    handleMouseEnter={handleMouseEnter}
-                    handleMouseLeave={handleMouseLeave}
-                    iconsDisabled={iconsDisabled}
-                    setIconsDisabled={setIconsDisabled}
-                    delay={DELAY}
-                    smoothness={2}
-                    open={open}
-                />
-            </div>
-            <div className={classes.menuLeft}>
-                <LeftMenu
-                    handRaiseActive={handRaiseActive}
-                    setHandRaiseActive={setHandRaiseActive}
-                    streamer={false}
-                    userData={userData}
-                    user={authenticatedUser}
-                    livestream={currentLivestream}
-                    showMenu={showMenu}
-                    setShowMenu={setShowMenu}
-                    isMobile={width < 768}
-                    toggleShowMenu={toggleShowMenu}/>
-            </div>
-            <div className='icons-container'>
-                <IconsContainer livestreamId={currentLivestream.id}/>
-            </div>
-            {currentLivestream && <RatingContainer livestreamId={currentLivestream.id}
-                              livestream={currentLivestream}/>}
-            <div className={'playButtonContent ' + (showVideoButton.muted ? '' : 'hidden')} onClick={unmuteVideos}>
-                <div className='playButton'>
-                    <VolumeUpRoundedIcon style={{fontSize: '3rem'}}/>
-                    <div>Click to unmute</div>
+                <div className='icons-container'>
+                    <IconsContainer isTest={currentLivestream.test} livestreamId={currentLivestream.id}/>
                 </div>
-            </div>
-            <div className={'playButtonContent ' + (showVideoButton.paused ? '' : 'hidden')} onClick={playVideos}>
-                <div className='playButton'>
-                    <PlayArrowRoundedIcon style={{fontSize: '3rem'}}/>
-                    <div>Click to play</div>
+                {currentLivestream && <RatingContainer livestreamId={currentLivestream.id}
+                                                       livestream={currentLivestream}/>}
+                <div className={'playButtonContent ' + (showVideoButton.muted ? '' : 'hidden')} onClick={unmuteVideos}>
+                    <div className='playButton'>
+                        <VolumeUpRoundedIcon style={{fontSize: '3rem'}}/>
+                        <div>Click to unmute</div>
+                    </div>
                 </div>
-            </div>
-            <style jsx>{`
+                <div className={'playButtonContent ' + (showVideoButton.paused ? '' : 'hidden')} onClick={playVideos}>
+                    <div className='playButton'>
+                        <PlayArrowRoundedIcon style={{fontSize: '3rem'}}/>
+                        <div>Click to play</div>
+                    </div>
+                </div>
+                <style jsx>{`
                 .hidden {
                     display: none
                 }
@@ -359,7 +368,7 @@ function ViewerPage({firebase}) {
                 .mini-chat-container {
                     position: absolute;
                     bottom: 0;
-                    right: 120px;
+                    right: 0;
                     width: 20%;
                     min-width: 250px;
                     z-index: 7250;
@@ -463,7 +472,7 @@ function ViewerPage({firebase}) {
                     z-index: 200;
                 }
             `}</style>
-            <style jsx global>{`
+                <style jsx global>{`
                 body {
                     min-height: 100vh;
                     min-height: -webkit-fill-available;
@@ -473,7 +482,8 @@ function ViewerPage({firebase}) {
                     height: -webkit-fill-available;
                   }
             `}</style>
-        </div>
+            </div>
+        </TutorialContext.Provider>
     );
 }
 

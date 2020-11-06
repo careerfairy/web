@@ -1,4 +1,4 @@
-import React, {useState, useEffect, Fragment, useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import HandRaiseElement from './hand-raise-element/HandRaiseElement';
 import NotificationsContext from 'context/notifications/NotificationsContext';
@@ -6,21 +6,26 @@ import Grow from "@material-ui/core/Grow";
 import CloseRoundedIcon from '@material-ui/icons/CloseRounded';
 import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
 
-import {Box, Button, Typography, useTheme} from "@material-ui/core";
+import {Box, Button, Typography} from "@material-ui/core";
 import {CategoryContainerCentered, CategoryContainerTopAligned} from "../../../../../../../materialUI/GlobalContainers";
-import {GreyPermanentMarker, ThemedPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
+import {ThemedPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
 import Paper from "@material-ui/core/Paper";
+import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";
+import {
+    TooltipButtonComponent,
+    TooltipText,
+    TooltipTitle,
+    WhiteTooltip
+} from "../../../../../../../materialUI/GlobalTooltips";
 
-function HandRaiseActive(props) {
+function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding}) {
 
     const {setNewNotification, setNotificationToRemove} = useContext(NotificationsContext);
-
-
-    const [handRaises, setHandRaises] = useState([]);
+    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
 
     useEffect(() => {
-        if (props.livestream) {
-            props.firebase.listenToHandRaises(props.livestream.id, querySnapshot => {
+        if (livestream) {
+            firebase.listenToHandRaises(livestream.id, querySnapshot => {
                 var handRaiseList = [];
                 querySnapshot.forEach(doc => {
                     let handRaise = doc.data();
@@ -30,14 +35,46 @@ function HandRaiseActive(props) {
                 setHandRaises(handRaiseList);
             });
         }
-    }, [props.livestream]);
+    }, [livestream]);
+
+    const getActiveTutorialStepKey = () => {
+        const activeStep = Object.keys(tutorialSteps).find((key) => {
+            if (tutorialSteps[key]) {
+                return key
+            }
+        })
+        return Number(activeStep)
+    }
+    const activeStep = getActiveTutorialStepKey()
+
+    const isOpen = (property) => {
+        const activeStep = getActiveTutorialStepKey()
+        return Boolean(livestream.test
+            && showMenu
+            && tutorialSteps.streamerReady
+            && (tutorialSteps[property] || activeStep === 9)
+            && selectedState === "hand"
+            && !sliding
+        )
+    }
+
+    const handleConfirm = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
+    }
+
+    const [handRaises, setHandRaises] = useState([]);
+
 
     function setHandRaiseModeInactive() {
-        props.firebase.setHandRaiseMode(props.livestream.id, false);
+        firebase.setHandRaiseMode(livestream.id, false);
     }
 
     function updateHandRaiseRequest(handRaiseId, state) {
-        props.firebase.updateHandRaiseRequest(props.livestream.id, handRaiseId, state);
+        firebase.updateHandRaiseRequest(livestream.id, handRaiseId, state);
     }
 
     let handRaiseElements = handRaises.filter(handRaise => (handRaise.state !== 'unrequested' && handRaise.state !== 'denied')).map(handRaise => {
@@ -48,7 +85,7 @@ function HandRaiseActive(props) {
         );
     })
 
-    if (!props.livestream.handRaiseActive) {
+    if (!livestream.handRaiseActive) {
         return null;
     }
     return (<>
@@ -67,12 +104,32 @@ function HandRaiseActive(props) {
                         <PanToolOutlinedIcon color="primary" style={{fontSize: 40}}/>
                         <ThemedPermanentMarker gutterBottom>Waiting for viewers to raise their
                             hands...</ThemedPermanentMarker>
-                        <Typography align="center">Your viewers can now request to join the stream. Don't forget to
+                        <Typography style={{marginBottom: "1rem"}} align="center">Your viewers can now request to join
+                            the stream. Don't forget to
                             remind them
                             to join in!</Typography>
-                        <Button style={{marginTop: "1rem"}} variant="contained" startIcon={<CloseRoundedIcon/>}
-                                children='Deactivate Hand Raise'
-                                onClick={() => setHandRaiseModeInactive()}/>
+                        <WhiteTooltip
+                            placement="right-start"
+                            title={
+                                <React.Fragment>
+                                    <TooltipTitle>Hand Raise (2/2)</TooltipTitle>
+                                    <TooltipText>
+                                        You can de-activate the Hand Raise mode to
+                                        prevent viewers from making subsequent requests.
+                                    </TooltipText>
+                                    {activeStep === 10 && < TooltipButtonComponent onConfirm={() => {
+                                        setHandRaiseModeInactive()
+                                        handleConfirm(10)
+                                    }} buttonText="Ok"/>}
+                                </React.Fragment>
+                            } open={isOpen(10)}>
+                            <Button variant="contained" startIcon={<CloseRoundedIcon/>}
+                                    children='Deactivate Hand Raise'
+                                    onClick={() => {
+                                        setHandRaiseModeInactive()
+                                        isOpen(10) && activeStep === 10 && handleConfirm(10)
+                                    }}/>
+                        </WhiteTooltip>
                     </Box>
                 </CategoryContainerCentered>
             </Grow>
