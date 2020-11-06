@@ -18,7 +18,9 @@ function RemoteVideoContainer(props) {
     },[props.stream.streamId]);
 
     useEffect(() => {
-        props.attachSinkId(videoElement.current, props.speakerSource)
+        if (!props.isPlayMode) {
+            props.attachSinkId(videoElement.current, props.speakerSource)
+        }
     },[props.speakerSource])
 
     useEffect(() => {

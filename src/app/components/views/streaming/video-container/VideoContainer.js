@@ -35,7 +35,6 @@ function VideoContainer(props) {
 
     const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
 
-    const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
     const [streamerReady, setStreamerReady] = useState(false);
     const [connectionEstablished, setConnectionEstablished] = useState(false);
 
@@ -143,7 +142,7 @@ function VideoContainer(props) {
     const isMainStreamer = props.streamerId === props.currentLivestream.id;
 
     useEffect(() => {
-        if (isMainStreamer && props.currentLivestream.speakerSwitchMode === 'automatic') {
+        if (isMainStreamer) {
             let timeout = setTimeout(() => {
                 if (audioLevels && audioLevels.length > 0) {
                     const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);

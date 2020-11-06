@@ -5,6 +5,7 @@ import MicIcon from '@material-ui/icons/Mic';
 import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
+import ScreenShareIcon from '@material-ui/icons/ScreenShare';
 import SettingsIcon from '@material-ui/icons/Settings';
 import HearingIcon from '@material-ui/icons/Hearing';
 import {withFirebasePage} from 'context/firebase';
@@ -71,6 +72,10 @@ function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMod
     const [delayHandler, setDelayHandler] = useState(null)
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
     const [isVideoInactive, setIsVideoInactive] = useState(false);
+
+    const presentMode = mode === "presentation"
+    const automaticMode = speakerSwitchMode === "automatic"
+    const desktopMode = mode === "desktop"
 
     useEffect(() => {
         if (isOpen(13)) {
@@ -139,7 +144,13 @@ function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMod
         firebase.setLivestreamMode(id, mode);
     }
 
-    const presentMode = mode === "presentation"
+    const showShareDesktopButton = () => {
+        if (desktopMode) {
+            return (isMainStreamer || streamerId === screenSharerId);
+        } else {
+            return true
+        }
+    }
 
     const actions = [{
         icon: isLocalMicMuted ? <MicOffIcon fontSize="large" style={{ color: "red" }}/> : <MicIcon fontSize="large" color="primary"/>,
@@ -156,6 +167,14 @@ function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMod
             icon: <DynamicFeedIcon fontSize="large" color={presentMode ? "primary" : "inherit"}/>,
             name: presentMode ? 'Stop sharing slides' : 'Share slides',
             onClick: () => setLivestreamMode(presentMode ? "default" : "presentation")
+        })
+    }
+
+    if (showShareDesktopButton()) {
+        actions.unshift({
+            icon: <ScreenShareIcon color={desktopMode ? "primary" : "inherit"}/>,
+            name: desktopMode ? 'Stop Sharing Desktop' : 'Share Desktop',
+            onClick: () => setDesktopMode(desktopMode ? "default" : "desktop", streamerId)
         })
     }
 
