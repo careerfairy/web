@@ -57,7 +57,10 @@ const StreamPreparationModalV2 = ({
                                       webRTCAdaptor,
                                       devices,
                                       streamId,
-                                      attachSinkId
+                                      attachSinkId,
+                                      isTest,
+                                      viewer,
+                                      handleOpenDemoIntroModal
                                   }) => {
     const classes = useStyles()
     const theme = useTheme()
@@ -194,6 +197,9 @@ const StreamPreparationModalV2 = ({
         storeDevices()
         setStreamerReady(true)
         setConnectionEstablished(true)
+        if (isTest && !viewer) {
+            handleOpenDemoIntroModal()
+        }
     }
 
     const handleReset = () => {

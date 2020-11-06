@@ -52,6 +52,12 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     cardHovered: {},
+    tooltip: {
+        transition: "all 0.8s",
+        transitionTimingFunction: theme.transitions.easeInOut,
+        display: ({open}) => open ? "block" : "none",
+        whiteSpace: "nowrap"
+    },
     dialButton: {
         display: "none"
     }

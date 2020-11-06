@@ -1,4 +1,4 @@
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {useState, useEffect, Fragment, useContext} from 'react';
 import {Grid, Icon, Button} from "semantic-ui-react";
 import MicOffIcon from '@material-ui/icons/MicOff';
 import MicIcon from '@material-ui/icons/Mic';
@@ -8,11 +8,13 @@ import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import SettingsIcon from '@material-ui/icons/Settings';
 import HearingIcon from '@material-ui/icons/Hearing';
 import {withFirebasePage} from 'context/firebase';
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {ClickAwayListener, fade} from "@material-ui/core";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
+import TutorialContext from 'context/tutorials/TutorialContext';
+import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "../../../../materialUI/GlobalTooltips";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -60,13 +62,37 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMode}, webRTCAdaptor, devices, viewer, joining, setShowSettings, showSettings, firebase}) {
+function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMode, screenSharerId, test}, webRTCAdaptor, devices, viewer, joining, setShowSettings, showSettings, firebase, streamerId, isMainStreamer, setDesktopMode}) {
+    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
+    const theme = useTheme();
     const DELAY = 3000; //3 seconds
     const [open, setOpen] = useState(true);
     const classes = useStyles({open});
     const [delayHandler, setDelayHandler] = useState(null)
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
     const [isVideoInactive, setIsVideoInactive] = useState(false);
+
+    useEffect(() => {
+        if (isOpen(13)) {
+            setOpen(true)
+        }
+    }, [tutorialSteps])
+
+    const isOpen = (property) => {
+        return Boolean(test
+            && tutorialSteps.streamerReady
+            && tutorialSteps[property]
+        )
+    }
+
+    const handleConfirm = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
+    }
+
 
     const handleMouseEnter = event => {
         clearTimeout(delayHandler)
@@ -113,12 +139,7 @@ function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMod
         firebase.setLivestreamMode(id, mode);
     }
 
-    function setLivestreamSpeakerSwitchMode(mode) {
-        firebase.setLivestreamSpeakerSwitchMode(id, mode);
-    }
-
     const presentMode = mode === "presentation"
-    const automaticMode = speakerSwitchMode === "automatic"
 
     const actions = [{
         icon: isLocalMicMuted ? <MicOffIcon fontSize="large" style={{ color: "red" }}/> : <MicIcon fontSize="large" color="primary"/>,
@@ -147,9 +168,28 @@ function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMod
     }
 
     return (
-        <Fragment>
             <ClickAwayListener onClickAway={handleClose}>
                 <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className={classes.root}>
+                <WhiteTooltip
+                    placement="top"
+                    style={{
+                        transition: "transform 0.2s",
+                        transitionTimingFunction: theme.transitions.easeInOut,
+                        transform: open ? "" : "translate(20px, 0) scale3d(0.8, 0.8, 0.8)",
+                    }}
+                    title={
+                        <React.Fragment>
+                            <TooltipTitle>Video Controls</TooltipTitle>
+                            <TooltipText>
+                                You can mute, share slides and
+                                toggle between automatic voice activated switching here.
+                            </TooltipText>
+                            <TooltipButtonComponent onConfirm={() => {
+                                handleOpen()
+                                handleConfirm(13)
+                            }} buttonText="Ok"/>
+                        </React.Fragment>
+                    } open={isOpen(13)}>
                     <SpeedDial
                         ariaLabel="interaction-selector"
                         className={classes.speedDial}
@@ -174,9 +214,9 @@ function SharingOptionsContainer({currentLivestream: {mode, id, speakerSwitchMod
                             />
                         ))}
                     </SpeedDial>
+                    </WhiteTooltip>
                 </div>
             </ClickAwayListener>
-        </Fragment>
     );
 }
 
