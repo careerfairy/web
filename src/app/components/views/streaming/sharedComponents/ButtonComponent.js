@@ -99,7 +99,7 @@ const ButtonComponent =
         const DELAY = 3000; //3 seconds
         const [open, setOpen] = useState(true);
         const [delayHandler, setDelayHandler] = useState(null)
-        const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
+        const {tutorialSteps, handleConfirmStep} = useContext(TutorialContext);
 
         const tutorialStepActive = () => {
             return Boolean(isOpen(3) || isOpen(8))
@@ -139,15 +139,6 @@ const ButtonComponent =
 
         if (isMobile && showMenu) {
             return null;
-        }
-
-
-        const handleConfirm = (property) => {
-            setTutorialSteps({
-                ...tutorialSteps,
-                [property]: false,
-                [property + 1]: true,
-            })
         }
 
         const actions = [
@@ -217,7 +208,7 @@ const ButtonComponent =
                                     tooltipOpen={Boolean(action.name.length)}
                                     onClick={() => {
                                         action.onClick()
-                                        isOpen(action.tutorialNum, action.disabled) && handleConfirm(action.tutorialNum)
+                                        isOpen(action.tutorialNum, action.disabled) && handleConfirmStep(action.tutorialNum)
                                     }}
                                     FabProps={{
                                         size: "large",

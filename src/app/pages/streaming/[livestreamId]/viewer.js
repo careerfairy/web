@@ -16,8 +16,6 @@ import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
 import MiniChatContainer from "../../../components/views/streaming/LeftMenu/categories/chat/MiniChatContainer";
 import EmoteButtons from "../../../components/views/viewer/EmoteButtons";
 import RatingContainer from "../../../components/views/viewer/rating-container/RatingContainer";
-import TutorialContext from "../../../context/tutorials/TutorialContext";
-import {initialTutorialState} from "./main-streamer";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -69,9 +67,6 @@ function ViewerPage({firebase}) {
     const classes = useStyles({showMenu, mobile: width < 768});
     const [open, setOpen] = React.useState(true);
     const [delayHandler, setDelayHandler] = useState(null)
-
-    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
-    const [showBubbles, setShowBubbles] = useState(false)
 
 
     const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
@@ -211,7 +206,6 @@ function ViewerPage({firebase}) {
     }
 
     return (
-         <TutorialContext.Provider value={{tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles}}>
             <div className={classes.root}>
                 <div className='top-menu'>
                     <div className='top-menu-left'>
@@ -482,8 +476,7 @@ function ViewerPage({firebase}) {
                     height: -webkit-fill-available;
                   }
             `}</style>
-            </div>
-        </TutorialContext.Provider>
+        </div>
     );
 }
 

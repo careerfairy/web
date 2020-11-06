@@ -1,17 +1,33 @@
 import { CircularProgress } from '@material-ui/core';
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import {Icon, Image} from "semantic-ui-react";
+import {
+    TooltipButtonComponent,
+    TooltipText,
+    TooltipTitle,
+    WhiteTooltip
+} from "materialUI/GlobalTooltips";
+import TutorialContext from "context/tutorials/TutorialContext";
 
 function RemoteVideoContainer(props) {
 
+    const {tutorialSteps, setTutorialSteps, getActiveTutorialStepKey, handleConfirmStep} = useContext(TutorialContext);
     const videoElement = useRef({ current: {} });
 
     const [canPlay, setCanPlay] = useState(false);
     const [stoppedByUserAgent, setStoppedByUserAgent] = useState(false);
     const [hasError, setHasError] = useState(false);
 
+    const activeStep = getActiveTutorialStepKey();
+
     useEffect(() => {
-        videoElement.current.srcObject = props.stream.stream;
+        if (props.stream.type === 'demo') {
+            videoElement.current.src = props.stream.url;
+            videoElement.current.loop = true;
+            videoElement.current.play();
+        } else {
+            videoElement.current.srcObject = props.stream.stream;
+        }
     },[props.stream.streamId]);
 
     useEffect(() => {
@@ -60,7 +76,7 @@ function RemoteVideoContainer(props) {
     }
 
     function handleVideoLoss() {
-        if (!videoElement.current.srcObject.active) {
+        if (videoElement.current.srcObject && !videoElement.current.srcObject.active) {
             props.removeStreamFromExternalMediaStreams(props.stream.streamId)
         }
     }
@@ -72,19 +88,34 @@ function RemoteVideoContainer(props) {
     }, [videoElement.current]);
 
     return (
-        <div>
-            <div className='videoContainer' style={{ height: props.height }}>
-                <video id='videoElement' ref={videoElement} width={ '100%' } onCanPlay={() => setCanPlay(true) } controls={false} muted={props.muted} onEnded={(e) => handleVideoError(e)} onError={handleVideoLoss} onSuspend={handleVideoLoss} playsInline>
-                </video>
-                <div className={ 'loader ' + (canPlay ? 'hidden' : '')}>
-                    <div style={{ position: 'absolute', width: '30%', maxWidth: '30px', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
-                        <CircularProgress style={{ maxWidth: '30px', height: 'auto'}} />
+        <>
+            <WhiteTooltip
+                placement="bottom"
+                title={
+                    <React.Fragment>
+                        <TooltipTitle>Hand Raise (3/5)</TooltipTitle>
+                        <TooltipText>
+                            Once connected, the viewer who raised their hand will appear as an additional streamer
+                        </TooltipText>
+                        {activeStep === 11 && < TooltipButtonComponent onConfirm={() => {
+                            handleConfirmStep(11)
+                        }} buttonText="Ok"/>}
+                    </React.Fragment>
+                } 
+                open={activeStep === 11 && props.stream.type === 'demo'}>
+                <div className='videoContainer' style={{ height: props.height }}>
+                    <video id='videoElement' ref={videoElement} width={ '100%' } onCanPlay={() => setCanPlay(true) } controls={false} muted={props.muted} onEnded={(e) => handleVideoError(e)} onError={handleVideoLoss} onSuspend={handleVideoLoss} playsInline>
+                    </video>
+                    <div className={ 'loader ' + (canPlay ? 'hidden' : '')}>
+                        <div style={{ position: 'absolute', width: '30%', maxWidth: '30px', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
+                            <CircularProgress style={{ maxWidth: '30px', height: 'auto'}} />
+                        </div>
                     </div>
-                </div>
-                <div className={ 'loader clickable ' + (stoppedByUserAgent ? '' : 'hidden')} onClick={(e) => {playVideo(); e.preventDefault();}}>
-                    <Icon name='play' size='big' style={{ color: 'white', width: '30%', maxWidth: '80px', height: 'auto', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}} />
-                </div>
-            </div>           
+                    <div className={ 'loader clickable ' + (stoppedByUserAgent ? '' : 'hidden')} onClick={(e) => {playVideo(); e.preventDefault();}}>
+                        <Icon name='play' size='big' style={{ color: 'white', width: '30%', maxWidth: '80px', height: 'auto', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}} />
+                    </div>
+                </div>      
+            </WhiteTooltip>     
             <style jsx>{`
                 .hidden {
                     display: none;
@@ -94,8 +125,8 @@ function RemoteVideoContainer(props) {
                     position: relative;
                     background-color: black;
                     width: 100%;
+                    height: 10vh;
                     margin: 0 auto;
-                    z-index: 2000;
                 }
 
                 #videoElement {
@@ -125,7 +156,7 @@ function RemoteVideoContainer(props) {
                     cursor: pointer;
                 }
           `}</style>
-        </div>
+        </>
     );
 }
 

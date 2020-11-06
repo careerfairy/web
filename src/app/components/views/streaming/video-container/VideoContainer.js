@@ -15,7 +15,7 @@ import DemoIntroModal from "../modal/DemoIntroModal";
 import DemoEndModal from "../modal/DemoEndModal";
 
 function VideoContainer(props) {
-    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
+    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles, getActiveTutorialStepKey} = useContext(TutorialContext);
     const [errorMessage, setErrorMessage] = useState(null);
     const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
 
@@ -87,7 +87,7 @@ function VideoContainer(props) {
         }
     }
 
-    const {webRTCAdaptor, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels} =
+    const {webRTCAdaptor, externalMediaStreams, setAddedStream, removeStreamFromExternalMediaStreams, audioLevels} =
         useWebRTCAdaptor(
             streamerReady,
             isPlayMode,
@@ -156,6 +156,21 @@ function VideoContainer(props) {
         location.reload();
     }
 
+    useEffect(() => {
+        const activeStep = getActiveTutorialStepKey();
+        if (webRTCAdaptor) {
+            if (activeStep > 10 && activeStep < 13) {
+                setAddedStream({
+                    streamId: "demoStream",
+                    type: "demo",
+                    url: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media"
+                })
+            } else {
+                removeStreamFromExternalMediaStreams("demoStream");
+            }
+        }
+    },[tutorialSteps])
+
     const isOpen = (property) => {
         return Boolean(props.currentLivestream.test
             && tutorialSteps.streamerReady
@@ -190,7 +205,7 @@ function VideoContainer(props) {
     }
 
     const handleCloseDemoEndModal = () => {
-        handleConfirm(14)
+        handleConfirm(17)
         setShowBubbles(true)
 
     }
@@ -251,7 +266,7 @@ function VideoContainer(props) {
             <DemoIntroModal livestreamId={props.currentLivestream.id}
                             open={showDemoIntroModal}
                             handleClose={handleCloseDemoIntroModal}/>
-            <DemoEndModal open={isOpen(14)} handleClose={handleCloseDemoEndModal}/>
+            <DemoEndModal open={isOpen(17)} handleClose={handleCloseDemoEndModal}/>
             <style jsx>{`
                 .screen-container {
                     position: absolute;                 

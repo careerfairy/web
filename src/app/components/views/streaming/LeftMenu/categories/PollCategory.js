@@ -23,7 +23,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
     const [addNewPoll, setAddNewPoll] = useState(false);
     const [pollEntries, setPollEntries] = useState([]);
     const [demoPolls, setDemoPolls] = useState(false);
-    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
+    const {tutorialSteps, handleConfirmStep} = useContext(TutorialContext);
 
     useEffect(() => {
         if (livestream.id) {
@@ -84,15 +84,6 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
         )
     }
 
-    const handleConfirm = (property) => {
-        setTutorialSteps({
-            ...tutorialSteps,
-            [property]: false,
-            [property + 1]: true,
-        })
-    }
-
-
     return (
         <CategoryContainerTopAligned>
             <QuestionContainerHeader>
@@ -110,14 +101,14 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
                             </TooltipText>
                             <TooltipButtonComponent onConfirm={() => {
                                 !pollElements.length && setAddNewPoll(true)
-                                handleConfirm(4)
+                                handleConfirmStep(4)
                             }} buttonText="Ok"/>
                         </React.Fragment>
                     } open={isOpen(4)}>
                     <Button startIcon={<AddIcon/>} children='Create Poll'
                             onClick={() => {
                                 setAddNewPoll(true)
-                                isOpen(4) && handleConfirm(4)
+                                isOpen(4) && handleConfirmStep(4)
                             }} variant="contained" color="primary"/>
                 </WhiteTooltip>
             </QuestionContainerHeader>

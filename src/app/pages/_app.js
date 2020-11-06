@@ -20,6 +20,7 @@ import TagManager from 'react-gtm-module'
 import ErrorSnackBar from "../components/views/common/ErrorSnackBar/ErrorSnackBar";
 import ErrorContext from "../context/error/ErrorContext";
 import {SnackbarProvider} from "notistack";
+import TutorialContext from 'context/tutorials/TutorialContext';
 
 const useStyles = makeStyles(({
     info: {
@@ -41,6 +42,17 @@ function MyApp({Component, pageProps}) {
     const [loading, setLoading] = useState(false)
     const [hideLoader, setHideLoader] = useState(false)
     const [generalError, setGeneralError] = useState("");
+
+    const initialTutorialState = {
+        0: false, 1: false, 2: false, 3: false,4: false,
+        5: false, 6: false, 7: false, 8: false,
+        9: true, 10: false, 11: false, 12: false,
+        13: false, 14: false, 15: false, 16: false, 17: false,
+        streamerReady: false,
+    }
+
+    const [showBubbles, setShowBubbles] = useState(false)
+    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
 
 
     useEffect(() => {
@@ -94,6 +106,28 @@ function MyApp({Component, pageProps}) {
 
     }, [authenticatedUser, userData, loading])
 
+    const getActiveTutorialStepKey = () => {
+        const activeStep = Object.keys(tutorialSteps).find((key) => {
+            if (tutorialSteps[key]) {
+                return key
+            }
+        })
+        return Number(activeStep)
+    }
+
+    const handleConfirmStep = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
+    }
+
+    const isOpen = (property) => {
+        const activeStep = getActiveTutorialStepKey()
+        return Boolean(activeStep === property)
+    }
+
     return (
         <Fragment>
             <Head>
@@ -104,14 +138,16 @@ function MyApp({Component, pageProps}) {
                     <SnackbarProvider classes={{
                         variantInfo: classes.info
                     }} maxSnack={3}>
-                        <UserContext.Provider value={{authenticatedUser, userData, setUserData, loading, hideLoader}}>
-                            <ErrorContext.Provider value={{generalError, setGeneralError}}>
-                                {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                                <CssBaseline/>
-                                <Component {...pageProps} />
-                                <ErrorSnackBar handleClose={() => setGeneralError("")} errorMessage={generalError}/>
-                            </ErrorContext.Provider>
-                        </UserContext.Provider>
+                        <TutorialContext.Provider value={{tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles, getActiveTutorialStepKey, handleConfirmStep, isOpen}}>
+                            <UserContext.Provider value={{authenticatedUser, userData, setUserData, loading, hideLoader}}>
+                                <ErrorContext.Provider value={{generalError, setGeneralError}}>
+                                    {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                                    <CssBaseline/>
+                                    <Component {...pageProps} />
+                                    <ErrorSnackBar handleClose={() => setGeneralError("")} errorMessage={generalError}/>
+                                </ErrorContext.Provider>
+                            </UserContext.Provider>
+                        </TutorialContext.Provider>
                     </SnackbarProvider>
                 </ThemeProvider>
             </FirebaseContext.Provider>

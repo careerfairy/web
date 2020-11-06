@@ -81,14 +81,9 @@ function CurrentSpeakerDisplayer(props) {
         }
     }
 
-    function updateCurrentStreamId(streamId) {
-        if (props.speakerSwitchModeActive) {
-            props.setLivestreamCurrentSpeakerId(streamId);
-        }
-    }
     let externalVideoElements = props.streams.map( (stream, index) => {
         return (
-            <div key={stream.streamId} className={getVideoContainerClass(stream.streamId)} style={{ padding: 0 }} onClick={() => updateCurrentStreamId(stream.streamId)}>
+            <div key={stream.streamId} className={getVideoContainerClass(stream.streamId)} style={{ padding: 0 }}>
                 <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
                 <style jsx>{`
                     .quarter-width {
@@ -140,7 +135,7 @@ function CurrentSpeakerDisplayer(props) {
 
     if (!props.isPlayMode) {
         let localVideoElement =
-            <div className={getVideoContainerClass(props.localId)} style={{ padding: '0', margin: '0' }} key={"localVideoId"} onClick={() => updateCurrentStreamId(props.localId)}>
+            <div className={getVideoContainerClass(props.localId)} style={{ padding: '0', margin: '0' }} key={"localVideoId"}>
                 <div className='video-container' style={{ height: getVideoContainerHeight(props.localId) }}>
                     <video id="localVideo" ref={localVideoRef} muted autoPlay width={ '100%' }></video> 
                 </div>
