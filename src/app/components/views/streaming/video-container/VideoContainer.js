@@ -3,12 +3,10 @@ import {Button, Modal} from "semantic-ui-react";
 
 import {withFirebasePage} from 'context/firebase';
 
-import CountdownTimer from 'components/views/common/Countdown';
-
 import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
 import CurrentSpeakerDisplayer from './CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
-import SharingOptionsContainer from './SharingOptionsContainer';
+import VideoControlsContainer from './VideoControlsContainer';
 import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
 import ErrorMessageModal from "../modal/StreamPreparationModalV2/ErrorMessageModal";
 import useDevices from 'components/custom-hook/useDevices';
@@ -283,7 +281,7 @@ function VideoContainer(props) {
                         presenter={true}/>
                     : null
                 }
-                <SharingOptionsContainer 
+                <VideoControlsContainer 
                     webRTCAdaptor={webRTCAdaptor} 
                     currentLivestream={props.currentLivestream}
                     viewer={props.viewer} 
