@@ -4,6 +4,7 @@ import {Button, Modal} from "semantic-ui-react";
 import {withFirebasePage} from 'context/firebase';
 
 import CountdownTimer from 'components/views/common/Countdown';
+
 import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
 import CurrentSpeakerDisplayer from './CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
@@ -31,6 +32,8 @@ const useStyles = makeStyles((theme) => ({
 function VideoContainer(props) {
     const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
     const [errorMessage, setErrorMessage] = useState(null);
+
+    const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
 
     const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
     const [streamerReady, setStreamerReady] = useState(false);
@@ -62,8 +65,12 @@ function VideoContainer(props) {
     const isPlayMode = false;
 
     useEffect(() => {
-        return () => console.log('VideoContainer destroyed');
-    }, []);
+        if (props.streamerId && props.currentLivestream.id ) {
+            if (props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
+                setDesktopMode("default", props.streamerId);
+            }
+        }
+    },[props.streamerId, props.currentLivestream.id])
 
     function isExistingCallback(callbackName) {
         return props.additionalCallbacks && typeof props.additionalCallbacks[callbackName] === 'function';
@@ -100,8 +107,9 @@ function VideoContainer(props) {
     let errorCallbacks = {
         onScreenSharePermissionDenied: () => {
             if (isExistingCallback('onScreenSharePermissionDenied')) {
-                props.additionalCallbacks.onScreenSharePermissionDenied(infoObj);
+                props.additionalCallbacks.onScreenSharePermissionDenied();
             }
+            setDesktopMode("default", props.streamerId);
         },
         onOtherError: (error) => {
             if (typeof error === "string") {
@@ -164,13 +172,21 @@ function VideoContainer(props) {
 
     useEffect(() => {
         if (webRTCAdaptor) {
-            if (props.currentLivestream.mode === 'desktop') {
+            if (props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
                 webRTCAdaptor.switchDesktopCaptureWithCamera(props.streamerId);
             } else {
                 webRTCAdaptor.switchVideoCameraCapture(props.streamerId);
             }
         }
     }, [props.currentLivestream.mode]);
+
+    const setDesktopMode = async (mode, initiatorId) => {
+        await props.firebase.setDesktopMode(props.currentLivestream.id, mode, initiatorId);
+        setLivestreamCurrentSpeakerId(initiatorId)
+        if (props.currentLivestream.speakerSwitchMode === "automatic") {
+            await props.firebase.setLivestreamSpeakerSwitchMode(props.currentLivestream.id, "manual");
+        }
+    }
 
     function setLivestreamCurrentSpeakerId(id) {
         props.firebase.setLivestreamCurrentSpeakerId(props.currentLivestream.id, id);
@@ -274,6 +290,8 @@ function VideoContainer(props) {
                     viewer={props.viewer} 
                     streamerId={props.streamerId}
                     joining={!isMainStreamer}
+                    isMainStreamer={isMainStreamer}
+                    setDesktopMode={setDesktopMode}
                     showSettings={showSettings}
                     setShowSettings={setShowSettings}
                     />

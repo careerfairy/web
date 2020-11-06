@@ -312,6 +312,11 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                 }
             },
             callbackError : function(error) {
+                if (error === "ScreenSharePermissionDenied") {
+                    if (typeof errorCallbackObject.onScreenSharePermissionDenied === 'function') {
+                        errorCallbackObject.onScreenSharePermissionDenied();
+                    }
+                }
                 errorCallback(error)
             }
         });
