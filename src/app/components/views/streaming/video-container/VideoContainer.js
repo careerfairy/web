@@ -37,14 +37,7 @@ function VideoContainer(props) {
 
     const localVideoId = 'localVideo';
     const isPlayMode = false;
-
-    useEffect(() => {
-        if (props.streamerId && props.currentLivestream.id ) {
-            if (props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
-                setDesktopMode("default", props.streamerId);
-            }
-        }
-    },[props.streamerId, props.currentLivestream.id])
+    
 
     function isExistingCallback(callbackName) {
         return props.additionalCallbacks && typeof props.additionalCallbacks[callbackName] === 'function';
@@ -75,6 +68,12 @@ function VideoContainer(props) {
                 props.additionalCallbacks.onConnected(infoObj);
             }
             setShowDisconnectionModal(false);
+        },
+        onScreenShareStopped: (infoObj) => {
+            if (isExistingCallback('onScreenShareStopped')) {
+                props.additionalCallbacks.onScreenShareStopped(infoObj);
+            }
+            setDesktopMode("default", props.streamerId);
         },
     }
 
@@ -131,6 +130,14 @@ function VideoContainer(props) {
             return () => clearTimeout(timeout);
         }
     }, [audioCounter, props.currentLivestream.speakerSwitchMode]);
+
+    useEffect(() => {
+        if (props.streamerId && props.currentLivestream.id ) {
+            if (props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
+                setDesktopMode("default", props.streamerId);
+            }
+        }
+    },[props.streamerId, props.currentLivestream.id])
 
     useEffect(() => {
         const constraints = {
@@ -207,7 +214,6 @@ function VideoContainer(props) {
     const handleCloseDemoEndModal = () => {
         handleConfirm(14)
         setShowBubbles(true)
-
     }
 
     return (
@@ -215,17 +221,17 @@ function VideoContainer(props) {
             <div className='screen-container'>
                 <div>
                     <CurrentSpeakerDisplayer isPlayMode={false}
-                                             smallScreenMode={props.currentLivestream.mode === 'presentation'}
-                                             speakerSwitchModeActive={isMainStreamer}
-                                             setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId}
-                                             removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
-                                             localId={props.streamerId}
-                                             localStream={localStream}
-                                             streams={externalMediaStreams}
-                                             mediaConstraints={mediaConstraints}
-                                             currentSpeaker={props.currentLivestream.currentSpeakerId}
-                                             {...props}
-                                             muted={false}/>
+                        smallScreenMode={props.currentLivestream.mode === 'presentation'}
+                        speakerSwitchModeActive={isMainStreamer}
+                        setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId}
+                        removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
+                        localId={props.streamerId}
+                        localStream={localStream}
+                        streams={externalMediaStreams}
+                        mediaConstraints={mediaConstraints}
+                        currentSpeaker={props.currentLivestream.currentSpeakerId}
+                        {...props}
+                        muted={false}/>
                 </div>
                 {props.currentLivestream.mode === 'presentation' ?
                     <SmallStreamerVideoDisplayer
