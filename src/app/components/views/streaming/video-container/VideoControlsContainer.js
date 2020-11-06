@@ -61,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode, screenSharerId}, webRTCAdaptor, viewer, joining, firebase, streamerId, isMainStreamer, setDesktopMode}) {
+function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode, test, screenSharerId}, webRTCAdaptor, viewer, joining, firebase, streamerId, isMainStreamer, setDesktopMode}) {
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
     const theme = useTheme()
     const DELAY = 3000; //3 seconds
