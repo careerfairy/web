@@ -1,3 +1,5 @@
+import { Category } from "@material-ui/icons";
+
 export default class StatsUtil {
 
     static getStudentInGroupDataObject(student, group) {
@@ -90,6 +92,7 @@ export default class StatsUtil {
                     }
                     categoryStats[category.id][option.id] = 0;
                 })
+                categoryStats[category.id].name = category.name;
             });
             registeredStudentsFromGroup.forEach( student  => {
                 let registeredGroup = StatsUtil.getRegisteredGroupById(student, group.groupId);
@@ -118,7 +121,8 @@ export default class StatsUtil {
         let categoryStats = {
             type: 'specialized',
             id: fieldOfStudyCategory.id,
-            options: {}
+            options: {},
+            names: levelOfStudyCategory.options.map( option => option.name )
         };
         fieldOfStudyCategory.options.forEach( option => {
             let optionObj = {
