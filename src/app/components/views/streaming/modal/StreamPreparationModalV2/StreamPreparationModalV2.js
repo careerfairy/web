@@ -226,6 +226,10 @@ const StreamPreparationModalV2 = ({
         setCompleted(newCompleted);
     }
 
+    const hasDevicesInLocalStorage = () => {
+        return localStorage.getItem('selectedDevices');
+    }
+
     const setDevicesFromLocalStorage = () => {
         const devices = JSON.parse(localStorage.getItem('selectedDevices'));
         if (devices) {
@@ -372,6 +376,8 @@ const StreamPreparationModalV2 = ({
                             Skip
                         </Button>
                     )}
+                    {
+                        hasDevicesInLocalStorage() && activeStep !== 4 && 
                         <Button
                             variant="contained"
                             color="primary"
@@ -380,7 +386,7 @@ const StreamPreparationModalV2 = ({
                         >
                             Connect Directly
                         </Button>
-
+                    }
                     {completedSteps() === totalSteps() - 1 && activeStep === 4 &&
                     <Button variant="contained" color="primary" onClick={handleFinalize}>
                         Continue
