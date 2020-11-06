@@ -1,14 +1,19 @@
-import React, {useState} from 'react';
+
+import React, {useState, useContext, Fragment, useEffect} from 'react';
+import {Grid, Icon, Button} from "semantic-ui-react";
 import MicOffIcon from '@material-ui/icons/MicOff';
 import MicIcon from '@material-ui/icons/Mic';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamIconOff from '@material-ui/icons/VideocamOff';
 import {withFirebasePage} from 'context/firebase';
 import {makeStyles} from "@material-ui/core/styles";
-import {ClickAwayListener, fade} from "@material-ui/core";
+import {Accordion, ClickAwayListener, fade} from "@material-ui/core";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
+import TutorialContext from "../../../../context/tutorials/TutorialContext";
+import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "../../../../materialUI/GlobalTooltips";
+import useTheme from "@material-ui/core/styles/useTheme";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -53,13 +58,38 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode, screenSharerId}, webRTCAdaptor, viewer, joining, firebase, streamerId, isMainStreamer, setDesktopMode}) {
+function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode, screenSharerId, test}, webRTCAdaptor, viewer, joining, firebase, streamerId, isMainStreamer, setDesktopMode}) {
+
+    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
+    const theme = useTheme()
     const DELAY = 3000; //3 seconds
     const [open, setOpen] = useState(true);
     const classes = useStyles({open});
     const [delayHandler, setDelayHandler] = useState(null)
     const [isLocalMicMuted, setIsLocalMicMuted] = useState(false);
     const [isVideoInactive, setIsVideoInactive] = useState(false);
+
+    useEffect(() => {
+        if (isOpen(13)) {
+            setOpen(true)
+        }
+    }, [tutorialSteps])
+
+    const isOpen = (property) => {
+        return Boolean(test
+            && tutorialSteps.streamerReady
+            && tutorialSteps[property]
+        )
+    }
+
+    const handleConfirm = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
+    }
+
 
     const handleMouseEnter = event => {
         clearTimeout(delayHandler)
@@ -112,33 +142,73 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
         }
     ];
 
+    if (!(viewer || joining)) {
+        actions.push({
+            icon: <HearingIcon fontSize="large" color={automaticMode ? "primary" : "inherit"}/>,
+            name: automaticMode ? 'Deactivate automatic speaker Switch' : 'Activate automatic speaker Switch',
+            onClick: () => setLivestreamSpeakerSwitchMode(automaticMode ? "manual" : "automatic")
+        })
+    }
+
+    if (!viewer) {
+        actions.push({
+            icon: <DynamicFeedIcon fontSize="large" color={presentMode ? "primary" : "inherit"}/>,
+            name: presentMode ? 'Stop sharing slides' : 'Share slides',
+            onClick: () => setLivestreamMode(presentMode ? "default" : "presentation")
+        })
+    }
+
     return (
         <ClickAwayListener onClickAway={handleClose}>
             <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className={classes.root}>
-                <SpeedDial
-                    ariaLabel="interaction-selector"
-                    className={classes.speedDial}
-                    FabProps={{onClick: handleToggle, className: classes.dialButton}}
-                    icon={<SpeedDialIcon/>}
-                    onFocus={handleOpen}
-                    open
-                >
-                    {actions.map((action) => (
-                        <SpeedDialAction
-                            key={action.name}
-                            icon={action.icon}
-                            classes={{staticTooltipLabel: classes.tooltip}}
-                            FabProps={{
-                                size: "large",
-                                // classes: {root:  classes.actionButton},
-                            }}
-                            onClick={action.onClick}
-                        />
-                    ))}
-                </SpeedDial>
+                <WhiteTooltip
+                    placement="top"
+                    style={{
+                        transition: "transform 0.2s",
+                        transitionTimingFunction: theme.transitions.easeInOut,
+                        transform: open ? "" : "translate(20px, 0) scale3d(0.8, 0.8, 0.8)",
+                    }}
+                    title={
+                        <React.Fragment>
+                            <TooltipTitle>Video Controls</TooltipTitle>
+                            <TooltipText>
+                                You can mute, share slides and
+                                toggle between automatic voice activated switching here.
+                            </TooltipText>
+                            <TooltipButtonComponent onConfirm={() => {
+                                handleOpen()
+                                handleConfirm(13)
+                            }} buttonText="Ok"/>
+                        </React.Fragment>
+                    } open={isOpen(13)}>
+                    <SpeedDial
+                        ariaLabel="interaction-selector"
+                        className={classes.speedDial}
+                        FabProps={{onClick: handleToggle, className: classes.dialButton}}
+                        icon={<SpeedDialIcon/>}
+                        onFocus={handleOpen}
+                        open
+                    >
+                        {actions.map((action) => (
+                            <SpeedDialAction
+                                key={action.name}
+                                icon={action.icon}
+                                tooltipPlacement="left"
+                                tooltipTitle={action.name}
+                                classes={{staticTooltipLabel: classes.tooltip}}
+                                tooltipOpen={Boolean(action.name.length)}
+                                FabProps={{
+                                    size: "large",
+                                    // classes: {root:  classes.actionButton},
+                                }}
+                                onClick={action.onClick}
+                            />
+                        ))}
+                    </SpeedDial>
+                </WhiteTooltip>
             </div>
         </ClickAwayListener>
-    )
+    );
 }
 
 export default withFirebasePage(VideoControlsContainer);

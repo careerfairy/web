@@ -1,10 +1,11 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useContext} from 'react';
 import {Image} from "semantic-ui-react";
 import RubberBand from 'react-reveal/RubberBand';
 import {withFirebasePage} from 'context/firebase';
 import React, {memo} from "react";
 import {makeStyles} from "@material-ui/core/styles";
-import Fade from 'react-reveal/Fade';
+import {v4 as uuidv4} from "uuid";
+import TutorialContext from "../../../../context/tutorials/TutorialContext";
 
 const useStyles = makeStyles(theme => ({
     actionBtn: {
@@ -14,7 +15,11 @@ const useStyles = makeStyles(theme => ({
         height: 50,
         cursor: "pointer",
         boxShadow: "0 0 8px rgb(120,120,120)",
-        bottom: 0,
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+
     },
     image: {
         position: 'absolute',
@@ -35,8 +40,8 @@ const useStyles = makeStyles(theme => ({
     },
 }))
 
-const ActionButton = ({icon, right, color, durationBubble, durationTransform}) => {
 
+const ActionButton = React.memo(({icon, right, color, durationTransform, index}) => {
     const [distance, setDistance] = useState(0)
     const [opacity, setOpacity] = useState(1)
     useEffect(() => {
@@ -47,23 +52,29 @@ const ActionButton = ({icon, right, color, durationBubble, durationTransform}) =
 
     return (
         <div className={classes.animatedBox}>
-            <Fade duration={durationTransform/3}>
-                <RubberBand duration={durationBubble}>
-                    <div className={classes.actionBtn}>
-                        <Image className={classes.image} src={'/' + icon.iconName + '.png'}/>
-                    </div>
-                </RubberBand>
-            </Fade>
+            <RubberBand>
+                <div className={classes.actionBtn}>
+                    <Image className={classes.image} src={'/' + icon.iconName + '.png'}/>
+                </div>
+            </RubberBand>
         </div>
     )
-}
+})
 
-function IconsContainer({livestreamId, firebase}) {
+const randomInteger = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+const emotes = ["clapping", "like", "heart"]
+
+function IconsContainer({livestreamId, firebase, isTest}) {
     const [postedIcons, setPostedIcons] = useState([]);
     const [filteredIcons, setFilteredIcons] = useState([]);
+    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
+
+    const classes = useStyles()
 
     useEffect(() => {
-        if (livestreamId) {
+        if (livestreamId && !showBubbles) {
             const unsubscribe = firebase.listenToLivestreamIcons(livestreamId, querySnapshot => {
                 let iconsList = [];
                 querySnapshot.forEach(doc => {
@@ -76,7 +87,7 @@ function IconsContainer({livestreamId, firebase}) {
 
             return () => unsubscribe()
         }
-    }, [livestreamId]);
+    }, [livestreamId, showBubbles]);
 
     useEffect(() => {
         if (postedIcons.length) {
@@ -92,6 +103,20 @@ function IconsContainer({livestreamId, firebase}) {
         }
     }, [postedIcons]);
 
+    useEffect(() => {
+        if (showBubbles) {
+            let count = 0
+            const interval = setInterval(() => {
+                count = count + 1
+                if (count === 10) {
+                    setShowBubbles(false)
+                }
+                simulateEmotes()
+            }, 200);
+            return () => clearInterval(interval)
+        }
+    }, [showBubbles])
+
     function getIconColor(icon) {
         if (icon.iconName === 'like') {
             return '#e01a4f'
@@ -102,6 +127,27 @@ function IconsContainer({livestreamId, firebase}) {
         if (icon.iconName === 'heart') {
             return '#f9c22e'
         }
+    }
+
+    const simulateEmotes = () => {
+        const newPostedIcons = [...postedIcons]
+        const index = randomInteger(1, 3)
+        newPostedIcons.push({
+            id: uuidv4(),
+            iconName: emotes[index - 1],
+            randomPosition: Math.random()
+        })
+        setPostedIcons(newPostedIcons)
+    }
+
+    const handleToggle = () => {
+        resetIcons()
+        setShowBubbles(!showBubbles)
+    }
+
+    const resetIcons = () => {
+        const newPostedIcons = [...postedIcons]
+        setPostedIcons(newPostedIcons)
     }
 
     function getRandomHorizontalPosition(icon, maxDistance) {
@@ -115,15 +161,16 @@ function IconsContainer({livestreamId, firebase}) {
     let postedIconsElements = filteredIcons.map((icon, index) => {
         return (<ActionButton
                 key={icon.id}
-                right={getRandomHorizontalPosition(icon, 90)} icon={icon}
-                durationBubble={getRandomDuration(500, 2000)}
-                durationTransform={getRandomDuration(2000, 3000)}
+                index={index}
+                right={getRandomHorizontalPosition(icon, 90)}
+                icon={icon}
+                durationTransform={getRandomDuration(3500, 4500)}
                 color={getIconColor(icon)}/>
         );
     });
 
     return (
-        <div className='topLevelContainer'>
+        <div style={{position: "relative"}} className='topLevelContainer'>
             {postedIconsElements}
         </div>
     );

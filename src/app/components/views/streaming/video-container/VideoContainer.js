@@ -1,10 +1,9 @@
-import {useState, useEffect, Fragment, useRef} from 'react';
-import {Button, Grid, Icon, Input, Modal} from "semantic-ui-react";
+import React, {useState, useEffect, Fragment, useRef, useContext} from 'react';
+import {Button, Modal} from "semantic-ui-react";
 
 import {withFirebasePage} from 'context/firebase';
 
 import CountdownTimer from 'components/views/common/Countdown';
-
 import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
 import CurrentSpeakerDisplayer from './CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
@@ -12,9 +11,11 @@ import SharingOptionsContainer from './SharingOptionsContainer';
 import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
 import ErrorMessageModal from "../modal/StreamPreparationModalV2/ErrorMessageModal";
 import useDevices from 'components/custom-hook/useDevices';
-import VideoControlsContainer from './VideoControlsContainer';
 import SettingsModal from './SettingsModal';
 import { makeStyles } from '@material-ui/core';
+import TutorialContext from "../../../../context/tutorials/TutorialContext";
+import DemoIntroModal from "../modal/DemoIntroModal";
+import DemoEndModal from "../modal/DemoEndModal";
 
 const useStyles = makeStyles((theme) => ({
     blackFrame: {
@@ -26,9 +27,12 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function VideoContainer(props) {
 
+function VideoContainer(props) {
+    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
     const [errorMessage, setErrorMessage] = useState(null);
+
+    const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
     const [streamerReady, setStreamerReady] = useState(false);
     const [connectionEstablished, setConnectionEstablished] = useState(false);
 
@@ -108,7 +112,6 @@ function VideoContainer(props) {
         }
     }
 
-
     const { webRTCAdaptor, localMediaStream, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels } = 
         useWebRTCAdaptor(
             streamerReady,
@@ -146,6 +149,29 @@ function VideoContainer(props) {
         }
     }, [audioCounter, props.currentLivestream.speakerSwitchMode]);
 
+    useEffect(() => {
+        const constraints = {
+            audio: {deviceId: audioSource || undefined},
+            video: {
+                width: {ideal: 1920, max: 1920},
+                height: {ideal: 1080, max: 1080},
+                aspectRatio: 1.77,
+                deviceId: videoSource ? videoSource : undefined
+            }
+        };
+        setMediaConstraints(constraints);
+    }, [audioSource, videoSource]);
+
+    useEffect(() => {
+        if (webRTCAdaptor) {
+            if (props.currentLivestream.mode === 'desktop') {
+                webRTCAdaptor.switchDesktopCaptureWithCamera(props.streamerId);
+            } else {
+                webRTCAdaptor.switchVideoCameraCapture(props.streamerId);
+            }
+        }
+    }, [props.currentLivestream.mode]);
+
     function setLivestreamCurrentSpeakerId(id) {
         props.firebase.setLivestreamCurrentSpeakerId(props.currentLivestream.id, id);
     }
@@ -171,6 +197,45 @@ function VideoContainer(props) {
         } else {
             console.warn('Browser does not support output device selection.');
         }
+    }
+
+    const isOpen = (property) => {
+        return Boolean(props.currentLivestream.test
+            && tutorialSteps.streamerReady
+            && tutorialSteps[property]
+        )
+    }
+
+    const handleConfirm = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
+    }
+
+    const handleCloseDemoIntroModal = (wantsDemo) => {
+        setShowDemoIntroModal(false)
+        if (wantsDemo) {
+            setShowBubbles(true)
+            setTutorialSteps({
+                ...tutorialSteps,
+                streamerReady: true,
+            })
+        } else {
+            setShowBubbles(true)
+        }
+
+    }
+
+    const handleOpenDemoIntroModal = () => {
+        setShowDemoIntroModal(true)
+    }
+
+    const handleCloseDemoEndModal = () => {
+        handleConfirm(14)
+        setShowBubbles(true)
+
     }
 
     return (
@@ -237,12 +302,18 @@ function VideoContainer(props) {
                                     streamerReady={streamerReady} setStreamerReady={setStreamerReady}
                                     localStream={localMediaStream} mediaConstraints={mediaConstraints}
                                     connectionEstablished={connectionEstablished}
+                                    isTest={props.currentLivestream.test} viewer={props.viewer}
+                                    handleOpenDemoIntroModal={handleOpenDemoIntroModal}
                                     attachSinkId={attachSinkId} devices={devices}
                                     setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
                                     webRTCAdaptor={webRTCAdaptor} streamId={props.streamerId}
                                     isStreaming={isStreaming}/>
             <ErrorMessageModal isStreaming={isStreaming} connectionEstablished={connectionEstablished}
                                errorMessage={errorMessage} streamerReady={streamerReady}/>
+            <DemoIntroModal livestreamId={props.currentLivestream.id}
+                            open={showDemoIntroModal}
+                            handleClose={handleCloseDemoIntroModal}/>
+            <DemoEndModal open={isOpen(14)} handleClose={handleCloseDemoEndModal}/>
             <style jsx>{`
                 .screen-container {
                     position: absolute;                 

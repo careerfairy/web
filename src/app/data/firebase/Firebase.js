@@ -409,6 +409,71 @@ class Firebase {
         });
         return batch.commit();
     }
+    resetTestStream = async (livestreamId, testChats, testQuestions, testPolls) => {
+
+        let batch = this.firestore.batch();
+        let livestreamRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId);
+
+        // reset hand raise and current speaker
+        batch.update(livestreamRef, {
+            handRaiseActive: false,
+            currentSpeakerId: livestreamId
+        });
+
+        // Declare all the refs
+        let chatsRef = livestreamRef
+            .collection("chatEntries");
+        let questionsRef = livestreamRef
+            .collection("questions");
+        let pollsRef = livestreamRef
+            .collection("polls");
+
+        // Delete all existing docs
+        // debugger
+        const questionsDocs = await questionsRef.get()
+        if (!questionsDocs.empty) {
+            questionsDocs.forEach(doc => {
+                let docRef = doc.ref
+                batch.delete(docRef)
+            })
+        }
+
+        const chatsDocs = await chatsRef.get()
+        if (!chatsDocs.empty) {
+            chatsDocs.forEach(doc => {
+                let docRef = doc.ref
+                batch.delete(docRef)
+            })
+        }
+
+        const pollsDocs = await pollsRef.get()
+        if (!pollsDocs.empty) {
+            pollsDocs.forEach(doc => {
+                let docRef = doc.ref
+                batch.delete(docRef)
+            })
+        }
+
+        // Add in the new Docs
+
+        testQuestions.forEach(question => {
+            let docRef = questionsRef.doc();
+            batch.set(docRef, question);
+        });
+
+        testChats.forEach(chat => {
+            let docRef = chatsRef.doc();
+            batch.set(docRef, chat);
+        });
+        testPolls.forEach(poll => {
+            let docRef = pollsRef.doc();
+            batch.set(docRef, poll);
+        });
+
+        return batch.commit();
+    }
 
     //SCHEDULED_LIVESTREAMS
 
