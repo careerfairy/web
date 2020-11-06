@@ -1,5 +1,5 @@
-import {useState, useEffect, Fragment, useRef} from 'react';
-import {Button, Grid, Icon, Input, Modal} from "semantic-ui-react";
+import React, {useState, useEffect, Fragment, useRef, useContext} from 'react';
+import {Button, Modal} from "semantic-ui-react";
 
 import {withFirebasePage} from 'context/firebase';
 
@@ -11,9 +11,15 @@ import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
 import StreamPreparationModal from 'components/views/streaming/modal/StreamPreparationModal';
 import VideoControlsContainer from './VideoControlsContainer';
 
-function VideoContainer(props) {
+import TutorialContext from "../../../../context/tutorials/TutorialContext";
+import DemoIntroModal from "../modal/DemoIntroModal";
+import DemoEndModal from "../modal/DemoEndModal";
 
+function VideoContainer(props) {
+    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
     const [errorMessage, setErrorMessage] = useState(null);
+
+    const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
 
     const [streamerReady, setStreamerReady] = useState(false);
     const [connectionEstablished, setConnectionEstablished] = useState(false);
@@ -165,6 +171,45 @@ function VideoContainer(props) {
         location.reload();
     }
 
+    const isOpen = (property) => {
+        return Boolean(props.currentLivestream.test
+            && tutorialSteps.streamerReady
+            && tutorialSteps[property]
+        )
+    }
+
+    const handleConfirm = (property) => {
+        setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+        })
+    }
+
+    const handleCloseDemoIntroModal = (wantsDemo) => {
+        setShowDemoIntroModal(false)
+        if (wantsDemo) {
+            setShowBubbles(true)
+            setTutorialSteps({
+                ...tutorialSteps,
+                streamerReady: true,
+            })
+        } else {
+            setShowBubbles(true)
+        }
+
+    }
+
+    const handleOpenDemoIntroModal = () => {
+        setShowDemoIntroModal(true)
+    }
+
+    const handleCloseDemoEndModal = () => {
+        handleConfirm(14)
+        setShowBubbles(true)
+
+    }
+
     return (
         <Fragment>
             <div className='screen-container'>
@@ -214,9 +259,16 @@ function VideoContainer(props) {
             <StreamPreparationModal streamerReady={streamerReady} setStreamerReady={setStreamerReady}
                                     localStream={localStream} mediaConstraints={mediaConstraints}
                                     connectionEstablished={connectionEstablished}
+                                    isTest={props.currentLivestream.test}
+                                    viewer={props.viewer}
+                                    handleOpenDemoIntroModal={handleOpenDemoIntroModal}
                                     setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
                                     isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource}
                                     videoSource={videoSource} setVideoSource={setVideoSource}/>
+            <DemoIntroModal livestreamId={props.currentLivestream.id}
+                            open={showDemoIntroModal}
+                            handleClose={handleCloseDemoIntroModal}/>
+            <DemoEndModal open={isOpen(14)} handleClose={handleCloseDemoEndModal}/>
             <style jsx>{`
                 .screen-container {
                     position: absolute;                 

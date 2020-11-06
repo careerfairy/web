@@ -83,7 +83,7 @@ const LeftMenu =
 
         const views = [
             <TabPanel key={0} value={value} index={0} dir={theme.direction}>
-                <QuestionCategory streamer={streamer} livestream={livestream} selectedState={selectedState} user={user}
+                <QuestionCategory showMenu={showMenu} streamer={streamer} livestream={livestream} selectedState={selectedState} user={user}
                                   userData={userData}/>
             </TabPanel>,
             <TabPanel key={1} value={value} index={1} dir={theme.direction}>

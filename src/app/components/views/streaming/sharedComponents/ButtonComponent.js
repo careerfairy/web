@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
 import HelpIcon from '@material-ui/icons/Help';
 import BarChartIcon from '@material-ui/icons/BarChart';
@@ -9,6 +9,9 @@ import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import {ClickAwayListener, fade} from "@material-ui/core";
 import ChevronLeftRoundedIcon from '@material-ui/icons/ChevronLeftRounded';
+import TutorialContext from "../../../../context/tutorials/TutorialContext";
+import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "../../../../materialUI/GlobalTooltips";
+import Grow from "@material-ui/core/Grow";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -60,7 +63,26 @@ const useStyles = makeStyles((theme) => ({
     },
     dialButton: {
         display: "none"
-    }
+    },
+    "@keyframes blink": {
+        "50%": {
+            borderColor: theme.palette.secondary.main
+        }
+    },
+    highlight: {},
+    actionButtonHighlight: {
+        backgroundColor: theme.palette.primary.main,
+        border: "4px solid transparent",
+        animation: "$blink .5s step-end infinite alternate",
+        color: "white",
+        "&:disabled": {
+            backgroundColor: fade(theme.palette.primary.main, 0.5),
+            color: "white",
+        },
+        "&:hover": {
+            backgroundColor: theme.palette.primary.dark,
+        },
+    },
 
 }));
 
@@ -76,8 +98,21 @@ const ButtonComponent =
      }) => {
         const DELAY = 3000; //3 seconds
         const [open, setOpen] = useState(true);
-        const classes = useStyles({open, showMenu, isMobile});
         const [delayHandler, setDelayHandler] = useState(null)
+        const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
+
+        const tutorialStepActive = () => {
+            return Boolean(isOpen(3) || isOpen(8))
+        }
+        const isValid = (actionTutorialNum, actionDisabled) => {
+            return tutorialSteps[actionTutorialNum] && !actionDisabled
+        }
+
+        const isOpen = (actionTutorialNum, actionDisabled) => {
+            return tutorialSteps.streamerReady && isValid(actionTutorialNum, actionDisabled)
+        }
+        const classes = useStyles({open: open || tutorialStepActive(), showMenu, isMobile});
+
 
         const handleMouseEnter = event => {
             clearTimeout(delayHandler)
@@ -106,18 +141,29 @@ const ButtonComponent =
             return null;
         }
 
+
+        const handleConfirm = (property) => {
+            setTutorialSteps({
+                ...tutorialSteps,
+                [property]: false,
+                [property + 1]: true,
+            })
+        }
+
         const actions = [
             {
                 icon: <BarChartIcon fontSize="large"/>,
                 name: "Polls",
                 disabled: showMenu && selectedState === 'polls',
-                onClick: () => handleStateChange("polls")
+                onClick: () => handleStateChange("polls"),
+                tutorialNum: 3
             },
             {
                 icon: <HelpIcon fontSize="large"/>,
                 name: "Q&A",
                 disabled: showMenu && selectedState === 'questions',
-                onClick: () => handleStateChange("questions")
+                onClick: () => handleStateChange("questions"),
+                tutorialNum: 2334
             },
         ];
 
@@ -126,14 +172,16 @@ const ButtonComponent =
                 icon: <ForumOutlinedIcon fontSize="large"/>,
                 name: "Chat",
                 disabled: showMenu && selectedState === 'chat',
-                onClick: () => handleStateChange("chat")
+                onClick: () => handleStateChange("chat"),
+                tutorialNum: 234
             })
         } else {
             actions.unshift({
                 icon: <PanToolOutlinedIcon />,
                 name: "Hand Raise",
                 disabled: showMenu && selectedState === 'hand',
-                onClick: () => handleStateChange("hand")
+                onClick: () => handleStateChange("hand"),
+                tutorialNum: 8
             })
         }
 
@@ -142,7 +190,8 @@ const ButtonComponent =
                 icon: <ChevronLeftRoundedIcon fontSize="large"/>,
                 name: "",
                 disabled: false,
-                onClick: () => setShowMenu(!showMenu)
+                onClick: () => setShowMenu(!showMenu),
+                tutorialNum: 9999999
             })
         }
 
@@ -157,22 +206,27 @@ const ButtonComponent =
                         onFocus={handleOpen}
                         open
                     >
-                        {actions.map((action) => (
-                            <SpeedDialAction
-                                key={action.name}
-                                icon={action.icon}
-                                tooltipPlacement="right"
-                                tooltipTitle={action.name}
-                                classes={{staticTooltipLabel: classes.tooltip}}
-                                tooltipOpen={Boolean(action.name.length)}
-                                onClick={action.onClick}
-                                FabProps={{
-                                    size: "large",
-                                    classes: {root: action.name.length ? classes.actionButton : classes.actionButtonPink},
-                                    disabled: action.disabled
-                                }}
-                            />
-                        ))}
+                        {actions.map((action) => {
+                            return (
+                                <SpeedDialAction
+                                    key={action.name}
+                                    icon={action.icon}
+                                    tooltipPlacement="right"
+                                    tooltipTitle={action.name}
+                                    classes={{staticTooltipLabel: classes.tooltip}}
+                                    tooltipOpen={Boolean(action.name.length)}
+                                    onClick={() => {
+                                        action.onClick()
+                                        isOpen(action.tutorialNum, action.disabled) && handleConfirm(action.tutorialNum)
+                                    }}
+                                    FabProps={{
+                                        size: "large",
+                                        classes: {root: action.name.length ? isOpen(action.tutorialNum, action.disabled) ? classes.actionButtonHighlight : classes.actionButton : classes.actionButtonPink},
+                                        disabled: action.disabled,
+                                    }}
+                                />
+                            )
+                        })}
                     </SpeedDial>
                 </div>
             </ClickAwayListener>
