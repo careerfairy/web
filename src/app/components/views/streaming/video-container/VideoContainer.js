@@ -3,6 +3,7 @@ import {Button, Modal} from "semantic-ui-react";
 
 import {withFirebasePage} from 'context/firebase';
 
+import CountdownTimer from 'components/views/common/Countdown';
 import {useLocalStream} from 'components/custom-hook/useLocalStream';
 import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
 import CurrentSpeakerDisplayer from './CurrentSpeakerDisplayer';
@@ -17,6 +18,7 @@ import DemoEndModal from "../modal/DemoEndModal";
 function VideoContainer(props) {
     const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles, getActiveTutorialStepKey} = useContext(TutorialContext);
     const [errorMessage, setErrorMessage] = useState(null);
+
     const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
 
     const [streamerReady, setStreamerReady] = useState(false);
@@ -35,10 +37,7 @@ function VideoContainer(props) {
 
     const localVideoId = 'localVideo';
     const isPlayMode = false;
-
-    useEffect(() => {
-        return () => console.log('VideoContainer destroyed');
-    }, []);
+    
 
     function isExistingCallback(callbackName) {
         return props.additionalCallbacks && typeof props.additionalCallbacks[callbackName] === 'function';
@@ -70,13 +69,20 @@ function VideoContainer(props) {
             }
             setShowDisconnectionModal(false);
         },
+        onScreenShareStopped: (infoObj) => {
+            if (isExistingCallback('onScreenShareStopped')) {
+                props.additionalCallbacks.onScreenShareStopped(infoObj);
+            }
+            setDesktopMode("default", props.streamerId);
+        },
     }
 
     let errorCallbacks = {
         onScreenSharePermissionDenied: () => {
             if (isExistingCallback('onScreenSharePermissionDenied')) {
-                props.additionalCallbacks.onScreenSharePermissionDenied(infoObj);
+                props.additionalCallbacks.onScreenSharePermissionDenied();
             }
+            setDesktopMode("default", props.streamerId);
         },
         onOtherError: (error) => {
             if (typeof error === "string") {
@@ -126,6 +132,14 @@ function VideoContainer(props) {
     }, [audioCounter, props.currentLivestream.speakerSwitchMode]);
 
     useEffect(() => {
+        if (props.streamerId && props.currentLivestream.id ) {
+            if (props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
+                setDesktopMode("default", props.streamerId);
+            }
+        }
+    },[props.streamerId, props.currentLivestream.id])
+
+    useEffect(() => {
         const constraints = {
             audio: {deviceId: audioSource || undefined},
             video: {
@@ -140,13 +154,21 @@ function VideoContainer(props) {
 
     useEffect(() => {
         if (webRTCAdaptor) {
-            if (props.currentLivestream.mode === 'desktop') {
+            if (props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
                 webRTCAdaptor.switchDesktopCaptureWithCamera(props.streamerId);
             } else {
                 webRTCAdaptor.switchVideoCameraCapture(props.streamerId);
             }
         }
     }, [props.currentLivestream.mode]);
+
+    const setDesktopMode = async (mode, initiatorId) => {
+        await props.firebase.setDesktopMode(props.currentLivestream.id, mode, initiatorId);
+        setLivestreamCurrentSpeakerId(initiatorId)
+        if (props.currentLivestream.speakerSwitchMode === "automatic") {
+            await props.firebase.setLivestreamSpeakerSwitchMode(props.currentLivestream.id, "manual");
+        }
+    }
 
     function setLivestreamCurrentSpeakerId(id) {
         props.firebase.setLivestreamCurrentSpeakerId(props.currentLivestream.id, id);
@@ -207,7 +229,6 @@ function VideoContainer(props) {
     const handleCloseDemoEndModal = () => {
         handleConfirm(17)
         setShowBubbles(true)
-
     }
 
     return (
@@ -215,17 +236,17 @@ function VideoContainer(props) {
             <div className='screen-container'>
                 <div>
                     <CurrentSpeakerDisplayer isPlayMode={false}
-                                             smallScreenMode={props.currentLivestream.mode === 'presentation'}
-                                             speakerSwitchModeActive={isMainStreamer}
-                                             setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId}
-                                             removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
-                                             localId={props.streamerId}
-                                             localStream={localStream}
-                                             streams={externalMediaStreams}
-                                             mediaConstraints={mediaConstraints}
-                                             currentSpeaker={props.currentLivestream.currentSpeakerId}
-                                             {...props}
-                                             muted={false}/>
+                        smallScreenMode={props.currentLivestream.mode === 'presentation'}
+                        speakerSwitchModeActive={isMainStreamer}
+                        setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId}
+                        removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
+                        localId={props.streamerId}
+                        localStream={localStream}
+                        streams={externalMediaStreams}
+                        mediaConstraints={mediaConstraints}
+                        currentSpeaker={props.currentLivestream.currentSpeakerId}
+                        {...props}
+                        muted={false}/>
                 </div>
                 {props.currentLivestream.mode === 'presentation' ?
                     <SmallStreamerVideoDisplayer
@@ -240,7 +261,9 @@ function VideoContainer(props) {
                 }
             </div>
             <div className='controls-container'>
-                <VideoControlsContainer webRTCAdaptor={webRTCAdaptor} currentLivestream={props.currentLivestream}
+                <VideoControlsContainer setDesktopMode={setDesktopMode}
+                                        streamerId={props.streamerId} webRTCAdaptor={webRTCAdaptor} 
+                                        isMainStreamer={isMainStreamer} currentLivestream={props.currentLivestream}
                                         viewer={props.viewer} joining={!isMainStreamer}/>
             </div>
             <Modal open={showDisconnectionModal}>

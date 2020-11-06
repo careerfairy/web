@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
 import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import HelpIcon from '@material-ui/icons/Help';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
 import {makeStyles} from "@material-ui/core/styles";
@@ -150,7 +150,7 @@ const ButtonComponent =
                 tutorialNum: 3
             },
             {
-                icon: <HelpOutlineIcon fontSize="large"/>,
+                icon: <HelpIcon fontSize="large"/>,
                 name: "Q&A",
                 disabled: showMenu && selectedState === 'questions',
                 onClick: () => handleStateChange("questions"),
@@ -168,7 +168,7 @@ const ButtonComponent =
             })
         } else {
             actions.unshift({
-                icon: <PanToolOutlinedIcon fontSize="large"/>,
+                icon: <PanToolOutlinedIcon />,
                 name: "Hand Raise",
                 disabled: showMenu && selectedState === 'hand',
                 onClick: () => handleStateChange("hand"),
