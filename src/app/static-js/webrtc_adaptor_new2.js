@@ -160,6 +160,8 @@ export function WebRTCAdaptor(initialValues)
 	this.setDesktopwithCameraSource = function(stream, streamId, audioStream, onEndedCallback) {
 
 		thiz.desktopStream = stream;
+		var videoTrack = stream.getVideoTracks()[0];
+		videoTrack.onended = onEndedCallback;
 
 		navigator.mediaDevices.getUserMedia({video: true, audio: false})
 		.then(function(cameraStream) {
@@ -245,6 +247,10 @@ export function WebRTCAdaptor(initialValues)
 					thiz.updateVideoTrack(stream,streamId,mediaConstraints,onended,true);
 				}
 				else if(thiz.publishMode == "screen+camera" ){
+					onended = function(event) {
+						thiz.callback("screen_share_stopped");
+						thiz.switchVideoCameraCapture(streamId);
+					}
 					thiz.setDesktopwithCameraSource(stream,streamId,audioStream,onended);
 				}
 				else{

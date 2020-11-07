@@ -11,15 +11,15 @@ import {makeStyles} from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Collapse from "@material-ui/core/Collapse";
 import Card from "@material-ui/core/Card";
-import {PlayIconButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
+import {PlayIconButton} from "materialUI/GlobalButtons/GlobalButtons";
 import Paper from "@material-ui/core/Paper";
 import {
     TooltipButtonComponent,
     TooltipText,
     TooltipTitle,
     WhiteTooltip
-} from "../../../../../materialUI/GlobalTooltips";
-import TutorialContext from "../../../../../context/tutorials/TutorialContext";
+} from "materialUI/GlobalTooltips";
+import TutorialContext from "context/tutorials/TutorialContext";
 
 const useStyles = makeStyles(theme => ({
     chatInput: {
@@ -89,7 +89,7 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
     const {authenticatedUser, userData} = useContext(UserContext);
-    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
+    const {tutorialSteps, handleConfirmStep} = useContext(TutorialContext);
 
     const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream?.test)
     const active = question?.type === 'current'
@@ -145,7 +145,7 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
     function addNewCommentOnEnter(target) {
         if (target.charCode == 13) {
             addNewComment();
-            isOpen(2) && handleConfirm(2)
+            isOpen(2) && handleConfirmStep(2)
         }
     }
 
@@ -172,15 +172,6 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
             && isNextQuestions
             && selectedState === "questions"
             && !sliding)
-    }
-
-
-    const handleConfirm = (property) => {
-        setTutorialSteps({
-            ...tutorialSteps,
-            [property]: false,
-            [property + 1]: true,
-        })
     }
 
     const componentDecorator = (href, text, key) => (
@@ -218,7 +209,7 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
                             These are the questions that students
                             already asked and upvoted before your event
                         </TooltipText>
-                        <TooltipButtonComponent onConfirm={() => handleConfirm(0)} buttonText="Ok"/>
+                        <TooltipButtonComponent onConfirm={() => handleConfirmStep(0)} buttonText="Ok"/>
                     </React.Fragment>
                 } open={isOpen(0)}>
                 <Paper className={classes.questionContainer}>
@@ -257,7 +248,7 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
                                     In the recruiter-chat a company HR representative can answer
                                     recruiting related questions. Try and type a comment.
                                 </TooltipText>
-                                <TooltipButtonComponent onConfirm={() => handleConfirm(2)} buttonText="Ok"/>
+                                <TooltipButtonComponent onConfirm={() => handleConfirmStep(2)} buttonText="Ok"/>
                             </React.Fragment>
                         } open={isOpen(2)}>
                         <Box p={1}>
@@ -275,7 +266,7 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
                                         isEmpty={isEmpty}
                                         addNewComment={() => {
                                             addNewComment()
-                                            isOpen(2) && handleConfirm(2)
+                                            isOpen(2) && handleConfirmStep(2)
                                         }}/>,
                                 }}
                                 onChange={(event) => {
@@ -296,7 +287,7 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
                                     </TooltipText>
                                     <TooltipButtonComponent onConfirm={() => {
                                         goToThisQuestion(question.id)
-                                        handleConfirm(1)
+                                        handleConfirmStep(1)
                                     }} buttonText="Ok"/>
                                 </React.Fragment>
                             } open={isOpen(1)}>
@@ -311,7 +302,7 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
                                 color="primary"
                                 onClick={() => {
                                     goToThisQuestion(question.id)
-                                    isOpen(1) && handleConfirm(1)
+                                    isOpen(1) && handleConfirmStep(1)
                                 }}
                                 variant="contained"
                             />

@@ -14,7 +14,6 @@ import NotificationsContext from 'context/notifications/NotificationsContext';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import LeftMenu from "../../../components/views/streaming/LeftMenu/LeftMenu";
 import {Button} from "@material-ui/core";
-import TutorialContext from "../../../context/tutorials/TutorialContext";
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {
@@ -44,26 +43,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export const initialTutorialState = {
-    0: true,
-    1: false,
-    2: false,
-    3: false,
-    4: false,
-    5: false,
-    6: false,
-    7: false,
-    8: false,
-    9: false,
-    10: false,
-    11: false,
-    12: false,
-    13: false,
-    14: false,
-    15: false,
-    streamerReady: false,
-}
-
 function StreamingPage(props) {
     const theme = useTheme()
 
@@ -81,8 +60,6 @@ function StreamingPage(props) {
     const [joiningStreamerLink, setJoiningStreamerLink] = useState("")
 
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
-    const [showBubbles, setShowBubbles] = useState(false)
-    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
 
     const numberOfViewers = useNumberOfViewers(currentLivestream);
 
@@ -146,7 +123,6 @@ function StreamingPage(props) {
     }
 
     return (
-        <TutorialContext.Provider value={{tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles}}>
             <NotificationsContext.Provider value={{setNewNotification, setNotificationToRemove}}>
                 <div>
                     <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
@@ -289,9 +265,7 @@ function StreamingPage(props) {
                 `}</style>
                 </div>
             </NotificationsContext.Provider>
-        </TutorialContext.Provider>
-    )
-        ;
+    );
 }
 
 export default withFirebasePage(StreamingPage);

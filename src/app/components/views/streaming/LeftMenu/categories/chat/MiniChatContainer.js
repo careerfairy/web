@@ -77,7 +77,7 @@ const useStyles = makeStyles(theme => ({
 
 function MiniChatContainer({isStreamer, livestream, firebase}) {
     const {authenticatedUser, userData} = useContext(UserContext);
-    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
+    const {tutorialSteps, setTutorialSteps, handleConfirmStep} = useContext(TutorialContext);
 
     const [chatEntries, setChatEntries] = useState([]);
     const [focused, setFocused] = useState(false);
@@ -141,14 +141,6 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
         )
     }
 
-    const handleConfirm = (property) => {
-        setTutorialSteps({
-            ...tutorialSteps,
-            [property]: false,
-            [property + 1]: true,
-        })
-    }
-
 
     function addNewChatEntry() {
         if (isEmpty) {
@@ -162,7 +154,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
             votes: 0
         }
 
-        isOpen(12) && handleConfirm(12)
+        isOpen(15) && handleConfirmStep(15)
         firebase.putChatEntry(livestream.id, newChatEntryObject)
             .then(() => {
                 setNewChatEntry('');
@@ -174,8 +166,8 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
     function addNewChatEntryOnEnter(target) {
         if (target.charCode == 13) {
             addNewChatEntry();
-            if (isOpen(12)) {
-                handleConfirm(12)
+            if (isOpen(15)) {
+                handleConfirmStep(15)
                 setOpen(false)
             }
         }
@@ -208,12 +200,12 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
                     </TooltipText>
                     <TooltipButtonComponent onConfirm={() => {
                         setOpen(true)
-                        handleConfirm(11)
+                        handleConfirmStep(14)
                     }} buttonText="Ok"/>
                 </React.Fragment>
-            } open={isOpen(11)}>
+            } open={isOpen(14)}>
             <Accordion TransitionProps={{unmountOnExit: true}} onChange={() => {
-                !open && isOpen(11) && handleConfirm(11)
+                !open && isOpen(14) && handleConfirmStep(14)
                 setOpen(!open)
             }} expanded={open}>
                 <AccordionSummary className={classes.header}
@@ -243,7 +235,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
                                     Give it a shot!
                                 </TooltipText>
                             </React.Fragment>
-                        } open={isOpen(12)}>
+                        } open={isOpen(15)}>
                         <div style={{margin: 5}}>
                             <TextField
                                 variant="outlined"

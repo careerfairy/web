@@ -13,8 +13,6 @@ import NotificationsContainer from 'components/views/streaming/notifications-con
 import {v4 as uuidv4} from 'uuid';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import LeftMenu from "../../../components/views/streaming/LeftMenu/LeftMenu";
-import {initialTutorialState} from "./main-streamer";
-import TutorialContext from "../../../context/tutorials/TutorialContext";
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {
@@ -50,8 +48,6 @@ function StreamingPage(props) {
 
     const [currentLivestream, setCurrentLivestream] = useState(false);
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
-    const [showBubbles, setShowBubbles] = useState(false)
-    const [tutorialSteps, setTutorialSteps] = useState(initialTutorialState)
 
     const [showMenu, setShowMenu] = useState(true);
     const classes = useStyles({showMenu})
@@ -99,7 +95,6 @@ function StreamingPage(props) {
     }
 
     return (
-        <TutorialContext.Provider value={{tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles}}>
             <NotificationsContext.Provider value={{setNewNotification: setNewNotification}}>
                 <div className='topLevelContainer'>
                     <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
@@ -213,7 +208,6 @@ function StreamingPage(props) {
                 `}</style>
                 </div>
             </NotificationsContext.Provider>
-        </TutorialContext.Provider>
     );
 }
 

@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 function VideoContainer(props) {
-    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
+    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles, getActiveTutorialStepKey} = useContext(TutorialContext);
     const [errorMessage, setErrorMessage] = useState(null);
 
     const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
@@ -60,14 +60,7 @@ function VideoContainer(props) {
     const devices = useDevices();
     const localVideoId = 'localVideo';
     const isPlayMode = false;
-
-    useEffect(() => {
-        if (props.streamerId && props.currentLivestream.id ) {
-            if (props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
-                setDesktopMode("default", props.streamerId);
-            }
-        }
-    },[props.streamerId, props.currentLivestream.id])
+    
 
     function isExistingCallback(callbackName) {
         return props.additionalCallbacks && typeof props.additionalCallbacks[callbackName] === 'function';
@@ -99,6 +92,12 @@ function VideoContainer(props) {
             }
             setShowDisconnectionModal(false);
         },
+        onScreenShareStopped: (infoObj) => {
+            if (isExistingCallback('onScreenShareStopped')) {
+                props.additionalCallbacks.onScreenShareStopped(infoObj);
+            }
+            setDesktopMode("default", props.streamerId);
+        },
     }
 
     let errorCallbacks = {
@@ -117,7 +116,7 @@ function VideoContainer(props) {
         }
     }
 
-    const { webRTCAdaptor, localMediaStream, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels } = 
+    const {webRTCAdaptor, externalMediaStreams, setAddedStream, removeStreamFromExternalMediaStreams, audioLevels} =
         useWebRTCAdaptor(
             streamerReady,
             isPlayMode,
@@ -153,6 +152,14 @@ function VideoContainer(props) {
             return () => clearTimeout(timeout);
         }
     }, [audioCounter, props.currentLivestream.speakerSwitchMode]);
+
+    useEffect(() => {
+        if (props.streamerId && props.currentLivestream.id ) {
+            if (props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
+                setDesktopMode("default", props.streamerId);
+            }
+        }
+    },[props.streamerId, props.currentLivestream.id])
 
     useEffect(() => {
         const constraints = {
@@ -212,6 +219,20 @@ function VideoContainer(props) {
         }
     }
 
+    useEffect(() => {
+        const activeStep = getActiveTutorialStepKey();
+        if (webRTCAdaptor) {
+            if (activeStep > 10 && activeStep < 13) {
+                setAddedStream({
+                    streamId: "demoStream",
+                    url: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media"
+                })
+            } else {
+                removeStreamFromExternalMediaStreams("demoStream");
+            }
+        }
+    },[tutorialSteps])
+
     const isOpen = (property) => {
         return Boolean(props.currentLivestream.test
             && tutorialSteps.streamerReady
@@ -246,9 +267,8 @@ function VideoContainer(props) {
     }
 
     const handleCloseDemoEndModal = () => {
-        handleConfirm(14)
+        handleConfirm(17)
         setShowBubbles(true)
-
     }
 
     return (
@@ -328,7 +348,7 @@ function VideoContainer(props) {
             <DemoIntroModal livestreamId={props.currentLivestream.id}
                             open={showDemoIntroModal}
                             handleClose={handleCloseDemoIntroModal}/>
-            <DemoEndModal open={isOpen(14)} handleClose={handleCloseDemoEndModal}/>
+            <DemoEndModal open={isOpen(17)} handleClose={handleCloseDemoEndModal}/>
             <style jsx>{`
                 .screen-container {
                     position: absolute;                 

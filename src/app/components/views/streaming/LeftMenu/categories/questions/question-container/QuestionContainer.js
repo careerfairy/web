@@ -148,13 +148,6 @@ function QuestionContainer(props) {
         commentsElements = commentsElements.slice(0, 1);
     }
 
-    const playIcon = (<div>
-        <IconButton classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}} disabled={isEmpty}
-                    onClick={() => addNewComment()}>
-            <ChevronRightRoundedIcon className={classes.sendIcon}/>
-        </IconButton>
-    </div>)
-
     const ReactionsToggle = (props) => {
         if (comments.length < 2) {
             return null;

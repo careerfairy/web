@@ -205,10 +205,10 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
                             </TooltipText>
                             <TooltipButtonComponent onConfirm={() => {
                                 handleOpen()
-                                handleConfirm(13)
+                                handleConfirm(16)
                             }} buttonText="Ok"/>
                         </React.Fragment>
-                    } open={isOpen(13)}>
+                    } open={isOpen(16)}>
                     <SpeedDial
                         ariaLabel="interaction-selector"
                         className={classes.speedDial}

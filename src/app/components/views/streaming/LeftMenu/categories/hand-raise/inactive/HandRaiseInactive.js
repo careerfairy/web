@@ -32,6 +32,9 @@ function HandRaiseInactive({firebase, livestream, showMenu, selectedState, slidi
             [property]: false,
             [property + 1]: true,
         })
+        if (property === 9) {
+            createDemoHandRaiseRequest()
+        }
     }
 
     if (livestream.handRaiseActive) {
@@ -40,6 +43,10 @@ function HandRaiseInactive({firebase, livestream, showMenu, selectedState, slidi
 
     function setHandRaiseModeActive() {
         firebase.setHandRaiseMode(livestream.id, true);
+    }
+
+    function createDemoHandRaiseRequest() {
+        firebase.createHandRaiseRequest(livestream.id, "demo@careerfairy.io", { firstName: 'Demoman', lastName: 'Test'});
     }
 
     return (
@@ -54,7 +61,7 @@ function HandRaiseInactive({firebase, livestream, showMenu, selectedState, slidi
                         placement="right-start"
                         title={
                             <React.Fragment>
-                                <TooltipTitle>Hand Raise (1/2)</TooltipTitle>
+                                <TooltipTitle>Hand Raise (1/5)</TooltipTitle>
                                 <TooltipText>
                                     Invite your viewers to also ask
                                     you questions via video and audio

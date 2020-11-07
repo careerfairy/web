@@ -322,6 +322,5 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         });
         return newAdaptor;
     }
-  
-    return { webRTCAdaptor, localMediaStream, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels };
+    return { webRTCAdaptor, externalMediaStreams, setAddedStream, removeStreamFromExternalMediaStreams, audioLevels };
 }

@@ -60,7 +60,7 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
     const [showNotEditableMessage, setShowNotEditableMessage] = useState(false);
 
     const [anchorEl, setAnchorEl] = useState(null);
-    const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
+    const {tutorialSteps, setTutorialSteps, handleConfirmStep} = useContext(TutorialContext);
 
     const isOpen = (property) => {
         return Boolean(livestream.test && index === 0
@@ -81,14 +81,6 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
             && !addNewPoll
             && !sliding
         )
-    }
-
-    const handleConfirm = (property) => {
-        setTutorialSteps({
-            ...tutorialSteps,
-            [property]: false,
-            [property + 1]: true,
-        })
     }
 
     const tutorialActive = () => {
@@ -151,7 +143,7 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
                     <TooltipText>
                         All your created polls will be stored here
                     </TooltipText>
-                    <TooltipButtonComponent onConfirm={() => handleConfirm(5)} buttonText="Ok"/>
+                    <TooltipButtonComponent onConfirm={() => handleConfirmStep(5)} buttonText="Ok"/>
                 </React.Fragment>
             } open={isOpen(5)}>
             <Paper style={{margin: 10, position: "relative"}} onMouseEnter={handleSetIsNotEditablePoll}
@@ -198,7 +190,7 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
                             <TooltipButtonComponent onConfirm={() => {
                                 setDemoPolls(true)
                                 setPollState('current')
-                                handleConfirm(6)
+                                handleConfirmStep(6)
                             }} buttonText="Ok"/>
                         </React.Fragment>
                     } open={isOpen(6)}>
@@ -206,8 +198,7 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
                             children={'Ask the Audience Now'} disabled={somePollIsCurrent || tutorialActive()}
                             onClick={() => {
                                 if (isOpen(6)) {
-                                    debugger
-                                    handleConfirm(6)
+                                    handleConfirmStep(6)
                                     setDemoPolls(true)
                                 }
                                 setPollState('current')
