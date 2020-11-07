@@ -107,7 +107,7 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
                             placement="right-end"
                             title={
                                 <React.Fragment>
-                                    <TooltipTitle>Hand Raise (2/2)</TooltipTitle>
+                                    <TooltipTitle>Hand Raise (5/5)</TooltipTitle>
                                     <TooltipText>
                                         You can de-activate the Hand Raise mode to
                                         prevent viewers from making subsequent requests.
