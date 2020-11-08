@@ -11,9 +11,8 @@ import TutorialContext from "context/tutorials/TutorialContext";
 
 function RemoteVideoContainer(props) {
 
-    const {tutorialSteps, setTutorialSteps, getActiveTutorialStepKey, handleConfirmStep} = useContext(TutorialContext);
+    const {getActiveTutorialStepKey, handleConfirmStep} = useContext(TutorialContext);
     const videoElement = useRef({ current: {} });
-    console.log("videoElement", videoElement);
 
     const [canPlay, setCanPlay] = useState(false);
     const [stoppedByUserAgent, setStoppedByUserAgent] = useState(false);
@@ -114,7 +113,7 @@ function RemoteVideoContainer(props) {
                         }} buttonText="Ok"/>}
                     </React.Fragment>
                 } 
-                open={activeStep === 11 && props.stream.type === 'demo'}>
+                open={activeStep === 11 && props.stream.streamId === 'demoStream'}>
                 <div className='videoContainer' style={{ height: props.height }}>
                     <video id='videoElement' ref={videoElement} width={ '100%' } onCanPlay={() => setCanPlay(true) } controls={false} muted={props.muted} onEnded={(e) => handleVideoError(e)} onError={handleVideoLoss} onSuspend={handleVideoLoss} playsInline>
                     </video>

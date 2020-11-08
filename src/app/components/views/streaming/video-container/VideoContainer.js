@@ -116,7 +116,7 @@ function VideoContainer(props) {
         }
     }
 
-    const {webRTCAdaptor, externalMediaStreams, setAddedStream, removeStreamFromExternalMediaStreams, audioLevels} =
+    const {webRTCAdaptor, externalMediaStreams, localMediaStream, setAddedStream, removeStreamFromExternalMediaStreams, audioLevels} =
         useWebRTCAdaptor(
             streamerReady,
             isPlayMode,
