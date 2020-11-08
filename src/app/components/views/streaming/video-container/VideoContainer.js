@@ -139,7 +139,7 @@ function VideoContainer(props) {
     const isMainStreamer = props.streamerId === props.currentLivestream.id;
 
     useEffect(() => {
-        if (isMainStreamer) {
+        if (isMainStreamer && props.currentLivestream.mode !== 'desktop') {
             let timeout = setTimeout(() => {
                 if (audioLevels && audioLevels.length > 0) {
                     const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
@@ -187,9 +187,6 @@ function VideoContainer(props) {
     const setDesktopMode = async (mode, initiatorId) => {
         await props.firebase.setDesktopMode(props.currentLivestream.id, mode, initiatorId);
         setLivestreamCurrentSpeakerId(initiatorId)
-        if (props.currentLivestream.speakerSwitchMode === "automatic") {
-            await props.firebase.setLivestreamSpeakerSwitchMode(props.currentLivestream.id, "manual");
-        }
     }
 
     function setLivestreamCurrentSpeakerId(id) {

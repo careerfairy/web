@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import window, { navigator, document } from 'global';
 import axios from 'axios';
-import { WebRTCAdaptor } from 'static-js/webrtc_adaptor_new2.js';
+import { WebRTCAdaptor } from 'static-js/webrtc_adaptor_new.js';
 import { WEBRTC_ERRORS } from 'data/errors/StreamingErrors.js';
 
 export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId) {
@@ -44,6 +44,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         if (!isPlayMode) {
             if (document && mediaConstraints && nsToken && nsToken.iceServers && roomId && streamId && isChromium) {
                 const adaptor = getWebRTCAdaptor();
+                debugger;
                 setWebRTCAdaptor(adaptor);
             }
         } else {
@@ -165,9 +166,9 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onInitialized(infoObj);
                         }                               
                         if (!isPlayMode) {
-                            setLocalMediaStream(this.getLocalStream());                        
+                            setLocalMediaStream(this.webrtcadaptor.getLocalStream());                        
                         } else {
-                            this.joinRoom(roomId);
+                            this.webrtcadaptor.joinRoom(roomId);
                         }
                         break;
                     }
@@ -176,16 +177,16 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onJoinedTheRoom(infoObj);
                         }
                         if (!isPlayMode) {
-                            publishNewStream(this, infoObj);
+                            publishNewStream(this.webrtcadaptor, infoObj);
                         }
-                        var adaptor = this;
+                        var adaptor = this.webrtcadaptor;
                         if (infoObj.streams != null) {
 							infoObj.streams.forEach( stream => {
 								adaptor.play(stream, null, roomId);
 							});
                             setStreamsList(infoObj.streams);
 						}
-                        this.getRoomInfo(infoObj.ATTR_ROOM_NAME, infoObj.streamId);
+                        this.webrtcadaptor.getRoomInfo(infoObj.ATTR_ROOM_NAME, infoObj.streamId);
                         break;
                     }
                     case "newStreamAvailable": {
@@ -193,14 +194,16 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onNewStreamAvailable(infoObj);
                         }
                         setAddedStream(infoObj);
-                        this.enableStats(infoObj.streamId);
+                        if (!isPlayMode) {
+                            this.enableStats(infoObj.streamId);
+                        }
                         break;
                     }
                     case "roomInformation": {
                         if (typeof streamingCallbackObject.onNewStreamAvailable === 'function') {
                             streamingCallbackObject.onNewStreamAvailable(infoObj);
                         }
-                        var adaptor = this;
+                        var adaptor = this.webrtcadaptor;
                         var tempRoomStreamList = [];
 	
 						if (streamsList != null) {
@@ -246,7 +249,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onPublishStarted(infoObj);
                         }
                         if (!isPlayMode) {
-                            this.enableStats(infoObj.streamId);
+                            this.webrtcadaptor.enableStats(infoObj.streamId);
                         }
                         break;
                     }
@@ -279,7 +282,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         if (typeof streamingCallbackObject.onClosed === 'function') {
                             streamingCallbackObject.onClosed(infoObj);
                         }
-                        this.closeWebSocket();
+                        this.webrtcadaptor.closeWebSocket();
                         break;
                     }
                     case "ice_connection_state_changed": {
