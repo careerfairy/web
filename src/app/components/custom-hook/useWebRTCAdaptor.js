@@ -44,7 +44,6 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         if (!isPlayMode) {
             if (document && mediaConstraints && nsToken && nsToken.iceServers && roomId && streamId && isChromium) {
                 const adaptor = getWebRTCAdaptor();
-                debugger;
                 setWebRTCAdaptor(adaptor);
             }
         } else {
@@ -53,7 +52,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                 setWebRTCAdaptor(adaptor);
             }
         }     
-    }, [mediaConstraints, document, nsToken, isPlayMode, roomId, streamId]);
+    }, [document, nsToken, isPlayMode, roomId, streamId]);
 
     useEffect(() => {
         if (webRTCAdaptor && streamerReady && roomId && streamId) {
@@ -152,7 +151,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
             OfferToReceiveVideo : false
         };
         const newAdaptor = new WebRTCAdaptor({
-            websocket_url : "wss://streaming.careerfairy.io/WebRTCAppEE/websocket",
+            websocket_url : "wss://streaming.thrillin.work/WebRTCAppEE/websocket",
             mediaConstraints : mediaConstraints,
             peerconnection_config : pc_config,
             sdp_constraints : sdpConstraints,
