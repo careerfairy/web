@@ -291,8 +291,8 @@ function ViewerPage({firebase}) {
                 <div className='icons-container'>
                     <IconsContainer isTest={currentLivestream.test} livestreamId={currentLivestream.id}/>
                 </div>
-                {currentLivestream && <RatingContainer livestreamId={currentLivestream.id}
-                                                       livestream={currentLivestream}/>}
+                {currentLivestream && !currentLivestream.hasNoRatings && 
+                    <RatingContainer livestreamId={currentLivestream.id} livestream={currentLivestream}/>}
                 <div className={'playButtonContent ' + (showVideoButton.muted ? '' : 'hidden')} onClick={unmuteVideos}>
                     <div className='playButton'>
                         <VolumeUpRoundedIcon style={{fontSize: '3rem'}}/>
