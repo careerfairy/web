@@ -146,7 +146,7 @@ function VideoContainer(props) {
     const isMainStreamer = props.streamerId === props.currentLivestream.id;
 
     useEffect(() => {
-        if (isMainStreamer) {
+        if (isMainStreamer && props.currentLivestream.mode !== 'desktop') {
             let timeout = setTimeout(() => {
                 if (audioLevels && audioLevels.length > 0) {
                     const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
@@ -169,19 +169,6 @@ function VideoContainer(props) {
     },[props.streamerId, props.currentLivestream.id])
 
     useEffect(() => {
-        const constraints = {
-            audio: {deviceId: audioSource || undefined},
-            video: {
-                width: {ideal: 1920, max: 1920},
-                height: {ideal: 1080, max: 1080},
-                aspectRatio: 1.77,
-                deviceId: videoSource ? videoSource : undefined
-            }
-        };
-        setMediaConstraints(constraints);
-    }, [audioSource, videoSource]);
-
-    useEffect(() => {
         if (webRTCAdaptor) {
             if (props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
                 webRTCAdaptor.switchDesktopCaptureWithCamera(props.streamerId);
@@ -190,6 +177,15 @@ function VideoContainer(props) {
             }
         }
     }, [props.currentLivestream.mode]);
+
+    useEffect(() => {
+        if (externalMediaStreams && props.currentLivestream.currentSpeakerId && isMainStreamer) {
+            let existingCurrentSpeaker = externalMediaStreams.find( stream => stream.streamId === props.currentLivestream.currentSpeakerId)
+            if (!existingCurrentSpeaker) {
+                setLivestreamCurrentSpeakerId(props.currentLivestream.id);
+            }
+        }
+    }, [externalMediaStreams]);
 
     const setDesktopMode = async (mode, initiatorId) => {
         await props.firebase.setDesktopMode(props.currentLivestream.id, mode, initiatorId);
