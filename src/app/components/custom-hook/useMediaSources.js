@@ -19,21 +19,21 @@ export default function useMediaSources(devices, webRTCAdaptor, streamId, localS
         const storedSpeakerSource = LocalStorageUtil.getAudioOutputFromLocalStorage();
 
         if (devices && webRTCAdaptor && localStream) {
-            if (devices.audioInputList && devices.audioInputList.length > 0 && !audioSource) {
+            if (devices.audioInputList && devices.audioInputList.length > 0 && (!audioSource || !devices.audioInputList.some( device => device.value === audioSource))) {
                 if (storedAudioSource && devices.audioInputList.some( device => device.value === storedAudioSource)) { 
                     updateAudioSource(storedAudioSource) 
                 } else {
                     updateAudioSource(devices.audioInputList[0].value)
                 }
             }
-            if (devices.videoDeviceList && devices.videoDeviceList.length > 0 && !videoSource) {
+            if (devices.videoDeviceList && devices.videoDeviceList.length > 0 && !videoSource || !devices.videoDeviceList.some( device => device.value === videoSource)) {
                 if (storedVideoSource && devices.videoDeviceList.some( device => device.value === storedVideoSource)) { 
                     updateVideoSource(storedVideoSource) 
                 } else {
                     updateVideoSource(devices.videoDeviceList[0].value)
                 }
             }
-            if (devices.audioOutputList && devices.audioOutputList.length > 0 && !speakerSource) {
+            if (devices.audioOutputList && devices.audioOutputList.length > 0 && !speakerSource || !devices.audioOutputList.some( device => device.value === speakerSource)) {
                 if (storedSpeakerSource && devices.audioOutputList.some( device => device.value === storedSpeakerSource)) {
                     updateSpeakerSource(storedSpeakerSource) 
                 } else {
