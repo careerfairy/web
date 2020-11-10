@@ -136,22 +136,6 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
     }, [careerCenterIds])
 
 
-    // useEffect(() => {
-    //     const unsubscribe = firebase.listenToGroups(querySnapshot => {
-    //         let careerCenters = [];
-    //         querySnapshot.forEach(doc => {
-    //             let careerCenter = doc.data();
-    //             careerCenter.id = doc.id;
-    //             careerCenter.selected = false
-    //             careerCenters.push(careerCenter);
-    //         })
-    //         setFetchingGroups(false)
-    //         setExistingGroups(careerCenters);
-    //     });
-    //     return () => unsubscribe();
-    //
-    // }, []);
-
     const handleAddTargetCategories = (arrayOfIds) => {
         const oldTargetCategories = {...targetCategories}
         const newTargetCategories = {}
@@ -183,36 +167,6 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         const newValues = {...values}
         newValues.speakers[uuidv4()] = obj
         setCallback(newValues)
-    }
-
-    const handleSetDefaultGroups = (arrayOfGroupIds) => {
-
-        if (Array.isArray(arrayOfGroupIds)) {
-            let groupsWithFlattenedOptions = []
-            arrayOfGroupIds.forEach(id => {
-                const targetGroup = existingGroups.find(group => group.groupId === id)
-                if (targetGroup) {
-                    targetGroup.flattenedOptions = handleFlattenOptions(targetGroup)
-                    groupsWithFlattenedOptions.push(targetGroup)
-                }
-            })
-            setSelectedGroups(groupsWithFlattenedOptions)
-        }
-    }
-
-    const handleGetMainSpeaker = (streamObj) => {
-        if (streamObj?.mainSpeakerName?.length) {
-            const fullnameArray = streamObj.mainSpeakerName.split(/[ ]+/)
-            return {
-                firstName: fullnameArray[0],
-                lastName: fullnameArray[1],
-                avatar: streamObj.mainSpeakerAvatar,
-                background: streamObj.mainSpeakerBackground,
-                position: streamObj.mainSpeakerPosition
-            }
-        } else {
-            return speakerObj
-        }
     }
 
     const handleFlattenOptions = (group) => {
