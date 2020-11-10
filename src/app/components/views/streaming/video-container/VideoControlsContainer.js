@@ -173,7 +173,7 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
     if (showShareDesktopButton()) {
         actions.unshift({
             icon: <ScreenShareIcon color={desktopMode ? "primary" : "inherit"}/>,
-            name: desktopMode ? 'Stop Sharing Desktop' : 'Share Desktop',
+            name: desktopMode ? 'Stop sharing desktop' : 'Share desktop',
             onClick: () => setDesktopMode(desktopMode ? "default" : "desktop", streamerId)
         })
     }
