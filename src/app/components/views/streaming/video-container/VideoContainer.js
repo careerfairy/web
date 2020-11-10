@@ -28,20 +28,22 @@ const useStyles = makeStyles((theme) => ({
 
 
 function VideoContainer(props) {
-    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles, getActiveTutorialStepKey} = useContext(TutorialContext);
+    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles, handleConfirmStep, getActiveTutorialStepKey} = useContext(TutorialContext);
+    
+    const classes = useStyles();
+    const devices = useDevices();
+    const localVideoId = 'localVideo';
+    const isPlayMode = false;
+    const isMainStreamer = props.streamerId === props.currentLivestream.id;
+
     const [errorMessage, setErrorMessage] = useState(null);
-
     const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
-
     const [streamerReady, setStreamerReady] = useState(false);
     const [connectionEstablished, setConnectionEstablished] = useState(false);
-
     const [isStreaming, setIsStreaming] = useState(false);
-
     const [speakerSource, setSpeakerSource] = useState(null);
     const [audioSource, setAudioSource] = useState(null);
     const [videoSource, setVideoSource] = useState(null);
-
     const [mediaConstraints, setMediaConstraints] = useState({
         audio: true,
         video: { 
@@ -50,17 +52,9 @@ function VideoContainer(props) {
             aspectRatio: 1.77,   
         }
     });
-
     const [audioCounter, setAudioCounter] = useState(0);
     const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
-
-    const classes = useStyles();
-
-    const devices = useDevices();
-    const localVideoId = 'localVideo';
-    const isPlayMode = false;
-    
 
     function isExistingCallback(callbackName) {
         return props.additionalCallbacks && typeof props.additionalCallbacks[callbackName] === 'function';
@@ -136,7 +130,6 @@ function VideoContainer(props) {
         }
     }, [webRTCAdaptor]);
 
-    const isMainStreamer = props.streamerId === props.currentLivestream.id;
 
     useEffect(() => {
         if (isMainStreamer && props.currentLivestream.mode !== 'desktop') {
@@ -189,11 +182,11 @@ function VideoContainer(props) {
         setLivestreamCurrentSpeakerId(initiatorId)
     }
 
-    function setLivestreamCurrentSpeakerId(id) {
+    const setLivestreamCurrentSpeakerId = (id) => {
         props.firebase.setLivestreamCurrentSpeakerId(props.currentLivestream.id, id);
     }
 
-    function reloadPage() {
+    const reloadPage = () => {
         location.reload();
     }
 
@@ -237,14 +230,6 @@ function VideoContainer(props) {
         )
     }
 
-    const handleConfirm = (property) => {
-        setTutorialSteps({
-            ...tutorialSteps,
-            [property]: false,
-            [property + 1]: true,
-        })
-    }
-
     const handleCloseDemoIntroModal = (wantsDemo) => {
         setShowDemoIntroModal(false)
         if (wantsDemo) {
@@ -264,7 +249,7 @@ function VideoContainer(props) {
     }
 
     const handleCloseDemoEndModal = () => {
-        handleConfirm(17)
+        handleConfirmStep(17)
         setShowBubbles(true)
     }
 
