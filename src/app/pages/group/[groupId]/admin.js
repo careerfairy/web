@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Container, Button, Image, Menu } from "semantic-ui-react";
 import { useRouter } from "next/router";
 import Header from "../../../components/views/header/Header";
@@ -7,28 +7,16 @@ import Footer from "../../../components/views/footer/Footer";
 import AdminHeader from "../../../components/views/group/admin/AdminHeader";
 import GroupNav from "../../../components/views/group/admin/GroupNav";
 import { withFirebase } from "../../../context/firebase";
+import UserContext from "context/user/UserContext";
 
 const JoinGroup = (props) => {
   const router = useRouter();
   const groupId = router.query.groupId;
 
-  const [user, setUser] = useState(null);
-
-  const [userData, setUserData] = useState(null);
+  const { authenticatedUser, userData } = useContext(UserContext);
 
   const [group, setGroup] = useState({});
-
   const [menuItem, setMenuItem] = useState("settings");
-
-  useEffect(() => {
-    props.firebase.auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        router.replace("/login");
-      }
-    });
-  }, []);
 
   useEffect(() => {
     if (groupId) {
@@ -44,6 +32,14 @@ const JoinGroup = (props) => {
     }
   }, [groupId]);
 
+  useEffect(() => {
+    debugger;
+    if (!(Object.keys(group).length === 0) && authenticatedUser && userData) {
+      if ((authenticatedUser.email !== group.adminEmail) && !userData.isAdmin)
+        router.replace("/");
+      }
+  }, [group, authenticatedUser, userData]);
+
   return (
     <div className="greyBackground">
       <Head>
@@ -55,7 +51,7 @@ const JoinGroup = (props) => {
         group={group}
         groupId={groupId}
         userData={userData}
-        user={user}
+        user={authenticatedUser}
       />
       <Footer />
       <style jsx>{`
