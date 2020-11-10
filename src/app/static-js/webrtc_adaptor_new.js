@@ -131,12 +131,14 @@ export class WebRTCAdaptor
 			//var screenVideo = document.getElementById('sourceVideo');
 			var screenVideo = document.createElement('video');
 
-			screenVideo.srcObject = stream;
+            screenVideo.srcObject = stream;
+            screenVideo.muted = true;
 			screenVideo.play();
 			//create video element for camera
 			var cameraVideo = document.createElement('video');
 
-			cameraVideo.srcObject = cameraStream;
+            cameraVideo.srcObject = cameraStream;
+            cameraVideo.muted = true;
 			cameraVideo.play();
 			var canvasStream = canvas.captureStream(15);
 
@@ -201,7 +203,7 @@ export class WebRTCAdaptor
 
 	prepareStreamTracks(mediaConstraints,audioConstraint,stream,streamId) 
 	{
-		//this trick, getting audio and video separately, make us add or remove tracks on the fly
+        //this trick, getting audio and video separately, make us add or remove tracks on the fly
 		var audioTrack = stream.getAudioTracks()
 		if (audioTrack.length > 0 && this.publishMode == "camera") {
 			audioTrack[0].stop();
