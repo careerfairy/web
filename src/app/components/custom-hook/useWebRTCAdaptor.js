@@ -52,7 +52,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                 setWebRTCAdaptor(adaptor);
             }
         }     
-    }, [mediaConstraints, document, nsToken, isPlayMode, roomId, streamId]);
+    }, [document, nsToken, isPlayMode, roomId, streamId]);
 
     useEffect(() => {
         if (webRTCAdaptor && streamerReady && roomId && streamId) {

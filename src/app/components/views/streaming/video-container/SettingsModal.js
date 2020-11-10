@@ -54,46 +54,18 @@ function SettingsModal({ open,
                         devices, 
                         localStream, 
                         audioSource,
-                        setAudioSource,
+                        updateAudioSource,
                         videoSource,
-                        setVideoSource,
+                        updateVideoSource,
                         speakerSource, 
                         setSpeakerSource, 
-                        attachSinkId 
+                        attachSinkId,
+                        audioLevel
                     }) {
 
     const classes = useStyles();
     const [value, setValue] = React.useState(0);
     const [audioValue, setAudioValue] = React.useState(0);
-
-    const audioLevel = useSoundMeter(true, localStream, audioValue);
-
-    useEffect(() => {
-        if (localStream) {
-            if (devices.audioInputList && devices.audioInputList.length > 0 && (!audioSource || !devices.audioInputList.some(device => device.value === audioSource))) {
-                updateAudioSource(devices.audioInputList[0].value)
-            }
-            if (devices.videoDeviceList && devices.videoDeviceList.length > 0 && (!videoSource || !devices.videoDeviceList.some(device => device.value === videoSource))) {
-                updateVideoSource(devices.videoDeviceList[0].value)
-            }
-            if (devices.audioOutputList && devices.audioOutputList.length > 0 && (!speakerSource || !devices.audioOutputList.some(device => device.value === speakerSource))) {
-                setSpeakerSource(devices.audioOutputList[0].value);
-            }
-        }   
-    },[devices, localStream]);
-
-    function updateAudioSource(deviceId) {
-        webRTCAdaptor.switchAudioInputSource(streamId, deviceId)
-        setAudioSource(deviceId);
-        setTimeout(() => {
-            setAudioValue(audioValue + 1);
-        }, 500);
-    }
-
-    function updateVideoSource(deviceId) {
-        webRTCAdaptor.switchVideoCameraCapture(streamId, deviceId)
-        setVideoSource(deviceId);
-    }
 
     const handleChange = (event, newValue) => {
         setValue(newValue);

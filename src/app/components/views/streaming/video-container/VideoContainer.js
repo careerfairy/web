@@ -15,6 +15,8 @@ import { makeStyles } from '@material-ui/core';
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
 import DemoIntroModal from "../modal/DemoIntroModal";
 import DemoEndModal from "../modal/DemoEndModal";
+import LocalStorageUtil from 'util/LocalStorageUtil';
+import useMediaSources from 'components/custom-hook/useMediaSources';
 
 const useStyles = makeStyles((theme) => ({
     blackFrame: {
@@ -38,10 +40,6 @@ function VideoContainer(props) {
 
     const [isStreaming, setIsStreaming] = useState(false);
 
-    const [speakerSource, setSpeakerSource] = useState(null);
-    const [audioSource, setAudioSource] = useState(null);
-    const [videoSource, setVideoSource] = useState(null);
-
     const [mediaConstraints, setMediaConstraints] = useState({
         audio: true,
         video: { 
@@ -58,6 +56,7 @@ function VideoContainer(props) {
     const classes = useStyles();
 
     const devices = useDevices();
+    
     const localVideoId = 'localVideo';
     const isPlayMode = false;
     
@@ -127,6 +126,14 @@ function VideoContainer(props) {
             props.currentLivestream.id,
             props.streamerId
         );
+
+    const { audioSource,
+        updateAudioSource,
+        videoSource,
+        updateVideoSource,
+        speakerSource,
+        updateSpeakerSource,
+        audioLevel } = useMediaSources(devices, webRTCAdaptor, props.currentLivestream.id, localMediaStream);
 
     useEffect(() => {
         return () => {
@@ -316,9 +323,9 @@ function VideoContainer(props) {
             <SettingsModal open={showSettings} close={() => setShowSettings(false)} 
                 webRTCAdaptor={webRTCAdaptor} streamId={props.streamerId} 
                 devices={devices} localStream={localMediaStream}
-                audioSource={audioSource} setAudioSource={setAudioSource} 
-                videoSource={videoSource} setVideoSource={setVideoSource} 
-                speakerSource={speakerSource} setSpeakerSource={setSpeakerSource} 
+                audioSource={audioSource} updateAudioSource={updateAudioSource} 
+                videoSource={videoSource} updateVideoSource={updateVideoSource}  audioLevel={audioLevel}
+                speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource} 
                 attachSinkId={attachSinkId}/>
             <Modal open={showDisconnectionModal}>
                 <Modal.Header>You have been disconnected</Modal.Header>
@@ -331,9 +338,9 @@ function VideoContainer(props) {
                             onClick={() => reloadPage()}/>
                 </Modal.Content>
             </Modal>
-            <StreamPreparationModalV2 audioSource={audioSource} setAudioSource={setAudioSource}
-                                    videoSource={videoSource} setVideoSource={setVideoSource}
-                                    speakerSource={speakerSource} setSpeakerSource={setSpeakerSource}
+            <StreamPreparationModalV2 audioSource={audioSource} updateAudioSource={updateAudioSource}
+                                    videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
+                                    speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
                                     streamerReady={streamerReady} setStreamerReady={setStreamerReady}
                                     localStream={localMediaStream} mediaConstraints={mediaConstraints}
                                     connectionEstablished={connectionEstablished}
@@ -341,7 +348,6 @@ function VideoContainer(props) {
                                     handleOpenDemoIntroModal={handleOpenDemoIntroModal}
                                     attachSinkId={attachSinkId} devices={devices}
                                     setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
-                                    webRTCAdaptor={webRTCAdaptor} streamId={props.streamerId}
                                     isStreaming={isStreaming}/>
             <ErrorMessageModal isStreaming={isStreaming} connectionEstablished={connectionEstablished}
                                errorMessage={errorMessage} streamerReady={streamerReady}/>

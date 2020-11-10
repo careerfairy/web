@@ -49,14 +49,13 @@ const StreamPreparationModalV2 = ({
                                       setConnectionEstablished,
                                       isStreaming,
                                       audioSource,
-                                      setAudioSource,
+                                      updateAudioSource,
                                       videoSource,
-                                      setVideoSource,
+                                      updateVideoSource,
                                       setSpeakerSource,
                                       speakerSource,
-                                      webRTCAdaptor,
                                       devices,
-                                      streamId,
+                                      audioLevel,
                                       attachSinkId,
                                       isTest,
                                       viewer,
@@ -65,51 +64,12 @@ const StreamPreparationModalV2 = ({
     const classes = useStyles()
     const theme = useTheme()
 
-    const [showAudioVideo, setShowAudioVideo] = useState(false);
-    const [value, setValue] = useState(0);
-    const [initialDevicesSet, setInitialDevicesSet] = useState(false);
-
     const [playSound, setPlaySound] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
     const [completed, setCompleted] = useState(new Set());
     const [skipped, setSkipped] = useState(new Set());
-    const audioLevel = useSoundMeter(showAudioVideo, localStream, value);
     const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
     const steps = getSteps();
-
-    useEffect(() => {
-        if (localStream && !initialDevicesSet) {
-            if (devices.audioInputList && devices.audioInputList.length > 0 && (!audioSource || !devices.audioInputList.some(device => device.value === audioSource))) {
-                updateAudioSource(devices.audioInputList[0].value)
-            }
-            if (devices.videoDeviceList && devices.videoDeviceList.length > 0 && (!videoSource || !devices.videoDeviceList.some(device => device.value === videoSource))) {
-                updateVideoSource(devices.videoDeviceList[0].value)
-            }
-            if (devices.audioOutputList && devices.audioOutputList.length > 0 && (!speakerSource || !devices.audioOutputList.some(device => device.value === speakerSource))) {
-                setSpeakerSource(devices.audioOutputList[0].value);
-            }
-            setInitialDevicesSet(true);
-        }   
-    },[devices, localStream]);
-
-    useEffect(() => {
-        if (initialDevicesSet) {
-            setDevicesFromLocalStorage()
-        }
-    },[initialDevicesSet]);
-
-    function updateAudioSource(deviceId) {
-        webRTCAdaptor.switchAudioInputSource(streamId, deviceId)
-        setAudioSource(deviceId);
-        setTimeout(() => {
-            setValue(value + 1);
-        }, 500);
-    }
-
-    function updateVideoSource(deviceId) {
-        webRTCAdaptor.switchVideoCameraCapture(streamId, deviceId)
-        setVideoSource(deviceId);
-    }
 
     const totalSteps = () => {
         return getSteps().length;
@@ -194,7 +154,6 @@ const StreamPreparationModalV2 = ({
     };
 
     const handleFinalize = () => {
-        storeDevices()
         setStreamerReady(true)
         setConnectionEstablished(true)
         if (isTest && !viewer) {
@@ -233,45 +192,9 @@ const StreamPreparationModalV2 = ({
     }
 
     const hasDevicesInLocalStorage = () => {
-        return localStorage.getItem('selectedDevices');
-    }
-
-    const setDevicesFromLocalStorage = () => {
-        const devices = JSON.parse(localStorage.getItem('selectedDevices'));
-        if (devices) {
-            setDevice(devices.videoSource, "video");
-            setDevice(devices.audioSource, "audioInput");
-            setDevice(devices.speakerSource, "audioOutput");
-        }
-    }
-
-    const storeDevices = () => {
-        localStorage.setItem('selectedDevices', JSON.stringify({
-            videoSource,
-            audioSource,
-            speakerSource
-        }));
-    }
-
-    const setDevice = (deviceId, deviceType) => {
-        if (deviceType === 'video') {
-            const deviceExists = devices.videoDeviceList.some( device => device.value === deviceId );
-            if (deviceExists) {
-                updateVideoSource(deviceId);
-            }
-        }
-        if (deviceType === 'audioInput') {
-            const deviceExists = devices.audioInputList.some( device => device.value === deviceId );
-            if (deviceExists) {
-                updateAudioSource(deviceId);
-            }        
-        }
-        if (deviceType === 'audioOutput') {
-            const deviceExists = devices.audioOutputList.some( device => device.value === deviceId );
-            if (deviceExists) {
-                setSpeakerSource(deviceId);
-            }             
-        }
+        return localStorage.getItem('selectedAudioInput') && 
+        localStorage.getItem('selectedVideoInput') &&
+        localStorage.getItem('selectedAudioOutput');
     }
 
     function getStepContent(stepIndex) {
