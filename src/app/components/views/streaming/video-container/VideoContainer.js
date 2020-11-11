@@ -128,7 +128,7 @@ function VideoContainer(props) {
         updateVideoSource,
         speakerSource,
         updateSpeakerSource,
-        audioLevel } = useMediaSources(devices, webRTCAdaptor, props.currentLivestream.id, localMediaStream);
+        audioLevel } = useMediaSources(devices, webRTCAdaptor, props.streamerId, localMediaStream, !streamerReady || showSettings );
 
     useEffect(() => {
         return () => {
@@ -317,7 +317,7 @@ function VideoContainer(props) {
                             onClick={() => reloadPage()}/>
                 </Modal.Content>
             </Modal>
-            <StreamPreparationModalV2 audioSource={audioSource} updateAudioSource={updateAudioSource}
+            { !streamerReady && <StreamPreparationModalV2 audioSource={audioSource} updateAudioSource={updateAudioSource}
                                     videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
                                     speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
                                     streamerReady={streamerReady} setStreamerReady={setStreamerReady}
@@ -327,7 +327,7 @@ function VideoContainer(props) {
                                     handleOpenDemoIntroModal={handleOpenDemoIntroModal}
                                     attachSinkId={attachSinkId} devices={devices}
                                     setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
-                                    isStreaming={isStreaming}/>
+                                    isStreaming={isStreaming}/>}
             <ErrorMessageModal isStreaming={isStreaming} connectionEstablished={connectionEstablished}
                                errorMessage={errorMessage} streamerReady={streamerReady}/>
             <DemoIntroModal livestreamId={props.currentLivestream.id}

@@ -64,18 +64,22 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
         }
     }, [devices])
 
-    const testAudioRef = useRef(null);
+    const initialAudioRef = useRef(null);
+
     useEffect(() => {
         if (localStream) {
-            testAudioRef.current.srcObject = localStream;
-        }
+            initialAudioRef.current.srcObject = localStream;
+            return () => {
+                initialAudioRef.current.srcObject = null;
+            }
+        } 
     }, [localStream]);
 
     useEffect(() => {
-        if (speakerSource && testAudioRef) {
-            attachSinkId(testAudioRef.current, speakerSource)
+        if (!streamerReady && speakerSource && initialAudioRef) {
+            attachSinkId(initialAudioRef.current, speakerSource)
         }
-    }, [speakerSource, testAudioRef])
+    }, [streamerReady, speakerSource, initialAudioRef])
 
     useEffect(() => {
         setPlaySound(true)
@@ -131,9 +135,7 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
 
     return (
         <Grid container spacing={4}>
-            { !streamerReady &&
-                <audio ref={testAudioRef} autoPlay/>      
-            }
+            <audio ref={initialAudioRef} autoPlay/>
             {localMicrophones.length && 
             <Grid item lg={12} md={12} sm={12} xs={12}>
                 <FormControl style={{marginBottom: 10}} disabled={!devices.audioInputList.length} fullWidth variant="outlined">

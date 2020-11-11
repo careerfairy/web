@@ -56,8 +56,6 @@ const AudioTab = ({audioLevel, audioSource, devices, setAudioSource, setSpeakerS
     const classes = useStyles()
     const [playing, toggle, audio] = useAudio("https://www.kozco.com/tech/piano2-CoolEdit.mp3")
 
-    const testAudioRef = useRef(null);
-
     useEffect(() => {
         if (speakerSource) {
             attachSinkId(audio, speakerSource);
@@ -74,7 +72,6 @@ const AudioTab = ({audioLevel, audioSource, devices, setAudioSource, setSpeakerS
 
     return (
         <Grid container spacing={4}>
-            <audio ref={testAudioRef} sinkId autoPlay loop/>       
             {devices.audioInputList.length && 
             <Grid item lg={12} md={12} sm={12} xs={12}>
                 <FormControl style={{marginBottom: 10}} disabled={!devices.audioInputList.length} fullWidth variant="outlined">
