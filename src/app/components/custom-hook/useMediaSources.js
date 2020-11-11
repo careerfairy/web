@@ -4,14 +4,14 @@ import {isEmptyArray} from 'formik';
 import LocalStorageUtil from 'util/LocalStorageUtil';
 import { useSoundMeter } from './useSoundMeter';
 
-export default function useMediaSources(devices, webRTCAdaptor, streamId, localStream) {
+export default function useMediaSources(devices, webRTCAdaptor, streamId, localStream, showSoundMeter) {
 
     const [audioSource, setAudioSource] = useState(null);
     const [videoSource, setVideoSource] = useState(null);
     const [speakerSource, setSpeakerSource] = useState(null);
     const [soundMediaUpdateCounter, setSoundMeterUpdateCounter] = useState(0);
 
-    const audioLevel = useSoundMeter(true, localStream, soundMediaUpdateCounter);
+    const audioLevel = useSoundMeter(showSoundMeter, localStream, soundMediaUpdateCounter);
 
     useEffect(() => {
         const storedAudioSource = LocalStorageUtil.getAudioInputFromLocalStorage();
