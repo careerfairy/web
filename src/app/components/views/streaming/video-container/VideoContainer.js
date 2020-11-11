@@ -317,7 +317,7 @@ function VideoContainer(props) {
                             onClick={() => reloadPage()}/>
                 </Modal.Content>
             </Modal>
-            { !streamerReady && <StreamPreparationModalV2 audioSource={audioSource} updateAudioSource={updateAudioSource}
+            { !streamerReady && <StreamPreparationModalV2 readyToConnect={(props.currentLivestream && props.currentLivestream.id)} audioSource={audioSource} updateAudioSource={updateAudioSource}
                                     videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
                                     speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
                                     streamerReady={streamerReady} setStreamerReady={setStreamerReady}

@@ -42,24 +42,25 @@ function getSteps() {
 
 
 const StreamPreparationModalV2 = ({
-                                      streamerReady,
-                                      setStreamerReady,
-                                      localStream,
-                                      connectionEstablished,
-                                      setConnectionEstablished,
-                                      isStreaming,
-                                      audioSource,
-                                      updateAudioSource,
-                                      videoSource,
-                                      updateVideoSource,
-                                      setSpeakerSource,
-                                      speakerSource,
-                                      devices,
-                                      audioLevel,
-                                      attachSinkId,
-                                      isTest,
-                                      viewer,
-                                      handleOpenDemoIntroModal
+                                    readyToConnect,
+                                    streamerReady,
+                                    setStreamerReady,
+                                    localStream,
+                                    connectionEstablished,
+                                    setConnectionEstablished,
+                                    isStreaming,
+                                    audioSource,
+                                    updateAudioSource,
+                                    videoSource,
+                                    updateVideoSource,
+                                    setSpeakerSource,
+                                    speakerSource,
+                                    devices,
+                                    audioLevel,
+                                    attachSinkId,
+                                    isTest,
+                                    viewer,
+                                    handleOpenDemoIntroModal
                                   }) => {
     const classes = useStyles()
     const theme = useTheme()
@@ -310,6 +311,7 @@ const StreamPreparationModalV2 = ({
                         <Button
                             variant="contained"
                             color="primary"
+                            disabled={!readyToConnect}
                             onClick={() => handleFinalize()}
                             className={classes.button}
                         >
