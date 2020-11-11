@@ -60,7 +60,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                 webRTCAdaptor.joinRoom(roomId, streamId);
             } 
         }
-    }, [webRTCAdaptor, streamerReady, roomId, streamId]);
+    }, [webRTCAdaptor?.roomName, streamerReady, roomId, streamId]);
 
     useEffect(() => {
         if (latestAudioLevel) {
@@ -228,7 +228,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                                 adaptor.play(stream, null, roomId);
                                 console.log("playing: " + stream.streamId)
 							});
-						}
+                        }
 						setStreamsList(tempRoomStreamList);
                         break;
                     }
