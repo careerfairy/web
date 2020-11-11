@@ -155,6 +155,12 @@ function VideoContainer(props) {
     }, [audioCounter, props.currentLivestream.speakerSwitchMode]);
 
     useEffect(() => {
+        if (isMainStreamer && props.currentLivestream.mode === 'desktop') {
+            setLivestreamCurrentSpeakerId(props.currentLivestream.screenSharerId);
+        }
+    },[props.currentLivestream.mode])
+
+    useEffect(() => {
         if (props.streamerId && props.currentLivestream.id ) {
             if (props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
                 setDesktopMode("default", props.streamerId);
