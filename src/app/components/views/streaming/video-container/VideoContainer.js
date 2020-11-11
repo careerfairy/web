@@ -152,7 +152,7 @@ function VideoContainer(props) {
             }, 500);
             return () => clearTimeout(timeout);
         }
-    }, [audioCounter, props.currentLivestream.speakerSwitchMode]);
+    }, [audioCounter, props.currentLivestream.mode]);
 
     useEffect(() => {
         if (isMainStreamer && props.currentLivestream.mode === 'desktop') {
