@@ -225,7 +225,7 @@ function ViewerPage({firebase}) {
                             fontWeight: '700',
                             color: 'rgba(0, 210, 170, 0.2)',
                             zIndex: '50'
-                        }}>&
+                        }}>
                         </div>
                     </div>
                     <div className={'top-menu-right'}>
@@ -291,8 +291,8 @@ function ViewerPage({firebase}) {
                 <div className='icons-container'>
                     <IconsContainer isTest={currentLivestream.test} livestreamId={currentLivestream.id}/>
                 </div>
-                {currentLivestream && <RatingContainer livestreamId={currentLivestream.id}
-                                                       livestream={currentLivestream}/>}
+                {currentLivestream && !currentLivestream.hasNoRatings && 
+                    <RatingContainer livestreamId={currentLivestream.id} livestream={currentLivestream}/>}
                 <div className={'playButtonContent ' + (showVideoButton.muted ? '' : 'hidden')} onClick={unmuteVideos}>
                     <div className='playButton'>
                         <VolumeUpRoundedIcon style={{fontSize: '3rem'}}/>
@@ -362,7 +362,7 @@ function ViewerPage({firebase}) {
                 .mini-chat-container {
                     position: absolute;
                     bottom: 0;
-                    right: 0;
+                    right: 40px;
                     width: 20%;
                     min-width: 250px;
                     z-index: 7250;
@@ -377,7 +377,7 @@ function ViewerPage({firebase}) {
                 .icons-container {
                     position: absolute;
                     bottom: 50px;
-                    right: 20px;
+                    right: 60px;
                     z-index: 100;
                     width: 80px;
                 }
