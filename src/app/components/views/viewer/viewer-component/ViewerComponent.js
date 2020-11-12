@@ -1,5 +1,5 @@
 import {useState, useEffect, useRef, Fragment} from 'react';
-import { withFirebasePage } from 'context/firebase';
+import {withFirebasePage} from 'context/firebase';
 import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
 import CurrentSpeakerDisplayer from 'components/views/streaming/video-container/CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from 'components/views/streaming/video-container/SmallStreamerVideoDisplayer';
@@ -7,16 +7,17 @@ import SmallStreamerVideoDisplayer from 'components/views/streaming/video-contai
 
 function ViewerComponent(props) {
 
-    const [mediaConstraints, setMediaConstraints] = useState({ audio: true, video: true});
+    const mediaConstraints = {audio: true, video: true}
 
     const streamerReady = true;
     const isPlayMode = true;
     const streamingCallbacks = {};
     const errorCallbacks = {
-        onOtherError: (error) => {}
+        onOtherError: (error) => {
+        }
     };
 
-    const { webRTCAdaptor, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels } = 
+    const {webRTCAdaptor, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels} =
         useWebRTCAdaptor(
             streamerReady,
             isPlayMode,
@@ -29,7 +30,7 @@ function ViewerComponent(props) {
         );
 
     useEffect(() => {
-        return () => { 
+        return () => {
             if (webRTCAdaptor) {
                 webRTCAdaptor.closeWebSocket();
             }
@@ -42,14 +43,38 @@ function ViewerComponent(props) {
 
     return (
         <div>
-            <div> 
-                <CurrentSpeakerDisplayer isPlayMode={true} smallScreenMode={props.currentLivestream.mode === 'presentation'} speakerSwitchModeActive={false} localStream={null} streams={externalMediaStreams} localId={props.streamerId} currentSpeaker={props.currentLivestream.currentSpeakerId} removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams} muted={!props.currentLivestream.hasStarted } {...props}/>
+            <div>
+                <CurrentSpeakerDisplayer isPlayMode={true}
+                                         smallScreenMode={props.currentLivestream.mode === 'presentation'}
+                                         speakerSwitchModeActive={false} localStream={null}
+                                         streams={externalMediaStreams} localId={props.streamerId}
+                                         currentSpeaker={props.currentLivestream.currentSpeakerId}
+                                         removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
+                                         muted={!props.currentLivestream.hasStarted} {...props}/>
             </div>
-            <div style={{ display: (props.currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
-                <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams} livestreamId={props.currentLivestream.id} presenter={false}/>
+            <div style={{display: (props.currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
+                <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams}
+                                             livestreamId={props.currentLivestream.id} presenter={false}/>
             </div>
-            <div className={ props.currentLivestream.hasStarted ? 'hidden' : '' } style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'white', zIndex: '9999'}}>
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: '1.1em', fontWeight: '700', color: 'rgb(0, 210, 170)', textAlign: 'center'}}>
+            <div className={props.currentLivestream.hasStarted ? 'hidden' : ''} style={{
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'white',
+                zIndex: '9999'
+            }}>
+                <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%,-50%)',
+                    fontSize: '1.1em',
+                    fontWeight: '700',
+                    color: 'rgb(0, 210, 170)',
+                    textAlign: 'center'
+                }}>
                     {props.currentLivestream.test ? 'The streamer has to press Start Streaming to be visible to students' : 'Thank you for joining!'}
                 </div>
             </div>
