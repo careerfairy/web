@@ -46,14 +46,10 @@ function VideoContainer(props) {
     const [connectionEstablished, setConnectionEstablished] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
 
-    const [mediaConstraints, setMediaConstraints] = useState({
+    const mediaConstraints = {
         audio: true,
-        video: { 
-            width: { ideal: 1920, max: 1920 },
-            height: { ideal: 1080, max: 1080 },
-            aspectRatio: 1.77,   
-        }
-    });
+        video: true,
+    }
     const [audioCounter, setAudioCounter] = useState(0);
     const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
     const [showSettings, setShowSettings] = useState(false);

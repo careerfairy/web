@@ -622,9 +622,9 @@ export class WebRTCAdaptor
 		if (typeof deviceId != "undefined" ) {
 			this.mediaConstraints.video = { 
                 "deviceId": deviceId, 
-                "width": { ideal: 1920, max: 1920 },
-				"height": { ideal: 1080, max: 1080 },
-                "aspectRatio": 1.77
+                // "width": { ideal: 1920, max: 1920 },
+				// "height": { ideal: 1080, max: 1080 },
+                // "aspectRatio": 1.77
             };
 		}
 		this.setVideoCameraSource(streamId, this.mediaConstraints, null, true, deviceId);
