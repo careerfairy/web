@@ -140,7 +140,10 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
             }
         });
         newAudioLevels.push(latestAudioLevel);
-        setAudioLevels(newAudioLevels);
+        const cleanedUpdatedAudioLevels = newAudioLevels.filter( audioLevel => {
+            return externalMediaStreams.some( stream =>  audioLevel.streamId === stream.streamId) || audioLevel.streamId === streamId;
+        });
+        setAudioLevels(cleanedUpdatedAudioLevels);
     }
 
     function getWebRTCAdaptor() {

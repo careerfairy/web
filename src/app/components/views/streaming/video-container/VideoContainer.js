@@ -149,6 +149,8 @@ function VideoContainer(props) {
                     const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
                     if (maxEntry.audioLevel > 0.05) {
                         setLivestreamCurrentSpeakerId(maxEntry.streamId);
+                    } else if (!audioLevels.some(audioLevel => audioLevel.streamId === props.currentLivestream.currentSpeakerId)){
+                        setLivestreamCurrentSpeakerId(maxEntry.streamId);
                     }
                 }
                 setAudioCounter(audioCounter + 1);
@@ -172,8 +174,8 @@ function VideoContainer(props) {
     },[props.streamerId, props.currentLivestream.id])
 
     useEffect(() => {
-        if (webRTCAdaptor) {
-            if (props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
+        if (webRTCAdaptor && props.currentLivestream.screenSharerId === props.streamerId) {
+            if (props.currentLivestream.mode === 'desktop') {
                 webRTCAdaptor.switchDesktopCaptureWithCamera(props.streamerId);
             } else {
                 webRTCAdaptor.switchVideoCameraCapture(props.streamerId);
