@@ -11,9 +11,23 @@ import axios from 'axios';
 import Link from 'next/link';
 import UserUtil from 'data/util/UserUtil';
 import DataAccessUtil from 'util/DataAccessUtil';
+import {makeStyles} from "@material-ui/core/styles";
+import {Avatar} from "@material-ui/core";
 
+const useStyles = makeStyles(theme => ({
+    speakerAvatar: {
+        width: 75,
+        height: 75
+    },
+    speakerWrapper: {
+        display: "flex !important",
+        flexDirection: "column !important",
+        alignItems: "center !important"
+    }
+}))
 
 function LivestreamCard(props) {
+    const classes = useStyles()
 
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
 
@@ -110,7 +124,8 @@ function LivestreamCard(props) {
                             <Grid.Column width={14}>
                                 <div className='livestream-streamer-description'>
                                     <div className='livestream-speaker-avatar-capsule'>
-                                        <div className='livestream-speaker-avatar' style={{ backgroundImage: 'url(' + avatar + ')'}}/>
+                                        <Avatar src={avatar} className={classes.speakerAvatar}/>
+                                        {/*<div className='livestream-speaker-avatar' style={{ backgroundImage: 'url(' + avatar + ')'}}/>*/}
                                     </div>
                                     <div className='livestream-streamer'>
                                         <div className='livestream-streamer-name'>{ props.livestream.mainSpeakerName }</div>
