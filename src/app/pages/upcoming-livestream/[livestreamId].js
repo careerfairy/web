@@ -23,8 +23,25 @@ import UserContext from "../../context/user/UserContext";
 import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
 import axios from "axios";
 import DataAccessUtil from "util/DataAccessUtil";
+import {Avatar} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles(theme => ({
+    speakerAvatar: {
+        width: 110,
+        height: 110
+    },
+    speakerWrapper: {
+        display: "flex !important",
+        flexDirection: "column !important",
+        alignItems: "center !important"
+    }
+}))
+
+const speakerPlaceholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media"
 
 function UpcomingLivestream(props) {
+    const classes = useStyles()
     const router = useRouter();
     const {livestreamId, groupId} = router.query;
     const absolutePath = router.asPath;
@@ -331,6 +348,8 @@ function UpcomingLivestream(props) {
     let speakerElements = livestreamSpeakers.map((speaker, index) => {
         return (
             <Grid.Column
+                className={classes.speakerWrapper}
+                verticalAlign="middle"
                 textAlign="center"
                 mobile="16"
                 tablet="8"
@@ -338,17 +357,7 @@ function UpcomingLivestream(props) {
                 key={index}
             >
                 <div className="livestream-speaker-avatar-capsule">
-                    <div
-                        className="livestream-speaker-avatar"
-                        style={{
-                            backgroundImage:
-                                "url(" +
-                                (speaker.avatar
-                                    ? speaker.avatar
-                                    : "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media" +
-                                    ")"),
-                        }}
-                    />
+                    <Avatar src={speaker?.avatar?.length? speaker.avatar : speakerPlaceholder} className={classes.speakerAvatar}/>
                 </div>
                 <div className="livestream-speaker-description">
                     <div
