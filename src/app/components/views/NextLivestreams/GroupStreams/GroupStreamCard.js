@@ -15,6 +15,7 @@ import {LazyLoadComponent} from "react-lazy-load-image-component";
 import TargetOptions from "../GroupsCarousel/TargetOptions";
 import GroupJoinToAttendModal from './GroupJoinToAttendModal';
 import DataAccessUtil from 'util/DataAccessUtil';
+import {Avatar} from "@material-ui/core";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -36,6 +37,15 @@ const useStyles = makeStyles((theme) => ({
         WebkitBoxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
         boxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
         MozBoxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
+    },
+    speakerAvatar: {
+        width: 75,
+        height: 75
+    },
+    speakerWrapper: {
+        display: "flex !important",
+        flexDirection: "column !important",
+        alignItems: "center !important"
     }
 
 }));
@@ -340,10 +350,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                                 <Grid.Column width={14}>
                                     <div className='livestream-streamer-description'>
                                         <div className='livestream-speaker-avatar-capsule'>
-                                            {/*<LazyLoad placeholder={<AvatarSkeleton/>}>*/}
-                                            <div className='livestream-speaker-avatar'
-                                                 style={{backgroundImage: 'url(' + avatar + ')'}}/>
-                                            {/*</LazyLoad>*/}
+                                            <Avatar src={avatar} className={classes.speakerAvatar} />
                                         </div>
                                         <div className='livestream-streamer'>
                                             <div
