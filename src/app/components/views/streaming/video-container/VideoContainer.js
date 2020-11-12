@@ -17,6 +17,7 @@ import DemoIntroModal from "../modal/DemoIntroModal";
 import DemoEndModal from "../modal/DemoEndModal";
 import LocalStorageUtil from 'util/LocalStorageUtil';
 import useMediaSources from 'components/custom-hook/useMediaSources';
+import ScreenSharePermissionDeniedModal from '../modal/ScreenSharePermissionDeniedModal';
 
 const useStyles = makeStyles((theme) => ({
     blackFrame: {
@@ -39,6 +40,7 @@ function VideoContainer(props) {
     const isMainStreamer = props.streamerId === props.currentLivestream.id;
 
     const [errorMessage, setErrorMessage] = useState(null);
+    const [screenSharePermissionDenied, setScreenSharePermissionDenied] = useState(false);
     const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
     const [streamerReady, setStreamerReady] = useState(false);
     const [connectionEstablished, setConnectionEstablished] = useState(false);
@@ -99,6 +101,7 @@ function VideoContainer(props) {
             if (isExistingCallback('onScreenSharePermissionDenied')) {
                 props.additionalCallbacks.onScreenSharePermissionDenied();
             }
+            setScreenSharePermissionDenied(true);
             setDesktopMode("default", props.streamerId);
         },
         onOtherError: (error) => {
@@ -334,6 +337,8 @@ function VideoContainer(props) {
                                     attachSinkId={attachSinkId} devices={devices}
                                     setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
                                     isStreaming={isStreaming}/>}
+            <ScreenSharePermissionDeniedModal screenSharePermissionDenied={screenSharePermissionDenied} 
+                                setScreenSharePermissionDenied={setScreenSharePermissionDenied}/>
             <ErrorMessageModal isStreaming={isStreaming} connectionEstablished={connectionEstablished}
                                errorMessage={errorMessage} streamerReady={streamerReady}/>
             <DemoIntroModal livestreamId={props.currentLivestream.id}
