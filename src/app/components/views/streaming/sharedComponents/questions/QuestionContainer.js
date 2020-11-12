@@ -127,10 +127,10 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
 
         const newComment = streamer ? {
             title: newCommentTitle,
-            author: userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous',
+            author: 'Streamer'
         } : {
             title: newCommentTitle,
-            author: 'Streamer',
+            author: userData ? (userData.firstName + ' ' + userData.lastName.charAt(0)) : 'anonymous'
         }
 
         firebase.putQuestionComment(livestream.id, question.id, newComment)
