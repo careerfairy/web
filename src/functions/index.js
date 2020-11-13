@@ -573,7 +573,7 @@ exports.getNumberOfViewers = functions.https.onRequest(async (req, res) => {
 
     axios({
         method: 'get',
-        url: 'https://streaming.careerfairy.io/WebRTCAppEE/rest/v2/broadcasts/' + req.query.livestreamId + '/broadcast-statistics',
+        url: 'https://streaming.careerfairy.io/WebRTCAppEE/rest/v2/broadcasts/' + req.query.livestreamId,
     }).then( response => { 
             console.log(response.data);
             return res.status(200).send(response.data);

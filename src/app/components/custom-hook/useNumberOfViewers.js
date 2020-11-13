@@ -14,8 +14,8 @@ export function useNumberOfViewers(currentLivestream) {
                         method: 'get',
                         url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=' + currentLivestream.id,
                     }).then( response => { 
-                            if (response.data.totalWebRTCWatchersCount > -1) {
-                                setNumberOfViewers(response.data.totalWebRTCWatchersCount);
+                            if (response.data.webRTCViewerCount > -1) {
+                                setNumberOfViewers(response.data.webRTCViewerCount);
                             }
                         }).catch(error => {
                             console.log(error);
