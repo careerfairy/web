@@ -154,7 +154,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
             OfferToReceiveVideo : false
         };
         const newAdaptor = new WebRTCAdaptor({
-            websocket_url : "wss://streaming.thrillin.work/WebRTCAppEE/websocket",
+            websocket_url : "wss://streaming.careerfairy.io/WebRTCAppEE/websocket",
             mediaConstraints : mediaConstraints,
             peerconnection_config : pc_config,
             sdp_constraints : sdpConstraints,
