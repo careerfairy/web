@@ -1,34 +1,32 @@
 import { useState, useEffect } from "react";
 import { navigator } from "global";
 
-export function useSoundMeter(isShowAudioVideo, localStream) {
+export function useSoundMeter(showAudioMeter, localStream, update) {
 
     const [audioValue, setAudioValue] = useState(0);
     const [soundMeter, setSoundMeter] = useState(null);
 
     useEffect(() => {
-        if (navigator && localStream) {
-            try {
-                window.AudioContext = window.AudioContext || window.webkitAudioContext;
-                window.audioContext = new AudioContext();
-            } catch (e) {
-                console.log('Web Audio API not supported.');
+        if (showAudioMeter) {
+            if (navigator && localStream) {
+                try {
+                    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                    window.audioContext = new AudioContext();
+                } catch (e) {
+                    console.log('Web Audio API not supported.');
+                }
+                if (soundMeter) {
+                    soundMeter.stop();
+                }
+                connectStream(localStream);
             }
+        } else {
             if (soundMeter) {
                 soundMeter.stop();
             }
-            connectStream(localStream);
         }
-    },[localStream, navigator]);
-
-    useEffect(() => {
-        if (!isShowAudioVideo && soundMeter) {
-            soundMeter.stop();
-        }
-    },[isShowAudioVideo]);
-
-    
-    
+    },[showAudioMeter, localStream, navigator, update]);
+  
     function SoundMeter(context) {
         this.context = context;
         this.instant = 0.0;
@@ -77,9 +75,6 @@ export function useSoundMeter(isShowAudioVideo, localStream) {
     };
 
     function connectStream(stream) {
-        // Put variables in global scope to make them available to the
-        // browser console.
-
         let zeroCounter = 0;
         const soundMeter = new SoundMeter(window.audioContext);
         soundMeter.connectToSource(stream, function(e) {

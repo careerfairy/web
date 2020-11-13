@@ -28,7 +28,6 @@ const UserCategorySelector = (props) => {
     }, [props.category]);
 
     useEffect(() => {
-        debugger;
         if (props.categoriesWithElements) {
             let category = props.categoriesWithElements.find(category => category.id === props.category.id);
             let selectedElement = category.elements.find(element => element.selected === true);

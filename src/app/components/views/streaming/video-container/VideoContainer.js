@@ -3,41 +3,56 @@ import {Button, Modal} from "semantic-ui-react";
 
 import {withFirebasePage} from 'context/firebase';
 
-import CountdownTimer from 'components/views/common/Countdown';
-import {useLocalStream} from 'components/custom-hook/useLocalStream';
 import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
 import CurrentSpeakerDisplayer from './CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
-import StreamPreparationModal from 'components/views/streaming/modal/StreamPreparationModal';
 import VideoControlsContainer from './VideoControlsContainer';
-
+import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
+import ErrorMessageModal from "../modal/StreamPreparationModalV2/ErrorMessageModal";
+import useDevices from 'components/custom-hook/useDevices';
+import SettingsModal from './SettingsModal';
+import { makeStyles } from '@material-ui/core';
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
 import DemoIntroModal from "../modal/DemoIntroModal";
 import DemoEndModal from "../modal/DemoEndModal";
+import LocalStorageUtil from 'util/LocalStorageUtil';
+import useMediaSources from 'components/custom-hook/useMediaSources';
+import ScreenSharePermissionDeniedModal from '../modal/ScreenSharePermissionDeniedModal';
+
+const useStyles = makeStyles((theme) => ({
+    blackFrame: {
+        position: "absolute",                
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+    }
+}));
+
 
 function VideoContainer(props) {
-    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles, getActiveTutorialStepKey} = useContext(TutorialContext);
-    const [errorMessage, setErrorMessage] = useState(null);
-
-    const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
-
-    const [streamerReady, setStreamerReady] = useState(false);
-    const [connectionEstablished, setConnectionEstablished] = useState(false);
-
-    const [isStreaming, setIsStreaming] = useState(false);
-
-    const [mediaConstraints, setMediaConstraints] = useState(null);
-    const [audioSource, setAudioSource] = useState(null);
-    const [videoSource, setVideoSource] = useState(null);
-
-    const {permissionGranted, userMediaError, localStream} = useLocalStream(mediaConstraints);
-    const [audioCounter, setAudioCounter] = useState(0);
-
-    const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
-
+    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles, handleConfirmStep, getActiveTutorialStepKey} = useContext(TutorialContext);
+    
+    const classes = useStyles();
+    const devices = useDevices();
     const localVideoId = 'localVideo';
     const isPlayMode = false;
-    
+    const isMainStreamer = props.streamerId === props.currentLivestream.id;
+
+    const [errorMessage, setErrorMessage] = useState(null);
+    const [screenSharePermissionDenied, setScreenSharePermissionDenied] = useState(false);
+    const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
+    const [streamerReady, setStreamerReady] = useState(false);
+    const [connectionEstablished, setConnectionEstablished] = useState(false);
+    const [isStreaming, setIsStreaming] = useState(false);
+
+    const mediaConstraints = {
+        audio: true,
+        video: true,
+    }
+    const [audioCounter, setAudioCounter] = useState(0);
+    const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
 
     function isExistingCallback(callbackName) {
         return props.additionalCallbacks && typeof props.additionalCallbacks[callbackName] === 'function';
@@ -82,6 +97,7 @@ function VideoContainer(props) {
             if (isExistingCallback('onScreenSharePermissionDenied')) {
                 props.additionalCallbacks.onScreenSharePermissionDenied();
             }
+            setScreenSharePermissionDenied(true);
             setDesktopMode("default", props.streamerId);
         },
         onOtherError: (error) => {
@@ -93,7 +109,7 @@ function VideoContainer(props) {
         }
     }
 
-    const {webRTCAdaptor, externalMediaStreams, setAddedStream, removeStreamFromExternalMediaStreams, audioLevels} =
+    const {webRTCAdaptor, externalMediaStreams, localMediaStream, setAddedStream, removeStreamFromExternalMediaStreams, audioLevels} =
         useWebRTCAdaptor(
             streamerReady,
             isPlayMode,
@@ -105,6 +121,14 @@ function VideoContainer(props) {
             props.streamerId
         );
 
+    const { audioSource,
+        updateAudioSource,
+        videoSource,
+        updateVideoSource,
+        speakerSource,
+        updateSpeakerSource,
+        audioLevel } = useMediaSources(devices, webRTCAdaptor, props.streamerId, localMediaStream, !streamerReady || showSettings );
+
     useEffect(() => {
         return () => {
             if (webRTCAdaptor) {
@@ -113,15 +137,15 @@ function VideoContainer(props) {
         }
     }, [webRTCAdaptor]);
 
-    const isMainStreamer = props.streamerId === props.currentLivestream.id;
 
     useEffect(() => {
-        if (isMainStreamer && props.currentLivestream.speakerSwitchMode === 'automatic') {
+        if (isMainStreamer && props.currentLivestream.mode !== 'desktop') {
             let timeout = setTimeout(() => {
-                console.log(audioLevels)
                 if (audioLevels && audioLevels.length > 0) {
                     const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
                     if (maxEntry.audioLevel > 0.05) {
+                        setLivestreamCurrentSpeakerId(maxEntry.streamId);
+                    } else if (!audioLevels.some(audioLevel => audioLevel.streamId === props.currentLivestream.currentSpeakerId)){
                         setLivestreamCurrentSpeakerId(maxEntry.streamId);
                     }
                 }
@@ -129,7 +153,13 @@ function VideoContainer(props) {
             }, 500);
             return () => clearTimeout(timeout);
         }
-    }, [audioCounter, props.currentLivestream.speakerSwitchMode]);
+    }, [audioCounter, props.currentLivestream.mode]);
+
+    useEffect(() => {
+        if (isMainStreamer && props.currentLivestream.mode === 'desktop') {
+            setLivestreamCurrentSpeakerId(props.currentLivestream.screenSharerId);
+        }
+    },[props.currentLivestream.mode])
 
     useEffect(() => {
         if (props.streamerId && props.currentLivestream.id ) {
@@ -140,21 +170,8 @@ function VideoContainer(props) {
     },[props.streamerId, props.currentLivestream.id])
 
     useEffect(() => {
-        const constraints = {
-            audio: {deviceId: audioSource || undefined},
-            video: {
-                width: {ideal: 1920, max: 1920},
-                height: {ideal: 1080, max: 1080},
-                aspectRatio: 1.77,
-                deviceId: videoSource ? videoSource : undefined
-            }
-        };
-        setMediaConstraints(constraints);
-    }, [audioSource, videoSource]);
-
-    useEffect(() => {
-        if (webRTCAdaptor) {
-            if (props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
+        if (webRTCAdaptor && props.currentLivestream.screenSharerId === props.streamerId) {
+            if (props.currentLivestream.mode === 'desktop') {
                 webRTCAdaptor.switchDesktopCaptureWithCamera(props.streamerId);
             } else {
                 webRTCAdaptor.switchVideoCameraCapture(props.streamerId);
@@ -162,20 +179,45 @@ function VideoContainer(props) {
         }
     }, [props.currentLivestream.mode]);
 
+    useEffect(() => {
+        if (externalMediaStreams && props.currentLivestream.currentSpeakerId && isMainStreamer) {
+            let existingCurrentSpeaker = externalMediaStreams.find( stream => stream.streamId === props.currentLivestream.currentSpeakerId)
+            if (!existingCurrentSpeaker) {
+                setLivestreamCurrentSpeakerId(props.currentLivestream.id);
+            }
+        }
+    }, [externalMediaStreams]);
+
     const setDesktopMode = async (mode, initiatorId) => {
         await props.firebase.setDesktopMode(props.currentLivestream.id, mode, initiatorId);
         setLivestreamCurrentSpeakerId(initiatorId)
-        if (props.currentLivestream.speakerSwitchMode === "automatic") {
-            await props.firebase.setLivestreamSpeakerSwitchMode(props.currentLivestream.id, "manual");
-        }
     }
 
-    function setLivestreamCurrentSpeakerId(id) {
+    const setLivestreamCurrentSpeakerId = (id) => {
         props.firebase.setLivestreamCurrentSpeakerId(props.currentLivestream.id, id);
     }
 
-    function reloadPage() {
+    const reloadPage = () => {
         location.reload();
+    }
+
+    const attachSinkId = (element, sinkId) => {
+        if (typeof element.sinkId !== 'undefined') {
+            element.setSinkId(sinkId)
+                .then(() => {
+                    console.log(`Success, audio output device attached: ${sinkId}`);
+                })
+                .catch(error => {
+                    let errorMessage = error;
+                    if (error.name === 'SecurityError') {
+                        errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
+                    }
+                    console.error(errorMessage);
+                    // Jump back to first output device in the list as it's the default.
+                });
+        } else {
+            console.warn('Browser does not support output device selection.');
+        }
     }
 
     useEffect(() => {
@@ -184,7 +226,6 @@ function VideoContainer(props) {
             if (activeStep > 10 && activeStep < 13) {
                 setAddedStream({
                     streamId: "demoStream",
-                    type: "demo",
                     url: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media"
                 })
             } else {
@@ -198,14 +239,6 @@ function VideoContainer(props) {
             && tutorialSteps.streamerReady
             && tutorialSteps[property]
         )
-    }
-
-    const handleConfirm = (property) => {
-        setTutorialSteps({
-            ...tutorialSteps,
-            [property]: false,
-            [property + 1]: true,
-        })
     }
 
     const handleCloseDemoIntroModal = (wantsDemo) => {
@@ -227,45 +260,59 @@ function VideoContainer(props) {
     }
 
     const handleCloseDemoEndModal = () => {
-        handleConfirm(17)
+        handleConfirmStep(17)
         setShowBubbles(true)
     }
 
     return (
         <Fragment>
-            <div className='screen-container'>
+            <div className={classes.blackFrame}>
                 <div>
-                    <CurrentSpeakerDisplayer isPlayMode={false}
-                        smallScreenMode={props.currentLivestream.mode === 'presentation'}
-                        speakerSwitchModeActive={isMainStreamer}
-                        setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId}
+                    <CurrentSpeakerDisplayer isPlayMode={false} 
+                        smallScreenMode={props.currentLivestream.mode === 'presentation'} 
+                        speakerSwitchModeActive={isMainStreamer} 
+                        setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId} 
                         removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
-                        localId={props.streamerId}
-                        localStream={localStream}
-                        streams={externalMediaStreams}
-                        mediaConstraints={mediaConstraints}
-                        currentSpeaker={props.currentLivestream.currentSpeakerId}
+                        localId={props.streamerId} 
+                        localStream={localMediaStream} 
+                        speakerSource={speakerSource}
+                        attachSinkId={attachSinkId}
+                        streams={externalMediaStreams} 
+                        mediaConstraints={mediaConstraints} 
+                        currentSpeaker={props.currentLivestream.currentSpeakerId} 
                         {...props}
                         muted={false}/>
                 </div>
-                {props.currentLivestream.mode === 'presentation' ?
-                    <SmallStreamerVideoDisplayer
-                        isPlayMode={false}
-                        localStream={localStream}
-                        streams={externalMediaStreams}
-                        mediaConstraints={mediaConstraints}
-                        livestreamId={props.currentLivestream.id}
+                { props.currentLivestream.mode === 'presentation' ?
+                    <SmallStreamerVideoDisplayer 
+                        isPlayMode={false} 
+                        localStream={localMediaStream} rn
+                        streams={externalMediaStreams} 
+                        mediaConstraints={mediaConstraints} 
+                        livestreamId={props.currentLivestream.id} 
                         showMenu={props.showMenu}
                         presenter={true}/>
                     : null
                 }
+                <VideoControlsContainer 
+                    webRTCAdaptor={webRTCAdaptor} 
+                    currentLivestream={props.currentLivestream}
+                    viewer={props.viewer} 
+                    streamerId={props.streamerId}
+                    joining={!isMainStreamer}
+                    isMainStreamer={isMainStreamer}
+                    setDesktopMode={setDesktopMode}
+                    showSettings={showSettings}
+                    setShowSettings={setShowSettings}
+                    />
             </div>
-            <div className='controls-container'>
-                <VideoControlsContainer setDesktopMode={setDesktopMode}
-                                        streamerId={props.streamerId} webRTCAdaptor={webRTCAdaptor} 
-                                        isMainStreamer={isMainStreamer} currentLivestream={props.currentLivestream}
-                                        viewer={props.viewer} joining={!isMainStreamer}/>
-            </div>
+            <SettingsModal open={showSettings} close={() => setShowSettings(false)} 
+                webRTCAdaptor={webRTCAdaptor} streamId={props.streamerId} 
+                devices={devices} localStream={localMediaStream}
+                audioSource={audioSource} updateAudioSource={updateAudioSource} 
+                videoSource={videoSource} updateVideoSource={updateVideoSource}  audioLevel={audioLevel}
+                speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource} 
+                attachSinkId={attachSinkId}/>
             <Modal open={showDisconnectionModal}>
                 <Modal.Header>You have been disconnected</Modal.Header>
                 <Modal.Content>
@@ -277,15 +324,21 @@ function VideoContainer(props) {
                             onClick={() => reloadPage()}/>
                 </Modal.Content>
             </Modal>
-            <StreamPreparationModal streamerReady={streamerReady} setStreamerReady={setStreamerReady}
-                                    localStream={localStream} mediaConstraints={mediaConstraints}
+            { !streamerReady && <StreamPreparationModalV2 readyToConnect={(props.currentLivestream && props.currentLivestream.id)} audioSource={audioSource} updateAudioSource={updateAudioSource}
+                                    videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
+                                    speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
+                                    streamerReady={streamerReady} setStreamerReady={setStreamerReady}
+                                    localStream={localMediaStream} mediaConstraints={mediaConstraints}
                                     connectionEstablished={connectionEstablished}
-                                    isTest={props.currentLivestream.test}
-                                    viewer={props.viewer}
+                                    isTest={props.currentLivestream.test} viewer={props.viewer}
                                     handleOpenDemoIntroModal={handleOpenDemoIntroModal}
+                                    attachSinkId={attachSinkId} devices={devices}
                                     setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
-                                    isStreaming={isStreaming} audioSource={audioSource} setAudioSource={setAudioSource}
-                                    videoSource={videoSource} setVideoSource={setVideoSource}/>
+                                    isStreaming={isStreaming}/>}
+            <ScreenSharePermissionDeniedModal screenSharePermissionDenied={screenSharePermissionDenied} 
+                                setScreenSharePermissionDenied={setScreenSharePermissionDenied}/>
+            <ErrorMessageModal isStreaming={isStreaming} connectionEstablished={connectionEstablished}
+                               errorMessage={errorMessage} streamerReady={streamerReady}/>
             <DemoIntroModal livestreamId={props.currentLivestream.id}
                             open={showDemoIntroModal}
                             handleClose={handleCloseDemoIntroModal}/>
@@ -297,6 +350,7 @@ function VideoContainer(props) {
                     bottom: 0;
                     left: 0;
                     right: 0;
+                    border: 2px solid red;
                 }
 
                 .button-container {

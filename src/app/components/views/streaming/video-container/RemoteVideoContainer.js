@@ -11,17 +11,16 @@ import TutorialContext from "context/tutorials/TutorialContext";
 
 function RemoteVideoContainer(props) {
 
-    const {tutorialSteps, setTutorialSteps, getActiveTutorialStepKey, handleConfirmStep} = useContext(TutorialContext);
+    const {getActiveTutorialStepKey, handleConfirmStep} = useContext(TutorialContext);
     const videoElement = useRef({ current: {} });
 
     const [canPlay, setCanPlay] = useState(false);
     const [stoppedByUserAgent, setStoppedByUserAgent] = useState(false);
-    const [hasError, setHasError] = useState(false);
 
     const activeStep = getActiveTutorialStepKey();
 
     useEffect(() => {
-        if (props.stream.type === 'demo') {
+        if (props.stream.streamId === 'demoStream') {
             videoElement.current.src = props.stream.url;
             videoElement.current.loop = true;
             videoElement.current.play();
@@ -31,9 +30,16 @@ function RemoteVideoContainer(props) {
     },[props.stream.streamId]);
 
     useEffect(() => {
+        if (!props.isPlayMode) {
+            props.attachSinkId(videoElement.current, props.speakerSource)
+        }
+    },[props.speakerSource])
+
+    useEffect(() => {
         if (videoElement.current && videoElement.current.srcObject && videoElement.current.paused) {
             if (props.showVideoButton && !props.showVideoButton.muted && !props.showVideoButton.paused) {
                 videoElement.current.play().catch( e => {
+
                     props.setShowVideoButton({ paused: false, muted: true });
                 });
             } else if (props.showVideoButton && props.showVideoButton.muted && !props.showVideoButton.paused) {
@@ -81,6 +87,11 @@ function RemoteVideoContainer(props) {
         }
     }
 
+    function handleVideoError(error) {
+        handleVideoLoss()
+        throw error;
+    }
+
     useEffect(() => {
         if (videoElement && videoElement.current && videoElement.current.srcObject && !videoElement.current.srcObject.active) {
             props.removeStreamFromExternalMediaStreams(props.stream.streamId)
@@ -102,7 +113,7 @@ function RemoteVideoContainer(props) {
                         }} buttonText="Ok"/>}
                     </React.Fragment>
                 } 
-                open={activeStep === 11 && props.stream.type === 'demo'}>
+                open={activeStep === 11 && props.stream.streamId === 'demoStream'}>
                 <div className='videoContainer' style={{ height: props.height }}>
                     <video id='videoElement' ref={videoElement} width={ '100%' } onCanPlay={() => setCanPlay(true) } controls={false} muted={props.muted} onEnded={(e) => handleVideoError(e)} onError={handleVideoLoss} onSuspend={handleVideoLoss} playsInline>
                     </video>

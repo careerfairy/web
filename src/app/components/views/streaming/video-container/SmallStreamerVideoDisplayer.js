@@ -3,12 +3,12 @@ import {Grid} from "semantic-ui-react";
 import LivestreamPdfViewer from '../../../util/LivestreamPdfViewer';
 import { useWindowSize } from '../../../custom-hook/useWindowSize';
 
-function SmallStreamerVideoDisplayer(props) {
+function SmallStreamerVideoDisplayer({livestreamId, presenter, showMenu}) {
 
     return (
         <Fragment>
             <div style={{ position: 'absolute', top: '20vh', width: '100%', backgroundColor: 'rgb(30,30,30)'}}>
-                <LivestreamPdfViewer livestreamId={props.livestreamId} presenter={props.presenter} showMenu={props.showMenu}/>
+                <LivestreamPdfViewer livestreamId={livestreamId} presenter={presenter} showMenu={showMenu}/>
             </div>         
             <style jsx>{`
                 .hidden {

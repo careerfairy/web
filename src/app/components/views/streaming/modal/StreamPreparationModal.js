@@ -10,10 +10,14 @@ import useUserMedia from 'components/custom-hook/useDevices';
 function StreamPreparationModal(props) {
 
     const [showAudioVideo, setShowAudioVideo] = useState(false);
+    const [audioSource, setAudioSource] = useState(null);
+    const [videoSource, setVideoSource] = useState(null);
+
     const testVideoRef = useRef(null);
+    const [value, setValue] = useState(0);
 
     const devices = useUserMedia(showAudioVideo);
-    const audioLevel = useSoundMeter(showAudioVideo, props.localStream);
+    const audioLevel = useSoundMeter(showAudioVideo, props.localStream, value);
 
     const [playSound, setPlaySound] = useState(true);
 
@@ -24,13 +28,26 @@ function StreamPreparationModal(props) {
     }, [props.localStream]);
 
     useEffect(() => {
-        if (!props.audioSource && devices.audioInputList && devices.audioInputList.length > 0) {
-            props.setAudioSource(devices.audioInputList[0].value);
+        if (devices.audioInputList && devices.audioInputList.length > 0) {
+            updateAudioSource(devices.audioInputList[0].value)
         }
-        if (!props.videoSource && devices.videoDeviceList && devices.videoDeviceList.length > 0) {
-            props.setVideoSource(devices.videoDeviceList[0].value);
+        if (devices.videoDeviceList && devices.videoDeviceList.length > 0) {
+            updateVideoSource(devices.videoDeviceList[0].value)
         }
     }, [devices]);
+
+    function updateAudioSource(deviceId) {
+        props.webRTCAdaptor.switchAudioInputSource(props.streamId, deviceId)
+        setAudioSource(deviceId);
+        setTimeout(() => {
+            setValue(value + 1);
+        }, 500);
+    }
+
+    function updateVideoSource(deviceId) {
+        props.webRTCAdaptor.switchVideoCameraCapture(props.streamId, deviceId)
+        setVideoSource(deviceId);
+    }
 
     return (
         <Modal open={!props.streamerReady || !props.connectionEstablished}>

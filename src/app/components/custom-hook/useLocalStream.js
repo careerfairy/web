@@ -20,7 +20,7 @@ export function useLocalStream(mediaConstraints) {
                 setLocalStream(stream);
             }).catch(error => {
                 setUserMediaError(error);
-                console.log(error);
+                console.log("error in use localStream", error);
             });
         }
     },[mediaConstraints]);

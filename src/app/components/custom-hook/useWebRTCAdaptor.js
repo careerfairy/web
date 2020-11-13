@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
-import { navigator, document } from 'global';
+import window, { navigator, document } from 'global';
 import axios from 'axios';
-import { WebRTCAdaptor } from 'static-js/webrtc_adaptor_new2.js';
+import { WebRTCAdaptor } from 'static-js/webrtc_adaptor_new.js';
 import { WEBRTC_ERRORS } from 'data/errors/StreamingErrors.js';
 
 export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId) {
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
     const [streamsList, setStreamsList] = useState([]);
+    const [localMediaStream, setLocalMediaStream] = useState(null);
+
     const [addedStream, setAddedStream] = useState(null);
     const [externalMediaStreams, setExternalMediaStreams] = useState([]);
 
@@ -16,6 +18,8 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
     const [latestAudioLevel, setLatestAudioLevel] = useState(null);
 
     const [nsToken, setNsToken] = useState(null);
+
+    var isChromium = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
 
     useEffect(() => {
         axios({
@@ -35,12 +39,28 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         }
     }, [addedStream]);
 
+
     useEffect(() => {
-        if (streamerReady && document && mediaConstraints && nsToken && nsToken.iceServers) {
-            const adaptor = getWebRTCAdaptor();
-            setWebRTCAdaptor(adaptor);
+        if (!isPlayMode) {
+            if (document && mediaConstraints && nsToken && nsToken.iceServers && roomId && streamId && isChromium) {
+                const adaptor = getWebRTCAdaptor();
+                setWebRTCAdaptor(adaptor);
+            }
+        } else {
+            if (document && mediaConstraints && nsToken && nsToken.iceServers && roomId) {
+                const adaptor = getWebRTCAdaptor();
+                setWebRTCAdaptor(adaptor);
+            }
+        }     
+    }, [document, nsToken, isPlayMode, roomId, streamId]);
+
+    useEffect(() => {
+        if (webRTCAdaptor && streamerReady && roomId && streamId) {
+            if (!isPlayMode) {
+                webRTCAdaptor.joinRoom(roomId, streamId);
+            } 
         }
-    }, [streamerReady, mediaConstraints, document, nsToken, isPlayMode]);
+    }, [webRTCAdaptor?.roomName, streamerReady, roomId, streamId]);
 
     useEffect(() => {
         if (latestAudioLevel) {
@@ -120,7 +140,10 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
             }
         });
         newAudioLevels.push(latestAudioLevel);
-        setAudioLevels(newAudioLevels);
+        const cleanedUpdatedAudioLevels = newAudioLevels.filter( audioLevel => {
+            return externalMediaStreams.some( stream =>  audioLevel.streamId === stream.streamId) || audioLevel.streamId === streamId;
+        });
+        setAudioLevels(cleanedUpdatedAudioLevels);
     }
 
     function getWebRTCAdaptor() {
@@ -143,14 +166,12 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                     case "initialized": {
                         if (typeof streamingCallbackObject.onInitialized === 'function') {
                             streamingCallbackObject.onInitialized(infoObj);
-                        }
+                        }                               
                         if (!isPlayMode) {
-                            this.joinRoom(roomId, streamId);
-                            console.log("joiningTheRoom");
+                            setLocalMediaStream(this.webrtcadaptor.getLocalStream());                        
                         } else {
-                            this.joinRoom(roomId);
+                            this.webrtcadaptor.joinRoom(roomId);
                         }
-                                               
                         break;
                     }
                     case "joinedTheRoom": {
@@ -158,16 +179,16 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onJoinedTheRoom(infoObj);
                         }
                         if (!isPlayMode) {
-                            publishNewStream(this, infoObj);
+                            publishNewStream(this.webrtcadaptor, infoObj);
                         }
-                        var adaptor = this;
+                        var adaptor = this.webrtcadaptor;
                         if (infoObj.streams != null) {
 							infoObj.streams.forEach( stream => {
 								adaptor.play(stream, null, roomId);
 							});
                             setStreamsList(infoObj.streams);
 						}
-                        this.getRoomInfo(infoObj.ATTR_ROOM_NAME, infoObj.streamId);
+                        this.webrtcadaptor.getRoomInfo(infoObj.ATTR_ROOM_NAME, infoObj.streamId);
                         break;
                     }
                     case "newStreamAvailable": {
@@ -175,14 +196,16 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onNewStreamAvailable(infoObj);
                         }
                         setAddedStream(infoObj);
-                        this.enableStats(infoObj.streamId);
+                        if (!isPlayMode) {
+                            this.enableStats(infoObj.streamId);
+                        }
                         break;
                     }
                     case "roomInformation": {
                         if (typeof streamingCallbackObject.onNewStreamAvailable === 'function') {
                             streamingCallbackObject.onNewStreamAvailable(infoObj);
                         }
-                        var adaptor = this;
+                        var adaptor = this.webrtcadaptor;
                         var tempRoomStreamList = [];
 	
 						if (streamsList != null) {
@@ -208,7 +231,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                                 adaptor.play(stream, null, roomId);
                                 console.log("playing: " + stream.streamId)
 							});
-						}
+                        }
 						setStreamsList(tempRoomStreamList);
                         break;
                     }
@@ -228,7 +251,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                             streamingCallbackObject.onPublishStarted(infoObj);
                         }
                         if (!isPlayMode) {
-                            this.enableStats(infoObj.streamId);
+                            this.webrtcadaptor.enableStats(infoObj.streamId);
                         }
                         break;
                     }
@@ -261,7 +284,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         if (typeof streamingCallbackObject.onClosed === 'function') {
                             streamingCallbackObject.onClosed(infoObj);
                         }
-                        this.closeWebSocket();
+                        this.webrtcadaptor.closeWebSocket();
                         break;
                     }
                     case "ice_connection_state_changed": {
@@ -304,6 +327,5 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         });
         return newAdaptor;
     }
-  
-    return { webRTCAdaptor, externalMediaStreams, setAddedStream, removeStreamFromExternalMediaStreams, audioLevels };
+    return { webRTCAdaptor, externalMediaStreams, localMediaStream, setAddedStream, removeStreamFromExternalMediaStreams, audioLevels };
 }
