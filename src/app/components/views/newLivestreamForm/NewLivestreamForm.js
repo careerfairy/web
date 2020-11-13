@@ -134,20 +134,23 @@ const NewLivestreamForm = ({firebase}) => {
                         hidden: livestream.hidden || false,
                         summary: livestream.summary || "",
                         speakers: {
-                            [mainSpeakerId]: handleGetMainSpeaker(livestream),
                         },
                     }
                     setFormData(newFormData)
                     handleSetDefaultGroups(livestream.groupIds)
                     setTargetCategories(livestream.targetCategories || {})
                     if (!speakerQuery.empty) {
-                        const mainSpeakerFirstName = livestream.mainSpeakerName.split(/[ ]+/)[0]
-                        const mainSpeakerLastName = livestream.mainSpeakerName.split(/[ ]+/)[1]
+                        const mainSpeakerFlattenedName = livestream.mainSpeakerName.split(/[ ]+/).join("")
                         speakerQuery.forEach(query => {
                             let speaker = query.data()
                             speaker.id = query.id
-                            if (speaker.firstName !== mainSpeakerFirstName && speaker.lastName !== mainSpeakerLastName) {
+                            const flattenedFirstName = speaker.firstName.split(/[ ]+/).join("")
+                            const flattenedLastName = speaker.lastName.split(/[ ]+/).join("")
+                            const flattenedFullName = flattenedFirstName + flattenedLastName
+                            if (flattenedFullName !== mainSpeakerFlattenedName) {
                                 handleAddSpeaker(newFormData, setFormData, speaker)
+                            } else {
+                                handleAddMainSpeaker(newFormData, setFormData, speaker)
                             }
                         })
                     }
@@ -216,6 +219,13 @@ const NewLivestreamForm = ({firebase}) => {
             return '';
         }
     }
+
+    const handleAddMainSpeaker = (values, setCallback, obj) => {
+        const newValues = {...values}
+        newValues.speakers[mainSpeakerId] = obj
+        setCallback(newValues)
+    }
+
     const handleAddSpeaker = (values, setCallback, obj) => {
         const newValues = {...values}
         newValues.speakers[uuidv4()] = obj
@@ -234,21 +244,6 @@ const NewLivestreamForm = ({firebase}) => {
                 }
             })
             setSelectedGroups(groupsWithFlattenedOptions)
-        }
-    }
-
-    const handleGetMainSpeaker = (streamObj) => {
-        if (streamObj.mainSpeakerName.length) {
-            const fullnameArray = streamObj.mainSpeakerName.split(/[ ]+/)
-            return {
-                firstName: fullnameArray[0],
-                lastName: fullnameArray[1],
-                avatar: streamObj.mainSpeakerAvatar,
-                background: streamObj.mainSpeakerBackground,
-                position: streamObj.mainSpeakerPosition
-            }
-        } else {
-            return speakerObj
         }
     }
 
@@ -415,7 +410,7 @@ const NewLivestreamForm = ({firebase}) => {
                       isSubmitting,
                       setFieldValue,
                       setValues,
-                    validateForm,
+                      validateForm,
                       /* and other goodies */
                   }) => (<form onSubmit={async (event) => {
                     event.preventDefault()
