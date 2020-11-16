@@ -11,7 +11,7 @@ import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPr
 import ErrorMessageModal from "../modal/StreamPreparationModalV2/ErrorMessageModal";
 import useDevices from 'components/custom-hook/useDevices';
 import SettingsModal from './SettingsModal';
-import { makeStyles } from '@material-ui/core';
+import {makeStyles} from '@material-ui/core';
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
 import DemoIntroModal from "../modal/DemoIntroModal";
 import DemoEndModal from "../modal/DemoEndModal";
@@ -21,7 +21,7 @@ import ScreenSharePermissionDeniedModal from '../modal/ScreenSharePermissionDeni
 
 const useStyles = makeStyles((theme) => ({
     blackFrame: {
-        position: "absolute",                
+        position: "absolute",
         top: 0,
         right: 0,
         bottom: 0,
@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
 
 function VideoContainer(props) {
     const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles, handleConfirmStep, getActiveTutorialStepKey} = useContext(TutorialContext);
-    
+
     const classes = useStyles();
     const devices = useDevices();
     const localVideoId = 'localVideo';
@@ -48,7 +48,11 @@ function VideoContainer(props) {
 
     const mediaConstraints = {
         audio: true,
-        video: true,
+        video: {
+            width: {ideal: 1920, max: 1920},
+            height: {ideal: 1080, max: 1080},
+            aspectRatio: 1.77
+        },
     }
     const [audioCounter, setAudioCounter] = useState(0);
     const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
@@ -121,13 +125,15 @@ function VideoContainer(props) {
             props.streamerId
         );
 
-    const { audioSource,
+    const {
+        audioSource,
         updateAudioSource,
         videoSource,
         updateVideoSource,
         speakerSource,
         updateSpeakerSource,
-        audioLevel } = useMediaSources(devices, webRTCAdaptor, props.streamerId, localMediaStream, !streamerReady || showSettings );
+        audioLevel
+    } = useMediaSources(devices, webRTCAdaptor, props.streamerId, localMediaStream, !streamerReady || showSettings);
 
     useEffect(() => {
         return () => {
@@ -145,7 +151,7 @@ function VideoContainer(props) {
                     const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
                     if (maxEntry.audioLevel > 0.05) {
                         setLivestreamCurrentSpeakerId(maxEntry.streamId);
-                    } else if (!audioLevels.some(audioLevel => audioLevel.streamId === props.currentLivestream.currentSpeakerId)){
+                    } else if (!audioLevels.some(audioLevel => audioLevel.streamId === props.currentLivestream.currentSpeakerId)) {
                         setLivestreamCurrentSpeakerId(maxEntry.streamId);
                     }
                 }
@@ -159,15 +165,15 @@ function VideoContainer(props) {
         if (isMainStreamer && props.currentLivestream.mode === 'desktop') {
             setLivestreamCurrentSpeakerId(props.currentLivestream.screenSharerId);
         }
-    },[props.currentLivestream.mode])
+    }, [props.currentLivestream.mode])
 
     useEffect(() => {
-        if (props.streamerId && props.currentLivestream.id ) {
+        if (props.streamerId && props.currentLivestream.id) {
             if (props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
                 setDesktopMode("default", props.streamerId);
             }
         }
-    },[props.streamerId, props.currentLivestream.id])
+    }, [props.streamerId, props.currentLivestream.id])
 
     useEffect(() => {
         if (webRTCAdaptor && props.currentLivestream.screenSharerId === props.streamerId) {
@@ -181,7 +187,7 @@ function VideoContainer(props) {
 
     useEffect(() => {
         if (externalMediaStreams && props.currentLivestream.currentSpeakerId && isMainStreamer) {
-            let existingCurrentSpeaker = externalMediaStreams.find( stream => stream.streamId === props.currentLivestream.currentSpeakerId)
+            let existingCurrentSpeaker = externalMediaStreams.find(stream => stream.streamId === props.currentLivestream.currentSpeakerId)
             if (!existingCurrentSpeaker) {
                 setLivestreamCurrentSpeakerId(props.currentLivestream.id);
             }
@@ -232,7 +238,7 @@ function VideoContainer(props) {
                 removeStreamFromExternalMediaStreams("demoStream");
             }
         }
-    },[tutorialSteps])
+    }, [tutorialSteps])
 
     const isOpen = (property) => {
         return Boolean(props.currentLivestream.test
@@ -268,51 +274,51 @@ function VideoContainer(props) {
         <Fragment>
             <div className={classes.blackFrame}>
                 <div>
-                    <CurrentSpeakerDisplayer isPlayMode={false} 
-                        smallScreenMode={props.currentLivestream.mode === 'presentation'} 
-                        speakerSwitchModeActive={isMainStreamer} 
-                        setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId} 
-                        removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
-                        localId={props.streamerId} 
-                        localStream={localMediaStream} 
-                        speakerSource={speakerSource}
-                        attachSinkId={attachSinkId}
-                        streams={externalMediaStreams} 
-                        mediaConstraints={mediaConstraints} 
-                        currentSpeaker={props.currentLivestream.currentSpeakerId} 
-                        {...props}
-                        muted={false}/>
+                    <CurrentSpeakerDisplayer isPlayMode={false}
+                                             smallScreenMode={props.currentLivestream.mode === 'presentation'}
+                                             speakerSwitchModeActive={isMainStreamer}
+                                             setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId}
+                                             removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
+                                             localId={props.streamerId}
+                                             localStream={localMediaStream}
+                                             speakerSource={speakerSource}
+                                             attachSinkId={attachSinkId}
+                                             streams={externalMediaStreams}
+                                             mediaConstraints={mediaConstraints}
+                                             currentSpeaker={props.currentLivestream.currentSpeakerId}
+                                             {...props}
+                                             muted={false}/>
                 </div>
-                { props.currentLivestream.mode === 'presentation' ?
-                    <SmallStreamerVideoDisplayer 
-                        isPlayMode={false} 
+                {props.currentLivestream.mode === 'presentation' ?
+                    <SmallStreamerVideoDisplayer
+                        isPlayMode={false}
                         localStream={localMediaStream} rn
-                        streams={externalMediaStreams} 
-                        mediaConstraints={mediaConstraints} 
-                        livestreamId={props.currentLivestream.id} 
+                        streams={externalMediaStreams}
+                        mediaConstraints={mediaConstraints}
+                        livestreamId={props.currentLivestream.id}
                         showMenu={props.showMenu}
                         presenter={true}/>
                     : null
                 }
-                <VideoControlsContainer 
-                    webRTCAdaptor={webRTCAdaptor} 
+                <VideoControlsContainer
+                    webRTCAdaptor={webRTCAdaptor}
                     currentLivestream={props.currentLivestream}
-                    viewer={props.viewer} 
+                    viewer={props.viewer}
                     streamerId={props.streamerId}
                     joining={!isMainStreamer}
                     isMainStreamer={isMainStreamer}
                     setDesktopMode={setDesktopMode}
                     showSettings={showSettings}
                     setShowSettings={setShowSettings}
-                    />
+                />
             </div>
-            <SettingsModal open={showSettings} close={() => setShowSettings(false)} 
-                webRTCAdaptor={webRTCAdaptor} streamId={props.streamerId} 
-                devices={devices} localStream={localMediaStream}
-                audioSource={audioSource} updateAudioSource={updateAudioSource} 
-                videoSource={videoSource} updateVideoSource={updateVideoSource}  audioLevel={audioLevel}
-                speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource} 
-                attachSinkId={attachSinkId}/>
+            <SettingsModal open={showSettings} close={() => setShowSettings(false)}
+                           webRTCAdaptor={webRTCAdaptor} streamId={props.streamerId}
+                           devices={devices} localStream={localMediaStream}
+                           audioSource={audioSource} updateAudioSource={updateAudioSource}
+                           videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
+                           speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
+                           attachSinkId={attachSinkId}/>
             <Modal open={showDisconnectionModal}>
                 <Modal.Header>You have been disconnected</Modal.Header>
                 <Modal.Content>
@@ -324,19 +330,22 @@ function VideoContainer(props) {
                             onClick={() => reloadPage()}/>
                 </Modal.Content>
             </Modal>
-            { !streamerReady && <StreamPreparationModalV2 readyToConnect={(props.currentLivestream && props.currentLivestream.id)} audioSource={audioSource} updateAudioSource={updateAudioSource}
-                                    videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
-                                    speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
-                                    streamerReady={streamerReady} setStreamerReady={setStreamerReady}
-                                    localStream={localMediaStream} mediaConstraints={mediaConstraints}
-                                    connectionEstablished={connectionEstablished}
-                                    isTest={props.currentLivestream.test} viewer={props.viewer}
-                                    handleOpenDemoIntroModal={handleOpenDemoIntroModal}
-                                    attachSinkId={attachSinkId} devices={devices}
-                                    setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
-                                    isStreaming={isStreaming}/>}
-            <ScreenSharePermissionDeniedModal screenSharePermissionDenied={screenSharePermissionDenied} 
-                                setScreenSharePermissionDenied={setScreenSharePermissionDenied}/>
+            {!streamerReady &&
+            <StreamPreparationModalV2 readyToConnect={(props.currentLivestream && props.currentLivestream.id)}
+                                      audioSource={audioSource} updateAudioSource={updateAudioSource}
+                                      videoSource={videoSource} updateVideoSource={updateVideoSource}
+                                      audioLevel={audioLevel}
+                                      speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
+                                      streamerReady={streamerReady} setStreamerReady={setStreamerReady}
+                                      localStream={localMediaStream} mediaConstraints={mediaConstraints}
+                                      connectionEstablished={connectionEstablished}
+                                      isTest={props.currentLivestream.test} viewer={props.viewer}
+                                      handleOpenDemoIntroModal={handleOpenDemoIntroModal}
+                                      attachSinkId={attachSinkId} devices={devices}
+                                      setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
+                                      isStreaming={isStreaming}/>}
+            <ScreenSharePermissionDeniedModal screenSharePermissionDenied={screenSharePermissionDenied}
+                                              setScreenSharePermissionDenied={setScreenSharePermissionDenied}/>
             <ErrorMessageModal isStreaming={isStreaming} connectionEstablished={connectionEstablished}
                                errorMessage={errorMessage} streamerReady={streamerReady}/>
             <DemoIntroModal livestreamId={props.currentLivestream.id}
