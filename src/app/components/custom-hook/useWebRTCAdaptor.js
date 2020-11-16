@@ -4,7 +4,7 @@ import axios from 'axios';
 import { WebRTCAdaptor } from 'static-js/webrtc_adaptor_new.js';
 import { WEBRTC_ERRORS } from 'data/errors/StreamingErrors.js';
 
-export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId) {
+export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, mediaConstraints, streamingCallbackObject, errorCallbackObject, roomId, streamId, isViewer) {
 
     const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
     const [streamsList, setStreamsList] = useState([]);
@@ -42,7 +42,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
 
     useEffect(() => {
         if (!isPlayMode) {
-            if (document && mediaConstraints && nsToken && nsToken.iceServers && roomId && streamId && isChromium) {
+            if (document && mediaConstraints && nsToken && nsToken.iceServers && roomId && streamId && (isChromium || isViewer)) {
                 const adaptor = getWebRTCAdaptor();
                 setWebRTCAdaptor(adaptor);
             }
@@ -293,7 +293,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                                 streamingCallbackObject.onConnected(infoObj);
                             }
                         }
-                        if (infoObj.streamId === streamId && infoObj.state === 'disconnected') {
+                        if (infoObj.streamId === streamId && (infoObj.state === 'disconnected' || infoObj.state === 'closed' || infoObj.state === 'failed')) {
                             if (typeof streamingCallbackObject.onDisconnected === 'function') {
                                 streamingCallbackObject.onDisconnected(infoObj);
                             }

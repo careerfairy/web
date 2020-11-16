@@ -26,14 +26,14 @@ export default function useMediaSources(devices, webRTCAdaptor, streamId, localS
                     updateAudioSource(devices.audioInputList[0].value)
                 }
             }
-            if (devices.videoDeviceList && devices.videoDeviceList.length > 0 && !videoSource || !devices.videoDeviceList.some( device => device.value === videoSource)) {
+            if (devices.videoDeviceList && devices.videoDeviceList.length > 0 && (!videoSource || !devices.videoDeviceList.some( device => device.value === videoSource))) {
                 if (storedVideoSource && devices.videoDeviceList.some( device => device.value === storedVideoSource)) { 
                     updateVideoSource(storedVideoSource) 
                 } else {
                     updateVideoSource(devices.videoDeviceList[0].value)
                 }
             }
-            if (devices.audioOutputList && devices.audioOutputList.length > 0 && !speakerSource || !devices.audioOutputList.some( device => device.value === speakerSource)) {
+            if (devices.audioOutputList && devices.audioOutputList.length > 0 && (!speakerSource || !devices.audioOutputList.some( device => device.value === speakerSource))) {
                 if (storedSpeakerSource && devices.audioOutputList.some( device => device.value === storedSpeakerSource)) {
                     updateSpeakerSource(storedSpeakerSource) 
                 } else {

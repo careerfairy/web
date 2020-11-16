@@ -18,6 +18,7 @@ import DemoEndModal from "../modal/DemoEndModal";
 import LocalStorageUtil from 'util/LocalStorageUtil';
 import useMediaSources from 'components/custom-hook/useMediaSources';
 import ScreenSharePermissionDeniedModal from '../modal/ScreenSharePermissionDeniedModal';
+import StreamPreparationModal from '../modal/StreamPreparationModal';
 
 const useStyles = makeStyles((theme) => ({
     blackFrame: {
@@ -48,7 +49,11 @@ function VideoContainer(props) {
 
     const mediaConstraints = {
         audio: true,
-        video: true,
+        video: { 
+            width: { ideal: 1920, max: 1920 },
+            height: { ideal: 1080, max: 1080 },
+            aspectRatio: 1.77,   
+        }
     }
     const [audioCounter, setAudioCounter] = useState(0);
     const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
@@ -118,7 +123,8 @@ function VideoContainer(props) {
             streamingCallbacks,
             errorCallbacks,
             props.currentLivestream.id,
-            props.streamerId
+            props.streamerId,
+            props.viewer
         );
 
     const {
@@ -326,24 +332,34 @@ function VideoContainer(props) {
                             onClick={() => reloadPage()}/>
                 </Modal.Content>
             </Modal>
-            {!streamerReady &&
-            <StreamPreparationModalV2 readyToConnect={(props.currentLivestream && props.currentLivestream.id)}
-                                      audioSource={audioSource} updateAudioSource={updateAudioSource}
-                                      videoSource={videoSource} updateVideoSource={updateVideoSource}
-                                      audioLevel={audioLevel}
-                                      speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
-                                      streamerReady={streamerReady} setStreamerReady={setStreamerReady}
-                                      localStream={localMediaStream} mediaConstraints={mediaConstraints}
-                                      connectionEstablished={connectionEstablished}
-                                      isTest={props.currentLivestream.test} viewer={props.viewer}
-                                      handleOpenDemoIntroModal={handleOpenDemoIntroModal}
-                                      attachSinkId={attachSinkId} devices={devices}
-                                      setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
-                                      isStreaming={isStreaming}/>}
-            <ScreenSharePermissionDeniedModal screenSharePermissionDenied={screenSharePermissionDenied}
-                                              setScreenSharePermissionDenied={setScreenSharePermissionDenied}/>
-            <ErrorMessageModal isStreaming={isStreaming} connectionEstablished={connectionEstablished}
+            { !props.viewer && !streamerReady && 
+                <StreamPreparationModalV2 readyToConnect={(props.currentLivestream && props.currentLivestream.id)}
+                    audioSource={audioSource} updateAudioSource={updateAudioSource}
+                    videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
+                    speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
+                    streamerReady={streamerReady} setStreamerReady={setStreamerReady}
+                    localStream={localMediaStream} readyToConnect={props.currentLivestream && props.currentLivestream.id}
+                    connectionEstablished={connectionEstablished}
+                    isTest={props.currentLivestream.test} viewer={props.viewer}
+                    handleOpenDemoIntroModal={handleOpenDemoIntroModal}
+                    attachSinkId={attachSinkId} devices={devices}
+                    setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
+                    isStreaming={isStreaming}/>
+            }
+            { props.viewer && 
+                <StreamPreparationModal audioSource={audioSource} updateAudioSource={updateAudioSource}
+                    videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
+                    speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
+                    streamerReady={streamerReady} setStreamerReady={setStreamerReady}
+                    localStream={localMediaStream} connectionEstablished={connectionEstablished} devices={devices}
+                    setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
+                    isStreaming={isStreaming}/>
+            }
+            <ScreenSharePermissionDeniedModal screenSharePermissionDenied={screenSharePermissionDenied} 
+                                setScreenSharePermissionDenied={setScreenSharePermissionDenied}/>
+           { !props.viewer && <ErrorMessageModal isStreaming={isStreaming} connectionEstablished={connectionEstablished}
                                errorMessage={errorMessage} streamerReady={streamerReady}/>
+            }
             <DemoIntroModal livestreamId={props.currentLivestream.id}
                             open={showDemoIntroModal}
                             handleClose={handleCloseDemoIntroModal}/>

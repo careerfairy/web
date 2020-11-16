@@ -170,7 +170,7 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
         })
     }
 
-    if (showShareDesktopButton()) {
+    if (!viewer && showShareDesktopButton()) {
         actions.unshift({
             icon: <ScreenShareIcon color={desktopMode ? "primary" : "inherit"}/>,
             name: desktopMode ? 'Stop sharing desktop' : 'Share desktop',
@@ -178,13 +178,12 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
         })
     }
 
-    if (!viewer) {
-        actions.unshift({
-            icon: <SettingsIcon fontSize="large"/>,
-            name: "Settings",
-            onClick: () => setShowSettings(!showSettings)
-        })
-    }
+   
+    actions.unshift({
+        icon: <SettingsIcon fontSize="large"/>,
+        name: "Settings",
+        onClick: () => setShowSettings(!showSettings)
+    })
 
     return (
             <ClickAwayListener onClickAway={handleClose}>
