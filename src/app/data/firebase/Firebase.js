@@ -606,11 +606,11 @@ class Firebase {
     }
 
     listenToUpcomingLiveStreamsByGroupId = (groupId, callback) => {
-        var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
+        var ninetyMinutesInMilliseconds = 1000 * 60 * 90;
         let ref = this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
-            .where("start", ">", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
+            .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
             .orderBy("start", "asc")
         return ref.onSnapshot(callback)
     }
@@ -1213,10 +1213,10 @@ class Firebase {
     };
 
     listenToUpcomingLivestreams = (callback) => {
-        var thirtyMinutesInMilliseconds = 1000 * 60 * 45;
+        var ninetyMinutesInMilliseconds = 1000 * 60 * 90;
         let ref = this.firestore
             .collection("livestreams")
-            .where("start", ">", new Date(Date.now() - thirtyMinutesInMilliseconds))
+            .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
             .orderBy("start", "asc");
         return ref.onSnapshot(callback);
     };
