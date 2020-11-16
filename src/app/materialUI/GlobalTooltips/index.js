@@ -65,6 +65,31 @@ export const WhiteTooltip = (
     )
 }
 
+export const StandartTooltip = (
+    {
+        title,
+        children,
+        open,
+        ...props
+    }) => {
+
+    const classes = useStyles()
+
+    return (
+        <Tooltip
+            arrow
+            open={open}
+            interactive
+            {...props}
+            classes={{arrow: classes.arrow, tooltip: classes.tooltip}}
+            title={title}>
+                <div>
+                {children}
+                </div>
+        </Tooltip>
+    )
+}
+
 export const TooltipHighlight = ({open, ...props}) => {
     const classes = useStyles()
     return(

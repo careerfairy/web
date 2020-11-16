@@ -13,7 +13,8 @@ import NotificationsContainer from 'components/views/streaming/notifications-con
 import NotificationsContext from 'context/notifications/NotificationsContext';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import LeftMenu from "../../../components/views/streaming/LeftMenu/LeftMenu";
-import {Button} from "@material-ui/core";
+import {Button, Tooltip} from "@material-ui/core";
+import { StandartTooltip, TooltipTitle, TooltipText, TooltipButtonComponent } from 'materialUI/GlobalTooltips';
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {
@@ -58,6 +59,7 @@ function StreamingPage(props) {
     const [notificationToRemove, setNotificationToRemove] = useState(null);
     const [notifications, setNotifications] = useState([]);
     const [joiningStreamerLink, setJoiningStreamerLink] = useState("")
+    const [hideTooltip, setHideTooltip] = useState(false);
 
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
 
@@ -133,6 +135,21 @@ function StreamingPage(props) {
                             transform: 'translateY(-50%)',
                             verticalAlign: 'middle'
                         }}>
+                            <StandartTooltip
+                                arrow
+                                open={!streamStartTimeIsNow && !hideTooltip}
+                                interactive
+                                placement='bottom'
+                                title={
+                                    <React.Fragment>
+                                        <TooltipTitle>Start Streaming</TooltipTitle>
+                                        <TooltipText>
+                                            The Start Streaming button will become active 2 minutes before the stream's official start time.
+                                        </TooltipText>
+                                        <TooltipButtonComponent onConfirm={() => setHideTooltip(true)} buttonText="Ok"/>
+                                    </React.Fragment>
+                                }
+                                >
                             <ButtonWithConfirm
                                 color={currentLivestream.hasStarted ? theme.palette.error.main : theme.palette.primary.main}
                                 fluid
@@ -140,6 +157,8 @@ function StreamingPage(props) {
                                 buttonAction={() => setStreamingStarted(!currentLivestream.hasStarted)}
                                 confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'}
                                 buttonLabel={currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming'}/>
+                            </StandartTooltip>
+                            
                         </div>
                         <Button
                             children="Invite additional streamer"
