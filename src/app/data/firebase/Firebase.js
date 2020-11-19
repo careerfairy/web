@@ -640,15 +640,26 @@ class Firebase {
         return ref.get();
     };
 
-    listenToLivestreamQuestions = (livestreamId, callback) => {
-        let ref = this.firestore
+    listenToUpcomingLivestreamQuestions = (livestreamId) => {
+        return this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("questions")
             .orderBy("type", "asc")
             .orderBy("votes", "desc")
-            .orderBy("timestamp", "asc");
-        return ref.onSnapshot(callback);
+            .orderBy("timestamp", "asc")
+            .where("type", "!=", 'done')
+    };
+
+    listenToPastLivestreamQuestions = (livestreamId) => {
+        return this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("questions")
+            .orderBy("type", "asc")
+            .orderBy("votes", "desc")
+            .orderBy("timestamp", "asc")
+            .where("type", "==", 'done')
     };
 
     listLivestreamQuestions = (livestreamId, callback) => {

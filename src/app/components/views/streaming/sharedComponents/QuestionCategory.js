@@ -1,11 +1,12 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect, useContext, useRef} from 'react';
 import UserContext from 'context/user/UserContext';
-import {Button, Typography, useTheme} from "@material-ui/core";
+import {Button, Grid, Typography, useTheme} from "@material-ui/core";
 import QuestionContainer from './questions/QuestionContainer';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import {TextField, Collapse} from "@material-ui/core";
+import InfiniteScroll from 'react-infinite-scroller';
 
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {withFirebase} from 'context/firebase';
@@ -18,14 +19,17 @@ import {
     QuestionContainerTitle
 } from "../../../../materialUI/GlobalContainers";
 import SwipeableViews from "react-swipeable-views";
-import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
+import {SimplePanel, TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import {makeStyles} from "@material-ui/core/styles";
+import usePagination from "firestore-pagination-hook";
+import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
 
 const useStyles = makeStyles(theme => ({
     view: {
         position: "relative",
         height: "100%",
         width: "100%",
+        overflow: "auto",
         "& .react-swipeable-view-container": {
             height: "100%"
         }
@@ -33,6 +37,9 @@ const useStyles = makeStyles(theme => ({
 }))
 
 function QuestionCategory({livestream, selectedState, sliding, streamer, firebase, showMenu}) {
+    if (!livestream?.id) {
+        return null
+    }
     const theme = useTheme()
     const classes = useStyles()
     const [showNextQuestions, setShowNextQuestions] = useState(true);
@@ -41,7 +48,9 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     const [value, setValue] = useState(0)
 
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
+    console.log("-> upcomingQuestions", upcomingQuestions);
     const [pastQuestions, setPastQuestions] = useState([]);
+    const[parentHeight, setParentHeight] = useState(400)
 
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
 
@@ -60,27 +69,66 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
         setShowNextQuestions(!showNextQuestions);
     }
 
+    const parentRef = useRef(null)
+    console.log("-> parentHeight", parentHeight);
     useEffect(() => {
-        if (livestream.id) {
-            const unsubscribe = firebase.listenToLivestreamQuestions(livestream.id, querySnapshot => {
-                var upcomingQuestionsList = [];
-                var pastQuestionsList = [];
-                querySnapshot.forEach(doc => {
-                    let question = doc.data();
-                    question.id = doc.id;
-                    if (question.type !== 'done') {
-                        upcomingQuestionsList.push(question);
-                    } else {
-                        pastQuestionsList.push(question);
-                    }
-                });
-                setUpcomingQuestions(upcomingQuestionsList);
-                setPastQuestions(pastQuestionsList);
-            });
-            return () => unsubscribe();
+        if(parentRef){
+            const height = parentRef.current.containerNode.offsetHeight
+            setParentHeight(height)
         }
-    }, [livestream.id]);
+    },[parentRef])
 
+    const {
+        loading: loadingUpcoming,
+        loadingError: loadingErrorUpcoming,
+        loadingMore: loadingMoreUpcoming,
+        loadingMoreError: loadingMoreErrorUpcoming,
+        hasMore: hasMoreUpcoming,
+        items: itemsUpcoming,
+        loadMore: loadMoreUpcoming
+    } = usePagination(firebase.listenToUpcomingLivestreamQuestions(livestream.id), {limit: 10});
+    console.log("-> hasMoreUpcoming", hasMoreUpcoming);
+
+    const {
+        loading: loadingPast,
+        loadingError: loadingErrorPast,
+        loadingMore: loadingMorePast,
+        loadingMoreError: loadingMoreErrorPast,
+        hasMore: hasMorePast,
+        items: itemsPast,
+        loadMore: loadMorePast
+    } = usePagination(firebase.listenToPastLivestreamQuestions(livestream.id), {limit: 10});
+    console.log("-> hasMorePast", hasMorePast);
+
+    useEffect(() => {
+        if (itemsPast?.length) {
+            let newPastQuestions = [];
+            itemsPast.forEach(doc => {
+                let question = doc.data();
+                question.id = doc.id;
+                newPastQuestions.push(question);
+            });
+            setPastQuestions(newPastQuestions);
+        }
+    }, [itemsPast])
+
+    useEffect(() => {
+        if (itemsUpcoming?.length) {
+            let newUpcomingQuestions = [];
+            itemsUpcoming.forEach(doc => {
+                let question = doc.data();
+                question.id = doc.id;
+                newUpcomingQuestions.push(question);
+            });
+            const sortedUpcoming = sortUpcoming(newUpcomingQuestions)
+            setUpcomingQuestions(sortedUpcoming);
+        }
+    }, [itemsUpcoming])
+
+
+    const sortUpcoming = (array) => {
+        return array.sort((a,b) => (a.type > b.type) ? 1 : ((b.type > a.type) ? -1 : 0))
+    }
     const handleClickUpcoming = () => {
         setShowNextQuestions(true)
         setValue(0)
@@ -115,7 +163,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
         return <QuestionContainer key={question.id} showNextQuestions={showNextQuestions} streamer={streamer}
                                   isNextQuestions={showNextQuestions}
-                                  livestream={livestream} 
+                                  livestream={livestream}
                                   index={index} sliding={sliding}
                                   showMenu={showMenu}
                                   selectedState={selectedState}
@@ -153,7 +201,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                              marginRight: "0.5rem",
                              color: showNextQuestions ? "white" : "black"
                          }}>
-                        <Box fontSize={10}>Upcoming [{upcomingQuestionsElements.length}]</Box>
+                        <Box fontSize={10}>Upcoming [{upcomingQuestionsElements.length}{hasMoreUpcoming && "+"}]</Box>
                     </Fab>
                     <Fab size="small" variant="extended" onClick={handleClickPast} value="center"
                          style={{
@@ -168,15 +216,37 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
             <SwipeableViews
                 containerStyle={{WebkitOverflowScrolling: 'touch'}}
                 disabled
+                ref={parentRef}
+                id="scrollable-container"
                 className={classes.view}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value} onChangeIndex={handleChange}>
-                <TabPanel height="auto" value={value} index={0} dir={theme.direction}>
-                    {upcomingQuestionsElements}
-                </TabPanel>
-                <TabPanel height="auto" value={value} index={1} dir={theme.direction}>
-                    {pastQuestionsElements}
-                </TabPanel>
+                    <CustomInfiniteScroll
+                        height={parentHeight}
+                        hasMore={hasMoreUpcoming}
+                        next={loadMoreUpcoming}
+                        dataLength={upcomingQuestionsElements.length}>
+                        {upcomingQuestionsElements}
+                    </CustomInfiniteScroll>
+                {/*<SimplePanel panelId="upcoming-elements" value={value} index={0} dir={theme.direction}>*/}
+                {/*{upcomingQuestionsElements}*/}
+                {/*<CustomInfiniteScroll*/}
+                {/*    hasMore={hasMoreUpcoming}*/}
+                {/*    next={loadMoreUpcoming}*/}
+                {/*    scrollableTarget="scrollable-container"*/}
+                {/*    dataLength={upcomingQuestionsElements.length}>*/}
+                {/*        {upcomingQuestionsElements}*/}
+                {/*</CustomInfiniteScroll>*/}
+                {/*</SimplePanel>*/}
+                {/*<SimplePanel panelId="past-elements"  value={value} index={1} dir={theme.direction}>*/}
+                {/*{pastQuestionsElements}*/}
+                {/*<CustomInfiniteScroll*/}
+                {/*    hasMore={hasMorePast}*/}
+                {/*    next={loadMorePast}*/}
+                {/*    dataLength={pastQuestionsElements.length}>*/}
+                {/*    {pastQuestionsElements}*/}
+                {/*</CustomInfiniteScroll>*/}
+                {/*</SimplePanel>*/}
             </SwipeableViews>
             <Dialog PaperProps={{style: {background: "transparent", boxShadow: "none"}}} fullWidth onClose={handleClose}
                     open={showQuestionModal} basic size='small'>

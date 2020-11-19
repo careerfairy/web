@@ -9,3 +9,12 @@ export const TabPanel = ({hidden, children, height, value, index, ...other}) => 
         </Box>
     );
 }
+
+export const SimplePanel = ({panelId, children, height,...other}) => {
+
+    return (
+        <div {...other} id={panelId} style={{height: "100%", ...other.style}}>
+            {children}
+        </div>
+    );
+}
