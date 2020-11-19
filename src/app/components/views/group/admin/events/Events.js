@@ -4,17 +4,15 @@ import {useRouter} from 'next/router';
 import {AppBar, Box, Button, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
 import usePagination from "firestore-pagination-hook";
 import EnhancedGroupStreamCard from './enhanced-group-stream-card/EnhancedGroupStreamCard';
-import CircularProgress from "@material-ui/core/CircularProgress";
+import CustomInfiniteScroll from "../../../../util/CustomInfiteScroll";
 
 const Events = (props) => {
-    const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
     const router = useRouter();
 
     const [grid, setGrid] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [livestreams, setLivestreams] = useState([]);
     const [pastLivestreams, setPastLivestreams] = useState([]);
-    // const [pastLivestreams, setPastLivestreams] = useState([]);
 
     const [value, setValue] = React.useState(0);
 
@@ -149,24 +147,24 @@ const Events = (props) => {
                     </Tabs>
                 </AppBar>
                 <TabPanel value={value} index={0}>
-                    <Grid container spacing={2}>
-                        {livestreamElements}
-                        {loadingMoreUpcoming && <Button
-                            startIcon={loadingMoreUpcoming && <CircularProgress size={20} color="inherit"/>}
-                            disabled={loadingMoreUpcoming} onClick={loadingMoreUpcoming} fullWidth>
-                            {(loadingUpcoming || loadingMoreUpcoming) ? "Loading" : "Load More"}
-                        </Button>}
-                    </Grid>
+                    <CustomInfiniteScroll
+                        hasMore={hasMoreUpcoming}
+                        next={loadingUpcoming}
+                        dataLength={livestreams.length}>
+                        <Grid container spacing={2}>
+                            {livestreamElements}
+                        </Grid>
+                    </CustomInfiniteScroll>
                 </TabPanel>
                 <TabPanel value={value} index={1}>
-                    <Grid container spacing={2}>
-                        {pastLivestreamElements}
-                        {hasMorePast &&
-                        <Button startIcon={loadingMorePast && <CircularProgress size={20} color="inherit"/>}
-                                disabled={loadingMorePast} onClick={loadMorePast} fullWidth>
-                            {(loadingPast || loadingMorePast) ? "Loading" : "Load More"}
-                        </Button>}
-                    </Grid>
+                    <CustomInfiniteScroll
+                        hasMore={hasMorePast}
+                        next={loadMorePast}
+                        dataLength={pastLivestreamElements.length}>
+                        <Grid container spacing={2}>
+                            {pastLivestreamElements}
+                        </Grid>
+                    </CustomInfiniteScroll>
                 </TabPanel>
                 {/* <Button variant="contained"
                         color="primary"
