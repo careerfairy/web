@@ -33,7 +33,6 @@ const JoinGroup = (props) => {
   }, [groupId]);
 
   useEffect(() => {
-    debugger;
     if (!(Object.keys(group).length === 0) && authenticatedUser && userData) {
       if ((authenticatedUser.email !== group.adminEmail) && !userData.isAdmin)
         router.replace("/");

@@ -79,7 +79,7 @@ const GroupNav = ({userData, user, groupId, group}) => {
                 onChangeIndex={handleChangeIndex}
             >
                 <TabPanel value={value} index={0} dir={theme.direction}>
-                    <Events group={group} user={user} userData={userData} menuItem={"events"}/>
+                    {group?.id && <Events group={group} user={user} userData={userData} menuItem={"events"}/>}
                 </TabPanel>
                 {/* <TabPanel value={value} index={1} dir={theme.direction}>
                     <Members groupId={groupId}/>

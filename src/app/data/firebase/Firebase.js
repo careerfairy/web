@@ -605,25 +605,24 @@ class Firebase {
         return ref.onSnapshot(callback)
     }
 
-    listenToUpcomingLiveStreamsByGroupId = (groupId, callback) => {
+    listenToUpcomingLiveStreamsByGroupId = (groupId) => {
         var ninetyMinutesInMilliseconds = 1000 * 60 * 90;
-        let ref = this.firestore
+        return  this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
             .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
             .orderBy("start", "asc")
-        return ref.onSnapshot(callback)
     }
 
-    listenToPastLiveStreamsByGroupId = (groupId, callback) => {
-        var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
-        let ref = this.firestore
+    listenToPastLiveStreamsByGroupId = (groupId) => {
+        const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
+        return this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
             .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
             .where("start", ">", new Date(2020, 9, 1, 0, 0, 0))
             .orderBy("start", "desc")
-        return ref.onSnapshot(callback)
+
     }
 
     getLivestreamSpeakers = (livestreamId) => {
@@ -1330,6 +1329,7 @@ class Firebase {
     getStorageRef = () => {
         return this.storage.ref();
     }
+
 }
 
 export default Firebase;

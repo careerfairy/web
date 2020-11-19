@@ -1,53 +1,67 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {withFirebase} from 'context/firebase';
 import {useRouter} from 'next/router';
-import {AppBar, Box, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
+import {AppBar, Box, Button, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
+import usePagination from "firestore-pagination-hook";
 import EnhancedGroupStreamCard from './enhanced-group-stream-card/EnhancedGroupStreamCard';
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const Events = (props) => {
-
+    const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
     const router = useRouter();
 
     const [grid, setGrid] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [livestreams, setLivestreams] = useState([]);
     const [pastLivestreams, setPastLivestreams] = useState([]);
+    // const [pastLivestreams, setPastLivestreams] = useState([]);
 
     const [value, setValue] = React.useState(0);
 
-    useEffect(() => {
-        if (props.group.id) {
-            const unsubscribe = props.firebase.listenToUpcomingLiveStreamsByGroupId(props.group.id, querySnapshot => {
-                var livestreams = [];
-                querySnapshot.forEach(doc => {
-                    let livestream = doc.data();
-                    livestream.id = doc.id;
-                    livestreams.push(livestream);
-                });
-                setLivestreams(livestreams);
-            }, error => {
-                console.log(error);
-            });
-            return () => unsubscribe();
-        }
-    }, [props.group.id]);
+    const {
+        loading: loadingPast,
+        loadingError: loadingErrorPast,
+        loadingMore: loadingMorePast,
+        loadingMoreError: loadingMoreErrorPast,
+        hasMore: hasMorePast,
+        items: itemsPast,
+        loadMore: loadMorePast
+    } = usePagination(props.firebase.listenToPastLiveStreamsByGroupId(props.group.id), {limit: 5});
+
+    const {
+        loading: loadingUpcoming,
+        loadingError: loadingErrorUpcoming,
+        loadingMore: loadingMoreUpcoming,
+        loadingMoreError: loadingMoreErrorUpcoming,
+        hasMore: hasMoreUpcoming,
+        items: itemsUpcoming,
+        loadMore: loadMoreUpcoming
+    } = usePagination(props.firebase.listenToUpcomingLiveStreamsByGroupId(props.group.id), {limit: 5});
 
     useEffect(() => {
-        if (props.group.id) {
-            const unsubscribe = props.firebase.listenToPastLiveStreamsByGroupId(props.group.id, querySnapshot => {
-                var livestreams = [];
-                querySnapshot.forEach(doc => {
-                    let livestream = doc.data();
-                    livestream.id = doc.id;
-                    livestreams.push(livestream);
-                });
-                setPastLivestreams(livestreams);
-            }, error => {
-                console.log(error);
+        if (itemsPast?.length) {
+            let pastStreams = [];
+            itemsPast.forEach(doc => {
+                let livestream = doc.data();
+                livestream.id = doc.id;
+                pastStreams.push(livestream);
             });
-            return () => unsubscribe();
+            setPastLivestreams(pastStreams);
         }
-    }, [props.group.id]);
+    }, [itemsPast])
+
+    useEffect(() => {
+        if (itemsUpcoming?.length) {
+            let pastStreams = [];
+            itemsUpcoming.forEach(doc => {
+                let livestream = doc.data();
+                livestream.id = doc.id;
+                pastStreams.push(livestream);
+            });
+            setLivestreams(pastStreams);
+        }
+    }, [itemsUpcoming])
+
 
     useEffect(() => {
         if (grid) {
@@ -70,37 +84,38 @@ const Events = (props) => {
     };
 
     function TabPanel(props) {
-  const { children, value, index, ...other } = props;
+        const {children, value, index, ...other} = props;
 
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`nav-tabpanel-${index}`}
-      aria-labelledby={`nav-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box p={3}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
+        return (
+            <div
+                role="tabpanel"
+                hidden={value !== index}
+                id={`nav-tabpanel-${index}`}
+                aria-labelledby={`nav-tab-${index}`}
+                {...other}
+            >
+                {value === index && (
+                    <Box p={3}>
+                        {children}
+                    </Box>
+                )}
+            </div>
+        );
+    }
 
     function a11yProps(index) {
         return {
-          id: `simple-tab-${index}`,
-          'aria-controls': `simple-tabpanel-${index}`,
+            id: `simple-tab-${index}`,
+            'aria-controls': `simple-tabpanel-${index}`,
         };
-      }
+    }
 
     let livestreamElements = livestreams.map((livestream, index) => {
         return (
             <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
                 <div style={{position: "relative"}}>
-                <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid} group={props.group} isPastLivestream={false}/>
+                    <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid}
+                                             group={props.group} isPastLivestream={false}/>
                 </div>
             </Grid>
         );
@@ -110,7 +125,8 @@ const Events = (props) => {
         return (
             <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
                 <div style={{position: "relative"}}>
-                <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid} group={props.group} isPastLivestream={true}/>
+                    <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid}
+                                             group={props.group} isPastLivestream={true}/>
                 </div>
             </Grid>
         );
@@ -122,11 +138,11 @@ const Events = (props) => {
             <div style={{width: '100%', textAlign: 'left', margin: '20px 0 20px 0'}}>
                 <AppBar color='default' position="static">
                     <Tabs
-                    variant="fullWidth"
-                    value={value}
-                    onChange={handleChange}
-                    indicatorColor='primary'
-                    aria-label="nav tabs example"
+                        variant="fullWidth"
+                        value={value}
+                        onChange={handleChange}
+                        indicatorColor='primary'
+                        aria-label="nav tabs example"
                     >
                         <Tab label="Next Live streams" {...a11yProps(0)}/>
                         <Tab label="Past Live streams" {...a11yProps(1)}/>
@@ -135,11 +151,21 @@ const Events = (props) => {
                 <TabPanel value={value} index={0}>
                     <Grid container spacing={2}>
                         {livestreamElements}
+                        {loadingMoreUpcoming && <Button
+                            startIcon={loadingMoreUpcoming && <CircularProgress size={20} color="inherit"/>}
+                            disabled={loadingMoreUpcoming} onClick={loadingMoreUpcoming} fullWidth>
+                            {(loadingUpcoming || loadingMoreUpcoming) ? "Loading" : "Load More"}
+                        </Button>}
                     </Grid>
                 </TabPanel>
                 <TabPanel value={value} index={1}>
                     <Grid container spacing={2}>
                         {pastLivestreamElements}
+                        {hasMorePast &&
+                        <Button startIcon={loadingMorePast && <CircularProgress size={20} color="inherit"/>}
+                                disabled={loadingMorePast} onClick={loadMorePast} fullWidth>
+                            {(loadingPast || loadingMorePast) ? "Loading" : "Load More"}
+                        </Button>}
                     </Grid>
                 </TabPanel>
                 {/* <Button variant="contained"
@@ -156,8 +182,9 @@ const Events = (props) => {
                     open={Boolean(anchorEl)}
                     onClose={handleClose}
                 >
-                <MenuItem onClick={() => router.push('/group/' + props.group.id + '/admin/schedule-event')}>Send a Company Request</MenuItem>
-                <MenuItem onClick={handleClose}>Schedule a Live Stream</MenuItem>
+                    <MenuItem onClick={() => router.push('/group/' + props.group.id + '/admin/schedule-event')}>Send a
+                        Company Request</MenuItem>
+                    <MenuItem onClick={handleClose}>Schedule a Live Stream</MenuItem>
                 </Menu>
             </div>
             <style jsx>{`
@@ -196,7 +223,8 @@ const Events = (props) => {
                 }
             `}</style>
         </Fragment>
-    );
+    )
+        ;
 }
 
 export default withFirebase(Events);
