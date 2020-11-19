@@ -48,8 +48,8 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     const [value, setValue] = useState(0)
 
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
-    console.log("-> upcomingQuestions", upcomingQuestions);
     const [pastQuestions, setPastQuestions] = useState([]);
+    console.log("-> pastQuestions", pastQuestions);
     const[parentHeight, setParentHeight] = useState(400)
 
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
@@ -70,7 +70,6 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     }
 
     const parentRef = useRef(null)
-    console.log("-> parentHeight", parentHeight);
     useEffect(() => {
         if(parentRef){
             const height = parentRef.current.containerNode.offsetHeight
@@ -87,7 +86,6 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
         items: itemsUpcoming,
         loadMore: loadMoreUpcoming
     } = usePagination(firebase.listenToUpcomingLivestreamQuestions(livestream.id), {limit: 10});
-    console.log("-> hasMoreUpcoming", hasMoreUpcoming);
 
     const {
         loading: loadingPast,
@@ -98,12 +96,12 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
         items: itemsPast,
         loadMore: loadMorePast
     } = usePagination(firebase.listenToPastLivestreamQuestions(livestream.id), {limit: 10});
-    console.log("-> hasMorePast", hasMorePast);
 
     useEffect(() => {
-        if (itemsPast?.length) {
+        if (itemsPast) {
             let newPastQuestions = [];
             itemsPast.forEach(doc => {
+            console.log("-> doc", doc);
                 let question = doc.data();
                 question.id = doc.id;
                 newPastQuestions.push(question);
@@ -209,7 +207,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                              marginLeft: "0.5rem",
                              color: showNextQuestions ? "black" : "white"
                          }}>
-                        <Box fontSize={10}>Answered [{pastQuestionsElements.length}]</Box>
+                        <Box fontSize={10}>Answered [{pastQuestionsElements.length}{hasMorePast && "+"}]</Box>
                     </Fab>
                 </div>
             </QuestionContainerHeader>
@@ -240,12 +238,13 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                 {/*</SimplePanel>*/}
                 {/*<SimplePanel panelId="past-elements"  value={value} index={1} dir={theme.direction}>*/}
                 {/*{pastQuestionsElements}*/}
-                {/*<CustomInfiniteScroll*/}
-                {/*    hasMore={hasMorePast}*/}
-                {/*    next={loadMorePast}*/}
-                {/*    dataLength={pastQuestionsElements.length}>*/}
-                {/*    {pastQuestionsElements}*/}
-                {/*</CustomInfiniteScroll>*/}
+                <CustomInfiniteScroll
+                    hasMore={hasMorePast}
+                    height={parentHeight}
+                    next={loadMorePast}
+                    dataLength={pastQuestionsElements.length}>
+                    {pastQuestionsElements}
+                </CustomInfiniteScroll>
                 {/*</SimplePanel>*/}
             </SwipeableViews>
             <Dialog PaperProps={{style: {background: "transparent", boxShadow: "none"}}} fullWidth onClose={handleClose}

@@ -656,9 +656,6 @@ class Firebase {
             .collection("livestreams")
             .doc(livestreamId)
             .collection("questions")
-            .orderBy("type", "asc")
-            .orderBy("votes", "desc")
-            .orderBy("timestamp", "asc")
             .where("type", "==", 'done')
     };
 
