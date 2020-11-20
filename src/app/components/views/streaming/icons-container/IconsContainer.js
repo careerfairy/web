@@ -191,10 +191,11 @@ function IconsContainer({livestreamId, firebase, isTest}) {
     // });
 
     let likeElements = [...Array(likes)].map((num, index) => {
+        const randomPosition = useMemo(() => getRandomHorizontalPosition(90), [index]);
         return (<ActionButton
                 key={index}
                 index={index}
-                right={getRandomHorizontalPosition(90)}
+                right={randomPosition}
                 iconName="like"
                 durationTransform={getRandomDuration(3500, 4500)}
                 color={"#e01a4f"}/>
@@ -202,10 +203,11 @@ function IconsContainer({livestreamId, firebase, isTest}) {
     });
 
     let heartElements = [...Array(hearts)].map((num, index) => {
+         const randomPosition = useMemo(() => getRandomHorizontalPosition(90), [index]);
         return (<ActionButton
                 key={index}
                 index={index}
-                right={getRandomHorizontalPosition(90)}
+                right={randomPosition}
                 iconName="heart"
                 durationTransform={getRandomDuration(3500, 4500)}
                 color={"#f9c22e"}/>
@@ -213,10 +215,11 @@ function IconsContainer({livestreamId, firebase, isTest}) {
     });
 
     let clapElements = [...Array(claps)].map((num, index) => {
+         const randomPosition = useMemo(() => getRandomHorizontalPosition(90), [index]);
         return (<ActionButton
                 key={index}
                 index={index}
-                right={getRandomHorizontalPosition(90)}
+                right={randomPosition}
                 iconName="clapping"
                 durationTransform={getRandomDuration(3500, 4500)}
                 color={"#f15946"}/>
