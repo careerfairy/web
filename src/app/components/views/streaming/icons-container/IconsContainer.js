@@ -41,7 +41,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 
-const ActionButton = React.memo(({icon, right, color, durationTransform, index}) => {
+const ActionButton = React.memo(({iconName, right, color, durationTransform}) => {
     const [distance, setDistance] = useState(0)
     const [opacity, setOpacity] = useState(1)
     useEffect(() => {
@@ -54,7 +54,7 @@ const ActionButton = React.memo(({icon, right, color, durationTransform, index})
         <div className={classes.animatedBox}>
             <RubberBand>
                 <div className={classes.actionBtn}>
-                    <Image className={classes.image} src={'/' + icon.iconName + '.png'}/>
+                    <Image className={classes.image} src={'/' + iconName + '.png'}/>
                 </div>
             </RubberBand>
         </div>
@@ -79,26 +79,26 @@ function IconsContainer({livestreamId, firebase, isTest}) {
 
     useEffect(() => {
         if (livestreamId && !showBubbles) {
-            const unsubscribeLikes = firebase.listenToLivestreamIconCollection(livestreamId, "likes", querySnapshot => {
+            const unsubscribeLikes = firebase.listenToLivestreamIconCollection(livestreamId, "like", querySnapshot => {
                 const totalChanges = querySnapshot.docChanges()
                 const addedChanges = totalChanges.filter(change => change.type === "added")
-                if (addedChanges.length > likes.length) {
+                if (addedChanges.length > likes) {
                     setLikes(prevState => prevState + 1)
                 }
             });
 
-            const unsubscribeHearts = firebase.listenToLivestreamIconCollection(livestreamId, "hearts", querySnapshot => {
+            const unsubscribeHearts = firebase.listenToLivestreamIconCollection(livestreamId, "heart", querySnapshot => {
                 const totalChanges = querySnapshot.docChanges()
                 const addedChanges = totalChanges.filter(change => change.type === "added")
-                if (addedChanges.length > likes.length) {
+                if (addedChanges.length > hearts) {
                     setHearts(prevState => prevState + 1)
                 }
             });
 
-            const unsubscribeClaps = firebase.listenToLivestreamIconCollection(livestreamId, "claps", querySnapshot => {
+            const unsubscribeClaps = firebase.listenToLivestreamIconCollection(livestreamId, "clapping", querySnapshot => {
                 const totalChanges = querySnapshot.docChanges()
                 const addedChanges = totalChanges.filter(change => change.type === "added")
-                if (addedChanges.length > likes.length) {
+                if (addedChanges.length > claps) {
                     setClaps(prevState => prevState + 1)
                 }
             });
@@ -150,18 +150,6 @@ function IconsContainer({livestreamId, firebase, isTest}) {
         }
     }, [showBubbles])
 
-    function getIconColor(icon) {
-        if (icon.iconName === 'like') {
-            return '#e01a4f'
-        }
-        if (icon.iconName === 'clapping') {
-            return '#f15946'
-        }
-        if (icon.iconName === 'heart') {
-            return '#f9c22e'
-        }
-    }
-
     const simulateEmotes = () => {
         const newPostedIcons = [...postedIcons]
         const index = randomInteger(1, 3)
@@ -202,7 +190,7 @@ function IconsContainer({livestreamId, firebase, isTest}) {
     //     );
     // });
 
-    let likeElements = [...Array(10)].map((num, index) => {
+    let likeElements = [...Array(likes)].map((num, index) => {
         return (<ActionButton
                 key={index}
                 index={index}
@@ -213,7 +201,7 @@ function IconsContainer({livestreamId, firebase, isTest}) {
         );
     });
 
-    let heartElements = [...Array(10)].map((num, index) => {
+    let heartElements = [...Array(hearts)].map((num, index) => {
         return (<ActionButton
                 key={index}
                 index={index}
@@ -224,7 +212,7 @@ function IconsContainer({livestreamId, firebase, isTest}) {
         );
     });
 
-    let clapElements = [...Array(10)].map((num, index) => {
+    let clapElements = [...Array(claps)].map((num, index) => {
         return (<ActionButton
                 key={index}
                 index={index}
