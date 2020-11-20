@@ -180,17 +180,6 @@ function IconsContainer({livestreamId, firebase, isTest}) {
         return Math.random() * (max - min) + min //returns int between min and max
     }
 
-    // let postedIconsElements = filteredIcons.map((icon, index) => {
-    //     return (<ActionButton
-    //             key={icon.id}
-    //             index={index}
-    //             right={getRandomHorizontalPosition(icon, 90)}
-    //             icon={icon}
-    //             durationTransform={getRandomDuration(3500, 4500)}
-    //             color={getIconColor(icon)}/>
-    //     );
-    // });
-
     let likeElements = likes.map((iconEl, index) => {
         return (<ActionButton
                 id={iconEl.id}
@@ -216,7 +205,6 @@ function IconsContainer({livestreamId, firebase, isTest}) {
     });
 
     let clapElements = claps.map((iconEl, index) => {
-
         return (<ActionButton
                 id={iconEl.id}
                 key={iconEl.id}
