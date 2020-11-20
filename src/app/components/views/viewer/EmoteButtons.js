@@ -179,29 +179,29 @@ const EmoteButtons =
                 <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className={classes.actionArea}>
                     <Box className={classes.miniButtons} classes={{root: open ? classes.cardHovered : ""}}>
                         <div className={classes.wrapper}>
-                            <Fab onClick={handleLike} disabled={iconsDisabled} className={classes.miniLike}
+                            <Fab onClick={handleLike}  className={classes.miniLike}
                                  aria-label="like">
                                 <ThumbUpAltOutlinedIcon fontSize="default"/>
                             </Fab>
-                            {iconsDisabled &&
-                            <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
+                            {/*{iconsDisabled &&*/}
+                            {/*<CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}*/}
                         </div>
                         <div className={classes.wrapper}>
-                            <Fab onClick={handleClap} disabled={iconsDisabled} className={classes.miniClap}
+                            <Fab onClick={handleClap}  className={classes.miniClap}
                                  aria-label="clap">
                                 <img alt="clap button" style={{width: 23}} src='/clapping.png'
                                      className={classes.image}/>
                             </Fab>
-                            {iconsDisabled &&
-                            <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
+                            {/*{iconsDisabled &&*/}
+                            {/*<CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}*/}
                         </div>
                         <div className={classes.wrapper}>
-                            <Fab onClick={handleHeart} disabled={iconsDisabled} className={classes.miniHeart}
+                            <Fab onClick={handleHeart}  className={classes.miniHeart}
                                  aria-label="heart">
                                 <FavoriteBorderOutlinedIcon fontSize="default"/>
                             </Fab>
-                            {iconsDisabled &&
-                            <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
+                            {/*{iconsDisabled &&*/}
+                            {/*<CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}*/}
                         </div>
                     </Box>
                 </div>

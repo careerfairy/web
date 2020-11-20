@@ -2,6 +2,7 @@ import {useState, useEffect, Fragment} from 'react';
 import VolumeUpRoundedIcon from '@material-ui/icons/VolumeUpRounded';
 import PlayArrowRoundedIcon from '@material-ui/icons/PlayArrowRounded';
 import {useRouter} from 'next/router';
+import {v4 as uuidv4} from 'uuid';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import {withFirebasePage} from '../../../context/firebase';
 import ViewerHandRaiseComponent from 'components/views/viewer/viewer-hand-raise-component/ViewerHandRaiseComponent';
@@ -171,8 +172,9 @@ function ViewerPage({firebase}) {
     }
 
     function postIcon(iconName) {
+        const iconId = uuidv4()
         let email = currentLivestream.test ? 'streamerEmail' : authenticatedUser.email;
-        firebase.postIcon(currentLivestream.id, iconName, email);
+        firebase.postIcon(currentLivestream.id, iconName, email, iconId);
         if (!iconsDisabled) {
             setIconsDisabled(true);
         }

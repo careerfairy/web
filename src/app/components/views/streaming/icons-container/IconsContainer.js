@@ -1,4 +1,4 @@
-import {useState, useEffect, useContext} from 'react';
+import {useState, useEffect, useContext, useMemo} from 'react';
 import {Image} from "semantic-ui-react";
 import RubberBand from 'react-reveal/RubberBand';
 import {withFirebasePage} from 'context/firebase';
@@ -41,16 +41,30 @@ const useStyles = makeStyles(theme => ({
 }))
 
 
-const ActionButton = React.memo(({iconName, right, color, durationTransform}) => {
+const ActionButton = React.memo(({iconName, color, getRandomDuration, getRandomHorizontalPosition, index}) => {
+    const [shouldRender, setShouldRender] = useState(true)
     const [distance, setDistance] = useState(0)
     const [opacity, setOpacity] = useState(1)
+
+
     useEffect(() => {
         setDistance(-100)
         setOpacity(0)
     }, [])
-    const classes = useStyles({color, distance, right, durationTransform, opacity})
 
-    return (
+    const durationTransform = useMemo(() => getRandomDuration(3500, 4500), [index]);
+    const right = useMemo(() => getRandomHorizontalPosition(90), [index]);
+
+    const classes = useStyles({color, distance, right, durationTransform, opacity})
+    //
+    // useEffect(() => {
+    //     setTimeout(() => {
+    //         setShouldRender(false)
+    //     }, durationTransform);
+    // }, [])
+
+
+    return shouldRender && (
         <div className={classes.animatedBox}>
             <RubberBand>
                 <div className={classes.actionBtn}>
@@ -68,73 +82,60 @@ const emotes = ["clapping", "like", "heart"]
 
 function IconsContainer({livestreamId, firebase, isTest}) {
 
-    const [likes, setLikes] = useState(0);
-    const [hearts, setHearts] = useState(0);
-    const [claps, setClaps] = useState(0);
-    const [postedIcons, setPostedIcons] = useState([]);
-    const [filteredIcons, setFilteredIcons] = useState([]);
-    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
+    const [likes, setLikes] = useState([]);
+    console.log("-> likes", likes);
+    const [hearts, setHearts] = useState([]);
+    const [claps, setClaps] = useState([]);
 
-    const classes = useStyles()
+    const [postedIcons, setPostedIcons] = useState([]);
+    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
 
     useEffect(() => {
         if (livestreamId && !showBubbles) {
             const unsubscribeLikes = firebase.listenToLivestreamIconCollection(livestreamId, "like", querySnapshot => {
-                const totalChanges = querySnapshot.docChanges()
-                const addedChanges = totalChanges.filter(change => change.type === "added")
-                if (addedChanges.length > likes) {
-                    setLikes(prevState => prevState + 1)
-                }
+                let icons = []
+                querySnapshot.forEach((doc) => {
+                    icons.push(doc.data())
+                })
+                setLikes(prevState => {
+                    if (prevState.length > 40) {
+                        return prevState.slice(-20)
+                    } else {
+                        return [...prevState, icons[0]]
+                    }
+                })
             });
 
             const unsubscribeHearts = firebase.listenToLivestreamIconCollection(livestreamId, "heart", querySnapshot => {
-                const totalChanges = querySnapshot.docChanges()
-                const addedChanges = totalChanges.filter(change => change.type === "added")
-                if (addedChanges.length > hearts) {
-                    setHearts(prevState => prevState + 1)
-                }
+                let icons = []
+                querySnapshot.forEach((doc) => {
+                    icons.push(doc.data())
+                })
+                setHearts(prevState => {
+                    if (prevState.length > 40) {
+                        return prevState.slice(-20)
+                    } else {
+                        return [...prevState, icons[0]]
+                    }
+                })
             });
 
             const unsubscribeClaps = firebase.listenToLivestreamIconCollection(livestreamId, "clapping", querySnapshot => {
-                const totalChanges = querySnapshot.docChanges()
-                const addedChanges = totalChanges.filter(change => change.type === "added")
-                if (addedChanges.length > claps) {
-                    setClaps(prevState => prevState + 1)
-                }
+                let icons = []
+                querySnapshot.forEach((doc) => {
+                    icons.push(doc.data())
+                })
+                setClaps(prevState => {
+                    if (prevState.length > 40) {
+                        return prevState.slice(-20)
+                    } else {
+                        return [...prevState, icons[0]]
+                    }
+                })
             });
             return () => [unsubscribeLikes, unsubscribeHearts, unsubscribeClaps].forEach(listener => listener())
         }
     }, [livestreamId, showBubbles]);
-
-    // useEffect(() => {
-    //     if (livestreamId && !showBubbles) {
-    //         const unsubscribe = firebase.listenToLivestreamIcons(livestreamId, querySnapshot => {
-    //             let iconsList = [];
-    //             querySnapshot.forEach(doc => {
-    //                 let icon = doc.data();
-    //                 icon.id = doc.id;
-    //                 iconsList.push(icon);
-    //             });
-    //             setPostedIcons(iconsList);
-    //         });
-    //
-    //         return () => unsubscribe()
-    //     }
-    // }, [livestreamId, showBubbles]);
-
-    // useEffect(() => {
-    //     if (postedIcons.length) {
-    //         if (filteredIcons.length < 250) {
-    //             if (!filteredIcons.some(icon => icon.id === postedIcons[postedIcons.length - 1].id)) {
-    //                 setFilteredIcons([...filteredIcons, postedIcons[postedIcons.length - 1]]);
-    //             }
-    //         } else {
-    //             if (!filteredIcons.some(icon => icon.id === postedIcons[postedIcons.length - 1].id)) {
-    //                 setFilteredIcons([...filteredIcons.slice(filteredIcons.length - 150), postedIcons[postedIcons.length - 1]]);
-    //             }
-    //         }
-    //     }
-    // }, [postedIcons]);
 
     useEffect(() => {
         if (showBubbles) {
@@ -190,38 +191,39 @@ function IconsContainer({livestreamId, firebase, isTest}) {
     //     );
     // });
 
-    let likeElements = [...Array(likes)].map((num, index) => {
-        const randomPosition = useMemo(() => getRandomHorizontalPosition(90), [index]);
+    let likeElements = likes.map((iconEl, index) => {
         return (<ActionButton
-                key={index}
+                id={iconEl.id}
+                key={iconEl.id}
                 index={index}
-                right={randomPosition}
+                getRandomHorizontalPosition={getRandomHorizontalPosition}
                 iconName="like"
-                durationTransform={getRandomDuration(3500, 4500)}
+                getRandomDuration={getRandomDuration}
                 color={"#e01a4f"}/>
         );
     });
 
-    let heartElements = [...Array(hearts)].map((num, index) => {
-         const randomPosition = useMemo(() => getRandomHorizontalPosition(90), [index]);
+    let heartElements = hearts.map((iconEl, index) => {
         return (<ActionButton
-                key={index}
+                id={iconEl.id}
+                key={iconEl.id}
                 index={index}
-                right={randomPosition}
+                getRandomHorizontalPosition={getRandomHorizontalPosition}
                 iconName="heart"
-                durationTransform={getRandomDuration(3500, 4500)}
+                getRandomDuration={getRandomDuration}
                 color={"#f9c22e"}/>
         );
     });
 
-    let clapElements = [...Array(claps)].map((num, index) => {
-         const randomPosition = useMemo(() => getRandomHorizontalPosition(90), [index]);
+    let clapElements = claps.map((iconEl, index) => {
+
         return (<ActionButton
-                key={index}
+                id={iconEl.id}
+                key={iconEl.id}
                 index={index}
-                right={randomPosition}
+                getRandomHorizontalPosition={getRandomHorizontalPosition}
                 iconName="clapping"
-                durationTransform={getRandomDuration(3500, 4500)}
+                getRandomDuration={getRandomDuration}
                 color={"#f15946"}/>
         );
     });
