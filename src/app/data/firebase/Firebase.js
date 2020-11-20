@@ -733,12 +733,13 @@ class Firebase {
         return ref.add(comment);
     };
 
-    listenToChatEntries = (livestreamId, callback) => {
+    listenToChatEntries = (livestreamId, limit, callback) => {
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("chatEntries")
-            .orderBy("timestamp", "asc");
+            .orderBy("timestamp", "desc")
+            .limit(limit)
         return ref.onSnapshot(callback);
     }
 

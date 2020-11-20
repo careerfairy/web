@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext, useRef} from 'react';
+import React, {useState, useEffect, useContext, useRef, useLayoutEffect} from 'react';
 import UserContext from 'context/user/UserContext';
 import {Button, Grid, Typography, useTheme} from "@material-ui/core";
 import QuestionContainer from './questions/QuestionContainer';
@@ -6,7 +6,6 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import {TextField, Collapse} from "@material-ui/core";
-import InfiniteScroll from 'react-infinite-scroller';
 
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {withFirebase} from 'context/firebase';
@@ -19,7 +18,7 @@ import {
     QuestionContainerTitle
 } from "../../../../materialUI/GlobalContainers";
 import SwipeableViews from "react-swipeable-views";
-import {SimplePanel, TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
+import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import {makeStyles} from "@material-ui/core/styles";
 import usePagination from "firestore-pagination-hook";
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
@@ -49,12 +48,25 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
 
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [pastQuestions, setPastQuestions] = useState([]);
-    console.log("-> pastQuestions", pastQuestions);
-    const[parentHeight, setParentHeight] = useState(400)
+    const [parentHeight, setParentHeight] = useState(400)
+    console.log("-> parentHeight", parentHeight);
 
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
 
     const {authenticatedUser, userData} = useContext(UserContext);
+
+    const parentRef = useRef()
+
+    useLayoutEffect(() => {
+        function updateSize() {
+            setParentHeight(parentRef.current.containerNode.offsetHeight);
+        }
+
+        window.addEventListener('resize', updateSize);
+        updateSize();
+        return () => window.removeEventListener('resize', updateSize);
+    }, []);
+
     const handleOpen = () => {
         setTouched(false)
         setShowQuestionModal(true)
@@ -69,13 +81,6 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
         setShowNextQuestions(!showNextQuestions);
     }
 
-    const parentRef = useRef(null)
-    useEffect(() => {
-        if(parentRef){
-            const height = parentRef.current.containerNode.offsetHeight
-            setParentHeight(height)
-        }
-    },[parentRef])
 
     const {
         loading: loadingUpcoming,
@@ -101,7 +106,6 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
         if (itemsPast) {
             let newPastQuestions = [];
             itemsPast.forEach(doc => {
-            console.log("-> doc", doc);
                 let question = doc.data();
                 question.id = doc.id;
                 newPastQuestions.push(question);
@@ -111,7 +115,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     }, [itemsPast])
 
     useEffect(() => {
-        if (itemsUpcoming?.length) {
+        if (itemsUpcoming) {
             let newUpcomingQuestions = [];
             itemsUpcoming.forEach(doc => {
                 let question = doc.data();
@@ -125,7 +129,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
 
 
     const sortUpcoming = (array) => {
-        return array.sort((a,b) => (a.type > b.type) ? 1 : ((b.type > a.type) ? -1 : 0))
+        return array.sort((a, b) => (a.type > b.type) ? 1 : ((b.type > a.type) ? -1 : 0))
     }
     const handleClickUpcoming = () => {
         setShowNextQuestions(true)
@@ -219,25 +223,16 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                 className={classes.view}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value} onChangeIndex={handleChange}>
-                    <CustomInfiniteScroll
-                        height={parentHeight}
-                        hasMore={hasMoreUpcoming}
-                        next={loadMoreUpcoming}
-                        dataLength={upcomingQuestionsElements.length}>
-                        {upcomingQuestionsElements}
-                    </CustomInfiniteScroll>
-                {/*<SimplePanel panelId="upcoming-elements" value={value} index={0} dir={theme.direction}>*/}
-                {/*{upcomingQuestionsElements}*/}
-                {/*<CustomInfiniteScroll*/}
-                {/*    hasMore={hasMoreUpcoming}*/}
-                {/*    next={loadMoreUpcoming}*/}
-                {/*    scrollableTarget="scrollable-container"*/}
-                {/*    dataLength={upcomingQuestionsElements.length}>*/}
-                {/*        {upcomingQuestionsElements}*/}
-                {/*</CustomInfiniteScroll>*/}
-                {/*</SimplePanel>*/}
-                {/*<SimplePanel panelId="past-elements"  value={value} index={1} dir={theme.direction}>*/}
-                {/*{pastQuestionsElements}*/}
+                <TabPanel>
+                <CustomInfiniteScroll
+                    height={parentHeight}
+                    hasMore={hasMoreUpcoming}
+                    next={loadMoreUpcoming}
+                    dataLength={upcomingQuestionsElements.length}>
+                    {upcomingQuestionsElements}
+                </CustomInfiniteScroll>
+                </TabPanel>
+                <TabPanel>
                 <CustomInfiniteScroll
                     hasMore={hasMorePast}
                     height={parentHeight}
@@ -245,7 +240,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                     dataLength={pastQuestionsElements.length}>
                     {pastQuestionsElements}
                 </CustomInfiniteScroll>
-                {/*</SimplePanel>*/}
+                </TabPanel>
             </SwipeableViews>
             <Dialog PaperProps={{style: {background: "transparent", boxShadow: "none"}}} fullWidth onClose={handleClose}
                     open={showQuestionModal} basic size='small'>

@@ -39,6 +39,11 @@ const useStyles = makeStyles(theme => ({
         },
         background: "white"
     },
+    scrollToBottom: {
+        display: "flex",
+        flexDirection: "column",
+        maxHeight: "100vh"
+    }
 }))
 
 function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
@@ -56,12 +61,12 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
 
     useEffect(() => {
         if (livestream.id) {
-            const unsubscribe = firebase.listenToChatEntries(livestream.id, querySnapshot => {
+            const unsubscribe = firebase.listenToChatEntries(livestream.id, 50, querySnapshot => {
                 var chatEntries = [];
                 querySnapshot.forEach(doc => {
                     let entry = doc.data();
                     entry.id = doc.id;
-                    chatEntries.push(entry);
+                    chatEntries.unshift(entry);
                 });
                 setChatEntries(chatEntries);
             });
@@ -126,40 +131,40 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
 
     return (
         <div>
-            <div className='questionToggle'>
-                <div className='questionToggleTitle'>
-                    <ForumOutlinedIcon color="primary" fontSize="small"/>
-                    <Typography style={{marginLeft: "0.6rem"}}>
-                        Main Chat
-                    </Typography>
-                </div>
-                <div style={{margin: 5}}>
-                    <TextField
-                        variant="outlined"
-                        fullWidth
-                        autoFocus
-                        onBlur={() => setFocused(false)}
-                        onFocus={() => setFocused(true)}
-                        className={classes.chatInput}
-                        size="small"
-                        onKeyPress={addNewChatEntryOnEnter}
-                        value={newChatEntry}
-                        onChange={() => setNewChatEntry(event.target.value)}
-                        placeholder='Post in the chat...'
-                        InputProps={{
-                            maxLength: 340,
-                            endAdornment: playIcon,
-                        }}/>
-                    <Collapse align="center"
-                              style={{color: "grey", fontSize: "1em", marginTop: 3, padding: "0 0.8em"}}
-                              in={focused && !isStreamer}>
-                        For questions, please use the Q&A tool!
-                    </Collapse>
-                </div>
-            </div>
             <div>
-                <ScrollToBottom className={ROOT_CSS}>
+                <ScrollToBottom className={classes.scrollToBottom}>
                     {chatElements}
+                <div className='questionToggle'>
+                    <div className='questionToggleTitle'>
+                        <ForumOutlinedIcon color="primary" fontSize="small"/>
+                        <Typography style={{marginLeft: "0.6rem"}}>
+                            Main Chat
+                        </Typography>
+                    </div>
+                    <div style={{margin: 5}}>
+                        <TextField
+                            variant="outlined"
+                            fullWidth
+                            autoFocus
+                            onBlur={() => setFocused(false)}
+                            onFocus={() => setFocused(true)}
+                            className={classes.chatInput}
+                            size="small"
+                            onKeyPress={addNewChatEntryOnEnter}
+                            value={newChatEntry}
+                            onChange={() => setNewChatEntry(event.target.value)}
+                            placeholder='Post in the chat...'
+                            InputProps={{
+                                maxLength: 340,
+                                endAdornment: playIcon,
+                            }}/>
+                        <Collapse align="center"
+                                  style={{color: "grey", fontSize: "1em", marginTop: 3, padding: "0 0.8em"}}
+                                  in={focused && !isStreamer}>
+                            For questions, please use the Q&A tool!
+                        </Collapse>
+                    </div>
+                </div>
                 </ScrollToBottom>
             </div>
             <style jsx>{`
