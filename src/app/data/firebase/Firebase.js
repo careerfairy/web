@@ -1335,6 +1335,15 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
+    listenToLivestreamIconCollection = (livestreamId, collection, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection(collection)
+            .orderBy("timestamp", "asc");
+        return ref.onSnapshot(callback);
+    };
+
     getStorageRef = () => {
         return this.storage.ref();
     }

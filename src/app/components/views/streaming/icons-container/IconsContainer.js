@@ -67,6 +67,10 @@ const randomInteger = (min, max) => {
 const emotes = ["clapping", "like", "heart"]
 
 function IconsContainer({livestreamId, firebase, isTest}) {
+
+    const [likes, setLikes] = useState(0);
+    const [hearts, setHearts] = useState(0);
+    const [claps, setClaps] = useState(0);
     const [postedIcons, setPostedIcons] = useState([]);
     const [filteredIcons, setFilteredIcons] = useState([]);
     const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
@@ -75,33 +79,62 @@ function IconsContainer({livestreamId, firebase, isTest}) {
 
     useEffect(() => {
         if (livestreamId && !showBubbles) {
-            const unsubscribe = firebase.listenToLivestreamIcons(livestreamId, querySnapshot => {
-                let iconsList = [];
-                querySnapshot.forEach(doc => {
-                    let icon = doc.data();
-                    icon.id = doc.id;
-                    iconsList.push(icon);
-                });
-                setPostedIcons(iconsList);
+            const unsubscribeLikes = firebase.listenToLivestreamIconCollection(livestreamId, "likes", querySnapshot => {
+                const totalChanges = querySnapshot.docChanges()
+                const addedChanges = totalChanges.filter(change => change.type === "added")
+                if (addedChanges > likes.length) {
+                    setLikes(prevState => prevState + 1)
+                }
             });
 
-            return () => unsubscribe()
+            const unsubscribeHearts = firebase.listenToLivestreamIconCollection(livestreamId, "hearts", querySnapshot => {
+                const totalChanges = querySnapshot.docChanges()
+                const addedChanges = totalChanges.filter(change => change.type === "added")
+                if (addedChanges > likes.length) {
+                    setHearts(prevState => prevState + 1)
+                }
+            });
+
+            const unsubscribeClaps = firebase.listenToLivestreamIconCollection(livestreamId, "claps", querySnapshot => {
+                const totalChanges = querySnapshot.docChanges()
+                const addedChanges = totalChanges.filter(change => change.type === "added")
+                if (addedChanges > likes.length) {
+                    setClaps(prevState => prevState + 1)
+                }
+            });
+            return () => [unsubscribeLikes, unsubscribeHearts, unsubscribeClaps].forEach(listener => listener())
         }
     }, [livestreamId, showBubbles]);
 
-    useEffect(() => {
-        if (postedIcons.length) {
-            if (filteredIcons.length < 250) {
-                if (!filteredIcons.some(icon => icon.id === postedIcons[postedIcons.length - 1].id)) {
-                    setFilteredIcons([...filteredIcons, postedIcons[postedIcons.length - 1]]);
-                }
-            } else {
-                if (!filteredIcons.some(icon => icon.id === postedIcons[postedIcons.length - 1].id)) {
-                    setFilteredIcons([...filteredIcons.slice(filteredIcons.length - 150), postedIcons[postedIcons.length - 1]]);
-                }
-            }
-        }
-    }, [postedIcons]);
+    // useEffect(() => {
+    //     if (livestreamId && !showBubbles) {
+    //         const unsubscribe = firebase.listenToLivestreamIcons(livestreamId, querySnapshot => {
+    //             let iconsList = [];
+    //             querySnapshot.forEach(doc => {
+    //                 let icon = doc.data();
+    //                 icon.id = doc.id;
+    //                 iconsList.push(icon);
+    //             });
+    //             setPostedIcons(iconsList);
+    //         });
+    //
+    //         return () => unsubscribe()
+    //     }
+    // }, [livestreamId, showBubbles]);
+
+    // useEffect(() => {
+    //     if (postedIcons.length) {
+    //         if (filteredIcons.length < 250) {
+    //             if (!filteredIcons.some(icon => icon.id === postedIcons[postedIcons.length - 1].id)) {
+    //                 setFilteredIcons([...filteredIcons, postedIcons[postedIcons.length - 1]]);
+    //             }
+    //         } else {
+    //             if (!filteredIcons.some(icon => icon.id === postedIcons[postedIcons.length - 1].id)) {
+    //                 setFilteredIcons([...filteredIcons.slice(filteredIcons.length - 150), postedIcons[postedIcons.length - 1]]);
+    //             }
+    //         }
+    //     }
+    // }, [postedIcons]);
 
     useEffect(() => {
         if (showBubbles) {
@@ -158,7 +191,18 @@ function IconsContainer({livestreamId, firebase, isTest}) {
         return Math.random() * (max - min) + min //returns int between min and max
     }
 
-    let postedIconsElements = filteredIcons.map((icon, index) => {
+    // let postedIconsElements = filteredIcons.map((icon, index) => {
+    //     return (<ActionButton
+    //             key={icon.id}
+    //             index={index}
+    //             right={getRandomHorizontalPosition(icon, 90)}
+    //             icon={icon}
+    //             durationTransform={getRandomDuration(3500, 4500)}
+    //             color={getIconColor(icon)}/>
+    //     );
+    // });
+
+    let likeElements = filteredIcons.map((icon, index) => {
         return (<ActionButton
                 key={icon.id}
                 index={index}
