@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect, useContext, memo} from 'react';
 import Grow from '@material-ui/core/Grow';
 import ThumbUpRoundedIcon from '@material-ui/icons/ThumbUpRounded';
 import Linkify from 'react-linkify';
@@ -84,7 +84,7 @@ const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
     )
 }
 
-const QuestionContainer = ({sliding, user, livestream, streamer, question, questions, firebase, index, isNextQuestions, selectedState, showMenu}) => {
+const QuestionContainer = memo( ({sliding, user, livestream, streamer, question, questions, firebase, index, isNextQuestions, selectedState, showMenu}) => {
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
@@ -322,6 +322,6 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
             </WhiteTooltip>
         </Grow>
     );
-}
+})
 
 export default withFirebase(QuestionContainer);

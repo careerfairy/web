@@ -175,9 +175,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
 
     let chatElements = chatEntries.map((chatEntry, index) => {
         return (
-            <div key={index}>
-                <ChatEntryContainer chatEntry={chatEntry}/>
-            </div>
+                <ChatEntryContainer key={index} chatEntry={chatEntry}/>
         );
     });
 

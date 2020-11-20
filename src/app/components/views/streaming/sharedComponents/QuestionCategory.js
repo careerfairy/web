@@ -49,7 +49,6 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [pastQuestions, setPastQuestions] = useState([]);
     const [parentHeight, setParentHeight] = useState(400)
-    console.log("-> parentHeight", parentHeight);
 
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
 

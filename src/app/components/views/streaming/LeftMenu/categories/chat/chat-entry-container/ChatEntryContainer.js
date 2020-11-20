@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {memo, useContext} from 'react';
 import Linkify from 'react-linkify';
 import {makeStyles} from "@material-ui/core/styles";
 import UserContext from "../../../../../../../context/user/UserContext";
@@ -75,4 +75,4 @@ function ChatEntryContainer({chatEntry}) {
     );
 }
 
-export default ChatEntryContainer;
+export default memo(ChatEntryContainer);
