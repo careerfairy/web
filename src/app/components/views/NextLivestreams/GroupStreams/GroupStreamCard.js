@@ -1,6 +1,5 @@
-import React, {Fragment, useState, useEffect, useRef} from 'react';
+import React, {Fragment, useState, useEffect} from 'react';
 import UserUtil from "../../../../data/util/UserUtil";
-import axios from "axios";
 import DateUtil from "../../../../util/DateUtil";
 import {Button, Grid, Icon, Image} from "semantic-ui-react";
 import Link from "next/link";

@@ -1,13 +1,25 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {withFirebase} from 'context/firebase';
 import {useRouter} from 'next/router';
-import {AppBar, Box, Button, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
+import {AppBar, Box, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
 import usePagination from "firestore-pagination-hook";
 import EnhancedGroupStreamCard from './enhanced-group-stream-card/EnhancedGroupStreamCard';
 import CustomInfiniteScroll from "../../../../util/CustomInfiteScroll";
+import {makeStyles} from "@material-ui/core/styles";
 
+const useStyles = makeStyles(theme => ({
+    streamsWrapper: {
+        overflowY: "hidden !important"
+    },
+    grid: {
+        margin: 0,
+        width: "100%"
+    }
+}))
 const Events = (props) => {
+    const classes = useStyles()
     const router = useRouter();
+    console.log("-> props");
 
     const [grid, setGrid] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -24,7 +36,7 @@ const Events = (props) => {
         hasMore: hasMorePast,
         items: itemsPast,
         loadMore: loadMorePast
-    } = usePagination(props.firebase.listenToPastLiveStreamsByGroupId(props.group.id), {limit: 5});
+    } = usePagination(props.firebase.queryPastLiveStreamsByGroupId(props.group.id), {limit: 5});
 
     const {
         loading: loadingUpcoming,
@@ -34,7 +46,7 @@ const Events = (props) => {
         hasMore: hasMoreUpcoming,
         items: itemsUpcoming,
         loadMore: loadMoreUpcoming
-    } = usePagination(props.firebase.listenToUpcomingLiveStreamsByGroupId(props.group.id), {limit: 5});
+    } = usePagination(props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id), {limit: 5});
 
     useEffect(() => {
         if (itemsPast?.length) {
@@ -110,7 +122,7 @@ const Events = (props) => {
 
     let livestreamElements = livestreams.map((livestream, index) => {
         return (
-            <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
+            <Grid key={livestream.id} md={12} lg={12} item>
                 <div style={{position: "relative"}}>
                     <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid}
                                              group={props.group} isPastLivestream={false}/>
@@ -121,7 +133,7 @@ const Events = (props) => {
 
     let pastLivestreamElements = pastLivestreams.map((livestream, index) => {
         return (
-            <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
+            <Grid key={livestream.id} md={12} lg={12} item>
                 <div style={{position: "relative"}}>
                     <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid}
                                              group={props.group} isPastLivestream={true}/>
@@ -148,20 +160,22 @@ const Events = (props) => {
                 </AppBar>
                 <TabPanel value={value} index={0}>
                     <CustomInfiniteScroll
+                        className={classes.streamsWrapper}
                         hasMore={hasMoreUpcoming}
                         next={loadingUpcoming}
                         dataLength={livestreams.length}>
-                        <Grid container spacing={2}>
+                        <Grid className={classes.grid} container spacing={2}>
                             {livestreamElements}
                         </Grid>
                     </CustomInfiniteScroll>
                 </TabPanel>
                 <TabPanel value={value} index={1}>
                     <CustomInfiniteScroll
+                        className={classes.streamsWrapper}
                         hasMore={hasMorePast}
                         next={loadMorePast}
                         dataLength={pastLivestreamElements.length}>
-                        <Grid container spacing={2}>
+                        <Grid className={classes.grid} container spacing={2}>
                             {pastLivestreamElements}
                         </Grid>
                     </CustomInfiniteScroll>
