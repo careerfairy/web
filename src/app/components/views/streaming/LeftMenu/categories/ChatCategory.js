@@ -42,7 +42,8 @@ const useStyles = makeStyles(theme => ({
     scrollToBottom: {
         display: "flex",
         flexDirection: "column",
-        maxHeight: "100vh"
+        justifyContent: "flex-end",
+        height: "calc(100vh - 118px)"
     }
 }))
 
@@ -130,42 +131,35 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
     </div>)
 
     return (
-        <div>
-            <div>
-                <ScrollToBottom className={classes.scrollToBottom}>
-                    {chatElements}
-                <div className='questionToggle'>
-                    <div className='questionToggleTitle'>
-                        <ForumOutlinedIcon color="primary" fontSize="small"/>
-                        <Typography style={{marginLeft: "0.6rem"}}>
-                            Main Chat
-                        </Typography>
-                    </div>
-                    <div style={{margin: 5}}>
-                        <TextField
-                            variant="outlined"
-                            fullWidth
-                            autoFocus
-                            onBlur={() => setFocused(false)}
-                            onFocus={() => setFocused(true)}
-                            className={classes.chatInput}
-                            size="small"
-                            onKeyPress={addNewChatEntryOnEnter}
-                            value={newChatEntry}
-                            onChange={() => setNewChatEntry(event.target.value)}
-                            placeholder='Post in the chat...'
-                            InputProps={{
-                                maxLength: 340,
-                                endAdornment: playIcon,
-                            }}/>
-                        <Collapse align="center"
-                                  style={{color: "grey", fontSize: "1em", marginTop: 3, padding: "0 0.8em"}}
-                                  in={focused && !isStreamer}>
-                            For questions, please use the Q&A tool!
-                        </Collapse>
-                    </div>
+        <div className="chat-container">
+            <ScrollToBottom className={classes.scrollToBottom}>
+                {chatElements}
+            </ScrollToBottom>
+            <div className='questionToggle'>
+                <div className='questionToggleTitle'>
+                    <ForumOutlinedIcon color="primary" fontSize="small"/>
+                    <Typography style={{marginLeft: "0.6rem"}}>
+                        Main Chat
+                    </Typography>
                 </div>
-                </ScrollToBottom>
+                <div style={{margin: 5}}>
+                    <TextField
+                        variant="outlined"
+                        fullWidth
+                        autoFocus
+                        onBlur={() => setFocused(false)}
+                        onFocus={() => setFocused(true)}
+                        className={classes.chatInput}
+                        size="small"
+                        onKeyPress={addNewChatEntryOnEnter}
+                        value={newChatEntry}
+                        onChange={() => setNewChatEntry(event.target.value)}
+                        placeholder='Post in the chat...'
+                        InputProps={{
+                            maxLength: 340,
+                            endAdornment: playIcon,
+                        }}/>
+                </div>
             </div>
             <style jsx>{`
                 .questionToggle {
@@ -175,6 +169,12 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
                     z-index: 9000;
                     padding: 10px;
                     background: white;
+                }
+                
+                .chat-container {
+                  height: 100vh;
+                  display: flex;
+                  flex-direction: column;
                 }
 
                 .questionToggleTitle {
