@@ -20,12 +20,17 @@ function RemoteVideoContainer(props) {
     const activeStep = getActiveTutorialStepKey();
 
     useEffect(() => {
+        debugger;
         if (props.stream.streamId === 'demoStream') {
             videoElement.current.src = props.stream.url;
             videoElement.current.loop = true;
             videoElement.current.play();
         } else {
-            videoElement.current.srcObject = props.stream.stream;
+            props.stream.stream.play(props.stream.streamId, { fit: 'contain' }, err => {
+                if (err) {
+                    console.error("Error playing remote video", err)
+                }
+            });
         }
     },[props.stream.streamId]);
 
@@ -115,16 +120,15 @@ function RemoteVideoContainer(props) {
                 } 
                 open={activeStep === 11 && props.stream.streamId === 'demoStream'}>
                 <div className='videoContainer' style={{ height: props.height }}>
-                    <video id='videoElement' ref={videoElement} width={ '100%' } onCanPlay={() => setCanPlay(true) } controls={false} muted={props.muted} onEnded={(e) => handleVideoError(e)} onError={handleVideoLoss} onSuspend={handleVideoLoss} playsInline>
-                    </video>
-                    <div className={ 'loader ' + (canPlay ? 'hidden' : '')}>
+                    <div id={props.stream.streamId} style={{ width: '100%', height: '100%' }}/>
+                    {/* <div className={ 'loader ' + (canPlay ? 'hidden' : '')}>
                         <div style={{ position: 'absolute', width: '30%', maxWidth: '30px', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
                             <CircularProgress style={{ maxWidth: '30px', height: 'auto'}} />
                         </div>
                     </div>
                     <div className={ 'loader clickable ' + (stoppedByUserAgent ? '' : 'hidden')} onClick={(e) => {playVideo(); e.preventDefault();}}>
                         <Icon name='play' size='big' style={{ color: 'white', width: '30%', maxWidth: '80px', height: 'auto', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}} />
-                    </div>
+                    </div> */}
                 </div>      
             </WhiteTooltip>     
             <style jsx>{`

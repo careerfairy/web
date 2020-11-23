@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode, screenSharerId, test}, webRTCAdaptor, devices, viewer, joining, setShowSettings, showSettings, firebase, streamerId, isMainStreamer, setDesktopMode}) {
+function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode, screenSharerId, test}, webRTCAdaptor, devices, viewer, joining, setShowSettings, showSettings, firebase, streamerId, isMainStreamer, localMediaStream, setDesktopMode}) {
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
     const theme = useTheme();
     const DELAY = 3000; //3 seconds
@@ -124,18 +124,18 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
 
     function toggleMicrophone() {
         if (isLocalMicMuted) {
-            webRTCAdaptor.unmuteLocalMic();
+            localMediaStream.enableAudio()
         } else {
-            webRTCAdaptor.muteLocalMic();
+            localMediaStream.disableAudio()
         }
         setIsLocalMicMuted(!isLocalMicMuted);
     }
 
     function toggleVideo() {
         if (isVideoInactive) {
-            webRTCAdaptor.turnOnLocalCamera();
+            localMediaStream.enableVideo()
         } else {
-            webRTCAdaptor.turnOffLocalCamera();
+            localMediaStream.disableVideo()
         }
         setIsVideoInactive(!isVideoInactive);
     }

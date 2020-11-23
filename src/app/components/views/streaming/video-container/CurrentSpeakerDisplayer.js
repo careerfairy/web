@@ -6,14 +6,7 @@ import CreateLivestreamProposalStep from 'components/views/group/admin/schedule-
 
 function CurrentSpeakerDisplayer(props) {
 
-    const localVideoRef = useRef(null);
     const windowSize = useWindowSize();
-
-    useEffect(() => {
-        if (!props.isPlayMode && props.localStream) {
-            localVideoRef.current.srcObject = props.localStream;
-        }
-    },[props.localStream]);
 
     function getVideoContainerHeight(streamId) {
         if (props.isPlayMode) {
@@ -138,7 +131,7 @@ function CurrentSpeakerDisplayer(props) {
         let localVideoElement =
             <div className={getVideoContainerClass(props.localId)} style={{ padding: '0', margin: '0' }} key={"localVideoId"}>
                 <div className='video-container' style={{ height: getVideoContainerHeight(props.localId) }}>
-                    <video id="localVideo" ref={localVideoRef} muted autoPlay width={ '100%' }></video> 
+                    <div id="localVideo" style={{ width: '100%', height: '100%' }}/> 
                 </div>
                 <style jsx>{`
                     .quarter-width {
@@ -169,15 +162,6 @@ function CurrentSpeakerDisplayer(props) {
                         width: 100%; 
                         margin: 0 auto;
                         z-index: 2000;
-                    }
-
-                    #localVideo {
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        max-width: 100%;
-                        max-height: 100%;
                     }
             `}</style>
             </div>;

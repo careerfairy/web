@@ -304,6 +304,7 @@ function VideoContainer(props) {
                     viewer={props.viewer}
                     streamerId={props.streamerId}
                     joining={!isMainStreamer}
+                    localMediaStream={localMediaStream}
                     isMainStreamer={isMainStreamer}
                     setDesktopMode={setDesktopMode}
                     showSettings={showSettings}
