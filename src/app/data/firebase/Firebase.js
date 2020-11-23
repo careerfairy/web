@@ -1322,7 +1322,6 @@ class Firebase {
             name: iconName,
             timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
             authorEmail: authorEmail,
-            randomPosition: Math.random(),
         });
     };
 //

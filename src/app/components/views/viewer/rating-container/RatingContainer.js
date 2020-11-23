@@ -67,7 +67,7 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
 
     const handleCheckRatings = async () => {
         for (const [index, rating] of ratings.entries()) { // this loop allows for easy async functions along with index
-            if (!rating.hasRated && minutesPassed > rating.appearAfter) { // if you've already rated, dont bother making an api call
+            if (!rating.hasRated && minutesPassed > rating.appearAfter && authenticatedUser?.email) { // if you've already rated, dont bother making an api call
                 const hasRated = await firebase.checkIfUserRated(livestreamId, authenticatedUser.email, rating.type)
                 if (hasRated) {
                     const newRatings = [...ratings]
