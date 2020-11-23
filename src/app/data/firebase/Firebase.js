@@ -1313,13 +1313,13 @@ class Firebase {
         return ref.get();
     };
 
-    postIcon = (livestreamId, iconName, authorEmail, iconId) => {
+    postIcon = (livestreamId, iconName, authorEmail) => {
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
-            .collection(iconName);
+            .collection("icons");
         return ref.add({
-            id: iconId,
+            name: iconName,
             timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
             authorEmail: authorEmail,
             randomPosition: Math.random(),
@@ -1331,7 +1331,8 @@ class Firebase {
             .collection("livestreams")
             .doc(livestreamId)
             .collection("icons")
-            .orderBy("timestamp", "asc");
+            .orderBy("timestamp", "desc")
+            .limit(1)
         return ref.onSnapshot(callback);
     };
 

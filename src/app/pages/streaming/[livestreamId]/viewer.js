@@ -172,9 +172,8 @@ function ViewerPage({firebase}) {
     }
 
     function postIcon(iconName) {
-        const iconId = uuidv4()
         let email = currentLivestream.test ? 'streamerEmail' : authenticatedUser.email;
-        firebase.postIcon(currentLivestream.id, iconName, email, iconId);
+        firebase.postIcon(currentLivestream.id, iconName, email);
         if (!iconsDisabled) {
             setIconsDisabled(true);
         }

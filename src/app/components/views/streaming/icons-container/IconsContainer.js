@@ -1,5 +1,6 @@
 import {useState, useEffect, useContext, useMemo} from 'react';
 import {Image} from "semantic-ui-react";
+var _ = require('lodash')
 import RubberBand from 'react-reveal/RubberBand';
 import {withFirebasePage} from 'context/firebase';
 import React, {memo} from "react";
@@ -41,7 +42,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 
-const ActionButton = React.memo(({iconName, color, getRandomDuration, getRandomHorizontalPosition, index}) => {
+const ActionButton = React.memo(({iconName, color, getRandomDuration, getRandomHorizontalPosition, id}) => {
     const [shouldRender, setShouldRender] = useState(true)
     const [distance, setDistance] = useState(0)
     const [opacity, setOpacity] = useState(1)
@@ -52,8 +53,8 @@ const ActionButton = React.memo(({iconName, color, getRandomDuration, getRandomH
         setOpacity(0)
     }, [])
 
-    const durationTransform = useMemo(() => getRandomDuration(3500, 4500), [index]);
-    const right = useMemo(() => getRandomHorizontalPosition(90), [index]);
+    const durationTransform = useMemo(() => getRandomDuration(3500, 4500), [id]);
+    const right = useMemo(() => getRandomHorizontalPosition(90), [id]);
 
     const classes = useStyles({color, distance, right, durationTransform, opacity})
     //
@@ -82,60 +83,86 @@ const emotes = ["clapping", "like", "heart"]
 
 function IconsContainer({livestreamId, firebase, isTest}) {
 
+
     const [likes, setLikes] = useState([]);
     console.log("-> likes", likes);
     const [hearts, setHearts] = useState([]);
     const [claps, setClaps] = useState([]);
+    const [livestreamIcons, setLivestreamIcons] = useState([])
 
     const [postedIcons, setPostedIcons] = useState([]);
     const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
 
     useEffect(() => {
         if (livestreamId && !showBubbles) {
-            const unsubscribeLikes = firebase.listenToLivestreamIconCollection(livestreamId, "like", querySnapshot => {
+            const unsubscribe = firebase.listenToLivestreamIcons(livestreamId, querySnapshot => {
                 let icons = []
                 querySnapshot.forEach((doc) => {
-                    icons.push(doc.data())
+                    const icon = doc.data()
+                    icon.id = doc.id
+                    icons.push(icon)
                 })
-                setLikes(prevState => {
+                setLivestreamIcons(prevState => {
                     if (prevState.length > 40) {
                         return prevState.slice(-20)
                     } else {
-                        return [...prevState, icons[0]]
+                        if (icons[0]) {
+                            const filteredState = [...prevState, icons[0]]
+                            return _.uniq(filteredState, 'id')
+
+                        } else {
+                            return prevState
+                        }
                     }
                 })
             });
 
-            const unsubscribeHearts = firebase.listenToLivestreamIconCollection(livestreamId, "heart", querySnapshot => {
-                let icons = []
-                querySnapshot.forEach((doc) => {
-                    icons.push(doc.data())
-                })
-                setHearts(prevState => {
-                    if (prevState.length > 40) {
-                        return prevState.slice(-20)
-                    } else {
-                        return [...prevState, icons[0]]
-                    }
-                })
-            });
-
-            const unsubscribeClaps = firebase.listenToLivestreamIconCollection(livestreamId, "clapping", querySnapshot => {
-                let icons = []
-                querySnapshot.forEach((doc) => {
-                    icons.push(doc.data())
-                })
-                setClaps(prevState => {
-                    if (prevState.length > 40) {
-                        return prevState.slice(-20)
-                    } else {
-                        return [...prevState, icons[0]]
-                    }
-                })
-            });
-            return () => [unsubscribeLikes, unsubscribeHearts, unsubscribeClaps].forEach(listener => listener())
+            return () => unsubscribe()
+            // const unsubscribeLikes = firebase.listenToLivestreamIconCollection(livestreamId, "like", querySnapshot => {
+            //     let icons = []
+            //     querySnapshot.forEach((doc) => {
+            //         icons.push(doc.data())
+            //     })
+            //     setLikes(prevState => {
+            //         if (prevState.length > 40) {
+            //             return prevState.slice(-20)
+            //         } else {
+            //             return [...prevState, icons[0]]
+            //         }
+            //     })
+            // });
+            //
+            // const unsubscribeHearts = firebase.listenToLivestreamIconCollection(livestreamId, "heart", querySnapshot => {
+            //     let icons = []
+            //     querySnapshot.forEach((doc) => {
+            //         icons.push(doc.data())
+            //     })
+            //     setHearts(prevState => {
+            //         if (prevState.length > 40) {
+            //             return prevState.slice(-20)
+            //         } else {
+            //             return [...prevState, icons[0]]
+            //         }
+            //     })
+            // });
+            //
+            // const unsubscribeClaps = firebase.listenToLivestreamIconCollection(livestreamId, "clapping", querySnapshot => {
+            //     let icons = []
+            //     querySnapshot.forEach((doc) => {
+            //         icons.push(doc.data())
+            //     })
+            //     setClaps(prevState => {
+            //         if (prevState.length > 40) {
+            //             return prevState.slice(-20)
+            //         } else {
+            //             return [...prevState, icons[0]]
+            //         }
+            //     })
+            // });
+            // return () => [unsubscribeLikes, unsubscribeHearts, unsubscribeClaps].forEach(listener => listener())
         }
     }, [livestreamId, showBubbles]);
+
 
     useEffect(() => {
         if (showBubbles) {
@@ -180,47 +207,68 @@ function IconsContainer({livestreamId, firebase, isTest}) {
         return Math.random() * (max - min) + min //returns int between min and max
     }
 
-    let likeElements = likes.map((iconEl, index) => {
-        return (<ActionButton
-                id={iconEl.id}
-                key={iconEl.id}
-                index={index}
-                getRandomHorizontalPosition={getRandomHorizontalPosition}
-                iconName="like"
-                getRandomDuration={getRandomDuration}
-                color={"#e01a4f"}/>
-        );
-    });
+    // let likeElements = likes.map((iconEl, index) => {
+    //     return (<ActionButton
+    //             id={iconEl?.id}
+    //             key={iconEl?.id}
+    //             index={index}
+    //             getRandomHorizontalPosition={getRandomHorizontalPosition}
+    //             iconName="like"
+    //             getRandomDuration={getRandomDuration}
+    //             color={"#e01a4f"}/>
+    //     );
+    // });
+    //
+    // let heartElements = hearts.map((iconEl, index) => {
+    //     return (<ActionButton
+    //             id={iconEl?.id}
+    //             key={iconEl?.id}
+    //             index={index}
+    //             getRandomHorizontalPosition={getRandomHorizontalPosition}
+    //             iconName="heart"
+    //             getRandomDuration={getRandomDuration}
+    //             color={"#f9c22e"}/>
+    //     );
+    // });
+    //
+    // let clapElements = claps.map((iconEl, index) => {
+    //     return (<ActionButton
+    //             id={iconEl?.id}
+    //             key={iconEl?.id}
+    //             index={index}
+    //             getRandomHorizontalPosition={getRandomHorizontalPosition}
+    //             iconName="clapping"
+    //             getRandomDuration={getRandomDuration}
+    //             color={"#f15946"}/>
+    //     );
+    // });
 
-    let heartElements = hearts.map((iconEl, index) => {
-        return (<ActionButton
-                id={iconEl.id}
-                key={iconEl.id}
-                index={index}
-                getRandomHorizontalPosition={getRandomHorizontalPosition}
-                iconName="heart"
-                getRandomDuration={getRandomDuration}
-                color={"#f9c22e"}/>
-        );
-    });
+    const getColor = (iconName) => {
+        if (iconName === "clapping") {
+            return "#f15946"
+        } else if (iconName === "heart") {
+            return "#f9c22e"
+        } else {
+            return "#e01a4f"
+        }
+    }
 
-    let clapElements = claps.map((iconEl, index) => {
+    let iconElements = livestreamIcons.map((iconEl) => {
         return (<ActionButton
                 id={iconEl.id}
                 key={iconEl.id}
-                index={index}
                 getRandomHorizontalPosition={getRandomHorizontalPosition}
-                iconName="clapping"
+                iconName={iconEl.name}
                 getRandomDuration={getRandomDuration}
-                color={"#f15946"}/>
+                color={getColor(iconEl.name)}/>
         );
     });
 
     return (
         <div style={{position: "relative"}} className='topLevelContainer'>
-            {likeElements}
-            {heartElements}
-            {clapElements}
+            {iconElements}
+            {/*{heartElements}*/}
+            {/*{clapElements}*/}
         </div>
     );
 }
