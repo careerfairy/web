@@ -71,7 +71,10 @@ const useStyles = makeStyles(theme => ({
     scrollToBottom: {
         display: "flex",
         flexDirection: "column",
-        height: "240px"
+        height: "240px",
+        "& div": {
+            overflowX: "hidden",
+        }
     }
 }))
 
@@ -175,7 +178,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
 
     let chatElements = chatEntries.map((chatEntry, index) => {
         return (
-                <ChatEntryContainer key={index} chatEntry={chatEntry}/>
+                <ChatEntryContainer key={chatEntry?.id} chatEntry={chatEntry}/>
         );
     });
 
