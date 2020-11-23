@@ -74,6 +74,13 @@ function ViewerPage({firebase}) {
 
     const {authenticatedUser, userData} = React.useContext(UserContext);
 
+    if (currentLivestream && !currentLivestream.test && authenticatedUser === null) {
+        router.replace({
+            pathname: `/login`,
+            query: {absolutePath: router.asPath},
+        });
+    }
+
     useEffect(() => {
         if (width < 768) {
             setShowMenu(false)
@@ -201,10 +208,6 @@ function ViewerPage({firebase}) {
             </Fragment>
         );
     });
-
-    if (currentLivestream && !currentLivestream.test && authenticatedUser === null) {
-        router.push('/login');
-    }
 
     return (
             <div className={classes.root}>

@@ -2,7 +2,6 @@ import React, {useState, useEffect, useContext} from 'react';
 import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
 import {withFirebase} from 'context/firebase';
 import ChevronRightRoundedIcon from '@material-ui/icons/ChevronRightRounded';
-import {css} from 'glamor';
 import ScrollToBottom from 'react-scroll-to-bottom';
 import ChatEntryContainer from './chat-entry-container/ChatEntryContainer';
 import UserContext from 'context/user/UserContext';
@@ -96,7 +95,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
 
     useEffect(() => {
         if (livestream.id) {
-            const unsubscribe = firebase.listenToChatEntries(livestream.id, 50, querySnapshot => {
+            const unsubscribe = firebase.listenToChatEntries(livestream.id, 150, querySnapshot => {
                 var chatEntries = [];
                 querySnapshot.forEach(doc => {
                     let entry = doc.data();
@@ -119,7 +118,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
     }, [livestream.id]);
 
     useEffect(() => {
-        if (numberOfMissedEntries + numberOfLatestChanges < 100 && !open) {
+        if (numberOfMissedEntries + numberOfLatestChanges <= 100 && !open) {
             setNumberOfMissedEntries(numberOfMissedEntries + numberOfLatestChanges);
         }
         setNumberOfLatestChanges(0);

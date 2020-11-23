@@ -65,7 +65,7 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
 
     useEffect(() => {
         if (livestream.id) {
-            const unsubscribe = firebase.listenToChatEntries(livestream.id, 50, querySnapshot => {
+            const unsubscribe = firebase.listenToChatEntries(livestream.id, 150, querySnapshot => {
                 var chatEntries = [];
                 querySnapshot.forEach(doc => {
                     let entry = doc.data();
