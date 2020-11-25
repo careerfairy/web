@@ -551,6 +551,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                     margin: 0 15px 0 0;
                     padding: 6px;
                     border-radius: 50%;
+                    vertical-align: middle;
                 }
 
                 .livestream-speaker-avatar {

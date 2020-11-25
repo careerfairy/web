@@ -32,6 +32,8 @@ const CFLogo = styled.Image`
 
 const CompanyLogo = styled.Image`
     max-height: 25vw;
+    width: auto;
+    height: auto;
 `;
 
 const SpeakerAvatar = styled.Image`
@@ -66,7 +68,7 @@ const CategoriesParent = styled.View`
     margin: 5vw 0;
 `;
 
-const EngagementParent = styled.View`
+const FlexParent = styled.View`
     display: flex;
     flex-direction: row;
 `;
@@ -74,6 +76,17 @@ const EngagementParent = styled.View`
 const EngagementChild = styled.View`
     width: 25vw;
     margin-right: 5vw;
+`;
+
+const RatingChild = styled.View`
+    width: 40vw;
+    margin-right: 5vw;
+`;
+
+const RatingText = styled.Text`
+    font-weight: bold;
+    font-size: 12px;
+    color: black;
 `;
 
 const SubCategoryParent = styled.View`
@@ -90,7 +103,7 @@ const SpeakersView = styled.View`
 
 const LargeNumber = styled.Text`
     font-weight: bold;
-    font-size: 17px;
+    font-size: 14px;
     width: 10vw;
     color: #314150;
 `;
@@ -167,6 +180,7 @@ const Border = styled.View`
     flex-wrap: wrap;
     vertical-align: middle;
     margin-bottom: 5px;
+    //height: 40px;
 `;
 
 const SmallView = styled.View`
@@ -258,7 +272,7 @@ const SpeakersViewElement = ({ speakers }) => {
     );
 }
 
-const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromETH, totalViewerFromOutsideETH, totalStudentsInTalentPool, questions, polls, icons, speakers }) => {
+const LivestreamPdfReport = ({ group, livestream, studentStats, overallRating, contentRating, totalViewerFromETH, totalViewerFromOutsideETH, totalStudentsInTalentPool, questions, polls, icons, speakers }) => {
 
     let categoryElements = [];
     let nameElements = [];
@@ -277,7 +291,7 @@ const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromE
                 </SmallView>
             )
         })
-        categoryElements = Object.keys(studentStats.options).sort(compareOptions).map( (option, index) => {
+        categoryElements = Object.keys(studentStats.options).sort(compareOptions).filter(option => studentStats.options[option].entries > 0).map( (option, index) => {
             return <SpecializedCategoryElement option={studentStats.options[option]} index={index}/>
         })
     }
@@ -297,7 +311,7 @@ const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromE
         <Document>
             <CFPage>
                 <TopView>
-                    <View style={{ maxWidth: '15vw' }}>
+                    <View style={{ maxWidth: '25vw' }}>
                         <CFLogo source={group.logoUrl}/>
                     </View>
                     <View style={{ maxWidth: '15vw' }}>
@@ -333,23 +347,40 @@ const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromE
                         </Border>
                         { categoryElements }
                     </CategoriesParent>
-                    <SubTitle>Engagement Figures</SubTitle>
-                    <EngagementParent>
-                        <EngagementChild>
-                            <View><Text># Questions</Text></View>
-                            <ColorText><Text>{ questions.length }</Text></ColorText>
-                        </EngagementChild>
-                        <EngagementChild>
-                            <View><Text># Reactions</Text></View>
-                            <ColorText><Text>{ icons.length }</Text></ColorText>
-                        </EngagementChild>
-                        <EngagementChild>
-                            <View><Text># Upvotes</Text></View>
-                            <ColorText><Text>{ numberOfUpvotes }</Text></ColorText>
-                        </EngagementChild>
-                    </EngagementParent>
-                    <SubTitle>Most upvoted questions</SubTitle>
-                    { questionElements }
+                    <View wrap={false}>
+                        <SubTitle>Viewer Ratings</SubTitle>
+                        <FlexParent>
+                            <RatingChild>
+                                <View><RatingText>How would you rate this live stream?</RatingText></View>
+                                <ColorText><Text>{ overallRating } / 5.0</Text></ColorText>
+                            </RatingChild>
+                            <RatingChild>
+                                <View><RatingText>How happy are you with the content of this livestream ?</RatingText></View>
+                                <ColorText><Text>{ contentRating } / 5.0</Text></ColorText>
+                            </RatingChild>
+                        </FlexParent>
+                    </View>     
+                    <View wrap={false}>    
+                        <SubTitle>Engagement Figures</SubTitle>
+                        <FlexParent>
+                            <EngagementChild>
+                                <View><Text># Questions</Text></View>
+                                <ColorText><Text>{ questions.length }</Text></ColorText>
+                            </EngagementChild>
+                            <EngagementChild>
+                                <View><Text># Reactions</Text></View>
+                                <ColorText><Text>{ icons.length }</Text></ColorText>
+                            </EngagementChild>
+                            <EngagementChild>
+                                <View><Text># Upvotes</Text></View>
+                                <ColorText><Text>{ numberOfUpvotes }</Text></ColorText>
+                            </EngagementChild>
+                        </FlexParent>
+                    </View>
+                    <View wrap={false}>
+                        <SubTitle>Most upvoted questions</SubTitle>
+                        { questionElements }
+                    </View>      
                     {/* <SubTitle>Your polls</SubTitle>
                     { pollElements } */}
                 </View>

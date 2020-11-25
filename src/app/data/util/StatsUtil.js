@@ -57,8 +57,12 @@ export default class StatsUtil {
                 if (studentCategoriesForGroup && studentCategoriesForGroup.categories && studentCategoriesForGroup.categories.length && currentGroup.categories) {
                     currentGroup.categories.forEach( category => {
                         let studentCatValue = studentCategoriesForGroup.categories.find( studCat => studCat.id === category.id);
-                        let studentSelectedOption = category.options.find( option => option.id === studentCatValue.selectedValueId);
-                        studentDataObject[category.name] = studentSelectedOption.name;
+                        if (studentCatValue) {
+                            let studentSelectedOption = category.options.find( option => option.id === studentCatValue.selectedValueId);
+                            if (studentSelectedOption) {
+                                studentDataObject[category.name] = studentSelectedOption.name;
+                            }
+                        } 
                     })
                 }
             }   

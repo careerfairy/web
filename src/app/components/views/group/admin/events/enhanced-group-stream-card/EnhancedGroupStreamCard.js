@@ -26,7 +26,7 @@ const EnhancedGroupStreamCard = (props) => {
     const [talentPool, setTalentPool] = useState([]);
 
     const [startDownloading, setStartDownloading] = useState(false);
-    const { hasDownloaded, questions, polls, icons, livestreamSpeakers } = useLivestreamMetadata(props.livestream, props.firebase, startDownloading);
+    const { hasDownloaded, questions, polls, icons, livestreamSpeakers, overallRating, contentRating } = useLivestreamMetadata(props.livestream, props.firebase, startDownloading);
 
 
     useEffect(() => {
@@ -217,6 +217,8 @@ const EnhancedGroupStreamCard = (props) => {
                                 livestream={props.livestream} 
                                 studentStats={studentStats} 
                                 speakers={livestreamSpeakers}
+                                overallRating={overallRating}
+                                contentRating={contentRating}
                                 totalStudentsInTalentPool={talentPool.length}
                                 totalViewerFromOutsideETH={participatingStudents.length - participatingStudentsFromGroup.length} 
                                 totalViewerFromETH={participatingStudentsFromGroup.length} questions={questions} polls={polls} icons={icons}/>} >
