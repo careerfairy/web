@@ -33,10 +33,7 @@ function TabPanel(props) {
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        backgroundColor: "rgb(250,250,250)",
-        height: "100%",
-        minHeight: "100vh",
-        width: "100%"
+       flex: 1
     },
     bar: {
         backgroundColor: "transparent",
@@ -58,7 +55,7 @@ const GroupNav = ({userData, user, groupId, group}) => {
     };
 
     return (
-        <Container>
+        <Container className={classes.root}>
             <AppBar className={classes.bar} position="static" color="default">
                 <Tabs
                     value={value}

@@ -174,19 +174,20 @@ const EnhancedGroupStreamCard = (props) => {
         });
     }
     
-    let categoryElements = localCategories.map( category => {
+    let categoryElements = localCategories.map( (category, index) => {
         return (
             <Chip
+                key={index}
                 size={"medium"}
                 variant={"outlined"}
                 onDelete={() => removeElement(category)}
-                label={getOptionName(category)} /> 
+                label={getOptionName(category)} />
         );
     });
 
     let menuItems = groupCategories.map( group => {
         return (
-            <MenuItem value={group.id}>{group?.name}</MenuItem>
+            <MenuItem key={group.id} value={group.id}>{group?.name}</MenuItem>
         );
     });
 
@@ -210,7 +211,7 @@ const EnhancedGroupStreamCard = (props) => {
                 <Fragment>
                     { !startDownloading || !hasDownloaded ? 
                         <div style={{ position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }}>
-                            <Button variant='outlined' primary onClick={() => setStartDownloading(true)} disabled={ startDownloading } loading={ startDownloading }>{ startDownloading ? 'Generating Report...' : 'Generate Report'}</Button>
+                            <Button startIcon={startDownloading && <CircularProgress size={20} color="inherit"/>} variant='outlined' onClick={() => setStartDownloading(true)} disabled={ startDownloading }>{ startDownloading ? 'Generating Report...' : 'Generate Report'}</Button>
                         </div> :
                         <PDFDownloadLink fileName="somename.pdf" style={{ position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }} document={ 
                             <LivestreamPdfReport group={props.group} 
@@ -235,7 +236,6 @@ const EnhancedGroupStreamCard = (props) => {
             <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle align="center">Update Target Groups</DialogTitle>
                 <DialogContent>
-                    <DialogContentText align="left">
                     <FormControl variant="outlined" fullWidth style={{ marginBottom: "10px"}}>
                         <InputLabel>Add a Target Group</InputLabel>
                         <Select
@@ -248,9 +248,6 @@ const EnhancedGroupStreamCard = (props) => {
                         </Select>
                     </FormControl>
                         { categoryElements }
-                    </DialogContentText>
-                    <Box>
-                    </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button

@@ -59,6 +59,8 @@ const JoinGroup = (props) => {
         }
 
         .greyBackground {
+          display: flex;
+          flex-direction: column;
           background-color: rgb(250, 250, 250);
           height: 100%;
           min-height: 100vh;
