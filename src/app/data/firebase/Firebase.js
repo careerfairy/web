@@ -280,10 +280,10 @@ class Firebase {
             })
 
             await batch.commit()
-            return {status: "OK", data: livestreamsRef.id}
+            return livestreamsRef.id
 
-        } catch (e) {
-            return {status: "ERROR", message: "Something went wrong"}
+        } catch (error) {
+            return error
         }
     }
 
@@ -307,14 +307,14 @@ class Firebase {
         return livestreamsRef.id
     }
 
-    updateLivestream = async (livestream, speakers) => {
+    updateLivestream = async (livestream, speakers, collection) => {
         try {
             let batch = this.firestore.batch();
             let livestreamsRef = this.firestore
-                .collection("livestreams")
+                .collection(collection)
                 .doc(livestream.id)
             let speakersRef = this.firestore
-                .collection("livestreams")
+                .collection(collection)
                 .doc(livestreamsRef.id)
                 .collection("speakers")
 
@@ -330,9 +330,9 @@ class Firebase {
                 batch.delete(docRef)
             })
             await batch.commit()
-            return {status: "OK", data: livestream.id}
-        } catch (e) {
-            return {status: "ERROR", message: "Something went wrong"}
+            return livestream.id
+        } catch (error) {
+            return error
         }
     }
 
@@ -1324,6 +1324,26 @@ class Firebase {
             .doc(livestreamId)
             .collection("icons")
             .orderBy("timestamp", "asc");
+        return ref.onSnapshot(callback);
+    };
+
+    listenToLivestreamOverallRatings = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc("overall")
+            .collection("voters");
+        return ref.onSnapshot(callback);
+    };
+
+    listenToLivestreamContentRatings = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc("company")
+            .collection("voters");
         return ref.onSnapshot(callback);
     };
 

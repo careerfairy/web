@@ -134,6 +134,7 @@ const NewLivestreamForm = ({firebase}) => {
                         hidden: livestream.hidden || false,
                         summary: livestream.summary || "",
                         speakers: {
+                            [mainSpeakerId]: speakerObj,
                         },
                     }
                     setFormData(newFormData)
@@ -374,27 +375,21 @@ const NewLivestreamForm = ({firebase}) => {
                         setSubmitting(true)
                         const livestream = buildLivestreamObject(values);
                         const speakers = buildSpeakersArray(values);
-                        let response = {}
+
+                        let id
                         if (updateMode) {
-                            response = await firebase.updateLivestream(livestream, speakers)
-                            if (response.status === "ERROR") {
-                                throw new Error()
-                            }
+                            id = livestream.id
+                            await firebase.updateLivestream(livestream, speakers, "livestreams")
                         } else {
-                            response = await firebase.addLivestream(livestream, speakers)
-                            if (response.status === "ERROR") {
-                                throw new Error()
-                            }
+                            id = await firebase.addLivestream(livestream, speakers)
                         }
-                        if (response.status === "OK") {
-                            const id = response.data
-                            console.log("-> Livestream was created or updated with id", id);
-                            if (values.hidden && values.groupIds.length) {
-                                return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)
-                            } else {
-                                return push(`/upcoming-livestream/${id}`)
-                            }
+
+                        if (values.hidden && values.groupIds.length) {
+                            return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)
+                        } else {
+                            return push(`/upcoming-livestream/${id}`)
                         }
+
                     } catch (e) {
                         setGeneralError("Something went wrong")
                     }
