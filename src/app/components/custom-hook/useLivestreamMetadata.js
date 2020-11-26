@@ -7,13 +7,24 @@ export function useLivestreamMetadata(livestream, firebase, userRequestedDownloa
     const [polls, setPolls] = useState(undefined);
     const [icons, setIcons] = useState(undefined);
     const [livestreamSpeakers, setLivestreamSpeakers] = useState(undefined);
+    const [overallRating, setOverallRating] = useState(undefined);
+    const [contentRating, setContentRating] = useState(undefined);
+    
     const [hasDownloaded, setHasDownloaded] = useState(false);
 
+    let average = (array) => array.reduce((a, b) => a + b) / array.length;
+
     useEffect(() => {
-        if (questions !== undefined && polls !== undefined && icons !== undefined && livestreamSpeakers !== undefined) {
+        if (questions !== undefined && 
+            polls !== undefined && 
+            icons !== undefined && 
+            livestreamSpeakers !== undefined &&
+            overallRating !== undefined &&
+            contentRating !== undefined
+            ) {
             setHasDownloaded(true);
         }  
-    }, [questions, polls, icons, livestreamSpeakers]);
+    }, [questions, polls, icons, livestreamSpeakers, overallRating, contentRating]);
 
     useEffect(() => {
         if (livestream && userRequestedDownload) {
@@ -71,5 +82,35 @@ export function useLivestreamMetadata(livestream, firebase, userRequestedDownloa
         }  
     }, [livestream, userRequestedDownload]);
   
-    return { hasDownloaded, questions, polls, icons, livestreamSpeakers };
+    useEffect(() => {
+        if (livestream && userRequestedDownload) {
+            firebase.listenToLivestreamOverallRatings(livestream.id, querySnapshot => {
+                let overallRatings = [];
+                querySnapshot.forEach(doc => {
+                    let cc = doc.data();
+                    cc.id = doc.id;
+                    overallRatings.push(cc.rating);
+                });
+                let value = overallRatings.length > 0 ? average(overallRatings).toFixed(2) : "N.A."
+                setOverallRating(value)
+            })
+        }  
+    }, [livestream, userRequestedDownload]);
+
+    useEffect(() => {
+        if (livestream && userRequestedDownload) {
+            firebase.listenToLivestreamContentRatings(livestream.id, querySnapshot => {
+                let contentRatings = [];
+                querySnapshot.forEach(doc => {
+                    let cc = doc.data();
+                    cc.id = doc.id;
+                    contentRatings.push(cc.rating);
+                });
+                let value = contentRatings.length > 0 ? average(contentRatings).toFixed(2) : "N.A."
+                setContentRating(value)
+            })
+        }  
+    }, [livestream, userRequestedDownload]);
+  
+    return { hasDownloaded, questions, polls, icons, livestreamSpeakers, overallRating, contentRating };
 }
