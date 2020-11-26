@@ -83,13 +83,6 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
             return;
         }
 
-        // const newChatEntryObject = {
-        //     message: newChatEntry,
-        //     authorName: isStreamer ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
-        //     authorEmail: isStreamer ? 'Streamer' : authenticatedUser.email,
-        //     votes: 0
-        // }
-
         const newChatEntryObject = {
             message: newChatEntry,
             authorName: isStreamer || livestream.test ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
