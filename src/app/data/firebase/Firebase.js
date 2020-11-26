@@ -754,7 +754,7 @@ class Firebase {
     }
 
     putChatEntry = (livestreamId, chatEntry) => {
-        chatEntry.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
+        chatEntry.timestamp = this.getServerTimestamp()
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
@@ -1377,6 +1377,10 @@ class Firebase {
 
     getStorageRef = () => {
         return this.storage.ref();
+    }
+
+    getServerTimestamp = () => {
+        return firebase.firestore.FieldValue.serverTimestamp()
     }
 
 }
