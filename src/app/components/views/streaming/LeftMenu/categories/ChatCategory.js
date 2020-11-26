@@ -10,6 +10,7 @@ import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
 import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
 import UserContext from 'context/user/UserContext';
+import CustomScrollToBottom from "../../../../util/CustomScrollToBottom";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -126,9 +127,7 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
 
     return (
         <div className="chat-container">
-            <ScrollToBottom className={classes.scrollToBottom}>
-                {chatElements}
-            </ScrollToBottom>
+            <CustomScrollToBottom className={classes.scrollToBottom} scrollItems={chatElements}/>
             <div className='questionToggle'>
                 <div className='questionToggleTitle'>
                     <ForumOutlinedIcon color="primary" fontSize="small"/>

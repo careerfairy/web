@@ -2,7 +2,6 @@ import React, {useState, useEffect, useContext} from 'react';
 import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
 import {withFirebase} from 'context/firebase';
 import ChevronRightRoundedIcon from '@material-ui/icons/ChevronRightRounded';
-import ScrollToBottom from 'react-scroll-to-bottom';
 import ChatEntryContainer from './chat-entry-container/ChatEntryContainer';
 import UserContext from 'context/user/UserContext';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
@@ -20,6 +19,7 @@ import {
     TooltipTitle,
     WhiteTooltip
 } from "../../../../../../materialUI/GlobalTooltips";
+import CustomScrollToBottom from "../../../../../util/CustomScrollToBottom";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -68,8 +68,8 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: "rgb(245,245,245)"
     },
     scrollToBottom: {
-        display: "flex",
-        flexDirection: "column",
+        // display: "flex",
+        // flexDirection: "column",
         height: "240px",
         "& div": {
             overflowX: "hidden",
@@ -223,9 +223,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
                     </Typography>
                 </AccordionSummary>
                 <AccordionDetails className={classes.chatRoom}>
-                    <ScrollToBottom className={classes.scrollToBottom}>
-                        {chatElements}
-                    </ScrollToBottom>
+                    <CustomScrollToBottom className={classes.scrollToBottom} scrollItems={chatElements}/>
                     <WhiteTooltip
                         placement="right-start"
                         title={
