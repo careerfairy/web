@@ -60,6 +60,7 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
 
     const [newChatEntry, setNewChatEntry] = useState('');
     const [chatEntries, setChatEntries] = useState([]);
+    const [submitting, setSubmitting] = useState(false);
 
     const isEmpty = (!(newChatEntry.trim()) || (!userData && !livestream.test && !isStreamer))
     const classes = useStyles({isEmpty})
@@ -80,9 +81,10 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
     }, [livestream.id]);
 
     function addNewChatEntry() {
-        if (!(newChatEntry.trim())) {
+        if (!(newChatEntry.trim()) || submitting) {
             return;
         }
+        setSubmitting(true)
 
         const newChatEntryObject = {
             message: newChatEntry,
@@ -93,8 +95,10 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
 
         firebase.putChatEntry(livestream.id, newChatEntryObject)
             .then(() => {
+                setSubmitting(false)
                 setNewChatEntry('');
             }, error => {
+                setSubmitting(false)
                 console.log("Error: " + error);
             });
     }

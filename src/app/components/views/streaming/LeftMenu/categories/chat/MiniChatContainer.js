@@ -83,6 +83,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
 
     const [chatEntries, setChatEntries] = useState([]);
     const [focused, setFocused] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     const [numberOfMissedEntries, setNumberOfMissedEntries] = useState(0);
     const [numberOfLatestChanges, setNumberOfLatestChanges] = useState(0);
@@ -145,9 +146,10 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
 
 
     function addNewChatEntry() {
-        if (isEmpty) {
+        if (isEmpty || submitting) {
             return;
         }
+        setSubmitting(true)
 
         const newChatEntryObject = {
             message: newChatEntry,
@@ -159,8 +161,10 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
         isOpen(15) && handleConfirmStep(15)
         firebase.putChatEntry(livestream.id, newChatEntryObject)
             .then(() => {
+                setSubmitting(false)
                 setNewChatEntry('');
             }, error => {
+                setSubmitting(false)
                 console.log("Error: " + error);
             });
     }
@@ -177,7 +181,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
 
     let chatElements = chatEntries.map((chatEntry, index) => {
         return (
-                <ChatEntryContainer key={chatEntry?.id} chatEntry={chatEntry}/>
+            <ChatEntryContainer key={chatEntry?.id} chatEntry={chatEntry}/>
         );
     });
 
