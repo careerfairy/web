@@ -49,9 +49,14 @@ export const uploadLogo = (location, fileObject, firebase, callback) => {
 }
 
 
-export const getTimeFromNow = (firebaseTimestamp) => {
+export function getTimeFromNow(firebaseTimestamp) {
     if (firebaseTimestamp) {
-        return dayjs(firebaseTimestamp.toDate()).fromNow()
+        const dateString = dayjs(firebaseTimestamp.toDate()).fromNow()
+        if (dateString === 'in a few seconds') {
+            return 'just now';
+        } else {
+            return dateString
+        }
     } else {
         return ""
     }

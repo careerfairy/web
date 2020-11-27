@@ -21,11 +21,19 @@ import Step4Mic from "./Step4Mic";
 import Step5Confirm from "./Step5Confirm";
 import {makeStyles} from "@material-ui/core/styles";
 import window from 'global';
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const useStyles = makeStyles(theme => ({
     root: {
         display: "flex",
-        flexDirection: "column"
+        flexDirection: "column",
+        overflowY: "hidden"
+    },
+    loaderWrapper: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: 100
     },
     stepper: {
         paddingLeft: 0,
@@ -42,25 +50,25 @@ function getSteps() {
 
 
 const StreamPreparationModalV2 = ({
-                                    readyToConnect,
-                                    streamerReady,
-                                    setStreamerReady,
-                                    localStream,
-                                    connectionEstablished,
-                                    setConnectionEstablished,
-                                    isStreaming,
-                                    audioSource,
-                                    updateAudioSource,
-                                    videoSource,
-                                    updateVideoSource,
-                                    setSpeakerSource,
-                                    speakerSource,
-                                    devices,
-                                    audioLevel,
-                                    attachSinkId,
-                                    isTest,
-                                    viewer,
-                                    handleOpenDemoIntroModal
+                                      readyToConnect,
+                                      streamerReady,
+                                      setStreamerReady,
+                                      localStream,
+                                      connectionEstablished,
+                                      setConnectionEstablished,
+                                      isStreaming,
+                                      audioSource,
+                                      updateAudioSource,
+                                      videoSource,
+                                      updateVideoSource,
+                                      setSpeakerSource,
+                                      speakerSource,
+                                      devices,
+                                      audioLevel,
+                                      attachSinkId,
+                                      isTest,
+                                      viewer,
+                                      handleOpenDemoIntroModal
                                   }) => {
     const classes = useStyles()
     const theme = useTheme()
@@ -193,16 +201,20 @@ const StreamPreparationModalV2 = ({
     }
 
     const hasDevicesInLocalStorage = () => {
-        return localStorage.getItem('selectedAudioInput') && 
-        localStorage.getItem('selectedVideoInput') &&
-        localStorage.getItem('selectedAudioOutput');
+        return localStorage.getItem('selectedAudioInput') &&
+            localStorage.getItem('selectedVideoInput') &&
+            localStorage.getItem('selectedAudioOutput');
+    }
+
+    const shouldDisplayButton = () => {
+        return Boolean(hasDevicesInLocalStorage() && activeStep !== 4 && localStream)
     }
 
     function getStepContent(stepIndex) {
         switch (stepIndex) {
             case 0:
                 return <Step1Chrome handleMarkComplete={handleMarkComplete}
-                                    isChromium={isChromium}                                    
+                                    isChromium={isChromium}
                                     localStream={localStream}
                                     isCompleted={isCompleted()}/>;
             case 1:
@@ -261,8 +273,8 @@ const StreamPreparationModalV2 = ({
             <DialogTitle disableTypography hidden={streamerReady && connectionEstablished}>
                 <h3 style={{color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3>
             </DialogTitle>
-            <DialogContent className={classes.root}>
-                { isChromium && 
+             <DialogContent className={classes.root}>
+                {isChromium &&
                 <Stepper className={classes.stepper} activeStep={activeStep} alternativeLabel>
                     {steps.map((label, index) => {
                         const stepProps = {};
@@ -284,7 +296,7 @@ const StreamPreparationModalV2 = ({
                     })}
                 </Stepper>}
                 {getStepContent(activeStep)}
-                { isChromium && 
+                {isChromium &&
                 <DialogActions>
                     <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
                         Back
@@ -306,8 +318,7 @@ const StreamPreparationModalV2 = ({
                             Skip
                         </Button>
                     )}
-                    {
-                        hasDevicesInLocalStorage() && activeStep !== 4 && 
+                    {shouldDisplayButton() ? (readyToConnect ?
                         <Button
                             variant="contained"
                             color="primary"
@@ -317,6 +328,8 @@ const StreamPreparationModalV2 = ({
                         >
                             Connect Directly
                         </Button>
+                        :
+                        <CircularProgress size={20} color="primary"/>) : null
                     }
                     {completedSteps() === totalSteps() - 1 && activeStep === 4 &&
                     <Button variant="contained" color="primary" onClick={handleFinalize}>
@@ -325,10 +338,18 @@ const StreamPreparationModalV2 = ({
                 </DialogActions>}
                 <p style={{fontSize: '0.8em', color: 'grey'}}>If anything is unclear or not working, please <a
                     href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
-                
             </DialogContent>
         </Dialog>
-    );
+    )
+}
+
+const Spinner = () => {
+    const classes = useStyles()
+    return (
+        <DialogContent className={classes.loaderWrapper}>
+            <CircularProgress color={"primary"} size={50}/>
+        </DialogContent>
+    )
 }
 
 export default withFirebase(StreamPreparationModalV2);
