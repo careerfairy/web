@@ -3,8 +3,8 @@ import React, {useEffect} from "react";
 
 const ScrollElements = ({scrollItems}) => {
     const scrollToBottom = useScrollToBottom();
-    const [sticky] = useSticky();
-    useEffect(() => {
+    const [sticky] = useSticky(); //  In order for use sticky hook to work,
+    useEffect(() => {//  the component must be the child of a scroll to bottom
         if(sticky){
             scrollToBottom()
         }
