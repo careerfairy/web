@@ -1,42 +1,38 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, useCallback} from "react";
 
 
 const useInfiniteScroll = (query, options) => {
     const {limit} = options
     const [hasMore, setHasMore] = useState(false)
     const [items, setItems] = useState([])
-    const [localQuery, setLocalQuery] = useState(null)
-    const [lastVisible, setLastVisible] = useState(null)
+    const [localLimit, setLocalLimit] = useState(limit)
 
     useEffect(() => {
-        setLocalQuery(query.limit(limit))
-    }, [])
+        IDefineMyListener()
+        return () => IDefineMyListener()
+    }, [localLimit])
 
-    useEffect(() => {
-        if (localQuery) {
-            const unsubscribe = localQuery.onSnapshot(querySnapshot => {
-                const lastTempVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
-                if (lastTempVisible) {
-                    setHasMore(true)
-                    setLastVisible(lastTempVisible)
-                } else {
-                    setHasMore(false)
-                }
-                const tempItems = []
-                querySnapshot.forEach(doc => {
-                    const data = doc.data()
-                    data.id = doc.id
-                    tempItems.push(data)
-                })
-                setItems(tempItems)
+    const IDefineMyListener = useCallback(event => {
+        return query.limit(localLimit).onSnapshot(querySnapshot => {
+            const lastTempVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+            if (lastTempVisible) {
+                setHasMore(true)
+            } else {
+                setHasMore(false)
+            }
+            const tempItems = []
+            querySnapshot.forEach(doc => {
+                const data = doc.data()
+                data.id = doc.id
+                tempItems.push(data)
             })
+            setItems(tempItems)
+        })
 
-            return () => unsubscribe()
-        }
-    }, [localQuery])
+    }, [localLimit]);
 
     const getMore = () => {
-        setLocalQuery(query.startAfter(lastVisible).limit(limit))
+        setLocalLimit(prevLimit => prevLimit + limit)
     }
 
     return [items, getMore, hasMore]

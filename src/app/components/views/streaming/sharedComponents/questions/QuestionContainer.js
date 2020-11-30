@@ -85,6 +85,7 @@ const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
 }
 
 const QuestionContainer = memo( ({sliding, user, livestream, streamer, question, questions, firebase, index, isNextQuestions, selectedState, showMenu}) => {
+
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
@@ -156,6 +157,9 @@ const QuestionContainer = memo( ({sliding, user, livestream, streamer, question,
 
     function goToThisQuestion(nextQuestionId) {
         const currentQuestion = questions.find(question => question.type === 'current');
+        console.log("-> questions", questions);
+        console.log("-> question.id", question.id);
+        console.log("-> currentQuestion?.id", currentQuestion?.id);
         if (currentQuestion) {
             firebase.goToNextLivestreamQuestion(currentQuestion.id, nextQuestionId, livestream.id);
         } else {

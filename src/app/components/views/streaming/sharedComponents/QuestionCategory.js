@@ -24,6 +24,7 @@ import usePagination from "firestore-pagination-hook";
 import {usePagination as usePaginate} from "use-pagination-firestore";
 
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
+import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
 
 const useStyles = makeStyles(theme => ({
     view: {
@@ -93,17 +94,12 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
         loadMore: loadMoreUpcoming
     } = usePagination(firebase.listenToUpcomingLivestreamQuestions(livestream.id), {limit: 10});
 
-    const {
-        items,
-        isLoading,
-        isStart,
-        isEnd,
-        getPrev,
-        getNext,
-    } = usePaginate(
+
+    const [items, getMore, hasMore] = useInfiniteScroll(
         firebase.listenToUpcomingLivestreamQuestions(livestream.id), {limit: 10}
     );
-    console.log("-> items", items);
+    // console.log("-> hasMore", hasMore);
+    // console.log("-> items", items);
 
     const {
         loading: loadingPast,
@@ -188,13 +184,14 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     }
 
     let upcomingQuestionsElements = items.map((question, index) => {
-        return <QuestionContainer key={question.timestamp.nanoseconds} showNextQuestions={showNextQuestions} streamer={streamer}
+        return <QuestionContainer key={question.id} showNextQuestions={showNextQuestions}
+                                  streamer={streamer}
                                   isNextQuestions={showNextQuestions}
                                   livestream={livestream}
                                   index={index} sliding={sliding}
                                   showMenu={showMenu}
                                   selectedState={selectedState}
-                                  questions={upcomingQuestions} question={question} user={authenticatedUser}
+                                  questions={items} question={question} user={authenticatedUser}
                                   userData={userData}/>
 
     });
@@ -228,7 +225,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                              marginRight: "0.5rem",
                              color: showNextQuestions ? "white" : "black"
                          }}>
-                        <Box fontSize={10}>Upcoming [{upcomingQuestionsElements.length}{hasMoreUpcoming && "+"}]</Box>
+                        <Box fontSize={10}>Upcoming [{upcomingQuestionsElements.length}{hasMore && "+"}]</Box>
                     </Fab>
                     <Fab size="small" variant="extended" onClick={handleClickPast} value="center"
                          style={{
@@ -249,22 +246,22 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value} onChangeIndex={handleChange}>
                 <TabPanel>
-                <CustomInfiniteScroll
-                    height={parentHeight}
-                    hasMore={!isEnd}
-                    next={getNext}
-                    dataLength={upcomingQuestionsElements.length}>
-                    {upcomingQuestionsElements}
-                </CustomInfiniteScroll>
+                    <CustomInfiniteScroll
+                        height={parentHeight}
+                        hasMore={hasMore}
+                        next={getMore}
+                        dataLength={upcomingQuestionsElements.length}>
+                        {upcomingQuestionsElements}
+                    </CustomInfiniteScroll>
                 </TabPanel>
                 <TabPanel>
-                <CustomInfiniteScroll
-                    hasMore={hasMorePast}
-                    height={parentHeight}
-                    next={loadMorePast}
-                    dataLength={pastQuestionsElements.length}>
-                    {pastQuestionsElements}
-                </CustomInfiniteScroll>
+                    <CustomInfiniteScroll
+                        hasMore={hasMorePast}
+                        height={parentHeight}
+                        next={loadMorePast}
+                        dataLength={pastQuestionsElements.length}>
+                        {pastQuestionsElements}
+                    </CustomInfiniteScroll>
                 </TabPanel>
             </SwipeableViews>
             <Dialog PaperProps={{style: {background: "transparent", boxShadow: "none"}}} fullWidth onClose={handleClose}
