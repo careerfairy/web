@@ -21,6 +21,8 @@ import SwipeableViews from "react-swipeable-views";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import {makeStyles} from "@material-ui/core/styles";
 import usePagination from "firestore-pagination-hook";
+import {usePagination as usePaginate} from "use-pagination-firestore";
+
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
 
 const useStyles = makeStyles(theme => ({
@@ -92,6 +94,18 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     } = usePagination(firebase.listenToUpcomingLivestreamQuestions(livestream.id), {limit: 10});
 
     const {
+        items,
+        isLoading,
+        isStart,
+        isEnd,
+        getPrev,
+        getNext,
+    } = usePaginate(
+        firebase.listenToUpcomingLivestreamQuestions(livestream.id), {limit: 10}
+    );
+    console.log("-> items", items);
+
+    const {
         loading: loadingPast,
         loadingError: loadingErrorPast,
         loadingMore: loadingMorePast,
@@ -100,6 +114,18 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
         items: itemsPast,
         loadMore: loadMorePast
     } = usePagination(firebase.listenToPastLivestreamQuestions(livestream.id), {limit: 10});
+
+    // useEffect(() => {
+    //     if (items) {
+    //         let newUpcomingQuestions = [];
+    //         items.forEach(doc => {
+    //             let question = doc.data();
+    //             question.id = doc.id;
+    //             newUpcomingQuestions.push(question);
+    //         });
+    //         setUpcomingQuestions(newUpcomingQuestions);
+    //     }
+    // }, [items])
 
     useEffect(() => {
         if (itemsPast) {
@@ -113,18 +139,18 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
         }
     }, [itemsPast])
 
-    useEffect(() => {
-        if (itemsUpcoming) {
-            let newUpcomingQuestions = [];
-            itemsUpcoming.forEach(doc => {
-                let question = doc.data();
-                question.id = doc.id;
-                newUpcomingQuestions.push(question);
-            });
-            const sortedUpcoming = sortUpcoming(newUpcomingQuestions)
-            setUpcomingQuestions(sortedUpcoming);
-        }
-    }, [itemsUpcoming])
+    // useEffect(() => {
+    //     if (itemsUpcoming) {
+    //         let newUpcomingQuestions = [];
+    //         itemsUpcoming.forEach(doc => {
+    //             let question = doc.data();
+    //             question.id = doc.id;
+    //             newUpcomingQuestions.push(question);
+    //         });
+    //         const sortedUpcoming = sortUpcoming(newUpcomingQuestions)
+    //         setUpcomingQuestions(sortedUpcoming);
+    //     }
+    // }, [itemsUpcoming])
 
 
     const sortUpcoming = (array) => {
@@ -161,8 +187,8 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
             })
     }
 
-    let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
-        return <QuestionContainer key={question.id} showNextQuestions={showNextQuestions} streamer={streamer}
+    let upcomingQuestionsElements = items.map((question, index) => {
+        return <QuestionContainer key={question.timestamp.nanoseconds} showNextQuestions={showNextQuestions} streamer={streamer}
                                   isNextQuestions={showNextQuestions}
                                   livestream={livestream}
                                   index={index} sliding={sliding}
@@ -225,8 +251,8 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                 <TabPanel>
                 <CustomInfiniteScroll
                     height={parentHeight}
-                    hasMore={hasMoreUpcoming}
-                    next={loadMoreUpcoming}
+                    hasMore={!isEnd}
+                    next={getNext}
                     dataLength={upcomingQuestionsElements.length}>
                     {upcomingQuestionsElements}
                 </CustomInfiniteScroll>
