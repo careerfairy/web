@@ -1,6 +1,5 @@
-import { isEmpty } from 'lodash/fp'
+import {isEmpty} from 'lodash/fp'
 
-export const uploadLogo = (location, fileObject, firebase, callback ) => {
 var dayjs = require('dayjs');
 var relativeTime = require('dayjs/plugin/relativeTime')
 dayjs.extend(relativeTime)

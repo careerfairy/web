@@ -163,7 +163,7 @@ const EnhancedGroupStreamCard = (props) => {
                 <Fragment>
                     { !startDownloadingReport || !hasDownloadedReport ?
                         <div style={{ position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }}>
-                            <Button startIcon={startDownloading && <CircularProgress size={20} color="inherit"/>} variant='outlined' onClick={() => setStartDownloadingReport(true)} disabled={ startDownloadingReport}>{ startDownloadingReport ? 'Generating Report...' : 'Generate Report'}</Button>
+                            <Button startIcon={startDownloadingReport && <CircularProgress size={20} color="inherit"/>} variant='outlined' onClick={() => setStartDownloadingReport(true)} disabled={ startDownloadingReport}>{ startDownloadingReport ? 'Generating Report...' : 'Generate Report'}</Button>
                         </div> :
                         <PDFDownloadLink fileName="somename.pdf" style={{ position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }} document={ 
                             <LivestreamPdfReport group={props.group} 
