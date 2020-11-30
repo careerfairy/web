@@ -1,4 +1,4 @@
-import isEmpty from 'lodash/isempty';
+import { isEmpty } from 'lodash/fp'
 
 export const uploadLogo = (location, fileObject, firebase, callback ) => {
     var storageRef = firebase.getStorageRef();
@@ -47,5 +47,5 @@ export const uploadLogo = (location, fileObject, firebase, callback ) => {
 }
 
 export const isEmptyObject = (obj) => {
-    return isEmpty(obj); 
+    return isEmpty(obj);
 }
