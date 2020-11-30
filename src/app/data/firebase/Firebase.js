@@ -617,12 +617,13 @@ class Firebase {
     }
 
     listenToPastLiveStreamsByGroupId = (groupId, callback) => {
+        let START_DATE_FOR_REPORTED_EVENTS = 'September 1, 2020 00:00:00';
         var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
         let ref = this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
             .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
-            .where("start", ">", new Date(2020, 9, 1, 0, 0, 0))
+            .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
             .orderBy("start", "desc")
         return ref.onSnapshot(callback)
     }
