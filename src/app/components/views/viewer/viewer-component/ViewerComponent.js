@@ -50,13 +50,13 @@ function ViewerComponent(props) {
                                          streams={externalMediaStreams} localId={props.streamerId}
                                          currentSpeaker={props.currentLivestream.currentSpeakerId}
                                          removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
-                                         muted={!props.currentLivestream.hasStarted} {...props}/>
+                                         muted={false} {...props}/>
             </div>
             <div style={{display: (props.currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
                 <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams}
                                              livestreamId={props.currentLivestream.id} presenter={false}/>
             </div>
-            <div className={props.currentLivestream.hasStarted ? 'hidden' : ''} style={{
+            {/* <div className={props.currentLivestream.hasStarted ? 'hidden' : ''} style={{
                 position: 'absolute',
                 top: '0',
                 left: '0',
@@ -77,7 +77,7 @@ function ViewerComponent(props) {
                 }}>
                     {props.currentLivestream.test ? 'The streamer has to press Start Streaming to be visible to students' : 'Thank you for joining!'}
                 </div>
-            </div>
+            </div> */}
             <style jsx>{`
                 .hidden {
                     display: none

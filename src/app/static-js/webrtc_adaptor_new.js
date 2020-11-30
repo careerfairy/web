@@ -622,8 +622,8 @@ export class WebRTCAdaptor
 		if (typeof deviceId != "undefined" ) {
 			this.mediaConstraints.video = {
                 deviceId: deviceId,
-                width: { max: 1920},
-				height: { max: 1080},
+                width: { max: 1920 },
+				height: { max: 1080 },
                 aspectRatio: 1.77
             };
 		}

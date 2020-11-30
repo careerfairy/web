@@ -9,6 +9,7 @@ import StatsUtil from 'data/util/StatsUtil';
 import { PDFDownloadLink, Document, Page, View, Text } from '@react-pdf/renderer';
 import LivestreamPdfReport from './LivestreamPdfReport';
 import { useLivestreamMetadata } from 'components/custom-hook/useLivestreamMetadata';
+import { useTalentPoolMetadata } from 'components/custom-hook/useTalentPoolMetadata';
 
 const EnhancedGroupStreamCard = (props) => {
 
@@ -19,15 +20,12 @@ const EnhancedGroupStreamCard = (props) => {
 
     const [registeredStudents, setRegisteredStudents] = useState([]);
     const [registeredStudentsFromGroup, setRegisteredStudentsFromGroup] = useState([]);
-    const [participatingStudents, setParticipatingStudents] = useState([]);
-    const [participatingStudentsFromGroup, setParticipatingStudentsFromGroup] = useState([]);
 
-    const [studentStats, setStudentStats] = useState(null);
-    const [talentPool, setTalentPool] = useState([]);
+    const [startDownloadingReport, setStartDownloadingReport] = useState(false);
+    const { hasDownloadedReport, questions, polls, icons, livestreamSpeakers, overallRating, contentRating, talentPoolForReport, participatingStudents, participatingStudentsFromGroup, studentStats } = useLivestreamMetadata(props.livestream, props.group, props.firebase, startDownloadingReport);
 
-    const [startDownloading, setStartDownloading] = useState(false);
-    const { hasDownloaded, questions, polls, icons, livestreamSpeakers, overallRating, contentRating } = useLivestreamMetadata(props.livestream, props.firebase, startDownloading);
-
+    const [startDownloadingTalentPool, setStartDownloadingTalentPool] = useState(false);
+    const { hasDownloadedTalentPool, talentPool} = useTalentPoolMetadata(props.livestream, allGroups, props.group, props.firebase, registeredStudentsFromGroup, startDownloadingTalentPool);
 
     useEffect(() => {
         if (props.livestream && props.livestream.targetCategories && props.livestream.targetCategories[props.group.id] && modalOpen) {
@@ -71,20 +69,6 @@ const EnhancedGroupStreamCard = (props) => {
     }, [props.livestream]);
 
     useEffect(() => {
-        if (props.livestream && props.group) {
-            props.firebase.getLivestreamParticipatingStudents(props.livestream.id).then(querySnapshot => {
-                let participatingStudents = [];
-                querySnapshot.forEach(doc => {
-                    let student = doc.data();
-                    student.id = doc.id;
-                    participatingStudents.push(student);
-                });
-                setParticipatingStudents(participatingStudents);
-            })
-        }      
-    }, [props.livestream]);
-
-    useEffect(() => {
         if (registeredStudents && registeredStudents.length) {
             let studentsOfGroup = [];
             registeredStudents.forEach( registeredStudent => {
@@ -96,46 +80,6 @@ const EnhancedGroupStreamCard = (props) => {
             setRegisteredStudentsFromGroup(studentsOfGroup);
         }      
     }, [registeredStudents]);
-
-    useEffect(() => {
-        if (participatingStudents && participatingStudents.length) {
-            let studentsOfGroup = [];
-            participatingStudents.forEach( student => {
-                if (studentBelongsToGroup(student)) {
-                    let publishedStudent = StatsUtil.getStudentInGroupDataObject(student, props.group);
-                    studentsOfGroup.push(publishedStudent);
-                }
-            });
-            setParticipatingStudentsFromGroup(studentsOfGroup);
-        }      
-    }, [participatingStudents]);
-
-    useEffect(() => {
-        if (participatingStudents && participatingStudents.length) {
-            let listOfStudents = participatingStudents.filter( student => studentBelongsToGroup(student));
-            let stats = StatsUtil.getRegisteredStudentsStats(listOfStudents, props.group);
-            setStudentStats(stats);
-        }      
-    }, [participatingStudents]);
-
-    useEffect(() => {
-        if (props.livestream && allGroups.length && registeredStudentsFromGroup) {
-            props.firebase.getLivestreamTalentPoolMembers(props.livestream.companyId).then(querySnapshot => {
-                let registeredStudents = [];
-                querySnapshot.forEach(doc => {
-                    let element = doc.data();
-                    if (registeredStudentsFromGroup.some( student => student.id === doc.id)) {
-                        let publishedStudent = StatsUtil.getStudentInGroupDataObject(element, props.group);
-                        registeredStudents.push(publishedStudent);
-                    } else {
-                        let publishedStudent = StatsUtil.getStudentOutsideGroupDataObject(element, props.group, allGroups);
-                        registeredStudents.push(publishedStudent);
-                    }    
-                });
-                setTalentPool(registeredStudents);
-            })
-        }      
-    }, [props.livestream, allGroups, registeredStudentsFromGroup]);
 
     function studentBelongsToGroup(student) {
         if (props.group.universityCode) {
@@ -179,6 +123,7 @@ const EnhancedGroupStreamCard = (props) => {
             <Chip
                 size={"medium"}
                 variant={"outlined"}
+                key={category.id}
                 onDelete={() => removeElement(category)}
                 label={getOptionName(category)} /> 
         );
@@ -186,7 +131,7 @@ const EnhancedGroupStreamCard = (props) => {
 
     let menuItems = groupCategories.map( group => {
         return (
-            <MenuItem value={group.id}>{group?.name}</MenuItem>
+            <MenuItem value={group.id} key={group.id}>{group?.name}</MenuItem>
         );
     });
 
@@ -201,16 +146,24 @@ const EnhancedGroupStreamCard = (props) => {
                     Registered Students
                 </Button>
             </CSVLink>
-            <CSVLink data={talentPool} filename={'TalentPool ' + props.livestream.company + ' ' + props.livestream.id + '.csv'} style={{ color: 'red' }}>
-            <Button startIcon={<GetAppIcon />} variant='outlined' style={{ position: 'absolute', top: '290px', right: '10px', zIndex: '2000' }}>
-                    Talent Pool
-                </Button>
-            </CSVLink>{
+            <Fragment>
+                { !startDownloadingTalentPool || !hasDownloadedTalentPool ? 
+                    <div style={{ position: 'absolute', top: '290px', right: '10px', zIndex: '2000' }}>
+                        <Button variant='outlined' primary="true" onClick={() => setStartDownloadingTalentPool(true)} disabled={ startDownloadingTalentPool} loading={ startDownloadingTalentPool ? "true" : "false" }>{ startDownloadingTalentPool ? 'Generating Talent Pool...' : 'Generate Talent Pool'}</Button>
+                    </div> :
+                    <CSVLink data={talentPool} filename={'TalentPool ' + props.livestream.company + ' ' + props.livestream.id + '.csv'} style={{ color: 'red' }}>
+                            <Button startIcon={<GetAppIcon />} variant='outlined' style={{ position: 'absolute', top: '290px', right: '10px', zIndex: '2000' }}>
+                                Talent Pool
+                            </Button>
+                    </CSVLink>             
+                }
+            </Fragment>           
+            {
                 props.isPastLivestream &&
                 <Fragment>
-                    { !startDownloading || !hasDownloaded ? 
+                    { !startDownloadingReport || !hasDownloadedReport ? 
                         <div style={{ position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }}>
-                            <Button variant='outlined' primary onClick={() => setStartDownloading(true)} disabled={ startDownloading } loading={ startDownloading }>{ startDownloading ? 'Generating Report...' : 'Generate Report'}</Button>
+                            <Button variant='outlined' primary="true" onClick={() => setStartDownloadingReport(true)} disabled={ startDownloadingReport} loading={ startDownloadingReport ? "true" : "false" }>{ startDownloadingReport ? 'Generating Report...' : 'Generate Report'}</Button>
                         </div> :
                         <PDFDownloadLink fileName="somename.pdf" style={{ position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }} document={ 
                             <LivestreamPdfReport group={props.group} 
@@ -219,7 +172,7 @@ const EnhancedGroupStreamCard = (props) => {
                                 speakers={livestreamSpeakers}
                                 overallRating={overallRating}
                                 contentRating={contentRating}
-                                totalStudentsInTalentPool={talentPool.length}
+                                totalStudentsInTalentPool={talentPoolForReport.length}
                                 totalViewerFromOutsideETH={participatingStudents.length - participatingStudentsFromGroup.length} 
                                 totalViewerFromETH={participatingStudentsFromGroup.length} questions={questions} polls={polls} icons={icons}/>} >
                             {({ blob, url, loading, error }) => (

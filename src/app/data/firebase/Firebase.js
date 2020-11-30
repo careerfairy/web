@@ -62,7 +62,7 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    setUserData = (userEmail, firstName, lastName, universityCode, universityCountryCode) => {
+    setUserData = (userEmail, firstName, lastName, universityCode, universityName, universityCountryCode) => {
         let ref = this.firestore.collection("userData").doc(userEmail);
         return ref.update({
             id: userEmail,
@@ -70,6 +70,7 @@ class Firebase {
             firstName,
             lastName,
             universityCode,
+            universityName, 
             universityCountryCode
         });
     };
@@ -1346,6 +1347,13 @@ class Firebase {
             .collection("voters");
         return ref.onSnapshot(callback);
     };
+
+    getUniversitiesByCountry = (countryCode) => {
+        let ref = this.firestore
+            .collection("universitiesByCountry")
+            .doc(countryCode)
+        return ref.get();
+    }
 
     getStorageRef = () => {
         return this.storage.ref();
