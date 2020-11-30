@@ -36,7 +36,7 @@ const Events = (props) => {
         hasMore: hasMorePast,
         items: itemsPast,
         loadMore: loadMorePast
-    } = usePagination(props.firebase.queryPastLiveStreamsByGroupId(props.group.id), {limit: 5});
+    } = usePagination(props.firebase.queryPastLiveStreamsByGroupId(props.group.id), {limit: 4});
 
     const {
         loading: loadingUpcoming,
@@ -46,7 +46,7 @@ const Events = (props) => {
         hasMore: hasMoreUpcoming,
         items: itemsUpcoming,
         loadMore: loadMoreUpcoming
-    } = usePagination(props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id), {limit: 5});
+    } = usePagination(props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id), {limit: 4});
 
     useEffect(() => {
         if (itemsPast?.length) {
@@ -122,7 +122,7 @@ const Events = (props) => {
 
     let livestreamElements = livestreams.map((livestream, index) => {
         return (
-            <Grid key={livestream.id} md={12} lg={12} item>
+            <Grid key={livestream.id} xs={12} sm={12} md={12} lg={12} item>
                 <div style={{position: "relative"}}>
                     <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid}
                                              group={props.group} isPastLivestream={false}/>
@@ -133,7 +133,7 @@ const Events = (props) => {
 
     let pastLivestreamElements = pastLivestreams.map((livestream, index) => {
         return (
-            <Grid key={livestream.id} md={12} lg={12} item>
+            <Grid key={livestream.id} xs={12} sm={12} md={12} lg={12} item>
                 <div style={{position: "relative"}}>
                     <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid}
                                              group={props.group} isPastLivestream={true}/>
