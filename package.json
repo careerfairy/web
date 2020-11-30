@@ -7,6 +7,7 @@
   "main": "dist/functions/index.js",
   "scripts": {
     "setup": "npm run firebase use --add",
+    "deploy:next3": "npm run firebase deploy --only functions:next3",
     "build:app": "next build src/app",
     "build:functions": "babel src/functions --out-dir dist/functions --source-maps && npm run copy-routes && npm run copy-emails && npm run copy-keys",
     "build": "npm run rm-prior-build && npm install && npm run build:app && npm run build:functions",
