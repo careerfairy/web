@@ -88,7 +88,7 @@ const Step1Chrome = ({isCompleted, handleMarkComplete, isChromium, localStream})
             />
             {!localStream &&
             <Fade
-                delay={4000}
+                delay={5000}
                 enter={!localStream}
                 collapse
                 bottom
