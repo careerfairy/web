@@ -157,9 +157,6 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
 
     function goToThisQuestion(nextQuestionId) {
         const currentQuestion = questions.find(question => question.type === 'current');
-        console.log("-> questions", questions);
-        console.log("-> question.id", question.id);
-        console.log("-> currentQuestion?.id", currentQuestion?.id);
         if (currentQuestion) {
             firebase.goToNextLivestreamQuestion(currentQuestion.id, nextQuestionId, livestream.id);
         } else {
