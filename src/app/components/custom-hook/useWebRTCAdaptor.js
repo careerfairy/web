@@ -74,7 +74,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
     useEffect(() => {
         if (client && agoraRTC && streamerReady && roomId && streamId) {
             if (!isPlayMode) {
-                client.join("00652e732c40bf94a8c97fdd0fd443210e0IAB32c0oM1buitu7YCOCRpaVxWR9JMlkPy902bCi4i43QAZa8+gAAAAAEADGU1aHtiy9XwEAAQC2LL1f", "testing", null, (uid)=>{
+                client.join("00652e732c40bf94a8c97fdd0fd443210e0IAAzF72jDbCah4+JHJw2Qe9zoweX8cd/O22IHTveflp2HZpjTicAAAAAEAAWal0mIxfGXwEAAQAiF8Zf", "Testing", null, (uid)=>{
                     let localStream = agoraRTC.createStream({
                         audio: true,
                         video: true

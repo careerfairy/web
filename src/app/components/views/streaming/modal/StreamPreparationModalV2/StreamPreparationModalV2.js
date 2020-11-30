@@ -307,7 +307,7 @@ const StreamPreparationModalV2 = ({
                         </Button>
                     )}
                     {
-                        hasDevicesInLocalStorage() && activeStep !== 4 && 
+                        activeStep !== 4 && 
                         <Button
                             variant="contained"
                             color="primary"
