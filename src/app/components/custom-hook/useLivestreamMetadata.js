@@ -1,19 +1,38 @@
 import { withFirebase } from 'context/firebase';
+import StatsUtil from 'data/util/StatsUtil';
 import { useState, useEffect } from 'react';
 
-export function useLivestreamMetadata(livestream, firebase, userRequestedDownload) {
+export function useLivestreamMetadata(livestream, group, firebase, userRequestedDownload) {
 
     const [questions, setQuestions] = useState(undefined);
     const [polls, setPolls] = useState(undefined);
     const [icons, setIcons] = useState(undefined);
     const [livestreamSpeakers, setLivestreamSpeakers] = useState(undefined);
-    const [hasDownloaded, setHasDownloaded] = useState(false);
+    const [overallRating, setOverallRating] = useState(undefined);
+    const [contentRating, setContentRating] = useState(undefined);
+    const [talentPoolForReport, setTalentPoolForReport] = useState(undefined);
+    const [participatingStudents, setParticipatingStudents] = useState(undefined);
+    const [participatingStudentsFromGroup, setParticipatingStudentsFromGroup] = useState(undefined);
+    const [studentStats, setStudentStats] = useState(undefined);
+    
+    const [hasDownloadedReport, setHasDownloadedReport] = useState(false);
+
+    let average = (array) => array.reduce((a, b) => a + b) / array.length;
 
     useEffect(() => {
-        if (questions !== undefined && polls !== undefined && icons !== undefined && livestreamSpeakers !== undefined) {
-            setHasDownloaded(true);
+        if (questions !== undefined && 
+            polls !== undefined && 
+            icons !== undefined && 
+            livestreamSpeakers !== undefined &&
+            overallRating !== undefined &&
+            contentRating !== undefined && 
+            talentPoolForReport !== undefined && 
+            participatingStudentsFromGroup !== undefined  && 
+            studentStats !== undefined
+            ) {
+            setHasDownloadedReport(true);
         }  
-    }, [questions, polls, icons, livestreamSpeakers]);
+    }, [questions, polls, icons, livestreamSpeakers, overallRating, contentRating, talentPoolForReport, participatingStudents, studentStats]);
 
     useEffect(() => {
         if (livestream && userRequestedDownload) {
@@ -70,6 +89,99 @@ export function useLivestreamMetadata(livestream, firebase, userRequestedDownloa
             })
         }  
     }, [livestream, userRequestedDownload]);
+
+    useEffect(() => {
+        if (livestream && group && userRequestedDownload) {
+            firebase.getLivestreamParticipatingStudents(livestream.id).then(querySnapshot => {
+                let participatingStudents = [];
+                querySnapshot.forEach(doc => {
+                    let student = doc.data();
+                    student.id = doc.id;
+                    participatingStudents.push(student);
+                });
+                debugger;
+                setParticipatingStudents(participatingStudents);
+            })
+        }      
+    }, [livestream, group, userRequestedDownload]);
+
+    useEffect(() => {
+        if (participatingStudents && participatingStudents.length && userRequestedDownload) {
+            let studentsOfGroup = [];
+            participatingStudents.forEach( student => {
+                if (studentBelongsToGroup(student)) {
+                    let publishedStudent = StatsUtil.getStudentInGroupDataObject(student, group);
+                    studentsOfGroup.push(publishedStudent);
+                }
+            });
+            debugger;
+            setParticipatingStudentsFromGroup(studentsOfGroup);
+        }      
+    }, [participatingStudents, userRequestedDownload]);
+
+    useEffect(() => {
+        if (participatingStudents && participatingStudents.length && userRequestedDownload) {
+            let listOfStudents = participatingStudents.filter( student => studentBelongsToGroup(student));
+            let stats = StatsUtil.getRegisteredStudentsStats(listOfStudents, group);
+            debugger;
+            setStudentStats(stats);
+        }      
+    }, [participatingStudents, userRequestedDownload]);
   
-    return { hasDownloaded, questions, polls, icons, livestreamSpeakers };
+    useEffect(() => {
+        if (livestream && userRequestedDownload) {
+            firebase.listenToLivestreamOverallRatings(livestream.id, querySnapshot => {
+                let overallRatings = [];
+                querySnapshot.forEach(doc => {
+                    let cc = doc.data();
+                    cc.id = doc.id;
+                    overallRatings.push(cc.rating);
+                });
+                let value = overallRatings.length > 0 ? average(overallRatings).toFixed(2) : "N.A."
+                setOverallRating(value)
+            })
+        }  
+    }, [livestream, userRequestedDownload]);
+
+    useEffect(() => {
+        if (livestream && userRequestedDownload) {
+            firebase.listenToLivestreamContentRatings(livestream.id, querySnapshot => {
+                let contentRatings = [];
+                querySnapshot.forEach(doc => {
+                    let cc = doc.data();
+                    cc.id = doc.id;
+                    contentRatings.push(cc.rating);
+                });
+                let value = contentRatings.length > 0 ? average(contentRatings).toFixed(2) : "N.A."
+                setContentRating(value)
+            })
+        }  
+    }, [livestream, userRequestedDownload]);
+
+    useEffect(() => {
+        if (livestream && userRequestedDownload) {
+            firebase.getLivestreamTalentPoolMembers(livestream.companyId).then(querySnapshot => {
+                let registeredStudents = [];
+                querySnapshot.forEach(doc => {
+                    let element = doc.data();
+                    registeredStudents.push(element) 
+                });
+                setTalentPoolForReport(registeredStudents);
+            })
+        }      
+    }, [livestream, userRequestedDownload]);
+
+    function studentBelongsToGroup(student) {
+        if (group.universityCode) {
+            if (student.universityCode === group.universityCode) {
+                return student.groupIds && student.groupIds.includes(group.groupId);
+            } else {
+                return false;
+            }
+        } else {
+            return student.groupIds && student.groupIds.includes(group.groupId);
+        }
+    }
+  
+    return { hasDownloadedReport, questions, polls, icons, livestreamSpeakers, overallRating, contentRating, talentPoolForReport, participatingStudents, participatingStudentsFromGroup, studentStats };
 }

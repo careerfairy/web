@@ -1,3 +1,5 @@
+import isEmpty from 'lodash/isempty';
+
 export const uploadLogo = (location, fileObject, firebase, callback ) => {
     var storageRef = firebase.getStorageRef();
     let fullPath = location + '/' + fileObject.name;
@@ -42,4 +44,8 @@ export const uploadLogo = (location, fileObject, firebase, callback ) => {
                 console.log('File available at', downloadURL);
             });
         });
+}
+
+export const isEmptyObject = (obj) => {
+    return isEmpty(obj); 
 }

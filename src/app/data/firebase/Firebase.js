@@ -62,7 +62,7 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    setUserData = (userEmail, firstName, lastName, universityCode, universityCountryCode) => {
+    setUserData = (userEmail, firstName, lastName, universityCode, universityName, universityCountryCode) => {
         let ref = this.firestore.collection("userData").doc(userEmail);
         return ref.update({
             id: userEmail,
@@ -70,6 +70,7 @@ class Firebase {
             firstName,
             lastName,
             universityCode,
+            universityName, 
             universityCountryCode
         });
     };
@@ -280,10 +281,10 @@ class Firebase {
             })
 
             await batch.commit()
-            return {status: "OK", data: livestreamsRef.id}
+            return livestreamsRef.id
 
-        } catch (e) {
-            return {status: "ERROR", message: "Something went wrong"}
+        } catch (error) {
+            return error
         }
     }
 
@@ -307,14 +308,14 @@ class Firebase {
         return livestreamsRef.id
     }
 
-    updateLivestream = async (livestream, speakers) => {
+    updateLivestream = async (livestream, speakers, collection) => {
         try {
             let batch = this.firestore.batch();
             let livestreamsRef = this.firestore
-                .collection("livestreams")
+                .collection(collection)
                 .doc(livestream.id)
             let speakersRef = this.firestore
-                .collection("livestreams")
+                .collection(collection)
                 .doc(livestreamsRef.id)
                 .collection("speakers")
 
@@ -330,9 +331,9 @@ class Firebase {
                 batch.delete(docRef)
             })
             await batch.commit()
-            return {status: "OK", data: livestream.id}
-        } catch (e) {
-            return {status: "ERROR", message: "Something went wrong"}
+            return livestream.id
+        } catch (error) {
+            return error
         }
     }
 
@@ -1326,6 +1327,33 @@ class Firebase {
             .orderBy("timestamp", "asc");
         return ref.onSnapshot(callback);
     };
+
+    listenToLivestreamOverallRatings = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc("overall")
+            .collection("voters");
+        return ref.onSnapshot(callback);
+    };
+
+    listenToLivestreamContentRatings = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc("company")
+            .collection("voters");
+        return ref.onSnapshot(callback);
+    };
+
+    getUniversitiesByCountry = (countryCode) => {
+        let ref = this.firestore
+            .collection("universitiesByCountry")
+            .doc(countryCode)
+        return ref.get();
+    }
 
     getStorageRef = () => {
         return this.storage.ref();

@@ -1,15 +1,12 @@
 import React, {Fragment, useContext, useEffect, useState} from 'react';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {
-    Box,
     Button,
     CircularProgress,
     Collapse,
     Container,
     FormControl,
-    FormControlLabel,
     Grid,
-    Switch,
     TextField,
     Typography
 } from "@material-ui/core";
@@ -81,8 +78,7 @@ const mainSpeakerId = uuidv4()
 const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
     const router = useRouter()
     const {
-        query: {careerCenterIds},
-        push
+        query: {careerCenterIds, draftStreamId},
     } = router;
 
     const classes = useStyles()
@@ -90,8 +86,9 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
     const {setGeneralError} = useContext(ErrorContext);
     const [targetCategories, setTargetCategories] = useState({})
     const [selectedGroups, setSelectedGroups] = useState([])
+    const [updateMode, setUpdateMode] = useState(undefined)
 
-    const [allFetched, setAllFetched] = useState(true)
+    const [allFetched, setAllFetched] = useState(false)
 
     const [draftId, setDraftId] = useState("")
 
@@ -112,28 +109,87 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         },
     })
 
+
+    const handleSetGroupIds = async (UrlIds, draftStreamGroupIds) => {
+        const totalGroups = [...new Set([...UrlIds, ...draftStreamGroupIds])]
+        if (totalGroups.length) {
+            const totalExistingGroups = await firebase.getCareerCentersByGroupId(totalGroups)
+            const totalFlattenedGroups = totalExistingGroups.map(group => ({
+                    ...group,
+                    selected: true,
+                    flattenedOptions: handleFlattenOptions(group)
+                }))
+            const flattenedDraftGroups = totalFlattenedGroups.filter(flattenedGroupObj => draftStreamGroupIds.some(draftId => flattenedGroupObj.id === draftId))
+            setExistingGroups(totalFlattenedGroups)
+            setSelectedGroups(flattenedDraftGroups)
+            const arrayOfActualGroupIds = totalExistingGroups.map(groupObj => groupObj.id)
+            setFormData({...formData, groupIds: arrayOfActualGroupIds})
+        }
+    }
+
     useEffect(() => {
-        if (careerCenterIds) {
+        if (draftStreamId) {
             (async () => {
-                setAllFetched(false)
-                const arrayOfIds = careerCenterIds.split(",")
-                if (arrayOfIds.length) {
-                    const arrayOfGroups = await firebase.getCareerCentersByGroupId(arrayOfIds)
-                    const newSelectedGroups = arrayOfGroups.map(group => (
-                        {
-                            ...group,
-                            selected: true,
-                            flattenedOptions: handleFlattenOptions(group)
-                        }))
-                    setSelectedGroups(newSelectedGroups)
-                    setExistingGroups(newSelectedGroups)
-                    const arrayOfActualGroupIds = arrayOfGroups.map(groupObj => groupObj.id)
-                    setFormData({...formData, groupIds: arrayOfActualGroupIds})
+                const targetId = draftStreamId
+                const targetCollection = "draftLivestreams"
+                const livestreamQuery = await firebase.getStreamById(targetId, targetCollection)
+                const speakerQuery = await firebase.getStreamSpeakers(targetId, targetCollection)
+                if (livestreamQuery.exists) {
+                    let livestream = livestreamQuery.data()
+                    const newFormData = {
+                        id: targetId,
+                        companyLogoUrl: livestream.companyLogoUrl || "",
+                        backgroundImageUrl: livestream.backgroundImageUrl || "",
+                        company: livestream.company || "",
+                        companyId: livestream.companyId || "",
+                        title: livestream.title || "",
+                        targetCategories: {},
+                        groupIds: livestream.groupIds || [],
+                        start: livestream.start.toDate() || new Date(),
+                        hidden: livestream.hidden || false,
+                        summary: livestream.summary || "",
+                        speakers: {
+                            [mainSpeakerId]: speakerObj,
+                        },
+                    }
+                    setFormData(newFormData)
+                    if (careerCenterIds) {
+                        const arrayOfUrlIds = careerCenterIds.split(",")
+                        await handleSetGroupIds(arrayOfUrlIds, livestream.groupIds)
+                    } else {
+                        await handleSetGroupIds([], livestream.groupIds)
+                    }
+                    // handleSetDefaultGroups(livestream.groupIds)
+                    setTargetCategories(livestream.targetCategories || {})
+                    if (!speakerQuery.empty) {
+                        const mainSpeakerFlattenedName = livestream.mainSpeakerName.split(/[ ]+/).join("")
+                        speakerQuery.forEach(query => {
+                            let speaker = query.data()
+                            speaker.id = query.id
+                            const flattenedFirstName = speaker.firstName.split(/[ ]+/).join("")
+                            const flattenedLastName = speaker.lastName.split(/[ ]+/).join("")
+                            const flattenedFullName = flattenedFirstName + flattenedLastName
+                            if (flattenedFullName !== mainSpeakerFlattenedName) {
+                                handleAddSpeaker(newFormData, setFormData, speaker)
+                            } else {
+                                handleAddMainSpeaker(newFormData, setFormData, speaker)
+                            }
+                        })
+                    }
                     setAllFetched(true)
+                    setUpdateMode(true)
                 }
             })()
+        } else if (careerCenterIds) {
+            handleSetOnlyUrlIds()
         }
-    }, [careerCenterIds])
+    }, [draftStreamId])
+
+    const handleSetOnlyUrlIds = async () => {
+        const arrayOfUrlIds = careerCenterIds.split(",")
+        await handleSetGroupIds(arrayOfUrlIds, [])
+        setAllFetched(true)
+    }
 
 
     const handleAddTargetCategories = (arrayOfIds) => {
@@ -169,6 +225,12 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         setCallback(newValues)
     }
 
+    const handleAddMainSpeaker = (values, setCallback, obj) => {
+        const newValues = {...values}
+        newValues.speakers[mainSpeakerId] = obj
+        setCallback(newValues)
+    }
+
     const handleFlattenOptions = (group) => {
         let optionsArray = []
         if (group.categories && group.categories.length) {
@@ -183,6 +245,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
 
     const buildLivestreamObject = (values) => {
         return {
+            ...(updateMode && {id: draftStreamId}),// only adds id: livestreamId field if there's actually a valid id, which is when updateMode is true
             backgroundImageUrl: values.backgroundImageUrl,
             company: values.company,
             companyId: values.companyId,
@@ -248,7 +311,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
     )
 
     return (<Container className={classes.root}>
-        {allFetched ? submitted ? SuccessMessage : <Formik
+        {allFetched ? (submitted ? SuccessMessage : <Formik
             initialValues={formData}
             enableReinitialize
             validate={values => {
@@ -295,12 +358,20 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     setSubmitting(true)
                     const livestream = buildLivestreamObject(values);
                     const speakers = buildSpeakersArray(values);
-                    const livestreamId = await firebase.addDraftLivestream(livestream, speakers)
-                    console.log("-> Draft livestream was created with id", livestreamId);
-                    setDraftId(livestreamId)
+                    let id;
+                    if (updateMode) {
+                        id = livestream.id
+                        await firebase.updateLivestream(livestream, speakers, "draftLivestreams")
+                        console.log("-> Draft livestream was updated with id", id);
+                    } else {
+                        id = await firebase.addDraftLivestream(livestream, speakers)
+                        console.log("-> Draft livestream was created with id", id);
+                    }
+                    setDraftId(id)
                     setSubmitted(true)
                     window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
                 } catch (e) {
+                    console.log("-> e", e);
                     setGeneralError("Something went wrong")
                 }
             }}
@@ -461,8 +532,8 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                             </FormGroup>
                         </Fragment>)
                 })}
+                <Typography style={{color: "white"}} variant="h4">Group Info:</Typography>
                 {!!existingGroups.length && <FormGroup>
-                    <Typography style={{color: "white"}} variant="h4">Group Info:</Typography>
                     <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                         <MultiGroupSelect
                             handleChange={handleChange}
@@ -494,12 +565,13 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
                     variant="contained" fullWidth>
                     <Typography variant="h4">
-                        {isSubmitting ? "Submitting" : "Submit Draft"}
+                        {isSubmitting ? "Submitting" : updateMode ? "Update Draft" : "Submit Draft"}
                     </Typography>
                 </Button>
             </form>)}
-        </Formik> : <CircularProgress style={{marginTop: "30vh", color: "white"}}/>}
+        </Formik>) : <CircularProgress style={{marginTop: "30vh", color: "white"}}/>}
     </Container>);
 };
+
 
 export default withFirebase(DraftStreamForm);
