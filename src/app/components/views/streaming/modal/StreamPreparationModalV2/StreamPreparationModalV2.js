@@ -207,7 +207,7 @@ const StreamPreparationModalV2 = ({
     }
 
     const shouldDisplayButton = () => {
-        return Boolean(hasDevicesInLocalStorage() && activeStep !== 4 && localStream)
+        return Boolean(hasDevicesInLocalStorage() && activeStep !== 4)
     }
 
     function getStepContent(stepIndex) {
@@ -318,19 +318,16 @@ const StreamPreparationModalV2 = ({
                             Skip
                         </Button>
                     )}
-                    {shouldDisplayButton() ? (readyToConnect ?
+                    {shouldDisplayButton() ? localStream?
                         <Button
                             variant="contained"
                             color="primary"
-                            disabled={!readyToConnect}
+                            disabled={!readyToConnect || !localStream}
                             onClick={() => handleFinalize()}
                             className={classes.button}
                         >
                             Connect Directly
-                        </Button>
-                        :
-                        <CircularProgress size={20} color="primary"/>) : null
-                    }
+                        </Button>: <CircularProgress color="primary" size={25}/>: null}
                     {completedSteps() === totalSteps() - 1 && activeStep === 4 &&
                     <Button variant="contained" color="primary" onClick={handleFinalize}>
                         Continue

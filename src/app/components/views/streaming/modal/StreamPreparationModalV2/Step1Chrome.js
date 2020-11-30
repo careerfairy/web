@@ -91,17 +91,17 @@ const Step1Chrome = ({isCompleted, handleMarkComplete, isChromium, localStream})
                 delay={5000}
                 enter={!localStream}
                 collapse
-                bottom
-            >
-                <Typography style={{
-                    margin: '20px auto',
-                    textAlign: 'center',
-                    color: '#00d2aa',
-                    width: '70%',
-                    fontWeight: 'bold',
-                }}>
-                    Please allow CareerFairy to access your camera and microphone in order to proceed.
-                </Typography>
+                bottom>
+                <div style={{width: "100%", display: "flex", justifyContent: "center"}}>
+                    <Typography style={{
+                        textAlign: 'center',
+                        color: '#00d2aa',
+                        width: '70%',
+                        fontWeight: 'bold',
+                    }}>
+                        Please allow CareerFairy to access your camera and microphone in order to proceed.
+                    </Typography>
+                </div>
             </Fade>}
             {/*<Button onClick={handleComplete} color="primary" variant="contained" fullWidth>*/}
             {/*    I agree to use Google Chrome as a browser*/}
