@@ -1,38 +1,46 @@
-import {useEffect, useState, useCallback} from "react";
+import {useEffect, useState} from "react";
 
 
-const useInfiniteScroll = (query, options) => {
-    const {limit} = options
+const useInfiniteScroll = (query, limit) => {
     const [hasMore, setHasMore] = useState(false)
     const [items, setItems] = useState([])
-    const [localLimit, setLocalLimit] = useState(limit)
+    const [localItems, setLocalItems] = useState([])
+    const [localLimit, setLocalLimit] = useState(0)
 
     useEffect(() => {
-        IDefineMyListener()
-        return () => IDefineMyListener()
-    }, [localLimit])
+        if (limit) {
+            setLocalLimit(limit)
+        }
+    }, [])
 
-    const IDefineMyListener = useCallback(event => {
-        return query.limit(localLimit).onSnapshot(querySnapshot => {
-            const lastTempVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
-            if (lastTempVisible) {
-                setHasMore(true)
-            } else {
-                setHasMore(false)
-            }
-            const tempItems = []
+    useEffect(() => {
+        setHasMore(Boolean(localItems.length > items.length))
+    }, [localItems.length, items.length])
+
+    useEffect(() => {
+        const paginatedItems = localItems.slice(0, localLimit)
+        setItems(paginatedItems)
+    }, [localLimit, localItems])
+
+
+    useEffect(() => {
+        const unsubscribe = query.onSnapshot(querySnapshot => {
+            let tempItems = []
             querySnapshot.forEach(doc => {
                 const data = doc.data()
                 data.id = doc.id
                 tempItems.push(data)
             })
-            setItems(tempItems)
+            setLocalItems(tempItems)
         })
+        return () => unsubscribe()
+    }, [])
 
-    }, [localLimit]);
 
     const getMore = () => {
-        setLocalLimit(prevLimit => prevLimit + limit)
+        if (hasMore) {
+            setLocalLimit(prevState => prevState + limit)
+        }
     }
 
     return [items, getMore, hasMore]

@@ -20,8 +20,6 @@ import {
 import SwipeableViews from "react-swipeable-views";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import {makeStyles} from "@material-ui/core/styles";
-import usePagination from "firestore-pagination-hook";
-import {usePagination as usePaginate} from "use-pagination-firestore";
 
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
 import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
@@ -48,9 +46,6 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     const [showQuestionModal, setShowQuestionModal] = useState(false);
     const [touched, setTouched] = useState(false);
     const [value, setValue] = useState(0)
-
-    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
-    const [pastQuestions, setPastQuestions] = useState([]);
     const [parentHeight, setParentHeight] = useState(400)
 
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
@@ -84,74 +79,16 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     }
 
 
-    const {
-        loading: loadingUpcoming,
-        loadingError: loadingErrorUpcoming,
-        loadingMore: loadingMoreUpcoming,
-        loadingMoreError: loadingMoreErrorUpcoming,
-        hasMore: hasMoreUpcoming,
-        items: itemsUpcoming,
-        loadMore: loadMoreUpcoming
-    } = usePagination(firebase.listenToUpcomingLivestreamQuestions(livestream.id), {limit: 10});
 
 
-    const [items, getMore, hasMore] = useInfiniteScroll(
-        firebase.listenToUpcomingLivestreamQuestions(livestream.id), {limit: 10}
+    const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming] = useInfiniteScroll(
+        firebase.listenToUpcomingLivestreamQuestions(livestream.id), 10
     );
-    // console.log("-> hasMore", hasMore);
-    // console.log("-> items", items);
 
-    const {
-        loading: loadingPast,
-        loadingError: loadingErrorPast,
-        loadingMore: loadingMorePast,
-        loadingMoreError: loadingMoreErrorPast,
-        hasMore: hasMorePast,
-        items: itemsPast,
-        loadMore: loadMorePast
-    } = usePagination(firebase.listenToPastLivestreamQuestions(livestream.id), {limit: 10});
+    const [itemsPast, loadMorePast, hasMorePast] = useInfiniteScroll(
+        firebase.listenToPastLivestreamQuestions(livestream.id), 10
+    );
 
-    // useEffect(() => {
-    //     if (items) {
-    //         let newUpcomingQuestions = [];
-    //         items.forEach(doc => {
-    //             let question = doc.data();
-    //             question.id = doc.id;
-    //             newUpcomingQuestions.push(question);
-    //         });
-    //         setUpcomingQuestions(newUpcomingQuestions);
-    //     }
-    // }, [items])
-
-    useEffect(() => {
-        if (itemsPast) {
-            let newPastQuestions = [];
-            itemsPast.forEach(doc => {
-                let question = doc.data();
-                question.id = doc.id;
-                newPastQuestions.push(question);
-            });
-            setPastQuestions(newPastQuestions);
-        }
-    }, [itemsPast])
-
-    // useEffect(() => {
-    //     if (itemsUpcoming) {
-    //         let newUpcomingQuestions = [];
-    //         itemsUpcoming.forEach(doc => {
-    //             let question = doc.data();
-    //             question.id = doc.id;
-    //             newUpcomingQuestions.push(question);
-    //         });
-    //         const sortedUpcoming = sortUpcoming(newUpcomingQuestions)
-    //         setUpcomingQuestions(sortedUpcoming);
-    //     }
-    // }, [itemsUpcoming])
-
-
-    const sortUpcoming = (array) => {
-        return array.sort((a, b) => (a.type > b.type) ? 1 : ((b.type > a.type) ? -1 : 0))
-    }
     const handleClickUpcoming = () => {
         setShowNextQuestions(true)
         setValue(0)
@@ -183,7 +120,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
             })
     }
 
-    let upcomingQuestionsElements = items.map((question, index) => {
+    let upcomingQuestionsElements = itemsUpcoming.map((question, index) => {
         return <QuestionContainer key={question.id} showNextQuestions={showNextQuestions}
                                   streamer={streamer}
                                   isNextQuestions={showNextQuestions}
@@ -191,19 +128,19 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                                   index={index} sliding={sliding}
                                   showMenu={showMenu}
                                   selectedState={selectedState}
-                                  questions={items} question={question} user={authenticatedUser}
+                                  questions={itemsUpcoming} question={question} user={authenticatedUser}
                                   userData={userData}/>
 
     });
 
-    let pastQuestionsElements = pastQuestions.map((question, index) => {
+    let pastQuestionsElements = itemsPast.map((question, index) => {
         return <QuestionContainer key={question.id} showNextQuestions={showNextQuestions} streamer={streamer}
                                   isNextQuestions={!showNextQuestions}
                                   livestream={livestream}
                                   index={index}
                                   showMenu={showMenu}
                                   selectedState={selectedState}
-                                  questions={pastQuestions} question={question} user={authenticatedUser}
+                                  questions={itemsPast} question={question} user={authenticatedUser}
                                   userData={userData}/>
     });
 
@@ -225,7 +162,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                              marginRight: "0.5rem",
                              color: showNextQuestions ? "white" : "black"
                          }}>
-                        <Box fontSize={10}>Upcoming [{upcomingQuestionsElements.length}{hasMore && "+"}]</Box>
+                        <Box fontSize={10}>Upcoming [{upcomingQuestionsElements.length}{hasMoreUpcoming && "+"}]</Box>
                     </Fab>
                     <Fab size="small" variant="extended" onClick={handleClickPast} value="center"
                          style={{
@@ -248,9 +185,9 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                 <TabPanel>
                     <CustomInfiniteScroll
                         height={parentHeight}
-                        hasMore={hasMore}
-                        next={getMore}
-                        dataLength={upcomingQuestionsElements.length}>
+                        hasMore={hasMoreUpcoming}
+                        next={loadMoreUpcoming}
+                        dataLength={itemsUpcoming.length}>
                         {upcomingQuestionsElements}
                     </CustomInfiniteScroll>
                 </TabPanel>
@@ -259,7 +196,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                         hasMore={hasMorePast}
                         height={parentHeight}
                         next={loadMorePast}
-                        dataLength={pastQuestionsElements.length}>
+                        dataLength={itemsPast.length}>
                         {pastQuestionsElements}
                     </CustomInfiniteScroll>
                 </TabPanel>

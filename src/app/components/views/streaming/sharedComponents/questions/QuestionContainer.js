@@ -84,7 +84,7 @@ const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
     )
 }
 
-const QuestionContainer = memo( ({sliding, user, livestream, streamer, question, questions, firebase, index, isNextQuestions, selectedState, showMenu}) => {
+const QuestionContainer = ({sliding, user, livestream, streamer, question, questions, firebase, index, isNextQuestions, selectedState, showMenu}) => {
 
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
@@ -326,7 +326,7 @@ const QuestionContainer = memo( ({sliding, user, livestream, streamer, question,
             </WhiteTooltip>
         </Grow>
     );
-})
+}
 
 
 export default withFirebase(QuestionContainer);
