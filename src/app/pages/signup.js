@@ -204,12 +204,13 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
         if (emailSent && user && !emailVerificationSent) {
             axios({
                 method: 'post',
-                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailUserDataAndUni',
+                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailUserDataAndUniWithName',
                 data: {
                     recipientEmail: user.email,
                     firstName: formData.firstName,
                     lastName: formData.lastName,
-                    universityCode: formData.universityCode,
+                    universityCode: formData.university.code,
+                    universityName: formData.university.name,
                     universityCountryCode: formData.universityCountryCode,
                 }
             }).then(response => {
@@ -250,7 +251,7 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                     password: '',
                     confirmPassword: '',
                     agreeTerm: false,
-                    universityCode: 'other',
+                    university: { id: 'other', name: 'Other' },
                     universityCountryCode: ''
                 }}
                 validate={values => {
@@ -273,9 +274,6 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                         errors.lastName = 'Cannot be longer than 50 characters';
                     } else if (!/^\D+$/i.test(values.lastName)) {
                         errors.lastName = 'Please enter a valid last name';
-                    }
-                    if (!values.universityCode) {
-                        errors.universityCode = 'Select a university or type "other"';
                     }
                     if (!values.password) {
                         errors.password = 'A password is required';
@@ -414,7 +412,7 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <UniversitySelector handleBlur={handleBlur}
-                                                    error={errors.universityCode && touched.universityCode && errors.universityCode}
+                                                    error={errors.university && touched.university && errors.university}
                                                     universityCountryCode={values.universityCountryCode}
                                                     values={values}
                                                     submitting={submitting(isSubmitting)}

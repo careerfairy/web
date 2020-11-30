@@ -485,6 +485,58 @@ exports.sendPostmarkEmailUserDataAndUni = functions.https.onRequest(async (req, 
         });   
 });
 
+exports.sendPostmarkEmailUserDataAndUniWithName = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    const recipient_email = req.body.recipientEmail;
+    const recipient_first_name = req.body.firstName;
+    const recipient_last_name = req.body.lastName;
+    const recipient_university = req.body.universityCode;
+    const recipient_university_name = req.body.universityName;
+    const recipient_university_country_code = req.body.universityCountryCode;
+    const pinCode = getRandomInt(9999);
+
+    admin.firestore().collection("userData").doc(recipient_email).set(
+        {
+            id: recipient_email,
+            validationPin: pinCode,
+            firstName: recipient_first_name,
+            lastName: recipient_last_name,
+            userEmail: recipient_email,
+            universityCode: recipient_university,
+            universityName: recipient_university_name,
+            universityCountryCode: recipient_university_country_code,
+        }).then(() => {
+            const email = {
+                "TemplateId": 17669843,
+                "From": 'CareerFairy <noreply@careerfairy.io>',
+                "To": recipient_email,
+                "TemplateModel": { pinCode: pinCode }
+            };
+        
+            return client.sendEmailWithTemplate(email).then(response => {
+                console.log(`Successfully sent PIN email to ${recipient_email}`);
+                res.sendStatus(200);
+            }, error => {
+                console.error(`Error sending PIN email to ${recipient_email}`, error);
+                res.sendStatus(500);
+            });
+        }).catch((error) => {
+            console.error(`Error creating user ${recipient_email}`, error);
+            res.sendStatus(500);
+        });   
+});
+
 exports.sendReminderEmailToRegistrants = functions.https.onRequest(async (req, res) => {
 
     res.set('Access-Control-Allow-Origin', '*');
@@ -504,23 +556,23 @@ exports.sendReminderEmailToRegistrants = functions.https.onRequest(async (req, r
             registeredUsers = doc.data().registeredUsers;
             var itemsProcessed = 0;
             registeredUsers.forEach( userEmail => {
-                const email = {
-                    "TemplateId": req.body.templateId,
-                    "From": 'CareerFairy <noreply@careerfairy.io>',
-                    "To": userEmail,
-                    "TemplateModel": {       
-                    }
-                };
-                client.sendEmailWithTemplate(email).then(() => {
-                    console.log("email sent to: " + userEmail);
-                    itemsProcessed++;
-                    if(itemsProcessed === registeredUsers.length) {
-                        return res.status(200).send();
-                    }
-                }, error => {
-                    console.log('error:' + error);
-                });
-            });
+            const email = {
+                "TemplateId": req.body.templateId,
+                "From": 'CareerFairy <noreply@careerfairy.io>',
+                "To": userEmail,
+                "TemplateModel": {       
+                }
+             };
+            client.sendEmailWithTemplate(email).then(() => {
+                console.log("email sent to: " + userEmail);
+                itemsProcessed++;
+                if(itemsProcessed === registeredUsers.length) {
+                    return res.status(200).send();
+                }
+            }, error => {
+                console.log('error:' + error);
+            });            
+        });
         }).catch(() => {
             return res.status(400).send();
         })  

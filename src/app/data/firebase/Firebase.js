@@ -62,7 +62,7 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    setUserData = (userEmail, firstName, lastName, universityCode, universityCountryCode) => {
+    setUserData = (userEmail, firstName, lastName, universityCode, universityName, universityCountryCode) => {
         let ref = this.firestore.collection("userData").doc(userEmail);
         return ref.update({
             id: userEmail,
@@ -70,6 +70,7 @@ class Firebase {
             firstName,
             lastName,
             universityCode,
+            universityName,
             universityCountryCode
         });
     };
@@ -625,12 +626,13 @@ class Firebase {
     }
 
     queryPastLiveStreamsByGroupId = (groupId) => {
+        let START_DATE_FOR_REPORTED_EVENTS = 'September 1, 2020 00:00:00';
         const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
         return this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
             .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
-            .where("start", ">", new Date(2020, 9, 1, 0, 0, 0))
+            .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
             .orderBy("start", "desc")
 
     }
@@ -1374,6 +1376,13 @@ class Firebase {
             .collection("voters");
         return ref.onSnapshot(callback);
     };
+
+    getUniversitiesByCountry = (countryCode) => {
+        let ref = this.firestore
+            .collection("universitiesByCountry")
+            .doc(countryCode)
+        return ref.get();
+    }
 
     getStorageRef = () => {
         return this.storage.ref();
