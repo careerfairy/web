@@ -1,11 +1,11 @@
-import React, {Fragment, useState, useEffect} from 'react';
+import React, {Fragment, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import {useRouter} from 'next/router';
 import {AppBar, Box, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
-import usePagination from "firestore-pagination-hook";
 import EnhancedGroupStreamCard from './enhanced-group-stream-card/EnhancedGroupStreamCard';
 import CustomInfiniteScroll from "../../../../util/CustomInfiteScroll";
 import {makeStyles} from "@material-ui/core/styles";
+import useInfiniteScroll from "../../../../custom-hook/useInfiniteScroll";
 
 const useStyles = makeStyles(theme => ({
     streamsWrapper: {
@@ -19,71 +19,18 @@ const useStyles = makeStyles(theme => ({
 const Events = (props) => {
     const classes = useStyles()
     const router = useRouter();
-    console.log("-> props");
 
-    const [grid, setGrid] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
-    const [livestreams, setLivestreams] = useState([]);
-    const [pastLivestreams, setPastLivestreams] = useState([]);
 
     const [value, setValue] = React.useState(0);
 
-    const {
-        loading: loadingPast,
-        loadingError: loadingErrorPast,
-        loadingMore: loadingMorePast,
-        loadingMoreError: loadingMoreErrorPast,
-        hasMore: hasMorePast,
-        items: itemsPast,
-        loadMore: loadMorePast
-    } = usePagination(props.firebase.queryPastLiveStreamsByGroupId(props.group.id), {limit: 4});
+    const [itemsPast, loadMorePast, hasMorePast] = useInfiniteScroll(
+        props.firebase.queryPastLiveStreamsByGroupId(props.group.id), 3
+    );
 
-    const {
-        loading: loadingUpcoming,
-        loadingError: loadingErrorUpcoming,
-        loadingMore: loadingMoreUpcoming,
-        loadingMoreError: loadingMoreErrorUpcoming,
-        hasMore: hasMoreUpcoming,
-        items: itemsUpcoming,
-        loadMore: loadMoreUpcoming
-    } = usePagination(props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id), {limit: 4});
-
-    useEffect(() => {
-        if (itemsPast?.length) {
-            let pastStreams = [];
-            itemsPast.forEach(doc => {
-                let livestream = doc.data();
-                livestream.id = doc.id;
-                pastStreams.push(livestream);
-            });
-            setPastLivestreams(pastStreams);
-        }
-    }, [itemsPast])
-
-    useEffect(() => {
-        if (itemsUpcoming?.length) {
-            let pastStreams = [];
-            itemsUpcoming.forEach(doc => {
-                let livestream = doc.data();
-                livestream.id = doc.id;
-                pastStreams.push(livestream);
-            });
-            setLivestreams(pastStreams);
-        }
-    }, [itemsUpcoming])
-
-
-    useEffect(() => {
-        if (grid) {
-            setTimeout(() => {
-                grid.updateLayout();
-            }, 10);
-        }
-    }, [grid, livestreams, props.menuItem]);
-
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+    const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming] = useInfiniteScroll(
+        props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id), 4
+    );
 
     const handleClose = () => {
         setAnchorEl(null);
@@ -120,22 +67,22 @@ const Events = (props) => {
         };
     }
 
-    let livestreamElements = livestreams.map((livestream, index) => {
+    let livestreamElements = itemsUpcoming.map((livestream, index) => {
         return (
             <Grid key={livestream.id} xs={12} sm={12} md={12} lg={12} item>
-                <div style={{position: "relative"}}>
-                    <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid}
+                <div key={livestream.id} style={{position: "relative"}}>
+                    <EnhancedGroupStreamCard key={livestream.id} livestream={livestream} {...props} fields={null}
                                              group={props.group} isPastLivestream={false}/>
                 </div>
             </Grid>
         );
     });
 
-    let pastLivestreamElements = pastLivestreams.map((livestream, index) => {
+    let pastLivestreamElements = itemsPast.map((livestream, index) => {
         return (
             <Grid key={livestream.id} xs={12} sm={12} md={12} lg={12} item>
-                <div style={{position: "relative"}}>
-                    <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid}
+                <div key={livestream.id} style={{position: "relative"}}>
+                    <EnhancedGroupStreamCard key={livestream.id} livestream={livestream} {...props} fields={null}
                                              group={props.group} isPastLivestream={true}/>
                 </div>
             </Grid>
@@ -162,8 +109,8 @@ const Events = (props) => {
                     <CustomInfiniteScroll
                         className={classes.streamsWrapper}
                         hasMore={hasMoreUpcoming}
-                        next={loadingUpcoming}
-                        dataLength={livestreams.length}>
+                        next={loadMoreUpcoming}
+                        dataLength={livestreamElements.length}>
                         <Grid className={classes.grid} container spacing={2}>
                             {livestreamElements}
                         </Grid>
@@ -200,39 +147,39 @@ const Events = (props) => {
                 </Menu>
             </div>
             <style jsx>{`
-                .hidden {
-                    display: none;
-                }
-                
-                .white-box {
-                    background-color: white;
-                    box-shadow: 0 0 5px rgb(190,190,190);
-                    border-radius: 5px;
-                    padding: 20px;
-                    margin: 10px;
-                    text-align: left;
-                }
+              .hidden {
+                display: none;
+              }
 
-                .white-box-label {
-                    font-size: 0.8em;
-                    font-weight: 700;
-                    color: rgb(160,160,160);
-                    margin: 5px 0 5px 0; 
-                }
+              .white-box {
+                background-color: white;
+                box-shadow: 0 0 5px rgb(190, 190, 190);
+                border-radius: 5px;
+                padding: 20px;
+                margin: 10px;
+                text-align: left;
+              }
 
-                .white-box-title {
-                    font-size: 1.2em;
-                    font-weight: 700;
-                    color: rgb(80,80,80);
-                }
+              .white-box-label {
+                font-size: 0.8em;
+                font-weight: 700;
+                color: rgb(160, 160, 160);
+                margin: 5px 0 5px 0;
+              }
 
-                .sublabel {
-                    text-align: left;
-                    display: inline-block;
-                    vertical-align: middle;
-                    margin: 9px 0;
-                    color: rgb(80,80,80);
-                }
+              .white-box-title {
+                font-size: 1.2em;
+                font-weight: 700;
+                color: rgb(80, 80, 80);
+              }
+
+              .sublabel {
+                text-align: left;
+                display: inline-block;
+                vertical-align: middle;
+                margin: 9px 0;
+                color: rgb(80, 80, 80);
+              }
             `}</style>
         </Fragment>
     )
