@@ -6,6 +6,7 @@
   "repository": "https://github.com/jthegedus/firebase-functions-next-example.git",
   "main": "dist/functions/index.js",
   "scripts": {
+    "full-install": "npm install && cd ./src/app && npm install",
     "setup": "npm run firebase use --add",
     "deploy:next3": "npm run firebase deploy --only functions:next3",
     "build:app": "next build src/app",
