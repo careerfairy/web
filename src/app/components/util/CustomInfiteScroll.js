@@ -7,7 +7,6 @@ const CustomInfiniteScroll = ({children, ...props}) => {
     return (
         <InfiniteScroll
             {...props}
-            // style={{overflow: "visible"}}
             loader={
                 <Typography
                     component="div"

@@ -1,17 +1,11 @@
 import {useEffect, useState} from "react";
 
 
-const useInfiniteScroll = (query, limit) => {
+const useInfiniteScroll = (query, limit = 3) => {
     const [hasMore, setHasMore] = useState(false)
     const [items, setItems] = useState([])
     const [localItems, setLocalItems] = useState([])
-    const [localLimit, setLocalLimit] = useState(0)
-
-    useEffect(() => {
-        if (limit) {
-            setLocalLimit(limit)
-        }
-    }, [])
+    const [localLimit, setLocalLimit] = useState(limit)
 
     useEffect(() => {
         setHasMore(Boolean(localItems.length > items.length))

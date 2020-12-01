@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext, memo} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import Grow from '@material-ui/core/Grow';
 import ThumbUpRoundedIcon from '@material-ui/icons/ThumbUpRounded';
 import Linkify from 'react-linkify';
