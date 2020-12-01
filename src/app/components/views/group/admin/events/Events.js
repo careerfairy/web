@@ -6,6 +6,7 @@ import EnhancedGroupStreamCard from './enhanced-group-stream-card/EnhancedGroupS
 import CustomInfiniteScroll from "../../../../util/CustomInfiteScroll";
 import {makeStyles} from "@material-ui/core/styles";
 import useInfiniteScroll from "../../../../custom-hook/useInfiniteScroll";
+import {usePagination} from "use-pagination-firestore";
 
 const useStyles = makeStyles(theme => ({
     streamsWrapper: {
@@ -24,11 +25,11 @@ const Events = (props) => {
 
     const [value, setValue] = React.useState(0);
 
-    const [itemsPast, loadMorePast, hasMorePast] = useInfiniteScroll(
+    const [itemsPast, loadMorePast, hasMorePast, totalItemsPast] = useInfiniteScroll(
         props.firebase.queryPastLiveStreamsByGroupId(props.group.id), 3
     );
 
-    const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming] = useInfiniteScroll(
+    const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming, totalItemsUpcoming] = useInfiniteScroll(
         props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id), 4
     );
 
@@ -67,7 +68,7 @@ const Events = (props) => {
         };
     }
 
-    let livestreamElements = itemsUpcoming.map((livestream, index) => {
+    let livestreamElements = totalItemsUpcoming.map((livestream, index) => {
         return (
             <Grid key={livestream.id} xs={12} sm={12} md={12} lg={12} item>
                 <div key={livestream.id} style={{position: "relative"}}>
@@ -78,7 +79,7 @@ const Events = (props) => {
         );
     });
 
-    let pastLivestreamElements = itemsPast.map((livestream, index) => {
+    let pastLivestreamElements = totalItemsPast.map((livestream, index) => {
         return (
             <Grid key={livestream.id} xs={12} sm={12} md={12} lg={12} item>
                 <div key={livestream.id} style={{position: "relative"}}>
@@ -106,26 +107,14 @@ const Events = (props) => {
                     </Tabs>
                 </AppBar>
                 <TabPanel value={value} index={0}>
-                    <CustomInfiniteScroll
-                        className={classes.streamsWrapper}
-                        hasMore={hasMoreUpcoming}
-                        next={loadMoreUpcoming}
-                        dataLength={livestreamElements.length}>
-                        <Grid className={classes.grid} container spacing={2}>
-                            {livestreamElements}
-                        </Grid>
-                    </CustomInfiniteScroll>
+                    <Grid className={classes.grid} container spacing={2}>
+                        {livestreamElements}
+                    </Grid>
                 </TabPanel>
                 <TabPanel value={value} index={1}>
-                    <CustomInfiniteScroll
-                        className={classes.streamsWrapper}
-                        hasMore={hasMorePast}
-                        next={loadMorePast}
-                        dataLength={pastLivestreamElements.length}>
-                        <Grid className={classes.grid} container spacing={2}>
-                            {pastLivestreamElements}
-                        </Grid>
-                    </CustomInfiniteScroll>
+                    <Grid className={classes.grid} container spacing={2}>
+                        {pastLivestreamElements}
+                    </Grid>
                 </TabPanel>
                 {/* <Button variant="contained"
                         color="primary"
