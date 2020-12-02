@@ -141,7 +141,7 @@ const EnhancedGroupStreamCard = (props) => {
                 <EditIcon fontSize="large" color="inherit"/>
             </IconButton>
             <div style={{ position: 'absolute', top: '210px', right: '10px', zIndex: '2000', fontWeight: '600' }}>{ registeredStudentsFromGroup.length } students registered</div>
-            <CSVLink data={registeredStudentsFromGroup} filename={'Registered Students ' + props.livestream.company + ' ' + props.livestream.id + '.csv'} style={{ color: 'red' }}>
+            <CSVLink data={registeredStudentsFromGroup} filename={'Registered Students ' + props.livestream.company + ' ' + props.livestream.id + '.csv'} separator={";"} style={{ color: 'red' }}>
             <Button startIcon={<GetAppIcon />} variant='outlined' style={{ position: 'absolute', top: '240px', right: '10px', zIndex: '2000' }}>
                     Registered Students
                 </Button>
@@ -151,7 +151,7 @@ const EnhancedGroupStreamCard = (props) => {
                     <div style={{ position: 'absolute', top: '290px', right: '10px', zIndex: '2000' }}>
                         <Button variant='outlined' primary="true" onClick={() => setStartDownloadingTalentPool(true)} disabled={ startDownloadingTalentPool} loading={ startDownloadingTalentPool ? "true" : "false" }>{ startDownloadingTalentPool ? 'Generating Talent Pool...' : 'Generate Talent Pool'}</Button>
                     </div> :
-                    <CSVLink data={talentPool} filename={'TalentPool ' + props.livestream.company + ' ' + props.livestream.id + '.csv'} style={{ color: 'red' }}>
+                    <CSVLink data={talentPool} filename={'TalentPool ' + props.livestream.company + ' ' + props.livestream.id + '.csv'} separator={";"} style={{ color: 'red' }}>
                             <Button startIcon={<GetAppIcon />} variant='outlined' style={{ position: 'absolute', top: '290px', right: '10px', zIndex: '2000' }}>
                                 Talent Pool
                             </Button>
