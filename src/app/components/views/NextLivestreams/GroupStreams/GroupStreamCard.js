@@ -1,7 +1,6 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import UserUtil from "../../../../data/util/UserUtil";
 import DateUtil from "../../../../util/DateUtil";
-import {Icon} from "semantic-ui-react";
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import Skeleton from '@material-ui/lab/Skeleton';
 import BookingModal from "../../common/booking-modal/BookingModal";

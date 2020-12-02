@@ -541,7 +541,6 @@ function UpcomingLivestream(props) {
                             </div>
                             <div style={{margin: "40px 0", width: "100%"}}>
                                 <div>
-                                    {/* <Button size='big' content={ 'Ready To Join' } icon={ 'play' } style={{ margin: '5px' }} onClick={() => setUserIsReady(true)} disabled={!currentLivestream.hasStarted} color='pink'/>  */}
                                     <Button
                                         size="big"
                                         id="register-button"
