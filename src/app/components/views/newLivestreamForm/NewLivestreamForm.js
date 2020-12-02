@@ -67,7 +67,6 @@ const speakerObj = {
 }
 
 
-const mainSpeakerId = uuidv4()
 const NewLivestreamForm = ({firebase}) => {
     const router = useRouter()
     const {
@@ -103,9 +102,7 @@ const NewLivestreamForm = ({firebase}) => {
         start: new Date(),
         hidden: false,
         summary: '',
-        speakers: {
-            [mainSpeakerId]: speakerObj,
-        },
+        speakers: {},
     })
 
     useEffect(() => {
@@ -133,28 +130,11 @@ const NewLivestreamForm = ({firebase}) => {
                         start: livestream.start.toDate() || new Date(),
                         hidden: livestream.hidden || false,
                         summary: livestream.summary || "",
-                        speakers: {
-                            [mainSpeakerId]: speakerObj,
-                        },
+                        speakers: extractSpeakers(livestream, speakerQuery)
                     }
                     setFormData(newFormData)
                     handleSetDefaultGroups(livestream.groupIds)
                     setTargetCategories(livestream.targetCategories || {})
-                    if (!speakerQuery.empty) {
-                        const mainSpeakerFlattenedName = livestream.mainSpeakerName.split(/[ ]+/).join("")
-                        speakerQuery.forEach(query => {
-                            let speaker = query.data()
-                            speaker.id = query.id
-                            const flattenedFirstName = speaker.firstName.split(/[ ]+/).join("")
-                            const flattenedLastName = speaker.lastName.split(/[ ]+/).join("")
-                            const flattenedFullName = flattenedFirstName + flattenedLastName
-                            if (flattenedFullName !== mainSpeakerFlattenedName) {
-                                handleAddSpeaker(newFormData, setFormData, speaker)
-                            } else {
-                                handleAddMainSpeaker(newFormData, setFormData, speaker)
-                            }
-                        })
-                    }
                     if (forLivestream) {
                         setUpdateMode(true)
                     }
@@ -193,6 +173,27 @@ const NewLivestreamForm = ({firebase}) => {
         }
     }, [fetchingAvatars, fetchingBackgrounds, fetchingLogos, fetchingGroups])
 
+    const extractSpeakers = (livestream, speakerQuery) => {
+        if (!speakerQuery.empty && !livestream.speakers) { // if this stream doc has no speakers array and but has a sub-collection
+            let speakersObj = {}
+            speakerQuery.forEach(query => {
+                let speaker = query.data()
+                speaker.id = query.id
+                speakersObj[speaker.id] = speaker
+            })
+            return speakersObj
+        } else if (livestream.speakers?.length) {
+            let speakersObj = {}
+            livestream.speakers.forEach(speaker => {
+                speakersObj[speaker.id] = speaker
+            })
+            return speakersObj
+        } else {
+            return {}
+
+        }
+    }
+
     const handleAddTargetCategories = (arrayOfIds) => {
         const oldTargetCategories = {...targetCategories}
         const newTargetCategories = {}
@@ -221,20 +222,11 @@ const NewLivestreamForm = ({firebase}) => {
         }
     }
 
-    const handleAddMainSpeaker = (values, setCallback, obj) => {
-        const newValues = {...values}
-        newValues.speakers[mainSpeakerId] = obj
-        setCallback(newValues)
-    }
-
-    const handleAddSpeaker = (values, setCallback, obj) => {
-        const newValues = {...values}
-        newValues.speakers[uuidv4()] = obj
-        setCallback(newValues)
+    const handleAddSpeaker = (values, obj) => {
+        values.speakers[obj.id] = obj
     }
 
     const handleSetDefaultGroups = (arrayOfGroupIds) => {
-
         if (Array.isArray(arrayOfGroupIds)) {
             let groupsWithFlattenedOptions = []
             arrayOfGroupIds.forEach(id => {
@@ -268,10 +260,6 @@ const NewLivestreamForm = ({firebase}) => {
             companyId: values.companyId,
             title: values.title,
             companyLogoUrl: values.companyLogoUrl,
-            mainSpeakerAvatar: values.speakers[mainSpeakerId].avatar,
-            mainSpeakerBackground: values.speakers[mainSpeakerId].background,
-            mainSpeakerPosition: values.speakers[mainSpeakerId].position,
-            mainSpeakerName: values.speakers[mainSpeakerId].firstName + ' ' + values.speakers[mainSpeakerId].lastName,
             registeredUsers: [],
             start: firebase.getFirebaseTimestamp(values.start),
             targetGroups: [],
@@ -281,7 +269,8 @@ const NewLivestreamForm = ({firebase}) => {
             groupIds: values.groupIds,
             hidden: values.hidden,
             universities: [],
-            summary: values.summary
+            summary: values.summary,
+            speakers: buildSpeakersArray(values)
         }
     }
 
@@ -558,7 +547,7 @@ const NewLivestreamForm = ({firebase}) => {
                             <Fragment key={key}>
                                 <div className={classes.speakersLabel}>
                                     <Typography
-                                        variant="h4">{index === 0 ? "Main Speaker:" : `Speaker ${index + 1}:`}</Typography>
+                                        variant="h4">{`Speaker ${index + 1}`}</Typography>
                                     {!!index &&
                                     <Fab size="small" color="secondary"
                                          onClick={() => handleDeleteSpeaker(key, values, setValues)}>
