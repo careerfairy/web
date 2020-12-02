@@ -57,7 +57,7 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
             if (livestream) {
                 return (
                     <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
-                        <GroupStreamCardV2/>
+                        <GroupStreamCardV2 livestream={livestream}/>
                         {/*<GroupStreamCard*/}
                         {/*    index={index}*/}
                         {/*    groupData={groupData}*/}

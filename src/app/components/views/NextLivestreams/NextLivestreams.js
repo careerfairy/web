@@ -40,6 +40,7 @@ const NextLivestreams = ({firebase}) => {
                     querySnapshot.forEach((doc) => {
                         let livestream = doc.data();
                         livestream.id = doc.id;
+                        console.log(doc.ref);
                         livestreams.push(livestream);
                     });
                     if (livestreamId && !careerCenterId) {
@@ -70,14 +71,9 @@ const NextLivestreams = ({firebase}) => {
         }
     }, [groupIdsToRemove])
 
-    // useEffect(() => {
-    //     // will set the params once the router is loaded whether it be undefined or truthy
-    //     if (paramsLivestreamId === null && router) {
-    //         console.log("paramsLivestreamId");
-    //         setParamsCareerCenterId(careerCenterId);
-    //         setParamsLivestreamId(livestreamId);
-    //     }
-    // }, [router]);
+    const getStreamSpeakers = (livestream) => {
+
+    }
 
     useEffect(() => {
         if (groupData && groupData.groupId) {

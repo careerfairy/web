@@ -1,5 +1,4 @@
 import React, {Fragment} from 'react';
-
 import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
 
@@ -20,6 +19,7 @@ const GroupStreamCardV2 = ({
                                listenToUpcoming
                            }) => {
 
+    console.log("livestream", livestream);
 
     return (
         <Fragment>
@@ -32,9 +32,9 @@ const GroupStreamCardV2 = ({
                     <div className="stats">
                         <p className="viewers icon">539.9k</p>
                         <div className="streamers">
-                            <img src="img/streamer-1.jpg" alt=""/>
-                            <img src="img/streamer-2.jpg" alt=""/>
-                            <img src="img/streamer-3.jpg" alt=""/>
+                            <img src="" alt=""/>
+                            <img src="./img/streamer-2.jpg" alt=""/>
+                            <img src="./img/streamer-3.jpg" alt=""/>
                         </div>
                     </div>
                 </div>
