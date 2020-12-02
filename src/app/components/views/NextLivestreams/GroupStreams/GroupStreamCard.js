@@ -1,8 +1,8 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import UserUtil from "../../../../data/util/UserUtil";
 import DateUtil from "../../../../util/DateUtil";
-import {Button, Grid, Icon, Image} from "semantic-ui-react";
-import Link from "next/link";
+import {Icon} from "semantic-ui-react";
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import Skeleton from '@material-ui/lab/Skeleton';
 import BookingModal from "../../common/booking-modal/BookingModal";
 import {withFirebase} from "context/firebase";
@@ -13,10 +13,12 @@ import LogoElement from "./LogoElement";
 import TargetOptions from "../GroupsCarousel/TargetOptions";
 import GroupJoinToAttendModal from './GroupJoinToAttendModal';
 import DataAccessUtil from 'util/DataAccessUtil';
-import {Avatar, Box, Grid as MuiGrid, Typography} from "@material-ui/core";
+import {Avatar, Button, Typography} from "@material-ui/core";
 import {LazyLoadComponent} from 'react-lazy-load-image-component';
 import {speakerPlaceholder} from "../../../util/constants";
-
+import AddToPhotosRoundedIcon from '@material-ui/icons/AddToPhotosRounded';
+import ClearRoundedIcon from '@material-ui/icons/ClearRounded';
+import Link from "next/link";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -43,26 +45,15 @@ const useStyles = makeStyles((theme) => ({
         width: 65,
         height: 65,
     },
-    speakerWrapper: {
-        display: "flex !important",
-        flexDirection: "column !important",
-        alignItems: "center !important"
-    },
     greenLineBreak: {
         width: '100%',
         height: '2px',
         backgroundColor: 'rgba(0,210,170,0.6)',
     },
-    streamerGrid: {
-        display: "grid",
-        placeItems: "center",
-        // padding: theme.spacing(0.5)
-    },
     streamerName: {
         fontSize: "1em",
         fontWeight: 600,
         marginBottom: 5,
-
     },
     streamerPosition: {
         margin: "0 0 0 0",
@@ -73,17 +64,6 @@ const useStyles = makeStyles((theme) => ({
         overflowWrap: "break-word",
         wordWrap: "break-word",
         hyphens: "auto",
-    },
-    streamerPositionLight: {
-        margin: "0 0 0 0",
-        fontSize: "0.8em",
-        lineHeight: "1.2em",
-        color: "rgb(180, 180, 180)",
-        fontWeight: 300,
-        overflowWrap: "break-word",
-        wordWrap: "break-word",
-        hyphens: "auto",
-
     },
     speakersWrapper: {
         display: "flex",
@@ -388,18 +368,29 @@ const GroupStreamCard = ({
                                      style={{color: userIsRegistered() ? 'white' : ''}}>{livestream.title}</div>
                                 <div>
                                     <Button size='large' style={{margin: '5px 5px 0 0'}}
-                                            icon={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? 'delete' : 'add'}
-                                            color={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? null : 'teal'}
-                                            content={user ? ((livestream.registeredUsers?.indexOf(user.email) > -1) ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
+                                            variant="contained"
+                                            startIcon={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ?
+                                                <ClearRoundedIcon/> : <AddToPhotosRoundedIcon/>}
+                                            color={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? "default" : 'primary'}
+                                            children={user ? ((livestream.registeredUsers?.indexOf(user.email) > -1) ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
                                             onClick={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
-                                    <Link href={{
-                                        pathname: `/upcoming-livestream/${livestream.id}`,
-                                        query: listenToUpcoming ? null : {groupId: groupData.groupId}
-                                    }}
-                                          prefetch={false}><a><Button
-                                        size='large' style={{margin: '5px 5px 0 0'}} icon='signup'
-                                        content='Details'
-                                        color='pink'/></a></Link>
+                                    <Link
+                                        href={{
+                                            pathname: `/upcoming-livestream/${livestream.id}`,
+                                            query: listenToUpcoming ? null : {groupId: groupData.groupId}
+                                        }} prefetch={false}
+                                    >
+                                        <a>
+                                            <Button
+                                                size='large'
+                                                style={{margin: '5px 5px 0 0'}}
+                                                startIcon={<LibraryBooksIcon/>}
+                                                children='Details'
+                                                variant="contained"
+                                                color="secondary"/>
+                                        </a>
+                                    </Link>
+
                                 </div>
                             </div>
                         </div>
@@ -414,9 +405,9 @@ const GroupStreamCard = ({
                             {speakerElements}
                         </div>
                         {!!targetOptions.length &&
-                            <div style={{padding: "1rem", paddingTop: 0}}>
-                                    <TargetOptions options={targetOptions}/>
-                            </div>}
+                        <div style={{padding: "1rem", paddingTop: 0}}>
+                            <TargetOptions options={targetOptions}/>
+                        </div>}
                         {fetchingCareerCenters ?
                             <>
                                 <div className={classes.greenLineBreak}/>
@@ -437,7 +428,13 @@ const GroupStreamCard = ({
                                     <div className={classes.greenLineBreak}/>
                                     <div style={{textAlign: 'center', fontSize: '0.8em', marginTop: 10}}>created by
                                     </div>
-                                    <div style={{padding: "1rem", paddingBottom: "1.5rem", display: "flex", justifyContent: "space-evenly", flexWrap: "wrap"}}>
+                                    <div style={{
+                                        padding: "1rem",
+                                        paddingBottom: "1.5rem",
+                                        display: "flex",
+                                        justifyContent: "space-evenly",
+                                        flexWrap: "wrap"
+                                    }}>
                                         {logoElements}
                                     </div>
                                 </div>
@@ -495,7 +492,6 @@ const GroupStreamCard = ({
                   }
 
                   .livestream-thumbnail-overlay {
-                    cursor: pointer;
                     display: flex;
                     flex-direction: column;
                     width: 100%;
@@ -514,7 +510,7 @@ const GroupStreamCard = ({
                     width: 80%;
                     color: white;
                   }
-                  
+
                   .livestream-position {
                     font-weight: 500;
                     color: rgb(44, 66, 81);
