@@ -262,11 +262,11 @@ class Firebase {
 
     // CREATE_LIVESTREAMS
 
-    addLivestream = async (livestream) => {
+    addLivestream = async (livestream, collection) => {
         try {
             let batch = this.firestore.batch();
             let livestreamsRef = this.firestore
-                .collection("livestreams")
+                .collection(collection)
                 .doc()
             livestream.currentSpeakerId = livestreamsRef.id
             livestream.id = livestreamsRef.id

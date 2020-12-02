@@ -28,7 +28,7 @@ import {
     buildLivestreamObject,
     getStreamSubCollectionSpeakers,
     handleAddSpeaker,
-    handleDeleteSpeaker, handleError, handleFlattenOptions
+    handleDeleteSpeaker, handleError, handleFlattenOptions, validateStreamForm
 } from "../../helperFunctions/streamFormFunctions";
 
 
@@ -112,21 +112,22 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         speakers: {[uuidv4()]: speakerObj},
     })
 
+    console.log("formData", formData);
 
-    const handleSetGroupIds = async (UrlIds, draftStreamGroupIds) => {
+    const handleSetGroupIds = async (UrlIds, draftStreamGroupIds, newFormData) => {
         const totalGroups = [...new Set([...UrlIds, ...draftStreamGroupIds])]
         if (totalGroups.length) {
             const totalExistingGroups = await firebase.getCareerCentersByGroupId(totalGroups)
             const totalFlattenedGroups = totalExistingGroups.map(group => ({
-                    ...group,
-                    selected: true,
-                    flattenedOptions: handleFlattenOptions(group)
-                }))
+                ...group,
+                selected: true,
+                flattenedOptions: handleFlattenOptions(group)
+            }))
             const flattenedDraftGroups = totalFlattenedGroups.filter(flattenedGroupObj => draftStreamGroupIds.some(draftId => flattenedGroupObj.id === draftId))
             setExistingGroups(totalFlattenedGroups)
             setSelectedGroups(flattenedDraftGroups)
             const arrayOfActualGroupIds = totalExistingGroups.map(groupObj => groupObj.id)
-            setFormData({...formData, groupIds: arrayOfActualGroupIds})
+            setFormData({...newFormData, groupIds: arrayOfActualGroupIds})
         }
     }
 
@@ -156,9 +157,9 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     setFormData(newFormData)
                     if (careerCenterIds) {
                         const arrayOfUrlIds = careerCenterIds.split(",")
-                        await handleSetGroupIds(arrayOfUrlIds, livestream.groupIds)
+                        await handleSetGroupIds(arrayOfUrlIds, livestream.groupIds, newFormData)
                     } else {
-                        await handleSetGroupIds([], livestream.groupIds)
+                        await handleSetGroupIds([], livestream.groupIds, newFormData)
                     }
                     setTargetCategories(livestream.targetCategories || {})
                     setAllFetched(true)
@@ -212,56 +213,19 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         {allFetched ? (submitted ? SuccessMessage : <Formik
             initialValues={formData}
             enableReinitialize
-            validate={values => {
-                let errors = {speakers: {}};
-                if (!values.companyLogoUrl) {
-                    errors.companyLogoUrl = 'Required';
-                }
-                if (!values.backgroundImageUrl) {
-                    errors.backgroundImageUrl = 'Required';
-                }
-                if (!values.company) {
-                    errors.company = 'Required';
-                }
-                if (!values.title) {
-                    errors.title = 'Required';
-                }
-
-                Object.keys(values.speakers).forEach((key) => {
-                    errors.speakers[key] = {}
-                    if (!values.speakers[key].firstName) {
-                        errors.speakers[key].firstName = 'Required';
-                    }
-                    if (!values.speakers[key].lastName) {
-                        errors.speakers[key].lastName = 'Required';
-                    }
-                    if (!values.speakers[key].position) {
-                        errors.speakers[key].position = 'Required';
-                    }
-                    if (!values.speakers[key].background) {
-                        errors.speakers[key].background = 'Required';
-                    }
-                    if (!Object.keys(errors.speakers[key]).length) {
-                        delete errors.speakers[key]
-                    }
-                })
-                if (!Object.keys(errors.speakers).length) {
-                    delete errors.speakers
-                }
-                return errors;
-            }}
+            validate={(values) => validateStreamForm(values, true)}
             onSubmit={async (values, {setSubmitting}) => {
                 try {
                     setGeneralError("")
                     setSubmitting(true)
-                    const livestream = buildLivestreamObject(values, targetCategories, updateMode, draftStreamId);
+                    const livestream = buildLivestreamObject(values, targetCategories, updateMode, draftStreamId, firebase);
                     let id;
                     if (updateMode) {
                         id = livestream.id
                         await firebase.updateLivestream(livestream, "draftLivestreams")
                         console.log("-> Draft livestream was updated with id", id);
                     } else {
-                        id = await firebase.addDraftLivestream(livestream)
+                        id = await firebase.addLivestream(livestream, "draftLivestreams")
                         console.log("-> Draft livestream was created with id", id);
                     }
                     setDraftId(id)

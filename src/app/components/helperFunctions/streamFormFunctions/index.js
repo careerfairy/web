@@ -47,7 +47,7 @@ export const handleError = (key, fieldName, errors, touched) => {
     return baseError && baseTouched && baseError
 }
 
-export const buildLivestreamObject = (values, targetCategories, updateMode, streamId) => {
+export const buildLivestreamObject = (values, targetCategories, updateMode, streamId, firebase) => {
     return {
         ...(updateMode && {id: streamId}),// only adds id: livestreamId field if there's actually a valid id, which is when updateMode is true
         backgroundImageUrl: values.backgroundImageUrl,
@@ -105,4 +105,46 @@ export const handleFlattenOptions = (group) => {
         })
     }
     return optionsArray
+}
+
+export const validateStreamForm = (values, isDraft) => {
+    let errors = {speakers: {}};
+    if (!values.companyLogoUrl) {
+        errors.companyLogoUrl = 'Required';
+    }
+    if (!values.backgroundImageUrl) {
+        errors.backgroundImageUrl = 'Required';
+    }
+    if (!values.company) {
+        errors.company = 'Required';
+    }
+    if (!isDraft && !values.companyId) {
+        errors.companyId = 'Required';
+    }
+    if (!values.title) {
+        errors.title = 'Required';
+    }
+
+    Object.keys(values.speakers).forEach((key) => {
+        errors.speakers[key] = {}
+        if (!values.speakers[key].firstName) {
+            errors.speakers[key].firstName = 'Required';
+        }
+        if (!values.speakers[key].lastName) {
+            errors.speakers[key].lastName = 'Required';
+        }
+        if (!values.speakers[key].position) {
+            errors.speakers[key].position = 'Required';
+        }
+        if (!values.speakers[key].background) {
+            errors.speakers[key].background = 'Required';
+        }
+        if (!Object.keys(errors.speakers[key]).length) {
+            delete errors.speakers[key]
+        }
+    })
+    if (!Object.keys(errors.speakers).length) {
+        delete errors.speakers
+    }
+    return errors;
 }

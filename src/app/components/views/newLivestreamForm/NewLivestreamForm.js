@@ -30,7 +30,7 @@ import {
     buildLivestreamObject,
     getStreamSubCollectionSpeakers,
     handleAddSpeaker,
-    handleDeleteSpeaker, handleError, handleFlattenOptions
+    handleDeleteSpeaker, handleError, handleFlattenOptions, validateStreamForm
 } from "../../helperFunctions/streamFormFunctions";
 
 
@@ -195,7 +195,6 @@ const NewLivestreamForm = ({firebase}) => {
     }
 
 
-
     const handleSetDefaultGroups = (arrayOfGroupIds) => {
         if (Array.isArray(arrayOfGroupIds)) {
             let groupsWithFlattenedOptions = []
@@ -224,74 +223,36 @@ const NewLivestreamForm = ({firebase}) => {
         });
     }
 
+    const handleSubmitForm = async (values, {setSubmitting}) => {
+        try {
+            setGeneralError("")
+            setSubmitting(true)
+            const livestream = buildLivestreamObject(values, targetCategories, updateMode, livestreamId, firebase);
+            let id
+            if (updateMode) {
+                id = livestream.id
+                await firebase.updateLivestream(livestream, "livestreams")
+            } else {
+                id = await firebase.addLivestream(livestream, "livestreams")
+            }
+            if (values.hidden && values.groupIds.length) {
+                return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)
+            } else {
+                return push(`/upcoming-livestream/${id}`)
+            }
+
+        } catch (e) {
+            setGeneralError("Something went wrong")
+        }
+    }
+
 
     return (<Container className={classes.root}>
         {(allFetched && updateMode !== undefined) ? <Formik
                 initialValues={formData}
                 enableReinitialize
-                validate={values => {
-                    let errors = {speakers: {}};
-                    if (!values.companyLogoUrl) {
-                        errors.companyLogoUrl = 'Required';
-                    }
-                    if (!values.backgroundImageUrl) {
-                        errors.backgroundImageUrl = 'Required';
-                    }
-                    if (!values.company) {
-                        errors.company = 'Required';
-                    }
-                    if (!values.companyId) {
-                        errors.companyId = 'Required';
-                    }
-                    if (!values.title) {
-                        errors.title = 'Required';
-                    }
-
-                    Object.keys(values.speakers).forEach((key) => {
-                        errors.speakers[key] = {}
-                        if (!values.speakers[key].firstName) {
-                            errors.speakers[key].firstName = 'Required';
-                        }
-                        if (!values.speakers[key].lastName) {
-                            errors.speakers[key].lastName = 'Required';
-                        }
-                        if (!values.speakers[key].position) {
-                            errors.speakers[key].position = 'Required';
-                        }
-                        if (!values.speakers[key].background) {
-                            errors.speakers[key].background = 'Required';
-                        }
-                        if (!Object.keys(errors.speakers[key]).length) {
-                            delete errors.speakers[key]
-                        }
-                    })
-                    if (!Object.keys(errors.speakers).length) {
-                        delete errors.speakers
-                    }
-                    return errors;
-                }}
-                onSubmit={async (values, {setSubmitting}) => {
-                    try {
-                        setGeneralError("")
-                        setSubmitting(true)
-                        const livestream = buildLivestreamObject(values, targetCategories, updateMode, livestreamId);
-                        let id
-                        if (updateMode) {
-                            id = livestream.id
-                            await firebase.updateLivestream(livestream, "livestreams")
-                        } else {
-                            id = await firebase.addLivestream(livestream)
-                        }
-                        if (values.hidden && values.groupIds.length) {
-                            return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)
-                        } else {
-                            return push(`/upcoming-livestream/${id}`)
-                        }
-
-                    } catch (e) {
-                        setGeneralError("Something went wrong")
-                    }
-                }}
+                validate={(values) => validateStreamForm(values, false)}
+                onSubmit={handleSubmitForm}
             >
                 {({
                       values,
