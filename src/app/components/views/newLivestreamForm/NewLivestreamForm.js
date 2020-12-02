@@ -30,7 +30,7 @@ import {
     buildLivestreamObject,
     getStreamSubCollectionSpeakers,
     handleAddSpeaker,
-    handleDeleteSpeaker, handleError
+    handleDeleteSpeaker, handleError, handleFlattenOptions
 } from "../../helperFunctions/streamFormFunctions";
 
 
@@ -179,19 +179,6 @@ const NewLivestreamForm = ({firebase}) => {
         }
     }, [fetchingAvatars, fetchingBackgrounds, fetchingLogos, fetchingGroups])
 
-    const handleAddTargetCategories = (arrayOfIds) => {
-        const oldTargetCategories = {...targetCategories}
-        const newTargetCategories = {}
-        arrayOfIds.forEach(id => {
-            if (!oldTargetCategories[id]) {
-                newTargetCategories[id] = []
-            } else {
-                newTargetCategories[id] = oldTargetCategories[id]
-            }
-        })
-        setTargetCategories(newTargetCategories)
-    }
-
     const handleSetGroupCategories = (groupId, targetOptionIds) => {
         const newTargetCategories = {...targetCategories}
         newTargetCategories[groupId] = targetOptionIds
@@ -222,22 +209,6 @@ const NewLivestreamForm = ({firebase}) => {
             setSelectedGroups(groupsWithFlattenedOptions)
         }
     }
-
-    const handleFlattenOptions = (group) => {
-        let optionsArray = []
-        if (group.categories && group.categories.length) {
-            group.categories.forEach(category => {
-                if (category.options && category.options.length) {
-                    category.options.forEach(option => optionsArray.push(option))
-                }
-            })
-        }
-        return optionsArray
-    }
-
-
-
-
 
     const handleGetFiles = (path, setFetchingCallback, setDataCallback) => {
         firebase.getStorageRef().child(path).listAll().then(res => {
@@ -529,7 +500,8 @@ const NewLivestreamForm = ({firebase}) => {
                                 values={values}
                                 isSubmitting={isSubmitting}
                                 selectedGroups={selectedGroups}
-                                handleAddTargetCategories={handleAddTargetCategories}
+                                setTargetCategories={setTargetCategories}
+                                targetCategories={targetCategories}
                                 handleFlattenOptions={handleFlattenOptions}
                                 setSelectedGroups={setSelectedGroups}
                                 setFieldValue={setFieldValue}

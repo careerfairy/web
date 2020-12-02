@@ -81,3 +81,28 @@ const buildSpeakersArray = (values) => {
         }
     });
 }
+
+export const handleAddTargetCategories = (arrayOfIds, setTargetCategories, targetCategories) => {
+    const oldTargetCategories = {...targetCategories}
+    const newTargetCategories = {}
+    arrayOfIds.forEach(id => {
+        if (!oldTargetCategories[id]) {
+            newTargetCategories[id] = []
+        } else {
+            newTargetCategories[id] = oldTargetCategories[id]
+        }
+    })
+    setTargetCategories(newTargetCategories)
+}
+
+export const handleFlattenOptions = (group) => {
+    let optionsArray = []
+    if (group.categories && group.categories.length) {
+        group.categories.forEach(category => {
+            if (category.options && category.options.length) {
+                category.options.forEach(option => optionsArray.push(option))
+            }
+        })
+    }
+    return optionsArray
+}

@@ -1,22 +1,24 @@
 import React from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import {Chip, TextField} from '@material-ui/core'
+import {handleAddTargetCategories} from "../../../helperFunctions/streamFormFunctions";
 
 
 const MultiGroupSelect = (
     {
         groups,
+        targetCategories,
         setSelectedGroups,
         setFieldValue,
         handleFlattenOptions,
+        setTargetCategories,
         selectedGroups,
-        handleAddTargetCategories,
         isSubmitting
     }) => {
     const handleMultiSelect = (event, selectedOptions) => {
         const groupIdsArray = selectedOptions.map(option => option.groupId)
         const groupsWithOptions = selectedOptions.map(group => { // if any of the groups from the multi select exists already in the selectedOptions
-            handleAddTargetCategories(groupIdsArray)
+            handleAddTargetCategories(groupIdsArray, setTargetCategories, targetCategories)
             const oldGroup = selectedGroups.find(selectedGroup => selectedGroup.groupId === group.groupId)
             if (!oldGroup) { // state, please dont replace it!
                 group.flattenedOptions = handleFlattenOptions(group)
