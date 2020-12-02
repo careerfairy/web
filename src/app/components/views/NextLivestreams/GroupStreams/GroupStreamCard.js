@@ -15,6 +15,7 @@ import GroupJoinToAttendModal from './GroupJoinToAttendModal';
 import DataAccessUtil from 'util/DataAccessUtil';
 import {Avatar, Box, Grid as MuiGrid, Typography} from "@material-ui/core";
 import {LazyLoadComponent} from 'react-lazy-load-image-component';
+import {speakerPlaceholder} from "../../../util/constants";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -334,7 +335,7 @@ const GroupStreamCard = ({
     let speakerElements = livestream.speakers?.map(speaker => {
         return (
             <div key={speaker.id} className={classes.speakerDiv}>
-                <Avatar className={classes.speakerAvatar} src={speaker.avatar}/>
+                <Avatar className={classes.speakerAvatar} src={speaker.avatar || speakerPlaceholder}/>
                 <Typography align="center" className={classes.streamerName}>
                     {`${speaker.firstName} ${speaker.lastName}`}
                 </Typography>

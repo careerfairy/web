@@ -72,12 +72,7 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
         })
 
         return (
-            <div style={{padding: mobile ? 0 : "1rem"}} className={classes.root}>
-                {/* {!userData?.groupIds?.includes(groupData.groupId) && !mobile && !listenToUpcoming &&
-                <Button className={classes.followButton} size="large" onClick={handleJoin} variant="contained" fullWidth
-                        color="primary" align="center">
-                    <Typography variant="h6">Start Following {groupData.universityName}</Typography>
-                </Button>} */}
+            <div style={{padding: mobile ? 0 : "1rem 1rem 0 1rem"}} className={classes.root}>
                 {groupData.id || listenToUpcoming ? (searching ?
                     <Box display="flex" justifyContent="center" mt={5}>
                         <LinearProgress style={{width: "80%"}} color="primary"/>
