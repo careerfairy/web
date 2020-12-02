@@ -361,10 +361,10 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     let id;
                     if (updateMode) {
                         id = livestream.id
-                        await firebase.updateLivestream(livestream, speakers, "draftLivestreams")
+                        await firebase.updateLivestream(livestream, "draftLivestreams")
                         console.log("-> Draft livestream was updated with id", id);
                     } else {
-                        id = await firebase.addDraftLivestream(livestream, speakers)
+                        id = await firebase.addDraftLivestream(livestream)
                         console.log("-> Draft livestream was created with id", id);
                     }
                     setDraftId(id)

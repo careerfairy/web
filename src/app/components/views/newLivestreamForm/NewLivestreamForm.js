@@ -102,7 +102,7 @@ const NewLivestreamForm = ({firebase}) => {
         start: new Date(),
         hidden: false,
         summary: '',
-        speakers: {},
+        speakers: {[uuidv4()]: speakerObj},
     })
 
     useEffect(() => {
@@ -189,8 +189,7 @@ const NewLivestreamForm = ({firebase}) => {
             })
             return speakersObj
         } else {
-            return {}
-
+            return {[uuidv4()]: speakerObj}
         }
     }
 
@@ -222,8 +221,10 @@ const NewLivestreamForm = ({firebase}) => {
         }
     }
 
-    const handleAddSpeaker = (values, obj) => {
-        values.speakers[obj.id] = obj
+    const handleAddSpeaker = (values, setValues, speakerObj) => {
+        const newValues = {...values}
+        newValues.speakers[uuidv4()] = speakerObj
+        setValues(newValues)
     }
 
     const handleSetDefaultGroups = (arrayOfGroupIds) => {
@@ -274,6 +275,18 @@ const NewLivestreamForm = ({firebase}) => {
         }
     }
 
+    const buildSpeakersArray = (values) => {
+        return Object.keys(values.speakers).map((key) => {
+            return {
+                avatar: values.speakers[key].avatar,
+                background: values.speakers[key].background,
+                firstName: values.speakers[key].firstName,
+                lastName: values.speakers[key].lastName,
+                position: values.speakers[key].position
+            }
+        });
+    }
+
     const handleGetFiles = (path, setFetchingCallback, setDataCallback) => {
         firebase.getStorageRef().child(path).listAll().then(res => {
             let fileItems = [];
@@ -287,19 +300,6 @@ const NewLivestreamForm = ({firebase}) => {
             setDataCallback(options);
         });
     }
-
-    const buildSpeakersArray = (values) => {
-        return Object.keys(values.speakers).map((key) => {
-            return {
-                avatar: values.speakers[key].avatar,
-                background: values.speakers[key].background,
-                firstName: values.speakers[key].firstName,
-                lastName: values.speakers[key].lastName,
-                position: values.speakers[key].position
-            }
-        });
-    }
-
 
     const handleError = (key, fieldName, errors, touched) => {
         const baseError = errors && errors.speakers && errors.speakers[key] && errors.speakers[key][fieldName]
@@ -372,7 +372,6 @@ const NewLivestreamForm = ({firebase}) => {
                         } else {
                             id = await firebase.addLivestream(livestream, speakers)
                         }
-
                         if (values.hidden && values.groupIds.length) {
                             return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)
                         } else {
