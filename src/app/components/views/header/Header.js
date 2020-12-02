@@ -193,7 +193,7 @@ function Header(props) {
                 }
 
                 i:hover {
-                    color: rgba(220,220,220);
+                    color: rgba(220,220,220, 1);
                 }
 
                 .sidebar {

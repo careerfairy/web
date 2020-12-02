@@ -67,5 +67,9 @@
     "not IE 9",
     "not IE_Mob 11",
     "maintained node versions"
-  ]
+  ],
+  "devDependencies": {
+    "node-sass": "^5.0.0",
+    "styled-jsx-plugin-sass": "^1.0.0"
+  }
 }

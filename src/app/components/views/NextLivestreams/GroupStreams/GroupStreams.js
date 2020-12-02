@@ -5,6 +5,7 @@ import GroupStreamCard, {StreamCardPlaceHolder} from "./GroupStreamCard";
 import {Typography, LinearProgress, Box, Button, Grid} from "@material-ui/core";
 import {useRouter} from "next/router";
 import GroupJoinModal from "../../profile/GroupJoinModal";
+import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -56,16 +57,17 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
             if (livestream) {
                 return (
                     <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
-                        <GroupStreamCard
-                            index={index}
-                            groupData={groupData}
-                            listenToUpcoming={listenToUpcoming}
-                            careerCenterId={careerCenterId}
-                            livestreamId={livestreamId}
-                            user={user} userData={userData} fields={null}
-                            careerCenters={[]}
-                            id={livestream.id}
-                            key={livestream.id} livestream={livestream}/>
+                        <GroupStreamCardV2/>
+                        {/*<GroupStreamCard*/}
+                        {/*    index={index}*/}
+                        {/*    groupData={groupData}*/}
+                        {/*    listenToUpcoming={listenToUpcoming}*/}
+                        {/*    careerCenterId={careerCenterId}*/}
+                        {/*    livestreamId={livestreamId}*/}
+                        {/*    user={user} userData={userData} fields={null}*/}
+                        {/*    careerCenters={[]}*/}
+                        {/*    id={livestream.id}*/}
+                        {/*    key={livestream.id} livestream={livestream}/>*/}
                     </Grid>
                 )
             }
