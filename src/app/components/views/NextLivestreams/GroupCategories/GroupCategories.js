@@ -9,7 +9,7 @@ import StackGrid from "react-stack-grid";
 const useStyles = makeStyles((theme) => ({
     root: {
         paddingBottom: 0,
-        paddingTop: 14,
+        paddingTop: ({mobile}) => mobile ? 0 : 14,
         width: ({mobile}) => mobile ? "100%" : "40%",
     },
     card: {

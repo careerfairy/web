@@ -11,6 +11,7 @@ import Events from "./events/Events";
 import Members from "./members/Members";
 import Settings from "./settings/Settings";
 import {withFirebase} from "../../../../context/firebase";
+import {ResponsiveContainer} from "../../../../materialUI/GlobalContainers";
 
 function TabPanel(props) {
     const {children, value, index, ...other} = props;
@@ -55,7 +56,7 @@ const GroupNav = ({userData, user, groupId, group}) => {
     };
 
     return (
-        <Container className={classes.root}>
+        <ResponsiveContainer className={classes.root}>
             <AppBar className={classes.bar} position="static" color="default">
                 <Tabs
                     value={value}
@@ -73,6 +74,7 @@ const GroupNav = ({userData, user, groupId, group}) => {
             <SwipeableViews
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
+                disabled
                 onChangeIndex={handleChangeIndex}
             >
                 <TabPanel value={value} index={0} dir={theme.direction}>
@@ -85,7 +87,7 @@ const GroupNav = ({userData, user, groupId, group}) => {
                     <Settings group={group} groupId={groupId}/>
                 </TabPanel>
             </SwipeableViews>
-        </Container>
+        </ResponsiveContainer>
     );
 }
 

@@ -19,6 +19,7 @@ import {LazyLoadComponent} from 'react-lazy-load-image-component';
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        minWidth: 300,
         borderRadius: 5,
         overflow: "hidden",
         textAlign: "left",
@@ -27,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
         MozBoxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
     },
     highlightedRoot: {
+        minWidth: 300,
         borderRadius: 5,
         border: '20px solid #00d2aa',
         overflow: "hidden",
@@ -38,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
     },
     speakerAvatar: {
         width: 65,
-        height: 65
+        height: 65,
     },
     speakerWrapper: {
         display: "flex !important",
@@ -49,7 +51,6 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         height: '2px',
         backgroundColor: 'rgba(0,210,170,0.6)',
-        margin: '30px 0 0 0'
     },
     streamerGrid: {
         display: "grid",
@@ -60,6 +61,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: "1em",
         fontWeight: 600,
         marginBottom: 5,
+
     },
     streamerPosition: {
         margin: "0 0 0 0",
@@ -67,6 +69,9 @@ const useStyles = makeStyles((theme) => ({
         lineHeight: "1.2em",
         color: "grey",
         fontWeight: 300,
+        overflowWrap: "break-word",
+        wordWrap: "break-word",
+        hyphens: "auto",
     },
     streamerPositionLight: {
         margin: "0 0 0 0",
@@ -74,10 +79,27 @@ const useStyles = makeStyles((theme) => ({
         lineHeight: "1.2em",
         color: "rgb(180, 180, 180)",
         fontWeight: 300,
+        overflowWrap: "break-word",
+        wordWrap: "break-word",
+        hyphens: "auto",
+
     },
     speakersWrapper: {
-        padding: "0.5rem",
-        marginBottom: theme.spacing(1)
+        display: "flex",
+        overflowX: "auto",
+        width: "100%",
+        justifyContent: "center",
+        overflowWrap: "break-word",
+        wordWrap: "break-word",
+        hyphens: "auto",
+    },
+    speakerDiv: {
+        padding: theme.spacing(2),
+        minWidth: 100,
+        alignItems: "center",
+        flexDirection: "column",
+        display: "flex",
+        flex: 1
     }
 
 }));
@@ -311,7 +333,7 @@ const GroupStreamCard = ({
 
     let speakerElements = livestream.speakers?.map(speaker => {
         return (
-            <MuiGrid xl={4} lg={4} md={4} sm={4} xs={4} style={{placeItems: "center", display: "grid"}} item>
+            <div key={speaker.id} className={classes.speakerDiv}>
                 <Avatar className={classes.speakerAvatar} src={speaker.avatar}/>
                 <Typography align="center" className={classes.streamerName}>
                     {`${speaker.firstName} ${speaker.lastName}`}
@@ -319,34 +341,26 @@ const GroupStreamCard = ({
                 <Typography align="center" className={classes.streamerPosition}>
                     {speaker.position}
                 </Typography>
-                <Typography align="center" className={classes.streamerPositionLight}>
-                    {speaker.background}
-                </Typography>
-            </MuiGrid>
+            </div>
         )
     })
 
 
     let logoElements = careerCenters.map((careerCenter, index) => {
         return (
-            <Grid.Column width='8' key={careerCenter.groupId}>
+            <div style={{flex: 1, minWidth: "50%"}} key={careerCenter.groupId}>
                 <LogoElement key={careerCenter.groupId} livestreamId={livestream.id}
                              userfollows={checkIfUserFollows(careerCenter)}
                              careerCenter={careerCenter} userData={userData} user={user}/>
-            </Grid.Column>
+            </div>
         );
     });
 
     return (
         <LazyLoadComponent style={{width: "100%"}} placeholder={<StreamCardPlaceHolder/>}>
             <Fragment>
-                <div className={livestream.highlighted ? classes.highlightedRoot : classes.root}
-                    // onClick={(event) => goToRouteFromParent(event, '/upcoming-livestream/' + livestream.id)}
-                >
+                <div className={livestream.highlighted ? classes.highlightedRoot : classes.root}>
                     <div className='date-indicator'>
-                        {/* <div className='coming-icon-container'>
-                        <div className='coming-icon' style={{ color: userIsRegistered() ? 'white' : '', border: userIsRegistered() ? '2px solid white' : ''}} ><Icon name='rss'/>Live stream</div>
-                    </div> */}
                         <div>
                             <div style={{display: 'inline-block'}}><Icon name='calendar alternate outline' style={{
                                 color: 'rgb(0, 210, 170)',
@@ -370,7 +384,7 @@ const GroupStreamCard = ({
                              style={{backgroundColor: userIsRegistered() ? 'rgba(0, 210, 170, 0.9)' : ''}}>
                             <CopyToClipboard value={linkToStream}/>
                             <div className='livestream-thumbnail-overlay-content'>
-                                <Image style={{
+                                <img alt="filter" style={{
                                     maxWidth: '220px',
                                     margin: '30px 0',
                                     maxHeight: '120px',
@@ -402,35 +416,13 @@ const GroupStreamCard = ({
                         </div>
                     </div>
                     <div className='background'>
-                        <MuiGrid className={classes.speakersWrapper} spacing={1} container>
+                        <div className={classes.speakersWrapper}>
                             {speakerElements}
-                        </MuiGrid>
-                        {/*<Grid centered className='middle aligned' divided>*/}
-                        {/*    <Grid.Row>*/}
-                        {/*        <Grid.Column width={14}>*/}
-                        {/*            <div className='livestream-streamer-description'>*/}
-                        {/*                <div className='livestream-speaker-avatar-capsule'>*/}
-                        {/*                    <Avatar src={avatar} className={classes.speakerAvatar}/>*/}
-                        {/*                </div>*/}
-                        {/*                <div className='livestream-streamer'>*/}
-                        {/*                    <div*/}
-                        {/*                        className='livestream-streamer-name'>{livestream.mainSpeakerName}</div>*/}
-                        {/*                    <div*/}
-                        {/*                        className='livestream-streamer-position'>{livestream.mainSpeakerPosition}</div>*/}
-                        {/*                    <div*/}
-                        {/*                        className='livestream-streamer-position light'>{livestream.mainSpeakerBackground}</div>*/}
-                        {/*                </div>*/}
-                        {/*            </div>*/}
-                        {/*        </Grid.Column>*/}
-                        {/*    </Grid.Row>*/}
-                        {/*</Grid>*/}
-                        <Grid className='middle aligned' centered>
-                            <Grid.Row style={{paddingTop: 0, paddingBottom: '5px'}}>
-                                <Grid.Column width={15}>
+                        </div>
+                        {!!targetOptions.length &&
+                            <div style={{padding: "1rem", paddingTop: 0}}>
                                     <TargetOptions options={targetOptions}/>
-                                </Grid.Column>
-                            </Grid.Row>
-                        </Grid>
+                            </div>}
                         {fetchingCareerCenters ?
                             <>
                                 <div className={classes.greenLineBreak}/>
@@ -451,14 +443,13 @@ const GroupStreamCard = ({
                                     <div className={classes.greenLineBreak}/>
                                     <div style={{textAlign: 'center', fontSize: '0.8em', marginTop: 10}}>created by
                                     </div>
-                                    <Grid className='middle aligned' centered style={{padding: '10px 10px 25px 10px'}}>
+                                    <div style={{padding: "1rem", paddingBottom: "1.5rem", display: "flex", justifyContent: "space-evenly", flexWrap: "wrap"}}>
                                         {logoElements}
-                                    </Grid>
+                                    </div>
                                 </div>
                                 : null}
                     </div>
                 </div>
-                {/*</Grow>*/}
                 <GroupJoinToAttendModal
                     open={openJoinModal}
                     groups={getGroups()}
@@ -495,7 +486,6 @@ const GroupStreamCard = ({
                   .livestream-thumbnail {
                     position: relative;
                     width: 100%;
-                    margin: 0 auto 10px auto;
                     background-size: cover;
                     background-position: center center;
                     z-index: 100;
