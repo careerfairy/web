@@ -70,7 +70,7 @@ class Firebase {
             firstName,
             lastName,
             universityCode,
-            universityName, 
+            universityName,
             universityCountryCode
         });
     };
@@ -616,16 +616,25 @@ class Firebase {
         return ref.onSnapshot(callback)
     }
 
-    listenToPastLiveStreamsByGroupId = (groupId, callback) => {
+    queryUpcomingLiveStreamsByGroupId = (groupId) => {
+        var ninetyMinutesInMilliseconds = 1000 * 60 * 90;
+        return  this.firestore
+            .collection("livestreams")
+            .where("groupIds", "array-contains", groupId)
+            .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
+            .orderBy("start", "asc")
+    }
+
+    queryPastLiveStreamsByGroupId = (groupId) => {
         let START_DATE_FOR_REPORTED_EVENTS = 'September 1, 2020 00:00:00';
-        var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
-        let ref = this.firestore
+        const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
+        return this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
             .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
             .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
             .orderBy("start", "desc")
-        return ref.onSnapshot(callback)
+
     }
 
     getLivestreamSpeakers = (livestreamId) => {
@@ -643,15 +652,23 @@ class Firebase {
         return ref.get();
     };
 
-    listenToLivestreamQuestions = (livestreamId, callback) => {
-        let ref = this.firestore
+    listenToUpcomingLivestreamQuestions = (livestreamId) => {
+        return this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("questions")
             .orderBy("type", "asc")
             .orderBy("votes", "desc")
-            .orderBy("timestamp", "asc");
-        return ref.onSnapshot(callback);
+            .orderBy("timestamp", "asc")
+            .where("type", "!=", 'done')
+    };
+
+    listenToPastLivestreamQuestions = (livestreamId) => {
+        return this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("questions")
+            .where("type", "==", 'done')
     };
 
     listLivestreamQuestions = (livestreamId, callback) => {
@@ -728,17 +745,18 @@ class Firebase {
         return ref.add(comment);
     };
 
-    listenToChatEntries = (livestreamId, callback) => {
+    listenToChatEntries = (livestreamId, limit, callback) => {
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("chatEntries")
-            .orderBy("timestamp", "asc");
+            .orderBy("timestamp", "desc")
+            .limit(limit)
         return ref.onSnapshot(callback);
     }
 
     putChatEntry = (livestreamId, chatEntry) => {
-        chatEntry.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
+        chatEntry.timestamp = this.getServerTimestamp()
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
@@ -1313,19 +1331,29 @@ class Firebase {
             .doc(livestreamId)
             .collection("icons");
         return ref.add({
-            iconName: iconName,
+            name: iconName,
             timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
             authorEmail: authorEmail,
-            randomPosition: Math.random(),
         });
     };
-
+//
     listenToLivestreamIcons = (livestreamId, callback) => {
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("icons")
-            .orderBy("timestamp", "asc");
+            .orderBy("timestamp", "desc")
+            .limit(1)
+        return ref.onSnapshot(callback);
+    };
+
+    listenToLivestreamIconCollection = (livestreamId, collection, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection(collection)
+            .orderBy("timestamp", "desc")
+            .limit(1)
         return ref.onSnapshot(callback);
     };
 
@@ -1359,6 +1387,11 @@ class Firebase {
     getStorageRef = () => {
         return this.storage.ref();
     }
+
+    getServerTimestamp = () => {
+        return firebase.firestore.FieldValue.serverTimestamp()
+    }
+
 }
 
 export default Firebase;

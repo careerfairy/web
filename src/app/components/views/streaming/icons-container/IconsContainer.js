@@ -1,11 +1,14 @@
-import {useState, useEffect, useContext} from 'react';
-import {Image} from "semantic-ui-react";
+import {useState, useEffect, useContext, useMemo} from 'react';
+var _ = require('lodash')
 import RubberBand from 'react-reveal/RubberBand';
 import {withFirebasePage} from 'context/firebase';
 import React, {memo} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {v4 as uuidv4} from "uuid";
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
+import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
+import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
+import ClappingSVG from "../../../util/CustomSVGs";
 
 const useStyles = makeStyles(theme => ({
     actionBtn: {
@@ -13,7 +16,6 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: ({color}) => color,
         width: 50,
         height: 50,
-        cursor: "pointer",
         boxShadow: "0 0 8px rgb(120,120,120)",
         position: 'absolute',
         top: '50%',
@@ -22,11 +24,13 @@ const useStyles = makeStyles(theme => ({
 
     },
     image: {
+        color: "white",
         position: 'absolute',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: '25px'
+        width: '25px',
+        height: "25px",
     },
     animatedBox: {
         transition: ({durationTransform}) => `transform ${durationTransform}ms ease-in, opacity ${durationTransform}ms cubic-bezier(1,0,.83,.67)`,
@@ -41,20 +45,35 @@ const useStyles = makeStyles(theme => ({
 }))
 
 
-const ActionButton = React.memo(({icon, right, color, durationTransform, index}) => {
+const ActionButton = React.memo(({iconName, color, getRandomDuration, getRandomHorizontalPosition, id}) => {
     const [distance, setDistance] = useState(0)
     const [opacity, setOpacity] = useState(1)
+
     useEffect(() => {
         setDistance(-100)
         setOpacity(0)
     }, [])
+
+    const durationTransform = useMemo(() => getRandomDuration(3500, 4500), [id]);
+    const right = useMemo(() => getRandomHorizontalPosition(90), [id]);
     const classes = useStyles({color, distance, right, durationTransform, opacity})
+
+    const renderIcon = () => {
+        if (iconName === "like") {
+            return <ThumbUpAltOutlinedIcon className={classes.image} fontSize="default"/>
+        } else if (iconName === "clapping") {
+            return <ClappingSVG className={classes.image}/>
+        } else {
+            return <FavoriteBorderOutlinedIcon className={classes.image} fontSize="default"/>
+        }
+    }
+
 
     return (
         <div className={classes.animatedBox}>
-            <RubberBand>
+            <RubberBand style={{position: "absolute"}}>
                 <div className={classes.actionBtn}>
-                    <Image className={classes.image} src={'/' + icon.iconName + '.png'}/>
+                    {renderIcon()}
                 </div>
             </RubberBand>
         </div>
@@ -66,42 +85,38 @@ const randomInteger = (min, max) => {
 }
 const emotes = ["clapping", "like", "heart"]
 
-function IconsContainer({livestreamId, firebase, isTest}) {
-    const [postedIcons, setPostedIcons] = useState([]);
-    const [filteredIcons, setFilteredIcons] = useState([]);
-    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
+function IconsContainer({livestreamId, firebase}) {
 
-    const classes = useStyles()
+    const [livestreamIcons, setLivestreamIcons] = useState([])
+    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
 
     useEffect(() => {
         if (livestreamId && !showBubbles) {
             const unsubscribe = firebase.listenToLivestreamIcons(livestreamId, querySnapshot => {
-                let iconsList = [];
-                querySnapshot.forEach(doc => {
-                    let icon = doc.data();
-                    icon.id = doc.id;
-                    iconsList.push(icon);
-                });
-                setPostedIcons(iconsList);
-            });
+                let icons = []
+                querySnapshot.forEach((doc) => {
+                    const icon = doc.data()
+                    icon.id = doc.id
+                    icons.push(icon)
+                })
+                setLivestreamIcons(prevState => {
+                    if (prevState.length > 40) {
+                        return prevState.slice(-20)
+                    } else {
+                        if (icons[0]) {
+                            const filteredState = [...prevState, icons[0]]
+                            return _.uniqBy(filteredState, 'id')
 
+                        } else {
+                            return prevState
+                        }
+                    }
+                })
+            });
             return () => unsubscribe()
         }
     }, [livestreamId, showBubbles]);
 
-    useEffect(() => {
-        if (postedIcons.length) {
-            if (filteredIcons.length < 250) {
-                if (!filteredIcons.some(icon => icon.id === postedIcons[postedIcons.length - 1].id)) {
-                    setFilteredIcons([...filteredIcons, postedIcons[postedIcons.length - 1]]);
-                }
-            } else {
-                if (!filteredIcons.some(icon => icon.id === postedIcons[postedIcons.length - 1].id)) {
-                    setFilteredIcons([...filteredIcons.slice(filteredIcons.length - 150), postedIcons[postedIcons.length - 1]]);
-                }
-            }
-        }
-    }, [postedIcons]);
 
     useEffect(() => {
         if (showBubbles) {
@@ -117,61 +132,47 @@ function IconsContainer({livestreamId, firebase, isTest}) {
         }
     }, [showBubbles])
 
-    function getIconColor(icon) {
-        if (icon.iconName === 'like') {
-            return '#e01a4f'
-        }
-        if (icon.iconName === 'clapping') {
-            return '#f15946'
-        }
-        if (icon.iconName === 'heart') {
-            return '#f9c22e'
-        }
-    }
-
     const simulateEmotes = () => {
-        const newPostedIcons = [...postedIcons]
         const index = randomInteger(1, 3)
-        newPostedIcons.push({
+        const newIcon = {
             id: uuidv4(),
-            iconName: emotes[index - 1],
-            randomPosition: Math.random()
-        })
-        setPostedIcons(newPostedIcons)
+            name: emotes[index - 1],
+        }
+        setLivestreamIcons(prevState => [...prevState, newIcon])
     }
 
-    const handleToggle = () => {
-        resetIcons()
-        setShowBubbles(!showBubbles)
-    }
-
-    const resetIcons = () => {
-        const newPostedIcons = [...postedIcons]
-        setPostedIcons(newPostedIcons)
-    }
-
-    function getRandomHorizontalPosition(icon, maxDistance) {
-        return icon.randomPosition * maxDistance;
+    function getRandomHorizontalPosition(maxDistance) {
+        return Math.random() * maxDistance;
     }
 
     function getRandomDuration(min, max) {
         return Math.random() * (max - min) + min //returns int between min and max
     }
 
-    let postedIconsElements = filteredIcons.map((icon, index) => {
+    const getColor = (iconName) => {
+        if (iconName === "clapping") {
+            return "#f15946"
+        } else if (iconName === "heart") {
+            return "#f9c22e"
+        } else {
+            return "#e01a4f"
+        }
+    }
+
+    let iconElements = livestreamIcons.map((iconEl) => {
         return (<ActionButton
-                key={icon.id}
-                index={index}
-                right={getRandomHorizontalPosition(icon, 90)}
-                icon={icon}
-                durationTransform={getRandomDuration(3500, 4500)}
-                color={getIconColor(icon)}/>
+                id={iconEl.id}
+                key={iconEl.id}
+                getRandomHorizontalPosition={getRandomHorizontalPosition}
+                iconName={iconEl.name}
+                getRandomDuration={getRandomDuration}
+                color={getColor(iconEl.name)}/>
         );
     });
 
     return (
         <div style={{position: "relative"}} className='topLevelContainer'>
-            {postedIconsElements}
+            {iconElements}
         </div>
     );
 }

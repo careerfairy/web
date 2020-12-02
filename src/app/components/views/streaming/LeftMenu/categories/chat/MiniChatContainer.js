@@ -2,8 +2,6 @@ import React, {useState, useEffect, useContext} from 'react';
 import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
 import {withFirebase} from 'context/firebase';
 import ChevronRightRoundedIcon from '@material-ui/icons/ChevronRightRounded';
-import {css} from 'glamor';
-import ScrollToBottom from 'react-scroll-to-bottom';
 import ChatEntryContainer from './chat-entry-container/ChatEntryContainer';
 import UserContext from 'context/user/UserContext';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
@@ -21,6 +19,7 @@ import {
     TooltipTitle,
     WhiteTooltip
 } from "../../../../../../materialUI/GlobalTooltips";
+import CustomScrollToBottom from "../../../../../util/CustomScrollToBottom";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -69,9 +68,12 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: "rgb(245,245,245)"
     },
     scrollToBottom: {
-        display: "flex",
-        flexDirection: "column",
-        height: "240px"
+        // display: "flex",
+        // flexDirection: "column",
+        height: "240px",
+        "& div": {
+            overflowX: "hidden",
+        }
     }
 }))
 
@@ -81,6 +83,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
 
     const [chatEntries, setChatEntries] = useState([]);
     const [focused, setFocused] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     const [numberOfMissedEntries, setNumberOfMissedEntries] = useState(0);
     const [numberOfLatestChanges, setNumberOfLatestChanges] = useState(0);
@@ -93,12 +96,12 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
 
     useEffect(() => {
         if (livestream.id) {
-            const unsubscribe = firebase.listenToChatEntries(livestream.id, querySnapshot => {
+            const unsubscribe = firebase.listenToChatEntries(livestream.id, 150, querySnapshot => {
                 var chatEntries = [];
                 querySnapshot.forEach(doc => {
                     let entry = doc.data();
                     entry.id = doc.id;
-                    chatEntries.push(entry);
+                    chatEntries.unshift(entry);
                 });
                 setChatEntries(chatEntries);
                 if (!open) {
@@ -116,7 +119,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
     }, [livestream.id]);
 
     useEffect(() => {
-        if (numberOfMissedEntries + numberOfLatestChanges < 100 && !open) {
+        if (numberOfMissedEntries + numberOfLatestChanges <= 100 && !open) {
             setNumberOfMissedEntries(numberOfMissedEntries + numberOfLatestChanges);
         }
         setNumberOfLatestChanges(0);
@@ -143,9 +146,10 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
 
 
     function addNewChatEntry() {
-        if (isEmpty) {
+        if (isEmpty || submitting) {
             return;
         }
+        setSubmitting(true)
 
         const newChatEntryObject = {
             message: newChatEntry,
@@ -157,8 +161,10 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
         isOpen(15) && handleConfirmStep(15)
         firebase.putChatEntry(livestream.id, newChatEntryObject)
             .then(() => {
+                setSubmitting(false)
                 setNewChatEntry('');
             }, error => {
+                setSubmitting(false)
                 console.log("Error: " + error);
             });
     }
@@ -175,9 +181,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
 
     let chatElements = chatEntries.map((chatEntry, index) => {
         return (
-            <div key={index}>
-                <ChatEntryContainer chatEntry={chatEntry}/>
-            </div>
+            <ChatEntryContainer key={chatEntry?.id} chatEntry={chatEntry}/>
         );
     });
 
@@ -223,9 +227,7 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
                     </Typography>
                 </AccordionSummary>
                 <AccordionDetails className={classes.chatRoom}>
-                    <ScrollToBottom className={classes.scrollToBottom}>
-                        {chatElements}
-                    </ScrollToBottom>
+                    <CustomScrollToBottom className={classes.scrollToBottom} scrollItems={chatElements}/>
                     <WhiteTooltip
                         placement="right-start"
                         title={

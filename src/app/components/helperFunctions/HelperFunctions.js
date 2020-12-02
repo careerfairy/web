@@ -1,6 +1,10 @@
-import { isEmpty } from 'lodash/fp'
+import {isEmpty} from 'lodash/fp'
 
-export const uploadLogo = (location, fileObject, firebase, callback ) => {
+var dayjs = require('dayjs');
+var relativeTime = require('dayjs/plugin/relativeTime')
+dayjs.extend(relativeTime)
+
+export const uploadLogo = (location, fileObject, firebase, callback) => {
     var storageRef = firebase.getStorageRef();
     let fullPath = location + '/' + fileObject.name;
     let companyLogoRef = storageRef.child(fullPath);
@@ -44,6 +48,20 @@ export const uploadLogo = (location, fileObject, firebase, callback ) => {
                 console.log('File available at', downloadURL);
             });
         });
+}
+
+
+export function getTimeFromNow(firebaseTimestamp) {
+    if (firebaseTimestamp) {
+        const dateString = dayjs(firebaseTimestamp.toDate()).fromNow()
+        if (dateString === 'in a few seconds') {
+            return 'just now';
+        } else {
+            return dateString
+        }
+    } else {
+        return ""
+    }
 }
 
 export const isEmptyObject = (obj) => {

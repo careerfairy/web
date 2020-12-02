@@ -1,6 +1,5 @@
-import React, {Fragment, useState, useEffect, useRef} from 'react';
+import React, {Fragment, useState, useEffect} from 'react';
 import UserUtil from "../../../../data/util/UserUtil";
-import axios from "axios";
 import DateUtil from "../../../../util/DateUtil";
 import {Button, Grid, Icon, Image} from "semantic-ui-react";
 import Link from "next/link";
@@ -11,18 +10,17 @@ import {makeStyles} from "@material-ui/core/styles";
 import {useRouter} from "next/router";
 import CopyToClipboard from "./CopyToClipboard";
 import LogoElement from "./LogoElement";
-import {LazyLoadComponent} from "react-lazy-load-image-component";
 import TargetOptions from "../GroupsCarousel/TargetOptions";
 import GroupJoinToAttendModal from './GroupJoinToAttendModal';
 import DataAccessUtil from 'util/DataAccessUtil';
 import {Avatar} from "@material-ui/core";
+import {LazyLoadComponent} from 'react-lazy-load-image-component';
 
 
 const useStyles = makeStyles((theme) => ({
     root: {
         borderRadius: 5,
         overflow: "hidden",
-        paddingBottom: 15,
         textAlign: "left",
         WebkitBoxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
         boxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
@@ -53,11 +51,11 @@ const useStyles = makeStyles((theme) => ({
 const AvatarSkeleton = () => (<Skeleton variant="circle" width={40} height={40}/>)
 
 const ThumbnailSkeleton = () => <Skeleton variant="rect" width={210} height={118}/>
-const BigThumbnailSkeleton = () => <Skeleton variant="rect" width={600} height={400}/>
+const BigThumbnailSkeleton = () => <Skeleton variant="rect" width="100%" height={400}/>
 
 export const StreamCardPlaceHolder = () => {
     return (
-        <div style={{width: "100%"}}>
+        <div style={{width: "100%", display: "flex", flexDirection: "column"}}>
             <Skeleton width="100%" variant="text"/>
             <Skeleton variant="circle" width={40} height={40}/>
             <Skeleton variant="rect" width="100%" height={550}/>
@@ -66,13 +64,26 @@ export const StreamCardPlaceHolder = () => {
 }
 
 
-const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestreamId, id, careerCenterId, groupData, listenToUpcoming}) => {
+const GroupStreamCard = ({
+                             livestream,
+                             user,
+                             fields,
+                             userData,
+                             firebase,
+                             livestreamId,
+                             id,
+                             careerCenterId,
+                             groupData,
+                             listenToUpcoming
+                         }) => {
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [isHighlighted, setIsHighlighted] = useState(false)
+    const [fetchingCareerCenters, setFetchingCareerCenters] = useState(false)
     const [careerCenters, setCareerCenters] = useState([])
     const [targetOptions, setTargetOptions] = useState([])
     const [openJoinModal, setOpenJoinModal] = useState(false);
     const classes = useStyles({isHighlighted})
+
 
     const router = useRouter();
     const absolutePath = router.asPath
@@ -111,7 +122,8 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
     }, [groupData, livestream])
 
     useEffect(() => {
-        if (livestream && livestream.groupIds && livestream.groupIds.length) {
+        if (!careerCenters.length && livestream && livestream.groupIds && livestream.groupIds.length) {
+            setFetchingCareerCenters(true)
             firebase.getDetailLivestreamCareerCenters(livestream.groupIds)
                 .then((querySnapshot) => {
                     let groupList = [];
@@ -120,10 +132,11 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                         group.id = doc.id;
                         groupList.push(group);
                     });
+                    setFetchingCareerCenters(false)
                     setCareerCenters(groupList);
-                });
+                }).catch(() => setFetchingCareerCenters(false))
         }
-    }, [livestream]);
+    }, [livestream.id]);
 
 
     const checkIfHighlighted = () => {
@@ -246,7 +259,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
         router.push(route);
     }
 
-    function sendEmailRegistrationConfirmation() {    
+    function sendEmailRegistrationConfirmation() {
         return DataAccessUtil.sendRegistrationConfirmationEmail(user, userData, livestream);
     }
 
@@ -270,21 +283,18 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
 
     let logoElements = careerCenters.map((careerCenter, index) => {
         return (
-            <Grid.Column width='8' key={index}>
-                <LogoElement livestreamId={livestream.id} userfollows={checkIfUserFollows(careerCenter)}
+            <Grid.Column width='8' key={careerCenter.groupId}>
+                <LogoElement key={careerCenter.groupId} livestreamId={livestream.id}
+                             userfollows={checkIfUserFollows(careerCenter)}
                              careerCenter={careerCenter} userData={userData} user={user}/>
             </Grid.Column>
         );
     });
 
     return (
-        <LazyLoadComponent
-            width="100%"
-            style={{width: "100%"}}
-            threshold={50}
-            placeholder={<StreamCardPlaceHolder/>}>
+        <LazyLoadComponent style={{width: "100%"}} placeholder={<StreamCardPlaceHolder/>}>
             <Fragment>
-                <div className={livestream.highlighted ? classes.highlightedRoot : classes.root }
+                <div className={livestream.highlighted ? classes.highlightedRoot : classes.root}
                     // onClick={(event) => goToRouteFromParent(event, '/upcoming-livestream/' + livestream.id)}
                 >
                     <div className='date-indicator'>
@@ -307,6 +317,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                             </div>
                         </div>
                     </div>
+
                     <div className='livestream-thumbnail'
                          style={{backgroundImage: 'url(' + livestream.backgroundImageUrl + ')'}}>
                         <div className='livestream-thumbnail-overlay'
@@ -350,7 +361,7 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                                 <Grid.Column width={14}>
                                     <div className='livestream-streamer-description'>
                                         <div className='livestream-speaker-avatar-capsule'>
-                                            <Avatar src={avatar} className={classes.speakerAvatar} />
+                                            <Avatar src={avatar} className={classes.speakerAvatar}/>
                                         </div>
                                         <div className='livestream-streamer'>
                                             <div
@@ -371,18 +382,31 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                                 </Grid.Column>
                             </Grid.Row>
                         </Grid>
-                        <div className={careerCenters.length === 0 ? 'hidden' : ''}>
-                            <div style={{
-                                width: '100%',
-                                height: '2px',
-                                backgroundColor: 'rgba(0,210,170,0.6)',
-                                margin: '30px 0 10px 0'
-                            }}/>
-                            <div style={{textAlign: 'center', fontSize: '0.8em'}}>created by</div>
-                            <Grid className='middle aligned' centered style={{padding: '10px'}}>
-                                {logoElements}
-                            </Grid>
-                        </div>
+                        {fetchingCareerCenters ?
+                            <>
+                                <GreenLineBreak/>
+                                <div style={{
+                                    display: "flex",
+                                    width: "100%",
+                                    alignItems: "center",
+                                    justifyContent: "space-evenly",
+                                    height: 150
+                                }}>
+                                    <Skeleton style={{borderRadius: 5}} variant="rect" width={120} height={100}/>
+                                    <Skeleton style={{borderRadius: 5}} variant="rect" width={120} height={100}/>
+                                </div>
+                            </>
+                            :
+                            careerCenters.length ?
+                                <div>
+                                    <GreenLineBreak/>
+                                    <div style={{textAlign: 'center', fontSize: '0.8em', marginTop: 10}}>created by
+                                    </div>
+                                    <Grid className='middle aligned' centered style={{padding: '10px 10px 25px 10px'}}>
+                                        {logoElements}
+                                    </Grid>
+                                </div>
+                                : null}
                     </div>
                 </div>
                 {/*</Grow>*/}
@@ -398,54 +422,54 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                               setModalOpen={setBookingModalOpen}
                               user={user}/>
                 <style jsx>{`
-                .hidden {
+                  .hidden {
                     display: none
-                }
+                  }
 
-                .date-indicator {
+                  .date-indicator {
                     text-align: left;
                     padding: 30px 45px 30px 45px;
                     font-size: 1.6em;
                     font-weight: 500;
                     color: white;
                     background-color: rgb(44, 66, 81);
-                }
+                  }
 
-                .companies-mentor-discriber-content-companylogo {
+                  .companies-mentor-discriber-content-companylogo {
                     position: relative;
                     height: 70px;
                     width: 100%;
                     margin: 0 auto;
                     text-align: center;
-                }
+                  }
 
-                .livestream-thumbnail {
+                  .livestream-thumbnail {
                     position: relative;
                     width: 100%;
                     margin: 0 auto 10px auto;
                     background-size: cover;
                     background-position: center center;
                     z-index: 100;
-                }
+                  }
 
-                .livestream-thumbnail-banner {
+                  .livestream-thumbnail-banner {
                     width: 100%;
                     height: 30px;
                     background-color: black;
                     position: absolute;
-                    left:0;
+                    left: 0;
                     z-index: -10;
-                }
+                  }
 
-                .livestream-thumbnail-banner.top {
-                    top:0;
-                }
+                  .livestream-thumbnail-banner.top {
+                    top: 0;
+                  }
 
-                .livestream-thumbnail-banner.bottom {
-                    bottom:0;
-                }
+                  .livestream-thumbnail-banner.bottom {
+                    bottom: 0;
+                  }
 
-                .livestream-thumbnail-overlay {
+                  .livestream-thumbnail-overlay {
                     cursor: pointer;
                     display: flex;
                     flex-direction: column;
@@ -454,108 +478,108 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                     padding: 10px 0 50px 30px;
                     background-color: rgba(255, 255, 255, 0.90);
                     transition: background-color 0.5s;
-                }
+                  }
 
-                .livestream-thumbnail-overlay:hover {
+                  .livestream-thumbnail-overlay:hover {
                     background-color: rgba(255, 255, 255, 0.85);
-                }
+                  }
 
-                .livestream-thumbnail-overlay-content {
+                  .livestream-thumbnail-overlay-content {
                     position: relative;
                     width: 80%;
                     color: white;
-                }
+                  }
 
-                .top-question-label {
+                  .top-question-label {
                     text-align: left;
                     font-weight: 500;
                     font-size: 0.8em;
                     text-transform: uppercase;
-                    color: rgb(180,180,180);
+                    color: rgb(180, 180, 180);
                     margin: 10px 0 0 0;
-                }
+                  }
 
-                .top-question-label.white {
+                  .top-question-label.white {
                     color: white;
-                }
+                  }
 
-                .top-question-label.margined {
+                  .top-question-label.margined {
                     margin: 10px 0 10px 18px;
-                }
+                  }
 
-                .top-question-label span {
+                  .top-question-label span {
                     margin-left: 3px;
-                }
+                  }
 
-                .livestream-streamer-position {
+                  .livestream-streamer-position {
                     margin: 0 0 0 0;
                     font-size: 0.9em;
                     line-height: 1.2em;
                     color: grey;
                     font-weight: 300;
-                }
+                  }
 
-                .livestream-streamer-position.light {
-                    color: rgb(180,180,180);
+                  .livestream-streamer-position.light {
+                    color: rgb(180, 180, 180);
                     font-size: 0.8em;
-                }
+                  }
 
-                .livestream-streamer-degree {
+                  .livestream-streamer-degree {
                     font-size: 0.8em;
-                }
+                  }
 
-                .livestream-streamer-name {
+                  .livestream-streamer-name {
                     font-size: 1.3em;
-                    font-weight:600;
+                    font-weight: 600;
                     margin-bottom: 5px;
-                }
+                  }
 
-                .livestream-streamer-description {
+                  .livestream-streamer-description {
                     margin-top: 5px;
-                }
+                  }
 
-                .livestream-streamer {
+                  .livestream-streamer {
                     width: 55%;
                     margin-left: 5px;
                     display: inline-block;
                     vertical-align: middle;
-                    color: rgb(40,40,40);
-                }
+                    color: rgb(40, 40, 40);
+                  }
 
-                .livestream-industry {
+                  .livestream-industry {
                     text-transform: uppercase;
-                }
+                  }
 
-                .livestream-position {
+                  .livestream-position {
                     font-weight: 500;
                     color: rgb(44, 66, 81);
                     font-size: 1.6em;
                     margin: 10px 0 20px 0;
                     line-height: 1.2em;
-                }
+                  }
 
-                .livestream-entrants {
+                  .livestream-entrants {
                     margin: 10px 0;
                     font-size: 0.9em;
                     color: white;
-                }
+                  }
 
-                .livestream-entrants span {
+                  .livestream-entrants span {
                     color: rgb(0, 210, 170);
                     font-size: 1.1em;
                     font-weight: 700;
-                }
+                  }
 
-                .livestream-speaker-avatar-capsule {
+                  .livestream-speaker-avatar-capsule {
                     border: 2px solid rgb(0, 210, 170);
                     display: inline-block;
                     margin: 0 15px 0 0;
                     padding: 6px;
                     border-radius: 50%;
                     vertical-align: middle;
-                }
+                  }
 
-                .livestream-speaker-avatar {
+                  .livestream-speaker-avatar {
                     width: 75px;
                     padding-top: 75px;
                     border-radius: 50%;
@@ -564,9 +588,9 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                     box-shadow: 0 0 2px grey;
                     display: inline-block;
                     background-size: cover;
-                }
+                  }
 
-                .date-icon {
+                  .date-icon {
                     position: absolute;
                     top: 15px;
                     right: 15px;
@@ -575,13 +599,13 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                     text-transform: uppercase;
                     color: rgb(44, 66, 81);
                     font-weight: 700;
-                }
+                  }
 
-                .coming-icon-container {
+                  .coming-icon-container {
                     margin: 0 0 30px 0;
-                }
+                  }
 
-                .coming-icon {
+                  .coming-icon {
                     padding: 6px 8px;
                     border: 3px solid white;
                     text-transform: uppercase;
@@ -591,16 +615,16 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                     display: inline-block;
                     font-size: 0.8em;
                     margin: 0 auto;
-                }
+                  }
 
-                .university-icon {
+                  .university-icon {
                     max-width: 80px;
                     display: inline-block;
                     margin: 0 10px 0 0;
                     vertical-align: middle;
-                }
+                  }
 
-                .booked-icon {
+                  .booked-icon {
                     position: absolute;
                     top: 0;
                     left: 0;
@@ -609,9 +633,9 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                     text-align: center;
                     font-size: 1.4em;
                     font-weight: 700;
-                }
+                  }
 
-                .spots-left {
+                  .spots-left {
                     position: absolute;
                     right: 20px;
                     bottom: 20px;
@@ -621,54 +645,65 @@ const GroupStreamCard = ({livestream, user, fields, userData, firebase, livestre
                     background-color: white;
                     text-align: center;
                     padding: 20px 0;
-                }
+                  }
 
-                .spots-left-number {
+                  .spots-left-number {
                     font-size: 1.8em;
                     font-weight: 700;
                     color: rgb(0, 210, 170);
-                }
+                  }
 
-                .spots-left-label {
+                  .spots-left-label {
                     font-size: 0.8em;
                     font-weight: 700;
                     margin: 5px 0;
                     color: rgb(44, 66, 81);
-                }
+                  }
 
-                .show-details {
+                  .show-details {
                     position: absolute;
                     width: 100%;
                     bottom: 5px;
                     z-index: 1000;
                     text-align: center;
-                }
+                  }
 
-                .background {
+                  .background {
                     position: relative;
                     background-color: white;
                     z-index: 10;
-                }
+                  }
 
-                .modalStep {
+                  .modalStep {
                     padding: 30px 0;
-                }
+                  }
 
-                .talentPoolMessage {
+                  .talentPoolMessage {
                     vertical-align: middle;
                     margin: 0 10px;
                     font-weight: 600;
                     text-transform: uppercase;
-                }
+                  }
 
-                .talentPoolMessage.active {
+                  .talentPoolMessage.active {
                     color: rgb(0, 210, 170);
-                }
-            `}</style>
+                  }
+                `}</style>
             </Fragment>
         </LazyLoadComponent>
+
     )
         ;
-};
+}
+
+const GreenLineBreak = () => {
+    return (<div style={{
+        width: '100%',
+        height: '2px',
+        backgroundColor: 'rgba(0,210,170,0.6)',
+        margin: '30px 0 0 0'
+    }}/>)
+}
+
 
 export default withFirebase(GroupStreamCard);
