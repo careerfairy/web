@@ -23,7 +23,7 @@ const Events = (props) => {
 
     const [anchorEl, setAnchorEl] = useState(null);
 
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = React.useState(1);
 
     const [itemsPast, loadMorePast, hasMorePast, totalItemsPast] = useInfiniteScroll(
         props.firebase.queryPastLiveStreamsByGroupId(props.group.id), 3

@@ -1,5 +1,4 @@
 import {isEmpty} from 'lodash/fp'
-import {v4 as uuidv4} from "uuid";
 
 var dayjs = require('dayjs');
 var relativeTime = require('dayjs/plugin/relativeTime')

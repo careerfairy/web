@@ -21,6 +21,9 @@ export const getStreamSubCollectionSpeakers = (livestream, speakerQuery) => {
     } else if (livestream.speakers?.length) {
         let speakersObj = {}
         livestream.speakers.forEach(speaker => {
+            if (!speaker.background) {
+                speaker.background = ""
+            }
             speakersObj[speaker.id] = speaker
         })
         return speakersObj
@@ -70,14 +73,15 @@ export const buildLivestreamObject = (values, targetCategories, updateMode, stre
 }
 
 const buildSpeakersArray = (values) => {
-    return Object.keys(values.speakers).map((key) => {
+    return Object.keys(values.speakers).map((key, index) => {
         return {
             id: key,
             avatar: values.speakers[key].avatar,
             background: values.speakers[key].background,
             firstName: values.speakers[key].firstName,
             lastName: values.speakers[key].lastName,
-            position: values.speakers[key].position
+            position: values.speakers[key].position,
+            rank: index
         }
     });
 }
@@ -146,5 +150,6 @@ export const validateStreamForm = (values, isDraft) => {
     if (!Object.keys(errors.speakers).length) {
         delete errors.speakers
     }
+    console.log(errors);
     return errors;
 }
