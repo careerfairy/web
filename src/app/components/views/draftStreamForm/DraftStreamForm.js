@@ -24,6 +24,11 @@ import {useRouter} from "next/router";
 import FormGroup from "./FormGroup";
 import Fab from "@material-ui/core/Fab";
 import ErrorContext from "../../../context/error/ErrorContext";
+import {
+    getStreamSubCollectionSpeakers,
+    handleAddSpeaker,
+    handleDeleteSpeaker, handleError
+} from "../../helperFunctions/streamFormFunctions";
 
 
 const useStyles = makeStyles(theme => ({
@@ -74,7 +79,6 @@ const speakerObj = {
 }
 
 
-const mainSpeakerId = uuidv4()
 const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
     const router = useRouter()
     const {
@@ -104,9 +108,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         start: new Date(),
         hidden: false,
         summary: '',
-        speakers: {
-            [mainSpeakerId]: speakerObj,
-        },
+        speakers: {[uuidv4()]: speakerObj},
     })
 
 
@@ -148,9 +150,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                         start: livestream.start.toDate() || new Date(),
                         hidden: livestream.hidden || false,
                         summary: livestream.summary || "",
-                        speakers: {
-                            [mainSpeakerId]: speakerObj,
-                        },
+                        speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery)
                     }
                     setFormData(newFormData)
                     if (careerCenterIds) {
@@ -159,23 +159,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     } else {
                         await handleSetGroupIds([], livestream.groupIds)
                     }
-                    // handleSetDefaultGroups(livestream.groupIds)
                     setTargetCategories(livestream.targetCategories || {})
-                    if (!speakerQuery.empty) {
-                        const mainSpeakerFlattenedName = livestream.mainSpeakerName.split(/[ ]+/).join("")
-                        speakerQuery.forEach(query => {
-                            let speaker = query.data()
-                            speaker.id = query.id
-                            const flattenedFirstName = speaker.firstName.split(/[ ]+/).join("")
-                            const flattenedLastName = speaker.lastName.split(/[ ]+/).join("")
-                            const flattenedFullName = flattenedFirstName + flattenedLastName
-                            if (flattenedFullName !== mainSpeakerFlattenedName) {
-                                handleAddSpeaker(newFormData, setFormData, speaker)
-                            } else {
-                                handleAddMainSpeaker(newFormData, setFormData, speaker)
-                            }
-                        })
-                    }
                     setAllFetched(true)
                     setUpdateMode(true)
                 }
@@ -218,17 +202,6 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
             console.log("-> no fileElement", fileElement);
             return '';
         }
-    }
-    const handleAddSpeaker = (values, setCallback, obj) => {
-        const newValues = {...values}
-        newValues.speakers[uuidv4()] = obj
-        setCallback(newValues)
-    }
-
-    const handleAddMainSpeaker = (values, setCallback, obj) => {
-        const newValues = {...values}
-        newValues.speakers[mainSpeakerId] = obj
-        setCallback(newValues)
     }
 
     const handleFlattenOptions = (group) => {
@@ -281,17 +254,9 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
     }
 
 
-    const handleError = (key, fieldName, errors, touched) => {
-        const baseError = errors?.speakers?.[key]?.[fieldName]
-        const baseTouched = touched?.speakers?.[key]?.[fieldName]
-        return baseError && baseTouched && baseError
-    }
 
-    const handleDeleteSpeaker = (key, values, setCallback) => {
-        const newValues = {...values}
-        delete newValues.speakers[key]
-        setCallback(newValues)
-    }
+
+
 
     const SuccessMessage = (
         <>

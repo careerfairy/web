@@ -1,7 +1,7 @@
 import React, {Fragment, useContext, useEffect, useState} from 'react';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {
-    Button, Card, CardHeader,
+    Button,
     CircularProgress,
     Collapse,
     Container,
@@ -26,6 +26,11 @@ import {useRouter} from "next/router";
 import FormGroup from "./FormGroup";
 import Fab from "@material-ui/core/Fab";
 import ErrorContext from "../../../context/error/ErrorContext";
+import {
+    getStreamSubCollectionSpeakers,
+    handleAddSpeaker,
+    handleDeleteSpeaker, handleError
+} from "../../helperFunctions/streamFormFunctions";
 
 
 const useStyles = makeStyles(theme => ({
@@ -130,7 +135,7 @@ const NewLivestreamForm = ({firebase}) => {
                         start: livestream.start.toDate() || new Date(),
                         hidden: livestream.hidden || false,
                         summary: livestream.summary || "",
-                        speakers: extractSpeakers(livestream, speakerQuery)
+                        speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery)
                     }
                     setFormData(newFormData)
                     handleSetDefaultGroups(livestream.groupIds)
@@ -173,26 +178,6 @@ const NewLivestreamForm = ({firebase}) => {
         }
     }, [fetchingAvatars, fetchingBackgrounds, fetchingLogos, fetchingGroups])
 
-    const extractSpeakers = (livestream, speakerQuery) => {
-        if (!speakerQuery.empty && !livestream.speakers) { // if this stream doc has no speakers array and but has a sub-collection
-            let speakersObj = {}
-            speakerQuery.forEach(query => {
-                let speaker = query.data()
-                speaker.id = query.id
-                speakersObj[speaker.id] = speaker
-            })
-            return speakersObj
-        } else if (livestream.speakers?.length) {
-            let speakersObj = {}
-            livestream.speakers.forEach(speaker => {
-                speakersObj[speaker.id] = speaker
-            })
-            return speakersObj
-        } else {
-            return {[uuidv4()]: speakerObj}
-        }
-    }
-
     const handleAddTargetCategories = (arrayOfIds) => {
         const oldTargetCategories = {...targetCategories}
         const newTargetCategories = {}
@@ -221,11 +206,7 @@ const NewLivestreamForm = ({firebase}) => {
         }
     }
 
-    const handleAddSpeaker = (values, setValues, speakerObj) => {
-        const newValues = {...values}
-        newValues.speakers[uuidv4()] = speakerObj
-        setValues(newValues)
-    }
+
 
     const handleSetDefaultGroups = (arrayOfGroupIds) => {
         if (Array.isArray(arrayOfGroupIds)) {
@@ -278,6 +259,7 @@ const NewLivestreamForm = ({firebase}) => {
     const buildSpeakersArray = (values) => {
         return Object.keys(values.speakers).map((key) => {
             return {
+                id: key,
                 avatar: values.speakers[key].avatar,
                 background: values.speakers[key].background,
                 firstName: values.speakers[key].firstName,
@@ -301,17 +283,6 @@ const NewLivestreamForm = ({firebase}) => {
         });
     }
 
-    const handleError = (key, fieldName, errors, touched) => {
-        const baseError = errors && errors.speakers && errors.speakers[key] && errors.speakers[key][fieldName]
-        const baseTouched = touched && touched.speakers && touched.speakers[key] && touched.speakers[key][fieldName]
-        return baseError && baseTouched && baseError
-    }
-
-    const handleDeleteSpeaker = (key, values, setCallback) => {
-        const newValues = {...values}
-        delete newValues.speakers[key]
-        setCallback(newValues)
-    }
 
     return (<Container className={classes.root}>
         {(allFetched && updateMode !== undefined) ? <Formik
