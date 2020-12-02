@@ -13,11 +13,14 @@ import LogoElement from "./LogoElement";
 import TargetOptions from "../GroupsCarousel/TargetOptions";
 import GroupJoinToAttendModal from './GroupJoinToAttendModal';
 import DataAccessUtil from 'util/DataAccessUtil';
-import {Avatar, Button, Typography} from "@material-ui/core";
+import {Avatar, Button, Grow, Typography} from "@material-ui/core";
 import {LazyLoadComponent} from 'react-lazy-load-image-component';
 import {speakerPlaceholder} from "../../../util/constants";
 import AddToPhotosRoundedIcon from '@material-ui/icons/AddToPhotosRounded';
 import ClearRoundedIcon from '@material-ui/icons/ClearRounded';
+import CheckCircleRoundedIcon from '@material-ui/icons/CheckCircleRounded';
+import QueryBuilderRoundedIcon from '@material-ui/icons/QueryBuilderRounded';
+import EventNoteRoundedIcon from '@material-ui/icons/EventNoteRounded';
 import Link from "next/link";
 
 const useStyles = makeStyles((theme) => ({
@@ -335,19 +338,10 @@ const GroupStreamCard = ({
             <Fragment>
                 <div className={livestream.highlighted ? classes.highlightedRoot : classes.root}>
                     <div className='date-indicator'>
-                        <div>
-                            <div style={{display: 'inline-block'}}><Icon name='calendar alternate outline' style={{
-                                color: 'rgb(0, 210, 170)',
-                                fontSize: '0.7em',
-                                marginRight: '10px'
-                            }}/>{DateUtil.getPrettyDay(livestream.start.toDate())}</div>
-                            <div style={{display: 'inline-block', float: 'right'}}>
-                                <Icon name='clock outline'
-                                      style={{
-                                          color: 'rgb(0, 210, 170)',
-                                          fontSize: '0.7em',
-                                          marginRight: '10px'
-                                      }}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
+                        <div style={{display: "flex", justifyContent: "space-between"}}>
+                            <div style={{display: 'flex', alignItems: "center"}}><EventNoteRoundedIcon style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyDay(livestream.start.toDate())}</div>
+                            <div style={{display: 'flex', alignItems: "center"}}>
+                                <QueryBuilderRoundedIcon style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
                             </div>
                         </div>
                     </div>
@@ -394,11 +388,12 @@ const GroupStreamCard = ({
                                 </div>
                             </div>
                         </div>
-                        <div
-                            className={'booked-icon animated tada delay-1s ' + (userIsRegistered() ? '' : 'hidden')}>
-                            <Icon
-                                name='check circle'/>Booked
-                        </div>
+                        <Grow in={Boolean(userIsRegistered())}>
+                            <div className={'booked-icon'}>
+                                <CheckCircleRoundedIcon style={{marginRight: "0.5rem"}}/>Booked
+                            </div>
+                        </Grow>
+
                     </div>
                     <div className='background'>
                         <div className={classes.speakersWrapper}>
@@ -528,6 +523,8 @@ const GroupStreamCard = ({
                     text-align: center;
                     font-size: 1.4em;
                     font-weight: 700;
+                    display: flex;
+                    align-items: center;
                   }
 
                   .background {
