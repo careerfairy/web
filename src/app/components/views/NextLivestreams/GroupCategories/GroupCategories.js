@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Card, CardContent, CardMedia, Grow} from "@material-ui/core";
+import {Box, Card, CardContent, CardMedia} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import CategoryCard from "./CategoryCard";
 import {SizeMe} from "react-sizeme";
@@ -13,8 +13,17 @@ const useStyles = makeStyles((theme) => ({
         width: ({mobile}) => mobile ? "100%" : "40%",
     },
     card: {
-        // padding: "1em",
-        overflow: "auto",
+        overflowY: "auto",
+        '&::-webkit-scrollbar': {
+            width: '0.4em'
+        },
+        '&::-webkit-scrollbar-track': {
+            boxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)',
+            webkitBoxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)'
+        },
+        '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(0,0,0,.1)',
+        },
         position: ({mobile}) => mobile ? "static" : "sticky",
         top: ({mobile}) => mobile ? "auto" : 165,
         maxHeight: ({mobile}) => mobile ? "auto" : "calc(100vh - 180px)"
@@ -89,37 +98,35 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
 
     return (
         <div className={classes.root}>
-            <Grow in={Boolean(groupData.categories?.length)}>
-                <Card className={classes.card}>
-                    <CardMedia className={classes.media}>
-                        <div className={classes.imageContainer}>
-                            <img src={groupData.logoUrl} className={classes.image}
-                                 alt={`${groupData.universityName} logo`}/>
-                        </div>
-                    </CardMedia>
-                    {!!hasCategories() && <CardContent>
-                        <Box className={classes.actions}>
-                            <SizeMe>{({size}) => (
-                                <StackGrid
-                                    style={{marginTop: 10}}
-                                    duration={20}
-                                    columnWidth={"100%"}
-                                    gridRef={grid => setGrid(grid)}>
-                                    {groupData.categories.map(category => {
-                                        if (category.name.toLowerCase() !== "level of study") {
-                                            return (
-                                                <CategoryCard width={size.width} mobile={mobile} key={category.id}
-                                                              category={category}
-                                                              handleToggleActive={handleToggleActive}/>
-                                            )
-                                        }
-                                    })}
-                                </StackGrid>
-                            )}</SizeMe>
-                        </Box>
-                    </CardContent>}
-                </Card>
-            </Grow>
+            <Card className={classes.card}>
+                <CardMedia className={classes.media}>
+                    <div className={classes.imageContainer}>
+                        <img src={groupData.logoUrl} className={classes.image}
+                             alt={`${groupData.universityName} logo`}/>
+                    </div>
+                </CardMedia>
+                {!!hasCategories() && <CardContent>
+                    <Box className={classes.actions}>
+                        <SizeMe>{({size}) => (
+                            <StackGrid
+                                style={{marginTop: 10}}
+                                duration={20}
+                                columnWidth={"100%"}
+                                gridRef={grid => setGrid(grid)}>
+                                {groupData.categories.map(category => {
+                                    if (category.name.toLowerCase() !== "level of study") {
+                                        return (
+                                            <CategoryCard width={size.width} mobile={mobile} key={category.id}
+                                                          category={category}
+                                                          handleToggleActive={handleToggleActive}/>
+                                        )
+                                    }
+                                })}
+                            </StackGrid>
+                        )}</SizeMe>
+                    </Box>
+                </CardContent>}
+            </Card>
         </div>
     )
 };

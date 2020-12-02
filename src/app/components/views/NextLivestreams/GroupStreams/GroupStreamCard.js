@@ -119,7 +119,6 @@ export const StreamCardPlaceHolder = () => {
 const GroupStreamCard = ({
                              livestream,
                              user,
-                             fields,
                              userData,
                              firebase,
                              livestreamId,
@@ -142,11 +141,8 @@ const GroupStreamCard = ({
 
     const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
 
-    const avatar = livestream.mainSpeakerAvatar ? livestream.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
-
     useEffect(() => {
         if (checkIfHighlighted() && !isHighlighted) {
-            // console.log(`careerCenterId: ${careerCenterId} | groupData.groupId: ${groupData.groupId}`);
             setIsHighlighted(true)
         } else if (checkIfHighlighted() && isHighlighted) {
             setIsHighlighted(false)
@@ -162,12 +158,9 @@ const GroupStreamCard = ({
             const flattenedOptions = totalOptions.reduce(function (a, b) {
                 return a.concat(b);
             }, []);
-            // console.log("flattenedOptions", flattenedOptions);
             const matchedOptions = livestream.targetCategories[groupId]
-            // console.log(matchedOptions);
             if (matchedOptions) {
                 const filteredOptions = flattenedOptions.filter(option => matchedOptions.includes(option.id))
-                // console.log("filteredOptions", filteredOptions);
                 setTargetOptions(filteredOptions)
             }
         }
@@ -476,14 +469,6 @@ const GroupStreamCard = ({
                     background-color: rgb(44, 66, 81);
                   }
 
-                  .companies-mentor-discriber-content-companylogo {
-                    position: relative;
-                    height: 70px;
-                    width: 100%;
-                    margin: 0 auto;
-                    text-align: center;
-                  }
-
                   .livestream-thumbnail {
                     position: relative;
                     width: 100%;
@@ -529,139 +514,13 @@ const GroupStreamCard = ({
                     width: 80%;
                     color: white;
                   }
-
-                  .top-question-label {
-                    text-align: left;
-                    font-weight: 500;
-                    font-size: 0.8em;
-                    text-transform: uppercase;
-                    color: rgb(180, 180, 180);
-                    margin: 10px 0 0 0;
-                  }
-
-                  .top-question-label.white {
-                    color: white;
-                  }
-
-                  .top-question-label.margined {
-                    margin: 10px 0 10px 18px;
-                  }
-
-                  .top-question-label span {
-                    margin-left: 3px;
-                  }
-
-                  .livestream-streamer-position {
-                    margin: 0 0 0 0;
-                    font-size: 0.9em;
-                    line-height: 1.2em;
-                    color: grey;
-                    font-weight: 300;
-                  }
-
-                  .livestream-streamer-position.light {
-                    color: rgb(180, 180, 180);
-                    font-size: 0.8em;
-                  }
-
-                  .livestream-streamer-degree {
-                    font-size: 0.8em;
-                  }
-
-                  .livestream-streamer-name {
-                    font-size: 1.3em;
-                    font-weight: 600;
-                    margin-bottom: 5px;
-                  }
-
-                  .livestream-streamer-description {
-                    margin-top: 5px;
-                  }
-
-                  .livestream-streamer {
-                    width: 55%;
-                    margin-left: 5px;
-                    display: inline-block;
-                    vertical-align: middle;
-                    color: rgb(40, 40, 40);
-                  }
-
-                  .livestream-industry {
-                    text-transform: uppercase;
-                  }
-
+                  
                   .livestream-position {
                     font-weight: 500;
                     color: rgb(44, 66, 81);
                     font-size: 1.6em;
                     margin: 10px 0 20px 0;
                     line-height: 1.2em;
-                  }
-
-                  .livestream-entrants {
-                    margin: 10px 0;
-                    font-size: 0.9em;
-                    color: white;
-                  }
-
-                  .livestream-entrants span {
-                    color: rgb(0, 210, 170);
-                    font-size: 1.1em;
-                    font-weight: 700;
-                  }
-
-                  .livestream-speaker-avatar-capsule {
-                    border: 2px solid rgb(0, 210, 170);
-                    display: inline-block;
-                    margin: 0 15px 0 0;
-                    padding: 6px;
-                    border-radius: 50%;
-                    vertical-align: middle;
-                  }
-
-                  .livestream-speaker-avatar {
-                    width: 75px;
-                    padding-top: 75px;
-                    border-radius: 50%;
-                    vertical-align: middle;
-                    display: inline-block;
-                    box-shadow: 0 0 2px grey;
-                    display: inline-block;
-                    background-size: cover;
-                  }
-
-                  .date-icon {
-                    position: absolute;
-                    top: 15px;
-                    right: 15px;
-                    padding: 4px 6px;
-                    border: 2px solid rgb(44, 66, 81);
-                    text-transform: uppercase;
-                    color: rgb(44, 66, 81);
-                    font-weight: 700;
-                  }
-
-                  .coming-icon-container {
-                    margin: 0 0 30px 0;
-                  }
-
-                  .coming-icon {
-                    padding: 6px 8px;
-                    border: 3px solid white;
-                    text-transform: uppercase;
-                    text-align: center;
-                    color: white;
-                    font-weight: 700;
-                    display: inline-block;
-                    font-size: 0.8em;
-                    margin: 0 auto;
-                  }
-
-                  .university-icon {
-                    max-width: 80px;
-                    display: inline-block;
-                    margin: 0 10px 0 0;
-                    vertical-align: middle;
                   }
 
                   .booked-icon {
@@ -675,58 +534,10 @@ const GroupStreamCard = ({
                     font-weight: 700;
                   }
 
-                  .spots-left {
-                    position: absolute;
-                    right: 20px;
-                    bottom: 20px;
-                    height: 80px;
-                    width: 80px;
-                    border-radius: 50%;
-                    background-color: white;
-                    text-align: center;
-                    padding: 20px 0;
-                  }
-
-                  .spots-left-number {
-                    font-size: 1.8em;
-                    font-weight: 700;
-                    color: rgb(0, 210, 170);
-                  }
-
-                  .spots-left-label {
-                    font-size: 0.8em;
-                    font-weight: 700;
-                    margin: 5px 0;
-                    color: rgb(44, 66, 81);
-                  }
-
-                  .show-details {
-                    position: absolute;
-                    width: 100%;
-                    bottom: 5px;
-                    z-index: 1000;
-                    text-align: center;
-                  }
-
                   .background {
                     position: relative;
                     background-color: white;
                     z-index: 10;
-                  }
-
-                  .modalStep {
-                    padding: 30px 0;
-                  }
-
-                  .talentPoolMessage {
-                    vertical-align: middle;
-                    margin: 0 10px;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                  }
-
-                  .talentPoolMessage.active {
-                    color: rgb(0, 210, 170);
                   }
                 `}</style>
             </Fragment>

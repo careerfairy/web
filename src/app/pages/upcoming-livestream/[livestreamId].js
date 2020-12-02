@@ -132,14 +132,11 @@ function UpcomingLivestream(props) {
             const flattenedOptions = totalOptions.reduce(function (a, b) {
                 return a.concat(b);
             }, []);
-            // console.log("flattenedOptions", flattenedOptions);
             const matchedOptions = currentLivestream.targetCategories[groupId];
-            // console.log(matchedOptions);
             if (matchedOptions) {
                 const filteredOptions = flattenedOptions.filter((option) =>
                     matchedOptions.includes(option.id)
                 );
-                // console.log("filteredOptions", filteredOptions);
                 setTargetOptions(filteredOptions);
             }
         }
