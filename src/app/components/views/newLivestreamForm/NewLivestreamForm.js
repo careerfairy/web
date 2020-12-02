@@ -27,6 +27,7 @@ import FormGroup from "./FormGroup";
 import Fab from "@material-ui/core/Fab";
 import ErrorContext from "../../../context/error/ErrorContext";
 import {
+    buildLivestreamObject,
     getStreamSubCollectionSpeakers,
     handleAddSpeaker,
     handleDeleteSpeaker, handleError
@@ -234,40 +235,9 @@ const NewLivestreamForm = ({firebase}) => {
         return optionsArray
     }
 
-    const buildLivestreamObject = (values) => {
-        return {
-            ...(updateMode && {id: livestreamId}),// only adds id: livestreamId field if there's actually a valid id, which is when updateMode is true
-            backgroundImageUrl: values.backgroundImageUrl,
-            company: values.company,
-            companyId: values.companyId,
-            title: values.title,
-            companyLogoUrl: values.companyLogoUrl,
-            registeredUsers: [],
-            start: firebase.getFirebaseTimestamp(values.start),
-            targetGroups: [],
-            targetCategories: targetCategories,
-            type: 'upcoming',
-            test: false,
-            groupIds: values.groupIds,
-            hidden: values.hidden,
-            universities: [],
-            summary: values.summary,
-            speakers: buildSpeakersArray(values)
-        }
-    }
 
-    const buildSpeakersArray = (values) => {
-        return Object.keys(values.speakers).map((key) => {
-            return {
-                id: key,
-                avatar: values.speakers[key].avatar,
-                background: values.speakers[key].background,
-                firstName: values.speakers[key].firstName,
-                lastName: values.speakers[key].lastName,
-                position: values.speakers[key].position
-            }
-        });
-    }
+
+
 
     const handleGetFiles = (path, setFetchingCallback, setDataCallback) => {
         firebase.getStorageRef().child(path).listAll().then(res => {
@@ -333,15 +303,13 @@ const NewLivestreamForm = ({firebase}) => {
                     try {
                         setGeneralError("")
                         setSubmitting(true)
-                        const livestream = buildLivestreamObject(values);
-                        const speakers = buildSpeakersArray(values);
-
+                        const livestream = buildLivestreamObject(values, targetCategories, updateMode, livestreamId);
                         let id
                         if (updateMode) {
                             id = livestream.id
-                            await firebase.updateLivestream(livestream, speakers, "livestreams")
+                            await firebase.updateLivestream(livestream, "livestreams")
                         } else {
-                            id = await firebase.addLivestream(livestream, speakers)
+                            id = await firebase.addLivestream(livestream)
                         }
                         if (values.hidden && values.groupIds.length) {
                             return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)

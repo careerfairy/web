@@ -46,3 +46,38 @@ export const handleError = (key, fieldName, errors, touched) => {
     const baseTouched = touched?.speakers?.[key]?.[fieldName]
     return baseError && baseTouched && baseError
 }
+
+export const buildLivestreamObject = (values, targetCategories, updateMode, streamId) => {
+    return {
+        ...(updateMode && {id: streamId}),// only adds id: livestreamId field if there's actually a valid id, which is when updateMode is true
+        backgroundImageUrl: values.backgroundImageUrl,
+        company: values.company,
+        companyId: values.companyId,
+        title: values.title,
+        companyLogoUrl: values.companyLogoUrl,
+        registeredUsers: [],
+        start: firebase.getFirebaseTimestamp(values.start),
+        targetGroups: [],
+        targetCategories: targetCategories,
+        type: 'upcoming',
+        test: false,
+        groupIds: values.groupIds,
+        hidden: values.hidden,
+        universities: [],
+        summary: values.summary,
+        speakers: buildSpeakersArray(values)
+    }
+}
+
+const buildSpeakersArray = (values) => {
+    return Object.keys(values.speakers).map((key) => {
+        return {
+            id: key,
+            avatar: values.speakers[key].avatar,
+            background: values.speakers[key].background,
+            firstName: values.speakers[key].firstName,
+            lastName: values.speakers[key].lastName,
+            position: values.speakers[key].position
+        }
+    });
+}

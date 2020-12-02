@@ -25,6 +25,7 @@ import FormGroup from "./FormGroup";
 import Fab from "@material-ui/core/Fab";
 import ErrorContext from "../../../context/error/ErrorContext";
 import {
+    buildLivestreamObject,
     getStreamSubCollectionSpeakers,
     handleAddSpeaker,
     handleDeleteSpeaker, handleError
@@ -216,48 +217,6 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         return optionsArray
     }
 
-    const buildLivestreamObject = (values) => {
-        return {
-            ...(updateMode && {id: draftStreamId}),// only adds id: livestreamId field if there's actually a valid id, which is when updateMode is true
-            backgroundImageUrl: values.backgroundImageUrl,
-            company: values.company,
-            companyId: values.companyId,
-            title: values.title,
-            companyLogoUrl: values.companyLogoUrl,
-            mainSpeakerAvatar: values.speakers[mainSpeakerId].avatar,
-            mainSpeakerBackground: values.speakers[mainSpeakerId].background,
-            mainSpeakerPosition: values.speakers[mainSpeakerId].position,
-            mainSpeakerName: values.speakers[mainSpeakerId].firstName + ' ' + values.speakers[mainSpeakerId].lastName,
-            registeredUsers: [],
-            start: firebase.getFirebaseTimestamp(values.start),
-            targetGroups: [],
-            targetCategories: targetCategories,
-            type: 'upcoming',
-            test: false,
-            groupIds: values.groupIds,
-            hidden: values.hidden,
-            universities: [],
-            summary: values.summary
-        }
-    }
-
-    const buildSpeakersArray = (values) => {
-        return Object.keys(values.speakers).map((key) => {
-            return {
-                avatar: values.speakers[key].avatar,
-                background: values.speakers[key].background,
-                firstName: values.speakers[key].firstName,
-                lastName: values.speakers[key].lastName,
-                position: values.speakers[key].position
-            }
-        });
-    }
-
-
-
-
-
-
     const SuccessMessage = (
         <>
             <Typography variant="h5" align="center" style={{color: "white"}}>Thanks for your
@@ -321,8 +280,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                 try {
                     setGeneralError("")
                     setSubmitting(true)
-                    const livestream = buildLivestreamObject(values);
-                    const speakers = buildSpeakersArray(values);
+                    const livestream = buildLivestreamObject(values, targetCategories, updateMode, draftStreamId);
                     let id;
                     if (updateMode) {
                         id = livestream.id
