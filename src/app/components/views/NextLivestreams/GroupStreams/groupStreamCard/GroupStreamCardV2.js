@@ -5,6 +5,7 @@ import {speakerPlaceholder} from "../../../../util/constants";
 import {Avatar, Button, Card, CardMedia, Paper} from "@material-ui/core";
 import {AvatarGroup} from "@material-ui/lab";
 import Streamers from "./Streamers";
+import Link from "next/link";
 import Wave from "./Wave";
 import LibraryBooksIcon from "@material-ui/icons/LibraryBooks";
 import Typography from "@material-ui/core/Typography";
@@ -14,6 +15,10 @@ import DateUtil from "../../../../../util/DateUtil";
 import TargetOptions from "../../GroupsCarousel/TargetOptions";
 import {grey} from "@material-ui/core/colors";
 import EventNoteRoundedIcon from "@material-ui/icons/EventNoteRounded";
+import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
+import AddToPhotosRoundedIcon from "@material-ui/icons/AddToPhotosRounded";
+import UserUtil from "../../../../../data/util/UserUtil";
+import DataAccessUtil from "../../../../../util/DataAccessUtil";
 
 const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
@@ -39,7 +44,7 @@ const useStyles = makeStyles((theme) => {
             padding: '0.5em 0.5em 0.75em',
             WebkitTransition: transition,
             transition: transition,
-            transform: ({cardHovered}) => cardHovered && "translate(71%, -61%)",
+            transform: ({cardHovered}) => cardHovered && "translate(71%, -40%)",
             flexDirection: ({cardHovered}) => cardHovered && "column",
             display: "flex",
             justifyContent: "center",
@@ -57,7 +62,7 @@ const useStyles = makeStyles((theme) => {
             padding: '0.5em 0.5em 0.75em',
             WebkitTransition: transition,
             transition: transition,
-            transform: ({cardHovered}) => cardHovered && "translate(-71%, -61%)",
+            transform: ({cardHovered}) => cardHovered && "translate(-68%, -40%)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center"
@@ -70,7 +75,7 @@ const useStyles = makeStyles((theme) => {
             width: "100%",
             display: "flex",
             alignItems: "center",
-            padding: theme.spacing(1),
+            padding: theme.spacing(2),
             borderRadius: `${theme.spacing(2)}px 0px`,
             background: grey[50]
         },
@@ -114,6 +119,10 @@ const useStyles = makeStyles((theme) => {
         },
         detailsBtn: {
             borderRadius: theme.spacing(2),
+        },
+        buttonsWrapper: {
+            display: "flex",
+            justifyContent: "center"
         },
         background: {
             transition: ({cardHovered}) => cardHovered && `${transition}, opacity 100ms linear`,
@@ -185,10 +194,13 @@ const GroupStreamCardV2 = ({
                                hasCategories
                            }) => {
 
-    const [careerCenters, setCareerCenters] = useState([])
     const [cardHovered, setCardHovered] = useState(false)
     const classes = useStyles({cardHovered, mobile, hasCategories, listenToUpcoming})
+    const [careerCenters, setCareerCenters] = useState([])
     const [targetOptions, setTargetOptions] = useState([])
+    const [bookingModalOpen, setBookingModalOpen] = useState(false);
+    const [isHighlighted, setIsHighlighted] = useState(false)
+    const [openJoinModal, setOpenJoinModal] = useState(false);
     const [fetchingCareerCenters, setFetchingCareerCenters] = useState(false)
 
     useEffect(() => {
@@ -224,12 +236,38 @@ const GroupStreamCardV2 = ({
         }
     }, [livestream.id]);
 
+    const checkIfHighlighted = () => {
+        if (careerCenterId && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId) {
+            return true
+        } else return livestreamId && !careerCenterId && !groupData.id && livestreamId === id;
+    }
+
+    function targetHasClickHandler(event) {
+        let element = event.target;
+        if (element.onclick !== null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function deregisterFromLivestream() {
+        if (!user) {
+            return router.push({
+                pathname: '/login',
+                query: {absolutePath}
+            });
+        }
+
+        firebase.deregisterFromLivestream(livestream.id, user.email);
+    }
+
     const handleMouseEntered = () => {
         !mobile && setCardHovered(true)
     }
 
     const handleMouseLeft = () => {
-        !mobile && setCardHovered(true)
+        !mobile && setCardHovered(false)
     }
     console.log("livestream", livestream);
 
@@ -239,6 +277,112 @@ const GroupStreamCardV2 = ({
             return userData.groupIds.includes(groupId)
         } else {
             return false
+        }
+    }
+
+    function deregisterFromLivestream() {
+        if (!user) {
+            return router.push({
+                pathname: '/login',
+                query: {absolutePath}
+            });
+        }
+
+        firebase.deregisterFromLivestream(livestream.id, user.email);
+    }
+
+    function startRegistrationProcess() {
+        if (!user || !user.emailVerified) {
+            return router.push({
+                pathname: `/login`,
+                query: {absolutePath: linkToStream},
+            });
+        }
+
+        if (!userData || !UserUtil.userProfileIsComplete(userData)) {
+            return router.push({
+                pathname: '/profile',
+                query: "profile"
+            });
+        }
+        if (listenToUpcoming) {// If on next livestreams tab...
+            if (!userFollowingAnyGroup()) {
+                setOpenJoinModal(true)
+            } else {
+                firebase.registerToLivestream(livestream.id, user.email).then(() => {
+                    setBookingModalOpen(true);
+                    sendEmailRegistrationConfirmation();
+                })
+            }
+        } else { // if on any other tab that isn't next livestreams...
+            if (!userFollowingCurrentGroup()) {
+                setOpenJoinModal(true)
+            } else {
+                firebase.registerToLivestream(livestream.id, user.email).then(() => {
+                    setBookingModalOpen(true);
+                    sendEmailRegistrationConfirmation();
+                })
+            }
+        }
+
+    }
+
+    function completeRegistrationProcess() {
+        firebase.registerToLivestream(livestream.id, user.email).then(() => {
+            setBookingModalOpen(true);
+            sendEmailRegistrationConfirmation();
+        })
+    }
+
+    function handleCloseJoinModal() {
+        setOpenJoinModal(false);
+    }
+
+    function userIsRegistered() {
+        if (!user || !livestream.registeredUsers) {
+            return false;
+        }
+        return checkIfRegistered();
+    }
+
+    function sendEmailRegistrationConfirmation() {
+        return DataAccessUtil.sendRegistrationConfirmationEmail(user, userData, livestream);
+    }
+
+    const userFollowingAnyGroup = () => {
+        if (userData.groupIds && livestream.groupIds) { // are you following any group thats part of this livstream?
+            return userData.groupIds.some(id => livestream.groupIds.indexOf(id) >= 0)
+        } else {
+            return false
+        }
+    }
+
+    const userFollowingCurrentGroup = () => {
+        if (userData.groupIds && groupData.groupId) { // Are you following the group in group tab?
+            return userData.groupIds.includes(groupData.groupId)
+        } else {
+            return false
+        }
+    }
+
+    const handleRegisterClick = () => {
+        if (user && livestream.registeredUsers?.indexOf(user.email) > -1) {
+            deregisterFromLivestream()
+        } else {
+            startRegistrationProcess()
+        }
+    }
+
+    const checkIfRegistered = () => {
+        return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1)
+    }
+
+
+    const getGroups = () => {
+        if (groupData.groupId) {
+            return [groupData]
+        } else {
+            return careerCenters
         }
     }
 
@@ -267,7 +411,8 @@ const GroupStreamCardV2 = ({
                         style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
                 </div>
                 <div className={classes.date}>
-                    <EventNoteRoundedIcon style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyDay(livestream.start.toDate())}
+                    <EventNoteRoundedIcon
+                        style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyDay(livestream.start.toDate())}
                 </div>
                 <Paper elevation={4} className={classes.front}>
                     <Paper elevation={cardHovered ? 24 : 4} className={classes.logoWrapper}>
@@ -289,8 +434,29 @@ const GroupStreamCardV2 = ({
                 <div className={classes.background}>
                     <img className={classes.backgroundImage} src={livestream.backgroundImageUrl} alt="background"/>
                     <div className={classes.backgroundContent}>
-                        <Button className={classes.detailsBtn} startIcon={<LibraryBooksIcon/>} size="large"
-                                variant="contained" color="secondary">Details</Button>
+                        <div className={classes.buttonsWrapper}>
+                            <Link
+                                prefetch={false}
+                                href={{
+                                    pathname: `/upcoming-livestream/${livestream.id}`,
+                                    query: listenToUpcoming ? null : {groupId: groupData.groupId}
+                                }}><a>
+                                    <Button className={classes.detailsBtn}
+                                            style={{marginRight: 5}}
+                                            startIcon={<LibraryBooksIcon/>}
+                                            size="large"
+                                            children="Details"
+                                            variant="contained" color="secondary"/>
+                                </a></Link>
+                            <Button className={classes.detailsBtn} size='large' style={{marginLeft: 5}}
+                                    variant="contained"
+                                    startIcon={(user && checkIfRegistered()) ?
+                                        <ClearRoundedIcon/> : <AddToPhotosRoundedIcon/>}
+                                    color={(user && checkIfRegistered()) ? "default" : 'primary'}
+                                    children={user ? (checkIfRegistered() ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
+                                    onClick={handleRegisterClick}/>
+
+                        </div>
                         <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
                         <div style={{padding: "1rem", paddingTop: 0}}>
                             {!!targetOptions.length &&

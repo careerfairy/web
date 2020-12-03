@@ -46,7 +46,6 @@ function PollOptionResultViewer(props) {
 
                 .option-container div {
                     vertical-align: middle;
-                    left-align: left;
                 }
 
                 .option-container-index {

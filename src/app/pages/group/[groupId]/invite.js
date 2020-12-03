@@ -121,7 +121,6 @@ const GroupInvite = (props) => {
                         font-weight: 500;
                         font-size: calc(1.1em + 2vw);
                         color: rgb(0, 210, 170);
-                        text-shado
                     }
 
                     .group-name-label {
@@ -129,7 +128,6 @@ const GroupInvite = (props) => {
                         font-weight: 500;
                         font-size: calc(1.1em + 1.3vw);
                         color: rgb(80,80,80);
-                        text-shado
                     }
 
                     .sublabel {

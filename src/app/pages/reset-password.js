@@ -212,7 +212,6 @@ export function ResetPasswordBase(props) {
                             .loginModal {
                                 background-color: rgb(230,230,230);
                                 padding: 60px;
-                                font-weight: 3em;
                             }
 
                             #loginModalTitle {

@@ -863,7 +863,7 @@ function UpcomingLivestream(props) {
                 .livestream-title {
                     font-size: calc(1.5em + 1.5vw);
                     color: rgb(44, 66, 81);
-                    text-align: let;
+                    text-align: left;
                     line-height: 1.4em;
                     font-weight: 700;
                     max-width: 800px;
@@ -874,7 +874,7 @@ function UpcomingLivestream(props) {
                     border: 2px solid rgb(0, 210, 170);
                     display: inline-block;
                     margin: 20px auto;
-                    padding 8px;
+                    padding: 8px;
                     border-radius: 50%;
                 }
 

@@ -276,8 +276,6 @@ function StreamingPage(props) {
                         top: 55px;
                         right: 130px;
                         width: 20%;
-                        minWidth: 400px;
-                        maxWidth: 500px;
                         z-index: 200;
                         padding: 10px 0;
                     }

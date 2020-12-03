@@ -176,7 +176,6 @@ function LandingPage(props) {
                             right: 0;
                             background-color: rgba(0, 210, 170, 0.7);
                             opacity: 0;
-                            transiton: opacity 1s;
                         }
                     `}</style>
                 </div>

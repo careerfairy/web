@@ -130,7 +130,6 @@ const ScheduleEvent = (props) => {
                         font-weight: 500;
                         font-size: calc(1em + 1.4vw);
                         color: rgb(80,80,80);
-                        text-shado
                     }
 
                     #profileContainer {
