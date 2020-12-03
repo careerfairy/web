@@ -13,6 +13,7 @@ import QueryBuilderRoundedIcon from "@material-ui/icons/QueryBuilderRounded";
 import DateUtil from "../../../../../util/DateUtil";
 import TargetOptions from "../../GroupsCarousel/TargetOptions";
 import {grey} from "@material-ui/core/colors";
+import EventNoteRoundedIcon from "@material-ui/icons/EventNoteRounded";
 
 const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
@@ -22,12 +23,12 @@ const useStyles = makeStyles((theme) => {
             display: "flex",
             justifyContent: "center",
             position: "relative",
-            zIndex: ({cardHovered}) => cardHovered && 9999,
+            zIndex: ({cardHovered}) => cardHovered && 1002,
             "& p": {
                 color: ({cardHovered}) => cardHovered ? theme.palette.common.white : theme.palette.common.black
             },
         },
-        date: {
+        time: {
             color: ({cardHovered}) => cardHovered && theme.palette.common.white,
             position: 'absolute',
             top: '0',
@@ -38,7 +39,25 @@ const useStyles = makeStyles((theme) => {
             padding: '0.5em 0.5em 0.75em',
             WebkitTransition: transition,
             transition: transition,
-            // transform: ({cardHovered}) => cardHovered && "translate(71%, -61%)",
+            transform: ({cardHovered}) => cardHovered && "translate(71%, -61%)",
+            flexDirection: ({cardHovered}) => cardHovered && "column",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+        },
+        date: {
+            flexDirection: ({cardHovered}) => cardHovered && "column",
+            color: ({cardHovered}) => cardHovered && theme.palette.common.white,
+            position: 'absolute',
+            top: '0',
+            left: '1em',
+            zIndex: '999',
+            fontWeight: 'bold',
+            fontSize: '1.125rem',
+            padding: '0.5em 0.5em 0.75em',
+            WebkitTransition: transition,
+            transition: transition,
+            transform: ({cardHovered}) => cardHovered && "translate(-71%, -61%)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center"
@@ -59,7 +78,6 @@ const useStyles = makeStyles((theme) => {
             fontWeight: "bold",
             margin: '0.75em 0',
             textAlign: 'center',
-            // animation: ({cardHovered}) => cardHovered && "$gameName 250ms forwards",
             fontSize: theme.spacing(3),
             display: "flex",
             alignItems: "center",
@@ -69,7 +87,7 @@ const useStyles = makeStyles((theme) => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            transform: ({cardHovered}) => cardHovered && "translateY(-30%) scale(0.7)",
+            transform: ({cardHovered}) => cardHovered && "translateY(-115px) scale(0.7)",
             transition: '250ms',
             background: ({cardHovered}) => cardHovered ? "transparent" : fade(paperColor, 0.5),
             boxShadow: ({cardHovered}) => cardHovered && "none",
@@ -99,10 +117,7 @@ const useStyles = makeStyles((theme) => {
         },
         background: {
             transition: ({cardHovered}) => cardHovered && `${transition}, opacity 100ms linear`,
-            transform: ({
-                            cardHovered,
-                            mobile
-                        }) => cardHovered ? mobile ? 'scale(1, 1.3)' : 'scale(1.35, 1.3) translateY(5%)' : 'scale(0.2, 0.9)',
+            transform: ({cardHovered}) => cardHovered ? 'scale(1.35, 1.3) translateY(5%)' : 'scale(0.2, 0.9)',
             opacity: ({cardHovered}) => cardHovered ? 1 : 0,
             background: 'rgb(40, 46, 54)',
             position: 'absolute',
@@ -121,6 +136,7 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center",
             padding: theme.spacing(2),
             marginTop: 140,
+            zIndex: 1005
         },
         backgroundImage: {
             position: "absolute",
@@ -209,11 +225,11 @@ const GroupStreamCardV2 = ({
     }, [livestream.id]);
 
     const handleMouseEntered = () => {
-        setCardHovered(true)
+        !mobile && setCardHovered(true)
     }
 
     const handleMouseLeft = () => {
-        setCardHovered(true)
+        !mobile && setCardHovered(true)
     }
     console.log("livestream", livestream);
 
@@ -246,9 +262,12 @@ const GroupStreamCardV2 = ({
     return (
         <Fragment>
             <div onMouseLeave={handleMouseLeft} onMouseEnter={handleMouseEntered} className={classes.game}>
-                <div className={classes.date}>
+                <div className={classes.time}>
                     <QueryBuilderRoundedIcon
                         style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
+                </div>
+                <div className={classes.date}>
+                    <EventNoteRoundedIcon style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyDay(livestream.start.toDate())}
                 </div>
                 <Paper elevation={4} className={classes.front}>
                     <Paper elevation={cardHovered ? 24 : 4} className={classes.logoWrapper}>
@@ -257,6 +276,7 @@ const GroupStreamCardV2 = ({
                     <Typography className={classes.companyName}>
                         {livestream.company}
                     </Typography>
+                    {!cardHovered &&
                     <div className={classes.speakersAndLogosWrapper}>
                         <AvatarGroup max={3}>
                             {speakerElements}
@@ -264,7 +284,7 @@ const GroupStreamCardV2 = ({
                         <div className={classes.logosFrontWrapper}>
                             {logoElements}
                         </div>
-                    </div>
+                    </div>}
                 </Paper>
                 <div className={classes.background}>
                     <img className={classes.backgroundImage} src={livestream.backgroundImageUrl} alt="background"/>
