@@ -10,7 +10,7 @@ import UserContext from "../../../context/user/UserContext"
 const NextLivestreams = ({firebase}) => {
     const {userData, authenticatedUser} = useContext(UserContext);
     const router = useRouter();
-    // console.log("router.asPath :", router.asPath, "router.route :", router.route, "router.query: ", router.query);
+
     const {
         query: {livestreamId},
     } = router;
@@ -25,12 +25,9 @@ const NextLivestreams = ({firebase}) => {
     const [groupIds, setGroupIds] = useState(["upcoming"]);
     const [livestreams, setLivestreams] = useState([]);
     const [groupIdsToRemove, setGroupIdsToRemove] = useState([])
-    // const [paramsLivestreamId, setParamsLivestreamId] = useState(null);
-    // const [paramsCareerCenterId, setParamsCareerCenterId] = useState(null);
     const [searching, setSearching] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [listenToUpcoming, setListenToUpcoming] = useState(false);
-    // const routerMounted = paramsLivestreamId !== null && paramsCareerCenterId !== null;
 
     useEffect(() => {
         if (listenToUpcoming) { // && routerMounted
@@ -40,7 +37,6 @@ const NextLivestreams = ({firebase}) => {
                     querySnapshot.forEach((doc) => {
                         let livestream = doc.data();
                         livestream.id = doc.id;
-                        console.log(doc.ref);
                         livestreams.push(livestream);
                     });
                     if (livestreamId && !careerCenterId) {
@@ -70,10 +66,6 @@ const NextLivestreams = ({firebase}) => {
             return firebase.updateUserGroups(userId, filteredGroupIds, filteredRegisteredGroups)
         }
     }, [groupIdsToRemove])
-
-    const getStreamSpeakers = (livestream) => {
-
-    }
 
     useEffect(() => {
         if (groupData && groupData.groupId) {

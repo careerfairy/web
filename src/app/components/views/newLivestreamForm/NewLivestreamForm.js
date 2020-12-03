@@ -1,7 +1,7 @@
 import React, {Fragment, useContext, useEffect, useState} from 'react';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {
-    Button, Card, CardHeader,
+    Button,
     CircularProgress,
     Collapse,
     Container,
@@ -26,6 +26,12 @@ import {useRouter} from "next/router";
 import FormGroup from "./FormGroup";
 import Fab from "@material-ui/core/Fab";
 import ErrorContext from "../../../context/error/ErrorContext";
+import {
+    buildLivestreamObject,
+    getStreamSubCollectionSpeakers,
+    handleAddSpeaker,
+    handleDeleteSpeaker, handleError, handleFlattenOptions, validateStreamForm
+} from "../../helperFunctions/streamFormFunctions";
 
 
 const useStyles = makeStyles(theme => ({
@@ -67,7 +73,6 @@ const speakerObj = {
 }
 
 
-const mainSpeakerId = uuidv4()
 const NewLivestreamForm = ({firebase}) => {
     const router = useRouter()
     const {
@@ -103,9 +108,7 @@ const NewLivestreamForm = ({firebase}) => {
         start: new Date(),
         hidden: false,
         summary: '',
-        speakers: {
-            [mainSpeakerId]: speakerObj,
-        },
+        speakers: {[uuidv4()]: speakerObj},
     })
 
     useEffect(() => {
@@ -133,28 +136,11 @@ const NewLivestreamForm = ({firebase}) => {
                         start: livestream.start.toDate() || new Date(),
                         hidden: livestream.hidden || false,
                         summary: livestream.summary || "",
-                        speakers: {
-                            [mainSpeakerId]: speakerObj,
-                        },
+                        speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery)
                     }
                     setFormData(newFormData)
                     handleSetDefaultGroups(livestream.groupIds)
                     setTargetCategories(livestream.targetCategories || {})
-                    if (!speakerQuery.empty) {
-                        const mainSpeakerFlattenedName = livestream.mainSpeakerName.split(/[ ]+/).join("")
-                        speakerQuery.forEach(query => {
-                            let speaker = query.data()
-                            speaker.id = query.id
-                            const flattenedFirstName = speaker.firstName.split(/[ ]+/).join("")
-                            const flattenedLastName = speaker.lastName.split(/[ ]+/).join("")
-                            const flattenedFullName = flattenedFirstName + flattenedLastName
-                            if (flattenedFullName !== mainSpeakerFlattenedName) {
-                                handleAddSpeaker(newFormData, setFormData, speaker)
-                            } else {
-                                handleAddMainSpeaker(newFormData, setFormData, speaker)
-                            }
-                        })
-                    }
                     if (forLivestream) {
                         setUpdateMode(true)
                     }
@@ -193,19 +179,6 @@ const NewLivestreamForm = ({firebase}) => {
         }
     }, [fetchingAvatars, fetchingBackgrounds, fetchingLogos, fetchingGroups])
 
-    const handleAddTargetCategories = (arrayOfIds) => {
-        const oldTargetCategories = {...targetCategories}
-        const newTargetCategories = {}
-        arrayOfIds.forEach(id => {
-            if (!oldTargetCategories[id]) {
-                newTargetCategories[id] = []
-            } else {
-                newTargetCategories[id] = oldTargetCategories[id]
-            }
-        })
-        setTargetCategories(newTargetCategories)
-    }
-
     const handleSetGroupCategories = (groupId, targetOptionIds) => {
         const newTargetCategories = {...targetCategories}
         newTargetCategories[groupId] = targetOptionIds
@@ -221,20 +194,8 @@ const NewLivestreamForm = ({firebase}) => {
         }
     }
 
-    const handleAddMainSpeaker = (values, setCallback, obj) => {
-        const newValues = {...values}
-        newValues.speakers[mainSpeakerId] = obj
-        setCallback(newValues)
-    }
-
-    const handleAddSpeaker = (values, setCallback, obj) => {
-        const newValues = {...values}
-        newValues.speakers[uuidv4()] = obj
-        setCallback(newValues)
-    }
 
     const handleSetDefaultGroups = (arrayOfGroupIds) => {
-
         if (Array.isArray(arrayOfGroupIds)) {
             let groupsWithFlattenedOptions = []
             arrayOfGroupIds.forEach(id => {
@@ -245,43 +206,6 @@ const NewLivestreamForm = ({firebase}) => {
                 }
             })
             setSelectedGroups(groupsWithFlattenedOptions)
-        }
-    }
-
-    const handleFlattenOptions = (group) => {
-        let optionsArray = []
-        if (group.categories && group.categories.length) {
-            group.categories.forEach(category => {
-                if (category.options && category.options.length) {
-                    category.options.forEach(option => optionsArray.push(option))
-                }
-            })
-        }
-        return optionsArray
-    }
-
-    const buildLivestreamObject = (values) => {
-        return {
-            ...(updateMode && {id: livestreamId}),// only adds id: livestreamId field if there's actually a valid id, which is when updateMode is true
-            backgroundImageUrl: values.backgroundImageUrl,
-            company: values.company,
-            companyId: values.companyId,
-            title: values.title,
-            companyLogoUrl: values.companyLogoUrl,
-            mainSpeakerAvatar: values.speakers[mainSpeakerId].avatar,
-            mainSpeakerBackground: values.speakers[mainSpeakerId].background,
-            mainSpeakerPosition: values.speakers[mainSpeakerId].position,
-            mainSpeakerName: values.speakers[mainSpeakerId].firstName + ' ' + values.speakers[mainSpeakerId].lastName,
-            registeredUsers: [],
-            start: firebase.getFirebaseTimestamp(values.start),
-            targetGroups: [],
-            targetCategories: targetCategories,
-            type: 'upcoming',
-            test: false,
-            groupIds: values.groupIds,
-            hidden: values.hidden,
-            universities: [],
-            summary: values.summary
         }
     }
 
@@ -299,101 +223,36 @@ const NewLivestreamForm = ({firebase}) => {
         });
     }
 
-    const buildSpeakersArray = (values) => {
-        return Object.keys(values.speakers).map((key) => {
-            return {
-                avatar: values.speakers[key].avatar,
-                background: values.speakers[key].background,
-                firstName: values.speakers[key].firstName,
-                lastName: values.speakers[key].lastName,
-                position: values.speakers[key].position
+    const handleSubmitForm = async (values, {setSubmitting}) => {
+        try {
+            setGeneralError("")
+            setSubmitting(true)
+            const livestream = buildLivestreamObject(values, targetCategories, updateMode, livestreamId, firebase);
+            let id
+            if (updateMode) {
+                id = livestream.id
+                await firebase.updateLivestream(livestream, "livestreams")
+            } else {
+                id = await firebase.addLivestream(livestream, "livestreams")
             }
-        });
+            if (values.hidden && values.groupIds.length) {
+                return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)
+            } else {
+                return push(`/upcoming-livestream/${id}`)
+            }
+
+        } catch (e) {
+            setGeneralError("Something went wrong")
+        }
     }
 
-
-    const handleError = (key, fieldName, errors, touched) => {
-        const baseError = errors && errors.speakers && errors.speakers[key] && errors.speakers[key][fieldName]
-        const baseTouched = touched && touched.speakers && touched.speakers[key] && touched.speakers[key][fieldName]
-        return baseError && baseTouched && baseError
-    }
-
-    const handleDeleteSpeaker = (key, values, setCallback) => {
-        const newValues = {...values}
-        delete newValues.speakers[key]
-        setCallback(newValues)
-    }
 
     return (<Container className={classes.root}>
         {(allFetched && updateMode !== undefined) ? <Formik
                 initialValues={formData}
                 enableReinitialize
-                validate={values => {
-                    let errors = {speakers: {}};
-                    if (!values.companyLogoUrl) {
-                        errors.companyLogoUrl = 'Required';
-                    }
-                    if (!values.backgroundImageUrl) {
-                        errors.backgroundImageUrl = 'Required';
-                    }
-                    if (!values.company) {
-                        errors.company = 'Required';
-                    }
-                    if (!values.companyId) {
-                        errors.companyId = 'Required';
-                    }
-                    if (!values.title) {
-                        errors.title = 'Required';
-                    }
-
-                    Object.keys(values.speakers).forEach((key) => {
-                        errors.speakers[key] = {}
-                        if (!values.speakers[key].firstName) {
-                            errors.speakers[key].firstName = 'Required';
-                        }
-                        if (!values.speakers[key].lastName) {
-                            errors.speakers[key].lastName = 'Required';
-                        }
-                        if (!values.speakers[key].position) {
-                            errors.speakers[key].position = 'Required';
-                        }
-                        if (!values.speakers[key].background) {
-                            errors.speakers[key].background = 'Required';
-                        }
-                        if (!Object.keys(errors.speakers[key]).length) {
-                            delete errors.speakers[key]
-                        }
-                    })
-                    if (!Object.keys(errors.speakers).length) {
-                        delete errors.speakers
-                    }
-                    return errors;
-                }}
-                onSubmit={async (values, {setSubmitting}) => {
-                    try {
-                        setGeneralError("")
-                        setSubmitting(true)
-                        const livestream = buildLivestreamObject(values);
-                        const speakers = buildSpeakersArray(values);
-
-                        let id
-                        if (updateMode) {
-                            id = livestream.id
-                            await firebase.updateLivestream(livestream, speakers, "livestreams")
-                        } else {
-                            id = await firebase.addLivestream(livestream, speakers)
-                        }
-
-                        if (values.hidden && values.groupIds.length) {
-                            return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)
-                        } else {
-                            return push(`/upcoming-livestream/${id}`)
-                        }
-
-                    } catch (e) {
-                        setGeneralError("Something went wrong")
-                    }
-                }}
+                validate={(values) => validateStreamForm(values, false)}
+                onSubmit={handleSubmitForm}
             >
                 {({
                       values,
@@ -558,7 +417,7 @@ const NewLivestreamForm = ({firebase}) => {
                             <Fragment key={key}>
                                 <div className={classes.speakersLabel}>
                                     <Typography
-                                        variant="h4">{index === 0 ? "Main Speaker:" : `Speaker ${index + 1}:`}</Typography>
+                                        variant="h4">{`Speaker ${index + 1}`}</Typography>
                                     {!!index &&
                                     <Fab size="small" color="secondary"
                                          onClick={() => handleDeleteSpeaker(key, values, setValues)}>
@@ -602,7 +461,8 @@ const NewLivestreamForm = ({firebase}) => {
                                 values={values}
                                 isSubmitting={isSubmitting}
                                 selectedGroups={selectedGroups}
-                                handleAddTargetCategories={handleAddTargetCategories}
+                                setTargetCategories={setTargetCategories}
+                                targetCategories={targetCategories}
                                 handleFlattenOptions={handleFlattenOptions}
                                 setSelectedGroups={setSelectedGroups}
                                 setFieldValue={setFieldValue}

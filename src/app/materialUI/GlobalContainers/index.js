@@ -1,5 +1,5 @@
-import {Box} from "@material-ui/core";
-import {makeStyles} from '@material-ui/core/styles';
+import {Box, Container, useMediaQuery} from "@material-ui/core";
+import {makeStyles, useTheme} from '@material-ui/core/styles';
 import React from "react";
 
 const useStyles = makeStyles(theme => ({
@@ -60,5 +60,12 @@ export const QuestionContainerTitle = ({...props}) => {
     return <Box className={classes.questionContainerTitleStyle} {...props}/>
 }
 
+export const ResponsiveContainer = ({children, ...props}) => {
+    const theme = useTheme()
+    const isMobile = useMediaQuery(theme.breakpoints.up('sm'));
+    return <Container disableGutters {...props}>
+        {children}
+    </Container>
+}
 
 
