@@ -67,3 +67,4 @@ export function getTimeFromNow(firebaseTimestamp) {
 export const isEmptyObject = (obj) => {
     return isEmpty(obj);
 }
+

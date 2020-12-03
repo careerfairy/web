@@ -1,8 +1,7 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import UserUtil from "../../../../data/util/UserUtil";
 import DateUtil from "../../../../util/DateUtil";
-import {Button, Grid, Icon, Image} from "semantic-ui-react";
-import Link from "next/link";
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import Skeleton from '@material-ui/lab/Skeleton';
 import BookingModal from "../../common/booking-modal/BookingModal";
 import {withFirebase} from "context/firebase";
@@ -13,12 +12,19 @@ import LogoElement from "./LogoElement";
 import TargetOptions from "../GroupsCarousel/TargetOptions";
 import GroupJoinToAttendModal from './GroupJoinToAttendModal';
 import DataAccessUtil from 'util/DataAccessUtil';
-import {Avatar} from "@material-ui/core";
+import {Avatar, Button, Grow, Typography} from "@material-ui/core";
 import {LazyLoadComponent} from 'react-lazy-load-image-component';
-
+import {speakerPlaceholder} from "../../../util/constants";
+import AddToPhotosRoundedIcon from '@material-ui/icons/AddToPhotosRounded';
+import ClearRoundedIcon from '@material-ui/icons/ClearRounded';
+import CheckCircleRoundedIcon from '@material-ui/icons/CheckCircleRounded';
+import QueryBuilderRoundedIcon from '@material-ui/icons/QueryBuilderRounded';
+import EventNoteRoundedIcon from '@material-ui/icons/EventNoteRounded';
+import Link from "next/link";
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        minWidth: 300,
         borderRadius: 5,
         overflow: "hidden",
         textAlign: "left",
@@ -27,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
         MozBoxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
     },
     highlightedRoot: {
+        minWidth: 300,
         borderRadius: 5,
         border: '20px solid #00d2aa',
         overflow: "hidden",
@@ -37,21 +44,48 @@ const useStyles = makeStyles((theme) => ({
         MozBoxShadow: ({isHighlighted}) => isHighlighted ? "0px -1px 11px 1px rgba(0,210,170,0.75)" : "0 0 5px rgb(180,180,180)",
     },
     speakerAvatar: {
-        width: 75,
-        height: 75
+        width: 65,
+        height: 65,
     },
-    speakerWrapper: {
-        display: "flex !important",
-        flexDirection: "column !important",
-        alignItems: "center !important"
+    greenLineBreak: {
+        width: '100%',
+        height: '2px',
+        backgroundColor: 'rgba(0,210,170,0.6)',
+    },
+    streamerName: {
+        fontSize: "1em",
+        fontWeight: 600,
+        marginBottom: 5,
+    },
+    streamerPosition: {
+        margin: "0 0 0 0",
+        fontSize: "0.9em",
+        lineHeight: "1.2em",
+        color: "grey",
+        fontWeight: 300,
+        overflowWrap: "break-word",
+        wordWrap: "break-word",
+        hyphens: "auto",
+    },
+    speakersWrapper: {
+        display: "flex",
+        overflowX: "auto",
+        width: "100%",
+        justifyContent: "center",
+        overflowWrap: "break-word",
+        wordWrap: "break-word",
+        hyphens: "auto",
+    },
+    speakerDiv: {
+        padding: theme.spacing(2),
+        minWidth: 100,
+        alignItems: "center",
+        flexDirection: "column",
+        display: "flex",
+        flex: 1
     }
 
 }));
-
-const AvatarSkeleton = () => (<Skeleton variant="circle" width={40} height={40}/>)
-
-const ThumbnailSkeleton = () => <Skeleton variant="rect" width={210} height={118}/>
-const BigThumbnailSkeleton = () => <Skeleton variant="rect" width="100%" height={400}/>
 
 export const StreamCardPlaceHolder = () => {
     return (
@@ -67,7 +101,6 @@ export const StreamCardPlaceHolder = () => {
 const GroupStreamCard = ({
                              livestream,
                              user,
-                             fields,
                              userData,
                              firebase,
                              livestreamId,
@@ -90,11 +123,8 @@ const GroupStreamCard = ({
 
     const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
 
-    const avatar = livestream.mainSpeakerAvatar ? livestream.mainSpeakerAvatar : 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
-
     useEffect(() => {
         if (checkIfHighlighted() && !isHighlighted) {
-            // console.log(`careerCenterId: ${careerCenterId} | groupData.groupId: ${groupData.groupId}`);
             setIsHighlighted(true)
         } else if (checkIfHighlighted() && isHighlighted) {
             setIsHighlighted(false)
@@ -110,12 +140,9 @@ const GroupStreamCard = ({
             const flattenedOptions = totalOptions.reduce(function (a, b) {
                 return a.concat(b);
             }, []);
-            // console.log("flattenedOptions", flattenedOptions);
             const matchedOptions = livestream.targetCategories[groupId]
-            // console.log(matchedOptions);
             if (matchedOptions) {
                 const filteredOptions = flattenedOptions.filter(option => matchedOptions.includes(option.id))
-                // console.log("filteredOptions", filteredOptions);
                 setTargetOptions(filteredOptions)
             }
         }
@@ -280,40 +307,40 @@ const GroupStreamCard = ({
         }
     }
 
+    let speakerElements = livestream.speakers?.map(speaker => {
+        return (
+            <div key={speaker.id} className={classes.speakerDiv}>
+                <Avatar className={classes.speakerAvatar} src={speaker.avatar || speakerPlaceholder}/>
+                <Typography align="center" className={classes.streamerName}>
+                    {`${speaker.firstName} ${speaker.lastName}`}
+                </Typography>
+                <Typography align="center" className={classes.streamerPosition}>
+                    {speaker.position}
+                </Typography>
+            </div>
+        )
+    })
+
 
     let logoElements = careerCenters.map((careerCenter, index) => {
         return (
-            <Grid.Column width='8' key={careerCenter.groupId}>
+            <div style={{flex: 1, minWidth: "50%"}} key={careerCenter.groupId}>
                 <LogoElement key={careerCenter.groupId} livestreamId={livestream.id}
                              userfollows={checkIfUserFollows(careerCenter)}
                              careerCenter={careerCenter} userData={userData} user={user}/>
-            </Grid.Column>
+            </div>
         );
     });
 
     return (
         <LazyLoadComponent style={{width: "100%"}} placeholder={<StreamCardPlaceHolder/>}>
             <Fragment>
-                <div className={livestream.highlighted ? classes.highlightedRoot : classes.root}
-                    // onClick={(event) => goToRouteFromParent(event, '/upcoming-livestream/' + livestream.id)}
-                >
+                <div className={livestream.highlighted ? classes.highlightedRoot : classes.root}>
                     <div className='date-indicator'>
-                        {/* <div className='coming-icon-container'>
-                        <div className='coming-icon' style={{ color: userIsRegistered() ? 'white' : '', border: userIsRegistered() ? '2px solid white' : ''}} ><Icon name='rss'/>Live stream</div>
-                    </div> */}
-                        <div>
-                            <div style={{display: 'inline-block'}}><Icon name='calendar alternate outline' style={{
-                                color: 'rgb(0, 210, 170)',
-                                fontSize: '0.7em',
-                                marginRight: '10px'
-                            }}/>{DateUtil.getPrettyDay(livestream.start.toDate())}</div>
-                            <div style={{display: 'inline-block', float: 'right'}}>
-                                <Icon name='clock outline'
-                                      style={{
-                                          color: 'rgb(0, 210, 170)',
-                                          fontSize: '0.7em',
-                                          marginRight: '10px'
-                                      }}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
+                        <div style={{display: "flex", justifyContent: "space-between"}}>
+                            <div style={{display: 'flex', alignItems: "center"}}><EventNoteRoundedIcon style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyDay(livestream.start.toDate())}</div>
+                            <div style={{display: 'flex', alignItems: "center"}}>
+                                <QueryBuilderRoundedIcon style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
                             </div>
                         </div>
                     </div>
@@ -324,7 +351,7 @@ const GroupStreamCard = ({
                              style={{backgroundColor: userIsRegistered() ? 'rgba(0, 210, 170, 0.9)' : ''}}>
                             <CopyToClipboard value={linkToStream}/>
                             <div className='livestream-thumbnail-overlay-content'>
-                                <Image style={{
+                                <img alt="filter" style={{
                                     maxWidth: '220px',
                                     margin: '30px 0',
                                     maxHeight: '120px',
@@ -334,57 +361,50 @@ const GroupStreamCard = ({
                                      style={{color: userIsRegistered() ? 'white' : ''}}>{livestream.title}</div>
                                 <div>
                                     <Button size='large' style={{margin: '5px 5px 0 0'}}
-                                            icon={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? 'delete' : 'add'}
-                                            color={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? null : 'teal'}
-                                            content={user ? ((livestream.registeredUsers?.indexOf(user.email) > -1) ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
+                                            variant="contained"
+                                            startIcon={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ?
+                                                <ClearRoundedIcon/> : <AddToPhotosRoundedIcon/>}
+                                            color={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? "default" : 'primary'}
+                                            children={user ? ((livestream.registeredUsers?.indexOf(user.email) > -1) ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
                                             onClick={(user && livestream.registeredUsers?.indexOf(user.email) > -1) ? () => deregisterFromLivestream() : () => startRegistrationProcess()}/>
-                                    <Link href={{
-                                        pathname: `/upcoming-livestream/${livestream.id}`,
-                                        query: listenToUpcoming ? null : {groupId: groupData.groupId}
-                                    }}
-                                          prefetch={false}><a><Button
-                                        size='large' style={{margin: '5px 5px 0 0'}} icon='signup'
-                                        content='Details'
-                                        color='pink'/></a></Link>
+                                    <Link
+                                        href={{
+                                            pathname: `/upcoming-livestream/${livestream.id}`,
+                                            query: listenToUpcoming ? null : {groupId: groupData.groupId}
+                                        }} prefetch={false}
+                                    >
+                                        <a>
+                                            <Button
+                                                size='large'
+                                                style={{margin: '5px 5px 0 0'}}
+                                                startIcon={<LibraryBooksIcon/>}
+                                                children='Details'
+                                                variant="contained"
+                                                color="secondary"/>
+                                        </a>
+                                    </Link>
+
                                 </div>
                             </div>
                         </div>
-                        <div
-                            className={'booked-icon animated tada delay-1s ' + (userIsRegistered() ? '' : 'hidden')}>
-                            <Icon
-                                name='check circle'/>Booked
-                        </div>
+                        <Grow in={Boolean(userIsRegistered())}>
+                            <div className={'booked-icon'}>
+                                <CheckCircleRoundedIcon style={{marginRight: "0.5rem"}}/>Booked
+                            </div>
+                        </Grow>
+
                     </div>
                     <div className='background'>
-                        <Grid centered className='middle aligned' divided>
-                            <Grid.Row>
-                                <Grid.Column width={14}>
-                                    <div className='livestream-streamer-description'>
-                                        <div className='livestream-speaker-avatar-capsule'>
-                                            <Avatar src={avatar} className={classes.speakerAvatar}/>
-                                        </div>
-                                        <div className='livestream-streamer'>
-                                            <div
-                                                className='livestream-streamer-name'>{livestream.mainSpeakerName}</div>
-                                            <div
-                                                className='livestream-streamer-position'>{livestream.mainSpeakerPosition}</div>
-                                            <div
-                                                className='livestream-streamer-position light'>{livestream.mainSpeakerBackground}</div>
-                                        </div>
-                                    </div>
-                                </Grid.Column>
-                            </Grid.Row>
-                        </Grid>
-                        <Grid className='middle aligned' centered>
-                            <Grid.Row style={{paddingTop: 0, paddingBottom: '5px'}}>
-                                <Grid.Column width={15}>
-                                    <TargetOptions options={targetOptions}/>
-                                </Grid.Column>
-                            </Grid.Row>
-                        </Grid>
+                        <div className={classes.speakersWrapper}>
+                            {speakerElements}
+                        </div>
+                        {!!targetOptions.length &&
+                        <div style={{padding: "1rem", paddingTop: 0}}>
+                            <TargetOptions options={targetOptions}/>
+                        </div>}
                         {fetchingCareerCenters ?
                             <>
-                                <GreenLineBreak/>
+                                <div className={classes.greenLineBreak}/>
                                 <div style={{
                                     display: "flex",
                                     width: "100%",
@@ -399,17 +419,22 @@ const GroupStreamCard = ({
                             :
                             careerCenters.length ?
                                 <div>
-                                    <GreenLineBreak/>
+                                    <div className={classes.greenLineBreak}/>
                                     <div style={{textAlign: 'center', fontSize: '0.8em', marginTop: 10}}>created by
                                     </div>
-                                    <Grid className='middle aligned' centered style={{padding: '10px 10px 25px 10px'}}>
+                                    <div style={{
+                                        padding: "1rem",
+                                        paddingBottom: "1.5rem",
+                                        display: "flex",
+                                        justifyContent: "space-evenly",
+                                        flexWrap: "wrap"
+                                    }}>
                                         {logoElements}
-                                    </Grid>
+                                    </div>
                                 </div>
                                 : null}
                     </div>
                 </div>
-                {/*</Grow>*/}
                 <GroupJoinToAttendModal
                     open={openJoinModal}
                     groups={getGroups()}
@@ -435,18 +460,9 @@ const GroupStreamCard = ({
                     background-color: rgb(44, 66, 81);
                   }
 
-                  .companies-mentor-discriber-content-companylogo {
-                    position: relative;
-                    height: 70px;
-                    width: 100%;
-                    margin: 0 auto;
-                    text-align: center;
-                  }
-
                   .livestream-thumbnail {
                     position: relative;
                     width: 100%;
-                    margin: 0 auto 10px auto;
                     background-size: cover;
                     background-position: center center;
                     z-index: 100;
@@ -470,7 +486,6 @@ const GroupStreamCard = ({
                   }
 
                   .livestream-thumbnail-overlay {
-                    cursor: pointer;
                     display: flex;
                     flex-direction: column;
                     width: 100%;
@@ -490,138 +505,12 @@ const GroupStreamCard = ({
                     color: white;
                   }
 
-                  .top-question-label {
-                    text-align: left;
-                    font-weight: 500;
-                    font-size: 0.8em;
-                    text-transform: uppercase;
-                    color: rgb(180, 180, 180);
-                    margin: 10px 0 0 0;
-                  }
-
-                  .top-question-label.white {
-                    color: white;
-                  }
-
-                  .top-question-label.margined {
-                    margin: 10px 0 10px 18px;
-                  }
-
-                  .top-question-label span {
-                    margin-left: 3px;
-                  }
-
-                  .livestream-streamer-position {
-                    margin: 0 0 0 0;
-                    font-size: 0.9em;
-                    line-height: 1.2em;
-                    color: grey;
-                    font-weight: 300;
-                  }
-
-                  .livestream-streamer-position.light {
-                    color: rgb(180, 180, 180);
-                    font-size: 0.8em;
-                  }
-
-                  .livestream-streamer-degree {
-                    font-size: 0.8em;
-                  }
-
-                  .livestream-streamer-name {
-                    font-size: 1.3em;
-                    font-weight: 600;
-                    margin-bottom: 5px;
-                  }
-
-                  .livestream-streamer-description {
-                    margin-top: 5px;
-                  }
-
-                  .livestream-streamer {
-                    width: 55%;
-                    margin-left: 5px;
-                    display: inline-block;
-                    vertical-align: middle;
-                    color: rgb(40, 40, 40);
-                  }
-
-                  .livestream-industry {
-                    text-transform: uppercase;
-                  }
-
                   .livestream-position {
                     font-weight: 500;
                     color: rgb(44, 66, 81);
                     font-size: 1.6em;
                     margin: 10px 0 20px 0;
                     line-height: 1.2em;
-                  }
-
-                  .livestream-entrants {
-                    margin: 10px 0;
-                    font-size: 0.9em;
-                    color: white;
-                  }
-
-                  .livestream-entrants span {
-                    color: rgb(0, 210, 170);
-                    font-size: 1.1em;
-                    font-weight: 700;
-                  }
-
-                  .livestream-speaker-avatar-capsule {
-                    border: 2px solid rgb(0, 210, 170);
-                    display: inline-block;
-                    margin: 0 15px 0 0;
-                    padding: 6px;
-                    border-radius: 50%;
-                    vertical-align: middle;
-                  }
-
-                  .livestream-speaker-avatar {
-                    width: 75px;
-                    padding-top: 75px;
-                    border-radius: 50%;
-                    vertical-align: middle;
-                    display: inline-block;
-                    box-shadow: 0 0 2px grey;
-                    display: inline-block;
-                    background-size: cover;
-                  }
-
-                  .date-icon {
-                    position: absolute;
-                    top: 15px;
-                    right: 15px;
-                    padding: 4px 6px;
-                    border: 2px solid rgb(44, 66, 81);
-                    text-transform: uppercase;
-                    color: rgb(44, 66, 81);
-                    font-weight: 700;
-                  }
-
-                  .coming-icon-container {
-                    margin: 0 0 30px 0;
-                  }
-
-                  .coming-icon {
-                    padding: 6px 8px;
-                    border: 3px solid white;
-                    text-transform: uppercase;
-                    text-align: center;
-                    color: white;
-                    font-weight: 700;
-                    display: inline-block;
-                    font-size: 0.8em;
-                    margin: 0 auto;
-                  }
-
-                  .university-icon {
-                    max-width: 80px;
-                    display: inline-block;
-                    margin: 0 10px 0 0;
-                    vertical-align: middle;
                   }
 
                   .booked-icon {
@@ -633,39 +522,8 @@ const GroupStreamCard = ({
                     text-align: center;
                     font-size: 1.4em;
                     font-weight: 700;
-                  }
-
-                  .spots-left {
-                    position: absolute;
-                    right: 20px;
-                    bottom: 20px;
-                    height: 80px;
-                    width: 80px;
-                    border-radius: 50%;
-                    background-color: white;
-                    text-align: center;
-                    padding: 20px 0;
-                  }
-
-                  .spots-left-number {
-                    font-size: 1.8em;
-                    font-weight: 700;
-                    color: rgb(0, 210, 170);
-                  }
-
-                  .spots-left-label {
-                    font-size: 0.8em;
-                    font-weight: 700;
-                    margin: 5px 0;
-                    color: rgb(44, 66, 81);
-                  }
-
-                  .show-details {
-                    position: absolute;
-                    width: 100%;
-                    bottom: 5px;
-                    z-index: 1000;
-                    text-align: center;
+                    display: flex;
+                    align-items: center;
                   }
 
                   .background {
@@ -673,36 +531,12 @@ const GroupStreamCard = ({
                     background-color: white;
                     z-index: 10;
                   }
-
-                  .modalStep {
-                    padding: 30px 0;
-                  }
-
-                  .talentPoolMessage {
-                    vertical-align: middle;
-                    margin: 0 10px;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                  }
-
-                  .talentPoolMessage.active {
-                    color: rgb(0, 210, 170);
-                  }
                 `}</style>
             </Fragment>
         </LazyLoadComponent>
 
     )
         ;
-}
-
-const GreenLineBreak = () => {
-    return (<div style={{
-        width: '100%',
-        height: '2px',
-        backgroundColor: 'rgba(0,210,170,0.6)',
-        margin: '30px 0 0 0'
-    }}/>)
 }
 
 

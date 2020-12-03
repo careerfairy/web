@@ -130,7 +130,7 @@ const EnhancedGroupStreamCard = (props) => {
     function getOptionName(optionId) {
         let correspondingOption = {};
         correspondingOption = groupCategories.find(option => option.id === optionId);
-        return correspondingOption.name || 'CATEGORY_UNDEFINED';
+        return correspondingOption?.name || 'CATEGORY_UNDEFINED';
     }
 
     function addElement(optionId) {

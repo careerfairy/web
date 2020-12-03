@@ -25,6 +25,7 @@ import axios from "axios";
 import DataAccessUtil from "util/DataAccessUtil";
 import {Avatar} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
+import {speakerPlaceholder} from "../../components/util/constants";
 
 const useStyles = makeStyles(theme => ({
     speakerAvatar: {
@@ -38,7 +39,6 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const speakerPlaceholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media"
 
 function UpcomingLivestream(props) {
     const classes = useStyles()
@@ -47,8 +47,6 @@ function UpcomingLivestream(props) {
     const absolutePath = router.asPath;
 
     const {userData, authenticatedUser: user} = useContext(UserContext);
-
-    const [livestreamSpeakers, setLivestreamSpeakers] = useState([]);
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
     const [currentLivestream, setCurrentLivestream] = useState(null);
@@ -134,14 +132,11 @@ function UpcomingLivestream(props) {
             const flattenedOptions = totalOptions.reduce(function (a, b) {
                 return a.concat(b);
             }, []);
-            // console.log("flattenedOptions", flattenedOptions);
             const matchedOptions = currentLivestream.targetCategories[groupId];
-            // console.log(matchedOptions);
             if (matchedOptions) {
                 const filteredOptions = flattenedOptions.filter((option) =>
                     matchedOptions.includes(option.id)
                 );
-                // console.log("filteredOptions", filteredOptions);
                 setTargetOptions(filteredOptions);
             }
         }
@@ -174,23 +169,6 @@ function UpcomingLivestream(props) {
             setUserIsInTalentPool(false);
         }
     }, [currentLivestream, userData]);
-
-
-    useEffect(() => {
-        if (livestreamId) {
-            props.firebase
-                .getLivestreamSpeakers(livestreamId)
-                .then((querySnapshot) => {
-                    var speakerList = [];
-                    querySnapshot.forEach((doc) => {
-                        let speaker = doc.data();
-                        speaker.id = doc.id;
-                        speakerList.push(speaker);
-                    });
-                    setLivestreamSpeakers(speakerList);
-                });
-        }
-    }, [livestreamId]);
 
     function goToSeparateRoute(route) {
         window.open("http://careerfairy.io" + route, "_blank");
@@ -345,7 +323,7 @@ function UpcomingLivestream(props) {
             );
     }
 
-    let speakerElements = livestreamSpeakers.map((speaker, index) => {
+    let speakerElements = currentLivestream?.speakers?.map((speaker, index) => {
         return (
             <Grid.Column
                 className={classes.speakerWrapper}
@@ -354,7 +332,7 @@ function UpcomingLivestream(props) {
                 mobile="16"
                 tablet="8"
                 computer="5"
-                key={index}
+                key={speaker.id}
             >
                 <div className="livestream-speaker-avatar-capsule">
                     <Avatar src={speaker?.avatar?.length? speaker.avatar : speakerPlaceholder} className={classes.speakerAvatar}/>
@@ -563,7 +541,6 @@ function UpcomingLivestream(props) {
                             </div>
                             <div style={{margin: "40px 0", width: "100%"}}>
                                 <div>
-                                    {/* <Button size='big' content={ 'Ready To Join' } icon={ 'play' } style={{ margin: '5px' }} onClick={() => setUserIsReady(true)} disabled={!currentLivestream.hasStarted} color='pink'/>  */}
                                     <Button
                                         size="big"
                                         id="register-button"

@@ -262,24 +262,15 @@ class Firebase {
 
     // CREATE_LIVESTREAMS
 
-    addLivestream = async (livestream, speakers) => {
+    addLivestream = async (livestream, collection) => {
         try {
             let batch = this.firestore.batch();
             let livestreamsRef = this.firestore
-                .collection("livestreams")
+                .collection(collection)
                 .doc()
             livestream.currentSpeakerId = livestreamsRef.id
+            livestream.id = livestreamsRef.id
             batch.set(livestreamsRef, livestream)
-
-            speakers.forEach(speaker => {
-                let speakersRef = this.firestore
-                    .collection("livestreams")
-                    .doc(livestreamsRef.id)
-                    .collection("speakers")
-                    .doc();
-                batch.set(speakersRef, speaker)
-            })
-
             await batch.commit()
             return livestreamsRef.id
 
@@ -288,48 +279,25 @@ class Firebase {
         }
     }
 
-    addDraftLivestream = async (livestream, speakers) => {
-
+    addDraftLivestream = async (livestream) => {
         let batch = this.firestore.batch();
         let livestreamsRef = this.firestore
             .collection("draftLivestreams")
             .doc()
         livestream.currentSpeakerId = livestreamsRef.id
+        livestream.id = livestreamsRef.id
         batch.set(livestreamsRef, livestream)
-        speakers.forEach(speaker => {
-            let speakersRef = this.firestore
-                .collection("draftLivestreams")
-                .doc(livestreamsRef.id)
-                .collection("speakers")
-                .doc();
-            batch.set(speakersRef, speaker)
-        })
         await batch.commit()
         return livestreamsRef.id
     }
 
-    updateLivestream = async (livestream, speakers, collection) => {
+    updateLivestream = async (livestream, collection) => {
         try {
             let batch = this.firestore.batch();
             let livestreamsRef = this.firestore
                 .collection(collection)
                 .doc(livestream.id)
-            let speakersRef = this.firestore
-                .collection(collection)
-                .doc(livestreamsRef.id)
-                .collection("speakers")
-
             batch.update(livestreamsRef, livestream)
-
-            speakers.forEach(speaker => {
-                let ref = speakersRef.doc()
-                batch.set(ref, speaker)
-            })
-            const docs = await speakersRef.get()
-            docs.forEach(doc => {
-                let docRef = doc.ref
-                batch.delete(docRef)
-            })
             await batch.commit()
             return livestream.id
         } catch (error) {

@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {Box, Button} from "@material-ui/core";
 import GroupJoinModal from "../../profile/GroupJoinModal";
-import {Image} from "semantic-ui-react";
 import {useRouter} from "next/router";
 
 
@@ -30,9 +29,8 @@ const LogoElement = ({careerCenter, userData, userfollows, livestreamId}) => {
 
 
     return (
-        <Box display="flex" justifyContent="space-between" flexDirection="column" alignItems="center"
-             style={{margin: '0 auto', width: '65px', height: "100%"}}>
-                <Image alt={`${careerCenter.universityName} logo`} src={careerCenter.logoUrl}/>
+        <Box style={{display: "flex", flexDirection: "column", alignItems: "center", height: "100%", justifyContent: "center"}}>
+                <img style={{width: '65px'}} alt={`${careerCenter.universityName} logo`} src={careerCenter.logoUrl}/>
                 {userfollows ? null :
                     <Button onClick={handleJoin} style={{marginTop: 10}} variant="outlined" color="primary"> Follow </Button>}
                 <GroupJoinModal
