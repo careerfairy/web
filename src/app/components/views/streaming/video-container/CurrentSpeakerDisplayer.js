@@ -75,7 +75,7 @@ function CurrentSpeakerDisplayer(props) {
         }
     }
 
-    let externalVideoElements = props.streams.map( (stream, index) => {
+    let externalVideoElements = props.streams.filter(stream => !stream.streamId.includes("screen")).map( (stream, index) => {
         return (
             <div key={stream.streamId} className={getVideoContainerClass(stream.streamId)} style={{ padding: 0 }}>
                 <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
@@ -138,6 +138,8 @@ function CurrentSpeakerDisplayer(props) {
                         width: 250px;
                         height: 100%;
                         display: inline-block;
+                        vertical-align: top;
+                        margin: 0;
                     }
 
                     .speaker-video {
@@ -162,6 +164,7 @@ function CurrentSpeakerDisplayer(props) {
                         width: 100%; 
                         margin: 0 auto;
                         z-index: 2000;
+                        border: 2px solid red;
                     }
             `}</style>
             </div>;
@@ -190,7 +193,6 @@ function CurrentSpeakerDisplayer(props) {
                     overflow-y: hidden;
                     white-space: nowrap;
                     text-align: center;
-                    scrollbar-width: 5px;
                     scollbar-color: black rgba(0, 210, 170, 0.8);
                 }
 

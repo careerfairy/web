@@ -55,69 +55,15 @@ function VideoContainer(props) {
     const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
 
-    function isExistingCallback(callbackName) {
-        return props.additionalCallbacks && typeof props.additionalCallbacks[callbackName] === 'function';
-    }
-
-    let streamingCallbacks = {
-        onPublishStarted: (infoObj) => {
-            if (isExistingCallback('onPublishStarted')) {
-                props.additionalCallbacks.onPublishStarted(infoObj);
-            }
-            setShowDisconnectionModal(false);
-            setIsStreaming(true);
-        },
-        onPublishFinished: (infoObj) => {
-            if (isExistingCallback('onPublishFinished')) {
-                props.additionalCallbacks.onPublishFinished(infoObj);
-            }
-            setIsStreaming(false);
-        },
-        onDisconnected: (infoObj) => {
-            if (isExistingCallback('onDisconnected')) {
-                props.additionalCallbacks.onDisconnected(infoObj);
-            }
-            setShowDisconnectionModal(true);
-        },
-        onConnected: (infoObj) => {
-            if (isExistingCallback('onConnected')) {
-                props.additionalCallbacks.onConnected(infoObj);
-            }
-            setShowDisconnectionModal(false);
-        },
-        onScreenShareStopped: (infoObj) => {
-            if (isExistingCallback('onScreenShareStopped')) {
-                props.additionalCallbacks.onScreenShareStopped(infoObj);
-            }
-            setDesktopMode("default", props.streamerId);
-        },
-    }
-
-    let errorCallbacks = {
-        onScreenSharePermissionDenied: () => {
-            if (isExistingCallback('onScreenSharePermissionDenied')) {
-                props.additionalCallbacks.onScreenSharePermissionDenied();
-            }
-            setScreenSharePermissionDenied(true);
-            setDesktopMode("default", props.streamerId);
-        },
-        onOtherError: (error) => {
-            if (typeof error === "string") {
-                setErrorMessage(error);
-            } else {
-                setErrorMessage("A connection error occured");
-            }
-        }
-    }
-
-    const {webRTCAdaptor, externalMediaStreams, localMediaStream, setAddedStream, removeStreamFromExternalMediaStreams, audioLevels} =
+    const screenSharingMode = !isPlayMode && props.currentLivestream.screenSharerId === props.streamerId && 
+        props.currentLivestream.mode === 'desktop';
+    const {webRTCAdaptor, localMediaStream, externalMediaStreams, localAudioLevel} =
         useWebRTCAdaptor(
             streamerReady,
             isPlayMode,
             localVideoId,
             mediaConstraints,
-            streamingCallbacks,
-            errorCallbacks,
+            screenSharingMode,
             props.currentLivestream.id,
             props.streamerId,
             props.viewer
@@ -130,29 +76,23 @@ function VideoContainer(props) {
         updateVideoSource,
         speakerSource,
         updateSpeakerSource,
+        localMediaStream: displayableMediaStream,
         audioLevel
-    } = useMediaSources(devices, webRTCAdaptor, props.streamerId, localMediaStream, !streamerReady || showSettings);
-
-    useEffect(() => {
-        return () => {
-            if (webRTCAdaptor) {
-                webRTCAdaptor.closeWebSocket();
-            }
-        }
-    }, [webRTCAdaptor]);
-
+    } = useMediaSources(devices, props.streamerId, localMediaStream, !streamerReady || showSettings);
 
     useEffect(() => {
         if (isMainStreamer && props.currentLivestream.mode !== 'desktop' && props.currentLivestream.speakerSwitchMode !== 'manual') {
             let timeout = setTimeout(() => {
-                if (audioLevels && audioLevels.length > 0) {
+                let audioLevels = externalMediaStreams.map( stream => stream.stream.getAudioLevel());
+                console.log(audioLevels)
+                if (audioLevels && audioLevels.length > 1) {
                     const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
                     if (maxEntry.audioLevel > 0.05) {
                         setLivestreamCurrentSpeakerId(maxEntry.streamId);
                     } else if (!audioLevels.some(audioLevel => audioLevel.streamId === props.currentLivestream.currentSpeakerId)) {
                         setLivestreamCurrentSpeakerId(maxEntry.streamId);
                     }
-                }
+                }       
                 setAudioCounter(audioCounter + 1);
             }, 500);
             return () => clearTimeout(timeout);
@@ -173,15 +113,15 @@ function VideoContainer(props) {
         }
     }, [props.streamerId, props.currentLivestream.id])
 
-    useEffect(() => {
-        if (webRTCAdaptor && props.currentLivestream.screenSharerId === props.streamerId) {
-            if (props.currentLivestream.mode === 'desktop') {
-                webRTCAdaptor.switchDesktopCaptureWithCamera(props.streamerId);
-            } else {
-                webRTCAdaptor.switchVideoCameraCapture(props.streamerId);
-            }
-        }
-    }, [props.currentLivestream.mode]);
+    // useEffect(() => {
+    //     if (webRTCAdaptor && props.currentLivestream.screenSharerId === props.streamerId) {
+    //         if (props.currentLivestream.mode === 'desktop') {
+    //             webRTCAdaptor.switchDesktopCaptureWithCamera(props.streamerId);
+    //         } else {
+    //             webRTCAdaptor.switchVideoCameraCapture(props.streamerId);
+    //         }
+    //     }
+    // }, [props.currentLivestream.mode]);
 
     useEffect(() => {
         if (externalMediaStreams && props.currentLivestream.currentSpeakerId && isMainStreamer) {
@@ -234,7 +174,7 @@ function VideoContainer(props) {
                     url: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media"
                 })
             } else {
-                removeStreamFromExternalMediaStreams("demoStream");
+                //removeStreamFromExternalMediaStreams("demoStream");
             }
         }
     }, [tutorialSteps])
@@ -274,28 +214,27 @@ function VideoContainer(props) {
             <div className={classes.blackFrame}>
                 <div>
                     <CurrentSpeakerDisplayer isPlayMode={false}
-                                             smallScreenMode={props.currentLivestream.mode === 'presentation'}
-                                             speakerSwitchModeActive={isMainStreamer}
-                                             setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId}
-                                             removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
-                                             localId={props.streamerId}
-                                             localStream={localMediaStream}
-                                             speakerSource={speakerSource}
-                                             attachSinkId={attachSinkId}
-                                             streams={externalMediaStreams}
-                                             mediaConstraints={mediaConstraints}
-                                             currentSpeaker={props.currentLivestream.currentSpeakerId}
-                                             {...props}
-                                             muted={false}/>
-                </div>
-                {props.currentLivestream.mode === 'presentation' ?
-                    <SmallStreamerVideoDisplayer
-                        isPlayMode={false}
-                        localStream={localMediaStream} rn
+                        smallScreenMode={props.currentLivestream.mode === 'presentation' ||  props.currentLivestream.mode === 'desktop'}
+                        speakerSwitchModeActive={isMainStreamer}
+                        setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId}
+                        localId={props.streamerId}
+                        localStream={localMediaStream}
+                        speakerSource={speakerSource}
+                        attachSinkId={attachSinkId}
                         streams={externalMediaStreams}
                         mediaConstraints={mediaConstraints}
+                        currentSpeaker={props.currentLivestream.currentSpeakerId}
+                        {...props}
+                        muted={false}/>
+                </div>
+                {props.currentLivestream.mode === 'presentation' ||  props.currentLivestream.mode === 'desktop' ?
+                    <SmallStreamerVideoDisplayer
                         livestreamId={props.currentLivestream.id}
+                        presentation={props.currentLivestream.mode === 'presentation'}
                         showMenu={props.showMenu}
+                        externalMediaStreams={externalMediaStreams}
+                        isLocalScreen={screenSharingMode}
+                        attachSinkId={attachSinkId}
                         presenter={true}/>
                     : null
                 }
@@ -314,7 +253,7 @@ function VideoContainer(props) {
             </div>
             <SettingsModal open={showSettings} close={() => setShowSettings(false)}
                            webRTCAdaptor={webRTCAdaptor} streamId={props.streamerId}
-                           devices={devices} localStream={localMediaStream}
+                           devices={devices} localStream={localMediaStream} displayableMediaStream={displayableMediaStream}
                            audioSource={audioSource} updateAudioSource={updateAudioSource}
                            videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
                            speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}

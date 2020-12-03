@@ -17,16 +17,16 @@ function ViewerComponent(props) {
         }
     };
 
-    const {webRTCAdaptor, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels} =
+    const {webRTCAdaptor, externalMediaStreams } =
         useWebRTCAdaptor(
             streamerReady,
             isPlayMode,
             'videoElement',
             mediaConstraints,
-            streamingCallbacks,
-            errorCallbacks,
+            false,
             props.livestreamId,
-            props.streamerId
+            props.streamerId,
+            true
         );
 
     useEffect(() => {
@@ -45,16 +45,16 @@ function ViewerComponent(props) {
         <div>
             <div>
                 <CurrentSpeakerDisplayer isPlayMode={true}
-                                         smallScreenMode={props.currentLivestream.mode === 'presentation'}
+                                         smallScreenMode={props.currentLivestream.mode === 'presentation' ||  props.currentLivestream.mode === 'desktop'}
                                          speakerSwitchModeActive={false} localStream={null}
                                          streams={externalMediaStreams} localId={props.streamerId}
                                          currentSpeaker={props.currentLivestream.currentSpeakerId}
-                                         removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
                                          muted={false} {...props}/>
             </div>
-            <div style={{display: (props.currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
-                <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams}
-                                             livestreamId={props.currentLivestream.id} presenter={false}/>
+            <div style={{display: (props.currentLivestream.mode === 'presentation' ||  props.currentLivestream.mode === 'desktop' ? 'block' : 'none')}}>
+                <SmallStreamerVideoDisplayer isPlayMode={true} externalMediaStreams={externalMediaStreams} isLocalScreen={false}
+                                             livestreamId={props.currentLivestream.id} presenter={false} presentation={props.currentLivestream.mode === 'presentation'}
+                                             />
             </div>
             {/* <div className={props.currentLivestream.hasStarted ? 'hidden' : ''} style={{
                 position: 'absolute',

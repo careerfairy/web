@@ -20,13 +20,12 @@ function RemoteVideoContainer(props) {
     const activeStep = getActiveTutorialStepKey();
 
     useEffect(() => {
-        debugger;
         if (props.stream.streamId === 'demoStream') {
             videoElement.current.src = props.stream.url;
             videoElement.current.loop = true;
             videoElement.current.play();
         } else {
-            props.stream.stream.play(props.stream.streamId, { fit: 'contain' }, err => {
+            props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
                 if (err) {
                     console.error("Error playing remote video", err)
                 }
@@ -44,7 +43,6 @@ function RemoteVideoContainer(props) {
         if (videoElement.current && videoElement.current.srcObject && videoElement.current.paused) {
             if (props.showVideoButton && !props.showVideoButton.muted && !props.showVideoButton.paused) {
                 videoElement.current.play().catch( e => {
-
                     props.setShowVideoButton({ paused: false, muted: true });
                 });
             } else if (props.showVideoButton && props.showVideoButton.muted && !props.showVideoButton.paused) {
@@ -80,28 +78,6 @@ function RemoteVideoContainer(props) {
             setStoppedByUserAgent(false);
         }).catch((e) => console.log("Video Error:", e));
     }
-
-    function handleVideoError(error) {
-        handleVideoLoss();
-        throw error;
-    }
-
-    function handleVideoLoss() {
-        if (videoElement.current.srcObject && !videoElement.current.srcObject.active) {
-            props.removeStreamFromExternalMediaStreams(props.stream.streamId)
-        }
-    }
-
-    function handleVideoError(error) {
-        handleVideoLoss()
-        throw error;
-    }
-
-    useEffect(() => {
-        if (videoElement && videoElement.current && videoElement.current.srcObject && !videoElement.current.srcObject.active) {
-            props.removeStreamFromExternalMediaStreams(props.stream.streamId)
-        }
-    }, [videoElement.current]);
 
     return (
         <>

@@ -432,7 +432,6 @@ class Firebase {
             .collection("polls");
 
         // Delete all existing docs
-        // debugger
         const questionsDocs = await questionsRef.get()
         if (!questionsDocs.empty) {
             questionsDocs.forEach(doc => {

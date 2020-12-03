@@ -99,7 +99,6 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
                     student.id = doc.id;
                     participatingStudents.push(student);
                 });
-                debugger;
                 setParticipatingStudents(participatingStudents);
             })
         }      
@@ -114,7 +113,6 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
                     studentsOfGroup.push(publishedStudent);
                 }
             });
-            debugger;
             setParticipatingStudentsFromGroup(studentsOfGroup);
         }      
     }, [participatingStudents, userRequestedDownload]);
@@ -123,7 +121,6 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
         if (participatingStudents && participatingStudents.length && userRequestedDownload) {
             let listOfStudents = participatingStudents.filter( student => studentBelongsToGroup(student));
             let stats = StatsUtil.getRegisteredStudentsStats(listOfStudents, group);
-            debugger;
             setStudentStats(stats);
         }      
     }, [participatingStudents, userRequestedDownload]);

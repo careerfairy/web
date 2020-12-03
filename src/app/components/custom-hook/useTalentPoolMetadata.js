@@ -19,7 +19,6 @@ export function useTalentPoolMetadata(livestream, allGroups, group, firebase, re
                 let registeredStudents = [];
                 querySnapshot.forEach(doc => {
                     let element = doc.data();
-                    debugger;
                     if (registeredStudentsFromGroup.some( student => student.Email === doc.id)) {
                         let publishedStudent = StatsUtil.getStudentInGroupDataObject(element, group);
                         registeredStudents.push(publishedStudent);
