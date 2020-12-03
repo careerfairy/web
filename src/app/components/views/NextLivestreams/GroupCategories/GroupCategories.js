@@ -105,7 +105,7 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
                              alt={`${groupData.universityName} logo`}/>
                     </div>
                 </CardMedia>
-                {!!hasCategories() && <CardContent>
+                {!!hasCategories && <CardContent>
                     <Box className={classes.actions}>
                         <SizeMe>{({size}) => (
                             <StackGrid

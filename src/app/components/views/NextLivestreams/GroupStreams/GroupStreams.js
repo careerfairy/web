@@ -23,21 +23,48 @@ const useStyles = makeStyles((theme) => ({
         margin: "0 auto",
         color: "rgb(130,130,130)"
     },
-    gridContainer:{
+    gridContainer: {
         marginTop: theme.spacing(2)
     }
 }));
 
 
-const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId, careerCenterId, alreadyJoined, listenToUpcoming, selectedOptions}) => {
+const GroupStreams = ({
+                          groupData,
+                          userData,
+                          user,
+                          livestreams,
+                          mobile,
+                          searching,
+                          livestreamId,
+                          careerCenterId,
+                          alreadyJoined,
+                          listenToUpcoming,
+                          selectedOptions,
+                          hasCategories
+                      }) => {
         const classes = useStyles()
         const searchedButNoResults = selectedOptions.length && !searching && !livestreams.length
 
         const renderStreamCards = livestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
-                    <Grid style={{width: "100%"}} key={livestream.id} md={4} lg={4} item>
-                        <GroupStreamCardV2 livestream={livestream}/>
+                    <Grid style={{width: "100%"}} key={livestream.id} xs={12} sm={6} md={hasCategories ? 6 : 4}
+                          lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 4} item>
+                        <GroupStreamCardV2
+                            index={index}
+                            mobile={mobile}
+                            hasCategories={hasCategories}
+                            groupData={groupData}
+                            listenToUpcoming={listenToUpcoming}
+                            careerCenterId={careerCenterId}
+                            livestreamId={livestreamId}
+                            user={user} userData={userData} fields={null}
+                            careerCenters={[]}
+                            id={livestream.id}
+                            key={livestream.id}
+                            livestream={livestream}
+                        />
                         {/*<GroupStreamCard*/}
                         {/*    index={index}*/}
                         {/*    groupData={groupData}*/}
@@ -66,7 +93,9 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
                         </Grid>
                         :
                         <Typography className={classes.emptyMessage} align="center" variant="h5"
-                                      style={{marginTop: 100}}>{searchedButNoResults ? "We couldn't find anything... 😕" :<strong>{groupData.universityName} currently has no scheduled live streams</strong>}</Typography>)
+                                    style={{marginTop: 100}}>{searchedButNoResults ? "We couldn't find anything... 😕" :
+                            <strong>{groupData.universityName} currently has no scheduled live
+                                streams</strong>}</Typography>)
                     : null}
             </div>
         );

@@ -271,7 +271,7 @@ const NextLivestreams = ({firebase}) => {
             {mobile ? (
                 <MobileFeed
                     groupData={groupData}
-                    hasCategories={hasCategories}
+                    hasCategories={hasCategories()}
                     user={authenticatedUser}
                     selectedOptions={selectedOptions}
                     scrollToTop={scrollToTop}
@@ -290,7 +290,7 @@ const NextLivestreams = ({firebase}) => {
                     alreadyJoined={groupData.alreadyJoined}
                     handleToggleActive={handleToggleActive}
                     userData={userData}
-                    hasCategories={hasCategories}
+                    hasCategories={hasCategories()}
                     listenToUpcoming={listenToUpcoming}
                     livestreamId={livestreamId}
                     searching={searching}

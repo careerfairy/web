@@ -12,7 +12,6 @@ const useStyles = makeStyles(theme => ({
         textAlign: 'center',
     },
     streamer: {
-        border: "1px solid red",
         display: "flex",
         flex: 1,
         minWidth: 120,
@@ -27,7 +26,8 @@ const useStyles = makeStyles(theme => ({
     avatar: {
         width: '2em',
         height: '2em',
-        borderRadius: '50%'
+        borderRadius: '50%',
+        zIndex: 1
     },
     streamerPosition: {
         margin: "0 0 0 0",

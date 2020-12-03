@@ -122,7 +122,7 @@ const MobileFeed = ({handleToggleActive, hasCategories, groupData, userData, alr
                 >
                     <Tab wrapped value={0}  {...a11yProps(0)} fullWidth
                          label={<Typography variant="h5">Events</Typography>}/>
-                    {hasCategories() ?
+                    {hasCategories ?
                         <Tab value={1} wrapped fullWidth disabled={!groupData.categories}
                              {...a11yProps(1)}
                              label={<Typography variant="h5">Filter</Typography>}/>
@@ -155,6 +155,7 @@ const MobileFeed = ({handleToggleActive, hasCategories, groupData, userData, alr
                 <TabPanel dir={theme.direction}>
                     <GroupStreams user={user}
                                   mobile={true}
+                                  hasCategories={hasCategories}
                                   livestreamId={livestreamId}
                                   listenToUpcoming={listenToUpcoming}
                                   careerCenterId={careerCenterId}
