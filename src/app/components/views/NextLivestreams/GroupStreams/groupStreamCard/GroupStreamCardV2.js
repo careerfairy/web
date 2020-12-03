@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react';
 import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
-
+import streamer from '../../../../../public/'
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -27,14 +27,14 @@ const GroupStreamCardV2 = ({
                 <div className="rank">3</div>
 
                 <div className="front">
-                    <img className="thumbnail" src="img/game-cover.jpg" alt=""/>
+                    <img className="thumbnail" src="/game-cover.png" alt=""/>
                     <h3 className="name icon">Game name</h3>
                     <div className="stats">
                         <p className="viewers icon">539.9k</p>
                         <div className="streamers">
                             <img src="" alt=""/>
-                            <img src="./img/streamer-2.jpg" alt=""/>
-                            <img src="./img/streamer-3.jpg" alt=""/>
+                            <img src="/streamer-2.png" alt=""/>
+                            <img src="/streamer-3.png" alt=""/>
                         </div>
                     </div>
                 </div>
@@ -47,17 +47,17 @@ const GroupStreamCardV2 = ({
                     <button className="btn">See more streams</button>
                     <div className="streamers">
                         <div className="streamer">
-                            <div className="icon"><img src="img/streamer-1.jpg" alt=""/></div>
+                            <div className="icon"><img src="/streamer-1.png" alt=""/></div>
                             <p className="name">Gamer1</p>
                             <p className="number">36.1k</p>
                         </div>
                         <div className="streamer">
-                            <div className="icon"><img src="img/streamer-2.jpg" alt=""/></div>
+                            <div className="icon"><img src="/streamer-2.png" alt=""/></div>
                             <p className="name">Gamer 2</p>
                             <p className="number">35.1k</p>
                         </div>
                         <div className="streamer">
-                            <div className="icon"><img src="img/streamer-3.jpg" alt=""/></div>
+                            <div className="icon"><img src="/streamer-3.png" alt=""/></div>
                             <p className="name">Gamer 3</p>
                             <p className="number">34.1k</p>
                         </div>
@@ -65,7 +65,7 @@ const GroupStreamCardV2 = ({
                 </div>
 
                 <div className="background">
-                    <img src="img/game-cover.jpg" alt=""/>
+                    <img src="/game-cover.png" alt=""/>
                 </div>
             </div>
             <svg width="0" height="0" x="0px" y="0px">
@@ -107,14 +107,14 @@ const GroupStreamCardV2 = ({
                 --transition: transform 200ms cubic-bezier(0.21, 1, 0.81, 1);
               }
 
-              body {
-                font-family: sans-serif;
-                min-height: 100vh;
-                display: grid;
-                place-items: center;
-                background: var(--clr-dark);
-                color: var(--clr-light);
-              }
+              //body {
+              //  font-family: sans-serif;
+              //  min-height: 100vh;
+              //  display: grid;
+              //  place-items: center;
+              //  background: var(--clr-dark);
+              //  color: var(--clr-light);
+              //}
 
               h1,
               h2,
@@ -130,9 +130,9 @@ const GroupStreamCardV2 = ({
               .btn {
                 cursor: pointer;
                 border: 0;
-                background: var(--clr-secondary);
+                background: rgb(0, 76, 199);
                 border-radius: 100vw;
-                color: var(--clr-light);
+                color: #fff;
                 font-weight: bold;
                 padding: 0.5em 1.5em;
               }
@@ -207,7 +207,7 @@ const GroupStreamCardV2 = ({
                 }
 
                 .streamers img {
-                  border: 2px solid var(--clr-dark);
+                  border: 2px solid rgb(13, 17, 19);
 
                   &:nth-of-type(1) {
                     transform: translateX(50%);

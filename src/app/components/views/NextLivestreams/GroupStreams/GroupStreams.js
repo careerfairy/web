@@ -3,6 +3,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../context/firebase";
 import GroupStreamCard from "./GroupStreamCard";
 import {Typography, LinearProgress, Box, Grid} from "@material-ui/core";
+import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -32,17 +33,18 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
         const renderStreamCards = livestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
-                    <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
-                        <GroupStreamCard
-                            index={index}
-                            groupData={groupData}
-                            listenToUpcoming={listenToUpcoming}
-                            careerCenterId={careerCenterId}
-                            livestreamId={livestreamId}
-                            user={user} userData={userData} fields={null}
-                            careerCenters={[]}
-                            id={livestream.id}
-                            key={livestream.id} livestream={livestream}/>
+                    <Grid style={{width: "100%"}} key={livestream.id} md={4} lg={4} item>
+                        <GroupStreamCardV2/>
+                        {/*<GroupStreamCard*/}
+                        {/*    index={index}*/}
+                        {/*    groupData={groupData}*/}
+                        {/*    listenToUpcoming={listenToUpcoming}*/}
+                        {/*    careerCenterId={careerCenterId}*/}
+                        {/*    livestreamId={livestreamId}*/}
+                        {/*    user={user} userData={userData} fields={null}*/}
+                        {/*    careerCenters={[]}*/}
+                        {/*    id={livestream.id}*/}
+                        {/*    key={livestream.id} livestream={livestream}/>*/}
                     </Grid>
                 )
             }
