@@ -22,6 +22,9 @@ const useStyles = makeStyles((theme) => ({
         maxWidth: "400px",
         margin: "0 auto",
         color: "rgb(130,130,130)"
+    },
+    gridContainer:{
+        marginTop: theme.spacing(2)
     }
 }));
 
@@ -34,7 +37,7 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
             if (livestream) {
                 return (
                     <Grid style={{width: "100%"}} key={livestream.id} md={4} lg={4} item>
-                        <GroupStreamCardV2/>
+                        <GroupStreamCardV2 livestream={livestream}/>
                         {/*<GroupStreamCard*/}
                         {/*    index={index}*/}
                         {/*    groupData={groupData}*/}
@@ -58,7 +61,7 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
                     </Box>
                     :
                     livestreams.length ?
-                        <Grid container spacing={2}>
+                        <Grid className={classes.gridContainer} container spacing={2}>
                             {renderStreamCards}
                         </Grid>
                         :

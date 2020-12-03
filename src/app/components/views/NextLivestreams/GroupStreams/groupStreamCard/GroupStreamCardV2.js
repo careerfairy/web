@@ -1,9 +1,190 @@
-import React, {Fragment} from 'react';
+import React, {Fragment, useState} from 'react';
 import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
-import streamer from '../../../../../public/'
+import {speakerPlaceholder} from "../../../../util/constants";
+import {Avatar, Card, CardMedia} from "@material-ui/core";
+import {AvatarGroup} from "@material-ui/lab";
+import Streamers from "./Streamers";
 
-const useStyles = makeStyles((theme) => ({}));
+const useStyles = makeStyles((theme) => {
+    const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
+    return ({
+        game: {
+            display: "flex",
+            justifyContent: "center",
+            border: "1px solid red",
+            "& img": {
+                maxWidth: "100%"
+            },
+            position: "relative",
+            width: "100%",
+            cursor: "pointer",
+            "&:hover": {
+                "& .back": {
+                    "& .streamers": {
+                        width: "100%",
+                        justifyContent: "space-between",
+                    },
+                    "& .streamer": {
+                        fontSize: "0.9rem",
+                    },
+                    "& .name": {
+                        fontWeight: "bold",
+                    },
+                },
+
+                "& .background": {
+                    transition: "transform 200ms cubic-bezier(0.21, 1, 0.81, 1), opacity 100ms linear",
+                    opacity: 1,
+                    transform: "scale(1.35, 1.3) translateY(5%)",
+                },
+            },
+        },
+        rank: {
+            position: 'absolute',
+            top: '0',
+            right: '1em',
+            zIndex: '999',
+            fontWeight: 'bold',
+            fontSize: '1.125rem',
+            background: 'rgba(0, 0, 0, 0.65)',
+            padding: '0.5em 0.5em 0.75em',
+            WebkitClipPath: 'polygon(100% 0%, 100% 100%, 50% 85%, 0 100%, 0 0)',
+            clipPath: 'polygon(100% 0%, 100% 100%, 50% 85%, 0 100%, 0 0)',
+            WebkitTransition: transition,
+            transition: transition,
+            transform: ({cardHovered}) => cardHovered && "translate(150%, -61%)"
+        },
+        companyLogo: {
+            borderRadius: theme.spacing(1)
+        },
+        logoWrapper: {
+            height: 230,
+            width: 180,
+            display: "flex",
+            alignItems: "center",
+            padding: theme.spacing(1)
+        },
+        front: {
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            transform: ({cardHovered}) => cardHovered && "translateY(-30%) scale(0.8)",
+            transition: '250ms',
+            '& .thumbnail': {
+                borderRadius: 'var(--br)'
+            },
+            '& .name': {
+                margin: '0.75em 0',
+                textAlign: 'center',
+                animation: ({cardHovered}) => cardHovered && "$gameName 250ms forwards",
+
+            },
+            '& .stats': {
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                opacity: ({cardHovered}) => cardHovered && 0,
+            },
+            '& .viewers': {
+                display: 'flex',
+                alignItems: 'center'
+            },
+            '& .viewers::before': {
+                content: '\'\\f007\'',
+                color: 'rgba(255, 255, 255, 0.75)',
+                fontSize: '0.75em',
+                marginRight: '0.5em'
+            },
+            '& .streamers img': {
+                border: '2px solid rgb(13, 17, 19)',
+                '&:nth-of-type(1)': {
+                    transform: 'translateX(50%)',
+                    zIndex: '1'
+                },
+                '&:nth-of-type(2)': {
+                    transform: 'translateX(25%)'
+                }
+            }
+        },
+        back: {
+            transition: ({cardHovered}) => cardHovered && "transform 250ms ease, opacity 150ms linear",
+            opacity: ({cardHovered}) => cardHovered ? 1 : 0,
+            transform: ({cardHovered}) => cardHovered ? "translateY(0)" : 'translateY(35%)',
+            position: 'absolute',
+            top: '55%',
+            left: '0',
+            right: '0',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1.5em',
+            '& .streaming-info': {
+                columns: '2',
+                columnRule: '1px solid rgba(255, 255, 255, 0.25)'
+            },
+            '& .game-stat': {
+                fontSize: '1.125rem',
+                textAlign: 'center',
+                "& span": {
+                    fontSize: '0.85rem',
+                    display: 'block'
+                }
+            }
+        },
+        background: {
+            transition:({cardHovered}) => cardHovered && `${transition}, opacity 100ms linear`,
+            transform:({cardHovered}) => cardHovered? 'scale(1.35, 1.3) translateY(5%)': 'scale(0.2, 0.9)',
+            opacity:({cardHovered}) => cardHovered? 1: 0,
+            background: 'rgb(40, 46, 54)',
+            position: 'absolute',
+            top: '0',
+            bottom: '0',
+            left: '0',
+            right: '0',
+            zIndex: '-1',
+            borderRadius: '0.5em',
+            overflow: 'hidden',
+            "& img": {
+                opacity: '.3',
+                clipPath: 'url(#wave)',
+                height: '30%',
+                width: '100%',
+                objectFit: 'cover'
+            }
+        },
+        '@keyframes pulse': {
+            '0%': {
+                transform: 'scale(0.95)',
+                opacity: '0.9'
+            },
+            '100%': {
+                transform: 'scale(1.4)',
+                opacity: '0'
+            }
+        },
+        '@keyframes gameName': {
+            '0%': {
+                textAlign: 'left',
+                opacity: '1'
+            },
+            '20%': {
+                textAlign: 'left',
+                opacity: '0'
+            },
+            '50%': {
+                textAlign: 'center',
+                opacity: '0',
+                transform: 'scale(1.2)'
+            },
+            '100%': {
+                textAlign: 'center',
+                opacity: '1',
+                transform: 'scale(1.2)'
+            }
+        }
+    })
+})
 
 
 const GroupStreamCardV2 = ({
@@ -19,53 +200,52 @@ const GroupStreamCardV2 = ({
                                listenToUpcoming
                            }) => {
 
+    const [cardHovered, setCardHovered] = useState(false)
+    console.log("cardHovered", cardHovered);
+    const classes = useStyles({cardHovered})
+    const handleHovered = () => {
+        setCardHovered(true)
+    }
+
+    const handleMouseLeft = () => {
+        setCardHovered(false)
+    }
     console.log("livestream", livestream);
 
     return (
         <Fragment>
-            <div className="game">
-                <div className="rank">3</div>
-
-                <div className="front">
-                    <img className="thumbnail" src="/game-cover.png" alt=""/>
-                    <h3 className="name icon">Game name</h3>
+            <div onMouseLeave={handleMouseLeft} onMouseEnter={handleHovered} className={classes.game}>
+                <div className={classes.rank}>3</div>
+                <div className={classes.front}>
+                    <Card className={classes.logoWrapper}>
+                        <img className={classes.companyLogo} src={livestream.companyLogoUrl} alt=""/>
+                    </Card>
+                    <h3 className="name icon">{livestream.company}</h3>
                     <div className="stats">
                         <p className="viewers icon">539.9k</p>
-                        <div className="streamers">
-                            <img src="" alt=""/>
-                            <img src="/streamer-2.png" alt=""/>
-                            <img src="/streamer-3.png" alt=""/>
+                        <div className={classes.streamers}>
+                            <AvatarGroup max={3}>
+                                {livestream.speakers?.map(speaker => {
+                                    return (<Avatar
+                                        key={speaker.id}
+                                        src={speaker.avatar || speakerPlaceholder}
+                                        alt={speaker.firstName}/>)
+                                })}
+                            </AvatarGroup>
                         </div>
                     </div>
                 </div>
-
-                <div className="back">
+                <div className={classes.back}>
                     <div className="streaming-info">
                         <p className="game-stat">559k<span>Watching</span></p>
                         <p className="game-stat">25.8k<span>Streams</span></p>
                     </div>
                     <button className="btn">See more streams</button>
-                    <div className="streamers">
-                        <div className="streamer">
-                            <div className="icon"><img src="/streamer-1.png" alt=""/></div>
-                            <p className="name">Gamer1</p>
-                            <p className="number">36.1k</p>
-                        </div>
-                        <div className="streamer">
-                            <div className="icon"><img src="/streamer-2.png" alt=""/></div>
-                            <p className="name">Gamer 2</p>
-                            <p className="number">35.1k</p>
-                        </div>
-                        <div className="streamer">
-                            <div className="icon"><img src="/streamer-3.png" alt=""/></div>
-                            <p className="name">Gamer 3</p>
-                            <p className="number">34.1k</p>
-                        </div>
-                    </div>
+                    <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
                 </div>
 
-                <div className="background">
-                    <img src="/game-cover.png" alt=""/>
+                <div className={classes.background}>
+                    <img src={livestream.backgroundImageUrl} alt=""/>
                 </div>
             </div>
             <svg width="0" height="0" x="0px" y="0px">
@@ -107,24 +287,12 @@ const GroupStreamCardV2 = ({
                 --transition: transform 200ms cubic-bezier(0.21, 1, 0.81, 1);
               }
 
-              //body {
-              //  font-family: sans-serif;
-              //  min-height: 100vh;
-              //  display: grid;
-              //  place-items: center;
-              //  background: var(--clr-dark);
-              //  color: var(--clr-light);
-              //}
 
               h1,
               h2,
               h3,
               p {
                 margin: 0;
-              }
-
-              img {
-                max-width: 100%;
               }
 
               .btn {
@@ -157,10 +325,20 @@ const GroupStreamCardV2 = ({
                 display: flex;
                 text-align: center;
 
+                &:nth-of-type(1) {
+                  transform: translateX(50%);
+                  z-index: 1;
+                }
+
+                &:nth-of-type(2) {
+                  transform: translateX(25%);
+                }
+
                 img {
                   width: 2em;
                   height: 2em;
                   border-radius: 50%;
+                  border: 2px solid rgb(13, 17, 19);
                 }
               }
 
@@ -177,48 +355,6 @@ const GroupStreamCardV2 = ({
                 transition: var(--transition);
               }
 
-              .front {
-                transition: 250ms;
-
-                .thumbnail {
-                  border-radius: var(--br);
-                }
-
-                .name {
-                  margin: 0.75em 0;
-                }
-
-                .stats {
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                }
-
-                .viewers {
-                  display: flex;
-                  align-items: center;
-                }
-
-                .viewers::before {
-                  content: "\\f007";
-                  color: rgba(255, 255, 255, 0.75);
-                  font-size: 0.75em;
-                  margin-right: 0.5em;
-                }
-
-                .streamers img {
-                  border: 2px solid rgb(13, 17, 19);
-
-                  &:nth-of-type(1) {
-                    transform: translateX(50%);
-                    z-index: 1;
-                  }
-
-                  &:nth-of-type(2) {
-                    transform: translateX(25%);
-                  }
-                }
-              }
 
               .back {
                 opacity: 0;
@@ -258,7 +394,7 @@ const GroupStreamCardV2 = ({
                 z-index: -1;
                 transform: scale(0.2, 0.9);
                 opacity: 0;
-                border-radius: var(--br);
+                border-radius: 0.5em;
                 overflow: hidden;
 
                 img {
@@ -335,64 +471,6 @@ const GroupStreamCardV2 = ({
                   text-align: center;
                   opacity: 1;
                   transform: scale(1.2);
-                }
-              }
-
-              .streamer {
-                .icon {
-                  display: inline-block;
-                  width: 2em;
-                  height: 2em;
-                  position: relative;
-                  transition: transform ease-in-out 150ms;
-
-                  &::before,
-                  &::after {
-                    opacity: 0;
-                    content: "";
-                    position: absolute;
-                    top: 0;
-                    bottom: 0;
-                    right: 0;
-                    left: 0;
-                    border-radius: 50%;
-                  }
-
-                  &::before {
-                    content: "\\f04b";
-                    font-family: "Font Awesome 5 Free";
-                    font-weight: 900;
-                    font-size: 0.65em;
-                    background: #f00;
-                    display: grid;
-                    place-items: center;
-                    z-index: 10;
-                    transition: opacity 75ms linear, background-color 100ms linear;
-                  }
-
-                  &:hover {
-                    transform: translateY(-15%) scale(1.2);
-
-                    &::before {
-                      background: #cc0202;
-                    }
-
-                    &::after {
-                      background: #f00;
-                      z-index: 1;
-                      animation: pulse 1250ms infinite;
-                    }
-                  }
-                }
-
-                &:hover {
-                  .icon {
-                    transform: translateY(-10%);
-
-                    &::before {
-                      opacity: 1;
-                    }
-                  }
                 }
               }
 
