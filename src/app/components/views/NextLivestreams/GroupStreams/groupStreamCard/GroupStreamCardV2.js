@@ -69,14 +69,16 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center"
         },
         companyLogo: {
-            maxWidth: "100%"
+            maxWidth: "100%",
+            maxHeight: "100%"
         },
         logoWrapper: {
             height: 230,
             width: "100%",
             display: "flex",
             alignItems: "center",
-            padding: theme.spacing(2),
+            justifyContent: "center",
+            padding: theme.spacing(3),
             borderRadius: `${theme.spacing(2)}px 0px`,
             background: grey[50],
             boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
@@ -85,10 +87,11 @@ const useStyles = makeStyles((theme) => {
             fontWeight: "bold",
             margin: '0.75em 0',
             textAlign: 'center',
-            fontSize: theme.spacing(3),
+            fontSize: theme.spacing(3.5),
             display: "flex",
             alignItems: "center",
-            width: ({cardHovered}) => cardHovered && "120%"
+            width: ({cardHovered}) => cardHovered && "120%",
+            height: ({cardHovered}) => cardHovered ? "auto" : 60
         },
         front: {
             width: "100%",
@@ -148,7 +151,7 @@ const useStyles = makeStyles((theme) => {
             flexDirection: "column",
             alignItems: "center",
             padding: theme.spacing(2),
-            marginTop:({streamTitleHeight}) => 100 + streamTitleHeight,
+            marginTop: "45%",
             zIndex: 1005
         },
         backgroundImage: {
@@ -200,7 +203,6 @@ const GroupStreamCardV2 = ({
 
     const [cardHovered, setCardHovered] = useState(false)
     const [streamTitleHeight, setStreamTitleHeight] = useState(0)
-    console.log("streamTitleHeight", streamTitleHeight);
     const classes = useStyles({cardHovered, mobile, hasCategories, listenToUpcoming, streamTitleHeight})
     const [careerCenters, setCareerCenters] = useState([])
     const [targetOptions, setTargetOptions] = useState([])
@@ -209,11 +211,16 @@ const GroupStreamCardV2 = ({
     const [openJoinModal, setOpenJoinModal] = useState(false);
     const [fetchingCareerCenters, setFetchingCareerCenters] = useState(false)
 
-    const streamTitleRef = useRef();
+    const streamTitleRef = useRef(null);
+
+    const handleMouseLeft = () => {
+        !mobile && setCardHovered(false)
+    }
+
 
     useEffect(() => {
         setStreamTitleHeight(streamTitleRef.current?.offsetHeight);
-    }, []);
+    }, [cardHovered, streamTitleRef.current]);
 
     useEffect(() => {
         if (groupData.categories && livestream.targetCategories) {
@@ -278,9 +285,6 @@ const GroupStreamCardV2 = ({
         !mobile && setCardHovered(true)
     }
 
-    const handleMouseLeft = () => {
-        !mobile && setCardHovered(false)
-    }
 
     const checkIfUserFollows = (careerCenter) => {
         if (user && userData && userData.groupIds) {
@@ -427,11 +431,11 @@ const GroupStreamCardV2 = ({
                 </div>
                 <Paper elevation={4} className={classes.front}>
                     <div
-                        // elevation={cardHovered ? 24 : 4}
+                        ref={streamTitleRef}
                         className={classes.logoWrapper}>
                         <img className={classes.companyLogo} src={livestream.companyLogoUrl} alt=""/>
                     </div>
-                    <Typography ref={streamTitleRef} className={classes.companyName}>
+                    <Typography className={classes.companyName}>
                         {cardHovered ? livestream.title : livestream.company}
                     </Typography>
                     {!cardHovered &&
