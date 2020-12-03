@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useRef, useState} from 'react';
 import {withFirebase} from "context/firebase";
 import {fade, makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
@@ -26,6 +26,7 @@ const useStyles = makeStyles((theme) => {
     return ({
         game: {
             display: "flex",
+            width: "100%",
             justifyContent: "center",
             position: "relative",
             zIndex: ({cardHovered}) => cardHovered && 1002,
@@ -77,7 +78,8 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center",
             padding: theme.spacing(2),
             borderRadius: `${theme.spacing(2)}px 0px`,
-            background: grey[50]
+            background: grey[50],
+            boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
         },
         companyName: {
             fontWeight: "bold",
@@ -86,9 +88,10 @@ const useStyles = makeStyles((theme) => {
             fontSize: theme.spacing(3),
             display: "flex",
             alignItems: "center",
-            height: 60
+            width: ({cardHovered}) => cardHovered && "120%"
         },
         front: {
+            width: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -122,7 +125,8 @@ const useStyles = makeStyles((theme) => {
         },
         buttonsWrapper: {
             display: "flex",
-            justifyContent: "center"
+            justifyContent: "center",
+            marginBottom: theme.spacing(1)
         },
         background: {
             transition: ({cardHovered}) => cardHovered && `${transition}, opacity 100ms linear`,
@@ -144,7 +148,7 @@ const useStyles = makeStyles((theme) => {
             flexDirection: "column",
             alignItems: "center",
             padding: theme.spacing(2),
-            marginTop: 140,
+            marginTop:({streamTitleHeight}) => 100 + streamTitleHeight,
             zIndex: 1005
         },
         backgroundImage: {
@@ -195,13 +199,21 @@ const GroupStreamCardV2 = ({
                            }) => {
 
     const [cardHovered, setCardHovered] = useState(false)
-    const classes = useStyles({cardHovered, mobile, hasCategories, listenToUpcoming})
+    const [streamTitleHeight, setStreamTitleHeight] = useState(0)
+    console.log("streamTitleHeight", streamTitleHeight);
+    const classes = useStyles({cardHovered, mobile, hasCategories, listenToUpcoming, streamTitleHeight})
     const [careerCenters, setCareerCenters] = useState([])
     const [targetOptions, setTargetOptions] = useState([])
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [isHighlighted, setIsHighlighted] = useState(false)
     const [openJoinModal, setOpenJoinModal] = useState(false);
     const [fetchingCareerCenters, setFetchingCareerCenters] = useState(false)
+
+    const streamTitleRef = useRef();
+
+    useEffect(() => {
+        setStreamTitleHeight(streamTitleRef.current?.offsetHeight);
+    }, []);
 
     useEffect(() => {
         if (groupData.categories && livestream.targetCategories) {
@@ -269,7 +281,6 @@ const GroupStreamCardV2 = ({
     const handleMouseLeft = () => {
         !mobile && setCardHovered(false)
     }
-    console.log("livestream", livestream);
 
     const checkIfUserFollows = (careerCenter) => {
         if (user && userData && userData.groupIds) {
@@ -415,11 +426,13 @@ const GroupStreamCardV2 = ({
                         style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyDay(livestream.start.toDate())}
                 </div>
                 <Paper elevation={4} className={classes.front}>
-                    <Paper elevation={cardHovered ? 24 : 4} className={classes.logoWrapper}>
+                    <div
+                        // elevation={cardHovered ? 24 : 4}
+                        className={classes.logoWrapper}>
                         <img className={classes.companyLogo} src={livestream.companyLogoUrl} alt=""/>
-                    </Paper>
-                    <Typography className={classes.companyName}>
-                        {livestream.company}
+                    </div>
+                    <Typography ref={streamTitleRef} className={classes.companyName}>
+                        {cardHovered ? livestream.title : livestream.company}
                     </Typography>
                     {!cardHovered &&
                     <div className={classes.speakersAndLogosWrapper}>
@@ -441,13 +454,13 @@ const GroupStreamCardV2 = ({
                                     pathname: `/upcoming-livestream/${livestream.id}`,
                                     query: listenToUpcoming ? null : {groupId: groupData.groupId}
                                 }}><a>
-                                    <Button className={classes.detailsBtn}
-                                            style={{marginRight: 5}}
-                                            startIcon={<LibraryBooksIcon/>}
-                                            size="large"
-                                            children="Details"
-                                            variant="contained" color="secondary"/>
-                                </a></Link>
+                                <Button className={classes.detailsBtn}
+                                        style={{marginRight: 5}}
+                                        startIcon={<LibraryBooksIcon/>}
+                                        size="large"
+                                        children="Details"
+                                        variant="contained" color="secondary"/>
+                            </a></Link>
                             <Button className={classes.detailsBtn} size='large' style={{marginLeft: 5}}
                                     variant="contained"
                                     startIcon={(user && checkIfRegistered()) ?

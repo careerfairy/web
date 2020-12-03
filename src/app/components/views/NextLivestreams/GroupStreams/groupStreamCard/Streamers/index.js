@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
     streamer: {
         display: "flex",
         flex: 1,
-        minWidth: 120,
+        minWidth: 100,
         flexDirection: "column",
         alignItems: "center",
         padding: theme.spacing(1)
