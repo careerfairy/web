@@ -19,16 +19,22 @@ import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
 import AddToPhotosRoundedIcon from "@material-ui/icons/AddToPhotosRounded";
 import UserUtil from "../../../../../data/util/UserUtil";
 import DataAccessUtil from "../../../../../util/DataAccessUtil";
+import {useRouter} from "next/router";
+import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
+import BookingModal from "../../../common/booking-modal/BookingModal";
+import CopyToClipboard from "../CopyToClipboard";
 
 const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
     const paperColor = theme.palette.background.paper
+    const frontHOveredHeight = 330
     return ({
         game: {
             display: "flex",
-            width: "100%",
             justifyContent: "center",
+            width: "100%",
             position: "relative",
+            webKitPosition: "relative",
             zIndex: ({cardHovered}) => cardHovered && 1002,
             "& p": {
                 color: ({cardHovered}) => cardHovered ? theme.palette.common.white : theme.palette.common.black
@@ -49,7 +55,6 @@ const useStyles = makeStyles((theme) => {
             flexDirection: ({cardHovered}) => cardHovered && "column",
             display: "flex",
             justifyContent: "center",
-            alignItems: "center"
         },
         date: {
             flexDirection: ({cardHovered}) => cardHovered && "column",
@@ -90,7 +95,7 @@ const useStyles = makeStyles((theme) => {
             fontSize: theme.spacing(3.5),
             display: "flex",
             alignItems: "center",
-            width: ({cardHovered}) => cardHovered && "120%",
+            width: ({cardHovered}) => cardHovered && "130%",
             height: ({cardHovered}) => cardHovered ? "auto" : 60
         },
         front: {
@@ -102,7 +107,8 @@ const useStyles = makeStyles((theme) => {
             transition: '250ms',
             background: ({cardHovered}) => cardHovered ? "transparent" : fade(paperColor, 0.5),
             boxShadow: ({cardHovered}) => cardHovered && "none",
-            borderRadius: theme.spacing(2.2)
+            borderRadius: theme.spacing(2.2),
+            height: ({cardHovered}) => cardHovered ? frontHOveredHeight : 475
         },
         speakersAndLogosWrapper: {
             opacity: ({cardHovered}) => cardHovered && 0,
@@ -129,7 +135,9 @@ const useStyles = makeStyles((theme) => {
         buttonsWrapper: {
             display: "flex",
             justifyContent: "center",
-            marginBottom: theme.spacing(1)
+            marginBottom: theme.spacing(1),
+            position: "sticky",
+            top: 0
         },
         background: {
             transition: ({cardHovered}) => cardHovered && `${transition}, opacity 100ms linear`,
@@ -144,15 +152,18 @@ const useStyles = makeStyles((theme) => {
             zIndex: '-1',
             borderRadius: theme.spacing(2),
             overflow: 'hidden',
-            boxShadow: theme.shadows[24]
+            boxShadow: theme.shadows[24],
         },
         backgroundContent: {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             padding: theme.spacing(2),
-            marginTop: "45%",
-            zIndex: 1005
+            marginTop: frontHOveredHeight / 2,
+            zIndex: 1005,
+            overflowX: 'hidden',
+            overflowY: 'auto',
+            maxHeight: "40vh"
         },
         backgroundImage: {
             position: "absolute",
@@ -201,9 +212,14 @@ const GroupStreamCardV2 = ({
                                hasCategories
                            }) => {
 
+    const router = useRouter();
+    const absolutePath = router.asPath
+
+    const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
+
     const [cardHovered, setCardHovered] = useState(false)
-    const [streamTitleHeight, setStreamTitleHeight] = useState(0)
-    const classes = useStyles({cardHovered, mobile, hasCategories, listenToUpcoming, streamTitleHeight})
+    const [cardWidth, setCardWidth] = useState(0)
+    const classes = useStyles({cardHovered, mobile, hasCategories, listenToUpcoming, cardWidth})
     const [careerCenters, setCareerCenters] = useState([])
     const [targetOptions, setTargetOptions] = useState([])
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -211,16 +227,25 @@ const GroupStreamCardV2 = ({
     const [openJoinModal, setOpenJoinModal] = useState(false);
     const [fetchingCareerCenters, setFetchingCareerCenters] = useState(false)
 
-    const streamTitleRef = useRef(null);
+    const cardRef = useRef(null);
 
     const handleMouseLeft = () => {
         !mobile && setCardHovered(false)
     }
 
+    useEffect(() => {
+        if (!cardHovered) {
+            setCardWidth(cardRef.current?.offsetWidth)
+        }
+    }, [cardHovered])
 
     useEffect(() => {
-        setStreamTitleHeight(streamTitleRef.current?.offsetHeight);
-    }, [cardHovered, streamTitleRef.current]);
+        if (checkIfHighlighted() && !isHighlighted) {
+            setIsHighlighted(true)
+        } else if (checkIfHighlighted() && isHighlighted) {
+            setIsHighlighted(false)
+        }
+    }, [livestreamId, id, careerCenterId, groupData.groupId]);
 
     useEffect(() => {
         if (groupData.categories && livestream.targetCategories) {
@@ -325,6 +350,7 @@ const GroupStreamCardV2 = ({
                 setOpenJoinModal(true)
             } else {
                 firebase.registerToLivestream(livestream.id, user.email).then(() => {
+                    setCardHovered(false)
                     setBookingModalOpen(true);
                     sendEmailRegistrationConfirmation();
                 })
@@ -334,6 +360,7 @@ const GroupStreamCardV2 = ({
                 setOpenJoinModal(true)
             } else {
                 firebase.registerToLivestream(livestream.id, user.email).then(() => {
+                    setCardHovered(false)
                     setBookingModalOpen(true);
                     sendEmailRegistrationConfirmation();
                 })
@@ -344,6 +371,7 @@ const GroupStreamCardV2 = ({
 
     function completeRegistrationProcess() {
         firebase.registerToLivestream(livestream.id, user.email).then(() => {
+            setCardHovered(false)
             setBookingModalOpen(true);
             sendEmailRegistrationConfirmation();
         })
@@ -420,10 +448,14 @@ const GroupStreamCardV2 = ({
 
     return (
         <Fragment>
-            <div onMouseLeave={handleMouseLeft} onMouseEnter={handleMouseEntered} className={classes.game}>
+            <div
+                onMouseLeave={handleMouseLeft} onMouseEnter={handleMouseEntered}
+                ref={cardRef}
+                className={classes.game}>
                 <div className={classes.time}>
                     <QueryBuilderRoundedIcon
                         style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
+                <CopyToClipboard value={linkToStream}/>
                 </div>
                 <div className={classes.date}>
                     <EventNoteRoundedIcon
@@ -431,7 +463,6 @@ const GroupStreamCardV2 = ({
                 </div>
                 <Paper elevation={4} className={classes.front}>
                     <div
-                        ref={streamTitleRef}
                         className={classes.logoWrapper}>
                         <img className={classes.companyLogo} src={livestream.companyLogoUrl} alt=""/>
                     </div>
@@ -483,6 +514,18 @@ const GroupStreamCardV2 = ({
                 </div>
             </div>
             <Wave/>
+            <GroupJoinToAttendModal
+                open={openJoinModal}
+                groups={getGroups()}
+                alreadyJoined={false}
+                userData={userData}
+                onConfirm={completeRegistrationProcess}
+                closeModal={handleCloseJoinModal}/>
+            <BookingModal
+                livestream={livestream}
+                modalOpen={bookingModalOpen}
+                setModalOpen={setBookingModalOpen}
+                user={user}/>
         </Fragment>
     )
 

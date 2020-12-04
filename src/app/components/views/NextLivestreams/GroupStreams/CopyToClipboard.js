@@ -3,7 +3,7 @@ import {Button, IconButton, Tooltip} from "@material-ui/core";
 import LinkIcon from '@material-ui/icons/Link';
 
 
-const CopyToClipboard = ({value}) => {
+const CopyToClipboard = ({value, ...props}) => {
 
     const [copySuccess, setCopySuccess] = useState(false)
     const [url, setUrl] = useState("")
@@ -56,7 +56,7 @@ const CopyToClipboard = ({value}) => {
     }
 
     return (
-        <div style={{alignSelf: "flex-end", marginRight: 10}}>
+        <div {...props}>
             <Tooltip
                 title="Copied!"
                 placement="top"

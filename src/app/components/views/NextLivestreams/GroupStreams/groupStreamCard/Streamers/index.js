@@ -10,6 +10,7 @@ const useStyles = makeStyles(theme => ({
         justifyContent: ({cardHovered}) => cardHovered && "space-between",
         display: 'flex',
         textAlign: 'center',
+        zIndex: -1
     },
     streamer: {
         display: "flex",
@@ -27,7 +28,7 @@ const useStyles = makeStyles(theme => ({
         width: '2em',
         height: '2em',
         borderRadius: '50%',
-        zIndex: 1
+        // zIndex: 1
     },
     streamerPosition: {
         margin: "0 0 0 0",
@@ -40,7 +41,7 @@ const useStyles = makeStyles(theme => ({
         hyphens: "auto",
     },
 }))
-
+//
 const Streamers = ({speakers, cardHovered}) => {
 
     const classes = useStyles({cardHovered})
@@ -48,7 +49,7 @@ const Streamers = ({speakers, cardHovered}) => {
         <div className={classes.streamers}>
             {speakers.map(speaker => {
                 return (
-                    <div className={classes.streamer}>
+                    <div key={speaker.id} className={classes.streamer}>
                         <Avatar
                             className={classes.avatar}
                             src={speaker.avatar || speakerPlaceholder}

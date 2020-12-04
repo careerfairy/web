@@ -349,7 +349,7 @@ const GroupStreamCard = ({
                          style={{backgroundImage: 'url(' + livestream.backgroundImageUrl + ')'}}>
                         <div className='livestream-thumbnail-overlay'
                              style={{backgroundColor: userIsRegistered() ? 'rgba(0, 210, 170, 0.9)' : ''}}>
-                            <CopyToClipboard value={linkToStream}/>
+                            <CopyToClipboard style={{alignSelf: "flex-end", marginRight: 10}} value={linkToStream}/>
                             <div className='livestream-thumbnail-overlay-content'>
                                 <img alt="filter" style={{
                                     maxWidth: '220px',

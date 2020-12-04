@@ -29,6 +29,7 @@ import {PDFDownloadLink, Document, Page, View, Text} from '@react-pdf/renderer';
 import LivestreamPdfReport from './LivestreamPdfReport';
 import {useLivestreamMetadata} from 'components/custom-hook/useLivestreamMetadata';
 import {useTalentPoolMetadata} from 'components/custom-hook/useTalentPoolMetadata';
+import GroupStreamCardV2 from "../../../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2";
 
 const EnhancedGroupStreamCard = (props) => {
 
@@ -272,10 +273,11 @@ const EnhancedGroupStreamCard = (props) => {
                     </Button>
                 </DialogActions>
             </Dialog>
-            <GroupStreamCard
+            <GroupStreamCardV2
                 livestreamId={props.livestream.id}
                 livestream={props.livestream}
                 user={props.user}
+                shrink={true}
                 userData={props.userData}
                 fields={null}
                 groupData={props.group}/>

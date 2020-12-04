@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, {useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import {useRouter} from 'next/router';
 import {AppBar, Box, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
@@ -44,19 +44,10 @@ const Events = (props) => {
         const {children, value, index, ...other} = props;
 
         return (
-            <div
-                role="tabpanel"
-                hidden={value !== index}
-                id={`nav-tabpanel-${index}`}
-                aria-labelledby={`nav-tab-${index}`}
-                {...other}
-            >
-                {value === index && (
-                    <Box>
-                        {children}
-                    </Box>
-                )}
-            </div>
+            value === index &&
+            <Box>
+                {children}
+            </Box>
         );
     }
 
@@ -69,7 +60,7 @@ const Events = (props) => {
 
     let livestreamElements = totalItemsUpcoming.map((livestream, index) => {
         return (
-            <Grid key={livestream.id} xs={12} sm={12} md={12} lg={12} item>
+            <Grid key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={3} item>
                 <div key={livestream.id} style={{position: "relative"}}>
                     <EnhancedGroupStreamCard key={livestream.id} livestream={livestream} {...props} fields={null}
                                              group={props.group} isPastLivestream={false}/>
@@ -80,7 +71,7 @@ const Events = (props) => {
 
     let pastLivestreamElements = totalItemsPast.map((livestream, index) => {
         return (
-            <Grid key={livestream.id} xs={12} sm={12} md={12} lg={12} item>
+            <Grid key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={3} item>
                 <div key={livestream.id} style={{position: "relative"}}>
                     <EnhancedGroupStreamCard key={livestream.id} livestream={livestream} {...props} fields={null}
                                              group={props.group} isPastLivestream={true}/>
