@@ -105,9 +105,9 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
                              alt={`${groupData.universityName} logo`}/>
                     </div>
                 </CardMedia>
-                <Typography style={{padding: "0 1rem 1rem 1rem"}}>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged
-                </Typography>
+                {groupData.description && <Typography style={{padding: "0 1rem 1rem 1rem"}}>
+                    {groupData.description}
+                </Typography>}
                 {!!hasCategories && <CardContent>
                     <Box className={classes.actions}>
                         <SizeMe>{({size}) => (

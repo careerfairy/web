@@ -93,7 +93,7 @@ const useStyles = makeStyles((theme) => {
         },
         companyLogo: {
             maxWidth: "100%",
-            maxHeight: "100%"
+            maxHeight: "65%"
         },
         logoWrapper: {
             height: 230,
@@ -161,7 +161,7 @@ const useStyles = makeStyles((theme) => {
             transition: ({cardHovered}) => cardHovered && `${transition}, opacity 100ms linear`,
             transform: ({cardHovered}) => cardHovered ? 'scale(1.35, 1.3) translateY(5%)' : 'scale(0.2, 0.9)',
             opacity: ({cardHovered}) => cardHovered ? 1 : 0,
-            background: 'rgb(40, 46, 54)',
+            background: theme.palette.navyBlue.main,
             position: 'absolute',
             top: '0',
             left: '0',
@@ -215,20 +215,20 @@ const useStyles = makeStyles((theme) => {
 })
 
 
-const GroupStreamCardV2 = memo( ({
-                               livestream,
-                               user,
-                               mobile,
-                               fields,
-                               userData,
-                               firebase,
-                               livestreamId,
-                               id,
-                               careerCenterId,
-                               groupData,
-                               listenToUpcoming,
-                               hasCategories
-                           }) => {
+const GroupStreamCardV2 = memo(({
+                                    livestream,
+                                    user,
+                                    mobile,
+                                    fields,
+                                    userData,
+                                    firebase,
+                                    livestreamId,
+                                    id,
+                                    careerCenterId,
+                                    groupData,
+                                    listenToUpcoming,
+                                    hasCategories
+                                }) => {
 
     const router = useRouter();
     const absolutePath = router.asPath
@@ -364,7 +364,7 @@ const GroupStreamCardV2 = memo( ({
             });
         }
         if (listenToUpcoming) {// If on next livestreams tab...
-            if (!userFollowingAnyGroup()) {
+            if (!userFollowingAnyGroup() && livestream.groupIds?.length) {
                 setOpenJoinModal(true)
             } else {
                 firebase.registerToLivestream(livestream.id, user.email).then(() => {
@@ -474,7 +474,8 @@ const GroupStreamCardV2 = memo( ({
                     <QueryBuilderRoundedIcon
                         style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
                 </div>
-                <CopyToClipboard color={cardHovered && "white"} className={classes.copyToClipBoard} value={linkToStream}/>
+                <CopyToClipboard color={cardHovered && "white"} className={classes.copyToClipBoard}
+                                 value={linkToStream}/>
                 <div className={classes.frontLabelRight}>
                     <EventNoteRoundedIcon
                         style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyDay(livestream.start.toDate())}
