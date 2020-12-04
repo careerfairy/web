@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useRef, useState} from 'react';
+import React, {Fragment, memo, useEffect, useRef, useState} from 'react';
 import {withFirebase} from "context/firebase";
 import {fade, makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => {
                 color: ({cardHovered}) => cardHovered ? theme.palette.common.white : theme.palette.common.black
             },
         },
-        time: {
+        frontLabelRight: {
             color: ({cardHovered}) => cardHovered && theme.palette.common.white,
             position: 'absolute',
             top: '0',
@@ -55,8 +55,26 @@ const useStyles = makeStyles((theme) => {
             flexDirection: ({cardHovered}) => cardHovered && "column",
             display: "flex",
             justifyContent: "center",
+            alignItems: "center"
         },
-        date: {
+        copyToClipBoard: {
+            color: ({cardHovered}) => cardHovered && theme.palette.common.white,
+            position: 'absolute',
+            top: 10,
+            right: '0',
+            zIndex: '999',
+            fontWeight: 'bold',
+            fontSize: '1.125rem',
+            padding: '0.5em 0.5em 0.75em',
+            WebkitTransition: transition,
+            transition: transition,
+            transform: ({cardHovered}) => cardHovered && "translate(60%, 0%)",
+            flexDirection: ({cardHovered}) => cardHovered && "column",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+        },
+        frontLabelLeft: {
             flexDirection: ({cardHovered}) => cardHovered && "column",
             color: ({cardHovered}) => cardHovered && theme.palette.common.white,
             position: 'absolute',
@@ -83,7 +101,7 @@ const useStyles = makeStyles((theme) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: theme.spacing(3),
+            padding: theme.spacing(5),
             borderRadius: `${theme.spacing(2)}px 0px`,
             background: grey[50],
             boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
@@ -197,7 +215,7 @@ const useStyles = makeStyles((theme) => {
 })
 
 
-const GroupStreamCardV2 = ({
+const GroupStreamCardV2 = memo( ({
                                livestream,
                                user,
                                mobile,
@@ -278,7 +296,7 @@ const GroupStreamCardV2 = ({
                     setCareerCenters(groupList);
                 }).catch(() => setFetchingCareerCenters(false))
         }
-    }, [livestream.id]);
+    }, []);
 
     const checkIfHighlighted = () => {
         if (careerCenterId && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId) {
@@ -452,18 +470,17 @@ const GroupStreamCardV2 = ({
                 onMouseLeave={handleMouseLeft} onMouseEnter={handleMouseEntered}
                 ref={cardRef}
                 className={classes.game}>
-                <div className={classes.time}>
+                <div className={classes.frontLabelLeft}>
                     <QueryBuilderRoundedIcon
                         style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
-                <CopyToClipboard value={linkToStream}/>
                 </div>
-                <div className={classes.date}>
+                <CopyToClipboard color={cardHovered && "white"} className={classes.copyToClipBoard} value={linkToStream}/>
+                <div className={classes.frontLabelRight}>
                     <EventNoteRoundedIcon
                         style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyDay(livestream.start.toDate())}
                 </div>
                 <Paper elevation={4} className={classes.front}>
-                    <div
-                        className={classes.logoWrapper}>
+                    <div className={classes.logoWrapper}>
                         <img className={classes.companyLogo} src={livestream.companyLogoUrl} alt=""/>
                     </div>
                     <Typography className={classes.companyName}>
@@ -529,7 +546,7 @@ const GroupStreamCardV2 = ({
         </Fragment>
     )
 
-}
+})
 
 
 export default withFirebase(GroupStreamCardV2);

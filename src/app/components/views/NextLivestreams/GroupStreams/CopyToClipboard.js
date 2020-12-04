@@ -3,7 +3,7 @@ import {Button, IconButton, Tooltip} from "@material-ui/core";
 import LinkIcon from '@material-ui/icons/Link';
 
 
-const CopyToClipboard = ({value, ...props}) => {
+const CopyToClipboard = ({value, color, ...props}) => {
 
     const [copySuccess, setCopySuccess] = useState(false)
     const [url, setUrl] = useState("")
@@ -67,8 +67,8 @@ const CopyToClipboard = ({value, ...props}) => {
                 disableHoverListener
                 disableTouchListener
             >
-                <IconButton  onClick={() => copyStringToClipboard()}>
-                    <LinkIcon fontSize="large" color="inherit"/>
+                <IconButton onClick={() => copyStringToClipboard()}>
+                    <LinkIcon fontSize="large" style={{color: color || "inherit"}} color="inherit"/>
                 </IconButton>
             </Tooltip>
         </div>

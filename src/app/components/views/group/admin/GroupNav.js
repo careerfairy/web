@@ -4,11 +4,8 @@ import {makeStyles, useTheme} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Box from '@material-ui/core/Box';
-
-import {Container, Typography, useMediaQuery} from "@material-ui/core";
+import {Typography} from "@material-ui/core";
 import Events from "./events/Events";
-import Members from "./members/Members";
 import Settings from "./settings/Settings";
 import {withFirebase} from "../../../../context/firebase";
 import {ResponsiveContainer} from "../../../../materialUI/GlobalContainers";
@@ -16,19 +13,12 @@ import {ResponsiveContainer} from "../../../../materialUI/GlobalContainers";
 function TabPanel(props) {
     const {children, value, index, ...other} = props;
     return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`full-width-tabpanel-${index}`}
-            aria-labelledby={`full-width-tab-${index}`}
-            {...other}
-        >
-            {value === index && (
-                <Box p={1}>
+
+            value === index && (
+                <div style={{display: "flex", flexDirection: "column", width: "100%", height: "100%"}}>
                     {children}
-                </Box>
-            )}
-        </div>
+                </div>
+            )
     );
 }
 
@@ -39,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
     bar: {
         backgroundColor: "transparent",
         boxShadow: "none",
+        marginBottom: theme.spacing(2)
     }
 }));
 
@@ -67,26 +58,15 @@ const GroupNav = ({userData, user, groupId, group}) => {
                     centered
                 >
                     <Tab wrapped fullWidth label={<Typography variant="h5">Events</Typography>}/>
-                    {/* <Tab wrapped fullWidth label={<Typography variant="h5">Members</Typography>}/> */}
                     <Tab wrapped fullWidth label={<Typography variant="h5">Settings</Typography>}/>
                 </Tabs>
             </AppBar>
-            <SwipeableViews
-                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                index={value}
-                disabled
-                onChangeIndex={handleChangeIndex}
-            >
                 <TabPanel value={value} index={0} dir={theme.direction}>
-                    {group?.id && <Events group={group} user={user} userData={userData} menuItem={"events"}/>}
+                  <Events group={group} user={user} userData={userData} menuItem={"events"}/>
                 </TabPanel>
-                {/* <TabPanel value={value} index={1} dir={theme.direction}>
-                    <Members groupId={groupId}/>
-                </TabPanel> */}
                 <TabPanel value={value} index={1} dir={theme.direction}>
                     <Settings group={group} groupId={groupId}/>
                 </TabPanel>
-            </SwipeableViews>
         </ResponsiveContainer>
     );
 }

@@ -18,6 +18,10 @@ let baseTheme = createMuiTheme({
             dark: "#b00024",
             contrastText: "#FFFFFF"
         },
+        navyBlue: {
+            main: "#2C4251",
+            contrastText: "#FFFFFF"
+        },
         info: {
             light: "#FFFFFF",
             main: "#00d2aa",

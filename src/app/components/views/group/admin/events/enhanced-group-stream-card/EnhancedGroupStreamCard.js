@@ -172,107 +172,107 @@ const EnhancedGroupStreamCard = (props) => {
 
     return (
         <>
-            <IconButton style={{position: 'absolute', top: '140px', right: '10px', zIndex: '2000'}}
-                        onClick={() => setModalOpen(true)}>
-                <EditIcon fontSize="large" color="inherit"/>
-            </IconButton>
-            <div style={{
-                position: 'absolute',
-                top: '210px',
-                right: '10px',
-                zIndex: '2000',
-                fontWeight: '600'
-            }}>{registeredStudentsFromGroup.length} students registered
-            </div>
-            <CSVLink data={registeredStudentsFromGroup}
-                     filename={'Registered Students ' + props.livestream.company + ' ' + props.livestream.id + '.csv'}
-                     style={{color: 'red'}}>
-                <Button startIcon={<GetAppIcon/>} variant='outlined'
-                        style={{position: 'absolute', top: '240px', right: '10px', zIndex: '2000'}}>
-                    Registered Students
-                </Button>
-            </CSVLink>
-            <Fragment>
-                {!startDownloadingTalentPool || !hasDownloadedTalentPool ?
-                    <div style={{position: 'absolute', top: '290px', right: '10px', zIndex: '2000'}}>
-                        <Button variant='outlined' primary="true" onClick={() => setStartDownloadingTalentPool(true)}
-                                disabled={startDownloadingTalentPool}
-                                loading={startDownloadingTalentPool ? "true" : "false"}>{startDownloadingTalentPool ? 'Generating Talent Pool...' : 'Generate Talent Pool'}</Button>
-                    </div> :
-                    <CSVLink data={talentPool}
-                             filename={'TalentPool ' + props.livestream.company + ' ' + props.livestream.id + '.csv'}
-                             style={{color: 'red'}}>
-                        <Button startIcon={<GetAppIcon/>} variant='outlined'
-                                style={{position: 'absolute', top: '290px', right: '10px', zIndex: '2000'}}>
-                            Talent Pool
-                        </Button>
-                    </CSVLink>
-                }
-            </Fragment>
-            {
-                props.isPastLivestream &&
-                <Fragment>
-                    {!startDownloadingReport || !hasDownloadedReport ?
-                        <div style={{position: 'absolute', top: '340px', right: '10px', zIndex: '2000'}}>
-                            <Button startIcon={startDownloadingReport && <CircularProgress size={20} color="inherit"/>}
-                                    variant='outlined' onClick={() => setStartDownloadingReport(true)}
-                                    disabled={startDownloadingReport}>{startDownloadingReport ? 'Generating Report...' : 'Generate Report'}</Button>
-                        </div> :
-                        <PDFDownloadLink fileName="somename.pdf"
-                                         style={{position: 'absolute', top: '340px', right: '10px', zIndex: '2000'}}
-                                         document={
-                                             <LivestreamPdfReport group={props.group}
-                                                                  livestream={props.livestream}
-                                                                  studentStats={studentStats}
-                                                                  speakers={livestreamSpeakers}
-                                                                  overallRating={overallRating}
-                                                                  contentRating={contentRating}
-                                                                  totalStudentsInTalentPool={talentPoolForReport.length}
-                                                                  totalViewerFromOutsideETH={participatingStudents.length - participatingStudentsFromGroup.length}
-                                                                  totalViewerFromETH={participatingStudentsFromGroup.length}
-                                                                  questions={questions} polls={polls} icons={icons}/>}>
-                            {({blob, url, loading, error}) => (
-                                <div>
-                                    <Button variant='outlined' color='primary'>Download Report</Button>
-                                </div>
-                            )}
-                        </PDFDownloadLink>
-                    }
+            {/*<IconButton style={{position: 'absolute', top: '140px', right: '10px', zIndex: '2000'}}*/}
+            {/*            onClick={() => setModalOpen(true)}>*/}
+            {/*    <EditIcon fontSize="large" color="inherit"/>*/}
+            {/*</IconButton>*/}
+            {/*<div style={{*/}
+            {/*    position: 'absolute',*/}
+            {/*    top: '210px',*/}
+            {/*    right: '10px',*/}
+            {/*    zIndex: '2000',*/}
+            {/*    fontWeight: '600'*/}
+            {/*}}>{registeredStudentsFromGroup.length} students registered*/}
+            {/*</div>*/}
+            {/*<CSVLink data={registeredStudentsFromGroup}*/}
+            {/*         filename={'Registered Students ' + props.livestream.company + ' ' + props.livestream.id + '.csv'}*/}
+            {/*         style={{color: 'red'}}>*/}
+            {/*    <Button startIcon={<GetAppIcon/>} variant='outlined'*/}
+            {/*            style={{position: 'absolute', top: '240px', right: '10px', zIndex: '2000'}}>*/}
+            {/*        Registered Students*/}
+            {/*    </Button>*/}
+            {/*</CSVLink>*/}
+            {/*<Fragment>*/}
+            {/*    {!startDownloadingTalentPool || !hasDownloadedTalentPool ?*/}
+            {/*        <div style={{position: 'absolute', top: '290px', right: '10px', zIndex: '2000'}}>*/}
+            {/*            <Button variant='outlined' primary="true" onClick={() => setStartDownloadingTalentPool(true)}*/}
+            {/*                    disabled={startDownloadingTalentPool}*/}
+            {/*                    loading={startDownloadingTalentPool ? "true" : "false"}>{startDownloadingTalentPool ? 'Generating Talent Pool...' : 'Generate Talent Pool'}</Button>*/}
+            {/*        </div> :*/}
+            {/*        <CSVLink data={talentPool}*/}
+            {/*                 filename={'TalentPool ' + props.livestream.company + ' ' + props.livestream.id + '.csv'}*/}
+            {/*                 style={{color: 'red'}}>*/}
+            {/*            <Button startIcon={<GetAppIcon/>} variant='outlined'*/}
+            {/*                    style={{position: 'absolute', top: '290px', right: '10px', zIndex: '2000'}}>*/}
+            {/*                Talent Pool*/}
+            {/*            </Button>*/}
+            {/*        </CSVLink>*/}
+            {/*    }*/}
+            {/*</Fragment>*/}
+            {/*{*/}
+            {/*    props.isPastLivestream &&*/}
+            {/*    <Fragment>*/}
+            {/*        {!startDownloadingReport || !hasDownloadedReport ?*/}
+            {/*            <div style={{position: 'absolute', top: '340px', right: '10px', zIndex: '2000'}}>*/}
+            {/*                <Button startIcon={startDownloadingReport && <CircularProgress size={20} color="inherit"/>}*/}
+            {/*                        variant='outlined' onClick={() => setStartDownloadingReport(true)}*/}
+            {/*                        disabled={startDownloadingReport}>{startDownloadingReport ? 'Generating Report...' : 'Generate Report'}</Button>*/}
+            {/*            </div> :*/}
+            {/*            <PDFDownloadLink fileName="somename.pdf"*/}
+            {/*                             style={{position: 'absolute', top: '340px', right: '10px', zIndex: '2000'}}*/}
+            {/*                             document={*/}
+            {/*                                 <LivestreamPdfReport group={props.group}*/}
+            {/*                                                      livestream={props.livestream}*/}
+            {/*                                                      studentStats={studentStats}*/}
+            {/*                                                      speakers={livestreamSpeakers}*/}
+            {/*                                                      overallRating={overallRating}*/}
+            {/*                                                      contentRating={contentRating}*/}
+            {/*                                                      totalStudentsInTalentPool={talentPoolForReport.length}*/}
+            {/*                                                      totalViewerFromOutsideETH={participatingStudents.length - participatingStudentsFromGroup.length}*/}
+            {/*                                                      totalViewerFromETH={participatingStudentsFromGroup.length}*/}
+            {/*                                                      questions={questions} polls={polls} icons={icons}/>}>*/}
+            {/*                {({blob, url, loading, error}) => (*/}
+            {/*                    <div>*/}
+            {/*                        <Button variant='outlined' color='primary'>Download Report</Button>*/}
+            {/*                    </div>*/}
+            {/*                )}*/}
+            {/*            </PDFDownloadLink>*/}
+            {/*        }*/}
 
-                </Fragment>
-            }
-            <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
-                <DialogTitle align="center">Update Target Groups</DialogTitle>
-                <DialogContent>
-                    <FormControl variant="outlined" fullWidth style={{marginBottom: "10px"}}>
-                        <InputLabel>Add a Target Group</InputLabel>
-                        <Select
-                            value={null}
-                            placeholder="Select a target group"
-                            onChange={(e) => addElement(e.target.value)}
-                            label="New target group"
-                        >
-                            {menuItems}
-                        </Select>
-                    </FormControl>
-                    {categoryElements}
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        variant="contained"
-                        size="large"
-                        color="primary"
-                        onClick={updateLivestreamCategories}
-                        autoFocus>
-                        Confirm
-                    </Button>
-                    <Button
-                        size="large"
-                        onClick={() => setModalOpen(false)}>
-                        Cancel
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            {/*    </Fragment>*/}
+            {/*}*/}
+            {/*<Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">*/}
+            {/*    <DialogTitle align="center">Update Target Groups</DialogTitle>*/}
+            {/*    <DialogContent>*/}
+            {/*        <FormControl variant="outlined" fullWidth style={{marginBottom: "10px"}}>*/}
+            {/*            <InputLabel>Add a Target Group</InputLabel>*/}
+            {/*            <Select*/}
+            {/*                value={null}*/}
+            {/*                placeholder="Select a target group"*/}
+            {/*                onChange={(e) => addElement(e.target.value)}*/}
+            {/*                label="New target group"*/}
+            {/*            >*/}
+            {/*                {menuItems}*/}
+            {/*            </Select>*/}
+            {/*        </FormControl>*/}
+            {/*        {categoryElements}*/}
+            {/*    </DialogContent>*/}
+            {/*    <DialogActions>*/}
+            {/*        <Button*/}
+            {/*            variant="contained"*/}
+            {/*            size="large"*/}
+            {/*            color="primary"*/}
+            {/*            onClick={updateLivestreamCategories}*/}
+            {/*            autoFocus>*/}
+            {/*            Confirm*/}
+            {/*        </Button>*/}
+            {/*        <Button*/}
+            {/*            size="large"*/}
+            {/*            onClick={() => setModalOpen(false)}>*/}
+            {/*            Cancel*/}
+            {/*        </Button>*/}
+            {/*    </DialogActions>*/}
+            {/*</Dialog>*/}
             <GroupStreamCardV2
                 livestreamId={props.livestream.id}
                 livestream={props.livestream}

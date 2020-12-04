@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Card, CardContent, CardMedia} from "@material-ui/core";
+import {Box, Card, CardContent, CardMedia, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import CategoryCard from "./CategoryCard";
 import {SizeMe} from "react-sizeme";
@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
         width: ({mobile}) => mobile ? "100%" : "40%",
     },
     card: {
+
         overflowY: "auto",
         '&::-webkit-scrollbar': {
             width: '0.4em'
@@ -36,7 +37,6 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         justifyContent: "center",
         backgroundColor: "white",
-        marginBottom: "2em"
     },
     imageContainer: {
         position: "relative",
@@ -105,6 +105,9 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
                              alt={`${groupData.universityName} logo`}/>
                     </div>
                 </CardMedia>
+                <Typography style={{padding: "0 1rem 1rem 1rem"}}>
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged
+                </Typography>
                 {!!hasCategories && <CardContent>
                     <Box className={classes.actions}>
                         <SizeMe>{({size}) => (

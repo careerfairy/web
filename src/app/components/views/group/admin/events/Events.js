@@ -1,10 +1,12 @@
-import React, {useState} from 'react';
+import React, {useLayoutEffect, useRef, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import {useRouter} from 'next/router';
-import {AppBar, Box, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
+import {AppBar, Box, Button, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
 import EnhancedGroupStreamCard from './enhanced-group-stream-card/EnhancedGroupStreamCard';
 import {makeStyles} from "@material-ui/core/styles";
 import useInfiniteScroll from "../../../../custom-hook/useInfiniteScroll";
+import CustomInfiniteScroll from "../../../../util/CustomInfiteScroll";
+import GroupStreamCardV2 from "../../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2";
 
 const useStyles = makeStyles(theme => ({
     streamsWrapper: {
@@ -17,6 +19,9 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 const Events = (props) => {
+    if (!props.group.id) {
+        return null
+    }
     const classes = useStyles()
     const router = useRouter();
 
@@ -29,7 +34,7 @@ const Events = (props) => {
     );
 
     const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming, totalItemsUpcoming] = useInfiniteScroll(
-        props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id), 4
+        props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id), 3
     );
 
     const handleClose = () => {
@@ -45,9 +50,9 @@ const Events = (props) => {
 
         return (
             value === index &&
-            <Box>
+            <div style={{display: "flex", flexDirection: "column", width: "100%", height: "100%"}}>
                 {children}
-            </Box>
+            </div>
         );
     }
 
@@ -58,31 +63,42 @@ const Events = (props) => {
         };
     }
 
-    let livestreamElements = totalItemsUpcoming.map((livestream, index) => {
+    let livestreamElements = itemsUpcoming.map((livestream, index) => {
         return (
             <Grid key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={3} item>
                 <div key={livestream.id} style={{position: "relative"}}>
-                    <EnhancedGroupStreamCard key={livestream.id} livestream={livestream} {...props} fields={null}
-                                             group={props.group} isPastLivestream={false}/>
+                    <GroupStreamCardV2
+                        livestreamId={livestream.id}
+                        livestream={livestream}
+                        user={props.user}
+                        shrink={true}
+                        userData={props.userData}
+                        fields={null}
+                        groupData={props.group}/>
                 </div>
             </Grid>
         );
     });
 
-    let pastLivestreamElements = totalItemsPast.map((livestream, index) => {
+    let pastLivestreamElements = itemsPast.map((livestream, index) => {
         return (
             <Grid key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={3} item>
-                <div key={livestream.id} style={{position: "relative"}}>
-                    <EnhancedGroupStreamCard key={livestream.id} livestream={livestream} {...props} fields={null}
-                                             group={props.group} isPastLivestream={true}/>
-                </div>
+                    <GroupStreamCardV2
+                        key={livestream.id}
+                        livestreamId={livestream.id}
+                        livestream={livestream}
+                        user={props.user}
+                        shrink={true}
+                        userData={props.userData}
+                        fields={null}
+                        groupData={props.group}/>
             </Grid>
         );
     });
 
 
     return (
-        <div style={{width: '100%', textAlign: 'left', margin: '20px 0 20px 0'}}>
+        <div style={{width: '100%', textAlign: 'left', height: "100%"}}>
             <AppBar color='default' position="static">
                 <Tabs
                     variant="fullWidth"
@@ -99,20 +115,18 @@ const Events = (props) => {
                 <Grid className={classes.grid} container spacing={2}>
                     {livestreamElements}
                 </Grid>
+                {hasMoreUpcoming && <Button fullWidth onClick={loadMoreUpcoming}>
+                    Load More
+                </Button>}
             </TabPanel>
             <TabPanel value={value} index={1}>
                 <Grid className={classes.grid} container spacing={2}>
                     {pastLivestreamElements}
                 </Grid>
+                {hasMorePast && <Button fullWidth onClick={loadMorePast}>
+                    Load More
+                </Button>}
             </TabPanel>
-            {/* <Button variant="contained"
-                        color="primary"
-                        size="medium"
-                        style={{float: 'right', verticalAlign: 'middle', margin: '0'}}
-                        onClick={handleClick}
-                        endIcon={<AddIcon/>}>
-                    New Live Stream
-                </Button> */}
             <Menu
                 anchorEl={anchorEl}
                 keepMounted

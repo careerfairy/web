@@ -82,7 +82,6 @@ function Footer(props) {
                 color: rgb(44, 66, 81);
                 padding: 50px 0 50px 0;
                 text-align: center;
-                margin-top: auto;
             }
 
             .social-icon-container {

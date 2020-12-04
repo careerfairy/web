@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
             content: "'' !important",
             display: "none"
         },
-        background: "rgb(44, 66, 81)",
+        background: theme.palette.navyBlue.main,
     },
     button: {
         height: 90,

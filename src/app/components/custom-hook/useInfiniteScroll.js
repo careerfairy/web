@@ -33,6 +33,7 @@ const useInfiniteScroll = (query, limit = 3) => {
     const getMore = () => {
         const stillMore = Boolean(totalItems.length > items.length)
         if (stillMore) {
+        console.log("in the get more");
             setEnd(prevState => prevState + limit)
         }
     }
