@@ -11,19 +11,13 @@ function ViewerComponent(props) {
 
     const streamerReady = true;
     const isPlayMode = true;
-    const streamingCallbacks = {};
-    const errorCallbacks = {
-        onOtherError: (error) => {
-        }
-    };
 
-    const {webRTCAdaptor, externalMediaStreams } =
+    const {webRTCAdaptor, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels} =
         useWebRTCAdaptor(
             streamerReady,
             isPlayMode,
             'videoElement',
             mediaConstraints,
-            false,
             props.livestreamId,
             props.streamerId,
             true
@@ -45,18 +39,18 @@ function ViewerComponent(props) {
         <div>
             <div>
                 <CurrentSpeakerDisplayer isPlayMode={true}
-                                         smallScreenMode={props.currentLivestream.mode === 'presentation' ||  props.currentLivestream.mode === 'desktop'}
+                                         smallScreenMode={props.currentLivestream.mode === 'presentation'}
                                          speakerSwitchModeActive={false} localStream={null}
                                          streams={externalMediaStreams} localId={props.streamerId}
                                          currentSpeaker={props.currentLivestream.currentSpeakerId}
-                                         muted={false} {...props}/>
+                                         removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
+                                         muted={!props.currentLivestream.hasStarted} {...props}/>
             </div>
-            <div style={{display: (props.currentLivestream.mode === 'presentation' ||  props.currentLivestream.mode === 'desktop' ? 'block' : 'none')}}>
-                <SmallStreamerVideoDisplayer isPlayMode={true} externalMediaStreams={externalMediaStreams} isLocalScreen={false}
-                                             livestreamId={props.currentLivestream.id} presenter={false} presentation={props.currentLivestream.mode === 'presentation'}
-                                             />
+            <div style={{display: (props.currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
+                <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams}
+                                             livestreamId={props.currentLivestream.id} presenter={false}/>
             </div>
-            {/* <div className={props.currentLivestream.hasStarted ? 'hidden' : ''} style={{
+            <div className={props.currentLivestream.hasStarted ? 'hidden' : ''} style={{
                 position: 'absolute',
                 top: '0',
                 left: '0',
@@ -77,7 +71,7 @@ function ViewerComponent(props) {
                 }}>
                     {props.currentLivestream.test ? 'The streamer has to press Start Streaming to be visible to students' : 'Thank you for joining!'}
                 </div>
-            </div> */}
+            </div>
             <style jsx>{`
                 .hidden {
                     display: none

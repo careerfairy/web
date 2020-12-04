@@ -164,7 +164,6 @@ function CurrentSpeakerDisplayer(props) {
                         width: 100%; 
                         margin: 0 auto;
                         z-index: 2000;
-                        border: 2px solid red;
                     }
             `}</style>
             </div>;

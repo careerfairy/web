@@ -230,5 +230,9 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
         return streamListCopy;
     } 
 
+    let handleError = function(err){
+        console.log("Error: ", err);
+    };  
+
     return { localMediaStream, externalMediaStreams };
 }

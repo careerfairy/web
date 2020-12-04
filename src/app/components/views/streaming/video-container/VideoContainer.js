@@ -83,8 +83,18 @@ function VideoContainer(props) {
     useEffect(() => {
         if (isMainStreamer && props.currentLivestream.mode !== 'desktop' && props.currentLivestream.speakerSwitchMode !== 'manual') {
             let timeout = setTimeout(() => {
-                let audioLevels = externalMediaStreams.map( stream => stream.stream.getAudioLevel());
-                console.log(audioLevels)
+                let audioLevels = externalMediaStreams.map( stream => { 
+                    return {  
+                        streamId: stream.streamId, 
+                        audioLevel: stream.stream.getAudioLevel() 
+                    }         
+                });
+                if (localMediaStream) { 
+                    audioLevels.push({ 
+                        streamId: localMediaStream.getId(),
+                        audioLevel: localMediaStream.getAudioLevel()
+                    }); 
+                }
                 if (audioLevels && audioLevels.length > 1) {
                     const maxEntry = audioLevels.reduce((prev, current) => (prev.audioLevel > current.audioLevel) ? prev : current);
                     if (maxEntry.audioLevel > 0.05) {
@@ -94,7 +104,7 @@ function VideoContainer(props) {
                     }
                 }       
                 setAudioCounter(audioCounter + 1);
-            }, 500);
+            }, 2500);
             return () => clearTimeout(timeout);
         }
     }, [audioCounter, props.currentLivestream.mode]);
@@ -113,16 +123,6 @@ function VideoContainer(props) {
         }
     }, [props.streamerId, props.currentLivestream.id])
 
-    // useEffect(() => {
-    //     if (webRTCAdaptor && props.currentLivestream.screenSharerId === props.streamerId) {
-    //         if (props.currentLivestream.mode === 'desktop') {
-    //             webRTCAdaptor.switchDesktopCaptureWithCamera(props.streamerId);
-    //         } else {
-    //             webRTCAdaptor.switchVideoCameraCapture(props.streamerId);
-    //         }
-    //     }
-    // }, [props.currentLivestream.mode]);
-
     useEffect(() => {
         if (externalMediaStreams && props.currentLivestream.currentSpeakerId && isMainStreamer) {
             let existingCurrentSpeaker = externalMediaStreams.find(stream => stream.streamId === props.currentLivestream.currentSpeakerId)
@@ -135,7 +135,6 @@ function VideoContainer(props) {
     const setDesktopMode = async (mode, initiatorId) => {
         let screenSharerId = mode === 'desktop' ? initiatorId : props.currentLivestream.screenSharerId;
         await props.firebase.setDesktopMode(props.currentLivestream.id, mode, screenSharerId);
-        setLivestreamCurrentSpeakerId(initiatorId)
     }
 
     const setLivestreamCurrentSpeakerId = (id) => {

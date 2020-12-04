@@ -96,7 +96,7 @@ function RemoteVideoContainer(props) {
                 } 
                 open={activeStep === 11 && props.stream.streamId === 'demoStream'}>
                 <div className='videoContainer' style={{ height: props.height }}>
-                    <div id={props.stream.streamId} style={{ width: '100%', height: '100%' }}/>
+                    <div ref={videoElement} id={props.stream.streamId} style={{ width: '100%', height: '100%' }}/>
                     {/* <div className={ 'loader ' + (canPlay ? 'hidden' : '')}>
                         <div style={{ position: 'absolute', width: '30%', maxWidth: '30px', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
                             <CircularProgress style={{ maxWidth: '30px', height: 'auto'}} />
