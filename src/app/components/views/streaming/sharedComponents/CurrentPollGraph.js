@@ -6,6 +6,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import {PollQuestion} from "../../../../materialUI/GlobalTitles";
 import {colorsArray} from "../../../util/colors";
+import {isServer} from "../../../helperFunctions/HelperFunctions";
 
 const GraphWrapper = withStyles(theme => ({
     root: {
@@ -28,6 +29,9 @@ const CountWrapper = withStyles(theme => ({
 }))(Box);
 
 const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
+    if(isServer()){ // Dont go looking for the char Object if you're on the server >:(
+        return null
+    }
     const chartRef = useRef()
     const [legendElements, setLegendElements] = useState([])
     const [legendLabels, setLegendLabels] = useState([])

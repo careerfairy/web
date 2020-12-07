@@ -30,6 +30,7 @@ const useStyles = makeStyles((theme) => {
     const frontHoveredHeight = 330
     const frontHoveredScale = 0.7
     const frontHoveredTranslate = -115
+    const offset = 50
     return ({
         streamCardRoot: {
             display: "flex",
@@ -43,24 +44,9 @@ const useStyles = makeStyles((theme) => {
                 color: ({cardHovered}) => cardHovered ? theme.palette.common.white : theme.palette.common.black
             },
         },
-        frontLabelRight: {
-            color: ({cardHovered}) => cardHovered && theme.palette.common.white,
-            position: 'absolute',
-            top: '0',
-            right: '1em',
-            zIndex: '999',
-            fontWeight: 'bold',
-            fontSize: '1.125rem',
-            padding: '0.5em 0.5em 0.75em',
-            WebkitTransition: transition,
-            transition: transition,
-            transform: ({cardHovered}) => cardHovered && "translate(71%, -40%)",
-            flexDirection: ({cardHovered}) => cardHovered && "column",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center"
-        },
         copyToClipBoard: {
+            marginRight: ({even, cardHovered}) => cardHovered && even && offset,
+            marginLeft: ({even, cardHovered}) => cardHovered && !even && offset,
             color: ({cardHovered}) => cardHovered && theme.palette.common.white,
             position: 'absolute',
             top: 10,
@@ -77,7 +63,28 @@ const useStyles = makeStyles((theme) => {
             justifyContent: "center",
             alignItems: "center"
         },
+        frontLabelRight: {
+            marginRight: ({even, cardHovered}) => cardHovered && even && offset,
+            marginLeft: ({even, cardHovered}) => cardHovered && !even && offset,
+            color: ({cardHovered}) => cardHovered && theme.palette.common.white,
+            position: 'absolute',
+            top: '0',
+            right: '1em',
+            zIndex: '999',
+            fontWeight: 'bold',
+            fontSize: '1.125rem',
+            padding: '0.5em 0.5em 0.75em',
+            WebkitTransition: transition,
+            transition: transition,
+            transform: ({cardHovered}) => cardHovered && "translate(71%, -40%)",
+            flexDirection: ({cardHovered}) => cardHovered && "column",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+        },
         frontLabelLeft: {
+            marginRight: ({even, cardHovered}) => cardHovered && even && offset,
+            marginLeft: ({even, cardHovered}) => cardHovered && !even && offset,
             flexDirection: ({cardHovered}) => cardHovered && "column",
             color: ({cardHovered}) => cardHovered && theme.palette.common.white,
             position: 'absolute',
@@ -130,7 +137,9 @@ const useStyles = makeStyles((theme) => {
             background: ({cardHovered}) => cardHovered ? "transparent" : fade(paperColor, 0.5),
             boxShadow: ({cardHovered}) => cardHovered && "none",
             borderRadius: theme.spacing(2.2),
-            height: ({cardHovered}) => cardHovered ? frontHoveredHeight : "100%"
+            height: ({cardHovered}) => cardHovered ? frontHoveredHeight : "100%",
+            marginRight: ({even, cardHovered}) => cardHovered && even && offset,
+            marginLeft: ({even, cardHovered}) => cardHovered && !even && offset
         },
         speakersAndLogosWrapper: {
             opacity: ({cardHovered}) => cardHovered && 0,
@@ -168,6 +177,8 @@ const useStyles = makeStyles((theme) => {
             maxHeight: "40vh",
         },
         background: {
+            marginRight: ({even, cardHovered}) => cardHovered && even && offset,
+            marginLeft: ({even, cardHovered}) => cardHovered && !even && offset,
             transition: ({cardHovered}) => cardHovered && `${transition}, opacity 100ms linear`,
             transform: ({cardHovered}) => cardHovered ? 'scale(1.35, 1.3) translateY(5%)' : 'scale(0.2, 0.9)',
             opacity: ({cardHovered}) => cardHovered ? 1 : 0,
@@ -179,7 +190,8 @@ const useStyles = makeStyles((theme) => {
             overflow: 'hidden',
             borderRadius: theme.spacing(2),
             boxShadow: theme.shadows[24],
-            minWidth: "100%" // prevents single speaker cards from being too thin
+            minWidth: "100%", // prevents single speaker cards from being too thin,
+
         },
         backgroundContent: {
             display: "flex",
@@ -224,16 +236,17 @@ const GroupStreamCardV2 = memo(({
                                     careerCenterId,
                                     groupData,
                                     listenToUpcoming,
-                                    hasCategories
+                                    hasCategories,
+                                    index
                                 }) => {
 
     const router = useRouter();
     const absolutePath = router.asPath
-
+    const even = (index + 1) % 2 === 0
     const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
 
     const [cardHovered, setCardHovered] = useState(false)
-    const classes = useStyles({cardHovered, mobile, hasCategories, listenToUpcoming})
+    const classes = useStyles({cardHovered, mobile, hasCategories, listenToUpcoming, even})
     const [careerCenters, setCareerCenters] = useState([])
     const [targetOptions, setTargetOptions] = useState([])
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
