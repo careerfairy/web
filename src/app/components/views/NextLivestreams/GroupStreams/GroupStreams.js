@@ -23,14 +23,11 @@ const useStyles = makeStyles((theme) => ({
         margin: "0 auto",
         color: "rgb(130,130,130)"
     },
-    gridContainer: {
-        // marginTop: theme.spacing(2)
-    },
     loaderWrapper: {
         display: "flex",
         alignItems: "center",
-        justifyContent: "center"
-    }
+        justifyContent: "center",
+    },
 }));
 
 
@@ -55,7 +52,7 @@ const GroupStreams = ({
             if (livestream) {
                 return (
                     <Grid key={livestream.id} xs={12} sm={6} md={6}
-                          lg={6} xl={3} item>
+                          lg={!hasCategories ? 4 : 6} xl={3} item>
                         <GroupStreamCardV2
                             index={index}
                             mobile={mobile}
@@ -79,14 +76,19 @@ const GroupStreams = ({
             <Grid item xs={12} sm={12} md={hasCategories ? 8 : 12} lg={hasCategories ? 8 : 12} xl={hasCategories ? 8 : 12}>
                 <Grid container spacing={2}>
                     {groupData.id || listenToUpcoming ? (searching ?
-                        <Grid item className={classes.loaderWrapper}>
-                            <LinearProgress style={{width: "80%"}} color="primary"/>
+                        <Grid md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
+                            <LinearProgress style={{width: "80%", marginTop: 100}} color="primary"/>
                         </Grid>
                         :
                         livestreams.length ?
-                                renderStreamCards
+                            [renderStreamCards,
+                                renderStreamCards,
+                                renderStreamCards,
+                                renderStreamCards,
+                                renderStreamCards,
+                                renderStreamCards]
                             :
-                            <Grid item className={classes.loaderWrapper}>
+                            <Grid md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
                                 <Typography className={classes.emptyMessage} align="center" variant="h5"
                                             style={{marginTop: 100}}>{searchedButNoResults ? "We couldn't find anything... 😕" :
                                     <strong>{groupData.universityName} currently has no scheduled live

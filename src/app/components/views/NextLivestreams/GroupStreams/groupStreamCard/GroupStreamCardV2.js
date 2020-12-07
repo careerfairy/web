@@ -116,8 +116,9 @@ const useStyles = makeStyles((theme) => {
             fontSize: theme.spacing(3.5),
             display: "flex",
             alignItems: "center",
-            width: ({cardHovered}) => cardHovered && "130%",
-            height: ({cardHovered}) => cardHovered ? "auto" : 60
+            width: ({cardHovered}) => cardHovered && "135%",
+            height: ({cardHovered}) => cardHovered ? "auto" : 60,
+            padding: `0 ${theme.spacing(1)}px`
         },
         front: {
             width: "100%",

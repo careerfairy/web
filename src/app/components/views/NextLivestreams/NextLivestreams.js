@@ -261,8 +261,6 @@ const NextLivestreams = ({firebase}) => {
                 mobile={mobile}
                 groupIdsToRemove={groupIdsToRemove}
                 setGroupIdsToRemove={setGroupIdsToRemove}
-                livestreamId={livestreamId}
-                careerCenterId={careerCenterId}
                 user={authenticatedUser}
                 handleResetGroup={handleResetGroup}
                 handleSetGroup={handleSetGroup}
