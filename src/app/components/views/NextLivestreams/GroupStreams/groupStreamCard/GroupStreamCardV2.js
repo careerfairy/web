@@ -27,7 +27,9 @@ import CopyToClipboard from "../CopyToClipboard";
 const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
     const paperColor = theme.palette.background.paper
-    const frontHOveredHeight = 330
+    const frontHoveredHeight = 330
+    const frontHoveredScale = 0.7
+    const frontHoveredTranslate = -115
     return ({
         game: {
             display: "flex",
@@ -121,12 +123,12 @@ const useStyles = makeStyles((theme) => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            transform: ({cardHovered}) => cardHovered && "translateY(-115px) scale(0.7)",
+            transform: ({cardHovered}) => cardHovered && `translateY(${frontHoveredTranslate}px) scale(${frontHoveredScale})`,
             transition: '250ms',
             background: ({cardHovered}) => cardHovered ? "transparent" : fade(paperColor, 0.5),
             boxShadow: ({cardHovered}) => cardHovered && "none",
             borderRadius: theme.spacing(2.2),
-            height: ({cardHovered}) => cardHovered ? frontHOveredHeight : 475
+            height: ({cardHovered}) => cardHovered ? frontHoveredHeight : 475
         },
         speakersAndLogosWrapper: {
             opacity: ({cardHovered}) => cardHovered && 0,
@@ -151,7 +153,7 @@ const useStyles = makeStyles((theme) => {
             borderRadius: theme.spacing(1),
         },
         buttonsWrapper: {
-            marginTop: frontHOveredHeight / 2,
+            marginTop: (frontHoveredHeight * frontHoveredScale) - (-frontHoveredTranslate / 2),
             display: "flex",
             justifyContent: "center",
             marginBottom: theme.spacing(1)
@@ -189,7 +191,7 @@ const useStyles = makeStyles((theme) => {
             overflowX: "auto",
             overflowY: "hidden",
         },
-        logoElement:{
+        logoElement: {
             margin: "0 auto",
             padding: `${theme.spacing(1)}px ${theme.spacing(0.5)}px`,
         },
@@ -258,7 +260,7 @@ const GroupStreamCardV2 = memo(({
     const cardRef = useRef(null);
 
     const handleMouseLeft = () => {
-        !mobile && setCardHovered(true)
+        !mobile && setCardHovered(false)
     }
 
     useEffect(() => {
