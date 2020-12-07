@@ -185,14 +185,16 @@ const MobileFeed = ({
                     </Grid>
                 </TabPanel>
                 <TabPanel dir={theme.direction}>
-                    <GroupCategories alreadyJoined={alreadyJoined}
-                                     groupData={groupData}
-                                     user={user}
-                                     hasCategories={hasCategories}
-                                     livestreams={livestreams}
-                                     userData={userData}
-                                     handleToggleActive={handleToggleActive}
-                                     mobile={true}/>
+                    <Grid className={classes.streamsGrid} container spacing={2}>
+                        <GroupCategories alreadyJoined={alreadyJoined}
+                                         groupData={groupData}
+                                         user={user}
+                                         hasCategories={hasCategories}
+                                         livestreams={livestreams}
+                                         userData={userData}
+                                         handleToggleActive={handleToggleActive}
+                                         mobile={true}/>
+                    </Grid>
                 </TabPanel>
             </SwipeableViews>
         </>

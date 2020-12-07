@@ -2,7 +2,7 @@ import React, {Fragment, memo, useEffect, useRef, useState} from 'react';
 import {withFirebase} from "context/firebase";
 import {fade, makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
-import {Avatar, Button, Card, CardMedia, Paper} from "@material-ui/core";
+import {Accordion, Avatar, Button, Card, CardMedia, Paper} from "@material-ui/core";
 import {AvatarGroup} from "@material-ui/lab";
 import Streamers from "./Streamers";
 import Link from "next/link";
@@ -151,14 +151,16 @@ const useStyles = makeStyles((theme) => {
             width: "100%",
             height: 100
         },
-        detailsBtn: {
+        actionButton: {
             borderRadius: theme.spacing(1),
+            margin: theme.spacing(0.5)
         },
         buttonsWrapper: {
-            marginTop: (frontHoveredHeight * frontHoveredScale) - (-frontHoveredTranslate / 2),
+            marginTop: (frontHoveredHeight * frontHoveredScale) - (-frontHoveredTranslate / 2.3),
             display: "flex",
             justifyContent: "center",
-            marginBottom: theme.spacing(1)
+            marginBottom: theme.spacing(1),
+            flexWrap: "wrap"
         },
         optionsWrapper: {
             overflowX: 'hidden',
@@ -172,13 +174,12 @@ const useStyles = makeStyles((theme) => {
             background: theme.palette.navyBlue.main,
             position: 'absolute',
             top: '0',
-            left: '0',
-            right: '0',
             bottom: "auto",
             zIndex: '-1',
             overflow: 'hidden',
             borderRadius: theme.spacing(2),
             boxShadow: theme.shadows[24],
+            minWidth: "100%" // prevents single speaker cards from being too thin
         },
         backgroundContent: {
             display: "flex",
@@ -436,7 +437,8 @@ const GroupStreamCardV2 = memo(({
     let logoElements = careerCenters.map(careerCenter => {
         return (
             <div className={classes.logoElement} key={careerCenter.groupId}>
-                <LogoElement hideFollow={!cardHovered} key={careerCenter.groupId} livestreamId={livestream.id}
+                <LogoElement hideFollow={!cardHovered && !mobile} key={careerCenter.groupId}
+                             livestreamId={livestream.id}
                              userFollows={checkIfUserFollows(careerCenter)}
                              careerCenter={careerCenter} userData={userData} user={user}/>
             </div>
@@ -472,6 +474,9 @@ const GroupStreamCardV2 = memo(({
                     <Typography className={classes.companyName}>
                         {cardHovered ? livestream.title : livestream.company}
                     </Typography>
+                    {/*{mobile && <Accordion>*/}
+
+                    {/*</Accordion>}*/}
                     {!cardHovered &&
                     <div className={classes.speakersAndLogosWrapper}>
                         <AvatarGroup max={3}>
@@ -485,33 +490,20 @@ const GroupStreamCardV2 = memo(({
                 <div className={classes.background}>
                     <img className={classes.backgroundImage} src={livestream.backgroundImageUrl} alt="background"/>
                     <div className={classes.buttonsWrapper}>
-                        <Link
-                            prefetch={false}
-                            href={{
-                                pathname: `/upcoming-livestream/${livestream.id}`,
-                                query: listenToUpcoming ? null : {groupId: groupData.groupId}
-                            }}><a>
-                            <Button className={classes.detailsBtn}
-                                    style={{marginRight: 5}}
-                                    startIcon={<LibraryBooksIcon/>}
-                                    size="large"
-                                    children="Details"
-                                    variant="contained" color="secondary"/>
-                        </a></Link>
-                        <Button className={classes.detailsBtn} size='large' style={{marginLeft: 5}}
-                                variant="contained"
-                                startIcon={(user && checkIfRegistered()) ?
-                                    <ClearRoundedIcon/> : <AddToPhotosRoundedIcon/>}
-                                color={(user && checkIfRegistered()) ? "default" : 'primary'}
-                                children={user ? (checkIfRegistered() ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
-                                onClick={handleRegisterClick}/>
-
+                        <DetailsButton
+                            groupData={groupData}
+                            listenToUpcoming={listenToUpcoming}
+                            livestream={livestream}/>
+                        <AttendButton
+                            handleRegisterClick={handleRegisterClick}
+                            checkIfRegistered={checkIfRegistered}
+                            user={user}/>
                     </div>
                     <div className={classes.backgroundContent}>
                         <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
                         {!!targetOptions.length &&
                         <div className={classes.optionsWrapper}>
-                        <TargetOptions options={targetOptions}/>
+                            <TargetOptions options={targetOptions}/>
                         </div>}
                     </div>
                     <div className={classes.logosBackWrapper}>
@@ -534,8 +526,42 @@ const GroupStreamCardV2 = memo(({
                 user={user}/>
         </Fragment>
     )
-
 })
+
+const AttendButton = ({checkIfRegistered, user, handleRegisterClick}) => {
+    const classes = useStyles()
+    return (
+        <Button className={classes.actionButton} size='large' style={{marginLeft: 5}}
+                variant="contained"
+                startIcon={(user && checkIfRegistered()) ?
+                    <ClearRoundedIcon/> : <AddToPhotosRoundedIcon/>}
+                color={(user && checkIfRegistered()) ? "default" : 'primary'}
+                children={user ? (checkIfRegistered() ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
+                onClick={handleRegisterClick}/>
+    )
+}
+
+const DetailsButton = ({listenToUpcoming, livestream, groupData}) => {
+    const classes = useStyles()
+    return (
+        <Link
+            prefetch={false}
+            href={{
+                pathname: `/upcoming-livestream/${livestream.id}`,
+                query: listenToUpcoming ? null : {groupId: groupData.groupId}
+            }}>
+            <a>
+                <Button
+                    className={classes.actionButton}
+                    style={{marginRight: 5}}
+                    startIcon={<LibraryBooksIcon/>}
+                    size="large"
+                    children="Details"
+                    variant="contained" color="secondary"/>
+            </a>
+        </Link>
+    )
+}
 
 
 export default withFirebase(GroupStreamCardV2);

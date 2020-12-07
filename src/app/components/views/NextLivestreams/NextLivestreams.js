@@ -13,6 +13,11 @@ const NextLivestreams = ({firebase}) => {
     const theme = useTheme();
     const mobile = useMediaQuery(theme.breakpoints.down("sm"));
     const router = useRouter();
+
+    // const {
+    //     query:{ livestreamId, careerCenterId}
+    // } = router
+
     const livestreamId = getServerSideRouterQuery("livestreamId", router)
     const careerCenterId = getServerSideRouterQuery("careerCenterId", router)
 
@@ -132,7 +137,7 @@ const NextLivestreams = ({firebase}) => {
         if (userData !== undefined) {
             handleGetGroupIds();
         }
-    }, [userData, careerCenterId]);
+    }, [userData, careerCenterId, router]);
 
     useEffect(() => {
         if (groupIds.length > 1 && setToUpcomingSlide()) {
