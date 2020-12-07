@@ -52,7 +52,7 @@ const GroupStreams = ({
             if (livestream) {
                 return (
                     <Grid key={livestream.id} xs={12} sm={6} md={6}
-                          lg={!hasCategories ? 4 : 6} xl={3} item>
+                          lg={hasCategories ? 6 : 4} xl={3} item>
                         <GroupStreamCardV2
                             index={index}
                             mobile={mobile}
@@ -81,12 +81,7 @@ const GroupStreams = ({
                         </Grid>
                         :
                         livestreams.length ?
-                            [renderStreamCards,
-                                renderStreamCards,
-                                renderStreamCards,
-                                renderStreamCards,
-                                renderStreamCards,
-                                renderStreamCards]
+                                renderStreamCards
                             :
                             <Grid md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
                                 <Typography className={classes.emptyMessage} align="center" variant="h5"

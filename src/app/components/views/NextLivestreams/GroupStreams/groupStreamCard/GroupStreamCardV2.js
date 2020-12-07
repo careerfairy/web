@@ -163,7 +163,7 @@ const useStyles = makeStyles((theme) => {
         optionsWrapper: {
             overflowX: 'hidden',
             overflowY: 'auto',
-            maxHeight: 150,
+            maxHeight: "40vh",
         },
         background: {
             transition: ({cardHovered}) => cardHovered && `${transition}, opacity 100ms linear`,
@@ -232,8 +232,7 @@ const GroupStreamCardV2 = memo(({
     const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
 
     const [cardHovered, setCardHovered] = useState(false)
-    const [cardWidth, setCardWidth] = useState(0)
-    const classes = useStyles({cardHovered, mobile, hasCategories, listenToUpcoming, cardWidth})
+    const classes = useStyles({cardHovered, mobile, hasCategories, listenToUpcoming})
     const [careerCenters, setCareerCenters] = useState([])
     const [targetOptions, setTargetOptions] = useState([])
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -241,17 +240,9 @@ const GroupStreamCardV2 = memo(({
     const [openJoinModal, setOpenJoinModal] = useState(false);
     const [fetchingCareerCenters, setFetchingCareerCenters] = useState(false)
 
-    const cardRef = useRef(null);
-
     const handleMouseLeft = () => {
-        !mobile && setCardHovered(false)
+        cardHovered && setCardHovered(false)
     }
-
-    useEffect(() => {
-        if (!cardHovered && cardRef.current?.offsetWidth) {
-            setCardWidth(cardRef.current.offsetWidth)
-        }
-    }, [cardHovered])
 
     useEffect(() => {
         if (checkIfHighlighted() && !isHighlighted) {
@@ -321,9 +312,8 @@ const GroupStreamCardV2 = memo(({
     }
 
     const handleMouseEntered = () => {
-        !mobile && setCardHovered(true)
+        !mobile && !cardHovered && setCardHovered(true)
     }
-
 
     const checkIfUserFollows = (careerCenter) => {
         if (user && userData && userData.groupIds) {
@@ -464,7 +454,6 @@ const GroupStreamCardV2 = memo(({
         <Fragment>
             <div
                 onMouseLeave={handleMouseLeft} onMouseEnter={handleMouseEntered}
-                ref={cardRef}
                 className={classes.streamCardRoot}>
                 <div className={classes.frontLabelLeft}>
                     <QueryBuilderRoundedIcon
