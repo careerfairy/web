@@ -10,19 +10,24 @@ const useStyles = makeStyles(theme => ({
         justifyContent: ({cardHovered}) => cardHovered && "space-between",
         display: 'flex',
         textAlign: 'center',
-        zIndex: -1
+        // zIndex: -1,
+        overflowX: "auto",
+        // overflowY: "hidden"
     },
     streamer: {
         display: "flex",
         flex: 1,
-        minWidth: 100,
+        minWidth: 95,
         flexDirection: "column",
         alignItems: "center",
-        padding: theme.spacing(1)
+        justifyContent:"space-between",
+        padding: theme.spacing(0.5)
     },
     name: {
         margin: '0.75em 0',
-        textAlign: 'center'
+        textAlign: 'center',
+        fontSize: "0.9em",
+        fontWeight: "bold"
     },
     avatar: {
         width: '2em',

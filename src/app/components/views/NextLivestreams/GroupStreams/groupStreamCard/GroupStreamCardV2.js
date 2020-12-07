@@ -159,6 +159,11 @@ const useStyles = makeStyles((theme) => {
             justifyContent: "center",
             marginBottom: theme.spacing(1)
         },
+        optionsWrapper: {
+            overflowX: 'hidden',
+            overflowY: 'auto',
+            maxHeight: 150,
+        },
         background: {
             transition: ({cardHovered}) => cardHovered && `${transition}, opacity 100ms linear`,
             transform: ({cardHovered}) => cardHovered ? 'scale(1.35, 1.3) translateY(5%)' : 'scale(0.2, 0.9)',
@@ -175,13 +180,11 @@ const useStyles = makeStyles((theme) => {
             boxShadow: theme.shadows[24],
         },
         backgroundContent: {
+            border: "2px solid orange",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             zIndex: 1005,
-            overflowX: 'hidden',
-            overflowY: 'auto',
-            maxHeight: "40vh",
             padding: theme.spacing(2),
             paddingTop: 0
         },
@@ -518,7 +521,9 @@ const GroupStreamCardV2 = memo(({
                     <div className={classes.backgroundContent}>
                         <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
                         {!!targetOptions.length &&
-                        <TargetOptions options={targetOptions}/>}
+                        <div className={classes.optionsWrapper}>
+                        <TargetOptions options={targetOptions}/>
+                        </div>}
                     </div>
                     <div className={classes.logosBackWrapper}>
                         {logoElements}

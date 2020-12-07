@@ -55,7 +55,7 @@ const GroupStreams = ({
             if (livestream) {
                 return (
                     <Grid key={livestream.id} xs={12} sm={6} md={6}
-                          lg={3} xl={2} item>
+                          lg={6} xl={3} item>
                         <GroupStreamCardV2
                             index={index}
                             mobile={mobile}
@@ -86,25 +86,30 @@ const GroupStreams = ({
         })
 
         return (
-            <>
-                {groupData.id || listenToUpcoming ? (searching ?
-                    <Grid item className={classes.loaderWrapper}>
-                        <LinearProgress style={{width: "80%"}} color="primary"/>
-                    </Grid>
-                    :
-                    livestreams.length ?
-                        [renderStreamCards,
-                        renderStreamCards,
-                        renderStreamCards]
-                        :
+            <Grid item xs={12} sm={12} md={hasCategories ? 8 : 12} lg={hasCategories ? 8 : 12} xl={hasCategories ? 8 : 12}>
+                <Grid container spacing={2}>
+                    {groupData.id || listenToUpcoming ? (searching ?
                         <Grid item className={classes.loaderWrapper}>
-                            <Typography className={classes.emptyMessage} align="center" variant="h5"
-                                        style={{marginTop: 100}}>{searchedButNoResults ? "We couldn't find anything... 😕" :
-                                <strong>{groupData.universityName} currently has no scheduled live
-                                    streams</strong>}</Typography>
-                        </Grid>)
-                    : null}
-            </>
+                            <LinearProgress style={{width: "80%"}} color="primary"/>
+                        </Grid>
+                        :
+                        livestreams.length ?
+                            [renderStreamCards,
+                                renderStreamCards,
+                                renderStreamCards,
+                                renderStreamCards,
+                                renderStreamCards,
+                                renderStreamCards]
+                            :
+                            <Grid item className={classes.loaderWrapper}>
+                                <Typography className={classes.emptyMessage} align="center" variant="h5"
+                                            style={{marginTop: 100}}>{searchedButNoResults ? "We couldn't find anything... 😕" :
+                                    <strong>{groupData.universityName} currently has no scheduled live
+                                        streams</strong>}</Typography>
+                            </Grid>)
+                        : null}
+                </Grid>
+            </Grid>
         );
     }
 ;

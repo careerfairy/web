@@ -99,39 +99,42 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
     }
 
     return (
-        <Grid style={{height: "100%"}} item xs={12} sm={12} md={6} lg={4} xl={2} className={classes.root}>
-            <Card className={classes.card}>
-                <CardMedia className={classes.media}>
-                    <div className={classes.imageContainer}>
-                        <img src={groupData.logoUrl} className={classes.image}
-                             alt={`${groupData.universityName} logo`}/>
-                    </div>
-                </CardMedia>
-                {groupData.description && <Typography style={{padding: "0 1rem 1rem 1rem"}}>
-                    {groupData.description}
-                </Typography>}
-                {!!hasCategories && <CardContent>
-                    <Box className={classes.actions}>
-                        <SizeMe>{({size}) => (
-                            <StackGrid
-                                style={{marginTop: 10}}
-                                duration={20}
-                                columnWidth={"100%"}
-                                gridRef={grid => setGrid(grid)}>
-                                {groupData.categories.map(category => {
-                                    if (category.name.toLowerCase() !== "level of study") {
-                                        return (
-                                            <CategoryCard width={size.width} mobile={mobile} key={category.id}
-                                                          category={category}
-                                                          handleToggleActive={handleToggleActive}/>
-                                        )
-                                    }
-                                })}
-                            </StackGrid>
-                        )}</SizeMe>
-                    </Box>
-                </CardContent>}
-            </Card>
+        <Grid style={{height: "100%", border: "3px solid pink"}} item xs={12} sm={12} md={4} lg={4} xl={4}
+              className={classes.root}>
+            {/*<Grid style={{height: "100%", border: "1px solid red"}}>*/}
+                <Card className={classes.card}>
+                    <CardMedia className={classes.media}>
+                        <div className={classes.imageContainer}>
+                            <img src={groupData.logoUrl} className={classes.image}
+                                 alt={`${groupData.universityName} logo`}/>
+                        </div>
+                    </CardMedia>
+                    {groupData.description && <Typography style={{padding: "0 1rem 1rem 1rem"}}>
+                        {groupData.description}
+                    </Typography>}
+                    {!!hasCategories && <CardContent>
+                        <Box className={classes.actions}>
+                            <SizeMe>{({size}) => (
+                                <StackGrid
+                                    style={{marginTop: 10}}
+                                    duration={20}
+                                    columnWidth={"100%"}
+                                    gridRef={grid => setGrid(grid)}>
+                                    {groupData.categories.map(category => {
+                                        if (category.name.toLowerCase() !== "level of study") {
+                                            return (
+                                                <CategoryCard width={size.width} mobile={mobile} key={category.id}
+                                                              category={category}
+                                                              handleToggleActive={handleToggleActive}/>
+                                            )
+                                        }
+                                    })}
+                                </StackGrid>
+                            )}</SizeMe>
+                        </Box>
+                    </CardContent>}
+                </Card>
+            {/*</Grid>*/}
         </Grid>
     )
 };
