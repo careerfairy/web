@@ -29,6 +29,25 @@ const NextLivestreams = ({firebase}) => {
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [listenToUpcoming, setListenToUpcoming] = useState(false);
 
+    const getRouterQuery = (key) => {
+        if (router.query[key]) {
+            return router.query[key]
+        } else {
+            const query = router.asPath.match(new RegExp(`[&?]${key}=(.*)(&|$)`))
+            if (query) {
+                return query[1]
+            } else {
+                return null
+            }
+        }
+    }
+
+    // useEffect(() => {
+        console.log("-> getRouterQuery", getRouterQuery("livestreamId"));
+
+    // }, [])
+
+
     useEffect(() => {
         if (listenToUpcoming) { // && routerMounted
             const unsubscribe = firebase.listenToUpcomingLivestreams(
@@ -145,6 +164,7 @@ const NextLivestreams = ({firebase}) => {
             setGroupIds([...new Set(newGroupIds)]);
         }
     }, [livestreamId, careerCenterId, router])
+
 
     const setToUpcomingSlide = () => {
         return livestreamId && !careerCenterId || (!livestreamId && !careerCenterId)

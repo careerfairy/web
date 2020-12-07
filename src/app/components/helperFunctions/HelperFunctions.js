@@ -68,3 +68,7 @@ export const isEmptyObject = (obj) => {
     return isEmpty(obj);
 }
 
+export const isServer = () => {
+    return typeof window === 'undefined'
+}
+
