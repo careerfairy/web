@@ -148,14 +148,13 @@ const useStyles = makeStyles((theme) => {
             height: 100
         },
         detailsBtn: {
-            borderRadius: theme.spacing(2),
+            borderRadius: theme.spacing(1),
         },
         buttonsWrapper: {
+            marginTop: frontHOveredHeight / 2,
             display: "flex",
             justifyContent: "center",
-            marginBottom: theme.spacing(1),
-            position: "sticky",
-            top: 0
+            marginBottom: theme.spacing(1)
         },
         background: {
             transition: ({cardHovered}) => cardHovered && `${transition}, opacity 100ms linear`,
@@ -176,12 +175,23 @@ const useStyles = makeStyles((theme) => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            padding: theme.spacing(2),
-            marginTop: frontHOveredHeight / 2,
             zIndex: 1005,
             overflowX: 'hidden',
             overflowY: 'auto',
-            maxHeight: "40vh"
+            maxHeight: "40vh",
+            padding: theme.spacing(2),
+            paddingTop: 0
+        },
+        logosBackWrapper: {
+            display: "flex",
+            width: "100%",
+            background: grey[50],
+            overflowX: "auto",
+            overflowY: "hidden",
+        },
+        logoElement:{
+            margin: "0 auto",
+            padding: `${theme.spacing(1)}px ${theme.spacing(0.5)}px`,
         },
         backgroundImage: {
             position: "absolute",
@@ -248,7 +258,7 @@ const GroupStreamCardV2 = memo(({
     const cardRef = useRef(null);
 
     const handleMouseLeft = () => {
-        !mobile && setCardHovered(false)
+        !mobile && setCardHovered(true)
     }
 
     useEffect(() => {
@@ -449,9 +459,9 @@ const GroupStreamCardV2 = memo(({
 
     let logoElements = careerCenters.map((careerCenter, index) => {
         return (
-            <div style={{flex: 1, minWidth: "25%"}} key={careerCenter.groupId}>
+            <div className={classes.logoElement} key={careerCenter.groupId}>
                 <LogoElement key={careerCenter.groupId} livestreamId={livestream.id}
-                             userfollows={checkIfUserFollows(careerCenter)}
+                             userFollows={checkIfUserFollows(careerCenter)}
                              careerCenter={careerCenter} userData={userData} user={user}/>
             </div>
         );
@@ -499,35 +509,38 @@ const GroupStreamCardV2 = memo(({
                 </Paper>
                 <div className={classes.background}>
                     <img className={classes.backgroundImage} src={livestream.backgroundImageUrl} alt="background"/>
-                    <div className={classes.backgroundContent}>
-                        <div className={classes.buttonsWrapper}>
-                            <Link
-                                prefetch={false}
-                                href={{
-                                    pathname: `/upcoming-livestream/${livestream.id}`,
-                                    query: listenToUpcoming ? null : {groupId: groupData.groupId}
-                                }}><a>
-                                <Button className={classes.detailsBtn}
-                                        style={{marginRight: 5}}
-                                        startIcon={<LibraryBooksIcon/>}
-                                        size="large"
-                                        children="Details"
-                                        variant="contained" color="secondary"/>
-                            </a></Link>
-                            <Button className={classes.detailsBtn} size='large' style={{marginLeft: 5}}
-                                    variant="contained"
-                                    startIcon={(user && checkIfRegistered()) ?
-                                        <ClearRoundedIcon/> : <AddToPhotosRoundedIcon/>}
-                                    color={(user && checkIfRegistered()) ? "default" : 'primary'}
-                                    children={user ? (checkIfRegistered() ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
-                                    onClick={handleRegisterClick}/>
+                    <div className={classes.buttonsWrapper}>
+                        <Link
+                            prefetch={false}
+                            href={{
+                                pathname: `/upcoming-livestream/${livestream.id}`,
+                                query: listenToUpcoming ? null : {groupId: groupData.groupId}
+                            }}><a>
+                            <Button className={classes.detailsBtn}
+                                    style={{marginRight: 5}}
+                                    startIcon={<LibraryBooksIcon/>}
+                                    size="large"
+                                    children="Details"
+                                    variant="contained" color="secondary"/>
+                        </a></Link>
+                        <Button className={classes.detailsBtn} size='large' style={{marginLeft: 5}}
+                                variant="contained"
+                                startIcon={(user && checkIfRegistered()) ?
+                                    <ClearRoundedIcon/> : <AddToPhotosRoundedIcon/>}
+                                color={(user && checkIfRegistered()) ? "default" : 'primary'}
+                                children={user ? (checkIfRegistered() ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
+                                onClick={handleRegisterClick}/>
 
-                        </div>
+                    </div>
+                    <div className={classes.backgroundContent}>
                         <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
-                        <div style={{padding: "1rem", paddingTop: 0}}>
+                        <div className={classes.targetOptions}>
                             {!!targetOptions.length &&
                             <TargetOptions options={targetOptions}/>}
                         </div>
+                    </div>
+                    <div className={classes.logosBackWrapper}>
+                        {logoElements}
                     </div>
                 </div>
             </div>

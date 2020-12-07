@@ -326,7 +326,7 @@ const GroupStreamCard = ({
         return (
             <div style={{flex: 1, minWidth: "50%"}} key={careerCenter.groupId}>
                 <LogoElement key={careerCenter.groupId} livestreamId={livestream.id}
-                             userfollows={checkIfUserFollows(careerCenter)}
+                             userFollows={checkIfUserFollows(careerCenter)}
                              careerCenter={careerCenter} userData={userData} user={user}/>
             </div>
         );
