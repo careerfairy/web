@@ -6,20 +6,15 @@ import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import MobileFeed from "./MobileFeed";
 import {useRouter} from "next/router";
 import UserContext from "../../../context/user/UserContext"
+import {getServerSideRouterQuery} from "../../helperFunctions/HelperFunctions";
 
 const NextLivestreams = ({firebase}) => {
     const {userData, authenticatedUser} = useContext(UserContext);
-    const router = useRouter();
-
-    const {
-        query: {livestreamId},
-    } = router;
-    const {
-        query: {careerCenterId},
-    } = router;
-
     const theme = useTheme();
     const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+    const router = useRouter();
+    const livestreamId = getServerSideRouterQuery("livestreamId", router)
+    const careerCenterId = getServerSideRouterQuery("careerCenterId", router)
 
     const [groupData, setGroupData] = useState({});
     const [groupIds, setGroupIds] = useState(["upcoming"]);
@@ -29,23 +24,8 @@ const NextLivestreams = ({firebase}) => {
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [listenToUpcoming, setListenToUpcoming] = useState(false);
 
-    const getRouterQuery = (key) => {
-        if (router.query[key]) {
-            return router.query[key]
-        } else {
-            const query = router.asPath.match(new RegExp(`[&?]${key}=(.*)(&|$)`))
-            if (query) {
-                return query[1]
-            } else {
-                return null
-            }
-        }
-    }
 
-    // useEffect(() => {
-        console.log("-> getRouterQuery", getRouterQuery("livestreamId"));
 
-    // }, [])
 
 
     useEffect(() => {

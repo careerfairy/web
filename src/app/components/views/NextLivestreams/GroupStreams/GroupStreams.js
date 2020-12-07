@@ -70,16 +70,6 @@ const GroupStreams = ({
                             key={livestream.id}
                             livestream={livestream}
                         />
-                        {/*<GroupStreamCard*/}
-                        {/*    index={index}*/}
-                        {/*    groupData={groupData}*/}
-                        {/*    listenToUpcoming={listenToUpcoming}*/}
-                        {/*    careerCenterId={careerCenterId}*/}
-                        {/*    livestreamId={livestreamId}*/}
-                        {/*    user={user} userData={userData} fields={null}*/}
-                        {/*    careerCenters={[]}*/}
-                        {/*    id={livestream.id}*/}
-                        {/*    key={livestream.id} livestream={livestream}/>*/}
                     </Grid>
                 )
             }
@@ -94,12 +84,7 @@ const GroupStreams = ({
                         </Grid>
                         :
                         livestreams.length ?
-                            [renderStreamCards,
-                                renderStreamCards,
-                                renderStreamCards,
-                                renderStreamCards,
-                                renderStreamCards,
-                                renderStreamCards]
+                                renderStreamCards
                             :
                             <Grid item className={classes.loaderWrapper}>
                                 <Typography className={classes.emptyMessage} align="center" variant="h5"

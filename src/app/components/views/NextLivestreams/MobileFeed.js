@@ -6,7 +6,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
 
-import {Button, Typography,} from "@material-ui/core";
+import {Button, Grid, Typography,} from "@material-ui/core";
 import {withFirebase} from "../../../context/firebase";
 import GroupCategories from "./GroupCategories/GroupCategories";
 import GroupStreams from "./GroupStreams/GroupStreams";
@@ -41,7 +41,9 @@ function a11yProps(index) {
 }
 
 const useStyles = makeStyles((theme) => ({
-
+    streamsGrid: {
+        marginBottom: theme.spacing(1)
+    },
     bar: {
         boxShadow: "none",
         position: "sticky",
@@ -60,7 +62,21 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const MobileFeed = ({handleToggleActive, hasCategories, groupData, userData, alreadyJoined, user, livestreams, searching, scrollToTop, livestreamId, careerCenterId, listenToUpcoming, selectedOptions}) => {
+const MobileFeed = ({
+                        handleToggleActive,
+                        hasCategories,
+                        groupData,
+                        userData,
+                        alreadyJoined,
+                        user,
+                        livestreams,
+                        searching,
+                        scrollToTop,
+                        livestreamId,
+                        careerCenterId,
+                        listenToUpcoming,
+                        selectedOptions
+                    }) => {
     const classes = useStyles();
     const theme = useTheme();
     const router = useRouter()
@@ -147,24 +163,26 @@ const MobileFeed = ({handleToggleActive, hasCategories, groupData, userData, alr
             }
             <SwipeableViews
                 disabled={!Boolean(groupData.categories)}
-                style={{minHeight: 200}}
+                style={{flex: 1}}
                 containerStyle={{WebkitOverflowScrolling: 'touch'}}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
                 onChangeIndex={handleChangeIndex}>
-                <TabPanel dir={theme.direction}>
-                    <GroupStreams user={user}
-                                  mobile={true}
-                                  hasCategories={hasCategories}
-                                  livestreamId={livestreamId}
-                                  listenToUpcoming={listenToUpcoming}
-                                  careerCenterId={careerCenterId}
-                                  selectedOptions={selectedOptions}
-                                  searching={searching}
-                                  alreadyJoined={alreadyJoined}
-                                  livestreams={livestreams}
-                                  userData={userData}
-                                  groupData={groupData}/>
+                <TabPanel style={{overflow: "hidden"}} dir={theme.direction}>
+                    <Grid className={classes.streamsGrid} container spacing={2}>
+                        <GroupStreams user={user}
+                                      mobile={true}
+                                      hasCategories={hasCategories}
+                                      livestreamId={livestreamId}
+                                      listenToUpcoming={listenToUpcoming}
+                                      careerCenterId={careerCenterId}
+                                      selectedOptions={selectedOptions}
+                                      searching={searching}
+                                      alreadyJoined={alreadyJoined}
+                                      livestreams={livestreams}
+                                      userData={userData}
+                                      groupData={groupData}/>
+                    </Grid>
                 </TabPanel>
                 <TabPanel dir={theme.direction}>
                     <GroupCategories alreadyJoined={alreadyJoined}

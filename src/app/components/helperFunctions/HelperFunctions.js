@@ -72,3 +72,16 @@ export const isServer = () => {
     return typeof window === 'undefined'
 }
 
+export const getServerSideRouterQuery = (queryKey, router) => {
+    if (router.query[queryKey]) {
+        return router.query[queryKey]
+    } else {
+        const query = router.asPath.match(new RegExp(`[&?]${queryKey}=(.*)(&|$)`))
+        if (query) {
+            return query[1]
+        } else {
+            return null
+        }
+    }
+}
+
