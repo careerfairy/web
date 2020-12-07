@@ -180,7 +180,6 @@ const useStyles = makeStyles((theme) => {
             boxShadow: theme.shadows[24],
         },
         backgroundContent: {
-            border: "2px solid orange",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",

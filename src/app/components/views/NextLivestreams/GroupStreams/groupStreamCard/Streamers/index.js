@@ -10,9 +10,7 @@ const useStyles = makeStyles(theme => ({
         justifyContent: ({cardHovered}) => cardHovered && "space-between",
         display: 'flex',
         textAlign: 'center',
-        // zIndex: -1,
         overflowX: "auto",
-        // overflowY: "hidden"
     },
     streamer: {
         display: "flex",
@@ -33,7 +31,6 @@ const useStyles = makeStyles(theme => ({
         width: '2em',
         height: '2em',
         borderRadius: '50%',
-        // zIndex: 1
     },
     streamerPosition: {
         margin: "0 0 0 0",
