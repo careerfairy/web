@@ -1,12 +1,12 @@
 import React from 'react';
-import {Box, Container} from "@material-ui/core";
+import {Box, Container, Grid} from "@material-ui/core";
 import GroupCategories from "../GroupCategories/GroupCategories";
 import GroupStreams from "../GroupStreams/GroupStreams";
 
 
 const DesktopFeed = ({groupData, hasCategories, userData, alreadyJoined, handleToggleActive, mobile, user, livestreams, searching, livestreamId, careerCenterId, listenToUpcoming, selectedOptions}) => {
     return (
-        <Container style={{flex: 1, display: "flex", minHeight: 700, marginBottom: 10}}>
+        <Grid container spacing={1} style={{minHeight: "50vh", margin: 10, border: "1px solid green"}}>
             {hasCategories ?
                 <GroupCategories livestreams={livestreams}
                                  mobile={mobile}
@@ -30,7 +30,7 @@ const DesktopFeed = ({groupData, hasCategories, userData, alreadyJoined, handleT
                 userData={userData}
                 groupData={groupData}
             />
-        </Container>
+        </Grid>
     );
 };
 

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Card, CardContent, CardMedia, Typography} from "@material-ui/core";
+import {Box, Card, CardContent, CardMedia, Grid, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import CategoryCard from "./CategoryCard";
 import {SizeMe} from "react-sizeme";
@@ -8,12 +8,13 @@ import StackGrid from "react-stack-grid";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        paddingBottom: 0,
-        paddingTop: ({mobile}) => mobile ? 0 : 14,
-        width: ({mobile}) => mobile ? "100%" : "40%",
+        // paddingBottom: 0,
+        // paddingTop: ({mobile}) => mobile ? 0 : 14,
+        // width: ({mobile}) => mobile ? "100%" : "40%",
     },
     card: {
-
+        borderRadius: theme.spacing(2),
+        boxShadow: theme.shadows[24],
         overflowY: "auto",
         '&::-webkit-scrollbar': {
             width: '0.4em'
@@ -97,7 +98,7 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
     }
 
     return (
-        <div className={classes.root}>
+        <Grid item xs={12} sm={12} md={3} lg={3} xl={3} className={classes.root}>
             <Card className={classes.card}>
                 <CardMedia className={classes.media}>
                     <div className={classes.imageContainer}>
@@ -130,7 +131,7 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
                     </Box>
                 </CardContent>}
             </Card>
-        </div>
+        </Grid>
     )
 };
 

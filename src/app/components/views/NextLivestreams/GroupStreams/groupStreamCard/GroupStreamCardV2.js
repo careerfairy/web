@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => {
     const frontHoveredScale = 0.7
     const frontHoveredTranslate = -115
     return ({
-        game: {
+        streamCardRoot: {
             display: "flex",
             justifyContent: "center",
             width: "100%",
@@ -169,8 +169,8 @@ const useStyles = makeStyles((theme) => {
             right: '0',
             bottom: "auto",
             zIndex: '-1',
-            borderRadius: theme.spacing(2),
             overflow: 'hidden',
+            borderRadius: theme.spacing(2),
             boxShadow: theme.shadows[24],
         },
         backgroundContent: {
@@ -203,26 +203,6 @@ const useStyles = makeStyles((theme) => {
             width: '100%',
             objectFit: 'cover',
         },
-        '@keyframes gameName': {
-            '0%': {
-                textAlign: 'left',
-                opacity: '1'
-            },
-            '20%': {
-                textAlign: 'left',
-                opacity: '0'
-            },
-            '50%': {
-                textAlign: 'center',
-                opacity: '0',
-                transform: 'scale(1.2)'
-            },
-            '100%': {
-                textAlign: 'center',
-                opacity: '1',
-                transform: 'scale(1.2)'
-            }
-        }
     })
 })
 
@@ -264,8 +244,8 @@ const GroupStreamCardV2 = memo(({
     }
 
     useEffect(() => {
-        if (!cardHovered) {
-            setCardWidth(cardRef.current?.offsetWidth)
+        if (!cardHovered && cardRef.current?.offsetWidth) {
+            setCardWidth(cardRef.current.offsetWidth)
         }
     }, [cardHovered])
 
@@ -481,7 +461,7 @@ const GroupStreamCardV2 = memo(({
             <div
                 onMouseLeave={handleMouseLeft} onMouseEnter={handleMouseEntered}
                 ref={cardRef}
-                className={classes.game}>
+                className={classes.streamCardRoot}>
                 <div className={classes.frontLabelLeft}>
                     <QueryBuilderRoundedIcon
                         style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
@@ -536,10 +516,8 @@ const GroupStreamCardV2 = memo(({
                     </div>
                     <div className={classes.backgroundContent}>
                         <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
-                        <div className={classes.targetOptions}>
-                            {!!targetOptions.length &&
-                            <TargetOptions options={targetOptions}/>}
-                        </div>
+                        {!!targetOptions.length &&
+                        <TargetOptions options={targetOptions}/>}
                     </div>
                     <div className={classes.logosBackWrapper}>
                         {logoElements}
