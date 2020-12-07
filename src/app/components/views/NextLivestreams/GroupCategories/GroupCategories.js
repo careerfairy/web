@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
     },
     card: {
         borderRadius: theme.spacing(2),
-        boxShadow: theme.shadows[24],
+        boxShadow: theme.shadows[4],
         overflowY: "auto",
         '&::-webkit-scrollbar': {
             width: '0.4em'
@@ -75,7 +75,7 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
         let soundportalLogo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fsoundportal-logo.png?alt=media&token=8acbf9d6-8e28-44c5-be07-4334e86e0db6";
 
         return (
-            <Grid xs={12} sm={12} md={4} lg={3} xl={3} item className={classes.root}>
+            <Grid xs={12} sm={12} md={6} lg={4} xl={2} item className={classes.root}>
                 <Card className={classes.card} style={{padding: '40px 0'}}>
                     <CardContent>
                         <div style={{position: 'relative', padding: '40px', marginBottom: '30px'}}>
@@ -99,7 +99,7 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
     }
 
     return (
-        <Grid item xs={12} sm={12} md={4} lg={3} xl={3} className={classes.root}>
+        <Grid style={{height: "100%"}} item xs={12} sm={12} md={6} lg={4} xl={2} className={classes.root}>
             <Card className={classes.card}>
                 <CardMedia className={classes.media}>
                     <div className={classes.imageContainer}>

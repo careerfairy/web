@@ -2,11 +2,14 @@ import React from 'react';
 import {Box, Container, Grid} from "@material-ui/core";
 import GroupCategories from "../GroupCategories/GroupCategories";
 import GroupStreams from "../GroupStreams/GroupStreams";
+import {useTheme} from "@material-ui/core/styles";
 
 
 const DesktopFeed = ({groupData, hasCategories, userData, alreadyJoined, handleToggleActive, mobile, user, livestreams, searching, livestreamId, careerCenterId, listenToUpcoming, selectedOptions}) => {
+    const theme = useTheme()
     return (
-        <Grid container spacing={1} style={{minHeight: "50vh", margin: 10}}>
+        <Container style={{flex: 1, display: "flex", height: "50vh", border: "1px solid green"}}>
+            <Grid container spacing={2} style={{margin: theme.spacing(1), border: "1px solid blue", height: "fit-content"}}>
             {hasCategories ?
                 <GroupCategories livestreams={livestreams}
                                  mobile={mobile}
@@ -30,7 +33,8 @@ const DesktopFeed = ({groupData, hasCategories, userData, alreadyJoined, handleT
                 userData={userData}
                 groupData={groupData}
             />
-        </Grid>
+            </Grid>
+        </Container>
     );
 };
 

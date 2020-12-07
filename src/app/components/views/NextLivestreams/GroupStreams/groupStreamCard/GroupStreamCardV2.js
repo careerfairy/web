@@ -35,6 +35,7 @@ const useStyles = makeStyles((theme) => {
             display: "flex",
             justifyContent: "center",
             width: "100%",
+            height: "100%",
             position: "relative",
             webKitPosition: "relative",
             zIndex: ({cardHovered}) => cardHovered && 1002,
@@ -128,7 +129,7 @@ const useStyles = makeStyles((theme) => {
             background: ({cardHovered}) => cardHovered ? "transparent" : fade(paperColor, 0.5),
             boxShadow: ({cardHovered}) => cardHovered && "none",
             borderRadius: theme.spacing(2.2),
-            height: ({cardHovered}) => cardHovered ? frontHoveredHeight : 475
+            height: ({cardHovered}) => cardHovered ? frontHoveredHeight : "100%"
         },
         speakersAndLogosWrapper: {
             opacity: ({cardHovered}) => cardHovered && 0,
