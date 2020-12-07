@@ -119,7 +119,7 @@ const PastLivestreamDetail = (props) => {
                     }
 
                     .individual-question-container.active:hover p {
-                        background-color: rgba(0, 210, 170);
+                        background-color: rgb(0, 210, 170);
                         cursor: auto;
                     }
 
