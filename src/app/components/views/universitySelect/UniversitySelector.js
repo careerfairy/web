@@ -24,7 +24,7 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
                         const fetchedUniversities = querySnapshot.data().universities
                         setUniversities([...fetchedUniversities, otherObj])
                     } else {
-                        setFieldValue("universityCode", "other")
+                        setFieldValue("university", {code: "othe", name: "Other"})
                     }
                     return setLoading(false)
                 } catch (e) {
