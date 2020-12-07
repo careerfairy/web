@@ -457,15 +457,15 @@ const GroupStreamCardV2 = memo(({
         }
     }
 
-    let logoElements = careerCenters.map((careerCenter, index) => {
+    let logoElements = careerCenters.map(careerCenter => {
         return (
             <div className={classes.logoElement} key={careerCenter.groupId}>
-                <LogoElement key={careerCenter.groupId} livestreamId={livestream.id}
+                <LogoElement hideFollow={!cardHovered} key={careerCenter.groupId} livestreamId={livestream.id}
                              userFollows={checkIfUserFollows(careerCenter)}
                              careerCenter={careerCenter} userData={userData} user={user}/>
             </div>
         );
-    });
+    })
 
     let speakerElements = livestream.speakers?.map(speaker => {
         return (<Avatar

@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
-import {Box, Button, makeStyles} from "@material-ui/core";
+import { Button, makeStyles} from "@material-ui/core";
 import GroupJoinModal from "../../profile/GroupJoinModal";
 import {useRouter} from "next/router";
-import {grey} from "@material-ui/core/colors";
 
 
 const useStyles = makeStyles(theme => ({
@@ -20,7 +19,6 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: grey[50],
         boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
     },
     followButton:{
@@ -28,7 +26,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const LogoElement = ({careerCenter, userData, userFollows, livestreamId}) => {
+const LogoElement = ({careerCenter, userData, userFollows, livestreamId, hideFollow}) => {
     const classes = useStyles()
     const router = useRouter()
 
@@ -58,7 +56,7 @@ const LogoElement = ({careerCenter, userData, userFollows, livestreamId}) => {
                 <img className={classes.logoImage} alt={`${careerCenter.universityName} logo`}
                      src={careerCenter.logoUrl}/>
             </div>
-            {userFollows ? null :
+            {(!userFollows && !hideFollow) &&
                 <Button onClick={handleJoin} className={classes.followButton} variant="outlined"
                         color="primary"> Follow </Button>}
             <GroupJoinModal
