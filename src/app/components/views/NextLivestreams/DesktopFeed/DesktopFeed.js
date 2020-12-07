@@ -6,7 +6,7 @@ import GroupStreams from "../GroupStreams/GroupStreams";
 
 const DesktopFeed = ({groupData, hasCategories, userData, alreadyJoined, handleToggleActive, mobile, user, livestreams, searching, livestreamId, careerCenterId, listenToUpcoming, selectedOptions}) => {
     return (
-        <Grid container spacing={1} style={{minHeight: "50vh", margin: 10, border: "1px solid green"}}>
+        <Grid container spacing={1} style={{minHeight: "50vh", margin: 10}}>
             {hasCategories ?
                 <GroupCategories livestreams={livestreams}
                                  mobile={mobile}

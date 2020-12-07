@@ -8,6 +8,7 @@ import StackGrid from "react-stack-grid";
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        height: "100%"
         // paddingBottom: 0,
         // paddingTop: ({mobile}) => mobile ? 0 : 14,
         // width: ({mobile}) => mobile ? "100%" : "40%",
@@ -74,7 +75,7 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
         let soundportalLogo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fsoundportal-logo.png?alt=media&token=8acbf9d6-8e28-44c5-be07-4334e86e0db6";
 
         return (
-            <div className={classes.root}>
+            <Grid item className={classes.root}>
                 <Card className={classes.card} style={{padding: '40px 0'}}>
                     <CardContent>
                         <div style={{position: 'relative', padding: '40px', marginBottom: '30px'}}>
@@ -93,7 +94,7 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
                         </div>
                     </CardContent>
                 </Card>
-            </div>
+            </Grid>
         )
     }
 

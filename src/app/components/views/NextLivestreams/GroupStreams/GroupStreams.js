@@ -25,6 +25,11 @@ const useStyles = makeStyles((theme) => ({
     },
     gridContainer: {
         // marginTop: theme.spacing(2)
+    },
+    loaderWrapper: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
     }
 }));
 
@@ -49,8 +54,8 @@ const GroupStreams = ({
         const renderStreamCards = livestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
-                    <Grid style={{width: "100%"}} key={livestream.id} xs={12} sm={6} md={hasCategories ? 6 : 4}
-                          lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 4} item>
+                    <Grid style={{width: "100%"}} key={livestream.id} xs={12} sm={6} md={4}
+                          lg={4} xl={4} item>
                         <GroupStreamCardV2
                             index={index}
                             mobile={mobile}
@@ -81,23 +86,23 @@ const GroupStreams = ({
         })
 
         return (
-            <div style={{padding: mobile ? 0 : "1rem 1rem 0 1rem"}} className={classes.root}>
+            <>
                 {groupData.id || listenToUpcoming ? (searching ?
-                    <Box display="flex" justifyContent="center" mt={5}>
+                    <Grid item className={classes.loaderWrapper}>
                         <LinearProgress style={{width: "80%"}} color="primary"/>
-                    </Box>
+                    </Grid>
                     :
                     livestreams.length ?
-                        <Grid className={classes.gridContainer} container spacing={2}>
-                            {renderStreamCards}
-                        </Grid>
+                        renderStreamCards
                         :
-                        <Typography className={classes.emptyMessage} align="center" variant="h5"
-                                    style={{marginTop: 100}}>{searchedButNoResults ? "We couldn't find anything... 😕" :
-                            <strong>{groupData.universityName} currently has no scheduled live
-                                streams</strong>}</Typography>)
+                        <Grid item className={classes.loaderWrapper}>
+                            <Typography className={classes.emptyMessage} align="center" variant="h5"
+                                        style={{marginTop: 100}}>{searchedButNoResults ? "We couldn't find anything... 😕" :
+                                <strong>{groupData.universityName} currently has no scheduled live
+                                    streams</strong>}</Typography>
+                        </Grid>)
                     : null}
-            </div>
+            </>
         );
     }
 ;
