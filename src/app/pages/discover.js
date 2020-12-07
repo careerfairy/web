@@ -104,7 +104,7 @@ function LandingPage(props) {
                     }
 
                     .filter-logo-element:hover {
-                        background-color: rgb(230,230,230,0.8);
+                        background-color: rgb(230,230,230);
                         transition-duration: 300ms;
                         opacity: 1;
                     }
