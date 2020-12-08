@@ -42,8 +42,8 @@ const useStyles = makeStyles((theme) => ({
     },
     imageContainer: {
         position: "relative",
-        width: "90%",
-        height: "250px"
+        width: "100%",
+        height: "250px",
     },
     image: {
         position: "absolute",
@@ -51,7 +51,8 @@ const useStyles = makeStyles((theme) => ({
         left: "50%",
         transform: "translate(-50%,-50%)",
         maxWidth: "90%",
-        maxHeight: "100%"
+        maxHeight: "90%",
+        borderRadius: theme.spacing(1)
     },
 }));
 
@@ -109,7 +110,7 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
                                  alt={`${groupData.universityName} logo`}/>
                         </div>
                     </CardMedia>
-                    {groupData.description && <Typography style={{padding: "0 1rem 1rem 1rem"}}>
+                    {groupData.description && <Typography align="center" style={{padding: "0 1rem 1rem 1rem"}}>
                         {groupData.description}
                     </Typography>}
                     {!!hasCategories && <CardContent>

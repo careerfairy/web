@@ -1,13 +1,11 @@
-import React, {Fragment, memo, useEffect, useRef, useState} from 'react';
+import React, {Fragment, memo, useEffect, useState} from 'react';
 import {withFirebase} from "context/firebase";
 import {fade, makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
-import {Accordion, Avatar, Button, Card, CardMedia, Paper} from "@material-ui/core";
+import {Avatar, Collapse, Paper} from "@material-ui/core";
 import {AvatarGroup} from "@material-ui/lab";
 import Streamers from "./Streamers";
-import Link from "next/link";
 import Wave from "./Wave";
-import LibraryBooksIcon from "@material-ui/icons/LibraryBooks";
 import Typography from "@material-ui/core/Typography";
 import LogoElement from "../LogoElement";
 import QueryBuilderRoundedIcon from "@material-ui/icons/QueryBuilderRounded";
@@ -15,14 +13,14 @@ import DateUtil from "../../../../../util/DateUtil";
 import TargetOptions from "../../GroupsCarousel/TargetOptions";
 import {grey} from "@material-ui/core/colors";
 import EventNoteRoundedIcon from "@material-ui/icons/EventNoteRounded";
-import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
-import AddToPhotosRoundedIcon from "@material-ui/icons/AddToPhotosRounded";
 import UserUtil from "../../../../../data/util/UserUtil";
 import DataAccessUtil from "../../../../../util/DataAccessUtil";
 import {useRouter} from "next/router";
 import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
 import CopyToClipboard from "../CopyToClipboard";
+import {AttendButton, DetailsButton} from "./actionButtons";
+import MobileComponent from "./MobileComponent";
 
 const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
@@ -30,7 +28,6 @@ const useStyles = makeStyles((theme) => {
     const frontHoveredHeight = 330
     const frontHoveredScale = 0.7
     const frontHoveredTranslate = -115
-    const offset = 50
     return ({
         streamCardRoot: {
             display: "flex",
@@ -39,14 +36,16 @@ const useStyles = makeStyles((theme) => {
             height: "100%",
             position: "relative",
             webKitPosition: "relative",
+            transform: ({even, cardHovered}) => cardHovered ? even ? `translate(-15%)` : `translate(15%)` : "none",
+            transitionProperty: "transform",
+            transitionDuration: `${theme.transitions.duration.shorter}ms`,
+            transitionTimingFunction: theme.transitions.easing.easeInOut,
             zIndex: ({cardHovered}) => cardHovered && 1002,
             "& p": {
                 color: ({cardHovered}) => cardHovered ? theme.palette.common.white : theme.palette.common.black
             },
         },
         copyToClipBoard: {
-            marginRight: ({even, cardHovered}) => cardHovered && even && offset,
-            marginLeft: ({even, cardHovered}) => cardHovered && !even && offset,
             color: ({cardHovered}) => cardHovered && theme.palette.common.white,
             position: 'absolute',
             top: 10,
@@ -57,15 +56,13 @@ const useStyles = makeStyles((theme) => {
             padding: '0.5em 0.5em 0.75em',
             WebkitTransition: transition,
             transition: transition,
-            transform: ({cardHovered}) => cardHovered && "translate(60%, 0%)",
+            transform: ({cardHovered}) => cardHovered && "translate(57%, 0%)",
             flexDirection: ({cardHovered}) => cardHovered && "column",
             display: "flex",
             justifyContent: "center",
             alignItems: "center"
         },
         frontLabelRight: {
-            marginRight: ({even, cardHovered}) => cardHovered && even && offset,
-            marginLeft: ({even, cardHovered}) => cardHovered && !even && offset,
             color: ({cardHovered}) => cardHovered && theme.palette.common.white,
             position: 'absolute',
             top: '0',
@@ -83,8 +80,6 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center"
         },
         frontLabelLeft: {
-            marginRight: ({even, cardHovered}) => cardHovered && even && offset,
-            marginLeft: ({even, cardHovered}) => cardHovered && !even && offset,
             flexDirection: ({cardHovered}) => cardHovered && "column",
             color: ({cardHovered}) => cardHovered && theme.palette.common.white,
             position: 'absolute',
@@ -118,9 +113,9 @@ const useStyles = makeStyles((theme) => {
         },
         companyName: {
             fontWeight: "bold",
-            margin: '0.75em 0',
-            textAlign: 'center',
             fontSize: theme.spacing(3.5),
+            margin: '0.5em 0',
+            textAlign: 'center',
             display: "flex",
             alignItems: "center",
             width: ({cardHovered}) => cardHovered && "135%",
@@ -136,10 +131,8 @@ const useStyles = makeStyles((theme) => {
             transition: '250ms',
             background: ({cardHovered}) => cardHovered ? "transparent" : fade(paperColor, 0.5),
             boxShadow: ({cardHovered}) => cardHovered && "none",
-            borderRadius: theme.spacing(2.2),
+            borderRadius: theme.spacing(2.5),
             height: ({cardHovered}) => cardHovered ? frontHoveredHeight : "100%",
-            marginRight: ({even, cardHovered}) => cardHovered && even && offset,
-            marginLeft: ({even, cardHovered}) => cardHovered && !even && offset
         },
         speakersAndLogosWrapper: {
             opacity: ({cardHovered}) => cardHovered && 0,
@@ -160,10 +153,6 @@ const useStyles = makeStyles((theme) => {
             width: "100%",
             height: 100
         },
-        actionButton: {
-            borderRadius: theme.spacing(1),
-            margin: theme.spacing(0.5)
-        },
         buttonsWrapper: {
             marginTop: (frontHoveredHeight * frontHoveredScale) - (-frontHoveredTranslate / 2.3),
             display: "flex",
@@ -177,8 +166,6 @@ const useStyles = makeStyles((theme) => {
             maxHeight: "40vh",
         },
         background: {
-            marginRight: ({even, cardHovered}) => cardHovered && even && offset,
-            marginLeft: ({even, cardHovered}) => cardHovered && !even && offset,
             transition: ({cardHovered}) => cardHovered && `${transition}, opacity 100ms linear`,
             transform: ({cardHovered}) => cardHovered ? 'scale(1.35, 1.3) translateY(5%)' : 'scale(0.2, 0.9)',
             opacity: ({cardHovered}) => cardHovered ? 1 : 0,
@@ -246,7 +233,8 @@ const GroupStreamCardV2 = memo(({
     const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
 
     const [cardHovered, setCardHovered] = useState(false)
-    const classes = useStyles({cardHovered, mobile, hasCategories, listenToUpcoming, even})
+    const [openMoreDetails, setOpenMoreDetails] = useState(false)
+    const classes = useStyles({cardHovered, mobile, even})
     const [careerCenters, setCareerCenters] = useState([])
     const [targetOptions, setTargetOptions] = useState([])
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -257,6 +245,11 @@ const GroupStreamCardV2 = memo(({
     const handleMouseLeft = () => {
         cardHovered && setCardHovered(false)
     }
+
+    const handleOpenMoreDetails = () => {
+        setOpenMoreDetails(!openMoreDetails)
+    }
+
 
     useEffect(() => {
         if (checkIfHighlighted() && !isHighlighted) {
@@ -487,17 +480,29 @@ const GroupStreamCardV2 = memo(({
                     <Typography className={classes.companyName}>
                         {cardHovered ? livestream.title : livestream.company}
                     </Typography>
-                    {/*{mobile && <Accordion>*/}
-
-                    {/*</Accordion>}*/}
-                    {!cardHovered &&
+                    {mobile &&
+                    <MobileComponent
+                        handleOpenMoreDetails={handleOpenMoreDetails}
+                        openMoreDetails={openMoreDetails}
+                        speakerElements={speakerElements}
+                        logoElements={logoElements}
+                        targetOptions={targetOptions}
+                        listenToUpcoming={listenToUpcoming}
+                        livestream={livestream}
+                        groupData={groupData}
+                        handleRegisterClick={handleRegisterClick}
+                        checkIfRegistered={checkIfRegistered}
+                        user={user}/>}
+                    {!cardHovered && !openMoreDetails &&
                     <div className={classes.speakersAndLogosWrapper}>
-                        <AvatarGroup max={3}>
+                        {!mobile && <AvatarGroup max={3}>
                             {speakerElements}
-                        </AvatarGroup>
-                        <div className={classes.logosFrontWrapper}>
-                            {logoElements}
-                        </div>
+                        </AvatarGroup>}
+                        <Collapse unmountOnExit in={!openMoreDetails}>
+                            <div className={classes.logosFrontWrapper}>
+                                {logoElements}
+                            </div>
+                        </Collapse>
                     </div>}
                 </Paper>
                 <div className={classes.background}>
@@ -540,41 +545,6 @@ const GroupStreamCardV2 = memo(({
         </Fragment>
     )
 })
-
-const AttendButton = ({checkIfRegistered, user, handleRegisterClick}) => {
-    const classes = useStyles()
-    return (
-        <Button className={classes.actionButton} size='large' style={{marginLeft: 5}}
-                variant="contained"
-                startIcon={(user && checkIfRegistered()) ?
-                    <ClearRoundedIcon/> : <AddToPhotosRoundedIcon/>}
-                color={(user && checkIfRegistered()) ? "default" : 'primary'}
-                children={user ? (checkIfRegistered() ? 'Cancel' : 'I\'ll attend') : 'Register to attend'}
-                onClick={handleRegisterClick}/>
-    )
-}
-
-const DetailsButton = ({listenToUpcoming, livestream, groupData}) => {
-    const classes = useStyles()
-    return (
-        <Link
-            prefetch={false}
-            href={{
-                pathname: `/upcoming-livestream/${livestream.id}`,
-                query: listenToUpcoming ? null : {groupId: groupData.groupId}
-            }}>
-            <a>
-                <Button
-                    className={classes.actionButton}
-                    style={{marginRight: 5}}
-                    startIcon={<LibraryBooksIcon/>}
-                    size="large"
-                    children="Details"
-                    variant="contained" color="secondary"/>
-            </a>
-        </Link>
-    )
-}
 
 
 export default withFirebase(GroupStreamCardV2);

@@ -22,8 +22,8 @@ const CategoryCard = ({category, handleToggleActive, mobile, width}) => {
     })
     return (
         <>
-            <Typography variant="h6">{category.name}</Typography>
-            <Box disyplay="flex" flexWrap="wrap">
+            <Typography align="center" variant="h6">{category.name}</Typography>
+            <Box display="flex" justifyContent="center" flexWrap="wrap">
                 {renderOptions}
             </Box>
         </>
