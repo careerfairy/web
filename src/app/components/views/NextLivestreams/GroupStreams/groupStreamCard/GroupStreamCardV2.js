@@ -1,4 +1,4 @@
-import React, {Fragment, memo, useEffect, useState} from 'react';
+import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from "context/firebase";
 import {fade, makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => {
             height: "100%",
             position: "relative",
             webKitPosition: "relative",
-            transform: ({even, cardHovered}) => cardHovered ? even ? `translate(-25%)` : `translate(25%)` : "none",
+            transform: ({hoverLeft, cardHovered}) => cardHovered ? hoverLeft ? `translate(-25%)` : `translate(25%)` : "none",
             transitionProperty: "transform",
             transitionDuration: `${theme.transitions.duration.shorter}ms`,
             transitionTimingFunction: theme.transitions.easing.easeInOut,
@@ -254,17 +254,27 @@ const GroupStreamCardV2 = memo(({
                                     groupData,
                                     listenToUpcoming,
                                     hasCategories,
-                                    index
+                                    index,
+                                    width
                                 }) => {
 
     const router = useRouter();
     const absolutePath = router.asPath
-    const even = (index + 1) % 2 === 0
     const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
+
+    const shouldHoverLeft = () => {
+        if (!hasCategories && width === "lg") {// only case when there's an odd number of cards in a row
+            return (index + 1) % 3 === 0 // Please hover only the 3rd/last element in the row to the left
+        } else {
+            return (index + 1) % 2 === 0 // Please hover only the 2nd/4th/last even element in the row to the left
+        }
+    }
+
+    const hoverLeft = useMemo(() => shouldHoverLeft(), [width, hasCategories])
 
     const [cardHovered, setCardHovered] = useState(false)
     const [openMoreDetails, setOpenMoreDetails] = useState(false)
-    const classes = useStyles({cardHovered, mobile, even, openMoreDetails})
+    const classes = useStyles({cardHovered, mobile, hoverLeft, openMoreDetails})
     const [careerCenters, setCareerCenters] = useState([])
     const [targetOptions, setTargetOptions] = useState([])
     const [bookingModalOpen, setBookingModalOpen] = useState(false);

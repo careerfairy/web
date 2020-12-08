@@ -3,9 +3,10 @@ import {Box, Container, Grid} from "@material-ui/core";
 import GroupCategories from "../GroupCategories/GroupCategories";
 import GroupStreams from "../GroupStreams/GroupStreams";
 import {useTheme} from "@material-ui/core/styles";
+import withWidth from '@material-ui/core/withWidth';
 
 
-const DesktopFeed = ({groupData, hasCategories, userData, alreadyJoined, handleToggleActive, mobile, user, livestreams, searching, livestreamId, careerCenterId, listenToUpcoming, selectedOptions}) => {
+const DesktopFeed = ({groupData, hasCategories, userData, alreadyJoined, handleToggleActive, mobile, user, livestreams, searching, livestreamId, careerCenterId, listenToUpcoming, selectedOptions, width}) => {
     const theme = useTheme()
     return (
         <Container maxWidth={false} disableGutters style={{flex: 1, display: "flex", height: "50vh", padding: "0 3rem"}}>
@@ -26,6 +27,7 @@ const DesktopFeed = ({groupData, hasCategories, userData, alreadyJoined, handleT
             <GroupStreams
                 user={user}
                 mobile={false}
+                width={width}
                 hasCategories={hasCategories}
                 livestreamId={livestreamId}
                 listenToUpcoming={listenToUpcoming}
@@ -42,4 +44,4 @@ const DesktopFeed = ({groupData, hasCategories, userData, alreadyJoined, handleT
     );
 };
 
-export default DesktopFeed;
+export default withWidth()(DesktopFeed);
