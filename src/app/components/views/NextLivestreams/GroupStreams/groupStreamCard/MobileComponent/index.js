@@ -44,6 +44,7 @@ const useStyles = makeStyles(theme => {
             overflowX: 'hidden',
             overflowY: 'auto',
             maxHeight: "40vh",
+            padding: theme.spacing(1)
         },
         backgroundContent: {
             display: "flex",
@@ -54,29 +55,40 @@ const useStyles = makeStyles(theme => {
             paddingTop: 0
         },
         details: {
+            background: theme.palette.navyBlue.main,
             display: "flex",
             flexDirection: "column",
             width: "100%",
-            padding: 0
+            padding: 0,
+            zIndex: 1004,
+            boxShadow: theme.shadows[24],
+            borderBottomRightRadius: `${theme.spacing(2.5)}px !important`,
+            borderBottomLeftRadius: `${theme.spacing(2.5)}px !important`,
         },
         detailsAccordionRoot: {
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
             "& p": {
                 color: "white !important"
             },
             flex: 1,
             boxShadow: "none",
             background: ({openMoreDetails}) => openMoreDetails ? theme.palette.navyBlue.main : "transparent",
-            borderBottomRightRadius: `${theme.spacing(2.5)}px !important`,
-            borderBottomLeftRadius: `${theme.spacing(2.5)}px !important`,
             marginTop: 0,
+            borderRadius: "0px !important",
             "& .MuiAccordion-root:before": {
                 backgroundColor: "none"
             },
             "& .MuiAccordion-root, &.Mui-expanded": {
                 margin: 0
-            }
+            },
+
         },
         logosFrontWrapper: {
+            borderRadius: "inherit",
             marginTop: theme.spacing(1),
             padding: theme.spacing(1),
             display: "flex",
@@ -94,15 +106,24 @@ const useStyles = makeStyles(theme => {
         summary: {
             "& .MuiAccordionSummary-expandIcon": {
                 position: "absolute",
-                right: 10
+                right: 10,
             },
             "& .MuiAccordionSummary-root, &.Mui-expanded": {
-                minHeight: 0
+                minHeight: 0,
             },
             "& .MuiAccordionSummary-content": {
                 margin: 0
             }
         },
+        streamerWrapper: {
+            padding: theme.spacing(1)
+        },
+        accordionWrapper: {
+            height: 50,
+            display: "flex",
+            width: "100%",
+            position: "relative"
+        }
     })
 })
 
@@ -122,53 +143,60 @@ const MobileComponent = ({
     const classes = useStyles({openMoreDetails})
 
 
-    return (<div className={classes.mobileComponentRoot}>
-        <div className={classes.buttonsWrapper}>
-            <DetailsButton
-                groupData={groupData}
-                listenToUpcoming={listenToUpcoming}
-                livestream={livestream}/>
-            <AttendButton
-                handleRegisterClick={handleRegisterClick}
-                checkIfRegistered={checkIfRegistered}
-                user={user}/>
+    return (
+        <div className={classes.mobileComponentRoot}>
+            <div className={classes.buttonsWrapper}>
+                <DetailsButton
+                    groupData={groupData}
+                    listenToUpcoming={listenToUpcoming}
+                    livestream={livestream}/>
+                <AttendButton
+                    handleRegisterClick={handleRegisterClick}
+                    checkIfRegistered={checkIfRegistered}
+                    user={user}/>
+            </div>
+            <div className={classes.accordionWrapper}>
+                <Accordion
+                    className={classes.detailsAccordionRoot}
+                    TransitionProps={{unmountOnExit: true}}
+                    classes={{root: classes.detailsAccordionRoot}}
+                    expanded={openMoreDetails}
+                    onChange={handleOpenMoreDetails}>
+                    <AccordionSummary
+                        className={classes.summary}
+                        expandIcon={<ExpandMoreIcon style={{color: openMoreDetails && "white"}}/>}
+                        aria-controls="details-content"
+                        id="panel1a-header">
+                        <div className={classes.groupWrapper}>
+                            <Grow in={!openMoreDetails}>
+                                <AvatarGroup className={classes.detailsContent} max={3}>
+                                    {speakerElements}
+                                </AvatarGroup>
+                            </Grow>
+                            <Grow in={openMoreDetails}>
+                                <Typography style={{color: openMoreDetails && "white"}} align="center"
+                                            className={classes.detailsContent}>
+                                    show Less
+                                </Typography>
+                            </Grow>
+                        </div>
+                    </AccordionSummary>
+                    <AccordionDetails className={classes.details}>
+                        <div className={classes.streamerWrapper}>
+                            <Streamers speakers={livestream.speakers} cardHovered={openMoreDetails}/>
+                        </div>
+                        {!!targetOptions.length &&
+                        <div className={classes.optionsWrapper}>
+                            <TargetOptions options={targetOptions}/>
+                        </div>}
+                        <div className={classes.logosFrontWrapper}>
+                            {logoElements}
+                        </div>
+                    </AccordionDetails>
+                </Accordion>
+            </div>
         </div>
-        <Accordion
-            className={classes.detailsAccordionRoot}
-            TransitionProps={{unmountOnExit: true}}
-            classes={{root: classes.detailsAccordionRoot}}
-            expanded={openMoreDetails}
-            onChange={handleOpenMoreDetails}>
-            <AccordionSummary
-                className={classes.summary}
-                expandIcon={<ExpandMoreIcon style={{color: openMoreDetails && "white"}}/>}
-                aria-controls="details-content"
-                id="panel1a-header">
-                <div className={classes.groupWrapper}>
-                    <Grow in={!openMoreDetails}>
-                        <AvatarGroup className={classes.detailsContent} max={3}>
-                            {speakerElements}
-                        </AvatarGroup>
-                    </Grow>
-                    <Grow in={openMoreDetails}>
-                        <Typography style={{color: openMoreDetails && "white"}} align="center" className={classes.detailsContent}>
-                            show Less
-                        </Typography>
-                    </Grow>
-                </div>
-            </AccordionSummary>
-            <AccordionDetails className={classes.details}>
-                <Streamers color={openMoreDetails ? "white": "inherit"} speakers={livestream.speakers} cardHovered={openMoreDetails}/>
-                {!!targetOptions.length &&
-                <div className={classes.optionsWrapper}>
-                    <TargetOptions options={targetOptions}/>
-                </div>}
-                <div className={classes.logosFrontWrapper}>
-                    {logoElements}
-                </div>
-            </AccordionDetails>
-        </Accordion>
-    </div>)
+    )
 }
 
 export default MobileComponent

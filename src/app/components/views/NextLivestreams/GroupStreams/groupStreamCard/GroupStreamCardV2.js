@@ -2,7 +2,7 @@ import React, {Fragment, memo, useEffect, useState} from 'react';
 import {withFirebase} from "context/firebase";
 import {fade, makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
-import {Avatar, Collapse, Paper} from "@material-ui/core";
+import {Avatar, Collapse, Fade, Paper} from "@material-ui/core";
 import {AvatarGroup} from "@material-ui/lab";
 import Streamers from "./Streamers";
 import Wave from "./Wave";
@@ -40,7 +40,8 @@ const useStyles = makeStyles((theme) => {
             transitionProperty: "transform",
             transitionDuration: `${theme.transitions.duration.shorter}ms`,
             transitionTimingFunction: theme.transitions.easing.easeInOut,
-            zIndex: ({cardHovered}) => cardHovered && 1002,
+            // zIndex: ({openMoreDetails}) => openMoreDetails && 1002
+            zIndex: ({cardHovered, openMoreDetails}) => (cardHovered || openMoreDetails) && 1002,
             "& p": {
                 color: ({cardHovered}) => cardHovered ? theme.palette.common.white : theme.palette.common.black
             },
@@ -234,7 +235,7 @@ const GroupStreamCardV2 = memo(({
 
     const [cardHovered, setCardHovered] = useState(false)
     const [openMoreDetails, setOpenMoreDetails] = useState(false)
-    const classes = useStyles({cardHovered, mobile, even})
+    const classes = useStyles({cardHovered, mobile, even, openMoreDetails})
     const [careerCenters, setCareerCenters] = useState([])
     const [targetOptions, setTargetOptions] = useState([])
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -494,16 +495,17 @@ const GroupStreamCardV2 = memo(({
                         checkIfRegistered={checkIfRegistered}
                         user={user}/>}
                     {!cardHovered && !openMoreDetails &&
-                    <div className={classes.speakersAndLogosWrapper}>
-                        {!mobile && <AvatarGroup max={3}>
-                            {speakerElements}
-                        </AvatarGroup>}
-                        <Collapse unmountOnExit in={!openMoreDetails}>
+                    <Fade timeout={1000} in={!openMoreDetails}>
+                        <div className={classes.speakersAndLogosWrapper}>
+                            {!mobile && <AvatarGroup max={3}>
+                                {speakerElements}
+                            </AvatarGroup>}
                             <div className={classes.logosFrontWrapper}>
                                 {logoElements}
                             </div>
-                        </Collapse>
-                    </div>}
+                        </div>
+                    </Fade>
+                    }
                 </Paper>
                 <div className={classes.background}>
                     <img className={classes.backgroundImage} src={livestream.backgroundImageUrl} alt="background"/>

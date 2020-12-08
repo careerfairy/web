@@ -168,7 +168,7 @@ const MobileFeed = ({
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
                 onChangeIndex={handleChangeIndex}>
-                <TabPanel style={{overflow: "hidden"}} dir={theme.direction}>
+                <TabPanel dir={theme.direction}>
                     <Grid className={classes.streamsGrid} container spacing={2}>
                         <GroupStreams user={user}
                                       mobile={true}

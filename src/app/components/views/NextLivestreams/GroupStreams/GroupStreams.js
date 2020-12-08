@@ -81,7 +81,13 @@ const GroupStreams = ({
                         </Grid>
                         :
                         livestreams.length ?
-                                renderStreamCards
+                                [
+                                    renderStreamCards,
+                                    renderStreamCards,
+                                    renderStreamCards,
+                                    renderStreamCards,
+                                    renderStreamCards,
+                                ]
                             :
                             <Grid sm={12} xs={12} md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
                                 <Typography className={classes.emptyMessage} align="center" variant="h5"
