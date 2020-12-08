@@ -109,11 +109,12 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center",
             justifyContent: "center",
             padding: theme.spacing(5),
-            borderRadius: `${theme.spacing(2)}px 0px`,
+            borderRadius:({cardHovered}) => cardHovered ? `${theme.spacing(2)}px 0px`: `${theme.spacing(2)}px ${theme.spacing(2)}px 0px 0px`,
             background: paperColor,
             boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
         },
         companyName: {
+            marginTop: `${theme.spacing(2)}px !important`,
             fontWeight: "bold",
             fontSize: theme.spacing(3.5),
             textAlign: 'center',
@@ -179,7 +180,7 @@ const useStyles = makeStyles((theme) => {
             maxHeight: "40vh",
         },
         background: {
-            transition: ({cardHovered}) => cardHovered && `${transition}, opacity 100ms linear`,
+            transition: ({cardHovered}) => cardHovered && `${transition}, opacity 250ms linear`,
             transform: ({cardHovered}) => cardHovered ? 'scale(1.35, 1.3) translateY(5%)' : 'scale(0.2, 0.9)',
             opacity: ({cardHovered}) => cardHovered ? 1 : 0,
             background: theme.palette.navyBlue.main,
@@ -221,7 +222,6 @@ const useStyles = makeStyles((theme) => {
             objectFit: 'cover',
         },
         lowerFrontContent: {
-            marginTop: theme.spacing(2),
             display: "flex",
             flex: 1,
             position: "relative",
@@ -507,7 +507,8 @@ const GroupStreamCardV2 = memo(({
     return (
         <Fragment>
             <div
-                onMouseLeave={handleMouseLeft} onMouseEnter={handleMouseEntered}
+                onMouseLeave={handleMouseLeft}
+                onMouseEnter={handleMouseEntered}
                 className={classes.streamCardRoot}>
                 <div className={classes.frontLabelLeft}>
                     <QueryBuilderRoundedIcon
@@ -519,7 +520,7 @@ const GroupStreamCardV2 = memo(({
                     <EventNoteRoundedIcon
                         style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyDay(livestream.start.toDate())}
                 </div>
-                <Paper elevation={4} className={classes.front}>
+                <Paper  elevation={4} className={classes.front}>
                     <div className={classes.logoWrapper}>
                         <img className={classes.companyLogo} src={livestream.companyLogoUrl} alt=""/>
                     </div>
