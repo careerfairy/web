@@ -109,12 +109,13 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center",
             justifyContent: "center",
             padding: theme.spacing(5),
-            borderRadius:({cardHovered}) => cardHovered ? `${theme.spacing(2)}px 0px`: `${theme.spacing(2)}px ${theme.spacing(2)}px 0px 0px`,
+            borderRadius: ({cardHovered}) => cardHovered ? `${theme.spacing(2)}px 0px` : `${theme.spacing(2)}px ${theme.spacing(2)}px 0px 0px`,
             background: paperColor,
             boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
         },
         companyName: {
             marginTop: `${theme.spacing(2)}px !important`,
+            marginBottom: `${theme.spacing(2)}px !important`,
             fontWeight: "bold",
             fontSize: theme.spacing(3.5),
             textAlign: 'center',
@@ -137,8 +138,9 @@ const useStyles = makeStyles((theme) => {
             transition: '250ms',
             background: ({cardHovered}) => cardHovered ? "transparent" : theme.palette.navyBlue.main,
             boxShadow: ({cardHovered}) => cardHovered && "none",
-            borderRadius: theme.spacing(2.5),
             height: ({cardHovered}) => cardHovered ? frontHoveredHeight : "100%",
+            borderRadius: ({openMoreDetails}) => openMoreDetails ? 0 : theme.spacing(2.5),
+
         },
         speakersAndLogosWrapper: {
             flex: 1,
@@ -157,7 +159,7 @@ const useStyles = makeStyles((theme) => {
             flexDirection: "column",
             alignItems: "center"
         },
-        logosFrontWrapper: {
+        companyLogosFrontWrapper: {
             background: "white",
             padding: theme.spacing(1),
             display: "flex",
@@ -166,6 +168,7 @@ const useStyles = makeStyles((theme) => {
             height: 100,
             borderRadius: "inherit",
             zIndex: 1,
+            flex: ({mobile}) => mobile && 1
         },
         buttonsWrapper: {
             marginTop: (frontHoveredHeight * frontHoveredScale) - (-frontHoveredTranslate / 2),
@@ -228,7 +231,7 @@ const useStyles = makeStyles((theme) => {
             flexDirection: "column",
             alignItems: "center",
             width: "100%",
-            borderRadius: "inherit"
+            borderRadius: ({openMoreDetails}) => openMoreDetails ? 0 : "inherit"
         },
         lowerFrontBackgroundImage: {
             borderBottomRightRadius: "inherit",
@@ -239,7 +242,7 @@ const useStyles = makeStyles((theme) => {
             width: '100%',
             objectFit: 'cover',
         },
-        optionChips:{
+        optionChips: {
             borderColor: "white",
             background: "none !important"
         }
@@ -520,7 +523,7 @@ const GroupStreamCardV2 = memo(({
                     <EventNoteRoundedIcon
                         style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyDay(livestream.start.toDate())}
                 </div>
-                <Paper  elevation={4} className={classes.front}>
+                <Paper elevation={4} className={classes.front}>
                     <div className={classes.logoWrapper}>
                         <img className={classes.companyLogo} src={livestream.companyLogoUrl} alt=""/>
                     </div>
@@ -550,7 +553,7 @@ const GroupStreamCardV2 = memo(({
                                 {!mobile && <AvatarGroup max={3}>
                                     {speakerElements}
                                 </AvatarGroup>}
-                                <div className={classes.logosFrontWrapper}>
+                                <div className={classes.companyLogosFrontWrapper}>
                                     {logoElements}
                                 </div>
                             </div>

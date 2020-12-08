@@ -76,7 +76,7 @@ const useStyles = makeStyles(theme => {
             },
             flex: 1,
             boxShadow: "none",
-            // background: ({openMoreDetails}) => openMoreDetails ? theme.palette.navyBlue.main : "transparent",
+            background: "transparent",
             marginTop: 0,
             borderRadius: "0px !important",
             "& .MuiAccordion-root:before": {
@@ -87,9 +87,8 @@ const useStyles = makeStyles(theme => {
             },
 
         },
-        logosFrontWrapper: {
+        mobileLogosFrontWrapper: {
             borderRadius: "inherit",
-            marginTop: theme.spacing(1),
             padding: theme.spacing(1),
             display: "flex",
             justifyContent: "space-evenly",
@@ -114,7 +113,8 @@ const useStyles = makeStyles(theme => {
             },
             "& .MuiAccordionSummary-content": {
                 margin: 0
-            }
+            },
+            background: "inherit"
         },
         streamerWrapper: {
             padding: theme.spacing(1)
@@ -169,7 +169,7 @@ const MobileComponent = ({
                     onChange={handleOpenMoreDetails}>
                     <AccordionSummary
                         className={classes.summary}
-                        expandIcon={<ExpandMoreIcon style={{color: openMoreDetails && "white"}}/>}
+                        expandIcon={<ExpandMoreIcon style={{color: "white"}}/>}
                         aria-controls="details-content"
                         id="panel1a-header">
                         <div className={classes.groupWrapper}>
@@ -194,7 +194,7 @@ const MobileComponent = ({
                         <div className={classes.optionsWrapper}>
                             <TargetOptions className={classes.optionChips} options={targetOptions}/>
                         </div>}
-                        <div className={classes.logosFrontWrapper}>
+                        <div className={classes.mobileLogosFrontWrapper}>
                             {logoElements}
                         </div>
                     </AccordionDetails>
