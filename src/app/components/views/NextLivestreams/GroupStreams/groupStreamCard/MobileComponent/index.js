@@ -61,7 +61,7 @@ const useStyles = makeStyles(theme => {
         },
         detailsAccordionRoot: {
             "& p": {
-                color: ({openMoreDetails}) => openMoreDetails ? theme.palette.common.white : theme.palette.common.black
+                color: "white !important"
             },
             flex: 1,
             boxShadow: "none",
@@ -151,14 +151,14 @@ const MobileComponent = ({
                         </AvatarGroup>
                     </Grow>
                     <Grow in={openMoreDetails}>
-                        <Typography align="center" className={classes.detailsContent}>
+                        <Typography style={{color: openMoreDetails && "white"}} align="center" className={classes.detailsContent}>
                             show Less
                         </Typography>
                     </Grow>
                 </div>
             </AccordionSummary>
             <AccordionDetails className={classes.details}>
-                <Streamers speakers={livestream.speakers} cardHovered={true}/>
+                <Streamers color={openMoreDetails ? "white": "inherit"} speakers={livestream.speakers} cardHovered={openMoreDetails}/>
                 {!!targetOptions.length &&
                 <div className={classes.optionsWrapper}>
                     <TargetOptions options={targetOptions}/>

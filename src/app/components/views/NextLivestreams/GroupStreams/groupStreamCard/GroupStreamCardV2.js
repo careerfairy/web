@@ -177,7 +177,7 @@ const useStyles = makeStyles((theme) => {
             overflow: 'hidden',
             borderRadius: theme.spacing(2),
             boxShadow: theme.shadows[24],
-            minWidth: "100%", // prevents single speaker cards from being too thin,
+            minWidth: "110%", // prevents single speaker cards from being too thin,
 
         },
         backgroundContent: {
