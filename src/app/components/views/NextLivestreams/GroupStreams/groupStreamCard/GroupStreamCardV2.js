@@ -2,7 +2,7 @@ import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
-import {Avatar, Fade, Paper} from "@material-ui/core";
+import {Avatar, Fade, Grow, Paper} from "@material-ui/core";
 import {AvatarGroup} from "@material-ui/lab";
 import Streamers from "./Streamers";
 import Wave from "./Wave";
@@ -20,6 +20,7 @@ import BookingModal from "../../../common/booking-modal/BookingModal";
 import CopyToClipboard from "../CopyToClipboard";
 import {AttendButton, DetailsButton} from "./actionButtons";
 import MobileComponent from "./MobileComponent";
+import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
 
 const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
@@ -248,6 +249,12 @@ const useStyles = makeStyles((theme) => {
         optionChips: {
             borderColor: "white",
             background: "none !important"
+        },
+        bookedIcon: {
+            color: "white",
+            position: "absolute",
+            top: 5,
+            left: 5
         }
     })
 })
@@ -535,6 +542,9 @@ const GroupStreamCardV2 = memo(({
                         {!cardHovered &&
                         <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
                              alt="background"/>}
+                        <Grow in={Boolean(userIsRegistered() && !cardHovered)}>
+                            <CheckCircleRoundedIcon fontSize="large" className={classes.bookedIcon}/>
+                        </Grow>
                         <Typography align="center" className={classes.companyName}>
                             {cardHovered ? livestream.title : livestream.company}
                         </Typography>
