@@ -124,6 +124,10 @@ const useStyles = makeStyles(theme => {
             display: "flex",
             width: "100%",
             position: "relative"
+        },
+        optionChips:{
+            borderColor: "white",
+            background: "none !important"
         }
     })
 })
@@ -188,7 +192,7 @@ const MobileComponent = ({
                         </div>
                         {!!targetOptions.length &&
                         <div className={classes.optionsWrapper}>
-                            <TargetOptions options={targetOptions}/>
+                            <TargetOptions className={classes.optionChips} options={targetOptions}/>
                         </div>}
                         <div className={classes.logosFrontWrapper}>
                             {logoElements}

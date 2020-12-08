@@ -49,7 +49,7 @@ const GroupStreams = ({
         const classes = useStyles()
         const searchedButNoResults = selectedOptions.length && !searching && !livestreams.length
 
-        const renderStreamCards = [...livestreams, ...livestreams, ...livestreams].map((livestream, index) => {
+        const renderStreamCards = livestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
                     <Grid key={livestream.id} xs={12} sm={6} md={6}

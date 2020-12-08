@@ -1,8 +1,8 @@
 import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from "context/firebase";
-import {fade, makeStyles} from "@material-ui/core/styles";
+import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
-import {Avatar, Collapse, Fade, Paper} from "@material-ui/core";
+import {Avatar, Fade, Paper} from "@material-ui/core";
 import {AvatarGroup} from "@material-ui/lab";
 import Streamers from "./Streamers";
 import Wave from "./Wave";
@@ -11,7 +11,6 @@ import LogoElement from "../LogoElement";
 import QueryBuilderRoundedIcon from "@material-ui/icons/QueryBuilderRounded";
 import DateUtil from "../../../../../util/DateUtil";
 import TargetOptions from "../../GroupsCarousel/TargetOptions";
-import {grey} from "@material-ui/core/colors";
 import EventNoteRoundedIcon from "@material-ui/icons/EventNoteRounded";
 import UserUtil from "../../../../../data/util/UserUtil";
 import DataAccessUtil from "../../../../../util/DataAccessUtil";
@@ -25,7 +24,7 @@ import MobileComponent from "./MobileComponent";
 const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
     const paperColor = theme.palette.background.paper
-    const frontHoveredHeight = 330
+    const frontHoveredHeight = 300
     const frontHoveredScale = 0.7
     const frontHoveredTranslate = -115
     return ({
@@ -36,11 +35,13 @@ const useStyles = makeStyles((theme) => {
             height: "100%",
             position: "relative",
             webKitPosition: "relative",
-            transform: ({hoverLeft, cardHovered}) => cardHovered ? hoverLeft ? `translate(-25%)` : `translate(25%)` : "none",
+            transform: ({
+                            hoverLeft,
+                            cardHovered
+                        }) => cardHovered ? hoverLeft ? `translate(-25%)` : `translate(25%)` : "none",
             transitionProperty: "transform",
             transitionDuration: `${theme.transitions.duration.shorter}ms`,
             transitionTimingFunction: theme.transitions.easing.easeInOut,
-            // zIndex: ({openMoreDetails}) => openMoreDetails && 1002
             zIndex: ({cardHovered, openMoreDetails}) => (cardHovered || openMoreDetails) && 1002,
             "& p": {
                 color: ({cardHovered}) => cardHovered ? theme.palette.common.white : theme.palette.common.black
@@ -115,7 +116,6 @@ const useStyles = makeStyles((theme) => {
         companyName: {
             fontWeight: "bold",
             fontSize: theme.spacing(3.5),
-            margin: '0.5em 0',
             textAlign: 'center',
             display: "flex",
             alignItems: "center",
@@ -124,6 +124,7 @@ const useStyles = makeStyles((theme) => {
             padding: `0 ${theme.spacing(1)}px`,
             color: "white !important",
             zIndex: 1,
+            justifyContent: "center"
         },
         front: {
             position: "relative",
@@ -166,7 +167,7 @@ const useStyles = makeStyles((theme) => {
             zIndex: 1,
         },
         buttonsWrapper: {
-            marginTop: (frontHoveredHeight * frontHoveredScale) - (-frontHoveredTranslate / 2.3),
+            marginTop: (frontHoveredHeight * frontHoveredScale) - (-frontHoveredTranslate / 2),
             display: "flex",
             justifyContent: "center",
             marginBottom: theme.spacing(1),
@@ -220,6 +221,7 @@ const useStyles = makeStyles((theme) => {
             objectFit: 'cover',
         },
         lowerFrontContent: {
+            marginTop: theme.spacing(2),
             display: "flex",
             flex: 1,
             position: "relative",
@@ -237,6 +239,10 @@ const useStyles = makeStyles((theme) => {
             width: '100%',
             objectFit: 'cover',
         },
+        optionChips:{
+            borderColor: "white",
+            background: "none !important"
+        }
     })
 })
 
@@ -521,7 +527,7 @@ const GroupStreamCardV2 = memo(({
                         {!cardHovered &&
                         <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
                              alt="background"/>}
-                        <Typography className={classes.companyName}>
+                        <Typography align="center" className={classes.companyName}>
                             {cardHovered ? livestream.title : livestream.company}
                         </Typography>
                         {mobile &&
@@ -567,7 +573,7 @@ const GroupStreamCardV2 = memo(({
                         <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
                         {!!targetOptions.length &&
                         <div className={classes.optionsWrapper}>
-                            <TargetOptions options={targetOptions}/>
+                            <TargetOptions className={classes.optionChips} options={targetOptions}/>
                         </div>}
                     </div>
                     <div className={classes.logosBackWrapper}>
