@@ -55,7 +55,7 @@ const useStyles = makeStyles(theme => {
             paddingTop: 0
         },
         details: {
-            background: theme.palette.navyBlue.main,
+            // background: theme.palette.navyBlue.main,
             display: "flex",
             flexDirection: "column",
             width: "100%",
@@ -76,7 +76,7 @@ const useStyles = makeStyles(theme => {
             },
             flex: 1,
             boxShadow: "none",
-            background: ({openMoreDetails}) => openMoreDetails ? theme.palette.navyBlue.main : "transparent",
+            // background: ({openMoreDetails}) => openMoreDetails ? theme.palette.navyBlue.main : "transparent",
             marginTop: 0,
             borderRadius: "0px !important",
             "& .MuiAccordion-root:before": {
@@ -94,7 +94,8 @@ const useStyles = makeStyles(theme => {
             display: "flex",
             justifyContent: "space-evenly",
             width: "100%",
-            background: paperColor
+            background: paperColor,
+            flex: 1
         },
         groupWrapper: {
             height: 50,

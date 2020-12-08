@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => {
             height: "100%",
             position: "relative",
             webKitPosition: "relative",
-            transform: ({even, cardHovered}) => cardHovered ? even ? `translate(-15%)` : `translate(15%)` : "none",
+            transform: ({even, cardHovered}) => cardHovered ? even ? `translate(-25%)` : `translate(25%)` : "none",
             transitionProperty: "transform",
             transitionDuration: `${theme.transitions.duration.shorter}ms`,
             transitionTimingFunction: theme.transitions.easing.easeInOut,
@@ -109,7 +109,7 @@ const useStyles = makeStyles((theme) => {
             justifyContent: "center",
             padding: theme.spacing(5),
             borderRadius: `${theme.spacing(2)}px 0px`,
-            background: grey[50],
+            background: paperColor,
             boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
         },
         companyName: {
@@ -121,26 +121,34 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center",
             width: ({cardHovered}) => cardHovered && "135%",
             height: ({cardHovered}) => cardHovered ? "auto" : 60,
-            padding: `0 ${theme.spacing(1)}px`
+            padding: `0 ${theme.spacing(1)}px`,
+            color: "white !important",
+            zIndex: 1,
         },
         front: {
+            position: "relative",
             width: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             transform: ({cardHovered}) => cardHovered && `translateY(${frontHoveredTranslate}px) scale(${frontHoveredScale})`,
             transition: '250ms',
-            background: ({cardHovered}) => cardHovered ? "transparent" : fade(paperColor, 0.5),
+            background: ({cardHovered}) => cardHovered ? "transparent" : theme.palette.navyBlue.main,
             boxShadow: ({cardHovered}) => cardHovered && "none",
             borderRadius: theme.spacing(2.5),
             height: ({cardHovered}) => cardHovered ? frontHoveredHeight : "100%",
         },
         speakersAndLogosWrapper: {
+            flex: 1,
             opacity: ({cardHovered}) => cardHovered && 0,
             width: "100%",
             display: "flex",
             flexDirection: "column",
-            alignItems: "center"
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderBottomRightRadius: `${theme.spacing(2.5)}px !important`,
+            borderBottomLeftRadius: `${theme.spacing(2.5)}px !important`,
+            zIndex: 1,
         },
         speakerAndButtonsWrapper: {
             display: "flex",
@@ -148,11 +156,14 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center"
         },
         logosFrontWrapper: {
+            background: "white",
             padding: theme.spacing(1),
             display: "flex",
             justifyContent: "space-evenly",
             width: "100%",
-            height: 100
+            height: 100,
+            borderRadius: "inherit",
+            zIndex: 1,
         },
         buttonsWrapper: {
             marginTop: (frontHoveredHeight * frontHoveredScale) - (-frontHoveredTranslate / 2.3),
@@ -192,7 +203,7 @@ const useStyles = makeStyles((theme) => {
         logosBackWrapper: {
             display: "flex",
             width: "100%",
-            background: grey[50],
+            background: paperColor,
             overflowX: "auto",
             overflowY: "hidden",
         },
@@ -205,6 +216,24 @@ const useStyles = makeStyles((theme) => {
             opacity: '.3',
             clipPath: 'url(#wave)',
             height: '30%',
+            width: '100%',
+            objectFit: 'cover',
+        },
+        lowerFrontContent: {
+            display: "flex",
+            flex: 1,
+            position: "relative",
+            flexDirection: "column",
+            alignItems: "center",
+            width: "100%",
+            borderRadius: "inherit"
+        },
+        lowerFrontBackgroundImage: {
+            borderBottomRightRadius: "inherit",
+            borderBottomLeftRadius: "inherit",
+            position: "absolute",
+            opacity: '.3',
+            height: '100%',
             width: '100%',
             objectFit: 'cover',
         },
@@ -478,34 +507,39 @@ const GroupStreamCardV2 = memo(({
                     <div className={classes.logoWrapper}>
                         <img className={classes.companyLogo} src={livestream.companyLogoUrl} alt=""/>
                     </div>
-                    <Typography className={classes.companyName}>
-                        {cardHovered ? livestream.title : livestream.company}
-                    </Typography>
-                    {mobile &&
-                    <MobileComponent
-                        handleOpenMoreDetails={handleOpenMoreDetails}
-                        openMoreDetails={openMoreDetails}
-                        speakerElements={speakerElements}
-                        logoElements={logoElements}
-                        targetOptions={targetOptions}
-                        listenToUpcoming={listenToUpcoming}
-                        livestream={livestream}
-                        groupData={groupData}
-                        handleRegisterClick={handleRegisterClick}
-                        checkIfRegistered={checkIfRegistered}
-                        user={user}/>}
-                    {!cardHovered && !openMoreDetails &&
-                    <Fade timeout={1000} in={!openMoreDetails}>
-                        <div className={classes.speakersAndLogosWrapper}>
-                            {!mobile && <AvatarGroup max={3}>
-                                {speakerElements}
-                            </AvatarGroup>}
-                            <div className={classes.logosFrontWrapper}>
-                                {logoElements}
+                    <div className={classes.lowerFrontContent}>
+                        {!cardHovered &&
+                        <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
+                             alt="background"/>}
+                        <Typography className={classes.companyName}>
+                            {cardHovered ? livestream.title : livestream.company}
+                        </Typography>
+                        {mobile &&
+                        <MobileComponent
+                            handleOpenMoreDetails={handleOpenMoreDetails}
+                            openMoreDetails={openMoreDetails}
+                            speakerElements={speakerElements}
+                            logoElements={logoElements}
+                            targetOptions={targetOptions}
+                            listenToUpcoming={listenToUpcoming}
+                            livestream={livestream}
+                            groupData={groupData}
+                            handleRegisterClick={handleRegisterClick}
+                            checkIfRegistered={checkIfRegistered}
+                            user={user}/>}
+                        {!cardHovered && !openMoreDetails &&
+                        <Fade timeout={250} in={!openMoreDetails}>
+                            <div className={classes.speakersAndLogosWrapper}>
+                                {!mobile && <AvatarGroup max={3}>
+                                    {speakerElements}
+                                </AvatarGroup>}
+                                <div className={classes.logosFrontWrapper}>
+                                    {logoElements}
+                                </div>
                             </div>
-                        </div>
-                    </Fade>
-                    }
+                        </Fade>
+                        }
+                    </div>
                 </Paper>
                 <div className={classes.background}>
                     <img className={classes.backgroundImage} src={livestream.backgroundImageUrl} alt="background"/>
