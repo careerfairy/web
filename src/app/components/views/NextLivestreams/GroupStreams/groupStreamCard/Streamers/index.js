@@ -18,11 +18,10 @@ const useStyles = makeStyles(theme => ({
         minWidth: 95,
         flexDirection: "column",
         alignItems: "center",
-        justifyContent:"space-between",
         padding: theme.spacing(0.5)
     },
     name: {
-        margin: '0.75em 0',
+        marginTop: theme.spacing(1) ,
         textAlign: 'center',
         fontSize: "0.9em",
         fontWeight: "bold"
