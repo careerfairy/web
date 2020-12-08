@@ -55,7 +55,6 @@ const useStyles = makeStyles(theme => {
             paddingTop: 0
         },
         details: {
-            // background: theme.palette.navyBlue.main,
             display: "flex",
             flexDirection: "column",
             width: "100%",
@@ -64,6 +63,7 @@ const useStyles = makeStyles(theme => {
             boxShadow: theme.shadows[24],
             borderBottomRightRadius: `${theme.spacing(2.5)}px !important`,
             borderBottomLeftRadius: `${theme.spacing(2.5)}px !important`,
+            marginBottom:  ({openMoreDetails}) => openMoreDetails && theme.spacing(2)
         },
         detailsAccordionRoot: {
             position: "absolute",

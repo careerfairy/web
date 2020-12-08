@@ -136,10 +136,13 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center",
             transform: ({cardHovered}) => cardHovered && `translateY(${frontHoveredTranslate}px) scale(${frontHoveredScale})`,
             transition: '250ms',
-            background: ({cardHovered}) => cardHovered ? "transparent" : theme.palette.navyBlue.main,
+            background: ({
+                             cardHovered,
+                             registered
+                         }) => cardHovered ? "transparent" : registered ? theme.palette.primary.main : theme.palette.navyBlue.main,
             boxShadow: ({cardHovered}) => cardHovered && "none",
             height: ({cardHovered}) => cardHovered ? frontHoveredHeight : "100%",
-            borderRadius: ({openMoreDetails}) => openMoreDetails ? 0 : theme.spacing(2.5),
+            borderRadius: ({openMoreDetails}) => openMoreDetails ? `${theme.spacing(2.5)}px ${theme.spacing(2.5)}px 0 0` : theme.spacing(2.5),
 
         },
         speakersAndLogosWrapper: {
@@ -271,6 +274,13 @@ const GroupStreamCardV2 = memo(({
     const absolutePath = router.asPath
     const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
 
+    function userIsRegistered() {
+        if (!user || !livestream.registeredUsers) {
+            return false;
+        }
+        return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1)
+    }
+
     const shouldHoverLeft = () => {
         if (!hasCategories && width === "lg") {// only case when there's an odd number of cards in a row
             return (index + 1) % 3 === 0 // Please hover only the 3rd/last element in the row to the left
@@ -280,10 +290,11 @@ const GroupStreamCardV2 = memo(({
     }
 
     const hoverLeft = useMemo(() => shouldHoverLeft(), [width, hasCategories])
+    const registered = useMemo(() => userIsRegistered(), [livestream.registeredUsers])
 
     const [cardHovered, setCardHovered] = useState(false)
     const [openMoreDetails, setOpenMoreDetails] = useState(false)
-    const classes = useStyles({cardHovered, mobile, hoverLeft, openMoreDetails})
+    const classes = useStyles({cardHovered, mobile, hoverLeft, openMoreDetails, registered})
     const [careerCenters, setCareerCenters] = useState([])
     const [targetOptions, setTargetOptions] = useState([])
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -439,13 +450,6 @@ const GroupStreamCardV2 = memo(({
 
     function handleCloseJoinModal() {
         setOpenJoinModal(false);
-    }
-
-    function userIsRegistered() {
-        if (!user || !livestream.registeredUsers) {
-            return false;
-        }
-        return checkIfRegistered();
     }
 
     function sendEmailRegistrationConfirmation() {

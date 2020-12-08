@@ -11,8 +11,9 @@ const useStyles = makeStyles(theme => ({
         flexDirection: "column"
     },
     logoImage: {
-        maxWidth: "100%",
-        maxHeight: "65%"
+        // minWidth: "90",
+        // height: "auto",
+        maxHeight: "90%"
     },
     imageWrapper: {
         height: 50,
