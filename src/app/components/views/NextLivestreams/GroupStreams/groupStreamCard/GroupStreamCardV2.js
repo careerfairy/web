@@ -21,6 +21,9 @@ import CopyToClipboard from "../CopyToClipboard";
 import {AttendButton, DetailsButton} from "./actionButtons";
 import MobileComponent from "./MobileComponent";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
+import {TimePicker} from "@material-ui/pickers";
+import TimeDisplay from "./TimeDisplay";
+
 
 const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
@@ -29,7 +32,12 @@ const useStyles = makeStyles((theme) => {
     const frontHoveredScale = 0.7
     const frontHoveredTranslate = -115
     return ({
-        streamCardRoot: {
+        root: {
+            width: "100%",
+            height: "100%",
+            display: "flex",
+        },
+        streamCard: {
             display: "flex",
             justifyContent: "center",
             width: "100%",
@@ -57,9 +65,9 @@ const useStyles = makeStyles((theme) => {
             fontWeight: 'bold',
             fontSize: '1.125rem',
             padding: '0.5em 0.5em 0.75em',
-            WebkitTransition: transition,
-            transition: transition,
-            transform: ({cardHovered}) => cardHovered && "translate(57%, 0%)",
+            // WebkitTransition: transition,
+            // transition: transition,
+            // transform: ({cardHovered}) => cardHovered && "translate(57%, 0%)",
             flexDirection: ({cardHovered}) => cardHovered && "column",
             display: "flex",
             justifyContent: "center",
@@ -103,16 +111,23 @@ const useStyles = makeStyles((theme) => {
             maxWidth: "100%",
             maxHeight: "65%"
         },
-        logoWrapper: {
-            height: 230,
+        logoTimeWrapper: {
+            height: 200,
             width: "100%",
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            padding: theme.spacing(5),
             borderRadius: ({cardHovered}) => cardHovered ? `${theme.spacing(2)}px 0px` : `${theme.spacing(2)}px ${theme.spacing(2)}px 0px 0px`,
             background: paperColor,
             boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
+        },
+        timeIndicator: {
+            width: "100%",
+            height: 100
+        },
+        picker: {
+            border: "2px solid blue"
         },
         companyName: {
             marginTop: `${theme.spacing(2)}px !important`,
@@ -143,8 +158,11 @@ const useStyles = makeStyles((theme) => {
                          }) => cardHovered ? "transparent" : registered ? theme.palette.primary.main : theme.palette.navyBlue.main,
             boxShadow: ({cardHovered}) => cardHovered && "none",
             height: ({cardHovered}) => cardHovered ? frontHoveredHeight : "100%",
-            borderRadius: ({openMoreDetails}) => openMoreDetails ? `${theme.spacing(2.5)}px ${theme.spacing(2.5)}px 0 0` : theme.spacing(2.5),
+            borderRadius: theme.spacing(2.5),
 
+        },
+        frontAvaGroup: {
+            marginBottom: theme.spacing(2)
         },
         speakersAndLogosWrapper: {
             flex: 1,
@@ -169,7 +187,6 @@ const useStyles = makeStyles((theme) => {
             display: "flex",
             justifyContent: "space-evenly",
             width: "100%",
-            height: 100,
             borderRadius: "inherit",
             zIndex: 1,
             flex: ({mobile}) => mobile && 1
@@ -217,6 +234,8 @@ const useStyles = makeStyles((theme) => {
             overflowY: "hidden",
         },
         logoElement: {
+            display: "flex",
+            alignItems: "center",
             margin: "0 auto",
             padding: `${theme.spacing(1)}px ${theme.spacing(0.5)}px`,
         },
@@ -235,7 +254,7 @@ const useStyles = makeStyles((theme) => {
             flexDirection: "column",
             alignItems: "center",
             width: "100%",
-            borderRadius: ({openMoreDetails}) => openMoreDetails ? 0 : "inherit"
+            borderRadius:"inherit"
         },
         lowerFrontBackgroundImage: {
             borderBottomRightRadius: "inherit",
@@ -521,81 +540,87 @@ const GroupStreamCardV2 = memo(({
     return (
         <Fragment>
             <div
-                onMouseLeave={handleMouseLeft}
                 onMouseEnter={handleMouseEntered}
-                className={classes.streamCardRoot}>
-                <div className={classes.frontLabelLeft}>
-                    <QueryBuilderRoundedIcon
-                        style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyTime(livestream.start.toDate())}
-                </div>
-                <CopyToClipboard color={cardHovered && "white"} className={classes.copyToClipBoard}
-                                 value={linkToStream}/>
-                <div className={classes.frontLabelRight}>
-                    <EventNoteRoundedIcon
-                        style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyDay(livestream.start.toDate())}
-                </div>
-                <Paper elevation={4} className={classes.front}>
-                    <div className={classes.logoWrapper}>
-                        <img className={classes.companyLogo} src={livestream.companyLogoUrl} alt=""/>
-                    </div>
-                    <div className={classes.lowerFrontContent}>
-                        {!cardHovered &&
-                        <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
-                             alt="background"/>}
-                        <Grow in={Boolean(userIsRegistered() && !cardHovered)}>
-                            <CheckCircleRoundedIcon fontSize="large" className={classes.bookedIcon}/>
-                        </Grow>
-                        <Typography align="center" className={classes.companyName}>
-                            {cardHovered ? livestream.title : livestream.company}
-                        </Typography>
-                        {mobile &&
-                        <MobileComponent
-                            handleOpenMoreDetails={handleOpenMoreDetails}
-                            openMoreDetails={openMoreDetails}
-                            speakerElements={speakerElements}
-                            logoElements={logoElements}
-                            targetOptions={targetOptions}
-                            listenToUpcoming={listenToUpcoming}
-                            livestream={livestream}
-                            groupData={groupData}
-                            handleRegisterClick={handleRegisterClick}
-                            checkIfRegistered={checkIfRegistered}
-                            user={user}/>}
-                        {!cardHovered && !openMoreDetails &&
-                        <Fade timeout={250} in={!openMoreDetails}>
-                            <div className={classes.speakersAndLogosWrapper}>
-                                {!mobile && <AvatarGroup max={3}>
-                                    {speakerElements}
-                                </AvatarGroup>}
-                                <div className={classes.companyLogosFrontWrapper}>
-                                    {logoElements}
+                className={classes.root}>
+                <div
+                    onMouseLeave={handleMouseLeft}
+                    className={classes.streamCard}>
+                    {/*<div className={classes.frontLabelLeft}>*/}
+                    {/*    <QueryBuilderRoundedIcon*/}
+                    {/*        style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyTime(livestream.start.toDate())}*/}
+                    {/*</div>*/}
+                    <CopyToClipboard color={cardHovered && "white"} className={classes.copyToClipBoard}
+                                     value={linkToStream}/>
+                    {/*<div className={classes.frontLabelRight}>*/}
+                    {/*    <EventNoteRoundedIcon*/}
+                    {/*        style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyDay(livestream.start.toDate())}*/}
+                    {/*</div>*/}
+                    <Paper elevation={4} className={classes.front}>
+                        <div className={classes.logoTimeWrapper}>
+                            <img className={classes.companyLogo} src={livestream.companyLogoUrl} alt=""/>
+                        </div>
+                        <div className={classes.timeIndicator}>
+                            <TimeDisplay date={livestream.start.toDate()}/>
+                        </div>
+                        <div className={classes.lowerFrontContent}>
+                            {!cardHovered &&
+                            <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
+                                 alt="background"/>}
+                            <Grow in={Boolean(userIsRegistered() && !cardHovered)}>
+                                <CheckCircleRoundedIcon fontSize="large" className={classes.bookedIcon}/>
+                            </Grow>
+                            <Typography align="center" className={classes.companyName}>
+                                {cardHovered ? livestream.title : livestream.company}
+                            </Typography>
+                            {mobile &&
+                            <MobileComponent
+                                handleOpenMoreDetails={handleOpenMoreDetails}
+                                openMoreDetails={openMoreDetails}
+                                speakerElements={speakerElements}
+                                logoElements={logoElements}
+                                targetOptions={targetOptions}
+                                listenToUpcoming={listenToUpcoming}
+                                livestream={livestream}
+                                groupData={groupData}
+                                handleRegisterClick={handleRegisterClick}
+                                checkIfRegistered={checkIfRegistered}
+                                user={user}/>}
+                            {!cardHovered && !openMoreDetails &&
+                            <Fade timeout={250} in={!openMoreDetails}>
+                                <div className={classes.speakersAndLogosWrapper}>
+                                    {!mobile && <AvatarGroup className={classes.frontAvaGroup} max={3}>
+                                        {speakerElements}
+                                    </AvatarGroup>}
+                                    <div className={classes.companyLogosFrontWrapper}>
+                                        {logoElements}
+                                    </div>
                                 </div>
-                            </div>
-                        </Fade>
-                        }
-                    </div>
-                </Paper>
-                <div className={classes.background}>
-                    <img className={classes.backgroundImage} src={livestream.backgroundImageUrl} alt="background"/>
-                    <div className={classes.buttonsWrapper}>
-                        <DetailsButton
-                            groupData={groupData}
-                            listenToUpcoming={listenToUpcoming}
-                            livestream={livestream}/>
-                        <AttendButton
-                            handleRegisterClick={handleRegisterClick}
-                            checkIfRegistered={checkIfRegistered}
-                            user={user}/>
-                    </div>
-                    <div className={classes.backgroundContent}>
-                        <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
-                        {!!targetOptions.length &&
-                        <div className={classes.optionsWrapper}>
-                            <TargetOptions className={classes.optionChips} options={targetOptions}/>
-                        </div>}
-                    </div>
-                    <div className={classes.logosBackWrapper}>
-                        {logoElements}
+                            </Fade>
+                            }
+                        </div>
+                    </Paper>
+                    <div onMouseLeave={handleMouseLeft} className={classes.background}>
+                        <img className={classes.backgroundImage} src={livestream.backgroundImageUrl} alt="background"/>
+                        <div className={classes.buttonsWrapper}>
+                            <DetailsButton
+                                groupData={groupData}
+                                listenToUpcoming={listenToUpcoming}
+                                livestream={livestream}/>
+                            <AttendButton
+                                handleRegisterClick={handleRegisterClick}
+                                checkIfRegistered={checkIfRegistered}
+                                user={user}/>
+                        </div>
+                        <div className={classes.backgroundContent}>
+                            <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
+                            {!!targetOptions.length &&
+                            <div className={classes.optionsWrapper}>
+                                <TargetOptions className={classes.optionChips} options={targetOptions}/>
+                            </div>}
+                        </div>
+                        <div className={classes.logosBackWrapper}>
+                            {logoElements}
+                        </div>
                     </div>
                 </div>
             </div>

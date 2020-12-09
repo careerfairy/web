@@ -7,6 +7,7 @@ import * as Sentry from '@sentry/browser';
 import {makeStyles, ThemeProvider} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import config from 'react-reveal/globals';
+import DateFnsUtils from '@date-io/date-fns';
 
 config({ssrFadeout: true});
 import "slick-carousel/slick/slick.css";
@@ -21,6 +22,7 @@ import ErrorSnackBar from "../components/views/common/ErrorSnackBar/ErrorSnackBa
 import ErrorContext from "../context/error/ErrorContext";
 import {SnackbarProvider} from "notistack";
 import TutorialContext from 'context/tutorials/TutorialContext';
+import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 
 const useStyles = makeStyles(({
     info: {
@@ -135,6 +137,7 @@ function MyApp({Component, pageProps}) {
             </Head>
             <FirebaseContext.Provider value={firebase}>
                 <ThemeProvider theme={theme}>
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
                     <SnackbarProvider classes={{
                         variantInfo: classes.info
                     }} maxSnack={3}>
@@ -149,6 +152,7 @@ function MyApp({Component, pageProps}) {
                             </UserContext.Provider>
                         </TutorialContext.Provider>
                     </SnackbarProvider>
+                    </MuiPickersUtilsProvider>
                 </ThemeProvider>
             </FirebaseContext.Provider>
         </Fragment>

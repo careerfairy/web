@@ -14,11 +14,12 @@ const useStyles = makeStyles(theme => ({
     },
 }))
 
-export const AttendButton = ({checkIfRegistered, user, handleRegisterClick}) => {
+export const AttendButton = ({checkIfRegistered, user, handleRegisterClick, ...props}) => {
     const classes = useStyles()
     return (
         <Button className={classes.actionButton} size='large' style={{marginLeft: 5}}
                 variant="contained"
+                {...props}
                 startIcon={(user && checkIfRegistered()) ?
                     <ClearRoundedIcon/> : <AddToPhotosRoundedIcon/>}
                 color={(user && checkIfRegistered()) ? "default" : 'primary'}
@@ -27,7 +28,7 @@ export const AttendButton = ({checkIfRegistered, user, handleRegisterClick}) => 
     )
 }
 
-export const DetailsButton = ({listenToUpcoming, livestream, groupData}) => {
+export const DetailsButton = ({listenToUpcoming, livestream, groupData, ...props}) => {
     const classes = useStyles()
     return (
         <Link
@@ -42,6 +43,7 @@ export const DetailsButton = ({listenToUpcoming, livestream, groupData}) => {
                     style={{marginRight: 5}}
                     startIcon={<LibraryBooksIcon/>}
                     size="large"
+                    {...props}
                     children="Details"
                     variant="contained" color="secondary"/>
             </a>

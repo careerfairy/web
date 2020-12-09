@@ -12,24 +12,17 @@ import GroupCategories from "./GroupCategories/GroupCategories";
 import GroupStreams from "./GroupStreams/GroupStreams";
 import {useRouter} from "next/router";
 import GroupJoinModal from "../profile/GroupJoinModal";
+import {bindKeyboard} from 'react-swipeable-views-utils';
+
+const BindKeyboardSwipeableViews = bindKeyboard(SwipeableViews);
 
 
 function TabPanel({children, value, index, ...other}) {
 
     return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`full-width-tabpanel-${index}`}
-            aria-labelledby={`full-width-tab-${index}`}
-            {...other}
-        >
-            {value === index && (
-                <Box p={1}>
-                    {children}
-                </Box>
-            )}
-        </div>
+        <Box {...other} p={1}>
+            {children}
+        </Box>
     );
 }
 
@@ -42,7 +35,8 @@ function a11yProps(index) {
 
 const useStyles = makeStyles((theme) => ({
     streamsGrid: {
-        marginBottom: theme.spacing(1)
+        // marginBottom: theme.spacing(1)
+        height: "100%"
     },
     bar: {
         boxShadow: "none",
@@ -161,10 +155,9 @@ const MobileFeed = ({
                 />
             </>
             }
-            <SwipeableViews
+            <BindKeyboardSwipeableViews
+                style={{overflow: "hidden", flex: 1}}
                 disabled={!Boolean(groupData.categories)}
-                style={{flex: 1}}
-                containerStyle={{WebkitOverflowScrolling: 'touch'}}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
                 onChangeIndex={handleChangeIndex}>
@@ -196,7 +189,7 @@ const MobileFeed = ({
                                          mobile={true}/>
                     </Grid>
                 </TabPanel>
-            </SwipeableViews>
+            </BindKeyboardSwipeableViews>
         </>
     );
 }

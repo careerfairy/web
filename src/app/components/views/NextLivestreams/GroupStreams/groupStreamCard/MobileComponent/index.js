@@ -55,6 +55,7 @@ const useStyles = makeStyles(theme => {
             paddingTop: 0
         },
         details: {
+            background: theme.palette.navyBlue.main,
             display: "flex",
             flexDirection: "column",
             width: "100%",
@@ -66,11 +67,6 @@ const useStyles = makeStyles(theme => {
             marginBottom:  ({openMoreDetails}) => openMoreDetails && theme.spacing(2)
         },
         detailsAccordionRoot: {
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
             "& p": {
                 color: "white !important"
             },
@@ -147,15 +143,17 @@ const MobileComponent = ({
                          }) => {
     const classes = useStyles({openMoreDetails})
 
-
+//
     return (
         <div className={classes.mobileComponentRoot}>
             <div className={classes.buttonsWrapper}>
                 <DetailsButton
+                    size="small"
                     groupData={groupData}
                     listenToUpcoming={listenToUpcoming}
                     livestream={livestream}/>
                 <AttendButton
+                    size="small"
                     handleRegisterClick={handleRegisterClick}
                     checkIfRegistered={checkIfRegistered}
                     user={user}/>

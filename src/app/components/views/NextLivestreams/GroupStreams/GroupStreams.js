@@ -49,10 +49,10 @@ const GroupStreams = ({
         const classes = useStyles()
         const searchedButNoResults = selectedOptions.length && !searching && !livestreams.length
 
-        const renderStreamCards = livestreams?.map((livestream, index) => {
+        const renderStreamCards = [...livestreams, ...livestreams, ...livestreams]?.map((livestream, index) => {
             if (livestream) {
                 return (
-                    <Grid key={livestream.id} xs={12} sm={6} md={6}
+                    <Grid style={{height: 520}} key={livestream.id} xs={12} sm={6} md={6}
                           lg={hasCategories ? 6 : 4} xl={3} item>
                         <GroupStreamCardV2
                             index={index}
@@ -83,7 +83,7 @@ const GroupStreams = ({
                         </Grid>
                         :
                         livestreams.length ?
-                            renderStreamCards
+                                renderStreamCards
                             :
                             <Grid sm={12} xs={12} md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
                                 <Typography className={classes.emptyMessage} align="center" variant="h5"

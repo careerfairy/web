@@ -9,7 +9,9 @@ import {useTheme} from "@material-ui/core/styles";
 
 const nextLivestreams = () => {
     const theme = useTheme()
-    return (
+    const isSSR = typeof window === 'undefined';
+
+    return !isSSR && (
         <GreyBackground>
             <Head>
                 <title key="title">CareerFairy | Next Live Streams</title>
