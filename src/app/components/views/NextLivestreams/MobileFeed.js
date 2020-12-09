@@ -17,22 +17,6 @@ import {bindKeyboard} from 'react-swipeable-views-utils';
 const BindKeyboardSwipeableViews = bindKeyboard(SwipeableViews);
 
 
-function TabPanel({children, value, index, ...other}) {
-
-    return (
-        <Box {...other} p={1}>
-            {children}
-        </Box>
-    );
-}
-
-function a11yProps(index) {
-    return {
-        id: `full-width-tab-${index}`,
-        'aria-controls': `full-width-tabpanel-${index}`,
-    };
-}
-
 const useStyles = makeStyles((theme) => ({
     streamsGrid: {
         // marginBottom: theme.spacing(1)
@@ -52,8 +36,27 @@ const useStyles = makeStyles((theme) => ({
         position: "sticky",
         top: 165,
         zIndex: 20
+    },
+    tabPanel: {
+
     }
 }));
+
+function TabPanel({children, value, index, ...other}) {
+    const classes = useStyles()
+    return (
+        <Box className={classes.tabPanel} p={1} {...other}>
+            {children}
+        </Box>
+    );
+}
+
+function a11yProps(index) {
+    return {
+        id: `full-width-tab-${index}`,
+        'aria-controls': `full-width-tabpanel-${index}`,
+    };
+}
 
 
 const MobileFeed = ({

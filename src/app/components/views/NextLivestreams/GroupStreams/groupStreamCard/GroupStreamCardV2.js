@@ -205,7 +205,7 @@ const useStyles = makeStyles((theme) => {
             overflowX: 'hidden',
             overflowY: 'auto',
             maxHeight: "40vh",
-            padding: theme.spacing(1),
+            padding: theme.spacing(2),
             paddingTop: 0
         },
         background: {
