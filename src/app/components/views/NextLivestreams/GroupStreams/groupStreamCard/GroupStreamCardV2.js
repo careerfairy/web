@@ -2,16 +2,13 @@ import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
-import {Avatar, Fade, Grow, Paper} from "@material-ui/core";
+import {Avatar, Button, Collapse, Fade, Grow, Paper} from "@material-ui/core";
 import {AvatarGroup} from "@material-ui/lab";
 import Streamers from "./Streamers";
 import Wave from "./Wave";
 import Typography from "@material-ui/core/Typography";
 import LogoElement from "../LogoElement";
-import QueryBuilderRoundedIcon from "@material-ui/icons/QueryBuilderRounded";
-import DateUtil from "../../../../../util/DateUtil";
 import TargetOptions from "../../GroupsCarousel/TargetOptions";
-import EventNoteRoundedIcon from "@material-ui/icons/EventNoteRounded";
 import UserUtil from "../../../../../data/util/UserUtil";
 import DataAccessUtil from "../../../../../util/DataAccessUtil";
 import {useRouter} from "next/router";
@@ -22,7 +19,7 @@ import {AttendButton, DetailsButton} from "./actionButtons";
 import MobileComponent from "./MobileComponent";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
 import {TimePicker} from "@material-ui/pickers";
-import TimeDisplay from "./TimeDisplay";
+import {DateDisplay, TimeDisplay} from "./TimeDisplay";
 
 
 const useStyles = makeStyles((theme) => {
@@ -31,6 +28,7 @@ const useStyles = makeStyles((theme) => {
     const frontHoveredHeight = 300
     const frontHoveredScale = 0.7
     const frontHoveredTranslate = -115
+    const dateHeight = 100
     return ({
         root: {
             width: "100%",
@@ -123,8 +121,10 @@ const useStyles = makeStyles((theme) => {
             boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
         },
         timeIndicator: {
+            display: "flex",
             width: "100%",
-            height: 100
+            height: dateHeight,
+            color: theme.palette.common.white
         },
         picker: {
             border: "2px solid blue"
@@ -137,7 +137,7 @@ const useStyles = makeStyles((theme) => {
             textAlign: 'center',
             display: "flex",
             alignItems: "center",
-            width: ({cardHovered}) => cardHovered && "135%",
+            width: ({cardHovered}) => cardHovered && "200%",
             height: ({cardHovered}) => cardHovered ? "auto" : 60,
             padding: `0 ${theme.spacing(1)}px`,
             color: "white !important",
@@ -158,11 +158,8 @@ const useStyles = makeStyles((theme) => {
                          }) => cardHovered ? "transparent" : registered ? theme.palette.primary.main : theme.palette.navyBlue.main,
             boxShadow: ({cardHovered}) => cardHovered && "none",
             height: ({cardHovered}) => cardHovered ? frontHoveredHeight : "100%",
-            borderRadius: theme.spacing(2.5),
+            borderRadius: ({expanded}) => expanded ? `${theme.spacing(2.5)}px ${theme.spacing(2.5)}px 0 0` : theme.spacing(2.8),
 
-        },
-        frontAvaGroup: {
-            marginBottom: theme.spacing(2)
         },
         speakersAndLogosWrapper: {
             flex: 1,
@@ -182,6 +179,7 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center"
         },
         companyLogosFrontWrapper: {
+            boxShadow:({expanded}) => expanded && theme.shadows[24],
             background: "white",
             padding: theme.spacing(1),
             display: "flex",
@@ -189,7 +187,7 @@ const useStyles = makeStyles((theme) => {
             width: "100%",
             borderRadius: "inherit",
             zIndex: 1,
-            flex: ({mobile}) => mobile && 1
+            flex: ({mobile}) => mobile && 1,
         },
         buttonsWrapper: {
             marginTop: (frontHoveredHeight * frontHoveredScale) - (-frontHoveredTranslate / 2),
@@ -202,6 +200,13 @@ const useStyles = makeStyles((theme) => {
             overflowX: 'hidden',
             overflowY: 'auto',
             maxHeight: "40vh",
+        },
+        expandedOptionsWrapper: {
+            overflowX: 'hidden',
+            overflowY: 'auto',
+            maxHeight: "40vh",
+            padding: theme.spacing(1),
+            paddingTop: 0
         },
         background: {
             transition: ({cardHovered}) => cardHovered && `${transition}, opacity 250ms linear`,
@@ -254,7 +259,7 @@ const useStyles = makeStyles((theme) => {
             flexDirection: "column",
             alignItems: "center",
             width: "100%",
-            borderRadius:"inherit"
+            borderRadius: theme.spacing(2.5)
         },
         lowerFrontBackgroundImage: {
             borderBottomRightRadius: "inherit",
@@ -265,15 +270,30 @@ const useStyles = makeStyles((theme) => {
             width: '100%',
             objectFit: 'cover',
         },
-        optionChips: {
-            borderColor: "white",
-            background: "none !important"
-        },
         bookedIcon: {
             color: "white",
             position: "absolute",
             top: 5,
             left: 5
+        },
+        expandArea:{
+            marginTop: theme.spacing(1),
+            background: ({registered}) => registered ? theme.palette.primary.main : theme.palette.navyBlue.main,
+            color: "white",
+            width: "100%",
+            "& p": {
+                color: "white !important"
+            },
+        },
+        optionChips:{
+            borderColor: "white",
+            background: "none !important"
+        },
+        expandButton:{
+            color: theme.palette.common.white
+        },
+        actionButtonsWrapper:{
+            marginTop: theme.spacing(1)
         }
     })
 })
@@ -317,10 +337,11 @@ const GroupStreamCardV2 = memo(({
 
     const hoverLeft = useMemo(() => shouldHoverLeft(), [width, hasCategories])
     const registered = useMemo(() => userIsRegistered(), [livestream.registeredUsers])
+    const [expanded, setExpanded] = useState(false);
 
     const [cardHovered, setCardHovered] = useState(false)
     const [openMoreDetails, setOpenMoreDetails] = useState(false)
-    const classes = useStyles({cardHovered, mobile, hoverLeft, openMoreDetails, registered})
+    const classes = useStyles({cardHovered, mobile, hoverLeft, openMoreDetails, registered, expanded})
     const [careerCenters, setCareerCenters] = useState([])
     const [targetOptions, setTargetOptions] = useState([])
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -545,21 +566,14 @@ const GroupStreamCardV2 = memo(({
                 <div
                     onMouseLeave={handleMouseLeft}
                     className={classes.streamCard}>
-                    {/*<div className={classes.frontLabelLeft}>*/}
-                    {/*    <QueryBuilderRoundedIcon*/}
-                    {/*        style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyTime(livestream.start.toDate())}*/}
-                    {/*</div>*/}
                     <CopyToClipboard color={cardHovered && "white"} className={classes.copyToClipBoard}
                                      value={linkToStream}/>
-                    {/*<div className={classes.frontLabelRight}>*/}
-                    {/*    <EventNoteRoundedIcon*/}
-                    {/*        style={{marginRight: "0.7rem"}}/>{DateUtil.getPrettyDay(livestream.start.toDate())}*/}
-                    {/*</div>*/}
                     <Paper elevation={4} className={classes.front}>
                         <div className={classes.logoTimeWrapper}>
                             <img className={classes.companyLogo} src={livestream.companyLogoUrl} alt=""/>
                         </div>
                         <div className={classes.timeIndicator}>
+                            <DateDisplay date={livestream.start.toDate()}/>
                             <TimeDisplay date={livestream.start.toDate()}/>
                         </div>
                         <div className={classes.lowerFrontContent}>
@@ -572,30 +586,43 @@ const GroupStreamCardV2 = memo(({
                             <Typography align="center" className={classes.companyName}>
                                 {cardHovered ? livestream.title : livestream.company}
                             </Typography>
+                            {!cardHovered &&
+                            <div className={classes.speakersAndLogosWrapper}>
+                                <AvatarGroup max={3}>
+                                    {speakerElements}
+                                </AvatarGroup>
+                                {mobile&&
+                                <div className={classes.actionButtonsWrapper}>
+                                <DetailsButton
+                                    size="small"
+                                    groupData={groupData}
+                                    listenToUpcoming={listenToUpcoming}
+                                    livestream={livestream}/>
+                                    <AttendButton
+                                    size="small"
+                                    handleRegisterClick={handleRegisterClick}
+                                    checkIfRegistered={checkIfRegistered}
+                                    user={user}/>
+                                </div>}
                             {mobile &&
-                            <MobileComponent
-                                handleOpenMoreDetails={handleOpenMoreDetails}
-                                openMoreDetails={openMoreDetails}
-                                speakerElements={speakerElements}
-                                logoElements={logoElements}
-                                targetOptions={targetOptions}
-                                listenToUpcoming={listenToUpcoming}
-                                livestream={livestream}
-                                groupData={groupData}
-                                handleRegisterClick={handleRegisterClick}
-                                checkIfRegistered={checkIfRegistered}
-                                user={user}/>}
-                            {!cardHovered && !openMoreDetails &&
-                            <Fade timeout={250} in={!openMoreDetails}>
-                                <div className={classes.speakersAndLogosWrapper}>
-                                    {!mobile && <AvatarGroup className={classes.frontAvaGroup} max={3}>
-                                        {speakerElements}
-                                    </AvatarGroup>}
-                                    <div className={classes.companyLogosFrontWrapper}>
-                                        {logoElements}
-                                    </div>
+                            <div className={classes.expandArea}>
+                                <Button className={classes.expandButton} onClick={() => setExpanded(!expanded)} fullWidth>
+                                    {expanded ? "Show less" : "See more"}
+                                </Button>
+                                <Collapse in={expanded}>
+
+                                    {!!targetOptions.length &&
+                                    <div className={classes.expandedOptionsWrapper}>
+                                        <TargetOptions className={classes.optionChips} options={targetOptions}/>
+                                    </div>}
+                                </Collapse>
+                            </div>
+                            }
+
+                                <div className={classes.companyLogosFrontWrapper}>
+                                    {logoElements}
                                 </div>
-                            </Fade>
+                            </div>
                             }
                         </div>
                     </Paper>

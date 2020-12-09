@@ -2,15 +2,6 @@ import {makeStyles, Typography} from "@material-ui/core";
 import React from "react";
 import dayjs from "dayjs";
 
-var updateLocale = require('dayjs/plugin/updateLocale')
-dayjs.extend(updateLocale)
-
-dayjs.updateLocale('en', {
-    monthsShort: [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    ]
-})
 
 const useStyles = makeStyles(theme => {
 
@@ -23,8 +14,8 @@ const useStyles = makeStyles(theme => {
             color: theme.palette.common.white
         },
         dateWrapper: {
+            minWidth:100,
             paddingLeft: theme.spacing(2),
-            // paddingRight: theme.spacing(1),
             flex: 1,
             display: "flex",
             flexDirection: "column",
@@ -54,37 +45,40 @@ const useStyles = makeStyles(theme => {
     }
 })
 
-
-const TimeDisplay = ({date}) => {
+export const DateDisplay = ({date}) => {
     const classes = useStyles()
     const year = dayjs(date).format('YYYY')
     const month = dayjs(date).format('MMM')
     const dayOfWeek = dayjs(date).format('ddd')
     const dayOfMonth = dayjs(date).format('D')
-    const hour = dayjs(date).format('hh')
-    const minute = dayjs(date).format('mm')
-    const amPm = dayjs(date).format('A')
 
     return (
-        <div className={classes.timePickerRoot}>
-            <div className={classes.dateWrapper}>
-                <Typography variant="h6">
-                    {year}
-                </Typography>
-                <Typography variant="h4">
-                    {`${dayOfWeek}, ${month} ${dayOfMonth}`}
-                </Typography>
-            </div>
-            <div className={classes.timeWrapper}>
-                <Typography gutterBottom={false} className={classes.hour} variant="h1">
-                    {`${hour}:${minute}`}
-                    <Typography className={classes.amPm} variant="h6">
-                        {amPm}
-                    </Typography>
-                </Typography>
-            </div>
+        <div className={classes.dateWrapper}>
+            <Typography variant="h6">
+                {year}
+            </Typography>
+            <Typography variant="h5">
+                {`${dayOfWeek}, ${month} ${dayOfMonth}`}
+            </Typography>
         </div>
     )
 }
 
-export default TimeDisplay
+export const TimeDisplay = ({date}) => {
+    const classes = useStyles()
+
+    const hour = dayjs(date).format('hh')
+    const minute = dayjs(date).format('mm')
+    const amPm = dayjs(date).format('A')
+    return (
+        <div className={classes.timeWrapper}>
+            <Typography gutterBottom={false} className={classes.hour} variant="h1">
+                {`${hour}:${minute}`}
+                <Typography className={classes.amPm} variant="h6">
+                    {amPm}
+                </Typography>
+            </Typography>
+        </div>
+    )
+}
+
