@@ -1,4 +1,4 @@
-import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
+import React, {Fragment, memo, useEffect, useMemo, useRef, useState} from 'react';
 import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
@@ -16,16 +16,13 @@ import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
 import CopyToClipboard from "../CopyToClipboard";
 import {AttendButton, DetailsButton} from "./actionButtons";
-import MobileComponent from "./MobileComponent";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
-import {TimePicker} from "@material-ui/pickers";
 import {DateDisplay, TimeDisplay} from "./TimeDisplay";
 
 
 const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
     const paperColor = theme.palette.background.paper
-    const frontHoveredHeight = 300
     const frontHoveredScale = 0.7
     const frontHoveredTranslate = -115
     const dateHeight = 100
@@ -51,7 +48,7 @@ const useStyles = makeStyles((theme) => {
             transitionTimingFunction: theme.transitions.easing.easeInOut,
             zIndex: ({cardHovered, openMoreDetails}) => (cardHovered || openMoreDetails) && 1002,
             "& p": {
-                color: ({cardHovered}) => cardHovered ? theme.palette.common.white : theme.palette.common.black
+                color: theme.palette.common.white
             },
         },
         copyToClipBoard: {
@@ -63,44 +60,6 @@ const useStyles = makeStyles((theme) => {
             fontWeight: 'bold',
             fontSize: '1.125rem',
             padding: '0.5em 0.5em 0.75em',
-            // WebkitTransition: transition,
-            // transition: transition,
-            // transform: ({cardHovered}) => cardHovered && "translate(57%, 0%)",
-            flexDirection: ({cardHovered}) => cardHovered && "column",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center"
-        },
-        frontLabelRight: {
-            color: ({cardHovered}) => cardHovered && theme.palette.common.white,
-            position: 'absolute',
-            top: '0',
-            right: '1em',
-            zIndex: '999',
-            fontWeight: 'bold',
-            fontSize: '1.125rem',
-            padding: '0.5em 0.5em 0.75em',
-            WebkitTransition: transition,
-            transition: transition,
-            transform: ({cardHovered}) => cardHovered && "translate(71%, -40%)",
-            flexDirection: ({cardHovered}) => cardHovered && "column",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center"
-        },
-        frontLabelLeft: {
-            flexDirection: ({cardHovered}) => cardHovered && "column",
-            color: ({cardHovered}) => cardHovered && theme.palette.common.white,
-            position: 'absolute',
-            top: '0',
-            left: '1em',
-            zIndex: '999',
-            fontWeight: 'bold',
-            fontSize: '1.125rem',
-            padding: '0.5em 0.5em 0.75em',
-            WebkitTransition: transition,
-            transition: transition,
-            transform: ({cardHovered}) => cardHovered && "translate(-68%, -40%)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center"
@@ -138,9 +97,6 @@ const useStyles = makeStyles((theme) => {
             display: "flex",
             alignItems: "flex-end"
         },
-        picker: {
-            border: "2px solid blue"
-        },
         companyName: {
             marginTop: `${theme.spacing(2)}px !important`,
             marginBottom: `${theme.spacing(2)}px !important`,
@@ -167,9 +123,9 @@ const useStyles = makeStyles((theme) => {
             background: ({
                              cardHovered,
                              registered
-                         }) => cardHovered ? "transparent" : registered ? theme.palette.primary.main : theme.palette.navyBlue.main,
+                         }) => cardHovered ? "transparent" : registered ? theme.palette.primary.dark : theme.palette.navyBlue.main,
             boxShadow: ({cardHovered}) => cardHovered && "none",
-            height: ({cardHovered}) => cardHovered ? frontHoveredHeight : "100%",
+            height: ({cardHovered, frontHeight}) => cardHovered ? frontHeight : "100%",
             borderRadius: ({expanded}) => expanded ? `${theme.spacing(2.5)}px ${theme.spacing(2.5)}px 0 0` : theme.spacing(2.8),
 
         },
@@ -185,13 +141,8 @@ const useStyles = makeStyles((theme) => {
             borderBottomLeftRadius: `${theme.spacing(2.5)}px !important`,
             zIndex: 1,
         },
-        speakerAndButtonsWrapper: {
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center"
-        },
         companyLogosFrontWrapper: {
-            boxShadow: ({expanded}) => expanded && theme.shadows[24],
+            boxShadow: ({isExpanded}) => isExpanded && theme.shadows[24],
             background: "white",
             padding: theme.spacing(1),
             display: "flex",
@@ -202,7 +153,7 @@ const useStyles = makeStyles((theme) => {
             flex: ({mobile}) => mobile && 1,
         },
         buttonsWrapper: {
-            marginTop: (frontHoveredHeight * frontHoveredScale) - (-frontHoveredTranslate / 2),
+            marginTop: ({frontHeight}) => frontHeight / 2,
             display: "flex",
             justifyContent: "center",
             marginBottom: theme.spacing(1),
@@ -217,7 +168,7 @@ const useStyles = makeStyles((theme) => {
             overflowX: 'hidden',
             overflowY: 'auto',
             maxHeight: "40vh",
-            padding: theme.spacing(2),
+            padding: ({hasGroups}) => theme.spacing(!hasGroups ? 4 : 2),
             paddingTop: 0
         },
         background: {
@@ -255,6 +206,7 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center",
             margin: "0 auto",
             padding: `${theme.spacing(1)}px ${theme.spacing(0.5)}px`,
+            height: ({cardHovered}) => !cardHovered && 90
         },
         backgroundImage: {
             position: "absolute",
@@ -271,9 +223,11 @@ const useStyles = makeStyles((theme) => {
             flexDirection: "column",
             alignItems: "center",
             width: "100%",
-            borderRadius: theme.spacing(2.5)
+            borderRadius: theme.spacing(2.5),
+            paddingBottom: ({expanded}) => expanded && theme.spacing(2)
         },
         lowerFrontBackgroundImage: {
+            paddingBottom: ({expanded}) => expanded && theme.spacing(4),
             borderBottomRightRadius: "inherit",
             borderBottomLeftRadius: "inherit",
             position: "absolute",
@@ -286,11 +240,18 @@ const useStyles = makeStyles((theme) => {
             color: "white",
             position: "absolute",
             top: 5,
-            left: 5
+            left: 5,
+            display: "flex",
+            alignItems: "center"
+        },
+        bookedText: {
+            marginLeft: theme.spacing(1),
+            fontWeight: "bold"
         },
         expandArea: {
+            borderRadius: ({hasGroups}) => !hasGroups && theme.spacing(2.5),
             marginTop: theme.spacing(1),
-            background: ({registered}) => registered ? theme.palette.primary.main : theme.palette.navyBlue.main,
+            background: ({registered}) => registered ? theme.palette.primary.dark : theme.palette.navyBlue.main,
             color: "white",
             width: "100%",
             "& p": {
@@ -302,7 +263,8 @@ const useStyles = makeStyles((theme) => {
             background: "none !important"
         },
         expandButton: {
-            color: theme.palette.common.white
+            color: theme.palette.common.white,
+            borderRadius: ({hasGroups}) => !hasGroups && theme.spacing(2.5)
         },
         actionButtonsWrapper: {
             marginTop: theme.spacing(1)
@@ -315,7 +277,6 @@ const GroupStreamCardV2 = memo(({
                                     livestream,
                                     user,
                                     mobile,
-                                    fields,
                                     userData,
                                     firebase,
                                     livestreamId,
@@ -353,13 +314,25 @@ const GroupStreamCardV2 = memo(({
 
     const [cardHovered, setCardHovered] = useState(false)
     const [openMoreDetails, setOpenMoreDetails] = useState(false)
-    const classes = useStyles({cardHovered, mobile, hoverLeft, openMoreDetails, registered, expanded})
-    const [careerCenters, setCareerCenters] = useState([])
+    const [frontHeight, setFrontHeight] = useState(0);
     const [targetOptions, setTargetOptions] = useState([])
+    const [careerCenters, setCareerCenters] = useState([])
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [isHighlighted, setIsHighlighted] = useState(false)
     const [openJoinModal, setOpenJoinModal] = useState(false);
     const [fetchingCareerCenters, setFetchingCareerCenters] = useState(false)
+    const classes = useStyles({
+        cardHovered,
+        mobile,
+        hoverLeft,
+        openMoreDetails,
+        hasGroups: careerCenters.length,
+        registered,
+        isExpanded: expanded,
+        expanded: expanded && targetOptions.length,
+        frontHeight
+    })
+    const frontRef = useRef()
 
     const handleMouseLeft = () => {
         cardHovered && setCardHovered(false)
@@ -368,6 +341,12 @@ const GroupStreamCardV2 = memo(({
     const handleOpenMoreDetails = () => {
         setOpenMoreDetails(!openMoreDetails)
     }
+
+    useEffect(() => {
+        if (frontRef.current?.offsetHeight) {
+            setFrontHeight(frontRef.current.offsetHeight * 0.7)
+        }
+    }, [frontRef.current])
 
 
     useEffect(() => {
@@ -582,9 +561,20 @@ const GroupStreamCardV2 = memo(({
                 <div
                     onMouseLeave={handleMouseLeft}
                     className={classes.streamCard}>
-                    <CopyToClipboard color={cardHovered && "white"} className={classes.copyToClipBoard}
-                                     value={linkToStream}/>
-                    <Paper elevation={4} className={classes.front}>
+                    {mobile &&
+                    <CopyToClipboard
+                        color={cardHovered && "white"}
+                        className={classes.copyToClipBoard}
+                        value={linkToStream}/>}
+                    <Paper ref={frontRef} elevation={4} className={classes.front}>
+                        <Grow in={Boolean(userIsRegistered())}>
+                            <div className={classes.bookedIcon}>
+                                <CheckCircleRoundedIcon color="primary" fontSize="large"/>
+                                <Typography color="primary" variant="h6" className={classes.bookedText}>
+                                    Booked
+                                </Typography>
+                            </div>
+                        </Grow>
                         <div className={classes.logoTimeWrapper}>
                             <img className={classes.companyLogo} src={livestream.companyLogoUrl} alt=""/>
                         </div>
@@ -600,17 +590,25 @@ const GroupStreamCardV2 = memo(({
                             {!cardHovered &&
                             <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
                                  alt="background"/>}
-                            <Grow in={Boolean(userIsRegistered() && !cardHovered)}>
-                                <CheckCircleRoundedIcon fontSize="large" className={classes.bookedIcon}/>
-                            </Grow>
+                            {/*<Grow in={Boolean(userIsRegistered() && !cardHovered && !mobile)}>*/}
+                            {/*    <div className={classes.bookedIcon}>*/}
+                            {/*        <CheckCircleRoundedIcon fontSize="large"/>*/}
+                            {/*        <Typography variant="h6" className={classes.bookedText}>*/}
+                            {/*            Booked*/}
+                            {/*        </Typography>*/}
+                            {/*    </div>*/}
+                            {/*</Grow>*/}
                             <Typography variant={mobile ? "h6" : "h4"} align="center" className={classes.companyName}>
                                 {cardHovered || mobile ? livestream.title : livestream.company}
                             </Typography>
                             {!cardHovered &&
                             <div className={classes.speakersAndLogosWrapper}>
-                                <AvatarGroup max={3}>
-                                    {speakerElements}
-                                </AvatarGroup>
+                                {expanded ?
+                                    <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
+                                    :
+                                    <AvatarGroup max={3}>
+                                        {speakerElements}
+                                    </AvatarGroup>}
                                 {mobile &&
                                 <div className={classes.actionButtonsWrapper}>
                                     <DetailsButton
@@ -637,18 +635,22 @@ const GroupStreamCardV2 = memo(({
                                             <TargetOptions className={classes.optionChips} options={targetOptions}/>
                                         </div>}
                                     </Collapse>
-                                </div>
-                                }
-
-                                <div className={classes.companyLogosFrontWrapper}>
-                                    {logoElements}
-                                </div>
+                                </div>}
+                                <Grow unmountOnExit in={Boolean(logoElements.length)}>
+                                    <div className={classes.companyLogosFrontWrapper}>
+                                        {logoElements}
+                                    </div>
+                                </Grow>
                             </div>
                             }
                         </div>
                     </Paper>
                     <div onMouseLeave={handleMouseLeft} className={classes.background}>
                         <img className={classes.backgroundImage} src={livestream.backgroundImageUrl} alt="background"/>
+                        <CopyToClipboard
+                            color="white"
+                            className={classes.copyToClipBoard}
+                            value={linkToStream}/>
                         <div className={classes.buttonsWrapper}>
                             <DetailsButton
                                 groupData={groupData}

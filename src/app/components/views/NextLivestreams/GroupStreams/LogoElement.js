@@ -58,7 +58,7 @@ const LogoElement = ({careerCenter, userData, userFollows, livestreamId, hideFol
                      src={careerCenter.logoUrl}/>
             </div>
             {(!userFollows && !hideFollow) &&
-                <Button onClick={handleJoin} className={classes.followButton} variant="outlined"
+                <Button size="small" onClick={handleJoin} className={classes.followButton} variant="outlined"
                         color="primary"> Follow </Button>}
             <GroupJoinModal
                 open={openJoinModal}
