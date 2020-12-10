@@ -120,11 +120,23 @@ const useStyles = makeStyles((theme) => {
             background: paperColor,
             boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
         },
-        timeIndicator: {
+        dateTimeWrapper: {
             display: "flex",
             width: "100%",
             height: dateHeight,
             color: theme.palette.common.white
+        },
+        dateWrapper: {
+            width: "63%",
+            height: "100%",
+            display: "flex",
+            alignItems: "flex-end"
+        },
+        timeWrapper: {
+            width: "37%",
+            height: "100%",
+            display: "flex",
+            alignItems: "flex-end"
         },
         picker: {
             border: "2px solid blue"
@@ -133,8 +145,8 @@ const useStyles = makeStyles((theme) => {
             marginTop: `${theme.spacing(2)}px !important`,
             marginBottom: `${theme.spacing(2)}px !important`,
             fontWeight: "bold",
-            fontSize: theme.spacing(3.5),
-            textAlign: 'center',
+            // fontSize: theme.spacing(3.5),
+            // textAlign: 'center',
             display: "flex",
             alignItems: "center",
             width: ({cardHovered}) => cardHovered && "200%",
@@ -179,7 +191,7 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center"
         },
         companyLogosFrontWrapper: {
-            boxShadow:({expanded}) => expanded && theme.shadows[24],
+            boxShadow: ({expanded}) => expanded && theme.shadows[24],
             background: "white",
             padding: theme.spacing(1),
             display: "flex",
@@ -276,7 +288,7 @@ const useStyles = makeStyles((theme) => {
             top: 5,
             left: 5
         },
-        expandArea:{
+        expandArea: {
             marginTop: theme.spacing(1),
             background: ({registered}) => registered ? theme.palette.primary.main : theme.palette.navyBlue.main,
             color: "white",
@@ -285,14 +297,14 @@ const useStyles = makeStyles((theme) => {
                 color: "white !important"
             },
         },
-        optionChips:{
+        optionChips: {
             borderColor: "white",
             background: "none !important"
         },
-        expandButton:{
+        expandButton: {
             color: theme.palette.common.white
         },
-        actionButtonsWrapper:{
+        actionButtonsWrapper: {
             marginTop: theme.spacing(1)
         }
     })
@@ -540,6 +552,10 @@ const GroupStreamCardV2 = memo(({
         }
     }
 
+    const isNarrow = () => {
+        return Boolean(width === "md" && hasCategories)
+    }
+
     let logoElements = careerCenters.map(careerCenter => {
         return (
             <div className={classes.logoElement} key={careerCenter.groupId}>
@@ -572,9 +588,13 @@ const GroupStreamCardV2 = memo(({
                         <div className={classes.logoTimeWrapper}>
                             <img className={classes.companyLogo} src={livestream.companyLogoUrl} alt=""/>
                         </div>
-                        <div className={classes.timeIndicator}>
-                            <DateDisplay date={livestream.start.toDate()}/>
-                            <TimeDisplay date={livestream.start.toDate()}/>
+                        <div className={classes.dateTimeWrapper}>
+                            <div className={classes.dateWrapper}>
+                                <DateDisplay mobile={mobile} narrow={isNarrow()} date={livestream.start.toDate()}/>
+                            </div>
+                            <div className={classes.timeWrapper}>
+                                <TimeDisplay mobile={mobile} narrow={isNarrow()} date={livestream.start.toDate()}/>
+                            </div>
                         </div>
                         <div className={classes.lowerFrontContent}>
                             {!cardHovered &&
@@ -583,41 +603,42 @@ const GroupStreamCardV2 = memo(({
                             <Grow in={Boolean(userIsRegistered() && !cardHovered)}>
                                 <CheckCircleRoundedIcon fontSize="large" className={classes.bookedIcon}/>
                             </Grow>
-                            <Typography align="center" className={classes.companyName}>
-                                {cardHovered ? livestream.title : livestream.company}
+                            <Typography variant={mobile ? "h6" : "h4"} align="center" className={classes.companyName}>
+                                {cardHovered || mobile ? livestream.title : livestream.company}
                             </Typography>
                             {!cardHovered &&
                             <div className={classes.speakersAndLogosWrapper}>
                                 <AvatarGroup max={3}>
                                     {speakerElements}
                                 </AvatarGroup>
-                                {mobile&&
+                                {mobile &&
                                 <div className={classes.actionButtonsWrapper}>
-                                <DetailsButton
-                                    size="small"
-                                    groupData={groupData}
-                                    listenToUpcoming={listenToUpcoming}
-                                    livestream={livestream}/>
+                                    <DetailsButton
+                                        size="small"
+                                        groupData={groupData}
+                                        listenToUpcoming={listenToUpcoming}
+                                        livestream={livestream}/>
                                     <AttendButton
-                                    size="small"
-                                    handleRegisterClick={handleRegisterClick}
-                                    checkIfRegistered={checkIfRegistered}
-                                    user={user}/>
+                                        size="small"
+                                        handleRegisterClick={handleRegisterClick}
+                                        checkIfRegistered={checkIfRegistered}
+                                        user={user}/>
                                 </div>}
-                            {mobile &&
-                            <div className={classes.expandArea}>
-                                <Button className={classes.expandButton} onClick={() => setExpanded(!expanded)} fullWidth>
-                                    {expanded ? "Show less" : "See more"}
-                                </Button>
-                                <Collapse in={expanded}>
+                                {mobile &&
+                                <div className={classes.expandArea}>
+                                    <Button className={classes.expandButton} onClick={() => setExpanded(!expanded)}
+                                            fullWidth>
+                                        {expanded ? "Show less" : "See more"}
+                                    </Button>
+                                    <Collapse in={expanded}>
 
-                                    {!!targetOptions.length &&
-                                    <div className={classes.expandedOptionsWrapper}>
-                                        <TargetOptions className={classes.optionChips} options={targetOptions}/>
-                                    </div>}
-                                </Collapse>
-                            </div>
-                            }
+                                        {!!targetOptions.length &&
+                                        <div className={classes.expandedOptionsWrapper}>
+                                            <TargetOptions className={classes.optionChips} options={targetOptions}/>
+                                        </div>}
+                                    </Collapse>
+                                </div>
+                                }
 
                                 <div className={classes.companyLogosFrontWrapper}>
                                     {logoElements}
