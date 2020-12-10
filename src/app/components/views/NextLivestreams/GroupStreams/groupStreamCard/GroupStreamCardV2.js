@@ -144,7 +144,7 @@ const useStyles = makeStyles((theme) => {
             zIndex: 1,
         },
         companyLogosFrontWrapper: {
-            boxShadow: ({expanded}) => expanded && theme.shadows[24],
+            boxShadow: ({isExpanded}) => isExpanded && theme.shadows[24],
             background: "white",
             padding: theme.spacing(1),
             display: "flex",

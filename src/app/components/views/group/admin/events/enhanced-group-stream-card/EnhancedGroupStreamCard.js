@@ -181,8 +181,8 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
     });
 
     return (
-            <Box p={2} style={{width: "100%"}}>
-                <Typography gutterBottom style={{fontWeight: "bold"}} variant="h3">
+            <Box px={2} style={{width: "100%"}}>
+                <Typography gutterBottom align="center" style={{fontWeight: "bold"}} variant="h5">
                     {registeredStudentsFromGroup.length} students registered
                 </Typography>
                 <Button className={classes.button} onClick={() => setModalOpen(true)}
@@ -201,10 +201,11 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
                 <Fragment>
                     {!startDownloadingTalentPool || !hasDownloadedTalentPool ?
                         <div>
-                            <Button className={classes.button} fullWidth variant='outlined' primary="true"
+                            <Button className={classes.button} fullWidth variant='outlined'
                                     onClick={() => setStartDownloadingTalentPool(true)}
-                                    disabled={startDownloadingTalentPool}
-                                    loading={startDownloadingTalentPool ? "true" : "false"}>{startDownloadingTalentPool ? 'Generating Talent Pool...' : 'Generate Talent Pool'}</Button>
+                                    disabled={startDownloadingTalentPool}>
+                                {startDownloadingTalentPool ? 'Generating Talent Pool...' : 'Generate Talent Pool'}
+                            </Button>
                         </div> :
                         <CSVLink data={talentPool}
                                  filename={'TalentPool ' + livestream.company + ' ' + livestream.id + '.csv'}
@@ -222,6 +223,7 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
                             <div>
                                 <Button className={classes.button}
                                         fullWidth
+                                        style={{color: "white"}}
                                         startIcon={startDownloadingReport &&
                                         <CircularProgress size={20} color="inherit"/>}
                                         variant='outlined' onClick={() => setStartDownloadingReport(true)}
@@ -242,7 +244,7 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
                                                                       icons={icons}/>}>
                                 {({blob, url, loading, error}) => (
                                     <div>
-                                        <Button variant='outlined' color='primary'>Download Report</Button>
+                                        <Button className={classes.button} fullWidth variant='outlined' color='primary'>Download Report</Button>
                                     </div>
                                 )}
                             </PDFDownloadLink>
