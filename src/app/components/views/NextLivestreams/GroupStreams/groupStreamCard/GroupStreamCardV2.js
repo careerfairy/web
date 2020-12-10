@@ -224,10 +224,10 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center",
             width: "100%",
             borderRadius: theme.spacing(2.5),
-            paddingBottom: ({expanded}) => expanded && theme.spacing(2)
+            paddingBottom: ({isExpanded}) => isExpanded && theme.spacing(2)
         },
         lowerFrontBackgroundImage: {
-            paddingBottom: ({expanded}) => expanded && theme.spacing(4),
+            paddingBottom: ({isExpanded}) => isExpanded && theme.spacing(4),
             borderBottomRightRadius: "inherit",
             borderBottomLeftRadius: "inherit",
             position: "absolute",
