@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../context/firebase";
 import GroupStreamCard from "./GroupStreamCard";
@@ -47,6 +47,7 @@ const GroupStreams = ({
                           width
                       }) => {
         const classes = useStyles()
+        const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
         const searchedButNoResults = selectedOptions.length && !searching && !livestreams.length
 
         const renderStreamCards = livestreams?.map((livestream, index) => {
@@ -58,6 +59,8 @@ const GroupStreams = ({
                             index={index}
                             width={width}
                             mobile={mobile}
+                            setGlobalCardHighlighted={setGlobalCardHighlighted}
+                            globalCardHighlighted={globalCardHighlighted}
                             hasCategories={hasCategories}
                             groupData={groupData}
                             listenToUpcoming={listenToUpcoming}
