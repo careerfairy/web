@@ -142,7 +142,7 @@ const useStyles = makeStyles((theme) => {
             zIndex: 1,
         },
         companyLogosFrontWrapper: {
-            boxShadow: ({isExpanded}) => isExpanded && theme.shadows[24],
+            boxShadow: ({expanded}) => expanded && theme.shadows[24],
             background: "white",
             padding: theme.spacing(1),
             display: "flex",
@@ -169,7 +169,7 @@ const useStyles = makeStyles((theme) => {
             overflowY: 'auto',
             maxHeight: "40vh",
             padding: ({hasGroups}) => theme.spacing(!hasGroups ? 4 : 2),
-            paddingTop: 0
+            paddingTop: 0,
         },
         background: {
             transition: ({cardHovered}) => cardHovered && `${transition}, opacity 250ms linear`,
@@ -224,10 +224,10 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center",
             width: "100%",
             borderRadius: theme.spacing(2.5),
-            paddingBottom: ({isExpanded}) => isExpanded && theme.spacing(2)
+            // paddingBottom: ({isExpanded}) => isExpanded && theme.spacing(2)
         },
         lowerFrontBackgroundImage: {
-            paddingBottom: ({isExpanded}) => isExpanded && theme.spacing(4),
+            // paddingBottom: ({isExpanded}) => isExpanded && theme.spacing(4),
             borderBottomRightRadius: "inherit",
             borderBottomLeftRadius: "inherit",
             position: "absolute",
@@ -546,7 +546,7 @@ const GroupStreamCardV2 = memo(({
         );
     })
 
-    let speakerElements = livestream.speakers?.map(speaker => {
+    let speakerElements = [...livestream.speakers, ...livestream.speakers, ...livestream.speakers].map(speaker => {
         return (<Avatar
             key={speaker.id}
             src={speaker.avatar || speakerPlaceholder}

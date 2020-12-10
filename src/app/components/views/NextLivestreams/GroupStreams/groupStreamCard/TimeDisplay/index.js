@@ -48,7 +48,7 @@ const useStyles = makeStyles(theme => {
             marginLeft: theme.spacing(0.5),
         },
         yearText:{
-            fontSize: ({mobile}) => mobile && theme.spacing(4)
+            fontSize: ({mobile}) => mobile && theme.spacing(2)
 
         },
         dayText:{
@@ -67,11 +67,11 @@ export const DateDisplay = ({date, narrow, mobile}) => {
 
     return (
         <div className={classes.dateWrapper}>
-            <Typography className={classes.yearText} variant={narrow ? "h5" : "h4"}>
+            <Typography className={classes.yearText} variant={narrow ? "h6" : "h5"}>
                 {year}
             </Typography>
             <Typography gutterBottom className={classes.dayText} variant={narrow ? "h4" : "h3"}>
-                {`${dayOfWeek}, ${month} ${dayOfMonth}`}
+                {`${month} ${dayOfMonth}`}
             </Typography>
         </div>
     )
