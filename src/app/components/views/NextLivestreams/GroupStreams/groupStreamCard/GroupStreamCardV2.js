@@ -18,6 +18,7 @@ import CopyToClipboard from "../CopyToClipboard";
 import {AttendButton, DetailsButton} from "./actionButtons";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
 import {DateDisplay, TimeDisplay} from "./TimeDisplay";
+import EnhancedGroupStreamCard from "../../../group/admin/events/enhanced-group-stream-card/EnhancedGroupStreamCard";
 
 
 const useStyles = makeStyles((theme) => {
@@ -47,7 +48,7 @@ const useStyles = makeStyles((theme) => {
             transitionProperty: "transform",
             transitionDuration: `${theme.transitions.duration.shorter}ms`,
             transitionTimingFunction: theme.transitions.easing.easeInOut,
-            zIndex: ({cardHovered}) => cardHovered  && 1002,
+            zIndex: ({cardHovered}) => cardHovered && 1002,
             "& p": {
                 color: theme.palette.common.white
             },
@@ -127,7 +128,7 @@ const useStyles = makeStyles((theme) => {
                          }) => cardHovered ? "transparent" : registered ? theme.palette.primary.dark : theme.palette.navyBlue.main,
             boxShadow: ({cardHovered}) => cardHovered && "none",
             height: ({cardHovered, frontHeight}) => cardHovered ? frontHeight : "100%",
-            borderRadius: ({expanded}) => expanded ? `${theme.spacing(2.5)}px ${theme.spacing(2.5)}px 0 0` : theme.spacing(2.8),
+            borderRadius: ({expanded}) => expanded ? `${theme.spacing(2.5)}px` : theme.spacing(2.8),
 
         },
         speakersAndLogosWrapper: {
@@ -304,13 +305,16 @@ const GroupStreamCardV2 = memo(({
                                     index,
                                     width,
                                     setGlobalCardHighlighted,
-                                    globalCardHighlighted
+                                    globalCardHighlighted,
+                                    isAdmin,
+                                    isPastLivestream
                                 }) => {
 
     const router = useRouter();
     const absolutePath = router.asPath
     const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
     const frontRef = useRef()
+    console.log("-> mobile", mobile);
 
     function userIsRegistered() {
         if (!user || !livestream.registeredUsers) {
@@ -648,7 +652,11 @@ const GroupStreamCardV2 = memo(({
                                         {expanded ? "Show less" : "See more"}
                                     </Button>
                                     <Collapse in={expanded}>
-
+                                        {isAdmin && <EnhancedGroupStreamCard
+                                            isPastLivestream={isPastLivestream}
+                                            group={groupData}
+                                            livestream={livestream}
+                                            firebase={firebase} />}
                                         {!!targetOptions.length &&
                                         <div className={classes.expandedOptionsWrapper}>
                                             <TargetOptions className={classes.optionChips} options={targetOptions}/>
@@ -665,37 +673,38 @@ const GroupStreamCardV2 = memo(({
                         </div>
                     </Paper>
                     <ClickAwayListener onClickAway={throttleMouseLeave}>
-                    <Box
-                        className={classes.background}
-                        classes={{
-                            root: handlePulseBackground()
-                        }}>
-                        <img className={classes.backgroundImage} src={livestream.backgroundImageUrl} alt="background"/>
-                        <CopyToClipboard
-                            color="white"
-                            className={classes.copyToClipBoard}
-                            value={linkToStream}/>
-                        <div className={classes.buttonsWrapper}>
-                            <DetailsButton
-                                groupData={groupData}
-                                listenToUpcoming={listenToUpcoming}
-                                livestream={livestream}/>
-                            <AttendButton
-                                handleRegisterClick={handleRegisterClick}
-                                checkIfRegistered={checkIfRegistered}
-                                user={user}/>
-                        </div>
-                        <div className={classes.backgroundContent}>
-                            <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
-                            {!!targetOptions.length &&
-                            <div className={classes.optionsWrapper}>
-                                <TargetOptions className={classes.optionChips} options={targetOptions}/>
-                            </div>}
-                        </div>
-                        <div className={classes.logosBackWrapper}>
-                            {logoElements}
-                        </div>
-                    </Box>
+                        <Box
+                            className={classes.background}
+                            classes={{
+                                root: handlePulseBackground()
+                            }}>
+                            <img className={classes.backgroundImage} src={livestream.backgroundImageUrl}
+                                 alt="background"/>
+                            <CopyToClipboard
+                                color="white"
+                                className={classes.copyToClipBoard}
+                                value={linkToStream}/>
+                            <div className={classes.buttonsWrapper}>
+                                <DetailsButton
+                                    groupData={groupData}
+                                    listenToUpcoming={listenToUpcoming}
+                                    livestream={livestream}/>
+                                <AttendButton
+                                    handleRegisterClick={handleRegisterClick}
+                                    checkIfRegistered={checkIfRegistered}
+                                    user={user}/>
+                            </div>
+                            <div className={classes.backgroundContent}>
+                                <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
+                                {!!targetOptions.length &&
+                                <div className={classes.optionsWrapper}>
+                                    <TargetOptions className={classes.optionChips} options={targetOptions}/>
+                                </div>}
+                            </div>
+                            <div className={classes.logosBackWrapper}>
+                                {logoElements}
+                            </div>
+                        </Box>
                     </ClickAwayListener>
                 </div>
             </div>

@@ -72,6 +72,8 @@ const Events = (props) => {
                         livestream={livestream}
                         user={props.user}
                         shrink={true}
+                        mobile
+                        isAdmin
                         userData={props.userData}
                         fields={null}
                         groupData={props.group}/>
@@ -82,13 +84,16 @@ const Events = (props) => {
 
     let pastLivestreamElements = itemsPast.map((livestream, index) => {
         return (
-            <Grid key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={3} item>
+            <Grid style={{height: 620}} key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={3} item>
                     <GroupStreamCardV2
                         key={livestream.id}
+                        mobile
+                        isAdmin
                         livestreamId={livestream.id}
                         livestream={livestream}
                         user={props.user}
                         shrink={true}
+                        isPastLivestream={true}
                         userData={props.userData}
                         fields={null}
                         groupData={props.group}/>
