@@ -191,7 +191,7 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
                         variant='outlined'>
                     Edit Categories
                 </Button>
-                <CSVLink data={registeredStudentsFromGroup}
+                <CSVLink data={registeredStudentsFromGroup} separator={";"}
                          filename={'Registered Students ' + livestream.company + ' ' + livestream.id + '.csv'}
                          style={{color: 'red'}}>
                     <Button className={classes.button} fullWidth startIcon={<GetAppIcon/>} variant='outlined'>
@@ -207,7 +207,7 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
                                 {startDownloadingTalentPool ? 'Generating Talent Pool...' : 'Generate Talent Pool'}
                             </Button>
                         </div> :
-                        <CSVLink data={talentPool}
+                        <CSVLink data={talentPool} separator={";"}
                                  filename={'TalentPool ' + livestream.company + ' ' + livestream.id + '.csv'}
                                  style={{color: 'red'}}>
                             <Button className={classes.button} fullWidth startIcon={<GetAppIcon/>} variant='outlined'>

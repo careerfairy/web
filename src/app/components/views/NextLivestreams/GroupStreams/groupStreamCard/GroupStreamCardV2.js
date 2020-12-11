@@ -383,7 +383,7 @@ const GroupStreamCardV2 = memo(({
 
 
     useEffect(() => {
-        if (checkIfHighlighted() && !isHighlighted) {
+        if (checkIfHighlighted() && !isHighlighted && frontHeight) {
             setIsHighlighted(true)
             setGlobalCardHighlighted(true)
             if (mobile) {
@@ -394,7 +394,7 @@ const GroupStreamCardV2 = memo(({
         } else if (checkIfHighlighted() && isHighlighted) {
             setIsHighlighted(false)
         }
-    }, [livestreamId, id, careerCenterId, groupData.groupId]);
+    }, [livestreamId, id, careerCenterId, groupData.groupId,frontHeight]);
 
     useEffect(() => {
         if (groupData.categories && livestream.targetCategories) {
