@@ -34,11 +34,11 @@ const Events = (props) => {
     const [value, setValue] = React.useState(0);
 
     const [itemsPast, loadMorePast, hasMorePast, totalItemsPast] = useInfiniteScroll(
-        props.firebase.queryPastLiveStreamsByGroupId(props.group.id), 3, 3
+        props.firebase.queryPastLiveStreamsByGroupId(props.group.id), 6, 3
     );
 
     const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming, totalItemsUpcoming] = useInfiniteScroll(
-        props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id), 3, 3
+        props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id), 6, 3
     );
 
     const handleClose = () => {
