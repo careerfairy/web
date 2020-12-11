@@ -251,6 +251,7 @@ const useStyles = makeStyles((theme) => {
         },
         expandArea: {
             borderRadius: ({hasGroups}) => !hasGroups && theme.spacing(2.5),
+            border: ({hasGroups}) => !hasGroups && "1px solid black",
             marginTop: theme.spacing(1),
             background: ({registered}) => registered ? theme.palette.primary.dark : theme.palette.navyBlue.main,
             color: "white",
@@ -334,7 +335,7 @@ const GroupStreamCardV2 = memo(({
             return (index + 1) % 2 === 0 // Please hover only the 2nd/4th/last even element in the row to the left
         }
     }
-
+//
     const hoverLeft = useMemo(() => shouldHoverLeft(), [width, hasCategories])
     const registered = useMemo(() => userIsRegistered(), [livestream.registeredUsers])
     const [expanded, setExpanded] = useState(false);
