@@ -31,14 +31,14 @@ export default class DateUtil {
         return DateUtil.getMonth(JSDate.getMonth()) + ' ' 
                 + JSDate.getDate() + ', '
                 + JSDate.getHours() + ':'
-                + DateUtil.getTimeMinutes(JSDate.getMinutes()) + ' CET';
+                + DateUtil.getTimeMinutes(JSDate.getMinutes());
     }
 
     static getPrettyDateShort(JSDate) {
         return  JSDate.getDate() + '.'
                 + JSDate.getMonth() + ' ' 
                 + JSDate.getHours() + ':'
-                + DateUtil.getTimeMinutes(JSDate.getMinutes()) + ' CET';
+                + DateUtil.getTimeMinutes(JSDate.getMinutes());
     }
 
     static getPrettyDay(JSDate) {
@@ -48,7 +48,7 @@ export default class DateUtil {
 
     static getPrettyTime(JSDate) {
         return JSDate.getHours() + ':'
-        + DateUtil.getTimeMinutes(JSDate.getMinutes()) + ' CET';
+        + DateUtil.getTimeMinutes(JSDate.getMinutes());
     }
 
     static getMonth(JsDateMonth) {
