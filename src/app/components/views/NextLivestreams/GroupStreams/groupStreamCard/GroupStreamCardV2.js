@@ -86,7 +86,7 @@ const useStyles = makeStyles((theme) => {
             width: "100%",
             height: dateHeight,
             color: theme.palette.common.white,
-            zIndex: 1
+            // zIndex: 1
         },
         dateWrapper: {
             width: "50%",
