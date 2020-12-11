@@ -18,7 +18,8 @@ const useStyles = makeStyles(theme => ({
         width: "100%"
     },
     loadMoreButton:{
-        margin: theme.spacing(1)
+        marginTop: theme.spacing(1),
+        marginBottom: theme.spacing(1)
     }
 }))
 const Events = (props) => {

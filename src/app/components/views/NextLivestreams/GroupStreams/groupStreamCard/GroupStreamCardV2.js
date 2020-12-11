@@ -154,6 +154,7 @@ const useStyles = makeStyles((theme) => {
             borderRadius: "inherit",
             zIndex: 1,
             flex: ({mobile}) => mobile && 1,
+            maxHeight: 125
         },
 
         optionsWrapper: {
@@ -656,7 +657,7 @@ const GroupStreamCardV2 = memo(({
                                         {!cardHovered &&
                                         <>
                                             {expanded ?
-                                                <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
+                                                <Streamers speakers={livestream.speakers} cardHovered={expanded}/>
                                                 :
                                                 <AvatarGroup max={3}>
                                                     {speakerElements}
