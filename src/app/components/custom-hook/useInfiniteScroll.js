@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 
 
-const useInfiniteScroll = (query, limit = 3) => {
+const useInfiniteScroll = (query, limit = 3, loadAdditional = 0) => {
     const [hasMore, setHasMore] = useState(true)
     const [items, setItems] = useState([])
     const [totalItems, setTotalItems] = useState([])
@@ -33,8 +33,8 @@ const useInfiniteScroll = (query, limit = 3) => {
     const getMore = () => {
         const stillMore = Boolean(totalItems.length > items.length)
         if (stillMore) {
-        console.log("in the get more");
-            setEnd(prevState => prevState + limit)
+            console.log("in the get more");
+            setEnd(prevState => prevState + (limit + loadAdditional))
         }
     }
 

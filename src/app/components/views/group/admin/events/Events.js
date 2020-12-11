@@ -16,6 +16,9 @@ const useStyles = makeStyles(theme => ({
         margin: 0,
         marginTop: 8,
         width: "100%"
+    },
+    loadMoreButton:{
+        margin: theme.spacing(1)
     }
 }))
 const Events = (props) => {
@@ -30,11 +33,11 @@ const Events = (props) => {
     const [value, setValue] = React.useState(0);
 
     const [itemsPast, loadMorePast, hasMorePast, totalItemsPast] = useInfiniteScroll(
-        props.firebase.queryPastLiveStreamsByGroupId(props.group.id), 3
+        props.firebase.queryPastLiveStreamsByGroupId(props.group.id), 3, 3
     );
 
     const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming, totalItemsUpcoming] = useInfiniteScroll(
-        props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id), 3
+        props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id), 3, 3
     );
 
     const handleClose = () => {
@@ -74,6 +77,7 @@ const Events = (props) => {
                         shrink={true}
                         mobile
                         isAdmin
+                        hideActions
                         userData={props.userData}
                         fields={null}
                         groupData={props.group}/>
@@ -84,11 +88,12 @@ const Events = (props) => {
 
     let pastLivestreamElements = itemsPast.map((livestream, index) => {
         return (
-            <Grid style={{height: 620}} key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={3} item>
+            <Grid style={{height: 620}} key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={4} item>
                     <GroupStreamCardV2
                         key={livestream.id}
                         mobile
                         isAdmin
+                        hideActions
                         livestreamId={livestream.id}
                         livestream={livestream}
                         user={props.user}
@@ -128,7 +133,7 @@ const Events = (props) => {
                 <Grid className={classes.grid} container spacing={2}>
                     {pastLivestreamElements}
                 </Grid>
-                {hasMorePast && <Button fullWidth onClick={loadMorePast}>
+                {hasMorePast && <Button variant="outlined" className={classes.loadMoreButton} fullWidth onClick={loadMorePast}>
                     Load More
                 </Button>}
             </TabPanel>

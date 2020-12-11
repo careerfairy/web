@@ -56,9 +56,8 @@ const useStyles = makeStyles((theme) => {
         copyToClipBoard: {
             color: ({cardHovered}) => cardHovered && theme.palette.common.white,
             position: 'absolute',
-            top: 10,
-            right: '0',
-            zIndex: '999',
+            top: 0,
+            right: 0,
             fontWeight: 'bold',
             fontSize: '1.125rem',
             padding: '0.5em 0.5em 0.75em',
@@ -67,17 +66,18 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center"
         },
         companyLogo: {
-            maxWidth: "90%",
+            maxWidth: "80%",
             maxHeight: "65%"
         },
         companyLogoWrapper: {
+            position: "relative",
             height: 200,
             width: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            borderRadius: ({cardHovered}) => cardHovered ? `${theme.spacing(2)}px 0px` : `${theme.spacing(2)}px ${theme.spacing(2)}px 0px 0px`,
+            borderRadius: ({cardHovered}) => cardHovered && `${theme.spacing(2)}px 0px`,
             background: paperColor,
             boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
         },
@@ -188,6 +188,7 @@ const useStyles = makeStyles((theme) => {
             minWidth: "110%", // prevents single speaker cards from being too thin,
         },
         backgroundContent: {
+            marginTop: ({frontHeight, hideActions}) => hideActions && frontHeight / 2,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -228,7 +229,7 @@ const useStyles = makeStyles((theme) => {
             // paddingBottom: ({isExpanded}) => isExpanded && theme.spacing(2)
         },
         lowerFrontBackgroundImage: {
-            // paddingBottom: ({isExpanded}) => isExpanded && theme.spacing(4),
+            // paddingBottom: ({isExpanded}) => isExpanded && theme.spacing(4)
             borderBottomRightRadius: "inherit",
             borderBottomLeftRadius: "inherit",
             position: "absolute",
@@ -241,7 +242,6 @@ const useStyles = makeStyles((theme) => {
             color: "white",
             position: "absolute",
             top: 5,
-            left: 5,
             display: "flex",
             alignItems: "center"
         },
@@ -275,14 +275,17 @@ const useStyles = makeStyles((theme) => {
         },
         "@keyframes pulse": {
             "0%": {
+                borderRadius: theme.spacing(2.5),
                 MozBoxShadow: `0 0 0 0 ${fade(themeColor, 1)}`,
                 boxShadow: `0 0 0 0 ${fade(themeColor, 1)}`
             },
             "70%": {
+                borderRadius: theme.spacing(2.5),
                 MozBoxShadow: `0 0 0 15px ${fade(themeColor, 0)}`,
                 boxShadow: `0 0 0 15px ${fade(themeColor, 0)}`
             },
             "100%": {
+                borderRadius: theme.spacing(2.5),
                 MozBoxShadow: `0 0 0 0 ${fade(themeColor, 0)}`,
                 boxShadow: `0 0 0 0 ${fade(themeColor, 0)}`
             }
@@ -307,7 +310,8 @@ const GroupStreamCardV2 = memo(({
                                     setGlobalCardHighlighted,
                                     globalCardHighlighted,
                                     isAdmin,
-                                    isPastLivestream
+                                    isPastLivestream,
+                                    hideActions
                                 }) => {
 
     const router = useRouter();
@@ -344,6 +348,7 @@ const GroupStreamCardV2 = memo(({
     const [isHighlighted, setIsHighlighted] = useState(false)
     const [openJoinModal, setOpenJoinModal] = useState(false);
     const classes = useStyles({
+        hideActions,
         isHighlighted,
         cardHovered,
         mobile,
@@ -578,136 +583,147 @@ const GroupStreamCardV2 = memo(({
             alt={speaker.firstName}/>)
     })
 
+    const handleClickAwayDetails = () => {
+        if (expanded) {
+            setExpanded(false)
+        }
+    }
+
     return (
         <Fragment>
-            <div
-                className={classes.root}>
+            <ClickAwayListener onClickAway={handleClickAwayDetails}>
                 <div
-                    onMouseEnter={throttleMouseEnter}
-                    onMouseLeave={throttleMouseLeave}
-                    className={classes.streamCard}>
-                    {mobile &&
-                    <CopyToClipboard
-                        color={cardHovered && "white"}
-                        className={classes.copyToClipBoard}
-                        value={linkToStream}/>}
-                    <Paper
+                    className={classes.root}>
+                    <Box
+                        onMouseEnter={throttleMouseEnter}
+                        onMouseLeave={throttleMouseLeave}
                         classes={{
                             root: handlePulseFront()
                         }}
-                        ref={frontRef}
-                        elevation={4}
-                        className={classes.front}>
-                        <Grow in={Boolean(userIsRegistered())}>
-                            <div className={classes.bookedIcon}>
-                                <CheckCircleRoundedIcon color="primary" fontSize="large"/>
-                                <Typography color="primary" variant="h6" className={classes.bookedText}>
-                                    Booked
-                                </Typography>
+                        className={classes.streamCard}>
+                        <Paper
+                            ref={frontRef}
+                            elevation={4}
+                            className={classes.front}>
+
+                            <Grow in={Boolean(userIsRegistered())}>
+                                <div className={classes.bookedIcon}>
+                                    <CheckCircleRoundedIcon/>
+                                    <Typography variant="h6" className={classes.bookedText}>
+                                        Booked
+                                    </Typography>
+                                </div>
+                            </Grow>
+                            <div className={classes.dateTimeWrapper}>
+                                <div className={classes.dateWrapper}>
+                                    <DateDisplay mobile={mobile} narrow={isNarrow()} date={livestream.start.toDate()}/>
+                                </div>
+                                <div className={classes.timeWrapper}>
+                                    <TimeDisplay mobile={mobile} narrow={isNarrow()} date={livestream.start.toDate()}/>
+                                </div>
                             </div>
-                        </Grow>
-                        <div className={classes.companyLogoWrapper}>
-                            <img className={classes.companyLogo} src={livestream.companyLogoUrl} alt=""/>
-                        </div>
-                        <div className={classes.dateTimeWrapper}>
-                            <div className={classes.dateWrapper}>
-                                <DateDisplay mobile={mobile} narrow={isNarrow()} date={livestream.start.toDate()}/>
-                            </div>
-                            <div className={classes.timeWrapper}>
-                                <TimeDisplay mobile={mobile} narrow={isNarrow()} date={livestream.start.toDate()}/>
-                            </div>
-                        </div>
-                        <div className={classes.lowerFrontContent}>
-                            {!cardHovered &&
-                            <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
-                                 alt="background"/>}
-                            <Typography variant={mobile ? "h6" : "h4"} align="center" className={classes.companyName}>
-                                {cardHovered || mobile ? livestream.title : livestream.company}
-                            </Typography>
-                            {!cardHovered &&
-                            <div className={classes.speakersAndLogosWrapper}>
-                                {expanded ?
-                                    <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
-                                    :
-                                    <AvatarGroup max={3}>
-                                        {speakerElements}
-                                    </AvatarGroup>}
+                            <div className={classes.companyLogoWrapper}>
                                 {mobile &&
-                                <div className={classes.actionButtonsWrapper}>
+                                <CopyToClipboard
+                                    color={cardHovered && "white"}
+                                    className={classes.copyToClipBoard}
+                                    value={linkToStream}/>}
+                                <img className={classes.companyLogo} src={livestream.companyLogoUrl} alt=""/>
+                            </div>
+
+                            <div className={classes.lowerFrontContent}>
+                                {!cardHovered &&
+                                <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
+                                     alt="background"/>}
+                                <Typography variant={mobile ? "h6" : "h4"} align="center"
+                                            className={classes.companyName}>
+                                    {cardHovered || mobile ? livestream.title : livestream.company}
+                                </Typography>
+                                {!cardHovered &&
+                                <div className={classes.speakersAndLogosWrapper}>
+                                    {expanded ?
+                                        <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
+                                        :
+                                        <AvatarGroup max={3}>
+                                            {speakerElements}
+                                        </AvatarGroup>}
+                                    {mobile && !hideActions &&
+                                    <div className={classes.actionButtonsWrapper}>
+                                        <DetailsButton
+                                            size="small"
+                                            groupData={groupData}
+                                            listenToUpcoming={listenToUpcoming}
+                                            livestream={livestream}/>
+                                        <AttendButton
+                                            size="small"
+                                            handleRegisterClick={handleRegisterClick}
+                                            checkIfRegistered={checkIfRegistered}
+                                            user={user}/>
+                                    </div>}
+                                    {mobile &&
+                                    <div className={classes.expandArea}>
+                                        <Button className={classes.expandButton} onClick={() => setExpanded(!expanded)}
+                                                fullWidth>
+                                            {expanded ? "Show less" : "See more"}
+                                        </Button>
+                                        <Collapse in={expanded}>
+                                            {isAdmin && <EnhancedGroupStreamCard
+                                                isPastLivestream={isPastLivestream}
+                                                group={groupData}
+                                                livestream={livestream}
+                                                firebase={firebase}/>}
+                                            {!!targetOptions.length &&
+                                            <div className={classes.expandedOptionsWrapper}>
+                                                <TargetOptions className={classes.optionChips} options={targetOptions}/>
+                                            </div>}
+                                        </Collapse>
+                                    </div>}
+                                    <Grow unmountOnExit in={Boolean(logoElements.length)}>
+                                        <div className={classes.companyLogosFrontWrapper}>
+                                            {logoElements}
+                                        </div>
+                                    </Grow>
+                                </div>
+                                }
+                            </div>
+                        </Paper>
+                        <ClickAwayListener onClickAway={throttleMouseLeave}>
+                            <Box
+                                className={classes.background}
+                                classes={{
+                                    root: handlePulseBackground()
+                                }}>
+                                <img className={classes.backgroundImage} src={livestream.backgroundImageUrl}
+                                     alt="background"/>
+                                <CopyToClipboard
+                                    color="white"
+                                    className={classes.copyToClipBoard}
+                                    value={linkToStream}/>
+                                {!hideActions && <div className={classes.buttonsWrapper}>
                                     <DetailsButton
-                                        size="small"
                                         groupData={groupData}
                                         listenToUpcoming={listenToUpcoming}
                                         livestream={livestream}/>
                                     <AttendButton
-                                        size="small"
                                         handleRegisterClick={handleRegisterClick}
                                         checkIfRegistered={checkIfRegistered}
                                         user={user}/>
                                 </div>}
-                                {mobile &&
-                                <div className={classes.expandArea}>
-                                    <Button className={classes.expandButton} onClick={() => setExpanded(!expanded)}
-                                            fullWidth>
-                                        {expanded ? "Show less" : "See more"}
-                                    </Button>
-                                    <Collapse in={expanded}>
-                                        {isAdmin && <EnhancedGroupStreamCard
-                                            isPastLivestream={isPastLivestream}
-                                            group={groupData}
-                                            livestream={livestream}
-                                            firebase={firebase} />}
-                                        {!!targetOptions.length &&
-                                        <div className={classes.expandedOptionsWrapper}>
-                                            <TargetOptions className={classes.optionChips} options={targetOptions}/>
-                                        </div>}
-                                    </Collapse>
-                                </div>}
-                                <Grow unmountOnExit in={Boolean(logoElements.length)}>
-                                    <div className={classes.companyLogosFrontWrapper}>
-                                        {logoElements}
-                                    </div>
-                                </Grow>
-                            </div>
-                            }
-                        </div>
-                    </Paper>
-                    <ClickAwayListener onClickAway={throttleMouseLeave}>
-                        <Box
-                            className={classes.background}
-                            classes={{
-                                root: handlePulseBackground()
-                            }}>
-                            <img className={classes.backgroundImage} src={livestream.backgroundImageUrl}
-                                 alt="background"/>
-                            <CopyToClipboard
-                                color="white"
-                                className={classes.copyToClipBoard}
-                                value={linkToStream}/>
-                            <div className={classes.buttonsWrapper}>
-                                <DetailsButton
-                                    groupData={groupData}
-                                    listenToUpcoming={listenToUpcoming}
-                                    livestream={livestream}/>
-                                <AttendButton
-                                    handleRegisterClick={handleRegisterClick}
-                                    checkIfRegistered={checkIfRegistered}
-                                    user={user}/>
-                            </div>
-                            <div className={classes.backgroundContent}>
-                                <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
-                                {!!targetOptions.length &&
-                                <div className={classes.optionsWrapper}>
-                                    <TargetOptions className={classes.optionChips} options={targetOptions}/>
-                                </div>}
-                            </div>
-                            <div className={classes.logosBackWrapper}>
-                                {logoElements}
-                            </div>
-                        </Box>
-                    </ClickAwayListener>
+                                <div className={classes.backgroundContent}>
+                                    <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
+                                    {!!targetOptions.length &&
+                                    <div className={classes.optionsWrapper}>
+                                        <TargetOptions className={classes.optionChips} options={targetOptions}/>
+                                    </div>}
+                                </div>
+                                <div className={classes.logosBackWrapper}>
+                                    {logoElements}
+                                </div>
+                            </Box>
+                        </ClickAwayListener>
+                    </Box>
                 </div>
-            </div>
+            </ClickAwayListener>
             <Wave/>
             <GroupJoinToAttendModal
                 open={openJoinModal}
