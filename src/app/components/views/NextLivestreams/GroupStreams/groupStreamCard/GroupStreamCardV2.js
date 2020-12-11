@@ -231,8 +231,9 @@ const useStyles = makeStyles((theme) => {
         },
         lowerFrontBackgroundImage: {
             // paddingBottom: ({isExpanded}) => isExpanded && theme.spacing(4)
-            borderBottomRightRadius: "inherit",
-            borderBottomLeftRadius: "inherit",
+            // borderBottomRightRadius: "inherit",
+            // borderBottomLeftRadius: "inherit",
+            borderRadius: "inherit",
             position: "absolute",
             opacity: '.3',
             height: '100%',
@@ -272,11 +273,11 @@ const useStyles = makeStyles((theme) => {
         actionButtonsWrapper: {
             marginTop: theme.spacing(1)
         },
-        avaGroupWrapper: {
-            width: "100%",
+        titleAndSpeakersWrapper: {
             flex: 1,
             display: "flex",
-            justifyContent: "center",
+            justifyContent: ({cardHovered}) => !cardHovered && "space-evenly",
+            flexDirection: "column",
             alignItems: "center"
         },
         pulseAnimate: {
@@ -644,18 +645,23 @@ const GroupStreamCardV2 = memo(({
 
                             <div className={classes.lowerFrontContent}>
                                 <div className={classes.speakersAndLogosWrapper}>
-                                    <Typography variant={mobile ? "h6" : cardHovered ? "h4" : "h5"} align="center"
-                                                className={classes.companyName}>
-                                        {livestream.title}
-                                    </Typography>
+                                    <div className={classes.titleAndSpeakersWrapper}>
+                                        <Typography variant={mobile ? "h6" : cardHovered ? "h4" : "h5"} align="center"
+                                                    className={classes.companyName}>
+                                            {livestream.title}
+                                        </Typography>
+                                        {!cardHovered &&
+                                        <>
+                                            {expanded ?
+                                                <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
+                                                :
+                                                <AvatarGroup max={3}>
+                                                    {speakerElements}
+                                                </AvatarGroup>}
+                                        </>}
+                                    </div>
                                     {!cardHovered &&
                                     <>
-                                        {expanded ?
-                                            <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
-                                            :
-                                            <AvatarGroup max={3}>
-                                                {speakerElements}
-                                            </AvatarGroup>}
                                         {mobile && !hideActions &&
                                         <div className={classes.actionButtonsWrapper}>
                                             <DetailsButton
