@@ -58,7 +58,7 @@ const GroupStreams = ({
             if (livestream) {
                 return (
                     <Grid style={{height: mobile ? 620 : 600}} key={livestream.id} xs={12} sm={12} md={6}
-                          lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 3} item>
+                          lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 4} item>
                         <GroupStreamCardV2
                             index={index}
                             width={width}
@@ -83,7 +83,7 @@ const GroupStreams = ({
 
         return (
             <Grid item xs={12} sm={12} md={hasCategories ? 8 : 12} lg={hasCategories ? 8 : 12} xl={hasCategories ? 8 : 12}>
-                <Grid container spacing={2}>
+                <Grid container spacing={4}>
                     {groupData.id || listenToUpcoming ? (searching ?
                         <Grid md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
                             <LinearProgress style={{width: "80%", marginTop: 100}} color="primary"/>

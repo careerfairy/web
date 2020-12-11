@@ -9,7 +9,7 @@ import {MultilineText} from "../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        height: "100%"
+        // height: "100%"
         // paddingBottom: 0,
         // paddingTop: ({mobile}) => mobile ? 0 : 14,
         // width: ({mobile}) => mobile ? "100%" : "40%",

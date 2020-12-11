@@ -71,21 +71,22 @@ const useStyles = makeStyles((theme) => {
         },
         companyLogoWrapper: {
             position: "relative",
-            height: 200,
+            height: 140,
             width: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             borderRadius: ({cardHovered}) => cardHovered && `${theme.spacing(2)}px 0px`,
-            background: paperColor,
+            background: ({cardHovered}) => fade(paperColor, 1),
             boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
         },
         dateTimeWrapper: {
             display: "flex",
             width: "100%",
             height: dateHeight,
-            color: theme.palette.common.white
+            color: theme.palette.common.white,
+            zIndex: 1
         },
         dateWrapper: {
             width: "50%",
@@ -108,7 +109,7 @@ const useStyles = makeStyles((theme) => {
             display: "flex",
             alignItems: "center",
             width: ({cardHovered}) => cardHovered && "200%",
-            height: ({cardHovered}) => cardHovered ? "auto" : 60,
+            // height: ({cardHovered}) => cardHovered ? "auto" : 60,
             padding: `0 ${theme.spacing(1)}px`,
             color: "white !important",
             zIndex: 1,
@@ -119,7 +120,6 @@ const useStyles = makeStyles((theme) => {
             width: "100%",
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
             transform: ({cardHovered}) => cardHovered && `translateY(${frontHoveredTranslate}px) scale(${frontHoveredScale})`,
             transition: '250ms',
             background: ({
@@ -127,13 +127,13 @@ const useStyles = makeStyles((theme) => {
                              registered
                          }) => cardHovered ? "transparent" : registered ? theme.palette.primary.dark : theme.palette.navyBlue.main,
             boxShadow: ({cardHovered}) => cardHovered && "none",
-            height: ({cardHovered, frontHeight}) => cardHovered ? frontHeight : "100%",
+            // height: ({cardHovered, frontHeight}) => cardHovered ? frontHeight : "100%",
             borderRadius: ({expanded}) => expanded ? `${theme.spacing(2.5)}px` : theme.spacing(2.8),
 
         },
         speakersAndLogosWrapper: {
             flex: 1,
-            opacity: ({cardHovered}) => cardHovered && 0,
+            // opacity: ({cardHovered}) => cardHovered && 0,
             width: "100%",
             display: "flex",
             flexDirection: "column",
@@ -154,13 +154,7 @@ const useStyles = makeStyles((theme) => {
             zIndex: 1,
             flex: ({mobile}) => mobile && 1,
         },
-        buttonsWrapper: {
-            marginTop: ({frontHeight}) => frontHeight / 2,
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: theme.spacing(1),
-            flexWrap: "wrap"
-        },
+
         optionsWrapper: {
             overflowX: 'hidden',
             overflowY: 'auto',
@@ -188,13 +182,20 @@ const useStyles = makeStyles((theme) => {
             minWidth: "110%", // prevents single speaker cards from being too thin,
         },
         backgroundContent: {
-            marginTop: ({frontHeight, hideActions}) => hideActions && frontHeight / 2,
+            marginTop: ({frontHeight, hideActions}) => hideActions && frontHeight / 2.2,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             zIndex: 1005,
-            padding: theme.spacing(2),
+            padding: theme.spacing(1),
             paddingTop: 0
+        },
+        buttonsWrapper: {
+            marginTop: ({frontHeight}) => frontHeight / 2.2,
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: theme.spacing(1),
+            flexWrap: "wrap"
         },
         logosBackWrapper: {
             display: "flex",
@@ -270,6 +271,13 @@ const useStyles = makeStyles((theme) => {
         },
         actionButtonsWrapper: {
             marginTop: theme.spacing(1)
+        },
+        avaGroupWrapper: {
+            width: "100%",
+            flex: 1,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
         },
         pulseAnimate: {
             animation: `$pulse 1s infinite`
@@ -606,7 +614,9 @@ const GroupStreamCardV2 = memo(({
                             ref={frontRef}
                             elevation={4}
                             className={classes.front}>
-
+                            {!cardHovered &&
+                            <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
+                                 alt="background"/>}
                             <Grow in={Boolean(userIsRegistered())}>
                                 <div className={classes.bookedIcon}>
                                     <CheckCircleRoundedIcon/>
@@ -633,59 +643,60 @@ const GroupStreamCardV2 = memo(({
                             </div>
 
                             <div className={classes.lowerFrontContent}>
-                                {!cardHovered &&
-                                <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
-                                     alt="background"/>}
-                                <Typography variant={mobile ? "h6" : "h4"} align="center"
-                                            className={classes.companyName}>
-                                    {cardHovered || mobile ? livestream.title : livestream.company}
-                                </Typography>
-                                {!cardHovered &&
                                 <div className={classes.speakersAndLogosWrapper}>
-                                    {expanded ?
-                                        <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
-                                        :
-                                        <AvatarGroup max={3}>
-                                            {speakerElements}
-                                        </AvatarGroup>}
-                                    {mobile && !hideActions &&
-                                    <div className={classes.actionButtonsWrapper}>
-                                        <DetailsButton
-                                            size="small"
-                                            groupData={groupData}
-                                            listenToUpcoming={listenToUpcoming}
-                                            livestream={livestream}/>
-                                        <AttendButton
-                                            size="small"
-                                            handleRegisterClick={handleRegisterClick}
-                                            checkIfRegistered={checkIfRegistered}
-                                            user={user}/>
-                                    </div>}
-                                    {mobile &&
-                                    <div className={classes.expandArea}>
-                                        <Button className={classes.expandButton} onClick={() => setExpanded(!expanded)}
-                                                fullWidth>
-                                            {expanded ? "Show less" : "See more"}
-                                        </Button>
-                                        <Collapse in={expanded}>
-                                            {isAdmin && <EnhancedGroupStreamCard
-                                                isPastLivestream={isPastLivestream}
-                                                group={groupData}
-                                                livestream={livestream}
-                                                firebase={firebase}/>}
-                                            {!!targetOptions.length &&
-                                            <div className={classes.expandedOptionsWrapper}>
-                                                <TargetOptions className={classes.optionChips} options={targetOptions}/>
-                                            </div>}
-                                        </Collapse>
-                                    </div>}
-                                    <Grow unmountOnExit in={Boolean(logoElements.length)}>
-                                        <div className={classes.companyLogosFrontWrapper}>
-                                            {logoElements}
-                                        </div>
-                                    </Grow>
+                                    <Typography variant={mobile ? "h6" : cardHovered ? "h4" : "h5"} align="center"
+                                                className={classes.companyName}>
+                                        {livestream.title}
+                                    </Typography>
+                                    {!cardHovered &&
+                                    <>
+                                        {expanded ?
+                                            <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
+                                            :
+                                            <AvatarGroup max={3}>
+                                                {speakerElements}
+                                            </AvatarGroup>}
+                                        {mobile && !hideActions &&
+                                        <div className={classes.actionButtonsWrapper}>
+                                            <DetailsButton
+                                                size="small"
+                                                groupData={groupData}
+                                                listenToUpcoming={listenToUpcoming}
+                                                livestream={livestream}/>
+                                            <AttendButton
+                                                size="small"
+                                                handleRegisterClick={handleRegisterClick}
+                                                checkIfRegistered={checkIfRegistered}
+                                                user={user}/>
+                                        </div>}
+                                        {mobile &&
+                                        <div className={classes.expandArea}>
+                                            <Button className={classes.expandButton}
+                                                    onClick={() => setExpanded(!expanded)}
+                                                    fullWidth>
+                                                {expanded ? "Show less" : "See more"}
+                                            </Button>
+                                            <Collapse in={expanded}>
+                                                {isAdmin && <EnhancedGroupStreamCard
+                                                    isPastLivestream={isPastLivestream}
+                                                    group={groupData}
+                                                    livestream={livestream}
+                                                    firebase={firebase}/>}
+                                                {!!targetOptions.length &&
+                                                <div className={classes.expandedOptionsWrapper}>
+                                                    <TargetOptions className={classes.optionChips}
+                                                                   options={targetOptions}/>
+                                                </div>}
+                                            </Collapse>
+                                        </div>}
+                                        <Grow in={Boolean(logoElements.length)}>
+                                            <div className={classes.companyLogosFrontWrapper}>
+                                                {logoElements}
+                                            </div>
+                                        </Grow>
+                                    </>
+                                    }
                                 </div>
-                                }
                             </div>
                         </Paper>
                         <ClickAwayListener onClickAway={throttleMouseLeave}>

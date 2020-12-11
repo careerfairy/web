@@ -9,10 +9,10 @@ import withWidth from '@material-ui/core/withWidth';
 const DesktopFeed = ({groupData, hasCategories, userData, alreadyJoined, handleToggleActive, mobile, user, livestreams, searching, livestreamId, careerCenterId, listenToUpcoming, selectedOptions, width}) => {
     const theme = useTheme()
     return (
-        <Container maxWidth={false} disableGutters style={{flex: 1, display: "flex", height: "50vh"}}>
+        <Container maxWidth="lg" disableGutters style={{flex: 1, display: "flex", height: "50vh"}}>
             <Grid
                 container
-                spacing={2}
+                spacing={4}
                 style={{margin: theme.spacing(1), height: "fit-content"}}
             >
             {hasCategories ?
