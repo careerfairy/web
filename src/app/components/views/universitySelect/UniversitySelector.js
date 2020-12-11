@@ -23,9 +23,8 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
                         const querySnapshot = await firebase.getUniversitiesFromCountryCode(universityCountryCode)
                         const fetchedUniversities = querySnapshot.data().universities
                         setUniversities([...fetchedUniversities, otherObj])
-                    } else {
-                        setFieldValue("universityCode", "other")
-                    }
+                    } 
+                    setFieldValue("university", {code: "othe", name: "Other"})
                     return setLoading(false)
                 } catch (e) {
                     console.log("error in fetch universities", e)

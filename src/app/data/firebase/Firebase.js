@@ -1201,10 +1201,10 @@ class Firebase {
     };
 
     listenToUpcomingLivestreams = (callback) => {
-        var ninetyMinutesInMilliseconds = 1000 * 60 * 90;
+        var oneDayInMilliseconds = 1000 * 60 * 60 * 24;
         let ref = this.firestore
             .collection("livestreams")
-            .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
+            .where("start", ">", new Date(Date.now() - oneDayInMilliseconds))
             .orderBy("start", "asc");
         return ref.onSnapshot(callback);
     };
@@ -1312,6 +1312,15 @@ class Firebase {
             .collection("icons")
             .orderBy("timestamp", "desc")
             .limit(1)
+        return ref.onSnapshot(callback);
+    };
+
+    listenToTotalLivestreamIcons = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("icons")
+            .orderBy("timestamp", "desc");
         return ref.onSnapshot(callback);
     };
 
