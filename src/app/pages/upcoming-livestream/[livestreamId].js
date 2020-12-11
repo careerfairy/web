@@ -863,11 +863,11 @@ function UpcomingLivestream(props) {
                 .livestream-title {
                     font-size: calc(1.5em + 1.5vw);
                     color: rgb(44, 66, 81);
-                    text-align: left;
                     line-height: 1.4em;
                     font-weight: 700;
                     max-width: 800px;
                     margin: 0 auto;
+                    text-align: center;
                 }
 
                 .livestream-speaker-avatar-capsule {
