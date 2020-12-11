@@ -83,7 +83,7 @@ const GroupStreams = ({
 
         return (
             <Grid item xs={12} sm={12} md={hasCategories ? 8 : 12} lg={hasCategories ? 8 : 12} xl={hasCategories ? 8 : 12}>
-                <Grid container spacing={4}>
+                <Grid container spacing={mobile? 2: 4}>
                     {groupData.id || listenToUpcoming ? (searching ?
                         <Grid md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
                             <LinearProgress style={{width: "80%", marginTop: 100}} color="primary"/>

@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
     const paperColor = theme.palette.background.paper
     const frontHoveredScale = 0.7
-    const frontHoveredTranslate = -115
+    const frontHoveredTranslate = -100
     const dateHeight = 100
     const themeColor = theme.palette.primary.main
     return ({
@@ -128,6 +128,7 @@ const useStyles = makeStyles((theme) => {
                          }) => cardHovered ? "transparent" : registered ? theme.palette.primary.dark : theme.palette.navyBlue.main,
             boxShadow: ({cardHovered}) => cardHovered && "none",
             // height: ({cardHovered, frontHeight}) => cardHovered ? frontHeight : "100%",
+            height: ({cardHovered, frontHeight}) => cardHovered && "fit-content",
             borderRadius: ({expanded}) => expanded ? `${theme.spacing(2.5)}px` : theme.spacing(2.8),
 
         },
@@ -243,13 +244,15 @@ const useStyles = makeStyles((theme) => {
         bookedIcon: {
             color: "white",
             position: "absolute",
+            left: theme.spacing(1),
             top: 5,
             display: "flex",
             alignItems: "center"
         },
         bookedText: {
             marginLeft: theme.spacing(1),
-            fontWeight: "bold"
+            fontWeight: "bold",
+            color: theme.palette.primary.main
         },
         expandArea: {
             borderRadius: ({hasGroups}) => !hasGroups && theme.spacing(2.5),
@@ -618,14 +621,6 @@ const GroupStreamCardV2 = memo(({
                             {!cardHovered &&
                             <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
                                  alt="background"/>}
-                            <Grow in={Boolean(userIsRegistered())}>
-                                <div className={classes.bookedIcon}>
-                                    <CheckCircleRoundedIcon/>
-                                    <Typography variant="h6" className={classes.bookedText}>
-                                        Booked
-                                    </Typography>
-                                </div>
-                            </Grow>
                             <div className={classes.dateTimeWrapper}>
                                 <div className={classes.dateWrapper}>
                                     <DateDisplay mobile={mobile} narrow={isNarrow()} date={livestream.start.toDate()}/>
@@ -635,6 +630,14 @@ const GroupStreamCardV2 = memo(({
                                 </div>
                             </div>
                             <div className={classes.companyLogoWrapper}>
+                                <Grow in={Boolean(userIsRegistered())}>
+                                    <div className={classes.bookedIcon}>
+                                        <CheckCircleRoundedIcon color="primary" />
+                                        <Typography variant="h6" className={classes.bookedText}>
+                                            Booked
+                                        </Typography>
+                                    </div>
+                                </Grow>
                                 {mobile &&
                                 <CopyToClipboard
                                     color={cardHovered && "white"}
