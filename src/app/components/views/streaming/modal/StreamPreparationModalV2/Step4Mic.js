@@ -64,25 +64,7 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
         }
     }, [devices])
 
-    const initialAudioRef = useRef(null);
-
     useEffect(() => {
-        if (localStream) {
-            initialAudioRef.current.srcObject = localStream;
-            return () => {
-                initialAudioRef.current.srcObject = null;
-            }
-        } 
-    }, [localStream]);
-
-    useEffect(() => {
-        if (!streamerReady && speakerSource && initialAudioRef) {
-            attachSinkId(initialAudioRef.current, speakerSource)
-        }
-    }, [streamerReady, speakerSource, initialAudioRef])
-
-    useEffect(() => {
-        setPlaySound(true)
         handleMarkIncomplete()
     }, [])
 
@@ -135,7 +117,6 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
 
     return (
         <Grid container spacing={4}>
-            <audio ref={initialAudioRef} autoPlay/>
             {localMicrophones.length && 
             <Grid item lg={12} md={12} sm={12} xs={12}>
                 <FormControl style={{marginBottom: 10}} disabled={!devices.audioInputList.length} fullWidth variant="outlined">
@@ -155,11 +136,13 @@ const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySoun
                         })}
                     </Select>
                 </FormControl>
-                <SoundLevelDisplayer audioLevel={audioLevel}/>
             </Grid>}
-            <Grid lg={12} md={12} sm={12} xs={12} style={{padding: "3rem 0"}} item>
-                <Typography align="center" variant="h5"
-                            gutterBottom><b>{allTested ? "We have tested all your Microphones" : "Speak and pause, do you hear a replay?"}</b></Typography>
+            <Grid lg={12} md={12} sm={12} xs={12} style={{padding: "0 0 3rem 0"}} item>
+                <Typography align="center" variant="h5" style={{ margin: '0 auto', width: '70%'}}
+                            gutterBottom><b>{allTested ? "We have tested all your Microphones" : "Speak into the microphone. Do you see the indicator moving?"}</b></Typography>
+                <div style={{ textAlign: 'center', margin: '20px auto'}}>
+                    <SoundLevelDisplayer audioLevel={audioLevel}/>
+                </div>
                 <div className={classes.buttons}>
                     {allTested ?
                         <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
