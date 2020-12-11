@@ -1193,18 +1193,22 @@ class Firebase {
     };
 
     getPastLivestreams = () => {
-        let ref = this.firestore
+        let START_DATE_FOR_REPORTED_EVENTS = 'September 1, 2020 00:00:00';
+        const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
+        return this.firestore
             .collection("livestreams")
-            .where("type", "==", "past")
-            .orderBy("rank", "asc");
-        return ref.get();
+            .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
+            .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
+            .where("test", "==", false)
+            .orderBy("start", "desc")
+            .get();
     };
 
     listenToUpcomingLivestreams = (callback) => {
-        var oneDayInMilliseconds = 1000 * 60 * 60 * 24;
+        var fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
         let ref = this.firestore
             .collection("livestreams")
-            .where("start", ">", new Date(Date.now() - oneDayInMilliseconds))
+            .where("start", ">", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
             .orderBy("start", "asc");
         return ref.onSnapshot(callback);
     };
