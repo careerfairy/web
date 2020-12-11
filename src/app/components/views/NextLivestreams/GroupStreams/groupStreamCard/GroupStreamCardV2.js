@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
     const paperColor = theme.palette.background.paper
     const frontHoveredScale = 0.7
-    const frontHoveredTranslate = -100
+    const frontHoveredTranslate = -90
     const dateHeight = 100
     const themeColor = theme.palette.primary.main
     return ({
