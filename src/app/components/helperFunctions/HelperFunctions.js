@@ -1,4 +1,5 @@
 import {isEmpty} from 'lodash/fp'
+import React from "react";
 
 var dayjs = require('dayjs');
 var relativeTime = require('dayjs/plugin/relativeTime')
@@ -83,5 +84,9 @@ export const getServerSideRouterQuery = (queryKey, router) => {
             return null
         }
     }
+}
+
+export const MultilineText = ({text}) => {
+    return text.split('\\n').map((item, i) => <p key={i}>{item}</p>)
 }
 

@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center"
         },
         companyLogo: {
-            maxWidth: "80%",
+            maxWidth: "70%",
             maxHeight: "65%"
         },
         companyLogoWrapper: {
