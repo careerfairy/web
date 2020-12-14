@@ -41,10 +41,10 @@ const useStyles = makeStyles((theme) => {
             height: "100%",
             position: "relative",
             webKitPosition: "relative",
-            transform: ({
-                            hoverLeft,
-                            cardHovered
-                        }) => cardHovered ? hoverLeft ? `translate(-25%)` : `translate(25%)` : "none",
+            // transform: ({
+            //                 hoverLeft,
+            //                 cardHovered
+            //             }) => cardHovered ? hoverLeft ? `translate(-25%)` : `translate(25%)` : "none",
             transitionProperty: "transform",
             transitionDuration: `${theme.transitions.duration.shorter}ms`,
             transitionTimingFunction: theme.transitions.easing.easeInOut,
@@ -108,7 +108,7 @@ const useStyles = makeStyles((theme) => {
             // textAlign: 'center',
             display: "flex",
             alignItems: "center",
-            width: ({cardHovered}) => cardHovered && "200%",
+            width: ({cardHovered}) => cardHovered && "150%",
             // height: ({cardHovered}) => cardHovered ? "auto" : 60,
             padding: `0 ${theme.spacing(1)}px`,
             color: "white !important",
@@ -170,18 +170,23 @@ const useStyles = makeStyles((theme) => {
             paddingTop: 0,
         },
         background: {
-            transition: ({cardHovered}) => cardHovered && `${transition}, opacity 250ms linear`,
-            transform: ({cardHovered}) => cardHovered ? 'scale(1.35, 1.3) translateY(5%)' : 'scale(0.2, 0.9)',
+            transition: ({cardHovered}) => cardHovered && `${transition}, opacity 150ms linear`,
+            transform: ({cardHovered}) => cardHovered ? 'scale(1.1, 1.1)' : 'scale(0.2, 0.9)',
             opacity: ({cardHovered}) => cardHovered ? 1 : 0,
             background: theme.palette.navyBlue.main,
             position: 'absolute',
             top: '0',
-            bottom: "auto",
+            bottom: 0,
+            left:0,
+            right:0,
             zIndex: '-1',
             overflow: 'hidden',
             borderRadius: theme.spacing(2),
             boxShadow: theme.shadows[24],
-            minWidth: "110%", // prevents single speaker cards from being too thin,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+            // minWidth: "110%", // prevents single speaker cards from being too thin,
         },
         backgroundContent: {
             marginTop: ({frontHeight, hideActions}) => hideActions && frontHeight / 2.2,
@@ -446,9 +451,9 @@ const GroupStreamCardV2 = memo(({
 
     const handleMouseLeft = () => {
         if (isHighlighted) {
-            setGlobalCardHighlighted(false)
+            // setGlobalCardHighlighted(false)
         }
-        cardHovered && setCardHovered(false)
+        // cardHovered && setCardHovered(false)
     }
 
     const checkIfHighlighted = () => {

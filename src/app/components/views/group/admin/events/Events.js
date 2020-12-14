@@ -105,7 +105,7 @@ const Events = (props) => {
 
     return (
         <div style={{width: '100%', textAlign: 'left', height: "100%"}}>
-            <AppBar color='default' position="static">
+            <AppBar color='default' position="sticky">
                 <Tabs
                     variant="fullWidth"
                     value={value}

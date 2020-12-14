@@ -24,7 +24,9 @@ function TabPanel(props) {
 
 const useStyles = makeStyles((theme) => ({
     root: {
-       flex: 1
+       flex: 1,
+        marginBottom: theme.spacing(1),
+        minHeight: "50vh"
     },
     bar: {
         backgroundColor: "transparent",

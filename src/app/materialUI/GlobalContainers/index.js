@@ -63,7 +63,7 @@ export const QuestionContainerTitle = ({...props}) => {
 export const ResponsiveContainer = ({children, ...props}) => {
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.up('sm'));
-    return <Container maxWidth="lg" disableGutters={isMobile} {...props}>
+    return <Container maxWidth="lg" {...props}>
         {children}
     </Container>
 }

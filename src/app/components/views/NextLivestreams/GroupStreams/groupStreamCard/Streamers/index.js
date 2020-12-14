@@ -24,7 +24,9 @@ const useStyles = makeStyles(theme => ({
         marginTop: theme.spacing(1) ,
         textAlign: 'center',
         fontSize: "0.8em",
-        fontWeight: "bold"
+        fontWeight: "bold",
+        width: "100%"
+
     },
     avatar: {
         width: '2em',
@@ -40,6 +42,7 @@ const useStyles = makeStyles(theme => ({
         overflowWrap: "break-word",
         wordWrap: "break-word",
         hyphens: "auto",
+        width: "100%"
     },
 }))
 //
@@ -55,7 +58,7 @@ const Streamers = ({speakers, cardHovered}) => {
                             className={classes.avatar}
                             src={speaker.avatar || speakerPlaceholder}
                             alt={speaker.firstName}/>
-                        <Typography className={classes.name}>
+                        <Typography noWrap className={classes.name}>
                             {`${speaker.firstName} ${speaker.lastName}`}
                         </Typography>
                         <Typography className={classes.streamerPosition}>
