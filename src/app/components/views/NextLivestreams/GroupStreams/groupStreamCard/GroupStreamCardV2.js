@@ -19,7 +19,7 @@ import {AttendButton, DetailsButton} from "./actionButtons";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
 import {DateDisplay, TimeDisplay} from "./TimeDisplay";
 import EnhancedGroupStreamCard from "../../../group/admin/events/enhanced-group-stream-card/EnhancedGroupStreamCard";
-
+import SettingsIcon from '@material-ui/icons/Settings';
 
 const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
@@ -160,7 +160,7 @@ const useStyles = makeStyles((theme) => {
         optionsWrapper: {
             overflowX: 'hidden',
             overflowY: 'auto',
-            maxHeight: "40vh",
+            maxHeight: 100,
         },
         expandedOptionsWrapper: {
             overflowX: 'hidden',
@@ -176,9 +176,9 @@ const useStyles = makeStyles((theme) => {
             background: theme.palette.navyBlue.main,
             position: 'absolute',
             top: '0',
-            bottom: 0,
-            left:0,
-            right:0,
+            left: 0,
+            right: 0,
+            minHeight: "100%",
             zIndex: '-1',
             overflow: 'hidden',
             borderRadius: theme.spacing(2),
@@ -189,7 +189,8 @@ const useStyles = makeStyles((theme) => {
             // minWidth: "110%", // prevents single speaker cards from being too thin,
         },
         backgroundContent: {
-            marginTop: ({frontHeight, hideActions}) => hideActions && frontHeight / 2.2,
+            // marginTop: ({frontHeight, hideActions}) => hideActions && frontHeight / 2.2,
+            marginTop: ({frontHeight, hideActions}) => hideActions && "50%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -198,7 +199,8 @@ const useStyles = makeStyles((theme) => {
             paddingTop: 0
         },
         buttonsWrapper: {
-            marginTop: ({frontHeight}) => frontHeight / 2.2,
+            // marginTop: ({frontHeight}) => frontHeight / 2.2,
+            marginTop: "65%",
             display: "flex",
             justifyContent: "center",
             marginBottom: theme.spacing(1),
@@ -222,7 +224,7 @@ const useStyles = makeStyles((theme) => {
             position: "absolute",
             opacity: '.3',
             clipPath: 'url(#wave)',
-            height: '30%',
+            height: '45%',
             width: '100%',
             objectFit: 'cover',
         },
@@ -276,8 +278,8 @@ const useStyles = makeStyles((theme) => {
             background: "none !important"
         },
         expandButton: {
-            color: theme.palette.common.white,
-            borderRadius: ({hasGroups}) => !hasGroups && theme.spacing(2.5)
+            color: ({isAdmin}) => !isAdmin && theme.palette.common.white,
+            borderRadius: ({hasGroups, isAdmin}) => isAdmin && hasGroups ? 0 : theme.spacing(2.5),
         },
         actionButtonsWrapper: {
             marginTop: theme.spacing(1)
@@ -337,7 +339,7 @@ const GroupStreamCardV2 = memo(({
     const absolutePath = router.asPath
     const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
     const frontRef = useRef()
-    console.log("-> mobile", mobile);
+    console.log("-> isAdmin", isAdmin);
 
     function userIsRegistered() {
         if (!user || !livestream.registeredUsers) {
@@ -377,6 +379,7 @@ const GroupStreamCardV2 = memo(({
         isExpanded: expanded,
         expanded: expanded && targetOptions.length,
         frontHeight,
+        isAdmin
     })
 
 
@@ -451,9 +454,9 @@ const GroupStreamCardV2 = memo(({
 
     const handleMouseLeft = () => {
         if (isHighlighted) {
-            // setGlobalCardHighlighted(false)
+            setGlobalCardHighlighted(false)
         }
-        // cardHovered && setCardHovered(false)
+        cardHovered && setCardHovered(false)
     }
 
     const checkIfHighlighted = () => {
@@ -687,6 +690,8 @@ const GroupStreamCardV2 = memo(({
                                         {mobile &&
                                         <div className={classes.expandArea}>
                                             <Button className={classes.expandButton}
+                                                    startIcon={isAdmin && <SettingsIcon/>}
+                                                    variant={isAdmin && "contained"}
                                                     onClick={() => setExpanded(!expanded)}
                                                     fullWidth>
                                                 {expanded ? "Show less" : isAdmin ? "Manage Stream" : "See more"}
@@ -740,7 +745,8 @@ const GroupStreamCardV2 = memo(({
                                     <Streamers speakers={livestream.speakers} cardHovered={cardHovered}/>
                                     {!!targetOptions.length &&
                                     <div className={classes.optionsWrapper}>
-                                        <TargetOptions className={classes.optionChips} options={targetOptions}/>
+                                        <TargetOptions className={classes.optionChips}
+                                                       options={[...targetOptions, ...targetOptions, ...targetOptions]}/>
                                     </div>}
                                 </div>
                                 <div className={classes.logosBackWrapper}>
