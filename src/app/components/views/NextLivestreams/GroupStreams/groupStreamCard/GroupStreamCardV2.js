@@ -163,7 +163,7 @@ const useStyles = makeStyles((theme) => {
             paddingTop: 0,
         },
         background: {
-            transition: ({cardHovered}) => cardHovered && `${transition}, opacity 100ms linear`,
+            transition: ({cardHovered}) => cardHovered && `${transition}, opacity 150ms linear`,
             transform: ({
                             cardHovered,
                             hasOptions
