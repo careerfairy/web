@@ -25,7 +25,6 @@ const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
     const paperColor = theme.palette.background.paper
     const frontHoveredScale = 0.7
-    const frontHoveredTranslate = -90
     const dateHeight = 100
     const themeColor = theme.palette.primary.main
     return ({
@@ -41,10 +40,6 @@ const useStyles = makeStyles((theme) => {
             height: "100%",
             position: "relative",
             webKitPosition: "relative",
-            // transform: ({
-            //                 hoverLeft,
-            //                 cardHovered
-            //             }) => cardHovered ? hoverLeft ? `translate(-25%)` : `translate(25%)` : "none",
             transitionProperty: "transform",
             transitionDuration: `${theme.transitions.duration.shorter}ms`,
             transitionTimingFunction: theme.transitions.easing.easeInOut,
@@ -78,7 +73,7 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center",
             justifyContent: "center",
             borderRadius: ({cardHovered}) => cardHovered && `${theme.spacing(2)}px 0px`,
-            background: ({cardHovered}) => fade(paperColor, 1),
+            background: fade(paperColor, 1),
             boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
         },
         dateTimeWrapper: {
@@ -86,7 +81,6 @@ const useStyles = makeStyles((theme) => {
             width: "100%",
             height: dateHeight,
             color: theme.palette.common.white,
-            // zIndex: 1
         },
         dateWrapper: {
             width: "50%",
@@ -101,15 +95,13 @@ const useStyles = makeStyles((theme) => {
             alignItems: "flex-end"
         },
         companyName: {
-            marginTop: `${theme.spacing(2)}px !important`,
-            marginBottom: `${theme.spacing(2)}px !important`,
+            marginTop: `${theme.spacing(3)}px !important`,
+            marginBottom: `${theme.spacing(3)}px !important`,
             fontWeight: "bold",
-            // fontSize: theme.spacing(3.5),
-            // textAlign: 'center',
             display: "flex",
             alignItems: "center",
-            width: ({cardHovered}) => cardHovered && "150%",
-            // height: ({cardHovered}) => cardHovered ? "auto" : 60,
+            width: ({cardHovered}) => cardHovered && "140%",
+            transition: "width 1s",
             padding: `0 ${theme.spacing(1)}px`,
             color: "white !important",
             zIndex: 1,
@@ -120,21 +112,22 @@ const useStyles = makeStyles((theme) => {
             width: "100%",
             display: "flex",
             flexDirection: "column",
-            transform: ({cardHovered}) => cardHovered && `translateY(${frontHoveredTranslate}px) scale(${frontHoveredScale})`,
+            transform: ({
+                            cardHovered,
+                            hasOptions
+                        }) => cardHovered && `translateY(${hasOptions ? -90 : -60}px) scale(${frontHoveredScale})`,
             transition: '250ms',
             background: ({
                              cardHovered,
                              registered
                          }) => cardHovered ? "transparent" : registered ? theme.palette.primary.dark : theme.palette.navyBlue.main,
             boxShadow: ({cardHovered}) => cardHovered && "none",
-            // height: ({cardHovered, frontHeight}) => cardHovered ? frontHeight : "100%",
-            height: ({cardHovered, frontHeight}) => cardHovered && "fit-content",
+            height: ({cardHovered}) => cardHovered && "fit-content",
             borderRadius: ({expanded}) => expanded ? `${theme.spacing(2.5)}px` : theme.spacing(2.8),
 
         },
         speakersAndLogosWrapper: {
             flex: 1,
-            // opacity: ({cardHovered}) => cardHovered && 0,
             width: "100%",
             display: "flex",
             flexDirection: "column",
@@ -171,7 +164,10 @@ const useStyles = makeStyles((theme) => {
         },
         background: {
             transition: ({cardHovered}) => cardHovered && `${transition}, opacity 150ms linear`,
-            transform: ({cardHovered}) => cardHovered ? 'scale(1.1, 1.1)' : 'scale(0.2, 0.9)',
+            transform: ({
+                            cardHovered,
+                            hasOptions
+                        }) => cardHovered ? hasOptions ? 'scale(1.1, 1.1)' : 'scale(1, 1)' : 'scale(0.2, 0.9)',
             opacity: ({cardHovered}) => cardHovered ? 1 : 0,
             background: theme.palette.navyBlue.main,
             position: 'absolute',
@@ -186,11 +182,9 @@ const useStyles = makeStyles((theme) => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between"
-            // minWidth: "110%", // prevents single speaker cards from being too thin,
         },
         backgroundContent: {
-            // marginTop: ({frontHeight, hideActions}) => hideActions && frontHeight / 2.2,
-            marginTop: ({frontHeight, hideActions}) => hideActions && "50%",
+            marginTop: ({hideActions, hasOptions}) => hideActions ? hasOptions ? "60%" : "70%" : 0,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -199,8 +193,7 @@ const useStyles = makeStyles((theme) => {
             paddingTop: 0
         },
         buttonsWrapper: {
-            // marginTop: ({frontHeight}) => frontHeight / 2.2,
-            marginTop: "65%",
+            marginTop: ({hasOptions}) => hasOptions ? "60%" : "70%",
             display: "flex",
             justifyContent: "center",
             marginBottom: theme.spacing(1),
@@ -236,12 +229,8 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center",
             width: "100%",
             borderRadius: theme.spacing(2.5),
-            // paddingBottom: ({isExpanded}) => isExpanded && theme.spacing(2)
         },
         lowerFrontBackgroundImage: {
-            // paddingBottom: ({isExpanded}) => isExpanded && theme.spacing(4)
-            // borderBottomRightRadius: "inherit",
-            // borderBottomLeftRadius: "inherit",
             borderRadius: "inherit",
             position: "absolute",
             opacity: '.3',
@@ -354,7 +343,7 @@ const GroupStreamCardV2 = memo(({
             return (index + 1) % 2 === 0 // Please hover only the 2nd/4th/last even element in the row to the left
         }
     }
-//
+
     const hoverLeft = useMemo(() => shouldHoverLeft(), [width, hasCategories])
     const registered = useMemo(() => userIsRegistered(), [livestream.registeredUsers])
     const [expanded, setExpanded] = useState(false);
@@ -378,7 +367,8 @@ const GroupStreamCardV2 = memo(({
         isExpanded: expanded,
         expanded: expanded && targetOptions.length,
         frontHeight,
-        isAdmin
+        isAdmin,
+        hasOptions: targetOptions.length
     })
 
 
@@ -453,9 +443,9 @@ const GroupStreamCardV2 = memo(({
 
     const handleMouseLeft = () => {
         if (isHighlighted) {
-            setGlobalCardHighlighted(false)
+            // setGlobalCardHighlighted(false)
         }
-        cardHovered && setCardHovered(false)
+        // cardHovered && setCardHovered(false)
     }
 
     const checkIfHighlighted = () => {
