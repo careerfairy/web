@@ -394,7 +394,7 @@ const GroupStreamCardV2 = memo(({
         } else if (checkIfHighlighted() && isHighlighted) {
             setIsHighlighted(false)
         }
-    }, [livestreamId, id, careerCenterId, groupData.groupId,frontHeight]);
+    }, [livestreamId, id, careerCenterId, groupData.groupId, frontHeight]);
 
     useEffect(() => {
         if (groupData.categories && livestream.targetCategories) {
@@ -633,7 +633,7 @@ const GroupStreamCardV2 = memo(({
                             <div className={classes.companyLogoWrapper}>
                                 <Grow in={Boolean(userIsRegistered())}>
                                     <div className={classes.bookedIcon}>
-                                        <CheckCircleRoundedIcon color="primary" />
+                                        <CheckCircleRoundedIcon color="primary"/>
                                         <Typography variant="h6" className={classes.bookedText}>
                                             Booked
                                         </Typography>
@@ -684,7 +684,7 @@ const GroupStreamCardV2 = memo(({
                                             <Button className={classes.expandButton}
                                                     onClick={() => setExpanded(!expanded)}
                                                     fullWidth>
-                                                {expanded ? "Show less" : "See more"}
+                                                {expanded ? "Show less" : isAdmin ? "Manage Stream" : "See more"}
                                             </Button>
                                             <Collapse in={expanded}>
                                                 {isAdmin && <EnhancedGroupStreamCard

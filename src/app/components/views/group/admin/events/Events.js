@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
         marginTop: 8,
         width: "100%"
     },
-    loadMoreButton:{
+    loadMoreButton: {
         marginTop: theme.spacing(1),
         marginBottom: theme.spacing(1)
     }
@@ -69,20 +69,17 @@ const Events = (props) => {
 
     let livestreamElements = itemsUpcoming.map((livestream, index) => {
         return (
-            <Grid key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={3} item>
-                <div key={livestream.id} style={{position: "relative"}}>
-                    <GroupStreamCardV2
-                        livestreamId={livestream.id}
-                        livestream={livestream}
-                        user={props.user}
-                        shrink={true}
-                        mobile
-                        isAdmin
-                        hideActions
-                        userData={props.userData}
-                        fields={null}
-                        groupData={props.group}/>
-                </div>
+            <Grid style={{height: 620}} key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={4} item>
+                <GroupStreamCardV2
+                    mobile
+                    isAdmin
+                    hideActions
+                    user={props.user}
+                    livestream={livestream}
+                    groupData={props.group}
+                    userData={props.userData}
+                    livestreamId={livestream.id}
+                />
             </Grid>
         );
     });
@@ -90,19 +87,17 @@ const Events = (props) => {
     let pastLivestreamElements = itemsPast.map((livestream, index) => {
         return (
             <Grid style={{height: 620}} key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={4} item>
-                    <GroupStreamCardV2
-                        key={livestream.id}
-                        mobile
-                        isAdmin
-                        hideActions
-                        livestreamId={livestream.id}
-                        livestream={livestream}
-                        user={props.user}
-                        shrink={true}
-                        isPastLivestream={true}
-                        userData={props.userData}
-                        fields={null}
-                        groupData={props.group}/>
+                <GroupStreamCardV2
+                    mobile
+                    isAdmin
+                    hideActions
+                    isPastLivestream
+                    key={livestream.id}
+                    livestreamId={livestream.id}
+                    livestream={livestream}
+                    user={props.user}
+                    userData={props.userData}
+                    groupData={props.group}/>
             </Grid>
         );
     });
@@ -134,7 +129,8 @@ const Events = (props) => {
                 <Grid className={classes.grid} container spacing={2}>
                     {pastLivestreamElements}
                 </Grid>
-                {hasMorePast && <Button variant="outlined" className={classes.loadMoreButton} fullWidth onClick={loadMorePast}>
+                {hasMorePast &&
+                <Button variant="outlined" className={classes.loadMoreButton} fullWidth onClick={loadMorePast}>
                     Load More
                 </Button>}
             </TabPanel>
