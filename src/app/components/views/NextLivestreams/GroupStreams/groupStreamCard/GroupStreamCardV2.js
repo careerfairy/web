@@ -598,6 +598,9 @@ const GroupStreamCardV2 = memo(({
         if (expanded) {
             setExpanded(false)
         }
+        if (cardHovered) {
+            setCardHovered(false)
+        }
     }
 
     return (
