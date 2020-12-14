@@ -339,7 +339,6 @@ const GroupStreamCardV2 = memo(({
     const absolutePath = router.asPath
     const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
     const frontRef = useRef()
-    console.log("-> isAdmin", isAdmin);
 
     function userIsRegistered() {
         if (!user || !livestream.registeredUsers) {

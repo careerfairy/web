@@ -41,14 +41,13 @@ const useStyles = makeStyles(theme => {
         },
         root: {
 
-            "&:before": {
-                content: "",
+            "&:after": {
+                content: '""',
                 position: "absolute",
-                left: 0,
-                bottom: 0,
-                height: 1,
-                width: "50%",
+                left: "10%",
+                width: "80%",
                 borderBottom: "1px solid white",
+                height: theme.spacing(2)
             }
         }
     })
