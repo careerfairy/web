@@ -163,11 +163,11 @@ const useStyles = makeStyles((theme) => {
             paddingTop: 0,
         },
         background: {
-            transition: ({cardHovered}) => cardHovered && `${transition}, opacity 150ms linear`,
+            transition: ({cardHovered}) => cardHovered && `${transition}, opacity 100ms linear`,
             transform: ({
                             cardHovered,
                             hasOptions
-                        }) => cardHovered ? hasOptions ? 'scale(1.1, 1.1)' : 'scale(1, 1)' : 'scale(0.2, 0.9)',
+                        }) => cardHovered ? 'scale(1.1, 1.1)' : 'scale(0.2, 0.9)',
             opacity: ({cardHovered}) => cardHovered ? 1 : 0,
             background: theme.palette.navyBlue.main,
             position: 'absolute',
@@ -443,9 +443,9 @@ const GroupStreamCardV2 = memo(({
 
     const handleMouseLeft = () => {
         if (isHighlighted) {
-            // setGlobalCardHighlighted(false)
+            setGlobalCardHighlighted(false)
         }
-        // cardHovered && setCardHovered(false)
+        cardHovered && setCardHovered(false)
     }
 
     const checkIfHighlighted = () => {
@@ -606,8 +606,8 @@ const GroupStreamCardV2 = memo(({
                 <div
                     className={classes.root}>
                     <Box
-                        onMouseEnter={throttleMouseEnter}
-                        onMouseLeave={throttleMouseLeave}
+                        onMouseEnter={handleMouseEntered}
+                        onMouseLeave={handleMouseLeft}
                         classes={{
                             root: handlePulseFront()
                         }}
@@ -708,7 +708,7 @@ const GroupStreamCardV2 = memo(({
                                 </div>
                             </div>
                         </Paper>
-                        <ClickAwayListener onClickAway={throttleMouseLeave}>
+                        <ClickAwayListener onClickAway={handleMouseLeft}>
                             <Box
                                 className={classes.background}
                                 classes={{
