@@ -104,7 +104,7 @@ const useStyles = makeStyles((theme) => {
             transition: "width 1s",
             padding: `0 ${theme.spacing(1)}px`,
             color: "white !important",
-            zIndex: 1,
+            // zIndex: 1,
             justifyContent: "center"
         },
         front: {
@@ -145,7 +145,7 @@ const useStyles = makeStyles((theme) => {
             justifyContent: "space-evenly",
             width: "100%",
             borderRadius: "inherit",
-            zIndex: 1,
+            // zIndex: 1,
             flex: ({mobile}) => mobile && 1,
             maxHeight: 125
         },
@@ -330,21 +330,12 @@ const GroupStreamCardV2 = memo(({
     const frontRef = useRef()
 
     function userIsRegistered() {
-        if (!user || !livestream.registeredUsers) {
+        if (!user || !livestream.registeredUsers || isAdmin) {
             return false;
         }
         return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1)
     }
 
-    const shouldHoverLeft = () => {
-        if (!hasCategories && width === "lg") {// only case when there's an odd number of cards in a row
-            return (index + 1) % 3 === 0 // Please hover only the 3rd/last element in the row to the left
-        } else {
-            return (index + 1) % 2 === 0 // Please hover only the 2nd/4th/last even element in the row to the left
-        }
-    }
-
-    const hoverLeft = useMemo(() => shouldHoverLeft(), [width, hasCategories])
     const registered = useMemo(() => userIsRegistered(), [livestream.registeredUsers])
     const [expanded, setExpanded] = useState(false);
 
@@ -361,7 +352,6 @@ const GroupStreamCardV2 = memo(({
         isHighlighted,
         cardHovered,
         mobile,
-        hoverLeft,
         hasGroups: careerCenters.length,
         registered,
         isExpanded: expanded,
@@ -553,6 +543,9 @@ const GroupStreamCardV2 = memo(({
     }
 
     const checkIfRegistered = () => {
+        if(isAdmin){
+            return false
+        }
         return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1)
     }
 
@@ -579,7 +572,7 @@ const GroupStreamCardV2 = memo(({
     let logoElements = careerCenters.map(careerCenter => {
         return (
             <div className={classes.logoElement} key={careerCenter.groupId}>
-                <LogoElement hideFollow={!cardHovered && !mobile} key={careerCenter.groupId}
+                <LogoElement hideFollow={(!cardHovered && !mobile)|| isAdmin} key={careerCenter.groupId}
                              livestreamId={livestream.id}
                              userFollows={checkIfUserFollows(careerCenter)}
                              careerCenter={careerCenter} userData={userData} user={user}/>
