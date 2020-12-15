@@ -81,11 +81,12 @@ exports.next3 = functions.https.onRequest(async (req, res) => {
 exports.addToIndex = functions.firestore.document('careerCenterData/{careerCenter}')
     .onCreate(snapshot => {
         const data = snapshot.data();
+        const objectID = snapshot.id
+        data.groupId = objectID
         // deletes personal Identifiable data
         delete data.adminEmail
 
-        const objectID = snapshot.id
-        return index.addObject({...data, objectID});
+        return index.saveObject({...data, objectID});
 
     })
 
