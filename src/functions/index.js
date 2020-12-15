@@ -28,6 +28,8 @@ const ALGOLIA_APP_ID = process.env.ALGOLIA_APP_ID
 const ALGOLIA_ADMIN_KEY = process.env.ALGOLIA_API_KEY
 const ALGOLIA_INDEX_NAME = process.env.ALGOLIA_INDEX_NAME
 
+
+
 // configure algolia
 const algolia = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_KEY);
 const index = algolia.initIndex(ALGOLIA_INDEX_NAME);
@@ -85,8 +87,13 @@ exports.addToIndex = functions.firestore.document('careerCenterData/{careerCente
         data.groupId = objectID
         // deletes personal Identifiable data
         delete data.adminEmail
-
-        return index.saveObject({...data, objectID});
+        return index.saveObject({...data, objectID})
+            .then(() => {
+                functions.logger.log('Groups imported into Algolia');
+            })
+            .catch(error => {
+                functions.logger.warn('Error when importing group into Algolia', error);
+            });
 
     })
 
@@ -97,7 +104,14 @@ exports.updateIndex = functions.firestore.document('careerCenterData/{careerCent
         delete newData.adminEmail
 
         const objectID = change.after.id;
-        return index.saveObject({...newData, objectID});
+        console.log("-> index", index);
+        return index.saveObject({...newData, objectID})
+            .then(() => {
+                functions.logger.log('Groups updated into Algolia');
+            })
+            .catch(error => {
+                functions.logger.warn('Error when importing group into Algolia', error);
+            })
     })
 
 exports.deleteFromIndex = functions.firestore.document('careerCenterData/{careerCenter}')
