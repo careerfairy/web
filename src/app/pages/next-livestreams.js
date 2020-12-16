@@ -4,16 +4,19 @@ import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
 
 import NextLivestreams from "../components/views/NextLivestreams/NextLivestreams";
+import {useTheme} from "@material-ui/core/styles";
 
 
 const nextLivestreams = () => {
+    const theme = useTheme()
+    const isSSR = typeof window === 'undefined';
 
-    return (
+    return !isSSR && (
         <GreyBackground>
             <Head>
                 <title key="title">CareerFairy | Next Live Streams</title>
             </Head>
-            <div style={{background: "rgb(44, 66, 81)"}}>
+            <div style={{background: theme.palette.navyBlue.main}}>
                 <Header color="white"/>
             </div>
             <NextLivestreams/>

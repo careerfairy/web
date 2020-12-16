@@ -88,11 +88,7 @@ function LogInPage({firebase}) {
                     query: {absolutePath}
                 } : '/signup');
             } else {
-                if (userData) {
-                    router.replace(absolutePath || '/next-livestreams');
-                } else {
-                    router.replace(absolutePath || '/next-livestreams');
-                }
+                router.replace(absolutePath || '/next-livestreams');
                 setGeneralLoading(false);
             }
         }
@@ -121,7 +117,14 @@ export default withFirebase(LogInPage);
 
 const LogInForm = withFirebase(LogInFormBase);
 
-export function LogInFormBase({userEmailNotValidated, absolutePath, setGeneralLoading, setUserEmailNotValidated, firebase, generalLoading}) {
+export function LogInFormBase({
+                                  userEmailNotValidated,
+                                  absolutePath,
+                                  setGeneralLoading,
+                                  setUserEmailNotValidated,
+                                  firebase,
+                                  generalLoading
+                              }) {
     const classes = useStyles()
 
     const [errorMessageShown, setErrorMessageShown] = useState(false);

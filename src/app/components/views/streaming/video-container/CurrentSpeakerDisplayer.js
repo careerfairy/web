@@ -192,7 +192,8 @@ function CurrentSpeakerDisplayer(props) {
                     overflow-y: hidden;
                     white-space: nowrap;
                     text-align: center;
-                    scollbar-color: black rgba(0, 210, 170, 0.8);
+                    scrollbar-color: black rgba(0, 210, 170, 0.8);
+
                 }
 
                 .relative-container-videos::-webkit-scrollbar {

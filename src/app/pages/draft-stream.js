@@ -9,7 +9,7 @@ import {Typography} from "@material-ui/core";
 import {useRouter} from "next/router";
 import UserContext from "../context/user/UserContext";
 import Loader from "../components/views/loader/Loader";
-import DraftStreamForm from "../components/views/DraftStreamForm/DraftStreamForm";
+import DraftStreamForm from "../components/views/draftStreamForm/DraftStreamForm";
 
 
 const draftStream = () => {

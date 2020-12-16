@@ -1,13 +1,21 @@
 import React from 'react';
-import {Box, Container} from "@material-ui/core";
+import {Box, Container, Grid} from "@material-ui/core";
 import GroupCategories from "../GroupCategories/GroupCategories";
 import GroupStreams from "../GroupStreams/GroupStreams";
+import {useTheme} from "@material-ui/core/styles";
+import withWidth from '@material-ui/core/withWidth';
 
 
-const DesktopFeed = ({groupData, hasCategories, userData, alreadyJoined, handleToggleActive, mobile, user, livestreams, searching, livestreamId, careerCenterId, listenToUpcoming, selectedOptions}) => {
+const DesktopFeed = ({groupData, hasCategories, userData, alreadyJoined, handleToggleActive, mobile, user, livestreams, searching, livestreamId, careerCenterId, listenToUpcoming, selectedOptions, width}) => {
+    const theme = useTheme()
     return (
-        <Container style={{flex: 1, display: "flex", minHeight: 700, marginBottom: 10}}>
-            {hasCategories() ?
+        <Container maxWidth="lg" disableGutters style={{flex: 1, display: "flex", height: "50vh"}}>
+            <Grid
+                container
+                spacing={4}
+                style={{margin: theme.spacing(1), height: "fit-content"}}
+            >
+            {hasCategories ?
                 <GroupCategories livestreams={livestreams}
                                  mobile={mobile}
                                  user={user}
@@ -19,6 +27,8 @@ const DesktopFeed = ({groupData, hasCategories, userData, alreadyJoined, handleT
             <GroupStreams
                 user={user}
                 mobile={false}
+                width={width}
+                hasCategories={hasCategories}
                 livestreamId={livestreamId}
                 listenToUpcoming={listenToUpcoming}
                 careerCenterId={careerCenterId}
@@ -29,8 +39,9 @@ const DesktopFeed = ({groupData, hasCategories, userData, alreadyJoined, handleT
                 userData={userData}
                 groupData={groupData}
             />
+            </Grid>
         </Container>
     );
 };
 
-export default DesktopFeed;
+export default withWidth()(DesktopFeed);

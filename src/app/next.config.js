@@ -1,5 +1,7 @@
 'use strict';
+
 const {PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD} = require('next/constants')
+
 module.exports = (phase, {defaultConfig}) => {
     console.log("-> phase", phase);
     const config = {
@@ -16,6 +18,7 @@ module.exports = (phase, {defaultConfig}) => {
                 poll: 1000,
                 aggregateTimeout: 300,
             }
+
             return config
         },
     }
@@ -25,3 +28,4 @@ module.exports = (phase, {defaultConfig}) => {
     /* config options for all phases except development here */
     return config
 }
+

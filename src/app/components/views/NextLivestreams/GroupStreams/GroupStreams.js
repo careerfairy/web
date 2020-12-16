@@ -1,11 +1,8 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../context/firebase";
-import GroupStreamCard, {StreamCardPlaceHolder} from "./GroupStreamCard";
-import {Typography, LinearProgress, Box, Button, Grid} from "@material-ui/core";
-import {useRouter} from "next/router";
-import GroupJoinModal from "../../profile/GroupJoinModal";
-
+import {Typography, LinearProgress, Box, Grid} from "@material-ui/core";
+import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -24,40 +21,51 @@ const useStyles = makeStyles((theme) => ({
         maxWidth: "400px",
         margin: "0 auto",
         color: "rgb(130,130,130)"
-    }
+    },
+    loaderWrapper: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+    },
 }));
 
 
-const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching, livestreamId, careerCenterId, alreadyJoined, listenToUpcoming, selectedOptions}) => {
+const GroupStreams = ({
+                          groupData,
+                          userData,
+                          user,
+                          livestreams,
+                          mobile,
+                          searching,
+                          livestreamId,
+                          careerCenterId,
+                          alreadyJoined,
+                          listenToUpcoming,
+                          selectedOptions,
+                          hasCategories,
+                          width
+                      }) => {
         const classes = useStyles()
-        const router = useRouter()
-        const absolutePath = router.asPath
-        const [openJoinModal, setOpenJoinModal] = useState(false);
-        const [hasChecked, setHasChecked] = useState(false)
+        const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
         const searchedButNoResults = selectedOptions.length && !searching && !livestreams.length
-
-
-        const handleCloseJoinModal = () => {
-            setOpenJoinModal(false);
-        };
-        const handleOpenJoinModal = () => {
-            setOpenJoinModal(true);
-        };
-
-        const handleJoin = () => {
-            if (userData) {
-                handleOpenJoinModal()
-            } else {
-                return router.push({pathname: "/login", query: {absolutePath}})
+        useEffect(() => {
+            if (globalCardHighlighted) {
+                setGlobalCardHighlighted(false)
             }
-        }
+        }, [groupData])
 
         const renderStreamCards = livestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
-                    <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
-                        <GroupStreamCard
+                    <Grid style={{height: mobile ? 620 : 600}} key={livestream.id} xs={12} sm={12} md={6}
+                          lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 4} item>
+                        <GroupStreamCardV2
                             index={index}
+                            width={width}
+                            mobile={mobile}
+                            setGlobalCardHighlighted={setGlobalCardHighlighted}
+                            globalCardHighlighted={globalCardHighlighted}
+                            hasCategories={hasCategories}
                             groupData={groupData}
                             listenToUpcoming={listenToUpcoming}
                             careerCenterId={careerCenterId}
@@ -65,40 +73,34 @@ const GroupStreams = ({groupData, userData, user, livestreams, mobile, searching
                             user={user} userData={userData} fields={null}
                             careerCenters={[]}
                             id={livestream.id}
-                            key={livestream.id} livestream={livestream}/>
+                            key={livestream.id}
+                            livestream={livestream}
+                        />
                     </Grid>
                 )
             }
         })
 
         return (
-            <div style={{padding: mobile ? 0 : "1rem"}} className={classes.root}>
-                {/* {!userData?.groupIds?.includes(groupData.groupId) && !mobile && !listenToUpcoming &&
-                <Button className={classes.followButton} size="large" onClick={handleJoin} variant="contained" fullWidth
-                        color="primary" align="center">
-                    <Typography variant="h6">Start Following {groupData.universityName}</Typography>
-                </Button>} */}
-                {groupData.id || listenToUpcoming ? (searching ?
-                    <Box display="flex" justifyContent="center" mt={5}>
-                        <LinearProgress style={{width: "80%"}} color="primary"/>
-                    </Box>
-                    :
-                    livestreams.length ?
-                        <Grid container spacing={2}>
-                            {renderStreamCards}
+            <Grid item xs={12} sm={12} md={hasCategories ? 8 : 12} lg={hasCategories ? 8 : 12} xl={hasCategories ? 8 : 12}>
+                <Grid container spacing={mobile? 2: 4}>
+                    {groupData.id || listenToUpcoming ? (searching ?
+                        <Grid md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
+                            <LinearProgress style={{width: "80%", marginTop: 100}} color="primary"/>
                         </Grid>
                         :
-                        <Typography className={classes.emptyMessage} align="center" variant="h5"
-                                      style={{marginTop: 100}}>{searchedButNoResults ? "We couldn't find anything... 😕" :<strong>{groupData.universityName} currently has no scheduled live streams</strong>}</Typography>)
-                    : null}
-                <GroupJoinModal
-                    open={openJoinModal}
-                    group={groupData}
-                    alreadyJoined={alreadyJoined}
-                    userData={userData}
-                    closeModal={handleCloseJoinModal}
-                />
-            </div>
+                        livestreams.length ?
+                            renderStreamCards
+                            :
+                            <Grid sm={12} xs={12} md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
+                                <Typography className={classes.emptyMessage} align="center" variant="h5"
+                                            style={{marginTop: 100}}>{searchedButNoResults ? "We couldn't find anything... 😕" :
+                                    <strong>{groupData.universityName} currently has no scheduled live
+                                        streams</strong>}</Typography>
+                            </Grid>)
+                        : null}
+                </Grid>
+            </Grid>
         );
     }
 ;

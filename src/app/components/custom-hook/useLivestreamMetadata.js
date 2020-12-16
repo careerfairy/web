@@ -78,7 +78,7 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
 
     useEffect(() => {
         if (livestream && userRequestedDownload) {
-            firebase.listenToLivestreamIcons(livestream.id, querySnapshot => {
+            firebase.listenToTotalLivestreamIcons(livestream.id, querySnapshot => {
                 let iconList = [];
                 querySnapshot.forEach(doc => {
                     let cc = doc.data();

@@ -269,12 +269,12 @@ function VideoContainer(props) {
                 </Modal.Content>
             </Modal>
             { !props.viewer && !streamerReady && 
-                <StreamPreparationModalV2 readyToConnect={(props.currentLivestream && props.currentLivestream.id)}
+                <StreamPreparationModalV2 readyToConnect={Boolean(props.currentLivestream && props.currentLivestream.id && localMediaStream)}
                     audioSource={audioSource} updateAudioSource={updateAudioSource}
                     videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
                     speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
                     streamerReady={streamerReady} setStreamerReady={setStreamerReady}
-                    localStream={localMediaStream} readyToConnect={props.currentLivestream && props.currentLivestream.id}
+                    localStream={localMediaStream}
                     connectionEstablished={connectionEstablished}
                     isTest={props.currentLivestream.test} viewer={props.viewer}
                     handleOpenDemoIntroModal={handleOpenDemoIntroModal}

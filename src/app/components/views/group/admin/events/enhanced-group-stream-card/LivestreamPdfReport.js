@@ -251,10 +251,11 @@ const PollView = ({ poll, index }) => {
 }
 
 const SpeakerView = ({ speaker }) => {
+    let avatarUrl = speaker.avatar || 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
     return (
         <View>
             <View style={{ maxWidth: '15vw', borderRadius: '50%', marginRight: '10vw', marginBottom: '5px', border: '2px solid #00d2aa' }}>
-                <SpeakerAvatar source={speaker.avatar} />
+                <SpeakerAvatar source={avatarUrl} />
             </View>
             <SmallLabel>{ speaker.firstName } { speaker.lastName }</SmallLabel>
         </View>

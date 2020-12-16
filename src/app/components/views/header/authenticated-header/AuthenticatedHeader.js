@@ -97,7 +97,7 @@ const AuthenticatedHeader = (props) => {
             }
 
             #right-menu.dark button, #right-menu.dark a {
-                background-color: rgba(0, 210, 170);
+                background-color: rgb(0, 210, 170);
                 color: white;
                 font-weight: 600;
             }
@@ -210,7 +210,7 @@ const AuthenticatedHeader = (props) => {
             }
 
             i:hover {
-                color: rgba(220,220,220);
+                color: rgb(220,220,220);
             }
 
             @media screen and (max-width: 992px) {

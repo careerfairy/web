@@ -46,9 +46,6 @@ const useStyles = makeStyles(theme => ({
         "& <": {
             margin: "0 5px"
         }
-    },
-    button: {
-        margin: "10px 0"
     }
 }))
 

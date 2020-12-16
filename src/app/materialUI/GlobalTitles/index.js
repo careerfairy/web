@@ -23,7 +23,9 @@ const useStyles = makeStyles(theme => ({
         textAlign: "center",
         fontWeight: 500,
         fontSize: "2.2em",
-        overflowWrap: "break-word"
+        overflowWrap: "break-word",
+        wordBreak: "break-word",
+        msWordBreak: "break-word"
     }
 }))
 

@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
 import HelpIcon from '@material-ui/icons/Help';
 import BarChartIcon from '@material-ui/icons/BarChart';
@@ -97,9 +97,14 @@ const ButtonComponent =
          setShowMenu
      }) => {
         const DELAY = 3000; //3 seconds
+        const [hasMounted, setHasMounted] = useState(false)
         const [open, setOpen] = useState(true);
         const [delayHandler, setDelayHandler] = useState(null)
         const {tutorialSteps, handleConfirmStep} = useContext(TutorialContext);
+
+        useEffect(() => {
+            setHasMounted(true)
+        },[])
 
         const tutorialStepActive = () => {
             return Boolean(isOpen(3) || isOpen(8))
@@ -112,7 +117,6 @@ const ButtonComponent =
             return tutorialSteps.streamerReady && isValid(actionTutorialNum, actionDisabled)
         }
         const classes = useStyles({open: open || tutorialStepActive(), showMenu, isMobile});
-
 
         const handleMouseEnter = event => {
             clearTimeout(delayHandler)
@@ -141,50 +145,58 @@ const ButtonComponent =
             return null;
         }
 
-        const actions = [
-            {
-                icon: <BarChartIcon fontSize="large"/>,
-                name: "Polls",
-                disabled: showMenu && selectedState === 'polls',
-                onClick: () => handleStateChange("polls"),
-                tutorialNum: 3
-            },
-            {
-                icon: <HelpIcon fontSize="large"/>,
-                name: "Q&A",
-                disabled: showMenu && selectedState === 'questions',
-                onClick: () => handleStateChange("questions"),
-                tutorialNum: 2334
-            },
-        ];
+        const getActions = () => {
+            if(!hasMounted){
+                return []
+            }
+            const actions = [
+                {
+                    icon: <BarChartIcon fontSize="large"/>,
+                    name: "Polls",
+                    disabled: showMenu && selectedState === 'polls',
+                    onClick: () => handleStateChange("polls"),
+                    tutorialNum: 3
+                },
+                {
+                    icon: <HelpIcon fontSize="large"/>,
+                    name: "Q&A",
+                    disabled: showMenu && selectedState === 'questions',
+                    onClick: () => handleStateChange("questions"),
+                    tutorialNum: 2334
+                },
+            ];
 
-        if (isMobile) {
-            actions.unshift({
-                icon: <ForumOutlinedIcon fontSize="large"/>,
-                name: "Chat",
-                disabled: showMenu && selectedState === 'chat',
-                onClick: () => handleStateChange("chat"),
-                tutorialNum: 234
-            })
-        } else {
-            actions.unshift({
-                icon: <PanToolOutlinedIcon />,
-                name: "Hand Raise",
-                disabled: showMenu && selectedState === 'hand',
-                onClick: () => handleStateChange("hand"),
-                tutorialNum: 8
-            })
+            if (isMobile) {
+                actions.unshift({
+                    icon: <ForumOutlinedIcon fontSize="large"/>,
+                    name: "Chat",
+                    disabled: showMenu && selectedState === 'chat',
+                    onClick: () => handleStateChange("chat"),
+                    tutorialNum: 234
+                })
+            }
+            if (!isMobile) {
+                actions.unshift({
+                    icon: <PanToolOutlinedIcon />,
+                    name: "Hand Raise",
+                    disabled: showMenu && selectedState === 'hand',
+                    onClick: () => handleStateChange("hand"),
+                    tutorialNum: 8
+                })
+            }
+
+            if (streamer && showMenu) {
+                actions.unshift({
+                    icon: <ChevronLeftRoundedIcon fontSize="large"/>,
+                    name: "",
+                    disabled: false,
+                    onClick: () => setShowMenu(!showMenu),
+                    tutorialNum: 9999999
+                })
+            }
+            return actions
         }
 
-        if (streamer && showMenu) {
-            actions.unshift({
-                icon: <ChevronLeftRoundedIcon fontSize="large"/>,
-                name: "",
-                disabled: false,
-                onClick: () => setShowMenu(!showMenu),
-                tutorialNum: 9999999
-            })
-        }
 
         return (
             <ClickAwayListener onClickAway={handleClose}>
@@ -197,10 +209,10 @@ const ButtonComponent =
                         onFocus={handleOpen}
                         open
                     >
-                        {actions.map((action) => {
+                        {getActions().map((action) => {
                             return (
                                 <SpeedDialAction
-                                    key={action.name}
+                                    key={action.tutorialNum}
                                     icon={action.icon}
                                     tooltipPlacement="right"
                                     tooltipTitle={action.name}

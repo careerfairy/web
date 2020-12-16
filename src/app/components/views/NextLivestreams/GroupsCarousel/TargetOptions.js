@@ -1,7 +1,7 @@
 import React from 'react';
 import {Chip, Tooltip, Typography} from "@material-ui/core";
 
-const TargetOptions = ({options}) => {
+const TargetOptions = ({options, ...props}) => {
 
     const renderOptions = options.map(option => {
         return <Tooltip arrow
@@ -12,8 +12,8 @@ const TargetOptions = ({options}) => {
             <Chip
                 variant="outlined"
                 size="small"
+                {...props}
                 style={{maxWidth: 300, background: "rgba(255,255,255, 0.5)"}}
-                // style={{maxWidth: width}}
                 label={<Typography variant="body1" noWrap>{option.name}</Typography>}/>
         </Tooltip>
     })

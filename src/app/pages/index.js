@@ -176,7 +176,6 @@ function LandingPage(props) {
                             right: 0;
                             background-color: rgba(0, 210, 170, 0.7);
                             opacity: 0;
-                            transiton: opacity 1s;
                         }
                     `}</style>
                 </div>
@@ -203,7 +202,7 @@ function LandingPage(props) {
                             <h1>Ask questions. Get hired.</h1>
                             <h1></h1>
                             <div className=''>
-                                <Link href='/next-livestreams'><a><Button primary size='big'>See Next Events</Button></a></Link>
+                                <Link href='/discover'><a><Button primary size='big'>See Our Most Recent Events</Button></a></Link>
                             </div>
                         </div>
                         <div  className='previewLogos'>
