@@ -598,8 +598,8 @@ exports.sendPostmarkEmailUserDataAndUniWithName = functions.https.onRequest(asyn
 
 
 const {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('agora-access-token')
-const appID = '52e732c40bf94a8c97fdd0fd443210e0';
-const appCertificate = 'ffb72ee48dea40c5be4b7c93228707b6';
+const appID = '53675bc6d3884026a72ecb1de3d19eb1';
+const appCertificate = '286a21681469490783ab75247de35f37';
 
 exports.generateAgoraToken = functions.https.onRequest(async (req, res) => {
 

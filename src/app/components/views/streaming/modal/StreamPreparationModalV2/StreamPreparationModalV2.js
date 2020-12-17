@@ -324,12 +324,13 @@ const StreamPreparationModalV2 = ({
                         <Button
                             variant="contained"
                             color="primary"
-                            disabled={!readyToConnect || !localStream}
+                            disabled={!readyToConnect}
                             onClick={() => handleFinalize()}
                             className={classes.button}
                         >
                             Connect Directly
-                        </Button>: <CircularProgress color="primary" size={25}/>: null}
+                        </Button>
+                    }
                     {completedSteps() === totalSteps() - 1 && activeStep === 4 &&
                     <Button variant="contained" color="primary" onClick={handleFinalize}>
                         Continue

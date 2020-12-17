@@ -69,14 +69,15 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                 mode: "live",
                 codec: "vp8",
             });
-            rtcClient.init("52e732c40bf94a8c97fdd0fd443210e0");
+            rtcClient.init("53675bc6d3884026a72ecb1de3d19eb1");
+            rtcClient.startProxyServer(2);
             setRtcClient(rtcClient);
         }
     },[agoraRTC, userUid, streamerReady, roomId, streamId])
 
     useEffect(() => {
         if (agoraRTM) {
-            let rtmClient = agoraRTM.createInstance("52e732c40bf94a8c97fdd0fd443210e0")
+            let rtmClient = agoraRTM.createInstance("53675bc6d3884026a72ecb1de3d19eb1")
             setRtmClient(rtmClient);
         }
     },[agoraRTM, userUid, streamerReady, roomId, streamId])
@@ -90,7 +91,7 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
                         codec: "vp8",
                     });
                     screenShareClient.setClientRole('host')
-                    screenShareClient.init("52e732c40bf94a8c97fdd0fd443210e0", () => {
+                    screenShareClient.init("53675bc6d3884026a72ecb1de3d19eb1", () => {
                         screenShareClient.join(agoraScreenShareToken.rtcToken, roomId, userUid + 'screen', (uid)=>{
                             let screenShareStream = agoraRTC.createStream({
                                 streamID: uid,

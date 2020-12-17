@@ -57,7 +57,7 @@ function VideoContainer(props) {
 
     const screenSharingMode = !isPlayMode && props.currentLivestream.screenSharerId === props.streamerId && 
         props.currentLivestream.mode === 'desktop';
-    const {webRTCAdaptor, localMediaStream, externalMediaStreams, localAudioLevel} =
+    const { webRTCAdaptor, localMediaStream, externalMediaStreams } =
         useWebRTCAdaptor(
             streamerReady,
             isPlayMode,
@@ -238,7 +238,6 @@ function VideoContainer(props) {
                     : null
                 }
                 <VideoControlsContainer
-                    webRTCAdaptor={webRTCAdaptor}
                     currentLivestream={props.currentLivestream}
                     viewer={props.viewer}
                     streamerId={props.streamerId}
@@ -269,7 +268,7 @@ function VideoContainer(props) {
                 </Modal.Content>
             </Modal>
             { !props.viewer && !streamerReady && 
-                <StreamPreparationModalV2 readyToConnect={Boolean(props.currentLivestream && props.currentLivestream.id && localMediaStream)}
+                <StreamPreparationModalV2 readyToConnect={Boolean(props.currentLivestream && props.currentLivestream.id)}
                     audioSource={audioSource} updateAudioSource={updateAudioSource}
                     videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
                     speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
