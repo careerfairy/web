@@ -2,6 +2,7 @@ import React, {Fragment, useState, useEffect} from 'react';
 import {withFirebase} from 'context/firebase';
 import EditIcon from '@material-ui/icons/Edit';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import {v4 as uuidv4} from 'uuid';
 import {
     Box,
     Button,
@@ -29,7 +30,8 @@ import LivestreamPdfReport from './LivestreamPdfReport';
 import {useLivestreamMetadata} from 'components/custom-hook/useLivestreamMetadata';
 import {useTalentPoolMetadata} from 'components/custom-hook/useTalentPoolMetadata';
 import {makeStyles} from "@material-ui/core/styles";
-
+import PublishIcon from '@material-ui/icons/Publish';
+import ListAltIcon from '@material-ui/icons/ListAlt';
 
 const useStyles = makeStyles(theme => {
     const themeWhite = theme.palette.common.white
@@ -39,20 +41,31 @@ const useStyles = makeStyles(theme => {
             border: `2px solid ${themeWhite}`,
             marginBottom: theme.spacing(1)
         },
-        divider:{
+        divider: {
             background: theme.palette.common.white
         }
     })
 })
-const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}) => {
+const EnhancedGroupStreamCard = ({
+                                     firebase,
+                                     livestream,
+                                     group,
+                                     isPastLivestream,
+                                     levelOfStudyModalOpen,
+                                     handleCloseLevelOfStudyModal,
+                                     handleOpenLevelOfStudyModal,
+                                     switchToNextLivestreamsTab,
+                                     isDraft,
+                                     router
+                                 }) => {
     const classes = useStyles()
-    const [modalOpen, setModalOpen] = useState(false);
     const [localCategories, setLocalCategories] = useState([]);
     const [groupCategories, setGroupCategories] = useState([]);
     const [allGroups, setAllGroups] = useState([]);
 
     const [registeredStudents, setRegisteredStudents] = useState([]);
     const [registeredStudentsFromGroup, setRegisteredStudentsFromGroup] = useState([]);
+    const [publishingDraft, setPublishingDraft] = useState(false);
 
     const [startDownloadingReport, setStartDownloadingReport] = useState(false);
     const {
@@ -76,10 +89,10 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
     } = useTalentPoolMetadata(livestream, allGroups, group, firebase, registeredStudentsFromGroup, startDownloadingTalentPool);
 
     useEffect(() => {
-        if (livestream && livestream.targetCategories && livestream.targetCategories[group.id] && modalOpen) {
+        if (livestream && livestream.targetCategories && livestream.targetCategories[group.id] && levelOfStudyModalOpen) {
             setLocalCategories(livestream.targetCategories[group.id])
         }
-    }, [livestream, modalOpen])
+    }, [livestream, levelOfStudyModalOpen])
 
     useEffect(() => {
         if (group && group.categories) {
@@ -129,6 +142,7 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
         }
     }, [registeredStudents]);
 
+
     function studentBelongsToGroup(student) {
         if (group.universityCode) {
             if (student.universityCode === group.universityCode) {
@@ -162,8 +176,40 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
         let categoryCopy = livestream.targetCategories ? livestream.targetCategories : {};
         categoryCopy[group.id] = localCategories;
         firebase.updateLivestreamCategories(livestream.id, categoryCopy).then(() => {
-            setModalOpen(false);
+            handleCloseLevelOfStudyModal()
         });
+    }
+
+    const handlePublishStream = async () => {
+        try {
+            setPublishingDraft(true)
+            const newStream = {...livestream}
+            newStream.companyId = uuidv4()
+            await firebase.addLivestream(newStream, "livestreams")
+            switchToNextLivestreamsTab()
+            setPublishingDraft(false)
+        } catch (e) {
+            setPublishingDraft(false)
+            console.log("-> e", e);
+        }
+    }
+
+    const handleEditStream = async () => {
+        const groupId = group.id
+        const targetPath = isDraft ? `/draft-stream` : "/new-livestream"
+        const targetQuery = {
+            absolutePath: `/group/${groupId}/admin`,
+            careerCenterIds: groupId,
+        }
+        if (isDraft) {
+            targetQuery.draftStreamId = livestream.id
+        } else {
+            targetQuery.livestreamId = livestream.id
+        }
+        return await router.push({
+            pathname: targetPath,
+            query: targetQuery
+        })
     }
 
     let categoryElements = localCategories.map((category, index) => {
@@ -171,7 +217,7 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
             <Chip
                 size={"medium"}
                 variant={"outlined"}
-                key={category.id}
+                key={category.id || index}
                 onDelete={() => removeElement(category)}
                 label={getOptionName(category)}/>
         );
@@ -189,7 +235,27 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
                 <Typography gutterBottom align="center" style={{fontWeight: "bold"}} variant="h5">
                     {registeredStudentsFromGroup.length} students registered
                 </Typography>
-                <Button className={classes.button} onClick={() => setModalOpen(true)}
+                {isDraft &&
+                <Button
+                    className={classes.button}
+                    fullWidth
+                    disabled={publishingDraft}
+                    onClick={handlePublishStream}
+                    startIcon={publishingDraft ? <CircularProgress size={20} color="inherit"/> : <PublishIcon/>}
+                    variant='outlined'
+                >
+                    {publishingDraft ? "Publishing" : "Publish Stream"}
+                </Button>}
+                <Button
+                    className={classes.button}
+                    fullWidth
+                    onClick={handleEditStream}
+                    startIcon={<ListAltIcon/>}
+                    variant='outlined'
+                >
+                    {isDraft ? "Edit Draft" : "Edit Stream"}
+                </Button>
+                <Button className={classes.button} onClick={handleOpenLevelOfStudyModal}
                         fullWidth
                         startIcon={<EditIcon/>}
                         variant='outlined'>
@@ -257,13 +323,13 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
 
                     </Fragment>
                 }
-                <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
+                <Dialog open={levelOfStudyModalOpen} onClose={handleCloseLevelOfStudyModal} fullWidth maxWidth="sm">
                     <DialogTitle align="center">Update Target Groups</DialogTitle>
                     <DialogContent>
                         <FormControl variant="outlined" fullWidth style={{marginBottom: "10px"}}>
                             <InputLabel>Add a Target Group</InputLabel>
                             <Select
-                                value={null}
+                                value={''}
                                 placeholder="Select a target group"
                                 onChange={(e) => addElement(e.target.value)}
                                 label="New target group"
@@ -284,7 +350,7 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
                         </Button>
                         <Button
                             size="large"
-                            onClick={() => setModalOpen(false)}>
+                            onClick={handleCloseLevelOfStudyModal}>
                             Cancel
                         </Button>
                     </DialogActions>

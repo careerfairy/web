@@ -1,12 +1,27 @@
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import {useRouter} from 'next/router';
-import {AppBar, Box, Button, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
-import EnhancedGroupStreamCard from './enhanced-group-stream-card/EnhancedGroupStreamCard';
+import {
+    AppBar,
+    Box,
+    Button,
+    CircularProgress,
+    Grid,
+    Menu,
+    MenuItem,
+    Tab,
+    Tabs,
+    useTheme,
+    Zoom
+} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import useInfiniteScroll from "../../../../custom-hook/useInfiniteScroll";
-import CustomInfiniteScroll from "../../../../util/CustomInfiteScroll";
 import GroupStreamCardV2 from "../../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2";
+import usePagination from "firestore-pagination-hook";
+import {snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
+import AddIcon from "@material-ui/icons/Add";
+import clsx from "clsx";
+import Fab from "@material-ui/core/Fab";
+import UserContext from "../../../../../context/user/UserContext";
 
 const useStyles = makeStyles(theme => ({
     streamsWrapper: {
@@ -20,25 +35,86 @@ const useStyles = makeStyles(theme => ({
     loadMoreButton: {
         marginTop: theme.spacing(1),
         marginBottom: theme.spacing(1)
-    }
+    },
+    fab: {
+        position: 'fixed',
+        bottom: theme.spacing(8),
+        right: theme.spacing(2),
+        zIndex: 1,
+        fontWeight: 600
+    },
 }))
+
 const Events = (props) => {
     if (!props.group.id) {
         return null
     }
     const classes = useStyles()
     const router = useRouter();
+    const {
+        query: {eventTab}
+    } = router
+    const theme = useTheme();
+
+    const transitionDuration = {
+        enter: theme.transitions.duration.enteringScreen,
+        exit: theme.transitions.duration.leavingScreen,
+    };
+
+    const {authenticatedUser, userData} = useContext(UserContext);
 
     const [anchorEl, setAnchorEl] = useState(null);
 
     const [value, setValue] = React.useState(0);
 
-    const [itemsPast, loadMorePast, hasMorePast, totalItemsPast] = useInfiniteScroll(
-        props.firebase.queryPastLiveStreamsByGroupId(props.group.id), 6, 3
+    useEffect(() => {
+        if (eventTab) {
+            setValue(Number(eventTab))
+        }
+    }, [router, eventTab])
+
+    const {
+        loading: loadingPast,
+        loadingError,
+        loadingMore: loadingMorePast,
+        loadingMoreError,
+        hasMore: hasMorePast,
+        items: itemsPast,
+        loadMore: loadMorePast
+    } = usePagination(
+        props.firebase.queryPastLiveStreamsByGroupId(props.group.id),
+        {
+            limit: 12
+        }
     );
 
-    const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming, totalItemsUpcoming] = useInfiniteScroll(
-        props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id), 6, 3
+    const {
+        loading: loadingUpcoming,
+        loadingError: loadingErrorUpcoming,
+        loadingMore: loadingMoreUpcoming,
+        loadingMoreError: loadingMoreErrorUpcoming,
+        hasMore: hasMoreUpcoming,
+        items: itemsUpcoming,
+        loadMore: loadMoreUpcoming
+    } = usePagination(
+        props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id),
+        {
+            limit: 12
+        }
+    );
+    const {
+        loading: loadingDrafts,
+        loadingError: loadingErrorDrafts,
+        loadingMore: loadingMoreDrafts,
+        loadingMoreError: loadingMoreErrorDrafts,
+        hasMore: hasMoreDrafts,
+        items: itemsDrafts,
+        loadMore: loadMoreDrafts,
+    } = usePagination(
+        props.firebase.queryDraftLiveStreamsByGroupId(props.group.id),
+        {
+            limit: 12
+        }
     );
 
     const handleClose = () => {
@@ -49,11 +125,15 @@ const Events = (props) => {
         setValue(newValue);
     };
 
+    const switchToNextLivestreamsTab = () => {
+        setValue(0)
+    }
+
     function TabPanel(props) {
         const {children, value, index, ...other} = props;
 
         return (
-            value === index &&
+            (value === index) &&
             <div style={{display: "flex", flexDirection: "column", width: "100%", height: "100%"}}>
                 {children}
             </div>
@@ -67,7 +147,54 @@ const Events = (props) => {
         };
     }
 
-    let livestreamElements = itemsUpcoming.map((livestream, index) => {
+    const handleClickDraftNewStream = async () => {
+        const groupId = props.group.id
+        const targetPath = `/draft-stream`
+        return await router.push({
+            pathname: targetPath,
+            query: {
+                absolutePath: router.asPath,
+                careerCenterIds: groupId
+            }
+        })
+    }
+
+    const handleCLickCreateNewLivestream = async () => {
+        if (userData.isAdmin) {
+            const targetPath = `/new-livestream`
+            await router.push({
+                pathname: targetPath,
+            })
+        }
+    }
+
+    const fabs = [
+        {
+            color: 'primary',
+            className: classes.fab,
+            icon: <AddIcon/>,
+            label: 'Create a new Stream',
+            onClick: () => handleCLickCreateNewLivestream(),
+            forTabs: [0, 1]
+        },
+        {
+            color: 'secondary',
+            className: clsx(classes.fab),
+            icon: <AddIcon/>,
+            label: 'Draft a New Stream',
+            onClick: () => handleClickDraftNewStream(),
+            forTabs: [2]
+        },
+    ];
+
+    const shouldRenderFab = (fab) => {
+        if (!userData?.isAdmin && fabs.label !== 'Draft a New Stream') {
+            return false
+        }
+        return Boolean(fab.forTabs.includes(value))
+    }
+
+    let livestreamElements = useMemo(() => snapShotsToData(itemsUpcoming).map((livestream) => {
         return (
             <Grid style={{height: 620}} key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={4} item>
                 <GroupStreamCardV2
@@ -82,9 +209,9 @@ const Events = (props) => {
                 />
             </Grid>
         );
-    });
+    }), [loadMoreUpcoming]);
 
-    let pastLivestreamElements = itemsPast.map((livestream, index) => {
+    let pastLivestreamElements = useMemo(() => snapShotsToData(itemsPast).map((livestream) => {
         return (
             <Grid style={{height: 620}} key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={4} item>
                 <GroupStreamCardV2
@@ -100,11 +227,31 @@ const Events = (props) => {
                     groupData={props.group}/>
             </Grid>
         );
-    });
+    }), [loadMorePast]);
+
+    let draftLivestreamElements = useMemo(() => snapShotsToData(itemsDrafts).map((livestream) => {
+        return (
+            <Grid style={{height: 620}} key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={4} item>
+                <GroupStreamCardV2
+                    mobile
+                    isDraft
+                    isAdmin
+                    hideActions
+                    isPastLivestream
+                    key={livestream.id}
+                    livestreamId={livestream.id}
+                    livestream={livestream}
+                    user={props.user}
+                    switchToNextLivestreamsTab={switchToNextLivestreamsTab}
+                    userData={props.userData}
+                    groupData={props.group}/>
+            </Grid>
+        );
+    }), [loadMoreDrafts]);
 
 
     return (
-        <div style={{width: '100%', textAlign: 'left', height: "100%"}}>
+        <div style={{width: '100%', textAlign: 'left', height: "100%", position: "relative"}}>
             <AppBar color='default' position="sticky">
                 <Tabs
                     variant="fullWidth"
@@ -115,25 +262,89 @@ const Events = (props) => {
                 >
                     <Tab label="Next Live streams" {...a11yProps(0)}/>
                     <Tab label="Past Live streams" {...a11yProps(1)}/>
+                    <Tab label="Draft Live streams" {...a11yProps(2)}/>
                 </Tabs>
             </AppBar>
             <TabPanel value={value} index={0}>
-                <Grid className={classes.grid} container spacing={2}>
-                    {livestreamElements}
-                </Grid>
-                {hasMoreUpcoming && <Button fullWidth onClick={loadMoreUpcoming}>
-                    Load More
+                {loadingMoreUpcoming ?
+                    <Box justifyContent="center" display="flex">
+                        <CircularProgress color="primary"/>
+                    </Box>
+                    :
+                    <Grid className={classes.grid} container spacing={2}>
+                        {livestreamElements}
+                    </Grid>}
+                {hasMoreUpcoming &&
+                <Button
+                    fullWidth
+                    disabled={loadingMorePast}
+                    variant="outlined"
+                    className={classes.loadMoreButton}
+                    startIcon={loadingMoreUpcoming && <CircularProgress color="inherit" size={20}/>}
+                    onClick={loadMoreUpcoming}
+                >
+                    {loadingMoreUpcoming ? "Loading" : "Load More"}
                 </Button>}
             </TabPanel>
             <TabPanel value={value} index={1}>
-                <Grid className={classes.grid} container spacing={2}>
-                    {pastLivestreamElements}
-                </Grid>
+                {loadingPast ?
+                    <Box justifyContent="center" display="flex">
+                        <CircularProgress color="primary"/>
+                    </Box>
+                    :
+                    <Grid className={classes.grid} container spacing={2}>
+                        {pastLivestreamElements}
+                    </Grid>}
                 {hasMorePast &&
-                <Button variant="outlined" className={classes.loadMoreButton} fullWidth onClick={loadMorePast}>
-                    Load More
+                <Button
+                    disabled={loadingMorePast}
+                    startIcon={loadingMorePast && <CircularProgress color="inherit" size={20}/>}
+                    variant="outlined"
+                    className={classes.loadMoreButton}
+                    fullWidth
+                    onClick={loadMorePast}
+                >
+                    {loadingMorePast ? "Loading" : "Load More"}
                 </Button>}
             </TabPanel>
+            <TabPanel value={value} index={2}>
+                {loadingDrafts ?
+                    <Box justifyContent="center" display="flex">
+                        <CircularProgress color="primary"/>
+                    </Box>
+                    :
+                    <Grid className={classes.grid} container spacing={2}>
+                        {draftLivestreamElements}
+                    </Grid>}
+                {hasMoreDrafts &&
+                <Button
+                    disabled={loadingMoreDrafts}
+                    startIcon={loadingMoreDrafts && <CircularProgress color="inherit" size={20}/>}
+                    variant="outlined"
+                    className={classes.loadMoreButton}
+                    fullWidth
+                    onClick={loadMoreDrafts}
+                >
+                    {loadingMoreDrafts ? "Loading" : "Load More"}
+                </Button>}
+            </TabPanel>
+            {fabs.map((fab, index) => {
+                return <Zoom
+                    key={index}
+                    in={shouldRenderFab(fab)}
+                    timeout={transitionDuration}
+                    style={{
+                        transitionDelay: `${shouldRenderFab(fab) ? transitionDuration.exit : 0}ms`,
+                    }}
+                    unmountOnExit
+                >
+                    <Fab onClick={fab.onClick} variant="extended" aria-label={fab.label} className={fab.className}
+                         color={fab.color}>
+                        {fab.icon}
+                        {fab.label}
+                    </Fab>
+                </Zoom>
+            })}
             <Menu
                 anchorEl={anchorEl}
                 keepMounted

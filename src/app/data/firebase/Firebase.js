@@ -592,6 +592,13 @@ class Firebase {
             .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
             .orderBy("start", "asc")
     }
+//
+    queryDraftLiveStreamsByGroupId = (groupId) => {
+        return  this.firestore
+            .collection("draftLivestreams")
+            .where("groupIds", "array-contains", groupId)
+            .orderBy("start", "asc")
+    }
 
     queryPastLiveStreamsByGroupId = (groupId) => {
         let START_DATE_FOR_REPORTED_EVENTS = 'September 1, 2020 00:00:00';
@@ -602,7 +609,6 @@ class Firebase {
             .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
             .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
             .orderBy("start", "desc")
-
     }
 
     getLivestreamSpeakers = (livestreamId) => {
