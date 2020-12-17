@@ -268,7 +268,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                                 fullWidth
                                 id="company"
                                 label="Company Name"
-                                inputProps={{maxLength: 70}}
+                                inputProps={{maxLength: 500}}
                                 onBlur={handleBlur}
                                 value={values.company}
                                 disabled={isSubmitting}
@@ -287,7 +287,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                                 fullWidth
                                 id="title"
                                 label="Livestream Title"
-                                inputProps={{maxLength: 70}}
+                                inputProps={{maxLength: 1000}}
                                 onBlur={handleBlur}
                                 value={values.title}
                                 disabled={isSubmitting}
@@ -344,7 +344,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                                 label="Summary"
                                 rows={2}
                                 rowsMax={7}
-                                inputProps={{maxLength: 500}}
+                                inputProps={{maxLength: 5000}}
                                 onBlur={handleBlur}
                                 value={values.summary}
                                 disabled={isSubmitting}

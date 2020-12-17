@@ -731,7 +731,7 @@ const GroupStreamCardV2 = memo(({
                                     {!!targetOptions.length &&
                                     <div className={classes.optionsWrapper}>
                                         <TargetOptions className={classes.optionChips}
-                                                       options={[...targetOptions, ...targetOptions, ...targetOptions]}/>
+                                                       options={targetOptions}/>
                                     </div>}
                                 </div>
                                 <div className={classes.logosBackWrapper}>

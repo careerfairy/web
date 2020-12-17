@@ -284,7 +284,7 @@ const NewLivestreamForm = ({firebase}) => {
                                     fullWidth
                                     id="title"
                                     label="Livestream Title"
-                                    // inputProps={{maxLength: 470}}
+                                    inputProps={{maxLength: 1000}}
                                     onBlur={handleBlur}
                                     value={values.title}
                                     disabled={isSubmitting}
@@ -347,7 +347,7 @@ const NewLivestreamForm = ({firebase}) => {
                                     fullWidth
                                     id="company"
                                     label="Company Name"
-                                    // inputProps={{maxLength: 70}}
+                                    inputProps={{maxLength: 500}}
                                     onBlur={handleBlur}
                                     value={values.company}
                                     disabled={isSubmitting}
@@ -366,7 +366,7 @@ const NewLivestreamForm = ({firebase}) => {
                                     fullWidth
                                     id="companyId"
                                     label="Company ID"
-                                    // inputProps={{maxLength: 70}}
+                                    inputProps={{maxLength: 1000}}
                                     onBlur={handleBlur}
                                     value={values.companyId}
                                     disabled={isSubmitting}
@@ -400,7 +400,7 @@ const NewLivestreamForm = ({firebase}) => {
                                     label="Summary"
                                     rows={2}
                                     rowsMax={7}
-                                    // inputProps={{maxLength: 500}}
+                                    inputProps={{maxLength: 5000}}
                                     onBlur={handleBlur}
                                     value={values.summary}
                                     disabled={isSubmitting}
