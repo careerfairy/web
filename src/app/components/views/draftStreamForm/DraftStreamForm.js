@@ -5,9 +5,9 @@ import {
     CircularProgress,
     Collapse,
     Container,
-    FormControl,
-    Grid,
-    TextField,
+    FormControl, FormControlLabel,
+    Grid, Switch,
+    TextField, Tooltip,
     Typography
 } from "@material-ui/core";
 import {Formik} from 'formik';
@@ -267,26 +267,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
             }} className={classes.form}>
                 <Typography style={{color: "white"}} variant="h4">Stream Info:</Typography>
                 <FormGroup>
-                    <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-                        <FormControl fullWidth>
-                            <TextField
-                                name="company"
-                                variant="outlined"
-                                fullWidth
-                                id="company"
-                                label="Company Name"
-                                inputProps={{maxLength: 70}}
-                                onBlur={handleBlur}
-                                value={values.company}
-                                disabled={isSubmitting}
-                                error={Boolean(errors.company && touched.company && errors.company)}
-                                onChange={handleChange}/>
-                            <Collapse style={{color: "red"}} in={Boolean(errors.company && touched.company)}>
-                                {errors.company}
-                            </Collapse>
-                        </FormControl>
-                    </Grid>
-                    <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+                    <Grid xs={7} sm={7} md={9} lg={9} xl={9} item>
                         <FormControl fullWidth>
                             <TextField
                                 name="title"
@@ -304,6 +285,28 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                                 {errors.title}
                             </Collapse>
                         </FormControl>
+                    </Grid>
+                    <Grid xs={5} sm={5} md={3} lg={3} xl={3}
+                          style={{display: "grid", placeItems: "center"}}
+                          item>
+                        <Tooltip
+                            placement="top"
+                            arrow
+                            title={<Typography>By enabling this you are making this stream only visible to members of your group</Typography>}>
+                        <FormControlLabel
+                            labelPlacement="start"
+                            label="Hide from other Groups"
+                            control={
+                                <Switch
+                                    checked={values.hidden}
+                                    onChange={handleChange}
+                                    color="primary"
+                                    id="hidden"
+                                    disabled={isSubmitting}
+                                    name="hidden"
+                                    inputProps={{'aria-label': 'primary checkbox'}}
+                                />}/>
+                        </Tooltip>
                     </Grid>
                     <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                         <ImageSelect
@@ -340,6 +343,26 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                                 }}/>
                         </MuiPickersUtilsProvider>
                     </Grid>
+                    <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                        <FormControl fullWidth>
+                            <TextField
+                                name="company"
+                                variant="outlined"
+                                fullWidth
+                                id="company"
+                                label="Company Name"
+                                inputProps={{maxLength: 70}}
+                                onBlur={handleBlur}
+                                value={values.company}
+                                disabled={isSubmitting}
+                                error={Boolean(errors.company && touched.company && errors.company)}
+                                onChange={handleChange}/>
+                            <Collapse style={{color: "red"}} in={Boolean(errors.company && touched.company)}>
+                                {errors.company}
+                            </Collapse>
+                        </FormControl>
+                    </Grid>
+
                     <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                         <FormControl fullWidth>
                             <TextField
