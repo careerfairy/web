@@ -112,7 +112,6 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         speakers: {[uuidv4()]: speakerObj},
     })
 
-    console.log("formData", formData);
 
     const handleSetGroupIds = async (UrlIds, draftStreamGroupIds, newFormData) => {
         const totalGroups = [...new Set([...UrlIds, ...draftStreamGroupIds])]
@@ -173,7 +172,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
 
     const handleSetOnlyUrlIds = async () => {
         const arrayOfUrlIds = careerCenterIds.split(",")
-        await handleSetGroupIds(arrayOfUrlIds, [])
+        await handleSetGroupIds(arrayOfUrlIds, [], formData)
         setAllFetched(true)
     }
 
@@ -430,7 +429,8 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                         {isSubmitting ? "Submitting" : updateMode ? "Update Draft" : "Submit Draft"}
                     </Typography>
                 </Button>
-            </form>)}
+            </form>)
+            }
         </Formik>) : <CircularProgress style={{marginTop: "30vh", color: "white"}}/>}
     </Container>);
 };
