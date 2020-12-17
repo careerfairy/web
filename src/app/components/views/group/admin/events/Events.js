@@ -1,7 +1,19 @@
 import React, {useCallback, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import {useRouter} from 'next/router';
-import {AppBar, Box, Button, CircularProgress, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
+import {
+    AppBar,
+    Box,
+    Button,
+    CircularProgress,
+    Grid,
+    Menu,
+    MenuItem,
+    Tab,
+    Tabs,
+    useTheme,
+    Zoom
+} from "@material-ui/core";
 import EnhancedGroupStreamCard from './enhanced-group-stream-card/EnhancedGroupStreamCard';
 import {makeStyles} from "@material-ui/core/styles";
 import useInfiniteScroll from "../../../../custom-hook/useInfiniteScroll";
@@ -10,6 +22,10 @@ import GroupStreamCardV2 from "../../../NextLivestreams/GroupStreams/groupStream
 import usePagination from "firestore-pagination-hook";
 import useFirestoreLoadMore from "../../../../custom-hook/useFirestoreLoadMore";
 import {snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
+import AddIcon from "@material-ui/icons/Add";
+import clsx from "clsx";
+import {green} from "@material-ui/core/colors";
+import Fab from "@material-ui/core/Fab";
 
 const useStyles = makeStyles(theme => ({
     streamsWrapper: {
@@ -23,14 +39,28 @@ const useStyles = makeStyles(theme => ({
     loadMoreButton: {
         marginTop: theme.spacing(1),
         marginBottom: theme.spacing(1)
-    }
+    },
+    fab: {
+        position: 'fixed',
+        bottom: theme.spacing(8),
+        right: theme.spacing(2),
+        zIndex: 1
+    },
 }))
+
 const Events = (props) => {
     if (!props.group.id) {
         return null
     }
     const classes = useStyles()
     const router = useRouter();
+    const theme = useTheme();
+
+    const transitionDuration = {
+        enter: theme.transitions.duration.enteringScreen,
+        exit: theme.transitions.duration.leavingScreen,
+    };
+
 
     const [anchorEl, setAnchorEl] = useState(null);
 
@@ -97,19 +127,6 @@ const Events = (props) => {
         }
     );
 
-
-    // const [itemsPast, loadMorePast, hasMorePast, totalItemsPast] = useInfiniteScroll(
-    //     props.firebase.queryPastLiveStreamsByGroupId(props.group.id), 6, 3
-    // );
-
-    // const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming, totalItemsUpcoming] = useInfiniteScroll(
-    //     props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id), 6, 3
-    // );
-    //
-    // const [itemsDrafts, loadMoreDrafts, hasMoreDrafts, totalItemsDrafts] = useInfiniteScroll(
-    //     props.firebase.queryDraftLiveStreamsByGroupId(props.group.id), 6, 3
-    // );
-
     const handleClose = () => {
         setAnchorEl(null);
     };
@@ -135,6 +152,22 @@ const Events = (props) => {
             'aria-controls': `simple-tabpanel-${index}`,
         };
     }
+
+    const fabs = [
+        {
+            color: 'primary',
+            className: classes.fab,
+            icon: <AddIcon/>,
+            label: 'Create a new Stream',
+        },
+        {},
+        {
+            color: 'secondary',
+            className: clsx(classes.fab),
+            icon: <AddIcon/>,
+            label: 'Draft a New Stream',
+        },
+    ];
 
     let livestreamElements = useMemo(() => snapShotsToData(itemsUpcoming).map((livestream) => {
         return (
@@ -172,7 +205,6 @@ const Events = (props) => {
     }), [loadMorePast]);
 
     let draftLivestreamElements = useMemo(() => snapShotsToData(itemsDrafts).map((livestream) => {
-        console.log("-> draft livestream", livestream);
         return (
             <Grid style={{height: 620}} key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={4} item>
                 <GroupStreamCardV2
@@ -193,7 +225,7 @@ const Events = (props) => {
 
 
     return (
-        <div style={{width: '100%', textAlign: 'left', height: "100%"}}>
+        <div style={{width: '100%', textAlign: 'left', height: "100%", position: "relative"}}>
             <AppBar color='default' position="sticky">
                 <Tabs
                     variant="fullWidth"
@@ -270,6 +302,24 @@ const Events = (props) => {
                     {loadingMoreDrafts ? "Loading" : "Load More"}
                 </Button>}
             </TabPanel>
+            {fabs.map((fab, index) => {
+                if (index !== 1) {
+                    return <Zoom
+                        key={index}
+                        in={value === index}
+                        timeout={transitionDuration}
+                        style={{
+                            transitionDelay: `${value === index ? transitionDuration.exit : 0}ms`,
+                        }}
+                        unmountOnExit
+                    >
+                        <Fab variant="extended" aria-label={fab.label} className={fab.className} color={fab.color}>
+                            {fab.icon}
+                            {fab.label}
+                        </Fab>
+                    </Zoom>
+                }
+            })}
             <Menu
                 anchorEl={anchorEl}
                 keepMounted
