@@ -167,6 +167,8 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
             })()
         } else if (careerCenterIds) {
             handleSetOnlyUrlIds()
+        } else {
+            setAllFetched(true)
         }
     }, [draftStreamId])
 
@@ -392,32 +394,36 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                             </FormGroup>
                         </Fragment>)
                 })}
-                <Typography style={{color: "white"}} variant="h4">Group Info:</Typography>
-                {!!existingGroups.length && <FormGroup>
-                    <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
-                        <MultiGroupSelect
-                            handleChange={handleChange}
-                            handleBlur={handleBlur}
-                            values={values}
-                            isSubmitting={isSubmitting}
-                            selectedGroups={selectedGroups}
-                            setTargetCategories={setTargetCategories}
-                            targetCategories={targetCategories}
-                            handleFlattenOptions={handleFlattenOptions}
-                            setSelectedGroups={setSelectedGroups}
-                            setFieldValue={setFieldValue}
-                            groups={existingGroups}/>
-                    </Grid>
-                    {selectedGroups.map(group => {
-                        return <Grid key={group.groupId} xs={12} sm={12} md={12} lg={12} xl={12} item>
-                            <GroupCategorySelect
-                                handleSetGroupCategories={handleSetGroupCategories}
-                                targetCategories={targetCategories}
+                {!!existingGroups.length &&
+                <>
+                    <Typography style={{color: "white"}} variant="h4">Group Info:</Typography>
+                    <FormGroup>
+                        <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                            <MultiGroupSelect
+                                handleChange={handleChange}
+                                handleBlur={handleBlur}
+                                values={values}
                                 isSubmitting={isSubmitting}
-                                group={group}/>
+                                selectedGroups={selectedGroups}
+                                setTargetCategories={setTargetCategories}
+                                targetCategories={targetCategories}
+                                handleFlattenOptions={handleFlattenOptions}
+                                setSelectedGroups={setSelectedGroups}
+                                setFieldValue={setFieldValue}
+                                groups={existingGroups}/>
                         </Grid>
-                    })}
-                </FormGroup>}
+                        {selectedGroups.map(group => {
+                            return <Grid key={group.groupId} xs={12} sm={12} md={12} lg={12} xl={12} item>
+                                <GroupCategorySelect
+                                    handleSetGroupCategories={handleSetGroupCategories}
+                                    targetCategories={targetCategories}
+                                    isSubmitting={isSubmitting}
+                                    group={group}/>
+                            </Grid>
+                        })}
+                    </FormGroup>
+                </>
+                }
                 <Button
                     type="submit"
                     disabled={isSubmitting}
