@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useCollectionOnce, useCollectionData } from 'react-firebase-hooks/firestore'
 import {snapShotsToData} from "../helperFunctions/HelperFunctions";
 
-const useFirestoreLoadMore = (queryFn, limit) => {
+const useFirestoreLoadMore = (queryFn, limit = 10) => {
     const [query, setQuery] = useState(null)
     const [last, setLast] = useState(null)
     const [data, setData] = useState([])
@@ -12,7 +12,7 @@ const useFirestoreLoadMore = (queryFn, limit) => {
 
     useEffect(() => {
         setData([])
-        setQuery(queryFn())
+        setQuery(queryFn().limit(limit))
     }, [queryFn])
 
     useEffect(() => {

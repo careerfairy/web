@@ -36,7 +36,7 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
 
     useEffect(() => {
         if (livestream && userRequestedDownload) {
-            firebase.listLivestreamQuestions(livestream.id, querySnapshot => {
+            const unsubscribe = firebase.listLivestreamQuestions(livestream.id, querySnapshot => {
                 let questionList = [];
                 querySnapshot.forEach(doc => {
                     let cc = doc.data();
@@ -45,12 +45,14 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
                 });
                 setQuestions(questionList);
             })
+
+            return  () => unsubscribe()
         }  
     }, [livestream, userRequestedDownload]);
 
     useEffect(() => {
         if (livestream && userRequestedDownload) {
-            firebase.listenToPollEntries(livestream.id, querySnapshot => {
+            const unsubscribe = firebase.listenToPollEntries(livestream.id, querySnapshot => {
                 let pollList = [];
                 querySnapshot.forEach(doc => {
                     let cc = doc.data();
@@ -59,6 +61,7 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
                 });
                 setPolls(pollList);
             })
+            return () =>  unsubscribe()
         }  
     }, [livestream, userRequestedDownload]);
 
@@ -78,7 +81,7 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
 
     useEffect(() => {
         if (livestream && userRequestedDownload) {
-            firebase.listenToTotalLivestreamIcons(livestream.id, querySnapshot => {
+            const unsubscribe = firebase.listenToTotalLivestreamIcons(livestream.id, querySnapshot => {
                 let iconList = [];
                 querySnapshot.forEach(doc => {
                     let cc = doc.data();
@@ -87,6 +90,7 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
                 });
                 setIcons(iconList);
             })
+            return () =>  unsubscribe()
         }  
     }, [livestream, userRequestedDownload]);
 
@@ -99,7 +103,6 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
                     student.id = doc.id;
                     participatingStudents.push(student);
                 });
-                debugger;
                 setParticipatingStudents(participatingStudents);
             })
         }      
@@ -114,7 +117,6 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
                     studentsOfGroup.push(publishedStudent);
                 }
             });
-            debugger;
             setParticipatingStudentsFromGroup(studentsOfGroup);
         }      
     }, [participatingStudents, userRequestedDownload]);
@@ -123,14 +125,13 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
         if (participatingStudents && participatingStudents.length && userRequestedDownload) {
             let listOfStudents = participatingStudents.filter( student => studentBelongsToGroup(student));
             let stats = StatsUtil.getRegisteredStudentsStats(listOfStudents, group);
-            debugger;
             setStudentStats(stats);
         }      
     }, [participatingStudents, userRequestedDownload]);
   
     useEffect(() => {
         if (livestream && userRequestedDownload) {
-            firebase.listenToLivestreamOverallRatings(livestream.id, querySnapshot => {
+            const unsubscribe = firebase.listenToLivestreamOverallRatings(livestream.id, querySnapshot => {
                 let overallRatings = [];
                 querySnapshot.forEach(doc => {
                     let cc = doc.data();
@@ -140,12 +141,13 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
                 let value = overallRatings.length > 0 ? average(overallRatings).toFixed(2) : "N.A."
                 setOverallRating(value)
             })
+            return () =>  unsubscribe()
         }  
     }, [livestream, userRequestedDownload]);
 
     useEffect(() => {
         if (livestream && userRequestedDownload) {
-            firebase.listenToLivestreamContentRatings(livestream.id, querySnapshot => {
+            const unsubscribe = firebase.listenToLivestreamContentRatings(livestream.id, querySnapshot => {
                 let contentRatings = [];
                 querySnapshot.forEach(doc => {
                     let cc = doc.data();
@@ -155,6 +157,7 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
                 let value = contentRatings.length > 0 ? average(contentRatings).toFixed(2) : "N.A."
                 setContentRating(value)
             })
+            return () =>  unsubscribe()
         }  
     }, [livestream, userRequestedDownload]);
 

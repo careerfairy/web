@@ -1,7 +1,7 @@
 import React, {useCallback, useLayoutEffect, useRef, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import {useRouter} from 'next/router';
-import {AppBar, Box, Button, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
+import {AppBar, Box, Button, CircularProgress, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
 import EnhancedGroupStreamCard from './enhanced-group-stream-card/EnhancedGroupStreamCard';
 import {makeStyles} from "@material-ui/core/styles";
 import useInfiniteScroll from "../../../../custom-hook/useInfiniteScroll";
@@ -54,9 +54,9 @@ const Events = (props) => {
     // );
 
     const {
-        loading,
+        loading: loadingPast,
         loadingError,
-        loadingMore,
+        loadingMore: loadingMorePast,
         loadingMoreError,
         hasMore: hasMorePast,
         items: itemsPast,
@@ -186,12 +186,23 @@ const Events = (props) => {
                 {/*</Button>}*/}
             </TabPanel>
             <TabPanel value={value} index={1}>
-                <Grid className={classes.grid} container spacing={2}>
-                    {pastLivestreamElements}
-                </Grid>
+                {loadingPast ?
+                    <Box justifyContent="center" display="flex">
+                        <CircularProgress color="primary"/>
+                    </Box>
+                    :
+                    <Grid className={classes.grid} container spacing={2}>
+                        {pastLivestreamElements}
+                    </Grid>}
                 {hasMorePast &&
-                <Button variant="outlined" className={classes.loadMoreButton} fullWidth onClick={loadMorePast}>
-                    Load More
+                <Button
+                    disabled={loadingMorePast}
+                    startIcon={loadingMorePast && <CircularProgress color="inherit" size={20}/>}
+                    variant="outlined" className={classes.loadMoreButton}
+                    fullWidth
+                    onClick={loadMorePast}
+                >
+                    {loadingMorePast ? "Loading" : "Load More"}
                 </Button>}
             </TabPanel>
             <TabPanel value={value} index={2}>
