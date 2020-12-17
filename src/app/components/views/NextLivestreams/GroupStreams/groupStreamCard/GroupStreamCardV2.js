@@ -321,7 +321,8 @@ const GroupStreamCardV2 = memo(({
                                     globalCardHighlighted,
                                     isAdmin,
                                     isPastLivestream,
-                                    hideActions
+                                    hideActions,
+                                    isDraft
                                 }) => {
 
     const router = useRouter();
@@ -687,6 +688,7 @@ const GroupStreamCardV2 = memo(({
                                                 <EnhancedGroupStreamCard
                                                     isPastLivestream={isPastLivestream}
                                                     group={groupData}
+                                                    isDraft={isDraft}
                                                     handleOpenLevelOfStudyModal={handleOpenLevelOfStudyModal}
                                                     handleCloseLevelOfStudyModal={handleCloseLevelOfStudyModal}
                                                     levelOfStudyModalOpen={levelOfStudyModalOpen}

@@ -137,12 +137,26 @@ const Events = (props) => {
         };
     }
 
+    const handleClickDraftNewStream = async () => {
+        const groupId = props.group.id
+        const targetPath = `/draft-stream`
+        return await router.push({
+            pathname: targetPath,
+            query: {
+                absolutePath: router.asPath,
+                careerCenterIds: groupId
+            }
+        })
+    }
+
     const fabs = [
         {
             color: 'primary',
             className: classes.fab,
             icon: <AddIcon/>,
             label: 'Create a new Stream',
+            onClick: () => {
+            }
         },
         {},
         {
@@ -150,6 +164,7 @@ const Events = (props) => {
             className: clsx(classes.fab),
             icon: <AddIcon/>,
             label: 'Draft a New Stream',
+            onClick: () => handleClickDraftNewStream()
         },
     ];
 
@@ -297,7 +312,7 @@ const Events = (props) => {
                         }}
                         unmountOnExit
                     >
-                        <Fab variant="extended" aria-label={fab.label} className={fab.className} color={fab.color}>
+                        <Fab onClick={fab.onClick} variant="extended" aria-label={fab.label} className={fab.className} color={fab.color}>
                             {fab.icon}
                             {fab.label}
                         </Fab>

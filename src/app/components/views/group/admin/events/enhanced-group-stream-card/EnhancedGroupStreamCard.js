@@ -29,7 +29,7 @@ import LivestreamPdfReport from './LivestreamPdfReport';
 import {useLivestreamMetadata} from 'components/custom-hook/useLivestreamMetadata';
 import {useTalentPoolMetadata} from 'components/custom-hook/useTalentPoolMetadata';
 import {makeStyles} from "@material-ui/core/styles";
-
+import PublishIcon from '@material-ui/icons/Publish';
 
 const useStyles = makeStyles(theme => {
     const themeWhite = theme.palette.common.white
@@ -44,7 +44,7 @@ const useStyles = makeStyles(theme => {
         }
     })
 })
-const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream, levelOfStudyModalOpen, handleCloseLevelOfStudyModal, handleOpenLevelOfStudyModal}) => {
+const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream, levelOfStudyModalOpen, handleCloseLevelOfStudyModal, handleOpenLevelOfStudyModal, isDraft}) => {
     const classes = useStyles()
     const [localCategories, setLocalCategories] = useState([]);
     const [groupCategories, setGroupCategories] = useState([]);
@@ -166,6 +166,10 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream,
         });
     }
 
+    const handlePublishStream = () => {
+
+    }
+
     let categoryElements = localCategories.map((category, index) => {
         return (
             <Chip
@@ -195,6 +199,17 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream,
                         variant='outlined'>
                     Edit Categories
                 </Button>
+                {isDraft &&
+                <Button
+                    className={classes.button}
+                    fullWidth
+                    onClick={handlePublishStream}
+                    startIcon={<PublishIcon/>}
+                    variant='outlined'
+                >
+                    Publish Stream
+                </Button>
+                }
                 <CSVLink data={registeredStudentsFromGroup} separator={";"}
                          filename={'Registered Students ' + livestream.company + ' ' + livestream.id + '.csv'}
                          style={{color: 'red'}}>

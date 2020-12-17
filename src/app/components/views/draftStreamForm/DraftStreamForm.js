@@ -83,7 +83,8 @@ const speakerObj = {
 const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
     const router = useRouter()
     const {
-        query: {careerCenterIds, draftStreamId},
+        query: {careerCenterIds, draftStreamId, absolutePath},
+        push
     } = router;
 
     const classes = useStyles()
@@ -228,6 +229,9 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     } else {
                         id = await firebase.addLivestream(livestream, "draftLivestreams")
                         console.log("-> Draft livestream was created with id", id);
+                    }
+                    if (absolutePath) {
+                        return push(absolutePath)
                     }
                     setDraftId(id)
                     setSubmitted(true)
