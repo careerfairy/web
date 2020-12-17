@@ -44,9 +44,8 @@ const useStyles = makeStyles(theme => {
         }
     })
 })
-const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}) => {
+const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream, levelOfStudyModalOpen, handleCloseLevelOfStudyModal, handleOpenLevelOfStudyModal}) => {
     const classes = useStyles()
-    const [modalOpen, setModalOpen] = useState(false);
     const [localCategories, setLocalCategories] = useState([]);
     const [groupCategories, setGroupCategories] = useState([]);
     const [allGroups, setAllGroups] = useState([]);
@@ -76,10 +75,10 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
     } = useTalentPoolMetadata(livestream, allGroups, group, firebase, registeredStudentsFromGroup, startDownloadingTalentPool);
 
     useEffect(() => {
-        if (livestream && livestream.targetCategories && livestream.targetCategories[group.id] && modalOpen) {
+        if (livestream && livestream.targetCategories && livestream.targetCategories[group.id] && levelOfStudyModalOpen) {
             setLocalCategories(livestream.targetCategories[group.id])
         }
-    }, [livestream, modalOpen])
+    }, [livestream, levelOfStudyModalOpen])
 
     useEffect(() => {
         if (group && group.categories) {
@@ -129,6 +128,7 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
         }
     }, [registeredStudents]);
 
+
     function studentBelongsToGroup(student) {
         if (group.universityCode) {
             if (student.universityCode === group.universityCode) {
@@ -162,7 +162,7 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
         let categoryCopy = livestream.targetCategories ? livestream.targetCategories : {};
         categoryCopy[group.id] = localCategories;
         firebase.updateLivestreamCategories(livestream.id, categoryCopy).then(() => {
-            setModalOpen(false);
+            handleCloseLevelOfStudyModal()
         });
     }
 
@@ -171,7 +171,7 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
             <Chip
                 size={"medium"}
                 variant={"outlined"}
-                key={category.id}
+                key={category.id || index}
                 onDelete={() => removeElement(category)}
                 label={getOptionName(category)}/>
         );
@@ -189,7 +189,7 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
                 <Typography gutterBottom align="center" style={{fontWeight: "bold"}} variant="h5">
                     {registeredStudentsFromGroup.length} students registered
                 </Typography>
-                <Button className={classes.button} onClick={() => setModalOpen(true)}
+                <Button className={classes.button} onClick={handleOpenLevelOfStudyModal}
                         fullWidth
                         startIcon={<EditIcon/>}
                         variant='outlined'>
@@ -257,13 +257,13 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
 
                     </Fragment>
                 }
-                <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
+                <Dialog open={levelOfStudyModalOpen} onClose={handleCloseLevelOfStudyModal} fullWidth maxWidth="sm">
                     <DialogTitle align="center">Update Target Groups</DialogTitle>
                     <DialogContent>
                         <FormControl variant="outlined" fullWidth style={{marginBottom: "10px"}}>
                             <InputLabel>Add a Target Group</InputLabel>
                             <Select
-                                value={null}
+                                value={''}
                                 placeholder="Select a target group"
                                 onChange={(e) => addElement(e.target.value)}
                                 label="New target group"
@@ -284,7 +284,7 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream}
                         </Button>
                         <Button
                             size="large"
-                            onClick={() => setModalOpen(false)}>
+                            onClick={handleCloseLevelOfStudyModal}>
                             Cancel
                         </Button>
                     </DialogActions>

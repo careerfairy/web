@@ -339,7 +339,6 @@ const GroupStreamCardV2 = memo(({
     const registered = useMemo(() => userIsRegistered(), [livestream.registeredUsers])
     const [expanded, setExpanded] = useState(false);
 
-    const [delayHandler, setDelayHandler] = useState(null)
     const [cardHovered, setCardHovered] = useState(false)
     const [frontHeight, setFrontHeight] = useState(0);
     const [targetOptions, setTargetOptions] = useState([])
@@ -347,6 +346,8 @@ const GroupStreamCardV2 = memo(({
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [isHighlighted, setIsHighlighted] = useState(false)
     const [openJoinModal, setOpenJoinModal] = useState(false);
+    const [levelOfStudyModalOpen, setLevelOfStudyModalOpen] = useState(false);
+
     const classes = useStyles({
         hideActions,
         isHighlighted,
@@ -367,6 +368,9 @@ const GroupStreamCardV2 = memo(({
             setFrontHeight(frontRef.current.offsetHeight * 0.7)
         }
     }, [frontRef.current])
+
+
+
 
 
     useEffect(() => {
@@ -414,16 +418,13 @@ const GroupStreamCardV2 = memo(({
         }
     }, []);
 
-    const throttleMouseEnter = event => {
-        clearTimeout(delayHandler)
-        handleMouseEntered()
-    }
-    const throttleMouseLeave = event => {
-        setDelayHandler(setTimeout(() => {
-            handleMouseLeft()
-        }, 150))
-    }
 
+    const handleCloseLevelOfStudyModal = () => {
+        setLevelOfStudyModalOpen(false)
+    }
+    const handleOpenLevelOfStudyModal = () => {
+        setLevelOfStudyModalOpen(true)
+    }
 
     const handleMouseEntered = () => {
         if (!mobile && !cardHovered && !globalCardHighlighted) {
@@ -559,7 +560,7 @@ const GroupStreamCardV2 = memo(({
     }
 
     const isNarrow = () => {
-        return Boolean(width === "md" && hasCategories)
+        return Boolean((width === "md" && hasCategories)|| isAdmin)
     }
 
     const handlePulseFront = () => {
@@ -588,7 +589,7 @@ const GroupStreamCardV2 = memo(({
     })
 
     const handleClickAwayDetails = () => {
-        if (expanded) {
+        if (expanded && !levelOfStudyModalOpen) {
             setExpanded(false)
         }
         if (cardHovered) {
@@ -681,11 +682,14 @@ const GroupStreamCardV2 = memo(({
                                                     fullWidth>
                                                 {expanded ? "Show less" : isAdmin ? "Manage Stream" : "See more"}
                                             </Button>
-                                            <Collapse in={expanded}>
+                                            <Collapse mountOnEnter in={expanded}>
                                                 {isAdmin &&
                                                 <EnhancedGroupStreamCard
                                                     isPastLivestream={isPastLivestream}
                                                     group={groupData}
+                                                    handleOpenLevelOfStudyModal={handleOpenLevelOfStudyModal}
+                                                    handleCloseLevelOfStudyModal={handleCloseLevelOfStudyModal}
+                                                    levelOfStudyModalOpen={levelOfStudyModalOpen}
                                                     livestream={livestream}
                                                     firebase={firebase}/>}
                                                 {!!targetOptions.length &&

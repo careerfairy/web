@@ -93,7 +93,6 @@ export const snapShotsToData = (snapShots) => {
         data.id = doc.id
         dataArray.push(data)
     })
-    console.log("-> dataArray", dataArray);
     return dataArray
 }
 
