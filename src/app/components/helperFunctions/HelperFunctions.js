@@ -86,6 +86,17 @@ export const getServerSideRouterQuery = (queryKey, router) => {
     }
 }
 
+export const snapShotsToData = (snapShots) => {
+    let dataArray = []
+    snapShots.forEach(doc => {
+        const data = doc.data()
+        data.id = doc.id
+        dataArray.push(data)
+    })
+    console.log("-> dataArray", dataArray);
+    return dataArray
+}
+
 export const MultilineText = ({text}) => {
     return text.split('\\n').map((item, i) => <p key={i}>{item}</p>)
 }

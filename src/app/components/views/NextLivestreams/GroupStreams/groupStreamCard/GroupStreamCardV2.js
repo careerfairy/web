@@ -682,7 +682,8 @@ const GroupStreamCardV2 = memo(({
                                                 {expanded ? "Show less" : isAdmin ? "Manage Stream" : "See more"}
                                             </Button>
                                             <Collapse in={expanded}>
-                                                {isAdmin && <EnhancedGroupStreamCard
+                                                {isAdmin &&
+                                                <EnhancedGroupStreamCard
                                                     isPastLivestream={isPastLivestream}
                                                     group={groupData}
                                                     livestream={livestream}
@@ -731,7 +732,7 @@ const GroupStreamCardV2 = memo(({
                                     {!!targetOptions.length &&
                                     <div className={classes.optionsWrapper}>
                                         <TargetOptions className={classes.optionChips}
-                                                       options={[...targetOptions, ...targetOptions, ...targetOptions]}/>
+                                                       options={targetOptions}/>
                                     </div>}
                                 </div>
                                 <div className={classes.logosBackWrapper}>
