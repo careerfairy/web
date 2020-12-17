@@ -44,7 +44,8 @@ const useStyles = makeStyles(theme => ({
         position: 'fixed',
         bottom: theme.spacing(8),
         right: theme.spacing(2),
-        zIndex: 1
+        zIndex: 1,
+        fontWeight: 600
     },
 }))
 
@@ -65,23 +66,6 @@ const Events = (props) => {
     const [anchorEl, setAnchorEl] = useState(null);
 
     const [value, setValue] = React.useState(0);
-
-    // const [
-    //     val,
-    //     {
-    //         loaded,
-    //         loadingMore,
-    //         hasMore,
-    //         loadMore,
-    //     },
-    //     error,
-    //
-    // ] = usePagination(
-    //     props.firebase.queryPastLiveStreamsByGroupId(props.group.id),
-    //     {
-    //         limit: 6
-    //     }
-    // );
 
     const {
         loading: loadingPast,
