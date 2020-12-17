@@ -2,6 +2,7 @@ import React, {Fragment, useState, useEffect} from 'react';
 import {withFirebase} from 'context/firebase';
 import EditIcon from '@material-ui/icons/Edit';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import {v4 as uuidv4} from 'uuid';
 import {
     Box,
     Button,
@@ -30,6 +31,7 @@ import {useLivestreamMetadata} from 'components/custom-hook/useLivestreamMetadat
 import {useTalentPoolMetadata} from 'components/custom-hook/useTalentPoolMetadata';
 import {makeStyles} from "@material-ui/core/styles";
 import PublishIcon from '@material-ui/icons/Publish';
+import ListAltIcon from '@material-ui/icons/ListAlt';
 
 const useStyles = makeStyles(theme => {
     const themeWhite = theme.palette.common.white
@@ -52,7 +54,9 @@ const EnhancedGroupStreamCard = ({
                                      levelOfStudyModalOpen,
                                      handleCloseLevelOfStudyModal,
                                      handleOpenLevelOfStudyModal,
-                                     isDraft
+                                     switchToNextLivestreamsTab,
+                                     isDraft,
+                                     router
                                  }) => {
     const classes = useStyles()
     const [localCategories, setLocalCategories] = useState([]);
@@ -61,6 +65,7 @@ const EnhancedGroupStreamCard = ({
 
     const [registeredStudents, setRegisteredStudents] = useState([]);
     const [registeredStudentsFromGroup, setRegisteredStudentsFromGroup] = useState([]);
+    const [publishingDraft, setPublishingDraft] = useState(false);
 
     const [startDownloadingReport, setStartDownloadingReport] = useState(false);
     const {
@@ -175,8 +180,37 @@ const EnhancedGroupStreamCard = ({
         });
     }
 
-    const handlePublishStream = () => {
+    const handlePublishStream = async () => {
+        try {
+            setPublishingDraft(true)
+            const newGroup = {...group}
+            newGroup.companyId = uuidv4()
+            await firebase.addLivestream(newGroup, "livestreams")
+            switchToNextLivestreamsTab()
+            setPublishingDraft(false)
+        } catch (e) {
+            setPublishingDraft(false)
+            console.log("-> e", e);
+        }
+    }
 
+    const handleEditStream = async () => {
+        const groupId = group.id
+        const targetPath = isDraft ? `/draft-stream` : "/new-livestream"
+        const targetQuery = {
+            absolutePath: router.asPath,
+            careerCenterIds: groupId,
+            eventTab: isDraft ? 2 : 0
+        }
+        if (isDraft) {
+            targetQuery.draftStreamId = livestream.id
+        } else {
+            targetQuery.livestreamId = livestream.id
+        }
+        return await router.push({
+            pathname: targetPath,
+            query: targetQuery
+        })
     }
 
     let categoryElements = localCategories.map((category, index) => {
@@ -206,12 +240,22 @@ const EnhancedGroupStreamCard = ({
                 <Button
                     className={classes.button}
                     fullWidth
+                    disabled={publishingDraft}
                     onClick={handlePublishStream}
-                    startIcon={<PublishIcon/>}
+                    startIcon={publishingDraft ? <CircularProgress size={20} color="inherit"/> : <PublishIcon/>}
                     variant='outlined'
                 >
-                    Publish Stream
+                    {publishingDraft ? "Publishing" : "Publish Stream"}
                 </Button>}
+                <Button
+                    className={classes.button}
+                    fullWidth
+                    onClick={handleEditStream}
+                    startIcon={<ListAltIcon/>}
+                    variant='outlined'
+                >
+                    Edit Stream
+                </Button>
                 <Button className={classes.button} onClick={handleOpenLevelOfStudyModal}
                         fullWidth
                         startIcon={<EditIcon/>}

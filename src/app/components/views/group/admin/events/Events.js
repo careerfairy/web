@@ -128,6 +128,10 @@ const Events = (props) => {
         setValue(newValue);
     };
 
+    const switchToNextLivestreamsTab = () => {
+        setValue(0)
+    }
+
     function TabPanel(props) {
         const {children, value, index, ...other} = props;
 
@@ -225,6 +229,7 @@ const Events = (props) => {
                     livestreamId={livestream.id}
                     livestream={livestream}
                     user={props.user}
+                    switchToNextLivestreamsTab={switchToNextLivestreamsTab}
                     userData={props.userData}
                     groupData={props.group}/>
             </Grid>
