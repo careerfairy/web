@@ -76,7 +76,7 @@ const speakerObj = {
 const NewLivestreamForm = ({firebase}) => {
     const router = useRouter()
     const {
-        query: {livestreamId, draftStreamId},
+        query: {livestreamId, draftStreamId, absolutePath},
         push
     } = router;
     const classes = useStyles()
@@ -235,7 +235,12 @@ const NewLivestreamForm = ({firebase}) => {
             } else {
                 id = await firebase.addLivestream(livestream, "livestreams")
             }
-            if (values.hidden && values.groupIds.length) {
+            if (absolutePath) {
+                return push({
+                    pathname: absolutePath,
+                    query: {eventTab: 0},
+                })
+            } else if (values.hidden && values.groupIds.length) {
                 return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)
             } else {
                 return push(`/upcoming-livestream/${id}`)

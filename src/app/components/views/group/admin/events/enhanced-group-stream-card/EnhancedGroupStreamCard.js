@@ -198,9 +198,8 @@ const EnhancedGroupStreamCard = ({
         const groupId = group.id
         const targetPath = isDraft ? `/draft-stream` : "/new-livestream"
         const targetQuery = {
-            absolutePath: router.asPath,
+            absolutePath: `/group/${groupId}/admin`,
             careerCenterIds: groupId,
-            eventTab: isDraft ? 2 : 0
         }
         if (isDraft) {
             targetQuery.draftStreamId = livestream.id
@@ -254,7 +253,7 @@ const EnhancedGroupStreamCard = ({
                     startIcon={<ListAltIcon/>}
                     variant='outlined'
                 >
-                    Edit Stream
+                    {isDraft ? "Edit Draft" : "Edit Stream"}
                 </Button>
                 <Button className={classes.button} onClick={handleOpenLevelOfStudyModal}
                         fullWidth

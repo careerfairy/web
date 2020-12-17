@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import {useRouter} from 'next/router';
 import {
@@ -26,6 +26,7 @@ import AddIcon from "@material-ui/icons/Add";
 import clsx from "clsx";
 import {green} from "@material-ui/core/colors";
 import Fab from "@material-ui/core/Fab";
+import UserContext from "../../../../../context/user/UserContext";
 
 const useStyles = makeStyles(theme => ({
     streamsWrapper: {
@@ -65,6 +66,7 @@ const Events = (props) => {
         exit: theme.transitions.duration.leavingScreen,
     };
 
+    const {authenticatedUser, userData} = useContext(UserContext);
 
     const [anchorEl, setAnchorEl] = useState(null);
 
@@ -72,7 +74,7 @@ const Events = (props) => {
 
     useEffect(() => {
         if (eventTab) {
-            setValue(eventTab)
+            setValue(Number(eventTab))
         }
     }, [router, eventTab])
 
@@ -162,24 +164,40 @@ const Events = (props) => {
         })
     }
 
+    const handleCLickCreateNewLivestream = async () => {
+        if (userData.isAdmin) {
+            const targetPath = `/new-livestream`
+            await router.push({
+                pathname: targetPath,
+            })
+        }
+    }
+
     const fabs = [
         {
             color: 'primary',
             className: classes.fab,
             icon: <AddIcon/>,
             label: 'Create a new Stream',
-            onClick: () => {
-            }
+            onClick: () => handleCLickCreateNewLivestream(),
+            forTabs: [0, 1]
         },
-        {},
         {
             color: 'secondary',
             className: clsx(classes.fab),
             icon: <AddIcon/>,
             label: 'Draft a New Stream',
-            onClick: () => handleClickDraftNewStream()
+            onClick: () => handleClickDraftNewStream(),
+            forTabs: [2]
         },
     ];
+
+    const shouldRenderFab = (fab) => {
+        if (!userData?.isAdmin && fabs.label !== 'Draft a New Stream') {
+            return false
+        }
+        return Boolean(fab.forTabs.includes(value))
+    }
 
     let livestreamElements = useMemo(() => snapShotsToData(itemsUpcoming).map((livestream) => {
         return (
@@ -316,23 +334,21 @@ const Events = (props) => {
                 </Button>}
             </TabPanel>
             {fabs.map((fab, index) => {
-                if (index !== 1) {
-                    return <Zoom
-                        key={index}
-                        in={value === index}
-                        timeout={transitionDuration}
-                        style={{
-                            transitionDelay: `${value === index ? transitionDuration.exit : 0}ms`,
-                        }}
-                        unmountOnExit
-                    >
-                        <Fab onClick={fab.onClick} variant="extended" aria-label={fab.label} className={fab.className}
-                             color={fab.color}>
-                            {fab.icon}
-                            {fab.label}
-                        </Fab>
-                    </Zoom>
-                }
+                return <Zoom
+                    key={index}
+                    in={shouldRenderFab(fab)}
+                    timeout={transitionDuration}
+                    style={{
+                        transitionDelay: `${shouldRenderFab(fab) ? transitionDuration.exit : 0}ms`,
+                    }}
+                    unmountOnExit
+                >
+                    <Fab onClick={fab.onClick} variant="extended" aria-label={fab.label} className={fab.className}
+                         color={fab.color}>
+                        {fab.icon}
+                        {fab.label}
+                    </Fab>
+                </Zoom>
             })}
             <Menu
                 anchorEl={anchorEl}
