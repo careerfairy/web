@@ -1,4 +1,4 @@
-import React, {useCallback, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import {useRouter} from 'next/router';
 import {
@@ -55,6 +55,9 @@ const Events = (props) => {
     }
     const classes = useStyles()
     const router = useRouter();
+    const {
+        query: {eventTab}
+    } = router
     const theme = useTheme();
 
     const transitionDuration = {
@@ -66,6 +69,12 @@ const Events = (props) => {
     const [anchorEl, setAnchorEl] = useState(null);
 
     const [value, setValue] = React.useState(0);
+
+    useEffect(() => {
+        if (eventTab) {
+            setValue(eventTab)
+        }
+    }, [router, eventTab])
 
     const {
         loading: loadingPast,
@@ -312,7 +321,8 @@ const Events = (props) => {
                         }}
                         unmountOnExit
                     >
-                        <Fab onClick={fab.onClick} variant="extended" aria-label={fab.label} className={fab.className} color={fab.color}>
+                        <Fab onClick={fab.onClick} variant="extended" aria-label={fab.label} className={fab.className}
+                             color={fab.color}>
                             {fab.icon}
                             {fab.label}
                         </Fab>

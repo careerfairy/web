@@ -39,12 +39,21 @@ const useStyles = makeStyles(theme => {
             border: `2px solid ${themeWhite}`,
             marginBottom: theme.spacing(1)
         },
-        divider:{
+        divider: {
             background: theme.palette.common.white
         }
     })
 })
-const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream, levelOfStudyModalOpen, handleCloseLevelOfStudyModal, handleOpenLevelOfStudyModal, isDraft}) => {
+const EnhancedGroupStreamCard = ({
+                                     firebase,
+                                     livestream,
+                                     group,
+                                     isPastLivestream,
+                                     levelOfStudyModalOpen,
+                                     handleCloseLevelOfStudyModal,
+                                     handleOpenLevelOfStudyModal,
+                                     isDraft
+                                 }) => {
     const classes = useStyles()
     const [localCategories, setLocalCategories] = useState([]);
     const [groupCategories, setGroupCategories] = useState([]);
@@ -193,12 +202,6 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream,
                 <Typography gutterBottom align="center" style={{fontWeight: "bold"}} variant="h5">
                     {registeredStudentsFromGroup.length} students registered
                 </Typography>
-                <Button className={classes.button} onClick={handleOpenLevelOfStudyModal}
-                        fullWidth
-                        startIcon={<EditIcon/>}
-                        variant='outlined'>
-                    Edit Categories
-                </Button>
                 {isDraft &&
                 <Button
                     className={classes.button}
@@ -208,8 +211,13 @@ const EnhancedGroupStreamCard = ({firebase, livestream, group, isPastLivestream,
                     variant='outlined'
                 >
                     Publish Stream
+                </Button>}
+                <Button className={classes.button} onClick={handleOpenLevelOfStudyModal}
+                        fullWidth
+                        startIcon={<EditIcon/>}
+                        variant='outlined'>
+                    Edit Categories
                 </Button>
-                }
                 <CSVLink data={registeredStudentsFromGroup} separator={";"}
                          filename={'Registered Students ' + livestream.company + ' ' + livestream.id + '.csv'}
                          style={{color: 'red'}}>

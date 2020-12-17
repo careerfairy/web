@@ -231,7 +231,10 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                         console.log("-> Draft livestream was created with id", id);
                     }
                     if (absolutePath) {
-                        return push(absolutePath)
+                        return push({
+                            pathname: absolutePath,
+                            query: {eventTab: 2},
+                        })
                     }
                     setDraftId(id)
                     setSubmitted(true)
