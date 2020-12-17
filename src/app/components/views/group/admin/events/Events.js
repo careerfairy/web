@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import {useRouter} from 'next/router';
 import {
@@ -14,17 +14,12 @@ import {
     useTheme,
     Zoom
 } from "@material-ui/core";
-import EnhancedGroupStreamCard from './enhanced-group-stream-card/EnhancedGroupStreamCard';
 import {makeStyles} from "@material-ui/core/styles";
-import useInfiniteScroll from "../../../../custom-hook/useInfiniteScroll";
-import CustomInfiniteScroll from "../../../../util/CustomInfiteScroll";
 import GroupStreamCardV2 from "../../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2";
 import usePagination from "firestore-pagination-hook";
-import useFirestoreLoadMore from "../../../../custom-hook/useFirestoreLoadMore";
 import {snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
 import AddIcon from "@material-ui/icons/Add";
 import clsx from "clsx";
-import {green} from "@material-ui/core/colors";
 import Fab from "@material-ui/core/Fab";
 import UserContext from "../../../../../context/user/UserContext";
 
@@ -89,7 +84,7 @@ const Events = (props) => {
     } = usePagination(
         props.firebase.queryPastLiveStreamsByGroupId(props.group.id),
         {
-            limit: 6
+            limit: 12
         }
     );
 
@@ -104,7 +99,7 @@ const Events = (props) => {
     } = usePagination(
         props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id),
         {
-            limit: 6
+            limit: 12
         }
     );
     const {
@@ -118,7 +113,7 @@ const Events = (props) => {
     } = usePagination(
         props.firebase.queryDraftLiveStreamsByGroupId(props.group.id),
         {
-            limit: 6
+            limit: 12
         }
     );
 

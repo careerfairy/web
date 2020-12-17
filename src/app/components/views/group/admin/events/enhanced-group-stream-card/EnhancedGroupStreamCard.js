@@ -183,9 +183,9 @@ const EnhancedGroupStreamCard = ({
     const handlePublishStream = async () => {
         try {
             setPublishingDraft(true)
-            const newGroup = {...group}
-            newGroup.companyId = uuidv4()
-            await firebase.addLivestream(newGroup, "livestreams")
+            const newStream = {...livestream}
+            newStream.companyId = uuidv4()
+            await firebase.addLivestream(newStream, "livestreams")
             switchToNextLivestreamsTab()
             setPublishingDraft(false)
         } catch (e) {
