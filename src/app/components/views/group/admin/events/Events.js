@@ -44,6 +44,22 @@ const useStyles = makeStyles(theme => ({
         zIndex: 1,
         fontWeight: 600
     },
+    buttonGroup: {
+        borderRadius: theme.spacing(3),
+        padding: theme.spacing(1),
+        background: theme.palette.primary.main,
+        position: 'fixed',
+        bottom: theme.spacing(8),
+        right: theme.spacing(2),
+        zIndex: 1,
+        fontWeight: 600,
+    },
+    mainButton: {
+        borderRadius: theme.spacing(3, 0, 0, 3),
+    },
+    sideButton: {
+        borderRadius: theme.spacing(0, 3, 3, 0),
+    },
 }))
 
 const Events = (props) => {
@@ -56,11 +72,6 @@ const Events = (props) => {
         query: {eventTab}
     } = router
     const theme = useTheme();
-
-    const transitionDuration = {
-        enter: theme.transitions.duration.enteringScreen,
-        exit: theme.transitions.duration.leavingScreen,
-    };
 
     const {authenticatedUser, userData} = useContext(UserContext);
 
@@ -321,25 +332,32 @@ const Events = (props) => {
                 >
                     {loadingMoreDrafts ? "Loading" : "Load More"}
                 </Button>}
-                <div>
-                    <CustomSplitButton
-                        options={draftButtonOptions}
-                    />
-                </div>
+
             </TabPanel>
-                <CustomZoom
-                    zoomIn={shouldRenderFab()}
-                    timeout={transitionDuration}
-                >
-                    <Fab onClick={handleCLickCreateNewLivestream}
-                         variant="extended"
-                         aria-label={'Create a new Stream'}
-                         className={classes.fab}
-                         color="primary">
-                        <AddIcon/>
-                        Create a new Stream
-                    </Fab>
-                </CustomZoom>
+            <CustomZoom
+                zoomIn={shouldRenderFab()}
+            >
+                <Fab
+                    onClick={handleCLickCreateNewLivestream}
+                    variant="extended"
+                    aria-label={'Create a new Stream'}
+                    className={classes.fab}
+                    color="primary">
+                    <AddIcon/>
+                    Create a new Stream
+                </Fab>
+            </CustomZoom>
+            <CustomZoom
+                zoomIn={value === 2}
+            >
+                <CustomSplitButton
+                    mainButtonProps={{classes: {root: classes.mainButton}, disableElevation: true}}
+                    sideButtonProps={{classes: {root: classes.sideButton}, disableElevation: true}}
+                    className={classes.buttonGroup}
+                    size="large"
+                    options={draftButtonOptions}
+                />
+            </CustomZoom>
             <Menu
                 anchorEl={anchorEl}
                 keepMounted

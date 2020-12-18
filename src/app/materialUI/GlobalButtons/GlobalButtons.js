@@ -73,7 +73,7 @@ export const PlayIconButton = ({addNewComment, isEmpty, IconProps, IconButtonPro
 //     }
 // }];
 
-export const CustomSplitButton = ({options = [], innerButtonProps, ...props}) => {
+export const CustomSplitButton = ({options = [], mainButtonProps, sideButtonProps, ...props}) => {
     const [open, setOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
     const [selectedIndex, setSelectedIndex] = React.useState(0);
@@ -100,14 +100,14 @@ export const CustomSplitButton = ({options = [], innerButtonProps, ...props}) =>
     return (
         <>
             <ButtonGroup {...props} variant="contained" color="primary" ref={anchorRef} aria-label="split button">
-                <Button {...innerButtonProps} onClick={options[selectedIndex].onClick}>{options[selectedIndex].label}</Button>
+                <Button {...mainButtonProps} onClick={options[selectedIndex].onClick}>{options[selectedIndex].label}</Button>
                 <Button
-                    {...innerButtonProps}
+                    {...sideButtonProps}
                     color="primary"
                     size="small"
                     aria-controls={open ? 'split-button-menu' : undefined}
                     aria-expanded={open ? 'true' : undefined}
-                    aria-label="select merge strategy"
+                    aria-label="Select draft create strategy"
                     aria-haspopup="menu"
                     onClick={handleToggle}
                 >
