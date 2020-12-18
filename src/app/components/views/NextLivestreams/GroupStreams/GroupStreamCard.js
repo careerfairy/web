@@ -7,7 +7,6 @@ import BookingModal from "../../common/booking-modal/BookingModal";
 import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
 import {useRouter} from "next/router";
-import CopyToClipboard from "./CopyToClipboard";
 import LogoElement from "./LogoElement";
 import TargetOptions from "../GroupsCarousel/TargetOptions";
 import GroupJoinToAttendModal from './GroupJoinToAttendModal';
@@ -21,6 +20,7 @@ import CheckCircleRoundedIcon from '@material-ui/icons/CheckCircleRounded';
 import QueryBuilderRoundedIcon from '@material-ui/icons/QueryBuilderRounded';
 import EventNoteRoundedIcon from '@material-ui/icons/EventNoteRounded';
 import Link from "next/link";
+import CopyToClipboard from "../../common/CopyToClipboard";
 
 const useStyles = makeStyles((theme) => ({
     root: {

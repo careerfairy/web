@@ -14,12 +14,12 @@ import DataAccessUtil from "../../../../../util/DataAccessUtil";
 import {useRouter} from "next/router";
 import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
-import CopyToClipboard from "../CopyToClipboard";
 import {AttendButton, DetailsButton} from "./actionButtons";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
 import {DateDisplay, TimeDisplay} from "./TimeDisplay";
 import EnhancedGroupStreamCard from "../../../group/admin/events/enhanced-group-stream-card/EnhancedGroupStreamCard";
 import SettingsIcon from '@material-ui/icons/Settings';
+import CopyToClipboard from "../../../common/CopyToClipboard";
 
 const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`

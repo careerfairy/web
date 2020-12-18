@@ -17,12 +17,13 @@ import {
 import {makeStyles} from "@material-ui/core/styles";
 import GroupStreamCardV2 from "../../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2";
 import usePagination from "firestore-pagination-hook";
-import {snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
+import {copyStringToClipboard, snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
 import AddIcon from "@material-ui/icons/Add";
 import clsx from "clsx";
 import Fab from "@material-ui/core/Fab";
 import UserContext from "../../../../../context/user/UserContext";
 import {CustomSplitButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
+import {useSnackbar} from "notistack";
 
 const useStyles = makeStyles(theme => ({
     streamsWrapper: {
@@ -72,6 +73,7 @@ const Events = (props) => {
         query: {eventTab}
     } = router
     const theme = useTheme();
+    const {enqueueSnackbar} = useSnackbar()
 
     const {authenticatedUser, userData} = useContext(UserContext);
 
@@ -189,13 +191,26 @@ const Events = (props) => {
         }
     }
 
+    const handleShareDraftLink = () => {
+        let baseUrl = "https://careerfairy.io"
+        if (window?.location?.origin) {
+            baseUrl = window.location.origin
+        }
+        const groupId = props.group.id
+        const targetPath = `${baseUrl}/draft-stream?careerCenterIds=${groupId}`
+        copyStringToClipboard(targetPath)
+        enqueueSnackbar("Link has been copied to your clipboard", {
+            variant: "default",
+            preventDuplicate: true
+        })
+    }
+
     const draftButtonOptions = [{
         label: 'Create a new draft',
         onClick: () => handleClickDraftNewStream()
     }, {
         label: 'Generate a sharable draft link',
-        onClick: () => {
-        }
+        onClick: () => handleShareDraftLink()
     }];
 
 
