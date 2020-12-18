@@ -6,19 +6,14 @@ import {v4 as uuidv4} from 'uuid';
 import {
     Box,
     Button,
-    CardMedia,
     Chip,
     CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle, Divider,
     FormControl,
-    Grid,
-    IconButton,
     InputLabel,
-    Menu,
     MenuItem,
     Select,
     Typography
@@ -292,15 +287,7 @@ const EnhancedGroupStreamCard = ({
                 >
                     {isDraft ? "Edit Draft" : "Edit Stream"}
                 </Button>
-                <Button
-                    className={classes.button}
-                    fullWidth
-                    onClick={handleOPenAreYouSureModal}
-                    startIcon={<DeleteForeverIcon/>}
-                    variant='outlined'
-                >
-                    {isDraft ? "Delete Draft" : "Delete Stream"}
-                </Button>
+
                 <Button className={classes.button} onClick={handleOpenLevelOfStudyModal}
                         fullWidth
                         startIcon={<EditIcon/>}
@@ -369,6 +356,15 @@ const EnhancedGroupStreamCard = ({
 
                     </Fragment>
                 }
+                <Button
+                    className={classes.button}
+                    fullWidth
+                    onClick={handleOPenAreYouSureModal}
+                    startIcon={<DeleteForeverIcon/>}
+                    variant='outlined'
+                >
+                    {isDraft ? "Delete Draft" : "Delete Stream"}
+                </Button>
                 <AreYouSureModal
                     open={openAreYouSureModal}
                     handleClose={handleCloseAreYouSureModal}

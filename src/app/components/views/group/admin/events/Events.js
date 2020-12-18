@@ -164,20 +164,26 @@ const Events = (props) => {
     const handleClickDraftNewStream = async () => {
         const groupId = props.group.id
         const targetPath = `/draft-stream`
+        const absolutePath = `/group/${groupId}/admin`
         return await router.push({
             pathname: targetPath,
             query: {
-                absolutePath: router.asPath,
+                absolutePath,
                 careerCenterIds: groupId
             }
         })
     }
 
     const handleCLickCreateNewLivestream = async () => {
+        const groupId = props.group.id
+        const absolutePath = `/group/${groupId}/admin`
         if (userData.isAdmin) {
             const targetPath = `/new-livestream`
             await router.push({
                 pathname: targetPath,
+                query: {
+                    absolutePath,
+                }
             })
         }
     }
