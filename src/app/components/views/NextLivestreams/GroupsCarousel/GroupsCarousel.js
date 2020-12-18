@@ -13,7 +13,13 @@ const useStyles = makeStyles((theme) => ({
     root: {
         zIndex: 1000,
         position: "sticky",
-        top: 0
+        top: -1,
+        WebkitTransform: "translate3d(0,0,0)",
+        transform: "translate3d(0,0,0)",
+        backfaceVisibility:"hidden",
+        perspective: 1000,
+        WebkitBackfaceVisibility: "hidden",
+        WebkitPerspective: 1000
     },
     slider: {
         boxShadow: "0 3px 3px grey",
@@ -55,7 +61,16 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleResetGroup, user, setGroupIdsToRemove, groupIdsToRemove}) => {
+const GroupsCarousel = ({
+                            groupIds,
+                            handleSetGroup,
+                            mobile,
+                            groupData,
+                            handleResetGroup,
+                            user,
+                            setGroupIdsToRemove,
+                            groupIdsToRemove
+                        }) => {
     const router = useRouter()
     const absolutePath = router.asPath;
     const classes = useStyles({mobile, singleCard: groupIds.length <= 1})
@@ -63,13 +78,9 @@ const GroupsCarousel = ({groupIds, handleSetGroup, mobile, groupData, handleRese
     const [activeSlide, setActiveSlide] = useState(0)
 
 
-
-
-
     const handleNext = () => {
         customSlider.current.slickNext()
     }
-
 
 
     const handlePrev = () => {
