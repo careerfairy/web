@@ -1,117 +1,138 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Container, Button, Image, Menu } from "semantic-ui-react";
-import { useRouter } from "next/router";
+import React, {useContext, useEffect, useState} from "react";
+import {Container, Button, Image, Menu} from "semantic-ui-react";
+import {useRouter} from "next/router";
 import Header from "../../../components/views/header/Header";
 import Head from "next/head";
 import Footer from "../../../components/views/footer/Footer";
 import AdminHeader from "../../../components/views/group/admin/AdminHeader";
 import GroupNav from "../../../components/views/group/admin/GroupNav";
-import { withFirebase } from "../../../context/firebase";
+import {withFirebase} from "../../../context/firebase";
 import UserContext from "context/user/UserContext";
+import Loader from "../../../components/views/loader/Loader";
+import {isEmptyObject} from "../../../components/helperFunctions/HelperFunctions";
 
 const JoinGroup = (props) => {
-  const router = useRouter();
-  const groupId = router.query.groupId;
+    const router = useRouter();
+    const groupId = router.query.groupId;
 
-  const { authenticatedUser, userData } = useContext(UserContext);
+    const {authenticatedUser: user, userData, loading} = useContext(UserContext);
 
-  const [group, setGroup] = useState({});
-  const [menuItem, setMenuItem] = useState("settings");
+    const [group, setGroup] = useState({});
+    const [menuItem, setMenuItem] = useState("settings");
 
-  useEffect(() => {
-    if (groupId) {
-      const unsubscribe = props.firebase.listenToCareerCenterById(
-        groupId,
-        (querySnapshot) => {
-          let careerCenter = querySnapshot.data();
-          careerCenter.id = querySnapshot.id;
-          setGroup(careerCenter);
+    useEffect(() => {
+        if (user === null) {
+            router.replace("/login");
         }
-      );
-      return () => unsubscribe();
+    }, [user]);
+
+
+    useEffect(() => {
+        if (groupId) {
+            const unsubscribe = props.firebase.listenToCareerCenterById(
+                groupId,
+                (querySnapshot) => {
+                    let careerCenter = querySnapshot.data();
+                    careerCenter.id = querySnapshot.id;
+                    setGroup(careerCenter);
+                }
+            );
+            return () => unsubscribe();
+        }
+    }, [groupId]);
+
+    useEffect(() => {
+        if (unAuthorized()) {
+            router.replace("/");
+        }
+
+    }, [group, user, userData]);
+
+    const unAuthorized = () => {
+        return Boolean(
+            (!isEmptyObject(group) && user && userData)
+            && (user.email !== group.adminEmail) && !userData.isAdmin
+        )
     }
-  }, [groupId]);
 
-  useEffect(() => {
-    if (!(Object.keys(group).length === 0) && authenticatedUser && userData) {
-      if ((authenticatedUser.email !== group.adminEmail) && !userData.isAdmin)
-        router.replace("/");
-      }
-  }, [group, authenticatedUser, userData]);
+    if (user === null || userData === null || loading === true || unAuthorized()) {
+        return <Loader/>;
+    }
 
-  return (
-    <div className="greyBackground">
-      <Head>
-        <title key="title">CareerFairy | Join Groups</title>
-      </Head>
-      <Header classElement="relative white-background" />
-      <AdminHeader group={group} menuItem={menuItem} />
-      <GroupNav
-        group={group}
-        groupId={groupId}
-        userData={userData}
-        user={authenticatedUser}
-      />
-      <Footer />
-      <style jsx>{`
-        .hidden {
-          display: none;
-        }
 
-        .greyBackground {
-          display: flex;
-          flex-direction: column;
-          background-color: rgb(250, 250, 250);
-          height: 100%;
-          min-height: 100vh;
-        }
+    return (
+        <div className="greyBackground">
+            <Head>
+                <title key="title">CareerFairy | Join Groups</title>
+            </Head>
+            <Header classElement="relative white-background"/>
+            <AdminHeader group={group} menuItem={menuItem}/>
+            <GroupNav
+                group={group}
+                groupId={groupId}
+                userData={userData}
+                user={user}
+            />
+            <Footer/>
+            <style jsx>{`
+              .hidden {
+                display: none;
+              }
 
-        .white-box {
-          padding: 10px;
-          margin: 10px 0 10px 0;
-          text-align: left;
-        }
+              .greyBackground {
+                display: flex;
+                flex-direction: column;
+                background-color: rgb(250, 250, 250);
+                height: 100%;
+                min-height: 100vh;
+              }
 
-        .title-container {
-          display: flex;
-          align-items: center;
-        }
+              .white-box {
+                padding: 10px;
+                margin: 10px 0 10px 0;
+                text-align: left;
+              }
 
-        .image-container {
-          position: relative;
-          width: 100%;
-          padding-top: 95%;
-          border-radius: 50%;
-          border: 5px solid rgb(0, 210, 170);
-          background-color: white;
-          margin: 0 auto;
-          box-shadow: 0 0 5px rgb(200, 200, 200);
-        }
+              .title-container {
+                display: flex;
+                align-items: center;
+              }
 
-        .field-error {
-          margin-top: 10px;
-          color: red;
-        }
+              .image-container {
+                position: relative;
+                width: 100%;
+                padding-top: 95%;
+                border-radius: 50%;
+                border: 5px solid rgb(0, 210, 170);
+                background-color: white;
+                margin: 0 auto;
+                box-shadow: 0 0 5px rgb(200, 200, 200);
+              }
 
-        .join-group-title {
-          text-align: left;
-          margin: 0 0 30px 0;
-          font-weight: 700;
-          font-size: 1.3em;
-          color: rgb(80, 80, 80);
-        }
+              .field-error {
+                margin-top: 10px;
+                color: red;
+              }
 
-        .sublabel {
-          margin: 40px 0 15px 0;
-          text-align: center;
-        }
+              .join-group-title {
+                text-align: left;
+                margin: 0 0 30px 0;
+                font-weight: 700;
+                font-size: 1.3em;
+                color: rgb(80, 80, 80);
+              }
 
-        #profileContainer {
-          padding: 30px 0;
-        }
-      `}</style>
-    </div>
-  );
+              .sublabel {
+                margin: 40px 0 15px 0;
+                text-align: center;
+              }
+
+              #profileContainer {
+                padding: 30px 0;
+              }
+            `}</style>
+        </div>
+    );
 };
 
 export default withFirebase(JoinGroup);
