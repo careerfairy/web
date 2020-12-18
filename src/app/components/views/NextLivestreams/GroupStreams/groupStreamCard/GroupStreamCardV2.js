@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => {
             transitionProperty: "transform",
             transitionDuration: `${theme.transitions.duration.shorter}ms`,
             transitionTimingFunction: theme.transitions.easing.easeInOut,
-            zIndex: ({cardHovered}) => cardHovered && 1002,
+            zIndex: ({cardHovered, expanded}) => (cardHovered || expanded) && 1002,
             "& p": {
                 color: theme.palette.common.white
             },
