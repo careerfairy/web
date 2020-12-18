@@ -32,6 +32,9 @@ import {useTalentPoolMetadata} from 'components/custom-hook/useTalentPoolMetadat
 import {makeStyles} from "@material-ui/core/styles";
 import PublishIcon from '@material-ui/icons/Publish';
 import ListAltIcon from '@material-ui/icons/ListAlt';
+import {useSnackbar} from "notistack";
+import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal";
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 
 const useStyles = makeStyles(theme => {
     const themeWhite = theme.palette.common.white
@@ -59,6 +62,9 @@ const EnhancedGroupStreamCard = ({
                                      router
                                  }) => {
     const classes = useStyles()
+
+    const {enqueueSnackbar} = useSnackbar()
+
     const [localCategories, setLocalCategories] = useState([]);
     const [groupCategories, setGroupCategories] = useState([]);
     const [allGroups, setAllGroups] = useState([]);
@@ -67,6 +73,8 @@ const EnhancedGroupStreamCard = ({
     const [registeredStudentsFromGroup, setRegisteredStudentsFromGroup] = useState([]);
     const [publishingDraft, setPublishingDraft] = useState(false);
 
+    const [deletingStream, setDeletingStream] = useState(false);
+    const [openAreYouSureModal, setOpenAreYouSureModal] = useState(false);
     const [startDownloadingReport, setStartDownloadingReport] = useState(false);
     const {
         hasDownloadedReport,
@@ -180,17 +188,46 @@ const EnhancedGroupStreamCard = ({
         });
     }
 
+    const sendErrorMessage = () => {
+        enqueueSnackbar("something went Wrong, please refresh the page", {
+            variant: "error",
+            preventDuplicate: true
+        })
+    }
+
+    const handleCloseAreYouSureModal = () => {
+        setOpenAreYouSureModal(false)
+    }
+    const handleOPenAreYouSureModal = () => {
+        setOpenAreYouSureModal(true)
+    }
+
+    const handleDeleteStream = async () => {
+        try {
+            setDeletingStream(true)
+            const targetCollection = isDraft ? "draftLivestreams" : "livestreams"
+            await firebase.deleteLivestream(livestream.id, targetCollection)
+            setDeletingStream(false)
+        } catch (e) {
+            setDeletingStream(false)
+            console.log("-> e", e);
+            sendErrorMessage()
+        }
+
+    }
+
     const handlePublishStream = async () => {
         try {
             setPublishingDraft(true)
             const newStream = {...livestream}
             newStream.companyId = uuidv4()
             await firebase.addLivestream(newStream, "livestreams")
+            await firebase.deleteLivestream(livestream.id, "draftLivestreams")
             switchToNextLivestreamsTab()
             setPublishingDraft(false)
         } catch (e) {
             setPublishingDraft(false)
-            console.log("-> e", e);
+            sendErrorMessage()
         }
     }
 
@@ -254,6 +291,15 @@ const EnhancedGroupStreamCard = ({
                     variant='outlined'
                 >
                     {isDraft ? "Edit Draft" : "Edit Stream"}
+                </Button>
+                <Button
+                    className={classes.button}
+                    fullWidth
+                    onClick={handleOPenAreYouSureModal}
+                    startIcon={<DeleteForeverIcon/>}
+                    variant='outlined'
+                >
+                    {isDraft ? "Delete Draft" : "Delete Stream"}
                 </Button>
                 <Button className={classes.button} onClick={handleOpenLevelOfStudyModal}
                         fullWidth
@@ -323,6 +369,13 @@ const EnhancedGroupStreamCard = ({
 
                     </Fragment>
                 }
+                <AreYouSureModal
+                    open={openAreYouSureModal}
+                    handleClose={handleCloseAreYouSureModal}
+                    handleConfirm={handleDeleteStream}
+                    loading={deletingStream}
+                    message={`Are you sure this ${isDraft ? "draft" : "stream"}? you will be no longer able to recover it`}
+                />
                 <Dialog open={levelOfStudyModalOpen} onClose={handleCloseLevelOfStudyModal} fullWidth maxWidth="sm">
                     <DialogTitle align="center">Update Target Groups</DialogTitle>
                     <DialogContent>

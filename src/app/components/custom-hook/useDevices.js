@@ -29,7 +29,6 @@ export default function useDevices() {
                 option.text = deviceInfo.label || `microphone ${audioInputList.length + 1}`;
                 audioInputList.push(option);
             } else if (deviceInfo.kind === 'audiooutput' && deviceInfo.deviceId !== "default") {
-                console.log("deviceInfo", deviceInfo);
                 option.text = deviceInfo.label || `speaker ${audioOutputList.length + 1}`;
                 audioOutputList.push(option);
             } else if (deviceInfo.kind === 'videoinput' && deviceInfo.deviceId !== "default") {

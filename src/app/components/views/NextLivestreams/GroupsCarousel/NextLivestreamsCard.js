@@ -42,7 +42,6 @@ const useStyles = makeStyles((theme) => ({
 
 
 const NextLivestreamsCard = ({handleSetGroup, mobile, index, handleResetGroup, activeSlide, groupData, position}) => {
-    // console.log("activeSlide in next",activeSlide);
     const classes = useStyles()
 
     useEffect(() => {
