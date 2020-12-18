@@ -22,6 +22,7 @@ import AddIcon from "@material-ui/icons/Add";
 import clsx from "clsx";
 import Fab from "@material-ui/core/Fab";
 import UserContext from "../../../../../context/user/UserContext";
+import {CustomSplitButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 
 const useStyles = makeStyles(theme => ({
     streamsWrapper: {
@@ -168,31 +169,24 @@ const Events = (props) => {
         }
     }
 
-    const fabs = [
-        {
-            color: 'primary',
-            className: classes.fab,
-            icon: <AddIcon/>,
-            label: 'Create a new Stream',
-            onClick: () => handleCLickCreateNewLivestream(),
-            forTabs: [0, 1]
-        },
-        {
-            color: 'secondary',
-            className: clsx(classes.fab),
-            icon: <AddIcon/>,
-            label: 'Draft a New Stream',
-            onClick: () => handleClickDraftNewStream(),
-            forTabs: [2]
-        },
-    ];
 
-    const shouldRenderFab = (fab) => {
-        if (!userData?.isAdmin && fabs.label !== 'Draft a New Stream') {
+    const shouldRenderFab = () => {
+        if (!userData?.isAdmin) {
             return false
+        } else {
+            return Boolean(value === 0 || value === 1)
         }
-        return Boolean(fab.forTabs.includes(value))
     }
+
+    const draftButtonOptions = [{
+        label: 'Create a new draft',
+        onClick: () => handleClickDraftNewStream()
+    }, {
+        label: 'Generate a sharable draft link',
+        onClick: () => {
+        }
+    }];
+
 
     let livestreamElements = useMemo(() => snapShotsToData(itemsUpcoming).map((livestream) => {
         return (
@@ -327,24 +321,25 @@ const Events = (props) => {
                 >
                     {loadingMoreDrafts ? "Loading" : "Load More"}
                 </Button>}
+                <div>
+                    <CustomSplitButton
+                        options={draftButtonOptions}
+                    />
+                </div>
             </TabPanel>
-            {fabs.map((fab, index) => {
-                return <Zoom
-                    key={index}
-                    in={shouldRenderFab(fab)}
+                <CustomZoom
+                    zoomIn={shouldRenderFab()}
                     timeout={transitionDuration}
-                    style={{
-                        transitionDelay: `${shouldRenderFab(fab) ? transitionDuration.exit : 0}ms`,
-                    }}
-                    unmountOnExit
                 >
-                    <Fab onClick={fab.onClick} variant="extended" aria-label={fab.label} className={fab.className}
-                         color={fab.color}>
-                        {fab.icon}
-                        {fab.label}
+                    <Fab onClick={handleCLickCreateNewLivestream}
+                         variant="extended"
+                         aria-label={'Create a new Stream'}
+                         className={classes.fab}
+                         color="primary">
+                        <AddIcon/>
+                        Create a new Stream
                     </Fab>
-                </Zoom>
-            })}
+                </CustomZoom>
             <Menu
                 anchorEl={anchorEl}
                 keepMounted
@@ -358,6 +353,28 @@ const Events = (props) => {
         </div>
     )
         ;
+}
+
+const CustomZoom = ({children, zoomIn, shouldRenderFab, ...props}) => {
+    const theme = useTheme()
+    const transitionDuration = {
+        enter: theme.transitions.duration.enteringScreen,
+        exit: theme.transitions.duration.leavingScreen,
+    };
+
+    return (
+        <Zoom
+            {...props}
+            timeout={transitionDuration}
+            in={zoomIn}
+            unmountOnExit
+            style={{
+                transitionDelay: `${zoomIn ? transitionDuration.exit : 0}ms`,
+            }}
+        >
+            {children}
+        </Zoom>
+    )
 }
 
 export default withFirebase(Events);
