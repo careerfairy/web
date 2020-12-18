@@ -57,7 +57,7 @@ const GroupStreams = ({
         const renderStreamCards = livestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
-                    <Grid style={{height: mobile ? 620 : 600}} key={livestream.id} xs={12} sm={12} md={6}
+                    <Grid style={{height: !mobile && 600}} key={livestream.id} xs={12} sm={12} md={6}
                           lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 4} item>
                         <GroupStreamCardV2
                             index={index}
