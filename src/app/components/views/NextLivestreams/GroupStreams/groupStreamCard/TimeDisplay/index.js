@@ -33,6 +33,30 @@ const useStyles = makeStyles(theme => {
                 color: "white !important"
             },
         },
+        dateTimeWrapper: {
+            position: "relative",
+            zIndex: "100",
+            borderRadius: "5px",
+            textAlign: "center",
+            backgroundColor: "rgb(245,245,245)",
+            boxShadow: "0 0 2px grey",
+            fontWeight: "500",
+            textTransform: "uppercase",
+            padding: "5px 15px",
+            width: "400",
+        },
+        dateTimeWrapperMonth: {
+            fontSize: "1.2rem",
+            fontWeight: "300"
+        },
+        dateTimeWrapperDay: {
+            fontSize: "2rem",
+            lineHeight: "1.8rem",
+        },
+        dateTimeWrapperHour: {
+            fontSize: "1.1rem",
+            lineHeight: "1.6rem"
+        },
         yearLabel: {
             width: "100%"
         },
@@ -91,6 +115,33 @@ export const TimeDisplay = ({date, narrow, mobile}) => {
                     {amPm}
                 </Typography>
             </Typography>
+        </div>
+    )
+}
+
+export const DateTimeDisplay = ({date, narrow, mobile}) => {
+    const classes = useStyles({mobile})
+
+    const month = dayjs(date).format('MMM')
+    const dayOfMonth = dayjs(date).format('D')
+
+    const hour = dayjs(date).format('HH')
+    const minute = dayjs(date).format('mm')
+    const amPm = dayjs(date).format('A')
+
+    return (
+        <div className={classes.dateTimeWrapper}>
+            <div className={classes.content}>
+                <div className={classes.dateTimeWrapperMonth}>
+                    { month }
+                </div>
+                <div className={classes.dateTimeWrapperDay}>
+                    { dayOfMonth }
+                </div>
+                <div className={classes.dateTimeWrapperHour}>
+                    { hour }:{ minute }
+                </div>
+            </div>
         </div>
     )
 }
