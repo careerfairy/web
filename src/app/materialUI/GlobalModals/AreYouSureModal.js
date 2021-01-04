@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
         color: theme.palette.error.contrastText
     }
 }))
-const AreYouSureModal = ({title, message, handleConfirm, open, handleClose, loading}) => {
+const AreYouSureModal = ({title = "Are you sure?", message, handleConfirm, open, handleClose, loading}) => {
     const classes = useStyles()
 
     return (

@@ -1,4 +1,4 @@
-import React, {Fragment, memo, useEffect, useMemo, useRef, useState} from 'react';
+import React, {createRef, Fragment, memo, useEffect, useMemo, useRef, useState} from 'react';
 import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
@@ -14,12 +14,13 @@ import DataAccessUtil from "../../../../../util/DataAccessUtil";
 import {useRouter} from "next/router";
 import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
-import CopyToClipboard from "../CopyToClipboard";
 import {AttendButton, DetailsButton} from "./actionButtons";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
 import {DateDisplay, TimeDisplay} from "./TimeDisplay";
 import EnhancedGroupStreamCard from "../../../group/admin/events/enhanced-group-stream-card/EnhancedGroupStreamCard";
 import SettingsIcon from '@material-ui/icons/Settings';
+import CopyToClipboard from "../../../common/CopyToClipboard";
+import LogosPlaceHolder from "./LogosPlaceholder";
 
 const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
@@ -43,7 +44,7 @@ const useStyles = makeStyles((theme) => {
             transitionProperty: "transform",
             transitionDuration: `${theme.transitions.duration.shorter}ms`,
             transitionTimingFunction: theme.transitions.easing.easeInOut,
-            zIndex: ({cardHovered}) => cardHovered && 1002,
+            zIndex: ({cardHovered, expanded}) => (cardHovered || expanded) && 1002,
             "& p": {
                 color: theme.palette.common.white
             },
@@ -184,7 +185,11 @@ const useStyles = makeStyles((theme) => {
             justifyContent: "space-between"
         },
         backgroundContent: {
-            marginTop: ({hideActions, hasOptions}) => hideActions ? hasOptions ? "60%" : "70%" : 0,
+            marginTop: ({
+                            frontHeight,
+                            hideActions,
+                            hasOptions
+                        }) => hideActions ? hasOptions ? frontHeight - 135 : frontHeight - 90 : 0,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -193,7 +198,7 @@ const useStyles = makeStyles((theme) => {
             paddingTop: 0
         },
         buttonsWrapper: {
-            marginTop: ({hasOptions}) => hasOptions ? "60%" : "70%",
+            marginTop: ({frontHeight, hasOptions}) => hasOptions ? frontHeight - 135 : frontHeight - 90,
             display: "flex",
             justifyContent: "center",
             marginBottom: theme.spacing(1),
@@ -321,13 +326,15 @@ const GroupStreamCardV2 = memo(({
                                     globalCardHighlighted,
                                     isAdmin,
                                     isPastLivestream,
-                                    hideActions
+                                    hideActions,
+                                    isDraft,
+                                    switchToNextLivestreamsTab
                                 }) => {
 
     const router = useRouter();
     const absolutePath = router.asPath
     const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
-    const frontRef = useRef()
+    const frontRef = createRef()
 
     function userIsRegistered() {
         if (!user || !livestream.registeredUsers || isAdmin) {
@@ -339,7 +346,6 @@ const GroupStreamCardV2 = memo(({
     const registered = useMemo(() => userIsRegistered(), [livestream.registeredUsers])
     const [expanded, setExpanded] = useState(false);
 
-    const [delayHandler, setDelayHandler] = useState(null)
     const [cardHovered, setCardHovered] = useState(false)
     const [frontHeight, setFrontHeight] = useState(0);
     const [targetOptions, setTargetOptions] = useState([])
@@ -347,6 +353,9 @@ const GroupStreamCardV2 = memo(({
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [isHighlighted, setIsHighlighted] = useState(false)
     const [openJoinModal, setOpenJoinModal] = useState(false);
+    const [levelOfStudyModalOpen, setLevelOfStudyModalOpen] = useState(false);
+    const [fetchingCareerCenters, setFetchingCareerCenters] = useState(false);
+
     const classes = useStyles({
         hideActions,
         isHighlighted,
@@ -364,9 +373,10 @@ const GroupStreamCardV2 = memo(({
 
     useEffect(() => {
         if (frontRef.current?.offsetHeight) {
-            setFrontHeight(frontRef.current.offsetHeight * 0.7)
+            const dimensions = frontRef.current.getBoundingClientRect()
+            setFrontHeight(dimensions.height)
         }
-    }, [frontRef.current])
+    }, [frontRef])
 
 
     useEffect(() => {
@@ -401,6 +411,7 @@ const GroupStreamCardV2 = memo(({
 
     useEffect(() => {
         if (!careerCenters.length && livestream && livestream.groupIds && livestream.groupIds.length) {
+            setFetchingCareerCenters(true)
             firebase.getDetailLivestreamCareerCenters(livestream.groupIds)
                 .then((querySnapshot) => {
                     let groupList = [];
@@ -410,20 +421,21 @@ const GroupStreamCardV2 = memo(({
                         groupList.push(group);
                     });
                     setCareerCenters(groupList);
-                }).catch((e) => console.log("error", e))
+                    setFetchingCareerCenters(false)
+                }).catch((e) => {
+                setFetchingCareerCenters(false)
+                console.log("error", e)
+            })
         }
     }, []);
 
-    const throttleMouseEnter = event => {
-        clearTimeout(delayHandler)
-        handleMouseEntered()
-    }
-    const throttleMouseLeave = event => {
-        setDelayHandler(setTimeout(() => {
-            handleMouseLeft()
-        }, 150))
-    }
 
+    const handleCloseLevelOfStudyModal = () => {
+        setLevelOfStudyModalOpen(false)
+    }
+    const handleOpenLevelOfStudyModal = () => {
+        setLevelOfStudyModalOpen(true)
+    }
 
     const handleMouseEntered = () => {
         if (!mobile && !cardHovered && !globalCardHighlighted) {
@@ -543,7 +555,7 @@ const GroupStreamCardV2 = memo(({
     }
 
     const checkIfRegistered = () => {
-        if(isAdmin){
+        if (isAdmin) {
             return false
         }
         return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1)
@@ -559,7 +571,7 @@ const GroupStreamCardV2 = memo(({
     }
 
     const isNarrow = () => {
-        return Boolean(width === "md" && hasCategories)
+        return Boolean((width === "md" && hasCategories) || isAdmin)
     }
 
     const handlePulseFront = () => {
@@ -572,7 +584,7 @@ const GroupStreamCardV2 = memo(({
     let logoElements = careerCenters.map(careerCenter => {
         return (
             <div className={classes.logoElement} key={careerCenter.groupId}>
-                <LogoElement hideFollow={(!cardHovered && !mobile)|| isAdmin} key={careerCenter.groupId}
+                <LogoElement hideFollow={(!cardHovered && !mobile) || isAdmin} key={careerCenter.groupId}
                              livestreamId={livestream.id}
                              userFollows={checkIfUserFollows(careerCenter)}
                              careerCenter={careerCenter} userData={userData} user={user}/>
@@ -588,7 +600,7 @@ const GroupStreamCardV2 = memo(({
     })
 
     const handleClickAwayDetails = () => {
-        if (expanded) {
+        if (expanded && !levelOfStudyModalOpen) {
             setExpanded(false)
         }
         if (cardHovered) {
@@ -681,10 +693,17 @@ const GroupStreamCardV2 = memo(({
                                                     fullWidth>
                                                 {expanded ? "Show less" : isAdmin ? "Manage Stream" : "See more"}
                                             </Button>
-                                            <Collapse in={expanded}>
-                                                {isAdmin && <EnhancedGroupStreamCard
+                                            <Collapse mountOnEnter in={expanded}>
+                                                {isAdmin &&
+                                                <EnhancedGroupStreamCard
                                                     isPastLivestream={isPastLivestream}
                                                     group={groupData}
+                                                    isDraft={isDraft}
+                                                    router={router}
+                                                    switchToNextLivestreamsTab={switchToNextLivestreamsTab}
+                                                    handleOpenLevelOfStudyModal={handleOpenLevelOfStudyModal}
+                                                    handleCloseLevelOfStudyModal={handleCloseLevelOfStudyModal}
+                                                    levelOfStudyModalOpen={levelOfStudyModalOpen}
                                                     livestream={livestream}
                                                     firebase={firebase}/>}
                                                 {!!targetOptions.length &&
@@ -694,11 +713,11 @@ const GroupStreamCardV2 = memo(({
                                                 </div>}
                                             </Collapse>
                                         </div>}
-                                        <Grow in={Boolean(logoElements.length)}>
-                                            <div className={classes.companyLogosFrontWrapper}>
-                                                {logoElements}
-                                            </div>
-                                        </Grow>
+                                        {/*<Grow in={Boolean(logoElements.length)}>*/}
+                                        <div className={classes.companyLogosFrontWrapper}>
+                                            {fetchingCareerCenters ? <LogosPlaceHolder/> : logoElements}
+                                        </div>
+                                        {/*</Grow>*/}
                                     </>
                                     }
                                 </div>
@@ -731,11 +750,11 @@ const GroupStreamCardV2 = memo(({
                                     {!!targetOptions.length &&
                                     <div className={classes.optionsWrapper}>
                                         <TargetOptions className={classes.optionChips}
-                                                       options={[...targetOptions, ...targetOptions, ...targetOptions]}/>
+                                                       options={targetOptions}/>
                                     </div>}
                                 </div>
                                 <div className={classes.logosBackWrapper}>
-                                    {logoElements}
+                                    {fetchingCareerCenters ? <LogosPlaceHolder/> : logoElements}
                                 </div>
                             </Box>
                         </ClickAwayListener>

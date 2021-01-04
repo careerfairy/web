@@ -86,7 +86,34 @@ export const getServerSideRouterQuery = (queryKey, router) => {
     }
 }
 
+export const snapShotsToData = (snapShots) => {
+    let dataArray = []
+    snapShots.forEach(doc => {
+        const data = doc.data()
+        data.id = doc.id
+        dataArray.push(data)
+    })
+    return dataArray
+}
+
 export const MultilineText = ({text}) => {
     return text.split('\\n').map((item, i) => <p key={i}>{item}</p>)
+}
+
+export const copyStringToClipboard = (string) => {
+    // Create new element
+    let el = document.createElement('textarea');
+    // Set value (string to be copied)
+    el.value = string;
+    // Set non-editable to avoid focus and move outside of view
+    el.setAttribute('readonly', '');
+    el.style = {position: 'absolute', left: '-9999px'};
+    document.body.appendChild(el);
+    // Select text inside element
+    el.select();
+    // Copy text to clipboard
+    document.execCommand('copy');
+    // Remove temporary element
+    document.body.removeChild(el);
 }
 

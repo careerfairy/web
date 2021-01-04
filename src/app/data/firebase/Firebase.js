@@ -279,6 +279,15 @@ class Firebase {
         }
     }
 
+    deleteLivestream = async (livestreamId, collection) => {
+        let batch = this.firestore.batch();
+        let livestreamsRef = this.firestore
+            .collection(collection)
+            .doc(livestreamId)
+        batch.delete(livestreamsRef)
+        await batch.commit()
+    }
+
     addDraftLivestream = async (livestream) => {
         let batch = this.firestore.batch();
         let livestreamsRef = this.firestore
@@ -585,10 +594,17 @@ class Firebase {
 
     queryUpcomingLiveStreamsByGroupId = (groupId) => {
         var ninetyMinutesInMilliseconds = 1000 * 60 * 90;
-        return  this.firestore
+        return this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
             .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
+            .orderBy("start", "asc")
+    }
+//
+    queryDraftLiveStreamsByGroupId = (groupId) => {
+        return this.firestore
+            .collection("draftLivestreams")
+            .where("groupIds", "array-contains", groupId)
             .orderBy("start", "asc")
     }
 
@@ -601,7 +617,6 @@ class Firebase {
             .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
             .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
             .orderBy("start", "desc")
-
     }
 
     getLivestreamSpeakers = (livestreamId) => {
