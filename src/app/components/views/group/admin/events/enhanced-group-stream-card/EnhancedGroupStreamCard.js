@@ -54,7 +54,8 @@ const EnhancedGroupStreamCard = ({
                                      handleOpenLevelOfStudyModal,
                                      switchToNextLivestreamsTab,
                                      isDraft,
-                                     router
+                                     router,
+                                     hasOptions
                                  }) => {
     const classes = useStyles()
 
@@ -405,7 +406,7 @@ const EnhancedGroupStreamCard = ({
                     </DialogActions>
                 </Dialog>
             </Box>
-            <Divider className={classes.divider} variant="middle"/>
+            {hasOptions && <Divider className={classes.divider} variant="middle"/>}
         </>
     );
 }

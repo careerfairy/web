@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => {
             transitionProperty: "transform",
             transitionDuration: `${theme.transitions.duration.shorter}ms`,
             transitionTimingFunction: theme.transitions.easing.easeInOut,
-            zIndex: ({cardHovered, expanded}) => (cardHovered || expanded) && 1002,
+            zIndex: ({cardHovered, isExpanded}) => (cardHovered || isExpanded) && 1002,
             "& p": {
                 color: theme.palette.common.white
             },
@@ -700,6 +700,7 @@ const GroupStreamCardV2 = memo(({
                                                     group={groupData}
                                                     isDraft={isDraft}
                                                     router={router}
+                                                    hasOptions={Boolean(targetOptions.length)}
                                                     switchToNextLivestreamsTab={switchToNextLivestreamsTab}
                                                     handleOpenLevelOfStudyModal={handleOpenLevelOfStudyModal}
                                                     handleCloseLevelOfStudyModal={handleCloseLevelOfStudyModal}
