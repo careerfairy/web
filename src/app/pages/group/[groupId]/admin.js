@@ -10,6 +10,7 @@ import {withFirebase} from "../../../context/firebase";
 import UserContext from "context/user/UserContext";
 import Loader from "../../../components/views/loader/Loader";
 import {isEmptyObject} from "../../../components/helperFunctions/HelperFunctions";
+import DashboardLayout from "../../../layouts/DashboardLayout";
 
 const JoinGroup = (props) => {
     const router = useRouter();
@@ -61,78 +62,139 @@ const JoinGroup = (props) => {
 
 
     return (
-        <div className="greyBackground">
-            <Head>
-                <title key="title">CareerFairy | Join Groups</title>
-            </Head>
-            <Header classElement="relative white-background"/>
-            <AdminHeader group={group} menuItem={menuItem}/>
-            <GroupNav
-                group={group}
-                groupId={groupId}
-                userData={userData}
-                user={user}
-            />
-            <Footer/>
-            <style jsx>{`
-              .hidden {
-                display: none;
-              }
+        <DashboardLayout
+            title="CareerFairy | Join Groups"
+            group={group}
+        >
+            <div>hi</div>
+        </DashboardLayout>
+    )
+    {/*<Header classElement="relative white-background"/>*/
+    }
+    {/*<AdminHeader group={group} menuItem={menuItem}/>*/
+    }
+    {/*<GroupNav*/
+    }
+    {/*    group={group}*/
+    }
+    {/*    groupId={groupId}*/
+    }
+    {/*    userData={userData}*/
+    }
+    {/*    user={user}*/
+    }
+    {/*/>*/
+    }
+    {/*<Footer/>*/
+    }
+    {/*<style jsx>{`*/
+    }
+    {/*  .hidden {*/
+    }
+    {/*    display: none;*/
+    }
+    {/*  }*/
+    }
 
-              .greyBackground {
-                display: flex;
-                flex-direction: column;
-                background-color: rgb(250, 250, 250);
-                height: 100%;
-                min-height: 100vh;
-              }
+    {/*  .greyBackground {*/
+    }
+    {/*    display: flex;*/
+    }
+    {/*    flex-direction: column;*/
+    }
+    {/*    background-color: rgb(250, 250, 250);*/
+    }
+    {/*    height: 100%;*/
+    }
+    {/*    min-height: 100vh;*/
+    }
+    {/*  }*/
+    }
 
-              .white-box {
-                padding: 10px;
-                margin: 10px 0 10px 0;
-                text-align: left;
-              }
+    {/*  .white-box {*/
+    }
+    {/*    padding: 10px;*/
+    }
+    {/*    margin: 10px 0 10px 0;*/
+    }
+    {/*    text-align: left;*/
+    }
+    {/*  }*/
+    }
 
-              .title-container {
-                display: flex;
-                align-items: center;
-              }
+    {/*  .title-container {*/
+    }
+    {/*    display: flex;*/
+    }
+    {/*    align-items: center;*/
+    }
+    {/*  }*/
+    }
 
-              .image-container {
-                position: relative;
-                width: 100%;
-                padding-top: 95%;
-                border-radius: 50%;
-                border: 5px solid rgb(0, 210, 170);
-                background-color: white;
-                margin: 0 auto;
-                box-shadow: 0 0 5px rgb(200, 200, 200);
-              }
+    {/*  .image-container {*/
+    }
+    {/*    position: relative;*/
+    }
+    {/*    width: 100%;*/
+    }
+    {/*    padding-top: 95%;*/
+    }
+    {/*    border-radius: 50%;*/
+    }
+    {/*    border: 5px solid rgb(0, 210, 170);*/
+    }
+    {/*    background-color: white;*/
+    }
+    {/*    margin: 0 auto;*/
+    }
+    {/*    box-shadow: 0 0 5px rgb(200, 200, 200);*/
+    }
+    {/*  }*/
+    }
 
-              .field-error {
-                margin-top: 10px;
-                color: red;
-              }
+    {/*  .field-error {*/
+    }
+    {/*    margin-top: 10px;*/
+    }
+    {/*    color: red;*/
+    }
+    {/*  }*/
+    }
 
-              .join-group-title {
-                text-align: left;
-                margin: 0 0 30px 0;
-                font-weight: 700;
-                font-size: 1.3em;
-                color: rgb(80, 80, 80);
-              }
+    {/*  .join-group-title {*/
+    }
+    {/*    text-align: left;*/
+    }
+    {/*    margin: 0 0 30px 0;*/
+    }
+    {/*    font-weight: 700;*/
+    }
+    {/*    font-size: 1.3em;*/
+    }
+    {/*    color: rgb(80, 80, 80);*/
+    }
+    {/*  }*/
+    }
 
-              .sublabel {
-                margin: 40px 0 15px 0;
-                text-align: center;
-              }
+    {/*  .sublabel {*/
+    }
+    {/*    margin: 40px 0 15px 0;*/
+    }
+    {/*    text-align: center;*/
+    }
+    {/*  }*/
+    }
 
-              #profileContainer {
-                padding: 30px 0;
-              }
-            `}</style>
-        </div>
-    );
+    {/*  #profileContainer {*/
+    }
+    {/*    padding: 30px 0;*/
+    }
+    {/*  }*/
+    }
+    {/*`}</style>*/
+    }
+
+    ;
 };
 
 export default withFirebase(JoinGroup);
