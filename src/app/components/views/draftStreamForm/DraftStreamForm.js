@@ -91,7 +91,9 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
 
     const {setGeneralError} = useContext(ErrorContext);
     const [targetCategories, setTargetCategories] = useState({})
+    console.log("-> targetCategories", targetCategories);
     const [selectedGroups, setSelectedGroups] = useState([])
+    console.log("-> selectedGroups", selectedGroups);
     const [updateMode, setUpdateMode] = useState(undefined)
 
     const [allFetched, setAllFetched] = useState(false)
@@ -123,9 +125,10 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                 selected: true,
                 flattenedOptions: handleFlattenOptions(group)
             }))
-            const flattenedDraftGroups = totalFlattenedGroups.filter(flattenedGroupObj => draftStreamGroupIds.some(draftId => flattenedGroupObj.id === draftId))
+            // Uncomment if u want provided group Ids in urls to no be auto selected
+            // const flattenedDraftGroups = totalFlattenedGroups.filter(flattenedGroupObj => draftStreamGroupIds.some(draftId => flattenedGroupObj.id === draftId))
             setExistingGroups(totalFlattenedGroups)
-            setSelectedGroups(flattenedDraftGroups)
+            setSelectedGroups(totalFlattenedGroups)
             const arrayOfActualGroupIds = totalExistingGroups.map(groupObj => groupObj.id)
             setFormData({...newFormData, groupIds: arrayOfActualGroupIds})
         }

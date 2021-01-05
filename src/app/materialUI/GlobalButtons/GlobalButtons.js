@@ -4,7 +4,7 @@ import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {fade} from "@material-ui/core";
 import {grey} from "@material-ui/core/colors";
-import Grid from '@material-ui/core/Grid';
+import Slide from '@material-ui/core/Slide';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
@@ -35,6 +35,9 @@ const useStyles = makeStyles(theme => ({
         margin: "0.5rem"
     },
     buttonDisabled: {},
+    popper: {
+        zIndex: 1
+    }
 }))
 
 export const PlayIconButton = ({addNewComment, isEmpty, IconProps, IconButtonProps, ...props}) => {
@@ -56,7 +59,6 @@ export const PlayIconButton = ({addNewComment, isEmpty, IconProps, IconButtonPro
 }
 
 
-
 //example
 // const options = [{
 //     label: 'Create a merge commit',
@@ -73,11 +75,11 @@ export const PlayIconButton = ({addNewComment, isEmpty, IconProps, IconButtonPro
 //     }
 // }];
 
-export const CustomSplitButton = ({options = [], mainButtonProps, sideButtonProps, ...props}) => {
+export const CustomSplitButton = ({options = [], mainButtonProps, slideDirection = "right", sideButtonProps, ...props}) => {
+    const classes = useStyles()
     const [open, setOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
     const [selectedIndex, setSelectedIndex] = React.useState(0);
-
 
 
     const handleMenuItemClick = (event, index) => {
@@ -99,27 +101,32 @@ export const CustomSplitButton = ({options = [], mainButtonProps, sideButtonProp
 
     return (
         <>
-            <ButtonGroup {...props} variant="contained" color="primary" ref={anchorRef} aria-label="split button">
-                <Button {...mainButtonProps} onClick={options[selectedIndex].onClick}>{options[selectedIndex].label}</Button>
-                <Button
-                    {...sideButtonProps}
-                    color="primary"
-                    size="small"
-                    aria-controls={open ? 'split-button-menu' : undefined}
-                    aria-expanded={open ? 'true' : undefined}
-                    aria-label="Select draft create strategy"
-                    aria-haspopup="menu"
-                    onClick={handleToggle}
-                >
-                    <ArrowDropDownIcon/>
-                </Button>
-            </ButtonGroup>
-            <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+            <Slide timeout={500} in direction={slideDirection}>
+                <ButtonGroup {...props} variant="contained" color="primary" ref={anchorRef} aria-label="split button">
+                    <Button {...mainButtonProps}
+                            onClick={options[selectedIndex].onClick}>{options[selectedIndex].label}</Button>
+                    <Button
+                        {...sideButtonProps}
+                        color="primary"
+                        aria-controls={open ? 'split-button-menu' : undefined}
+                        aria-expanded={open ? 'true' : undefined}
+                        aria-label="Select draft create strategy"
+                        aria-haspopup="menu"
+                        startIcon={
+                            <ArrowDropDownIcon/>
+                        }
+                        onClick={handleToggle}
+                    >
+                        More options
+                    </Button>
+                </ButtonGroup>
+            </Slide>
+            <Popper className={classes.popper} open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
                 {({TransitionProps, placement}) => (
                     <Grow
                         {...TransitionProps}
                         style={{
-                            transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
+                            transformOrigin: placement === 'bottom' ? 'center top' : 'center top',
                         }}
                     >
                         <Paper>
