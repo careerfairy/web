@@ -63,7 +63,6 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center"
         },
         companyLogo: {
-            width: "70%",
             maxWidth: "200px",
             maxHeight: "65%"
         },
