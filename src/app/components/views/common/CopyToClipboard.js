@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from "react"
-import {Button, IconButton, Tooltip} from "@material-ui/core";
+import { IconButton, Tooltip} from "@material-ui/core";
 import LinkIcon from '@material-ui/icons/Link';
 
 
-const CopyToClipboard = ({value, color, ...props}) => {
+const CopyToClipboard = ({value, color, children, ...props}) => {
 
     const [copySuccess, setCopySuccess] = useState(false)
     const [url, setUrl] = useState("")

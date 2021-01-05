@@ -42,7 +42,7 @@ const GroupCategorySelect = ({group, handleSetGroupCategories, targetCategories,
 
     }
 
-    const label = group.flattenedOptions.length ? `${group.universityName} Options` : `${group.universityName} has no options`
+    const label = group.flattenedOptions.length ? `Specify target audiences for ${group.universityName}` : `${group.universityName} has no options`
 
     return (
         <Autocomplete

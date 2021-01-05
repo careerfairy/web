@@ -5,9 +5,9 @@ import {
     CircularProgress,
     Collapse,
     Container,
-    FormControl,
-    Grid,
-    TextField,
+    FormControl, FormControlLabel,
+    Grid, Switch,
+    TextField, Tooltip,
     Typography
 } from "@material-ui/core";
 import {Formik} from 'formik';
@@ -83,7 +83,8 @@ const speakerObj = {
 const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
     const router = useRouter()
     const {
-        query: {careerCenterIds, draftStreamId},
+        query: {careerCenterIds, draftStreamId, absolutePath},
+        push
     } = router;
 
     const classes = useStyles()
@@ -122,9 +123,10 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                 selected: true,
                 flattenedOptions: handleFlattenOptions(group)
             }))
-            const flattenedDraftGroups = totalFlattenedGroups.filter(flattenedGroupObj => draftStreamGroupIds.some(draftId => flattenedGroupObj.id === draftId))
+            // Uncomment if u want provided group Ids in urls to no be auto selected
+            // const flattenedDraftGroups = totalFlattenedGroups.filter(flattenedGroupObj => draftStreamGroupIds.some(draftId => flattenedGroupObj.id === draftId))
             setExistingGroups(totalFlattenedGroups)
-            setSelectedGroups(flattenedDraftGroups)
+            setSelectedGroups(totalFlattenedGroups)
             const arrayOfActualGroupIds = totalExistingGroups.map(groupObj => groupObj.id)
             setFormData({...newFormData, groupIds: arrayOfActualGroupIds})
         }
@@ -167,8 +169,20 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
             })()
         } else if (careerCenterIds) {
             handleSetOnlyUrlIds()
+        } else {
+            setAllFetched(true)
         }
     }, [draftStreamId])
+
+    const groupsSelected = () => {
+        return Boolean(selectedGroups.length)
+    }
+
+    const buildHiddenMessage = () => {
+        // Creates the group names string separated by commas and an "and" at the end
+        const groupNames = selectedGroups.map(group => group.universityName).join(', ').replace(/, ([^,]*)$/, ' and $1')
+        return `By enabling this you are making this stream only visible to members of ${groupNames}.`
+    }
 
     const handleSetOnlyUrlIds = async () => {
         const arrayOfUrlIds = careerCenterIds.split(",")
@@ -227,6 +241,12 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                         id = await firebase.addLivestream(livestream, "draftLivestreams")
                         console.log("-> Draft livestream was created with id", id);
                     }
+                    if (absolutePath) {
+                        return push({
+                            pathname: absolutePath,
+                            query: {eventTab: 2},
+                        })
+                    }
                     setDraftId(id)
                     setSubmitted(true)
                     window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
@@ -258,26 +278,8 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
             }} className={classes.form}>
                 <Typography style={{color: "white"}} variant="h4">Stream Info:</Typography>
                 <FormGroup>
-                    <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-                        <FormControl fullWidth>
-                            <TextField
-                                name="company"
-                                variant="outlined"
-                                fullWidth
-                                id="company"
-                                label="Company Name"
-                                inputProps={{maxLength: 70}}
-                                onBlur={handleBlur}
-                                value={values.company}
-                                disabled={isSubmitting}
-                                error={Boolean(errors.company && touched.company && errors.company)}
-                                onChange={handleChange}/>
-                            <Collapse style={{color: "red"}} in={Boolean(errors.company && touched.company)}>
-                                {errors.company}
-                            </Collapse>
-                        </FormControl>
-                    </Grid>
-                    <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+                    <Grid xs={groupsSelected() ? 7 : 12} sm={groupsSelected() ? 7 : 12} md={groupsSelected() ? 9 : 12}
+                          lg={groupsSelected() ? 9 : 12} xl={groupsSelected() ? 9 : 12} item>
                         <FormControl fullWidth>
                             <TextField
                                 name="title"
@@ -285,7 +287,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                                 fullWidth
                                 id="title"
                                 label="Livestream Title"
-                                inputProps={{maxLength: 70}}
+                                inputProps={{maxLength: 1000}}
                                 onBlur={handleBlur}
                                 value={values.title}
                                 disabled={isSubmitting}
@@ -296,6 +298,31 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                             </Collapse>
                         </FormControl>
                     </Grid>
+                    {groupsSelected() &&
+                    <Grid xs={5} sm={5} md={3} lg={3} xl={3}
+                          style={{display: "grid", placeItems: "center"}}
+                          item>
+                        <Tooltip
+                            placement="top"
+                            arrow
+                            disableHoverListener={Boolean(!selectedGroups.length)}
+                            title={<Typography>{buildHiddenMessage()}</Typography>}>
+                            <FormControlLabel
+                                labelPlacement="start"
+                                label="Make Exclusive"
+                                disabled={Boolean(!selectedGroups.length)}
+                                control={
+                                    <Switch
+                                        checked={values.hidden}
+                                        onChange={handleChange}
+                                        disabled={Boolean(!selectedGroups.length || isSubmitting)}
+                                        color="primary"
+                                        id="hidden"
+                                        name="hidden"
+                                        inputProps={{'aria-label': 'primary checkbox'}}
+                                    />}/>
+                        </Tooltip>
+                    </Grid>}
                     <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                         <ImageSelect
                             getDownloadUrl={getDownloadUrl}
@@ -334,6 +361,26 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                         <FormControl fullWidth>
                             <TextField
+                                name="company"
+                                variant="outlined"
+                                fullWidth
+                                id="company"
+                                label="Company Name"
+                                inputProps={{maxLength: 70}}
+                                onBlur={handleBlur}
+                                value={values.company}
+                                disabled={isSubmitting}
+                                error={Boolean(errors.company && touched.company && errors.company)}
+                                onChange={handleChange}/>
+                            <Collapse style={{color: "red"}} in={Boolean(errors.company && touched.company)}>
+                                {errors.company}
+                            </Collapse>
+                        </FormControl>
+                    </Grid>
+
+                    <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                        <FormControl fullWidth>
+                            <TextField
                                 name="summary"
                                 variant="outlined"
                                 fullWidth
@@ -342,7 +389,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                                 label="Summary"
                                 rows={2}
                                 rowsMax={7}
-                                inputProps={{maxLength: 500}}
+                                inputProps={{maxLength: 5000}}
                                 onBlur={handleBlur}
                                 value={values.summary}
                                 disabled={isSubmitting}
@@ -392,32 +439,36 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                             </FormGroup>
                         </Fragment>)
                 })}
-                <Typography style={{color: "white"}} variant="h4">Group Info:</Typography>
-                {!!existingGroups.length && <FormGroup>
-                    <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
-                        <MultiGroupSelect
-                            handleChange={handleChange}
-                            handleBlur={handleBlur}
-                            values={values}
-                            isSubmitting={isSubmitting}
-                            selectedGroups={selectedGroups}
-                            setTargetCategories={setTargetCategories}
-                            targetCategories={targetCategories}
-                            handleFlattenOptions={handleFlattenOptions}
-                            setSelectedGroups={setSelectedGroups}
-                            setFieldValue={setFieldValue}
-                            groups={existingGroups}/>
-                    </Grid>
-                    {selectedGroups.map(group => {
-                        return <Grid key={group.groupId} xs={12} sm={12} md={12} lg={12} xl={12} item>
-                            <GroupCategorySelect
-                                handleSetGroupCategories={handleSetGroupCategories}
-                                targetCategories={targetCategories}
+                {!!existingGroups.length &&
+                <>
+                    <Typography style={{color: "white"}} variant="h4">Group Info:</Typography>
+                    <FormGroup>
+                        <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                            <MultiGroupSelect
+                                handleChange={handleChange}
+                                handleBlur={handleBlur}
+                                values={values}
                                 isSubmitting={isSubmitting}
-                                group={group}/>
+                                selectedGroups={selectedGroups}
+                                setTargetCategories={setTargetCategories}
+                                targetCategories={targetCategories}
+                                handleFlattenOptions={handleFlattenOptions}
+                                setSelectedGroups={setSelectedGroups}
+                                setFieldValue={setFieldValue}
+                                groups={existingGroups}/>
                         </Grid>
-                    })}
-                </FormGroup>}
+                        {selectedGroups.map(group => {
+                            return <Grid key={group.groupId} xs={12} sm={12} md={12} lg={12} xl={12} item>
+                                <GroupCategorySelect
+                                    handleSetGroupCategories={handleSetGroupCategories}
+                                    targetCategories={targetCategories}
+                                    isSubmitting={isSubmitting}
+                                    group={group}/>
+                            </Grid>
+                        })}
+                    </FormGroup>
+                </>
+                }
                 <Button
                     type="submit"
                     disabled={isSubmitting}

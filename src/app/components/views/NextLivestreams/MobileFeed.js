@@ -163,6 +163,7 @@ const MobileFeed = ({
                 disabled={!Boolean(groupData.categories)}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
+                slideStyle={{overflow: "hidden", height: "max-content"}}
                 onChangeIndex={handleChangeIndex}>
                 <TabPanel dir={theme.direction}>
                     <Grid className={classes.streamsGrid} container spacing={2}>

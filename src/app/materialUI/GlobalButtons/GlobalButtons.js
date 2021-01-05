@@ -4,6 +4,16 @@ import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {fade} from "@material-ui/core";
 import {grey} from "@material-ui/core/colors";
+import Slide from '@material-ui/core/Slide';
+import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Grow from '@material-ui/core/Grow';
+import Paper from '@material-ui/core/Paper';
+import Popper from '@material-ui/core/Popper';
+import MenuItem from '@material-ui/core/MenuItem';
+import MenuList from '@material-ui/core/MenuList';
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -25,6 +35,9 @@ const useStyles = makeStyles(theme => ({
         margin: "0.5rem"
     },
     buttonDisabled: {},
+    popper: {
+        zIndex: 1
+    }
 }))
 
 export const PlayIconButton = ({addNewComment, isEmpty, IconProps, IconButtonProps, ...props}) => {
@@ -43,4 +56,97 @@ export const PlayIconButton = ({addNewComment, isEmpty, IconProps, IconButtonPro
             </IconButton>
         </div>
     )
+}
+
+
+//example
+// const options = [{
+//     label: 'Create a merge commit',
+//     onClick: () => {
+//     }
+// }, {
+//     label: 'Squash and merge',
+//     onClick: () => {
+//     }
+// }, {
+//     label: 'Rebase and merge',
+//     onClick: () => {
+//
+//     }
+// }];
+
+export const CustomSplitButton = ({options = [], mainButtonProps, slideDirection = "right", sideButtonProps, ...props}) => {
+    const classes = useStyles()
+    const [open, setOpen] = React.useState(false);
+    const anchorRef = React.useRef(null);
+    const [selectedIndex, setSelectedIndex] = React.useState(0);
+
+
+    const handleMenuItemClick = (event, index) => {
+        setSelectedIndex(index);
+        setOpen(false);
+    };
+
+    const handleToggle = () => {
+        setOpen((prevOpen) => !prevOpen);
+    };
+
+    const handleClose = (event) => {
+        if (anchorRef.current && anchorRef.current.contains(event.target)) {
+            return;
+        }
+
+        setOpen(false);
+    };
+
+    return (
+        <>
+            <Slide timeout={500} in direction={slideDirection}>
+                <ButtonGroup {...props} variant="contained" color="primary" ref={anchorRef} aria-label="split button">
+                    <Button {...mainButtonProps}
+                            onClick={options[selectedIndex].onClick}>{options[selectedIndex].label}</Button>
+                    <Button
+                        {...sideButtonProps}
+                        color="primary"
+                        aria-controls={open ? 'split-button-menu' : undefined}
+                        aria-expanded={open ? 'true' : undefined}
+                        aria-label="Select draft create strategy"
+                        aria-haspopup="menu"
+                        startIcon={
+                            <ArrowDropDownIcon/>
+                        }
+                        onClick={handleToggle}
+                    >
+                        More options
+                    </Button>
+                </ButtonGroup>
+            </Slide>
+            <Popper className={classes.popper} open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+                {({TransitionProps, placement}) => (
+                    <Grow
+                        {...TransitionProps}
+                        style={{
+                            transformOrigin: placement === 'bottom' ? 'center top' : 'center top',
+                        }}
+                    >
+                        <Paper>
+                            <ClickAwayListener onClickAway={handleClose}>
+                                <MenuList id="split-button-menu">
+                                    {options.map((option, index) => (
+                                        <MenuItem
+                                            key={option.label}
+                                            selected={index === selectedIndex}
+                                            onClick={(event) => handleMenuItemClick(event, index)}
+                                        >
+                                            {option.label}
+                                        </MenuItem>
+                                    ))}
+                                </MenuList>
+                            </ClickAwayListener>
+                        </Paper>
+                    </Grow>
+                )}
+            </Popper>
+        </>
+    );
 }

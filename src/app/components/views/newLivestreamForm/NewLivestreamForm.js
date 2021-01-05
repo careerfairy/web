@@ -76,7 +76,7 @@ const speakerObj = {
 const NewLivestreamForm = ({firebase}) => {
     const router = useRouter()
     const {
-        query: {livestreamId, draftStreamId},
+        query: {livestreamId, draftStreamId, absolutePath},
         push
     } = router;
     const classes = useStyles()
@@ -235,7 +235,12 @@ const NewLivestreamForm = ({firebase}) => {
             } else {
                 id = await firebase.addLivestream(livestream, "livestreams")
             }
-            if (values.hidden && values.groupIds.length) {
+            if (absolutePath) {
+                return push({
+                    pathname: absolutePath,
+                    query: {eventTab: 0},
+                })
+            } else if (values.hidden && values.groupIds.length) {
                 return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)
             } else {
                 return push(`/upcoming-livestream/${id}`)
@@ -284,7 +289,7 @@ const NewLivestreamForm = ({firebase}) => {
                                     fullWidth
                                     id="title"
                                     label="Livestream Title"
-                                    // inputProps={{maxLength: 470}}
+                                    inputProps={{maxLength: 1000}}
                                     onBlur={handleBlur}
                                     value={values.title}
                                     disabled={isSubmitting}
@@ -347,7 +352,7 @@ const NewLivestreamForm = ({firebase}) => {
                                     fullWidth
                                     id="company"
                                     label="Company Name"
-                                    // inputProps={{maxLength: 70}}
+                                    inputProps={{maxLength: 500}}
                                     onBlur={handleBlur}
                                     value={values.company}
                                     disabled={isSubmitting}
@@ -366,7 +371,7 @@ const NewLivestreamForm = ({firebase}) => {
                                     fullWidth
                                     id="companyId"
                                     label="Company ID"
-                                    // inputProps={{maxLength: 70}}
+                                    inputProps={{maxLength: 1000}}
                                     onBlur={handleBlur}
                                     value={values.companyId}
                                     disabled={isSubmitting}
@@ -400,7 +405,7 @@ const NewLivestreamForm = ({firebase}) => {
                                     label="Summary"
                                     rows={2}
                                     rowsMax={7}
-                                    // inputProps={{maxLength: 500}}
+                                    inputProps={{maxLength: 5000}}
                                     onBlur={handleBlur}
                                     value={values.summary}
                                     disabled={isSubmitting}
