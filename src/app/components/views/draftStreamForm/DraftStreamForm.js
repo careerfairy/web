@@ -91,9 +91,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
 
     const {setGeneralError} = useContext(ErrorContext);
     const [targetCategories, setTargetCategories] = useState({})
-    console.log("-> targetCategories", targetCategories);
     const [selectedGroups, setSelectedGroups] = useState([])
-    console.log("-> selectedGroups", selectedGroups);
     const [updateMode, setUpdateMode] = useState(undefined)
 
     const [allFetched, setAllFetched] = useState(false)
@@ -175,6 +173,19 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
             setAllFetched(true)
         }
     }, [draftStreamId])
+
+    const groupsSelected = () => {
+        return Boolean(selectedGroups.length)
+    }
+
+    const buildHiddenMessage = () => {
+        if (groupsSelected()) {
+            // Creates the group names string separated by commas and an "and" at the end
+            const groupNames = selectedGroups.map(group => group.universityName).join(', ').replace(/, ([^,]*)$/, ' and $1')
+            return `By enabling this you are making this stream only visible to members of ${groupNames}.`
+        }
+    }
+    buildHiddenMessage()
 
     const handleSetOnlyUrlIds = async () => {
         const arrayOfUrlIds = careerCenterIds.split(",")
@@ -270,7 +281,8 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
             }} className={classes.form}>
                 <Typography style={{color: "white"}} variant="h4">Stream Info:</Typography>
                 <FormGroup>
-                    <Grid xs={7} sm={7} md={9} lg={9} xl={9} item>
+                    <Grid xs={groupsSelected() ? 7 : 12} sm={groupsSelected() ? 7 : 12} md={groupsSelected() ? 9 : 12}
+                          lg={groupsSelected() ? 9 : 12} xl={groupsSelected() ? 9 : 12} item>
                         <FormControl fullWidth>
                             <TextField
                                 name="title"
@@ -289,28 +301,31 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                             </Collapse>
                         </FormControl>
                     </Grid>
+                    {groupsSelected() &&
                     <Grid xs={5} sm={5} md={3} lg={3} xl={3}
                           style={{display: "grid", placeItems: "center"}}
                           item>
                         <Tooltip
                             placement="top"
                             arrow
-                            title={<Typography>By enabling this you are making this stream only visible to members of your group</Typography>}>
-                        <FormControlLabel
-                            labelPlacement="start"
-                            label="Hide from other Groups"
-                            control={
-                                <Switch
-                                    checked={values.hidden}
-                                    onChange={handleChange}
-                                    color="primary"
-                                    id="hidden"
-                                    disabled={isSubmitting}
-                                    name="hidden"
-                                    inputProps={{'aria-label': 'primary checkbox'}}
-                                />}/>
+                            disableHoverListener={Boolean(!selectedGroups.length)}
+                            title={<Typography>{buildHiddenMessage()}</Typography>}>
+                            <FormControlLabel
+                                labelPlacement="start"
+                                label="Make Exclusive"
+                                disabled={Boolean(!selectedGroups.length)}
+                                control={
+                                    <Switch
+                                        checked={values.hidden}
+                                        onChange={handleChange}
+                                        disabled={Boolean(!selectedGroups.length || isSubmitting)}
+                                        color="primary"
+                                        id="hidden"
+                                        name="hidden"
+                                        inputProps={{'aria-label': 'primary checkbox'}}
+                                    />}/>
                         </Tooltip>
-                    </Grid>
+                    </Grid>}
                     <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
                         <ImageSelect
                             getDownloadUrl={getDownloadUrl}
