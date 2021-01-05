@@ -23,6 +23,7 @@ import ErrorContext from "../context/error/ErrorContext";
 import {SnackbarProvider} from "notistack";
 import TutorialContext from 'context/tutorials/TutorialContext';
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
+import {AuthProvider} from "../HOCs/AuthProvider";
 
 const useStyles = makeStyles(({
     info: {
@@ -46,7 +47,7 @@ function MyApp({Component, pageProps}) {
     const [generalError, setGeneralError] = useState("");
 
     const initialTutorialState = {
-        0: true, 1: false, 2: false, 3: false,4: false,
+        0: true, 1: false, 2: false, 3: false, 4: false,
         5: false, 6: false, 7: false, 8: false,
         9: false, 10: false, 11: false, 12: false,
         13: false, 14: false, 15: false, 16: false, 17: false,
@@ -129,32 +130,47 @@ function MyApp({Component, pageProps}) {
         const activeStep = getActiveTutorialStepKey()
         return Boolean(activeStep === property)
     }
+    const Layout = Component.layout || (({children}) => <>{children}</>);
 
     return (
         <Fragment>
             <Head>
                 <title>CareerFairy | Watch live streams. Get hired.</title>
             </Head>
-            <FirebaseContext.Provider value={firebase}>
-                <ThemeProvider theme={theme}>
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <SnackbarProvider classes={{
-                        variantInfo: classes.info
-                    }} maxSnack={3}>
-                        <TutorialContext.Provider value={{tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles, getActiveTutorialStepKey, handleConfirmStep, isOpen}}>
-                            <UserContext.Provider value={{authenticatedUser, userData, setUserData, loading, hideLoader}}>
-                                <ErrorContext.Provider value={{generalError, setGeneralError}}>
-                                    {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                                    <CssBaseline/>
-                                    <Component {...pageProps} />
-                                    <ErrorSnackBar handleClose={() => setGeneralError("")} errorMessage={generalError}/>
-                                </ErrorContext.Provider>
-                            </UserContext.Provider>
-                        </TutorialContext.Provider>
-                    </SnackbarProvider>
-                    </MuiPickersUtilsProvider>
-                </ThemeProvider>
-            </FirebaseContext.Provider>
+            <AuthProvider firebase={firebase}>
+                <FirebaseContext.Provider value={firebase}>
+                    <ThemeProvider theme={theme}>
+                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                            <SnackbarProvider classes={{
+                                variantInfo: classes.info
+                            }} maxSnack={3}>
+                                <TutorialContext.Provider value={{
+                                    tutorialSteps,
+                                    setTutorialSteps,
+                                    showBubbles,
+                                    setShowBubbles,
+                                    getActiveTutorialStepKey,
+                                    handleConfirmStep,
+                                    isOpen
+                                }}>
+                                    <UserContext.Provider
+                                        value={{authenticatedUser, userData, setUserData, loading, hideLoader}}>
+                                        <ErrorContext.Provider value={{generalError, setGeneralError}}>
+                                            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                                            <CssBaseline/>
+                                            <Layout>
+                                                <Component {...pageProps} />
+                                            </Layout>
+                                            <ErrorSnackBar handleClose={() => setGeneralError("")}
+                                                           errorMessage={generalError}/>
+                                        </ErrorContext.Provider>
+                                    </UserContext.Provider>
+                                </TutorialContext.Provider>
+                            </SnackbarProvider>
+                        </MuiPickersUtilsProvider>
+                    </ThemeProvider>
+                </FirebaseContext.Provider>
+            </AuthProvider>
         </Fragment>
     );
 }

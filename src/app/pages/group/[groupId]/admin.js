@@ -12,9 +12,9 @@ import Loader from "../../../components/views/loader/Loader";
 import {isEmptyObject} from "../../../components/helperFunctions/HelperFunctions";
 import DashboardLayout from "../../../layouts/DashboardLayout";
 
-const JoinGroup = (props) => {
+const JoinGroup = ({props}) => {
     const router = useRouter();
-    const groupId = router.query.groupId;
+    // console.log("-> props", props);
 
     const {authenticatedUser: user, userData, loading} = useContext(UserContext);
 
@@ -26,21 +26,6 @@ const JoinGroup = (props) => {
             router.replace("/login");
         }
     }, [user]);
-
-
-    useEffect(() => {
-        if (groupId) {
-            const unsubscribe = props.firebase.listenToCareerCenterById(
-                groupId,
-                (querySnapshot) => {
-                    let careerCenter = querySnapshot.data();
-                    careerCenter.id = querySnapshot.id;
-                    setGroup(careerCenter);
-                }
-            );
-            return () => unsubscribe();
-        }
-    }, [groupId]);
 
     useEffect(() => {
         if (unAuthorized()) {
@@ -56,18 +41,18 @@ const JoinGroup = (props) => {
         )
     }
 
-    if (user === null || userData === null || loading === true || unAuthorized()) {
-        return <Loader/>;
-    }
+    // if (user === null || userData === null || loading === true || unAuthorized()) {
+    //     return <Loader/>;
+    // }
 
 
     return (
-        <DashboardLayout
-            title="CareerFairy | Join Groups"
-            group={group}
-        >
+        <>
+            <Head>
+                <title key="title">CareerFairy | Join Groups</title>
+            </Head>
             <div>hi</div>
-        </DashboardLayout>
+        </>
     )
     {/*<Header classElement="relative white-background"/>*/
     }
@@ -197,4 +182,6 @@ const JoinGroup = (props) => {
     ;
 };
 
-export default withFirebase(JoinGroup);
+JoinGroup.layout = DashboardLayout
+
+export default JoinGroup;

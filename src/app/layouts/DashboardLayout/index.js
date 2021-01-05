@@ -1,8 +1,10 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {makeStyles} from '@material-ui/core';
 import NavBar from './NavBar';
 import TopBar from './TopBar';
 import Head from "next/head";
+import {useRouter} from "next/router";
+import {withFirebase} from "../../context/firebase";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -33,32 +35,45 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const DashboardLayout = ({children, title, group}) => {
+const DashboardLayout = (props) => {
+    const {children, firebase} = props
     const classes = useStyles();
+    const {query: {groupId, careerCenterId}} = useRouter()
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
+    const [group, setGroup] = useState({});
+
+    useEffect(() => {
+        if (groupId || careerCenterId) {
+            const targetGroupId = groupId || careerCenterId
+            const unsubscribe = firebase.listenToCareerCenterById(
+                targetGroupId,
+                (querySnapshot) => {
+                    let careerCenter = querySnapshot.data();
+                    careerCenter.id = querySnapshot.id;
+                    setGroup(careerCenter);
+                }
+            );
+            return () => unsubscribe();
+        }
+    }, [groupId, careerCenterId]);
 
     return (
-        <>
-            <Head>
-                <title key="title">{title}</title>
-            </Head>
-            <div className={classes.root}>
-                <TopBar  onMobileNavOpen={() => setMobileNavOpen(true)}/>
-                <NavBar
-                    group={group}
-                    onMobileClose={() => setMobileNavOpen(false)}
-                    openMobile={isMobileNavOpen}
-                />
-                <div className={classes.wrapper}>
-                    <div className={classes.contentContainer}>
-                        <div className={classes.content}>
-                            {children}
-                        </div>
+        <div className={classes.root}>
+            <TopBar onMobileNavOpen={() => setMobileNavOpen(true)}/>
+            <NavBar
+                group={group}
+                onMobileClose={() => setMobileNavOpen(false)}
+                openMobile={isMobileNavOpen}
+            />
+            <div className={classes.wrapper}>
+                <div className={classes.contentContainer}>
+                    <div className={classes.content}>
+                        {React.cloneElement(children, {group, ...props})}
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 
-export default DashboardLayout;
+export default withFirebase(DashboardLayout);

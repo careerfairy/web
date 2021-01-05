@@ -8,6 +8,7 @@ import Loader from "../components/views/loader/Loader";
 import Footer from "../components/views/footer/Footer";
 import ProfileNav from "../components/views/profile/ProfileNav";
 import UserContext from "../context/user/UserContext";
+import {useAuth} from "../HOCs/AuthProvider";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -23,17 +24,17 @@ const useStyles = makeStyles((theme) => ({
 const UserProfile = ({firebase}) => {
     const classes = useStyles();
     const router = useRouter();
-    const {userData, authenticatedUser: user, loading} = useContext(UserContext);
+    const {userData, authenticatedUser: user, loading} = useAuth();
 
-    useEffect(() => {
-        if (user === null) {
-            router.replace("/login");
-        }
-    }, [user]);
-
-    if (user === null || userData === null || loading === true) {
-        return <Loader/>;
-    }
+    // useEffect(() => {
+    //     if (user === null) {
+    //         router.replace("/login");
+    //     }
+    // }, [user]);
+    //
+    // if (user === null || userData === null || loading === true) {
+    //     return <Loader/>;
+    // }
 
     return (
         <div className={classes.root}>

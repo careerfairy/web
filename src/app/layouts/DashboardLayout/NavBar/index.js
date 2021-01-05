@@ -87,7 +87,7 @@ const useStyles = makeStyles(() => ({
         cursor: 'pointer',
         height: 100,
         width: '100%',
-        "&.MuiAvatar-img": {
+        "& img": {
             objectFit: "contain"
         }
     },
