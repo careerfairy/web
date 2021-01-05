@@ -179,13 +179,10 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
     }
 
     const buildHiddenMessage = () => {
-        if (groupsSelected()) {
-            // Creates the group names string separated by commas and an "and" at the end
-            const groupNames = selectedGroups.map(group => group.universityName).join(', ').replace(/, ([^,]*)$/, ' and $1')
-            return `By enabling this you are making this stream only visible to members of ${groupNames}.`
-        }
+        // Creates the group names string separated by commas and an "and" at the end
+        const groupNames = selectedGroups.map(group => group.universityName).join(', ').replace(/, ([^,]*)$/, ' and $1')
+        return `By enabling this you are making this stream only visible to members of ${groupNames}.`
     }
-    buildHiddenMessage()
 
     const handleSetOnlyUrlIds = async () => {
         const arrayOfUrlIds = careerCenterIds.split(",")
