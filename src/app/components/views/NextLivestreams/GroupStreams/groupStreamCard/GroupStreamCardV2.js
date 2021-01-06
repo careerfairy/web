@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => {
             transitionProperty: "transform",
             transitionDuration: `${theme.transitions.duration.shorter}ms`,
             transitionTimingFunction: theme.transitions.easing.easeInOut,
-            zIndex: ({cardHovered}) => cardHovered && 995,
+            zIndex: ({cardHovered, isExpanded}) => (cardHovered || isExpanded) && 995,
             "& p": {
                 color: theme.palette.common.white
             },
@@ -103,14 +103,19 @@ const useStyles = makeStyles((theme) => {
             marginTop: `${theme.spacing(3)}px !important`,
             marginBottom: `${theme.spacing(3)}px !important`,
             fontWeight: "bold",
-            display: "flex",
             alignItems: "center",
             width: ({cardHovered}) => cardHovered && "140%",
             transition: "width 1s",
             padding: `0 ${theme.spacing(1)}px`,
             color: "white !important",
             // zIndex: 1,
-            justifyContent: "center"
+            justifyContent: "center",
+            display: "-webkit-box",
+            overflow: "hidden",
+            wordBreak: "break-word",
+            textOverflow: "ellipsis",
+            WebkitBoxOrient: "vertical",
+            WebkitLineClamp: "2"
         },
         front: {
             position: "relative",
