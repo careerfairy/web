@@ -11,11 +11,12 @@ import {
     SvgIcon,
     makeStyles
 } from '@material-ui/core';
-import { Search as SearchIcon } from 'react-feather';
+import {Search as SearchIcon, RefreshCw as RefreshIcon} from 'react-feather';
 import {CustomSplitButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import {copyStringToClipboard} from "../../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
+import IconButton from "@material-ui/core/IconButton";
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Toolbar = ({ className, ...rest }) => {
+const Toolbar = ({value, onChange, className, handleSubmit, handleRefresh, ...rest}) => {
     const {enqueueSnackbar} = useSnackbar()
     const {userData} = useAuth()
     const classes = useStyles();
@@ -115,23 +116,40 @@ const Toolbar = ({ className, ...rest }) => {
                 <Card>
                     <CardContent>
                         <Box maxWidth={500}>
-                            <TextField
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <SvgIcon
-                                                fontSize="small"
-                                                color="action"
-                                            >
-                                                <SearchIcon />
-                                            </SvgIcon>
-                                        </InputAdornment>
-                                    )
-                                }}
-                                placeholder="Search streams"
-                                variant="outlined"
-                            />
+                            <form onSubmit={handleSubmit}>
+                                <TextField
+                                    fullWidth
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <SvgIcon
+                                                    fontSize="small"
+                                                    color="action"
+                                                >
+                                                    <SearchIcon/>
+                                                </SvgIcon>
+                                            </InputAdornment>
+                                        ),
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton onClick={handleRefresh}>
+                                                    <SvgIcon
+                                                        fontSize="small"
+                                                        color="action"
+                                                    >
+                                                        <RefreshIcon/>
+                                                    </SvgIcon>
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                    onChange={onChange}
+                                    value={value}
+                                    placeholder="Search by title, description, hosts or company name"
+                                    label="Search streams"
+                                    variant="outlined"
+                                />
+                            </form>
                         </Box>
                     </CardContent>
                 </Card>
