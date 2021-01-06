@@ -74,7 +74,8 @@ const ImageSelect =
          handleBlur,
          getDownloadUrl,
          setFieldValue,
-         path, isAvatar
+         path, isAvatar,
+        isSuperAdmin
      }) => {
 
         const classes = useStyles()
@@ -116,7 +117,7 @@ const ImageSelect =
                 <Autocomplete
                     id={formName}
                     name={formName}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !isSuperAdmin}
                     selectOnFocus
                     onBlur={handleBlur}
                     autoHighlight
