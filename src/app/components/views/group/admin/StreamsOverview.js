@@ -40,7 +40,6 @@ const StreamsOverview = ({group, typeOfStream, query}) => {
         (async function () {
             try {
                 setFetching(true)
-                console.log("-> setFetching");
                 const snapshots = await query(group.id)
                 const newStreams = snapShotsToData(snapshots)
                 setUpcomingStreams(newStreams)
@@ -114,6 +113,7 @@ const StreamsOverview = ({group, typeOfStream, query}) => {
                 <GroupStreamCardV2
                     mobile
                     isAdmin
+                    isDraft={typeOfStream === "draft"}
                     hideActions
                     user={authenticatedUser}
                     livestream={livestream}
