@@ -25,6 +25,15 @@ const useStyles = makeStyles((theme) => ({
         textTransform: 'none',
         width: '100%',
         textDecoration: "none !important",
+        "&.active": {
+            color: theme.palette.primary.main,
+            '& $title': {
+                fontWeight: theme.typography.fontWeightMedium
+            },
+            '& $icon': {
+                color: theme.palette.primary.main
+            }
+        }
     },
     icon: {
         marginRight: theme.spacing(1)
@@ -32,15 +41,7 @@ const useStyles = makeStyles((theme) => ({
     title: {
         marginRight: 'auto'
     },
-    active: {
-        color: theme.palette.primary.main,
-        '& $title': {
-            fontWeight: theme.typography.fontWeightMedium
-        },
-        '& $icon': {
-            color: theme.palette.primary.main
-        }
-    }
+
 }));
 
 const NavItem = ({
@@ -52,9 +53,7 @@ const NavItem = ({
                  }) => {
     const classes = useStyles();
     const {asPath} = useRouter()
-    const isActive = () => {
-        return Boolean(asPath === href)
-    }
+
     return (
         <ListItem
             className={clsx(classes.item, className)}
@@ -62,7 +61,6 @@ const NavItem = ({
             {...rest}
         >
                 <Button
-                    classes={{root: isActive() && classes.active }}
                     href={href}
                     component={Link}
                     className={classes.button}
