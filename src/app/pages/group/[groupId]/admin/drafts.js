@@ -1,28 +1,21 @@
 import React from 'react';
-import {makeStyles} from "@material-ui/core/styles";
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout";
-import JoinGroup from "./index";
-import Head from "next/head";
-import {Container} from "@material-ui/core";
+import Page from "../../../../components/page";
+import StreamsOverview from "../../../../components/views/group/admin/StreamsOverview";
 
-const useStyles = makeStyles(theme => ({}));
-
-const Drafts = ({}) => {
-
-    const classes = useStyles()
+const DraftStreamsPage = ({group, firebase}) => {
 
     return (
-        <>
-            <Head>
-                <title key="title">CareerFairy | Admin Drafts</title>
-            </Head>
-            <Container maxWidth="lg">
-                <div>hi</div>
-            </Container>
-        </>
+        <Page title="CareerFairy | Admin Upcoming Streams">
+            <StreamsOverview
+                query={firebase.getDraftLiveStreamsByGroupId}
+                group={group}
+                firebase={firebase}
+                typeOfStream="draft"
+            />
+        </Page>
     );
 };
+DraftStreamsPage.layout = GroupDashboardLayout
 
-Drafts.layout = GroupDashboardLayout
-
-export default Drafts;
+export default DraftStreamsPage;

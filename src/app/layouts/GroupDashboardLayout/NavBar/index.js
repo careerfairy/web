@@ -81,7 +81,7 @@ const NavBar = ({onMobileClose, openMobile, group}) => {
         {
             href: `/group/${group.id}/admin/drafts`,
             icon: DraftStreamIcon,
-            title: 'Drafts'
+            title: 'Manage and Approve Drafts'
         },
         {
             href: `/group/${group.id}/admin/edit`,

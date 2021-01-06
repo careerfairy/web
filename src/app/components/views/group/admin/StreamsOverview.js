@@ -26,13 +26,13 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const StreamResults = ({group, typeOfStreams, query}) => {
+const StreamsOverview = ({group, typeOfStream, query}) => {
     const classes = useStyles();
     const {userData, authenticatedUser} = useAuth();
     const {enqueueSnackbar} = useSnackbar()
     const [upcomingStreams, setUpcomingStreams] = useState(null);
-    const [filteredStreams, setFilteredStreams] = useState(null);
-    const {page, action} = usePagination((filteredStreams ? filteredStreams : []), 6);
+    const [filteredStreams, setFilteredStreams] = useState([]);
+    const {page, action} = usePagination(filteredStreams, 6);
     const [searchParams, setSearchParams] = useState('');
     const [fetching, setFetching] = useState(false);
 
@@ -72,9 +72,9 @@ const StreamResults = ({group, typeOfStreams, query}) => {
     }
 
     const noFilterHits = () => {
-        return Boolean(filteredStreams?.length === 0)
+        return Boolean(page.data.length === 0 && upcomingStreams?.length)
     }
-    const noGroupHasNoUpcoming = () => {
+    const noQueryHits = () => {
         return Boolean(upcomingStreams?.length === 0)
     }
 
@@ -143,19 +143,11 @@ const StreamResults = ({group, typeOfStreams, query}) => {
                         container
                         spacing={3}
                     >
-                        {noGroupHasNoUpcoming() ?
-                            <Grid sm={12} md={12} lg={12} xl={12} item>
-                                <Typography variant="h4" align="center">
-                                    You currently have no scheduled Streams
-                                </Typography>
-                            </Grid>
+                        {noQueryHits() ?
+                            <SearchMessage message={`You currently have no ${typeOfStream} Streams`}/>
                             :
                             noFilterHits() ?
-                                <Grid sm={12} md={12} lg={12} xl={12} item>
-                                    <Typography variant="h4" align="center">
-                                        Could not find any matches
-                                    </Typography>
-                                </Grid>
+                                <SearchMessage message={`You currently have no ${typeOfStream} Streams`}/>
                                 :
                                 livestreamElements}
                     </Grid>
@@ -182,5 +174,13 @@ const StreamResults = ({group, typeOfStreams, query}) => {
     );
 };
 
+const SearchMessage = ({message}) => (
+    <Grid sm={12} md={12} lg={12} xl={12} item>
+        <Typography variant="h4" align="center">
+            {message}
+        </Typography>
+    </Grid>
+)
 
-export default StreamResults;
+
+export default StreamsOverview;

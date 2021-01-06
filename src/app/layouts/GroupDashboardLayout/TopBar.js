@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {
@@ -13,7 +12,8 @@ import {
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
-import InputIcon from '@material-ui/icons/Input';
+import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
+import Link from '../../materialUI/NextNavLink'
 
 const useStyles = makeStyles(() => ({
   root: {},
@@ -44,8 +44,8 @@ const TopBar = ({ className, onMobileNavOpen, ...rest }) => {
               <NotificationsIcon />
             </Badge>
           </IconButton>
-          <IconButton color="inherit">
-            <InputIcon />
+          <IconButton href="/profile" component={Link} color="inherit">
+            <AccountCircleOutlinedIcon />
           </IconButton>
         </Hidden>
         <Hidden lgUp>

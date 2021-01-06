@@ -40,7 +40,8 @@ const useStyles = makeStyles((theme) => ({
 const GroupDashboardLayout = (props) => {
     const {children, firebase} = props
     const classes = useStyles();
-    const {query: {groupId, careerCenterId}, replace} = useRouter()
+    const {query: {groupId, careerCenterId}, replace, pathname} = useRouter()
+    console.log("-> pathname", pathname);
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
     const [group, setGroup] = useState({});
     const {userData, authenticatedUser} = useAuth()

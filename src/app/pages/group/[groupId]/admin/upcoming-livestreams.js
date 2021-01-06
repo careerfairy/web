@@ -1,17 +1,17 @@
 import React from "react";
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout";
 import Page from "../../../../components/page";
-import StreamResults from "../../../../components/views/group/admin/StreamResults";
+import StreamsOverview from "../../../../components/views/group/admin/StreamsOverview";
 
 const UpcomingLivestreamsPage = ({group, firebase}) => {
 
     return (
-        <Page title="CareerFairy | Admin Upcoming Streams">
-            <StreamResults
+        <Page title="CareerFairy | Admin Manage Drafts">
+            <StreamsOverview
                 query={firebase.getUpcomingLiveStreamsByGroupId}
                 group={group}
                 firebase={firebase}
-                typeOfStreams="upcoming"
+                typeOfStream="upcoming"
             />
         </Page>
     );

@@ -113,15 +113,15 @@ function MyApp({Component, pageProps}) {
                                     handleConfirmStep,
                                     isOpen
                                 }}>
-                                        <ErrorContext.Provider value={{generalError, setGeneralError}}>
-                                            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                                            <CssBaseline/>
-                                            <Layout>
-                                                <Component {...pageProps} />
-                                            </Layout>
-                                            <ErrorSnackBar handleClose={() => setGeneralError("")}
-                                                           errorMessage={generalError}/>
-                                        </ErrorContext.Provider>
+                                    <ErrorContext.Provider value={{generalError, setGeneralError}}>
+                                        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                                        <CssBaseline/>
+                                        <Layout>
+                                            <Component {...pageProps} />
+                                        </Layout>
+                                        <ErrorSnackBar handleClose={() => setGeneralError("")}
+                                                       errorMessage={generalError}/>
+                                    </ErrorContext.Provider>
                                 </TutorialContext.Provider>
                             </SnackbarProvider>
                         </MuiPickersUtilsProvider>

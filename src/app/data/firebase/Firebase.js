@@ -612,12 +612,20 @@ class Firebase {
             .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
             .orderBy("start", "asc")
     }
-//
+
     queryDraftLiveStreamsByGroupId = (groupId) => {
         return this.firestore
             .collection("draftLivestreams")
             .where("groupIds", "array-contains", groupId)
             .orderBy("start", "asc")
+    }
+
+    getDraftLiveStreamsByGroupId = (groupId) => {
+        let ref =  this.firestore
+            .collection("draftLivestreams")
+            .where("groupIds", "array-contains", groupId)
+            .orderBy("start", "asc")
+        return ref.get()
     }
 
     queryPastLiveStreamsByGroupId = (groupId) => {
