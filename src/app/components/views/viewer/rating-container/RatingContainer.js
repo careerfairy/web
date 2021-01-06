@@ -1,7 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react';
 import {withFirebasePage} from 'context/firebase';
 import {Rating} from '@material-ui/lab';
-import UserContext from 'context/user/UserContext';
 import {useSnackbar} from "notistack";
 import {useAuth} from "../../../../HOCs/AuthProvider";
 

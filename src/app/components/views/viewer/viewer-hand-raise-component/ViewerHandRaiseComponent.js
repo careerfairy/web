@@ -6,7 +6,6 @@ import { withFirebasePage } from 'context/firebase';
 import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
 import SmallStreamerVideoDisplayer from 'components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
-import UserContext from 'context/user/UserContext';
 import useUserMedia from '../../../custom-hook/useDevices';
 import { v4 as uuidv4 } from 'uuid';
 import {useAuth} from "../../../../HOCs/AuthProvider";

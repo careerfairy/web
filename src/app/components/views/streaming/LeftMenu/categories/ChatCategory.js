@@ -9,7 +9,6 @@ import IconButton from "@material-ui/core/IconButton";
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
 import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
-import UserContext from 'context/user/UserContext';
 import CustomScrollToBottom from "../../../../util/CustomScrollToBottom";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 

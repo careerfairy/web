@@ -12,7 +12,6 @@ import StepLabel from '@material-ui/core/StepLabel';
 import CreateCategories from "../../components/views/group/create/CreateCategories";
 import CompleteGroup from "../../components/views/group/create/CompleteGroup";
 import {GlobalBackground} from "../../materialUI/GlobalBackground/GlobalBackGround";
-import UserContext from "../../context/user/UserContext";
 import Loader from "../../components/views/loader/Loader";
 import {useAuth} from "../../HOCs/AuthProvider";
 

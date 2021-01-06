@@ -5,7 +5,6 @@ import Linkify from 'react-linkify';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import ExpandMoreRoundedIcon from '@material-ui/icons/ExpandMoreRounded';
 import {withFirebase} from 'context/firebase';
-import UserContext from 'context/user/UserContext';
 import {Box, Button, Slide, TextField} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";

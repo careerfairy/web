@@ -19,7 +19,6 @@ import UserUtil from "../../data/util/UserUtil";
 import MulitLineText from "../../components/views/common/MultiLineText";
 import CurrentGroup from "components/views/profile/CurrentGroup";
 import TargetOptions from "../../components/views/NextLivestreams/GroupsCarousel/TargetOptions";
-import UserContext from "../../context/user/UserContext";
 import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
 import axios from "axios";
 import DataAccessUtil from "util/DataAccessUtil";

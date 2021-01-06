@@ -7,7 +7,6 @@ import Footer from "../components/views/footer/Footer";
 import React, {useContext, useEffect, useState} from "react";
 import {Typography} from "@material-ui/core";
 import {useRouter} from "next/router";
-import UserContext from "../context/user/UserContext";
 import Loader from "../components/views/loader/Loader";
 import DraftStreamForm from "../components/views/draftStreamForm/DraftStreamForm";
 import {useAuth} from "../HOCs/AuthProvider";

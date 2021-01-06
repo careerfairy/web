@@ -5,7 +5,6 @@ import HandRaiseRequested from './hand-raise/active/HandRaiseRequested';
 import HandRaiseDenied from './hand-raise/active/HandRaiseDenied';
 import HandRaiseConnecting from './hand-raise/active/HandRaiseConnecting';
 import HandRaiseConnected from './hand-raise/active/HandRaiseConnected';
-import UserContext from 'context/user/UserContext';
 import HandRaiseInactive from './hand-raise/inactive/HandRaiseInactive';
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";

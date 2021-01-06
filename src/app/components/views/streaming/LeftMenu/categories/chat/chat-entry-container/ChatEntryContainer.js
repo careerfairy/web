@@ -1,7 +1,6 @@
 import React, {memo, useContext} from 'react';
 import Linkify from 'react-linkify';
 import {makeStyles} from "@material-ui/core/styles";
-import UserContext from "../../../../../../../context/user/UserContext";
 import {Box, Card, Typography} from "@material-ui/core";
 import Slide from "@material-ui/core/Slide";
 import {getTimeFromNow} from "../../../../../../helperFunctions/HelperFunctions";

@@ -30,7 +30,6 @@ import {
 import {makeStyles} from "@material-ui/core/styles";
 import {TealBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import GroupProvider from "../components/views/signup/GroupProvider";
-import UserContext from "../context/user/UserContext";
 import UniversitySelector from "../components/views/universitySelect/UniversitySelector";
 import UniversityCountrySelector from "../components/views/universitySelect/UniversityCountrySelector";
 import {useAuth} from "../HOCs/AuthProvider";

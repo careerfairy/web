@@ -7,7 +7,6 @@ import Footer from "../../../components/views/footer/Footer";
 import AdminHeader from "../../../components/views/group/admin/AdminHeader";
 import GroupNav from "../../../components/views/group/admin/GroupNav";
 import {withFirebase} from "../../../context/firebase";
-import UserContext from "context/user/UserContext";
 import Loader from "../../../components/views/loader/Loader";
 import {isEmptyObject} from "../../../components/helperFunctions/HelperFunctions";
 import GroupDashboardLayout from "../../../layouts/GroupDashboardLayout";

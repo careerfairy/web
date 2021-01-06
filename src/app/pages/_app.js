@@ -16,7 +16,6 @@ import "slick-carousel/slick/slick-theme.css";
 
 import Head from 'next/head';
 import {theme} from "../materialUI";
-import UserContext from 'context/user/UserContext';
 import TagManager from 'react-gtm-module'
 import ErrorSnackBar from "../components/views/common/ErrorSnackBar/ErrorSnackBar";
 import ErrorContext from "../context/error/ErrorContext";
@@ -40,10 +39,6 @@ function MyApp({Component, pageProps}) {
 
     const firebase = new Firebase();
 
-    const [authenticatedUser, setAuthenticatedUser] = useState(undefined);
-    const [userData, setUserData] = useState(undefined);
-    const [loading, setLoading] = useState(false)
-    const [hideLoader, setHideLoader] = useState(false)
     const [generalError, setGeneralError] = useState("");
 
     const initialTutorialState = {
@@ -73,41 +68,6 @@ function MyApp({Component, pageProps}) {
     useEffect(() => {
         TagManager.initialize(tagManagerArgs);
     }, []);
-
-    useEffect(() => {
-        firebase.auth.onAuthStateChanged(user => {
-            if (user) {
-                setAuthenticatedUser(user);
-            } else {
-                setAuthenticatedUser(null);
-                setUserData(null);
-            }
-        })
-    }, []);
-
-    useEffect(() => {
-        setLoading(true);
-        if (authenticatedUser && authenticatedUser.email) {
-            const unsubscribe = firebase.listenToUserData(authenticatedUser.email, querySnapshot => {
-                if (querySnapshot.exists) {
-                    setLoading(false)
-                    let user = querySnapshot.data();
-                    user.id = querySnapshot.id;
-                    setUserData(user);
-                } else {
-                    setUserData(null);
-                }
-            });
-            return () => unsubscribe();
-        }
-    }, [authenticatedUser]);
-
-    useEffect(() => {
-        if (authenticatedUser === null || userData === null || loading === true) {
-            setHideLoader(true)
-        }
-
-    }, [authenticatedUser, userData, loading])
 
     const getActiveTutorialStepKey = () => {
         const activeStep = Object.keys(tutorialSteps).find((key) => {
@@ -153,8 +113,6 @@ function MyApp({Component, pageProps}) {
                                     handleConfirmStep,
                                     isOpen
                                 }}>
-                                    <UserContext.Provider
-                                        value={{authenticatedUser, userData, setUserData, loading, hideLoader}}>
                                         <ErrorContext.Provider value={{generalError, setGeneralError}}>
                                             {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                                             <CssBaseline/>
@@ -164,7 +122,6 @@ function MyApp({Component, pageProps}) {
                                             <ErrorSnackBar handleClose={() => setGeneralError("")}
                                                            errorMessage={generalError}/>
                                         </ErrorContext.Provider>
-                                    </UserContext.Provider>
                                 </TutorialContext.Provider>
                             </SnackbarProvider>
                         </MuiPickersUtilsProvider>

@@ -20,7 +20,6 @@ import {makeStyles} from "@material-ui/core/styles";
 import TheatersRoundedIcon from "@material-ui/icons/TheatersRounded";
 import BusinessCenterRoundedIcon from "@material-ui/icons/BusinessCenterRounded";
 import MicOutlinedIcon from '@material-ui/icons/MicOutlined';
-import UserContext from "../context/user/UserContext";
 import {useAuth} from "../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({

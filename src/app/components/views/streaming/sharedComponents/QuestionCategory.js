@@ -1,5 +1,4 @@
 import React, {useState, useEffect, useContext, useRef, useLayoutEffect} from 'react';
-import UserContext from 'context/user/UserContext';
 import {Button, Grid, Typography, useTheme} from "@material-ui/core";
 import QuestionContainer from './questions/QuestionContainer';
 import Dialog from '@material-ui/core/Dialog';

@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
 import {withFirebase} from 'context/firebase';
-import UserContext from 'context/user/UserContext';
 import CurrentPollGraph from "../../../streaming/sharedComponents/CurrentPollGraph";
 import {Button, Paper, useTheme, withStyles} from "@material-ui/core";
 import {GreyPermanentMarker, PollQuestion} from "../../../../../materialUI/GlobalTitles";

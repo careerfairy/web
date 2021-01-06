@@ -5,7 +5,6 @@ import {useMediaQuery, useTheme} from "@material-ui/core";
 import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import MobileFeed from "./MobileFeed";
 import {useRouter} from "next/router";
-import UserContext from "../../../context/user/UserContext"
 import {getServerSideRouterQuery} from "../../helperFunctions/HelperFunctions";
 import {useAuth} from "../../../HOCs/AuthProvider";
 

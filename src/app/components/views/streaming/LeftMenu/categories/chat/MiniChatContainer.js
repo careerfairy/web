@@ -3,7 +3,6 @@ import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
 import {withFirebase} from 'context/firebase';
 import ChevronRightRoundedIcon from '@material-ui/icons/ChevronRightRounded';
 import ChatEntryContainer from './chat-entry-container/ChatEntryContainer';
-import UserContext from 'context/user/UserContext';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import {
     TextField,

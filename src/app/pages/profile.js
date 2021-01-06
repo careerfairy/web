@@ -7,7 +7,6 @@ import {useRouter} from "next/router";
 import Loader from "../components/views/loader/Loader";
 import Footer from "../components/views/footer/Footer";
 import ProfileNav from "../components/views/profile/ProfileNav";
-import UserContext from "../context/user/UserContext";
 import {useAuth} from "../HOCs/AuthProvider";
 
 
