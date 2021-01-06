@@ -20,7 +20,11 @@ import {
     ShoppingBag as ShoppingBagIcon,
     User as UserIcon,
     UserPlus as UserPlusIcon,
-    Users as UsersIcon
+    Users as UsersIcon,
+    Film as StreamIcon,
+    Archive as PastStreamIcon,
+    FileText as DraftStreamIcon,
+    Edit as EditGroupIcon
 } from 'react-feather';
 import NavItem from './NavItem';
 import {useRouter} from "next/router";
@@ -31,48 +35,7 @@ const user = {
     name: 'Katarina Smith'
 };
 
-const items = [
-    {
-        href: '/app/dashboard',
-        icon: BarChartIcon,
-        title: 'Dashboard'
-    },
-    {
-        href: '/app/customers',
-        icon: UsersIcon,
-        title: 'Customers'
-    },
-    {
-        href: '/app/products',
-        icon: ShoppingBagIcon,
-        title: 'Products'
-    },
-    {
-        href: '/app/account',
-        icon: UserIcon,
-        title: 'Account'
-    },
-    {
-        href: '/app/settings',
-        icon: SettingsIcon,
-        title: 'Settings'
-    },
-    {
-        href: '/login',
-        icon: LockIcon,
-        title: 'Login'
-    },
-    {
-        href: '/register',
-        icon: UserPlusIcon,
-        title: 'Register'
-    },
-    {
-        href: '/404',
-        icon: AlertCircleIcon,
-        title: 'Error'
-    }
-];
+
 
 const useStyles = makeStyles(() => ({
     mobileDrawer: {
@@ -98,13 +61,41 @@ const useStyles = makeStyles(() => ({
 const NavBar = ({onMobileClose, openMobile, group}) => {
     const classes = useStyles();
     const {pathname} = useRouter()
-
+    console.log("-> group", group);
     useEffect(() => {
         if (openMobile && onMobileClose) {
             onMobileClose();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pathname]);
+
+    const items = [
+        {
+            href: `/group/${group.id}/admin/upcoming-livestreams`,
+            icon: StreamIcon,
+            title: 'Upcoming Streams'
+        },
+        {
+            href: `/group/${group.id}/admin/past-livestreams`,
+            icon: PastStreamIcon,
+            title: 'Past Streams'
+        },
+        {
+            href: `/group/${group.id}/admin/drafts`,
+            icon: DraftStreamIcon,
+            title: 'Drafts'
+        },
+        {
+            href: `/group/${group.id}/admin/edit`,
+            icon: EditGroupIcon,
+            title: 'Edit Group Profile'
+        },
+        {
+            href: `/group/${group.id}/admin/settings`,
+            icon: SettingsIcon,
+            title: 'Settings'
+        }
+    ];
 
     const content = (
         <Box
@@ -121,7 +112,6 @@ const NavBar = ({onMobileClose, openMobile, group}) => {
                 <Avatar
                     className={classes.avatar}
                     src={group.logoUrl}
-                    // imgProps={{classes: {root: classes.image}}}
                     variant="square"
                     href="/app/account"
                 />
@@ -130,7 +120,7 @@ const NavBar = ({onMobileClose, openMobile, group}) => {
                     color="textPrimary"
                     variant="h5"
                 >
-                    {group.companyName}
+                    {group.universityName}
                 </Typography>
                 <Typography
                     color="textSecondary"

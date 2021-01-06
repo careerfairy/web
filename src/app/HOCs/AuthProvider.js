@@ -2,6 +2,7 @@ import React, {createContext, useContext, useState, useEffect} from "react";
 import {useRouter} from "next/router";
 import {withFirebase} from "../context/firebase";
 import Loader from "../components/views/loader/Loader";
+import {isEmptyObject} from "../components/helperFunctions/HelperFunctions";
 
 const AuthContext = createContext();
 
@@ -12,6 +13,10 @@ const securePaths = [
     "/upcoming-livestream/[livestreamId]",
     "/streaming/[livestreamId]/viewer",
     "/group/[groupId]/admin",
+    "/group/[groupId]/admin/past-livestreams",
+    "/group/[groupId]/admin/upcoming-livestreams",
+    "/group/[groupId]/admin/drafts",
+    "/group/[groupId]/admin/edit",
     "/new-livestream",
     "/group/create"
 ];

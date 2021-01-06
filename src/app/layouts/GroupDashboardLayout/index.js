@@ -5,6 +5,8 @@ import TopBar from './TopBar';
 import Head from "next/head";
 import {useRouter} from "next/router";
 import {withFirebase} from "../../context/firebase";
+import {isEmptyObject} from "../../components/helperFunctions/HelperFunctions";
+import {useAuth} from "../../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -38,9 +40,10 @@ const useStyles = makeStyles((theme) => ({
 const GroupDashboardLayout = (props) => {
     const {children, firebase} = props
     const classes = useStyles();
-    const {query: {groupId, careerCenterId}} = useRouter()
+    const {query: {groupId, careerCenterId}, replace} = useRouter()
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
     const [group, setGroup] = useState({});
+    const {userData, authenticatedUser} = useAuth()
 
     useEffect(() => {
         if (groupId || careerCenterId) {
@@ -56,6 +59,19 @@ const GroupDashboardLayout = (props) => {
             return () => unsubscribe();
         }
     }, [groupId, careerCenterId]);
+
+    useEffect(() => {
+        if (unAuthorized()) {
+            replace("/");
+        }
+    }, [group, authenticatedUser, userData]);
+
+    const unAuthorized = () => {
+        return Boolean(
+            (!isEmptyObject(group) && authenticatedUser && userData)
+            && (authenticatedUser.email !== group.adminEmail) && !userData.isAdmin
+        )
+    }
 
     return (
         <div className={classes.root}>

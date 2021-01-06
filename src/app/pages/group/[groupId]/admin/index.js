@@ -1,16 +1,16 @@
 import React, {useContext, useEffect, useState} from "react";
-import {Container, Button, Image, Menu} from "semantic-ui-react";
 import {useRouter} from "next/router";
-import Header from "../../../components/views/header/Header";
+import Header from "../../../../components/views/header/Header";
 import Head from "next/head";
-import Footer from "../../../components/views/footer/Footer";
-import AdminHeader from "../../../components/views/group/admin/AdminHeader";
-import GroupNav from "../../../components/views/group/admin/GroupNav";
-import {withFirebase} from "../../../context/firebase";
-import Loader from "../../../components/views/loader/Loader";
-import {isEmptyObject} from "../../../components/helperFunctions/HelperFunctions";
-import GroupDashboardLayout from "../../../layouts/GroupDashboardLayout";
-import {useAuth} from "../../../HOCs/AuthProvider";
+import Footer from "../../../../components/views/footer/Footer";
+import AdminHeader from "../../../../components/views/group/admin/AdminHeader";
+import GroupNav from "../../../../components/views/group/admin/GroupNav";
+import {withFirebase} from "../../../../context/firebase";
+import Loader from "../../../../components/views/loader/Loader";
+import {isEmptyObject} from "../../../../components/helperFunctions/HelperFunctions";
+import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout";
+import {useAuth} from "../../../../HOCs/AuthProvider";
+import {Container} from "@material-ui/core";
 
 const JoinGroup = ({props}) => {
     const router = useRouter();
@@ -20,19 +20,6 @@ const JoinGroup = ({props}) => {
 
     const [group, setGroup] = useState({});
     const [menuItem, setMenuItem] = useState("settings");
-
-    useEffect(() => {
-        if (user === null) {
-            router.replace("/login");
-        }
-    }, [user]);
-
-    useEffect(() => {
-        if (unAuthorized()) {
-            router.replace("/");
-        }
-
-    }, [group, user, userData]);
 
     const unAuthorized = () => {
         return Boolean(
@@ -49,9 +36,11 @@ const JoinGroup = ({props}) => {
     return (
         <>
             <Head>
-                <title key="title">CareerFairy | Join Groups</title>
+                <title key="title">CareerFairy | Admin</title>
             </Head>
-            <div>hi</div>
+            <Container maxWidth="lg">
+                <div>hi</div>
+            </Container>
         </>
     )
     {/*<Header classElement="relative white-background"/>*/
