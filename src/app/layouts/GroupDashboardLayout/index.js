@@ -7,6 +7,12 @@ import {useRouter} from "next/router";
 import {withFirebase} from "../../context/firebase";
 import {isEmptyObject} from "../../components/helperFunctions/HelperFunctions";
 import {useAuth} from "../../HOCs/AuthProvider";
+import {
+    Archive as PastStreamIcon,
+    Edit as EditGroupIcon,
+    FileText as DraftStreamIcon,
+    Film as StreamIcon, Settings as SettingsIcon
+} from "react-feather";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -76,10 +82,64 @@ const GroupDashboardLayout = (props) => {
         )
     }
 
+
+    const topNavItems = [
+        {
+            href: `/next-livestreams`,
+            title: 'NEXT LIVE STREAMS'
+        },
+        {
+            href: `/discover`,
+            title: 'PAST LIVE STREAMS'
+        },
+        {
+            href: `/wishlist`,
+            title: 'WISHLIST'
+        },
+        {
+            href: `/groups`,
+            title: 'FOLLOW GROUPS'
+        }
+
+    ]
+
+    const items = [
+        {
+            href: `/group/${group.id}/admin/upcoming-livestreams`,
+            icon: StreamIcon,
+            title: 'Upcoming Streams'
+        },
+        {
+            href: `/group/${group.id}/admin/past-livestreams`,
+            icon: PastStreamIcon,
+            title: 'Past Streams'
+        },
+        {
+            href: `/group/${group.id}/admin/drafts`,
+            icon: DraftStreamIcon,
+            title: 'Manage and Approve Drafts'
+        },
+        {
+            href: `/group/${group.id}/admin/edit`,
+            icon: EditGroupIcon,
+            title: 'Edit Group Profile'
+        },
+        {
+            href: `/group/${group.id}/admin/settings`,
+            icon: SettingsIcon,
+            title: 'Settings'
+        }
+    ];
+
     return (
         <div className={classes.root}>
-            <TopBar onMobileNavOpen={() => setMobileNavOpen(true)}/>
+            <TopBar
+                topNavItems={topNavItems}
+                onMobileNavOpen={() => setMobileNavOpen(true)}
+            />
             <NavBar
+                items={items}
+                topNavItems={topNavItems}
                 group={group}
                 onMobileClose={() => setMobileNavOpen(false)}
                 openMobile={isMobileNavOpen}

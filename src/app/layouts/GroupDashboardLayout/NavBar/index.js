@@ -36,7 +36,6 @@ const user = {
 };
 
 
-
 const useStyles = makeStyles(() => ({
     mobileDrawer: {
         width: 256
@@ -58,7 +57,7 @@ const useStyles = makeStyles(() => ({
     // }
 }));
 
-const NavBar = ({onMobileClose, openMobile, group}) => {
+const NavBar = ({onMobileClose, openMobile, group, items, topNavItems}) => {
     const classes = useStyles();
     const {pathname} = useRouter()
     useEffect(() => {
@@ -67,33 +66,6 @@ const NavBar = ({onMobileClose, openMobile, group}) => {
         }
     }, [pathname]);
 
-    const items = [
-        {
-            href: `/group/${group.id}/admin/upcoming-livestreams`,
-            icon: StreamIcon,
-            title: 'Upcoming Streams'
-        },
-        {
-            href: `/group/${group.id}/admin/past-livestreams`,
-            icon: PastStreamIcon,
-            title: 'Past Streams'
-        },
-        {
-            href: `/group/${group.id}/admin/drafts`,
-            icon: DraftStreamIcon,
-            title: 'Manage and Approve Drafts'
-        },
-        {
-            href: `/group/${group.id}/admin/edit`,
-            icon: EditGroupIcon,
-            title: 'Edit Group Profile'
-        },
-        {
-            href: `/group/${group.id}/admin/settings`,
-            icon: SettingsIcon,
-            title: 'Settings'
-        }
-    ];
 
     const content = (
         <Box
@@ -141,6 +113,19 @@ const NavBar = ({onMobileClose, openMobile, group}) => {
                 </List>
             </Box>
             <Box flexGrow={1}/>
+            <Hidden lgUp>
+            <Box p={2}>
+                <List>
+                    {topNavItems.map((item) => (
+                        <NavItem
+                            href={item.href}
+                            key={item.title}
+                            title={item.title}
+                        />
+                    ))}
+                </List>
+            </Box>
+            </Hidden>
         </Box>
     );
 
