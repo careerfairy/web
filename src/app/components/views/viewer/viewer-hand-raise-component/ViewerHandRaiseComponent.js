@@ -9,10 +9,11 @@ import VideoContainer from 'components/views/streaming/video-container/VideoCont
 import UserContext from 'context/user/UserContext';
 import useUserMedia from '../../../custom-hook/useDevices';
 import { v4 as uuidv4 } from 'uuid';
+import {useAuth} from "../../../../HOCs/AuthProvider";
 
 function ViewerHandRaiseComponent(props) {
 
-    const { authenticatedUser, userData } = React.useContext(UserContext);
+    const { authenticatedUser, userData } = useAuth();
 
     const [streamerId, setStreamerId] = useState(uuidv4())
 

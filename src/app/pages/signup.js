@@ -33,6 +33,7 @@ import GroupProvider from "../components/views/signup/GroupProvider";
 import UserContext from "../context/user/UserContext";
 import UniversitySelector from "../components/views/universitySelect/UniversitySelector";
 import UniversityCountrySelector from "../components/views/universitySelect/UniversityCountrySelector";
+import {useAuth} from "../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -92,7 +93,7 @@ function SignUpPage({firebase}) {
     const classes = useStyles()
     const router = useRouter();
     const {absolutePath} = router.query
-    const {authenticatedUser: user, userData} = useContext(UserContext)
+    const {authenticatedUser: user, userData} = useAuth()
     const steps = getSteps(absolutePath);
 
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);

@@ -3,6 +3,7 @@ import {withFirebasePage} from 'context/firebase';
 import {Rating} from '@material-ui/lab';
 import UserContext from 'context/user/UserContext';
 import {useSnackbar} from "notistack";
+import {useAuth} from "../../../../HOCs/AuthProvider";
 
 
 const ActionComponent = ({snackKey, firebase, typeOfRating, livestreamId, email}) => {
@@ -24,7 +25,7 @@ const ActionComponent = ({snackKey, firebase, typeOfRating, livestreamId, email}
 
 
 const RatingContainer = ({firebase, livestream, livestreamId}) => {
-    const {authenticatedUser} = useContext(UserContext);
+    const {authenticatedUser} = useAuth();
     const {enqueueSnackbar} = useSnackbar();
     const [minutesPassed, setMinutesPassed] = useState(null)
     const [ratings, setRatings] = useState([

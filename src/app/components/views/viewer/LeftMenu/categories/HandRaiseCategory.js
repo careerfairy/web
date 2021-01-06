@@ -11,10 +11,11 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import {Button, Typography, useTheme} from "@material-ui/core";
 import DialogContent from "@material-ui/core/DialogContent";
+import {useAuth} from "../../../../../HOCs/AuthProvider";
 
 function HandRaiseCategory(props) {
     const theme = useTheme()
-    const {authenticatedUser, userData} = React.useContext(UserContext);
+    const {authenticatedUser, userData} = useAuth();
     const [handRaiseState, setHandRaiseState] = useState(null);
 
     useEffect(() => {

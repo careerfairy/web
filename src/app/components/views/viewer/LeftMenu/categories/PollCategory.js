@@ -6,6 +6,7 @@ import {Button, Paper, useTheme, withStyles} from "@material-ui/core";
 import {GreyPermanentMarker, PollQuestion} from "../../../../../materialUI/GlobalTitles";
 import {CategoryContainerCentered} from "../../../../../materialUI/GlobalContainers";
 import {colorsArray} from "../../../../util/colors";
+import {useAuth} from "../../../../../HOCs/AuthProvider";
 
 const PollWrapper = withStyles(theme => ({
     root: {
@@ -24,7 +25,7 @@ const PollWrapper = withStyles(theme => ({
 
 function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
     const theme = useTheme()
-    const {authenticatedUser} = React.useContext(UserContext);
+    const {authenticatedUser} = useAuth();
     const [currentPoll, setCurrentPoll] = useState(null);
     const [currentPollId, setCurrentPollId] = useState(null);
 

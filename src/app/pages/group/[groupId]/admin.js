@@ -10,13 +10,14 @@ import {withFirebase} from "../../../context/firebase";
 import UserContext from "context/user/UserContext";
 import Loader from "../../../components/views/loader/Loader";
 import {isEmptyObject} from "../../../components/helperFunctions/HelperFunctions";
-import DashboardLayout from "../../../layouts/DashboardLayout";
+import GroupDashboardLayout from "../../../layouts/GroupDashboardLayout";
+import {useAuth} from "../../../HOCs/AuthProvider";
 
 const JoinGroup = ({props}) => {
     const router = useRouter();
     // console.log("-> props", props);
 
-    const {authenticatedUser: user, userData, loading} = useContext(UserContext);
+    const {authenticatedUser: user, userData, loading} = useAuth();
 
     const [group, setGroup] = useState({});
     const [menuItem, setMenuItem] = useState("settings");
@@ -182,6 +183,6 @@ const JoinGroup = ({props}) => {
     ;
 };
 
-JoinGroup.layout = DashboardLayout
+JoinGroup.layout = GroupDashboardLayout
 
 export default JoinGroup;

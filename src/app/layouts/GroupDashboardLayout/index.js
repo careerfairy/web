@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const DashboardLayout = (props) => {
+const GroupDashboardLayout = (props) => {
     const {children, firebase} = props
     const classes = useStyles();
     const {query: {groupId, careerCenterId}} = useRouter()
@@ -76,4 +76,4 @@ const DashboardLayout = (props) => {
     );
 };
 
-export default withFirebase(DashboardLayout);
+export default withFirebase(GroupDashboardLayout);

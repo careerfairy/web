@@ -17,6 +17,7 @@ import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
 import MiniChatContainer from "../../../components/views/streaming/LeftMenu/categories/chat/MiniChatContainer";
 import EmoteButtons from "../../../components/views/viewer/EmoteButtons";
 import RatingContainer from "../../../components/views/viewer/rating-container/RatingContainer";
+import {useAuth} from "../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -72,7 +73,7 @@ function ViewerPage({firebase}) {
 
     const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
 
-    const {authenticatedUser, userData} = React.useContext(UserContext);
+    const {authenticatedUser, userData} = useAuth();
 
     if (currentLivestream && !currentLivestream.test && authenticatedUser === null) {
         router.replace({

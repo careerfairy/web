@@ -7,9 +7,10 @@ import MobileFeed from "./MobileFeed";
 import {useRouter} from "next/router";
 import UserContext from "../../../context/user/UserContext"
 import {getServerSideRouterQuery} from "../../helperFunctions/HelperFunctions";
+import {useAuth} from "../../../HOCs/AuthProvider";
 
 const NextLivestreams = ({firebase}) => {
-    const {userData, authenticatedUser} = useContext(UserContext);
+    const {userData, authenticatedUser} = useAuth();
     const theme = useTheme();
     const mobile = useMediaQuery(theme.breakpoints.down("sm"));
     const router = useRouter();

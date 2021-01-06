@@ -13,12 +13,13 @@ import {Typography} from "@material-ui/core";
 import {useRouter} from "next/router";
 import UserContext from "../context/user/UserContext";
 import Loader from "../components/views/loader/Loader";
+import {useAuth} from "../HOCs/AuthProvider";
 
 
 const newLivestream = () => {
 
     const {replace, asPath: absolutePath, back} = useRouter();
-    const {userData, authenticatedUser: user, hideLoader} = useContext(UserContext);
+    const {userData, authenticatedUser: user, hideLoader} = useAuth();
 
     useEffect(() => {
         if (user === null) {

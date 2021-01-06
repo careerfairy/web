@@ -23,6 +23,7 @@ import {makeStyles} from "@material-ui/core/styles";
 
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
 import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
+import {useAuth} from "../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
     view: {
@@ -50,7 +51,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
 
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
 
-    const {authenticatedUser, userData} = useContext(UserContext);
+    const {authenticatedUser, userData} = useAuth();
 
     const parentRef = useRef()
 

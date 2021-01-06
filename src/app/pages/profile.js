@@ -26,16 +26,6 @@ const UserProfile = ({firebase}) => {
     const router = useRouter();
     const {userData, authenticatedUser: user, loading} = useAuth();
 
-    // useEffect(() => {
-    //     if (user === null) {
-    //         router.replace("/login");
-    //     }
-    // }, [user]);
-    //
-    // if (user === null || userData === null || loading === true) {
-    //     return <Loader/>;
-    // }
-
     return (
         <div className={classes.root}>
             <Head>

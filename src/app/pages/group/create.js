@@ -14,6 +14,7 @@ import CompleteGroup from "../../components/views/group/create/CompleteGroup";
 import {GlobalBackground} from "../../materialUI/GlobalBackground/GlobalBackGround";
 import UserContext from "../../context/user/UserContext";
 import Loader from "../../components/views/loader/Loader";
+import {useAuth} from "../../HOCs/AuthProvider";
 
 function getSteps() {
     return ['Create your base group', 'Setup your categories and sub-categories', 'Finish'];
@@ -25,7 +26,7 @@ const CreateGroup = ({firebase}) => {
     const [activeStep, setActiveStep] = useState(0);
     const [baseGroupInfo, setBaseGroupInfo] = useState({});
     const [arrayOfCategories, setArrayOfCategories] = useState([]);
-    const {userData, authenticatedUser: user, loading} = useContext(UserContext);
+    const {userData, authenticatedUser: user, loading} = useAuth();
 
 
     useEffect(() => {

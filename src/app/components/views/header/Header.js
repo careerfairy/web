@@ -11,6 +11,7 @@ import LandingHeader from './landing-header/LandingHeader';
 import {Button} from "@material-ui/core";
 import UserContext from "../../../context/user/UserContext";
 import {makeStyles} from "@material-ui/core/styles";
+import {useAuth} from "../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({
     nextLink: {
@@ -27,7 +28,7 @@ function Header(props) {
 
     const [authenticated, setAuthenticated] = useState(false);
     const [sidebarState, setSidebarState] = useState("unopened");
-    const {userData, setUserData} = useContext(UserContext)
+    const {userData, setUserData} = useAuth()
 
     useEffect(() => {
         if (userData) {

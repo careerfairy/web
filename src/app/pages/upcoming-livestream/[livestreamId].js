@@ -26,6 +26,7 @@ import DataAccessUtil from "util/DataAccessUtil";
 import {Avatar} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../components/util/constants";
+import {useAuth} from "../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
     speakerAvatar: {
@@ -46,7 +47,7 @@ function UpcomingLivestream(props) {
     const {livestreamId, groupId} = router.query;
     const absolutePath = router.asPath;
 
-    const {userData, authenticatedUser: user} = useContext(UserContext);
+    const {userData, authenticatedUser: user} = useAuth();
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
     const [currentLivestream, setCurrentLivestream] = useState(null);

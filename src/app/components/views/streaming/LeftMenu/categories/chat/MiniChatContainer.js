@@ -20,6 +20,7 @@ import {
     WhiteTooltip
 } from "../../../../../../materialUI/GlobalTooltips";
 import CustomScrollToBottom from "../../../../../util/CustomScrollToBottom";
+import {useAuth} from "../../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -78,7 +79,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 function MiniChatContainer({isStreamer, livestream, firebase}) {
-    const {authenticatedUser, userData} = useContext(UserContext);
+    const {authenticatedUser, userData} = useAuth();
     const {tutorialSteps, setTutorialSteps, handleConfirmStep} = useContext(TutorialContext);
 
     const [chatEntries, setChatEntries] = useState([]);
