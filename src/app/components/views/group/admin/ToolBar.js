@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import {
     Box,
-    Button,
     Card,
     CardContent,
     TextField,
@@ -12,10 +11,10 @@ import {
     makeStyles
 } from '@material-ui/core';
 import {Search as SearchIcon, RefreshCw as RefreshIcon} from 'react-feather';
-import {CustomSplitButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
-import {copyStringToClipboard} from "../../../../helperFunctions/HelperFunctions";
+import {CustomSplitButton} from "../../../../materialUI/GlobalButtons/GlobalButtons";
+import {copyStringToClipboard} from "../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
-import {useAuth} from "../../../../../HOCs/AuthProvider";
+import {useAuth} from "../../../../HOCs/AuthProvider";
 import IconButton from "@material-ui/core/IconButton";
 
 const useStyles = makeStyles((theme) => ({

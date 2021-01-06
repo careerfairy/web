@@ -61,12 +61,10 @@ const useStyles = makeStyles(() => ({
 const NavBar = ({onMobileClose, openMobile, group}) => {
     const classes = useStyles();
     const {pathname} = useRouter()
-    console.log("-> group", group);
     useEffect(() => {
         if (openMobile && onMobileClose) {
             onMobileClose();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pathname]);
 
     const items = [
