@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {
@@ -7,6 +6,9 @@ import {
     ListItem,
     makeStyles
 } from '@material-ui/core';
+import {useRouter} from "next/router";
+import Link from '../../../materialUI/NextNavLink'
+
 
 const useStyles = makeStyles((theme) => ({
     item: {
@@ -21,7 +23,8 @@ const useStyles = makeStyles((theme) => ({
         letterSpacing: 0,
         padding: '10px 8px',
         textTransform: 'none',
-        width: '100%'
+        width: '100%',
+        textDecoration: "none !important",
     },
     icon: {
         marginRight: theme.spacing(1)
@@ -48,16 +51,20 @@ const NavItem = ({
                      ...rest
                  }) => {
     const classes = useStyles();
-
+    const {asPath} = useRouter()
+    const isActive = () => {
+        return Boolean(asPath === href)
+    }
     return (
         <ListItem
             className={clsx(classes.item, className)}
             disableGutters
             {...rest}
         >
-            <Link href={href} passHref>
                 <Button
-                    // activeClassName={classes.active}
+                    classes={{root: isActive() && classes.active }}
+                    href={href}
+                    component={Link}
                     className={classes.button}
                 >
                     {Icon && (
@@ -70,7 +77,6 @@ const NavItem = ({
           {title}
         </span>
                 </Button>
-            </Link>
         </ListItem>
     );
 };

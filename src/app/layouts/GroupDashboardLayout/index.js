@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
     root: {
         backgroundColor: theme.palette.background.dark,
         display: 'flex',
-        height: '100%',
+        height: '100vh',
         overflow: 'hidden',
         width: '100%'
     },
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     contentContainer: {
         display: 'flex',
         flex: '1 1 auto',
-        overflow: 'hidden'
+        overflow: 'hidden',
     },
     content: {
         flex: '1 1 auto',
@@ -84,7 +84,7 @@ const GroupDashboardLayout = (props) => {
             <div className={classes.wrapper}>
                 <div className={classes.contentContainer}>
                     <div className={classes.content}>
-                        {React.cloneElement(children, {group, ...props})}
+                        {!isEmptyObject(group) && React.cloneElement(children, {group, ...props})}
                     </div>
                 </div>
             </div>
