@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
     },
     buttonDisabled: {},
     popper: {
-        zIndex: 1
+        zIndex: 102
     }
 }))
 
