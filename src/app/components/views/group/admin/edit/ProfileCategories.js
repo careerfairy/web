@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {Fragment, useState} from 'react';
 import clsx from 'clsx';
 import {Formik} from 'formik';
 import PropTypes from 'prop-types';
@@ -17,6 +17,9 @@ import {validateStreamForm} from "../../../../helperFunctions/streamFormFunction
 import {useSnackbar} from "notistack";
 import {GENERAL_ERROR} from "../../../../util/constants";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import AddIcon from "@material-ui/icons/Add";
+import CategoryElement from "../settings/Category/CategoryElement";
+import CategoryEdit from "../settings/Category/CategoryEdit";
 
 const states = [
     {
@@ -40,6 +43,7 @@ const useStyles = makeStyles(() => ({
 const ProfileCategories = ({group, firebase, className, ...rest}) => {
         const classes = useStyles();
         const {enqueueSnackbar} = useSnackbar()
+        const [createMode, setCreateMode] = useState(false);
 
         const handleSubmitForm = async (values, {setStatus}) => {
             try {
@@ -66,116 +70,62 @@ const ProfileCategories = ({group, firebase, className, ...rest}) => {
         }
 
         return (
-            <Formik
-                autoComplete="off"
-                initialValues={{
-                    universityName: group.universityName,
-                    description: group.description,
-                }}
-                enableReinitialize
-                validate={(values) => {
-                    let errors = {}
-                    const minDescCharLength = 30
-                    const minGroupNameLength = 5
-                    if (!values.description) {
-                        errors.description = "Please fill"
-                    } else if (values.description.length < minDescCharLength) {
-                        errors.description = `Must be at least ${minDescCharLength} characters`
-                    }
 
-                    if (!values.universityName) {
-                        errors.universityName = "Please fill"
-                    } else if (values.universityName < minGroupNameLength) {
-                        errors.universityName = `Must be at least ${minGroupNameLength} characters`
-                    }
-                    return errors
-                }}
-                onSubmit={handleSubmitForm}
-                className={clsx(classes.root, className)}
-                {...rest}
-            >{({
-                   values,
-                   errors,
-                   touched,
-                   handleChange,
-                   handleBlur,
-                   handleSubmit,
-                   isSubmitting,
-                   setFieldValue,
-                   setValues,
-                   dirty,
-                   validateForm,
-                   /* and other goodies */
-               }) => (
-                <Card>
-                    <CardHeader
-                        subheader="The information can be edited"
-                        title="Categories"
-                    />
-                    <Divider/>
-                    <CardContent>
-
-                        <Grid
-                            container
-                            spacing={3}
-                        >
-                            <Grid
-                                item
-                                md={12}
-                                xs={12}
-                            >
-                                <TextField
-                                    fullWidth
-                                    helperText={errors.universityName}
-                                    label="Group Name"
-                                    disabled={isSubmitting}
-                                    name="universityName"
-                                    onChange={handleChange}
-                                    required
-                                    error={Boolean(errors.universityName)}
-                                    value={values.universityName}
-                                    variant="outlined"
-                                />
-                            </Grid>
-                            <Grid
-                                item
-                                md={12}
-                                xs={12}
-                            >
-                                <TextField
-                                    fullWidth
-                                    multiline
-                                    helperText={errors.description}
-                                    label="About"
-                                    name="description"
-                                    disabled={isSubmitting}
-                                    onChange={handleChange}
-                                    required
-                                    error={Boolean(errors.description)}
-                                    value={values.description}
-                                    variant="outlined"
-                                />
-                            </Grid>
-                        </Grid>
-                    </CardContent>
-                    <Divider/>
-                    <Box
-                        display="flex"
-                        justifyContent="flex-end"
-                        p={2}
+            <Card>
+                <CardHeader
+                    subheader="The information can be edited"
+                    title="Categories"
+                />
+                <Divider/>
+                <CardContent>
+                    <Grid
+                        container
+                        spacing={3}
                     >
-                        <Button
-                            disabled={!dirty}
-                            onClick={handleSubmit}
-                            color="primary"
-                            variant="contained"
-                            endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
+                        {group.categories?.map((category) => {
+                            return (
+                                <Grid
+                                    key={category.id}
+                                    item
+                                    md={12}
+                                    xs={12}
+                                >
+                                    <CategoryElement group={group} category={category}/>
+                                </Grid>
+                            );
+                        })}
+                        {createMode &&
+                        <Grid
+                            item
+                            md={12}
+                            xs={12}
                         >
-                            {isSubmitting ? "Updating" : "Save details"}
-                        </Button>
-                    </Box>
-                </Card>)}
-            </Formik>
+                            <CategoryEdit
+                                group={group}
+                                category={{}}
+                                options={[]}
+                                newCategory={true}
+                                setEditMode={setCreateMode}/>
+                        </Grid>
+                        }
+                    </Grid>
+                </CardContent>
+                <Divider/>
+                <Box
+                    display="flex"
+                    justifyContent="flex-end"
+                    p={2}
+                >
+                    <Button variant="contained"
+                            color="primary"
+                            size="medium"
+                            onClick={() => setCreateMode(true)}
+                            disabled={createMode}
+                            endIcon={<AddIcon/>}>
+                        Add Category
+                    </Button>
+                </Box>
+            </Card>
         );
     }
 ;

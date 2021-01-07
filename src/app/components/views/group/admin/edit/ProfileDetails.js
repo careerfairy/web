@@ -114,7 +114,6 @@ const ProfileDetails = ({group, firebase, className, ...rest}) => {
                     />
                     <Divider/>
                     <CardContent>
-
                         <Grid
                             container
                             spacing={3}
