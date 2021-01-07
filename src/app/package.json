@@ -36,6 +36,7 @@
     "global": "^4.4.0",
     "lodash": "^4.17.20",
     "lodash.debounce": "^4.0.8",
+    "moment": "^2.29.1",
     "next": "^9.2.0",
     "notistack": "^1.0.1",
     "react": "^16.14.0",
@@ -80,6 +81,7 @@
     "clsx": "^1.1.1",
     "node-sass": "^5.0.0",
     "prop-types": "^15.7.2",
+    "react-perfect-scrollbar": "^1.5.8",
     "styled-jsx-plugin-sass": "^1.0.0"
   }
 }
