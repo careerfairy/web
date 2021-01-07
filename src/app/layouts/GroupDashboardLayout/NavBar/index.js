@@ -53,9 +53,7 @@ const useStyles = makeStyles(() => ({
         "& img": {
             objectFit: "contain"
         }
-    },
-    // image:{
-    // }
+    }
 }));
 
 const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, drawerBottomLinks, firebase}) => {
