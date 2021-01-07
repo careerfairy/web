@@ -57,6 +57,8 @@ const PersonalInfo = ({firebase, userData}) => {
     const [open, setOpen] = useState(false);
     const [updated, setUpdated] = useState(false)
 
+    const urlRegex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/gm;
+
     useEffect(() => {
         if (updated) {
             setTimeout(() => {
@@ -85,6 +87,7 @@ const PersonalInfo = ({firebase, userData}) => {
             initialValues={userData && userData.firstName ? {
                 firstName: userData.firstName,
                 lastName: userData.lastName,
+                linkedinUrl: userData.linkedinUrl ? userData.linkedinUrl : '',
                 university: { 
                     code: userData.universityCode, 
                     name: userData.universityName
@@ -93,6 +96,7 @@ const PersonalInfo = ({firebase, userData}) => {
             } : {
                 firstName: '',
                 lastName: '',
+                linkedinUrl: '',
                 universityCode: 'other',
                 universityName: '',
                 universityCountryCode: ''
@@ -114,6 +118,9 @@ const PersonalInfo = ({firebase, userData}) => {
                 } else if (values.lastName.length > 50) {
                     errors.lastName = 'Cannot be longer than 50 characters';
                 }
+                if (values.linkedinUrl.length > 0 && !values.linkedinUrl.match(urlRegex)) {
+                    errors.linkedinUrl = 'Please enter a valid URL';
+                }
                 if (!values.universityCountryCode) {
                     errors.universityCountryCode = 'Please chose a country code';
                 }
@@ -121,7 +128,7 @@ const PersonalInfo = ({firebase, userData}) => {
             }}
             onSubmit={(values, {setSubmitting}) => {
                 setSubmitting(true);
-                firebase.setUserData(userData.id, values.firstName, values.lastName, values.university.code, values.university.name, values.universityCountryCode)
+                firebase.setUserData(userData.id, values.firstName, values.lastName, values.linkedinUrl, values.university.code, values.university.name, values.universityCountryCode)
                     .then(() => {
                         setSubmitting(false);
                         setUpdated(true)
@@ -204,6 +211,30 @@ const PersonalInfo = ({firebase, userData}) => {
                                             in={Boolean(errors.lastName && touched.lastName && errors.lastName)}>
                                             <FormHelperText error>
                                                 {errors.lastName}
+                                            </FormHelperText>
+                                        </Collapse>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <FormControl fullWidth>
+                                        <TextField
+                                            variant="outlined"
+                                            fullWidth
+                                            id="linkedinUrl"
+                                            label="LinkedIn (optional)"
+                                            name="linkedinUrl"
+                                            autoComplete="lname"
+                                            placeholder="https://www.linkedin.com/in/username/"
+                                            disabled={isSubmitting}
+                                            onBlur={handleBlur}
+                                            value={values.linkedinUrl}
+                                            error={Boolean(errors.linkedinUrl && touched.linkedinUrl && errors.linkedinUrl)}
+                                            onChange={handleChange}
+                                        />
+                                        <Collapse
+                                            in={Boolean(errors.linkedinUrl && touched.linkedinUrl && errors.linkedinUrl)}>
+                                            <FormHelperText error>
+                                                {errors.linkedinUrl}
                                             </FormHelperText>
                                         </Collapse>
                                     </FormControl>

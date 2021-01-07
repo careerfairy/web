@@ -62,13 +62,14 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    setUserData = (userEmail, firstName, lastName, universityCode, universityName, universityCountryCode) => {
+    setUserData = (userEmail, firstName, lastName, linkedinUrl, universityCode, universityName, universityCountryCode) => {
         let ref = this.firestore.collection("userData").doc(userEmail);
         return ref.update({
             id: userEmail,
             userEmail,
             firstName,
             lastName,
+            linkedinUrl,
             universityCode,
             universityName,
             universityCountryCode

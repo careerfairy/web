@@ -54,7 +54,8 @@ const EnhancedGroupStreamCard = ({
                                      handleOpenLevelOfStudyModal,
                                      switchToNextLivestreamsTab,
                                      isDraft,
-                                     router
+                                     router,
+                                     hasOptions
                                  }) => {
     const classes = useStyles()
 
@@ -287,13 +288,12 @@ const EnhancedGroupStreamCard = ({
                 >
                     {isDraft ? "Edit Draft" : "Edit Stream"}
                 </Button>
-
-                <Button className={classes.button} onClick={handleOpenLevelOfStudyModal}
-                        fullWidth
-                        startIcon={<EditIcon/>}
-                        variant='outlined'>
-                    Edit Categories
-                </Button>
+                {/*<Button className={classes.button} onClick={handleOpenLevelOfStudyModal}*/}
+                {/*        fullWidth*/}
+                {/*        startIcon={<EditIcon/>}*/}
+                {/*        variant='outlined'>*/}
+                {/*    Edit Categories*/}
+                {/*</Button>*/}
                 <CSVLink data={registeredStudentsFromGroup} separator={";"}
                          filename={'Registered Students ' + livestream.company + ' ' + livestream.id + '.csv'}
                          style={{color: 'red'}}>
@@ -405,7 +405,7 @@ const EnhancedGroupStreamCard = ({
                     </DialogActions>
                 </Dialog>
             </Box>
-            <Divider className={classes.divider} variant="middle"/>
+            {hasOptions && <Divider className={classes.divider} variant="middle"/>}
         </>
     );
 }

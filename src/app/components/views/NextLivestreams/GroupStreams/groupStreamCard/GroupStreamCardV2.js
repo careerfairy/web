@@ -16,7 +16,7 @@ import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
 import {AttendButton, DetailsButton} from "./actionButtons";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
-import {DateDisplay, TimeDisplay} from "./TimeDisplay";
+import {DateDisplay, DateTimeDisplay, TimeDisplay} from "./TimeDisplay";
 import EnhancedGroupStreamCard from "../../../group/admin/events/enhanced-group-stream-card/EnhancedGroupStreamCard";
 import SettingsIcon from '@material-ui/icons/Settings';
 import CopyToClipboard from "../../../common/CopyToClipboard";
@@ -26,13 +26,14 @@ const useStyles = makeStyles((theme) => {
     const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
     const paperColor = theme.palette.background.paper
     const frontHoveredScale = 0.7
-    const dateHeight = 100
+    const dateHeight = 90
     const themeColor = theme.palette.primary.main
     return ({
         root: {
             width: "100%",
             height: "100%",
             display: "flex",
+            cursor: "pointer"
         },
         streamCard: {
             display: "flex",
@@ -44,7 +45,7 @@ const useStyles = makeStyles((theme) => {
             transitionProperty: "transform",
             transitionDuration: `${theme.transitions.duration.shorter}ms`,
             transitionTimingFunction: theme.transitions.easing.easeInOut,
-            zIndex: ({cardHovered, expanded}) => (cardHovered || expanded) && 1002,
+            zIndex: ({cardHovered}) => cardHovered && 995,
             "& p": {
                 color: theme.palette.common.white
             },
@@ -62,7 +63,7 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center"
         },
         companyLogo: {
-            maxWidth: "70%",
+            maxWidth: "200px",
             maxHeight: "65%"
         },
         companyLogoWrapper: {
@@ -79,9 +80,12 @@ const useStyles = makeStyles((theme) => {
         },
         dateTimeWrapper: {
             display: "flex",
-            width: "100%",
+            justifyContent: "center",
+            flexDirection: "row",
             height: dateHeight,
-            color: theme.palette.common.white,
+        },
+        dynamicMargin: {
+            margin: ({cardHovered}) => cardHovered ? "-5px"  : "5px"
         },
         dateWrapper: {
             width: "50%",
@@ -168,7 +172,7 @@ const useStyles = makeStyles((theme) => {
             transform: ({
                             cardHovered,
                             hasOptions
-                        }) => cardHovered ? 'scale(1.1, 1.1)' : 'scale(0.2, 0.9)',
+                        }) => cardHovered ? 'scale(1.05, 1.05)' : 'scale(0.2, 0.9)',
             opacity: ({cardHovered}) => cardHovered ? 1 : 0,
             background: theme.palette.navyBlue.main,
             position: 'absolute',
@@ -238,7 +242,7 @@ const useStyles = makeStyles((theme) => {
         lowerFrontBackgroundImage: {
             borderRadius: "inherit",
             position: "absolute",
-            opacity: '.3',
+            opacity: '.1',
             height: '100%',
             width: '100%',
             objectFit: 'cover',
@@ -628,11 +632,8 @@ const GroupStreamCardV2 = memo(({
                             <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
                                  alt="background"/>}
                             <div className={classes.dateTimeWrapper}>
-                                <div className={classes.dateWrapper}>
-                                    <DateDisplay mobile={mobile} narrow={isNarrow()} date={livestream.start.toDate()}/>
-                                </div>
-                                <div className={classes.timeWrapper}>
-                                    <TimeDisplay mobile={mobile} narrow={isNarrow()} date={livestream.start.toDate()}/>
+                                <div className={classes.dynamicMargin}>
+                                    <DateTimeDisplay mobile={mobile} narrow={isNarrow()} date={livestream.start.toDate()}/>
                                 </div>
                             </div>
                             <div className={classes.companyLogoWrapper}>
@@ -700,6 +701,7 @@ const GroupStreamCardV2 = memo(({
                                                     group={groupData}
                                                     isDraft={isDraft}
                                                     router={router}
+                                                    hasOptions={Boolean(targetOptions.length)}
                                                     switchToNextLivestreamsTab={switchToNextLivestreamsTab}
                                                     handleOpenLevelOfStudyModal={handleOpenLevelOfStudyModal}
                                                     handleCloseLevelOfStudyModal={handleCloseLevelOfStudyModal}
