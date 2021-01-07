@@ -83,7 +83,7 @@ function CategoryElement({
     if (editMode === false) {
         return (
             <Fade in>
-                <Card>
+                <Card elevation={2}>
                     <CardHeader
                         titleTypographyProps={{className: classes.headerTitle, gutterBottom: true}}
                         title={category.name}

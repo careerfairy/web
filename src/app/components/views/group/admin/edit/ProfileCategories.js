@@ -11,7 +11,7 @@ import {
     Divider,
     Grid,
     TextField,
-    makeStyles
+    makeStyles, Grow
 } from '@material-ui/core';
 import {validateStreamForm} from "../../../../helperFunctions/streamFormFunctions";
 import {useSnackbar} from "notistack";
@@ -72,16 +72,46 @@ const ProfileCategories = ({group, firebase, className, ...rest}) => {
         return (
 
             <Card>
-                <CardHeader
-                    subheader="The information can be edited"
-                    title="Categories"
-                />
+                <Box
+                    display="flex"
+                    justifyContent="space-between"
+                >
+                    <CardHeader
+                        subheader="The information can be edited"
+                        title="Categories"
+                    />
+                    <Box p={2} display="flex" alignItems="flex-end">
+                        <Button variant="contained"
+                                color="primary"
+                                size="medium"
+                                onClick={() => setCreateMode(true)}
+                                disabled={createMode}
+                                endIcon={<AddIcon/>}>
+                            Add Category
+                        </Button>
+                    </Box>
+                </Box>
                 <Divider/>
                 <CardContent>
                     <Grid
                         container
                         spacing={3}
                     >
+                        <Grow unmountOnExit in={createMode}>
+                            <Grid
+                                item
+                                md={12}
+                                xs={12}
+                            >
+                                <CategoryEdit
+                                    group={group}
+                                    category={{}}
+                                    options={[]}
+                                    newCategory={true}
+                                    setEditMode={setCreateMode}/>
+                            </Grid>
+                        </Grow>
+
                         {group.categories?.map((category) => {
                             return (
                                 <Grid
@@ -94,37 +124,10 @@ const ProfileCategories = ({group, firebase, className, ...rest}) => {
                                 </Grid>
                             );
                         })}
-                        {createMode &&
-                        <Grid
-                            item
-                            md={12}
-                            xs={12}
-                        >
-                            <CategoryEdit
-                                group={group}
-                                category={{}}
-                                options={[]}
-                                newCategory={true}
-                                setEditMode={setCreateMode}/>
-                        </Grid>
-                        }
                     </Grid>
                 </CardContent>
                 <Divider/>
-                <Box
-                    display="flex"
-                    justifyContent="flex-end"
-                    p={2}
-                >
-                    <Button variant="contained"
-                            color="primary"
-                            size="medium"
-                            onClick={() => setCreateMode(true)}
-                            disabled={createMode}
-                            endIcon={<AddIcon/>}>
-                        Add Category
-                    </Button>
-                </Box>
+
             </Card>
         );
     }
