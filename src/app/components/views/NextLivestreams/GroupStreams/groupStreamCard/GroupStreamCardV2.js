@@ -83,6 +83,7 @@ const useStyles = makeStyles((theme) => {
             justifyContent: "center",
             flexDirection: "row",
             height: dateHeight,
+            position: "sticky"
         },
         dynamicMargin: {
             margin: ({cardHovered}) => cardHovered ? "-5px" : "5px"
@@ -103,24 +104,25 @@ const useStyles = makeStyles((theme) => {
             marginTop: `${theme.spacing(3)}px !important`,
             marginBottom: `${theme.spacing(3)}px !important`,
             fontWeight: "bold",
-            display: "flex",
             alignItems: "center",
             width: ({cardHovered}) => cardHovered && "140%",
             transition: "width 1s",
-            padding: `0 ${theme.spacing(1)}px`,
+            padding: theme.spacing(0, 2),
             color: "white !important",
-            // zIndex: 1,
-            justifyContent: "center"
+            justifyContent: "center",
+            display: "-webkit-box",
+            overflow: "hidden",
+            wordBreak: "break-word",
+            textOverflow: "ellipsis",
+            WebkitBoxOrient: "vertical",
+            WebkitLineClamp: ({cardHovered, isExpanded}) => (cardHovered || isExpanded) ? 3 : 2
         },
         front: {
             position: "relative",
             width: "100%",
             display: "flex",
             flexDirection: "column",
-            transform: ({
-                            cardHovered,
-                            hasOptions
-                        }) => cardHovered && `translateY(${hasOptions ? -90 : -60}px) scale(${frontHoveredScale})`,
+            transform: ({cardHovered}) => cardHovered && `translateY(${-60}px) scale(${frontHoveredScale})`,
             transition: '250ms',
             background: ({
                              cardHovered,
@@ -150,7 +152,6 @@ const useStyles = makeStyles((theme) => {
             justifyContent: "space-evenly",
             width: "100%",
             borderRadius: "inherit",
-            // zIndex: 1,
             flex: ({mobile}) => mobile && 1,
             maxHeight: 125
         },
@@ -158,7 +159,7 @@ const useStyles = makeStyles((theme) => {
         optionsWrapper: {
             overflowX: 'hidden',
             overflowY: 'auto',
-            maxHeight: 100,
+            // maxHeight: 200,
         },
         expandedOptionsWrapper: {
             overflowX: 'hidden',
@@ -169,10 +170,7 @@ const useStyles = makeStyles((theme) => {
         },
         background: {
             transition: ({cardHovered}) => cardHovered && `${transition}, opacity 150ms linear`,
-            transform: ({
-                            cardHovered,
-                            hasOptions
-                        }) => cardHovered ? 'scale(1.05, 1.05)' : 'scale(0.2, 0.9)',
+            transform: ({cardHovered}) => cardHovered ? 'scale(1.05, 1.05)' : 'scale(0.2, 0.9)',
             opacity: ({cardHovered}) => cardHovered ? 1 : 0,
             background: theme.palette.navyBlue.main,
             position: 'absolute',
@@ -190,10 +188,9 @@ const useStyles = makeStyles((theme) => {
         },
         backgroundContent: {
             marginTop: ({
-                            frontHeight,
                             hideActions,
                             hasOptions
-                        }) => hideActions ? hasOptions ? frontHeight - 135 : frontHeight - 90 : 0,
+                        }) => hideActions ? hasOptions ? 265 : 265 : 0,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -202,7 +199,7 @@ const useStyles = makeStyles((theme) => {
             paddingTop: 0
         },
         buttonsWrapper: {
-            marginTop: ({frontHeight, hasOptions}) => hasOptions ? frontHeight - 135 : frontHeight - 90,
+            marginTop: ({hasOptions}) => hasOptions ? 265 : 265,
             display: "flex",
             justifyContent: "center",
             marginBottom: theme.spacing(1),
@@ -338,7 +335,6 @@ const GroupStreamCardV2 = memo(({
     const router = useRouter();
     const absolutePath = router.asPath
     const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
-    const frontRef = createRef()
 
     function userIsRegistered() {
         if (!user || !livestream.registeredUsers || isAdmin) {
@@ -351,7 +347,6 @@ const GroupStreamCardV2 = memo(({
     const [expanded, setExpanded] = useState(false);
 
     const [cardHovered, setCardHovered] = useState(false)
-    const [frontHeight, setFrontHeight] = useState(0);
     const [targetOptions, setTargetOptions] = useState([])
     const [careerCenters, setCareerCenters] = useState([])
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -369,22 +364,12 @@ const GroupStreamCardV2 = memo(({
         registered,
         isExpanded: expanded,
         expanded: expanded && targetOptions.length,
-        frontHeight,
         isAdmin,
         hasOptions: targetOptions.length
     })
 
-
     useEffect(() => {
-        if (frontRef.current?.offsetHeight) {
-            const dimensions = frontRef.current.getBoundingClientRect()
-            setFrontHeight(dimensions.height)
-        }
-    }, [frontRef])
-
-
-    useEffect(() => {
-        if (checkIfHighlighted() && !isHighlighted && frontHeight) {
+        if (checkIfHighlighted() && !isHighlighted) {
             setIsHighlighted(true)
             setGlobalCardHighlighted(true)
             if (mobile) {
@@ -395,7 +380,7 @@ const GroupStreamCardV2 = memo(({
         } else if (checkIfHighlighted() && isHighlighted) {
             setIsHighlighted(false)
         }
-    }, [livestreamId, id, careerCenterId, groupData.groupId, frontHeight]);
+    }, [livestreamId, id, careerCenterId, groupData.groupId]);
 
     useEffect(() => {
         if (groupData.categories && livestream.targetCategories) {
@@ -625,7 +610,6 @@ const GroupStreamCardV2 = memo(({
                         }}
                         className={classes.streamCard}>
                         <Paper
-                            ref={frontRef}
                             elevation={4}
                             className={classes.front}>
                             {!cardHovered &&
@@ -716,11 +700,11 @@ const GroupStreamCardV2 = memo(({
                                                 </div>}
                                             </Collapse>
                                         </div>}
-                                        {/*<Grow in={Boolean(logoElements.length)}>*/}
-                                        <div className={classes.companyLogosFrontWrapper}>
-                                            {fetchingCareerCenters ? <LogosPlaceHolder/> : logoElements}
-                                        </div>
-                                        {/*</Grow>*/}
+                                        <Fade in={Boolean(logoElements.length)}>
+                                            <div className={classes.companyLogosFrontWrapper}>
+                                                {fetchingCareerCenters ? <LogosPlaceHolder/> : logoElements}
+                                            </div>
+                                        </Fade>
                                     </>
                                     }
                                 </div>
