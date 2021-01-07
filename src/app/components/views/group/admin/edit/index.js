@@ -30,7 +30,7 @@ const EditOverview = ({firebase, group}) => {
                     md={6}
                     xs={12}
                 >
-                    <Profile group={group}/>
+                    <Profile firebase={firebase} group={group}/>
                 </Grid>
                 <Grid
                     item
@@ -38,7 +38,7 @@ const EditOverview = ({firebase, group}) => {
                     md={6}
                     xs={12}
                 >
-                    <ProfileDetails/>
+                    <ProfileDetails firebase={firebase} group={group}/>
                 </Grid>
             </Grid>
         </Container>

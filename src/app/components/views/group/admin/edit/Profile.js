@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
-import moment from 'moment';
 import {
     Avatar,
     Box,
@@ -11,20 +10,14 @@ import {
     CardContent,
     Divider,
     Typography,
-    makeStyles, FormHelperText
+    makeStyles, FormHelperText, Grow
 } from '@material-ui/core';
 import FilePickerContainer from "../../../../ssr/FilePickerContainer";
 import PublishIcon from "@material-ui/icons/Publish";
-import ImagePickerContainer from "../../../../ssr/ImagePickerContainer";
-
-const user = {
-    avatar: '/static/images/avatars/avatar_6.png',
-    city: 'Los Angeles',
-    country: 'USA',
-    jobTitle: 'Senior Developer',
-    name: 'Katarina Smith',
-    timezone: 'GTM-7'
-};
+import CircularProgress from "@material-ui/core/CircularProgress";
+import {useSnackbar} from "notistack";
+import {GENERAL_ERROR} from "../../../../util/constants";
+import {uploadLogo} from "../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles(() => ({
     root: {},
@@ -35,17 +28,37 @@ const useStyles = makeStyles(() => ({
             objectFit: "contain"
         }
     },
-    actionsWrapper:{
+    actionsWrapper: {
         display: "flex",
         flexDirection: "column",
     }
 }));
 
-const Profile = ({group, className, ...rest}) => {
+const Profile = ({group, firebase, className, ...rest}) => {
     const classes = useStyles();
-    const [editData, setEditData] = useState(false);
+    const [editData, setEditData] = useState({});
     const [filePickerError, setFilePickerError] = useState('');
-    console.log("-> group", group);
+    const [submittingLogo, setSubmittingLogo] = useState(false);
+    const {enqueueSnackbar} = useSnackbar()
+
+    const handleSubmitLogo = async (e) => {
+        e.preventDefault();
+        try {
+            setSubmittingLogo(true);
+            await uploadLogo("group-logos", editData.fileObj, firebase, async (newUrl, fullPath) => {
+                await firebase.updateCareerCenter(group.id, {logoUrl: newUrl});
+            });
+            setEditData({})
+            setSubmittingLogo(false);
+        } catch (e) {
+            setSubmittingLogo(false);
+            console.log("-> e", e);
+            enqueueSnackbar(GENERAL_ERROR, {
+                variant: "error",
+                preventDuplicate: true,
+            })
+        }
+    };
 
     return (
         <Card
@@ -61,7 +74,7 @@ const Profile = ({group, className, ...rest}) => {
                     <Avatar
                         variant="rounded"
                         className={classes.avatar}
-                        src={group.logoUrl}
+                        src={editData.logoUrl || group.logoUrl}
                     />
                     <Typography
                         color="textPrimary"
@@ -81,16 +94,9 @@ const Profile = ({group, className, ...rest}) => {
             </CardContent>
             <Divider/>
             <CardActions className={classes.actionsWrapper}>
-                {/*<Button*/}
-                {/*  color="primary"*/}
-                {/*  fullWidth*/}
-                {/*  variant="text"*/}
-                {/*>*/}
-                {/*  Upload picture*/}
-                {/*</Button>*/}
-                <ImagePickerContainer
+                <FilePickerContainer
+                    style={{width: "100%"}}
                     extensions={["jpg", "jpeg", "png"]}
-                    dims={{minWidth: 100, maxWidth: 500, minHeight: 100, maxHeight: 500}}
                     maxSize={20}
                     onChange={(fileObject) => {
                         setFilePickerError(null);
@@ -101,17 +107,32 @@ const Profile = ({group, className, ...rest}) => {
                         });
                     }}
                     onError={(errMsg) => setFilePickerError(errMsg)}>
-                    {/*<Box flexDirection="column" display="flex" alignItems="center">*/}
+                    <Box flexDirection="column" display="flex" alignItems="center">
                         <Button
-                            style={{margin: "10px"}}
                             color="primary"
                             size="large"
+                            disabled={submittingLogo}
                             fullWidth
                             endIcon={<PublishIcon/>}>
-                            Upload Logo
+                            {editData.logoUrl ? "Change" : "Upload Logo"}
                         </Button>
-                    {/*</Box>*/}
-                </ImagePickerContainer>
+                    </Box>
+                </FilePickerContainer>
+                <Grow unmountOnExit in={Boolean(editData.fileObj)}>
+                    <Button
+                        color="primary"
+                        onClick={handleSubmitLogo}
+                        size="large"
+                        variant="contained"
+                        fullWidth
+                        disabled={submittingLogo}
+                        endIcon={
+                            submittingLogo && <CircularProgress size={20} color="inherit"/>
+                        }
+                    >
+                        save
+                    </Button>
+                </Grow>
                 <FormHelperText error>{filePickerError}</FormHelperText>
             </CardActions>
         </Card>
@@ -119,7 +140,9 @@ const Profile = ({group, className, ...rest}) => {
 };
 
 Profile.propTypes = {
-    className: PropTypes.string
+    className: PropTypes.string,
+    group: PropTypes.object,
+    firebase: PropTypes.object
 };
 
 export default Profile;

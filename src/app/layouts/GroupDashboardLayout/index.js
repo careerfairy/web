@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {makeStyles} from '@material-ui/core';
 import NavBar from './NavBar';
 import TopBar from './TopBar';
-import Head from "next/head";
 import {useRouter} from "next/router";
 import {withFirebase} from "../../context/firebase";
 import {isEmptyObject} from "../../components/helperFunctions/HelperFunctions";

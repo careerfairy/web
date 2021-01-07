@@ -1,197 +1,189 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import clsx from 'clsx';
+import {Formik} from 'formik';
 import PropTypes from 'prop-types';
 import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Divider,
-  Grid,
-  TextField,
-  makeStyles
+    Box,
+    Button,
+    Card,
+    CardContent,
+    CardHeader,
+    Divider,
+    Grid,
+    TextField,
+    makeStyles
 } from '@material-ui/core';
+import {validateStreamForm} from "../../../../helperFunctions/streamFormFunctions";
+import {useSnackbar} from "notistack";
+import {GENERAL_ERROR} from "../../../../util/constants";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const states = [
-  {
-    value: 'alabama',
-    label: 'Alabama'
-  },
-  {
-    value: 'new-york',
-    label: 'New York'
-  },
-  {
-    value: 'san-francisco',
-    label: 'San Francisco'
-  }
+    {
+        value: 'alabama',
+        label: 'Alabama'
+    },
+    {
+        value: 'new-york',
+        label: 'New York'
+    },
+    {
+        value: 'san-francisco',
+        label: 'San Francisco'
+    }
 ];
 
 const useStyles = makeStyles(() => ({
-  root: {}
+    root: {}
 }));
 
-const ProfileDetails = ({ className, ...rest }) => {
-  const classes = useStyles();
-  const [values, setValues] = useState({
-    firstName: 'Katarina',
-    lastName: 'Smith',
-    email: 'demo@devias.io',
-    phone: '',
-    state: 'Alabama',
-    country: 'USA'
-  });
+const ProfileDetails = ({group, firebase, className, ...rest}) => {
+        const classes = useStyles();
+        const {enqueueSnackbar} = useSnackbar()
 
-  const handleChange = (event) => {
-    setValues({
-      ...values,
-      [event.target.name]: event.target.value
-    });
-  };
+        const handleSubmitForm = async (values, {setStatus}) => {
+            try {
+                await firebase.updateCareerCenter(group.id, {
+                    description: values.description,
+                    universityName: values.universityName,
+                });
+                enqueueSnackbar("Your profile has been updated!", {
+                    variant: "success",
+                    preventDuplicate: true,
+                    anchorOrigin: {
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }
+                })
+            } catch (e) {
+                console.log("error", e);
+                enqueueSnackbar(GENERAL_ERROR, {
+                    variant: "error",
+                    preventDuplicate: true,
+                })
+                setStatus(e)
+            }
+        }
 
-  return (
-    <form
-      autoComplete="off"
-      noValidate
-      className={clsx(classes.root, className)}
-      {...rest}
-    >
-      <Card>
-        <CardHeader
-          subheader="The information can be edited"
-          title="Profile"
-        />
-        <Divider />
-        <CardContent>
-          <Grid
-            container
-            spacing={3}
-          >
-            <Grid
-              item
-              md={6}
-              xs={12}
-            >
-              <TextField
-                fullWidth
-                helperText="Please specify the first name"
-                label="First name"
-                name="firstName"
-                onChange={handleChange}
-                required
-                value={values.firstName}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid
-              item
-              md={6}
-              xs={12}
-            >
-              <TextField
-                fullWidth
-                label="Last name"
-                name="lastName"
-                onChange={handleChange}
-                required
-                value={values.lastName}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid
-              item
-              md={6}
-              xs={12}
-            >
-              <TextField
-                fullWidth
-                label="Email Address"
-                name="email"
-                onChange={handleChange}
-                required
-                value={values.email}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid
-              item
-              md={6}
-              xs={12}
-            >
-              <TextField
-                fullWidth
-                label="Phone Number"
-                name="phone"
-                onChange={handleChange}
-                type="number"
-                value={values.phone}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid
-              item
-              md={6}
-              xs={12}
-            >
-              <TextField
-                fullWidth
-                label="Country"
-                name="country"
-                onChange={handleChange}
-                required
-                value={values.country}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid
-              item
-              md={6}
-              xs={12}
-            >
-              <TextField
-                fullWidth
-                label="Select State"
-                name="state"
-                onChange={handleChange}
-                required
-                select
-                SelectProps={{ native: true }}
-                value={values.state}
-                variant="outlined"
-              >
-                {states.map((option) => (
-                  <option
-                    key={option.value}
-                    value={option.value}
-                  >
-                    {option.label}
-                  </option>
-                ))}
-              </TextField>
-            </Grid>
-          </Grid>
-        </CardContent>
-        <Divider />
-        <Box
-          display="flex"
-          justifyContent="flex-end"
-          p={2}
-        >
-          <Button
-            color="primary"
-            variant="contained"
-          >
-            Save details
-          </Button>
-        </Box>
-      </Card>
-    </form>
-  );
-};
+        return (
+            <Formik
+                autoComplete="off"
+                initialValues={{
+                    universityName: group.universityName,
+                    description: group.description,
+                }}
+                enableReinitialize
+                validate={(values) => {
+                    let errors = {}
+                    const minDescCharLength = 30
+                    const minGroupNameLength = 5
+                    if (!values.description) {
+                        errors.description = "Please fill"
+                    } else if (values.description.length < minDescCharLength) {
+                        errors.description = `Must be at least ${minDescCharLength} characters`
+                    }
 
-ProfileDetails.propTypes = {
-  className: PropTypes.string
-};
+                    if (!values.universityName) {
+                        errors.universityName = "Please fill"
+                    } else if (values.universityName < minGroupNameLength) {
+                        errors.universityName = `Must be at least ${minGroupNameLength} characters`
+                    }
+                    return errors
+                }}
+                onSubmit={handleSubmitForm}
+                className={clsx(classes.root, className)}
+                {...rest}
+            >{({
+                   values,
+                   errors,
+                   touched,
+                   handleChange,
+                   handleBlur,
+                   handleSubmit,
+                   isSubmitting,
+                   setFieldValue,
+                   setValues,
+                   dirty,
+                   validateForm,
+                   /* and other goodies */
+               }) => (
+                <Card>
+                    <CardHeader
+                        subheader="The information can be edited"
+                        title="Profile"
+                    />
+                    <Divider/>
+                    <CardContent>
+
+                        <Grid
+                            container
+                            spacing={3}
+                        >
+                            <Grid
+                                item
+                                md={12}
+                                xs={12}
+                            >
+                                <TextField
+                                    fullWidth
+                                    helperText={errors.universityName}
+                                    label="Group Name"
+                                    disabled={isSubmitting}
+                                    name="universityName"
+                                    onChange={handleChange}
+                                    required
+                                    error={Boolean(errors.universityName)}
+                                    value={values.universityName}
+                                    variant="outlined"
+                                />
+                            </Grid>
+                            <Grid
+                                item
+                                md={12}
+                                xs={12}
+                            >
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    helperText={errors.description}
+                                    label="About"
+                                    name="description"
+                                    disabled={isSubmitting}
+                                    onChange={handleChange}
+                                    required
+                                    error={Boolean(errors.description)}
+                                    value={values.description}
+                                    variant="outlined"
+                                />
+                            </Grid>
+                        </Grid>
+                    </CardContent>
+                    <Divider/>
+                    <Box
+                        display="flex"
+                        justifyContent="flex-end"
+                        p={2}
+                    >
+                        <Button
+                            disabled={!dirty}
+                            onClick={handleSubmit}
+                            color="primary"
+                            variant="contained"
+                            endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
+                        >
+                            {isSubmitting ? "Updating" : "Save details"}
+                        </Button>
+                    </Box>
+                </Card>)}
+            </Formik>
+        );
+    }
+;
+
+ProfileDetails.propTypes =
+    {
+        className: PropTypes.string
+    }
+;
 
 export default ProfileDetails;
