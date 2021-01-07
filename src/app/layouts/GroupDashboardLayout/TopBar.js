@@ -34,13 +34,35 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: 600,
         opacity: 1,
         color: `${theme.palette.primary.contrastText} !important`,
-        "&:hover": {
-            borderBottom: "2px solid white"
+        "&:before": {
+            content: '""',
+            position: "absolute",
+            width: "100%",
+            height: 2,
+            bottom: 4,
+            left: "0",
+            backgroundColor: theme.palette.common.white,
+            visibility: "hidden",
+            WebkitTransform: "scaleX(0)",
+            transform: "scaleX(0)",
+            transition: theme.transitions.create(['all'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.complex,
+            }),
+        },
+        "&:hover:before": {
+            visibility: "visible",
+            WebkitTransform: "scaleX(1)",
+            transform: "scaleX(1)"
         }
     },
     indicator: {
         background: theme.palette.common.white,
         color: theme.palette.common.white
+    },
+    root: {
+        // Ensures top bar's Zindex is always above the drawer
+        zIndex: theme.zIndex.drawer + 1
     }
 }));
 
@@ -50,7 +72,7 @@ const TopBar = ({className, topNavItems, onMobileNavOpen, ...rest}) => {
 
 
     return (
-        <AppBar className={clsx(classes.root, className)} elevation={0} {...rest}>
+        <AppBar elevation={1} className={clsx(classes.root, className)} {...rest}>
             <Toolbar className={classes.toolbar}>
                 <Hidden smDown>
                     <MainLogo white/>
