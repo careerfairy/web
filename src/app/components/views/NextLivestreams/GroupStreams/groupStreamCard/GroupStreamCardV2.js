@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => {
             transitionProperty: "transform",
             transitionDuration: `${theme.transitions.duration.shorter}ms`,
             transitionTimingFunction: theme.transitions.easing.easeInOut,
-            zIndex: ({cardHovered}) => cardHovered && 995,
+            zIndex: ({cardHovered, isExpanded}) => (cardHovered || isExpanded) && 995,
             "& p": {
                 color: theme.palette.common.white
             },
@@ -85,7 +85,7 @@ const useStyles = makeStyles((theme) => {
             height: dateHeight,
         },
         dynamicMargin: {
-            margin: ({cardHovered}) => cardHovered ? "-5px"  : "5px"
+            margin: ({cardHovered}) => cardHovered ? "-5px" : "5px"
         },
         dateWrapper: {
             width: "50%",
@@ -633,7 +633,8 @@ const GroupStreamCardV2 = memo(({
                                  alt="background"/>}
                             <div className={classes.dateTimeWrapper}>
                                 <div className={classes.dynamicMargin}>
-                                    <DateTimeDisplay mobile={mobile} narrow={isNarrow()} date={livestream.start.toDate()}/>
+                                    <DateTimeDisplay mobile={mobile} narrow={isNarrow()}
+                                                     date={livestream.start.toDate()}/>
                                 </div>
                             </div>
                             <div className={classes.companyLogoWrapper}>
