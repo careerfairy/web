@@ -19,7 +19,7 @@ import {useSnackbar} from "notistack";
 import {GENERAL_ERROR} from "../../../../util/constants";
 import {uploadLogo} from "../../../../helperFunctions/HelperFunctions";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
     root: {},
     avatar: {
         height: "100%",
@@ -31,6 +31,9 @@ const useStyles = makeStyles(() => ({
     actionsWrapper: {
         display: "flex",
         flexDirection: "column",
+    },
+    saveButton:{
+        marginTop: theme.spacing(1)
     }
 }));
 
@@ -93,7 +96,7 @@ const Profile = ({group, firebase, className, ...rest}) => {
                 </Box>
             </CardContent>
             <Divider/>
-            <CardActions className={classes.actionsWrapper}>
+            <CardActions disableSpacing className={classes.actionsWrapper}>
                 <FilePickerContainer
                     style={{width: "100%"}}
                     extensions={["jpg", "jpeg", "png"]}
@@ -120,6 +123,7 @@ const Profile = ({group, firebase, className, ...rest}) => {
                 </FilePickerContainer>
                 <Grow unmountOnExit in={Boolean(editData.fileObj)}>
                     <Button
+                        className={classes.saveButton}
                         color="primary"
                         onClick={handleSubmitLogo}
                         size="large"
