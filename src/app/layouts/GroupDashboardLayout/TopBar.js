@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const TopBar = ({className, topNavItems, onMobileNavOpen, ...rest}) => {
+const TopBar = ({className, links, onMobileNavOpen, ...rest}) => {
     const classes = useStyles();
     const [notifications] = useState([2, 123, 3, 13]);
 
@@ -80,18 +80,20 @@ const TopBar = ({className, topNavItems, onMobileNavOpen, ...rest}) => {
                 <Hidden mdUp>
                     <MiniLogo/>
                 </Hidden>
-                <Tabs classes={{indicator: classes.indicator}}>
-                    {topNavItems.map((item) => {
-                        return (
-                            <Tab
-                                className={classes.navLinks}
-                                label={item.title}
-                                href={item.href}
-                            />
-                        )
-                    })}
-                </Tabs>
-                {/*<Box flexGrow={1}/>*/}
+                <Hidden smDown>
+                    <Tabs value={false} classes={{indicator: classes.indicator}}>
+                        {links.map((item) => {
+                            return (
+                                <Tab
+                                    key={item.title}
+                                    className={classes.navLinks}
+                                    label={item.title}
+                                    href={item.href}
+                                />
+                            )
+                        })}
+                    </Tabs>
+                </Hidden>
                 <Hidden mdDown>
                     <Box>
                         <IconButton color="inherit">

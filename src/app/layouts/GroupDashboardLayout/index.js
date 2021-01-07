@@ -11,8 +11,11 @@ import {
     Archive as PastStreamIcon,
     Edit as EditGroupIcon,
     FileText as DraftStreamIcon,
-    Film as StreamIcon, Settings as SettingsIcon
+    Film as StreamIcon,
+    Settings as SettingsIcon,
+    User as ProfileIcon
 } from "react-feather";
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -83,7 +86,7 @@ const GroupDashboardLayout = (props) => {
     }
 
 
-    const topNavItems = [
+    const headerLinks = [
         {
             href: `/next-livestreams`,
             title: 'NEXT LIVE STREAMS'
@@ -95,15 +98,21 @@ const GroupDashboardLayout = (props) => {
         {
             href: `/wishlist`,
             title: 'WISHLIST'
-        },
-        {
-            href: `/groups`,
-            title: 'FOLLOW GROUPS'
         }
-
     ]
 
-    const items = [
+    const drawerBottomLinks = [
+        {
+            href: `https://corporate.careerfairy.io/companies`,
+            title: 'FOR COMPANIES'
+        },
+        {
+            href: `https://corporate.careerfairy.io/career-center`,
+            title: 'FOR CAREER CENTERS'
+        }
+    ]
+
+    const drawerTopLinks = [
         {
             href: `/group/${group.id}/admin/upcoming-livestreams`,
             icon: StreamIcon,
@@ -131,15 +140,29 @@ const GroupDashboardLayout = (props) => {
         }
     ];
 
+    if (authenticatedUser?.emailVerified) {
+        headerLinks.push({
+            href: `/groups`,
+            title: 'FOLLOW GROUPS'
+        })
+        drawerBottomLinks.push({
+            href: `/profile`,
+            title: 'PROFILE',
+            icon: ProfileIcon
+        })
+    }
+
     return (
         <div className={classes.root}>
             <TopBar
-                topNavItems={topNavItems}
+                links={headerLinks}
                 onMobileNavOpen={() => setMobileNavOpen(true)}
             />
             <NavBar
-                items={items}
-                topNavItems={topNavItems}
+                firebase={firebase}
+                drawerTopLinks={drawerTopLinks}
+                drawerBottomLinks={drawerBottomLinks}
+                headerLinks={headerLinks}
                 group={group}
                 onMobileClose={() => setMobileNavOpen(false)}
                 openMobile={isMobileNavOpen}

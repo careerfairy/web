@@ -49,6 +49,7 @@ const NavItem = ({
                      href,
                      icon: Icon,
                      title,
+                     svgIcon,
                      ...rest
                  }) => {
     const classes = useStyles();
@@ -60,21 +61,26 @@ const NavItem = ({
             disableGutters
             {...rest}
         >
-                <Button
-                    href={href}
-                    component={Link}
-                    className={classes.button}
-                >
-                    {Icon && (
+            <Button
+                href={href}
+                component={Link}
+                className={classes.button}
+            >
+                {svgIcon ?
+                    <div className={classes.icon}>
+                        {svgIcon}
+                    </div>
+                    :
+                    Icon && (
                         <Icon
                             className={classes.icon}
                             size="20"
                         />
                     )}
-                    <span className={classes.title}>
+                <span className={classes.title}>
           {title}
         </span>
-                </Button>
+            </Button>
         </ListItem>
     );
 };
@@ -83,7 +89,7 @@ NavItem.propTypes = {
     className: PropTypes.string,
     href: PropTypes.string,
     icon: PropTypes.elementType,
-    title: PropTypes.string
+    title: PropTypes.string,
 };
 
 export default NavItem;

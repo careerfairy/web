@@ -10,7 +10,7 @@ import {
     Hidden,
     List,
     Typography,
-    makeStyles
+    makeStyles, ListItem, ListItemText, ListItemIcon
 } from '@material-ui/core';
 import {
     AlertCircle as AlertCircleIcon,
@@ -24,7 +24,8 @@ import {
     Film as StreamIcon,
     Archive as PastStreamIcon,
     FileText as DraftStreamIcon,
-    Edit as EditGroupIcon
+    Edit as EditGroupIcon,
+    LogOut as LogoutIcon
 } from 'react-feather';
 import NavItem from './NavItem';
 import {useRouter} from "next/router";
@@ -57,7 +58,7 @@ const useStyles = makeStyles(() => ({
     // }
 }));
 
-const NavBar = ({onMobileClose, openMobile, group, items, topNavItems}) => {
+const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, drawerBottomLinks, firebase}) => {
     const classes = useStyles();
     const {pathname} = useRouter()
     useEffect(() => {
@@ -65,6 +66,10 @@ const NavBar = ({onMobileClose, openMobile, group, items, topNavItems}) => {
             onMobileClose();
         }
     }, [pathname]);
+
+    const signOut = () => {
+        firebase.doSignOut()
+    }
 
 
     const content = (
@@ -102,7 +107,7 @@ const NavBar = ({onMobileClose, openMobile, group, items, topNavItems}) => {
             <Divider/>
             <Box p={2}>
                 <List>
-                    {items.map((item) => (
+                    {drawerTopLinks.map((item) => (
                         <NavItem
                             href={item.href}
                             key={item.title}
@@ -113,19 +118,33 @@ const NavBar = ({onMobileClose, openMobile, group, items, topNavItems}) => {
                 </List>
             </Box>
             <Box flexGrow={1}/>
-            <Hidden lgUp>
             <Box p={2}>
                 <List>
-                    {topNavItems.map((item) => (
+                    <Hidden lgUp>
+                        {headerLinks.map((item) => (
+                            <NavItem
+                                href={item.href}
+                                key={item.title}
+                                title={item.title}
+                            />
+                        ))}
+                    </Hidden>
+                    {drawerBottomLinks.map((item) => (
                         <NavItem
                             href={item.href}
                             key={item.title}
                             title={item.title}
+                            icon={item.icon}
                         />
                     ))}
+                    <NavItem
+                        href=""
+                        onClick={signOut}
+                        icon={LogoutIcon}
+                        title="LOGOUT"
+                    />
                 </List>
             </Box>
-            </Hidden>
         </Box>
     );
 
