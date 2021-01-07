@@ -4,6 +4,7 @@ import {Container} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import Profile from "./Profile";
 import ProfileDetails from "./ProfileDetails";
+import ProfileCategories from "./ProfileCategories";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -38,8 +39,28 @@ const EditOverview = ({firebase, group}) => {
                     md={6}
                     xs={12}
                 >
-                    <ProfileDetails firebase={firebase} group={group}/>
+                    <Grid spacing={3} container>
+                        <Grid
+                            item
+                            lg={12}
+                            md={12}
+                            xs={12}
+                        >
+                            <ProfileDetails firebase={firebase} group={group}/>
+
+                        </Grid>
+                        <Grid
+                            item
+                            lg={12}
+                            md={12}
+                            xs={12}
+                        >
+
+                            <ProfileCategories firebase={firebase} group={group}/>
+                        </Grid>
+                    </Grid>
                 </Grid>
+
             </Grid>
         </Container>
     );

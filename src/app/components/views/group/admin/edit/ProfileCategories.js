@@ -37,7 +37,7 @@ const useStyles = makeStyles(() => ({
     root: {}
 }));
 
-const ProfileDetails = ({group, firebase, className, ...rest}) => {
+const ProfileCategories = ({group, firebase, className, ...rest}) => {
         const classes = useStyles();
         const {enqueueSnackbar} = useSnackbar()
 
@@ -110,7 +110,7 @@ const ProfileDetails = ({group, firebase, className, ...rest}) => {
                 <Card>
                     <CardHeader
                         subheader="The information can be edited"
-                        title="Details"
+                        title="Categories"
                     />
                     <Divider/>
                     <CardContent>
@@ -180,10 +180,10 @@ const ProfileDetails = ({group, firebase, className, ...rest}) => {
     }
 ;
 
-ProfileDetails.propTypes =
+ProfileCategories.propTypes =
     {
         className: PropTypes.string
     }
 ;
 
-export default ProfileDetails;
+export default ProfileCategories;
