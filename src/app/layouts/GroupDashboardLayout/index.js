@@ -12,7 +12,8 @@ import {
     FileText as DraftStreamIcon,
     Film as StreamIcon,
     Settings as SettingsIcon,
-    User as ProfileIcon
+    User as ProfileIcon,
+    BarChart2 as AnalyticsIcon
 } from "react-feather";
 
 
@@ -133,9 +134,9 @@ const GroupDashboardLayout = (props) => {
             title: 'Edit Group Profile'
         },
         {
-            href: `/group/${group.id}/admin/settings`,
-            icon: SettingsIcon,
-            title: 'Settings'
+            href: `/group/${group.id}/admin/analytics`,
+            icon: AnalyticsIcon,
+            title: 'Analytics'
         }
     ];
 
