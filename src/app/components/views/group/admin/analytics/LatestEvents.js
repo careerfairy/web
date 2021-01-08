@@ -11,65 +11,63 @@ import {
     Divider,
     useTheme,
     makeStyles,
-    colors,
 } from "@material-ui/core";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowRightIcon from "@material-ui/icons/ArrowRight";
 import {withFirebase} from "../../../../../context/firebase";
 import {colorsArray} from "../../../../util/colors";
-import useStreamTalentAndParticipation from "../../../../custom-hook/useStreamTalentAndParticipation";
+import {snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles(() => ({
     root: {},
 }));
 
 const getLength = (arr, prop) => {
-    return arr.map(event => {
-        if (event[prop]?.length) {
-            return event[prop].length
-        } else {
-            return 0
-        }
+    return arr.map((el) => {
+        return el?.[prop]?.length || 0
     })
-    console.log("-> arr", arr);
-
 }
 
 const LatestEvents = ({firebase, mostRecentEvents, currentTimeFrame, group, className, ...rest}) => {
     const classes = useStyles();
     const theme = useTheme();
 
-    // const {updatedStreams} = useStreamTalentAndParticipation(firebase, mostRecentEvents)
-    const [updatedStreams, setUpdatedStreams] = useState([]);
-    // console.log("-> updatedStreams", updatedStreams);
+    const [localStreams, setLocalStreams] = useState([]);
+
 
     useEffect(() => {
-        (async function () {
-            const newUpdatedStreams = await firebase.getLivestreamParticipantsAndTalentPool(currentTimeFrame.date, group.id)
-            setUpdatedStreams(newUpdatedStreams)
-        })()
-    }, [currentTimeFrame, group.id])
+        setLocalStreams(mostRecentEvents)
+    }, [mostRecentEvents])
+
+    useEffect(() => {
+        if (mostRecentEvents.length) {
+            setParticipatingStudents(mostRecentEvents)
+            setTalentPool(mostRecentEvents)
+        }
+    }, [mostRecentEvents])
+
+
 
     const data = {
         datasets: [
             {
                 backgroundColor: colorsArray[0],
-                data: getLength(updatedStreams, "registeredUsers"),
+                data: getLength(localStreams, "registeredUsers"),
                 label: "Registrations",
             },
             {
                 backgroundColor: colorsArray[1],
-                data: getLength(updatedStreams, "participatingStudents"),
+                data: getLength(localStreams, "participatingStudents"),
                 label: "Participation",
             },
             {
                 backgroundColor: colorsArray[2],
-                data: getLength(updatedStreams, "talentPool"),
+                data: getLength(localStreams, "talentPool"),
                 label: "Talent Pool",
             },
         ],
-        labels: updatedStreams.map(event => event.company),
-    };
+        labels: localStreams.map(event => event.company),
+    }
 
     const options = {
         // animation: false,
@@ -126,6 +124,29 @@ const LatestEvents = ({firebase, mostRecentEvents, currentTimeFrame, group, clas
             titleFontColor: theme.palette.text.primary,
         },
     };
+
+    const setParticipatingStudents = async (mostRecentEvents) => {
+        const streamsWithParticipation = [...mostRecentEvents]
+        for (const livestream of streamsWithParticipation) {
+            const snapData = await firebase.getLivestreamParticipatingStudents(livestream.id)
+            livestream.participatingStudents = snapShotsToData(snapData)
+        }
+        setLocalStreams(prevState => {
+            // Merges the original array of object with the updated array of object with NEW properties
+            return prevState.map((item, i) => Object.assign({}, item, streamsWithParticipation[i]))
+        })
+    }
+    const setTalentPool = async (mostRecentEvents) => {
+        const streamsWithTalentPool = [...mostRecentEvents]
+        for (const livestream of streamsWithTalentPool) {
+            const snapData = await firebase.getLivestreamTalentPoolMembers(livestream.companyId)
+            livestream.talentPool = snapShotsToData(snapData)
+        }
+        setLocalStreams(prevState => {
+            // Merges the original array of object with the updated array of object with NEW properties
+            return prevState.map((item, i) => Object.assign({}, item, streamsWithTalentPool[i]))
+        })
+    }
 
     return (
         <Card className={clsx(classes.root, className)} {...rest}>

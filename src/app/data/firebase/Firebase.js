@@ -1428,34 +1428,49 @@ class Firebase {
     };
 
     getLivestreamParticipantsAndTalentPool = async (timeframe, groupId) => {
-        let streamData = []
+        const tempStreams = []
+        const data = []
         let streamsRef = this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
             // .where("start", "<", timeframe)
             .orderBy("start", "desc")
-        const snapShots = await streamsRef.get()
-        snapShots.forEach(streamSnap => {
-            const streamDoc = streamSnap.data()
-            streamDoc.id = streamSnap.id
 
-            // Get talent Pool Members
-            this.getLivestreamTalentPoolMembers(streamDoc.companyId).then(userSnaps => {
-                streamDoc.talentPool = this.snapShotsToData(userSnaps)
-            })
-
-            // Get Participating Students
-            this.firestore.collection("livestreams")
-                .doc(streamSnap.id)
-                .collection("participatingStudents")
-                .get().then(participatingSnaps => {
-                streamDoc.participatingStudents = this.snapShotsToData(participatingSnaps)
-            })
-            streamData.push(streamDoc)
-
+        const streamSnapShots = await streamsRef.get()
+        streamSnapShots.forEach(streamDoc => {
+            const streamData = streamDoc.data()
+            streamData.id = streamDoc.id
+            tempStreams.push(streamData)
         })
 
-        return streamData
+        for (livestream of tempStreams) {
+            let tempStream = {}
+        }
+
+        return streamsRef.get().then(snapShots => {
+            let streamData = []
+            snapShots.docs.forEach((streamSnap, index) => {
+                const streamDoc = streamSnap.data()
+                streamDoc.id = streamSnap.id
+                // Get talent Pool Members
+                this.firestore
+                    .collection("userData")
+                    .where("talentPools", "array-contains", streamDoc.companyId).get().then(userSnaps => {
+                    streamDoc.talentPool = this.snapShotsToData(userSnaps)
+                }).then(() => {
+                    // Get Participating Students
+                    this.firestore.collection("livestreams")
+                        .doc(streamSnap.id)
+                        .collection("participatingStudents")
+                        .get().then(participatingSnaps => {
+                        streamDoc.participatingStudents = this.snapShotsToData(participatingSnaps)
+                        streamData.push(streamDoc)
+                    })
+                })
+
+            })
+            console.log("-> streamData", streamData);
+        })
     }
 
     snapShotsToData = (snapShots) => {
