@@ -32,6 +32,7 @@ import {
     handleAddSpeaker,
     handleDeleteSpeaker, handleError, handleFlattenOptions, validateStreamForm
 } from "../../helperFunctions/streamFormFunctions";
+import UserContext from "../../../context/user/UserContext";
 
 
 const useStyles = makeStyles(theme => ({
@@ -73,11 +74,13 @@ const speakerObj = {
 }
 
 
-const NewLivestreamForm = ({firebase}) => {
+const NewLivestreamForm = ({firebase, user}) => {
     const router = useRouter()
+    const {userData, authenticatedUser, hideLoader} = useContext(UserContext);
+
     const {
         query: {livestreamId, draftStreamId, absolutePath},
-        push
+        push, replace, pathname
     } = router;
     const classes = useStyles()
 
@@ -89,7 +92,6 @@ const NewLivestreamForm = ({firebase}) => {
     const [fetchingLogos, setFetchingLogos] = useState(true)
     const [fetchingGroups, setFetchingGroups] = useState(true);
     const [fetchingAvatars, setFetchingAvatars] = useState(true)
-
     const [allFetched, setAllFetched] = useState(false)
     const [updateMode, setUpdateMode] = useState(undefined)
 
@@ -112,6 +114,10 @@ const NewLivestreamForm = ({firebase}) => {
     })
 
     useEffect(() => {
+        // If there are no relevant IDs and ur not a super admin, get lost...
+        if (!(livestreamId || draftStreamId) && !hasPermissionToCreate()) {
+            replace("/")
+        }
         if ((livestreamId || draftStreamId) && allFetched) {
             (async () => {
                 const targetId = livestreamId || draftStreamId
@@ -143,6 +149,11 @@ const NewLivestreamForm = ({firebase}) => {
                     setTargetCategories(livestream.targetCategories || {})
                     if (forLivestream) {
                         setUpdateMode(true)
+                    }
+                } else {
+                    // If you're not a super admin and the Ids dont return any relevant draft or stream, get lost...
+                    if (!hasPermissionToCreate()) {
+                        replace("/")
                     }
                 }
             })()
@@ -205,6 +216,11 @@ const NewLivestreamForm = ({firebase}) => {
                     groupsWithFlattenedOptions.push(targetGroup)
                 }
             })
+
+            // If ur not a super admin and ur also not an admin of any of the groups in the stream, get lost....
+            if (!hasPermissionToEdit(groupsWithFlattenedOptions)) {
+                replace("/")
+            }
             setSelectedGroups(groupsWithFlattenedOptions)
         }
     }
@@ -249,6 +265,16 @@ const NewLivestreamForm = ({firebase}) => {
         } catch (e) {
             setGeneralError("Something went wrong")
         }
+    }
+
+    const hasPermissionToEdit = (arrayOfGroups) => {
+        return Boolean(
+            userData.isAdmin
+            || arrayOfGroups.some(group => group.adminEmail === authenticatedUser.email
+            ))
+    }
+    const hasPermissionToCreate = () => {
+        return Boolean(userData.isAdmin)
     }
 
 
@@ -328,6 +354,7 @@ const NewLivestreamForm = ({firebase}) => {
                                 label="Logo"
                                 handleBlur={handleBlur}
                                 formName="companyLogoUrl"
+                                isSuperAdmin={authenticatedUser.isAdmin}
                                 value={values.companyLogoUrl}
                                 options={existingLogos}
                                 loading={fetchingLogos}
@@ -338,6 +365,7 @@ const NewLivestreamForm = ({firebase}) => {
                                 getDownloadUrl={getDownloadUrl} values={values} firebase={firebase}
                                 setFieldValue={setFieldValue} isSubmitting={isSubmitting}
                                 path="illustration-images"
+                                isSuperAdmin={authenticatedUser.isAdmin}
                                 label="Company Background" handleBlur={handleBlur}
                                 formName="backgroundImageUrl"
                                 value={values.backgroundImageUrl} options={existingBackgrounds}
@@ -464,6 +492,8 @@ const NewLivestreamForm = ({firebase}) => {
                                 handleChange={handleChange}
                                 handleBlur={handleBlur}
                                 values={values}
+                                isSuperAdmin={authenticatedUser.isAdmin}
+                                adminEmail={authenticatedUser.email}
                                 isSubmitting={isSubmitting}
                                 selectedGroups={selectedGroups}
                                 setTargetCategories={setTargetCategories}

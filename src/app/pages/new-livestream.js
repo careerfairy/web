@@ -27,14 +27,12 @@ const newLivestream = () => {
                 query: {absolutePath},
             });
         }
-
-        if (userData && !userData.isAdmin) {
-            replace(`/`);
-        }
     }, [user, userData]);
 
 
-    return hideLoader && userData && userData.isAdmin ? (
+
+
+    return hideLoader && userData ? (
         <TealBackground style={{paddingBottom: 0}}>
             <Head>
                 <title key="title">CareerFairy | Create Livestreams</title>
@@ -45,7 +43,7 @@ const newLivestream = () => {
             <Typography variant="h3" align="center" style={{marginTop: "1.5rem", color: "white"}}>
                 Create a Livestream
             </Typography>
-            <NewLivestreamForm/>
+            <NewLivestreamForm user={user}/>
             <Footer/>
         </TealBackground>
     ) : <Loader/>;
