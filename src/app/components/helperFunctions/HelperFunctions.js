@@ -96,6 +96,15 @@ export const snapShotsToData = (snapShots) => {
     return dataArray
 }
 
+export const singleSnapToData = (snapShot) => {
+    let data = {}
+    if (snapShot.exists) {
+        data = snapShot.data()
+        data.id = snapShot.id
+    }
+    return data
+}
+
 export const MultilineText = ({text}) => {
     return text.split('\\n').map((item, i) => <p key={i}>{item}</p>)
 }

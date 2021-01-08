@@ -17,6 +17,7 @@ import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowRightIcon from "@material-ui/icons/ArrowRight";
 import {withFirebase} from "../../../../../context/firebase";
 import {colorsArray} from "../../../../util/colors";
+import useStreamTalentAndParticipation from "../../../../custom-hook/useStreamTalentAndParticipation";
 
 const useStyles = makeStyles(() => ({
     root: {},
@@ -25,25 +26,8 @@ const useStyles = makeStyles(() => ({
 const LatestEvents = ({firebase, mostRecentEvents, timeFrames, className, ...rest}) => {
     const classes = useStyles();
     const theme = useTheme();
-    const [localEvents, setLocalEvents] = useState(mostRecentEvents);
-    console.log("-> mostRecentEvents", mostRecentEvents);
-    // console.log("-> localEvents", localEvents);
 
-    useEffect(() => {
-        (async function cloneStreamsAndGetAdditionalData () {
-            if (mostRecentEvents?.length) {
-                const newLocalEvents = [...localEvents]
-                for (stream of newLocalEvents) {
-                    if (!stream.talentPoolData) {
-                        const talentPoolData = await firebase.getLivestreamTalentPoolMembers(stream.companyId)
-                        console.log("-> talentPoolData", talentPoolData);
-                        console.log("-> talentPoolData.get(", talentPoolData.data());
-                    }
-                }
-
-            }
-        })()
-    }, [mostRecentEvents])
+    const {updatedEvents} = useStreamTalentAndParticipation(firebase, mostRecentEvents)
 
     const data = {
         datasets: [
