@@ -117,8 +117,7 @@ const AnalyticsOverview = ({firebase, group}) => {
                 return stream
             }
         });
-        const limitedRecentItems = recentStreams.slice(0, limit)
-
+        return recentStreams.slice(0, limit)
     }
 
 
@@ -178,8 +177,8 @@ const AnalyticsOverview = ({firebase, group}) => {
                 </Grid>
                 <Grid item lg={8} md={12} xl={9} xs={12}>
                     <LatestEvents
+                        currentTimeFrame={currentTimeFrame}
                         mostRecentEvents={mostRecentEvents}
-                        timeFrames={timeFrames}
                         group={group}
                     />
                 </Grid>

@@ -2,15 +2,18 @@ import React, {useEffect, useState} from "react";
 import {snapShotsToData} from "../helperFunctions/HelperFunctions";
 
 
-const useStreamTalentAndParticipation = (firebase, streams) => {
+const useStreamTalentAndParticipationV2 = (firebase, streams) => {
 
     const [updatedStreams, setUpdatedStreams] = useState([]);
-    console.log("-> updatedStreams", updatedStreams);
-    console.log("-> streams", streams);
 
     useEffect(() => {
+        if(streams.length){
+            const arrayOfIds = getStreamIds()
+
+
+        }
         setUpdatedStreams(streams)
-    },[streams])
+    }, [streams])
 
     useEffect(() => {
         (async function () {
@@ -18,16 +21,18 @@ const useStreamTalentAndParticipation = (firebase, streams) => {
                 const newStreams = [...streams]
                 for (const livestream of newStreams) {
                     const talentPoolSnapShots = await firebase.getLivestreamTalentPoolMembers(livestream.companyId)
-                    const participatingStudentsSnapShots = await firebase.getLivestreamParticipatingStudents(livestream.id)
                     livestream.talentPool = snapShotsToData(talentPoolSnapShots)
-                    livestream.participatingStudents = snapShotsToData(participatingStudentsSnapShots)
                 }
                 setUpdatedStreams(newStreams)
             }
         })()
     }, [streams])
 
+    const getStreamIds = (streams) => {
+        return streams.map(stream => stream.id)
+    }
+
     return {updatedStreams}
 }
 
-export default useStreamTalentAndParticipation
+export default useStreamTalentAndParticipationV2

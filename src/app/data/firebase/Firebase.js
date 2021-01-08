@@ -2,7 +2,6 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/storage";
-import {snapshotsToData} from "../../components/helperFunctions/HelperFunctions";
 
 const config = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -622,7 +621,7 @@ class Firebase {
     }
 
     getDraftLiveStreamsByGroupId = (groupId) => {
-        let ref =  this.firestore
+        let ref = this.firestore
             .collection("draftLivestreams")
             .where("groupIds", "array-contains", groupId)
             .orderBy("start", "asc")
@@ -643,7 +642,7 @@ class Firebase {
     getPastLiveStreamsByGroupId = (groupId) => {
         let START_DATE_FOR_REPORTED_EVENTS = 'September 1, 2020 00:00:00';
         const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
-        let ref =  this.firestore
+        let ref = this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
             .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
@@ -1427,6 +1426,48 @@ class Firebase {
             .where("groupIds", "array-contains", groupId)
         return ref.onSnapshot(callback);
     };
+
+    getLivestreamParticipantsAndTalentPool = async (timeframe, groupId) => {
+        let streamData = []
+        let streamsRef = this.firestore
+            .collection("livestreams")
+            .where("groupIds", "array-contains", groupId)
+            // .where("start", "<", timeframe)
+            .orderBy("start", "desc")
+        const snapShots = await streamsRef.get()
+        snapShots.forEach(streamSnap => {
+            const streamDoc = streamSnap.data()
+            streamDoc.id = streamSnap.id
+
+            // Get talent Pool Members
+            this.getLivestreamTalentPoolMembers(streamDoc.companyId).then(userSnaps => {
+                streamDoc.talentPool = this.snapShotsToData(userSnaps)
+            })
+
+            // Get Participating Students
+            this.firestore.collection("livestreams")
+                .doc(streamSnap.id)
+                .collection("participatingStudents")
+                .get().then(participatingSnaps => {
+                streamDoc.participatingStudents = this.snapShotsToData(participatingSnaps)
+            })
+            streamData.push(streamDoc)
+
+        })
+
+        return streamData
+    }
+
+    snapShotsToData = (snapShots) => {
+        let dataArray = []
+        snapShots.forEach(doc => {
+            const data = doc.data()
+            data.id = doc.id
+            dataArray.push(data)
+        })
+        return dataArray
+    }
+
 
     getStorageRef = () => {
         return this.storage.ref();

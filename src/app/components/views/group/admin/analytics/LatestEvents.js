@@ -23,35 +23,57 @@ const useStyles = makeStyles(() => ({
     root: {},
 }));
 
-const LatestEvents = ({firebase, mostRecentEvents, timeFrames, className, ...rest}) => {
+const getLength = (arr, prop) => {
+    return arr.map(event => {
+        if (event[prop]?.length) {
+            return event[prop].length
+        } else {
+            return 0
+        }
+    })
+    console.log("-> arr", arr);
+
+}
+
+const LatestEvents = ({firebase, mostRecentEvents, currentTimeFrame, group, className, ...rest}) => {
     const classes = useStyles();
     const theme = useTheme();
 
-    const {updatedEvents} = useStreamTalentAndParticipation(firebase, mostRecentEvents)
+    // const {updatedStreams} = useStreamTalentAndParticipation(firebase, mostRecentEvents)
+    const [updatedStreams, setUpdatedStreams] = useState([]);
+    // console.log("-> updatedStreams", updatedStreams);
+
+    useEffect(() => {
+        (async function () {
+            const newUpdatedStreams = await firebase.getLivestreamParticipantsAndTalentPool(currentTimeFrame.date, group.id)
+            setUpdatedStreams(newUpdatedStreams)
+        })()
+    }, [currentTimeFrame, group.id])
 
     const data = {
         datasets: [
             {
                 backgroundColor: colorsArray[0],
-                data: mostRecentEvents.map(event => event.registeredUsers?.length),
+                data: getLength(updatedStreams, "registeredUsers"),
                 label: "Registrations",
             },
-            // {
-            //     backgroundColor: colorsArray[1],
-            //     data: [111, 202, 124, 292, 304, 255, 134, 271, 293, 191, 207],
-            //     label: "Participation",
-            // },
-            // {
-            //     backgroundColor: colorsArray[2],
-            //     data: [34, 78, 45, 123, 87, 45, 31, 271, 293, 191, 207],
-            //     label: "Talent Pool",
-            // },
+            {
+                backgroundColor: colorsArray[1],
+                data: getLength(updatedStreams, "participatingStudents"),
+                label: "Participation",
+            },
+            {
+                backgroundColor: colorsArray[2],
+                data: getLength(updatedStreams, "talentPool"),
+                label: "Talent Pool",
+            },
         ],
-        labels: mostRecentEvents.map(event => event.company),
+        labels: updatedStreams.map(event => event.company),
     };
 
     const options = {
         // animation: false,
+        redraw: true,
         cornerRadius: 20,
         layout: {padding: 0},
         legend: {display: false},
