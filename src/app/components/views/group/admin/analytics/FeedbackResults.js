@@ -18,6 +18,7 @@ import {
 } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+import {withFirebase} from "../../../../../context/firebase";
 
 const data = [
   {
@@ -62,7 +63,7 @@ const useStyles = makeStyles(({
   }
 }));
 
-const LatestProducts = ({ className, ...rest }) => {
+const FeedbackResults = ({timeFrames , className, ...rest }) => {
   const classes = useStyles();
   const [products] = useState(data);
 
@@ -86,7 +87,7 @@ const LatestProducts = ({ className, ...rest }) => {
               <img
                 alt="Product"
                 className={classes.image}
-                src={product.imageUrl}
+                // src={product.imageUrl}
               />
             </ListItemAvatar>
             <ListItemText
@@ -121,8 +122,8 @@ const LatestProducts = ({ className, ...rest }) => {
   );
 };
 
-LatestProducts.propTypes = {
+FeedbackResults.propTypes = {
   className: PropTypes.string
 };
 
-export default LatestProducts;
+export default withFirebase(FeedbackResults);

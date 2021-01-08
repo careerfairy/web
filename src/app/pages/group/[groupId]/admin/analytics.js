@@ -6,7 +6,7 @@ import AnalyticsOverview from "../../../../components/views/group/admin/analytic
 const AnalyticsPage = ({group, firebase}) => {
 
     return (
-        <Page title="CareerFairy | Admin Upcoming Streams">
+        <Page title={`CareerFairy | Admin Analytics of ${group.universityName}`}>
             <AnalyticsOverview
                 group={group}
                 firebase={firebase}

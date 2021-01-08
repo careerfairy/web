@@ -6,7 +6,7 @@ import StreamsOverview from "../../../../components/views/group/admin/StreamsOve
 const DraftStreamsPage = ({group, firebase}) => {
 
     return (
-        <Page title="CareerFairy | Admin Upcoming Streams">
+        <Page title={`CareerFairy | Admin Manage Drafts of ${group.universityName}`}>
             <StreamsOverview
                 query={firebase.getDraftLiveStreamsByGroupId}
                 group={group}

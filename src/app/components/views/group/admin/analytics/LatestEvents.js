@@ -15,29 +15,36 @@ import {
 } from '@material-ui/core';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+import {withFirebase} from "../../../../../context/firebase";
+import {colorsArray} from "../../../../util/colors";
 
 const useStyles = makeStyles(() => ({
   root: {}
 }));
 
-const Sales = ({ className, ...rest }) => {
+const LatestEvents = ({timeFrames , className, ...rest }) => {
   const classes = useStyles();
   const theme = useTheme();
 
   const data = {
     datasets: [
       {
-        backgroundColor: colors.indigo[500],
-        data: [18, 5, 19, 27, 29, 19, 20],
-        label: 'This year'
+        backgroundColor: colorsArray[0],
+        data: [183, 53, 194, 271, 293, 191, 207],
+        label: 'Registrations'
       },
       {
-        backgroundColor: colors.grey[200],
-        data: [11, 20, 12, 29, 30, 25, 13],
-        label: 'Last year'
+        backgroundColor: colorsArray[1],
+        data: [111, 202, 124, 292, 304, 255, 134],
+        label: 'Participation'
+      },
+      {
+        backgroundColor: colorsArray[2],
+        data: [34, 78, 45, 123, 87, 45, 31],
+        label: 'Talent Pool'
       }
     ],
-    labels: ['1 Aug', '2 Aug', '3 Aug', '4 Aug', '5 Aug', '6 Aug']
+    labels: ['Stream 1', 'stream 2', 'stream 3', 'stream 4', 'stream 5', 'stream 6']
   };
 
   const options = {
@@ -103,8 +110,8 @@ const Sales = ({ className, ...rest }) => {
             Last 7 days
           </Button>
         )}
-        title="Latest events"
-        subheader="first bar registrations, second bar particip, third talent pool"
+        title="Latest Events"
+        // subheader="first bar registrations, second bar particip, third talent pool"
       />
       <Divider />
       <CardContent>
@@ -127,8 +134,8 @@ const Sales = ({ className, ...rest }) => {
   );
 };
 
-Sales.propTypes = {
+LatestEvents.propTypes = {
   className: PropTypes.string
 };
 
-export default Sales;
+export default withFirebase(LatestEvents);

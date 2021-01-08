@@ -16,6 +16,8 @@ import {
 import LaptopMacIcon from '@material-ui/icons/LaptopMac';
 import PhoneIcon from '@material-ui/icons/Phone';
 import TabletIcon from '@material-ui/icons/Tablet';
+import {colorsArray} from "../../../../util/colors";
+import {withFirebase} from "../../../../../context/firebase";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -23,7 +25,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const TrafficByDevice = ({ className, ...rest }) => {
+const TypeOfParticipants = ({timeFrames , className, ...rest }) => {
   const classes = useStyles();
   const theme = useTheme();
 
@@ -32,9 +34,9 @@ const TrafficByDevice = ({ className, ...rest }) => {
       {
         data: [63, 15, 22],
         backgroundColor: [
-          colors.indigo[500],
-          colors.red[600],
-          colors.orange[600]
+          colorsArray[0],
+          colorsArray[1],
+          colorsArray[2],
         ],
         borderWidth: 8,
         borderColor: colors.common.white,
@@ -71,19 +73,19 @@ const TrafficByDevice = ({ className, ...rest }) => {
       title: 'Physics',
       value: 63,
       icon: LaptopMacIcon,
-      color: colors.indigo[500]
+      color: colorsArray[0],
     },
     {
       title: 'Consulting',
       value: 15,
       icon: TabletIcon,
-      color: colors.red[600]
+      color: colorsArray[1]
     },
     {
       title: 'Environmental Studies',
       value: 23,
       icon: PhoneIcon,
-      color: colors.orange[600]
+      color: colorsArray[2]
     }
   ];
 
@@ -119,8 +121,11 @@ const TrafficByDevice = ({ className, ...rest }) => {
               key={title}
               p={1}
               textAlign="center"
+              display="flex"
+              flexDirection="column"
+              justifyContent="space-between"
             >
-              <Icon color="action" />
+              {/*<Icon color="action" />*/}
               <Typography
                 color="textPrimary"
                 variant="body1"
@@ -142,8 +147,8 @@ const TrafficByDevice = ({ className, ...rest }) => {
   );
 };
 
-TrafficByDevice.propTypes = {
+TypeOfParticipants.propTypes = {
   className: PropTypes.string
 };
 
-export default TrafficByDevice;
+export default withFirebase(TypeOfParticipants);

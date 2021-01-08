@@ -117,3 +117,8 @@ export const copyStringToClipboard = (string) => {
     document.body.removeChild(el);
 }
 
+export const mustBeNumber = (value) => {
+    // checks to see if value is an int or float, if not it will return zero
+    return Number.isFinite(value) ? value : 0
+}
+

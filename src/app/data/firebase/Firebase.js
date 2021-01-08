@@ -1411,6 +1411,14 @@ class Firebase {
         return ref.get();
     }
 
+    // Analytics Queries
+    listenToAllLivestreamsOfGroup = (groupId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .where("groupIds", "array-contains", groupId)
+        return ref.onSnapshot(callback);
+    }
+
     getStorageRef = () => {
         return this.storage.ref();
     }

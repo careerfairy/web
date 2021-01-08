@@ -6,12 +6,12 @@ import StreamsOverview from "../../../../components/views/group/admin/StreamsOve
 const PastLivestreamsPage = ({group, firebase}) => {
 
     return (
-        <Page title="CareerFairy | Admin Upcoming Streams">
+        <Page title={`CareerFairy | Admin Past Streams of ${group.universityName}`}>
             <StreamsOverview
                 query={firebase.getPastLiveStreamsByGroupId}
                 group={group}
                 firebase={firebase}
-                typeOfStream="upcoming"
+                typeOfStream="past"
             />
         </Page>
     );
