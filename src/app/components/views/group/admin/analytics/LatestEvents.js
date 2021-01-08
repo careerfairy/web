@@ -10,16 +10,19 @@ import {
     CardHeader,
     Divider,
     useTheme,
-    makeStyles,
+    makeStyles, Menu, MenuItem,
 } from "@material-ui/core";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowRightIcon from "@material-ui/icons/ArrowRight";
 import {withFirebase} from "../../../../../context/firebase";
 import {colorsArray} from "../../../../util/colors";
-import {snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
+import {getTimeFromNow, snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
     root: {},
+    select: {
+        backgroundColor: theme.palette.background.paper,
+    }
 }));
 
 const getLength = (arr, prop) => {
@@ -28,11 +31,21 @@ const getLength = (arr, prop) => {
     })
 }
 
-const LatestEvents = ({firebase, mostRecentEvents, currentTimeFrame, group, className, ...rest}) => {
+const LatestEvents = ({
+                          timeFrames,
+                          setCurrentTimeFrame,
+                          firebase,
+                          mostRecentEvents,
+                          currentTimeFrame,
+                          group,
+                          className,
+                          ...rest
+                      }) => {
     const classes = useStyles();
     const theme = useTheme();
 
     const [localStreams, setLocalStreams] = useState([]);
+    const [anchorEl, setAnchorEl] = React.useState(null);
 
 
     useEffect(() => {
@@ -45,7 +58,6 @@ const LatestEvents = ({firebase, mostRecentEvents, currentTimeFrame, group, clas
             setTalentPool(mostRecentEvents)
         }
     }, [mostRecentEvents])
-
 
 
     const data = {
@@ -66,11 +78,10 @@ const LatestEvents = ({firebase, mostRecentEvents, currentTimeFrame, group, clas
                 label: "Talent Pool",
             },
         ],
-        labels: localStreams.map(event => event.company),
+        labels: localStreams.map(event => [`${event.company} `, `(${getTimeFromNow(event.start)})`]),
     }
 
     const options = {
-        // animation: false,
         redraw: true,
         cornerRadius: 20,
         layout: {padding: 0},
@@ -122,7 +133,25 @@ const LatestEvents = ({firebase, mostRecentEvents, currentTimeFrame, group, clas
             intersect: false,
             mode: "index",
             titleFontColor: theme.palette.text.primary,
+            callbacks: {
+                title: (tooltipItems, data) => data.labels[tooltipItems[0].index],
+                label: (tooltipItems, data) =>
+                    data.datasets[tooltipItems.datasetIndex].label + ': ' + tooltipItems.value
+            }
         },
+    };
+
+    const handleClickListItem = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuItemClick = (event, index) => {
+        setCurrentTimeFrame(timeFrames[index])
+        setAnchorEl(null);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
     };
 
     const setParticipatingStudents = async (mostRecentEvents) => {
@@ -152,16 +181,35 @@ const LatestEvents = ({firebase, mostRecentEvents, currentTimeFrame, group, clas
         <Card className={clsx(classes.root, className)} {...rest}>
             <CardHeader
                 action={
-                    <Button endIcon={<ArrowDropDownIcon/>} size="small" variant="text">
-                        Last 7 days
-                    </Button>
+                    <div>
+                        <Button onClick={handleClickListItem} endIcon={<ArrowDropDownIcon/>} size="small"
+                                variant="text">
+                            {`In the last ${currentTimeFrame.pastName}`}
+                        </Button>
+                        <Menu
+                            id="lock-menu"
+                            anchorEl={anchorEl}
+                            keepMounted
+                            open={Boolean(anchorEl)}
+                            onClose={handleClose}
+                        >
+                            {timeFrames.map((option, index) => (
+                                <MenuItem
+                                    key={option.id}
+                                    selected={option.id === currentTimeFrame.id}
+                                    onClick={(event) => handleMenuItemClick(event, index)}
+                                >
+                                    {option.name}
+                                </MenuItem>
+                            ))}
+                        </Menu>
+                    </div>
                 }
                 title="Latest Events"
-                // subheader="first bar registrations, second bar particip, third talent pool"
             />
             <Divider/>
             <CardContent>
-                <Box height={400} position="relative">
+                <Box height={400}>
                     <Bar data={data} options={options}/>
                 </Box>
             </CardContent>

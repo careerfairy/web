@@ -1416,6 +1416,7 @@ class Firebase {
         let ref = this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
+            .orderBy("start", "desc")
         return ref.onSnapshot(callback);
     }
 
@@ -1427,51 +1428,12 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    getLivestreamParticipantsAndTalentPool = async (timeframe, groupId) => {
-        const tempStreams = []
-        const data = []
-        let streamsRef = this.firestore
-            .collection("livestreams")
+    getFollowers = async (groupId) => {
+        let ref = this.firestore
+            .collection("userData")
             .where("groupIds", "array-contains", groupId)
-            // .where("start", "<", timeframe)
-            .orderBy("start", "desc")
-
-        const streamSnapShots = await streamsRef.get()
-        streamSnapShots.forEach(streamDoc => {
-            const streamData = streamDoc.data()
-            streamData.id = streamDoc.id
-            tempStreams.push(streamData)
-        })
-
-        for (livestream of tempStreams) {
-            let tempStream = {}
-        }
-
-        return streamsRef.get().then(snapShots => {
-            let streamData = []
-            snapShots.docs.forEach((streamSnap, index) => {
-                const streamDoc = streamSnap.data()
-                streamDoc.id = streamSnap.id
-                // Get talent Pool Members
-                this.firestore
-                    .collection("userData")
-                    .where("talentPools", "array-contains", streamDoc.companyId).get().then(userSnaps => {
-                    streamDoc.talentPool = this.snapShotsToData(userSnaps)
-                }).then(() => {
-                    // Get Participating Students
-                    this.firestore.collection("livestreams")
-                        .doc(streamSnap.id)
-                        .collection("participatingStudents")
-                        .get().then(participatingSnaps => {
-                        streamDoc.participatingStudents = this.snapShotsToData(participatingSnaps)
-                        streamData.push(streamDoc)
-                    })
-                })
-
-            })
-            console.log("-> streamData", streamData);
-        })
-    }
+        return ref.get();
+    };
 
     snapShotsToData = (snapShots) => {
         let dataArray = []

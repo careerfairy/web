@@ -8,11 +8,13 @@ import AverageRegistrations from "./AverageRegistrations";
 import FeedbackResults from "./FeedbackResults";
 import UpVotedQuestionsTable from "./UpVotedQuestionsTable";
 import {
+    getTimeFromNow,
     mustBeNumber,
     snapShotsToData,
 } from "../../../../helperFunctions/HelperFunctions";
 import NumberOfFollowers from "./NumberOfFollowers";
-import * as dayjs from "dayjs";
+import { v4 as uuid } from 'uuid';
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -23,37 +25,42 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const timeFrames = {
-    oneWeek: {
+const timeFrames = [
+    {
         defaultName: "7 Days",
         pastName: "Last week",
         date: new Date().setDate(new Date().getDate() - 7),
+        id: uuid()
     },
-    oneMonth: {
+    {
         name: "30 Days",
         pastName: "Last Month",
         date: new Date().setMonth(new Date().getMonth() - 1),
+        id: uuid()
     },
-    threeMonths: {
+    {
         name: "4 Months",
         pastName: "Last 4 months",
         date: new Date().setMonth(new Date().getMonth() - 3),
+        id: uuid()
     },
-    sixMonths: {
+    {
         name: "6 Months",
         pastName: "Last 6 months",
         date: new Date().setMonth(new Date().getMonth() - 6),
+        id: uuid()
     },
-    oneYear: {
+    {
         name: "1 Year",
         pastName: "Last year",
         date: new Date().setFullYear(new Date().getFullYear() - 1),
+        id: uuid()
     },
-}
+]
 
 const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();
-    const [currentTimeFrame, setCurrentTimeFrame] = useState(timeFrames.oneYear);
+    const [currentTimeFrame, setCurrentTimeFrame] = useState(timeFrames[4]);
     const [livestreams, setLivestreams] = useState([]);
     const [totalFollowers, setTotalFollowers] = useState([]);
     const [fetchingStreams, setFetchingStreams] = useState(false);
@@ -64,7 +71,7 @@ const AnalyticsOverview = ({firebase, group}) => {
         const unsubscribe = firebase.listenToAllLivestreamsOfGroup(
             group.id,
             (snapshots) => {
-                const livestreamData = snapShotsToData(snapshots);
+                const livestreamData = snapShotsToData(snapshots).reverse();
                 setFetchingStreams(false);
                 setLivestreams(livestreamData);
             }
@@ -74,14 +81,14 @@ const AnalyticsOverview = ({firebase, group}) => {
 
 
     useEffect(() => {
-        setFetchingFollowers(true);
-        const unsubscribe = firebase.listenToFollowers(group.id, (snapshots) => {
+        (async function () {
+            setFetchingFollowers(true);
+            const snapshots = await firebase.getFollowers(group.id)
             const followerData = snapShotsToData(snapshots);
             setTotalFollowers(followerData);
             setFetchingFollowers(false);
-        });
-        return () => unsubscribe();
-    }, []);
+        })()
+    }, [group.id]);
 
     const getTotalRegisteredUsers = () => {
         const total = livestreams.reduce(
@@ -111,7 +118,7 @@ const AnalyticsOverview = ({firebase, group}) => {
         return mustBeNumber(average);
     };
 
-    const getMostRecentEvents = (timeframe, limit = 10) => {
+    const getMostRecentEvents = (timeframe, limit = 50) => {
         const recentStreams = livestreams.filter((stream) => {
             if (stream.start?.toDate() >= timeframe) {
                 return stream
@@ -179,6 +186,8 @@ const AnalyticsOverview = ({firebase, group}) => {
                     <LatestEvents
                         currentTimeFrame={currentTimeFrame}
                         mostRecentEvents={mostRecentEvents}
+                        timeFrames={timeFrames}
+                        setCurrentTimeFrame={setCurrentTimeFrame}
                         group={group}
                     />
                 </Grid>
