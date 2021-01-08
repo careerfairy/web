@@ -32,7 +32,7 @@ import {
     handleAddSpeaker,
     handleDeleteSpeaker, handleError, handleFlattenOptions, validateStreamForm
 } from "../../helperFunctions/streamFormFunctions";
-import UserContext from "../../../context/user/UserContext";
+import {useAuth} from "../../../HOCs/AuthProvider";
 
 
 const useStyles = makeStyles(theme => ({
@@ -76,7 +76,7 @@ const speakerObj = {
 
 const NewLivestreamForm = ({firebase, user}) => {
     const router = useRouter()
-    const {userData, authenticatedUser, hideLoader} = useContext(UserContext);
+    const {userData, authenticatedUser, hideLoader} = useAuth()
 
     const {
         query: {livestreamId, draftStreamId, absolutePath},
