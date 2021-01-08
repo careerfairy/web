@@ -2,6 +2,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/storage";
+import {snapshotsToData} from "../../components/helperFunctions/HelperFunctions";
 
 const config = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -1418,6 +1419,14 @@ class Firebase {
             .where("groupIds", "array-contains", groupId)
         return ref.onSnapshot(callback);
     }
+
+    // listens to all followers of a group
+    listenToFollowers = async (groupId, callback) => {
+        let ref = this.firestore
+            .collection("userData")
+            .where("groupIds", "array-contains", groupId)
+        return ref.onSnapshot(callback);
+    };
 
     getStorageRef = () => {
         return this.storage.ref();

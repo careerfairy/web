@@ -118,7 +118,11 @@ export const copyStringToClipboard = (string) => {
 }
 
 export const mustBeNumber = (value) => {
+    function round(value, decimals) {
+        return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+    }
+
     // checks to see if value is an int or float, if not it will return zero
-    return Number.isFinite(value) ? value : 0
+    return Number.isFinite(value) ? round(value, 2) : 0
 }
 

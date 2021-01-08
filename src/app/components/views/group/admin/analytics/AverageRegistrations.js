@@ -10,7 +10,7 @@ import {
     LinearProgress,
     Typography,
     makeStyles,
-    colors
+    colors, CircularProgress
 } from '@material-ui/core';
 import InsertChartIcon from '@material-ui/icons/InsertChartOutlined';
 import {withFirebase} from "../../../../../context/firebase";
@@ -26,7 +26,7 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const AverageRegistrations = ({averageRegistrations, timeFrames ,className, ...rest}) => {
+const AverageRegistrations = ({fetchingStreams, averageRegistrations, timeFrames, className, ...rest}) => {
     const classes = useStyles();
 
     return (
@@ -55,7 +55,7 @@ const AverageRegistrations = ({averageRegistrations, timeFrames ,className, ...r
                             color="textPrimary"
                             variant="h3"
                         >
-                            {averageRegistrations}
+                            {fetchingStreams ? <CircularProgress/> : averageRegistrations}
                         </Typography>
                     </Grid>
                     <Grid item>
@@ -64,12 +64,12 @@ const AverageRegistrations = ({averageRegistrations, timeFrames ,className, ...r
                         </Avatar>
                     </Grid>
                 </Grid>
-                <Box mt={3}>
-                    <LinearProgress
-                        value={75.5}
-                        variant="determinate"
-                    />
-                </Box>
+                {/*<Box mt={3}>*/}
+                {/*    <LinearProgress*/}
+                {/*        value={75.5}*/}
+                {/*        variant="determinate"*/}
+                {/*    />*/}
+                {/*</Box>*/}
             </CardContent>
         </Card>
     );

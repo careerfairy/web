@@ -8,7 +8,7 @@ import {
     Grid,
     Typography,
     makeStyles,
-    colors
+    colors, CircularProgress
 } from '@material-ui/core';
 import PeopleIcon from '@material-ui/icons/PeopleOutlined';
 import {withFirebase} from "../../../../../context/firebase";
@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const NumberofFollowers = ({timeFrames ,className, ...rest}) => {
+const NumberOfFollowers = ({fetchingFollowers, totalFollowers, timeFrames, className, ...rest}) => {
     const classes = useStyles();
 
     return (
@@ -50,7 +50,7 @@ const NumberofFollowers = ({timeFrames ,className, ...rest}) => {
                             color="textPrimary"
                             variant="h3"
                         >
-                            3,674
+                            {fetchingFollowers ? <CircularProgress/> : totalFollowers}
                         </Typography>
                     </Grid>
                     <Grid item>
@@ -64,8 +64,8 @@ const NumberofFollowers = ({timeFrames ,className, ...rest}) => {
     );
 };
 
-NumberofFollowers.propTypes = {
+NumberOfFollowers.propTypes = {
     className: PropTypes.string
 };
 
-export default withFirebase(NumberofFollowers);
+export default withFirebase(NumberOfFollowers);

@@ -5,10 +5,14 @@ import TotalUniqueRegistrations from "./TotalUniqueRegistrations";
 import LatestEvents from "./LatestEvents";
 import TypeOfParticipants from "./TypeOfParticipants";
 import AverageRegistrations from "./AverageRegistrations";
-import NumberOfFollowers from "./NumberofFollowers";
 import FeedbackResults from "./FeedbackResults";
 import UpVotedQuestionsTable from "./UpVotedQuestionsTable";
-import {mustBeNumber, snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
+import {
+    mustBeNumber,
+    snapShotsToData,
+} from "../../../../helperFunctions/HelperFunctions";
+import NumberOfFollowers from "./NumberOfFollowers";
+import * as dayjs from "dayjs";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -19,97 +23,165 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const timeFrames = [
-    {
+const timeFrames = {
+    oneWeek: {
         defaultName: "7 Days",
         pastName: "Last week",
-        seconds: 604800,
+        date: new Date().setDate(new Date().getDate() - 7),
     },
-    {
+    oneMonth: {
         name: "30 Days",
         pastName: "Last Month",
-        seconds: 2592000
+        date: new Date().setMonth(new Date().getMonth() - 1),
     },
-    {
+    threeMonths: {
         name: "4 Months",
         pastName: "Last 4 months",
-        seconds: 10368000
+        date: new Date().setMonth(new Date().getMonth() - 3),
     },
-    {
+    sixMonths: {
         name: "6 Months",
         pastName: "Last 6 months",
-        seconds: 15552000
+        date: new Date().setMonth(new Date().getMonth() - 6),
     },
-    {
+    oneYear: {
         name: "1 Year",
         pastName: "Last year",
-        seconds: 31556952
-    }
-]
+        date: new Date().setFullYear(new Date().getFullYear() - 1),
+    },
+}
 
 const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();
-    const [currentTimeFrame, setCurrentTimeFrame] = useState({});
+    const [currentTimeFrame, setCurrentTimeFrame] = useState(timeFrames.oneYear);
     const [livestreams, setLivestreams] = useState([]);
+    const [totalFollowers, setTotalFollowers] = useState([]);
+    const [fetchingStreams, setFetchingStreams] = useState(false);
+    const [fetchingFollowers, setFetchingFollowers] = useState(false);
 
     useEffect(() => {
-        const unsubscribe = firebase.listenToAllLivestreamsOfGroup(group.id, (snapshots => {
-            const livestreamData = snapShotsToData(snapshots)
-            setLivestreams(livestreamData)
-        }))
-        return () => unsubscribe()
+        setFetchingStreams(true);
+        const unsubscribe = firebase.listenToAllLivestreamsOfGroup(
+            group.id,
+            (snapshots) => {
+                const livestreamData = snapShotsToData(snapshots);
+                setFetchingStreams(false);
+                setLivestreams(livestreamData);
+            }
+        );
+        return () => unsubscribe();
     }, []);
 
 
+    useEffect(() => {
+        setFetchingFollowers(true);
+        const unsubscribe = firebase.listenToFollowers(group.id, (snapshots) => {
+            const followerData = snapShotsToData(snapshots);
+            setTotalFollowers(followerData);
+            setFetchingFollowers(false);
+        });
+        return () => unsubscribe();
+    }, []);
+
     const getTotalRegisteredUsers = () => {
-        const total = livestreams.reduce((accumulator, {registeredUsers}) => accumulator + registeredUsers.length, 0);
+        const total = livestreams.reduce(
+            (accumulator, {registeredUsers}) =>
+                accumulator + registeredUsers.length,
+            0
+        );
         // Checks if the result is a number
-        return mustBeNumber(total)
-    }
+        return mustBeNumber(total);
+    };
 
     const getUniqueRegisteredUsers = () => {
-        const totalViewers = livestreams.reduce((accumulator, {registeredUsers}) => {
-            return [...accumulator, ...registeredUsers]
-        }, []);
+        const totalViewers = livestreams.reduce(
+            (accumulator, {registeredUsers}) => {
+                return [...accumulator, ...registeredUsers];
+            },
+            []
+        );
 
         // new Set method removes all duplicates from array
-        const uniqueRegisteredUsers = [...new Set(totalViewers)]
-        return mustBeNumber(uniqueRegisteredUsers.length)
-    }
+        const uniqueRegisteredUsers = [...new Set(totalViewers)];
+        return mustBeNumber(uniqueRegisteredUsers.length);
+    };
 
     const getAverageRegistrationsPerEvent = () => {
-        const average = totalRegistrations / livestreams.length
-        return mustBeNumber(average)
+        const average = totalRegistrations / livestreams.length;
+        return mustBeNumber(average);
+    };
+
+    const getMostRecentEvents = (timeframe, limit = 10) => {
+        const recentStreams = livestreams.filter((stream) => {
+            if (stream.start?.toDate() >= timeframe) {
+                return stream
+            }
+        });
+        const limitedRecentItems = recentStreams.slice(0, limit)
+
     }
+
 
     // use Memo is great for optimizing expensive calculations, the value of the function call will be stored in memory
     // The function will only be re-called when the value(livestreams) in the dependency array changes
-    const totalRegistrations = useMemo(() => getTotalRegisteredUsers(), [livestreams]);
+    const mostRecentEvents = useMemo(() => getMostRecentEvents(currentTimeFrame.date), [
+        livestreams, currentTimeFrame
+    ]);
 
-    const totalUniqueRegistrations = useMemo(() => getUniqueRegisteredUsers(), [livestreams]);
+    const totalRegistrations = useMemo(() => getTotalRegisteredUsers(), [
+        livestreams,
+    ]);
 
-    const averageRegistrations = useMemo(() => getAverageRegistrationsPerEvent(), [livestreams]);
+    const totalUniqueRegistrations = useMemo(() => getUniqueRegisteredUsers(), [
+        livestreams,
+    ]);
 
+    const averageRegistrations = useMemo(
+        () => getAverageRegistrationsPerEvent(),
+        [livestreams]
+    );
 
     return (
         <Container className={classes.root} maxWidth={false}>
             <Grid container spacing={3}>
                 <Grid item lg={3} sm={6} xl={3} xs={12}>
-                    <TotalRegistrations totalRegistrations={totalRegistrations} timeFrames={timeFrames} group={group}/>
+                    <TotalRegistrations
+                        fetchingStreams={fetchingStreams}
+                        totalRegistrations={totalRegistrations}
+                        timeFrames={timeFrames}
+                        group={group}
+                    />
                 </Grid>
                 <Grid item lg={3} sm={6} xl={3} xs={12}>
-                    <TotalUniqueRegistrations totalUniqueRegistrations={totalUniqueRegistrations}
-                                              timeFrames={timeFrames} group={group}/>
+                    <TotalUniqueRegistrations
+                        fetchingStreams={fetchingStreams}
+                        totalUniqueRegistrations={totalUniqueRegistrations}
+                        timeFrames={timeFrames}
+                        group={group}
+                    />
                 </Grid>
                 <Grid item lg={3} sm={6} xl={3} xs={12}>
-                    <AverageRegistrations averageRegistrations={averageRegistrations} timeFrames={timeFrames}
-                                          group={group}/>
+                    <AverageRegistrations
+                        fetchingStreams={fetchingStreams}
+                        averageRegistrations={averageRegistrations}
+                        timeFrames={timeFrames}
+                        group={group}
+                    />
                 </Grid>
                 <Grid item lg={3} sm={6} xl={3} xs={12}>
-                    <NumberOfFollowers timeFrames={timeFrames} group={group}/>
+                    <NumberOfFollowers
+                        fetchingFollowers={fetchingFollowers}
+                        totalFollowers={totalFollowers.length}
+                        timeFrames={timeFrames}
+                        group={group}
+                    />
                 </Grid>
                 <Grid item lg={8} md={12} xl={9} xs={12}>
-                    <LatestEvents timeFrames={timeFrames} group={group}/>
+                    <LatestEvents
+                        mostRecentEvents={mostRecentEvents}
+                        timeFrames={timeFrames}
+                        group={group}
+                    />
                 </Grid>
                 <Grid item lg={4} md={6} xl={3} xs={12}>
                     <TypeOfParticipants timeFrames={timeFrames} group={group}/>

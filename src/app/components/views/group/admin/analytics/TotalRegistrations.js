@@ -9,7 +9,7 @@ import {
     Grid,
     Typography,
     colors,
-    makeStyles
+    makeStyles, CircularProgress
 } from '@material-ui/core';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import {withFirebase} from "../../../../../context/firebase";
@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const TotalRegistrations = ({totalRegistrations, timeFrames, className, ...rest}) => {
+const TotalRegistrations = ({fetchingStreams, totalRegistrations, timeFrames, className, ...rest}) => {
     const classes = useStyles();
 
     return (
@@ -59,7 +59,7 @@ const TotalRegistrations = ({totalRegistrations, timeFrames, className, ...rest}
                             color="textPrimary"
                             variant="h3"
                         >
-                            {totalRegistrations}
+                            {fetchingStreams ? <CircularProgress/> : totalRegistrations}
                         </Typography>
                     </Grid>
                     <Grid item>
