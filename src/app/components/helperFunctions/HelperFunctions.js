@@ -3,7 +3,8 @@ import React from "react";
 
 var dayjs = require('dayjs');
 var relativeTime = require('dayjs/plugin/relativeTime')
-
+var localizedFormat = require('dayjs/plugin/localizedFormat')
+dayjs.extend(localizedFormat)
 dayjs.extend(relativeTime)
 
 export const uploadLogo = (location, fileObject, firebase, callback) => {
@@ -72,7 +73,7 @@ export function getTimeFromNow(firebaseTimestamp) {
 
 export const prettyDate = (firebaseTimestamp) => {
     if (firebaseTimestamp) {
-        return dayjs(firebaseTimestamp.toDate()).format('DD/MM/YYYY')
+        return dayjs(firebaseTimestamp.toDate()).format('LL LT')
     } else {
         return ""
     }

@@ -16,7 +16,7 @@ import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowRightIcon from "@material-ui/icons/ArrowRight";
 import {withFirebase} from "../../../../../context/firebase";
 import {colorsArray} from "../../../../util/colors";
-import {getLength, prettyDate, snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
+import {getLength, getTimeFromNow, prettyDate, snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -86,7 +86,7 @@ const LatestEvents = ({
                 }
             }
         },
-        onClick: (event, chartElement) => {
+        onClick: (event, chartElement, data) => {
             if (chartElement.length) {
                 const index = chartElement[0]._index
                 if (localStreams[index].participatingStudents.length) {
@@ -112,12 +112,13 @@ const LatestEvents = ({
                         maxTicksLimit: 15,
                         callback: function (value, index, values) {
                             return value[0]
-                        }
+                        },
                     },
                     gridLines: {
                         display: false,
                         drawBorder: false,
                     },
+
                 },
             ],
             yAxes: [
@@ -155,7 +156,16 @@ const LatestEvents = ({
                 },
                 label: (tooltipItems, data) => {
                     return data.datasets[tooltipItems.datasetIndex].label + ': ' + tooltipItems.value
-                }
+                },
+                afterTitle: (tooltipItem, data) => {
+                    if (tooltipItem.length) {
+                        const index = tooltipItem[0].index
+                        if (localStreams[index].participatingStudents.length) {
+                            return "Click for breakdown"
+                        }
+                    }
+                },
+
             }
         },
     };

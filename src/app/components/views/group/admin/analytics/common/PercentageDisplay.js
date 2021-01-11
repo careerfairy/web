@@ -45,7 +45,7 @@ const PercentageDisplay = ({fetchingStreams, positive, percentage, globalTimeFra
                 color="textSecondary"
                 variant="caption"
             >
-                Since the last {globalTimeFrame.name}
+                Compared to the last {globalTimeFrame.name}
             </Typography>
         </Box>
     )

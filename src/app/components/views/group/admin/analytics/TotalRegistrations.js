@@ -25,13 +25,6 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: colors.red[600],
         height: 56,
         width: 56
-    },
-    differenceIcon: {
-        color: ({positive}) => positive ? colors.green[900] : colors.red[900]
-    },
-    differenceValue: {
-        color: ({positive}) => positive ? colors.green[900] : colors.red[900],
-        marginRight: theme.spacing(1)
     }
 }));
 
@@ -44,7 +37,7 @@ const TotalRegistrations = ({
                                 className,
                                 ...rest
                             }) => {
-    const classes = useStyles({positive: registrationsStatus.positive});
+    const classes = useStyles();
 
     return (
         <Card

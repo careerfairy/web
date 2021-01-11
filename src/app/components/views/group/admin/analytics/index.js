@@ -64,7 +64,7 @@ const timeFrames = [
         id: uuid()
     },
     {
-        defaultName: "7 Days",
+        name: "week",
         pastName: "week",
         date: sevenDays,
         id: uuid()
@@ -125,11 +125,15 @@ const AnalyticsOverview = ({firebase, group}) => {
         const unsubscribe = firebase.listenToAllLivestreamsOfGroup(
             group.id,
             (snapshots) => {
+                if (snapshots.empty) {
+                    setFetchingStreams(false)
+                    setLivestreams([])
+                }
                 let livestreams = []
                 snapshots.docs.forEach(async (snap, index, arr) => {
                     const livestream = snap.data()
-
                     livestream.id = snap.id
+
                     const participatingSnap = await firebase.getLivestreamParticipatingStudents(snap.id)
                     const talentPoolSnap = await firebase.getLivestreamTalentPoolMembers(livestream.companyId)
                     livestream.participatingStudents = snapShotsToData(participatingSnap)
@@ -145,7 +149,7 @@ const AnalyticsOverview = ({firebase, group}) => {
             }, new Date(globalTimeFrame.double)
         );
         return () => unsubscribe();
-    }, [globalTimeFrame]);
+    }, [globalTimeFrame, group.id]);
 
 
     useEffect(() => {
@@ -193,12 +197,17 @@ const AnalyticsOverview = ({firebase, group}) => {
         return mustBeNumber(average, 0);
     };
 
-    const getMostRecentEvents = (timeframe, limit = 50) => {
+    const getMostRecentEvents = (timeframe, limit = 500) => {
+        const targetTime = new Date(timeframe)
         const recentStreams = livestreams.filter((stream) => {
-            if (stream.start?.toDate() >= timeframe) {
+            if (stream.start?.toDate() > targetTime) {
                 return stream
             }
         });
+        recentStreams.forEach(livestream => {
+            if (livestream.id === "0SupFLhiCs5FdIxRc5Dp") {
+            }
+        })
         return recentStreams.slice(0, limit)
     }
 
@@ -286,7 +295,7 @@ const AnalyticsOverview = ({firebase, group}) => {
         flattenedGroupOptions.forEach(option => {
             option.count = aggregateCategories.filter(category => category.categories.some(userOption => userOption.selectedValueId === option.id)).length
         })
-        return flattenedGroupOptions
+        return flattenedGroupOptions.sort((a, b) => b.count - a.count);
     }
 
 
@@ -384,6 +393,7 @@ const AnalyticsOverview = ({firebase, group}) => {
                         currentStream={currentStream}
                         typesOfOptions={typesOfOptions}
                         timeFrames={timeFrames}
+                        setCurrentStream={setCurrentStream}
                         group={group}
                     />
                 </Grid>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {Doughnut} from 'react-chartjs-2';
@@ -9,8 +9,8 @@ import {
     CardHeader,
     Divider,
     Typography,
-    colors,
     makeStyles,
+    colors,
     useTheme
 } from '@material-ui/core';
 import LaptopMacIcon from '@material-ui/icons/LaptopMac';
@@ -18,6 +18,8 @@ import PhoneIcon from '@material-ui/icons/Phone';
 import TabletIcon from '@material-ui/icons/Tablet';
 import {colorsArray} from "../../../../util/colors";
 import {withFirebase} from "../../../../../context/firebase";
+import Button from "@material-ui/core/Button";
+import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -30,15 +32,47 @@ function randomColor() {
     return '#' + Math.round(Math.random() * max).toString(16);
 }
 
-const TypeOfParticipants = ({currentStream, typesOfOptions, timeFrames, className, ...rest}) => {
+const TypeOfParticipants = ({
+                                group,
+                                setCurrentStream,
+                                currentStream,
+                                typesOfOptions,
+                                timeFrames,
+                                className,
+                                ...rest
+                            }) => {
     const classes = useStyles();
     const theme = useTheme();
+
+    const [localColors, setLocalColors] = useState(colorsArray);
+    const [total, setTotal] = useState(0);
+
+    useEffect(() => {
+        if (group.categories?.length) {
+            setLocalColors([...colorsArray, ...typesOfOptions.map(() => randomColor())])
+        }
+    }, [group.categories])
+
+    useEffect(() => {
+        if (typesOfOptions.length) {
+            const totalCount = typesOfOptions.reduce((acc, curr) => {
+                return acc + curr.count
+            }, 0)
+            setTotal(totalCount)
+        }
+    }, [typesOfOptions])
+
+    useEffect(() => {
+        if (hasNoData()) {
+            setCurrentStream({})
+        }
+    }, [total])
 
     const data = {
         datasets: [
             {
                 data: typesOfOptions.map(option => option.count),
-                backgroundColor: typesOfOptions.map(() => randomColor()),
+                backgroundColor: localColors,
                 borderWidth: 8,
                 borderColor: colors.common.white,
                 hoverBorderColor: colors.common.white
@@ -48,7 +82,6 @@ const TypeOfParticipants = ({currentStream, typesOfOptions, timeFrames, classNam
     };
 
     const options = {
-        // animation: false,
         cutoutPercentage: 70,
         layout: {padding: 0},
         legend: {
@@ -69,80 +102,87 @@ const TypeOfParticipants = ({currentStream, typesOfOptions, timeFrames, classNam
         }
     };
 
-    const devices = [
-        {
-            title: 'Physics',
-            value: 63,
-            icon: LaptopMacIcon,
-            color: colorsArray[0],
-        },
-        {
-            title: 'Consulting',
-            value: 15,
-            icon: TabletIcon,
-            color: colorsArray[1]
-        },
-        {
-            title: 'Environmental Studies',
-            value: 23,
-            icon: PhoneIcon,
-            color: colorsArray[2]
-        }
-    ];
+    const getPercentage = (count) => {
+        const percentage = Math.round((count / total) * 100)
+        return percentage + "%"
+    }
+
+    const hasNoData = () => {
+        return Boolean(typesOfOptions.length && total === 0)
+    }
 
     return (
         <Card
             className={clsx(classes.root, className)}
             {...rest}
         >
-            <CardHeader title="Most Common Participants" subheader={`That attended ${currentStream.company}`}/>
+            <CardHeader
+                title="Most Common Participants"
+                subheader={currentStream.company ? `That attended ${currentStream.company}` : "on average"}
+                action={
+                    currentStream.id &&
+                    <Button size="small"
+                            variant="text"
+                            onClick={() => setCurrentStream({})}
+                            endIcon={<RotateLeftIcon/>}
+                    >
+                        Reset
+                    </Button>
+                }
+            />
             <Divider/>
             <CardContent>
                 <Box
                     height={300}
                     position="relative"
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
                 >
-                    <Doughnut
-                        data={data}
-                        options={options}
-                    />
+                    {hasNoData() ?
+                        <Typography>
+                            No data
+                        </Typography>
+                        :
+                        <Doughnut
+                            data={data}
+                            options={options}
+                        />}
                 </Box>
+                {!hasNoData() &&
                 <Box
                     display="flex"
                     justifyContent="center"
                     mt={2}
                 >
-                    {devices.map(({
-                                      color,
-                                      icon: Icon,
-                                      title,
-                                      value
-                                  }) => (
+                    {typesOfOptions.slice(0, 3).map(({
+                                                         name,
+                                                         count,
+                                                         id
+                                                     }, index) => (
                         <Box
-                            key={title}
+                            key={id}
                             p={1}
                             textAlign="center"
                             display="flex"
                             flexDirection="column"
                             justifyContent="space-between"
                         >
-                            {/*<Icon color="action" />*/}
                             <Typography
                                 color="textPrimary"
                                 variant="body1"
                             >
-                                {title}
+                                {name}
                             </Typography>
                             <Typography
-                                style={{color}}
-                                variant="h2"
+                                style={{color: localColors[index]}}
+                                variant="h3"
                             >
-                                {value}
-                                %
+                                {getPercentage(count)}
                             </Typography>
                         </Box>
                     ))}
-                </Box>
+                </Box>}
             </CardContent>
         </Card>
     );
