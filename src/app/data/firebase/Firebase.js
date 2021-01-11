@@ -1412,9 +1412,13 @@ class Firebase {
     }
 
     // Analytics Queries
-    listenToAllLivestreamsOfGroup = (groupId, callback) => {
+    listenToAllLivestreamsOfGroup = (groupId, callback, timeframe) => {
+        const oneYear = 31536000000
+        const oneYearAgo = new Date(Date.now() - oneYear)
+        const maxDate = timeframe || oneYearAgo
         let ref = this.firestore
             .collection("livestreams")
+            .where("start", ">", maxDate)
             .where("groupIds", "array-contains", groupId)
             .orderBy("start", "desc")
         return ref.onSnapshot(callback);

@@ -9,12 +9,13 @@ import {
     Grid,
     Typography,
     colors,
-    makeStyles, CircularProgress
+    makeStyles, CircularProgress, LinearProgress
 } from '@material-ui/core';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
 import {withFirebase} from "../../../../../context/firebase";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
+import PercentageDisplay from "./common/PercentageDisplay";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -34,7 +35,15 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const TotalUniqueRegistrations = ({uniqueRegistrationsStatus, fetchingStreams, totalUniqueRegistrations, timeFrames, className, ...rest}) => {
+const TotalUniqueRegistrations = ({
+                                      globalTimeFrame,
+                                      uniqueRegistrationsStatus,
+                                      fetchingStreams,
+                                      totalUniqueRegistrations,
+                                      timeFrames,
+                                      className,
+                                      ...rest
+                                  }) => {
     const classes = useStyles({positive: uniqueRegistrationsStatus.positive});
 
     return (
@@ -69,29 +78,12 @@ const TotalUniqueRegistrations = ({uniqueRegistrationsStatus, fetchingStreams, t
                         </Avatar>
                     </Grid>
                 </Grid>
-                <Box
-                    mt={2}
-                    display="flex"
-                    alignItems="center"
-                >
-                    {uniqueRegistrationsStatus.positive ?
-                        <ArrowUpwardIcon className={classes.differenceIcon}/>
-                        :
-                        <ArrowDownwardIcon className={classes.differenceIcon}/>
-                    }
-                    <Typography
-                        className={classes.differenceValue}
-                        variant="body2"
-                    >
-                        {uniqueRegistrationsStatus.percentage}
-                    </Typography>
-                    <Typography
-                        color="textSecondary"
-                        variant="caption"
-                    >
-                        Since last month
-                    </Typography>
-                </Box>
+                <PercentageDisplay
+                    percentage={uniqueRegistrationsStatus.percentage}
+                    fetchingStreams={fetchingStreams}
+                    globalTimeFrame={globalTimeFrame}
+                    positive={uniqueRegistrationsStatus.positive}
+                />
             </CardContent>
         </Card>
     );

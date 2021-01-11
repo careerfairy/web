@@ -15,6 +15,7 @@ import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import {withFirebase} from "../../../../../context/firebase";
 import AddToPhotosRoundedIcon from "@material-ui/icons/AddToPhotosRounded";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
+import PercentageDisplay from "./common/PercentageDisplay";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -35,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const TotalRegistrations = ({
+                                globalTimeFrame,
                                 registrationsStatus,
                                 fetchingStreams,
                                 totalRegistrations,
@@ -76,29 +78,12 @@ const TotalRegistrations = ({
                         </Avatar>
                     </Grid>
                 </Grid>
-                <Box
-                    mt={2}
-                    display="flex"
-                    alignItems="center"
-                >
-                    {registrationsStatus.positive ?
-                        <ArrowUpwardIcon className={classes.differenceIcon}/>
-                        :
-                        <ArrowDownwardIcon className={classes.differenceIcon}/>
-                    }
-                    <Typography
-                        className={classes.differenceValue}
-                        variant="body2"
-                    >
-                        {registrationsStatus.percentage}
-                    </Typography>
-                    <Typography
-                        color="textSecondary"
-                        variant="caption"
-                    >
-                        Since last month
-                    </Typography>
-                </Box>
+                <PercentageDisplay
+                    percentage={registrationsStatus.percentage}
+                    fetchingStreams={fetchingStreams}
+                    globalTimeFrame={globalTimeFrame}
+                    positive={registrationsStatus.positive}
+                />
             </CardContent>
         </Card>
     );

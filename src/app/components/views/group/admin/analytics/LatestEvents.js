@@ -50,8 +50,8 @@ const LatestEvents = ({
 
     useEffect(() => {
         if (mostRecentEvents.length) {
-            setParticipatingStudents(mostRecentEvents)
-            setTalentPool(mostRecentEvents)
+            // setParticipatingStudents(mostRecentEvents)
+            // setTalentPool(mostRecentEvents)
         }
     }, [mostRecentEvents])
 

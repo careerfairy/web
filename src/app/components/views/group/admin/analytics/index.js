@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from "react";
-import {Container, Grid, makeStyles} from "@material-ui/core";
+import {Card, CardHeader, Container, Grid, makeStyles} from "@material-ui/core";
 import TotalRegistrations from "./TotalRegistrations";
 import TotalUniqueRegistrations from "./TotalUniqueRegistrations";
 import LatestEvents from "./LatestEvents";
@@ -7,14 +7,11 @@ import TypeOfParticipants from "./TypeOfParticipants";
 import AverageRegistrations from "./AverageRegistrations";
 import FeedbackResults from "./FeedbackResults";
 import UpVotedQuestionsTable from "./UpVotedQuestionsTable";
-import {
-    getLength,
-    getTimeFromNow,
-    mustBeNumber,
-    snapShotsToData,
-} from "../../../../helperFunctions/HelperFunctions";
+import {mustBeNumber, snapShotsToData, timeAgo,} from "../../../../helperFunctions/HelperFunctions";
 import NumberOfFollowers from "./NumberOfFollowers";
 import {v4 as uuid} from 'uuid';
+import Title from "./Title";
+import dayjs from "dayjs";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -26,59 +23,126 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const sevenDays = new Date().setDate(new Date().getDate() - 7)
+const twoWeeks = new Date().setDate(new Date().getDate() - 14)
+
+const thirtyDays = new Date().setMonth(new Date().getMonth() - 1)
+const twoMonths = new Date().setMonth(new Date().getMonth() - 2)
+
+const fourMonths = new Date().setMonth(new Date().getMonth() - 4)
+const eightMonths = new Date().setMonth(new Date().getMonth() - 8)
+
+const sixMonths = new Date().setMonth(new Date().getMonth() - 6)
+
+const oneYear = new Date().setFullYear(new Date().getFullYear() - 1)
+const twoYears = new Date().setFullYear(new Date().getFullYear() - 2)
+
 const timeFrames = [
     {
-        defaultName: "7 Days",
-        pastName: "week",
-        date: new Date().setDate(new Date().getDate() - 7),
-        id: uuid()
-    },
-    {
-        name: "30 Days",
-        pastName: "month",
-        date: new Date().setMonth(new Date().getMonth() - 1),
-        id: uuid()
-    },
-    {
-        name: "4 Months",
-        pastName: "4 months",
-        date: new Date().setMonth(new Date().getMonth() - 3),
+        name: "1 Year",
+        pastName: "year",
+        date: oneYear,
         id: uuid()
     },
     {
         name: "6 Months",
         pastName: "6 months",
-        date: new Date().setMonth(new Date().getMonth() - 6),
+        date: sixMonths,
         id: uuid()
     },
     {
-        name: "1 Year",
-        pastName: "year",
-        date: new Date().setFullYear(new Date().getFullYear() - 1),
+        name: "4 Months",
+        pastName: "4 months",
+        date: fourMonths,
         id: uuid()
+    },
+    {
+        name: "30 Days",
+        pastName: "month",
+        date: thirtyDays,
+        id: uuid()
+    },
+    {
+        defaultName: "7 Days",
+        pastName: "week",
+        date: sevenDays,
+        id: uuid()
+    },
+]
+
+const globalTimeFrames = [
+    {
+        globalDate: oneYear,
+        timeFrames: timeFrames.filter(timeOb => timeOb.date >= oneYear),
+        name: "year",
+        id: uuid(),
+        double: twoYears
+    },
+    {
+        globalDate: sixMonths,
+        timeFrames: timeFrames.filter(timeOb => timeOb.date >= sixMonths),
+        name: "six months",
+        id: uuid(),
+        double: oneYear
+    },
+    {
+        globalDate: fourMonths,
+        timeFrames: timeFrames.filter(timeOb => timeOb.date >= fourMonths),
+        name: "four months",
+        id: uuid(),
+        double: eightMonths
+    },
+    {
+        globalDate: thirtyDays,
+        timeFrames: timeFrames.filter(timeOb => timeOb.date >= thirtyDays),
+        name: "month",
+        id: uuid(),
+        double: twoMonths
+    },
+    {
+        globalDate: sevenDays,
+        timeFrames: timeFrames.filter(timeOb => timeOb.date >= sevenDays),
+        name: "week",
+        id: uuid(),
+        double: twoWeeks
     },
 ]
 
 const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();
-    const [currentTimeFrame, setCurrentTimeFrame] = useState(timeFrames[2]);
+    const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[0]);
     const [livestreams, setLivestreams] = useState([]);
     const [totalFollowers, setTotalFollowers] = useState([]);
     const [fetchingStreams, setFetchingStreams] = useState(false);
     const [fetchingFollowers, setFetchingFollowers] = useState(false);
+    const [currentTimeFrame, setCurrentTimeFrame] = useState({});
 
     useEffect(() => {
         setFetchingStreams(true);
         const unsubscribe = firebase.listenToAllLivestreamsOfGroup(
             group.id,
             (snapshots) => {
-                const livestreamData = snapShotsToData(snapshots).reverse();
-                setFetchingStreams(false);
-                setLivestreams(livestreamData);
-            }
+                let livestreams = []
+                snapshots.docs.forEach(async (snap, index, arr) => {
+                    const livestream = snap.data()
+
+                    livestream.id = snap.id
+                    const participatingSnap = await firebase.getLivestreamParticipatingStudents(snap.id)
+                    const talentPoolSnap = await firebase.getLivestreamTalentPoolMembers(livestream.companyId)
+                    livestream.participatingStudents = snapShotsToData(participatingSnap)
+                    livestream.talentPool = snapShotsToData(talentPoolSnap)
+                    livestreams.push(livestream)
+                    if (index === arr.length - 1) {
+                        const livestreamData = livestreams.reverse();
+                        setFetchingStreams(false);
+                        setLivestreams(livestreamData);
+                    }
+                })
+
+            }, new Date(globalTimeFrame.double)
         );
         return () => unsubscribe();
-    }, []);
+    }, [globalTimeFrame]);
 
 
     useEffect(() => {
@@ -91,6 +155,10 @@ const AnalyticsOverview = ({firebase, group}) => {
         })()
     }, [group.id]);
 
+    useEffect(() => {
+        setCurrentTimeFrame(globalTimeFrame.timeFrames[0])
+    }, [globalTimeFrame])
+
     const getTotalRegisteredUsers = () => {
         const total = livestreams.reduce(
             (accumulator, {registeredUsers}) =>
@@ -101,17 +169,20 @@ const AnalyticsOverview = ({firebase, group}) => {
         return mustBeNumber(total);
     };
 
-    const getUniqueRegisteredUsers = (livestreams) => {
+    const getUniqueUsers = (livestreams, prop = "registeredUsers") => {
         const totalViewers = livestreams.reduce(
-            (accumulator, {registeredUsers}) => {
-                return [...accumulator, ...registeredUsers];
+            (accumulator, livestream) => {
+                return [...accumulator, ...livestream[prop]];
             },
             []
         );
 
         // new Set method removes all duplicates from array
         const uniqueRegisteredUsers = [...new Set(totalViewers)];
-        return mustBeNumber(uniqueRegisteredUsers.length);
+        return {
+            amount: mustBeNumber(uniqueRegisteredUsers.length),
+            data: uniqueRegisteredUsers
+        };
     };
 
     const getAverageRegistrationsPerEvent = () => {
@@ -128,22 +199,22 @@ const AnalyticsOverview = ({firebase, group}) => {
         return recentStreams.slice(0, limit)
     }
 
-    const getLastMonthsStreams = () => {
-        const monthAgo = new Date().setMonth(new Date().getMonth() - 1)
-        const twoMonthsAgo = new Date().setMonth(new Date().getMonth() - 2)
-        const streamsFromPastMonth = livestreams.filter(stream => stream.start.toDate() >= monthAgo)
-        const streamsFromTwoMonthsAgo = livestreams.filter(stream => stream.start.toDate() >= twoMonthsAgo && stream.start.toDate() <= monthAgo)
-        return {streamsFromPastMonth, streamsFromTwoMonthsAgo}
+    const getStreamsToCompare = () => {
+        const timeAgo = globalTimeFrame.globalDate
+        const doubleTimeAgo = globalTimeFrame.double
+        const streamsFromTimeAgo = livestreams.filter(stream => stream.start.toDate() >= timeAgo)
+        const streamsFromDoubleTimeAgo = livestreams.filter(stream => stream.start.toDate() >= doubleTimeAgo && stream.start.toDate() <= timeAgo)
+        return {streamsFromTimeAgo, streamsFromDoubleTimeAgo}
     }
 
     const compareRegistrations = () => {
-        const {streamsFromTwoMonthsAgo, streamsFromPastMonth} = getLastMonthsStreams()
-        const lastMonthsRegistrations = streamsFromPastMonth.reduce(
+        const {streamsFromDoubleTimeAgo, streamsFromTimeAgo} = getStreamsToCompare()
+        const registrationsTimAgo = streamsFromTimeAgo.reduce(
             (accumulator, {registeredUsers}) =>
                 accumulator + registeredUsers.length,
             0
         );
-        const lastTwoMonthsRegistrations = streamsFromTwoMonthsAgo.reduce(
+        const registrationsDoubleTimeAgo = streamsFromDoubleTimeAgo.reduce(
             (accumulator, {registeredUsers}) =>
                 accumulator + registeredUsers.length,
             0
@@ -151,7 +222,7 @@ const AnalyticsOverview = ({firebase, group}) => {
         const {
             positive,
             percentage,
-        } = getStats(lastMonthsRegistrations, lastTwoMonthsRegistrations)
+        } = getStats(registrationsTimAgo, registrationsDoubleTimeAgo)
 
         return {
             positive,
@@ -160,13 +231,13 @@ const AnalyticsOverview = ({firebase, group}) => {
     }
 
     const compareUniqueRegistrations = () => {
-        const {streamsFromTwoMonthsAgo, streamsFromPastMonth} = getLastMonthsStreams()
-        const lastMonthsUniqueRegistrations = getUniqueRegisteredUsers(streamsFromPastMonth)
-        const lastTwoMonthsUniqueRegistrations = getUniqueRegisteredUsers(streamsFromTwoMonthsAgo)
+        const {streamsFromDoubleTimeAgo, streamsFromTimeAgo} = getStreamsToCompare()
+        const registrationsTimAgo = getUniqueUsers(streamsFromTimeAgo).amount
+        const registrationsDoubleTimeAgo = getUniqueUsers(streamsFromDoubleTimeAgo).amount
         const {
             positive,
             percentage,
-        } = getStats(lastMonthsUniqueRegistrations, lastTwoMonthsUniqueRegistrations)
+        } = getStats(registrationsTimAgo, registrationsDoubleTimeAgo)
 
         return {
             positive,
@@ -177,13 +248,37 @@ const AnalyticsOverview = ({firebase, group}) => {
     const getStats = (lastMonthsRegistrations, lastTwoMonthsRegistrations) => {
         const difference = lastMonthsRegistrations - lastTwoMonthsRegistrations
         const positive = Boolean(lastMonthsRegistrations > lastTwoMonthsRegistrations)
-        const percentage = (difference / lastMonthsRegistrations) * 100
-
+        let percentage
+        if (difference > 0) {
+            percentage = (difference / (lastTwoMonthsRegistrations || 1)) * 100
+        } else {
+            percentage = (difference / (lastMonthsRegistrations || 1)) * 100
+        }
         return {
             positive,
             percentage: mustBeNumber(percentage, 0)
         }
     }
+
+    const getAggregateCategories = (participants) => {
+        return participants.map(user => {
+            // console.log("-> user", user);
+            const matchedGroup = user.registeredGroups?.find(group => group.groupId === group.id)
+            // console.log("-> matchedGroup", matchedGroup);
+            if (matchedGroup) {
+                // console.log("-> matchedGroup", matchedGroup);
+                return matchedGroup
+            }
+        })
+    }
+
+    const getTypeOfParticipant = () => {
+        const participants = getUniqueUsers(livestreams, "participatingStudents").data
+        // console.log("-> participants", participants);
+        const aggregateCategories = getAggregateCategories(participants)
+        return aggregateCategories
+    }
+    getTypeOfParticipant()
 
 
     // use Memo is great for optimizing expensive calculations, the value of the function call will be stored in memory
@@ -196,7 +291,7 @@ const AnalyticsOverview = ({firebase, group}) => {
         livestreams,
     ]);
 
-    const totalUniqueRegistrations = useMemo(() => getUniqueRegisteredUsers(livestreams), [
+    const totalUniqueRegistrations = useMemo(() => getUniqueUsers(livestreams).amount, [
         livestreams,
     ]);
 
@@ -217,12 +312,20 @@ const AnalyticsOverview = ({firebase, group}) => {
     return (
         <Container className={classes.root} maxWidth={false}>
             <Grid container spacing={3}>
+                <Grid item lg={12} sm={12} xl={12} xs={12}>
+                    <Title
+                        setGlobalTimeFrame={setGlobalTimeFrame}
+                        globalTimeFrames={globalTimeFrames}
+                        globalTimeFrame={globalTimeFrame}
+                    />
+                </Grid>
                 <Grid item lg={3} sm={6} xl={3} xs={12}>
                     <TotalRegistrations
                         fetchingStreams={fetchingStreams}
                         registrationsStatus={registrationsStatus}
                         totalRegistrations={totalRegistrations}
-                        timeFrames={timeFrames}
+                        timeFrames={globalTimeFrame.timeFrames}
+                        globalTimeFrame={globalTimeFrame}
                         group={group}
                     />
                 </Grid>
@@ -231,7 +334,8 @@ const AnalyticsOverview = ({firebase, group}) => {
                         fetchingStreams={fetchingStreams}
                         uniqueRegistrationsStatus={uniqueRegistrationsStatus}
                         totalUniqueRegistrations={totalUniqueRegistrations}
-                        timeFrames={timeFrames}
+                        timeFrames={globalTimeFrame.timeFrames}
+                        globalTimeFrame={globalTimeFrame}
                         group={group}
                     />
                 </Grid>
@@ -239,7 +343,8 @@ const AnalyticsOverview = ({firebase, group}) => {
                     <AverageRegistrations
                         fetchingStreams={fetchingStreams}
                         averageRegistrations={averageRegistrations}
-                        timeFrames={timeFrames}
+                        timeFrames={globalTimeFrame.timeFrames}
+                        globalTimeFrame={globalTimeFrame}
                         group={group}
                     />
                 </Grid>
@@ -247,7 +352,8 @@ const AnalyticsOverview = ({firebase, group}) => {
                     <NumberOfFollowers
                         fetchingFollowers={fetchingFollowers}
                         totalFollowers={totalFollowers.length}
-                        timeFrames={timeFrames}
+                        globalTimeFrame={globalTimeFrame}
+                        timeFrames={globalTimeFrame.timeFrames}
                         group={group}
                     />
                 </Grid>
@@ -255,7 +361,7 @@ const AnalyticsOverview = ({firebase, group}) => {
                     <LatestEvents
                         currentTimeFrame={currentTimeFrame}
                         mostRecentEvents={mostRecentEvents}
-                        timeFrames={timeFrames}
+                        timeFrames={globalTimeFrame.timeFrames}
                         setCurrentTimeFrame={setCurrentTimeFrame}
                         group={group}
                     />

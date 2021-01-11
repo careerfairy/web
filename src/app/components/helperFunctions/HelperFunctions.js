@@ -52,6 +52,10 @@ export const uploadLogo = (location, fileObject, firebase, callback) => {
         });
 }
 
+export const timeAgo = (date = new Date) => {
+    return dayjs(date).fromNow()
+}
+
 
 export function getTimeFromNow(firebaseTimestamp) {
     if (firebaseTimestamp) {
