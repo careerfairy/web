@@ -26,13 +26,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-
 const LatestEvents = ({
                           timeFrames,
                           setCurrentTimeFrame,
                           firebase,
                           mostRecentEvents,
                           currentTimeFrame,
+                          setCurrentStream,
                           group,
                           className,
                           ...rest
@@ -78,6 +78,22 @@ const LatestEvents = ({
     }
 
     const options = {
+        onHover: (event, chartElement) => {
+            if (chartElement.length) {
+                const index = chartElement[0]._index
+                if (localStreams[index].participatingStudents.length) {
+                    event.target.style.cursor = chartElement[0] ? 'pointer' : 'default'
+                }
+            }
+        },
+        onClick: (event, chartElement) => {
+            if (chartElement.length) {
+                const index = chartElement[0]._index
+                if (localStreams[index].participatingStudents.length) {
+                    setCurrentStream(localStreams[index])
+                }
+            }
+        },
         redraw: true,
         cornerRadius: 20,
         layout: {padding: 0},

@@ -12,6 +12,7 @@ import NumberOfFollowers from "./NumberOfFollowers";
 import {v4 as uuid} from 'uuid';
 import Title from "./Title";
 import dayjs from "dayjs";
+import {handleFlattenOptions} from "../../../../helperFunctions/streamFormFunctions";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -57,7 +58,7 @@ const timeFrames = [
         id: uuid()
     },
     {
-        name: "30 Days",
+        name: "month",
         pastName: "month",
         date: thirtyDays,
         id: uuid()
@@ -110,12 +111,14 @@ const globalTimeFrames = [
 
 const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();
-    const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[0]);
+
+    const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
     const [livestreams, setLivestreams] = useState([]);
     const [totalFollowers, setTotalFollowers] = useState([]);
     const [fetchingStreams, setFetchingStreams] = useState(false);
     const [fetchingFollowers, setFetchingFollowers] = useState(false);
     const [currentTimeFrame, setCurrentTimeFrame] = useState({});
+    const [currentStream, setCurrentStream] = useState({});
 
     useEffect(() => {
         setFetchingStreams(true);
@@ -261,24 +264,30 @@ const AnalyticsOverview = ({firebase, group}) => {
     }
 
     const getAggregateCategories = (participants) => {
-        return participants.map(user => {
-            // console.log("-> user", user);
-            const matchedGroup = user.registeredGroups?.find(group => group.groupId === group.id)
-            // console.log("-> matchedGroup", matchedGroup);
-            if (matchedGroup) {
-                // console.log("-> matchedGroup", matchedGroup);
-                return matchedGroup
+        let categories = []
+        participants.forEach(user => {
+            const matched = user.registeredGroups?.find(groupData => groupData.groupId === group.id)
+            if (matched) {
+                categories.push(matched)
             }
         })
+        return categories
     }
 
-    const getTypeOfParticipant = () => {
-        const participants = getUniqueUsers(livestreams, "participatingStudents").data
-        // console.log("-> participants", participants);
-        const aggregateCategories = getAggregateCategories(participants)
-        return aggregateCategories
+    const getTypeOfStudents = () => {
+        let students = []
+        if (currentStream.participatingStudents) {
+            students = currentStream.participatingStudents
+        } else {
+            students = getUniqueUsers(livestreams, "participatingStudents").data
+        }
+        const aggregateCategories = getAggregateCategories(students)
+        const flattenedGroupOptions = handleFlattenOptions(group)
+        flattenedGroupOptions.forEach(option => {
+            option.count = aggregateCategories.filter(category => category.categories.some(userOption => userOption.selectedValueId === option.id)).length
+        })
+        return flattenedGroupOptions
     }
-    getTypeOfParticipant()
 
 
     // use Memo is great for optimizing expensive calculations, the value of the function call will be stored in memory
@@ -307,6 +316,11 @@ const AnalyticsOverview = ({firebase, group}) => {
     const uniqueRegistrationsStatus = useMemo(
         () => compareUniqueRegistrations(),
         [livestreams]
+    );
+
+    const typesOfOptions = useMemo(
+        () => getTypeOfStudents(),
+        [livestreams, currentStream]
     );
 
     return (
@@ -344,7 +358,6 @@ const AnalyticsOverview = ({firebase, group}) => {
                         fetchingStreams={fetchingStreams}
                         averageRegistrations={averageRegistrations}
                         timeFrames={globalTimeFrame.timeFrames}
-                        globalTimeFrame={globalTimeFrame}
                         group={group}
                     />
                 </Grid>
@@ -352,7 +365,6 @@ const AnalyticsOverview = ({firebase, group}) => {
                     <NumberOfFollowers
                         fetchingFollowers={fetchingFollowers}
                         totalFollowers={totalFollowers.length}
-                        globalTimeFrame={globalTimeFrame}
                         timeFrames={globalTimeFrame.timeFrames}
                         group={group}
                     />
@@ -362,12 +374,18 @@ const AnalyticsOverview = ({firebase, group}) => {
                         currentTimeFrame={currentTimeFrame}
                         mostRecentEvents={mostRecentEvents}
                         timeFrames={globalTimeFrame.timeFrames}
+                        setCurrentStream={setCurrentStream}
                         setCurrentTimeFrame={setCurrentTimeFrame}
                         group={group}
                     />
                 </Grid>
                 <Grid item lg={4} md={6} xl={3} xs={12}>
-                    <TypeOfParticipants timeFrames={timeFrames} group={group}/>
+                    <TypeOfParticipants
+                        currentStream={currentStream}
+                        typesOfOptions={typesOfOptions}
+                        timeFrames={timeFrames}
+                        group={group}
+                    />
                 </Grid>
                 <Grid item lg={4} md={6} xl={3} xs={12}>
                     <FeedbackResults timeFrames={timeFrames} group={group}/>
