@@ -16,7 +16,7 @@ import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowRightIcon from "@material-ui/icons/ArrowRight";
 import {withFirebase} from "../../../../../context/firebase";
 import {colorsArray} from "../../../../util/colors";
-import {getTimeFromNow, snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
+import {getLength, prettyDate, snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -25,11 +25,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const getLength = (arr, prop) => {
-    return arr.map((el) => {
-        return el?.[prop]?.length || 0
-    })
-}
+
 
 const LatestEvents = ({
                           timeFrames,
@@ -78,7 +74,7 @@ const LatestEvents = ({
                 label: "Talent Pool",
             },
         ],
-        labels: localStreams.map(event => [`${event.company} `, `(${getTimeFromNow(event.start)})`]),
+        labels: localStreams.map(event => [`${event.company} `, `${prettyDate(event.start)}`]),
     }
 
     const options = {
@@ -97,6 +93,10 @@ const LatestEvents = ({
                     categoryPercentage: 0.5,
                     ticks: {
                         fontColor: theme.palette.text.secondary,
+                        maxTicksLimit: 15,
+                        callback: function (value, index, values) {
+                            return value[0]
+                        }
                     },
                     gridLines: {
                         display: false,
@@ -141,6 +141,7 @@ const LatestEvents = ({
         },
     };
 
+
     const handleClickListItem = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -160,8 +161,8 @@ const LatestEvents = ({
             const snapData = await firebase.getLivestreamParticipatingStudents(livestream.id)
             livestream.participatingStudents = snapShotsToData(snapData)
         }
-        setLocalStreams(prevState => {
-            // Merges the original array of object with the updated array of object with NEW properties
+        return setLocalStreams(prevState => {
+            // Merges the original array of objects with the updated array of object with NEW properties
             return prevState.map((item, i) => Object.assign({}, item, streamsWithParticipation[i]))
         })
     }
@@ -172,7 +173,7 @@ const LatestEvents = ({
             livestream.talentPool = snapShotsToData(snapData)
         }
         setLocalStreams(prevState => {
-            // Merges the original array of object with the updated array of object with NEW properties
+            // Merges the original array of objects with the updated array of object with NEW properties
             return prevState.map((item, i) => Object.assign({}, item, streamsWithTalentPool[i]))
         })
     }

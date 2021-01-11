@@ -14,6 +14,7 @@ import {
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
 import {withFirebase} from "../../../../../context/firebase";
+import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -25,16 +26,16 @@ const useStyles = makeStyles((theme) => ({
         width: 56
     },
     differenceIcon: {
-        color: colors.green[900]
+        color: ({positive}) => positive ? colors.green[900] : colors.red[900]
     },
     differenceValue: {
-        color: colors.green[900],
+        color: ({positive}) => positive ? colors.green[900] : colors.red[900],
         marginRight: theme.spacing(1)
     }
 }));
 
-const TotalUniqueRegistrations = ({fetchingStreams, totalUniqueRegistrations, timeFrames, className, ...rest}) => {
-    const classes = useStyles();
+const TotalUniqueRegistrations = ({uniqueRegistrationsStatus, fetchingStreams, totalUniqueRegistrations, timeFrames, className, ...rest}) => {
+    const classes = useStyles({positive: uniqueRegistrationsStatus.positive});
 
     return (
         <Card
@@ -73,12 +74,16 @@ const TotalUniqueRegistrations = ({fetchingStreams, totalUniqueRegistrations, ti
                     display="flex"
                     alignItems="center"
                 >
-                    <ArrowUpwardIcon className={classes.differenceIcon}/>
+                    {uniqueRegistrationsStatus.positive ?
+                        <ArrowUpwardIcon className={classes.differenceIcon}/>
+                        :
+                        <ArrowDownwardIcon className={classes.differenceIcon}/>
+                    }
                     <Typography
                         className={classes.differenceValue}
                         variant="body2"
                     >
-                        16%
+                        {uniqueRegistrationsStatus.percentage}
                     </Typography>
                     <Typography
                         color="textSecondary"

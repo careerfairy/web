@@ -8,12 +8,13 @@ import AverageRegistrations from "./AverageRegistrations";
 import FeedbackResults from "./FeedbackResults";
 import UpVotedQuestionsTable from "./UpVotedQuestionsTable";
 import {
+    getLength,
     getTimeFromNow,
     mustBeNumber,
     snapShotsToData,
 } from "../../../../helperFunctions/HelperFunctions";
 import NumberOfFollowers from "./NumberOfFollowers";
-import { v4 as uuid } from 'uuid';
+import {v4 as uuid} from 'uuid';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -28,31 +29,31 @@ const useStyles = makeStyles((theme) => ({
 const timeFrames = [
     {
         defaultName: "7 Days",
-        pastName: "Last week",
+        pastName: "week",
         date: new Date().setDate(new Date().getDate() - 7),
         id: uuid()
     },
     {
         name: "30 Days",
-        pastName: "Last Month",
+        pastName: "month",
         date: new Date().setMonth(new Date().getMonth() - 1),
         id: uuid()
     },
     {
         name: "4 Months",
-        pastName: "Last 4 months",
+        pastName: "4 months",
         date: new Date().setMonth(new Date().getMonth() - 3),
         id: uuid()
     },
     {
         name: "6 Months",
-        pastName: "Last 6 months",
+        pastName: "6 months",
         date: new Date().setMonth(new Date().getMonth() - 6),
         id: uuid()
     },
     {
         name: "1 Year",
-        pastName: "Last year",
+        pastName: "year",
         date: new Date().setFullYear(new Date().getFullYear() - 1),
         id: uuid()
     },
@@ -60,7 +61,7 @@ const timeFrames = [
 
 const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();
-    const [currentTimeFrame, setCurrentTimeFrame] = useState(timeFrames[4]);
+    const [currentTimeFrame, setCurrentTimeFrame] = useState(timeFrames[2]);
     const [livestreams, setLivestreams] = useState([]);
     const [totalFollowers, setTotalFollowers] = useState([]);
     const [fetchingStreams, setFetchingStreams] = useState(false);
@@ -100,7 +101,7 @@ const AnalyticsOverview = ({firebase, group}) => {
         return mustBeNumber(total);
     };
 
-    const getUniqueRegisteredUsers = () => {
+    const getUniqueRegisteredUsers = (livestreams) => {
         const totalViewers = livestreams.reduce(
             (accumulator, {registeredUsers}) => {
                 return [...accumulator, ...registeredUsers];
@@ -115,7 +116,7 @@ const AnalyticsOverview = ({firebase, group}) => {
 
     const getAverageRegistrationsPerEvent = () => {
         const average = totalRegistrations / livestreams.length;
-        return mustBeNumber(average);
+        return mustBeNumber(average, 0);
     };
 
     const getMostRecentEvents = (timeframe, limit = 50) => {
@@ -125,6 +126,63 @@ const AnalyticsOverview = ({firebase, group}) => {
             }
         });
         return recentStreams.slice(0, limit)
+    }
+
+    const getLastMonthsStreams = () => {
+        const monthAgo = new Date().setMonth(new Date().getMonth() - 1)
+        const twoMonthsAgo = new Date().setMonth(new Date().getMonth() - 2)
+        const streamsFromPastMonth = livestreams.filter(stream => stream.start.toDate() >= monthAgo)
+        const streamsFromTwoMonthsAgo = livestreams.filter(stream => stream.start.toDate() >= twoMonthsAgo && stream.start.toDate() <= monthAgo)
+        return {streamsFromPastMonth, streamsFromTwoMonthsAgo}
+    }
+
+    const compareRegistrations = () => {
+        const {streamsFromTwoMonthsAgo, streamsFromPastMonth} = getLastMonthsStreams()
+        const lastMonthsRegistrations = streamsFromPastMonth.reduce(
+            (accumulator, {registeredUsers}) =>
+                accumulator + registeredUsers.length,
+            0
+        );
+        const lastTwoMonthsRegistrations = streamsFromTwoMonthsAgo.reduce(
+            (accumulator, {registeredUsers}) =>
+                accumulator + registeredUsers.length,
+            0
+        );
+        const {
+            positive,
+            percentage,
+        } = getStats(lastMonthsRegistrations, lastTwoMonthsRegistrations)
+
+        return {
+            positive,
+            percentage: `${percentage}%`
+        }
+    }
+
+    const compareUniqueRegistrations = () => {
+        const {streamsFromTwoMonthsAgo, streamsFromPastMonth} = getLastMonthsStreams()
+        const lastMonthsUniqueRegistrations = getUniqueRegisteredUsers(streamsFromPastMonth)
+        const lastTwoMonthsUniqueRegistrations = getUniqueRegisteredUsers(streamsFromTwoMonthsAgo)
+        const {
+            positive,
+            percentage,
+        } = getStats(lastMonthsUniqueRegistrations, lastTwoMonthsUniqueRegistrations)
+
+        return {
+            positive,
+            percentage: `${percentage}%`
+        }
+    }
+
+    const getStats = (lastMonthsRegistrations, lastTwoMonthsRegistrations) => {
+        const difference = lastMonthsRegistrations - lastTwoMonthsRegistrations
+        const positive = Boolean(lastMonthsRegistrations > lastTwoMonthsRegistrations)
+        const percentage = (difference / lastMonthsRegistrations) * 100
+
+        return {
+            positive,
+            percentage: mustBeNumber(percentage, 0)
+        }
     }
 
 
@@ -138,12 +196,21 @@ const AnalyticsOverview = ({firebase, group}) => {
         livestreams,
     ]);
 
-    const totalUniqueRegistrations = useMemo(() => getUniqueRegisteredUsers(), [
+    const totalUniqueRegistrations = useMemo(() => getUniqueRegisteredUsers(livestreams), [
         livestreams,
     ]);
 
     const averageRegistrations = useMemo(
         () => getAverageRegistrationsPerEvent(),
+        [livestreams]
+    );
+
+    const registrationsStatus = useMemo(
+        () => compareRegistrations(),
+        [livestreams]
+    );
+    const uniqueRegistrationsStatus = useMemo(
+        () => compareUniqueRegistrations(),
         [livestreams]
     );
 
@@ -153,6 +220,7 @@ const AnalyticsOverview = ({firebase, group}) => {
                 <Grid item lg={3} sm={6} xl={3} xs={12}>
                     <TotalRegistrations
                         fetchingStreams={fetchingStreams}
+                        registrationsStatus={registrationsStatus}
                         totalRegistrations={totalRegistrations}
                         timeFrames={timeFrames}
                         group={group}
@@ -161,6 +229,7 @@ const AnalyticsOverview = ({firebase, group}) => {
                 <Grid item lg={3} sm={6} xl={3} xs={12}>
                     <TotalUniqueRegistrations
                         fetchingStreams={fetchingStreams}
+                        uniqueRegistrationsStatus={uniqueRegistrationsStatus}
                         totalUniqueRegistrations={totalUniqueRegistrations}
                         timeFrames={timeFrames}
                         group={group}

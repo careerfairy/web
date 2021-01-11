@@ -3,6 +3,7 @@ import React from "react";
 
 var dayjs = require('dayjs');
 var relativeTime = require('dayjs/plugin/relativeTime')
+
 dayjs.extend(relativeTime)
 
 export const uploadLogo = (location, fileObject, firebase, callback) => {
@@ -63,6 +64,20 @@ export function getTimeFromNow(firebaseTimestamp) {
     } else {
         return ""
     }
+}
+
+export const prettyDate = (firebaseTimestamp) => {
+    if (firebaseTimestamp) {
+        return dayjs(firebaseTimestamp.toDate()).format('DD/MM/YYYY')
+    } else {
+        return ""
+    }
+}
+
+export const getLength = (arr, prop) => {
+    return arr.map((el) => {
+        return el?.[prop]?.length || 0
+    })
 }
 
 export const isEmptyObject = (obj) => {
@@ -126,12 +141,12 @@ export const copyStringToClipboard = (string) => {
     document.body.removeChild(el);
 }
 
-export const mustBeNumber = (value) => {
+export const mustBeNumber = (value, decimals = 2) => {
     function round(value, decimals) {
         return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
     }
 
     // checks to see if value is an int or float, if not it will return zero
-    return Number.isFinite(value) ? round(value, 2) : 0
+    return Number.isFinite(value) ? round(value, decimals) : 0
 }
 

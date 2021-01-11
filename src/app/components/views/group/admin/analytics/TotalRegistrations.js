@@ -14,6 +14,7 @@ import {
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import {withFirebase} from "../../../../../context/firebase";
 import AddToPhotosRoundedIcon from "@material-ui/icons/AddToPhotosRounded";
+import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -25,16 +26,23 @@ const useStyles = makeStyles((theme) => ({
         width: 56
     },
     differenceIcon: {
-        color: colors.red[900]
+        color: ({positive}) => positive ? colors.green[900] : colors.red[900]
     },
     differenceValue: {
-        color: colors.red[900],
+        color: ({positive}) => positive ? colors.green[900] : colors.red[900],
         marginRight: theme.spacing(1)
     }
 }));
 
-const TotalRegistrations = ({fetchingStreams, totalRegistrations, timeFrames, className, ...rest}) => {
-    const classes = useStyles();
+const TotalRegistrations = ({
+                                registrationsStatus,
+                                fetchingStreams,
+                                totalRegistrations,
+                                timeFrames,
+                                className,
+                                ...rest
+                            }) => {
+    const classes = useStyles({positive: registrationsStatus.positive});
 
     return (
         <Card
@@ -73,12 +81,16 @@ const TotalRegistrations = ({fetchingStreams, totalRegistrations, timeFrames, cl
                     display="flex"
                     alignItems="center"
                 >
-                    <ArrowDownwardIcon className={classes.differenceIcon}/>
+                    {registrationsStatus.positive ?
+                        <ArrowUpwardIcon className={classes.differenceIcon}/>
+                        :
+                        <ArrowDownwardIcon className={classes.differenceIcon}/>
+                    }
                     <Typography
                         className={classes.differenceValue}
                         variant="body2"
                     >
-                        12%
+                        {registrationsStatus.percentage}
                     </Typography>
                     <Typography
                         color="textSecondary"
