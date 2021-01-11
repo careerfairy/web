@@ -74,14 +74,14 @@ const LatestEvents = ({
                 label: "Talent Pool",
             },
         ],
-        labels: localStreams.map(event => [`${event.company} `, `${prettyDate(event.start)}`]),
+        labels: localStreams.map(event => [`${event.company} `, `${prettyDate(event.start)}`, event.id]),
     }
 
     const options = {
         redraw: true,
         cornerRadius: 20,
         layout: {padding: 0},
-        legend: {display: false},
+        legend: {display: true},
         maintainAspectRatio: false,
         responsive: true,
         scales: {
@@ -134,9 +134,12 @@ const LatestEvents = ({
             mode: "index",
             titleFontColor: theme.palette.text.primary,
             callbacks: {
-                title: (tooltipItems, data) => data.labels[tooltipItems[0].index],
-                label: (tooltipItems, data) =>
-                    data.datasets[tooltipItems.datasetIndex].label + ': ' + tooltipItems.value
+                title: (tooltipItems, data) => {
+                    return data.labels[tooltipItems[0].index].slice(0, -1)
+                },
+                label: (tooltipItems, data) => {
+                    return data.datasets[tooltipItems.datasetIndex].label + ': ' + tooltipItems.value
+                }
             }
         },
     };
