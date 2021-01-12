@@ -27,7 +27,8 @@ const Audience = ({
                       userType,
                       setUserType,
                       userTypes,
-                      fetchingStreams
+                      fetchingStreams,
+                      groupOptions
 
                   }) => {
     const classes = useStyles()
@@ -79,6 +80,7 @@ const Audience = ({
                         totalUniqueUsers={totalUniqueUsers}
                         currentStream={currentStream}
                         fetchingStreams={fetchingStreams}
+                        groupOptions={groupOptions}
                         userType={userType}
                         group={group}/>
                 </Grid>

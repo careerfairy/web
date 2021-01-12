@@ -31,7 +31,8 @@ const General = ({
                      mostRecentEvents,
                      userTypes,
                      userType,
-                     setUserType
+                     setUserType,
+                     groupOptions
                  }) => {
     const classes = useStyles()
     const [totalFollowers, setTotalFollowers] = useState([]);
@@ -164,7 +165,7 @@ const General = ({
             students = getUniqueUsers(livestreams, prop).data
         }
         const aggregateCategories = getAggregateCategories(students)
-        const flattenedGroupOptions = handleFlattenOptions(group)
+        const flattenedGroupOptions = [...groupOptions]
         flattenedGroupOptions.forEach(option => {
             option.count = aggregateCategories.filter(category => category.categories.some(userOption => userOption.selectedValueId === option.id)).length
         })

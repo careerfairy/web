@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import {Box, Button, Card, CardHeader, Divider, makeStyles} from '@material-ui/core';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import {DataGrid} from '@material-ui/data-grid';
-import {useDemoData} from '@material-ui/x-grid-data-generator';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {CustomLoadingOverlay, CustomNoRowsOverlay} from "./Overlays";
@@ -50,23 +49,38 @@ const initialColumns = [
     },
 ]
 
-const UsersTable = ({fetchingStreams, userType, currentStream, group, totalUniqueUsers, className, ...rest}) => {
+const UsersTable = ({
+                        groupOptions,
+                        fetchingStreams,
+                        userType,
+                        currentStream,
+                        group,
+                        totalUniqueUsers,
+                        className,
+                        ...rest
+                    }) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const [columns, setColumns] = useState([]);
     const [expandTable, setExpandTable] = useState(false);
+    const [users, setUsers] = useState([]);
 
     useEffect(() => {
         const categoryColumns = getGroupCategoryColumns()
-        setColumns([...initialColumns, ...categoryColumns])
+        const newColumns = [...initialColumns]
+        // Place the group category options before gender, streamsWatched, etc...
+        newColumns.splice(4, 0, ...categoryColumns)
+        setColumns(newColumns)
     }, [group.id])
-    const {data} = useDemoData({
-        dataSet: 'Commodity',
-        rowLength: 12,
-        maxColumns: 6,
-    });
-    console.log("-> fetchingStreams", fetchingStreams);
-    console.log("-> data", data);
+
+    useEffect(() => {
+        setUsers(totalUniqueUsers)
+        extractUserCategories()
+
+    }, [totalUniqueUsers])
+
+    // console.log("-> fetchingStreams", fetchingStreams);
+    // console.log("-> data", data);
 
     const getGroupCategoryColumns = () => {
         if (group.categories?.length) {
@@ -74,11 +88,43 @@ const UsersTable = ({fetchingStreams, userType, currentStream, group, totalUniqu
                 return {
                     field: category.name,
                     headerName: category.name,
-                    width: 170
+                    width: 170,
                 }
             })
         } else {
             return []
+        }
+    }
+
+    const getCategoryOptionName = (targetCategoryId, user) => {
+        if (user.registeredGroups) {
+            const targetGroup = user.registeredGroups.find(groupObj => groupObj.groupId === group.id)
+            if (targetGroup?.categories) {
+                const targetCategory = targetGroup.categories.find(categoryObj => categoryObj.id === targetCategoryId)
+                if (targetCategory?.selectedValueId) {
+                    const targetOption = groupOptions.find(option => option.id === targetCategory.selectedValueId)
+                    if (targetOption?.name) {
+                        // console.log("-> targetOption.name", targetOption.name);
+                        return targetOption.name
+                    }
+                }
+            }
+        }
+    }
+
+    const extractUserCategories = () => {
+        const groupCategories = [...group.categories]
+        if (groupCategories.length) {
+            const updatedUsers = totalUniqueUsers.map(user => {
+                const updatedUser = user
+                groupCategories.forEach(category => {
+                    const targetCategoryId = category.id
+                    const propertyName = category.name
+                    updatedUser[propertyName] = getCategoryOptionName(targetCategoryId, user)
+                })
+                return updatedUser
+            })
+            setUsers(updatedUsers )
         }
     }
 
@@ -89,7 +135,7 @@ const UsersTable = ({fetchingStreams, userType, currentStream, group, totalUniqu
 
     const newData = {
         columns: columns,
-        rows: totalUniqueUsers
+        rows: users
     }
 
     return (

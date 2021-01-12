@@ -13,6 +13,7 @@ import Audience from "./Audience";
 import Grid from "@material-ui/core/Grid";
 import Title from "./Title";
 import Box from "@material-ui/core/Box";
+import {handleFlattenOptions} from "../../../../helperFunctions/streamFormFunctions";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -151,11 +152,18 @@ const AnalyticsOverview = ({firebase, group}) => {
     const [fetchingStreams, setFetchingStreams] = useState(false);
     const [currentTimeFrame, setCurrentTimeFrame] = useState({});
     const [userType, setUserType] = useState(userTypes[0]);
+    const [groupOptions, setGroupOptions] = useState([]);
 
 
     useEffect(() => {
         setCurrentTimeFrame(globalTimeFrame.timeFrames[0])
     }, [globalTimeFrame])
+
+    useEffect(() => {
+        const flattenedGroupOptions = handleFlattenOptions(group)
+        setGroupOptions(flattenedGroupOptions)
+
+    }, [group])
 
 
     const handleChange = (event, newValue) => {
@@ -243,7 +251,8 @@ const AnalyticsOverview = ({firebase, group}) => {
             setCurrentTimeFrame,
             userType,
             userTypes,
-            setUserType
+            setUserType,
+            groupOptions
         }
     }
 
