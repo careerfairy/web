@@ -5,54 +5,24 @@ import {Box, Button, Card, CardHeader, Divider, makeStyles} from '@material-ui/c
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import {DataGrid} from '@material-ui/data-grid';
 import {withFirebase} from "../../../../../../../context/firebase";
-import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
+import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {CustomLoadingOverlay, CustomNoRowsOverlay} from "./Overlays";
+import {useSnackbar} from "notistack";
 
 const useStyles = makeStyles(() => ({
     root: {},
     actions: {
         justifyContent: 'flex-end'
+    },
+    gridWrapper: {
+        '& .link': {
+            backgroundColor: 'rgba(224, 183, 60, 0.55)',
+            color: '#1a3e72',
+            fontWeight: '600',
+        },
     }
 }));
 
-const initialColumns = [
-    {
-        field: "id",
-        headerName: "ID",
-        width: 170,
-        hide: true
-    },
-    {
-        field: "firstName",
-        headerName: "First Name",
-        width: 140,
-    },
-    {
-        field: "lastName",
-        headerName: "Last Name",
-        width: 140,
-    },
-    {
-        field: "userEmail",
-        headerName: "Email",
-        width: 200,
-    },
-    {
-        field: "didNotAttend",
-        headerName: "Did not attend",
-        width: 170,
-    },
-    {
-        field: "streamsWatched",
-        headerName: "Events Attended",
-        width: 170,
-    },
-    {
-        field: "streamsRegistered",
-        headerName: "Events Registered",
-        width: 170,
-    },
-]
 
 const UsersTable = ({
                         groupOptions,
@@ -67,17 +37,70 @@ const UsersTable = ({
                     }) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
+    const {enqueueSnackbar} = useSnackbar()
     const [columns, setColumns] = useState([]);
     const [expandTable, setExpandTable] = useState(false);
     const [users, setUsers] = useState([]);
 
+    const initialColumns = [
+        {
+            field: "id",
+            headerName: "ID",
+            width: 170,
+            hide: true
+        },
+        {
+            field: "firstName",
+            headerName: "First Name",
+            width: 140,
+        },
+        {
+            field: "lastName",
+            headerName: "Last Name",
+            width: 140,
+        },
+
+
+        {
+            field: "streamsWatched",
+            headerName: "Events Attended",
+            width: 170,
+        },
+        {
+            field: "streamsRegistered",
+            headerName: "Events Registered To",
+            width: 170,
+        },
+    ]
+
+    if (userType.propertyName === "talentPool") {
+        initialColumns.unshift({
+            field: "userEmail",
+            headerName: "Email",
+            width: 200,
+            renderCell: (params) => (
+                <a href={`mailto:${params.value}`}>
+                    {params.value}
+                </a>
+            ),
+        },)
+    }
+
+    if (currentStream) {
+        initialColumns.push({
+            field: "didNotAttend",
+            headerName: "Did not attend",
+            width: 170,
+        })
+    }
+
     useEffect(() => {
         const categoryColumns = getGroupCategoryColumns()
-        const newColumns = [...initialColumns]
-        // Place the group category options before gender, streamsWatched, etc...
-        newColumns.splice(4, 0, ...categoryColumns)
-        setColumns(newColumns)
-    }, [group.id])
+        // const newColumns = [...initialColumns]
+        // // Place the group category options before gender, streamsWatched, etc...
+        // newColumns.splice(4, 0, ...categoryColumns)
+        setColumns([...initialColumns, ...categoryColumns])
+    }, [group.id, userType, currentStream])
 
     useEffect(() => {
         setUsers(totalUniqueUsers)
@@ -86,10 +109,6 @@ const UsersTable = ({
         mapStreamsRegistered()
 
     }, [totalUniqueUsers])
-
-
-    // console.log("-> fetchingStreams", fetchingStreams);
-    // console.log("-> data", data);
 
     const getGroupCategoryColumns = () => {
         if (group.categories?.length) {
@@ -177,6 +196,13 @@ const UsersTable = ({
         setExpandTable(!expandTable)
     }
 
+    const handleCopyEmails = () => {
+        copyStringToClipboard(selection.join(";"))
+        enqueueSnackbar("Emails have been copied!", {
+            variant: "success"
+        })
+    }
+
 
     const newData = {
         columns: columns,
@@ -193,26 +219,35 @@ const UsersTable = ({
                 subheader={currentStream && `That attended ${currentStream.company} on ${prettyDate(currentStream.start)}`}
             />
             <Divider/>
-            <Box height={expandTable ? 800 : 400} width="100%">
+            <Box className={classes.gridWrapper} height={expandTable ? 800 : 400} width="100%">
                 <DataGrid
-                    loading={fetchingStreams}
+                    {...newData}
                     showToolbar
+                    checkboxSelection
+                    loading={fetchingStreams}
+                    onSelectionChange={(newSelection) => {
+                        setSelection(newSelection.rowIds);
+                    }}
                     components={{
                         noRowsOverlay: CustomNoRowsOverlay,
                         loadingOverlay: CustomLoadingOverlay,
                     }}
-                    checkboxSelection
-                    onSelectionChange={(newSelection) => {
-                        setSelection(newSelection.rowIds);
-                    }}
-                    {...newData}
                 />
             </Box>
             <Box
                 display="flex"
-                justifyContent="flex-end"
+                justifyContent="space-between"
                 p={2}
             >
+                <Button
+                    color="primary"
+                    size="small"
+                    variant="contained"
+                    disabled={Boolean(!selection.length)}
+                    onClick={handleCopyEmails}
+                >
+                    Copy Email Addresses
+                </Button>
                 <Button
                     color="primary"
                     onClick={toggleTable}

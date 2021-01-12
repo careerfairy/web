@@ -85,9 +85,9 @@ const Audience = ({
                         userType={userType}
                         group={group}/>
                 </Grid>
-                <Grid item lg={4} md={6} xl={3} xs={12}>
-                    <FeedbackResults group={group}/>
-                </Grid>
+                {/*<Grid item lg={4} md={6} xl={3} xs={12}>*/}
+                {/*    <FeedbackResults group={group}/>*/}
+                {/*</Grid>*/}
             </Grid>
         </Container>
     );
