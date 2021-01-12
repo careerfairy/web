@@ -2,15 +2,14 @@ import React, {useEffect, useMemo, useState} from "react";
 import {Container, Grid} from "@material-ui/core";
 import TotalRegistrations from "./TotalRegistrations";
 import TotalUniqueRegistrations from "./TotalUniqueRegistrations";
-import LatestEvents from "./LatestEvents";
 import TypeOfParticipants from "./TypeOfParticipants";
 import AverageRegistrations from "./AverageRegistrations";
 import {mustBeNumber, snapShotsToData} from "../../../../../helperFunctions/HelperFunctions";
 import NumberOfFollowers from "./NumberOfFollowers";
 import {handleFlattenOptions} from "../../../../../helperFunctions/streamFormFunctions";
 import {makeStyles} from "@material-ui/core/styles";
+import LatestEvents from "../common/LatestEvents";
 
-const now = new Date()
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -28,13 +27,18 @@ const General = ({
                      fetchingStreams,
                      globalTimeFrames,
                      globalTimeFrame,
-                     setGlobalTimeFrame
+                     setGlobalTimeFrame,
+                     currentTimeFrame,
+                     setCurrentTimeFrame,
+                     futureStreams,
+                     mostRecentEvents,
+                     userTypes,
+                     userType
                  }) => {
     const classes = useStyles()
     const [totalFollowers, setTotalFollowers] = useState([]);
     const [fetchingFollowers, setFetchingFollowers] = useState(false);
-    const [currentTimeFrame, setCurrentTimeFrame] = useState({});
-    const [currentStream, setCurrentStream] = useState({});
+    const [currentStream, setCurrentStream] = useState(null);
 
 
     useEffect(() => {
@@ -47,9 +51,6 @@ const General = ({
         })()
     }, [group.id]);
 
-    useEffect(() => {
-        setCurrentTimeFrame(globalTimeFrame.timeFrames[0])
-    }, [globalTimeFrame])
 
     const getTotalRegisteredUsers = () => {
         const total = livestreams.reduce(
@@ -82,26 +83,8 @@ const General = ({
         return mustBeNumber(average, 0);
     };
 
-    const getMostRecentEvents = (timeframe, limit = 500) => {
-        const targetTime = new Date(timeframe)
-        const recentStreams = livestreams.filter((stream) => {
-            if (stream.start?.toDate() > targetTime
-                && stream.start?.toDate() < now
-            ) {
-                return stream
-            }
-        });
-        return recentStreams.slice(0, limit)
-    }
-    const getFutureEvents = (timeframe, limit = 500) => {
-        const targetTime = new Date(timeframe)
-        const futureStreams = livestreams.filter((stream) => {
-            if (stream.start?.toDate() > now) {
-                return stream
-            }
-        });
-        return futureStreams.slice(0, limit)
-    }
+
+
 
     const getStreamsToCompare = () => {
         const timeAgo = globalTimeFrame.globalDate
@@ -175,12 +158,12 @@ const General = ({
         return categories
     }
 
-    const getTypeOfStudents = () => {
+    const getTypeOfStudents = (prop) => {
         let students = []
-        if (currentStream.participatingStudents) {
-            students = currentStream.participatingStudents
+        if (currentStream?.[prop]) {
+            students = currentStream[prop]
         } else {
-            students = getUniqueUsers(livestreams, "participatingStudents").data
+            students = getUniqueUsers(livestreams, prop).data
         }
         const aggregateCategories = getAggregateCategories(students)
         const flattenedGroupOptions = handleFlattenOptions(group)
@@ -193,12 +176,8 @@ const General = ({
 
     // use Memo is great for optimizing expensive calculations, the value of the function call will be stored in memory
     // The function will only be re-called when the value(livestreams) in the dependency array changes
-    const mostRecentEvents = useMemo(() => getMostRecentEvents(currentTimeFrame.date), [
-        livestreams, currentTimeFrame
-    ]);
-    const futureStreams = useMemo(() => getFutureEvents(currentTimeFrame.date), [
-        livestreams, currentTimeFrame
-    ]);
+
+
 
     const totalRegistrations = useMemo(() => getTotalRegisteredUsers(), [
         livestreams,
@@ -223,8 +202,8 @@ const General = ({
     );
 
     const typesOfOptions = useMemo(
-        () => getTypeOfStudents(),
-        [livestreams, currentStream]
+        () => getTypeOfStudents(userType),
+        [livestreams, currentStream, userType]
     );
 
     return (
@@ -274,6 +253,7 @@ const General = ({
                         timeFrames={globalTimeFrame.timeFrames}
                         setCurrentStream={setCurrentStream}
                         futureStreams={futureStreams}
+                        livestreams={livestreams}
                         setCurrentTimeFrame={setCurrentTimeFrame}
                         group={group}
                     />

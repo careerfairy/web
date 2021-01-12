@@ -36,6 +36,7 @@ const LatestEvents = ({
                           setCurrentStream,
                           group,
                           className,
+                          livestreams,
                           ...rest
                       }) => {
     const classes = useStyles();
@@ -124,19 +125,7 @@ const LatestEvents = ({
                 backgroundColor: theme.palette.primary.dark,
                 borderColor: colorsArray[0],
                 data: handleFutureStreams("registeredUsers"),
-                label: "Future Registrations",
-                spanGaps: true
-            },
-            {
-                borderDash: [20, 30],
-                pointHoverBackgroundColor: colorsArray[1],
-                pointHoverBorderColor: 'rgba(220,220,220,1)',
-                pointBorderColor: colorsArray[1],
-                pointBackgroundColor: colorsArray[1],
-                backgroundColor: colorsArray[1],
-                borderColor: colorsArray[1],
-                data: handleFutureStreams("participatingStudents"),
-                label: "Future Participation",
+                label: "Registrations so Far",
                 spanGaps: true
             },
             {
@@ -148,7 +137,7 @@ const LatestEvents = ({
                 backgroundColor: colorsArray[2],
                 borderColor: colorsArray[2],
                 data: handleFutureStreams("talentPool"),
-                label: "Future Talent Pool",
+                label: "Talent Pool so Far",
                 spanGaps: true
             },
         ],
@@ -159,17 +148,14 @@ const LatestEvents = ({
     const options = {
         onHover: (event, chartElement) => {
             if (chartElement.length) {
-                const index = chartElement[0]._index
-                if (mostRecentEvents[index]?.participatingStudents?.length) {
-                    event.target.style.cursor = chartElement[0] ? 'pointer' : 'default'
-                }
+                event.target.style.cursor = chartElement[0] ? 'pointer' : 'default'
             }
         },
         onClick: (event, chartElement, data) => {
             if (chartElement.length) {
                 const index = chartElement[0]._index
-                if (mostRecentEvents[index]?.participatingStudents?.length) {
-                    setCurrentStream(mostRecentEvents[index])
+                if ([...mostRecentEvents, ...futureStreams][index]) {
+                    setCurrentStream([...mostRecentEvents, ...futureStreams][index])
                 }
             }
         },

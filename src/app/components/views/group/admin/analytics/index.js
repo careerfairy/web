@@ -1,4 +1,4 @@
-import React, {useEffect, useState, Fragment} from "react";
+import React, {useEffect, useState, Fragment, useMemo} from "react";
 import {Container, fade, makeStyles} from "@material-ui/core";
 import {snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
 import {v4 as uuid} from 'uuid';
@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const now = new Date()
 
 const sevenDays = new Date().setDate(new Date().getDate() - 7)
 const twoWeeks = new Date().setDate(new Date().getDate() - 14)
@@ -126,6 +127,8 @@ const globalTimeFrames = [
     },
 ]
 
+const userTypes = ["registeredUsers", "participatingStudents", "talentPool"]
+
 const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();
     const theme = useTheme()
@@ -134,6 +137,14 @@ const AnalyticsOverview = ({firebase, group}) => {
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
     const [livestreams, setLivestreams] = useState([]);
     const [fetchingStreams, setFetchingStreams] = useState(false);
+    const [currentTimeFrame, setCurrentTimeFrame] = useState({});
+    const [userType, setUserType] = useState(userTypes[0]);
+
+
+    useEffect(() => {
+        setCurrentTimeFrame(globalTimeFrame.timeFrames[0])
+    }, [globalTimeFrame])
+
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -159,6 +170,8 @@ const AnalyticsOverview = ({firebase, group}) => {
 
                     const participatingSnap = await firebase.getLivestreamParticipatingStudents(snap.id)
                     const talentPoolSnap = await firebase.getLivestreamTalentPoolMembers(livestream.companyId)
+                    const registeredStudentsSnap = await firebase.getLivestreamRegisteredStudents(livestream.id)
+                    livestream.registeredUsers = snapShotsToData(registeredStudentsSnap)
                     livestream.participatingStudents = snapShotsToData(participatingSnap)
                     livestream.talentPool = snapShotsToData(talentPoolSnap)
                     livestreams.push(livestream)
@@ -173,6 +186,54 @@ const AnalyticsOverview = ({firebase, group}) => {
         );
         return () => unsubscribe();
     }, [globalTimeFrame, group.id]);
+
+    const getFutureEvents = (timeframe, limit = 500) => {
+        const futureStreams = livestreams.filter((stream) => {
+            if (stream.start?.toDate() > now) {
+                return stream
+            }
+        });
+        return futureStreams.slice(0, limit)
+    }
+
+    const getMostRecentEvents = (timeframe, limit = 500) => {
+        const targetTime = new Date(timeframe)
+        const recentStreams = livestreams.filter((stream) => {
+            if (stream.start?.toDate() > targetTime
+                && stream.start?.toDate() < now
+            ) {
+                return stream
+            }
+        });
+        return recentStreams.slice(0, limit)
+    }
+
+    const mostRecentEvents = useMemo(() => getMostRecentEvents(currentTimeFrame.date), [
+        livestreams, currentTimeFrame
+    ]);
+
+    const futureStreams = useMemo(() => getFutureEvents(currentTimeFrame.date), [
+        livestreams, currentTimeFrame
+    ]);
+
+    const getTabProps = () => {
+        return {
+            group,
+            firebase,
+            livestreams,
+            futureStreams,
+            globalTimeFrame,
+            fetchingStreams,
+            mostRecentEvents,
+            currentTimeFrame,
+            globalTimeFrames,
+            setGlobalTimeFrame,
+            setCurrentTimeFrame,
+            userType,
+            userTypes,
+            setUserType
+        }
+    }
 
 
     return (
@@ -205,24 +266,12 @@ const AnalyticsOverview = ({firebase, group}) => {
             >
                 <SwipeablePanel value={value} index={0} dir={theme.direction}>
                     <General
-                        globalTimeFrame={globalTimeFrame}
-                        fetchingStreams={fetchingStreams}
-                        firebase={firebase}
-                        group={group}
-                        globalTimeFrames={globalTimeFrames}
-                        livestreams={livestreams}
-                        setGlobalTimeFrame={setGlobalTimeFrame}
+                        {...getTabProps()}
                     />
                 </SwipeablePanel>
                 <SwipeablePanel value={value} index={1} dir={theme.direction}>
                     <Audience
-                        globalTimeFrame={globalTimeFrame}
-                        fetchingStreams={fetchingStreams}
-                        firebase={firebase}
-                        group={group}
-                        globalTimeFrames={globalTimeFrames}
-                        livestreams={livestreams}
-                        setGlobalTimeFrame={setGlobalTimeFrame}
+                        {...getTabProps()}
                     />
                 </SwipeablePanel>
                 <SwipeablePanel value={value} index={2} dir={theme.direction}>

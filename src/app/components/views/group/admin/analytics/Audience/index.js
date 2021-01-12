@@ -5,6 +5,7 @@ import FeedbackResults from "./FeedbackResults";
 
 import {makeStyles} from "@material-ui/core/styles";
 import UsersTable from "./UsersTable";
+import LatestEvents from "../common/LatestEvents";
 
 const now = new Date()
 
@@ -18,46 +19,66 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 const Audience = ({
-                     firebase,
-                     group,
-                     livestreams,
-                     fetchingStreams,
-                     globalTimeFrames,
-                     globalTimeFrame,
-                     setGlobalTimeFrame
-                 }) => {
+                      firebase,
+                      group,
+                      livestreams,
+                      fetchingStreams,
+                      globalTimeFrames,
+                      globalTimeFrame,
+                      setGlobalTimeFrame,
+                      currentTimeFrame,
+                      mostRecentEvents,
+                      setCurrentTimeFrame,
+                      futureStreams,
+                      userType,
+                      setUserType,
+                      userTypes
+                  }) => {
     const classes = useStyles()
-    const [totalFollowers, setTotalFollowers] = useState([]);
-    const [currentTimeFrame, setCurrentTimeFrame] = useState({});
-    const [currentStream, setCurrentStream] = useState({});
-    console.log("-> livestreams", livestreams);
+    const [currentStream, setCurrentStream] = useState(null);
+    console.log("-> currentStream", currentStream);
 
-    useEffect(() => {
-        setCurrentTimeFrame(globalTimeFrame.timeFrames[0])
-    }, [globalTimeFrame])
+    const getUsers = (livestreams, prop = "registeredUsers") => {
 
-    const getUniqueUsers = (livestreams, prop = "registeredUsers") => {
         const totalViewers = livestreams.reduce(
             (accumulator, livestream) => {
                 return [...accumulator, ...livestream[prop]];
             },
             []
         );
-
-        // new Set method removes all duplicates from array
-        return [...new Set(totalViewers)]
+        return totalViewers.filter(function (el) {
+            if (!this[el.userEmail]) {
+                this[el.userEmail] = true;
+                return true;
+            }
+            return false;
+        }, Object.create(null))
     };
 
-    const totalUniqueRegistrations = useMemo(() => getUniqueUsers(livestreams).amount, [
-        livestreams,
+    const totalUniqueUsers = useMemo(() => getUsers(livestreams), [
+        livestreams, currentStream
     ]);
-    console.log("-> totalUniqueRegisdfsdfstrations", totalUniqueRegistrations);
 
     return (
         <Container className={classes.root} maxWidth={false}>
             <Grid container spacing={3}>
                 <Grid item lg={12} md={12} xl={12} xs={12}>
-                    <UsersTable group={group}/>
+                    <LatestEvents
+                        currentTimeFrame={currentTimeFrame}
+                        mostRecentEvents={mostRecentEvents}
+                        timeFrames={globalTimeFrame.timeFrames}
+                        setCurrentStream={setCurrentStream}
+                        futureStreams={futureStreams}
+                        livestreams={livestreams}
+                        setCurrentTimeFrame={setCurrentTimeFrame}
+                        group={group}
+                    />
+                </Grid>
+                <Grid item lg={12} md={12} xl={12} xs={12}>
+                    <UsersTable
+                        totalUniqueUsers={totalUniqueUsers}
+                        currentStream={currentStream}
+                        group={group}/>
                 </Grid>
                 <Grid item lg={4} md={6} xl={3} xs={12}>
                     <FeedbackResults group={group}/>

@@ -63,7 +63,7 @@ const TypeOfParticipants = ({
 
     useEffect(() => {
         if (hasNoData()) {
-            setCurrentStream({})
+            setCurrentStream(null)
         }
     }, [total])
 
@@ -117,12 +117,12 @@ const TypeOfParticipants = ({
         >
             <CardHeader
                 title="Most Common Participants"
-                subheader={currentStream.company ? `That attended ${currentStream.company}` : "on average"}
+                subheader={currentStream ? `That attended ${currentStream.company}` : "on average"}
                 action={
-                    currentStream.id &&
+                    currentStream &&
                     <Button size="small"
                             variant="text"
-                            onClick={() => setCurrentStream({})}
+                            onClick={() => setCurrentStream(null)}
                             endIcon={<RotateLeftIcon/>}
                     >
                         Reset

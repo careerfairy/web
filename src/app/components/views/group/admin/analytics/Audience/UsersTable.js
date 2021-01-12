@@ -1,29 +1,12 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
-import moment from 'moment';
-import {v4 as uuid} from 'uuid';
-import PerfectScrollbar from 'react-perfect-scrollbar';
 import PropTypes from 'prop-types';
-import {
-    Box,
-    Button,
-    Card,
-    CardHeader,
-    Chip,
-    Divider,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    TableSortLabel,
-    Tooltip,
-    makeStyles
-} from '@material-ui/core';
+import {Box, Button, Card, CardHeader, Divider, makeStyles} from '@material-ui/core';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import {DataGrid} from '@material-ui/data-grid';
 import {useDemoData} from '@material-ui/x-grid-data-generator';
 import {withFirebase} from "../../../../../../context/firebase";
+import {prettyDate} from "../../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles(() => ({
     root: {},
@@ -32,58 +15,98 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const UsersTable = ({className, ...rest}) => {
+const initialColumns = [
+    {
+        field: "id",
+        headerName: "ID",
+        width: 170,
+        hide: true
+    },
+    {
+        field: "firstName",
+        headerName: "First Name",
+        width: 170,
+    },
+    {
+        field: "lastName",
+        headerName: "Last Name",
+        width: 170,
+    },
+    {
+        field: "userEmail",
+        headerName: "Email",
+        width: 170,
+    },
+    {
+        field: "gender",
+        headerName: "Gender",
+        width: 170,
+    },
+    {
+        field: "streamsWatched",
+        headerName: "Streams Watched",
+        width: 170,
+    },
+]
+
+const UsersTable = ({currentStream, group, totalUniqueUsers, className, ...rest}) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
-    console.log("-> selection", selection);
+    const [columns, setColumns] = useState([]);
+    const [expandTable, setExpandTable] = useState(false);
 
+    useEffect(() => {
+        const categoryColumns = getGroupCategoryColumns()
+        setColumns([...initialColumns, ...categoryColumns])
+    }, [group.id])
     const {data} = useDemoData({
         dataSet: 'Commodity',
-        rowLength: 20,
+        rowLength: 12,
         maxColumns: 6,
     });
+    console.log("-> data", data);
+
+    const getGroupCategoryColumns = () => {
+        if (group.categories?.length) {
+            return group.categories.map(category => {
+                return {
+                    field: category.name,
+                    headerName: category.name,
+                    width: 170
+                }
+            })
+        } else {
+            return []
+        }
+    }
+
+    const toggleTable = () => {
+        setExpandTable(!expandTable)
+    }
+
 
     const newData = {
-        columns:[
-            {
-                field: "firstName",
-                headerName: "First Name",
-                width: 110,
-            },
-            {
-                field: "lastName",
-                headerName: "Last Name",
-                width: 110,
-            },
-            {
-                field: "email",
-                headerName: "Email",
-                width: 110,
-            },
-            {
-                field: "streamsWatched",
-                headerName: "Streams Watched",
-                width: 110,
-            },
-        ],
-        rows: data.rows
+        columns: columns,
+        rows: totalUniqueUsers
     }
-    console.log("-> data", data);
 
     return (
         <Card
             className={clsx(classes.root, className)}
             {...rest}
         >
-            <CardHeader title="Participating Students"/>
+            <CardHeader
+                title="Participating Students"
+                subheader={currentStream && `That attended ${currentStream.company} on ${prettyDate(currentStream.start)}`}
+            />
             <Divider/>
-            <Box height={400} width="100%">
+            <Box height={expandTable ? 800 : 400} width="100%">
                 <DataGrid
                     checkboxSelection
                     onSelectionChange={(newSelection) => {
                         setSelection(newSelection.rowIds);
                     }}
-                    {...data}
+                    {...newData}
                 />
             </Box>
             <Box
@@ -93,11 +116,12 @@ const UsersTable = ({className, ...rest}) => {
             >
                 <Button
                     color="primary"
-                    endIcon={<ArrowRightIcon/>}
+                    onClick={toggleTable}
+                    endIcon={!expandTable && <ArrowRightIcon/>}
                     size="small"
                     variant="text"
                 >
-                    View all
+                    {expandTable ? "Show Less" : "See More"}
                 </Button>
             </Box>
         </Card>
