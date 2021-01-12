@@ -25,26 +25,31 @@ const initialColumns = [
     {
         field: "firstName",
         headerName: "First Name",
-        width: 170,
+        width: 140,
     },
     {
         field: "lastName",
         headerName: "Last Name",
-        width: 170,
+        width: 140,
     },
     {
         field: "userEmail",
         headerName: "Email",
-        width: 240,
+        width: 200,
     },
     {
-        field: "gender",
-        headerName: "Gender",
+        field: "didNotAttend",
+        headerName: "Did not attend",
         width: 170,
     },
     {
         field: "streamsWatched",
-        headerName: "Streams Watched",
+        headerName: "Events Attended",
+        width: 170,
+    },
+    {
+        field: "streamsRegistered",
+        headerName: "Events Registered",
         width: 170,
     },
 ]
@@ -78,6 +83,7 @@ const UsersTable = ({
         setUsers(totalUniqueUsers)
         mapUserCategories()
         mapStreamsWatched()
+        mapStreamsRegistered()
 
     }, [totalUniqueUsers])
 
@@ -107,7 +113,6 @@ const UsersTable = ({
                 if (targetCategory?.selectedValueId) {
                     const targetOption = groupOptions.find(option => option.id === targetCategory.selectedValueId)
                     if (targetOption?.name) {
-                        // console.log("-> targetOption.name", targetOption.name);
                         return targetOption.name
                     }
                 }
@@ -135,12 +140,14 @@ const UsersTable = ({
 
     const mapStreamsWatched = () => {
         const updatedUsers = totalUniqueUsers.map(user => {
-            const currentUserEmail = user?.userEmail
+            user.didNotAttend = "Yes"
+            const currentUserEmail = user.userEmail
             if (currentUserEmail) {
                 const watchedStreams = []
                 livestreams.forEach(stream => {
                     if (stream?.participatingStudents?.some(userObj => userObj?.userEmail === currentUserEmail)) {
                         watchedStreams.push(stream)
+                        user.didNotAttend = "No"
                     }
                 })
                 user.streamsWatched = watchedStreams.length
@@ -149,6 +156,22 @@ const UsersTable = ({
         })
         setUsers(updatedUsers)
     }
+    const mapStreamsRegistered = () => {
+        const updatedUsers = totalUniqueUsers.map(currentUser => {
+            if (currentUser.userEmail) {
+                const registeredStreams = []
+                livestreams.forEach(stream => {
+                    if (stream?.registeredUsers?.some(userObj => userObj?.userEmail === currentUser.userEmail)) {
+                        registeredStreams.push(stream)
+                    }
+                })
+                currentUser.streamsRegistered = registeredStreams.length
+            }
+            return currentUser
+        })
+        setUsers(updatedUsers)
+    }
+
 
     const toggleTable = () => {
         setExpandTable(!expandTable)
@@ -197,7 +220,7 @@ const UsersTable = ({
                     size="small"
                     variant="text"
                 >
-                    {expandTable ? "Show Less" : "See More"}
+                    {expandTable ? "Show Less" : "Expand"}
                 </Button>
             </Box>
         </Card>
