@@ -56,6 +56,7 @@ const UsersTable = ({
                         currentStream,
                         group,
                         totalUniqueUsers,
+                        livestreams,
                         className,
                         ...rest
                     }) => {
@@ -75,9 +76,11 @@ const UsersTable = ({
 
     useEffect(() => {
         setUsers(totalUniqueUsers)
-        extractUserCategories()
+        mapUserCategories()
+        mapStreamsWatched()
 
     }, [totalUniqueUsers])
+
 
     // console.log("-> fetchingStreams", fetchingStreams);
     // console.log("-> data", data);
@@ -112,20 +115,39 @@ const UsersTable = ({
         }
     }
 
-    const extractUserCategories = () => {
+    const mapUserCategories = () => {
         const groupCategories = [...group.categories]
         if (groupCategories.length) {
             const updatedUsers = totalUniqueUsers.map(user => {
                 const updatedUser = user
                 groupCategories.forEach(category => {
                     const targetCategoryId = category.id
-                    const propertyName = category.name
-                    updatedUser[propertyName] = getCategoryOptionName(targetCategoryId, user)
+                    if (targetCategoryId) {
+                        const propertyName = category.name
+                        updatedUser[propertyName] = getCategoryOptionName(targetCategoryId, user)
+                    }
                 })
                 return updatedUser
             })
-            setUsers(updatedUsers )
+            setUsers(updatedUsers)
         }
+    }
+
+    const mapStreamsWatched = () => {
+        const updatedUsers = totalUniqueUsers.map(user => {
+            const currentUserEmail = user?.userEmail
+            if (currentUserEmail) {
+                const watchedStreams = []
+                livestreams.forEach(stream => {
+                    if (stream?.participatingStudents?.some(userObj => userObj?.userEmail === currentUserEmail)) {
+                        watchedStreams.push(stream)
+                    }
+                })
+                user.streamsWatched = watchedStreams.length
+            }
+            return user
+        })
+        setUsers(updatedUsers)
     }
 
     const toggleTable = () => {

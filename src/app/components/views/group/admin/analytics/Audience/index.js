@@ -81,6 +81,7 @@ const Audience = ({
                         currentStream={currentStream}
                         fetchingStreams={fetchingStreams}
                         groupOptions={groupOptions}
+                        livestreams={livestreams}
                         userType={userType}
                         group={group}/>
                 </Grid>
