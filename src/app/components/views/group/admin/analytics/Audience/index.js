@@ -1,14 +1,12 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useMemo, useState} from "react";
 import {Container, Grid} from "@material-ui/core";
 
 import FeedbackResults from "./FeedbackResults";
 
 import {makeStyles} from "@material-ui/core/styles";
-import UsersTable from "./UsersTable";
 import LatestEvents from "../common/LatestEvents";
-import TypeOfParticipants from "../General/TypeOfParticipants";
+import UsersTable from "./UsersTable";
 
-const now = new Date()
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -29,6 +27,8 @@ const Audience = ({
                       userType,
                       setUserType,
                       userTypes,
+                      fetchingStreams
+
                   }) => {
     const classes = useStyles()
     const [currentStream, setCurrentStream] = useState(null);
@@ -78,6 +78,7 @@ const Audience = ({
                     <UsersTable
                         totalUniqueUsers={totalUniqueUsers}
                         currentStream={currentStream}
+                        fetchingStreams={fetchingStreams}
                         userType={userType}
                         group={group}/>
                 </Grid>
@@ -86,7 +87,6 @@ const Audience = ({
                 </Grid>
             </Grid>
         </Container>
-
     );
 };
 

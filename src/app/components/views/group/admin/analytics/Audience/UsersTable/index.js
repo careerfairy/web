@@ -5,8 +5,9 @@ import {Box, Button, Card, CardHeader, Divider, makeStyles} from '@material-ui/c
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import {DataGrid} from '@material-ui/data-grid';
 import {useDemoData} from '@material-ui/x-grid-data-generator';
-import {withFirebase} from "../../../../../../context/firebase";
-import {prettyDate} from "../../../../../helperFunctions/HelperFunctions";
+import {withFirebase} from "../../../../../../../context/firebase";
+import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
+import {CustomLoadingOverlay, CustomNoRowsOverlay} from "./Overlays";
 
 const useStyles = makeStyles(() => ({
     root: {},
@@ -49,7 +50,7 @@ const initialColumns = [
     },
 ]
 
-const UsersTable = ({userType, currentStream, group, totalUniqueUsers, className, ...rest}) => {
+const UsersTable = ({fetchingStreams, userType, currentStream, group, totalUniqueUsers, className, ...rest}) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const [columns, setColumns] = useState([]);
@@ -64,6 +65,7 @@ const UsersTable = ({userType, currentStream, group, totalUniqueUsers, className
         rowLength: 12,
         maxColumns: 6,
     });
+    console.log("-> fetchingStreams", fetchingStreams);
     console.log("-> data", data);
 
     const getGroupCategoryColumns = () => {
@@ -102,6 +104,12 @@ const UsersTable = ({userType, currentStream, group, totalUniqueUsers, className
             <Divider/>
             <Box height={expandTable ? 800 : 400} width="100%">
                 <DataGrid
+                    loading={fetchingStreams}
+                    showToolbar
+                    components={{
+                        noRowsOverlay: CustomNoRowsOverlay,
+                        loadingOverlay: CustomLoadingOverlay,
+                    }}
                     checkboxSelection
                     onSelectionChange={(newSelection) => {
                         setSelection(newSelection.rowIds);
