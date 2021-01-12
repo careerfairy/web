@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import clsx from "clsx";
 import PropTypes from "prop-types";
-import {Bar} from "react-chartjs-2";
+import {Bar, Line} from "react-chartjs-2";
 import {
     Box,
     Button,
@@ -16,7 +16,7 @@ import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowRightIcon from "@material-ui/icons/ArrowRight";
 import {withFirebase} from "../../../../../context/firebase";
 import {colorsArray} from "../../../../util/colors";
-import {getLength, getTimeFromNow, prettyDate, snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
+import {getLength, prettyDate, snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
 const LatestEvents = ({
                           timeFrames,
                           setCurrentTimeFrame,
+                          futureStreams,
                           firebase,
                           mostRecentEvents,
                           currentTimeFrame,
@@ -40,48 +41,130 @@ const LatestEvents = ({
     const classes = useStyles();
     const theme = useTheme();
 
-    const [localStreams, setLocalStreams] = useState([]);
     const [anchorEl, setAnchorEl] = React.useState(null);
 
 
-    useEffect(() => {
-        setLocalStreams(mostRecentEvents)
-    }, [mostRecentEvents])
+    const lineConfig = {
+        fill: false,
+        lineTension: 0.1,
+        borderCapStyle: 'butt',
+        borderDash: [],
+        borderDashOffset: 0.0,
+        borderJoinStyle: 'miter',
+        pointBorderWidth: 1,
+        pointHoverRadius: 5,
+        pointHoverBorderWidth: 2,
+        pointRadius: 1,
+        pointHitRadius: 10,
+        spanGaps: true,
+    }
 
-    useEffect(() => {
-        if (mostRecentEvents.length) {
-            // setParticipatingStudents(mostRecentEvents)
-            // setTalentPool(mostRecentEvents)
+    const handlePastStreams = (prop) => {
+        if (futureStreams.length) {
+            return [...getLength(mostRecentEvents, prop),
+                // , futureStreams[0][prop].length,
+                ...Array(futureStreams.length).fill(undefined)
+                // ...Array(futureStreams.length - 1).fill(undefined)
+            ]
+        } else {
+            return [...getLength(mostRecentEvents, prop)]
         }
-    }, [mostRecentEvents])
+    }
+    const handleFutureStreams = (prop) => {
+        if (mostRecentEvents.length) {
+            return [...Array(mostRecentEvents.length).fill(undefined), ...getLength(futureStreams, prop)]
+            // return [...Array(mostRecentEvents.length - 1).fill(undefined), mostRecentEvents[mostRecentEvents.length - 1][prop].length, ...getLength(futureStreams, prop)]
+        } else {
+            return [...getLength(futureStreams, prop)]
+        }
+    }
 
 
     const data = {
         datasets: [
             {
-                backgroundColor: colorsArray[0],
-                data: getLength(localStreams, "registeredUsers"),
+                pointHoverBackgroundColor: colorsArray[0],
+                pointHoverBorderColor: 'rgba(220,220,220,1)',
+                pointBorderColor: colorsArray[0],
+                pointBackgroundColor: colorsArray[0],
+                backgroundColor: theme.palette.primary.dark,
+                borderColor: colorsArray[0],
+                data: handlePastStreams("registeredUsers"),
                 label: "Registrations",
+                ...lineConfig
             },
             {
+                pointHoverBackgroundColor: colorsArray[1],
+                pointHoverBorderColor: 'rgba(220,220,220,1)',
+                pointBorderColor: colorsArray[1],
+                pointBackgroundColor: colorsArray[1],
                 backgroundColor: colorsArray[1],
-                data: getLength(localStreams, "participatingStudents"),
+                borderColor: colorsArray[1],
+                data: handlePastStreams("participatingStudents"),
                 label: "Participation",
+                ...lineConfig
             },
             {
+                pointHoverBackgroundColor: colorsArray[2],
+                pointHoverBorderColor: 'rgba(220,220,220,1)',
+                pointBorderColor: colorsArray[2],
+                pointBackgroundColor: colorsArray[2],
                 backgroundColor: colorsArray[2],
-                data: getLength(localStreams, "talentPool"),
+                borderColor: colorsArray[2],
+                data: handlePastStreams("talentPool"),
                 label: "Talent Pool",
+                ...lineConfig
+            },
+            {
+                borderDash: [20, 30],
+                pointHoverBackgroundColor: colorsArray[0],
+                pointHoverBorderColor: 'rgba(220,220,220,1)',
+                pointBorderColor: colorsArray[0],
+                pointBackgroundColor: colorsArray[0],
+                backgroundColor: theme.palette.primary.dark,
+                borderColor: colorsArray[0],
+                data: handleFutureStreams("registeredUsers"),
+                label: "Future Registrations",
+                spanGaps: true
+            },
+            {
+                borderDash: [20, 30],
+                pointHoverBackgroundColor: colorsArray[1],
+                pointHoverBorderColor: 'rgba(220,220,220,1)',
+                pointBorderColor: colorsArray[1],
+                pointBackgroundColor: colorsArray[1],
+                backgroundColor: colorsArray[1],
+                borderColor: colorsArray[1],
+                data: handleFutureStreams("participatingStudents"),
+                label: "Future Participation",
+                spanGaps: true
+            },
+            {
+                borderDash: [20, 30],
+                pointHoverBackgroundColor: colorsArray[2],
+                pointHoverBorderColor: 'rgba(220,220,220,1)',
+                pointBorderColor: colorsArray[2],
+                pointBackgroundColor: colorsArray[2],
+                backgroundColor: colorsArray[2],
+                borderColor: colorsArray[2],
+                data: handleFutureStreams("talentPool"),
+                label: "Future Talent Pool",
+                spanGaps: true
             },
         ],
-        labels: localStreams.map(event => [`${event.company} `, `${prettyDate(event.start)}`, event.id]),
+        labels: [...mostRecentEvents, ...futureStreams].map(event => [`${event.company} `, `${prettyDate(event.start)}`, event.id]),
     }
+    // console.log("-> mostRecentEvents", mostRecentEvents);
+    // console.log("-> futureStreams", futureStreams);
+    // console.log("-> data.datasets[2", data.datasets[2].data, data.datasets[2].label);
+    // console.log("-> data.datasets[3", data.datasets[5].data, data.datasets[5].label);
+
 
     const options = {
         onHover: (event, chartElement) => {
             if (chartElement.length) {
                 const index = chartElement[0]._index
-                if (localStreams[index].participatingStudents.length) {
+                if (mostRecentEvents[index]?.participatingStudents?.length) {
                     event.target.style.cursor = chartElement[0] ? 'pointer' : 'default'
                 }
             }
@@ -89,9 +172,15 @@ const LatestEvents = ({
         onClick: (event, chartElement, data) => {
             if (chartElement.length) {
                 const index = chartElement[0]._index
-                if (localStreams[index].participatingStudents.length) {
-                    setCurrentStream(localStreams[index])
+                if (mostRecentEvents[index]?.participatingStudents?.length) {
+                    setCurrentStream(mostRecentEvents[index])
                 }
+            }
+        },
+        elements: {
+            line: {
+                fill: false,
+                tension: 0
             }
         },
         redraw: true,
@@ -152,7 +241,7 @@ const LatestEvents = ({
             titleFontColor: theme.palette.text.primary,
             callbacks: {
                 title: (tooltipItems, data) => {
-                    return data.labels[tooltipItems[0].index].slice(0, -1)
+                    return data.labels[tooltipItems[0].index]?.slice(0, -1)
                 },
                 label: (tooltipItems, data) => {
                     return data.datasets[tooltipItems.datasetIndex].label + ': ' + tooltipItems.value
@@ -160,7 +249,7 @@ const LatestEvents = ({
                 afterTitle: (tooltipItem, data) => {
                     if (tooltipItem.length) {
                         const index = tooltipItem[0].index
-                        if (localStreams[index].participatingStudents.length) {
+                        if (mostRecentEvents[index]?.participatingStudents.length) {
                             return "Click for breakdown"
                         }
                     }
@@ -184,28 +273,6 @@ const LatestEvents = ({
         setAnchorEl(null);
     };
 
-    const setParticipatingStudents = async (mostRecentEvents) => {
-        const streamsWithParticipation = [...mostRecentEvents]
-        for (const livestream of streamsWithParticipation) {
-            const snapData = await firebase.getLivestreamParticipatingStudents(livestream.id)
-            livestream.participatingStudents = snapShotsToData(snapData)
-        }
-        return setLocalStreams(prevState => {
-            // Merges the original array of objects with the updated array of object with NEW properties
-            return prevState.map((item, i) => Object.assign({}, item, streamsWithParticipation[i]))
-        })
-    }
-    const setTalentPool = async (mostRecentEvents) => {
-        const streamsWithTalentPool = [...mostRecentEvents]
-        for (const livestream of streamsWithTalentPool) {
-            const snapData = await firebase.getLivestreamTalentPoolMembers(livestream.companyId)
-            livestream.talentPool = snapShotsToData(snapData)
-        }
-        setLocalStreams(prevState => {
-            // Merges the original array of objects with the updated array of object with NEW properties
-            return prevState.map((item, i) => Object.assign({}, item, streamsWithTalentPool[i]))
-        })
-    }
 
     return (
         <Card className={clsx(classes.root, className)} {...rest}>
@@ -240,7 +307,7 @@ const LatestEvents = ({
             <Divider/>
             <CardContent>
                 <Box height={400}>
-                    <Bar data={data} options={options}/>
+                    <Line data={data} options={options}/>
                 </Box>
             </CardContent>
             <Divider/>

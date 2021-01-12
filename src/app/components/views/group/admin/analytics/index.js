@@ -24,6 +24,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const now =  new Date()
+
 const sevenDays = new Date().setDate(new Date().getDate() - 7)
 const twoWeeks = new Date().setDate(new Date().getDate() - 14)
 
@@ -200,15 +202,22 @@ const AnalyticsOverview = ({firebase, group}) => {
     const getMostRecentEvents = (timeframe, limit = 500) => {
         const targetTime = new Date(timeframe)
         const recentStreams = livestreams.filter((stream) => {
-            if (stream.start?.toDate() > targetTime) {
+            if (stream.start?.toDate() > targetTime
+                && stream.start?.toDate() < now
+            ) {
                 return stream
             }
         });
-        recentStreams.forEach(livestream => {
-            if (livestream.id === "0SupFLhiCs5FdIxRc5Dp") {
-            }
-        })
         return recentStreams.slice(0, limit)
+    }
+    const getFutureEvents = (timeframe, limit = 500) => {
+        const targetTime = new Date(timeframe)
+        const futureStreams = livestreams.filter((stream) => {
+            if (stream.start?.toDate() > now) {
+                return stream
+            }
+        });
+        return futureStreams.slice(0, limit)
     }
 
     const getStreamsToCompare = () => {
@@ -304,6 +313,9 @@ const AnalyticsOverview = ({firebase, group}) => {
     const mostRecentEvents = useMemo(() => getMostRecentEvents(currentTimeFrame.date), [
         livestreams, currentTimeFrame
     ]);
+    const futureStreams = useMemo(() => getFutureEvents(currentTimeFrame.date), [
+        livestreams, currentTimeFrame
+    ]);
 
     const totalRegistrations = useMemo(() => getTotalRegisteredUsers(), [
         livestreams,
@@ -384,6 +396,7 @@ const AnalyticsOverview = ({firebase, group}) => {
                         mostRecentEvents={mostRecentEvents}
                         timeFrames={globalTimeFrame.timeFrames}
                         setCurrentStream={setCurrentStream}
+                        futureStreams={futureStreams}
                         setCurrentTimeFrame={setCurrentTimeFrame}
                         group={group}
                     />
