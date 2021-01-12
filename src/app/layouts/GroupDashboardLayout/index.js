@@ -33,9 +33,9 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.up('lg')]: {
             paddingLeft: 256
         },
-        [theme.breakpoints.down('md')]: {
+        [theme.breakpoints.down('xs')]: {
             paddingTop: 56
-        }
+        },
     },
     contentContainer: {
         display: 'flex',

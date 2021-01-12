@@ -9,12 +9,12 @@ import {
     Grid,
     Typography,
     colors,
-    makeStyles, CircularProgress, LinearProgress
+    makeStyles, CircularProgress
 } from '@material-ui/core';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
-import {withFirebase} from "../../../../../context/firebase";
-import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import {withFirebase} from "../../../../../../context/firebase";
+import AddToPhotosRoundedIcon from "@material-ui/icons/AddToPhotosRounded";
+import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import PercentageDisplay from "./common/PercentageDisplay";
 
 const useStyles = makeStyles((theme) => ({
@@ -22,21 +22,21 @@ const useStyles = makeStyles((theme) => ({
         height: '100%'
     },
     avatar: {
-        backgroundColor: colors.green[600],
+        backgroundColor: colors.red[600],
         height: 56,
         width: 56
-    },
+    }
 }));
 
-const TotalUniqueRegistrations = ({
-                                      globalTimeFrame,
-                                      uniqueRegistrationsStatus,
-                                      fetchingStreams,
-                                      totalUniqueRegistrations,
-                                      timeFrames,
-                                      className,
-                                      ...rest
-                                  }) => {
+const TotalRegistrations = ({
+                                globalTimeFrame,
+                                registrationsStatus,
+                                fetchingStreams,
+                                totalRegistrations,
+                                timeFrames,
+                                className,
+                                ...rest
+                            }) => {
     const classes = useStyles();
 
     return (
@@ -56,34 +56,34 @@ const TotalUniqueRegistrations = ({
                             gutterBottom
                             variant="h6"
                         >
-                            UNIQUE REGISTRATIONS
+                            REGISTRATIONS
                         </Typography>
                         <Typography
                             color="textPrimary"
                             variant="h3"
                         >
-                            {fetchingStreams ? <CircularProgress/> : totalUniqueRegistrations}
+                            {fetchingStreams ? <CircularProgress/> : totalRegistrations}
                         </Typography>
                     </Grid>
                     <Grid item>
                         <Avatar className={classes.avatar}>
-                            <LibraryAddCheckIcon/>
+                            <AddToPhotosRoundedIcon/>
                         </Avatar>
                     </Grid>
                 </Grid>
                 <PercentageDisplay
-                    percentage={uniqueRegistrationsStatus.percentage}
+                    percentage={registrationsStatus.percentage}
                     fetchingStreams={fetchingStreams}
                     globalTimeFrame={globalTimeFrame}
-                    positive={uniqueRegistrationsStatus.positive}
+                    positive={registrationsStatus.positive}
                 />
             </CardContent>
         </Card>
     );
 };
 
-TotalUniqueRegistrations.propTypes = {
+TotalRegistrations.propTypes = {
     className: PropTypes.string
 };
 
-export default withFirebase(TotalUniqueRegistrations);
+export default withFirebase(TotalRegistrations);

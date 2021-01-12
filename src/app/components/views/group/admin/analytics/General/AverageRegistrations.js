@@ -13,7 +13,7 @@ import {
     colors, CircularProgress
 } from '@material-ui/core';
 import InsertChartIcon from '@material-ui/icons/InsertChartOutlined';
-import {withFirebase} from "../../../../../context/firebase";
+import {withFirebase} from "../../../../../../context/firebase";
 
 const useStyles = makeStyles(() => ({
     root: {

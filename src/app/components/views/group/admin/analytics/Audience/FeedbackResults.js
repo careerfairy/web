@@ -18,7 +18,7 @@ import {
 } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
-import {withFirebase} from "../../../../../context/firebase";
+import {withFirebase} from "../../../../../../context/firebase";
 
 const data = [
   {
@@ -63,7 +63,7 @@ const useStyles = makeStyles(({
   }
 }));
 
-const FeedbackResults = ({timeFrames , className, ...rest }) => {
+const FeedbackResults = ({ className, ...rest }) => {
   const classes = useStyles();
   const [products] = useState(data);
 

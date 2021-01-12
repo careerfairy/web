@@ -16,8 +16,8 @@ import {
 import LaptopMacIcon from '@material-ui/icons/LaptopMac';
 import PhoneIcon from '@material-ui/icons/Phone';
 import TabletIcon from '@material-ui/icons/Tablet';
-import {colorsArray} from "../../../../util/colors";
-import {withFirebase} from "../../../../../context/firebase";
+import {colorsArray} from "../../../../../util/colors";
+import {withFirebase} from "../../../../../../context/firebase";
 import Button from "@material-ui/core/Button";
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 
@@ -37,7 +37,6 @@ const TypeOfParticipants = ({
                                 setCurrentStream,
                                 currentStream,
                                 typesOfOptions,
-                                timeFrames,
                                 className,
                                 ...rest
                             }) => {

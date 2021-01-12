@@ -14,9 +14,9 @@ import {
 } from "@material-ui/core";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowRightIcon from "@material-ui/icons/ArrowRight";
-import {withFirebase} from "../../../../../context/firebase";
-import {colorsArray} from "../../../../util/colors";
-import {getLength, prettyDate, snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
+import {withFirebase} from "../../../../../../context/firebase";
+import {colorsArray} from "../../../../../util/colors";
+import {getLength, prettyDate, snapShotsToData} from "../../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -154,10 +154,6 @@ const LatestEvents = ({
         ],
         labels: [...mostRecentEvents, ...futureStreams].map(event => [`${event.company} `, `${prettyDate(event.start)}`, event.id]),
     }
-    // console.log("-> mostRecentEvents", mostRecentEvents);
-    // console.log("-> futureStreams", futureStreams);
-    // console.log("-> data.datasets[2", data.datasets[2].data, data.datasets[2].label);
-    // console.log("-> data.datasets[3", data.datasets[5].data, data.datasets[5].label);
 
 
     const options = {
@@ -186,7 +182,7 @@ const LatestEvents = ({
         redraw: true,
         cornerRadius: 20,
         layout: {padding: 0},
-        legend: {display: true},
+        legend: {display: false},
         maintainAspectRatio: false,
         responsive: true,
         scales: {

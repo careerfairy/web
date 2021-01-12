@@ -11,7 +11,7 @@ import {
     colors, CircularProgress
 } from '@material-ui/core';
 import PeopleIcon from '@material-ui/icons/PeopleOutlined';
-import {withFirebase} from "../../../../../context/firebase";
+import {withFirebase} from "../../../../../../context/firebase";
 
 const useStyles = makeStyles(() => ({
     root: {

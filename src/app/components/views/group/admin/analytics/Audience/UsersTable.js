@@ -21,7 +21,7 @@ import {
   makeStyles
 } from '@material-ui/core';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
-import {withFirebase} from "../../../../../context/firebase";
+import {withFirebase} from "../../../../../../context/firebase";
 
 const data = [
   {
@@ -93,7 +93,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const UpVotedQuestionsTable = ({timeFrames , className, ...rest }) => {
+const UsersTable = ({className, ...rest }) => {
   const classes = useStyles();
   const [orders] = useState(data);
 
@@ -179,8 +179,8 @@ const UpVotedQuestionsTable = ({timeFrames , className, ...rest }) => {
   );
 };
 
-UpVotedQuestionsTable.propTypes = {
+UsersTable.propTypes = {
   className: PropTypes.string
 };
 
-export default withFirebase(UpVotedQuestionsTable);
+export default withFirebase(UsersTable);
