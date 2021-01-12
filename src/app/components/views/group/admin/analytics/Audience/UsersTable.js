@@ -35,7 +35,7 @@ const initialColumns = [
     {
         field: "userEmail",
         headerName: "Email",
-        width: 170,
+        width: 240,
     },
     {
         field: "gender",

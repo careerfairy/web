@@ -20,16 +20,11 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 const Audience = ({
-                      firebase,
                       group,
                       livestreams,
-                      fetchingStreams,
-                      globalTimeFrames,
                       globalTimeFrame,
-                      setGlobalTimeFrame,
                       currentTimeFrame,
                       mostRecentEvents,
-                      setCurrentTimeFrame,
                       futureStreams,
                       userType,
                       setUserType,
@@ -37,27 +32,29 @@ const Audience = ({
                   }) => {
     const classes = useStyles()
     const [currentStream, setCurrentStream] = useState(null);
-    console.log("-> currentStream", currentStream);
 
     const getUsers = (livestreams, prop = "registeredUsers") => {
-
-        const totalViewers = livestreams.reduce(
-            (accumulator, livestream) => {
-                return [...accumulator, ...livestream[prop]];
-            },
-            []
-        );
-        return totalViewers.filter(function (el) {
-            if (!this[el.userEmail]) {
-                this[el.userEmail] = true;
-                return true;
-            }
-            return false;
-        }, Object.create(null))
+        if (currentStream) {
+            return currentStream[prop]
+        } else {
+            const totalViewers = livestreams.reduce(
+                (accumulator, livestream) => {
+                    return [...accumulator, ...livestream[prop]];
+                },
+                []
+            );
+            return totalViewers.filter(function (el) {
+                if (!this[el.userEmail]) {
+                    this[el.userEmail] = true;
+                    return true;
+                }
+                return false;
+            }, Object.create(null))
+        }
     };
 
-    const totalUniqueUsers = useMemo(() => getUsers(livestreams), [
-        livestreams, currentStream
+    const totalUniqueUsers = useMemo(() => getUsers(livestreams, userType.propertyName), [
+        livestreams, currentStream, userType
     ]);
 
     return (
