@@ -6,6 +6,7 @@ import FeedbackResults from "./FeedbackResults";
 import {makeStyles} from "@material-ui/core/styles";
 import UsersTable from "./UsersTable";
 import LatestEvents from "../common/LatestEvents";
+import TypeOfParticipants from "../General/TypeOfParticipants";
 
 const now = new Date()
 
@@ -32,7 +33,7 @@ const Audience = ({
                       futureStreams,
                       userType,
                       setUserType,
-                      userTypes
+                      userTypes,
                   }) => {
     const classes = useStyles()
     const [currentStream, setCurrentStream] = useState(null);
@@ -70,7 +71,9 @@ const Audience = ({
                         setCurrentStream={setCurrentStream}
                         futureStreams={futureStreams}
                         livestreams={livestreams}
-                        setCurrentTimeFrame={setCurrentTimeFrame}
+                        userType={userType}
+                        userTypes={userTypes}
+                        setUserType={setUserType}
                         group={group}
                     />
                 </Grid>
@@ -78,6 +81,7 @@ const Audience = ({
                     <UsersTable
                         totalUniqueUsers={totalUniqueUsers}
                         currentStream={currentStream}
+                        userType={userType}
                         group={group}/>
                 </Grid>
                 <Grid item lg={4} md={6} xl={3} xs={12}>

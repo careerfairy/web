@@ -49,7 +49,7 @@ const initialColumns = [
     },
 ]
 
-const UsersTable = ({currentStream, group, totalUniqueUsers, className, ...rest}) => {
+const UsersTable = ({userType, currentStream, group, totalUniqueUsers, className, ...rest}) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const [columns, setColumns] = useState([]);
@@ -96,7 +96,7 @@ const UsersTable = ({currentStream, group, totalUniqueUsers, className, ...rest}
             {...rest}
         >
             <CardHeader
-                title="Participating Students"
+                title={userType.displayName}
                 subheader={currentStream && `That attended ${currentStream.company} on ${prettyDate(currentStream.start)}`}
             />
             <Divider/>

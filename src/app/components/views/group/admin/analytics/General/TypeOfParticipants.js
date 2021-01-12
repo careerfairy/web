@@ -13,13 +13,11 @@ import {
     colors,
     useTheme
 } from '@material-ui/core';
-import LaptopMacIcon from '@material-ui/icons/LaptopMac';
-import PhoneIcon from '@material-ui/icons/Phone';
-import TabletIcon from '@material-ui/icons/Tablet';
 import {colorsArray} from "../../../../../util/colors";
 import {withFirebase} from "../../../../../../context/firebase";
 import Button from "@material-ui/core/Button";
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
+import {prettyDate} from "../../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -37,6 +35,7 @@ const TypeOfParticipants = ({
                                 setCurrentStream,
                                 currentStream,
                                 typesOfOptions,
+                                userType,
                                 className,
                                 ...rest
                             }) => {
@@ -62,9 +61,9 @@ const TypeOfParticipants = ({
     }, [typesOfOptions])
 
     useEffect(() => {
-        if (hasNoData()) {
-            setCurrentStream(null)
-        }
+        // if (hasNoData()) {
+        //     setCurrentStream(null)
+        // }
     }, [total])
 
     const data = {
@@ -116,8 +115,10 @@ const TypeOfParticipants = ({
             {...rest}
         >
             <CardHeader
-                title="Most Common Participants"
-                subheader={currentStream ? `That attended ${currentStream.company}` : "on average"}
+                title={`Breakdown of ${userType.displayName}`}
+                subheader={
+                    currentStream ? `That attended ${currentStream.company} on ${prettyDate(currentStream.start)}` : "on average"
+                }
                 action={
                     currentStream &&
                     <Button size="small"
@@ -135,13 +136,23 @@ const TypeOfParticipants = ({
                     height={300}
                     position="relative"
                     display="flex"
+                    flexDirection="column"
                     justifyContent="center"
                     alignItems="center"
                 >
                     {hasNoData() ?
-                        <Typography>
-                            No data
-                        </Typography>
+                        <>
+                            <Typography>
+                                Not enough {userType.displayName} data
+                            </Typography>
+                            <Button size="small"
+                                    variant="text"
+                                    onClick={() => setCurrentStream(null)}
+                                    endIcon={<RotateLeftIcon/>}
+                            >
+                                Reset
+                            </Button>
+                        </>
                         :
                         <Doughnut
                             data={data}

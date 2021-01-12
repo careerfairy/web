@@ -33,7 +33,8 @@ const General = ({
                      futureStreams,
                      mostRecentEvents,
                      userTypes,
-                     userType
+                     userType,
+                     setUserType
                  }) => {
     const classes = useStyles()
     const [totalFollowers, setTotalFollowers] = useState([]);
@@ -202,7 +203,7 @@ const General = ({
     );
 
     const typesOfOptions = useMemo(
-        () => getTypeOfStudents(userType),
+        () => getTypeOfStudents(userType.propertyName),
         [livestreams, currentStream, userType]
     );
 
@@ -254,7 +255,9 @@ const General = ({
                         setCurrentStream={setCurrentStream}
                         futureStreams={futureStreams}
                         livestreams={livestreams}
-                        setCurrentTimeFrame={setCurrentTimeFrame}
+                        userType={userType}
+                        userTypes={userTypes}
+                        setUserType={setUserType}
                         group={group}
                     />
                 </Grid>
@@ -262,6 +265,7 @@ const General = ({
                     <TypeOfParticipants
                         currentStream={currentStream}
                         typesOfOptions={typesOfOptions}
+                        userType={userType}
                         setCurrentStream={setCurrentStream}
                         group={group}
                     />

@@ -127,7 +127,19 @@ const globalTimeFrames = [
     },
 ]
 
-const userTypes = ["registeredUsers", "participatingStudents", "talentPool"]
+const userTypes = [
+    {
+        propertyName: "registeredUsers",
+        displayName: "Registered Users"
+    },
+    {
+        propertyName: "participatingStudents",
+        displayName: "Participating Students"
+    },
+    {
+        propertyName: "talentPool",
+        displayName: "Talent Pool"
+    }]
 
 const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();

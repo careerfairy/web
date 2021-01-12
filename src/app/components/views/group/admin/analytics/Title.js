@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
         // fontWeight: 400
     },
     header: {
-        paddingLeft: theme.spacing(6)
+        paddingLeft: theme.spacing(3)
     }
 }));
 
@@ -42,7 +42,7 @@ const Title = ({setGlobalTimeFrame, globalTimeFrames, globalTimeFrame}) => {
                     className: classes.title,
                     variant: "h4"
                 }}
-                title={`Chanel Analytics`}
+                title={`Channel Analytics`}
                 subheader={`Over the past ${globalTimeFrame.name}`}
                 action={
                     <div>

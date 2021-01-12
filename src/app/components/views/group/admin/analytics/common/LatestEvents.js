@@ -33,10 +33,13 @@ const LatestEvents = ({
                           firebase,
                           mostRecentEvents,
                           currentTimeFrame,
-                          setCurrentStream,
+                          setUserType,
                           group,
                           className,
                           livestreams,
+                          userTypes,
+                          userType,
+                          setCurrentStream,
                           ...rest
                       }) => {
     const classes = useStyles();
@@ -247,7 +250,7 @@ const LatestEvents = ({
     };
 
     const handleMenuItemClick = (event, index) => {
-        setCurrentTimeFrame(timeFrames[index])
+        setUserType(userTypes[index])
         setAnchorEl(null);
     };
 
@@ -263,7 +266,7 @@ const LatestEvents = ({
                     <div>
                         <Button onClick={handleClickListItem} endIcon={<ArrowDropDownIcon/>} size="small"
                                 variant="text">
-                            {`In the last ${currentTimeFrame.pastName}`}
+                            {userType.displayName}
                         </Button>
                         <Menu
                             id="lock-menu"
@@ -272,13 +275,13 @@ const LatestEvents = ({
                             open={Boolean(anchorEl)}
                             onClose={handleClose}
                         >
-                            {timeFrames.map((option, index) => (
+                            {userTypes.map(({displayName, propertyName}, index) => (
                                 <MenuItem
-                                    key={option.id}
-                                    selected={option.id === currentTimeFrame.id}
+                                    key={propertyName}
+                                    selected={propertyName === userType.propertyName}
                                     onClick={(event) => handleMenuItemClick(event, index)}
                                 >
-                                    {option.name}
+                                    {displayName}
                                 </MenuItem>
                             ))}
                         </Menu>
