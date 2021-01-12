@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
         // fontWeight: 400
     },
     header: {
-        paddingLeft: 0
+        paddingLeft: theme.spacing(6)
     }
 }));
 
@@ -42,7 +42,8 @@ const Title = ({setGlobalTimeFrame, globalTimeFrames, globalTimeFrame}) => {
                     className: classes.title,
                     variant: "h4"
                 }}
-                title={`Events over the Past ${globalTimeFrame.name}`}
+                title={`Chanel Analytics`}
+                subheader={`Over the past ${globalTimeFrame.name}`}
                 action={
                     <div>
                         <Button onClick={handleClickListItem}

@@ -10,6 +10,9 @@ import General from "./General";
 import {useTheme} from "@material-ui/core/styles";
 import {SwipeablePanel} from "../../../../../materialUI/GlobalPanels/GlobalPanels";
 import Audience from "./Audience";
+import Grid from "@material-ui/core/Grid";
+import Title from "./Title";
+import Box from "@material-ui/core/Box";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -31,6 +34,8 @@ const useStyles = makeStyles((theme) => ({
 
 const sevenDays = new Date().setDate(new Date().getDate() - 7)
 const twoWeeks = new Date().setDate(new Date().getDate() - 14)
+
+const fourWeeks = new Date().setDate(new Date().getDate() - 28)
 
 const thirtyDays = new Date().setMonth(new Date().getMonth() - 1)
 const twoMonths = new Date().setMonth(new Date().getMonth() - 2)
@@ -106,6 +111,13 @@ const globalTimeFrames = [
         double: twoMonths
     },
     {
+        globalDate: twoWeeks,
+        timeFrames: timeFrames.filter(timeOb => timeOb.date >= twoWeeks),
+        name: "2 weeks",
+        id: uuid(),
+        double: fourWeeks
+    },
+    {
         globalDate: sevenDays,
         timeFrames: timeFrames.filter(timeOb => timeOb.date >= sevenDays),
         name: "week",
@@ -165,6 +177,13 @@ const AnalyticsOverview = ({firebase, group}) => {
 
     return (
         <Fragment>
+            <Box p={3}>
+                <Title
+                    setGlobalTimeFrame={setGlobalTimeFrame}
+                    globalTimeFrames={globalTimeFrames}
+                    globalTimeFrame={globalTimeFrame}
+                />
+            </Box>
             <AppBar className={classes.appBar} position="static" color="default">
                 <Tabs
                     value={value}

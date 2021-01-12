@@ -7,7 +7,6 @@ import TypeOfParticipants from "./TypeOfParticipants";
 import AverageRegistrations from "./AverageRegistrations";
 import {mustBeNumber, snapShotsToData} from "../../../../../helperFunctions/HelperFunctions";
 import NumberOfFollowers from "./NumberOfFollowers";
-import Title from "./Title";
 import {handleFlattenOptions} from "../../../../../helperFunctions/streamFormFunctions";
 import {makeStyles} from "@material-ui/core/styles";
 
@@ -231,13 +230,7 @@ const General = ({
     return (
         <Container className={classes.root} maxWidth={false}>
             <Grid container spacing={3}>
-                <Grid item lg={12} sm={12} xl={12} xs={12}>
-                    <Title
-                        setGlobalTimeFrame={setGlobalTimeFrame}
-                        globalTimeFrames={globalTimeFrames}
-                        globalTimeFrame={globalTimeFrame}
-                    />
-                </Grid>
+
                 <Grid item lg={3} sm={6} xl={3} xs={12}>
                     <TotalRegistrations
                         fetchingStreams={fetchingStreams}
