@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Container, Grid} from "@material-ui/core";
 
 import FeedbackResults from "./FeedbackResults";
@@ -30,10 +30,28 @@ const Audience = ({
     const [totalFollowers, setTotalFollowers] = useState([]);
     const [currentTimeFrame, setCurrentTimeFrame] = useState({});
     const [currentStream, setCurrentStream] = useState({});
+    console.log("-> livestreams", livestreams);
 
     useEffect(() => {
         setCurrentTimeFrame(globalTimeFrame.timeFrames[0])
     }, [globalTimeFrame])
+
+    const getUniqueUsers = (livestreams, prop = "registeredUsers") => {
+        const totalViewers = livestreams.reduce(
+            (accumulator, livestream) => {
+                return [...accumulator, ...livestream[prop]];
+            },
+            []
+        );
+
+        // new Set method removes all duplicates from array
+        return [...new Set(totalViewers)]
+    };
+
+    const totalUniqueRegistrations = useMemo(() => getUniqueUsers(livestreams).amount, [
+        livestreams,
+    ]);
+    console.log("-> totalUniqueRegisdfsdfstrations", totalUniqueRegistrations);
 
     return (
         <Container className={classes.root} maxWidth={false}>
