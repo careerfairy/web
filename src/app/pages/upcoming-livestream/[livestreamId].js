@@ -197,7 +197,8 @@ function UpcomingLivestream(props) {
 
         props.firebase.joinCompanyTalentPool(
             currentLivestream.companyId,
-            user.email
+            user.email,
+            currentLivestream.id
         );
     }
 
@@ -212,7 +213,8 @@ function UpcomingLivestream(props) {
 
         props.firebase.leaveCompanyTalentPool(
             currentLivestream.companyId,
-            user.email
+            user.email,
+            currentLivestream.id
         );
     }
 
