@@ -151,12 +151,12 @@ const General = ({
         return categories
     }
 
-    const getTypeOfStudents = async (prop) => {
+    const getTypeOfStudents = (prop) => {
         let students = []
         if (currentStream?.[prop]) {
             students = currentStream[prop]
         } else {//Get total Students
-            // students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop).data
+            students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop).data
             // students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop).data
 
             // Talent Pool
