@@ -27,8 +27,12 @@ const useStyles = makeStyles((theme) => ({
     },
     appBar: {
         boxShadow: "none",
-        background: "inherit",
+        background: theme.palette.common.white,
         borderBottom: `1px solid ${fade(theme.palette.text.secondary, 0.3)}`
+
+    },
+    title:{
+        background: theme.palette.common.white
     }
 }));
 
@@ -70,6 +74,12 @@ const timeFrames = [
         id: uuid()
     },
     {
+        name: "2 Months",
+        pastName: "2 months",
+        date: twoMonths,
+        id: uuid()
+    },
+    {
         name: "month",
         pastName: "month",
         date: thirtyDays,
@@ -104,6 +114,13 @@ const globalTimeFrames = [
         name: "four months",
         id: uuid(),
         double: eightMonths
+    },
+    {
+        globalDate: twoMonths,
+        timeFrames: timeFrames.filter(timeOb => timeOb.date >= twoMonths),
+        name: "two months",
+        id: uuid(),
+        double: fourMonths
     },
     {
         globalDate: thirtyDays,
@@ -179,7 +196,6 @@ const AnalyticsOverview = ({firebase, group}) => {
                     setLivestreams([])
                 } else {
                     let livestreams = []
-                    console.log("-> setFetchingStreams");
                     snapshots.docs.forEach(async (snap, index, arr) => {
                         const livestream = snap.data()
                         livestream.id = snap.id
@@ -222,7 +238,7 @@ const AnalyticsOverview = ({firebase, group}) => {
     const getStreamsFromBeforeTimeFrame = () => {
         return livestreams.filter(stream => {
                 const streamStart = stream.start?.toDate()
-                return (streamStart >= globalTimeFrame.globalDate && streamStart <= globalTimeFrame.double)
+                return (streamStart < globalTimeFrame.globalDate)
             }
         )
     }
@@ -266,7 +282,7 @@ const AnalyticsOverview = ({firebase, group}) => {
 
     return (
         <Fragment>
-            <Box p={3}>
+            <Box className={classes.title} p={3}>
                 <Title
                     setGlobalTimeFrame={setGlobalTimeFrame}
                     globalTimeFrames={globalTimeFrames}

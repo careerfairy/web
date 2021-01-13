@@ -145,7 +145,12 @@ const LatestEvents = ({
     const options = {
         onHover: (event, chartElement) => {
             if (chartElement.length) {
-                event.target.style.cursor = chartElement[0] ? 'pointer' : 'default'
+                const index = chartElement[0]._index
+                if ([...streamsFromTimeFrame, ...futureStreams][index]?.[userType.propertyName].length) {
+                    event.target.style.cursor = 'pointer'
+                } else {
+                    event.target.style.cursor = 'default'
+                }
             }
         },
         onClick: (event, chartElement, data) => {

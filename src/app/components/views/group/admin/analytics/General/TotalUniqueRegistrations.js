@@ -71,12 +71,13 @@ const TotalUniqueRegistrations = ({
                         </Avatar>
                     </Grid>
                 </Grid>
+                {uniqueRegistrationsStatus.dataToCompare &&
                 <PercentageDisplay
                     percentage={uniqueRegistrationsStatus.percentage}
                     fetchingStreams={fetchingStreams}
                     globalTimeFrame={globalTimeFrame}
                     positive={uniqueRegistrationsStatus.positive}
-                />
+                />}
             </CardContent>
         </Card>
     );

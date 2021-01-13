@@ -70,7 +70,13 @@ const General = ({
         );
 
         // new Set method removes all duplicates from array
-        const uniqueRegisteredUsers = [...new Set(totalViewers)];
+        const uniqueRegisteredUsers = totalViewers.filter(function (el) {
+            if (!this[el.userEmail]) {
+                this[el.userEmail] = true;
+                return true;
+            }
+            return false;
+        }, Object.create(null));
         return {
             amount: mustBeNumber(uniqueRegisteredUsers.length),
             data: uniqueRegisteredUsers
@@ -100,7 +106,8 @@ const General = ({
 
         return {
             positive,
-            percentage: `${percentage}%`
+            percentage: `${percentage}%`,
+            dataToCompare: Boolean(registrationsFromBeforeTimeFrame && registrationsFromTimeFrame)
         }
     }
 
@@ -114,7 +121,8 @@ const General = ({
 
         return {
             positive,
-            percentage: `${percentage}%`
+            percentage: `${percentage}%`,
+            dataToCompare: Boolean(registrationsFromBeforeTimeFrame && registrationsFromTimeFrame)
         }
     }
 
@@ -162,7 +170,6 @@ const General = ({
 
     // use Memo is great for optimizing expensive calculations, the value of the function call will be stored in memory
     // The function will only be re-called when the value(streamsFromTimeFrame) in the dependency array changes
-
 
 
     const totalRegistrations = useMemo(() => getTotalRegisteredUsers(), [
