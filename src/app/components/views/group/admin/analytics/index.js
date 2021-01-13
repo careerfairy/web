@@ -162,9 +162,9 @@ const userTypes = [
 const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();
     const theme = useTheme()
-    const [value, setValue] = useState(1);
+    const [value, setValue] = useState(0);
 
-    const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
+    const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[0]);
     const [livestreams, setLivestreams] = useState([]);
     const [fetchingStreams, setFetchingStreams] = useState(false);
     const [userType, setUserType] = useState(userTypes[0]);
@@ -199,12 +199,12 @@ const AnalyticsOverview = ({firebase, group}) => {
                     snapshots.docs.forEach(async (snap, index, arr) => {
                         const livestream = snap.data()
                         livestream.id = snap.id
-                        const participatingSnap = await firebase.getLivestreamParticipatingStudents(snap.id)
-                        const talentPoolSnap = await firebase.getLivestreamTalentPoolMembers(livestream.companyId)
-                        const registeredStudentsSnap = await firebase.getLivestreamRegisteredStudents(livestream.id)
-                        livestream.registeredUsers = snapShotsToData(registeredStudentsSnap)
-                        livestream.participatingStudents = snapShotsToData(participatingSnap)
-                        livestream.talentPool = snapShotsToData(talentPoolSnap)
+                        // const participatingSnap = await firebase.getLivestreamParticipatingStudents(snap.id)
+                        // const talentPoolSnap = await firebase.getLivestreamTalentPoolMembers(livestream.companyId)
+                        // const registeredStudentsSnap = await firebase.getLivestreamRegisteredStudents(livestream.id)
+                        // livestream.registeredUsers = snapShotsToData(registeredStudentsSnap)
+                        // livestream.participatingStudents = snapShotsToData(participatingSnap)
+                        // livestream.talentPool = snapShotsToData(talentPoolSnap)
                         livestreams.push(livestream)
                         if (index === arr.length - 1) {
                             const livestreamData = livestreams.reverse();

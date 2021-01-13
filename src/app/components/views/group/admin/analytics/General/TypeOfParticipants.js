@@ -45,6 +45,8 @@ const TypeOfParticipants = ({
     const [localColors, setLocalColors] = useState(colorsArray);
     const [total, setTotal] = useState(0);
 
+
+
     useEffect(() => {
         if (group.categories?.length) {
             setLocalColors([...colorsArray, ...typesOfOptions.map(() => randomColor())])

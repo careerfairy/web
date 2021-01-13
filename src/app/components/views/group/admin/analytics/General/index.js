@@ -6,7 +6,6 @@ import TypeOfParticipants from "./TypeOfParticipants";
 import AverageRegistrations from "./AverageRegistrations";
 import {mustBeNumber, snapShotsToData} from "../../../../../helperFunctions/HelperFunctions";
 import NumberOfFollowers from "./NumberOfFollowers";
-import {handleFlattenOptions} from "../../../../../helperFunctions/streamFormFunctions";
 import {makeStyles} from "@material-ui/core/styles";
 import LatestEvents from "../common/LatestEvents";
 
@@ -152,12 +151,31 @@ const General = ({
         return categories
     }
 
-    const getTypeOfStudents = (prop) => {
+    const getTypeOfStudents = async (prop) => {
         let students = []
         if (currentStream?.[prop]) {
             students = currentStream[prop]
-        } else {
-            students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop).data
+        } else {//Get total Students
+            // students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop).data
+            // students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop).data
+
+            // Talent Pool
+            // 1. Map all livestream's companyId into an array of company IDs
+            // 2. user collection where talent pool array contains any of the companyIDs
+
+            // Registered users
+            // 1. Get followers
+            // 2. Map all livestream's registered users into an array of unique IDs
+            // 3. filter followers against array of unique IDs
+            // 4. Return filtered Data
+
+            // Participating students
+            // 1. Map all participating students IDs from livestreams into unique array
+            // 2. query user's collection with array of Unique IDs
+            // 3. Return queried Data
+
+
+
         }
         const aggregateCategories = getAggregateCategories(students)
         const flattenedGroupOptions = [...groupOptions]
