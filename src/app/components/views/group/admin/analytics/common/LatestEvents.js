@@ -28,15 +28,12 @@ const useStyles = makeStyles((theme) => ({
 
 const LatestEvents = ({
                           timeFrames,
-                          setCurrentTimeFrame,
                           futureStreams,
                           firebase,
-                          mostRecentEvents,
-                          currentTimeFrame,
                           setUserType,
+                          streamsFromTimeFrame,
                           group,
                           className,
-                          livestreams,
                           userTypes,
                           userType,
                           setCurrentStream,
@@ -65,19 +62,16 @@ const LatestEvents = ({
 
     const handlePastStreams = (prop) => {
         if (futureStreams.length) {
-            return [...getLength(mostRecentEvents, prop),
-                // , futureStreams[0][prop].length,
+            return [...getLength(streamsFromTimeFrame, prop),
                 ...Array(futureStreams.length).fill(undefined)
-                // ...Array(futureStreams.length - 1).fill(undefined)
             ]
         } else {
-            return [...getLength(mostRecentEvents, prop)]
+            return [...getLength(streamsFromTimeFrame, prop)]
         }
     }
     const handleFutureStreams = (prop) => {
-        if (mostRecentEvents.length) {
-            return [...Array(mostRecentEvents.length).fill(undefined), ...getLength(futureStreams, prop)]
-            // return [...Array(mostRecentEvents.length - 1).fill(undefined), mostRecentEvents[mostRecentEvents.length - 1][prop].length, ...getLength(futureStreams, prop)]
+        if (streamsFromTimeFrame.length) {
+            return [...Array(streamsFromTimeFrame.length).fill(undefined), ...getLength(futureStreams, prop)]
         } else {
             return [...getLength(futureStreams, prop)]
         }
@@ -144,7 +138,7 @@ const LatestEvents = ({
                 spanGaps: true
             },
         ],
-        labels: [...mostRecentEvents, ...futureStreams].map(event => [`${event.company} `, `${prettyDate(event.start)}`, event.id]),
+        labels: [...streamsFromTimeFrame, ...futureStreams].map(event => [`${event.company} `, `${prettyDate(event.start)}`, event.id]),
     }
 
 
@@ -157,8 +151,8 @@ const LatestEvents = ({
         onClick: (event, chartElement, data) => {
             if (chartElement.length) {
                 const index = chartElement[0]._index
-                if ([...mostRecentEvents, ...futureStreams][index]) {
-                    setCurrentStream([...mostRecentEvents, ...futureStreams][index])
+                if ([...streamsFromTimeFrame, ...futureStreams][index]) {
+                    setCurrentStream([...streamsFromTimeFrame, ...futureStreams][index])
                 }
             }
         },
@@ -234,7 +228,7 @@ const LatestEvents = ({
                 afterTitle: (tooltipItem, data) => {
                     if (tooltipItem.length) {
                         const index = tooltipItem[0].index
-                        if (mostRecentEvents[index]?.participatingStudents.length) {
+                        if ([...streamsFromTimeFrame, ...futureStreams][index]?.[userType.propertyName].length) {
                             return "Click for breakdown"
                         }
                     }

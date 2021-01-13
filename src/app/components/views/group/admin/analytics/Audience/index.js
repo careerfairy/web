@@ -1,8 +1,6 @@
 import React, {useMemo, useState} from "react";
 import {Container, Grid} from "@material-ui/core";
 
-import FeedbackResults from "./FeedbackResults";
-
 import {makeStyles} from "@material-ui/core/styles";
 import LatestEvents from "../common/LatestEvents";
 import UsersTable from "./UsersTable";
@@ -19,26 +17,24 @@ const useStyles = makeStyles(theme => ({
 }))
 const Audience = ({
                       group,
-                      livestreams,
                       globalTimeFrame,
-                      currentTimeFrame,
-                      mostRecentEvents,
                       futureStreams,
                       userType,
                       setUserType,
                       userTypes,
                       fetchingStreams,
-                      groupOptions
-
+                      streamsFromTimeFrame,
+                      streamsFromTimeFrameAndFuture,
+                      groupOptions,
                   }) => {
     const classes = useStyles()
     const [currentStream, setCurrentStream] = useState(null);
 
-    const getUsers = (livestreams, prop = "registeredUsers") => {
+    const getUsers = (streamsFromTimeFrame, prop = "registeredUsers") => {
         if (currentStream) {
             return currentStream[prop]
         } else {
-            const totalViewers = livestreams.reduce(
+            const totalViewers = streamsFromTimeFrame.reduce(
                 (accumulator, livestream) => {
                     return [...accumulator, ...livestream[prop]];
                 },
@@ -54,8 +50,8 @@ const Audience = ({
         }
     };
 
-    const totalUniqueUsers = useMemo(() => getUsers(livestreams, userType.propertyName), [
-        livestreams, currentStream, userType
+    const totalUniqueUsers = useMemo(() => getUsers(streamsFromTimeFrame, userType.propertyName), [
+        streamsFromTimeFrame, currentStream, userType
     ]);
 
     return (
@@ -63,12 +59,10 @@ const Audience = ({
             <Grid container spacing={3}>
                 <Grid item lg={12} md={12} xl={12} xs={12}>
                     <LatestEvents
-                        currentTimeFrame={currentTimeFrame}
-                        mostRecentEvents={mostRecentEvents}
                         timeFrames={globalTimeFrame.timeFrames}
                         setCurrentStream={setCurrentStream}
                         futureStreams={futureStreams}
-                        livestreams={livestreams}
+                        streamsFromTimeFrame={streamsFromTimeFrame}
                         userType={userType}
                         userTypes={userTypes}
                         setUserType={setUserType}
@@ -81,7 +75,8 @@ const Audience = ({
                         currentStream={currentStream}
                         fetchingStreams={fetchingStreams}
                         groupOptions={groupOptions}
-                        livestreams={livestreams}
+                        futureStreams={futureStreams}
+                        streamsFromTimeFrameAndFuture={streamsFromTimeFrameAndFuture}
                         userType={userType}
                         group={group}/>
                 </Grid>

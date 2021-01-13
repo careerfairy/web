@@ -23,12 +23,12 @@ const useStyles = makeStyles(theme => ({
 const General = ({
                      firebase,
                      group,
-                     livestreams,
                      fetchingStreams,
                      globalTimeFrame,
-                     currentTimeFrame,
                      futureStreams,
-                     mostRecentEvents,
+                     streamsFromBeforeTimeFrame,
+                     streamsFromTimeFrame,
+                     streamsFromTimeFrameAndFuture,
                      userTypes,
                      userType,
                      setUserType,
@@ -52,7 +52,7 @@ const General = ({
 
 
     const getTotalRegisteredUsers = () => {
-        const total = livestreams.reduce(
+        const total = streamsFromTimeFrameAndFuture.reduce(
             (accumulator, {registeredUsers}) =>
                 accumulator + registeredUsers.length,
             0
@@ -61,8 +61,8 @@ const General = ({
         return mustBeNumber(total);
     };
 
-    const getUniqueUsers = (livestreams, prop = "registeredUsers") => {
-        const totalViewers = livestreams.reduce(
+    const getUniqueUsers = (streamsArray, prop = "registeredUsers") => {
+        const totalViewers = streamsArray.reduce(
             (accumulator, livestream) => {
                 return [...accumulator, ...livestream[prop]];
             },
@@ -78,29 +78,17 @@ const General = ({
     };
 
     const getAverageRegistrationsPerEvent = () => {
-        const average = totalRegistrations / livestreams.length;
+        const average = totalRegistrations / streamsFromTimeFrameAndFuture.length;
         return mustBeNumber(average, 0);
     };
 
-
-
-
-    const getStreamsToCompare = () => {
-        const timeAgo = globalTimeFrame.globalDate
-        const doubleTimeAgo = globalTimeFrame.double
-        const streamsFromTimeAgo = livestreams.filter(stream => stream.start.toDate() >= timeAgo)
-        const streamsFromDoubleTimeAgo = livestreams.filter(stream => stream.start.toDate() >= doubleTimeAgo && stream.start.toDate() <= timeAgo)
-        return {streamsFromTimeAgo, streamsFromDoubleTimeAgo}
-    }
-
     const compareRegistrations = () => {
-        const {streamsFromDoubleTimeAgo, streamsFromTimeAgo} = getStreamsToCompare()
-        const registrationsTimAgo = streamsFromTimeAgo.reduce(
+        const registrationsFromTimeFrame = streamsFromTimeFrameAndFuture.reduce(
             (accumulator, {registeredUsers}) =>
                 accumulator + registeredUsers.length,
             0
         );
-        const registrationsDoubleTimeAgo = streamsFromDoubleTimeAgo.reduce(
+        const registrationsFromBeforeTimeFrame = streamsFromBeforeTimeFrame.reduce(
             (accumulator, {registeredUsers}) =>
                 accumulator + registeredUsers.length,
             0
@@ -108,7 +96,7 @@ const General = ({
         const {
             positive,
             percentage,
-        } = getStats(registrationsTimAgo, registrationsDoubleTimeAgo)
+        } = getStats(registrationsFromTimeFrame, registrationsFromBeforeTimeFrame)
 
         return {
             positive,
@@ -117,13 +105,12 @@ const General = ({
     }
 
     const compareUniqueRegistrations = () => {
-        const {streamsFromDoubleTimeAgo, streamsFromTimeAgo} = getStreamsToCompare()
-        const registrationsTimAgo = getUniqueUsers(streamsFromTimeAgo).amount
-        const registrationsDoubleTimeAgo = getUniqueUsers(streamsFromDoubleTimeAgo).amount
+        const registrationsFromTimeFrame = getUniqueUsers(streamsFromTimeFrameAndFuture).amount
+        const registrationsFromBeforeTimeFrame = getUniqueUsers(streamsFromBeforeTimeFrame).amount
         const {
             positive,
             percentage,
-        } = getStats(registrationsTimAgo, registrationsDoubleTimeAgo)
+        } = getStats(registrationsFromTimeFrame, registrationsFromBeforeTimeFrame)
 
         return {
             positive,
@@ -162,7 +149,7 @@ const General = ({
         if (currentStream?.[prop]) {
             students = currentStream[prop]
         } else {
-            students = getUniqueUsers(livestreams, prop).data
+            students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop).data
         }
         const aggregateCategories = getAggregateCategories(students)
         const flattenedGroupOptions = [...groupOptions]
@@ -174,35 +161,35 @@ const General = ({
 
 
     // use Memo is great for optimizing expensive calculations, the value of the function call will be stored in memory
-    // The function will only be re-called when the value(livestreams) in the dependency array changes
+    // The function will only be re-called when the value(streamsFromTimeFrame) in the dependency array changes
 
 
 
     const totalRegistrations = useMemo(() => getTotalRegisteredUsers(), [
-        livestreams,
+        streamsFromTimeFrameAndFuture,
     ]);
 
-    const totalUniqueRegistrations = useMemo(() => getUniqueUsers(livestreams).amount, [
-        livestreams,
+    const totalUniqueRegistrations = useMemo(() => getUniqueUsers(streamsFromTimeFrameAndFuture).amount, [
+        streamsFromTimeFrameAndFuture,
     ]);
 
     const averageRegistrations = useMemo(
         () => getAverageRegistrationsPerEvent(),
-        [livestreams]
+        [streamsFromTimeFrameAndFuture]
     );
 
     const registrationsStatus = useMemo(
         () => compareRegistrations(),
-        [livestreams]
+        [streamsFromTimeFrameAndFuture, streamsFromBeforeTimeFrame]
     );
     const uniqueRegistrationsStatus = useMemo(
         () => compareUniqueRegistrations(),
-        [livestreams]
+        [streamsFromTimeFrameAndFuture, streamsFromBeforeTimeFrame]
     );
 
     const typesOfOptions = useMemo(
         () => getTypeOfStudents(userType.propertyName),
-        [livestreams, currentStream, userType]
+        [streamsFromTimeFrameAndFuture, currentStream, userType]
     );
 
     return (
@@ -247,12 +234,10 @@ const General = ({
                 </Grid>
                 <Grid item lg={8} md={12} xl={9} xs={12}>
                     <LatestEvents
-                        currentTimeFrame={currentTimeFrame}
-                        mostRecentEvents={mostRecentEvents}
                         timeFrames={globalTimeFrame.timeFrames}
                         setCurrentStream={setCurrentStream}
                         futureStreams={futureStreams}
-                        livestreams={livestreams}
+                        streamsFromTimeFrame={streamsFromTimeFrame}
                         userType={userType}
                         userTypes={userTypes}
                         setUserType={setUserType}

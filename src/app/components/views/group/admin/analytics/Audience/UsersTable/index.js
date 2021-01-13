@@ -30,8 +30,9 @@ const UsersTable = ({
                         userType,
                         currentStream,
                         group,
+                        futureStreams,
                         totalUniqueUsers,
-                        livestreams,
+                        streamsFromTimeFrameAndFuture,
                         className,
                         ...rest
                     }) => {
@@ -163,7 +164,7 @@ const UsersTable = ({
             const currentUserEmail = user.userEmail
             if (currentUserEmail) {
                 const watchedStreams = []
-                livestreams.forEach(stream => {
+                streamsFromTimeFrameAndFuture.forEach(stream => {
                     if (stream?.participatingStudents?.some(userObj => userObj?.userEmail === currentUserEmail)) {
                         watchedStreams.push(stream)
                         user.didNotAttend = "No"
@@ -179,7 +180,7 @@ const UsersTable = ({
         const updatedUsers = totalUniqueUsers.map(currentUser => {
             if (currentUser.userEmail) {
                 const registeredStreams = []
-                livestreams.forEach(stream => {
+                streamsFromTimeFrameAndFuture.forEach(stream => {
                     if (stream?.registeredUsers?.some(userObj => userObj?.userEmail === currentUser.userEmail)) {
                         registeredStreams.push(stream)
                     }

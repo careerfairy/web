@@ -150,14 +150,9 @@ const AnalyticsOverview = ({firebase, group}) => {
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
     const [livestreams, setLivestreams] = useState([]);
     const [fetchingStreams, setFetchingStreams] = useState(false);
-    const [currentTimeFrame, setCurrentTimeFrame] = useState({});
     const [userType, setUserType] = useState(userTypes[0]);
     const [groupOptions, setGroupOptions] = useState([]);
 
-
-    useEffect(() => {
-        setCurrentTimeFrame(globalTimeFrame.timeFrames[0])
-    }, [globalTimeFrame])
 
     useEffect(() => {
         const flattenedGroupOptions = handleFlattenOptions(group)
@@ -182,58 +177,70 @@ const AnalyticsOverview = ({firebase, group}) => {
                 if (snapshots.empty) {
                     setFetchingStreams(false)
                     setLivestreams([])
+                } else {
+                    let livestreams = []
+                    console.log("-> setFetchingStreams");
+                    snapshots.docs.forEach(async (snap, index, arr) => {
+                        const livestream = snap.data()
+                        livestream.id = snap.id
+                        const participatingSnap = await firebase.getLivestreamParticipatingStudents(snap.id)
+                        const talentPoolSnap = await firebase.getLivestreamTalentPoolMembers(livestream.companyId)
+                        const registeredStudentsSnap = await firebase.getLivestreamRegisteredStudents(livestream.id)
+                        livestream.registeredUsers = snapShotsToData(registeredStudentsSnap)
+                        livestream.participatingStudents = snapShotsToData(participatingSnap)
+                        livestream.talentPool = snapShotsToData(talentPoolSnap)
+                        livestreams.push(livestream)
+                        if (index === arr.length - 1) {
+                            const livestreamData = livestreams.reverse();
+                            setFetchingStreams(false);
+                            setLivestreams(livestreamData);
+                        }
+                    })
                 }
-                let livestreams = []
-                snapshots.docs.forEach(async (snap, index, arr) => {
-                    const livestream = snap.data()
-                    livestream.id = snap.id
-
-                    const participatingSnap = await firebase.getLivestreamParticipatingStudents(snap.id)
-                    const talentPoolSnap = await firebase.getLivestreamTalentPoolMembers(livestream.companyId)
-                    const registeredStudentsSnap = await firebase.getLivestreamRegisteredStudents(livestream.id)
-                    livestream.registeredUsers = snapShotsToData(registeredStudentsSnap)
-                    livestream.participatingStudents = snapShotsToData(participatingSnap)
-                    livestream.talentPool = snapShotsToData(talentPoolSnap)
-                    livestreams.push(livestream)
-                    if (index === arr.length - 1) {
-                        const livestreamData = livestreams.reverse();
-                        setFetchingStreams(false);
-                        setLivestreams(livestreamData);
-                    }
-                })
 
             }, new Date(globalTimeFrame.double)
         );
         return () => unsubscribe();
     }, [globalTimeFrame, group.id]);
 
-    const getFutureEvents = (timeframe, limit = 500) => {
-        const futureStreams = livestreams.filter((stream) => {
+    const getFutureEvents = () => {
+        return livestreams.filter((stream) => {
             if (stream.start?.toDate() > now) {
                 return stream
             }
         });
-        return futureStreams.slice(0, limit)
     }
 
-    const getMostRecentEvents = (timeframe, limit = 500) => {
+    const getStreamsFromTimeFrame = (timeframe) => {
         const targetTime = new Date(timeframe)
-        const recentStreams = livestreams.filter((stream) => {
-            if (stream.start?.toDate() > targetTime
-                && stream.start?.toDate() < now
-            ) {
-                return stream
-            }
+        return livestreams.filter((stream) => {
+            const streamStart = stream.start?.toDate()
+            return (streamStart > targetTime && streamStart < now)
         });
-        return recentStreams.slice(0, limit)
     }
 
-    const mostRecentEvents = useMemo(() => getMostRecentEvents(currentTimeFrame.date), [
-        livestreams, currentTimeFrame
+    const getStreamsFromBeforeTimeFrame = () => {
+        return livestreams.filter(stream => {
+                const streamStart = stream.start?.toDate()
+                return (streamStart >= globalTimeFrame.globalDate && streamStart <= globalTimeFrame.double)
+            }
+        )
+    }
+
+    const streamsFromTimeFrame = useMemo(() => getStreamsFromTimeFrame(globalTimeFrame.globalDate), [
+        livestreams, globalTimeFrame
     ]);
 
-    const futureStreams = useMemo(() => getFutureEvents(currentTimeFrame.date), [
-        livestreams, currentTimeFrame
+    const streamsFromBeforeTimeFrame = useMemo(() => getStreamsFromBeforeTimeFrame(globalTimeFrame.globalDate), [
+        livestreams, globalTimeFrame
+    ]);
+
+    const futureStreams = useMemo(() => getFutureEvents(globalTimeFrame.globalDate), [
+        livestreams, globalTimeFrame
+    ]);
+
+    const streamsFromTimeFrameAndFuture = useMemo(() => [...streamsFromTimeFrame, ...futureStreams], [
+        futureStreams, streamsFromTimeFrame, globalTimeFrame
     ]);
 
     const getTabProps = () => {
@@ -244,11 +251,11 @@ const AnalyticsOverview = ({firebase, group}) => {
             futureStreams,
             globalTimeFrame,
             fetchingStreams,
-            mostRecentEvents,
-            currentTimeFrame,
+            streamsFromTimeFrame,
+            streamsFromBeforeTimeFrame,
+            streamsFromTimeFrameAndFuture,
             globalTimeFrames,
             setGlobalTimeFrame,
-            setCurrentTimeFrame,
             userType,
             userTypes,
             setUserType,
