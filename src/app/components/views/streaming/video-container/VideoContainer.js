@@ -3,7 +3,7 @@ import {Button, Modal} from "semantic-ui-react";
 
 import {withFirebasePage} from 'context/firebase';
 
-import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
+import useAgoraAsStreamer from 'components/custom-hook/useAgoraAsStreamer';
 import CurrentSpeakerDisplayer from './CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
 import VideoControlsContainer from './VideoControlsContainer';
@@ -55,14 +55,13 @@ function VideoContainer(props) {
     const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
 
-    const screenSharingMode = !isPlayMode && props.currentLivestream.screenSharerId === props.streamerId && 
+    const screenSharingMode = props.currentLivestream.screenSharerId === props.streamerId && 
         props.currentLivestream.mode === 'desktop';
     const { webRTCAdaptor, localMediaStream, externalMediaStreams } =
-        useWebRTCAdaptor(
+        useAgoraAsStreamer(
             streamerReady,
-            isPlayMode,
+            false,
             localVideoId,
-            mediaConstraints,
             screenSharingMode,
             props.currentLivestream.id,
             props.streamerId,

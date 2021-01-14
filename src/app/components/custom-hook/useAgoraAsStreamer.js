@@ -3,10 +3,8 @@ import window, { navigator, document } from 'global';
 import { v4 as uuidv4 } from 'uuid';
 import { useAgoraToken } from './useAgoraToken';
 
-export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, mediaConstraints, screenSharingMode, roomId, streamId, isViewer) {
+export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer) {
 
-    const [webRTCAdaptor, setWebRTCAdaptor] = useState(null);
-    const [streamsList, setStreamsList] = useState([]);
     const [localMediaStream, setLocalMediaStream] = useState(null);
 
     const [addedStream, setAddedStream] = useState(null);
@@ -23,18 +21,17 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
     const [rtmChannel, setRtmChannel] = useState(null);
     
     const [userUid, setUserUid] = useState(null);
-
-    const agoraToken = useAgoraToken(roomId, userUid, !isPlayMode, true);
-    const agoraScreenShareToken = useAgoraToken(roomId, userUid + 'screen', !isPlayMode, screenSharingMode);
-
+    const [readyToConnect, setReadyToConnect] = useState(false);
     const [numberOfViewers, setNumberOfViewers] = useState(0);
 
-
-    var isChromium = true;
+    const agoraToken = useAgoraToken(roomId, userUid, !isViewer, true);
+    const agoraScreenShareToken = useAgoraToken(roomId, userUid + 'screen', !isPlayMode, screenSharingMode);
 
     useEffect(() => {
         if (isPlayMode) {
-            setUserUid(uuidv4())
+            let uuid = uuidv4()
+            let joiningId = uuid.replaceAll('-', '')
+            setUserUid(joiningId)
         } else if (streamId) {
             setUserUid(streamId)
         }
@@ -55,32 +52,126 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
     }, [removedStream]);
 
     useEffect(() => {
-        if (window) {
-            let AgoraRTC = require('agora-rtc-sdk');
-            let AgoraRTM = require('agora-rtm-sdk');
-            setAgoraRTC(AgoraRTC);
-            setAgoraRTM(AgoraRTM);
+        if (window &&
+            userUid &&
+            streamerReady &&
+            roomId &&
+            streamId &&
+            agoraToken &&
+            document) {
+            setReadyToConnect(true);
         }
-    },[window])
+    },[window, userUid, streamerReady, roomId, streamId, agoraToken, document])
 
     useEffect(() => {
-        if (agoraRTC && userUid && streamerReady && roomId && streamId) {
-            let rtcClient = agoraRTC.createClient({
-                mode: "live",
-                codec: "vp8",
+        if (readyToConnect) {
+            debugger;
+            setupAgoraRTC()
+            setupAgoraRTM()
+        }
+    },[readyToConnect])
+
+    const setupAgoraRTC = () => {
+        let AgoraRTC = require('agora-rtc-sdk');
+        setAgoraRTC(AgoraRTC);
+        let rtcClient = AgoraRTC.createClient({
+            mode: "live",
+            codec: "vp8",
+        });
+        rtcClient.init("53675bc6d3884026a72ecb1de3d19eb1");
+        //rtcClient.startProxyServer(3);
+        if (!isViewer) {
+            rtcClient.setClientRole("host")
+            rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid)=>{
+                let localStream = AgoraRTC.createStream({
+                    audio: true,
+                    video: true
+                });
+                localStream.setVideoProfile("480p_9");
+                localStream.init(()=>{
+                    localStream.play(videoId);
+                    rtcClient.publish(localStream, handleError);
+                    setLocalMediaStream(localStream);
+                    // Publish the local stream
+                }, handleError);
+            }, handleError);
+        } else {
+            rtcClient.setClientRole("audience");
+            rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {}, handleError);
+        }
+        rtcClient.on("stream-added", function(evt){
+            debugger;
+            if (evt.stream.getId() !== userUid + 'screen') {
+                rtcClient.subscribe(evt.stream, handleError);
+            }
+        });
+        rtcClient.on("stream-subscribed", function(evt){
+            let stream = evt.stream;
+            let streamId = String(stream.getId());
+            setAddedStream({
+                streamId: streamId,
+                stream: stream
             });
-            rtcClient.init("53675bc6d3884026a72ecb1de3d19eb1");
-            rtcClient.startProxyServer(2);
-            setRtcClient(rtcClient);
-        }
-    },[agoraRTC, userUid, streamerReady, roomId, streamId])
+        });
+        rtcClient.on("stream-removed", function(evt){
+            let stream = evt.stream;
+            let streamId = String(stream.getId());
+            stream.close();
+            setRemovedStream(streamId);
+        });
+        rtcClient.on("peer-leave", function(evt){
+            let stream = evt.stream;
+            let streamId = String(stream.getId());
+            stream.close();
+            setRemovedStream(streamId);
+        });   
+        let localStream = null;
+        rtcClient.on("client-role-changed", function(evt){
+            let role = evt.role;
+            if (role === 'host') {
+                localStream = AgoraRTC.createStream({
+                    audio: true,
+                    video: true
+                });
+                localStream.setVideoProfile("480p_9");
+                localStream.init(()=>{
+                    localStream.play(videoId);
+                    rtcClient.publish(localStream, handleError);
+                    setLocalMediaStream(localStream);
+                }, handleError);
+            }
+            if (role === 'audience') {
+                if (localStream) {
+                    rtcClient.unpublish(localStream, handleError);
+                    localStream.close();
+                    setLocalMediaStream(null);
+                }
+            }
+        });  
+        setRtcClient(rtcClient);
+    }
 
-    useEffect(() => {
-        if (agoraRTM) {
-            let rtmClient = agoraRTM.createInstance("53675bc6d3884026a72ecb1de3d19eb1")
-            setRtmClient(rtmClient);
-        }
-    },[agoraRTM, userUid, streamerReady, roomId, streamId])
+    const setupAgoraRTM = () => {
+        let AgoraRTM = require('agora-rtm-sdk');
+        setAgoraRTM(AgoraRTM);
+        let rtmClient = AgoraRTM.createInstance("53675bc6d3884026a72ecb1de3d19eb1")
+        rtmClient.on('ConnectionStateChanged', (newState, reason) => {
+            console.log('on connection state changed to ' + newState + ' reason: ' + reason);
+        });
+        rtmClient.login({ token: agoraToken.rtmToken, uid: userUid }).then(() => {
+            console.log('AgoraRTM client login success');
+            const channel = rtmClient.createChannel(roomId);
+            channel.join().then(() => {
+                console.log('Joined channel');
+                setRtmChannel(channel);
+                }).catch(error => {
+                console.error(error);
+                });
+        }).catch(err => {
+            console.log('AgoraRTM client login failure', err);
+        });
+        setRtmClient(rtmClient);
+    }
 
     useEffect(() => {
         if (!isPlayMode) {
@@ -137,77 +228,14 @@ export default function useWebRTCAdaptor(streamerReady, isPlayMode, videoId, med
     },[agoraRTC, screenSharingMode, isPlayMode, agoraScreenShareToken])
 
     useEffect(() => {
-        if (!isPlayMode) {
-            if (rtcClient && document && mediaConstraints && roomId && streamId && (isChromium || isViewer)) {
-                rtcClient.setClientRole("host")
-            }
-        } else {
-            if (rtcClient && document && mediaConstraints && roomId) {
+        if (isViewer && agoraRTC && rtcClient) {
+            if (!isPlayMode) {
+                rtcClient.setClientRole("host");
+            } else {
                 rtcClient.setClientRole("audience");
             }
-        }     
-    }, [rtcClient, document, isPlayMode, roomId, streamId]);
-
-    useEffect(() => {
-        if (rtcClient && rtmClient && agoraRTC && agoraToken && userUid) {
-                rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid)=>{
-                    if (!isPlayMode) {
-                        let localStream = agoraRTC.createStream({
-                            audio: true,
-                            video: true
-                        });
-                        localStream.setVideoProfile("480p_9");
-                        localStream.init(()=>{
-                            localStream.play(videoId);
-                            rtcClient.publish(localStream, handleError);
-                            setLocalMediaStream(localStream);
-                            // Publish the local stream
-                        }, handleError);
-                    }
-                }, handleError);
-                rtcClient.on("stream-added", function(evt){
-                    if (evt.stream.getId() !== userUid + 'screen') {
-                        rtcClient.subscribe(evt.stream, handleError);
-                    }
-                });
-                // Play the remote stream when it is subsribed
-                rtcClient.on("stream-subscribed", function(evt){
-                    let stream = evt.stream;
-                    let streamId = String(stream.getId());
-                    setAddedStream({
-                        streamId: streamId,
-                        stream: stream
-                    });
-                });
-                rtcClient.on("stream-removed", function(evt){
-                    let stream = evt.stream;
-                    let streamId = String(stream.getId());
-                    stream.close();
-                    setRemovedStream(streamId);
-                });
-                rtcClient.on("peer-leave", function(evt){
-                    let stream = evt.stream;
-                    let streamId = String(stream.getId());
-                    stream.close();
-                    setRemovedStream(streamId);
-                });
-                rtmClient.on('ConnectionStateChanged', (newState, reason) => {
-                    console.log('on connection state changed to ' + newState + ' reason: ' + reason);
-                });
-                rtmClient.login({ token: agoraToken.rtmToken, uid: userUid }).then(() => {
-                    console.log('AgoraRTM client login success');
-                    const channel = rtmClient.createChannel(roomId);
-                    channel.join().then(() => {
-                        console.log('Joined channel');
-                        setRtmChannel(channel);
-                        }).catch(error => {
-                        console.error(error);
-                        });
-                }).catch(err => {
-                    console.log('AgoraRTM client login failure', err);
-                });
         }
-    }, [rtcClient, rtmClient, agoraToken]);
+    },[isPlayMode])
 
     useEffect(() => {
         if (rtmChannel) {

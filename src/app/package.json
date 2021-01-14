@@ -20,7 +20,7 @@
     "@react-pdf/renderer": "^1.6.11",
     "@react-pdf/styled-components": "^1.4.0",
     "@sentry/browser": "^5.13.2",
-    "agora-rtc-sdk": "^3.2.3",
+    "agora-rtc-sdk": "^3.3.1",
     "agora-rtm-sdk": "^1.4.1",
     "algoliasearch": "^4.8.3",
     "autosuggest-highlight": "^3.1.1",
