@@ -8,8 +8,12 @@ import {withFirebase} from "../../../../../../../context/firebase";
 import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {CustomLoadingOverlay, CustomNoRowsOverlay} from "./Overlays";
 import {useSnackbar} from "notistack";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import Typography from "@material-ui/core/Typography";
+import Tooltip from "@material-ui/core/Tooltip";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
     root: {},
     actions: {
         justifyContent: 'flex-end'
@@ -20,146 +24,43 @@ const useStyles = makeStyles(() => ({
             color: '#1a3e72',
             fontWeight: '600',
         },
+    },
+    tableTooltipQuestion: {
+        fontSize: theme.spacing(2)
     }
 }));
 
 
 const FeedbackTable = ({
-                        groupOptions,
-                        fetchingStreams,
-                        userType,
-                        currentStream,
-                        group,
-                        futureStreams,
-                        totalUniqueUsers,
-                        streamsFromTimeFrameAndFuture,
-                        className,
-                        ...rest
-                    }) => {
+                           groupOptions,
+                           fetchingStreams,
+                           userType,
+                           currentStream,
+                           group,
+                           futureStreams,
+                           totalUniqueUsers,
+                           streamsFromTimeFrameAndFuture,
+                           setStreamDataType,
+                           streamDataType,
+                           streamDataTypes,
+                           className,
+                           ...rest
+                       }) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const {enqueueSnackbar} = useSnackbar()
     const [columns, setColumns] = useState([]);
     const [expandTable, setExpandTable] = useState(false);
-    const [users, setUsers] = useState([]);
+    const [data, setData] = useState([]);
 
-    const initialColumns = [
-        {
-            field: "id",
-            headerName: "ID",
-            width: 170,
-            hide: true
-        },
-        {
-            field: "firstName",
-            headerName: "First Name",
-            width: 140,
-        },
-        {
-            field: "lastName",
-            headerName: "Last Name",
-            width: 140,
-        },
-        {
-            field: "streamsWatched",
-            headerName: "Events Attended",
-            width: 150,
-        },
-        {
-            field: "streamsRegistered",
-            headerName: "Events Registered To",
-            width: 170,
-        },
-    ]
 
     useEffect(() => {
-        setUsers(totalUniqueUsers)
-        mapUserCategories()
-        mapStreamsWatched()
-        mapStreamsRegistered()
-
-    }, [totalUniqueUsers])
-
-    const getGroupCategoryColumns = () => {
-        if (group.categories?.length) {
-            return group.categories.map(category => {
-                return {
-                    field: category.name,
-                    headerName: category.name,
-                    width: 170,
-                }
-            })
-        } else {
-            return []
+        const newData = currentStream?.[streamDataType.propertyName]
+        // console.log("-> newData", newData);
+        if (newData) {
+            setData(newData)
         }
-    }
-
-    const getCategoryOptionName = (targetCategoryId, user) => {
-        if (user.registeredGroups) {
-            const targetGroup = user.registeredGroups.find(groupObj => groupObj.groupId === group.id)
-            if (targetGroup?.categories) {
-                const targetCategory = targetGroup.categories.find(categoryObj => categoryObj.id === targetCategoryId)
-                if (targetCategory?.selectedValueId) {
-                    const targetOption = groupOptions.find(option => option.id === targetCategory.selectedValueId)
-                    if (targetOption?.name) {
-                        return targetOption.name
-                    }
-                }
-            }
-        }
-    }
-
-    const mapUserCategories = () => {
-        const groupCategories = [...group.categories]
-        if (groupCategories.length) {
-            const updatedUsers = totalUniqueUsers.map(user => {
-                const updatedUser = user
-                groupCategories.forEach(category => {
-                    const targetCategoryId = category.id
-                    if (targetCategoryId) {
-                        const propertyName = category.name
-                        updatedUser[propertyName] = getCategoryOptionName(targetCategoryId, user)
-                    }
-                })
-                return updatedUser
-            })
-            setUsers(updatedUsers)
-        }
-    }
-
-    const mapStreamsWatched = () => {
-        const updatedUsers = totalUniqueUsers.map(user => {
-            user.watchedEvent = "No"
-            const currentUserEmail = user.userEmail
-            if (currentUserEmail) {
-                const watchedStreams = []
-                streamsFromTimeFrameAndFuture.forEach(stream => {
-                    if (stream?.participatingStudents?.some(userEmail => userEmail === currentUserEmail)) {
-                        watchedStreams.push(stream)
-                        user.watchedEvent = "Yes"
-                    }
-                })
-                user.streamsWatched = watchedStreams.length
-            }
-            return user
-        })
-        setUsers(updatedUsers)
-    }
-    const mapStreamsRegistered = () => {
-        const updatedUsers = totalUniqueUsers.map(currentUser => {
-            if (currentUser.userEmail) {
-                const registeredStreams = []
-                streamsFromTimeFrameAndFuture.forEach(stream => {
-                    if (stream?.registeredUsers?.some(userEmail => userEmail === currentUser.userEmail)) {
-                        registeredStreams.push(stream)
-                    }
-                })
-                currentUser.streamsRegistered = registeredStreams.length
-            }
-            return currentUser
-        })
-        setUsers(updatedUsers)
-    }
+    }, [streamDataType, currentStream])
 
 
     const toggleTable = () => {
@@ -172,11 +73,86 @@ const FeedbackTable = ({
             variant: "success"
         })
     }
+    // console.log("-> table");
+
+    const getDate = (params) => {
+        return prettyDate(params.value)
+    }
+    const getAuthorLastName = (params) => {
+        return `${params.getValue('firstName') || ''} ${
+            params.getValue('lastName') || ''
+        }`;
+    }
+
+    const renderTitle = ({value}) => (
+        <Tooltip title={
+            <Typography className={classes.tableTooltipQuestion}>
+                {value}
+            </Typography>
+        }>
+            <Typography variant="inherit" noWrap>
+                {value}
+            </Typography>
+        </Tooltip>
+    )
+
+
+    const handleMenuItemClick = (event, index) => {
+        setStreamDataType(streamDataTypes[index])
+    };
+
+    const questionColumns = [
+        {
+            field: "id",
+            headerName: "ID",
+            width: 170,
+            hide: true
+        },
+        {
+            field: "author",
+            headerName: "Author's Email",
+            width: 140,
+        },
+        {
+            field: "firstName",
+            headerName: "First Name",
+            width: 140,
+        },
+        {
+            field: "lastName",
+            headerName: "Last Name",
+            width: 150,
+        },
+        {
+            field: "title",
+            headerName: "Question",
+            width: 250,
+            renderCell: renderTitle,
+        },
+        {
+            field: "votes",
+            headerName: "Votes",
+            width: 130,
+            type: 'number',
+        },
+        {
+            field: "timestamp",
+            headerName: "Date Created",
+            width: 200,
+            type: 'dateTime',
+            valueGetter: getDate
+        },
+        {
+            field: "type",
+            headerName: "status",
+            width: 100,
+        },
+    ]
 
 
     const newData = {
-        columns: initialColumns,
-        rows: users
+        columns: questionColumns,
+        rows: data
     }
 
     return (
@@ -185,9 +161,28 @@ const FeedbackTable = ({
             {...rest}
         >
             <CardHeader
-                title={userType.displayName}
-                subheader={currentStream && `That attended ${currentStream.company} on ${prettyDate(currentStream.start)}`}
+                title={streamDataType.displayName}
+                subheader={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
             />
+            <Divider/>
+            <Tabs
+                value={streamDataType.propertyName}
+                indicatorColor="primary"
+                textColor="primary"
+                scrollButtons="auto"
+                aria-label="disabled tabs example"
+            >
+                {streamDataTypes.map(({displayName, propertyName}, index) => {
+                    return (
+                        <Tab
+                            key={propertyName}
+                            value={propertyName}
+                            onClick={(event) => handleMenuItemClick(event, index)}
+                            label={`${displayName} - ${currentStream?.[propertyName]?.length || 0}`}
+                        />
+                    )
+                })}
+            </Tabs>
             <Divider/>
             <Box className={classes.gridWrapper} height={expandTable ? 800 : 400} width="100%">
                 <DataGrid
@@ -204,7 +199,7 @@ const FeedbackTable = ({
                         // console.log("-> sortModelParams.api.state.filter", sortModelParams.api.state.filter);
                     }}
                     onPageChange={(pageChangeParams) => {
-                        console.log("-> pageChangeParams", pageChangeParams);
+                        // console.log("-> pageChangeParams", pageChangeParams);
                     }}
                     components={{
                         noRowsOverlay: CustomNoRowsOverlay,
@@ -212,30 +207,30 @@ const FeedbackTable = ({
                     }}
                 />
             </Box>
-            {/*<Box*/}
-            {/*    display="flex"*/}
-            {/*    justifyContent="space-between"*/}
-            {/*    p={2}*/}
-            {/*>*/}
-            {/*    <Button*/}
-            {/*        color="primary"*/}
-            {/*        size="small"*/}
-            {/*        variant="contained"*/}
-            {/*        disabled={Boolean(!selection.length)}*/}
-            {/*        onClick={handleCopyEmails}*/}
-            {/*    >*/}
-            {/*        Copy Email Addresses*/}
-            {/*    </Button>*/}
-            {/*    <Button*/}
-            {/*        color="primary"*/}
-            {/*        onClick={toggleTable}*/}
-            {/*        endIcon={!expandTable && <ArrowRightIcon/>}*/}
-            {/*        size="small"*/}
-            {/*        variant="text"*/}
-            {/*    >*/}
-            {/*        {expandTable ? "Show Less" : "Expand"}*/}
-            {/*    </Button>*/}
-            {/*</Box>*/}
+            <Box
+                display="flex"
+                justifyContent="space-between"
+                p={2}
+            >
+                {/*<Button*/}
+                {/*    color="primary"*/}
+                {/*    size="small"*/}
+                {/*    variant="contained"*/}
+                {/*    disabled={Boolean(!selection.length)}*/}
+                {/*    onClick={handleCopyEmails}*/}
+                {/*>*/}
+                {/*    Copy Email Addresses*/}
+                {/*</Button>*/}
+                <Button
+                    color="primary"
+                    onClick={toggleTable}
+                    endIcon={!expandTable && <ArrowRightIcon/>}
+                    size="small"
+                    variant="text"
+                >
+                    {expandTable ? "Show Less" : "Expand"}
+                </Button>
+            </Box>
         </Card>
     );
 };

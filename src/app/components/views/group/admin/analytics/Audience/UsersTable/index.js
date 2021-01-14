@@ -212,7 +212,7 @@ const UsersTable = ({
         >
             <CardHeader
                 title={userType.displayName}
-                subheader={currentStream && `That attended ${currentStream.company} on ${prettyDate(currentStream.start)}`}
+                subheader={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
             />
             <Divider/>
             <Box className={classes.gridWrapper} height={expandTable ? 800 : 400} width="100%">

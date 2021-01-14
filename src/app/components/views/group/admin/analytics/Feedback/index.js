@@ -23,19 +23,19 @@ const Feedback = ({
                       setUserType,
                       userTypes,
                       fetchingStreams,
+                      streamDataTypes,
                       streamsFromTimeFrame,
                       streamsFromTimeFrameAndFuture,
                       groupOptions,
                       totalFollowers,
+                      streamDataType,
+                      setStreamDataType,
                       handleToggleBar,
                       currentStream,
                       setCurrentStream,
                       showBar
                   }) => {
     const classes = useStyles()
-
-
-
 
 
     const getUsers = () => {
@@ -74,6 +74,7 @@ const Feedback = ({
                         streamsFromTimeFrame={streamsFromTimeFrame}
                         userType={userType}
                         userTypes={userTypes}
+                        isFeedback
                         handleToggleBar={handleToggleBar}
                         showBar={showBar}
                         setUserType={setUserType}
@@ -86,6 +87,9 @@ const Feedback = ({
                         currentStream={currentStream}
                         fetchingStreams={fetchingStreams}
                         groupOptions={groupOptions}
+                        streamDataType={streamDataType}
+                        setStreamDataType={setStreamDataType}
+                        streamDataTypes={streamDataTypes}
                         futureStreams={futureStreams}
                         streamsFromTimeFrameAndFuture={streamsFromTimeFrameAndFuture}
                         userType={userType}
