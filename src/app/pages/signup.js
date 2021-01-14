@@ -200,8 +200,6 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
     const [formData, setFormData] = useState({})
     const [open, setOpen] = React.useState(false);
 
-    const urlRegex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/gm;
-
     useEffect(() => {
         if (emailSent && user && !emailVerificationSent) {
             axios({
@@ -251,7 +249,6 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                     firstName: '',
                     lastName: '',
                     email: '',
-                    linkedinUrl: '',
                     password: '',
                     confirmPassword: '',
                     agreeTerm: false,
@@ -278,9 +275,6 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                         errors.lastName = 'Cannot be longer than 50 characters';
                     } else if (!/^\D+$/i.test(values.lastName)) {
                         errors.lastName = 'Please enter a valid last name';
-                    }
-                    if (values.linkedinUrl.length > 0 && !values.linkedinUrl.match(urlRegex)) {
-                        errors.linkedinUrl = 'Please enter a valid URL';
                     }
                     if (!values.password) {
                         errors.password = 'A password is required';
@@ -407,29 +401,6 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                                     </Collapse>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={12}>
-                                    <FormControl fullWidth>
-                                        <TextField
-                                            variant="outlined"
-                                            fullWidth
-                                            id="linkedinUrl"
-                                            label="LinkedIn (optional)"
-                                            name="linkedinUrl"
-                                            placeholder="https://www.linkedin.com/in/username/"
-                                            disabled={isSubmitting}
-                                            onBlur={handleBlur}
-                                            value={values.linkedinUrl}
-                                            error={Boolean(errors.linkedinUrl && touched.linkedinUrl && errors.linkedinUrl)}
-                                            onChange={handleChange}
-                                        />
-                                        <Collapse
-                                            in={Boolean(errors.linkedinUrl && touched.linkedinUrl && errors.linkedinUrl)}>
-                                            <FormHelperText error>
-                                                {errors.linkedinUrl}
-                                            </FormHelperText>
-                                        </Collapse>
-                                    </FormControl>
-                                </Grid>
                             <Grid item xs={12} sm={6}>
                                 <UniversityCountrySelector value={values.universityCountryCode}
                                                            handleClose={handleClose}
