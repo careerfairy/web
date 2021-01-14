@@ -4,6 +4,8 @@ import {Container, Grid} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import LatestEvents from "../common/LatestEvents";
 import FeedbackTable from "./FeedbackTable";
+import FeedbackGraph from "./FeedbackGraph";
+import TypeOfParticipants from "../General/TypeOfParticipants";
 
 
 const useStyles = makeStyles(theme => ({
@@ -36,6 +38,7 @@ const Feedback = ({
                       showBar
                   }) => {
     const classes = useStyles()
+    const [currentPoll, setCurrentPoll] = useState(null);
 
 
     const getUsers = () => {
@@ -81,7 +84,7 @@ const Feedback = ({
                         group={group}
                     />
                 </Grid>
-                <Grid item lg={12} md={12} xl={12} xs={12}>
+                <Grid item lg={8} md={12} xl={9} xs={12}>
                     <FeedbackTable
                         totalUniqueUsers={totalUniqueUsers}
                         currentStream={currentStream}
@@ -89,11 +92,25 @@ const Feedback = ({
                         groupOptions={groupOptions}
                         streamDataType={streamDataType}
                         setStreamDataType={setStreamDataType}
+                        setCurrentPoll={setCurrentPoll}
                         streamDataTypes={streamDataTypes}
                         futureStreams={futureStreams}
                         streamsFromTimeFrameAndFuture={streamsFromTimeFrameAndFuture}
                         userType={userType}
                         group={group}/>
+                </Grid>
+                <Grid item lg={4} md={12} xl={3} xs={12}>
+                    <FeedbackGraph
+                        currentPoll={currentPoll}
+                        currentStream={currentStream}
+                        streamDataType={streamDataType}
+                        typesOfOptions={[]}
+                        userType={userType}
+                        userTypes={userTypes}
+                        setUserType={setUserType}
+                        setCurrentStream={setCurrentStream}
+                        group={group}
+                    />
                 </Grid>
                 {/*<Grid item lg={4} md={6} xl={3} xs={12}>*/}
                 {/*    <FeedbackResults group={group}/>*/}

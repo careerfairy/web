@@ -45,12 +45,6 @@ const UsersTable = ({
 
     const initialColumns = [
         {
-            field: "id",
-            headerName: "ID",
-            width: 170,
-            hide: true
-        },
-        {
             field: "firstName",
             headerName: "First Name",
             width: 140,

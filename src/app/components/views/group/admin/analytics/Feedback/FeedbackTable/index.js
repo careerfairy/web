@@ -27,8 +27,71 @@ const useStyles = makeStyles((theme) => ({
     },
     tableTooltipQuestion: {
         fontSize: theme.spacing(2)
+    },
+    displayGraphButton: {
+        fontWeight: 500,
+        color: theme.palette.primary.main
     }
 }));
+
+const getDate = (params) => {
+    return prettyDate(params.value)
+}
+const getCount = ({value}) => {
+    return value ? value.length : 0
+}
+const renderLongText = ({value}) => {
+    const classes = useStyles()
+    return (
+        <Tooltip title={
+            <Typography className={classes.tableTooltipQuestion}>
+                {value}
+            </Typography>
+        }>
+            <Typography variant="inherit" noWrap>
+                {value}
+            </Typography>
+        </Tooltip>
+    )
+}
+
+
+const questionColumns = [
+    {
+        field: "firstName",
+        headerName: "First Name",
+        width: 140,
+    },
+    {
+        field: "lastName",
+        headerName: "Last Name",
+        width: 150,
+    },
+    {
+        field: "title",
+        headerName: "Question",
+        width: 250,
+        renderCell: renderLongText,
+    },
+    {
+        field: "votes",
+        headerName: "Votes",
+        width: 130,
+        type: 'number',
+    },
+    {
+        field: "timestamp",
+        headerName: "Date Created",
+        width: 200,
+        type: 'dateTime',
+        valueGetter: getDate
+    },
+    {
+        field: "type",
+        headerName: "status",
+        width: 100,
+    },
+]
 
 
 const FeedbackTable = ({
@@ -40,6 +103,7 @@ const FeedbackTable = ({
                            futureStreams,
                            totalUniqueUsers,
                            streamsFromTimeFrameAndFuture,
+                           setCurrentPoll,
                            setStreamDataType,
                            streamDataType,
                            streamDataTypes,
@@ -55,85 +119,61 @@ const FeedbackTable = ({
 
 
     useEffect(() => {
-        const newData = currentStream?.[streamDataType.propertyName]
-        // console.log("-> newData", newData);
-        if (newData) {
-            setData(newData)
+        const dataType = streamDataType.propertyName
+        const newData = currentStream?.[dataType] || []
+        setData(newData)
+        if (dataType === "pollEntries") {
+            setColumns(pollColumns)
+        } else if (dataType === "questions") {
+            setColumns(questionColumns)
         }
     }, [streamDataType, currentStream])
 
-
-    const toggleTable = () => {
-        setExpandTable(!expandTable)
+    const DisplayButton = ({row}) => {
+        const classes = useStyles()
+        const hasNoData = () => {
+            return Boolean(!row.voters?.length)
+        }
+        return (
+            <Button
+                className={classes.displayGraphButton}
+                variant="text"
+                disabled={hasNoData()}
+                onClick={() => setCurrentPoll(row)}
+                fullWidth
+                size="small"
+            >
+                {hasNoData() ? "No Data" : "Display"}
+            </Button>
+        )
     }
 
-    const handleCopyEmails = () => {
-        copyStringToClipboard(selection.join(";"))
-        enqueueSnackbar("Emails have been copied!", {
-            variant: "success"
-        })
-    }
-    // console.log("-> table");
-
-    const getDate = (params) => {
-        return prettyDate(params.value)
-    }
-    const getAuthorLastName = (params) => {
-        return `${params.getValue('firstName') || ''} ${
-            params.getValue('lastName') || ''
-        }`;
-    }
-
-    const renderTitle = ({value}) => (
-        <Tooltip title={
-            <Typography className={classes.tableTooltipQuestion}>
-                {value}
-            </Typography>
-        }>
-            <Typography variant="inherit" noWrap>
-                {value}
-            </Typography>
-        </Tooltip>
-    )
-
-
-    const handleMenuItemClick = (event, index) => {
-        setStreamDataType(streamDataTypes[index])
-    };
-
-    const questionColumns = [
+    const pollColumns = [
         {
-            field: "id",
-            headerName: "ID",
-            width: 170,
-            hide: true
-        },
-        {
-            field: "author",
-            headerName: "Author's Email",
-            width: 140,
-        },
-        {
-            field: "firstName",
-            headerName: "First Name",
-            width: 140,
-        },
-        {
-            field: "lastName",
-            headerName: "Last Name",
-            width: 150,
-        },
-        {
-            field: "title",
+            field: "question",
             headerName: "Question",
             width: 250,
-            renderCell: renderTitle,
+            renderCell: renderLongText,
         },
         {
-            field: "votes",
+            field: "voters",
             headerName: "Votes",
-            width: 130,
+            width: 90,
             type: 'number',
+            valueGetter: getCount
+        },
+        {
+            field: "options",
+            headerName: "Graph",
+            filterable: false,
+            width: 150,
+            renderCell: DisplayButton,
+            disableClickEventBubbling: true,
+        },
+        {
+            field: "state",
+            headerName: "Status",
+            width: 100,
         },
         {
             field: "timestamp",
@@ -142,16 +182,20 @@ const FeedbackTable = ({
             type: 'dateTime',
             valueGetter: getDate
         },
-        {
-            field: "type",
-            headerName: "status",
-            width: 100,
-        },
     ]
 
 
+    const toggleTable = () => {
+        setExpandTable(!expandTable)
+    }
+
+    const handleMenuItemClick = (event, index) => {
+        setStreamDataType(streamDataTypes[index])
+    };
+
+
     const newData = {
-        columns: questionColumns,
+        columns: columns,
         rows: data
     }
 

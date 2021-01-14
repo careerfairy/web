@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {Doughnut} from 'react-chartjs-2';
@@ -11,15 +11,16 @@ import {
     Typography,
     makeStyles,
     colors,
-    useTheme
+    useTheme, ListItem, Checkbox, List
 } from '@material-ui/core';
 import {colorsArray} from "../../../../../util/colors";
 import {withFirebase} from "../../../../../../context/firebase";
 import Button from "@material-ui/core/Button";
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
-import {prettyDate} from "../../../../../helperFunctions/HelperFunctions";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
+import {convertStringToArray} from "../../../../../helperFunctions/HelperFunctions";
+
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -32,22 +33,31 @@ function randomColor() {
     return '#' + Math.round(Math.random() * max).toString(16);
 }
 
-const TypeOfParticipants = ({
-                                group,
-                                setCurrentStream,
-                                currentStream,
-                                typesOfOptions,
-                                userTypes,
-                                setUserType,
-                                userType,
-                                className,
-                                ...rest
-                            }) => {
+const FeedbackGraph = ({
+                           group,
+                           setCurrentStream,
+                           currentStream,
+                           typesOfOptions,
+                           userTypes,
+                           setUserType,
+                           currentPoll,
+                           userType,
+                           streamDataType,
+                           className,
+                           ...rest
+                       }) => {
     const classes = useStyles();
     const theme = useTheme();
+    const chartRef = useRef()
+
 
     const [localColors, setLocalColors] = useState(colorsArray);
     const [total, setTotal] = useState(0);
+    const [legendLabels, setLegendLabels] = useState([]);
+    const [data, setData] = useState({
+        datasets: [],
+        labels: []
+    });
 
 
     useEffect(() => {
@@ -65,19 +75,26 @@ const TypeOfParticipants = ({
         }
     }, [typesOfOptions])
 
+    useEffect(() => {
+        if (currentPoll) {
+            setData({
+                datasets: [
+                    {
+                        data: currentPoll.options.map(option => option.votes),
+                        backgroundColor: localColors,
+                        borderWidth: 8,
+                        borderColor: colors.common.white,
+                        hoverBorderColor: colors.common.white
+                    }
+                ],
+                labels: currentPoll.options.map(option => convertStringToArray(option.name))
+            })
+            setLegendLabels(currentPoll.options.map(option => ({name: option.name, hidden: false})))
 
-    const data = {
-        datasets: [
-            {
-                data: typesOfOptions.map(option => option.count),
-                backgroundColor: localColors,
-                borderWidth: 8,
-                borderColor: colors.common.white,
-                hoverBorderColor: colors.common.white
-            }
-        ],
-        labels: typesOfOptions.map(option => option.name)
-    };
+        }
+
+    }, [currentPoll])
+
 
     const options = {
         cutoutPercentage: 70,
@@ -96,22 +113,23 @@ const TypeOfParticipants = ({
             footerFontColor: theme.palette.text.secondary,
             intersect: false,
             mode: 'index',
-            titleFontColor: theme.palette.text.primary
+            titleFontColor: theme.palette.text.primary,
+            callbacks: {
+                title: (tooltipItems, data) => {
+                    return data.labels[tooltipItems[0].index]
+                },
+                label: () => " ",
+            }
         },
         plugins: {
             labels: [{
                 fontColor: 'white',
                 render: 'percent',
                 fontStyle: 'bold',
-                arc: false,
+                arc: true,
             }]
         },
     };
-
-    const getPercentage = (count) => {
-        const percentage = Math.round((count / total) * 100)
-        return percentage + "%"
-    }
 
     const hasNoData = () => {
         return Boolean(typesOfOptions.length && total === 0)
@@ -121,9 +139,22 @@ const TypeOfParticipants = ({
         setUserType(userTypes[0])
     }
 
-    const handleMenuItemClick = (event, index) => {
-        setUserType(userTypes[index])
-    };
+    const handleClickLegend = (e, legendItem) => {
+        const index = legendItem.index;
+        const chart = chartRef?.current?.chartInstance;
+        let i, iLength, meta;
+        for (i = 0, iLength = (chart.data.datasets || []).length; i < iLength; ++i) {
+            meta = chart.getDatasetMeta(i);
+            // toggle visibility of index if exists
+            if (meta.data[index]) {
+                meta.data[index].hidden = !meta.data[index].hidden;
+                const newLabels = [...legendLabels]
+                newLabels[index].hidden = meta.data[index].hidden
+                setLegendLabels(newLabels)
+            }
+        }
+        chart.update();
+    }
 
     return (
         <Card
@@ -131,10 +162,8 @@ const TypeOfParticipants = ({
             {...rest}
         >
             <CardHeader
-                title={`Breakdown of ${userType.displayName}`}
-                subheader={
-                    currentStream ? `That attended ${currentStream.company} on ${prettyDate(currentStream.start)}` : "on average"
-                }
+                title={`${streamDataType.displayName.slice(0, -1)} Breakdown`}
+                subheader={currentPoll?.question}
                 action={
                     currentStream &&
                     <Button size="small"
@@ -146,23 +175,6 @@ const TypeOfParticipants = ({
                     </Button>
                 }
             />
-            <Divider/>
-            <Tabs
-                value={userType.propertyName}
-                indicatorColor="primary"
-                textColor="primary"
-                aria-label="disabled tabs example"
-            >
-                {userTypes.map(({displayName, propertyName}, index) => (
-                    <Tab
-                        wrapped
-                        key={propertyName}
-                        value={propertyName}
-                        onClick={(event) => handleMenuItemClick(event, index)}
-                        label={displayName}
-                    />
-                ))}
-            </Tabs>
             <Divider/>
             <CardContent>
                 <Box
@@ -189,50 +201,37 @@ const TypeOfParticipants = ({
                         :
                         <Doughnut
                             data={data}
+                            ref={chartRef}
                             options={options}
                         />}
                 </Box>
                 {!hasNoData() &&
-                <Box
-                    display="flex"
-                    justifyContent="center"
-                    mt={2}
-                >
-                    {typesOfOptions.slice(0, 3).map(({
-                                                         name,
-                                                         count,
-                                                         id
-                                                     }, index) => (
-                        <Box
-                            key={id}
-                            p={1}
-                            textAlign="center"
-                            display="flex"
-                            flexDirection="column"
-                            justifyContent="space-between"
-                        >
-                            <Typography
-                                color="textPrimary"
-                                variant="body1"
-                            >
-                                {name}
-                            </Typography>
-                            <Typography
-                                style={{color: localColors[index]}}
-                                variant="h3"
-                            >
-                                {getPercentage(count)}
-                            </Typography>
-                        </Box>
-                    ))}
-                </Box>}
+                <List dense>
+                    {currentPoll?.options.map(option => {
+                        return (
+                            <ListItem dense key={option.index} onClick={(e) => handleClickLegend(e, option)} button>
+                                <ListItemIcon style={{minWidth: 0}}>
+                                    <Checkbox
+                                        edge="start"
+                                        style={{color: colorsArray[option.index]}}
+                                        checked={!legendLabels?.[option.index]?.hidden}
+                                    />
+                                </ListItemIcon>
+                                <ListItemText>
+                                    {option.name}
+                                    <br/><strong>[{option.votes} Vote{option.votes !== 1 && "s"}]</strong>
+                                </ListItemText>
+                            </ListItem>)
+                    })}
+                </List>
+                }
             </CardContent>
         </Card>
     );
 };
 
-TypeOfParticipants.propTypes = {
+FeedbackGraph.propTypes = {
     className: PropTypes.string
 };
 
-export default withFirebase(TypeOfParticipants);
+export default withFirebase(FeedbackGraph);

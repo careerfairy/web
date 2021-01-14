@@ -118,7 +118,7 @@ const LatestEvents = ({
                 ...lineConfig
             },
             {
-                borderDash: [20, 30],
+                borderDash: [5, 5],
                 pointHoverBackgroundColor: colorsArray[0],
                 pointHoverBorderColor: 'rgba(220,220,220,1)',
                 pointBorderColor: colorsArray[0],
@@ -130,7 +130,7 @@ const LatestEvents = ({
                 spanGaps: true
             },
             {
-                borderDash: [20, 30],
+                borderDash: [5, 5],
                 pointHoverBackgroundColor: colorsArray[4],
                 pointHoverBorderColor: 'rgba(220,220,220,1)',
                 pointBorderColor: colorsArray[2],

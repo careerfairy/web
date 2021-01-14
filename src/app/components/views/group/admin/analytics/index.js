@@ -165,19 +165,19 @@ const userTypes = [
 const streamDataTypes = [
     {
         propertyName: "questions",
-        displayName: "Stream Questions",
+        displayName: "Questions",
         propertyDataName: "questions"
     },
     {
         propertyName: "pollEntries",
-        displayName: "Stream Polls",
+        displayName: "Polls",
         propertyDataName: "pollEntries"
     }]
 
 const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();
     const theme = useTheme()
-    const [value, setValue] = useState(0);
+    const [value, setValue] = useState(2);
 
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[0]);
     const [showBar, setShowBar] = useState(false);
@@ -187,7 +187,6 @@ const AnalyticsOverview = ({firebase, group}) => {
     const [streamDataType, setStreamDataType] = useState(streamDataTypes[0]);
     const [groupOptions, setGroupOptions] = useState([]);
     const [currentStream, setCurrentStream] = useState(null);
-    console.log("-> currentStream", currentStream);
     const [fetchingFollowers, setFetchingFollowers] = useState(false);
     const [totalFollowers, setTotalFollowers] = useState(null);
 
@@ -220,13 +219,13 @@ const AnalyticsOverview = ({firebase, group}) => {
                         const livestream = snap.data()
                         livestream.id = snap.id
                         livestream.registeredUsersData = totalFollowers.filter(follower => {
-                            return livestream.registeredUsers.some(userEmail => userEmail === follower.userEmail)
+                            return livestream.registeredUsers?.some(userEmail => userEmail === follower.userEmail)
                         })
                         livestream.participatingStudentsData = totalFollowers.filter(follower => {
                             return livestream.participatingStudents?.some(userEmail => userEmail === follower.userEmail)
                         })
                         livestream.talentPoolData = totalFollowers.filter(follower => {
-                            return livestream.talentPool.some(userEmail => userEmail === follower.userEmail)
+                            return livestream.talentPool?.some(userEmail => userEmail === follower.userEmail)
                         })
                         return livestream
                     })
@@ -358,7 +357,7 @@ const AnalyticsOverview = ({firebase, group}) => {
                     globalTimeFrame={globalTimeFrame}
                 />
             </Box>
-            <AppBar className={classes.appBar} position="static" color="default">
+            <AppBar className={classes.appBar} position="sticky" color="default">
                 <Tabs
                     value={value}
                     TabIndicatorProps={{className: classes.indicator}}

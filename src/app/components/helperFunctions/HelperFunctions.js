@@ -155,4 +155,22 @@ export const mustBeNumber = (value, decimals = 2) => {
     return Number.isFinite(value) ? round(value, decimals) : 0
 }
 
+export const convertStringToArray = (string, maxChars = 30) => {
+
+// Split by spaces
+    return string.split(/\s+/)
+
+        // Then join words so that each string section is less then 40
+        .reduce(function (prev, curr) {
+            if (prev.length && (prev[prev.length - 1] + ' ' + curr).length <= maxChars) {
+                prev[prev.length - 1] += ' ' + curr;
+            } else {
+                prev.push(curr);
+            }
+            return prev;
+        }, [])
+        .map(str => str)
+
+}
+
 
