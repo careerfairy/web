@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import clsx from "clsx";
 import PropTypes from "prop-types";
-import {Bar, Line} from "react-chartjs-2";
+import {Bar, Doughnut, Line} from "react-chartjs-2";
 import {
     Box,
     Button,
@@ -10,7 +10,7 @@ import {
     CardHeader,
     Divider,
     useTheme,
-    makeStyles, Menu, MenuItem, CircularProgress, fade,
+    makeStyles, Menu, MenuItem, CircularProgress, fade, FormControlLabel, Switch,
 } from "@material-ui/core";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowRightIcon from "@material-ui/icons/ArrowRight";
@@ -46,7 +46,7 @@ const LatestEvents = ({
     const classes = useStyles();
     const theme = useTheme();
 
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [showBar, setShowBar] = useState(false);
 
 
     const lineConfig = {
@@ -79,6 +79,10 @@ const LatestEvents = ({
         } else {
             return [...getLength(futureStreams, prop)]
         }
+    }
+
+    const handleToggleBar = () => {
+        setShowBar(!showBar)
     }
 
 
@@ -232,12 +236,14 @@ const LatestEvents = ({
                     return data.labels[tooltipItems[0].index]?.slice(0, -1)
                 },
                 label: (tooltipItems, data) => {
-                    return data.datasets[tooltipItems.datasetIndex].label + ': ' + tooltipItems.value
+                    if (!isNaN(tooltipItems.value)) {
+                        return data.datasets[tooltipItems.datasetIndex].label + ': ' + tooltipItems.value
+                    }
                 },
                 afterTitle: (tooltipItem, data) => {
                     if (tooltipItem.length) {
                         const index = tooltipItem[0].index
-                        if ([...streamsFromTimeFrame, ...futureStreams][index]?.[userType.propertyName].length) {
+                        if ([...streamsFromTimeFrame, ...futureStreams][index]?.[userType.propertyName]?.length) {
                             return "Click for breakdown"
                         }
                     }
@@ -247,48 +253,27 @@ const LatestEvents = ({
         },
     };
 
-
-    const handleClickListItem = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
     const handleMenuItemClick = (event, index) => {
         setUserType(userTypes[index])
-        setAnchorEl(null);
     };
 
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
 
 
     return (
         <Card className={clsx(classes.root, className)} {...rest}>
             <CardHeader
                 action={
-                    <div>
-                        <Button onClick={handleClickListItem} endIcon={<ArrowDropDownIcon/>} size="small"
-                                variant="text">
-                            {userType.displayName}
-                        </Button>
-                        <Menu
-                            id="lock-menu"
-                            anchorEl={anchorEl}
-                            keepMounted
-                            open={Boolean(anchorEl)}
-                            onClose={handleClose}
-                        >
-                            {userTypes.map(({displayName, propertyName}, index) => (
-                                <MenuItem
-                                    key={propertyName}
-                                    selected={propertyName === userType.propertyName}
-                                    onClick={(event) => handleMenuItemClick(event, index)}
-                                >
-                                    {displayName}
-                                </MenuItem>
-                            ))}
-                        </Menu>
-                    </div>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={showBar}
+                                onChange={handleToggleBar}
+                                name="barToggle"
+                                color="primary"
+                            />
+                        }
+                        label={`Make Bar Chart`}
+                    />
                 }
                 title="Latest Events"
             />
@@ -311,7 +296,8 @@ const LatestEvents = ({
             <Divider/>
             <CardContent>
                 <Box display="flex" alignItems="center" justifyContent="center" height={400}>
-                    {fetchingStreams ? <CircularProgress size={50}/> : <Line data={data} options={options}/>}
+                    {fetchingStreams ? <CircularProgress size={50}/> : (showBar ? <Bar data={data} options={options}/> :
+                        <Line data={data} options={options}/>)}
                 </Box>
             </CardContent>
         </Card>

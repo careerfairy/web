@@ -31,13 +31,13 @@ const Audience = ({
     const classes = useStyles()
     const [currentStream, setCurrentStream] = useState(null);
 
-    const getUsers = (streamsFromTimeFrame, prop) => {
+    const getUsers = () => {
         if (currentStream) {
-            return currentStream[prop]
+            return currentStream[userType.propertyDataName]
         } else {
-            const totalViewers = streamsFromTimeFrame.reduce(
+            const totalViewers = streamsFromTimeFrameAndFuture.reduce(
                 (accumulator, livestream) => {
-                    return [...accumulator, ...livestream[prop]];
+                    return [...accumulator, ...livestream[userType.propertyDataName]];
                 },
                 []
             );
@@ -51,8 +51,8 @@ const Audience = ({
         }
     };
 
-    const totalUniqueUsers = useMemo(() => getUsers(streamsFromTimeFrame, userType.propertyDataName), [
-        streamsFromTimeFrame, currentStream, userType
+    const totalUniqueUsers = useMemo(() => getUsers(), [
+        streamsFromTimeFrameAndFuture, currentStream, userType
     ]);
 
     return (

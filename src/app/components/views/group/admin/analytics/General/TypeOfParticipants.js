@@ -18,6 +18,8 @@ import {withFirebase} from "../../../../../../context/firebase";
 import Button from "@material-ui/core/Button";
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 import {prettyDate} from "../../../../../helperFunctions/HelperFunctions";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -35,6 +37,8 @@ const TypeOfParticipants = ({
                                 setCurrentStream,
                                 currentStream,
                                 typesOfOptions,
+                                userTypes,
+                                setUserType,
                                 userType,
                                 className,
                                 ...rest
@@ -44,7 +48,6 @@ const TypeOfParticipants = ({
 
     const [localColors, setLocalColors] = useState(colorsArray);
     const [total, setTotal] = useState(0);
-
 
 
     useEffect(() => {
@@ -110,6 +113,14 @@ const TypeOfParticipants = ({
     const hasNoData = () => {
         return Boolean(typesOfOptions.length && total === 0)
     }
+    const handleReset = () => {
+        setCurrentStream(null)
+        setUserType(userTypes[0])
+    }
+
+    const handleMenuItemClick = (event, index) => {
+        setUserType(userTypes[index])
+    };
 
     return (
         <Card
@@ -125,13 +136,30 @@ const TypeOfParticipants = ({
                     currentStream &&
                     <Button size="small"
                             variant="text"
-                            onClick={() => setCurrentStream(null)}
+                            onClick={handleReset}
                             endIcon={<RotateLeftIcon/>}
                     >
                         Reset
                     </Button>
                 }
             />
+            <Divider/>
+            <Tabs
+                value={userType.propertyName}
+                indicatorColor="primary"
+                textColor="primary"
+                aria-label="disabled tabs example"
+            >
+                {userTypes.map(({displayName, propertyName}, index) => (
+                    <Tab
+                        wrapped
+                        key={propertyName}
+                        value={propertyName}
+                        onClick={(event) => handleMenuItemClick(event, index)}
+                        label={displayName}
+                    />
+                ))}
+            </Tabs>
             <Divider/>
             <CardContent>
                 <Box
@@ -149,7 +177,7 @@ const TypeOfParticipants = ({
                             </Typography>
                             <Button size="small"
                                     variant="text"
-                                    onClick={() => setCurrentStream(null)}
+                                    onClick={handleReset}
                                     endIcon={<RotateLeftIcon/>}
                             >
                                 Reset

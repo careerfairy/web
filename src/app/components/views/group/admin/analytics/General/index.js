@@ -249,6 +249,8 @@ const General = ({
                         currentStream={currentStream}
                         typesOfOptions={typesOfOptions}
                         userType={userType}
+                        userTypes={userTypes}
+                        setUserType={setUserType}
                         setCurrentStream={setCurrentStream}
                         group={group}
                     />
