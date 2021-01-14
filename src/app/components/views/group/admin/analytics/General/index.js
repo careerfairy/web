@@ -33,6 +33,8 @@ const General = ({
                      setUserType,
                      groupOptions,
                      fetchingFollowers,
+                     handleToggleBar,
+    showBar
                  }) => {
     const classes = useStyles()
     const [currentStream, setCurrentStream] = useState(null);
@@ -240,6 +242,8 @@ const General = ({
                         streamsFromTimeFrame={streamsFromTimeFrame}
                         userType={userType}
                         userTypes={userTypes}
+                        handleToggleBar={handleToggleBar}
+                        showBar={showBar}
                         setUserType={setUserType}
                         group={group}
                     />

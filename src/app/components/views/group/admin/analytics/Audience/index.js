@@ -27,6 +27,7 @@ const Audience = ({
                       streamsFromTimeFrameAndFuture,
                       groupOptions,
                       totalFollowers,
+                      handleToggleBar, showBar
                   }) => {
     const classes = useStyles()
     const [currentStream, setCurrentStream] = useState(null);
@@ -67,6 +68,8 @@ const Audience = ({
                         streamsFromTimeFrame={streamsFromTimeFrame}
                         userType={userType}
                         userTypes={userTypes}
+                        handleToggleBar={handleToggleBar}
+                        showBar={showBar}
                         setUserType={setUserType}
                         group={group}
                     />

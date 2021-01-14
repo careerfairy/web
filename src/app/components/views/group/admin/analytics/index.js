@@ -168,6 +168,7 @@ const AnalyticsOverview = ({firebase, group}) => {
     const [value, setValue] = useState(0);
 
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[0]);
+    const [showBar, setShowBar] = useState(false);
     const [livestreams, setLivestreams] = useState([]);
     const [fetchingStreams, setFetchingStreams] = useState(false);
     const [userType, setUserType] = useState(userTypes[0]);
@@ -257,6 +258,10 @@ const AnalyticsOverview = ({firebase, group}) => {
         )
     }
 
+    const handleToggleBar = () => {
+        setShowBar(!showBar)
+    }
+
     const streamsFromTimeFrame = useMemo(() => getStreamsFromTimeFrame(globalTimeFrame.globalDate), [
         livestreams, globalTimeFrame
     ]);
@@ -282,6 +287,8 @@ const AnalyticsOverview = ({firebase, group}) => {
             globalTimeFrame,
             fetchingStreams: fetchingStreams || fetchingFollowers,
             streamsFromTimeFrame,
+            showBar,
+            handleToggleBar,
             streamsFromBeforeTimeFrame,
             streamsFromTimeFrameAndFuture,
             globalTimeFrames,

@@ -41,12 +41,12 @@ const LatestEvents = ({
                           userType,
                           setCurrentStream,
                           fetchingStreams,
+                          showBar,
+                          handleToggleBar,
                           ...rest
                       }) => {
     const classes = useStyles();
     const theme = useTheme();
-
-    const [showBar, setShowBar] = useState(false);
 
 
     const lineConfig = {
@@ -79,10 +79,6 @@ const LatestEvents = ({
         } else {
             return [...getLength(futureStreams, prop)]
         }
-    }
-
-    const handleToggleBar = () => {
-        setShowBar(!showBar)
     }
 
 
@@ -256,7 +252,6 @@ const LatestEvents = ({
     const handleMenuItemClick = (event, index) => {
         setUserType(userTypes[index])
     };
-
 
 
     return (
