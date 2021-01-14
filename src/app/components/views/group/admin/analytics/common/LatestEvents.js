@@ -150,7 +150,7 @@ const LatestEvents = ({
         onHover: (event, chartElement) => {
             if (chartElement.length) {
                 const index = chartElement[0]._index
-                if ([...streamsFromTimeFrame, ...futureStreams][index]?.[userType.propertyName].length) {
+                if ([...streamsFromTimeFrame, ...futureStreams][index]?.[userType.propertyName]?.length) {
                     event.target.style.cursor = 'pointer'
                 } else {
                     event.target.style.cursor = 'default'
@@ -277,6 +277,7 @@ const LatestEvents = ({
                 value={userType.propertyName}
                 indicatorColor="primary"
                 textColor="primary"
+                scrollButtons="auto"
                 aria-label="disabled tabs example"
             >
                 {userTypes.map(({displayName, propertyName}, index) => (

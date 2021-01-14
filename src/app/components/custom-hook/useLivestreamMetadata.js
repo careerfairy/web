@@ -36,7 +36,7 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
 
     useEffect(() => {
         if (livestream && userRequestedDownload) {
-            const unsubscribe = firebase.listLivestreamQuestions(livestream.id, querySnapshot => {
+            const unsubscribe = firebase.listenToLivestreamQuestions(livestream.id, querySnapshot => {
                 let questionList = [];
                 querySnapshot.forEach(doc => {
                     let cc = doc.data();

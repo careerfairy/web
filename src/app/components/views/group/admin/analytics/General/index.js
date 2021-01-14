@@ -34,10 +34,11 @@ const General = ({
                      groupOptions,
                      fetchingFollowers,
                      handleToggleBar,
+                     setCurrentStream,
+                     currentStream,
     showBar
                  }) => {
     const classes = useStyles()
-    const [currentStream, setCurrentStream] = useState(null);
 
     const getTotalRegisteredUsers = (streamsArray) => {
         const total = streamsArray.reduce(

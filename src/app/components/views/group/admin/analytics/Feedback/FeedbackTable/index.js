@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 
-const UsersTable = ({
+const FeedbackTable = ({
                         groupOptions,
                         fetchingStreams,
                         userType,
@@ -71,32 +71,6 @@ const UsersTable = ({
             width: 170,
         },
     ]
-
-    if (userType.propertyName === "talentPool") {
-        initialColumns.unshift({
-            field: "userEmail",
-            headerName: "Email",
-            width: 200,
-            renderCell: (params) => (
-                <a href={`mailto:${params.value}`}>
-                    {params.value}
-                </a>
-            ),
-        },)
-    }
-
-    if (currentStream) {
-        initialColumns.push({
-            field: "watchedEvent",
-            headerName: "Attended Event",
-            width: 170,
-        })
-    }
-
-    useEffect(() => {
-        const categoryColumns = getGroupCategoryColumns()
-        setColumns([...initialColumns, ...categoryColumns])
-    }, [group.id, userType, currentStream])
 
     useEffect(() => {
         setUsers(totalUniqueUsers)
@@ -201,7 +175,7 @@ const UsersTable = ({
 
 
     const newData = {
-        columns: columns,
+        columns: initialColumns,
         rows: users
     }
 
@@ -238,37 +212,36 @@ const UsersTable = ({
                     }}
                 />
             </Box>
-            <Box
-                display="flex"
-                justifyContent="space-between"
-                p={2}
-            >
-                {userType.propertyName === "talentPool" &&
-                <Button
-                    color="primary"
-                    size="small"
-                    variant="contained"
-                    disabled={Boolean(!selection.length)}
-                    onClick={handleCopyEmails}
-                >
-                    Copy Email Addresses
-                </Button>}
-                <Button
-                    color="primary"
-                    onClick={toggleTable}
-                    endIcon={!expandTable && <ArrowRightIcon/>}
-                    size="small"
-                    variant="text"
-                >
-                    {expandTable ? "Show Less" : "Expand"}
-                </Button>
-            </Box>
+            {/*<Box*/}
+            {/*    display="flex"*/}
+            {/*    justifyContent="space-between"*/}
+            {/*    p={2}*/}
+            {/*>*/}
+            {/*    <Button*/}
+            {/*        color="primary"*/}
+            {/*        size="small"*/}
+            {/*        variant="contained"*/}
+            {/*        disabled={Boolean(!selection.length)}*/}
+            {/*        onClick={handleCopyEmails}*/}
+            {/*    >*/}
+            {/*        Copy Email Addresses*/}
+            {/*    </Button>*/}
+            {/*    <Button*/}
+            {/*        color="primary"*/}
+            {/*        onClick={toggleTable}*/}
+            {/*        endIcon={!expandTable && <ArrowRightIcon/>}*/}
+            {/*        size="small"*/}
+            {/*        variant="text"*/}
+            {/*    >*/}
+            {/*        {expandTable ? "Show Less" : "Expand"}*/}
+            {/*    </Button>*/}
+            {/*</Box>*/}
         </Card>
     );
 };
 
-UsersTable.propTypes = {
+FeedbackTable.propTypes = {
     className: PropTypes.string
 };
 
-export default withFirebase(UsersTable);
+export default withFirebase(FeedbackTable);

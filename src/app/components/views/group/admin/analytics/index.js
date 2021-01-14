@@ -14,6 +14,7 @@ import Grid from "@material-ui/core/Grid";
 import Title from "./Title";
 import Box from "@material-ui/core/Box";
 import {handleFlattenOptions} from "../../../../helperFunctions/streamFormFunctions";
+import Feedback from "./Feedback";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -173,6 +174,8 @@ const AnalyticsOverview = ({firebase, group}) => {
     const [fetchingStreams, setFetchingStreams] = useState(false);
     const [userType, setUserType] = useState(userTypes[0]);
     const [groupOptions, setGroupOptions] = useState([]);
+    const [currentStream, setCurrentStream] = useState(null);
+    console.log("-> currentStream", currentStream);
 
 
     useEffect(() => {
@@ -213,9 +216,6 @@ const AnalyticsOverview = ({firebase, group}) => {
                         livestream.talentPoolData = totalFollowers.filter(follower => {
                             return livestream.talentPool.some(userEmail => userEmail === follower.userEmail)
                         })
-                        if(livestream.registeredUsers.length){
-                        console.log("-> livestream", livestream);
-                        }
                         return livestream
                     })
                     setLivestreams(livestreamsData.reverse())
@@ -225,6 +225,17 @@ const AnalyticsOverview = ({firebase, group}) => {
             return () => unsubscribe();
         }
     }, [globalTimeFrame, group.id, totalFollowers]);
+
+    useEffect(() => {
+        if (currentStream?.id) {
+            const newStream = {...currentStream}
+            const unsubscribePolls = firebase.listenToPollEntries(currentStream.id, querySnapshot => {
+                newStream.pollEntries = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                setCurrentStream(newStream);
+            });
+            return () => unsubscribePolls();
+        }
+    }, [currentStream?.id])
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -295,6 +306,8 @@ const AnalyticsOverview = ({firebase, group}) => {
             setGlobalTimeFrame,
             fetchingFollowers,
             totalFollowers,
+            currentStream,
+            setCurrentStream,
             userType,
             userTypes,
             setUserType,
@@ -329,6 +342,7 @@ const AnalyticsOverview = ({firebase, group}) => {
             <SwipeableViews
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
+                disabled
                 onChangeIndex={handleChangeIndex}
             >
                 <SwipeablePanel value={value} index={0} dir={theme.direction}>
@@ -342,7 +356,9 @@ const AnalyticsOverview = ({firebase, group}) => {
                     />
                 </SwipeablePanel>
                 <SwipeablePanel value={value} index={2} dir={theme.direction}>
-                    Item Three
+                    <Feedback
+                        {...getTabProps()}
+                    />
                 </SwipeablePanel>
             </SwipeableViews>
         </Fragment>

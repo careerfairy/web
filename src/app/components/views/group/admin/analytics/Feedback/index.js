@@ -1,9 +1,9 @@
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Container, Grid} from "@material-ui/core";
 
 import {makeStyles} from "@material-ui/core/styles";
 import LatestEvents from "../common/LatestEvents";
-import UsersTable from "./UsersTable";
+import FeedbackTable from "./FeedbackTable";
 
 
 const useStyles = makeStyles(theme => ({
@@ -15,7 +15,7 @@ const useStyles = makeStyles(theme => ({
         width: "100%"
     }
 }))
-const Audience = ({
+const Feedback = ({
                       group,
                       globalTimeFrame,
                       futureStreams,
@@ -28,11 +28,15 @@ const Audience = ({
                       groupOptions,
                       totalFollowers,
                       handleToggleBar,
-                      setCurrentStream,
                       currentStream,
+                      setCurrentStream,
                       showBar
                   }) => {
     const classes = useStyles()
+
+
+
+
 
     const getUsers = () => {
         if (currentStream) {
@@ -77,7 +81,7 @@ const Audience = ({
                     />
                 </Grid>
                 <Grid item lg={12} md={12} xl={12} xs={12}>
-                    <UsersTable
+                    <FeedbackTable
                         totalUniqueUsers={totalUniqueUsers}
                         currentStream={currentStream}
                         fetchingStreams={fetchingStreams}
@@ -95,4 +99,4 @@ const Audience = ({
     );
 };
 
-export default Audience;
+export default Feedback;

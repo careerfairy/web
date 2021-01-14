@@ -65,7 +65,7 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (livestreamId) {
-            const unsubscribe = props.firebase.listLivestreamQuestions(
+            const unsubscribe = props.firebase.listenToLivestreamQuestions(
                 livestreamId,
                 (querySnapshot) => {
                     var questionsList = [];

@@ -685,7 +685,7 @@ class Firebase {
             .where("type", "==", 'done')
     };
 
-    listLivestreamQuestions = (livestreamId, callback) => {
+    listenToLivestreamQuestions = (livestreamId, callback) => {
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
