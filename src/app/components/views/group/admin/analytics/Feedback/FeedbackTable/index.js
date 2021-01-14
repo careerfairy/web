@@ -151,16 +151,6 @@ const FeedbackTable = ({
 
     const questionColumns = [
         {
-            field: "firstName",
-            headerName: "First Name",
-            width: 140,
-        },
-        {
-            field: "lastName",
-            headerName: "Last Name",
-            width: 150,
-        },
-        {
             field: "title",
             headerName: "Question",
             width: 250,
