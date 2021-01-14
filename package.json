@@ -46,7 +46,7 @@
     "dayjs": "^1.9.3",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "firebase": "^7.7.0",
+    "firebase": "^7.24.0",
     "firebase-admin": "^8.9.2",
     "firebase-functions": "^3.3.0",
     "firestore-pagination-hook": "^1.0.0",

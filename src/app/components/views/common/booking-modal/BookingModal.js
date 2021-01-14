@@ -110,7 +110,7 @@ function BookingModal({modalOpen, user, careerCenters, livestream, registration,
     }
 
     function joinTalentPool() {
-        firebase.joinCompanyTalentPool(livestream.companyId, user.email).then(() => {
+        firebase.joinCompanyTalentPool(livestream.companyId, user.email, livestream.id).then(() => {
             setModalStep(4);
         });
     }

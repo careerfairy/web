@@ -209,6 +209,7 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                     recipientEmail: user.email,
                     firstName: formData.firstName,
                     lastName: formData.lastName,
+                    linkedinUrl: formData.linkedinUrl,
                     universityCode: formData.university.code,
                     universityName: formData.university.name,
                     universityCountryCode: formData.universityCountryCode,

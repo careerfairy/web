@@ -1297,35 +1297,49 @@ class Firebase {
         return batch.commit();
     };
 
-    joinCompanyTalentPool = (companyId, userId) => {
-        let ref = this.firestore.collection("userData").doc(userId);
-        return this.firestore.runTransaction((transaction) => {
-            return transaction.get(ref).then((user) => {
-                transaction.update(ref, {
-                    talentPools: firebase.firestore.FieldValue.arrayUnion(companyId),
-                });
-            });
+    joinCompanyTalentPool = (companyId, userId, livestreamId) => {
+        let batch = this.firestore.batch();
+        let userRef = this.firestore.collection("userData").doc(userId);
+        let streamRef = this.firestore.collection("livestreams").doc(livestreamId)
+        batch.update(userRef, {
+            talentPools: firebase.firestore.FieldValue.arrayUnion(companyId),
         });
+        batch.update(streamRef, {
+            talentPool: firebase.firestore.FieldValue.arrayUnion(userId),
+        });
+        return batch.commit()
     };
 
-    leaveCompanyTalentPool = (companyId, userId) => {
-        let ref = this.firestore.collection("userData").doc(userId);
-        return this.firestore.runTransaction((transaction) => {
-            return transaction.get(ref).then((company) => {
-                transaction.update(ref, {
-                    talentPools: firebase.firestore.FieldValue.arrayRemove(companyId),
-                });
-            });
+    leaveCompanyTalentPool = (companyId, userId, livestreamId) => {
+        let batch = this.firestore.batch();
+        let userRef = this.firestore.collection("userData").doc(userId);
+        let streamRef = this.firestore.collection("livestreams").doc(livestreamId)
+        batch.update(userRef, {
+            talentPools: firebase.firestore.FieldValue.arrayRemove(companyId),
         });
+        batch.update(streamRef, {
+            talentPool: firebase.firestore.FieldValue.arrayRemove(userId),
+        });
+        return batch.commit()
     };
 
     setUserIsParticipating = (livestreamId, userData) => {
-        let ref = this.firestore
+        let batch = this.firestore.batch()
+        let livestreamRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+        let participantsRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("participatingStudents")
-            .doc(userData.userEmail);
-        return ref.set(userData);
+            .doc(userData.userEmail)
+
+        batch.set(participantsRef, userData)
+        batch.update(livestreamRef, {
+            participatingStudents: firebase.firestore.FieldValue.arrayUnion(userData.userEmail),
+        })
+
+        return batch.commit();
     }
 
     getRegisteredStudentsInLivestream = (livestreamId) => {
