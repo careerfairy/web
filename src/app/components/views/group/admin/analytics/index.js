@@ -207,11 +207,14 @@ const AnalyticsOverview = ({firebase, group}) => {
                             return livestream.registeredUsers.some(userEmail => userEmail === follower.userEmail)
                         })
                         livestream.participatingStudentsData = totalFollowers.filter(follower => {
-                            return livestream.participatingStudents.some(userEmail => userEmail === follower.userEmail)
+                            return livestream.participatingStudents?.some(userEmail => userEmail === follower.userEmail)
                         })
                         livestream.talentPoolData = totalFollowers.filter(follower => {
                             return livestream.talentPool.some(userEmail => userEmail === follower.userEmail)
                         })
+                        if(livestream.registeredUsers.length){
+                        console.log("-> livestream", livestream);
+                        }
                         return livestream
                     })
                     setLivestreams(livestreamsData.reverse())

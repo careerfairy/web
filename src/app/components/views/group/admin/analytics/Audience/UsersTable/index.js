@@ -60,12 +60,10 @@ const UsersTable = ({
             headerName: "Last Name",
             width: 140,
         },
-
-
         {
             field: "streamsWatched",
             headerName: "Events Attended",
-            width: 170,
+            width: 150,
         },
         {
             field: "streamsRegistered",
@@ -89,17 +87,14 @@ const UsersTable = ({
 
     if (currentStream) {
         initialColumns.push({
-            field: "didNotAttend",
-            headerName: "Did not attend",
+            field: "watchedEvent",
+            headerName: "Attended Event",
             width: 170,
         })
     }
 
     useEffect(() => {
         const categoryColumns = getGroupCategoryColumns()
-        // const newColumns = [...initialColumns]
-        // // Place the group category options before gender, streamsWatched, etc...
-        // newColumns.splice(4, 0, ...categoryColumns)
         setColumns([...initialColumns, ...categoryColumns])
     }, [group.id, userType, currentStream])
 
@@ -160,14 +155,14 @@ const UsersTable = ({
 
     const mapStreamsWatched = () => {
         const updatedUsers = totalUniqueUsers.map(user => {
-            user.didNotAttend = "Yes"
+            user.watchedEvent = "No"
             const currentUserEmail = user.userEmail
             if (currentUserEmail) {
                 const watchedStreams = []
                 streamsFromTimeFrameAndFuture.forEach(stream => {
-                    if (stream?.participatingStudents?.some(userObj => userObj?.userEmail === currentUserEmail)) {
+                    if (stream?.participatingStudents?.some(userEmail => userEmail === currentUserEmail)) {
                         watchedStreams.push(stream)
-                        user.didNotAttend = "No"
+                        user.watchedEvent = "Yes"
                     }
                 })
                 user.streamsWatched = watchedStreams.length
@@ -181,7 +176,7 @@ const UsersTable = ({
             if (currentUser.userEmail) {
                 const registeredStreams = []
                 streamsFromTimeFrameAndFuture.forEach(stream => {
-                    if (stream?.registeredUsers?.some(userObj => userObj?.userEmail === currentUser.userEmail)) {
+                    if (stream?.registeredUsers?.some(userEmail => userEmail === currentUser.userEmail)) {
                         registeredStreams.push(stream)
                     }
                 })

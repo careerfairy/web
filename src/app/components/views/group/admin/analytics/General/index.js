@@ -235,6 +235,7 @@ const General = ({
                     <LatestEvents
                         timeFrames={globalTimeFrame.timeFrames}
                         setCurrentStream={setCurrentStream}
+                        fetchingStreams={fetchingStreams}
                         futureStreams={futureStreams}
                         streamsFromTimeFrame={streamsFromTimeFrame}
                         userType={userType}

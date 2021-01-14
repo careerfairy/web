@@ -10,13 +10,15 @@ import {
     CardHeader,
     Divider,
     useTheme,
-    makeStyles, Menu, MenuItem,
+    makeStyles, Menu, MenuItem, CircularProgress, fade,
 } from "@material-ui/core";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowRightIcon from "@material-ui/icons/ArrowRight";
 import {withFirebase} from "../../../../../../context/firebase";
 import {colorsArray} from "../../../../../util/colors";
 import {getLength, prettyDate, snapShotsToData} from "../../../../../helperFunctions/HelperFunctions";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -28,6 +30,7 @@ const useStyles = makeStyles((theme) => ({
 
 const LatestEvents = ({
                           timeFrames,
+
                           futureStreams,
                           firebase,
                           setUserType,
@@ -37,6 +40,7 @@ const LatestEvents = ({
                           userTypes,
                           userType,
                           setCurrentStream,
+                          fetchingStreams,
                           ...rest
                       }) => {
     const classes = useStyles();
@@ -120,19 +124,19 @@ const LatestEvents = ({
                 pointBorderColor: colorsArray[0],
                 pointBackgroundColor: colorsArray[0],
                 backgroundColor: theme.palette.primary.dark,
-                borderColor: colorsArray[0],
+                borderColor: fade(colorsArray[0], 0.5),
                 data: handleFutureStreams("registeredUsers"),
                 label: "Registrations so Far",
                 spanGaps: true
             },
             {
                 borderDash: [20, 30],
-                pointHoverBackgroundColor: colorsArray[2],
+                pointHoverBackgroundColor: colorsArray[4],
                 pointHoverBorderColor: 'rgba(220,220,220,1)',
                 pointBorderColor: colorsArray[2],
                 pointBackgroundColor: colorsArray[2],
                 backgroundColor: colorsArray[2],
-                borderColor: colorsArray[2],
+                borderColor: fade(colorsArray[2], 0.5),
                 data: handleFutureStreams("talentPool"),
                 label: "Talent Pool so Far",
                 spanGaps: true
@@ -170,7 +174,7 @@ const LatestEvents = ({
         redraw: true,
         cornerRadius: 20,
         layout: {padding: 0},
-        legend: {display: false},
+        legend: {display: true},
         maintainAspectRatio: false,
         responsive: true,
         scales: {
@@ -289,22 +293,27 @@ const LatestEvents = ({
                 title="Latest Events"
             />
             <Divider/>
+            <Tabs
+                value={userType.propertyName}
+                indicatorColor="primary"
+                textColor="primary"
+                aria-label="disabled tabs example"
+            >
+                {userTypes.map(({displayName, propertyName}, index) => (
+                    <Tab
+                        key={propertyName}
+                        value={propertyName}
+                        onClick={(event) => handleMenuItemClick(event, index)}
+                        label={displayName}
+                    />
+                ))}
+            </Tabs>
+            <Divider/>
             <CardContent>
-                <Box height={400}>
-                    <Line data={data} options={options}/>
+                <Box display="flex" alignItems="center" justifyContent="center" height={400}>
+                    {fetchingStreams ? <CircularProgress size={50}/> : <Line data={data} options={options}/>}
                 </Box>
             </CardContent>
-            {/*<Divider/>*/}
-            {/*<Box display="flex" justifyContent="flex-end" p={2}>*/}
-            {/*    <Button*/}
-            {/*        color="primary"*/}
-            {/*        endIcon={<ArrowRightIcon/>}*/}
-            {/*        size="small"*/}
-            {/*        variant="text"*/}
-            {/*    >*/}
-            {/*        Overview*/}
-            {/*    </Button>*/}
-            {/*</Box>*/}
         </Card>
     );
 };
