@@ -241,7 +241,6 @@ const AnalyticsOverview = ({firebase, group}) => {
         if (currentStream?.id) {
             const unsubscribePolls = firebase.listenToPollEntries(currentStream.id, querySnapshot => {
                 const pollEntries = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
-
                 setCurrentStream(prevState => ({...prevState, pollEntries}));
             });
             return () => unsubscribePolls();

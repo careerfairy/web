@@ -56,42 +56,7 @@ const renderLongText = ({value}) => {
 }
 
 
-const questionColumns = [
-    {
-        field: "firstName",
-        headerName: "First Name",
-        width: 140,
-    },
-    {
-        field: "lastName",
-        headerName: "Last Name",
-        width: 150,
-    },
-    {
-        field: "title",
-        headerName: "Question",
-        width: 250,
-        renderCell: renderLongText,
-    },
-    {
-        field: "votes",
-        headerName: "Votes",
-        width: 130,
-        type: 'number',
-    },
-    {
-        field: "timestamp",
-        headerName: "Date Created",
-        width: 200,
-        type: 'dateTime',
-        valueGetter: getDate
-    },
-    {
-        field: "type",
-        headerName: "status",
-        width: 100,
-    },
-]
+
 
 
 const FeedbackTable = ({
@@ -181,6 +146,43 @@ const FeedbackTable = ({
             width: 200,
             type: 'dateTime',
             valueGetter: getDate
+        },
+    ]
+
+    const questionColumns = [
+        {
+            field: "firstName",
+            headerName: "First Name",
+            width: 140,
+        },
+        {
+            field: "lastName",
+            headerName: "Last Name",
+            width: 150,
+        },
+        {
+            field: "title",
+            headerName: "Question",
+            width: 250,
+            renderCell: renderLongText,
+        },
+        {
+            field: "votes",
+            headerName: "Votes",
+            width: 130,
+            type: 'number',
+        },
+        {
+            field: "timestamp",
+            headerName: "Date Created",
+            width: 200,
+            type: 'dateTime',
+            valueGetter: getDate
+        },
+        {
+            field: "type",
+            headerName: "status",
+            width: 100,
         },
     ]
 
