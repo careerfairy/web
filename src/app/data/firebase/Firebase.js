@@ -1438,6 +1438,11 @@ class Firebase {
             .where("groupIds", "array-contains", groupId)
         return ref.get();
     };
+    queryFollowers = async (groupId) => {
+        return  this.firestore
+            .collection("userData")
+            .where("groupIds", "array-contains", groupId)
+    };
 
     snapShotsToData = (snapShots) => {
         let dataArray = []

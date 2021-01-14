@@ -20,7 +20,6 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 const General = ({
-                     firebase,
                      group,
                      fetchingStreams,
                      globalTimeFrame,
@@ -28,30 +27,18 @@ const General = ({
                      streamsFromBeforeTimeFrame,
                      streamsFromTimeFrame,
                      streamsFromTimeFrameAndFuture,
+                     totalFollowers,
                      userTypes,
                      userType,
                      setUserType,
-                     groupOptions
+                     groupOptions,
+                     fetchingFollowers,
                  }) => {
     const classes = useStyles()
-    const [totalFollowers, setTotalFollowers] = useState([]);
-    const [fetchingFollowers, setFetchingFollowers] = useState(false);
     const [currentStream, setCurrentStream] = useState(null);
 
-
-    useEffect(() => {
-        (async function () {
-            setFetchingFollowers(true);
-            const snapshots = await firebase.getFollowers(group.id)
-            const followerData = snapShotsToData(snapshots);
-            setTotalFollowers(followerData);
-            setFetchingFollowers(false);
-        })()
-    }, [group.id]);
-
-
-    const getTotalRegisteredUsers = () => {
-        const total = streamsFromTimeFrameAndFuture.reduce(
+    const getTotalRegisteredUsers = (streamsArray) => {
+        const total = streamsArray.reduce(
             (accumulator, {registeredUsers}) =>
                 accumulator + registeredUsers.length,
             0
@@ -60,26 +47,29 @@ const General = ({
         return mustBeNumber(total);
     };
 
-    const getUniqueUsers = (streamsArray, prop = "registeredUsers") => {
-        const totalViewers = streamsArray.reduce(
+    const getTotal = (streamsArray, prop) => {
+        return streamsArray.reduce(
             (accumulator, livestream) => {
                 return [...accumulator, ...livestream[prop]];
             },
             []
         );
+    }
 
+    const getUniqueIds = (arrayOfIds) => {
+        return [...new Set(arrayOfIds)]
+    }
+
+    const getUniqueUsers = (streamsArray, prop) => {
+        const totalViewers = getTotal(streamsArray, prop)
         // new Set method removes all duplicates from array
-        const uniqueRegisteredUsers = totalViewers.filter(function (el) {
+        return totalViewers.filter(function (el) {
             if (!this[el.userEmail]) {
                 this[el.userEmail] = true;
                 return true;
             }
             return false;
         }, Object.create(null));
-        return {
-            amount: mustBeNumber(uniqueRegisteredUsers.length),
-            data: uniqueRegisteredUsers
-        };
     };
 
     const getAverageRegistrationsPerEvent = () => {
@@ -88,16 +78,8 @@ const General = ({
     };
 
     const compareRegistrations = () => {
-        const registrationsFromTimeFrame = streamsFromTimeFrameAndFuture.reduce(
-            (accumulator, {registeredUsers}) =>
-                accumulator + registeredUsers.length,
-            0
-        );
-        const registrationsFromBeforeTimeFrame = streamsFromBeforeTimeFrame.reduce(
-            (accumulator, {registeredUsers}) =>
-                accumulator + registeredUsers.length,
-            0
-        );
+        const registrationsFromTimeFrame = getTotal(streamsFromTimeFrameAndFuture, "registeredUsers").length
+        const registrationsFromBeforeTimeFrame = getTotal(streamsFromBeforeTimeFrame, "registeredUsers").length
         const {
             positive,
             percentage,
@@ -111,17 +93,19 @@ const General = ({
     }
 
     const compareUniqueRegistrations = () => {
-        const registrationsFromTimeFrame = getUniqueUsers(streamsFromTimeFrameAndFuture).amount
-        const registrationsFromBeforeTimeFrame = getUniqueUsers(streamsFromBeforeTimeFrame).amount
+        const totalRegistrationsFromTimeFrame = getTotal(streamsFromTimeFrameAndFuture, "registeredUsers")
+        const totalRegistrationsFromBeforeTimeFrame = getTotal(streamsFromBeforeTimeFrame, "registeredUsers")
+        const uniqueRegistrationsFromTimeFrame = getUniqueIds(totalRegistrationsFromTimeFrame).length
+        const uniqueRegistrationsFromBeforeTimeFrame = getUniqueIds(totalRegistrationsFromBeforeTimeFrame).length
         const {
             positive,
             percentage,
-        } = getStats(registrationsFromTimeFrame, registrationsFromBeforeTimeFrame)
+        } = getStats(uniqueRegistrationsFromTimeFrame, uniqueRegistrationsFromBeforeTimeFrame)
 
         return {
             positive,
             percentage: `${percentage}%`,
-            dataToCompare: Boolean(registrationsFromBeforeTimeFrame && registrationsFromTimeFrame)
+            dataToCompare: Boolean(uniqueRegistrationsFromBeforeTimeFrame && uniqueRegistrationsFromTimeFrame)
         }
     }
 
@@ -140,6 +124,11 @@ const General = ({
         }
     }
 
+    const getTotalUniqueUsers = (streamsArray) => {
+        const totalUsers = getTotal(streamsArray, "registeredUsers")
+        return getUniqueIds(totalUsers).length
+    }
+
     const getAggregateCategories = (participants) => {
         let categories = []
         participants.forEach(user => {
@@ -156,26 +145,7 @@ const General = ({
         if (currentStream?.[prop]) {
             students = currentStream[prop]
         } else {//Get total Students
-            students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop).data
-            // students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop).data
-
-            // Talent Pool
-            // 1. Map all livestream's companyId into an array of company IDs
-            // 2. user collection where talent pool array contains any of the companyIDs
-
-            // Registered users
-            // 1. Get followers
-            // 2. Map all livestream's registered users into an array of unique IDs
-            // 3. filter followers against array of unique IDs
-            // 4. Return filtered Data
-
-            // Participating students
-            // 1. Map all participating students IDs from livestreams into unique array
-            // 2. query user's collection with array of Unique IDs
-            // 3. Return queried Data
-
-
-
+            students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop)
         }
         const aggregateCategories = getAggregateCategories(students)
         const flattenedGroupOptions = [...groupOptions]
@@ -185,16 +155,20 @@ const General = ({
         return flattenedGroupOptions.sort((a, b) => b.count - a.count);
     }
 
+    const getTotalFollowers = () => {
+        return totalFollowers ? totalFollowers.length : 0
+    }
+
 
     // use Memo is great for optimizing expensive calculations, the value of the function call will be stored in memory
     // The function will only be re-called when the value(streamsFromTimeFrame) in the dependency array changes
 
 
-    const totalRegistrations = useMemo(() => getTotalRegisteredUsers(), [
+    const totalRegistrations = useMemo(() => getTotalRegisteredUsers(streamsFromTimeFrameAndFuture), [
         streamsFromTimeFrameAndFuture,
     ]);
 
-    const totalUniqueRegistrations = useMemo(() => getUniqueUsers(streamsFromTimeFrameAndFuture).amount, [
+    const totalUniqueRegistrations = useMemo(() => getTotalUniqueUsers(streamsFromTimeFrameAndFuture), [
         streamsFromTimeFrameAndFuture,
     ]);
 
@@ -213,7 +187,7 @@ const General = ({
     );
 
     const typesOfOptions = useMemo(
-        () => getTypeOfStudents(userType.propertyName),
+        () => getTypeOfStudents(userType.propertyDataName),
         [streamsFromTimeFrameAndFuture, currentStream, userType]
     );
 
@@ -252,7 +226,7 @@ const General = ({
                 <Grid item lg={3} sm={6} xl={3} xs={12}>
                     <NumberOfFollowers
                         fetchingFollowers={fetchingFollowers}
-                        totalFollowers={totalFollowers.length}
+                        totalFollowers={getTotalFollowers()}
                         timeFrames={globalTimeFrame.timeFrames}
                         group={group}
                     />

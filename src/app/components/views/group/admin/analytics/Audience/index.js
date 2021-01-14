@@ -26,17 +26,19 @@ const Audience = ({
                       streamsFromTimeFrame,
                       streamsFromTimeFrameAndFuture,
                       groupOptions,
+                      totalFollowers,
                   }) => {
     const classes = useStyles()
     const [currentStream, setCurrentStream] = useState(null);
 
     const getUsers = (streamsFromTimeFrame, prop = "registeredUsers") => {
+        const propData = prop + "Data"
         if (currentStream) {
-            return currentStream[prop]
+            return currentStream[propData]
         } else {
             const totalViewers = streamsFromTimeFrame.reduce(
                 (accumulator, livestream) => {
-                    return [...accumulator, ...livestream[prop]];
+                    return [...accumulator, ...livestream[propData]];
                 },
                 []
             );

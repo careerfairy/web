@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
         borderBottom: `1px solid ${fade(theme.palette.text.secondary, 0.3)}`
 
     },
-    title:{
+    title: {
         background: theme.palette.common.white
     }
 }));
@@ -148,15 +148,18 @@ const globalTimeFrames = [
 const userTypes = [
     {
         propertyName: "registeredUsers",
-        displayName: "Registered Users"
+        displayName: "Registered Users",
+        propertyDataName: "registeredUsersData"
     },
     {
         propertyName: "participatingStudents",
-        displayName: "Participating Students"
+        displayName: "Participating Students",
+        propertyDataName: "participatingStudentsData"
     },
     {
         propertyName: "talentPool",
-        displayName: "Talent Pool"
+        displayName: "Talent Pool",
+        propertyDataName: "talentPoolData"
     }]
 
 const AnalyticsOverview = ({firebase, group}) => {
@@ -177,6 +180,47 @@ const AnalyticsOverview = ({firebase, group}) => {
 
     }, [group])
 
+    const [fetchingFollowers, setFetchingFollowers] = useState(false);
+    const [totalFollowers, setTotalFollowers] = useState(null);
+
+    useEffect(() => {
+        (async function () {
+            setFetchingFollowers(true);
+            const snapshots = await firebase.getFollowers(group.id)
+            const followerData = snapshots.docs.map(doc => ({id: doc.id, ...doc.data()}))
+            setTotalFollowers(followerData);
+            setFetchingFollowers(false);
+        })()
+    }, [group.id]);
+
+
+    useEffect(() => {
+        if (totalFollowers) {
+            setFetchingStreams(true);
+            const unsubscribe = firebase.listenToAllLivestreamsOfGroup(
+                group.id,
+                (snapshots) => {
+                    const livestreamsData = snapshots.docs.map(snap => {
+                        const livestream = snap.data()
+                        livestream.id = snap.id
+                        livestream.registeredUsersData = totalFollowers.filter(follower => {
+                            return livestream.registeredUsers.some(userEmail => userEmail === follower.userEmail)
+                        })
+                        livestream.participatingStudentsData = totalFollowers.filter(follower => {
+                            return livestream.participatingStudents.some(userEmail => userEmail === follower.userEmail)
+                        })
+                        livestream.talentPoolData = totalFollowers.filter(follower => {
+                            return livestream.talentPool.some(userEmail => userEmail === follower.userEmail)
+                        })
+                        return livestream
+                    })
+                    setLivestreams(livestreamsData.reverse())
+                    setFetchingStreams(false)
+                }, new Date(globalTimeFrame.double)
+            );
+            return () => unsubscribe();
+        }
+    }, [globalTimeFrame, group.id, totalFollowers]);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -185,39 +229,6 @@ const AnalyticsOverview = ({firebase, group}) => {
     const handleChangeIndex = (index) => {
         setValue(index);
     };
-
-    useEffect(() => {
-        setFetchingStreams(true);
-        const unsubscribe = firebase.listenToAllLivestreamsOfGroup(
-            group.id,
-            (snapshots) => {
-                if (snapshots.empty) {
-                    setFetchingStreams(false)
-                    setLivestreams([])
-                } else {
-                    let livestreams = []
-                    snapshots.docs.forEach(async (snap, index, arr) => {
-                        const livestream = snap.data()
-                        livestream.id = snap.id
-                        // const participatingSnap = await firebase.getLivestreamParticipatingStudents(snap.id)
-                        // const talentPoolSnap = await firebase.getLivestreamTalentPoolMembers(livestream.companyId)
-                        // const registeredStudentsSnap = await firebase.getLivestreamRegisteredStudents(livestream.id)
-                        // livestream.registeredUsers = snapShotsToData(registeredStudentsSnap)
-                        // livestream.participatingStudents = snapShotsToData(participatingSnap)
-                        // livestream.talentPool = snapShotsToData(talentPoolSnap)
-                        livestreams.push(livestream)
-                        if (index === arr.length - 1) {
-                            const livestreamData = livestreams.reverse();
-                            setFetchingStreams(false);
-                            setLivestreams(livestreamData);
-                        }
-                    })
-                }
-
-            }, new Date(globalTimeFrame.double)
-        );
-        return () => unsubscribe();
-    }, [globalTimeFrame, group.id]);
 
     const getFutureEvents = () => {
         return livestreams.filter((stream) => {
@@ -266,12 +277,14 @@ const AnalyticsOverview = ({firebase, group}) => {
             livestreams,
             futureStreams,
             globalTimeFrame,
-            fetchingStreams,
+            fetchingStreams: fetchingStreams || fetchingFollowers,
             streamsFromTimeFrame,
             streamsFromBeforeTimeFrame,
             streamsFromTimeFrameAndFuture,
             globalTimeFrames,
             setGlobalTimeFrame,
+            fetchingFollowers,
+            totalFollowers,
             userType,
             userTypes,
             setUserType,
