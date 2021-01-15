@@ -150,6 +150,5 @@ export const validateStreamForm = (values, isDraft) => {
     if (!Object.keys(errors.speakers).length) {
         delete errors.speakers
     }
-    console.log(errors);
     return errors;
 }
