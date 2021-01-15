@@ -251,7 +251,6 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     setSubmitted(true)
                     window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
                 } catch (e) {
-                    console.log("-> e", e);
                     setGeneralError("Something went wrong")
                 }
             }}

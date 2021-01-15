@@ -265,6 +265,30 @@ class Firebase {
 
     addLivestream = async (livestream, collection) => {
         try {
+            const ratings = [
+                {
+                    message: "How would you rate this live stream?",
+                    type: "overall",
+                    appearAfter: 20,
+                    hasRated: false,
+                    isForEnd: false
+                },
+                {
+                    message: `How happy are you with the content shared by ${livestream.company}?`,
+                    type: "company",
+                    appearAfter: 30,
+                    hasRated: false,
+                    isForEnd: false
+                },
+                {
+                    message: `After this stream, are you more likely to apply to ${livestream.company}?`,
+                    type: "willingnessToApply",
+                    appearAfter: 25,
+                    hasRated: false,
+                    isForEnd: true
+                },
+            ]
+
             let batch = this.firestore.batch();
             let livestreamsRef = this.firestore
                 .collection(collection)
@@ -272,6 +296,20 @@ class Firebase {
             livestream.currentSpeakerId = livestreamsRef.id
             livestream.id = livestreamsRef.id
             batch.set(livestreamsRef, livestream)
+
+            for (const rating of ratings) {
+                let ratingRef = this.firestore.collection(collection)
+                    .doc(livestreamsRef.id)
+                    .collection("rating")
+                    .doc(rating.type)
+
+                batch.set(ratingRef, {
+                    title: rating.type,
+                    question: rating.message,
+                    appearAfter: rating.appearAfter
+                })
+            }
+
             await batch.commit()
             return livestreamsRef.id
 
