@@ -14,13 +14,6 @@ const useStyles = makeStyles(() => ({
     actions: {
         justifyContent: 'flex-end'
     },
-    gridWrapper: {
-        '& .link': {
-            backgroundColor: 'rgba(224, 183, 60, 0.55)',
-            color: '#1a3e72',
-            fontWeight: '600',
-        },
-    }
 }));
 
 
@@ -33,6 +26,7 @@ const UsersTable = ({
                         futureStreams,
                         totalUniqueUsers,
                         streamsFromTimeFrameAndFuture,
+                        breakdownRef,
                         className,
                         ...rest
                     }) => {
@@ -214,10 +208,11 @@ const UsersTable = ({
                 subheader={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
             />
             <Divider/>
-            <Box className={classes.gridWrapper} height={expandTable ? 800 : 400} width="100%">
+            <Box height={expandTable ? 800 : 400} width="100%">
                 <DataGrid
                     {...newData}
                     showToolbar
+                    ref={breakdownRef}
                     checkboxSelection
                     loading={fetchingStreams}
                     onSelectionChange={(newSelection) => {

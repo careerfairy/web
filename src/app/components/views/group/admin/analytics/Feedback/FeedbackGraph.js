@@ -33,6 +33,11 @@ function randomColor() {
     return '#' + Math.round(Math.random() * max).toString(16);
 }
 
+const initialData = {
+    datasets: [],
+    labels: []
+}
+
 const FeedbackGraph = ({
                            group,
                            setCurrentStream,
@@ -54,10 +59,7 @@ const FeedbackGraph = ({
     const [localColors, setLocalColors] = useState(colorsArray);
     const [total, setTotal] = useState(0);
     const [legendLabels, setLegendLabels] = useState([]);
-    const [data, setData] = useState({
-        datasets: [],
-        labels: []
-    });
+    const [data, setData] = useState(initialData);
 
     useEffect(() => {
         if (data.datasets.length) {
@@ -81,6 +83,8 @@ const FeedbackGraph = ({
             })
             setLegendLabels(currentPoll.options.map(option => ({name: option.name, hidden: false})))
 
+        } else {
+            setData(initialData)
         }
 
     }, [currentPoll])

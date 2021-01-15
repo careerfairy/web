@@ -1,9 +1,10 @@
-import React, {useMemo, useState} from "react";
+import React, {useMemo, useRef, useState} from "react";
 import {Container, Grid} from "@material-ui/core";
 
 import {makeStyles} from "@material-ui/core/styles";
 import LatestEvents from "../common/LatestEvents";
 import UsersTable from "./UsersTable";
+import TypeOfParticipants from "../General/TypeOfParticipants";
 
 
 const useStyles = makeStyles(theme => ({
@@ -28,12 +29,13 @@ const Audience = ({
                       groupOptions,
                       totalFollowers,
                       handleToggleBar,
+                      breakdownRef,
                       setCurrentStream,
+                      handleScrollToBreakdown,
                       currentStream,
                       showBar
                   }) => {
     const classes = useStyles()
-
     const getUsers = () => {
         if (currentStream) {
             return currentStream[userType.propertyDataName]
@@ -58,6 +60,7 @@ const Audience = ({
         streamsFromTimeFrameAndFuture, currentStream, userType
     ]);
 
+
     return (
         <Container className={classes.root} maxWidth={false}>
             <Grid container spacing={3}>
@@ -72,6 +75,7 @@ const Audience = ({
                         userTypes={userTypes}
                         handleToggleBar={handleToggleBar}
                         showBar={showBar}
+                        handleScrollToBreakdown={handleScrollToBreakdown}
                         setUserType={setUserType}
                         group={group}
                     />
@@ -82,6 +86,7 @@ const Audience = ({
                         currentStream={currentStream}
                         fetchingStreams={fetchingStreams}
                         groupOptions={groupOptions}
+                        breakdownRef={breakdownRef}
                         futureStreams={futureStreams}
                         streamsFromTimeFrameAndFuture={streamsFromTimeFrameAndFuture}
                         userType={userType}

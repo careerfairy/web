@@ -1,4 +1,4 @@
-import React, {useEffect, useState, Fragment, useMemo} from "react";
+import React, {useEffect, useState, Fragment, useMemo, useRef} from "react";
 import {Container, fade, makeStyles} from "@material-ui/core";
 import {snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
 import {v4 as uuid} from 'uuid';
@@ -13,7 +13,10 @@ import Audience from "./Audience";
 import Grid from "@material-ui/core/Grid";
 import Title from "./Title";
 import Box from "@material-ui/core/Box";
-import {handleFlattenOptions} from "../../../../helperFunctions/streamFormFunctions";
+import {
+    handleFlattenOptions,
+    handleFlattenOptionsWithoutLvlOfStudy
+} from "../../../../helperFunctions/streamFormFunctions";
 import Feedback from "./Feedback";
 
 
@@ -181,6 +184,7 @@ const streamDataTypes = [
 
 const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();
+    const breakdownRef = useRef(null)
     const theme = useTheme()
     const [value, setValue] = useState(2);
 
@@ -197,7 +201,7 @@ const AnalyticsOverview = ({firebase, group}) => {
 
 
     useEffect(() => {
-        const flattenedGroupOptions = handleFlattenOptions(group)
+        const flattenedGroupOptions = handleFlattenOptionsWithoutLvlOfStudy(group)
         setGroupOptions(flattenedGroupOptions)
 
     }, [group])
@@ -304,6 +308,11 @@ const AnalyticsOverview = ({firebase, group}) => {
         });
     }
 
+
+    const handleScrollToBreakdown = () => {
+        breakdownRef.current.scrollIntoView({behavior: 'smooth', block: 'start'})
+    }
+
     const getAverageRating = (voters) => {
         const total = voters?.reduce((acc, curr) => acc + curr.rating, 0)
         return total ? Number(total / voters.length).toFixed(2) : 0
@@ -364,6 +373,8 @@ const AnalyticsOverview = ({firebase, group}) => {
             globalTimeFrames,
             setGlobalTimeFrame,
             fetchingFollowers,
+            breakdownRef,
+            handleScrollToBreakdown,
             totalFollowers,
             currentStream,
             setCurrentStream,

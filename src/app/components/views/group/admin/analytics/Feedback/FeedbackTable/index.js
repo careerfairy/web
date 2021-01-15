@@ -5,14 +5,20 @@ import {Box, Button, Card, CardHeader, Divider, makeStyles} from '@material-ui/c
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import {DataGrid, getNumericColumnOperators} from '@material-ui/data-grid';
 import {withFirebase} from "../../../../../../../context/firebase";
-import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
+import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {CustomLoadingOverlay, CustomNoRowsOverlay} from "./Overlays";
-import {useSnackbar} from "notistack";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
-import Typography from "@material-ui/core/Typography";
-import Tooltip from "@material-ui/core/Tooltip";
-import {Rating} from '@material-ui/lab';
+import {
+    filterModel,
+    getCount,
+    getDate,
+    RatingInputValue,
+    renderAppearAfter,
+    renderLongText,
+    renderRating
+} from "../../common/TableUtils";
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -20,104 +26,11 @@ const useStyles = makeStyles((theme) => ({
     actions: {
         justifyContent: 'flex-end'
     },
-    gridWrapper: {
-        '& .link': {
-            backgroundColor: 'rgba(224, 183, 60, 0.55)',
-            color: '#1a3e72',
-            fontWeight: '600',
-        },
-    },
-    tableTooltipQuestion: {
-        fontSize: theme.spacing(2)
-    },
     displayGraphButton: {
         fontWeight: 500,
         color: theme.palette.primary.main
     },
-    ratingInput: {
-        display: 'inline-flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: 48,
-        paddingLeft: 20,
-    },
-    ratingText: {
-        marginLeft: theme.spacing(1),
-        color: theme.palette.text.secondary,
-        fontWeight: 500
-    }
 }));
-
-const getDate = (params) => {
-    return prettyDate(params.value)
-}
-const getCount = ({value}) => {
-    return value ? value.length : 0
-}
-const renderLongText = ({value}) => {
-    const classes = useStyles()
-    return (
-        <Tooltip title={
-            <Typography className={classes.tableTooltipQuestion}>
-                {value}
-            </Typography>
-        }>
-            <Typography variant="inherit" noWrap>
-                {value}
-            </Typography>
-        </Tooltip>
-    )
-}
-const renderAppearAfter = ({value}) => {
-    return (
-        <Typography variant="inherit" noWrap>
-            {value} minutes
-        </Typography>
-    )
-}
-
-const RatingInputValue = ({item, applyValue}) => {
-    const classes = useStyles();
-
-    const handleFilterChange = (event) => {
-        applyValue({...item, value: event.target.value});
-    };
-
-    return (
-        <div className={classes.ratingInput}>
-            <Rating
-                name="custom-rating-filter-operator"
-                placeholder="Filter value"
-                value={Number(item.value)}
-                onChange={handleFilterChange}
-                precision={0.5}
-            />
-        </div>
-    );
-}
-
-const renderRating = ({value, row}) => {
-    const classes = useStyles()
-    return (
-        <Box display="flex" alignItems="center">
-            <Rating
-                readOnly
-                name={row.id}
-                value={Number(value)}
-                precision={0.5}
-            />
-            {value ?
-                <Typography className={classes.ratingText}>
-                    {value}
-                </Typography> : null}
-        </Box>
-    )
-}
-
-
-const filterModel = {
-    items: [{columnField: 'rating', value: '3.5', operatorValue: '>='}],
-};
 
 
 const FeedbackTable = ({
@@ -128,9 +41,11 @@ const FeedbackTable = ({
                            group,
                            futureStreams,
                            totalUniqueUsers,
+                           tableRef,
                            streamsFromTimeFrameAndFuture,
                            setCurrentRating,
                            setCurrentPoll,
+                           breakdownRef,
                            setStreamDataType,
                            streamDataType,
                            streamDataTypes,
@@ -139,7 +54,6 @@ const FeedbackTable = ({
                        }) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
-    const {enqueueSnackbar} = useSnackbar()
     const [columns, setColumns] = useState([]);
     const [expandTable, setExpandTable] = useState(false);
     const [data, setData] = useState([]);
@@ -200,11 +114,6 @@ const FeedbackTable = ({
             width: 90,
             type: 'number',
             valueGetter: getCount
-        },
-        {
-            field: "universityName",
-            headerName: "University",
-            width: 150,
         },
         {
             field: "options",
@@ -335,10 +244,10 @@ const FeedbackTable = ({
                 )}
             </Tabs>
             <Divider/>
-            <Box className={classes.gridWrapper} height={expandTable ? 800 : 400} width="100%">
+            <Box height={expandTable ? 800 : 400} width="100%">
                 <DataGrid
                     {...newData}
-                    showToolbar
+                    ref={breakdownRef}
                     filterModel={filterModel}
                     loading={fetchingStreams}
                     onSelectionChange={(newSelection) => {

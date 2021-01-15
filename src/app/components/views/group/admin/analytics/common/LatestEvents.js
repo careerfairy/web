@@ -35,6 +35,7 @@ const LatestEvents = ({
                           firebase,
                           setUserType,
                           streamsFromTimeFrame,
+                          handleScrollToBreakdown,
                           group,
                           className,
                           userTypes,
@@ -162,6 +163,7 @@ const LatestEvents = ({
                 const index = chartElement[0]._index
                 if ([...streamsFromTimeFrame, ...futureStreams][index]) {
                     setCurrentStream([...streamsFromTimeFrame, ...futureStreams][index])
+                    handleScrollToBreakdown()
                 }
             }
         },

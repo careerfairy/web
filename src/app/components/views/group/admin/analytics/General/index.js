@@ -27,18 +27,21 @@ const General = ({
                      streamsFromBeforeTimeFrame,
                      streamsFromTimeFrame,
                      streamsFromTimeFrameAndFuture,
+                     handleScrollToBreakdown,
                      totalFollowers,
                      userTypes,
                      userType,
                      setUserType,
                      groupOptions,
+                     breakdownRef,
                      fetchingFollowers,
                      handleToggleBar,
                      setCurrentStream,
                      currentStream,
-    showBar
+                     showBar
                  }) => {
     const classes = useStyles()
+
 
     const getTotalRegisteredUsers = (streamsArray) => {
         const total = streamsArray.reduce(
@@ -243,6 +246,7 @@ const General = ({
                         streamsFromTimeFrame={streamsFromTimeFrame}
                         userType={userType}
                         userTypes={userTypes}
+                        handleScrollToBreakdown={handleScrollToBreakdown}
                         handleToggleBar={handleToggleBar}
                         showBar={showBar}
                         setUserType={setUserType}
@@ -252,6 +256,7 @@ const General = ({
                 <Grid item lg={4} md={6} xl={3} xs={12}>
                     <TypeOfParticipants
                         currentStream={currentStream}
+                        breakdownRef={breakdownRef}
                         typesOfOptions={typesOfOptions}
                         userType={userType}
                         userTypes={userTypes}

@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import {Container, Grid} from "@material-ui/core";
 
 import {makeStyles} from "@material-ui/core/styles";
@@ -7,6 +7,7 @@ import FeedbackTable from "./FeedbackTable";
 import FeedbackGraph from "./FeedbackGraph";
 import TypeOfParticipants from "../General/TypeOfParticipants";
 import RatingSideTable from "./RatingSideTable";
+import UsersTable from "../Audience/UsersTable";
 
 
 const useStyles = makeStyles(theme => ({
@@ -29,6 +30,8 @@ const Feedback = ({
                       streamDataTypes,
                       streamsFromTimeFrame,
                       streamsFromTimeFrameAndFuture,
+                      handleScrollToBreakdown,
+                      breakdownRef,
                       groupOptions,
                       totalFollowers,
                       streamDataType,
@@ -39,8 +42,15 @@ const Feedback = ({
                       showBar
                   }) => {
     const classes = useStyles()
+    const tableRef = useRef(null)
+
     const [currentPoll, setCurrentPoll] = useState(null);
     const [currentRating, setCurrentRating] = useState(null);
+
+    useEffect(() => {
+        setCurrentPoll(null)
+        setCurrentRating(null)
+    }, [currentStream?.id])
 
 
     const getUsers = () => {
@@ -71,6 +81,7 @@ const Feedback = ({
         return Boolean(streamDataType.propertyName === "feedback")
     }
 
+
     return (
         <Container className={classes.root} maxWidth={false}>
             <Grid container spacing={3}>
@@ -84,6 +95,7 @@ const Feedback = ({
                         userType={userType}
                         userTypes={userTypes}
                         isFeedback
+                        handleScrollToBreakdown={handleScrollToBreakdown}
                         handleToggleBar={handleToggleBar}
                         showBar={showBar}
                         setUserType={setUserType}
@@ -99,6 +111,7 @@ const Feedback = ({
                         streamDataType={streamDataType}
                         setStreamDataType={setStreamDataType}
                         setCurrentRating={setCurrentRating}
+                        breakdownRef={breakdownRef}
                         setCurrentPoll={setCurrentPoll}
                         streamDataTypes={streamDataTypes}
                         futureStreams={futureStreams}
@@ -109,7 +122,7 @@ const Feedback = ({
                 <Grid item lg={4} md={12} xl={3} xs={12}>
                     {isRating() ?
                         <RatingSideTable
-                        streamDataType={streamDataType}
+                            streamDataType={streamDataType}
                             fetchingStreams={fetchingStreams}
                             currentRating={currentRating}
                         />

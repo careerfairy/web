@@ -38,6 +38,7 @@ const TypeOfParticipants = ({
                                 currentStream,
                                 typesOfOptions,
                                 userTypes,
+    breakdownRef,
                                 setUserType,
                                 userType,
                                 className,
@@ -132,6 +133,7 @@ const TypeOfParticipants = ({
         >
             <CardHeader
                 title={`Breakdown of ${userType.displayName}`}
+                ref={breakdownRef}
                 subheader={
                     currentStream ? `That attended ${currentStream.company} on ${prettyDate(currentStream.start)}` : "on average"
                 }
