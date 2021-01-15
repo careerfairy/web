@@ -167,7 +167,7 @@ function ViewerPage({firebase}) {
             return router.replace('/signup');
         }
 
-        firebase.joinCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email);
+        firebase.joinCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email, currentLivestream.id);
     }
 
     function leaveTalentPool() {
@@ -175,7 +175,7 @@ function ViewerPage({firebase}) {
             return router.replace('/signup');
         }
 
-        firebase.leaveCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email);
+        firebase.leaveCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email, currentLivestream.id);
     }
 
     function postIcon(iconName) {
