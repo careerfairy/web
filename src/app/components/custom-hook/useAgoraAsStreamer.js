@@ -23,6 +23,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     const [userUid, setUserUid] = useState(null);
     const [readyToConnect, setReadyToConnect] = useState(false);
     const [numberOfViewers, setNumberOfViewers] = useState(0);
+    const [connectionStatus, setConnectionStatus] = useState("initial")
 
     const agoraToken = useAgoraToken(roomId, userUid, !isViewer, true);
     const agoraScreenShareToken = useAgoraToken(roomId, userUid + 'screen', !isPlayMode, screenSharingMode);
@@ -80,15 +81,18 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         });
         rtcClient.init("53675bc6d3884026a72ecb1de3d19eb1");
         //rtcClient.startProxyServer(3);
+        setConnectionStatus("joining_channel");
         if (!isViewer) {
             rtcClient.setClientRole("host")
-            rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid)=>{
+            rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
+                setConnectionStatus("getting_media_access");
                 let localStream = AgoraRTC.createStream({
                     audio: true,
                     video: true
                 });
                 localStream.setVideoProfile("480p_9");
                 localStream.init(()=>{
+                    setConnectionStatus("publish_stream");
                     localStream.play(videoId);
                     rtcClient.publish(localStream, handleError);
                     setLocalMediaStream(localStream);
@@ -99,8 +103,10 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             rtcClient.setClientRole("audience");
             rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {}, handleError);
         }
+        rtcClient.on("stream-published", function(evt){
+            setAgoraStatus("stream_published");
+        });
         rtcClient.on("stream-added", function(evt){
-            debugger;
             if (evt.stream.getId() !== userUid + 'screen') {
                 rtcClient.subscribe(evt.stream, handleError);
             }
