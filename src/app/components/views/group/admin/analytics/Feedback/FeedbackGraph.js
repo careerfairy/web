@@ -59,21 +59,11 @@ const FeedbackGraph = ({
         labels: []
     });
 
-
     useEffect(() => {
-        if (group.categories?.length) {
-            setLocalColors([...colorsArray, ...typesOfOptions.map(() => randomColor())])
+        if (data.datasets.length) {
+            setLocalColors([...colorsArray, ...data.datasets.map(() => randomColor())])
         }
     }, [group.categories])
-
-    useEffect(() => {
-        if (typesOfOptions.length) {
-            const totalCount = typesOfOptions.reduce((acc, curr) => {
-                return acc + curr.count
-            }, 0)
-            setTotal(totalCount)
-        }
-    }, [typesOfOptions])
 
     useEffect(() => {
         if (currentPoll) {

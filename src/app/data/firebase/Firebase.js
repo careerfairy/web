@@ -1478,10 +1478,20 @@ class Firebase {
 
 
     getLivestreamRatingNames = (livestreamId) => {
-         let ref =   this.firestore
+        let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("rating")
+        return ref.get()
+    };
+
+    getLivestreamRatingVoters = (ratingId, livestreamId) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc(ratingId)
+            .collection("voters")
         return ref.get()
     };
 
@@ -1500,7 +1510,7 @@ class Firebase {
         return ref.get();
     };
     queryFollowers = async (groupId) => {
-        return  this.firestore
+        return this.firestore
             .collection("userData")
             .where("groupIds", "array-contains", groupId)
     };

@@ -12,7 +12,7 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
 import Tooltip from "@material-ui/core/Tooltip";
-import { Rating } from '@material-ui/lab';
+import {Rating} from '@material-ui/lab';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -40,6 +40,11 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
         height: 48,
         paddingLeft: 20,
+    },
+    ratingText: {
+        marginLeft: theme.spacing(1),
+        color: theme.palette.text.secondary,
+        fontWeight: 500
     }
 }));
 
@@ -63,13 +68,19 @@ const renderLongText = ({value}) => {
         </Tooltip>
     )
 }
+const renderAppearAfter = ({value}) => {
+    return (
+        <Typography variant="inherit" noWrap>
+            {value} minutes
+        </Typography>
+    )
+}
 
-function RatingInputValue(props) {
+const RatingInputValue = ({item, applyValue}) => {
     const classes = useStyles();
-    const { item, applyValue } = props;
 
     const handleFilterChange = (event) => {
-        applyValue({ ...item, value: event.target.value });
+        applyValue({...item, value: event.target.value});
     };
 
     return (
@@ -85,9 +96,27 @@ function RatingInputValue(props) {
     );
 }
 
+const renderRating = ({value, row}) => {
+    const classes = useStyles()
+    return (
+        <Box display="flex" alignItems="center">
+            <Rating
+                readOnly
+                name={row.id}
+                value={Number(value)}
+                precision={0.5}
+            />
+            {value ?
+                <Typography className={classes.ratingText}>
+                    {value}
+                </Typography> : null}
+        </Box>
+    )
+}
+
 
 const filterModel = {
-    items: [{ columnField: 'rating', value: '3.5', operatorValue: '>=' }],
+    items: [{columnField: 'rating', value: '3.5', operatorValue: '>='}],
 };
 
 
@@ -100,6 +129,7 @@ const FeedbackTable = ({
                            futureStreams,
                            totalUniqueUsers,
                            streamsFromTimeFrameAndFuture,
+                           setCurrentRating,
                            setCurrentPoll,
                            setStreamDataType,
                            streamDataType,
@@ -118,46 +148,44 @@ const FeedbackTable = ({
     useEffect(() => {
         const dataType = streamDataType.propertyName
         const newData = currentStream?.[dataType] || []
-        console.log("-> newData", newData);
         setData(newData)
         if (dataType === "pollEntries") {
             setColumns(pollColumns)
         } else if (dataType === "questions") {
             setColumns(questionColumns)
+        } else if (dataType === "feedback") {
+            setColumns(feedbackColumns)
         }
+
     }, [streamDataType, currentStream])
-    //
-    // React.useEffect(() => {
-    //     if (data.columns.length > 0) {
-    //         const ratingColumn = data.columns.find((column) => column.field === 'rating');
-    //
-    //         ratingColumn.filterOperators = getNumericColumnOperators().map((operator) => ({
-    //             ...operator,
-    //             InputComponent: RatingInputValue,
-    //         }));
-    //
-    //         setColumns(data.columns);
-    //     }
-    // }, [data.columns]);
 
     const DisplayButton = ({row}) => {
         const classes = useStyles()
         const hasNoData = () => {
             return Boolean(!row.voters?.length)
         }
+        const handleClick = () => {
+            const dataType = streamDataType.propertyName
+            if (dataType === "feedback") {
+                setCurrentRating(row)
+            } else {
+                setCurrentPoll(row)
+            }
+        }
         return (
             <Button
                 className={classes.displayGraphButton}
                 variant="text"
                 disabled={hasNoData()}
-                onClick={() => setCurrentPoll(row)}
+                onClick={handleClick}
                 fullWidth
                 size="small"
             >
-                {hasNoData() ? "No Data" : "Display"}
+                {hasNoData() ? "No Data" : "Click for Breakdown"}
             </Button>
         )
     }
+
 
     const pollColumns = [
         {
@@ -210,13 +238,8 @@ const FeedbackTable = ({
         {
             field: "votes",
             headerName: "Votes",
-            width: 130,
+            width: 90,
             type: 'number',
-        },
-        {
-            field: "universityName",
-            headerName: "University",
-            width: 150,
         },
         {
             field: "timestamp",
@@ -231,30 +254,44 @@ const FeedbackTable = ({
             width: 100,
         },
     ]
-    const ratingColumns = [
+    const feedbackColumns = [
         {
-            field: "rating",
-            headerName: "Rating",
+            field: "question",
+            headerName: "Question",
             width: 250,
+            renderCell: renderLongText,
         },
         {
-            field: "timestamp",
-            headerName: "Rated on",
-            width: 130,
-            type: 'date',
-        },
-        {
-            field: "universityName",
-            headerName: "University",
+            field: "average",
+            headerName: "Average Rating",
             width: 150,
+            renderCell: renderRating,
+            filterOperators: getNumericColumnOperators().map((operator) => ({
+                ...operator,
+                InputComponent: RatingInputValue,
+            }))
         },
         {
-            field: "ratingText",
-            headerName: "Rating Message",
-            width: 220,
-        }
+            field: "appearAfter",
+            headerName: "This question will appear after",
+            width: 180,
+            renderCell: renderAppearAfter
+        },
+        {
+            field: "voters",
+            headerName: "Votes",
+            width: 100,
+            valueGetter: getCount
+        },
+        {
+            field: "options",
+            headerName: "Breakdown",
+            filterable: false,
+            width: 180,
+            renderCell: DisplayButton,
+            disableClickEventBubbling: true,
+        },
     ]
-
 
     const toggleTable = () => {
         setExpandTable(!expandTable)
@@ -287,8 +324,7 @@ const FeedbackTable = ({
                 scrollButtons="auto"
                 aria-label="disabled tabs example"
             >
-                {streamDataTypes.map(({displayName, propertyName}, index) => {
-                    return (
+                {streamDataTypes.map(({displayName, propertyName}, index) => (
                         <Tab
                             key={propertyName}
                             value={propertyName}
@@ -296,25 +332,17 @@ const FeedbackTable = ({
                             label={`${displayName} - ${currentStream?.[propertyName]?.length || 0}`}
                         />
                     )
-                })}
+                )}
             </Tabs>
             <Divider/>
             <Box className={classes.gridWrapper} height={expandTable ? 800 : 400} width="100%">
                 <DataGrid
                     {...newData}
                     showToolbar
-                    checkboxSelection
+                    filterModel={filterModel}
                     loading={fetchingStreams}
                     onSelectionChange={(newSelection) => {
-                        // console.log("-> newSelection", newSelection);
                         setSelection(newSelection.rowIds);
-                    }}
-                    onSortModelChange={(sortModelParams) => {
-                        // console.log("-> sortModelParams", sortModelParams);
-                        // console.log("-> sortModelParams.api.state.filter", sortModelParams.api.state.filter);
-                    }}
-                    onPageChange={(pageChangeParams) => {
-                        // console.log("-> pageChangeParams", pageChangeParams);
                     }}
                     components={{
                         noRowsOverlay: CustomNoRowsOverlay,
@@ -327,15 +355,6 @@ const FeedbackTable = ({
                 justifyContent="space-between"
                 p={2}
             >
-                {/*<Button*/}
-                {/*    color="primary"*/}
-                {/*    size="small"*/}
-                {/*    variant="contained"*/}
-                {/*    disabled={Boolean(!selection.length)}*/}
-                {/*    onClick={handleCopyEmails}*/}
-                {/*>*/}
-                {/*    Copy Email Addresses*/}
-                {/*</Button>*/}
                 <Button
                     color="primary"
                     onClick={toggleTable}

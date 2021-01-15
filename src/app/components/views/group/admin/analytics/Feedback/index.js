@@ -6,6 +6,7 @@ import LatestEvents from "../common/LatestEvents";
 import FeedbackTable from "./FeedbackTable";
 import FeedbackGraph from "./FeedbackGraph";
 import TypeOfParticipants from "../General/TypeOfParticipants";
+import RatingSideTable from "./RatingSideTable";
 
 
 const useStyles = makeStyles(theme => ({
@@ -39,6 +40,7 @@ const Feedback = ({
                   }) => {
     const classes = useStyles()
     const [currentPoll, setCurrentPoll] = useState(null);
+    const [currentRating, setCurrentRating] = useState(null);
 
 
     const getUsers = () => {
@@ -64,6 +66,10 @@ const Feedback = ({
     const totalUniqueUsers = useMemo(() => getUsers(), [
         streamsFromTimeFrameAndFuture, currentStream, userType
     ]);
+
+    const isRating = () => {
+        return Boolean(streamDataType.propertyName === "feedback")
+    }
 
     return (
         <Container className={classes.root} maxWidth={false}>
@@ -92,6 +98,7 @@ const Feedback = ({
                         groupOptions={groupOptions}
                         streamDataType={streamDataType}
                         setStreamDataType={setStreamDataType}
+                        setCurrentRating={setCurrentRating}
                         setCurrentPoll={setCurrentPoll}
                         streamDataTypes={streamDataTypes}
                         futureStreams={futureStreams}
@@ -100,17 +107,24 @@ const Feedback = ({
                         group={group}/>
                 </Grid>
                 <Grid item lg={4} md={12} xl={3} xs={12}>
-                    <FeedbackGraph
-                        currentPoll={currentPoll}
-                        currentStream={currentStream}
+                    {isRating() ?
+                        <RatingSideTable
                         streamDataType={streamDataType}
-                        typesOfOptions={[]}
-                        userType={userType}
-                        userTypes={userTypes}
-                        setUserType={setUserType}
-                        setCurrentStream={setCurrentStream}
-                        group={group}
-                    />
+                            fetchingStreams={fetchingStreams}
+                            currentRating={currentRating}
+                        />
+                        :
+                        <FeedbackGraph
+                            currentPoll={currentPoll}
+                            currentStream={currentStream}
+                            streamDataType={streamDataType}
+                            typesOfOptions={[]}
+                            userType={userType}
+                            userTypes={userTypes}
+                            setUserType={setUserType}
+                            setCurrentStream={setCurrentStream}
+                            group={group}
+                        />}
                 </Grid>
                 {/*<Grid item lg={4} md={6} xl={3} xs={12}>*/}
                 {/*    <FeedbackResults group={group}/>*/}

@@ -182,7 +182,7 @@ const streamDataTypes = [
 const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();
     const theme = useTheme()
-    const [value, setValue] = useState(1);
+    const [value, setValue] = useState(2);
 
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[0]);
     const [showBar, setShowBar] = useState(false);
@@ -261,7 +261,7 @@ const AnalyticsOverview = ({firebase, group}) => {
                     return {
                         id: doc.id,
                         ...questionData,
-                        ...authorData
+                        authorData
                     }
                 })
                 setCurrentStream(prevState => ({...prevState, questions}));
@@ -272,14 +272,19 @@ const AnalyticsOverview = ({firebase, group}) => {
 
     useEffect(() => {
         if (currentStream?.id) {
-            (async function (){
-                const ratingNameSnaps = await firebase.getLivestreamRatingNames("0SupFLhiCs5FdIxRc5Dp")
-                console.log("-> ratingNameSnaps", ratingNameSnaps);
-                const data = ratingNameSnaps.docs.map(doc => doc.id)
-                console.log("-> data", data);
-
+            (async function () {
+                const ratingSnaps = await firebase.getLivestreamRatingNames(currentStream.id)
+                const feedback = []
+                for (const ratingDoc of ratingSnaps.docs) {
+                    const ratingData = ratingDoc.data()
+                    ratingData.id = ratingDoc.id
+                    const votersSnap = await firebase.getLivestreamRatingVoters(ratingDoc.id, currentStream.id)
+                    const voters = votersSnap.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                    const average = getAverageRating(voters)
+                    feedback.push({...ratingData, voters, average})
+                }
+                setCurrentStream(prevState => ({...prevState, feedback}))
             })()
-
         }
     }, [currentStream?.id])
 
@@ -297,6 +302,11 @@ const AnalyticsOverview = ({firebase, group}) => {
                 return stream
             }
         });
+    }
+
+    const getAverageRating = (voters) => {
+        const total = voters?.reduce((acc, curr) => acc + curr.rating, 0)
+        return total ? Number(total / voters.length).toFixed(2) : 0
     }
 
     const getStreamsFromTimeFrame = (timeframe) => {
