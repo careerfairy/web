@@ -55,6 +55,11 @@ const UsersTable = ({
             width: 140,
         },
         {
+            field: "universityName",
+            headerName: "University",
+            width: 150,
+        },
+        {
             field: "streamsWatched",
             headerName: "Events Attended",
             width: 150,
@@ -216,15 +221,7 @@ const UsersTable = ({
                     checkboxSelection
                     loading={fetchingStreams}
                     onSelectionChange={(newSelection) => {
-                        // console.log("-> newSelection", newSelection);
                         setSelection(newSelection.rowIds);
-                    }}
-                    onSortModelChange={(sortModelParams) => {
-                        // console.log("-> sortModelParams", sortModelParams);
-                        // console.log("-> sortModelParams.api.state.filter", sortModelParams.api.state.filter);
-                    }}
-                    onPageChange={(pageChangeParams) => {
-                        console.log("-> pageChangeParams", pageChangeParams);
                     }}
                     components={{
                         noRowsOverlay: CustomNoRowsOverlay,

@@ -126,7 +126,7 @@ const LatestEvents = ({
                 backgroundColor: theme.palette.primary.dark,
                 borderColor: fade(colorsArray[0], 0.5),
                 data: handleFutureStreams("registeredUsers"),
-                label: "Registrations so Far",
+                label: "Registrations (future)",
                 spanGaps: true
             },
             {
@@ -138,7 +138,7 @@ const LatestEvents = ({
                 backgroundColor: colorsArray[2],
                 borderColor: fade(colorsArray[2], 0.5),
                 data: handleFutureStreams("talentPool"),
-                label: "Talent Pool so Far",
+                label: "Talent Pool (future)",
                 spanGaps: true
             },
         ],

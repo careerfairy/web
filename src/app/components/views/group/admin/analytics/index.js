@@ -172,12 +172,17 @@ const streamDataTypes = [
         propertyName: "pollEntries",
         displayName: "Polls",
         propertyDataName: "pollEntries"
+    },
+    {
+        propertyName: "feedback",
+        displayName: "Feedback",
+        propertyDataName: "feedback"
     }]
 
 const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();
     const theme = useTheme()
-    const [value, setValue] = useState(2);
+    const [value, setValue] = useState(1);
 
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[0]);
     const [showBar, setShowBar] = useState(false);
@@ -262,6 +267,19 @@ const AnalyticsOverview = ({firebase, group}) => {
                 setCurrentStream(prevState => ({...prevState, questions}));
             });
             return () => unsubscribeQuestions();
+        }
+    }, [currentStream?.id])
+
+    useEffect(() => {
+        if (currentStream?.id) {
+            (async function (){
+                const ratingNameSnaps = await firebase.getLivestreamRatingNames("0SupFLhiCs5FdIxRc5Dp")
+                console.log("-> ratingNameSnaps", ratingNameSnaps);
+                const data = ratingNameSnaps.docs.map(doc => doc.id)
+                console.log("-> data", data);
+
+            })()
+
         }
     }, [currentStream?.id])
 

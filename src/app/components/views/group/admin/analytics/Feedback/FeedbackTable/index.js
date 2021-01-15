@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {Box, Button, Card, CardHeader, Divider, makeStyles} from '@material-ui/core';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
-import {DataGrid} from '@material-ui/data-grid';
+import {DataGrid, getNumericColumnOperators} from '@material-ui/data-grid';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {CustomLoadingOverlay, CustomNoRowsOverlay} from "./Overlays";
@@ -12,6 +12,8 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
 import Tooltip from "@material-ui/core/Tooltip";
+import { Rating } from '@material-ui/lab';
+
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -31,6 +33,13 @@ const useStyles = makeStyles((theme) => ({
     displayGraphButton: {
         fontWeight: 500,
         color: theme.palette.primary.main
+    },
+    ratingInput: {
+        display: 'inline-flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 48,
+        paddingLeft: 20,
     }
 }));
 
@@ -55,8 +64,31 @@ const renderLongText = ({value}) => {
     )
 }
 
+function RatingInputValue(props) {
+    const classes = useStyles();
+    const { item, applyValue } = props;
+
+    const handleFilterChange = (event) => {
+        applyValue({ ...item, value: event.target.value });
+    };
+
+    return (
+        <div className={classes.ratingInput}>
+            <Rating
+                name="custom-rating-filter-operator"
+                placeholder="Filter value"
+                value={Number(item.value)}
+                onChange={handleFilterChange}
+                precision={0.5}
+            />
+        </div>
+    );
+}
 
 
+const filterModel = {
+    items: [{ columnField: 'rating', value: '3.5', operatorValue: '>=' }],
+};
 
 
 const FeedbackTable = ({
@@ -86,6 +118,7 @@ const FeedbackTable = ({
     useEffect(() => {
         const dataType = streamDataType.propertyName
         const newData = currentStream?.[dataType] || []
+        console.log("-> newData", newData);
         setData(newData)
         if (dataType === "pollEntries") {
             setColumns(pollColumns)
@@ -93,6 +126,19 @@ const FeedbackTable = ({
             setColumns(questionColumns)
         }
     }, [streamDataType, currentStream])
+    //
+    // React.useEffect(() => {
+    //     if (data.columns.length > 0) {
+    //         const ratingColumn = data.columns.find((column) => column.field === 'rating');
+    //
+    //         ratingColumn.filterOperators = getNumericColumnOperators().map((operator) => ({
+    //             ...operator,
+    //             InputComponent: RatingInputValue,
+    //         }));
+    //
+    //         setColumns(data.columns);
+    //     }
+    // }, [data.columns]);
 
     const DisplayButton = ({row}) => {
         const classes = useStyles()
@@ -126,6 +172,11 @@ const FeedbackTable = ({
             width: 90,
             type: 'number',
             valueGetter: getCount
+        },
+        {
+            field: "universityName",
+            headerName: "University",
+            width: 150,
         },
         {
             field: "options",
@@ -163,6 +214,11 @@ const FeedbackTable = ({
             type: 'number',
         },
         {
+            field: "universityName",
+            headerName: "University",
+            width: 150,
+        },
+        {
             field: "timestamp",
             headerName: "Date Created",
             width: 200,
@@ -174,6 +230,29 @@ const FeedbackTable = ({
             headerName: "status",
             width: 100,
         },
+    ]
+    const ratingColumns = [
+        {
+            field: "rating",
+            headerName: "Rating",
+            width: 250,
+        },
+        {
+            field: "timestamp",
+            headerName: "Rated on",
+            width: 130,
+            type: 'date',
+        },
+        {
+            field: "universityName",
+            headerName: "University",
+            width: 150,
+        },
+        {
+            field: "ratingText",
+            headerName: "Rating Message",
+            width: 220,
+        }
     ]
 
 

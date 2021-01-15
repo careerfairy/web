@@ -1023,7 +1023,7 @@ class Firebase {
             .doc(userEmail);
         return ref.set({
             rating: rating,
-            timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+            timestamp: this.getServerTimestamp(),
         });
     }
 
@@ -1437,6 +1437,15 @@ class Firebase {
             .orderBy("start", "desc")
         return ref.onSnapshot(callback);
     }
+
+
+    getLivestreamRatingNames = (livestreamId) => {
+         let ref =   this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+        return ref.get()
+    };
 
     // listens to all followers of a group
     listenToFollowers = async (groupId, callback) => {
