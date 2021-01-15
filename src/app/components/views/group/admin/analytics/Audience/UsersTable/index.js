@@ -6,8 +6,8 @@ import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import {DataGrid} from '@material-ui/data-grid';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
-import {CustomLoadingOverlay, CustomNoRowsOverlay} from "./Overlays";
 import {useSnackbar} from "notistack";
+import {CustomLoadingOverlay, CustomNoRowsOverlay} from "../../common/Overlays";
 
 const useStyles = makeStyles(() => ({
     root: {},
@@ -200,6 +200,7 @@ const UsersTable = ({
 
     return (
         <Card
+            raised={Boolean(currentStream)}
             className={clsx(classes.root, className)}
             {...rest}
         >
@@ -221,6 +222,7 @@ const UsersTable = ({
                     components={{
                         noRowsOverlay: CustomNoRowsOverlay,
                         loadingOverlay: CustomLoadingOverlay,
+
                     }}
                 />
             </Box>

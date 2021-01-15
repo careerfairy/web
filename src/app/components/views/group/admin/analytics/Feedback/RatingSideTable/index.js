@@ -5,8 +5,8 @@ import {Box, Button, Card, CardHeader, Divider, makeStyles} from '@material-ui/c
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import {DataGrid, getNumericColumnOperators} from '@material-ui/data-grid';
 import {withFirebase} from "../../../../../../../context/firebase";
-import {CustomLoadingOverlay, CustomNoRowsOverlay} from "./Overlays";
 import {filterModel, getDate, RatingInputValue, renderRating} from "../../common/TableUtils";
+import {CustomLoadingOverlay, CustomNoRowsOverlay} from "../../common/Overlays";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -72,9 +72,16 @@ const RatingSideTable = ({
         columns: initialColumns,
         rows: data
     }
+    const active = () => {
+        return Boolean(
+            currentRating
+        )
+    }
+
 
     return (
         <Card
+            raised={active()}
             className={clsx(classes.root, className)}
             {...rest}
         >

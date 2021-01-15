@@ -30,6 +30,9 @@ const Feedback = ({
                       streamDataTypes,
                       streamsFromTimeFrame,
                       streamsFromTimeFrameAndFuture,
+                      fetchingPolls,
+                      fetchingQuestions,
+                      fetchingRatings,
                       handleScrollToBreakdown,
                       breakdownRef,
                       groupOptions,
@@ -80,6 +83,18 @@ const Feedback = ({
     const isRating = () => {
         return Boolean(streamDataType.propertyName === "feedback")
     }
+    const isPoll = () => {
+        return Boolean(streamDataType.propertyName === "pollEntries")
+    }
+    const isQuestion = () => {
+        return Boolean(streamDataType.propertyName === "questions")
+    }
+
+    const isFetching = () => {
+        return Boolean(
+            fetchingStreams || fetchingRatings || fetchingQuestions || fetchingPolls
+        )
+    }
 
 
     return (
@@ -102,16 +117,18 @@ const Feedback = ({
                         group={group}
                     />
                 </Grid>
-                <Grid item lg={8} md={12} xl={9} xs={12}>
+                <Grid item lg={isQuestion() ? 12 : 8} md={12} xl={isQuestion() ? 12 : 9} xs={12}>
                     <FeedbackTable
                         totalUniqueUsers={totalUniqueUsers}
                         currentStream={currentStream}
-                        fetchingStreams={fetchingStreams}
+                        fetchingStreams={isFetching()}
                         groupOptions={groupOptions}
                         streamDataType={streamDataType}
                         setStreamDataType={setStreamDataType}
                         setCurrentRating={setCurrentRating}
+                        currentPoll={currentPoll}
                         breakdownRef={breakdownRef}
+                        currentRating={currentRating}
                         setCurrentPoll={setCurrentPoll}
                         streamDataTypes={streamDataTypes}
                         futureStreams={futureStreams}
@@ -119,6 +136,7 @@ const Feedback = ({
                         userType={userType}
                         group={group}/>
                 </Grid>
+                {!isQuestion() &&
                 <Grid item lg={4} md={12} xl={3} xs={12}>
                     {isRating() ?
                         <RatingSideTable
@@ -138,7 +156,7 @@ const Feedback = ({
                             setCurrentStream={setCurrentStream}
                             group={group}
                         />}
-                </Grid>
+                </Grid>}
                 {/*<Grid item lg={4} md={6} xl={3} xs={12}>*/}
                 {/*    <FeedbackResults group={group}/>*/}
                 {/*</Grid>*/}

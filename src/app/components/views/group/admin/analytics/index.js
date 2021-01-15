@@ -198,10 +198,16 @@ const AnalyticsOverview = ({firebase, group}) => {
     const [currentStream, setCurrentStream] = useState(null);
     const [fetchingFollowers, setFetchingFollowers] = useState(false);
     const [totalFollowers, setTotalFollowers] = useState(null);
+    const [groupOptionsWithoutLvlOfStudy, setGroupOptionsWithoutLvlOfStudy] = useState([]);
+    const [fetchingQuestions, setFetchingQuestions] = useState(false);
+    const [fetchingRatings, setFetchingRatings] = useState(false);
+    const [fetchingPolls, setFetchingPolls] = useState(false);
 
 
     useEffect(() => {
-        const flattenedGroupOptions = handleFlattenOptionsWithoutLvlOfStudy(group)
+        const flattenedGroupOptions = handleFlattenOptions(group)
+        const flattenedGroupOptionsWithoutLvlOfStudy = handleFlattenOptionsWithoutLvlOfStudy(group)
+        setGroupOptionsWithoutLvlOfStudy(flattenedGroupOptionsWithoutLvlOfStudy)
         setGroupOptions(flattenedGroupOptions)
 
     }, [group])
@@ -248,9 +254,11 @@ const AnalyticsOverview = ({firebase, group}) => {
 
     useEffect(() => {
         if (currentStream?.id) {
+            setFetchingPolls(true)
             const unsubscribePolls = firebase.listenToPollEntries(currentStream.id, querySnapshot => {
                 const pollEntries = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
                 setCurrentStream(prevState => ({...prevState, pollEntries}));
+                setFetchingPolls(false)
             });
             return () => unsubscribePolls();
         }
@@ -258,6 +266,7 @@ const AnalyticsOverview = ({firebase, group}) => {
 
     useEffect(() => {
         if (currentStream?.id) {
+            setFetchingQuestions(true)
             const unsubscribeQuestions = firebase.listenToLivestreamQuestions(currentStream.id, querySnapshot => {
                 const questions = querySnapshot.docs.map(doc => {
                     const questionData = doc.data()
@@ -269,6 +278,7 @@ const AnalyticsOverview = ({firebase, group}) => {
                     }
                 })
                 setCurrentStream(prevState => ({...prevState, questions}));
+                setFetchingQuestions(false)
             });
             return () => unsubscribeQuestions();
         }
@@ -277,6 +287,7 @@ const AnalyticsOverview = ({firebase, group}) => {
     useEffect(() => {
         if (currentStream?.id) {
             (async function () {
+                setFetchingRatings(true)
                 const ratingSnaps = await firebase.getLivestreamRatingNames(currentStream.id)
                 const feedback = []
                 for (const ratingDoc of ratingSnaps.docs) {
@@ -288,6 +299,7 @@ const AnalyticsOverview = ({firebase, group}) => {
                     feedback.push({...ratingData, voters, average})
                 }
                 setCurrentStream(prevState => ({...prevState, feedback}))
+                setFetchingRatings(false)
             })()
         }
     }, [currentStream?.id])
@@ -366,11 +378,15 @@ const AnalyticsOverview = ({firebase, group}) => {
             showBar,
             streamDataType,
             setStreamDataType,
+            fetchingPolls,
+            fetchingQuestions,
+            fetchingRatings,
             handleToggleBar,
             streamDataTypes,
             streamsFromBeforeTimeFrame,
             streamsFromTimeFrameAndFuture,
             globalTimeFrames,
+            groupOptionsWithoutLvlOfStudy,
             setGlobalTimeFrame,
             fetchingFollowers,
             breakdownRef,

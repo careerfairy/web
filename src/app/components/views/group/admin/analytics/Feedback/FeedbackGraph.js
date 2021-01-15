@@ -11,7 +11,7 @@ import {
     Typography,
     makeStyles,
     colors,
-    useTheme, ListItem, Checkbox, List
+    useTheme, ListItem, Checkbox, List, SvgIcon
 } from '@material-ui/core';
 import {colorsArray} from "../../../../../util/colors";
 import {withFirebase} from "../../../../../../context/firebase";
@@ -21,6 +21,7 @@ import {convertStringToArray} from "../../../../../helperFunctions/HelperFunctio
 
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
+import {OverlaySvg} from "../common/Overlays";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -126,7 +127,7 @@ const FeedbackGraph = ({
     };
 
     const hasNoData = () => {
-        return Boolean(typesOfOptions.length && total === 0)
+        return Boolean(!data.datasets.length)
     }
     const handleReset = () => {
         setCurrentStream(null)
@@ -150,24 +151,21 @@ const FeedbackGraph = ({
         chart.update();
     }
 
+    const active = () => {
+        return Boolean(
+            currentPoll
+        )
+    }
+
     return (
         <Card
+            raised={active()}
             className={clsx(classes.root, className)}
             {...rest}
         >
             <CardHeader
                 title={`${streamDataType.displayName.slice(0, -1)} Breakdown`}
                 subheader={currentPoll?.question}
-                action={
-                    currentStream &&
-                    <Button size="small"
-                            variant="text"
-                            onClick={handleReset}
-                            endIcon={<RotateLeftIcon/>}
-                    >
-                        Reset
-                    </Button>
-                }
             />
             <Divider/>
             <CardContent>
@@ -180,18 +178,9 @@ const FeedbackGraph = ({
                     alignItems="center"
                 >
                     {hasNoData() ?
-                        <>
-                            <Typography>
-                                Not enough {userType.displayName} data
-                            </Typography>
-                            <Button size="small"
-                                    variant="text"
-                                    onClick={handleReset}
-                                    endIcon={<RotateLeftIcon/>}
-                            >
-                                Reset
-                            </Button>
-                        </>
+                        <Typography>
+                            Not enough {streamDataType.displayName.slice(0, -1)} data
+                        </Typography>
                         :
                         <Doughnut
                             data={data}

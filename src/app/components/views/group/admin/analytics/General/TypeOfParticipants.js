@@ -128,6 +128,7 @@ const TypeOfParticipants = ({
 
     return (
         <Card
+            raised={Boolean(currentStream)}
             className={clsx(classes.root, className)}
             {...rest}
         >

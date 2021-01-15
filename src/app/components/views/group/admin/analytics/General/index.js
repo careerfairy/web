@@ -27,6 +27,7 @@ const General = ({
                      streamsFromBeforeTimeFrame,
                      streamsFromTimeFrame,
                      streamsFromTimeFrameAndFuture,
+                     groupOptionsWithoutLvlOfStudy,
                      handleScrollToBreakdown,
                      totalFollowers,
                      userTypes,
@@ -154,7 +155,7 @@ const General = ({
             students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop)
         }
         const aggregateCategories = getAggregateCategories(students)
-        const flattenedGroupOptions = [...groupOptions]
+        const flattenedGroupOptions = [...groupOptionsWithoutLvlOfStudy]
         flattenedGroupOptions.forEach(option => {
             option.count = aggregateCategories.filter(category => category.categories.some(userOption => userOption.selectedValueId === option.id)).length
         })

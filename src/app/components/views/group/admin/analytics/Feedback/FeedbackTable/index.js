@@ -6,7 +6,6 @@ import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import {DataGrid, getNumericColumnOperators} from '@material-ui/data-grid';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
-import {CustomLoadingOverlay, CustomNoRowsOverlay} from "./Overlays";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import {
@@ -18,7 +17,7 @@ import {
     renderLongText,
     renderRating
 } from "../../common/TableUtils";
-
+import {CustomLoadingOverlay, CustomNoRowsOverlay} from "../../common/Overlays";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -48,6 +47,8 @@ const FeedbackTable = ({
                            breakdownRef,
                            setStreamDataType,
                            streamDataType,
+                           currentPoll,
+                           currentRating,
                            streamDataTypes,
                            className,
                            ...rest
@@ -74,7 +75,6 @@ const FeedbackTable = ({
     }, [streamDataType, currentStream])
 
     const DisplayButton = ({row}) => {
-        const classes = useStyles()
         const hasNoData = () => {
             return Boolean(!row.voters?.length)
         }
@@ -210,6 +210,12 @@ const FeedbackTable = ({
         setStreamDataType(streamDataTypes[index])
     };
 
+    const active = () => {
+        return Boolean(
+            currentStream && !currentRating && !currentPoll
+        )
+    }
+
 
     const newData = {
         columns: columns,
@@ -218,6 +224,7 @@ const FeedbackTable = ({
 
     return (
         <Card
+            raised={active()}
             className={clsx(classes.root, className)}
             {...rest}
         >
@@ -238,7 +245,7 @@ const FeedbackTable = ({
                             key={propertyName}
                             value={propertyName}
                             onClick={(event) => handleMenuItemClick(event, index)}
-                            label={`${displayName} - ${currentStream?.[propertyName]?.length || 0}`}
+                            label={`${displayName} - ${fetchingStreams ? "..." : currentStream?.[propertyName]?.length || 0}`}
                         />
                     )
                 )}

@@ -103,8 +103,6 @@ export const handleFlattenOptions = (group) => {
     let optionsArray = []
     if (group.categories && group.categories.length) {
         group.categories.forEach(category => {
-            console.log("-> category", category);
-
             if (category.options && category.options.length) {
                 category.options.forEach(option => optionsArray.push(option))
             }
