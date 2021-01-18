@@ -90,7 +90,6 @@ function MyApp({Component, pageProps}) {
         const activeStep = getActiveTutorialStepKey()
         return Boolean(activeStep === property)
     }
-    const Layout = Component.layout || (({children}) => <>{children}</>);
 
     return (
         <Fragment>
@@ -116,9 +115,12 @@ function MyApp({Component, pageProps}) {
                                     <ErrorContext.Provider value={{generalError, setGeneralError}}>
                                         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                                         <CssBaseline/>
-                                        <Layout>
-                                            <Component {...pageProps} />
-                                        </Layout>
+                                        {Component.layout ?
+                                            <Component.layout>
+                                                <Component {...pageProps} />
+                                            </Component.layout>
+                                            :
+                                            <Component {...pageProps} />}
                                         <ErrorSnackBar handleClose={() => setGeneralError("")}
                                                        errorMessage={generalError}/>
                                     </ErrorContext.Provider>

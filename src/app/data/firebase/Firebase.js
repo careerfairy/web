@@ -1050,16 +1050,16 @@ class Firebase {
         });
     }
 
-    rateLivestream = (livestreamId, userEmail, rating, typeOfRating) => {
+    rateLivestream = (livestreamId, userEmail, rating, ratingId) => {
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("rating")
-            .doc(typeOfRating)
+            .doc(ratingId)
             .collection("voters")
             .doc(userEmail);
         return ref.set({
-            rating: rating,
+            ...rating,
             timestamp: this.getServerTimestamp(),
         });
     }
