@@ -252,18 +252,18 @@ function ViewerPage({firebase}) {
                 </div>
             </div>
             <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
-                {handRaiseActive ?
+                {/* {handRaiseActive ?
                     <ViewerHandRaiseComponent
                         currentLivestream={currentLivestream}
                         handRaiseActive={handRaiseActive}
                         setHandRaiseActive={setHandRaiseActive}/>
-                    :
+                    : */}
                     <ViewerComponent
                         livestreamId={livestreamId} streamerId={streamerId}
                         currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
                         setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton}
                         setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>
-                }
+                {/* } */}
                 <div className='mini-chat-container'>
                     <MiniChatContainer livestream={currentLivestream} isStreamer={false}/>
                 </div>

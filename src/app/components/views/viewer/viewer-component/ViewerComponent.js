@@ -1,6 +1,6 @@
 import {useState, useEffect, useRef, Fragment} from 'react';
 import {withFirebasePage} from 'context/firebase';
-import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
+import useAgoraAsStreamer from 'components/custom-hook/useAgoraAsStreamer';
 import CurrentSpeakerDisplayer from 'components/views/streaming/video-container/CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from 'components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 
@@ -11,51 +11,63 @@ function ViewerComponent(props) {
 
     const streamerReady = true;
     const isPlayMode = true;
-    const streamingCallbacks = {};
-    const errorCallbacks = {
-        onOtherError: (error) => {
-        }
-    };
 
-    const {webRTCAdaptor, externalMediaStreams, removeStreamFromExternalMediaStreams, audioLevels} =
-        useWebRTCAdaptor(
+    const { externalMediaStreams, removeStreamFromExternalMediaStreams } =
+        useAgoraAsStreamer(
             streamerReady,
-            isPlayMode,
-            'videoElement',
-            mediaConstraints,
-            streamingCallbacks,
-            errorCallbacks,
+            !props.handRaiseActive,
+            'localVideo',
+            false,
             props.livestreamId,
-            props.streamerId
+            props.streamerId,
+            true
         );
-
-    useEffect(() => {
-        return () => {
-            if (webRTCAdaptor) {
-                webRTCAdaptor.closeWebSocket();
-            }
-        }
-    }, [webRTCAdaptor]);
 
     if (!props.currentLivestream) {
         return null;
     }
 
+    const attachSinkId = (element, sinkId) => {
+        if (typeof element.sinkId !== 'undefined') {
+            element.setSinkId(sinkId)
+                .then(() => {
+                    console.log(`Success, audio output device attached: ${sinkId}`);
+                })
+                .catch(error => {
+                    let errorMessage = error;
+                    if (error.name === 'SecurityError') {
+                        errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
+                    }
+                    console.error(errorMessage);
+                    // Jump back to first output device in the list as it's the default.
+                });
+        } else {
+            console.warn('Browser does not support output device selection.');
+        }
+    }
+
     return (
         <div>
             <div>
-                <CurrentSpeakerDisplayer isPlayMode={true}
-                                         smallScreenMode={props.currentLivestream.mode === 'presentation'}
-                                         speakerSwitchModeActive={false} localStream={null}
+                <CurrentSpeakerDisplayer isPlayMode={!props.handRaiseActive}
+                                         smallScreenMode={props.currentLivestream.mode === 'presentation' ||  props.currentLivestream.mode === 'desktop'}
+                                         speakerSwitchModeActive={false} localStream={null} attachSinkId={attachSinkId}
                                          streams={externalMediaStreams} localId={props.streamerId}
                                          currentSpeaker={props.currentLivestream.currentSpeakerId}
                                          removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
                                          muted={!props.currentLivestream.hasStarted} {...props}/>
             </div>
-            <div style={{display: (props.currentLivestream.mode === 'presentation' ? 'block' : 'none')}}>
-                <SmallStreamerVideoDisplayer isPlayMode={true} streams={externalMediaStreams}
-                                             livestreamId={props.currentLivestream.id} presenter={false}/>
-            </div>
+            {props.currentLivestream.mode === 'presentation' ||  props.currentLivestream.mode === 'desktop' ?
+                    <SmallStreamerVideoDisplayer
+                        livestreamId={props.currentLivestream.id}
+                        presentation={props.currentLivestream.mode === 'presentation'}
+                        showMenu={props.showMenu}
+                        externalMediaStreams={externalMediaStreams}
+                        isLocalScreen={false}
+                        attachSinkId={attachSinkId}
+                        presenter={false}/>
+                    : null
+                }
             <div className={props.currentLivestream.hasStarted ? 'hidden' : ''} style={{
                 position: 'absolute',
                 top: '0',

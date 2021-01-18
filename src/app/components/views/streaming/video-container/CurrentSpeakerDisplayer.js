@@ -6,14 +6,7 @@ import CreateLivestreamProposalStep from 'components/views/group/admin/schedule-
 
 function CurrentSpeakerDisplayer(props) {
 
-    const localVideoRef = useRef(null);
     const windowSize = useWindowSize();
-
-    useEffect(() => {
-        if (!props.isPlayMode && props.localStream) {
-            localVideoRef.current.srcObject = props.localStream;
-        }
-    },[props.localStream]);
 
     function getVideoContainerHeight(streamId) {
         if (props.isPlayMode) {
@@ -82,7 +75,7 @@ function CurrentSpeakerDisplayer(props) {
         }
     }
 
-    let externalVideoElements = props.streams.map( (stream, index) => {
+    let externalVideoElements = props.streams.filter(stream => !stream.streamId.includes("screen")).map( (stream, index) => {
         return (
             <div key={stream.streamId} className={getVideoContainerClass(stream.streamId)} style={{ padding: 0 }}>
                 <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
@@ -138,13 +131,15 @@ function CurrentSpeakerDisplayer(props) {
         let localVideoElement =
             <div className={getVideoContainerClass(props.localId)} style={{ padding: '0', margin: '0' }} key={"localVideoId"}>
                 <div className='video-container' style={{ height: getVideoContainerHeight(props.localId) }}>
-                    <video id="localVideo" ref={localVideoRef} muted autoPlay width={ '100%' }></video> 
+                    <div id="localVideo" style={{ width: '100%', height: '100%' }}/> 
                 </div>
                 <style jsx>{`
                     .quarter-width {
                         width: 250px;
                         height: 100%;
                         display: inline-block;
+                        vertical-align: top;
+                        margin: 0;
                     }
 
                     .speaker-video {
@@ -169,15 +164,6 @@ function CurrentSpeakerDisplayer(props) {
                         width: 100%; 
                         margin: 0 auto;
                         z-index: 2000;
-                    }
-
-                    #localVideo {
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        max-width: 100%;
-                        max-height: 100%;
                     }
             `}</style>
             </div>;
@@ -206,6 +192,8 @@ function CurrentSpeakerDisplayer(props) {
                     overflow-y: hidden;
                     white-space: nowrap;
                     text-align: center;
+                    scrollbar-color: black rgba(0, 210, 170, 0.8);
+
                 }
 
                 .relative-container-videos::-webkit-scrollbar {
