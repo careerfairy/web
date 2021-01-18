@@ -1476,13 +1476,38 @@ class Firebase {
         return ref.onSnapshot(callback);
     }
 
+    updateFeedbackQuestion = async (livestreamId, feedbackId, data) => {
+        let feedbackRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc(feedbackId)
+        return feedbackRef.update(data)
+    }
 
-    getLivestreamRatingNames = (livestreamId) => {
+    deleteFeedbackQuestion = async (livestreamId, feedbackId) => {
+        let feedbackRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc(feedbackId)
+        return feedbackRef.delete()
+    }
+
+    createFeedbackQuestion = async (livestreamId, data) => {
+        let feedbackRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+        return feedbackRef.add(data)
+    }
+
+    listenToLivestreamRatings = (livestreamId, callback) => {
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("rating")
-        return ref.get()
+        return ref.onSnapshot(callback)
     };
 
     getLivestreamRatingVoters = (ratingId, livestreamId) => {

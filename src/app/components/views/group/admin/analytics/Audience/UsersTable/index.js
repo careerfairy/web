@@ -208,12 +208,12 @@ const UsersTable = ({
                 title={userType.displayName}
                 subheader={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
             />
-            <Divider/>
+            <Divider ref={breakdownRef}/>
             <Box height={expandTable ? 800 : 400} width="100%">
                 <DataGrid
                     {...newData}
                     showToolbar
-                    ref={breakdownRef}
+                    // ref={breakdownRef}
                     checkboxSelection
                     loading={fetchingStreams}
                     onSelectionChange={(newSelection) => {

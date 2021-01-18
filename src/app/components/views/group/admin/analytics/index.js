@@ -186,7 +186,7 @@ const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();
     const breakdownRef = useRef(null)
     const theme = useTheme()
-    const [value, setValue] = useState(2);
+    const [value, setValue] = useState(0);
 
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[0]);
     const [showBar, setShowBar] = useState(false);
@@ -286,11 +286,9 @@ const AnalyticsOverview = ({firebase, group}) => {
 
     useEffect(() => {
         if (currentStream?.id) {
-            (async function () {
-                setFetchingRatings(true)
-                const ratingSnaps = await firebase.getLivestreamRatingNames(currentStream.id)
+            const unsubscribeRatings = firebase.listenToLivestreamRatings(currentStream.id, async querySnapshot => {
                 const feedback = []
-                for (const ratingDoc of ratingSnaps.docs) {
+                for (const ratingDoc of querySnapshot.docs) {
                     const ratingData = ratingDoc.data()
                     ratingData.id = ratingDoc.id
                     const votersSnap = await firebase.getLivestreamRatingVoters(ratingDoc.id, currentStream.id)
@@ -300,7 +298,9 @@ const AnalyticsOverview = ({firebase, group}) => {
                 }
                 setCurrentStream(prevState => ({...prevState, feedback}))
                 setFetchingRatings(false)
-            })()
+            })
+
+            return () => unsubscribeRatings()
         }
     }, [currentStream?.id])
 

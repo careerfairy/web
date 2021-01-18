@@ -105,6 +105,7 @@ const Feedback = ({
                         timeFrames={globalTimeFrame.timeFrames}
                         setCurrentStream={setCurrentStream}
                         futureStreams={futureStreams}
+                        currentStream={currentStream}
                         fetchingStreams={fetchingStreams}
                         streamsFromTimeFrame={streamsFromTimeFrame}
                         userType={userType}

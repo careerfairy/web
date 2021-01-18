@@ -243,6 +243,7 @@ const General = ({
                         timeFrames={globalTimeFrame.timeFrames}
                         setCurrentStream={setCurrentStream}
                         fetchingStreams={fetchingStreams}
+                        currentStream={currentStream}
                         futureStreams={futureStreams}
                         streamsFromTimeFrame={streamsFromTimeFrame}
                         userType={userType}

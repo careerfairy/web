@@ -41,6 +41,7 @@ const LatestEvents = ({
                           className,
                           userTypes,
                           userType,
+                          currentStream,
                           setCurrentStream,
                           fetchingStreams,
                           showBar,
@@ -163,7 +164,8 @@ const LatestEvents = ({
             onClick: (event, chartElement, data) => {
                 if (chartElement.length) {
                     const index = chartElement[0]._index
-                    if ([...streamsFromTimeFrame, ...futureStreams][index]) {
+                    const clickedStream = [...streamsFromTimeFrame, ...futureStreams][index]
+                    if (clickedStream?.id !== currentStream?.id) { // Only set a new stream if it exists and isn't the current stream
                         setCurrentStream([...streamsFromTimeFrame, ...futureStreams][index])
                         handleScrollToBreakdown()
                     }
@@ -208,6 +210,7 @@ const LatestEvents = ({
                             fontColor: theme.palette.text.secondary,
                             beginAtZero: true,
                             min: 0,
+                            precision: 0
                         },
                         gridLines: {
                             borderDash: [2],
@@ -272,9 +275,9 @@ const LatestEvents = ({
                                 />
                             }
                             label={
-                            <Typography  className={classes.toggleLabel}>
-                                Toggle Display
-                            </Typography>
+                                <Typography className={classes.toggleLabel}>
+                                    Toggle Display
+                                </Typography>
                             }
                         />
                     }

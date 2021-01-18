@@ -73,6 +73,7 @@ const Audience = ({
                         streamsFromTimeFrame={streamsFromTimeFrame}
                         userType={userType}
                         userTypes={userTypes}
+                        currentStream={currentStream}
                         handleToggleBar={handleToggleBar}
                         showBar={showBar}
                         handleScrollToBreakdown={handleScrollToBreakdown}

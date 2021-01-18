@@ -5,6 +5,8 @@ import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import {Rating} from "@material-ui/lab";
 import {Box} from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import EditIcon from '@material-ui/icons/Edit';
 
 const useStyles = makeStyles(theme => ({
     ratingInput: {
@@ -45,6 +47,8 @@ export const renderLongText = ({value}) => {
         </Tooltip>
     )
 }
+
+
 export const renderAppearAfter = ({value}) => {
     return (
         <Typography variant="inherit" noWrap>

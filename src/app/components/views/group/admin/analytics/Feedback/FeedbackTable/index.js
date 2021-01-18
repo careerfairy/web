@@ -18,6 +18,12 @@ import {
     renderRating
 } from "../../common/TableUtils";
 import {CustomLoadingOverlay, CustomNoRowsOverlay} from "../../common/Overlays";
+import EditFeedbackModal from "./EditFeedbackModal";
+import EditIcon from "@material-ui/icons/Edit";
+import AddIcon from '@material-ui/icons/Add';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYouSureModal";
+import {useSnackbar} from "notistack";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -29,6 +35,9 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: 500,
         color: theme.palette.primary.main
     },
+    deleteButton: {
+        color: theme.palette.error.main
+    }
 }));
 
 
@@ -47,6 +56,7 @@ const FeedbackTable = ({
                            breakdownRef,
                            setStreamDataType,
                            streamDataType,
+                           firebase,
                            currentPoll,
                            currentRating,
                            streamDataTypes,
@@ -55,24 +65,31 @@ const FeedbackTable = ({
                        }) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
-    const [columns, setColumns] = useState([]);
     const [expandTable, setExpandTable] = useState(false);
-    const [data, setData] = useState([]);
+    const [tableData, setTableData] = useState({rows: [], columns: []});
+    const [feedbackModal, setFeedbackModal] = useState({data: {}, open: false})
+    const [areYouSureModal, setAreYouSureModal] = useState({data: {}, open: false, warning: ""});
+    const [deletingFeedback, setDeletingFeedback] = useState(false);
+    const {enqueueSnackbar} = useSnackbar()
 
 
     useEffect(() => {
         const dataType = streamDataType.propertyName
         const newData = currentStream?.[dataType] || []
-        setData(newData)
+        let newColumns = tableData.columns
         if (dataType === "pollEntries") {
-            setColumns(pollColumns)
+            newColumns = pollColumns
         } else if (dataType === "questions") {
-            setColumns(questionColumns)
+            newColumns = questionColumns
         } else if (dataType === "feedback") {
-            setColumns(feedbackColumns)
+            newColumns = feedbackColumns
         }
+        setTableData({
+            rows: newData,
+            columns: newColumns
+        })
 
-    }, [streamDataType, currentStream])
+    }, [streamDataType.propertyName, currentStream])
 
     const DisplayButton = ({row}) => {
         const hasNoData = () => {
@@ -95,9 +112,68 @@ const FeedbackTable = ({
                 fullWidth
                 size="small"
             >
-                {hasNoData() ? "No Data" : "Click for Breakdown"}
+                {hasNoData() ? "No Data" : "Breakdown"}
             </Button>
         )
+    }
+
+
+    const EditButton = (row) => {
+        return (
+            <Button
+                onClick={() => handleEditFeedback(row)}
+                startIcon={<EditIcon/>} color="primary"
+                size="small"
+            >
+                Edit
+            </Button>
+        )
+    }
+    const DeleteButton = (row) => {
+        return (
+            <Button
+                className={classes.deleteButton}
+                onClick={() => handleOpenAreYouSureModal(row)}
+                startIcon={<DeleteForeverIcon/>}
+                color="primary"
+                size="small"
+            >
+                Delete
+            </Button>
+        )
+    }
+    const handleEditFeedback = (row) => {
+        setFeedbackModal({data: row, open: true})
+    }
+    const handleCreateFeedback = () => {
+        setFeedbackModal({data: {}, open: true})
+    }
+    const handleOpenAreYouSureModal = (row) => {
+        const warning = `Are you sure you want to delete the question "${row.question}"? You wont be able to revert this action`
+        setAreYouSureModal({data: row, open: true, warning})
+    }
+
+    const handleDeleteFeedback = async () => {
+        try {
+            setDeletingFeedback(true)
+            const {id: livestreamId} = currentStream
+            const {id: feedbackId} = areYouSureModal.data
+            if (livestreamId && feedbackId) {
+                await firebase.deleteFeedbackQuestion(livestreamId, feedbackId)
+            }
+            handleCloseAreYouSureModal()
+        } catch (e) {
+            enqueueSnackbar("Something went wrong, please refresh the page", {
+                variant: "error",
+                preventDuplicate: true
+            })
+            handleCloseAreYouSureModal()
+        }
+        setDeletingFeedback(false)
+    }
+
+    const handleCloseAreYouSureModal = () => {
+        setAreYouSureModal({data: {}, open: false, warning: ""})
     }
 
 
@@ -119,7 +195,6 @@ const FeedbackTable = ({
             field: "options",
             headerName: "Graph",
             filterable: false,
-            width: 150,
             renderCell: DisplayButton,
             disableClickEventBubbling: true,
         },
@@ -165,6 +240,20 @@ const FeedbackTable = ({
     ]
     const feedbackColumns = [
         {
+            field: "edit",
+            headerName: "Edit",
+            renderCell: ({row}) => EditButton(row),
+            filterable: false,
+            disableClickEventBubbling: true,
+        },
+        {
+            field: "delete",
+            headerName: "Delete",
+            renderCell: ({row}) => DeleteButton(row),
+            filterable: false,
+            disableClickEventBubbling: true,
+        },
+        {
             field: "question",
             headerName: "Question",
             width: 250,
@@ -193,14 +282,24 @@ const FeedbackTable = ({
             valueGetter: getCount
         },
         {
+            field: "hasText",
+            headerName: "Enabled Written Reviews",
+            width: 140,
+            valueGetter: ({value}) => value ? "Yes" : "No"
+        },
+        {
             field: "options",
             headerName: "Breakdown",
-            filterable: false,
             width: 180,
             renderCell: DisplayButton,
+            filterable: false,
             disableClickEventBubbling: true,
         },
     ]
+
+    const handleCloseFeedbackModal = () => {
+        setFeedbackModal(prevState => ({...prevState, open: false}))
+    }
 
     const toggleTable = () => {
         setExpandTable(!expandTable)
@@ -216,72 +315,96 @@ const FeedbackTable = ({
         )
     }
 
-
-    const newData = {
-        columns: columns,
-        rows: data
+    const isFeedback = () => {
+        return Boolean(streamDataType.propertyName === "feedback")
     }
 
     return (
-        <Card
-            raised={active()}
-            className={clsx(classes.root, className)}
-            {...rest}
-        >
-            <CardHeader
-                title={streamDataType.displayName}
-                subheader={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
-            />
-            <Divider/>
-            <Tabs
-                value={streamDataType.propertyName}
-                indicatorColor="primary"
-                textColor="primary"
-                scrollButtons="auto"
-                aria-label="disabled tabs example"
+        <>
+            <Card
+                raised={active()}
+                className={clsx(classes.root, className)}
+                {...rest}
             >
-                {streamDataTypes.map(({displayName, propertyName}, index) => (
-                        <Tab
-                            key={propertyName}
-                            value={propertyName}
-                            onClick={(event) => handleMenuItemClick(event, index)}
-                            label={`${displayName} - ${fetchingStreams ? "..." : currentStream?.[propertyName]?.length || 0}`}
-                        />
-                    )
-                )}
-            </Tabs>
-            <Divider/>
-            <Box height={expandTable ? 800 : 400} width="100%">
-                <DataGrid
-                    {...newData}
-                    ref={breakdownRef}
-                    filterModel={filterModel}
-                    loading={fetchingStreams}
-                    onSelectionChange={(newSelection) => {
-                        setSelection(newSelection.rowIds);
-                    }}
-                    components={{
-                        noRowsOverlay: CustomNoRowsOverlay,
-                        loadingOverlay: CustomLoadingOverlay,
-                    }}
+                <CardHeader
+                    title={streamDataType.displayName}
+                    subheader={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
                 />
-            </Box>
-            <Box
-                display="flex"
-                justifyContent="space-between"
-                p={2}
-            >
-                <Button
-                    color="primary"
-                    onClick={toggleTable}
-                    endIcon={!expandTable && <ArrowRightIcon/>}
-                    size="small"
-                    variant="text"
+                <Divider/>
+                <Tabs
+                    value={streamDataType.propertyName}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    scrollButtons="auto"
+                    aria-label="disabled tabs example"
                 >
-                    {expandTable ? "Show Less" : "Expand"}
-                </Button>
-            </Box>
-        </Card>
+                    {streamDataTypes.map(({displayName, propertyName}, index) => (
+                            <Tab
+                                key={propertyName}
+                                value={propertyName}
+                                onClick={(event) => handleMenuItemClick(event, index)}
+                                label={`${displayName} - ${fetchingStreams ? "..." : currentStream?.[propertyName]?.length || 0}`}
+                            />
+                        )
+                    )}
+                </Tabs>
+                <Divider/>
+                <Box height={expandTable ? 800 : 400} width="100%">
+                    <DataGrid
+                        {...tableData}
+                        ref={breakdownRef}
+                        filterModel={filterModel}
+                        loading={fetchingStreams}
+                        onSelectionChange={(newSelection) => {
+                            setSelection(newSelection.rowIds);
+                        }}
+                        components={{
+                            noRowsOverlay: CustomNoRowsOverlay,
+                            loadingOverlay: CustomLoadingOverlay,
+                        }}
+                    />
+                </Box>
+                <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    p={2}
+                >
+                    <Button
+                        color="primary"
+                        onClick={toggleTable}
+                        endIcon={!expandTable && <ArrowRightIcon/>}
+                        size="small"
+                        variant="text"
+                    >
+                        {expandTable ? "Show Less" : "Expand"}
+                    </Button>
+                    {isFeedback() &&
+                    <Button
+                        startIcon={<AddIcon/>}
+                        color="primary"
+                        disabled={feedbackModal.open}
+                        variant="contained"
+                        onClick={handleCreateFeedback}
+                    >
+                        Add Question
+                    </Button>
+                    }
+                </Box>
+            </Card>
+            <EditFeedbackModal
+                currentStream={currentStream}
+                handleClose={handleCloseFeedbackModal}
+                state={feedbackModal}
+            />
+            <AreYouSureModal
+                open={areYouSureModal.open}
+                message={areYouSureModal.warning}
+                handleConfirm={handleDeleteFeedback}
+                loading={deletingFeedback}
+                handleClose={handleCloseAreYouSureModal}
+                title="Warning"
+            />
+        </>
     );
 };
 
