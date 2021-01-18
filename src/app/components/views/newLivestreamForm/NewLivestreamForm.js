@@ -76,7 +76,7 @@ const speakerObj = {
 
 const NewLivestreamForm = ({firebase, user}) => {
     const router = useRouter()
-    const {userData, authenticatedUser, loading} = useAuth()
+    const {userData, authenticatedUser} = useAuth()
 
     const {
         query: {livestreamId, draftStreamId, absolutePath},
@@ -114,7 +114,10 @@ const NewLivestreamForm = ({firebase, user}) => {
     })
 
     useEffect(() => {
-
+        // If there are no relevant IDs and ur not a super admin, get lost...
+        if (!(livestreamId || draftStreamId) && !isAuthenticating() && !hasPermissionToCreate()) {
+            replace("/")
+        }
         if ((livestreamId || draftStreamId) && allFetched) {
             (async () => {
                 const targetId = livestreamId || draftStreamId
@@ -158,13 +161,6 @@ const NewLivestreamForm = ({firebase, user}) => {
             setUpdateMode(false)
         }
     }, [livestreamId, allFetched, draftStreamId])
-
-    useEffect(() => {
-        // If there are no relevant IDs and ur not a super admin, get lost...
-        if (!(livestreamId || draftStreamId) && !hasPermissionToCreate()) {
-            replace("/")
-        }
-    }, [livestreamId, allFetched, draftStreamId, loading, userData])
 
     useEffect(() => {
         handleGetFiles('mentors-pictures', setFetchingAvatars, setExistingAvatars)
@@ -274,11 +270,15 @@ const NewLivestreamForm = ({firebase, user}) => {
     const hasPermissionToEdit = (arrayOfGroups) => {
         return Boolean(
             userData.isAdmin
-            || arrayOfGroups.some(group => group.adminEmail === authenticatedUser.email
+            || arrayOfGroups.some(group => group.adminEmail === authenticatedUser?.email
             ))
     }
     const hasPermissionToCreate = () => {
-        return Boolean(!loading && userData?.isAdmin)
+        return Boolean(userData?.isAdmin)
+    }
+
+    const isAuthenticating = () => {
+        return Boolean(authenticatedUser === undefined)
     }
 
 

@@ -24,15 +24,13 @@ const adminPaths = [
     "/group/create"
 ];
 const AuthProvider = ({children, firebase}) => {
-    const {pathname, events, replace, asPath} = useRouter();
+    const {pathname, replace, asPath} = useRouter();
 
     const [authenticatedUser, setAuthenticatedUser] = useState(undefined);
     const [userData, setUserData] = useState(undefined);
-    const [loading, setLoading] = useState(true);
-    const [hideLoader, setHideLoader] = useState(false);
 
     useEffect(() => {
-        if (authenticatedUser && authenticatedUser.email) {
+        if (authenticatedUser?.email) {
             const unsubscribe = firebase.listenToUserData(
                 authenticatedUser.email,
                 (querySnapshot) => {
@@ -43,7 +41,6 @@ const AuthProvider = ({children, firebase}) => {
                     } else {
                         setUserData(null);
                     }
-                    setLoading(false);
                 }
             );
             return () => unsubscribe();
@@ -62,18 +59,6 @@ const AuthProvider = ({children, firebase}) => {
     }, []);
 
     useEffect(() => {
-        // Check that a new route is OK
-        const handleRouteChange = (url) => {
-            if (securePaths.includes(url) && authenticatedUser === null) {
-                replace({
-                    pathname: `/login`,
-                    query: {absolutePath: asPath},
-                })
-            } else if (isAdminPath() && userData && !userData.isAdmin) {
-                console.log("-> re-routing on rout change");
-                replace(`/`);
-            }
-        };
 
         // Check that initial route is OK
         if (isSecurePath() && authenticatedUser === null) {
@@ -85,12 +70,8 @@ const AuthProvider = ({children, firebase}) => {
             replace(`/`);
         }
 
-        // Monitor routes
-        events.on("routeChangeStart", handleRouteChange);
-        return () => {
-            events.off("routeChangeStart", handleRouteChange);
-        };
-    }, [authenticatedUser, userData]);
+
+    }, [authenticatedUser, userData, pathname]);
 
     const isSecurePath = () => {
         return Boolean(securePaths.includes(pathname))
@@ -100,7 +81,7 @@ const AuthProvider = ({children, firebase}) => {
     }
 
     const isAuthenticating = () => {
-        return Boolean(authenticatedUser === null || userData === null || loading === true)
+        return Boolean(authenticatedUser === undefined || userData === undefined)
     }
 
     if ((isSecurePath() || isAdminPath()) && isAuthenticating()) {
@@ -109,7 +90,7 @@ const AuthProvider = ({children, firebase}) => {
 
     return (
         <AuthContext.Provider
-            value={{authenticatedUser, userData, setUserData, loading, hideLoader}}
+            value={{authenticatedUser, userData, setUserData}}
         >
             {children}
         </AuthContext.Provider>

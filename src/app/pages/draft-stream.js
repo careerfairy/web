@@ -14,7 +14,8 @@ const draftStream = () => {
 
     const {userData, hideLoader} = useAuth();
     console.log("-> userData", userData);
-    console.log("-> hideLoader", hideLoader);
+    // console.log("-> userData", userData);
+    // console.log("-> hideLoader", hideLoader);
     const [submitted, setSubmitted] = useState(false)
 
     return (

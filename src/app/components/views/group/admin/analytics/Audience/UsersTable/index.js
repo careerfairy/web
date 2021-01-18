@@ -8,6 +8,7 @@ import {withFirebase} from "../../../../../../../context/firebase";
 import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
 import {CustomLoadingOverlay, CustomNoRowsOverlay} from "../../common/Overlays";
+import Link from 'next/link'
 
 const useStyles = makeStyles(() => ({
     root: {},
@@ -16,7 +17,38 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-
+const initialColumns = [
+    {
+        field: "firstName",
+        headerName: "First Name",
+        width: 140,
+    },
+    {
+        field: "lastName",
+        headerName: "Last Name",
+        width: 140,
+    },
+    {
+        field: "linkedinUrl",
+        headerName: "LinkedIn",
+        width: 180,
+    },
+    {
+        field: "universityName",
+        headerName: "University",
+        width: 150,
+    },
+    {
+        field: "streamsWatched",
+        headerName: "Events Attended",
+        width: 150,
+    },
+    {
+        field: "streamsRegistered",
+        headerName: "Events Registered To",
+        width: 170,
+    },
+]
 const UsersTable = ({
                         groupOptions,
                         fetchingStreams,
@@ -36,55 +68,34 @@ const UsersTable = ({
     const [columns, setColumns] = useState([]);
     const [expandTable, setExpandTable] = useState(false);
     const [users, setUsers] = useState([]);
+    const [checkboxSelection, setCheckboxSelection] = useState(false);
+    const [gridData, setGridData] = useState({columns: initialColumns, rows: []});
 
-    const initialColumns = [
-        {
-            field: "firstName",
-            headerName: "First Name",
-            width: 140,
-        },
-        {
-            field: "lastName",
-            headerName: "Last Name",
-            width: 140,
-        },
-        {
-            field: "universityName",
-            headerName: "University",
-            width: 150,
-        },
-        {
-            field: "streamsWatched",
-            headerName: "Events Attended",
-            width: 150,
-        },
-        {
-            field: "streamsRegistered",
-            headerName: "Events Registered To",
-            width: 170,
-        },
-    ]
+    useEffect(() => {
+        const userProp = userType.propertyName
+        const newColumns = [...initialColumns]
+        if (currentStream) {
+            newColumns.push({
+                field: "watchedEvent",
+                headerName: "Attended Event",
+                width: 170,
+            })
+        }
+        if (userProp === "talentPool") {
+            newColumns.unshift({
+                field: "userEmail",
+                headerName: "Email",
+                width: 200,
+                renderCell: (params) => (
+                    <a href={`mailto:${params.value}`}>
+                        {params.value}
+                    </a>
+                ),
+            })
+        }
+        setGridData({rows: users, columns: newColumns})
+    }, [userType.propertyName, currentStream, users])
 
-    if (userType.propertyName === "talentPool") {
-        initialColumns.unshift({
-            field: "userEmail",
-            headerName: "Email",
-            width: 200,
-            renderCell: (params) => (
-                <a href={`mailto:${params.value}`}>
-                    {params.value}
-                </a>
-            ),
-        },)
-    }
-
-    if (currentStream) {
-        initialColumns.push({
-            field: "watchedEvent",
-            headerName: "Attended Event",
-            width: 170,
-        })
-    }
 
     useEffect(() => {
         const categoryColumns = getGroupCategoryColumns()
@@ -98,6 +109,15 @@ const UsersTable = ({
         mapStreamsRegistered()
 
     }, [totalUniqueUsers])
+
+    useEffect(() => {
+        if (userType.propertyName === "talentPool") {
+            setCheckboxSelection(true)
+        } else {
+            setCheckboxSelection(false)
+        }
+
+    }, [userType.propertyName])
 
     const getGroupCategoryColumns = () => {
         if (group.categories?.length) {
@@ -192,12 +212,6 @@ const UsersTable = ({
         })
     }
 
-
-    const newData = {
-        columns: columns,
-        rows: users
-    }
-
     return (
         <Card
             raised={Boolean(currentStream)}
@@ -209,12 +223,18 @@ const UsersTable = ({
                 subheader={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
             />
             <Divider ref={breakdownRef}/>
-            <Box height={expandTable ? 800 : 400} width="100%">
+            <Box height={expandTable ? 800 : 400}>
                 <DataGrid
-                    {...newData}
-                    showToolbar
-                    // ref={breakdownRef}
-                    checkboxSelection
+                    {...gridData}
+                    onFilterModelChange={({filterModel}) => {
+                        const filterActive = filterModel.items?.[0]?.value
+                        if (filterActive) {
+                            setCheckboxSelection(false)
+                        } else {
+                            setCheckboxSelection(true)
+                        }
+                    }}
+                    checkboxSelection={checkboxSelection}
                     loading={fetchingStreams}
                     onSelectionChange={(newSelection) => {
                         setSelection(newSelection.rowIds);
