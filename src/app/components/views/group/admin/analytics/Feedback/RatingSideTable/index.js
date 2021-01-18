@@ -48,6 +48,7 @@ const RatingSideTable = ({
                              currentRating,
                              streamDataType,
                              fetchingStreams,
+    sideRef,
                              className,
                              ...rest
                          }) => {
@@ -82,6 +83,7 @@ const RatingSideTable = ({
     return (
         <Card
             raised={active()}
+            ref={sideRef}
             className={clsx(classes.root, className)}
             {...rest}
         >

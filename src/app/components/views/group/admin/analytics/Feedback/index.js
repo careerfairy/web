@@ -45,7 +45,7 @@ const Feedback = ({
                       showBar
                   }) => {
     const classes = useStyles()
-    const tableRef = useRef(null)
+    const sideRef = useRef(null)
 
     const [currentPoll, setCurrentPoll] = useState(null);
     const [currentRating, setCurrentRating] = useState(null);
@@ -96,6 +96,10 @@ const Feedback = ({
         )
     }
 
+    const handleScrollToSideRef = () => {
+        sideRef.current.scrollIntoView({behavior: 'smooth', block: 'start'})
+    }
+
 
     return (
         <Container className={classes.root} maxWidth={false}>
@@ -118,7 +122,7 @@ const Feedback = ({
                         group={group}
                     />
                 </Grid>
-                <Grid item lg={isQuestion() ? 12 : 8} md={12} xl={isQuestion() ? 12 : 9} xs={12}>
+                <Grid item lg={12} md={12} xl={12} xs={12}>
                     <FeedbackTable
                         totalUniqueUsers={totalUniqueUsers}
                         currentStream={currentStream}
@@ -129,6 +133,7 @@ const Feedback = ({
                         setCurrentRating={setCurrentRating}
                         currentPoll={currentPoll}
                         breakdownRef={breakdownRef}
+                        handleScrollToSideRef={handleScrollToSideRef}
                         currentRating={currentRating}
                         setCurrentPoll={setCurrentPoll}
                         streamDataTypes={streamDataTypes}
@@ -138,16 +143,18 @@ const Feedback = ({
                         group={group}/>
                 </Grid>
                 {!isQuestion() &&
-                <Grid item lg={4} md={12} xl={3} xs={12}>
+                <Grid  item lg={6} md={12} xl={6} xs={12}>
                     {isRating() ?
                         <RatingSideTable
                             streamDataType={streamDataType}
                             fetchingStreams={fetchingStreams}
+                            sideRef={sideRef}
                             currentRating={currentRating}
                         />
                         :
                         <FeedbackGraph
                             currentPoll={currentPoll}
+                            sideRef={sideRef}
                             currentStream={currentStream}
                             streamDataType={streamDataType}
                             typesOfOptions={[]}

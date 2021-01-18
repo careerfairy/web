@@ -22,6 +22,7 @@ import {convertStringToArray} from "../../../../../helperFunctions/HelperFunctio
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import {OverlaySvg} from "../common/Overlays";
+import RatingSideTable from "./RatingSideTable";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -47,6 +48,7 @@ const FeedbackGraph = ({
                            userTypes,
                            setUserType,
                            currentPoll,
+                           sideRef,
                            userType,
                            streamDataType,
                            className,
@@ -66,7 +68,7 @@ const FeedbackGraph = ({
         if (data.datasets.length) {
             setLocalColors([...colorsArray, ...data.datasets.map(() => randomColor())])
         }
-    }, [group.categories])
+    }, [group.categories, data.datasets.length])
 
     useEffect(() => {
         if (currentPoll) {
@@ -159,6 +161,7 @@ const FeedbackGraph = ({
 
     return (
         <Card
+            ref={sideRef}
             raised={active()}
             className={clsx(classes.root, className)}
             {...rest}

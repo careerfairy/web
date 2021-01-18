@@ -24,6 +24,7 @@ import AddIcon from '@material-ui/icons/Add';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYouSureModal";
 import {useSnackbar} from "notistack";
+import IconButton from "@material-ui/core/IconButton";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -58,6 +59,7 @@ const FeedbackTable = ({
                            streamDataType,
                            firebase,
                            currentPoll,
+                           handleScrollToSideRef,
                            currentRating,
                            streamDataTypes,
                            className,
@@ -102,6 +104,7 @@ const FeedbackTable = ({
             } else {
                 setCurrentPoll(row)
             }
+            handleScrollToSideRef()
         }
         return (
             <Button
@@ -120,26 +123,23 @@ const FeedbackTable = ({
 
     const EditButton = (row) => {
         return (
-            <Button
+            <IconButton
                 onClick={() => handleEditFeedback(row)}
-                startIcon={<EditIcon/>} color="primary"
-                size="small"
+                color="primary"
             >
-                Edit
-            </Button>
+                <EditIcon/>
+            </IconButton>
         )
     }
     const DeleteButton = (row) => {
         return (
-            <Button
+            <IconButton
                 className={classes.deleteButton}
                 onClick={() => handleOpenAreYouSureModal(row)}
-                startIcon={<DeleteForeverIcon/>}
                 color="primary"
-                size="small"
             >
-                Delete
-            </Button>
+                <DeleteForeverIcon/>
+            </IconButton>
         )
     }
     const handleEditFeedback = (row) => {
@@ -245,6 +245,7 @@ const FeedbackTable = ({
             renderCell: ({row}) => EditButton(row),
             filterable: false,
             disableClickEventBubbling: true,
+            width: 80
         },
         {
             field: "delete",
@@ -252,6 +253,7 @@ const FeedbackTable = ({
             renderCell: ({row}) => DeleteButton(row),
             filterable: false,
             disableClickEventBubbling: true,
+            width: 80
         },
         {
             field: "question",
@@ -324,6 +326,7 @@ const FeedbackTable = ({
             <Card
                 raised={active()}
                 className={clsx(classes.root, className)}
+                ref={breakdownRef}
                 {...rest}
             >
                 <CardHeader
@@ -352,7 +355,6 @@ const FeedbackTable = ({
                 <Box height={expandTable ? 800 : 400} width="100%">
                     <DataGrid
                         {...tableData}
-                        ref={breakdownRef}
                         filterModel={filterModel}
                         loading={fetchingStreams}
                         onSelectionChange={(newSelection) => {

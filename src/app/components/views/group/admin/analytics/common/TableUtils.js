@@ -34,10 +34,9 @@ export const getCount = ({value}) => {
     return value ? value.length : 0
 }
 export const renderLongText = ({value}) => {
-    const classes = useStyles()
     return (
         <Tooltip title={
-            <Typography className={classes.tableTooltipQuestion}>
+            <Typography style={{fontSize: "2rem"}}>
                 {value}
             </Typography>
         }>
