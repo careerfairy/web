@@ -1,8 +1,6 @@
 import React, {createContext, useContext, useState, useEffect} from "react";
 import {useRouter} from "next/router";
-import {withFirebase} from "../context/firebase";
 import Loader from "../components/views/loader/Loader";
-import {isEmptyObject} from "../components/helperFunctions/HelperFunctions";
 
 const AuthContext = createContext();
 
@@ -27,27 +25,25 @@ const adminPaths = [
 ];
 const AuthProvider = ({children, firebase}) => {
     const {pathname, events, replace, asPath} = useRouter();
-    const [user, setUser] = useState();
 
     const [authenticatedUser, setAuthenticatedUser] = useState(undefined);
     const [userData, setUserData] = useState(undefined);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [hideLoader, setHideLoader] = useState(false);
 
     useEffect(() => {
-        setLoading(true);
         if (authenticatedUser && authenticatedUser.email) {
             const unsubscribe = firebase.listenToUserData(
                 authenticatedUser.email,
                 (querySnapshot) => {
                     if (querySnapshot.exists) {
-                        setLoading(false);
                         let user = querySnapshot.data();
                         user.id = querySnapshot.id;
                         setUserData(user);
                     } else {
                         setUserData(null);
                     }
+                    setLoading(false);
                 }
             );
             return () => unsubscribe();
@@ -74,6 +70,7 @@ const AuthProvider = ({children, firebase}) => {
                     query: {absolutePath: asPath},
                 })
             } else if (isAdminPath() && userData && !userData.isAdmin) {
+                console.log("-> re-routing on rout change");
                 replace(`/`);
             }
         };
@@ -106,7 +103,7 @@ const AuthProvider = ({children, firebase}) => {
         return Boolean(authenticatedUser === null || userData === null || loading === true)
     }
 
-    if (isSecurePath() && isAuthenticating()) {
+    if ((isSecurePath() || isAdminPath()) && isAuthenticating()) {
         return <Loader/>;
     }
 

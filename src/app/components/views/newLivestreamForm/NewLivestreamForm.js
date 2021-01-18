@@ -76,7 +76,7 @@ const speakerObj = {
 
 const NewLivestreamForm = ({firebase, user}) => {
     const router = useRouter()
-    const {userData, authenticatedUser, hideLoader} = useAuth()
+    const {userData, authenticatedUser, loading} = useAuth()
 
     const {
         query: {livestreamId, draftStreamId, absolutePath},
@@ -114,10 +114,7 @@ const NewLivestreamForm = ({firebase, user}) => {
     })
 
     useEffect(() => {
-        // If there are no relevant IDs and ur not a super admin, get lost...
-        if (!(livestreamId || draftStreamId) && !hasPermissionToCreate()) {
-            replace("/")
-        }
+
         if ((livestreamId || draftStreamId) && allFetched) {
             (async () => {
                 const targetId = livestreamId || draftStreamId
@@ -161,6 +158,13 @@ const NewLivestreamForm = ({firebase, user}) => {
             setUpdateMode(false)
         }
     }, [livestreamId, allFetched, draftStreamId])
+
+    useEffect(() => {
+        // If there are no relevant IDs and ur not a super admin, get lost...
+        if (!(livestreamId || draftStreamId) && !hasPermissionToCreate()) {
+            replace("/")
+        }
+    }, [livestreamId, allFetched, draftStreamId, loading, userData])
 
     useEffect(() => {
         handleGetFiles('mentors-pictures', setFetchingAvatars, setExistingAvatars)
@@ -274,7 +278,7 @@ const NewLivestreamForm = ({firebase, user}) => {
             ))
     }
     const hasPermissionToCreate = () => {
-        return Boolean(userData.isAdmin)
+        return Boolean(!loading && userData?.isAdmin)
     }
 
 

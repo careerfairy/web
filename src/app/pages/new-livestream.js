@@ -1,38 +1,20 @@
 import {
-    DarkBackground,
-    GlobalBackground,
-    GreyBackground,
     TealBackground
 } from "../materialUI/GlobalBackground/GlobalBackGround";
 import Head from "next/head";
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
 import NewLivestreamForm from "../components/views/newLivestreamForm/NewLivestreamForm";
-import React, {useContext, useEffect, useState} from "react";
+import React from "react";
 import {Typography} from "@material-ui/core";
-import {useRouter} from "next/router";
-import Loader from "../components/views/loader/Loader";
 import {useAuth} from "../HOCs/AuthProvider";
 
 
 const newLivestream = () => {
 
-    const {replace, asPath: absolutePath, back} = useRouter();
-    const {userData, authenticatedUser: user, hideLoader} = useAuth();
-
-    useEffect(() => {
-        if (user === null) {
-            replace({
-                pathname: `/login`,
-                query: {absolutePath},
-            });
-        }
-    }, [user, userData]);
-
-
-
-
-    return hideLoader && userData ? (
+    const {authenticatedUser: user} = useAuth();
+    
+    return (
         <TealBackground style={{paddingBottom: 0}}>
             <Head>
                 <title key="title">CareerFairy | Create Livestreams</title>
@@ -46,7 +28,7 @@ const newLivestream = () => {
             <NewLivestreamForm user={user}/>
             <Footer/>
         </TealBackground>
-    ) : <Loader/>;
+    );
 };
 
 export default newLivestream;
