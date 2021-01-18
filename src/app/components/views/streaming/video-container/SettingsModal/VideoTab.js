@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
 
 }))
 
-const VideoTab = ({videoSource, devices, setVideoSource, playSound, handleMarkComplete, handleMarkIncomplete, localStream, isCompleted}) => {
+const VideoTab = ({videoSource, devices, setVideoSource, playSound, handleMarkComplete, handleMarkIncomplete, displayableMediaStream, isCompleted}) => {
     const classes = useStyles()
 
     const testVideoRef = useRef(null);
@@ -33,10 +33,11 @@ const VideoTab = ({videoSource, devices, setVideoSource, playSound, handleMarkCo
     const [labelWidth, setLabelWidth] = useState(0);
 
     useEffect(() => {
-        if (localStream) {
-            testVideoRef.current.srcObject = localStream;
+        if (displayableMediaStream) {
+            testVideoRef.current.srcObject = displayableMediaStream;
+
         }
-    }, [localStream]);
+    }, [displayableMediaStream]);
 
     React.useEffect(() => {
         setLabelWidth(inputLabel.current.offsetWidth);

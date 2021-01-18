@@ -3,7 +3,6 @@ import {Container, Button, Grid, Header as SemanticHeader, Icon, Image, Input, M
 
 import { useRouter } from 'next/router';
 import { withFirebasePage } from 'context/firebase';
-import useWebRTCAdaptor from 'components/custom-hook/useWebRTCAdaptor';
 import SmallStreamerVideoDisplayer from 'components/views/streaming/video-container/SmallStreamerVideoDisplayer';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
 import useUserMedia from '../../../custom-hook/useDevices';

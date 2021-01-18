@@ -49,7 +49,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const AudioTab = ({audioLevel, audioSource, devices, setAudioSource, setSpeakerSource, localStream, speakerSource, attachSinkId, sinkId}) => {
+const AudioTab = ({audioLevel, audioSource, devices, setAudioSource, setSpeakerSource, speakerSource, attachSinkId, sinkId}) => {
     const classes = useStyles()
     const [playing, toggle, audio] = useAudio("https://www.kozco.com/tech/piano2-CoolEdit.mp3")
 

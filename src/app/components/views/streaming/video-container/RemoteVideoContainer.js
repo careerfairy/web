@@ -25,7 +25,13 @@ function RemoteVideoContainer(props) {
             videoElement.current.loop = true;
             videoElement.current.play();
         } else {
-            videoElement.current.srcObject = props.stream.stream;
+            if (!props.stream.stream.isPlaying()) {
+                props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
+                    if (err) {
+                        props.setShowVideoButton({ paused: false, muted: true });
+                    }
+                });
+            }       
         }
     },[props.stream.streamId]);
 
@@ -35,32 +41,42 @@ function RemoteVideoContainer(props) {
         }
     },[props.speakerSource])
 
-    useEffect(() => {
-        if (videoElement.current && videoElement.current.srcObject && videoElement.current.paused) {
-            if (props.showVideoButton && !props.showVideoButton.muted && !props.showVideoButton.paused) {
-                videoElement.current.play().catch( e => {
-
-                    props.setShowVideoButton({ paused: false, muted: true });
-                });
-            } else if (props.showVideoButton && props.showVideoButton.muted && !props.showVideoButton.paused) {
-                videoElement.current.muted = true;
-                videoElement.current.play().catch(e => {
-                    videoElement.current.muted = false;
-                    props.setShowVideoButton({ paused: true, muted: false });
-                });
-            } else {
-                videoElement.current.play().then(() => {
-                    setStoppedByUserAgent(false);
-                }).catch(e => {
-                    setStoppedByUserAgent(true)
-                });
-            }       
-        }
-    },[videoElement, videoElement.current.srcObject, props.showVideoButton]);
+    // useEffect(() => {
+    //     if (props.stream.stream && !props.stream.stream.isPlaying()) {
+    //         if (props.showVideoButton && !props.showVideoButton.muted && !props.showVideoButton.paused) {
+    //             debugger;
+    //             props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
+    //                 if (err) {
+    //                     debugger;
+    //                     props.setShowVideoButton({ paused: false, muted: true });
+    //                 }
+    //             });
+    //         } else if (props.showVideoButton && props.showVideoButton.muted && !props.showVideoButton.paused) {
+    //             props.stream.stream.disableAudio();
+    //             debugger;
+    //             props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
+    //                 if (err) {
+    //                     debugger;
+    //                     props.setShowVideoButton({ paused: true, muted: false });
+    //                 }
+    //             });
+    //         } else {
+    //             debugger;
+    //             props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
+    //                 if (err) {
+    //                     debugger;
+    //                     setStoppedByUserAgent(true)
+    //                 } else {
+    //                     setStoppedByUserAgent(false)
+    //                 }
+    //             });
+    //         }       
+    //     }
+    // },[props.stream.stream, props.showVideoButton]);
 
     useEffect(() => {
         if (props.unmute) {
-            videoElement.current.muted = false;
+            props.stream.stream.play(props.stream.streamId, { muted: false });
         }
     },[props.unmute])
 
@@ -71,32 +87,16 @@ function RemoteVideoContainer(props) {
     },[props.play])
 
     function playVideo() {
-        videoElement.current.play().then(() => {
-            setStoppedByUserAgent(false);
-        }).catch((e) => console.log("Video Error:", e));
-    }
-
-    function handleVideoError(error) {
-        handleVideoLoss();
-        throw error;
-    }
-
-    function handleVideoLoss() {
-        if (videoElement.current.srcObject && !videoElement.current.srcObject.active) {
-            props.removeStreamFromExternalMediaStreams(props.stream.streamId)
+        if (!props.stream.stream.isPlaying()) {
+            props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
+                if (!err) {
+                    setStoppedByUserAgent(false);
+                } else {
+                    debugger;
+                }
+            });
         }
     }
-
-    function handleVideoError(error) {
-        handleVideoLoss()
-        throw error;
-    }
-
-    useEffect(() => {
-        if (videoElement && videoElement.current && videoElement.current.srcObject && !videoElement.current.srcObject.active) {
-            props.removeStreamFromExternalMediaStreams(props.stream.streamId)
-        }
-    }, [videoElement.current]);
 
     return (
         <>
@@ -115,16 +115,15 @@ function RemoteVideoContainer(props) {
                 } 
                 open={activeStep === 11 && props.stream.streamId === 'demoStream'}>
                 <div className='videoContainer' style={{ height: props.height }}>
-                    <video id='videoElement' ref={videoElement} width={ '100%' } onCanPlay={() => setCanPlay(true) } controls={false} muted={props.muted} onEnded={(e) => handleVideoError(e)} onError={handleVideoLoss} onSuspend={handleVideoLoss} playsInline>
-                    </video>
-                    <div className={ 'loader ' + (canPlay ? 'hidden' : '')}>
+                    <div ref={videoElement} id={props.stream.streamId} style={{ width: '100%', height: '100%' }}/>
+                    {/* <div className={ 'loader ' + (canPlay ? 'hidden' : '')}>
                         <div style={{ position: 'absolute', width: '30%', maxWidth: '30px', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
                             <CircularProgress style={{ maxWidth: '30px', height: 'auto'}} />
                         </div>
                     </div>
                     <div className={ 'loader clickable ' + (stoppedByUserAgent ? '' : 'hidden')} onClick={(e) => {playVideo(); e.preventDefault();}}>
                         <Icon name='play' size='big' style={{ color: 'white', width: '30%', maxWidth: '80px', height: 'auto', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}} />
-                    </div>
+                    </div> */}
                 </div>      
             </WhiteTooltip>     
             <style jsx>{`

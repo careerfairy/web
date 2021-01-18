@@ -52,7 +52,8 @@ function SettingsModal({ open,
                         webRTCAdaptor, 
                         streamId, 
                         devices, 
-                        localStream, 
+                        localStream,
+                        displayableMediaStream, 
                         audioSource,
                         updateAudioSource,
                         videoSource,
@@ -65,7 +66,6 @@ function SettingsModal({ open,
 
     const classes = useStyles();
     const [value, setValue] = React.useState(0);
-    const [audioValue, setAudioValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -97,10 +97,10 @@ function SettingsModal({ open,
                         </Grid>
                         <Grid xs={9} item className={classes.gridItem}>
                             <TabPanel value={value} index={0} className={classes.content} >
-                                <VideoTab devices={devices} localStream={localStream} localStream={localStream} videoSource={videoSource} setVideoSource={updateVideoSource}/>              
+                                <VideoTab devices={devices} displayableMediaStream={displayableMediaStream} localStream={localStream} videoSource={videoSource} setVideoSource={updateVideoSource}/>              
                             </TabPanel>
                             <TabPanel value={value} index={1} className={classes.content}>
-                                <AudioTab devices={devices} localStream={localStream} audioLevel={audioLevel} audioSource={audioSource} setAudioSource={updateAudioSource}
+                                <AudioTab devices={devices} displayableMediaStream={displayableMediaStream} audioLevel={audioLevel} audioSource={audioSource} setAudioSource={updateAudioSource}
                                     speakerSource={speakerSource} setSpeakerSource={setSpeakerSource} attachSinkId={attachSinkId}/>
                             </TabPanel>
                         </Grid>

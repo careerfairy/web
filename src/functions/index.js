@@ -639,6 +639,45 @@ exports.sendPostmarkEmailUserDataAndUniWithName = functions.https.onRequest(asyn
     });
 });
 
+
+const {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('agora-access-token')
+const appID = '53675bc6d3884026a72ecb1de3d19eb1';
+const appCertificate = '286a21681469490783ab75247de35f37';
+
+exports.generateAgoraToken = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    const channelName = req.body.channel;
+    const rtcRole = req.body.isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
+    const rtmRole = 0;
+    const expirationTimeInSeconds = 5400
+    const uid = req.body.uid;
+    const currentTimestamp = Math.floor(Date.now() / 1000)
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+    
+    // IMPORTANT! Build token with either the uid or with the user account. Comment out the option you do not want to use below.
+    
+    // Build token with uid
+    const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
+    console.log("Token With Integer Number Uid: " + rtcToken);
+    const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
+    console.log("Token With Integer Number Uid: " + rtmToken);
+
+    return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
+    
+})
+
+
 exports.sendReminderEmailToRegistrants = functions.https.onRequest(async (req, res) => {
 
     res.set('Access-Control-Allow-Origin', '*');
