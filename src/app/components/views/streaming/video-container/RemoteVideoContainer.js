@@ -25,11 +25,13 @@ function RemoteVideoContainer(props) {
             videoElement.current.loop = true;
             videoElement.current.play();
         } else {
-            props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
-                if (err) {
-                    console.error("Error playing remote video", err)
-                }
-            });
+            if (!props.stream.stream.isPlaying()) {
+                props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
+                    if (err) {
+                        props.setShowVideoButton({ paused: false, muted: true });
+                    }
+                });
+            }       
         }
     },[props.stream.streamId]);
 
@@ -39,31 +41,42 @@ function RemoteVideoContainer(props) {
         }
     },[props.speakerSource])
 
-    useEffect(() => {
-        if (videoElement.current && videoElement.current.srcObject && videoElement.current.paused) {
-            if (props.showVideoButton && !props.showVideoButton.muted && !props.showVideoButton.paused) {
-                videoElement.current.play().catch( e => {
-                    props.setShowVideoButton({ paused: false, muted: true });
-                });
-            } else if (props.showVideoButton && props.showVideoButton.muted && !props.showVideoButton.paused) {
-                videoElement.current.muted = true;
-                videoElement.current.play().catch(e => {
-                    videoElement.current.muted = false;
-                    props.setShowVideoButton({ paused: true, muted: false });
-                });
-            } else {
-                videoElement.current.play().then(() => {
-                    setStoppedByUserAgent(false);
-                }).catch(e => {
-                    setStoppedByUserAgent(true)
-                });
-            }       
-        }
-    },[videoElement, videoElement.current.srcObject, props.showVideoButton]);
+    // useEffect(() => {
+    //     if (props.stream.stream && !props.stream.stream.isPlaying()) {
+    //         if (props.showVideoButton && !props.showVideoButton.muted && !props.showVideoButton.paused) {
+    //             debugger;
+    //             props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
+    //                 if (err) {
+    //                     debugger;
+    //                     props.setShowVideoButton({ paused: false, muted: true });
+    //                 }
+    //             });
+    //         } else if (props.showVideoButton && props.showVideoButton.muted && !props.showVideoButton.paused) {
+    //             props.stream.stream.disableAudio();
+    //             debugger;
+    //             props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
+    //                 if (err) {
+    //                     debugger;
+    //                     props.setShowVideoButton({ paused: true, muted: false });
+    //                 }
+    //             });
+    //         } else {
+    //             debugger;
+    //             props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
+    //                 if (err) {
+    //                     debugger;
+    //                     setStoppedByUserAgent(true)
+    //                 } else {
+    //                     setStoppedByUserAgent(false)
+    //                 }
+    //             });
+    //         }       
+    //     }
+    // },[props.stream.stream, props.showVideoButton]);
 
     useEffect(() => {
         if (props.unmute) {
-            videoElement.current.muted = false;
+            props.stream.stream.play(props.stream.streamId, { muted: false });
         }
     },[props.unmute])
 
@@ -74,9 +87,15 @@ function RemoteVideoContainer(props) {
     },[props.play])
 
     function playVideo() {
-        videoElement.current.play().then(() => {
-            setStoppedByUserAgent(false);
-        }).catch((e) => console.log("Video Error:", e));
+        if (!props.stream.stream.isPlaying()) {
+            props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
+                if (!err) {
+                    setStoppedByUserAgent(false);
+                } else {
+                    debugger;
+                }
+            });
+        }
     }
 
     return (

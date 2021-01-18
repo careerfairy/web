@@ -63,8 +63,6 @@ function StreamingPage(props) {
 
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
 
-    const numberOfViewers = useNumberOfViewers(currentLivestream);
-
     useEffect(() => {
         if (livestreamId) {
             let baseUrl = "https://careerfairy.io"
@@ -200,7 +198,7 @@ function StreamingPage(props) {
                                 transform: 'translateY(-50%)'
                             }}
                         />
-                        <div style={{
+                        {/* <div style={{
                             float: 'right',
                             margin: '0 20px',
                             fontSize: '1em',
@@ -209,7 +207,7 @@ function StreamingPage(props) {
                             fontWeight: '700'
                         }}>
                             Viewers: {numberOfViewers}
-                        </div>
+                        </div> */}
                     </div>
                     <div className={classes.blackFrame}>
                         <VideoContainer currentLivestream={currentLivestream} streamerId={currentLivestream.id}

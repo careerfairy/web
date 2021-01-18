@@ -55,8 +55,6 @@ function StreamingPage(props) {
     const [newNotification, setNewNotification] = useState(null);
     const [notifications, setNotifications] = useState([]);
 
-    const numberOfViewers = useNumberOfViewers(currentLivestream);
-
     useEffect(() => {
         if (livestreamId) {
             let uuid = uuidv4()
@@ -121,7 +119,7 @@ function StreamingPage(props) {
                             <h3 style={{color: (currentLivestream.hasStarted ? 'teal' : 'orange')}}>{currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}</h3>
                             {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
                         </div>
-                        <div style={{
+                        {/* <div style={{
                             float: 'right',
                             margin: '0 20px',
                             fontSize: '1em',
@@ -129,7 +127,7 @@ function StreamingPage(props) {
                             verticalAlign: 'middle'
                         }}>
                             Viewers: {numberOfViewers}
-                        </div>
+                        </div> */}
                     </div>
                     <div className={classes.blackFrame}>
                         <VideoContainer currentLivestream={currentLivestream} streamerId={streamerId} viewer={false}/>
