@@ -51,6 +51,16 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
         },
     ])
 
+    // useEffect(() => {
+    //     if (livestream?.id) {
+    //         const unsubscribeRatings = firebase.listenToLivestreamRatings(livestream.id, async querySnapshot => {
+    //             const ratingData = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
+    //             console.log("-> ratingData", ratingData);
+    //         })
+    //         return () => unsubscribeRatings()
+    //     }
+    // }, [livestream?.id])
+
     useEffect(() => {
         const interval = setInterval(() => {
             setMinutesPassed(getMinutesPassed())

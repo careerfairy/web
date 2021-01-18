@@ -173,4 +173,15 @@ export const convertStringToArray = (string, maxChars = 30) => {
 
 }
 
+export const mergeArrayOfObjects = (arr1, arr2, property) => {
+
+    let merged = [];
+    for(let i=0; i<arr1.length; i++) {
+        merged.push({
+            ...arr1[i],
+            ...(arr2.find((itmInner) => itmInner[property] === arr1[i][property]))}
+        );
+    }
+    return merged
+}
 

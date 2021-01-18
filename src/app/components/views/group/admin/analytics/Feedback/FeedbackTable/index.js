@@ -290,6 +290,12 @@ const FeedbackTable = ({
             valueGetter: ({value}) => value ? "Yes" : "No"
         },
         {
+            field: "isForEnd",
+            headerName: "Automatically ask once stream is over",
+            width: 140,
+            valueGetter: ({value}) => value ? "Yes" : "No"
+        },
+        {
             field: "options",
             headerName: "Breakdown",
             width: 180,

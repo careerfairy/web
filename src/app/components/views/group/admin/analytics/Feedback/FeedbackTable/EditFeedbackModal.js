@@ -36,6 +36,7 @@ const FeedbackModal = ({
                 question: data.question || "",
                 appearAfter: data.appearAfter || 15,
                 hasText: data.hasText || false,
+                isForEnd: data.isForEnd || false
             }}
             enableReinitialize
             validate={(values) => {
@@ -159,6 +160,21 @@ const FeedbackModal = ({
                                             />
                                         }
                                         label="Enable Written Reviews"
+                                    />
+                                </FormControl>
+                            </Box>
+                            <Box marginY={2}>
+                                <FormControl variant="outlined" fullWidth required>
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                onChange={(e) => handleChange(e)}
+                                                checked={Boolean(values.isForEnd)}
+                                                name="isForEnd"
+                                                color="primary"
+                                            />
+                                        }
+                                        label="Prompt Question When Stream Ends"
                                     />
                                 </FormControl>
                             </Box>

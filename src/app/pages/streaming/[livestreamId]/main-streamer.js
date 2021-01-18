@@ -51,6 +51,7 @@ function StreamingPage(props) {
     const livestreamId = router.query.livestreamId;
 
     const [currentLivestream, setCurrentLivestream] = useState(false);
+    console.log("-> currentLivestream", currentLivestream);
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const [showMenu, setShowMenu] = useState(true);
     const classes = useStyles({showMenu})
