@@ -200,7 +200,7 @@ const AnalyticsOverview = ({firebase, group}) => {
     const theme = useTheme()
     const [value, setValue] = useState(0);
 
-    const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[0]);
+    const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
     const [showBar, setShowBar] = useState(false);
     const [livestreams, setLivestreams] = useState([]);
     const [fetchingStreams, setFetchingStreams] = useState(false);
