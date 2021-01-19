@@ -821,6 +821,31 @@ exports.sendReminderEmailsWhenLivestreamStarts = functions.firestore
         }
     });
 
+exports.assertLivestreamRegistrationWasCompleted = functions.firestore
+    .document('livestreams/{livestreamId}/registeredStudents/{studentId}')
+    .onCreate((snapshot, context) => {
+        console.log(`Documents created in registeredStudents in ${context.params.livestreamId}`);
+        if (snapshot.exists) {
+            admin.firestore().collection("livestreams").doc(context.params.livestreamId).update({
+                registeredUsers: admin.firestore.FieldValue.arrayUnion(context.params.studentId)
+            }).then(() => {
+                console.log(`Successfully updated registeredUsers in ${context.params.livestreamId}`)
+            })
+        }
+    });
+
+
+exports.assertLivestreamDeregistrationWasCompleted = functions.firestore
+.document('livestreams/{livestreamId}/registeredStudents/{studentId}')
+.onDelete((snapshot, context) => {
+    console.log(`Documents deleted in registeredStudents in ${context.params.livestreamId}`);
+    admin.firestore().collection("livestreams").doc(context.params.livestreamId).update({
+        registeredUsers: admin.firestore.FieldValue.arrayRemove(context.params.studentId)
+    }).then(() => {
+        console.log(`Successfully removed user from registeredUsers in ${context.params.livestreamId}`)
+    })
+});
+
 function generateEmailData(livestreamId, livestream, startingNow) {
     let recipientEmails = livestream.registeredUsers.join();
     var luxonStartDateTime = DateTime.fromJSDate(livestream.start.toDate(), {zone: 'Europe/Zurich'});
