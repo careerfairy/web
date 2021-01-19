@@ -1,18 +1,24 @@
-import {useState, useEffect, useRef, Fragment} from 'react';
+import {useState, useContext, Fragment} from 'react';
 import {withFirebasePage} from 'context/firebase';
 import useAgoraAsStreamer from 'components/custom-hook/useAgoraAsStreamer';
 import CurrentSpeakerDisplayer from 'components/views/streaming/video-container/CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from 'components/views/streaming/video-container/SmallStreamerVideoDisplayer';
+import UserContext from 'context/user/UserContext';
+import useDevices from 'components/custom-hook/useDevices';
+import useMediaSources from 'components/custom-hook/useMediaSources';
+import VideoControlsContainer from 'components/views/streaming/video-container/VideoControlsContainer';
+import SettingsModal from 'components/views/streaming/video-container/SettingsModal';
 
 
 function ViewerComponent(props) {
 
-    const mediaConstraints = {audio: true, video: true}
+    const [showSettings, setShowSettings] = useState(false);
+    const {authenticatedUser, userData} = useContext(UserContext);
 
     const streamerReady = true;
-    const isPlayMode = true;
+    const devices = useDevices();
 
-    const { externalMediaStreams, removeStreamFromExternalMediaStreams } =
+    const { externalMediaStreams, localMediaStream } =
         useAgoraAsStreamer(
             streamerReady,
             !props.handRaiseActive,
@@ -22,6 +28,17 @@ function ViewerComponent(props) {
             props.streamerId,
             true
         );
+
+    const {
+        audioSource,
+        updateAudioSource,
+        videoSource,
+        updateVideoSource,
+        speakerSource,
+        updateSpeakerSource,
+        localMediaStream: displayableMediaStream,
+        audioLevel
+    } = useMediaSources(devices, authenticatedUser?.email, localMediaStream, !streamerReady || showSettings);
 
     if (!props.currentLivestream) {
         return null;
@@ -46,6 +63,11 @@ function ViewerComponent(props) {
         }
     }
 
+    const setDesktopMode = async (mode, initiatorId) => {
+        let screenSharerId = mode === 'desktop' ? initiatorId : props.currentLivestream.screenSharerId;
+        await props.firebase.setDesktopMode(props.currentLivestream.id, mode, screenSharerId);
+    }
+
     return (
         <div>
             <div>
@@ -54,7 +76,6 @@ function ViewerComponent(props) {
                                          speakerSwitchModeActive={false} localStream={null} attachSinkId={attachSinkId}
                                          streams={externalMediaStreams} localId={props.streamerId}
                                          currentSpeaker={props.currentLivestream.currentSpeakerId}
-                                         removeStreamFromExternalMediaStreams={removeStreamFromExternalMediaStreams}
                                          muted={!props.currentLivestream.hasStarted} {...props}/>
             </div>
             {props.currentLivestream.mode === 'presentation' ||  props.currentLivestream.mode === 'desktop' ?
@@ -68,6 +89,28 @@ function ViewerComponent(props) {
                         presenter={false}/>
                     : null
                 }
+            { props.handRaiseActive && 
+                <Fragment>
+                    <VideoControlsContainer
+                        currentLivestream={props.currentLivestream}
+                        viewer={true}
+                        streamerId={authenticatedUser.email}
+                        joining={true}
+                        localMediaStream={localMediaStream}e
+                        isMainStreamer={false}
+                        setDesktopMode={setDesktopMode}
+                        showSettings={showSettings}
+                        setShowSettings={setShowSettings}
+                    />
+                    <SettingsModal open={showSettings} close={() => setShowSettings(false)}
+                                streamId={authenticatedUser.email} devices={devices} 
+                                localStream={localMediaStream} displayableMediaStream={displayableMediaStream}
+                                audioSource={audioSource} updateAudioSource={updateAudioSource}
+                                videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
+                                speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
+                                attachSinkId={attachSinkId}/>
+                </Fragment>
+            }
             <div className={props.currentLivestream.hasStarted ? 'hidden' : ''} style={{
                 position: 'absolute',
                 top: '0',

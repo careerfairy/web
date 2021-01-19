@@ -57,9 +57,9 @@ function VideoContainer(props) {
 
     const screenSharingMode = props.currentLivestream.screenSharerId === props.streamerId && 
         props.currentLivestream.mode === 'desktop';
-    const { webRTCAdaptor, localMediaStream, externalMediaStreams } =
+    const { localMediaStream, externalMediaStreams } =
         useAgoraAsStreamer(
-            streamerReady,
+            true,
             false,
             localVideoId,
             screenSharingMode,
@@ -165,7 +165,7 @@ function VideoContainer(props) {
 
     useEffect(() => {
         const activeStep = getActiveTutorialStepKey();
-        if (webRTCAdaptor) {
+        if (localMediaStream) {
             if (activeStep > 10 && activeStep < 13) {
                 setAddedStream({
                     streamId: "demoStream",
@@ -249,7 +249,7 @@ function VideoContainer(props) {
                 />
             </div>
             <SettingsModal open={showSettings} close={() => setShowSettings(false)}
-                           webRTCAdaptor={webRTCAdaptor} streamId={props.streamerId}
+                           streamId={props.streamerId}
                            devices={devices} localStream={localMediaStream} displayableMediaStream={displayableMediaStream}
                            audioSource={audioSource} updateAudioSource={updateAudioSource}
                            videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
@@ -272,7 +272,7 @@ function VideoContainer(props) {
                     videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
                     speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
                     streamerReady={streamerReady} setStreamerReady={setStreamerReady}
-                    localStream={localMediaStream}
+                    localStream={displayableMediaStream}
                     connectionEstablished={connectionEstablished}
                     isTest={props.currentLivestream.test} viewer={props.viewer}
                     handleOpenDemoIntroModal={handleOpenDemoIntroModal}
