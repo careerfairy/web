@@ -3,29 +3,31 @@ import {withFirebasePage} from 'context/firebase';
 import useAgoraAsStreamer from 'components/custom-hook/useAgoraAsStreamer';
 import CurrentSpeakerDisplayer from 'components/views/streaming/video-container/CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from 'components/views/streaming/video-container/SmallStreamerVideoDisplayer';
-import UserContext from 'context/user/UserContext';
 import useDevices from 'components/custom-hook/useDevices';
 import useMediaSources from 'components/custom-hook/useMediaSources';
 import VideoControlsContainer from 'components/views/streaming/video-container/VideoControlsContainer';
 import SettingsModal from 'components/views/streaming/video-container/SettingsModal';
+import { useAuth } from 'HOCs/AuthProvider';
 
 
 function ViewerComponent(props) {
 
     const [showSettings, setShowSettings] = useState(false);
-    const {authenticatedUser, userData} = useContext(UserContext);
+    const {userData, authenticatedUser} = useAuth();
 
     const streamerReady = true;
     const devices = useDevices();
 
+    const screenSharingMode = props.currentLivestream.screenSharerId === authenticatedUser?.email && 
+        props.currentLivestream.mode === 'desktop';
     const { externalMediaStreams, localMediaStream } =
         useAgoraAsStreamer(
             streamerReady,
             !props.handRaiseActive,
             'localVideo',
-            false,
+            screenSharingMode,
             props.livestreamId,
-            props.streamerId,
+            authenticatedUser.email,
             true
         );
 

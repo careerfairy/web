@@ -2,11 +2,8 @@ import { useState, useEffect, useContext } from 'react';
 import window, { navigator, document } from 'global';
 import { v4 as uuidv4 } from 'uuid';
 import { useAgoraToken } from './useAgoraToken';
-import UserContext from 'context/user/UserContext';
 
 export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer) {
-
-    const {authenticatedUser, userData} = useContext(UserContext);
 
     const [localMediaStream, setLocalMediaStream] = useState(null);
 
@@ -33,12 +30,10 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     const agoraScreenShareToken = useAgoraToken(roomId, userUid, !isViewer, true);
 
     useEffect(() => {
-        if (isPlayMode && authenticatedUser) {
-            setUserUid(authenticatedUser.email)
-        } else if (streamId) {
+        if (streamId) {
             setUserUid(streamId)
         }
-    },[isPlayMode, streamId, authenticatedUser])
+    },[streamId])
 
     useEffect(() => {
         if (addedStream) {
