@@ -21,6 +21,10 @@ import FormControl from "@material-ui/core/FormControl";
 import {withFirebase} from "../../../../../../../context/firebase";
 import {useTheme} from "@material-ui/core/styles";
 
+const marks = [
+    5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150, 160, 180, 9999999
+];
+
 const FeedbackModal = ({
                            state: {open, data},
                            handleClose,
@@ -29,6 +33,15 @@ const FeedbackModal = ({
                        }) => {
     const theme = useTheme()
     const fullScreen = useMediaQuery(theme.breakpoints.down("xs"))
+
+    function valuetext(value) {
+        return value === 9999999 ? "stream Ends" : `${value} minutes`;
+    }
+
+    const isForEnd = (appearAfter) => {
+        return Boolean(appearAfter === marks[marks.length - 1])
+    }
+
     return (
         <Formik
             autoComplete="off"
@@ -36,12 +49,18 @@ const FeedbackModal = ({
                 question: data.question || "",
                 appearAfter: data.appearAfter || 15,
                 hasText: data.hasText || false,
-                isForEnd: data.isForEnd || false
+                isForEnd: data.isForEnd || false,
+                noStars: data.isForEnd || false
             }}
             enableReinitialize
             validate={(values) => {
                 let errors = {};
                 const minQuestionLength = 5;
+
+                if (values.noStars && !values.hasText) {
+                    errors.hasText = "Review needs to have a written review or a star rating";
+                    errors.noStars = "Review needs to have a written review or a star rating";
+                }
                 if (!values.question) {
                     errors.question = "Required";
                 } else if (values.question.length < minQuestionLength) {
@@ -77,6 +96,7 @@ const FeedbackModal = ({
                   handleSubmit,
                   isSubmitting,
                   dirty,
+                  setFieldValue
                   /* and other goodies */
               }) => {
                 return (
@@ -117,39 +137,25 @@ const FeedbackModal = ({
                                         label="This Question will automatically appear in the stream after:"
                                         name="appearAfter"
                                         id="appearAfter"
-                                        onChange={(e) => handleChange(e)}
+                                        onChange={(e) => {
+                                            handleChange(e)
+                                            if (isForEnd(e.target.value)) {
+                                                setFieldValue("isForEnd", true)
+                                            }
+                                        }}
                                         value={values.appearAfter}
                                     >
-                                        <MenuItem value={5} label="10 minutes">
-                                            5 minutes
-                                        </MenuItem>
-                                        <MenuItem value={10} label="10 minutes">
-                                            10 minutes
-                                        </MenuItem>
-                                        <MenuItem value={15} label="15 minutes">
-                                            15 minutes
-                                        </MenuItem>
-                                        <MenuItem value={20} label="20 minutes">
-                                            20 minutes
-                                        </MenuItem>
-                                        <MenuItem value={25} label="25 minutes">
-                                            25 minutes
-                                        </MenuItem>
-                                        <MenuItem value={30} label="30 minutes">
-                                            30 minutes
-                                        </MenuItem>
-                                        <MenuItem value={35} label="35 minutes">
-                                            35 minutes
-                                        </MenuItem>
-                                        <MenuItem value={40} label="40 minutes">
-                                            40 minutes
-                                        </MenuItem>
+                                        {marks.map(value => (
+                                            <MenuItem key={value} value={value}>
+                                                {valuetext(value)}
+                                            </MenuItem>
+                                        ))}
                                     </Select>
                                     <FormHelperText>{errors.appearAfter}</FormHelperText>
                                 </FormControl>
                             </Box>
                             <Box marginY={2}>
-                                <FormControl variant="outlined" fullWidth required>
+                                <FormControl error={Boolean(errors.hasText)} variant="outlined" fullWidth required>
                                     <FormControlLabel
                                         control={
                                             <Checkbox
@@ -161,10 +167,29 @@ const FeedbackModal = ({
                                         }
                                         label="Enable Written Reviews"
                                     />
+                                    <FormHelperText>{errors.hasText}</FormHelperText>
                                 </FormControl>
                             </Box>
                             <Box marginY={2}>
-                                <FormControl variant="outlined" fullWidth required>
+                                <FormControl error={Boolean(errors.noStars)} variant="outlined" fullWidth
+                                             required>
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                onChange={(e) => handleChange(e)}
+                                                checked={Boolean(values.noStars)}
+                                                name="noStars"
+                                                color="primary"
+                                            />
+                                        }
+                                        label="Disable Star Rating"
+                                    />
+                                    <FormHelperText>{errors.noStars}</FormHelperText>
+                                </FormControl>
+                            </Box>
+                            <Box marginY={2}>
+                                <FormControl disabled={isForEnd(values.appearAfter)} variant="outlined" fullWidth
+                                             required>
                                     <FormControlLabel
                                         control={
                                             <Checkbox
