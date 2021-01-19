@@ -3,108 +3,159 @@ import {withFirebasePage} from "context/firebase";
 import {Rating} from "@material-ui/lab";
 import {useSnackbar} from "notistack";
 import {useAuth} from "../../../../HOCs/AuthProvider";
-import {TextField} from "@material-ui/core";
+import {FormHelperText, TextField} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
+import {Formik} from "formik";
+import FormControl from "@material-ui/core/FormControl";
 
 const useStyles = makeStyles((theme) => ({
     snackbar: {
         flexDirection: "column",
+        alignItems: "flex-start",
+        "& #notistack-snackbar": {
+            paddingLeft: theme.spacing(2)
+        }
     },
     action: {
         display: "flex",
         flexDirection: "column",
     },
     button: {
-        marginBottom: theme.spacing(1)
+        marginBottom: theme.spacing(2.5),
+        marginTop: theme.spacing(1)
     },
     input: {
-        marginBottom: theme.spacing(1)
+        marginBottom: theme.spacing(1),
+        paddingRight: theme.spacing(2.5)
     },
+    ratingHelper: {
+        marginLeft: theme.spacing(2)
+    },
+    stars: {
+        marginBottom: theme.spacing(1)
+    }
 }));
 
 const ActionComponent = ({
                              firebase,
-                             question,
                              livestreamId,
                              email,
                              ratingId,
                              hasText,
+                             noStars
                          }) => {
     const classes = useStyles();
     const {closeSnackbar} = useSnackbar();
-    const [data, setData] = useState({rating: 0, message: ""});
-    const [submitting, setSubmitting] = useState(false);
 
-    const handleRatingChange = async ({currentTarget: {value}}) => {
-        const ratingNumber = Number(value)
-        if (hasText) {
-            setData({...data, rating: ratingNumber});
-        } else {
-            await handleSubmit({rating: ratingNumber})
-        }
-    };
-    const handleMessageChange = ({currentTarget: {value}}) => {
-        setData({...data, message: value});
-    };
-
-    const handleSubmit = async (data) => {
-        setSubmitting(true);
+    const handleFormSubmit = async (values, {setSubmitting}) => {
+        setSubmitting(true)
         try {
-            await firebase.rateLivestream(livestreamId, email, data, ratingId);
+            const newValues = {
+                rating: Number(values[ratingId]),
+                message: values.message
+            }
+            await firebase.rateLivestream(livestreamId, email, newValues, ratingId);
         } catch (e) {
         }
+        setSubmitting(false)
         closeSnackbar(ratingId);
-        setSubmitting(false);
     };
     return (
-        <Grid container>
-            <Grid xl={12} lg={12} md={12} sm={12} xs={12} item>
-                <Rating
-                    name={question}
-                    value={data.rating}
-                    size="large"
-                    max={5}
-                    onChange={handleRatingChange}
-                />
-            </Grid>
-            {hasText ? (
-                <>
-                    <Grid item xl={12} lg={12} md={12} sm={12} xs={12}>
-                        <TextField
-                            multiline
-                            fullWidth
-                            margin="dense"
-                            value={data.message}
-                            inputProps={{maxLength: 1000}}
-                            label="Reason (optional)"
-                            onChange={handleMessageChange}
-                            variant="outlined"
-                            className={classes.input}
-                        />
-                    </Grid>
-                    <Grid
-                        xl={12}
-                        lg={12}
-                        md={12}
-                        sm={12}
-                        xs={12}
-                        item
-                    >
-                        <Button
-                            color="primary"
-                            disabled={submitting || !data.rating}
-                            onClick={() => handleSubmit(data)}
-                            variant="contained"
-                            className={classes.button}
-                        >
-                            Submit
-                        </Button>
-                    </Grid>
-                </>
-            ) : null}
-        </Grid>
+        <Formik
+            autoComplete="off"
+            initialValues={{
+                [ratingId]: 0,
+                message: "",
+            }}
+            enableReinitialize
+            validate={(values) => {
+                let errors = {};
+                if (!values[ratingId] && !values.message) {
+                    errors.message = "Please fill one"
+                    errors[ratingId] = "Please fill one"
+                }
+                return errors;
+            }}
+            onSubmit={handleFormSubmit}
+        >
+            {({
+                  values,
+                  errors,
+                  handleChange,
+                  handleSubmit,
+                  isSubmitting,
+                  setSubmitting,
+              }) => (
+                <Grid container>
+                    {!noStars &&
+                    <Grid xl={12} lg={12} md={12} sm={12} xs={12} item>
+                        <FormControl error={errors[ratingId]}>
+                            <Rating
+                                name={ratingId}
+                                value={values[ratingId]}
+                                size="large"
+                                className={classes.stars}
+                                disabled={isSubmitting}
+                                max={5}
+                                onChange={async (e) => {
+                                    handleChange(e)
+                                    if (!hasText) {
+                                        const {currentTarget: {value}} = e
+                                        await handleFormSubmit({
+                                            [ratingId]: value,
+                                            message: values.message
+                                        }, {setSubmitting})
+                                    }
+                                }}
+                            />
+                            <FormHelperText className={classes.ratingHelper}>
+                                {errors[ratingId]}
+                            </FormHelperText>
+                        </FormControl>
+                    </Grid>}
+                    {hasText ? (
+                        <>
+                            <Grid item xl={12} lg={12} md={12} sm={12} xs={12}>
+                                <TextField
+                                    multiline
+                                    fullWidth
+                                    disabled={isSubmitting}
+                                    name="message"
+                                    value={values.message}
+                                    error={errors.message}
+                                    helperText={errors.message}
+                                    inputProps={{maxLength: 1000}}
+                                    label="Review"
+                                    onChange={handleChange}
+                                    variant="outlined"
+                                    className={classes.input}
+                                />
+                            </Grid>
+                            <Grid
+                                xl={12}
+                                lg={12}
+                                md={12}
+                                sm={12}
+                                xs={12}
+                                item
+                            >
+                                <Button
+                                    color="primary"
+                                    disabled={isSubmitting}
+                                    onClick={handleSubmit}
+                                    variant="contained"
+                                    className={classes.button}
+                                >
+                                    Submit
+                                </Button>
+                            </Grid>
+                        </>
+                    ) : null}
+                </Grid>)}
+        </Formik>
+
     );
 };
 
@@ -141,7 +192,7 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
     useEffect(() => {
         const interval = setInterval(() => {
             setMinutesPassed(getMinutesPassed());
-        }, 3 * 1000); // check for minutes passed every 10 seconds
+        }, 10 * 1000); // check for minutes passed every 10 seconds
         return () => clearInterval(interval);
     }, [livestream.start]);
 
@@ -153,13 +204,30 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
         }
     }, [minutesPassed, livestream.hasEnded]);
 
+    const hasNotRatedAndTimeHasPassed = (rating) => {
+        return Boolean(
+            !rating.hasRated &&
+            minutesPassed > rating.appearAfter &&
+            authenticatedUser?.email
+        )
+    }
+
+    const hasNotRatedAndNotTimeYetButStreamEndedAndRatingIsForEnd = (rating) => {
+        return Boolean(
+            !rating.hasRated &&
+            minutesPassed < rating.appearAfter &&
+            authenticatedUser?.email &&
+            rating.isForEnd &&
+            livestream.hasEnded
+        )
+    }
+
     const handleCheckRatings = async () => {
         for (const [index, rating] of ratings.entries()) {
             // this loop allows for easy async functions along with index
             if (
-                !rating.hasRated &&
-                minutesPassed > rating.appearAfter &&
-                authenticatedUser?.email
+                hasNotRatedAndTimeHasPassed(rating) ||
+                hasNotRatedAndNotTimeYetButStreamEndedAndRatingIsForEnd(rating)
             ) {
                 // if you've already rated, dont bother making an api call
                 const hasRated = await firebase.checkIfUserRated(
@@ -184,8 +252,8 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
                                 <ActionComponent
                                     firebase={firebase}
                                     ratingId={rating.id}
-                                    question={rating.question}
                                     hasText={rating.hasText}
+                                    noStars={rating.noStars}
                                     email={authenticatedUser.email}
                                     livestreamId={livestreamId}
                                 />
