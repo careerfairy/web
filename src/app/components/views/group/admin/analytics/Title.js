@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {Button, Card, CardHeader, Grid, Menu, MenuItem} from "@material-ui/core";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import Box from "@material-ui/core/Box";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -13,25 +14,49 @@ const useStyles = makeStyles(theme => ({
     },
     header: {
         paddingLeft: theme.spacing(3)
+    },
+    titleButton: {
+        paddingRight: theme.spacing(1)
     }
 }));
 
-const Title = ({setGlobalTimeFrame, globalTimeFrames, globalTimeFrame}) => {
+const Title = ({
+                   setGlobalTimeFrame,
+                   globalTimeFrames,
+                   group,
+                   currentUserDataSet,
+                   userDataSets,
+                   setCurrentUserDataSet,
+                   globalTimeFrame
+               }) => {
 
     const classes = useStyles()
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [dateAnchorEl, setDateAnchorEl] = useState(null);
+    const [studentAnchorEl, setStudentAnchorEl] = useState(null);
 
-    const handleClickListItem = (event) => {
-        setAnchorEl(event.currentTarget);
+    const handleDateClickListItem = (event) => {
+        setDateAnchorEl(event.currentTarget);
     };
 
-    const handleMenuItemClick = (event, index) => {
+    const handleDateMenuItemClick = (event, index) => {
         setGlobalTimeFrame(globalTimeFrames[index])
-        setAnchorEl(null);
+        setDateAnchorEl(null);
     };
 
-    const handleClose = () => {
-        setAnchorEl(null);
+    const handleDateMenuClose = () => {
+        setDateAnchorEl(null);
+    };
+    const handleStudentClickListItem = (event) => {
+        setStudentAnchorEl(event.currentTarget);
+    };
+
+    const handleStudentMenuItemClick = (event, index) => {
+        setCurrentUserDataSet(userDataSets[index])
+        setStudentAnchorEl(null);
+    };
+
+    const handleStudentMenuClose = () => {
+        setStudentAnchorEl(null);
     };
 
     return (
@@ -43,32 +68,59 @@ const Title = ({setGlobalTimeFrame, globalTimeFrames, globalTimeFrame}) => {
                     variant: "h4"
                 }}
                 title={`Channel Analytics`}
-                subheader={`Over the past ${globalTimeFrame.name}`}
+                subheader={`Over the past ${globalTimeFrame.name} for ${currentUserDataSet.displayName}`}
                 action={
-                    <div>
-                        <Button onClick={handleClickListItem}
+                    <Box display="flex" flexDirection="column" alignItems="flex-end">
+                        <Button onClick={handleDateClickListItem}
+                                className={classes.titleButton}
                                 endIcon={<ArrowDropDownIcon/>}
                                 variant="text">
                             {`In the last ${globalTimeFrame.name}`}
                         </Button>
                         <Menu
-                            id="lock-menu"
-                            anchorEl={anchorEl}
+                            id="followers-menu"
+                            anchorEl={dateAnchorEl}
                             keepMounted
-                            open={Boolean(anchorEl)}
-                            onClose={handleClose}
+                            open={Boolean(dateAnchorEl)}
+                            onClose={handleDateMenuClose}
                         >
                             {globalTimeFrames.map((option, index) => (
                                 <MenuItem
                                     key={option.id}
                                     selected={option.id === globalTimeFrame.id}
-                                    onClick={(event) => handleMenuItemClick(event, index)}
+                                    onClick={(event) => handleDateMenuItemClick(event, index)}
                                 >
                                     {option.name}
                                 </MenuItem>
                             ))}
                         </Menu>
-                    </div>
+                        {group.universityCode &&
+                        <>
+                            <Button onClick={handleStudentClickListItem}
+                                    className={classes.titleButton}
+                                    endIcon={<ArrowDropDownIcon/>}
+                                    variant="outlined">
+                                {`For ${currentUserDataSet.displayName}`}
+                            </Button>
+                            <Menu
+                                id="students-Menu"
+                                anchorEl={studentAnchorEl}
+                                keepMounted
+                                open={Boolean(studentAnchorEl)}
+                                onClose={handleStudentMenuClose}
+                            >
+                                {userDataSets.map((option, index) => (
+                                    <MenuItem
+                                        key={option.id}
+                                        selected={option.id === currentUserDataSet.id}
+                                        onClick={(event) => handleStudentMenuItemClick(event, index)}
+                                    >
+                                        {option.displayName}
+                                    </MenuItem>
+                                ))}
+                            </Menu>
+                        </>}
+                    </Box>
                 }
 
             />

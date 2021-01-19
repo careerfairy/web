@@ -36,7 +36,6 @@ const Feedback = ({
                       handleScrollToBreakdown,
                       breakdownRef,
                       groupOptions,
-                      totalFollowers,
                       streamDataType,
                       setStreamDataType,
                       handleToggleBar,

@@ -1,6 +1,5 @@
-import React, {useEffect, useState, Fragment, useMemo, useRef} from "react";
-import {Container, fade, makeStyles} from "@material-ui/core";
-import {snapShotsToData} from "../../../../helperFunctions/HelperFunctions";
+import React, {Fragment, useEffect, useMemo, useRef, useState} from "react";
+import {fade, makeStyles} from "@material-ui/core";
 import {v4 as uuid} from 'uuid';
 import SwipeableViews from 'react-swipeable-views';
 import AppBar from '@material-ui/core/AppBar';
@@ -10,7 +9,6 @@ import General from "./General";
 import {useTheme} from "@material-ui/core/styles";
 import {SwipeablePanel} from "../../../../../materialUI/GlobalPanels/GlobalPanels";
 import Audience from "./Audience";
-import Grid from "@material-ui/core/Grid";
 import Title from "./Title";
 import Box from "@material-ui/core/Box";
 import {
@@ -182,7 +180,21 @@ const streamDataTypes = [
         displayName: "Feedback",
     }]
 
+
 const AnalyticsOverview = ({firebase, group}) => {
+    const userDataSets = [
+        {
+            id: uuid(),
+            dataSet: "followers",
+            displayName: "Followers",
+        },
+        {
+            id: uuid(),
+            dataSet: "groupUniversityStudents",
+            displayName: `${group.universityName} students`,
+        },
+    ]
+
     const classes = useStyles();
     const breakdownRef = useRef(null)
     const theme = useTheme()
@@ -202,6 +214,9 @@ const AnalyticsOverview = ({firebase, group}) => {
     const [fetchingQuestions, setFetchingQuestions] = useState(false);
     const [fetchingRatings, setFetchingRatings] = useState(false);
     const [fetchingPolls, setFetchingPolls] = useState(false);
+    const [totalStudentsOfGroupUniversity, setTotalStudentsOfGroupUniversity] = useState(null);
+    const [fetchingStudentsOfGroupUniversity, setFetchingStudentsOfGroupUniversity] = useState(false);
+    const [currentUserDataSet, setCurrentUserDataSet] = useState(userDataSets[0]);
 
 
     useEffect(() => {
@@ -223,26 +238,41 @@ const AnalyticsOverview = ({firebase, group}) => {
         })()
     }, [group.id]);
 
+    useEffect(() => {
+        (async function () {
+            if (group.universityCode) {
+                setFetchingStudentsOfGroupUniversity(true);
+                const snapshots = await firebase.getStudentsOfGroupUniversity(group.universityCode)
+                const uniStudentsData = snapshots.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                setTotalStudentsOfGroupUniversity(uniStudentsData);
+                setFetchingStudentsOfGroupUniversity(false);
+            } else {
+                setTotalStudentsOfGroupUniversity([])
+            }
+        })()
+    }, [group.id, group.universityCode]);
+
 
     useEffect(() => {
-        if (totalFollowers) {
+        if (totalFollowers && totalStudentsOfGroupUniversity) {
             setFetchingStreams(true);
             const unsubscribe = firebase.listenToAllLivestreamsOfGroup(
                 group.id,
                 (snapshots) => {
-                    const livestreamsData = snapshots.docs.map(async snap => {
+                    const userDataSet = getUserDataset()
+                    const livestreamsData = snapshots.docs.map(snap => {
                         const livestream = snap.data()
                         livestream.id = snap.id
                         for (const userType of userTypes) {
-                            // Get general data relative to users following
-                            livestream[userType.propertyDataName] = totalFollowers.filter(follower => {
-                                return livestream[userType.propertyName]?.some(userEmail => userEmail === follower.userEmail)
-                            })
-                            if (group.universityCode) {
-                            const registeredSnaps = await firebase.getLivestreamRegisteredStudents(livestream.id)
+                            if (currentUserDataSet.dataSet === "groupUniversityStudents") {// Change the graph and status data if we're looking at the groups university Students
+                                livestream[userType.propertyName] = livestream[userType.propertyName].filter(userEmail => {
+                                    return userDataSet?.some(userData => userData.userEmail === userEmail)
+                                })
                             }
+                            livestream[userType.propertyDataName] = userDataSet.filter(userData => {
+                                return livestream[userType.propertyName]?.some(userEmail => userEmail === userData.userEmail)
+                            })
                         }
-
                         return livestream
                     })
                     setLivestreams(livestreamsData.reverse())
@@ -251,7 +281,7 @@ const AnalyticsOverview = ({firebase, group}) => {
             );
             return () => unsubscribe();
         }
-    }, [globalTimeFrame, group.id, totalFollowers]);
+    }, [globalTimeFrame, group.id, totalFollowers, currentUserDataSet, totalStudentsOfGroupUniversity]);
 
     useEffect(() => {
         if (currentStream?.id) {
@@ -271,7 +301,8 @@ const AnalyticsOverview = ({firebase, group}) => {
             const unsubscribeQuestions = firebase.listenToLivestreamQuestions(currentStream.id, querySnapshot => {
                 const questions = querySnapshot.docs.map(doc => {
                     const questionData = doc.data()
-                    const authorData = totalFollowers.find(follower => follower.userEmail === questionData.author)
+                    const userDataSet = getUserDataset()
+                    const authorData = userDataSet.find(follower => follower.userEmail === questionData.author)
                     return {
                         id: doc.id,
                         ...questionData,
@@ -304,6 +335,10 @@ const AnalyticsOverview = ({firebase, group}) => {
             return () => unsubscribeRatings()
         }
     }, [currentStream?.id])
+
+    const getUserDataset = () => {
+        return currentUserDataSet.dataSet === "followers" ? totalFollowers : totalStudentsOfGroupUniversity
+    }
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -393,6 +428,9 @@ const AnalyticsOverview = ({firebase, group}) => {
             breakdownRef,
             handleScrollToBreakdown,
             totalFollowers,
+            totalStudentsOfGroupUniversity,
+            fetchingStudentsOfGroupUniversity,
+            currentUserDataSet,
             currentStream,
             setCurrentStream,
             userType,
@@ -408,7 +446,11 @@ const AnalyticsOverview = ({firebase, group}) => {
             <Box className={classes.title} p={3}>
                 <Title
                     setGlobalTimeFrame={setGlobalTimeFrame}
+                    userDataSets={userDataSets}
+                    currentUserDataSet={currentUserDataSet}
+                    setCurrentUserDataSet={setCurrentUserDataSet}
                     globalTimeFrames={globalTimeFrames}
+                    group={group}
                     globalTimeFrame={globalTimeFrame}
                 />
             </Box>

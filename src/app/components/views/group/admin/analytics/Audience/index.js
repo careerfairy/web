@@ -27,7 +27,6 @@ const Audience = ({
                       streamsFromTimeFrame,
                       streamsFromTimeFrameAndFuture,
                       groupOptions,
-                      totalFollowers,
                       handleToggleBar,
                       breakdownRef,
                       setCurrentStream,

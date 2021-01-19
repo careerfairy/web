@@ -117,6 +117,7 @@ const StreamsOverview = ({group, typeOfStream, query}) => {
                     hideActions
                     user={authenticatedUser}
                     livestream={livestream}
+                    isPastLivestream={typeOfStream === "past"}
                     groupData={group}
                     userData={userData}
                     livestreamId={livestream.id}
