@@ -30,7 +30,10 @@ import {
     buildLivestreamObject,
     getStreamSubCollectionSpeakers,
     handleAddSpeaker,
-    handleDeleteSpeaker, handleError, handleFlattenOptions, validateStreamForm
+    handleDeleteSpeaker,
+    handleError,
+    handleFlattenOptions,
+    validateStreamForm
 } from "../../helperFunctions/streamFormFunctions";
 import {useAuth} from "../../../HOCs/AuthProvider";
 
@@ -74,13 +77,13 @@ const speakerObj = {
 }
 
 
-const NewLivestreamForm = ({firebase, user}) => {
+const NewLivestreamForm = ({firebase}) => {
     const router = useRouter()
     const {userData, authenticatedUser} = useAuth()
 
     const {
         query: {livestreamId, draftStreamId, absolutePath},
-        push, replace, pathname
+        push, replace
     } = router;
     const classes = useStyles()
 
@@ -254,7 +257,6 @@ const NewLivestreamForm = ({firebase, user}) => {
             if (absolutePath) {
                 return push({
                     pathname: absolutePath,
-                    query: {eventTab: 0},
                 })
             } else if (values.hidden && values.groupIds.length) {
                 return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)

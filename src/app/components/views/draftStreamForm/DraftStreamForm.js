@@ -244,7 +244,6 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     if (absolutePath) {
                         return push({
                             pathname: absolutePath,
-                            query: {eventTab: 2},
                         })
                     }
                     setDraftId(id)

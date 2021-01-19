@@ -130,6 +130,7 @@ const StreamsOverview = ({group, typeOfStream, query}) => {
             <Toolbar
                 handleSubmit={handleSubmit}
                 onChange={onSearch}
+                group={group}
                 value={searchParams}
                 handleRefresh={handleRefreshSearch}
             />

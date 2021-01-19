@@ -16,6 +16,7 @@ import {copyStringToClipboard} from "../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
 import {useAuth} from "../../../../HOCs/AuthProvider";
 import IconButton from "@material-ui/core/IconButton";
+import {useRouter} from "next/router";
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -27,33 +28,32 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Toolbar = ({value, onChange, className, handleSubmit, handleRefresh, ...rest}) => {
+const Toolbar = ({value,group, onChange, className, handleSubmit, handleRefresh, ...rest}) => {
     const {enqueueSnackbar} = useSnackbar()
     const {userData} = useAuth()
     const classes = useStyles();
+    const {asPath, push} = useRouter()
 
     const handleClickDraftNewStream = async () => {
-        const groupId = props.group.id;
+        const groupId = group.id;
         const targetPath = `/draft-stream`;
-        const absolutePath = `/group/${groupId}/admin`;
-        return await router.push({
+        // const absolutePath = `/group/${groupId}/admin`;
+        return await push({
             pathname: targetPath,
             query: {
-                absolutePath,
+                absolutePath: asPath,
                 careerCenterIds: groupId,
             },
         });
     };
 
     const handleCLickCreateNewLivestream = async () => {
-        const groupId = props.group.id;
-        const absolutePath = `/group/${groupId}/admin`;
         if (userData?.isAdmin) {
             const targetPath = `/new-livestream`;
-            await router.push({
+            await push({
                 pathname: targetPath,
                 query: {
-                    absolutePath,
+                    absolutePath: asPath,
                 },
             });
         }
@@ -68,7 +68,7 @@ const Toolbar = ({value, onChange, className, handleSubmit, handleRefresh, ...re
         if (window?.location?.origin) {
             baseUrl = window.location.origin;
         }
-        const groupId = props.group.id;
+        const groupId = group.id;
         const targetPath = `${baseUrl}/draft-stream?careerCenterIds=${groupId}`;
         copyStringToClipboard(targetPath);
         enqueueSnackbar("Link has been copied to your clipboard", {
