@@ -1,10 +1,10 @@
 import React, {memo, useContext} from 'react';
 import Linkify from 'react-linkify';
 import {makeStyles} from "@material-ui/core/styles";
-import UserContext from "../../../../../../../context/user/UserContext";
 import {Box, Card, Typography} from "@material-ui/core";
 import Slide from "@material-ui/core/Slide";
 import {getTimeFromNow} from "../../../../../../helperFunctions/HelperFunctions";
+import {useAuth} from "../../../../../../../HOCs/AuthProvider";
 
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => {
 
 function ChatEntryContainer({chatEntry}) {
 
-    const {authenticatedUser} = useContext(UserContext);
+    const {authenticatedUser} = useAuth();
     const isMe = chatEntry?.authorEmail === authenticatedUser?.email
     const isStreamer = chatEntry?.authorEmail === "Streamer"
     const classes = useStyles({

@@ -121,6 +121,41 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
         return null
     }
 
+    const menuItems = []
+
+    if (!isAdmin) {
+        menuItems.push({
+                onClick: () => router.push(`/next-livestreams?careerCenterId=${localGroup.groupId}`),
+                label: "Group Page",
+            },
+            {
+                onClick: () => setOpen(true),
+                label: "Leave Group",
+                onMouseEnter: () => setLeaveGroup(true)
+            })
+        if (localGroup.categories) {
+            menuItems.push({
+                onClick: () => handleOpenJoinModal(),
+                label: "Update Categories",
+            })
+        }
+    }
+
+
+    if (isAdmin) {
+        menuItems.push({
+                onClick: () => push(`/group/${localGroup.id}/admin`),
+                label: "Admin group"
+            },
+            {
+                onClick: () => {
+                    setOpen(true)
+                    handleClose()
+                },
+                label: "Delete group"
+            })
+    }
+
     return (
         <Fragment key={localGroup.id}>
             <Grow in={Boolean(localGroup.id)} timeout={600}>
@@ -148,20 +183,20 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                             <MoreVertIcon/>
                         </IconButton>
                         <CardActions>
-                        {!isAdmin &&
+                            {!isAdmin &&
                             <Link href={`next-livestreams?careerCenterId=${localGroup.groupId}`}>
                                 <Button fullWidth size="large" color="primary">
                                     View Calendar
                                 </Button>
                             </Link>
-                        }
-                        {isAdmin &&
+                            }
+                            {isAdmin &&
                             <Link href={`/group/${localGroup.id}/admin`}>
                                 <Button fullWidth size="large" color="primary">
                                     View Admin Page
                                 </Button>
                             </Link>
-                        }    
+                            }
                             <Menu
                                 id="simple-menu"
                                 anchorEl={anchorEl}
@@ -169,28 +204,14 @@ const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
                                 open={Boolean(anchorEl)}
                                 onClose={handleClose}
                             >
-                                {!isAdmin &&
-                                <>
-                                    <MenuItem onClick={() => {
-                                        router.push(`/next-livestreams?careerCenterId=${localGroup.groupId}`)
-                                    }}>Group Page</MenuItem>
-                                    <MenuItem onMouseEnter={() => setLeaveGroup(true)} onClick={() => setOpen(true)}>Leave
-                                        Group</MenuItem>
-                                    {localGroup.categories &&
-                                    <MenuItem onClick={handleOpenJoinModal}>Update Categories</MenuItem>}
-                                </>}
-                                {isAdmin &&
-                                <>
-                                    <MenuItem onClick={() => push(`/group/${localGroup.id}/admin`)}>
-                                        Admin group
-                                    </MenuItem>
-                                    <MenuItem onClick={() => {
-                                        setOpen(true)
-                                        handleClose()
-                                    }}
-                                    onMouseEnter={() => setLeaveGroup(false)}
-                                    >Delete group</MenuItem>
-                                </>}
+                                {menuItems.map(item => {
+                                    return (
+                                        <MenuItem key={item.label} onMouseEnter={item.onMouseEnter}
+                                                  onClick={item.onClick}>
+                                            {item.label}
+                                        </MenuItem>
+                                    )
+                                })}
                             </Menu>
                         </CardActions>
                     </Card>

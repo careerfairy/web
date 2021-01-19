@@ -56,8 +56,8 @@ function VideoContainer(props) {
     const [showSettings, setShowSettings] = useState(false);
 
     const screenSharingMode = props.currentLivestream.screenSharerId === props.streamerId && 
-        props.currentLivestream.mode === 'desktop';
-    const { localMediaStream, externalMediaStreams } =
+        props.currentLivestream.mode === 'desktop'
+    const { localMediaStream, externalMediaStreams, setAddedStream, setRemovedStream } =
         useAgoraAsStreamer(
             true,
             false,
@@ -83,10 +83,17 @@ function VideoContainer(props) {
         if (isMainStreamer && props.currentLivestream.mode !== 'desktop' && props.currentLivestream.speakerSwitchMode !== 'manual') {
             let timeout = setTimeout(() => {
                 let audioLevels = externalMediaStreams.map( stream => { 
-                    return {  
-                        streamId: stream.streamId, 
-                        audioLevel: stream.stream.getAudioLevel() 
-                    }         
+                    if (stream.streamId !== 'demoStream') {
+                        return {  
+                            streamId: stream.streamId, 
+                            audioLevel: stream.stream.getAudioLevel() 
+                        }   
+                    } else {
+                        return {
+                            streamId: stream.streamId, 
+                            audioLevel: 0
+                        }                
+                    }           
                 });
                 if (localMediaStream) { 
                     audioLevels.push({ 
@@ -165,14 +172,16 @@ function VideoContainer(props) {
 
     useEffect(() => {
         const activeStep = getActiveTutorialStepKey();
-        if (localMediaStream) {
+        if (localMediaStream && activeStep > 0) {
             if (activeStep > 10 && activeStep < 13) {
-                setAddedStream({
-                    streamId: "demoStream",
-                    url: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media"
-                })
+                if (!externalMediaStreams.some( stream => stream.streamId === 'demoStream' )) {
+                    setAddedStream({
+                        streamId: "demoStream",
+                        url: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media"
+                    })
+                }     
             } else {
-                //removeStreamFromExternalMediaStreams("demoStream");
+                setRemovedStream("demoStream");
             }
         }
     }, [tutorialSteps])

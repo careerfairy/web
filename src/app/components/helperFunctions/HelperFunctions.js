@@ -3,6 +3,8 @@ import React from "react";
 
 var dayjs = require('dayjs');
 var relativeTime = require('dayjs/plugin/relativeTime')
+var localizedFormat = require('dayjs/plugin/localizedFormat')
+dayjs.extend(localizedFormat)
 dayjs.extend(relativeTime)
 
 export const uploadLogo = (location, fileObject, firebase, callback) => {
@@ -51,6 +53,10 @@ export const uploadLogo = (location, fileObject, firebase, callback) => {
         });
 }
 
+export const timeAgo = (date = new Date) => {
+    return dayjs(date).fromNow()
+}
+
 
 export function getTimeFromNow(firebaseTimestamp) {
     if (firebaseTimestamp) {
@@ -63,6 +69,20 @@ export function getTimeFromNow(firebaseTimestamp) {
     } else {
         return ""
     }
+}
+
+export const prettyDate = (firebaseTimestamp) => {
+    if (firebaseTimestamp) {
+        return dayjs(firebaseTimestamp.toDate()).format('LL LT')
+    } else {
+        return ""
+    }
+}
+
+export const getLength = (arr, prop) => {
+    return arr.map((el) => {
+        return el?.[prop]?.length || 0
+    })
 }
 
 export const isEmptyObject = (obj) => {
@@ -96,6 +116,15 @@ export const snapShotsToData = (snapShots) => {
     return dataArray
 }
 
+export const singleSnapToData = (snapShot) => {
+    let data = {}
+    if (snapShot.exists) {
+        data = snapShot.data()
+        data.id = snapShot.id
+    }
+    return data
+}
+
 export const MultilineText = ({text}) => {
     return text.split('\\n').map((item, i) => <p key={i}>{item}</p>)
 }
@@ -115,5 +144,44 @@ export const copyStringToClipboard = (string) => {
     document.execCommand('copy');
     // Remove temporary element
     document.body.removeChild(el);
+}
+
+export const mustBeNumber = (value, decimals = 2) => {
+    function round(value, decimals) {
+        return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+    }
+
+    // checks to see if value is an int or float, if not it will return zero
+    return Number.isFinite(value) ? round(value, decimals) : 0
+}
+
+export const convertStringToArray = (string, maxChars = 30) => {
+
+// Split by spaces
+    return string.split(/\s+/)
+
+        // Then join words so that each string section is less then 40
+        .reduce(function (prev, curr) {
+            if (prev.length && (prev[prev.length - 1] + ' ' + curr).length <= maxChars) {
+                prev[prev.length - 1] += ' ' + curr;
+            } else {
+                prev.push(curr);
+            }
+            return prev;
+        }, [])
+        .map(str => str)
+
+}
+
+export const mergeArrayOfObjects = (arr1, arr2, property) => {
+
+    let merged = [];
+    for(let i=0; i<arr1.length; i++) {
+        merged.push({
+            ...arr1[i],
+            ...(arr2.find((itmInner) => itmInner[property] === arr1[i][property]))}
+        );
+    }
+    return merged
 }
 

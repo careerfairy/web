@@ -44,12 +44,6 @@ const AdminGroups = ({userData, firebase, adminGroups}) => {
                     <Typography className={classes.title} variant="h5">
                         Admin Groups
                     </Typography>
-                    {/* <Button endIcon={<AddIcon/>}
-                        variant="contained"
-                        color="primary"
-                        onClick={() => router.push('/group/create')}>
-                        Create a group
-                    </Button> */}
                 </div>
                 {adminGroupElements.length ?
                     <Grid style={{marginBottom: 50}} container spacing={3}>

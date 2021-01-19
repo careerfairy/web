@@ -5,7 +5,6 @@ import Linkify from 'react-linkify';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import ExpandMoreRoundedIcon from '@material-ui/icons/ExpandMoreRounded';
 import {withFirebase} from 'context/firebase';
-import UserContext from 'context/user/UserContext';
 import {Box, Button, Slide, TextField} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -20,6 +19,7 @@ import {
     WhiteTooltip
 } from "materialUI/GlobalTooltips";
 import TutorialContext from "context/tutorials/TutorialContext";
+import {useAuth} from "../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
     chatInput: {
@@ -89,7 +89,7 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
-    const {authenticatedUser, userData} = useContext(UserContext);
+    const {authenticatedUser, userData} = useAuth();
     const {tutorialSteps, handleConfirmStep} = useContext(TutorialContext);
 
     const isEmpty = !(newCommentTitle.trim()) || (!userData && !livestream?.test)

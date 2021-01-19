@@ -30,9 +30,12 @@ import {
     buildLivestreamObject,
     getStreamSubCollectionSpeakers,
     handleAddSpeaker,
-    handleDeleteSpeaker, handleError, handleFlattenOptions, validateStreamForm
+    handleDeleteSpeaker,
+    handleError,
+    handleFlattenOptions,
+    validateStreamForm
 } from "../../helperFunctions/streamFormFunctions";
-import UserContext from "../../../context/user/UserContext";
+import {useAuth} from "../../../HOCs/AuthProvider";
 
 
 const useStyles = makeStyles(theme => ({
@@ -74,13 +77,13 @@ const speakerObj = {
 }
 
 
-const NewLivestreamForm = ({firebase, user}) => {
+const NewLivestreamForm = ({firebase}) => {
     const router = useRouter()
-    const {userData, authenticatedUser, hideLoader} = useContext(UserContext);
+    const {userData, authenticatedUser} = useAuth()
 
     const {
         query: {livestreamId, draftStreamId, absolutePath},
-        push, replace, pathname
+        push, replace
     } = router;
     const classes = useStyles()
 
@@ -115,7 +118,7 @@ const NewLivestreamForm = ({firebase, user}) => {
 
     useEffect(() => {
         // If there are no relevant IDs and ur not a super admin, get lost...
-        if (!(livestreamId || draftStreamId) && !hasPermissionToCreate()) {
+        if (!(livestreamId || draftStreamId) && !isAuthenticating() && !hasPermissionToCreate()) {
             replace("/")
         }
         if ((livestreamId || draftStreamId) && allFetched) {
@@ -254,7 +257,6 @@ const NewLivestreamForm = ({firebase, user}) => {
             if (absolutePath) {
                 return push({
                     pathname: absolutePath,
-                    query: {eventTab: 0},
                 })
             } else if (values.hidden && values.groupIds.length) {
                 return push(`/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`)
@@ -270,11 +272,15 @@ const NewLivestreamForm = ({firebase, user}) => {
     const hasPermissionToEdit = (arrayOfGroups) => {
         return Boolean(
             userData.isAdmin
-            || arrayOfGroups.some(group => group.adminEmail === authenticatedUser.email
+            || arrayOfGroups.some(group => group.adminEmail === authenticatedUser?.email
             ))
     }
     const hasPermissionToCreate = () => {
-        return Boolean(userData.isAdmin)
+        return Boolean(userData?.isAdmin)
+    }
+
+    const isAuthenticating = () => {
+        return Boolean(authenticatedUser === undefined)
     }
 
 

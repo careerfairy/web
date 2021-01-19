@@ -110,6 +110,17 @@ export const handleFlattenOptions = (group) => {
     }
     return optionsArray
 }
+export const handleFlattenOptionsWithoutLvlOfStudy = (group) => {
+    let optionsArray = []
+    if (group.categories && group.categories.length) {
+        group.categories.forEach(category => {
+            if (category.options && category.name.toLowerCase() !== "level of study" && category.options.length) {
+                category.options.forEach(option => optionsArray.push(option))
+            }
+        })
+    }
+    return optionsArray
+}
 
 export const validateStreamForm = (values, isDraft) => {
     let errors = {speakers: {}};

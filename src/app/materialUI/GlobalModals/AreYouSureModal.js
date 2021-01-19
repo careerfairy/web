@@ -32,12 +32,12 @@ const AreYouSureModal = ({title = "Are you sure?", message, handleConfirm, open,
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
+                    <Button onClick={handleClose}>
+                        Cancel
+                    </Button>
                     <Button disabled={loading} endIcon={loading && <CircularProgress color="inherit" size={20}/>}
                             onClick={handleConfirm} variant="contained" color="primary">
                         Confirm
-                    </Button>
-                    <Button onClick={handleClose} className={classes.errorButton}>
-                        Cancel
                     </Button>
                 </DialogActions>
             </Dialog>

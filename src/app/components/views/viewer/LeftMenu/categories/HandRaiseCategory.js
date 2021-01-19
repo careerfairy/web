@@ -5,16 +5,16 @@ import HandRaiseRequested from './hand-raise/active/HandRaiseRequested';
 import HandRaiseDenied from './hand-raise/active/HandRaiseDenied';
 import HandRaiseConnecting from './hand-raise/active/HandRaiseConnecting';
 import HandRaiseConnected from './hand-raise/active/HandRaiseConnected';
-import UserContext from 'context/user/UserContext';
 import HandRaiseInactive from './hand-raise/inactive/HandRaiseInactive';
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import {Button, Typography, useTheme} from "@material-ui/core";
 import DialogContent from "@material-ui/core/DialogContent";
+import {useAuth} from "../../../../../HOCs/AuthProvider";
 
 function HandRaiseCategory(props) {
     const theme = useTheme()
-    const {authenticatedUser, userData} = React.useContext(UserContext);
+    const {authenticatedUser, userData} = useAuth();
     const [handRaiseState, setHandRaiseState] = useState(null);
 
     useEffect(() => {

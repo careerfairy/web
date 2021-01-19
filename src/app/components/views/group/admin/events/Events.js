@@ -24,9 +24,9 @@ import {
 import AddIcon from "@material-ui/icons/Add";
 import clsx from "clsx";
 import Fab from "@material-ui/core/Fab";
-import UserContext from "../../../../../context/user/UserContext";
 import {CustomSplitButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import {useSnackbar} from "notistack";
+import {useAuth} from "../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({
     streamsWrapper: {
@@ -79,7 +79,7 @@ const Events = (props) => {
     const theme = useTheme();
     const {enqueueSnackbar} = useSnackbar();
 
-    const {authenticatedUser, userData} = useContext(UserContext);
+    const {authenticatedUser, userData} = useAuth();
 
     const [anchorEl, setAnchorEl] = useState(null);
 

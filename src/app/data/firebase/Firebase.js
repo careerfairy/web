@@ -630,6 +630,16 @@ class Firebase {
             .orderBy("start", "asc")
         return ref.onSnapshot(callback)
     }
+//
+    getUpcomingLiveStreamsByGroupId = (groupId) => {
+        var ninetyMinutesInMilliseconds = 1000 * 60 * 90;
+        let ref = this.firestore
+            .collection("livestreams")
+            .where("groupIds", "array-contains", groupId)
+            .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
+            .orderBy("start", "asc")
+        return ref.get()
+    }
 
     queryUpcomingLiveStreamsByGroupId = (groupId) => {
         var ninetyMinutesInMilliseconds = 1000 * 60 * 90;
@@ -639,12 +649,20 @@ class Firebase {
             .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
             .orderBy("start", "asc")
     }
-//
+
     queryDraftLiveStreamsByGroupId = (groupId) => {
         return this.firestore
             .collection("draftLivestreams")
             .where("groupIds", "array-contains", groupId)
             .orderBy("start", "asc")
+    }
+
+    getDraftLiveStreamsByGroupId = (groupId) => {
+        let ref = this.firestore
+            .collection("draftLivestreams")
+            .where("groupIds", "array-contains", groupId)
+            .orderBy("start", "asc")
+        return ref.get()
     }
 
     queryPastLiveStreamsByGroupId = (groupId) => {
@@ -656,6 +674,18 @@ class Firebase {
             .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
             .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
             .orderBy("start", "desc")
+    }
+    //
+    getPastLiveStreamsByGroupId = (groupId) => {
+        let START_DATE_FOR_REPORTED_EVENTS = 'September 1, 2020 00:00:00';
+        const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
+        let ref = this.firestore
+            .collection("livestreams")
+            .where("groupIds", "array-contains", groupId)
+            .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
+            .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
+            .orderBy("start", "desc")
+        return ref.get()
     }
 
     getLivestreamSpeakers = (livestreamId) => {
@@ -692,7 +722,7 @@ class Firebase {
             .where("type", "==", 'done')
     };
 
-    listLivestreamQuestions = (livestreamId, callback) => {
+    listenToLivestreamQuestions = (livestreamId, callback) => {
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
@@ -1020,17 +1050,17 @@ class Firebase {
         });
     }
 
-    rateLivestream = (livestreamId, userEmail, rating, typeOfRating) => {
+    rateLivestream = (livestreamId, userEmail, rating, ratingId) => {
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("rating")
-            .doc(typeOfRating)
+            .doc(ratingId)
             .collection("voters")
             .doc(userEmail);
         return ref.set({
-            rating: rating,
-            timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+            ...rating,
+            timestamp: this.getServerTimestamp(),
         });
     }
 
@@ -1431,6 +1461,94 @@ class Firebase {
             .doc(countryCode)
         return ref.get();
     }
+
+    // Analytics Queries
+    listenToAllLivestreamsOfGroup = (groupId, callback, timeframe) => {
+        const oneYear = 31536000000
+        const oneYearAgo = new Date(Date.now() - oneYear)
+        const maxDate = timeframe || oneYearAgo
+        let ref = this.firestore
+            .collection("livestreams")
+            .where("start", ">", maxDate)
+            .where("groupIds", "array-contains", groupId)
+            .orderBy("start", "desc")
+        return ref.onSnapshot(callback);
+    }
+
+    updateFeedbackQuestion = async (livestreamId, feedbackId, data) => {
+        let feedbackRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc(feedbackId)
+        return feedbackRef.update(data)
+    }
+
+    deleteFeedbackQuestion = async (livestreamId, feedbackId) => {
+        let feedbackRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc(feedbackId)
+        return feedbackRef.delete()
+    }
+
+    createFeedbackQuestion = async (livestreamId, data) => {
+        let feedbackRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+        return feedbackRef.add(data)
+    }
+
+    listenToLivestreamRatings = (livestreamId, callback) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+        return ref.onSnapshot(callback)
+    };
+
+    getLivestreamRatingVoters = (ratingId, livestreamId) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc(ratingId)
+            .collection("voters")
+        return ref.get()
+    };
+
+    // listens to all followers of a group
+    listenToFollowers = async (groupId, callback) => {
+        let ref = this.firestore
+            .collection("userData")
+            .where("groupIds", "array-contains", groupId)
+        return ref.onSnapshot(callback);
+    };
+
+    getFollowers = async (groupId) => {
+        let ref = this.firestore
+            .collection("userData")
+            .where("groupIds", "array-contains", groupId)
+        return ref.get();
+    };
+    queryFollowers = async (groupId) => {
+        return this.firestore
+            .collection("userData")
+            .where("groupIds", "array-contains", groupId)
+    };
+
+    snapShotsToData = (snapShots) => {
+        let dataArray = []
+        snapShots.forEach(doc => {
+            const data = doc.data()
+            data.id = doc.id
+            dataArray.push(data)
+        })
+        return dataArray
+    }
+
 
     getStorageRef = () => {
         return this.storage.ref();

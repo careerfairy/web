@@ -1,5 +1,6 @@
 import React from 'react';
 import Box from "@material-ui/core/Box";
+import * as PropTypes from "prop-types";
 
 export const TabPanel = ({hidden, children, height, value, index, ...other}) => {
 
@@ -10,7 +11,7 @@ export const TabPanel = ({hidden, children, height, value, index, ...other}) => 
     );
 }
 
-export const SimplePanel = ({panelId, children, height,...other}) => {
+export const SimplePanel = ({panelId, children, height, ...other}) => {
 
     return (
         <div {...other} id={panelId} style={{height: "100%", ...other.style}}>
@@ -18,3 +19,29 @@ export const SimplePanel = ({panelId, children, height,...other}) => {
         </div>
     );
 }
+
+export const SwipeablePanel = (props) => {
+    const {children, value, index, ...other} = props;
+
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`full-width-tabpanel-${index}`}
+            aria-labelledby={`full-width-tab-${index}`}
+            {...other}
+        >
+            {value === index && (
+                <>
+                    {children}
+                </>
+            )}
+        </div>
+    );
+}
+
+SwipeablePanel.propTypes = {
+    children: PropTypes.node,
+    index: PropTypes.any.isRequired,
+    value: PropTypes.any.isRequired,
+};

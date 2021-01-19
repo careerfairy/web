@@ -1,5 +1,4 @@
 import React, {useState, useEffect, useContext, useRef, useLayoutEffect} from 'react';
-import UserContext from 'context/user/UserContext';
 import {Button, Grid, Typography, useTheme} from "@material-ui/core";
 import QuestionContainer from './questions/QuestionContainer';
 import Dialog from '@material-ui/core/Dialog';
@@ -23,6 +22,7 @@ import {makeStyles} from "@material-ui/core/styles";
 
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
 import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
+import {useAuth} from "../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
     view: {
@@ -50,7 +50,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
 
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
 
-    const {authenticatedUser, userData} = useContext(UserContext);
+    const {authenticatedUser, userData} = useAuth();
 
     const parentRef = useRef()
 

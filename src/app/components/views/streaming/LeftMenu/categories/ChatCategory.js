@@ -9,8 +9,8 @@ import IconButton from "@material-ui/core/IconButton";
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
 import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
-import UserContext from 'context/user/UserContext';
 import CustomScrollToBottom from "../../../../util/CustomScrollToBottom";
+import {useAuth} from "../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
 function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
 
 
-    const {authenticatedUser, userData} = useContext(UserContext);
+    const {authenticatedUser, userData} = useAuth();
     const [focused, setFocused] = useState(false);
 
 

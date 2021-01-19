@@ -16,13 +16,13 @@ import "slick-carousel/slick/slick-theme.css";
 
 import Head from 'next/head';
 import {theme} from "../materialUI";
-import UserContext from 'context/user/UserContext';
 import TagManager from 'react-gtm-module'
 import ErrorSnackBar from "../components/views/common/ErrorSnackBar/ErrorSnackBar";
 import ErrorContext from "../context/error/ErrorContext";
 import {SnackbarProvider} from "notistack";
 import TutorialContext from 'context/tutorials/TutorialContext';
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
+import {AuthProvider} from "../HOCs/AuthProvider";
 
 const useStyles = makeStyles(({
     info: {
@@ -39,14 +39,10 @@ function MyApp({Component, pageProps}) {
 
     const firebase = new Firebase();
 
-    const [authenticatedUser, setAuthenticatedUser] = useState(undefined);
-    const [userData, setUserData] = useState(undefined);
-    const [loading, setLoading] = useState(false)
-    const [hideLoader, setHideLoader] = useState(false)
     const [generalError, setGeneralError] = useState("");
 
     const initialTutorialState = {
-        0: true, 1: false, 2: false, 3: false,4: false,
+        0: true, 1: false, 2: false, 3: false, 4: false,
         5: false, 6: false, 7: false, 8: false,
         9: false, 10: false, 11: false, 12: false,
         13: false, 14: false, 15: false, 16: false, 17: false,
@@ -72,41 +68,6 @@ function MyApp({Component, pageProps}) {
     useEffect(() => {
         TagManager.initialize(tagManagerArgs);
     }, []);
-
-    useEffect(() => {
-        firebase.auth.onAuthStateChanged(user => {
-            if (user) {
-                setAuthenticatedUser(user);
-            } else {
-                setAuthenticatedUser(null);
-                setUserData(null);
-            }
-        })
-    }, []);
-
-    useEffect(() => {
-        setLoading(true);
-        if (authenticatedUser && authenticatedUser.email) {
-            const unsubscribe = firebase.listenToUserData(authenticatedUser.email, querySnapshot => {
-                if (querySnapshot.exists) {
-                    setLoading(false)
-                    let user = querySnapshot.data();
-                    user.id = querySnapshot.id;
-                    setUserData(user);
-                } else {
-                    setUserData(null);
-                }
-            });
-            return () => unsubscribe();
-        }
-    }, [authenticatedUser]);
-
-    useEffect(() => {
-        if (authenticatedUser === null || userData === null || loading === true) {
-            setHideLoader(true)
-        }
-
-    }, [authenticatedUser, userData, loading])
 
     const getActiveTutorialStepKey = () => {
         const activeStep = Object.keys(tutorialSteps).find((key) => {
@@ -135,26 +96,40 @@ function MyApp({Component, pageProps}) {
             <Head>
                 <title>CareerFairy | Watch live streams. Get hired.</title>
             </Head>
-            <FirebaseContext.Provider value={firebase}>
-                <ThemeProvider theme={theme}>
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <SnackbarProvider classes={{
-                        variantInfo: classes.info
-                    }} maxSnack={3}>
-                        <TutorialContext.Provider value={{tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles, getActiveTutorialStepKey, handleConfirmStep, isOpen}}>
-                            <UserContext.Provider value={{authenticatedUser, userData, setUserData, loading, hideLoader}}>
-                                <ErrorContext.Provider value={{generalError, setGeneralError}}>
-                                    {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                                    <CssBaseline/>
-                                    <Component {...pageProps} />
-                                    <ErrorSnackBar handleClose={() => setGeneralError("")} errorMessage={generalError}/>
-                                </ErrorContext.Provider>
-                            </UserContext.Provider>
-                        </TutorialContext.Provider>
-                    </SnackbarProvider>
-                    </MuiPickersUtilsProvider>
-                </ThemeProvider>
-            </FirebaseContext.Provider>
+            <AuthProvider firebase={firebase}>
+                <FirebaseContext.Provider value={firebase}>
+                    <ThemeProvider theme={theme}>
+                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                            <SnackbarProvider classes={{
+                                variantInfo: classes.info
+                            }} maxSnack={3}>
+                                <TutorialContext.Provider value={{
+                                    tutorialSteps,
+                                    setTutorialSteps,
+                                    showBubbles,
+                                    setShowBubbles,
+                                    getActiveTutorialStepKey,
+                                    handleConfirmStep,
+                                    isOpen
+                                }}>
+                                    <ErrorContext.Provider value={{generalError, setGeneralError}}>
+                                        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                                        <CssBaseline/>
+                                        {Component.layout ?
+                                            <Component.layout>
+                                                <Component {...pageProps} />
+                                            </Component.layout>
+                                            :
+                                            <Component {...pageProps} />}
+                                        <ErrorSnackBar handleClose={() => setGeneralError("")}
+                                                       errorMessage={generalError}/>
+                                    </ErrorContext.Provider>
+                                </TutorialContext.Provider>
+                            </SnackbarProvider>
+                        </MuiPickersUtilsProvider>
+                    </ThemeProvider>
+                </FirebaseContext.Provider>
+            </AuthProvider>
         </Fragment>
     );
 }

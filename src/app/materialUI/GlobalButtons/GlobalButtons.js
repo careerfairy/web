@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
     },
     buttonDisabled: {},
     popper: {
-        zIndex: 1
+        zIndex: 102
     }
 }))
 
@@ -136,7 +136,10 @@ export const CustomSplitButton = ({options = [], mainButtonProps, slideDirection
                                         <MenuItem
                                             key={option.label}
                                             selected={index === selectedIndex}
-                                            onClick={(event) => handleMenuItemClick(event, index)}
+                                            onClick={(event) => {
+                                                handleMenuItemClick(event, index)
+                                                option.onClick()
+                                            }}
                                         >
                                             {option.label}
                                         </MenuItem>

@@ -20,7 +20,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import TheatersRoundedIcon from "@material-ui/icons/TheatersRounded";
 import BusinessCenterRoundedIcon from "@material-ui/icons/BusinessCenterRounded";
 import MicOutlinedIcon from '@material-ui/icons/MicOutlined';
-import UserContext from "../context/user/UserContext";
+import {useAuth} from "../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({
     box: {
@@ -68,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function LogInPage({firebase}) {
-    const {authenticatedUser, userData} = useContext(UserContext)
+    const {authenticatedUser, userData} = useAuth()
     const [userEmailNotValidated, setUserEmailNotValidated] = useState(false);
     const [generalLoading, setGeneralLoading] = useState(false);
     const router = useRouter();

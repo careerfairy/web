@@ -21,6 +21,5 @@ module.exports = routes()
     .add('streaming', 'streaming/:livestreamId', 'streaming/[livestreamId]')
     .add('player', 'player/:livestreamId', 'player/[livestreamId]')
     .add('player-alt', 'player-alt/:livestreamId', 'player-alt/[livestreamId]')
-    .add('feed', '/feed', 'feed')
     .add('profile', '/profile', 'profile')
     .add('signup', '/signup', 'signup');

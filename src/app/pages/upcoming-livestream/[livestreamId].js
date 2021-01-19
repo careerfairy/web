@@ -19,13 +19,13 @@ import UserUtil from "../../data/util/UserUtil";
 import MulitLineText from "../../components/views/common/MultiLineText";
 import CurrentGroup from "components/views/profile/CurrentGroup";
 import TargetOptions from "../../components/views/NextLivestreams/GroupsCarousel/TargetOptions";
-import UserContext from "../../context/user/UserContext";
 import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
 import axios from "axios";
 import DataAccessUtil from "util/DataAccessUtil";
 import {Avatar} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../components/util/constants";
+import {useAuth} from "../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
     speakerAvatar: {
@@ -46,7 +46,7 @@ function UpcomingLivestream(props) {
     const {livestreamId, groupId} = router.query;
     const absolutePath = router.asPath;
 
-    const {userData, authenticatedUser: user} = useContext(UserContext);
+    const {userData, authenticatedUser: user} = useAuth();
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
     const [currentLivestream, setCurrentLivestream] = useState(null);
@@ -65,7 +65,7 @@ function UpcomingLivestream(props) {
 
     useEffect(() => {
         if (livestreamId) {
-            const unsubscribe = props.firebase.listLivestreamQuestions(
+            const unsubscribe = props.firebase.listenToLivestreamQuestions(
                 livestreamId,
                 (querySnapshot) => {
                     var questionsList = [];

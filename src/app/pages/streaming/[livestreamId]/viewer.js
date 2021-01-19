@@ -7,7 +7,6 @@ import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import {withFirebasePage} from '../../../context/firebase';
 import ViewerHandRaiseComponent from 'components/views/viewer/viewer-hand-raise-component/ViewerHandRaiseComponent';
 import ViewerComponent from 'components/views/viewer/viewer-component/ViewerComponent';
-import UserContext from 'context/user/UserContext';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 import {useWindowSize} from 'components/custom-hook/useWindowSize';
 import React from 'react';
@@ -17,6 +16,7 @@ import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
 import MiniChatContainer from "../../../components/views/streaming/LeftMenu/categories/chat/MiniChatContainer";
 import EmoteButtons from "../../../components/views/viewer/EmoteButtons";
 import RatingContainer from "../../../components/views/viewer/rating-container/RatingContainer";
+import {useAuth} from "../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -72,7 +72,7 @@ function ViewerPage({firebase}) {
 
     const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
 
-    const {authenticatedUser, userData} = React.useContext(UserContext);
+    const {authenticatedUser, userData} = useAuth();
 
     if (currentLivestream && !currentLivestream.test && authenticatedUser === null) {
         router.replace({

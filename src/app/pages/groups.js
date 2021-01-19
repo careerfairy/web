@@ -11,12 +11,12 @@ import Footer from "../components/views/footer/Footer";
 import {Container, Grow, Typography} from "@material-ui/core";
 import {GlobalBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import Groups from "../components/views/groups/Groups";
-import UserContext from "../context/user/UserContext";
+import {useAuth} from "../HOCs/AuthProvider";
 
 const JoinGroup = (props) => {
     const router = useRouter();
     const [groups, setGroups] = useState([]);
-    const {userData, authenticatedUser: user, loading} = useContext(UserContext);
+    const {userData, authenticatedUser: user, loading} = useAuth();
 
     useEffect(() => {
         if (user === null) {

@@ -3,10 +3,10 @@ import Groups from "../groups/Groups";
 import {withFirebase} from "../../../context/firebase";
 import {Button} from "@material-ui/core";
 import Link from "next/link";
-import UserContext from "../../../context/user/UserContext";
+import {useAuth} from "../../../HOCs/AuthProvider";
 
 const GroupProvider = ({firebase, absolutePath}) => {
-    const {userData} = useContext(UserContext)
+    const {userData} = useAuth()
     const [groups, setGroups] = useState([]);
 
 

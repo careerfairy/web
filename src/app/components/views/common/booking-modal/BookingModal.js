@@ -27,7 +27,7 @@ function BookingModal({modalOpen, user, careerCenters, livestream, registration,
 
     useEffect(() => {
         if (livestream.id) {
-            const unsubscribe = firebase.listLivestreamQuestions(livestream.id, querySnapshot => {
+            const unsubscribe = firebase.listenToLivestreamQuestions(livestream.id, querySnapshot => {
                 var questionsList = [];
                 querySnapshot.forEach(doc => {
                     let question = doc.data();
