@@ -279,5 +279,5 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         console.log("Error: ", err);
     };  
 
-    return { localMediaStream, externalMediaStreams };
+    return { localMediaStream, externalMediaStreams, setAddedStream, setRemovedStream };
 }

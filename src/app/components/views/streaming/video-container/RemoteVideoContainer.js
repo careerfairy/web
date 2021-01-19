@@ -14,16 +14,13 @@ function RemoteVideoContainer(props) {
     const {getActiveTutorialStepKey, handleConfirmStep} = useContext(TutorialContext);
     const videoElement = useRef({ current: {} });
 
-    const [canPlay, setCanPlay] = useState(false);
     const [stoppedByUserAgent, setStoppedByUserAgent] = useState(false);
 
     const activeStep = getActiveTutorialStepKey();
 
     useEffect(() => {
         if (props.stream.streamId === 'demoStream') {
-            videoElement.current.src = props.stream.url;
-            videoElement.current.loop = true;
-            videoElement.current.play();
+            generateDemoHandRaiser()         
         } else {
             if (!props.stream.stream.isPlaying()) {
                 props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
@@ -41,39 +38,6 @@ function RemoteVideoContainer(props) {
         }
     },[props.speakerSource])
 
-    // useEffect(() => {
-    //     if (props.stream.stream && !props.stream.stream.isPlaying()) {
-    //         if (props.showVideoButton && !props.showVideoButton.muted && !props.showVideoButton.paused) {
-    //             debugger;
-    //             props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
-    //                 if (err) {
-    //                     debugger;
-    //                     props.setShowVideoButton({ paused: false, muted: true });
-    //                 }
-    //             });
-    //         } else if (props.showVideoButton && props.showVideoButton.muted && !props.showVideoButton.paused) {
-    //             props.stream.stream.disableAudio();
-    //             debugger;
-    //             props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
-    //                 if (err) {
-    //                     debugger;
-    //                     props.setShowVideoButton({ paused: true, muted: false });
-    //                 }
-    //             });
-    //         } else {
-    //             debugger;
-    //             props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
-    //                 if (err) {
-    //                     debugger;
-    //                     setStoppedByUserAgent(true)
-    //                 } else {
-    //                     setStoppedByUserAgent(false)
-    //                 }
-    //             });
-    //         }       
-    //     }
-    // },[props.stream.stream, props.showVideoButton]);
-
     useEffect(() => {
         if (props.unmute) {
             props.stream.stream.play(props.stream.streamId, { muted: false });
@@ -85,6 +49,15 @@ function RemoteVideoContainer(props) {
             playVideo();
         }
     },[props.play])
+
+    function generateDemoHandRaiser() {
+        let video = document.createElement('video');
+        const videoContainer = document.querySelector('#' + props.stream.streamId);
+        videoContainer.appendChild(video);
+        video.src = props.stream.url;
+        video.loop = true;
+        video.play(); 
+    }
 
     function playVideo() {
         if (!props.stream.stream.isPlaying()) {
