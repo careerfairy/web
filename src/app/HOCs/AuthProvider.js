@@ -20,7 +20,6 @@ const securePaths = [
     "/group/create"
 ];
 const adminPaths = [
-    "/new-livestream",
     "/group/create"
 ];
 const AuthProvider = ({children, firebase}) => {
