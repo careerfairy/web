@@ -27,7 +27,7 @@ function ViewerComponent(props) {
             'localVideo',
             screenSharingMode,
             props.livestreamId,
-            authenticatedUser.email,
+            authenticatedUser?.email,
             true
         );
 
