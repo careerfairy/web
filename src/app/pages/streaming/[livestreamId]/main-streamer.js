@@ -7,7 +7,6 @@ import {useRouter} from 'next/router';
 import SpeakerManagementModal from 'components/views/streaming/modal/SpeakerManagementModal';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
 import MiniChatContainer from 'components/views/streaming/LeftMenu/categories/chat/MiniChatContainer';
-import {useNumberOfViewers} from 'components/custom-hook/useNumberOfViewers';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 import NotificationsContainer from 'components/views/streaming/notifications-container/NotificationsContainer';
 import NotificationsContext from 'context/notifications/NotificationsContext';
@@ -62,6 +61,7 @@ function StreamingPage(props) {
     const [hideTooltip, setHideTooltip] = useState(false);
 
     const [speakerManagementOpen, setSpeakerManagementOpen] = useState(false);
+    const [numberOfViewers, setNumberOfViewers] = useState(0);
 
     useEffect(() => {
         if (livestreamId) {
@@ -198,7 +198,7 @@ function StreamingPage(props) {
                                 transform: 'translateY(-50%)'
                             }}
                         />
-                        {/* <div style={{
+                        <div style={{
                             float: 'right',
                             margin: '0 20px',
                             fontSize: '1em',
@@ -207,11 +207,11 @@ function StreamingPage(props) {
                             fontWeight: '700'
                         }}>
                             Viewers: {numberOfViewers}
-                        </div> */}
+                        </div>
                     </div>
                     <div className={classes.blackFrame}>
                         <VideoContainer currentLivestream={currentLivestream} streamerId={currentLivestream.id}
-                                        showMenu={showMenu} viewer={false}/>
+                                        setNumberOfViewers={setNumberOfViewers} showMenu={showMenu} viewer={false}/>
                     </div>
                     <div className={classes.menuLeft}>
                         <LeftMenu

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import window, { navigator, document } from 'global';
 import { v4 as uuidv4 } from 'uuid';
 import { useAgoraToken } from './useAgoraToken';
@@ -61,7 +61,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             roomId &&
             streamId &&
             agoraToken &&
-            agoraScreenShareToken &&
+            agoraScreenShareToken && 
             document) {
             setReadyToConnect(true);
         }
@@ -257,7 +257,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         if (rtmChannel) {
             let interval = setInterval(() => {
                 rtmClient.getChannelMemberCount([roomId]).then( result => {
-                    setNumberOfViewers(result[streamId])
+                    setNumberOfViewers(result[roomId])
                 })
             }, 5000)
             return () => clearInterval(interval);
@@ -279,5 +279,5 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         console.log("Error: ", err);
     };  
 
-    return { localMediaStream, externalMediaStreams, setAddedStream, setRemovedStream };
+    return { localMediaStream, externalMediaStreams, numberOfViewers, setAddedStream, setRemovedStream };
 }
