@@ -153,33 +153,33 @@ const userTypes = [
     {
         propertyName: "registeredUsers",
         displayName: "Registered Users",
-        propertyDataName: "registeredUsersData"
+        propertyDataName: "registeredUsersData",
+        universityPropertyDataName: "universityRegisteredUsersData"
     },
     {
         propertyName: "participatingStudents",
         displayName: "Participating Students",
-        propertyDataName: "participatingStudentsData"
+        propertyDataName: "participatingStudentsData",
+        universityPropertyDataName: "universityParticipatingStudentsData"
     },
     {
         propertyName: "talentPool",
         displayName: "Talent Pool",
-        propertyDataName: "talentPoolData"
+        propertyDataName: "talentPoolData",
+        universityPropertyDataName: "universityTalentPoolData"
     }]
 const streamDataTypes = [
     {
         propertyName: "questions",
         displayName: "Questions",
-        propertyDataName: "questions"
     },
     {
         propertyName: "pollEntries",
         displayName: "Polls",
-        propertyDataName: "pollEntries"
     },
     {
         propertyName: "feedback",
         displayName: "Feedback",
-        propertyDataName: "feedback"
     }]
 
 const AnalyticsOverview = ({firebase, group}) => {
@@ -230,18 +230,19 @@ const AnalyticsOverview = ({firebase, group}) => {
             const unsubscribe = firebase.listenToAllLivestreamsOfGroup(
                 group.id,
                 (snapshots) => {
-                    const livestreamsData = snapshots.docs.map(snap => {
+                    const livestreamsData = snapshots.docs.map(async snap => {
                         const livestream = snap.data()
                         livestream.id = snap.id
-                        livestream.registeredUsersData = totalFollowers.filter(follower => {
-                            return livestream.registeredUsers?.some(userEmail => userEmail === follower.userEmail)
-                        })
-                        livestream.participatingStudentsData = totalFollowers.filter(follower => {
-                            return livestream.participatingStudents?.some(userEmail => userEmail === follower.userEmail)
-                        })
-                        livestream.talentPoolData = totalFollowers.filter(follower => {
-                            return livestream.talentPool?.some(userEmail => userEmail === follower.userEmail)
-                        })
+                        for (const userType of userTypes) {
+                            // Get general data relative to users following
+                            livestream[userType.propertyDataName] = totalFollowers.filter(follower => {
+                                return livestream[userType.propertyName]?.some(userEmail => userEmail === follower.userEmail)
+                            })
+                            if (group.universityCode) {
+                            const registeredSnaps = await firebase.getLivestreamRegisteredStudents(livestream.id)
+                            }
+                        }
+
                         return livestream
                     })
                     setLivestreams(livestreamsData.reverse())
