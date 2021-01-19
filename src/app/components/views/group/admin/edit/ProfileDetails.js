@@ -46,6 +46,7 @@ const ProfileDetails = ({group, firebase, className, ...rest}) => {
                 await firebase.updateCareerCenter(group.id, {
                     description: values.description,
                     universityName: values.universityName,
+                    extraInfo: values.extraInfo
                 });
                 enqueueSnackbar("Your profile has been updated!", {
                     variant: "success",
@@ -69,18 +70,23 @@ const ProfileDetails = ({group, firebase, className, ...rest}) => {
             <Formik
                 autoComplete="off"
                 initialValues={{
-                    universityName: group.universityName,
-                    description: group.description,
+                    universityName: group.universityName || "",
+                    description: group.description || "",
+                    extraInfo: group.extraInfo || ""
                 }}
                 enableReinitialize
                 validate={(values) => {
                     let errors = {}
-                    const minDescCharLength = 30
+                    const minDescCharLength = 10
                     const minGroupNameLength = 5
+                    const extraInfoMaxLength = 700
                     if (!values.description) {
                         errors.description = "Please fill"
                     } else if (values.description.length < minDescCharLength) {
                         errors.description = `Must be at least ${minDescCharLength} characters`
+                    }
+                    if (values.extraInfo.length > extraInfoMaxLength) {
+                        errors.extraInfo = `Cannot be more than ${extraInfoMaxLength} characters`
                     }
 
                     if (!values.universityName) {
@@ -145,13 +151,32 @@ const ProfileDetails = ({group, firebase, className, ...rest}) => {
                                     fullWidth
                                     multiline
                                     helperText={errors.description}
-                                    label="About"
+                                    label="About The group in a couple words"
                                     name="description"
                                     disabled={isSubmitting}
                                     onChange={handleChange}
                                     required
                                     error={Boolean(errors.description)}
                                     value={values.description}
+                                    variant="outlined"
+                                />
+                            </Grid>
+                            <Grid
+                                item
+                                md={12}
+                                xs={12}
+                            >
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    helperText={errors.extraInfo}
+                                    label="Group Summary"
+                                    name="extraInfo"
+                                    disabled={isSubmitting}
+                                    onChange={handleChange}
+                                    required
+                                    error={Boolean(errors.extraInfo)}
+                                    value={values.extraInfo}
                                     variant="outlined"
                                 />
                             </Grid>

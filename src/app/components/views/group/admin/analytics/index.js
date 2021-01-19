@@ -186,12 +186,14 @@ const AnalyticsOverview = ({firebase, group}) => {
         {
             id: uuid(),
             dataSet: "followers",
-            displayName: "Followers",
+            displayName: "Subscribed students",
+            miscName: "All subscribed students"
         },
         {
             id: uuid(),
             dataSet: "groupUniversityStudents",
             displayName: `${group.universityName} students`,
+            miscName: `Only ${group.universityName} students`
         },
     ]
 

@@ -41,7 +41,7 @@ const FeedbackModal = ({
             enableReinitialize
             validate={(values) => {
                 let errors = {};
-                const minQuestionLength = 20;
+                const minQuestionLength = 5;
                 if (!values.question) {
                     errors.question = "Required";
                 } else if (values.question.length < minQuestionLength) {
