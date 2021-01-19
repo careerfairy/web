@@ -253,7 +253,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         if (rtmChannel) {
             let interval = setInterval(() => {
                 rtmClient.getChannelMemberCount([roomId]).then( result => {
-                    setNumberOfViewers(result[streamId])
+                    setNumberOfViewers(result[roomId])
                 })
             }, 5000)
             return () => clearInterval(interval);
@@ -275,5 +275,5 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         console.log("Error: ", err);
     };  
 
-    return { localMediaStream, externalMediaStreams, setAddedStream, setRemovedStream };
+    return { localMediaStream, externalMediaStreams, numberOfViewers, setAddedStream, setRemovedStream };
 }

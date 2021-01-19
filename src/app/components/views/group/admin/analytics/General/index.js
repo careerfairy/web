@@ -1,13 +1,13 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useMemo} from "react";
 import {Container, Grid} from "@material-ui/core";
 import TotalRegistrations from "./TotalRegistrations";
 import TotalUniqueRegistrations from "./TotalUniqueRegistrations";
 import TypeOfParticipants from "./TypeOfParticipants";
 import AverageRegistrations from "./AverageRegistrations";
 import {mustBeNumber, snapShotsToData} from "../../../../../helperFunctions/HelperFunctions";
-import NumberOfFollowers from "./NumberOfFollowers";
 import {makeStyles} from "@material-ui/core/styles";
 import LatestEvents from "../common/LatestEvents";
+import UserCount from "./UserCount";
 
 
 const useStyles = makeStyles(theme => ({
@@ -38,6 +38,9 @@ const General = ({
                      fetchingFollowers,
                      handleToggleBar,
                      setCurrentStream,
+                     totalStudentsOfGroupUniversity,
+                     currentUserDataSet,
+                     fetchingStudentsOfGroupUniversity,
                      currentStream,
                      showBar
                  }) => {
@@ -162,8 +165,8 @@ const General = ({
         return flattenedGroupOptions.sort((a, b) => b.count - a.count);
     }
 
-    const getTotalFollowers = () => {
-        return totalFollowers ? totalFollowers.length : 0
+    const getTotalUserDataSetCount = () => {
+        return currentUserDataSet.dataSet === "followers"? totalFollowers?.length : totalStudentsOfGroupUniversity?.length
     }
 
 
@@ -231,10 +234,11 @@ const General = ({
                     />
                 </Grid>
                 <Grid item lg={3} sm={6} xl={3} xs={12}>
-                    <NumberOfFollowers
-                        fetchingFollowers={fetchingFollowers}
-                        totalFollowers={getTotalFollowers()}
+                    <UserCount
+                        fetching={fetchingStudentsOfGroupUniversity || fetchingFollowers}
+                        totalUsers={getTotalUserDataSetCount()}
                         timeFrames={globalTimeFrame.timeFrames}
+                        currentUserDataSet={currentUserDataSet}
                         group={group}
                     />
                 </Grid>

@@ -1533,6 +1533,14 @@ class Firebase {
             .where("groupIds", "array-contains", groupId)
         return ref.get();
     };
+
+    getStudentsOfGroupUniversity = async (groupUniversityCode) => {
+        let ref = this.firestore
+            .collection("userData")
+            .where("universityCode", "==", groupUniversityCode)
+        return ref.get();
+    }
+
     queryFollowers = async (groupId) => {
         return this.firestore
             .collection("userData")

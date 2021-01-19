@@ -231,7 +231,7 @@ const EnhancedGroupStreamCard = ({
         const groupId = group.id
         const targetPath = isDraft ? `/draft-stream` : "/new-livestream"
         const targetQuery = {
-            absolutePath: `/group/${groupId}/admin`,
+            absolutePath: router.asPath,
             careerCenterIds: groupId,
         }
         if (isDraft) {

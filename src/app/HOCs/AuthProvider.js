@@ -8,7 +8,6 @@ const securePaths = [
     "/profile",
     "/groups",
     "/draft-stream",
-    "/streaming/[livestreamId]/viewer",
     "/group/[groupId]/admin",
     "/group/[groupId]/admin/past-livestreams",
     "/group/[groupId]/admin/upcoming-livestreams",
@@ -19,7 +18,6 @@ const securePaths = [
     "/group/create"
 ];
 const adminPaths = [
-    "/new-livestream",
     "/group/create"
 ];
 const AuthProvider = ({children, firebase}) => {

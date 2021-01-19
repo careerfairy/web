@@ -119,6 +119,7 @@ const NewLivestreamForm = ({firebase}) => {
     useEffect(() => {
         // If there are no relevant IDs and ur not a super admin, get lost...
         if (!(livestreamId || draftStreamId) && !isAuthenticating() && !hasPermissionToCreate()) {
+            //re-direct! if no Ids in query!
             replace("/")
         }
         if ((livestreamId || draftStreamId) && allFetched) {
@@ -156,6 +157,7 @@ const NewLivestreamForm = ({firebase}) => {
                 } else {
                     // If you're not a super admin and the Ids dont return any relevant draft or stream, get lost...
                     if (!hasPermissionToCreate()) {
+                        //re-direct if no queries were found!
                         replace("/")
                     }
                 }
@@ -222,6 +224,7 @@ const NewLivestreamForm = ({firebase}) => {
 
             // If ur not a super admin and ur also not an admin of any of the groups in the stream, get lost....
             if (!hasPermissionToEdit(groupsWithFlattenedOptions)) {
+                // redirect if ur not a group admin!
                 replace("/")
             }
             setSelectedGroups(groupsWithFlattenedOptions)

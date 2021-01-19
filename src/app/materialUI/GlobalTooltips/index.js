@@ -34,8 +34,8 @@ const useStyles = makeStyles(theme => {
         },
         highlight: {
             borderRadius: 10,
-            border: "4px solid transparent",
-            animation: "$blink .5s step-end infinite alternate",
+            border: "8px solid transparent",
+            animation: "$blink 0.7s linear infinite alternate",
         }
     }
 })
@@ -83,16 +83,16 @@ export const StandartTooltip = (
             {...props}
             classes={{arrow: classes.arrow, tooltip: classes.tooltip}}
             title={title}>
-                <div>
+            <div>
                 {children}
-                </div>
+            </div>
         </Tooltip>
     )
 }
 
 export const TooltipHighlight = ({open, ...props}) => {
     const classes = useStyles()
-    return(
+    return (
         <div {...props} className={open ? classes.highlight : {}}>
 
         </div>
@@ -125,5 +125,37 @@ export const TooltipButtonComponent = ({onConfirm, buttonText = "Ok", ...props})
                 {buttonText}
             </Button>
         </div>
+    )
+}
+
+export const StyledTooltipWithButton = ({
+                                            children,
+                                            open = false,
+                                            tooltipTitle = "",
+                                            tooltipText = "",
+                                            buttonText = "Ok",
+                                            placement = "top",
+                                            onConfirm = () => {
+                                            },
+                                            ...rest
+                                        }) => {
+
+    return (
+        <WhiteTooltip
+            placement={placement}
+            open={open}
+            {...rest}
+            title={
+                <React.Fragment>
+                    <TooltipTitle>{tooltipTitle}</TooltipTitle>
+                    <TooltipText>
+                        {tooltipText}
+                    </TooltipText>
+                    <TooltipButtonComponent onConfirm={onConfirm} buttonText={buttonText}/>
+                </React.Fragment>
+            }
+        >
+            {children}
+        </WhiteTooltip>
     )
 }

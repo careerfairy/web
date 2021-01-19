@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const NumberOfFollowers = ({fetchingFollowers, totalFollowers, timeFrames, className, ...rest}) => {
+const UserCount = ({fetching, currentUserDataSet, group, totalUsers, timeFrames, className, ...rest}) => {
     const classes = useStyles();
 
     return (
@@ -44,13 +44,13 @@ const NumberOfFollowers = ({fetchingFollowers, totalFollowers, timeFrames, class
                             gutterBottom
                             variant="h6"
                         >
-                            FOLLOWERS
+                            {currentUserDataSet.displayName.toUpperCase()}
                         </Typography>
                         <Typography
                             color="textPrimary"
                             variant="h3"
                         >
-                            {fetchingFollowers ? <CircularProgress/> : totalFollowers}
+                            {fetching ? <CircularProgress/> : totalUsers}
                         </Typography>
                     </Grid>
                     <Grid item>
@@ -64,8 +64,8 @@ const NumberOfFollowers = ({fetchingFollowers, totalFollowers, timeFrames, class
     );
 };
 
-NumberOfFollowers.propTypes = {
+UserCount.propTypes = {
     className: PropTypes.string
 };
 
-export default withFirebase(NumberOfFollowers);
+export default withFirebase(UserCount);
