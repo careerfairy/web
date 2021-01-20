@@ -363,6 +363,7 @@ const FeedbackTable = ({
                         {...tableData}
                         filterModel={filterModel}
                         loading={fetchingStreams}
+                        showToolbar
                         onSelectionChange={(newSelection) => {
                             setSelection(newSelection.rowIds);
                         }}

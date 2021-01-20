@@ -5,7 +5,7 @@ import {Box, Button, Card, CardHeader, Divider, makeStyles} from '@material-ui/c
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import {DataGrid, getNumericColumnOperators} from '@material-ui/data-grid';
 import {withFirebase} from "../../../../../../../context/firebase";
-import {filterModel, getDate, RatingInputValue, renderRating} from "../../common/TableUtils";
+import {filterModel, getDate, RatingInputValue, renderLongText, renderRating} from "../../common/TableUtils";
 import {CustomLoadingOverlay, CustomNoRowsOverlay} from "../../common/Overlays";
 
 
@@ -41,6 +41,7 @@ const initialColumns = [
         field: "message",
         headerName: "Message",
         width: 250,
+        renderCell: renderLongText,
     },
 ]
 
@@ -95,6 +96,7 @@ const RatingSideTable = ({
             <Box height={expandTable ? 800 : 500} width="100%">
                 <DataGrid
                     {...newData}
+                    showToolbar
                     filterModel={filterModel}
                     loading={fetchingStreams}
                     onSelectionChange={(newSelection) => {

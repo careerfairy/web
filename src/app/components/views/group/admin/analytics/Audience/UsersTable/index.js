@@ -226,6 +226,7 @@ const UsersTable = ({
             <Box height={expandTable ? 800 : 400}>
                 <DataGrid
                     {...gridData}
+                    showToolbar
                     onFilterModelChange={({filterModel}) => {
                         const filterActive = filterModel.items?.[0]?.value
                         if (filterActive) {

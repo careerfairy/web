@@ -1,10 +1,10 @@
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {prettyDate} from "../../../../../helperFunctions/HelperFunctions";
+import {getMinutes, prettyDate} from "../../../../../helperFunctions/HelperFunctions";
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import {Rating} from "@material-ui/lab";
-import {Box} from "@material-ui/core";
+import {Box, useTheme} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import EditIcon from '@material-ui/icons/Edit';
 
@@ -36,7 +36,7 @@ export const getCount = ({value}) => {
 export const renderLongText = ({value}) => {
     return (
         <Tooltip title={
-            <Typography style={{fontSize: "2rem"}}>
+            <Typography style={{fontSize: "1.5rem"}}>
                 {value}
             </Typography>
         }>
@@ -51,7 +51,7 @@ export const renderLongText = ({value}) => {
 export const renderAppearAfter = ({value}) => {
     return (
         <Typography variant="inherit" noWrap>
-            {value} minutes
+            {getMinutes(value)}
         </Typography>
     )
 }
@@ -77,7 +77,7 @@ export const RatingInputValue = ({item, applyValue}) => {
 }
 
 export const renderRating = ({value, row}) => {
-    const classes = useStyles()
+    const theme = useTheme()
     return (
         <Box display="flex" alignItems="center">
             <Rating
@@ -87,7 +87,12 @@ export const renderRating = ({value, row}) => {
                 precision={0.5}
             />
             {value ?
-                <Typography className={classes.ratingText}>
+                <Typography
+                    style={{
+                    marginLeft: theme.spacing(1),
+                    color: theme.palette.text.secondary,
+                    fontWeight: 500
+                }}>
                     {value}
                 </Typography> : null}
         </Box>

@@ -411,7 +411,7 @@ const AnalyticsOverview = ({firebase, group}) => {
             livestreams,
             futureStreams,
             globalTimeFrame,
-            fetchingStreams: fetchingStreams || fetchingFollowers,
+            fetchingStreams: fetchingStreams || fetchingFollowers || fetchingStudentsOfGroupUniversity,
             streamsFromTimeFrame,
             showBar,
             streamDataType,

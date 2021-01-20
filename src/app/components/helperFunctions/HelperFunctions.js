@@ -1,5 +1,6 @@
 import {isEmpty} from 'lodash/fp'
 import React from "react";
+import {LONG_NUMBER} from "../util/constants";
 
 var dayjs = require('dayjs');
 var relativeTime = require('dayjs/plugin/relativeTime')
@@ -185,3 +186,4 @@ export const mergeArrayOfObjects = (arr1, arr2, property) => {
     return merged
 }
 
+export const getMinutes = value => ( value === LONG_NUMBER ? "stream Ends" : `${value} minutes`)

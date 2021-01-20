@@ -101,7 +101,7 @@ const Title = ({
                 title={
                     <Box display="flex" flexWrap="wrap" alignItems="center">
                         <Typography className={classes.title} variant="h4">
-                            Channel Analytics For
+                            Channel Analytics
                         </Typography>
                         {group.universityCode &&
                         <>
