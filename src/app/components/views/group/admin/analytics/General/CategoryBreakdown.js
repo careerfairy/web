@@ -11,7 +11,7 @@ import {
     Typography,
     makeStyles,
     colors,
-    useTheme, Select, MenuItem
+    useTheme, Select, MenuItem, Switch, FormControlLabel
 } from '@material-ui/core';
 import {colorsArray} from "../../../../../util/colors";
 import {withFirebase} from "../../../../../../context/firebase";
@@ -21,6 +21,10 @@ import {prettyDate} from "../../../../../helperFunctions/HelperFunctions";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import CustomLegend from "../../../../../../materialUI/Legends";
+import Chart from 'chart.js';
+import 'chartjs-plugin-labels';
+
+Chart.defaults.global.plugins.labels = false;
 
 
 const useStyles = makeStyles(() => ({
@@ -54,6 +58,7 @@ const CategoryBreakdown = ({
 
     const [localColors, setLocalColors] = useState(colorsArray);
     const [total, setTotal] = useState(0);
+    const [showPercentage, setShowPercentage] = useState(false);
     const [data, setData] = useState({
         datasets: [],
         labels: [],
@@ -115,14 +120,23 @@ const CategoryBreakdown = ({
             titleFontColor: theme.palette.text.primary
         },
         plugins: {
-            labels: [{
-                fontColor: 'white',
-                render: 'percent',
+            labels: showPercentage && [{
+                display: false,
                 fontStyle: 'bold',
-                arc: false,
+                textShadow: true,
+                overlap: true,
+                fontColor: "white",
+                render: ({percentage}) => {
+                    // args will be something like:
+                    // { label: 'Label', value: 123, percentage: 50, index: 0, dataset: {...} }
+                    return percentage > 2 ? percentage + "%" : "";
+                    // return object if it is image
+                    // return { src: 'image.png', width: 16, height: 16 };
+                }
             }]
         },
     };
+
 
     const hasNoData = () => {
         return Boolean(typesOfOptions.length && total === 0)
@@ -141,6 +155,10 @@ const CategoryBreakdown = ({
         if (targetCategory) {
             setCurrentCategory(targetCategory)
         }
+    }
+
+    const togglePercentage = () => {
+        setShowPercentage(!showPercentage)
     }
 
     return (
@@ -171,7 +189,8 @@ const CategoryBreakdown = ({
                 value={userType.propertyName}
                 indicatorColor="primary"
                 textColor="primary"
-                aria-label="disabled tabs example"
+                variant="scrollable"
+                aria-label="students-type-tabs"
             >
                 {userTypes.map(({displayName, propertyName}, index) => (
                     <Tab
@@ -186,15 +205,34 @@ const CategoryBreakdown = ({
             <Divider/>
             <CardContent>
                 {currentCategory.id &&
-                <Select
-                    value={currentCategory.id}
-                    label={"currentCategory.name"}
-                    onChange={handleGroupCategorySelect}
-                >
-                    {group.categories.map(({id, name}) => (
-                        <MenuItem key={id} value={id}>{name}</MenuItem>
-                    ))}
-                </Select>}
+                <Box display="flex" justifyContent="space-between">
+                    <Select
+                        value={currentCategory.id}
+                        label={"currentCategory.name"}
+                        onChange={handleGroupCategorySelect}
+                    >
+                        {group.categories.map(({id, name}) => (
+                            <MenuItem key={id} value={id}>{name}</MenuItem>
+                        ))}
+                    </Select>
+
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={showPercentage}
+                                onChange={togglePercentage}
+                                name="percentageToggle"
+                                color="primary"
+                            />
+                        }
+                        label={
+                            <Typography className={classes.toggleLabel}>
+                                Show Percentage
+                            </Typography>
+                        }
+                    />
+                </Box>
+                }
                 <Box
                     height={300}
                     position="relative"
