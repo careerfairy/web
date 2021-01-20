@@ -30,14 +30,10 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     const agoraScreenShareToken = useAgoraToken(roomId, userUid, !isViewer, true);
 
     useEffect(() => {
-        if (isPlayMode) {
-            let uuid = uuidv4()
-            let joiningId = uuid.replaceAll('-', '')
-            setUserUid(joiningId)
-        } else if (streamId) {
+        if (streamId) {
             setUserUid(streamId)
         }
-    },[isPlayMode, streamId])
+    },[streamId])
 
     useEffect(() => {
         if (addedStream) {

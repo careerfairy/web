@@ -1,14 +1,10 @@
-import React, {useState, useEffect, Fragment} from 'react';
+import React from 'react';
 import {withFirebasePage} from 'context/firebase';
-import {Box, Button, ClickAwayListener, fade, Grid, makeStyles, Tab, Tabs, Typography} from "@material-ui/core";
-import SpeedDial from "@material-ui/lab/SpeedDial";
-import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
-import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
+import {Box, Button, Grid, makeStyles, Tab, Tabs, Typography} from "@material-ui/core";
 import SettingsIcon from '@material-ui/icons/Settings';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core';
 import VideoTab from "./SettingsModal/VideoTab";
 import AudioTab from "./SettingsModal/AudioTab";
-import { useSoundMeter } from 'components/custom-hook/useSoundMeter';
 
 const useStyles = makeStyles((theme) => ({
     grid: {
@@ -49,8 +45,6 @@ function TabPanel(props) {
 
 function SettingsModal({ open, 
                         close, 
-                        webRTCAdaptor, 
-                        streamId, 
                         devices, 
                         localStream,
                         displayableMediaStream, 

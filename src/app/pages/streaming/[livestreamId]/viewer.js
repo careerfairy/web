@@ -16,7 +16,7 @@ import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
 import MiniChatContainer from "../../../components/views/streaming/LeftMenu/categories/chat/MiniChatContainer";
 import EmoteButtons from "../../../components/views/viewer/EmoteButtons";
 import RatingContainer from "../../../components/views/viewer/rating-container/RatingContainer";
-import {useAuth} from "../../../HOCs/AuthProvider";
+import { useAuth } from 'HOCs/AuthProvider';
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -252,18 +252,12 @@ function ViewerPage({firebase}) {
                 </div>
             </div>
             <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
-                {/* {handRaiseActive ?
-                    <ViewerHandRaiseComponent
-                        currentLivestream={currentLivestream}
-                        handRaiseActive={handRaiseActive}
-                        setHandRaiseActive={setHandRaiseActive}/>
-                    : */}
-                    <ViewerComponent
-                        livestreamId={livestreamId} streamerId={streamerId}
-                        currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
-                        setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton}
-                        setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>
-                {/* } */}
+                
+                <ViewerComponent
+                    livestreamId={livestreamId} streamerId={streamerId}
+                    currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
+                    setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton}
+                    setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>
                 <div className='mini-chat-container'>
                     <MiniChatContainer livestream={currentLivestream} isStreamer={false}/>
                 </div>
