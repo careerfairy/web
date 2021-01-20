@@ -78,7 +78,7 @@ function ViewerComponent(props) {
                                          speakerSwitchModeActive={false} localStream={null} attachSinkId={attachSinkId}
                                          streams={externalMediaStreams} localId={props.streamerId}
                                          currentSpeaker={props.currentLivestream.currentSpeakerId}
-                                         muted={!props.currentLivestream.hasStarted} {...props}/>
+                                         muted={false} {...props}/>
             </div>
             {props.currentLivestream.mode === 'presentation' ||  props.currentLivestream.mode === 'desktop' ?
                     <SmallStreamerVideoDisplayer
@@ -105,15 +105,15 @@ function ViewerComponent(props) {
                         setShowSettings={setShowSettings}
                     />
                     <SettingsModal open={showSettings} close={() => setShowSettings(false)}
-                                streamId={authenticatedUser.email} devices={devices} 
-                                localStream={localMediaStream} displayableMediaStream={displayableMediaStream}
-                                audioSource={audioSource} updateAudioSource={updateAudioSource}
-                                videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
-                                speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
-                                attachSinkId={attachSinkId}/>
+                        streamId={authenticatedUser.email} devices={devices} 
+                        localStream={localMediaStream} displayableMediaStream={displayableMediaStream}
+                        audioSource={audioSource} updateAudioSource={updateAudioSource}
+                        videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
+                        speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
+                        attachSinkId={attachSinkId}/>
                 </Fragment>
             }
-            <div className={props.currentLivestream.hasStarted ? 'hidden' : ''} style={{
+            {/* <div className={props.currentLivestream.hasStarted ? 'hidden' : ''} style={{
                 position: 'absolute',
                 top: '0',
                 left: '0',
@@ -134,7 +134,7 @@ function ViewerComponent(props) {
                 }}>
                     {props.currentLivestream.test ? 'The streamer has to press Start Streaming to be visible to students' : 'Thank you for joining!'}
                 </div>
-            </div>
+            </div> */}
             <style jsx>{`
                 .hidden {
                     display: none
