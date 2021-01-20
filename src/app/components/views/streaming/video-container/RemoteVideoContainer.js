@@ -50,6 +50,14 @@ function RemoteVideoContainer(props) {
         }
     },[props.play])
 
+    useEffect(() => {
+        if (props.muted) { 
+            props.stream.stream.muteAudio()
+        } else {
+            props.stream.stream.unmuteAudio()
+        }
+    },[props.muted])
+
     function generateDemoHandRaiser() {
         let video = document.createElement('video');
         const videoContainer = document.querySelector('#' + props.stream.streamId);

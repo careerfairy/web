@@ -31,7 +31,8 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
     useEffect(() => {
         if (streamId) {
-            setUserUid(streamId)
+            let joiningId = streamId.replaceAll('-', '')
+            setUserUid(joiningId)
         }
     },[streamId])
 
@@ -254,6 +255,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             let interval = setInterval(() => {
                 rtmClient.getChannelMemberCount([roomId]).then( result => {
                     setNumberOfViewers(result[roomId])
+                    console.log(result)
                 })
             }, 5000)
             return () => clearInterval(interval);
