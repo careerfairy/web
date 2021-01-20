@@ -27,13 +27,11 @@ const General = ({
                      streamsFromBeforeTimeFrame,
                      streamsFromTimeFrame,
                      streamsFromTimeFrameAndFuture,
-                     groupOptionsWithoutLvlOfStudy,
                      handleScrollToBreakdown,
                      totalFollowers,
                      userTypes,
                      userType,
                      setUserType,
-                     groupOptions,
                      breakdownRef,
                      fetchingFollowers,
                      handleToggleBar,
@@ -46,7 +44,6 @@ const General = ({
                  }) => {
     const classes = useStyles()
     const [currentCategory, setCurrentCategory] = useState({options:[]});
-    console.log("-> currentCategory", currentCategory);
 
     useEffect(() => {
         if (group.categories?.length) {

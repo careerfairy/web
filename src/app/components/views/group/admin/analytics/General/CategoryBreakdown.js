@@ -22,6 +22,7 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import CustomLegend from "../../../../../../materialUI/Legends";
 
+
 const useStyles = makeStyles(() => ({
     root: {
         height: '100%'
@@ -62,7 +63,7 @@ const CategoryBreakdown = ({
 
     useEffect(() => {
         if (group.categories?.length) {
-            if (localColors.length < group.categories.length) { // only add more colors if there arent enough colors
+            if (localColors.length < typesOfOptions.length) { // only add more colors if there arent enough colors
                 setLocalColors([...colorsArray, ...typesOfOptions.map(() => randomColor())])
             }
         }

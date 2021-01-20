@@ -83,7 +83,6 @@ const FeedbackGraph = ({
                 labels: currentPoll.options.map(option => convertStringToArray(option.name))
             })
             setLegendLabels(currentPoll.options.map(option => ({name: option.name, hidden: false})))
-            console.log("-> currentPoll", currentPoll);
 
         } else {
             setData(initialData)
