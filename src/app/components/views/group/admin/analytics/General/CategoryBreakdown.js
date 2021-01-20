@@ -208,14 +208,12 @@ const CategoryBreakdown = ({
                 <Box display="flex" justifyContent="space-between">
                     <Select
                         value={currentCategory.id}
-                        label={"currentCategory.name"}
                         onChange={handleGroupCategorySelect}
                     >
                         {group.categories.map(({id, name}) => (
                             <MenuItem key={id} value={id}>{name}</MenuItem>
                         ))}
                     </Select>
-
                     <FormControlLabel
                         control={
                             <Switch
