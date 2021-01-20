@@ -7,22 +7,21 @@ import {
     Card,
     CardContent,
     CardHeader,
-    Divider,
-    Typography,
-    makeStyles,
+    Checkbox,
     colors,
-    useTheme, ListItem, Checkbox, List, SvgIcon
+    Divider,
+    List,
+    ListItem,
+    makeStyles,
+    Typography,
+    useTheme
 } from '@material-ui/core';
 import {colorsArray} from "../../../../../util/colors";
 import {withFirebase} from "../../../../../../context/firebase";
-import Button from "@material-ui/core/Button";
-import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 import {convertStringToArray} from "../../../../../helperFunctions/HelperFunctions";
 
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import {OverlaySvg} from "../common/Overlays";
-import RatingSideTable from "./RatingSideTable";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -60,7 +59,6 @@ const FeedbackGraph = ({
 
 
     const [localColors, setLocalColors] = useState(colorsArray);
-    const [total, setTotal] = useState(0);
     const [legendLabels, setLegendLabels] = useState([]);
     const [data, setData] = useState(initialData);
 
@@ -85,6 +83,7 @@ const FeedbackGraph = ({
                 labels: currentPoll.options.map(option => convertStringToArray(option.name))
             })
             setLegendLabels(currentPoll.options.map(option => ({name: option.name, hidden: false})))
+            console.log("-> currentPoll", currentPoll);
 
         } else {
             setData(initialData)
@@ -130,10 +129,6 @@ const FeedbackGraph = ({
 
     const hasNoData = () => {
         return Boolean(!data.datasets.length)
-    }
-    const handleReset = () => {
-        setCurrentStream(null)
-        setUserType(userTypes[0])
     }
 
     const handleClickLegend = (e, legendItem) => {

@@ -1,8 +1,8 @@
-import React, {useMemo} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Container, Grid} from "@material-ui/core";
 import TotalRegistrations from "./TotalRegistrations";
 import TotalUniqueRegistrations from "./TotalUniqueRegistrations";
-import TypeOfParticipants from "./TypeOfParticipants";
+import CategoryBreakdown from "./CategoryBreakdown";
 import AverageRegistrations from "./AverageRegistrations";
 import {mustBeNumber, snapShotsToData} from "../../../../../helperFunctions/HelperFunctions";
 import {makeStyles} from "@material-ui/core/styles";
@@ -45,7 +45,15 @@ const General = ({
                      showBar
                  }) => {
     const classes = useStyles()
+    const [currentCategory, setCurrentCategory] = useState({options:[]});
+    console.log("-> currentCategory", currentCategory);
 
+    useEffect(() => {
+        if (group.categories?.length) {
+            setCurrentCategory(group.categories[0])
+        }
+
+    }, [group.categories])
 
     const getTotalRegisteredUsers = (streamsArray) => {
         const total = streamsArray.reduce(
@@ -158,7 +166,7 @@ const General = ({
             students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop)
         }
         const aggregateCategories = getAggregateCategories(students)
-        const flattenedGroupOptions = [...groupOptionsWithoutLvlOfStudy]
+        const flattenedGroupOptions = [...currentCategory.options]
         flattenedGroupOptions.forEach(option => {
             option.count = aggregateCategories.filter(category => category.categories.some(userOption => userOption.selectedValueId === option.id)).length
         })
@@ -198,7 +206,7 @@ const General = ({
 
     const typesOfOptions = useMemo(
         () => getTypeOfStudents(userType.propertyDataName),
-        [streamsFromTimeFrameAndFuture, currentStream, userType]
+        [streamsFromTimeFrameAndFuture, currentStream, userType, currentCategory.id]
     );
 
     return (
@@ -260,12 +268,14 @@ const General = ({
                     />
                 </Grid>
                 <Grid item lg={4} md={6} xl={3} xs={12}>
-                    <TypeOfParticipants
+                    <CategoryBreakdown
                         currentStream={currentStream}
                         breakdownRef={breakdownRef}
                         typesOfOptions={typesOfOptions}
                         userType={userType}
                         userTypes={userTypes}
+                        setCurrentCategory={setCurrentCategory}
+                        currentCategory={currentCategory}
                         setUserType={setUserType}
                         setCurrentStream={setCurrentStream}
                         group={group}

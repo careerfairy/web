@@ -5,9 +5,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import LatestEvents from "../common/LatestEvents";
 import FeedbackTable from "./FeedbackTable";
 import FeedbackGraph from "./FeedbackGraph";
-import TypeOfParticipants from "../General/TypeOfParticipants";
 import RatingSideTable from "./RatingSideTable";
-import UsersTable from "../Audience/UsersTable";
 
 
 const useStyles = makeStyles(theme => ({

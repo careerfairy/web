@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {Doughnut} from 'react-chartjs-2';
@@ -11,7 +11,7 @@ import {
     Typography,
     makeStyles,
     colors,
-    useTheme
+    useTheme, Select, MenuItem
 } from '@material-ui/core';
 import {colorsArray} from "../../../../../util/colors";
 import {withFirebase} from "../../../../../../context/firebase";
@@ -20,6 +20,7 @@ import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 import {prettyDate} from "../../../../../helperFunctions/HelperFunctions";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
+import CustomLegend from "../../../../../../materialUI/Legends";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -32,28 +33,38 @@ function randomColor() {
     return '#' + Math.round(Math.random() * max).toString(16);
 }
 
-const TypeOfParticipants = ({
-                                group,
-                                setCurrentStream,
-                                currentStream,
-                                typesOfOptions,
-                                userTypes,
-    breakdownRef,
-                                setUserType,
-                                userType,
-                                className,
-                                ...rest
-                            }) => {
+const CategoryBreakdown = ({
+                               group,
+                               setCurrentStream,
+                               currentStream,
+                               typesOfOptions,
+                               userTypes,
+                               breakdownRef,
+                               setUserType,
+                               userType,
+                               setCurrentCategory,
+                               currentCategory,
+                               className,
+                               ...rest
+                           }) => {
     const classes = useStyles();
     const theme = useTheme();
+    const chartRef = useRef()
 
     const [localColors, setLocalColors] = useState(colorsArray);
     const [total, setTotal] = useState(0);
+    const [data, setData] = useState({
+        datasets: [],
+        labels: [],
+        ids: []
+    });
 
 
     useEffect(() => {
         if (group.categories?.length) {
-            setLocalColors([...colorsArray, ...typesOfOptions.map(() => randomColor())])
+            if (localColors.length < group.categories.length) { // only add more colors if there arent enough colors
+                setLocalColors([...colorsArray, ...typesOfOptions.map(() => randomColor())])
+            }
         }
     }, [group.categories, typesOfOptions.length])
 
@@ -66,19 +77,22 @@ const TypeOfParticipants = ({
         }
     }, [typesOfOptions])
 
+    useEffect(() => {
+        setData({
+            datasets: [
+                {
+                    data: typesOfOptions.map(option => option.count),
+                    backgroundColor: localColors,
+                    borderWidth: 8,
+                    borderColor: colors.common.white,
+                    hoverBorderColor: colors.common.white
+                }
+            ],
+            labels: typesOfOptions.map(option => option.name),
+            ids: typesOfOptions.map(option => option.id)
+        })
+    }, [typesOfOptions, localColors])
 
-    const data = {
-        datasets: [
-            {
-                data: typesOfOptions.map(option => option.count),
-                backgroundColor: localColors,
-                borderWidth: 8,
-                borderColor: colors.common.white,
-                hoverBorderColor: colors.common.white
-            }
-        ],
-        labels: typesOfOptions.map(option => option.name)
-    };
 
     const options = {
         cutoutPercentage: 70,
@@ -109,11 +123,6 @@ const TypeOfParticipants = ({
         },
     };
 
-    const getPercentage = (count) => {
-        const percentage = Math.round((count / total) * 100)
-        return percentage + "%"
-    }
-
     const hasNoData = () => {
         return Boolean(typesOfOptions.length && total === 0)
     }
@@ -125,6 +134,13 @@ const TypeOfParticipants = ({
     const handleMenuItemClick = (event, index) => {
         setUserType(userTypes[index])
     };
+
+    const handleGroupCategorySelect = ({target: {value}}) => {
+        const targetCategory = group.categories.find(category => category.id === value)
+        if (targetCategory) {
+            setCurrentCategory(targetCategory)
+        }
+    }
 
     return (
         <Card
@@ -168,6 +184,16 @@ const TypeOfParticipants = ({
             </Tabs>
             <Divider/>
             <CardContent>
+                {currentCategory.id &&
+                <Select
+                    value={currentCategory.id}
+                    label={"currentCategory.name"}
+                    onChange={handleGroupCategorySelect}
+                >
+                    {group.categories.map(({id, name}) => (
+                        <MenuItem key={id} value={id}>{name}</MenuItem>
+                    ))}
+                </Select>}
                 <Box
                     height={300}
                     position="relative"
@@ -192,6 +218,7 @@ const TypeOfParticipants = ({
                         :
                         <Doughnut
                             data={data}
+                            ref={chartRef}
                             options={options}
                         />}
                 </Box>
@@ -201,41 +228,23 @@ const TypeOfParticipants = ({
                     justifyContent="center"
                     mt={2}
                 >
-                    {typesOfOptions.slice(0, 3).map(({
-                                                         name,
-                                                         count,
-                                                         id
-                                                     }, index) => (
-                        <Box
-                            key={id}
-                            p={1}
-                            textAlign="center"
-                            display="flex"
-                            flexDirection="column"
-                            justifyContent="space-between"
-                        >
-                            <Typography
-                                color="textPrimary"
-                                variant="body1"
-                            >
-                                {name}
-                            </Typography>
-                            <Typography
-                                style={{color: localColors[index]}}
-                                variant="h3"
-                            >
-                                {getPercentage(count)}
-                            </Typography>
-                        </Box>
-                    ))}
+                    <CustomLegend
+                        options={currentCategory.options}
+                        colors={localColors}
+                        chartRef={chartRef}
+                        fullWidth
+                        chartData={data}
+                        optionDataType="Student"
+                        optionValueProp="count"
+                    />
                 </Box>}
             </CardContent>
         </Card>
     );
 };
 
-TypeOfParticipants.propTypes = {
+CategoryBreakdown.propTypes = {
     className: PropTypes.string
 };
 
-export default withFirebase(TypeOfParticipants);
+export default withFirebase(CategoryBreakdown);

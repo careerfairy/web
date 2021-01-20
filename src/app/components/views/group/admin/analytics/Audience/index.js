@@ -1,10 +1,9 @@
-import React, {useMemo, useRef, useState} from "react";
+import React, {useMemo} from "react";
 import {Container, Grid} from "@material-ui/core";
 
 import {makeStyles} from "@material-ui/core/styles";
 import LatestEvents from "../common/LatestEvents";
 import UsersTable from "./UsersTable";
-import TypeOfParticipants from "../General/TypeOfParticipants";
 
 
 const useStyles = makeStyles(theme => ({
