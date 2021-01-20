@@ -57,7 +57,7 @@ function VideoContainer(props) {
 
     const screenSharingMode = props.currentLivestream.screenSharerId === props.streamerId && 
         props.currentLivestream.mode === 'desktop';
-    const { localMediaStream, externalMediaStreams, setAddedStream, setRemovedStream } =
+    const { localMediaStream, externalMediaStreams, numberOfViewers, setAddedStream, setRemovedStream } =
         useAgoraAsStreamer(
             streamerReady,
             false,
@@ -137,6 +137,14 @@ function VideoContainer(props) {
             }
         }
     }, [externalMediaStreams]);
+
+    useEffect(() => {
+        if (numberOfViewers && props.currentLivestream.hasStarted) {
+            props.setNumberOfViewers(numberOfViewers)
+        } else {
+            props.setNumberOfViewers(0)
+        }
+    }, [numberOfViewers]);
 
     const setDesktopMode = async (mode, initiatorId) => {
         let screenSharerId = mode === 'desktop' ? initiatorId : props.currentLivestream.screenSharerId;

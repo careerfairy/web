@@ -5,8 +5,6 @@ import {withFirebasePage} from 'context/firebase';
 import {useRouter} from 'next/router';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
 import MiniChatContainer from 'components/views/streaming/LeftMenu/categories/chat/MiniChatContainer';
-import ButtonWithConfirm from 'components/views/common/ButtonWithConfirm';
-import {useNumberOfViewers} from 'components/custom-hook/useNumberOfViewers';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 import NotificationsContext from 'context/notifications/NotificationsContext';
 import NotificationsContainer from 'components/views/streaming/notifications-container/NotificationsContainer';
@@ -54,6 +52,7 @@ function StreamingPage(props) {
 
     const [newNotification, setNewNotification] = useState(null);
     const [notifications, setNotifications] = useState([]);
+    const [numberOfViewers, setNumberOfViewers] = useState(0);
 
     useEffect(() => {
         if (livestreamId) {
@@ -119,7 +118,7 @@ function StreamingPage(props) {
                             <h3 style={{color: (currentLivestream.hasStarted ? 'teal' : 'orange')}}>{currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}</h3>
                             {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
                         </div>
-                        {/* <div style={{
+                        <div style={{
                             float: 'right',
                             margin: '0 20px',
                             fontSize: '1em',
@@ -127,10 +126,10 @@ function StreamingPage(props) {
                             verticalAlign: 'middle'
                         }}>
                             Viewers: {numberOfViewers}
-                        </div> */}
+                        </div>
                     </div>
                     <div className={classes.blackFrame}>
-                        <VideoContainer currentLivestream={currentLivestream} streamerId={streamerId} viewer={false}/>
+                        <VideoContainer currentLivestream={currentLivestream} streamerId={streamerId} viewer={false} setNumberOfViewers={setNumberOfViewers} />
                     </div>
                     <div className={classes.menuLeft}>
                         <LeftMenu
