@@ -1,30 +1,27 @@
 import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Box, Button, Card, CardHeader, Divider, makeStyles} from '@material-ui/core';
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
-import {DataGrid, getNumericColumnOperators} from '@material-ui/data-grid';
+import {Box, Card, CardHeader, Divider, Grow, makeStyles} from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import {
-    filterModel,
-    getCount,
-    getDate,
-    RatingInputValue,
+    exportSelectionAction,
     renderAppearAfter,
-    renderLongText,
-    renderRating
+    renderRatingStars,
+    StarRatingInputValue,
+    tableIcons
 } from "../../common/TableUtils";
-import {CustomLoadingOverlay, CustomNoRowsOverlay} from "../../common/Overlays";
 import EditFeedbackModal from "./EditFeedbackModal";
 import EditIcon from "@material-ui/icons/Edit";
-import AddIcon from '@material-ui/icons/Add';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYouSureModal";
 import {useSnackbar} from "notistack";
 import IconButton from "@material-ui/core/IconButton";
+import MaterialTable from "material-table";
+import FeedbackGraph from "../FeedbackGraph";
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -52,6 +49,7 @@ const FeedbackTable = ({
                            totalUniqueUsers,
                            tableRef,
                            streamsFromTimeFrameAndFuture,
+                           setCurrentStream,
                            setCurrentRating,
                            setCurrentPoll,
                            breakdownRef,
@@ -63,12 +61,15 @@ const FeedbackTable = ({
                            currentRating,
                            streamDataTypes,
                            className,
+                           typesOfOptions,
+                           userTypes,
+                           setUserType,
+                           sideRef,
                            ...rest
                        }) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
-    const [expandTable, setExpandTable] = useState(false);
-    const [tableData, setTableData] = useState({rows: [], columns: []});
+    const [tableData, setTableData] = useState({data: [], columns: []});
     const [feedbackModal, setFeedbackModal] = useState({data: {}, open: false})
     const [areYouSureModal, setAreYouSureModal] = useState({data: {}, open: false, warning: ""});
     const [deletingFeedback, setDeletingFeedback] = useState(false);
@@ -87,36 +88,30 @@ const FeedbackTable = ({
             newColumns = feedbackColumns
         }
         setTableData({
-            rows: newData,
+            data: newData,
             columns: newColumns
         })
 
     }, [streamDataType.propertyName, currentStream])
 
-    const DisplayButton = ({row}) => {
+
+    const DisplayButton = (rowData) => {
         const hasNoData = () => {
-            return Boolean(!row.voters?.length)
+            return Boolean(!rowData.voters?.length)
         }
         const handleClick = () => {
-            const dataType = streamDataType.propertyName
-            if (dataType === "feedback") {
-                setCurrentRating(row)
-            } else {
-                setCurrentPoll(row)
-            }
+            setCurrentRating(rowData)
             handleScrollToSideRef()
         }
         return (
-            <Button
-                className={classes.displayGraphButton}
-                variant="text"
-                disabled={hasNoData()}
-                onClick={handleClick}
-                fullWidth
-                size="small"
-            >
-                {hasNoData() ? "No Data" : "Breakdown"}
-            </Button>
+            <Box display="flex" justifyContent="center">
+                <IconButton
+                    color={currentRating?.id === rowData.id ? "primary" : "default"}
+                    disabled={hasNoData()}
+                    onClick={handleClick}>
+                    <ArrowDownwardIcon/>
+                </IconButton>
+            </Box>
         )
     }
 
@@ -124,21 +119,23 @@ const FeedbackTable = ({
     const EditButton = (row) => {
         return (
             <IconButton
+                size="medium"
                 onClick={() => handleEditFeedback(row)}
                 color="primary"
             >
-                <EditIcon/>
+                <EditIcon  fontSize="small" />
             </IconButton>
         )
     }
     const DeleteButton = (row) => {
         return (
             <IconButton
+                size="medium"
                 className={classes.deleteButton}
                 onClick={() => handleOpenAreYouSureModal(row)}
                 color="primary"
             >
-                <DeleteForeverIcon/>
+                <DeleteForeverIcon fontSize="small"/>
             </IconButton>
         )
     }
@@ -180,128 +177,115 @@ const FeedbackTable = ({
     const pollColumns = [
         {
             field: "question",
-            headerName: "Question",
-            width: 250,
-            renderCell: renderLongText,
+            title: "Question",
         },
         {
-            field: "voters",
-            headerName: "Votes",
-            width: 90,
-            type: 'number',
-            valueGetter: getCount
-        },
-        {
-            field: "options",
-            headerName: "Graph",
-            filterable: false,
-            renderCell: DisplayButton,
-            disableClickEventBubbling: true,
+            title: "Votes",
+            type: 'numeric',
+            field: "votes",
         },
         {
             field: "state",
-            headerName: "Status",
-            width: 100,
+            title: "Status",
+            lookup: {closed: 'Answered', upcoming: 'New', current: "Answering"},
         },
         {
-            field: "timestamp",
-            headerName: "Date Created",
-            width: 200,
-            type: 'dateTime',
-            valueGetter: getDate
+            field: "date",
+            title: "Date Created",
+            type: 'date',
+            render: (rowData) => prettyDate(rowData.timestamp),
         },
     ]
 
     const questionColumns = [
         {
             field: "title",
-            headerName: "Question",
+            title: "Question",
             width: 250,
-            renderCell: renderLongText,
         },
         {
             field: "votes",
-            headerName: "Votes",
+            title: "Votes",
             width: 90,
-            type: 'number',
+            type: 'numeric',
         },
         {
-            field: "timestamp",
-            headerName: "Date Created",
-            width: 200,
-            type: 'dateTime',
-            valueGetter: getDate
+            field: "date",
+            title: "Posted On",
+            type: 'date',
+            render: (rowData) => prettyDate(rowData.timestamp),
         },
         {
             field: "type",
-            headerName: "status",
-            width: 100,
+            title: "status",
+            lookup: {done: 'Answered', new: 'New', current: "Answering"},
         },
     ]
     const feedbackColumns = [
         {
             field: "edit",
-            headerName: "Edit",
-            renderCell: ({row}) => EditButton(row),
-            filterable: false,
+            title: "Edit",
+            render: EditButton,
+            filtering: false,
+            sorting: false,
             disableClickEventBubbling: true,
-            width: 80
+            export: false
         },
         {
             field: "delete",
-            headerName: "Delete",
-            renderCell: ({row}) => DeleteButton(row),
-            filterable: false,
+            title: "Delete",
+            render: DeleteButton,
+            filtering: false,
+            sorting: false,
             disableClickEventBubbling: true,
-            width: 80
+            export: false
         },
         {
             field: "question",
-            headerName: "Question",
+            title: "Question",
             width: 250,
-            renderCell: renderLongText,
         },
         {
             field: "average",
-            headerName: "Average Rating",
+            title: "Average Rating",
             width: 150,
-            renderCell: renderRating,
-            filterOperators: getNumericColumnOperators().map((operator) => ({
-                ...operator,
-                InputComponent: RatingInputValue,
-            }))
+            render: (rowData) => renderRatingStars({rating: rowData.average, id: rowData.id}),
+            filterComponent: StarRatingInputValue,
+            customFilterAndSearch: (term, rowData) => Number(term) >= Number(rowData.average)
         },
         {
             field: "appearAfter",
-            headerName: "This question will appear after",
+            title: "Appear After",
             width: 180,
-            renderCell: renderAppearAfter
+            type: "numeric",
+            render: renderAppearAfter
         },
         {
-            field: "voters",
-            headerName: "Votes",
-            width: 100,
-            valueGetter: getCount
-        },
-        {
-            field: "hasText",
-            headerName: "Enabled Written Reviews",
-            width: 140,
-            valueGetter: ({value}) => value ? "Yes" : "No"
-        },
-        {
-            field: "isForEnd",
-            headerName: "Automatically ask once stream is over",
-            width: 140,
-            valueGetter: ({value}) => value ? "Yes" : "No"
+            field: "votes",
+            title: "Votes",
+            type: "numeric",
         },
         {
             field: "options",
-            headerName: "Breakdown",
+            title: "Breakdown",
             width: 180,
-            renderCell: DisplayButton,
-            filterable: false,
+            render: DisplayButton,
+            filtering: false,
+            sorting: false,
             disableClickEventBubbling: true,
+            export: false
+        },
+        {
+            field: "hasText",
+            title: "Enabled Written Reviews",
+            width: 140,
+            lookup: {true: 'Yes', false: 'No'},
+        },
+        {
+            field: "isForEnd",
+            title: "Automatically ask once stream is over",
+            width: 140,
+            lookup: {true: 'Yes', false: 'No'},
         },
     ]
 
@@ -309,9 +293,6 @@ const FeedbackTable = ({
         setFeedbackModal(prevState => ({...prevState, open: false}))
     }
 
-    const toggleTable = () => {
-        setExpandTable(!expandTable)
-    }
 
     const handleMenuItemClick = (event, index) => {
         setStreamDataType(streamDataTypes[index])
@@ -326,6 +307,9 @@ const FeedbackTable = ({
     const isFeedback = () => {
         return Boolean(streamDataType.propertyName === "feedback")
     }
+    const isPoll = () => {
+        return Boolean(streamDataType.propertyName === "pollEntries")
+    }
 
     return (
         <>
@@ -335,11 +319,6 @@ const FeedbackTable = ({
                 ref={breakdownRef}
                 {...rest}
             >
-                <CardHeader
-                    title={streamDataType.displayName}
-                    subheader={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
-                />
-                <Divider/>
                 <Tabs
                     value={streamDataType.propertyName}
                     indicatorColor="primary"
@@ -358,47 +337,86 @@ const FeedbackTable = ({
                     )}
                 </Tabs>
                 <Divider/>
-                <Box height={expandTable ? 800 : 400} width="100%">
-                    <DataGrid
-                        {...tableData}
-                        filterModel={filterModel}
-                        loading={fetchingStreams}
-                        showToolbar
-                        onSelectionChange={(newSelection) => {
-                            setSelection(newSelection.rowIds);
-                        }}
-                        components={{
-                            noRowsOverlay: CustomNoRowsOverlay,
-                            loadingOverlay: CustomLoadingOverlay,
-                        }}
-                    />
-                </Box>
-                <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    p={2}
-                >
-                    <Button
-                        color="primary"
-                        onClick={toggleTable}
-                        endIcon={!expandTable && <ArrowRightIcon/>}
-                        size="small"
-                        variant="text"
-                    >
-                        {expandTable ? "Show Less" : "Expand"}
-                    </Button>
-                    {isFeedback() &&
-                    <Button
-                        startIcon={<AddIcon/>}
-                        color="primary"
-                        disabled={feedbackModal.open}
-                        variant="contained"
-                        onClick={handleCreateFeedback}
-                    >
-                        Add Question
-                    </Button>
+                <MaterialTable
+                    icons={tableIcons}
+                    {...tableData}
+                    isLoading={fetchingStreams}
+                    options={{
+                        filtering: true,
+                        selection: true,
+                        pageSize: 5,
+                        pageSizeOptions: [5, 10, 25, 50, 100, 200],
+                        exportButton: {csv: true, pdf: false}
+                    }}
+                    actions={[
+                        exportSelectionAction(tableData.columns),
+                        {
+                            icon: tableIcons.BallotIcon,
+                            tooltip: 'Display Info',
+                            onClick: (event, rowData) => handleClick(rowData),
+                        }
+                    ]}
+                    onSelectionChange={(rows) => {
+                        setSelection(rows);
+                    }}
+                    title={
+                        <CardHeader
+                            title={streamDataType.displayName}
+                            subheader={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
+                        />
                     }
-                </Box>
+                    detailPanel={
+                        isPoll() ? [{
+                            tooltip: "Show Chart",
+                            icon: tableIcons.InsertChartOutlinedIcon,
+                            openIcon: tableIcons.InsertChartIcon,
+                            render: rowData => {
+                                return (
+                                    <Grow in>
+                                        <FeedbackGraph
+                                            group={group}
+                                            setCurrentStream={setCurrentStream}
+                                            currentStream={currentStream}
+                                            typesOfOptions={typesOfOptions}
+                                            userTypes={userTypes}
+                                            setUserType={setUserType}
+                                            currentPoll={rowData}
+                                            sideRef={sideRef}
+                                            userType={userType}
+                                            streamDataType={streamDataType}
+                                        />
+                                    </Grow>
+                                )
+                            },
+                        }] : []
+                    }
+                />
+                {/*<Box*/}
+                {/*    display="flex"*/}
+                {/*    justifyContent="space-between"*/}
+                {/*    p={2}*/}
+                {/*>*/}
+                {/*    <Button*/}
+                {/*        color="primary"*/}
+                {/*        onClick={toggleTable}*/}
+                {/*        endIcon={!expandTable && <ArrowRightIcon/>}*/}
+                {/*        size="small"*/}
+                {/*        variant="text"*/}
+                {/*    >*/}
+                {/*        {expandTable ? "Show Less" : "Expand"}*/}
+                {/*    </Button>*/}
+                {/*    {isFeedback() &&*/}
+                {/*    <Button*/}
+                {/*        startIcon={<AddIcon/>}*/}
+                {/*        color="primary"*/}
+                {/*        disabled={feedbackModal.open}*/}
+                {/*        variant="contained"*/}
+                {/*        onClick={handleCreateFeedback}*/}
+                {/*    >*/}
+                {/*        Add Question*/}
+                {/*    </Button>*/}
+                {/*    }*/}
+                {/*</Box>*/}
             </Card>
             <EditFeedbackModal
                 currentStream={currentStream}

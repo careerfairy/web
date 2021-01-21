@@ -16,6 +16,8 @@ import {
     handleFlattenOptionsWithoutLvlOfStudy
 } from "../../../../helperFunctions/streamFormFunctions";
 import Feedback from "./Feedback";
+import {prettyDate} from "../../../../helperFunctions/HelperFunctions";
+import {number} from "prop-types";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -165,7 +167,8 @@ const userTypes = [
         displayName: "Talent Pool",
         propertyDataName: "talentPoolData",
         universityPropertyDataName: "universityTalentPoolData"
-    }]
+    }
+]
 const streamDataTypes = [
     {
         propertyName: "questions",
@@ -200,7 +203,7 @@ const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();
     const breakdownRef = useRef(null)
     const theme = useTheme()
-    const [value, setValue] = useState(0);
+    const [value, setValue] = useState(2);
 
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
     const [showBar, setShowBar] = useState(false);
@@ -289,7 +292,15 @@ const AnalyticsOverview = ({firebase, group}) => {
         if (currentStream?.id) {
             setFetchingPolls(true)
             const unsubscribePolls = firebase.listenToPollEntries(currentStream.id, querySnapshot => {
-                const pollEntries = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                const pollEntries = querySnapshot.docs.map(doc => {
+                    const data = doc.data()
+                    return {
+                        id: doc.id,
+                        date: data.timestamp?.toDate(),
+                        votes: data.voters?.length || 0,
+                        ...data
+                    }
+                })
                 setCurrentStream(prevState => ({...prevState, pollEntries}));
                 setFetchingPolls(false)
             });
@@ -308,6 +319,7 @@ const AnalyticsOverview = ({firebase, group}) => {
                     return {
                         id: doc.id,
                         ...questionData,
+                        date: questionData.timestamp?.toDate(),
                         authorData
                     }
                 })
@@ -326,10 +338,16 @@ const AnalyticsOverview = ({firebase, group}) => {
                     const ratingData = ratingDoc.data()
                     ratingData.id = ratingDoc.id
                     const votersSnap = await firebase.getLivestreamRatingVoters(ratingDoc.id, currentStream.id)
-                    const voters = votersSnap.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                    const voters = votersSnap.docs.map(doc => ({
+                        id: doc.id,
+                        date: doc.data().timestamp.toDate(),
+                        ...doc.data()
+                    }))
                     const average = getAverageRating(voters)
-                    feedback.push({...ratingData, voters, average})
+                    console.log("-> average", average);
+                    feedback.push({...ratingData, voters, votes: voters.length, average: Number(average)})
                 }
+                console.log("-> feedback", feedback);
                 setCurrentStream(prevState => ({...prevState, feedback}))
                 setFetchingRatings(false)
             })

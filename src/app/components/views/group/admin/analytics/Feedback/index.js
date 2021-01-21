@@ -122,6 +122,10 @@ const Feedback = ({
                 <Grid item lg={12} md={12} xl={12} xs={12}>
                     <FeedbackTable
                         totalUniqueUsers={totalUniqueUsers}
+                        sideRef={sideRef}
+                        typesOfOptions={[]}
+                        userTypes={userTypes}
+                        setUserType={setUserType}
                         currentStream={currentStream}
                         fetchingStreams={isFetching()}
                         groupOptions={groupOptions}
@@ -131,6 +135,7 @@ const Feedback = ({
                         currentPoll={currentPoll}
                         breakdownRef={breakdownRef}
                         handleScrollToSideRef={handleScrollToSideRef}
+                        setCurrentStream={setCurrentStream}
                         currentRating={currentRating}
                         setCurrentPoll={setCurrentPoll}
                         streamDataTypes={streamDataTypes}
@@ -141,26 +146,27 @@ const Feedback = ({
                 </Grid>
                 {!isQuestion() &&
                 <Grid  item lg={6} md={12} xl={6} xs={12}>
-                    {isRating() ?
+                    {isRating() &&
                         <RatingSideTable
                             streamDataType={streamDataType}
                             fetchingStreams={fetchingStreams}
                             sideRef={sideRef}
                             currentRating={currentRating}
                         />
-                        :
-                        <FeedbackGraph
-                            currentPoll={currentPoll}
-                            sideRef={sideRef}
-                            currentStream={currentStream}
-                            streamDataType={streamDataType}
-                            typesOfOptions={[]}
-                            userType={userType}
-                            userTypes={userTypes}
-                            setUserType={setUserType}
-                            setCurrentStream={setCurrentStream}
-                            group={group}
-                        />}
+                        // :
+                        // <FeedbackGraph
+                        //     currentPoll={currentPoll}
+                        //     sideRef={sideRef}
+                        //     currentStream={currentStream}
+                        //     streamDataType={streamDataType}
+                        //     typesOfOptions={[]}
+                        //     userType={userType}
+                        //     userTypes={userTypes}
+                        //     setUserType={setUserType}
+                        //     setCurrentStream={setCurrentStream}
+                        //     group={group}
+                        // />
+                    }
                 </Grid>}
             </Grid>
         </Container>

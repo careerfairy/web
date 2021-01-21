@@ -5,12 +5,24 @@ import {Box, Button, Card, CardHeader, Divider, makeStyles} from '@material-ui/c
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import {DataGrid, getNumericColumnOperators} from '@material-ui/data-grid';
 import {withFirebase} from "../../../../../../../context/firebase";
-import {filterModel, getDate, RatingInputValue, renderLongText, renderRating} from "../../common/TableUtils";
-import {CustomLoadingOverlay, CustomNoRowsOverlay} from "../../common/Overlays";
+import {
+    exportSelectionAction,
+    filterModel,
+    getDate,
+    RatingInputValue,
+    renderLongText,
+    renderRating, renderRatingStars, StarRatingInputValue,
+    tableIcons
+} from "../../common/TableUtils";
+import {CustomLoadingOverlay, CustomNoRowsOverlay, CustomNoRowsTableOverlay} from "../../common/Overlays";
+import MaterialTable, {MTableBody} from "material-table";
+import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 
 
 const useStyles = makeStyles((theme) => ({
-    root: {},
+    root: {
+        padding: 0
+    },
     actions: {
         justifyContent: 'flex-end'
     },
@@ -23,25 +35,23 @@ const useStyles = makeStyles((theme) => ({
 const initialColumns = [
     {
         field: "rating",
-        headerName: "Rating",
+        title: "Rating",
         width: 160,
-        renderCell: renderRating,
-        filterOperators: getNumericColumnOperators().map((operator) => ({
-            ...operator,
-            InputComponent: RatingInputValue,
-        }))
+        render: renderRatingStars,
+        filterComponent: StarRatingInputValue,
+        customFilterAndSearch: (term, rowData) => Number(term) >= Number(rowData.rating)
     },
     {
-        field: "timestamp",
-        headerName: "Voted On",
+        field: "date",
+        title: "Voted",
         width: 200,
-        valueGetter: getDate,
+        render: (rowData) => prettyDate(rowData.timestamp),
+        type: 'date'
     },
     {
         field: "message",
-        headerName: "Message",
+        title: "Message",
         width: 250,
-        renderCell: renderLongText,
     },
 ]
 
@@ -49,14 +59,13 @@ const RatingSideTable = ({
                              currentRating,
                              streamDataType,
                              fetchingStreams,
-    sideRef,
+                             sideRef,
                              className,
                              ...rest
                          }) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const [data, setData] = useState([]);
-    const [expandTable, setExpandTable] = useState(false);
 
     useEffect(() => {
         if (currentRating) {
@@ -66,20 +75,15 @@ const RatingSideTable = ({
         }
     }, [currentRating])
 
-    const toggleTable = () => {
-        setExpandTable(!expandTable)
-    }
-
     const newData = {
         columns: initialColumns,
-        rows: data
+        data
     }
     const active = () => {
         return Boolean(
             currentRating
         )
     }
-
 
     return (
         <Card
@@ -88,41 +92,28 @@ const RatingSideTable = ({
             className={clsx(classes.root, className)}
             {...rest}
         >
-            <CardHeader
-                title={`${streamDataType.displayName} Breakdown`}
-                subheader={currentRating?.question}
-            />
-            <Divider/>
-            <Box height={expandTable ? 800 : 500} width="100%">
-                <DataGrid
+                <MaterialTable
+                    icons={tableIcons}
                     {...newData}
-                    showToolbar
-                    filterModel={filterModel}
-                    loading={fetchingStreams}
-                    onSelectionChange={(newSelection) => {
-                        setSelection(newSelection.rowIds);
+                    options={{
+                        exportButton: true,
+                        filtering: true,
+                        selection: true,
+                        pageSize: 5,
+                        pageSizeOptions: [5, 10, 25, 50, 100, 200],
                     }}
-                    components={{
-                        noRowsOverlay: CustomNoRowsOverlay,
-                        loadingOverlay: CustomLoadingOverlay,
+                    isLoading={fetchingStreams}
+                    actions={[exportSelectionAction(newData.columns)]}
+                    onSelectionChange={(rows) => {
+                        setSelection(rows);
                     }}
+                    title={
+                        <CardHeader
+                            title={`${streamDataType.displayName} Breakdown`}
+                            subheader={currentRating?.question}
+                        />
+                    }
                 />
-            </Box>
-            <Box
-                display="flex"
-                justifyContent="space-between"
-                p={2}
-            >
-                <Button
-                    color="primary"
-                    onClick={toggleTable}
-                    endIcon={!expandTable && <ArrowRightIcon/>}
-                    size="small"
-                    variant="text"
-                >
-                    {expandTable ? "Show Less" : "Expand"}
-                </Button>
-            </Box>
         </Card>
     );
 };

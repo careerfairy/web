@@ -1,14 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Box, Button, Card, CardHeader, Divider, makeStyles} from '@material-ui/core';
+import {Box, Button, Card, CardHeader, Collapse, Divider, Grow, makeStyles, Slide, Zoom} from '@material-ui/core';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import {DataGrid} from '@material-ui/data-grid';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
 import {CustomLoadingOverlay, CustomNoRowsOverlay} from "../../common/Overlays";
-import Link from 'next/link'
+import MaterialTable from "material-table";
+import {tableIcons} from "../../common/TableUtils";
 
 const useStyles = makeStyles(() => ({
     root: {},
@@ -20,32 +21,32 @@ const useStyles = makeStyles(() => ({
 const initialColumns = [
     {
         field: "firstName",
-        headerName: "First Name",
+        title: "First Name",
         width: 140,
     },
     {
         field: "lastName",
-        headerName: "Last Name",
+        title: "Last Name",
         width: 140,
     },
     {
         field: "linkedinUrl",
-        headerName: "LinkedIn",
+        title: "LinkedIn",
         width: 180,
     },
     {
         field: "universityName",
-        headerName: "University",
+        title: "University",
         width: 150,
     },
     {
         field: "streamsWatched",
-        headerName: "Events Attended",
+        title: "Events Attended",
         width: 150,
     },
     {
         field: "streamsRegistered",
-        headerName: "Events Registered To",
+        title: "Events Registered To",
         width: 170,
     },
 ]
@@ -64,12 +65,13 @@ const UsersTable = ({
                     }) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
+    console.log("-> selection", selection);
     const {enqueueSnackbar} = useSnackbar()
     const [columns, setColumns] = useState([]);
     const [expandTable, setExpandTable] = useState(false);
     const [users, setUsers] = useState([]);
     const [checkboxSelection, setCheckboxSelection] = useState(false);
-    const [gridData, setGridData] = useState({columns: initialColumns, rows: []});
+    const [gridData, setGridData] = useState({columns: initialColumns, data: []});
 
     useEffect(() => {
         const userProp = userType.propertyName
@@ -77,14 +79,14 @@ const UsersTable = ({
         if (currentStream) {
             newColumns.push({
                 field: "watchedEvent",
-                headerName: "Attended Event",
+                title: "Attended Event",
                 width: 170,
             })
         }
         if (userProp === "talentPool") {
             newColumns.unshift({
                 field: "userEmail",
-                headerName: "Email",
+                title: "Email",
                 width: 200,
                 renderCell: (params) => (
                     <a href={`mailto:${params.value}`}>
@@ -93,7 +95,7 @@ const UsersTable = ({
                 ),
             })
         }
-        setGridData({rows: users, columns: newColumns})
+        setGridData({data: users, columns: newColumns})
     }, [userType.propertyName, currentStream, users])
 
 
@@ -124,7 +126,7 @@ const UsersTable = ({
             return group.categories.map(category => {
                 return {
                     field: category.name,
-                    headerName: category.name,
+                    title: category.name,
                     width: 170,
                 }
             })
@@ -212,67 +214,110 @@ const UsersTable = ({
         })
     }
 
-    return (
-        <Card
-            raised={Boolean(currentStream)}
-            className={clsx(classes.root, className)}
-            {...rest}
-        >
-            <CardHeader
-                title={userType.displayName}
-                subheader={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
-            />
-            <Divider ref={breakdownRef}/>
-            <Box height={expandTable ? 800 : 400}>
-                <DataGrid
-                    {...gridData}
-                    showToolbar
-                    onFilterModelChange={({filterModel}) => {
-                        const filterActive = filterModel.items?.[0]?.value
-                        if (filterActive) {
-                            setCheckboxSelection(false)
-                        } else {
-                            setCheckboxSelection(true)
-                        }
-                    }}
-                    checkboxSelection={checkboxSelection}
-                    loading={fetchingStreams}
-                    onSelectionChange={(newSelection) => {
-                        setSelection(newSelection.rowIds);
-                    }}
-                    components={{
-                        noRowsOverlay: CustomNoRowsOverlay,
-                        loadingOverlay: CustomLoadingOverlay,
+    const shouldHide = () => {
+        const userProp = userType.propertyName
+        return Boolean(
+            !group.universityCode &&
+            (userProp === "registeredUsers" || userProp === "participatingStudents")
+        )
+    }
 
-                    }}
-                />
-            </Box>
-            <Box
-                display="flex"
-                justifyContent="space-between"
-                p={2}
+    return (
+        <Slide direction="up" unmountOnExit mountOnEnter in={!shouldHide()}>
+            <Card
+                raised={Boolean(currentStream)}
+                className={clsx(classes.root, className)}
+                {...rest}
             >
-                {userType.propertyName === "talentPool" &&
-                <Button
-                    color="primary"
-                    size="small"
-                    variant="contained"
-                    disabled={Boolean(!selection.length)}
-                    onClick={handleCopyEmails}
+                <CardHeader
+                    title={userType.displayName}
+                    subheader={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
+                />
+                <Divider ref={breakdownRef}/>
+                <Box
+                    // height={expandTable ? 800 : 400}
                 >
-                    Copy Email Addresses
-                </Button>}
-                <Button
-                    color="primary"
-                    onClick={toggleTable}
-                    endIcon={!expandTable && <ArrowRightIcon/>}
-                    size="small"
-                    variant="text"
+                    <MaterialTable
+                        icons={tableIcons}
+                        // columns={[
+                        //     {title: "Adı", field: "name"},
+                        //     {title: "Soyadı", field: "surname"},
+                        //     {title: "Doğum Yılı", field: "birthYear", type: "numeric"},
+                        //     {
+                        //         title: "Doğum Yeri",
+                        //         field: "birthCity",
+                        //         lookup: {34: "İstanbul", 63: "Şanlıurfa"},
+                        //     },
+                        // ]}
+                        {...gridData}
+                        options={{
+                            exportButton: true,
+                            filtering: true,
+                            selection: true
+                        }}
+                            onSelectionChange={(rows) => {
+                                setSelection(rows);
+                            }}
+                        // data={[
+                        //     {
+                        //         name: "Mehmet",
+                        //         surname: "Baran",
+                        //         birthYear: 1987,
+                        //         birthCity: 63,
+                        //     },
+                        // ]}
+                        title="Demo Title"
+                    />
+                    {/*<DataGrid*/}
+                    {/*    {...gridData}*/}
+                    {/*    showToolbar*/}
+                    {/*    onFilterModelChange={({filterModel}) => {*/}
+                    {/*        const filterActive = filterModel.items?.[0]?.value*/}
+                    {/*        if (filterActive) {*/}
+                    {/*            setCheckboxSelection(false)*/}
+                    {/*        } else {*/}
+                    {/*            setCheckboxSelection(true)*/}
+                    {/*        }*/}
+                    {/*    }}*/}
+                    {/*    checkboxSelection={checkboxSelection}*/}
+                    {/*    loading={fetchingStreams}*/}
+                    {/*    onSelectionChange={(newSelection) => {*/}
+                    {/*        setSelection(newSelection.rowIds);*/}
+                    {/*    }}*/}
+                    {/*    components={{*/}
+                    {/*        noRowsOverlay: CustomNoRowsOverlay,*/}
+                    {/*        loadingOverlay: CustomLoadingOverlay,*/}
+
+                    {/*    }}*/}
+                    {/*/>*/}
+                </Box>
+                <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    p={2}
                 >
-                    {expandTable ? "Show Less" : "Expand"}
-                </Button>
-            </Box>
-        </Card>
+                    {userType.propertyName === "talentPool" &&
+                    <Button
+                        color="primary"
+                        size="small"
+                        variant="contained"
+                        disabled={Boolean(!selection.length)}
+                        onClick={handleCopyEmails}
+                    >
+                        Copy Email Addresses
+                    </Button>}
+                    <Button
+                        color="primary"
+                        onClick={toggleTable}
+                        endIcon={!expandTable && <ArrowRightIcon/>}
+                        size="small"
+                        variant="text"
+                    >
+                        {expandTable ? "Show Less" : "Expand"}
+                    </Button>
+                </Box>
+            </Card>
+        </Slide>
     );
 };
 

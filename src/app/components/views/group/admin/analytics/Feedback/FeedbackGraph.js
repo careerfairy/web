@@ -25,7 +25,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 
 const useStyles = makeStyles(() => ({
     root: {
-        height: '100%'
+        height: '100%',
     }
 }));
 
@@ -156,14 +156,9 @@ const FeedbackGraph = ({
     return (
         <Card
             ref={sideRef}
-            raised={active()}
             className={clsx(classes.root, className)}
             {...rest}
         >
-            <CardHeader
-                title={`${streamDataType.displayName.slice(0, -1)} Breakdown`}
-                subheader={currentPoll?.question}
-            />
             <Divider/>
             <CardContent>
                 <Box
