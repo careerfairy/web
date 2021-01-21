@@ -151,7 +151,7 @@ const UsersTable = ({
     }
 
     const mapUserCategories = () => {
-        const groupCategories = [...group.categories]
+        const groupCategories = group.categories ? [...group.categories] : []
         if (groupCategories.length) {
             const updatedUsers = totalUniqueUsers.map(user => {
                 const updatedUser = user
@@ -255,9 +255,9 @@ const UsersTable = ({
                             filtering: true,
                             selection: true
                         }}
-                            onSelectionChange={(rows) => {
-                                setSelection(rows);
-                            }}
+                        onSelectionChange={(rows) => {
+                            setSelection(rows);
+                        }}
                         // data={[
                         //     {
                         //         name: "Mehmet",

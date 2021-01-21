@@ -26,7 +26,8 @@ import InsertChartOutlinedIcon from '@material-ui/icons/InsertChartOutlined';
 import InsertChartIcon from '@material-ui/icons/InsertChart';
 import BallotIcon from '@material-ui/icons/Ballot';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-
+import EditIcon from "@material-ui/icons/Edit";
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 export const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref}/>),
     Check: forwardRef((props, ref) => <Check {...props} ref={ref}/>),
@@ -48,7 +49,9 @@ export const tableIcons = {
     InsertChartIcon: forwardRef((props, ref) => <InsertChartIcon color="primary" {...props} ref={ref}/>),
     InsertChartOutlinedIcon: forwardRef((props, ref) => <InsertChartOutlinedIcon {...props} ref={ref}/>),
     BallotIcon: forwardRef((props, ref) => <BallotIcon {...props} ref={ref}/>),
-    ArrowDownwardIcon: forwardRef((props, ref) => <ArrowDownwardIcon {...props} ref={ref}/>)
+    ArrowDownwardIcon: forwardRef((props, ref) => <ArrowDownwardIcon {...props} ref={ref}/>),
+    EditIcon: forwardRef((props, ref) => <EditIcon {...props} ref={ref}/>),
+    DeleteForeverIcon: forwardRef((props, ref) => <DeleteForeverIcon {...props} ref={ref}/>)
 };
 
 export const exportSelectionAction = (columns = []) => {

@@ -14,8 +14,6 @@ import {
     tableIcons
 } from "../../common/TableUtils";
 import EditFeedbackModal from "./EditFeedbackModal";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYouSureModal";
 import {useSnackbar} from "notistack";
 import IconButton from "@material-ui/core/IconButton";
@@ -73,6 +71,7 @@ const FeedbackTable = ({
     const [feedbackModal, setFeedbackModal] = useState({data: {}, open: false})
     const [areYouSureModal, setAreYouSureModal] = useState({data: {}, open: false, warning: ""});
     const [deletingFeedback, setDeletingFeedback] = useState(false);
+    const actions = [exportSelectionAction(tableData.columns)]
     const {enqueueSnackbar} = useSnackbar()
 
 
@@ -115,30 +114,6 @@ const FeedbackTable = ({
         )
     }
 
-
-    const EditButton = (row) => {
-        return (
-            <IconButton
-                size="medium"
-                onClick={() => handleEditFeedback(row)}
-                color="primary"
-            >
-                <EditIcon  fontSize="small" />
-            </IconButton>
-        )
-    }
-    const DeleteButton = (row) => {
-        return (
-            <IconButton
-                size="medium"
-                className={classes.deleteButton}
-                onClick={() => handleOpenAreYouSureModal(row)}
-                color="primary"
-            >
-                <DeleteForeverIcon fontSize="small"/>
-            </IconButton>
-        )
-    }
     const handleEditFeedback = (row) => {
         setFeedbackModal({data: row, open: true})
     }
@@ -223,24 +198,6 @@ const FeedbackTable = ({
     ]
     const feedbackColumns = [
         {
-            field: "edit",
-            title: "Edit",
-            render: EditButton,
-            filtering: false,
-            sorting: false,
-            disableClickEventBubbling: true,
-            export: false
-        },
-        {
-            field: "delete",
-            title: "Delete",
-            render: DeleteButton,
-            filtering: false,
-            sorting: false,
-            disableClickEventBubbling: true,
-            export: false
-        },
-        {
             field: "question",
             title: "Question",
             width: 250,
@@ -311,6 +268,27 @@ const FeedbackTable = ({
         return Boolean(streamDataType.propertyName === "pollEntries")
     }
 
+    if (isFeedback()) {
+        actions.push({
+                icon: tableIcons.EditIcon,
+                position: "row",
+                tooltip: 'Edit',
+                onClick: (event, rowData) => handleEditFeedback(rowData)
+            }, {
+                icon: tableIcons.DeleteForeverIcon,
+                position: "row",
+                tooltip: 'Delete',
+                onClick: (event, rowData) => handleOpenAreYouSureModal(rowData)
+            },
+            {
+                icon: tableIcons.Add,
+                position: "toolbar",
+                iconProps: {color: "green"},
+                tooltip: 'Add Question',
+                onClick: handleCreateFeedback
+            })
+    }
+
     return (
         <>
             <Card
@@ -348,14 +326,7 @@ const FeedbackTable = ({
                         pageSizeOptions: [5, 10, 25, 50, 100, 200],
                         exportButton: {csv: true, pdf: false}
                     }}
-                    actions={[
-                        exportSelectionAction(tableData.columns),
-                        {
-                            icon: tableIcons.BallotIcon,
-                            tooltip: 'Display Info',
-                            onClick: (event, rowData) => handleClick(rowData),
-                        }
-                    ]}
+                    actions={actions}
                     onSelectionChange={(rows) => {
                         setSelection(rows);
                     }}
@@ -388,35 +359,9 @@ const FeedbackTable = ({
                                     </Grow>
                                 )
                             },
-                        }] : []
+                        }] : null
                     }
                 />
-                {/*<Box*/}
-                {/*    display="flex"*/}
-                {/*    justifyContent="space-between"*/}
-                {/*    p={2}*/}
-                {/*>*/}
-                {/*    <Button*/}
-                {/*        color="primary"*/}
-                {/*        onClick={toggleTable}*/}
-                {/*        endIcon={!expandTable && <ArrowRightIcon/>}*/}
-                {/*        size="small"*/}
-                {/*        variant="text"*/}
-                {/*    >*/}
-                {/*        {expandTable ? "Show Less" : "Expand"}*/}
-                {/*    </Button>*/}
-                {/*    {isFeedback() &&*/}
-                {/*    <Button*/}
-                {/*        startIcon={<AddIcon/>}*/}
-                {/*        color="primary"*/}
-                {/*        disabled={feedbackModal.open}*/}
-                {/*        variant="contained"*/}
-                {/*        onClick={handleCreateFeedback}*/}
-                {/*    >*/}
-                {/*        Add Question*/}
-                {/*    </Button>*/}
-                {/*    }*/}
-                {/*</Box>*/}
             </Card>
             <EditFeedbackModal
                 currentStream={currentStream}
