@@ -92,13 +92,12 @@ const FeedbackTable = ({
         })
 
     }, [streamDataType.propertyName, currentStream])
-
-
+    
     const DisplayButton = (rowData) => {
         const hasNoData = () => {
             return Boolean(!rowData.voters?.length)
         }
-        const handleClick = () => {
+        const handleClick = (rowData) => {
             setCurrentRating(rowData)
             handleScrollToSideRef()
         }
@@ -234,13 +233,13 @@ const FeedbackTable = ({
         },
         {
             field: "hasText",
-            title: "Enabled Written Reviews",
+            title: "Has Written Reviews",
             width: 140,
             lookup: {true: 'Yes', false: 'No'},
         },
         {
             field: "isForEnd",
-            title: "Automatically ask once stream is over",
+            title: "Ask on Stream End",
             width: 140,
             lookup: {true: 'Yes', false: 'No'},
         },
@@ -268,26 +267,6 @@ const FeedbackTable = ({
         return Boolean(streamDataType.propertyName === "pollEntries")
     }
 
-    if (isFeedback()) {
-        actions.push({
-                icon: tableIcons.EditIcon,
-                position: "row",
-                tooltip: 'Edit',
-                onClick: (event, rowData) => handleEditFeedback(rowData)
-            }, {
-                icon: tableIcons.DeleteForeverIcon,
-                position: "row",
-                tooltip: 'Delete',
-                onClick: (event, rowData) => handleOpenAreYouSureModal(rowData)
-            },
-            {
-                icon: tableIcons.Add,
-                position: "toolbar",
-                iconProps: {color: "green"},
-                tooltip: 'Add Question',
-                onClick: handleCreateFeedback
-            })
-    }
 
     return (
         <>
@@ -326,7 +305,30 @@ const FeedbackTable = ({
                         pageSizeOptions: [5, 10, 25, 50, 100, 200],
                         exportButton: {csv: true, pdf: false}
                     }}
-                    actions={actions}
+                    actions={[
+                        exportSelectionAction(tableData.columns),
+                        {
+                            icon: tableIcons.EditIcon,
+                            hidden: !isFeedback(),
+                            position: "row",
+                            tooltip: 'Edit',
+                            onClick: (event, rowData) => handleEditFeedback(rowData)
+                        }, {
+                            icon: tableIcons.DeleteForeverIcon,
+                            hidden: !isFeedback(),
+                            position: "row",
+                            tooltip: 'Delete',
+                            onClick: (event, rowData) => handleOpenAreYouSureModal(rowData)
+                        },
+                        {
+                            icon: tableIcons.Add,
+                            hidden: !isFeedback(),
+                            position: "toolbar",
+                            iconProps: {color: "green"},
+                            tooltip: 'Add Question',
+                            onClick: handleCreateFeedback
+                        }
+                    ]}
                     onSelectionChange={(rows) => {
                         setSelection(rows);
                     }}
