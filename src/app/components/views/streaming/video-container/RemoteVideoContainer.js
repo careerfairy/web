@@ -52,10 +52,12 @@ function RemoteVideoContainer(props) {
 
     useEffect(() => {
         if (props.muted) {
-            // Had to add questionmarks because it would crash when handraising in demo mode (ONYL IN DEMO MODE) normal handraise works
+            // Had to add questionmarks because it would crash when handraising in demo mode
+            // (ONYL IN DEMO MODE) normal handraise works
             props.stream?.stream?.muteAudio()
         } else {
-            // Had to add questionmarks because it would crash when handraising in demo mode (ONYL IN DEMO MODE) normal handraise works
+            // Had to add questionmarks because it would crash when handraising in demo mode
+            // (ONYL IN DEMO MODE) normal handraise works
             props.stream?.stream?.unmuteAudio()
         }
     },[props.muted])
