@@ -86,7 +86,6 @@ const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, 
                     className={classes.avatar}
                     src={group.logoUrl}
                     variant="square"
-                    href="/app/account"
                 />
                 <Typography
                     className={classes.name}

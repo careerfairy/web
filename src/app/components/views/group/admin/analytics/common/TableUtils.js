@@ -30,6 +30,9 @@ import EditIcon from "@material-ui/icons/Edit";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import EmailIcon from '@material-ui/icons/Email';
 import LinkedInIcon from '@material-ui/icons/LinkedIn';
+import VideoLibraryIcon from '@material-ui/icons/VideoLibrary';
+import AddToPhotosIcon from '@material-ui/icons/AddToPhotos';
+import SettingsIcon from '@material-ui/icons/Settings';
 import Linkify from "react-linkify";
 
 export const tableIcons = {
@@ -57,6 +60,9 @@ export const tableIcons = {
     EditIcon: forwardRef((props, ref) => <EditIcon {...props} ref={ref}/>),
     EmailIcon: forwardRef((props, ref) => <EmailIcon {...props} ref={ref}/>),
     LinkedInIcon: forwardRef((props, ref) => <LinkedInIcon {...props} ref={ref}/>),
+    VideoLibraryIcon: forwardRef((props, ref) => <VideoLibraryIcon {...props} ref={ref}/>),
+    AddToPhotosIcon: forwardRef((props, ref) => <AddToPhotosIcon {...props} ref={ref}/>),
+    SettingsIcon: forwardRef((props, ref) => <SettingsIcon {...props} ref={ref}/>),
     DeleteForeverIcon: forwardRef((props, ref) => <DeleteForeverIcon {...props} ref={ref}/>)
 };
 

@@ -1,7 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Box, Button, Card, CardHeader, Collapse, Divider, Grow, makeStyles, Slide, Zoom} from '@material-ui/core';
+import {
+    Avatar,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    CardHeader,
+    Collapse,
+    Divider,
+    Grow,
+    makeStyles, Paper,
+    Slide,
+    Zoom
+} from '@material-ui/core';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import {DataGrid} from '@material-ui/data-grid';
 import {withFirebase} from "../../../../../../../context/firebase";
@@ -10,12 +23,31 @@ import {useSnackbar} from "notistack";
 import {CustomLoadingOverlay, CustomNoRowsOverlay} from "../../common/Overlays";
 import MaterialTable from "material-table";
 import {defaultTableOptions, exportSelectionAction, LinkifyText, tableIcons} from "../../common/TableUtils";
+import GroupStreamCardV2 from "../../../../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2";
+import {useAuth} from "../../../../../../../HOCs/AuthProvider";
+import Grid from "@material-ui/core/Grid";
+import EnhancedGroupStreamCard from "../../../events/enhanced-group-stream-card/EnhancedGroupStreamCard";
+import {useRouter} from "next/router";
+import {theme} from "../../../../../../../materialUI";
+import UserInnerTable from "./UserInnerTable";
 
 const useStyles = makeStyles(() => ({
     root: {},
     actions: {
         justifyContent: 'flex-end'
     },
+    avatar: {
+        height: 70,
+        width: '80%',
+        "& img": {
+            objectFit: "contain"
+        },
+        boxShadow: theme.shadows[1]
+    },
+    streamManage: {
+        background: theme.palette.navyBlue.main,
+        color: theme.palette.common.white
+    }
 }));
 
 const initialColumns = [
@@ -40,12 +72,12 @@ const initialColumns = [
         width: 150,
     },
     {
-        field: "streamsWatched",
+        field: "numberOfStreamsWatched",
         title: "Events Attended",
         width: 150,
     },
     {
-        field: "streamsRegistered",
+        field: "numberOfStreamsRegistered",
         title: "Events Registered To",
         width: 170,
     },
@@ -56,6 +88,7 @@ const UsersTable = ({
                         userType,
                         currentStream,
                         group,
+                        firebase,
                         futureStreams,
                         totalUniqueUsers,
                         streamsFromTimeFrameAndFuture,
@@ -63,6 +96,8 @@ const UsersTable = ({
                         className,
                         ...rest
                     }) => {
+    const {userData, authenticatedUser} = useAuth()
+    const router = useRouter()
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const {enqueueSnackbar} = useSnackbar()
@@ -91,12 +126,12 @@ const UsersTable = ({
             width: 150,
         },
         {
-            field: "streamsWatched",
+            field: "numberOfStreamsWatched",
             title: "Events Attended",
             width: 150,
         },
         {
-            field: "streamsRegistered",
+            field: "numberOfStreamsRegistered",
             title: "Events Registered To",
             width: 170,
         },
@@ -172,7 +207,8 @@ const UsersTable = ({
                         user.watchedEvent = true
                     }
                 })
-                user.streamsWatched = watchedStreams.length
+                user.numberOfStreamsWatched = watchedStreams.length
+                user.streamsWatched = watchedStreams
             }
             return user
         })
@@ -187,7 +223,8 @@ const UsersTable = ({
                         registeredStreams.push(stream)
                     }
                 })
-                currentUser.streamsRegistered = registeredStreams.length
+                currentUser.numberOfStreamsRegistered = registeredStreams.length
+                currentUser.streamsRegistered = registeredStreams
             }
             return currentUser
         })
@@ -229,6 +266,8 @@ const UsersTable = ({
         )
     }
 
+    const isTalentPool = () => userType.propertyName === "talentPool"
+
     return (
         <Slide direction="up" unmountOnExit mountOnEnter in={!shouldHide()}>
             <Card
@@ -246,35 +285,45 @@ const UsersTable = ({
                         {
                             field: "firstName",
                             title: "First Name",
+                            cellStyle: {
+                                width: 300,
+                            },
                         },
                         {
                             field: "lastName",
                             title: "Last Name",
+                            cellStyle: {
+                                width: 300,
+                            },
                         },
                         {
                             field: "linkedinUrl",
                             title: "LinkedIn",
-                            render: (rowData) => LinkifyText(rowData.linkedinUrl)
+                            render: (rowData) => LinkifyText(rowData.linkedinUrl),
+                            cellStyle: {
+                                width: 300,
+                            },
                         },
                         {
                             field: "universityName",
                             title: "University",
+                            cellStyle: {
+                                width: 300,
+                            },
                         },
                         {
-                            field: "streamsWatched",
+                            field: "numberOfStreamsWatched",
                             title: "Events Attended",
                             type: "numeric"
                         },
                         {
-                            field: "streamsRegistered",
+                            field: "numberOfStreamsRegistered",
                             title: "Events Registered To",
-                            width: 170,
                             type: "numeric"
                         },
                         {
                             field: "userEmail",
                             title: "Email",
-                            width: 200,
                             hidden: userType.propertyName !== "talentPool",
                             export: userType.propertyName === "talentPool",
                             render: ({id}) => (
@@ -282,6 +331,9 @@ const UsersTable = ({
                                     {id}
                                 </a>
                             ),
+                            cellStyle: {
+                                width: 300,
+                            },
                         },
                         {
                             field: "watchedEvent",
@@ -292,20 +344,45 @@ const UsersTable = ({
                             hidden: !currentStream
                         }
                     ]}
+                    detailPanel={[
+                        ({numberOfStreamsRegistered, streamsRegistered, firstName, lastName}) => ({
+                            icon: tableIcons.AddToPhotosIcon,
+                            tooltip: 'See streams registered to',
+                            disabled: numberOfStreamsRegistered === 0,
+                            render: <UserInnerTable
+                                firstName={firstName}
+                                lastName={lastName}
+                                group={group}
+                                streams={streamsRegistered}
+                                registered
+                            />
+                        }),
+                        ({numberOfStreamsWatched, streamsWatched, firstName, lastName}) => ({
+                            icon: tableIcons.VideoLibraryIcon,
+                            tooltip: 'See streams watched',
+                            disabled: numberOfStreamsWatched === 0,
+                            render: <UserInnerTable
+                                firstName={firstName}
+                                lastName={lastName}
+                                group={group}
+                                streams={streamsWatched}
+                            />
+                        })
+                    ]}
                     actions={[
                         exportSelectionAction(columns),
                         (rowData) => ({
                             tooltip: "Copy Emails",
                             position: "toolbarOnSelect",
                             icon: tableIcons.EmailIcon,
-                            disabled: rowData.length === 0,
+                            disabled: (rowData.length === 0 || !isTalentPool()),
                             onClick: handleCopyEmails
                         }),
                         (rowData) => ({
                             tooltip: "Copy LinkedIn Addresses",
                             position: "toolbarOnSelect",
                             icon: tableIcons.LinkedInIcon,
-                            disabled: rowData.length === 0,
+                            disabled: (rowData.length === 0 || !isTalentPool()),
                             onClick: handleCopyLinkedin
                         }),
                     ]}
