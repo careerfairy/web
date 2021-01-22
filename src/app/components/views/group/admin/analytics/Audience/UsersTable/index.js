@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {Card, CardHeader, makeStyles, Slide} from '@material-ui/core';
@@ -83,6 +83,8 @@ const UsersTable = ({
                         className,
                         ...rest
                     }) => {
+    const dataTableRef = useRef(null)
+
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const {enqueueSnackbar} = useSnackbar()
@@ -146,6 +148,12 @@ const UsersTable = ({
         setSelection([])
 
     }, [totalUniqueUsers])
+
+    useEffect(() => {
+        if (dataTableRef.current) {
+            dataTableRef.current.onAllSelected(false)
+        }
+    }, [currentStream?.id])
 
     const getCategoryOptionName = (targetCategoryId, user) => {
         if (user.registeredGroups) {
@@ -281,6 +289,7 @@ const UsersTable = ({
                 </Tabs>
                 <MaterialTable
                     icons={tableIcons}
+                    tableRef={dataTableRef}
                     isLoading={fetchingStreams}
                     data={users}
                     options={defaultTableOptions}
