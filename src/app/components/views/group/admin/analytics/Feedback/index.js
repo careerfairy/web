@@ -121,7 +121,6 @@ const Feedback = ({
                 <Grid item lg={12} md={12} xl={12} xs={12}>
                     <FeedbackTable
                         totalUniqueUsers={totalUniqueUsers}
-                        sideRef={sideRef}
                         typesOfOptions={[]}
                         userTypes={userTypes}
                         setUserType={setUserType}
@@ -135,6 +134,7 @@ const Feedback = ({
                         breakdownRef={breakdownRef}
                         setCurrentStream={setCurrentStream}
                         currentRating={currentRating}
+                        handleScrollToSideRef={handleScrollToSideRef}
                         setCurrentPoll={setCurrentPoll}
                         streamDataTypes={streamDataTypes}
                         futureStreams={futureStreams}
@@ -146,7 +146,6 @@ const Feedback = ({
                     {isRating() &&
                     <RatingSideTable
                         streamDataType={streamDataType}
-                        handleScrollToSideRef={handleScrollToSideRef}
                         fetchingStreams={fetchingStreams}
                         sideRef={sideRef}
                         currentRating={currentRating}

@@ -378,7 +378,9 @@ const AnalyticsOverview = ({firebase, group}) => {
 
 
     const handleScrollToBreakdown = () => {
-        breakdownRef.current.scrollIntoView({behavior: 'smooth', block: 'start'})
+        if (breakdownRef.current) {
+            breakdownRef.current.scrollIntoView({behavior: 'smooth', block: 'start'})
+        }
     }
 
     const getAverageRating = (voters) => {

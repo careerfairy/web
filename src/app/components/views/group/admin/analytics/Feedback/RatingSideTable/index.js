@@ -57,7 +57,7 @@ const RatingSideTable = ({
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        if (currentRating) {
+        if (currentRating?.voters?.length) {
             setData(currentRating.voters)
         } else {
             setData([])
@@ -103,11 +103,11 @@ const RatingSideTable = ({
                 ]}
                 data={data}
                 options={{
-                    exportButton: true,
                     filtering: true,
                     selection: true,
                     pageSize: 5,
                     pageSizeOptions: [5, 10, 25, 50, 100, 200],
+                    exportButton: {csv: true, pdf: false}// PDF is false because its buggy and throws errors
                 }}
                 isLoading={fetchingStreams}
                 actions={[(exportSelectionAction(columns))]}

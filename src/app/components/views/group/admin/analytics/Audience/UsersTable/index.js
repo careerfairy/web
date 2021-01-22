@@ -9,7 +9,7 @@ import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctio
 import {useSnackbar} from "notistack";
 import {CustomLoadingOverlay, CustomNoRowsOverlay} from "../../common/Overlays";
 import MaterialTable from "material-table";
-import {tableIcons} from "../../common/TableUtils";
+import {defaultTableOptions, exportSelectionAction, tableIcons} from "../../common/TableUtils";
 
 const useStyles = makeStyles(() => ({
     root: {},
@@ -65,44 +65,60 @@ const UsersTable = ({
                     }) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
-    console.log("-> selection", selection);
     const {enqueueSnackbar} = useSnackbar()
-    const [columns, setColumns] = useState([]);
     const [expandTable, setExpandTable] = useState(false);
     const [users, setUsers] = useState([]);
-    const [checkboxSelection, setCheckboxSelection] = useState(false);
-    const [gridData, setGridData] = useState({columns: initialColumns, data: []});
+    console.log("-> users", users);
 
-    useEffect(() => {
-        const userProp = userType.propertyName
-        const newColumns = [...initialColumns]
-        if (currentStream) {
-            newColumns.push({
-                field: "watchedEvent",
-                title: "Attended Event",
-                width: 170,
-            })
+    const columns = [
+        {
+            field: "firstName",
+            title: "First Name",
+            width: 140,
+        },
+        {
+            field: "lastName",
+            title: "Last Name",
+            width: 140,
+        },
+        {
+            field: "linkedinUrl",
+            title: "LinkedIn",
+            width: 180,
+        },
+        {
+            field: "universityName",
+            title: "University",
+            width: 150,
+        },
+        {
+            field: "streamsWatched",
+            title: "Events Attended",
+            width: 150,
+        },
+        {
+            field: "streamsRegistered",
+            title: "Events Registered To",
+            width: 170,
+        },
+        {
+            field: "userEmail",
+            title: "Email",
+            width: 200,
+            hidden: userType.propertyName !== "talentPool",
+            render: (params) => (
+                <a href={`mailto:${params.value}`}>
+                    {params.value}
+                </a>
+            ),
+        },
+        {
+            field: "watchedEvent",
+            title: "Attended Event",
+            width: 170,
+            hidden: !currentStream
         }
-        if (userProp === "talentPool") {
-            newColumns.unshift({
-                field: "userEmail",
-                title: "Email",
-                width: 200,
-                renderCell: (params) => (
-                    <a href={`mailto:${params.value}`}>
-                        {params.value}
-                    </a>
-                ),
-            })
-        }
-        setGridData({data: users, columns: newColumns})
-    }, [userType.propertyName, currentStream, users])
-
-
-    useEffect(() => {
-        const categoryColumns = getGroupCategoryColumns()
-        setColumns([...initialColumns, ...categoryColumns])
-    }, [group.id, userType, currentStream])
+    ]
 
     useEffect(() => {
         setUsers(totalUniqueUsers)
@@ -111,15 +127,6 @@ const UsersTable = ({
         mapStreamsRegistered()
 
     }, [totalUniqueUsers])
-
-    useEffect(() => {
-        if (userType.propertyName === "talentPool") {
-            setCheckboxSelection(true)
-        } else {
-            setCheckboxSelection(false)
-        }
-
-    }, [userType.propertyName])
 
     const getGroupCategoryColumns = () => {
         if (group.categories?.length) {
@@ -208,8 +215,17 @@ const UsersTable = ({
     }
 
     const handleCopyEmails = () => {
-        copyStringToClipboard(selection.join(";"))
+        const emails = selection.map(user => user.id).join(";")
+        copyStringToClipboard(emails)
         enqueueSnackbar("Emails have been copied!", {
+            variant: "success"
+        })
+    }
+
+    const handleCopyLinkedin = () => {
+        const linkedInAddresses = selection.filter(user => user.linkedinUrl).map(user => user.linkedinUrl).join(",")
+        copyStringToClipboard(linkedInAddresses)
+        enqueueSnackbar("LinkedIn addresses have been copied!", {
             variant: "success"
         })
     }
@@ -227,95 +243,90 @@ const UsersTable = ({
             <Card
                 raised={Boolean(currentStream)}
                 className={clsx(classes.root, className)}
+                ref={breakdownRef}
                 {...rest}
             >
-                <CardHeader
-                    title={userType.displayName}
-                    subheader={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
+                <MaterialTable
+                    icons={tableIcons}
+                    isLoading={fetchingStreams}
+                    data={users}
+                    options={defaultTableOptions}
+                    columns={[
+                        {
+                            field: "firstName",
+                            title: "First Name",
+                            width: 140,
+                        },
+                        {
+                            field: "lastName",
+                            title: "Last Name",
+                            width: 140,
+                        },
+                        {
+                            field: "linkedinUrl",
+                            title: "LinkedIn",
+                            width: 180,
+                        },
+                        {
+                            field: "universityName",
+                            title: "University",
+                            width: 150,
+                        },
+                        {
+                            field: "streamsWatched",
+                            title: "Events Attended",
+                            width: 150,
+                        },
+                        {
+                            field: "streamsRegistered",
+                            title: "Events Registered To",
+                            width: 170,
+                        },
+                        {
+                            field: "userEmail",
+                            title: "Email",
+                            width: 200,
+                            hidden: userType.propertyName !== "talentPool",
+                            render: ({id}) => (
+                                <a href={`mailto:${id}`}>
+                                    {id}
+                                </a>
+                            ),
+                        },
+                        {
+                            field: "watchedEvent",
+                            title: "Attended Event",
+                            width: 170,
+                            hidden: !currentStream
+                        }
+                    ]}
+                    actions={[
+                        exportSelectionAction(columns),
+                        (rowData) => ({
+                            tooltip: "Copy Emails",
+                            position: "toolbarOnSelect",
+                            icon: tableIcons.EmailIcon,
+                            disabled: rowData.length === 0,
+                            onClick: handleCopyEmails
+                        }),
+                        (rowData) => ({
+                            tooltip: "Copy LinkedIn Addresses",
+                            position: "toolbarOnSelect",
+                            icon: tableIcons.LinkedInIcon,
+                            disabled: rowData.length === 0,
+                            onClick: handleCopyLinkedin
+                        }),
+                    ]}
+                    onSelectionChange={(rows) => {
+                        setSelection(rows);
+                    }}
+                    title={
+                        <CardHeader
+                            title={userType.displayName}
+                            subheader={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
+                        />
+                    }
                 />
-                <Divider ref={breakdownRef}/>
-                <Box
-                    // height={expandTable ? 800 : 400}
-                >
-                    <MaterialTable
-                        icons={tableIcons}
-                        // columns={[
-                        //     {title: "Adı", field: "name"},
-                        //     {title: "Soyadı", field: "surname"},
-                        //     {title: "Doğum Yılı", field: "birthYear", type: "numeric"},
-                        //     {
-                        //         title: "Doğum Yeri",
-                        //         field: "birthCity",
-                        //         lookup: {34: "İstanbul", 63: "Şanlıurfa"},
-                        //     },
-                        // ]}
-                        {...gridData}
-                        options={{
-                            exportButton: true,
-                            filtering: true,
-                            selection: true
-                        }}
-                        onSelectionChange={(rows) => {
-                            setSelection(rows);
-                        }}
-                        // data={[
-                        //     {
-                        //         name: "Mehmet",
-                        //         surname: "Baran",
-                        //         birthYear: 1987,
-                        //         birthCity: 63,
-                        //     },
-                        // ]}
-                        title="Demo Title"
-                    />
-                    {/*<DataGrid*/}
-                    {/*    {...gridData}*/}
-                    {/*    showToolbar*/}
-                    {/*    onFilterModelChange={({filterModel}) => {*/}
-                    {/*        const filterActive = filterModel.items?.[0]?.value*/}
-                    {/*        if (filterActive) {*/}
-                    {/*            setCheckboxSelection(false)*/}
-                    {/*        } else {*/}
-                    {/*            setCheckboxSelection(true)*/}
-                    {/*        }*/}
-                    {/*    }}*/}
-                    {/*    checkboxSelection={checkboxSelection}*/}
-                    {/*    loading={fetchingStreams}*/}
-                    {/*    onSelectionChange={(newSelection) => {*/}
-                    {/*        setSelection(newSelection.rowIds);*/}
-                    {/*    }}*/}
-                    {/*    components={{*/}
-                    {/*        noRowsOverlay: CustomNoRowsOverlay,*/}
-                    {/*        loadingOverlay: CustomLoadingOverlay,*/}
-
-                    {/*    }}*/}
-                    {/*/>*/}
-                </Box>
-                <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    p={2}
-                >
-                    {userType.propertyName === "talentPool" &&
-                    <Button
-                        color="primary"
-                        size="small"
-                        variant="contained"
-                        disabled={Boolean(!selection.length)}
-                        onClick={handleCopyEmails}
-                    >
-                        Copy Email Addresses
-                    </Button>}
-                    <Button
-                        color="primary"
-                        onClick={toggleTable}
-                        endIcon={!expandTable && <ArrowRightIcon/>}
-                        size="small"
-                        variant="text"
-                    >
-                        {expandTable ? "Show Less" : "Expand"}
-                    </Button>
-                </Box>
             </Card>
         </Slide>
     );

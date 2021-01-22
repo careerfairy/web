@@ -28,6 +28,9 @@ import BallotIcon from '@material-ui/icons/Ballot';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import EmailIcon from '@material-ui/icons/Email';
+import LinkedInIcon from '@material-ui/icons/LinkedIn';
+
 export const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref}/>),
     Check: forwardRef((props, ref) => <Check {...props} ref={ref}/>),
@@ -51,6 +54,8 @@ export const tableIcons = {
     BallotIcon: forwardRef((props, ref) => <BallotIcon {...props} ref={ref}/>),
     ArrowDownwardIcon: forwardRef((props, ref) => <ArrowDownwardIcon {...props} ref={ref}/>),
     EditIcon: forwardRef((props, ref) => <EditIcon {...props} ref={ref}/>),
+    EmailIcon: forwardRef((props, ref) => <EmailIcon {...props} ref={ref}/>),
+    LinkedInIcon: forwardRef((props, ref) => <LinkedInIcon {...props} ref={ref}/>),
     DeleteForeverIcon: forwardRef((props, ref) => <DeleteForeverIcon {...props} ref={ref}/>)
 };
 
@@ -81,6 +86,14 @@ export const exportSelectionAction = (columns = []) => {
                 .exportFile();
         },
     }
+}
+
+export const defaultTableOptions = {
+    filtering: true,
+    selection: true,
+    pageSize: 5,
+    pageSizeOptions: [5, 10, 25, 50, 100, 200],
+    exportButton: {csv: true, pdf: false}// PDF is false because its buggy and throws errors
 }
 
 const useStyles = makeStyles(theme => ({
