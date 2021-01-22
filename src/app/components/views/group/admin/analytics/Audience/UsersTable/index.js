@@ -33,38 +33,6 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const initialColumns = [
-    {
-        field: "firstName",
-        title: "First Name",
-        width: 140,
-    },
-    {
-        field: "lastName",
-        title: "Last Name",
-        width: 140,
-    },
-    {
-        field: "linkedinUrl",
-        title: "LinkedIn",
-        width: 180,
-    },
-    {
-        field: "universityName",
-        title: "University",
-        width: 150,
-    },
-    {
-        field: "numberOfStreamsWatched",
-        title: "Events Attended",
-        width: 150,
-    },
-    {
-        field: "numberOfStreamsRegistered",
-        title: "Events Registered To",
-        width: 170,
-    },
-]
 const UsersTable = ({
                         groupOptions,
                         fetchingStreams,

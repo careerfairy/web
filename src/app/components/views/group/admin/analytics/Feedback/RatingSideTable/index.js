@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Card, CardHeader, makeStyles, useTheme} from '@material-ui/core';
+import {Card, makeStyles, useTheme} from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {
     defaultTableOptions,
@@ -59,9 +59,10 @@ const RatingSideTable = ({
                              className,
                              ...rest
                          }) => {
+    const dataTableRef = useRef(null)
+
     const theme = useTheme()
     const classes = useStyles();
-    const [selection, setSelection] = useState([]);
     const [data, setData] = useState([]);
 
     useEffect(() => {
@@ -72,6 +73,11 @@ const RatingSideTable = ({
         }
     }, [currentRating])
 
+    useEffect(() => {
+        if (dataTableRef.current) {
+            dataTableRef.current.onAllSelected(false)
+        }
+    }, [currentRating?.id])
     const active = () => {
         return Boolean(
             currentRating
@@ -94,6 +100,7 @@ const RatingSideTable = ({
         >
             <MaterialTable
                 icons={tableIcons}
+                tableRef={dataTableRef}
                 columns={[
                     {
                         field: "rating",
@@ -120,9 +127,7 @@ const RatingSideTable = ({
                 options={customOptions}
                 isLoading={fetchingStreams}
                 actions={[(exportSelectionAction(columns))]}
-                onSelectionChange={(rows) => {
-                    setSelection(rows);
-                }}
+
                 title={currentRating?.question}
             />
         </Card>

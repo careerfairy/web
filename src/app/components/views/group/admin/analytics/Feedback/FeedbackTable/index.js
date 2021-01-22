@@ -66,7 +66,6 @@ const FeedbackTable = ({
                            ...rest
                        }) => {
     const classes = useStyles();
-    const [selection, setSelection] = useState([]);
     const [tableData, setTableData] = useState({data: [], columns: []});
     const [feedbackModal, setFeedbackModal] = useState({data: {}, open: false})
     const [areYouSureModal, setAreYouSureModal] = useState({data: {}, open: false, warning: ""});
@@ -380,9 +379,6 @@ const FeedbackTable = ({
                             onClick: (event, rowData) => handleDisplayTable(rowData)
                         })
                     ]}
-                    onSelectionChange={(rows) => {
-                        setSelection(rows);
-                    }}
                     title={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
                     detailPanel={
                         isPoll() ? [{
