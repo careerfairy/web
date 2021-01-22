@@ -62,7 +62,6 @@ const FeedbackTable = ({
                            typesOfOptions,
                            userTypes,
                            setUserType,
-                           sideRef,
                            ...rest
                        }) => {
     const classes = useStyles();
@@ -71,7 +70,6 @@ const FeedbackTable = ({
     const [feedbackModal, setFeedbackModal] = useState({data: {}, open: false})
     const [areYouSureModal, setAreYouSureModal] = useState({data: {}, open: false, warning: ""});
     const [deletingFeedback, setDeletingFeedback] = useState(false);
-    const actions = [exportSelectionAction(tableData.columns)]
     const {enqueueSnackbar} = useSnackbar()
 
 
@@ -92,12 +90,17 @@ const FeedbackTable = ({
         })
 
     }, [streamDataType.propertyName, currentStream])
-    
+
+    const handleDisplayTable = (rowData) => {
+        setCurrentRating(rowData)
+        handleScrollToSideRef()
+    }
+
     const DisplayButton = (rowData) => {
         const hasNoData = () => {
             return Boolean(!rowData.voters?.length)
         }
-        const handleClick = (rowData) => {
+        const handleClick = () => {
             setCurrentRating(rowData)
             handleScrollToSideRef()
         }
@@ -303,7 +306,7 @@ const FeedbackTable = ({
                         selection: true,
                         pageSize: 5,
                         pageSizeOptions: [5, 10, 25, 50, 100, 200],
-                        exportButton: {csv: true, pdf: false}
+                        exportButton: {csv: true, pdf: false}// PDF is false because its buggy and throws errors
                     }}
                     actions={[
                         exportSelectionAction(tableData.columns),
@@ -327,7 +330,17 @@ const FeedbackTable = ({
                             iconProps: {color: "green"},
                             tooltip: 'Add Question',
                             onClick: handleCreateFeedback
-                        }
+
+                        },
+                        // (rowData) => ({
+                        //     icon: tableIcons.ArrowDownwardIcon,
+                        //     hidden: !isFeedback(),
+                        //     position: "row",
+                        //     disabled: rowData?.votes === 0,
+                        //     iconProps: {color: "green"},
+                        //     tooltip: 'Display Table',
+                        //     onClick: (rowData) => handleDisplayTable(rowData)
+                        // })
                     ]}
                     onSelectionChange={(rows) => {
                         setSelection(rows);
@@ -354,7 +367,6 @@ const FeedbackTable = ({
                                             userTypes={userTypes}
                                             setUserType={setUserType}
                                             currentPoll={rowData}
-                                            sideRef={sideRef}
                                             userType={userType}
                                             streamDataType={streamDataType}
                                         />

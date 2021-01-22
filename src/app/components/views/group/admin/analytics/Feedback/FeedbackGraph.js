@@ -47,7 +47,6 @@ const FeedbackGraph = ({
                            userTypes,
                            setUserType,
                            currentPoll,
-                           sideRef,
                            userType,
                            streamDataType,
                            className,
@@ -155,7 +154,6 @@ const FeedbackGraph = ({
 
     return (
         <Card
-            ref={sideRef}
             className={clsx(classes.root, className)}
             {...rest}
         >

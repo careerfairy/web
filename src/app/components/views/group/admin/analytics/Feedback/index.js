@@ -4,7 +4,6 @@ import {Container, Grid} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import LatestEvents from "../common/LatestEvents";
 import FeedbackTable from "./FeedbackTable";
-import FeedbackGraph from "./FeedbackGraph";
 import RatingSideTable from "./RatingSideTable";
 
 
@@ -42,10 +41,10 @@ const Feedback = ({
                       showBar
                   }) => {
     const classes = useStyles()
-    const sideRef = useRef(null)
 
     const [currentPoll, setCurrentPoll] = useState(null);
     const [currentRating, setCurrentRating] = useState(null);
+    const sideRef = useRef(null)
 
     useEffect(() => {
         setCurrentPoll(null)
@@ -134,7 +133,6 @@ const Feedback = ({
                         setCurrentRating={setCurrentRating}
                         currentPoll={currentPoll}
                         breakdownRef={breakdownRef}
-                        handleScrollToSideRef={handleScrollToSideRef}
                         setCurrentStream={setCurrentStream}
                         currentRating={currentRating}
                         setCurrentPoll={setCurrentPoll}
@@ -144,30 +142,16 @@ const Feedback = ({
                         userType={userType}
                         group={group}/>
                 </Grid>
-                {!isQuestion() &&
-                <Grid  item lg={6} md={12} xl={6} xs={12}>
+                <Grid item lg={6} md={12} xl={6} xs={12}>
                     {isRating() &&
-                        <RatingSideTable
-                            streamDataType={streamDataType}
-                            fetchingStreams={fetchingStreams}
-                            sideRef={sideRef}
-                            currentRating={currentRating}
-                        />
-                        // :
-                        // <FeedbackGraph
-                        //     currentPoll={currentPoll}
-                        //     sideRef={sideRef}
-                        //     currentStream={currentStream}
-                        //     streamDataType={streamDataType}
-                        //     typesOfOptions={[]}
-                        //     userType={userType}
-                        //     userTypes={userTypes}
-                        //     setUserType={setUserType}
-                        //     setCurrentStream={setCurrentStream}
-                        //     group={group}
-                        // />
-                    }
-                </Grid>}
+                    <RatingSideTable
+                        streamDataType={streamDataType}
+                        handleScrollToSideRef={handleScrollToSideRef}
+                        fetchingStreams={fetchingStreams}
+                        sideRef={sideRef}
+                        currentRating={currentRating}
+                    />}
+                </Grid>
             </Grid>
         </Container>
     );
