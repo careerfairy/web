@@ -30,14 +30,11 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     const agoraScreenShareToken = useAgoraToken(roomId, userUid, !isViewer, true);
 
     useEffect(() => {
-        if (isPlayMode) {
-            let uuid = uuidv4()
-            let joiningId = uuid.replaceAll('-', '')
+        if (streamId) {
+            let joiningId = streamId.replaceAll('-', '')
             setUserUid(joiningId)
-        } else if (streamId) {
-            setUserUid(streamId)
         }
-    },[isPlayMode, streamId])
+    },[streamId])
 
     useEffect(() => {
         if (addedStream) {
@@ -258,6 +255,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             let interval = setInterval(() => {
                 rtmClient.getChannelMemberCount([roomId]).then( result => {
                     setNumberOfViewers(result[roomId])
+                    console.log(result)
                 })
             }, 5000)
             return () => clearInterval(interval);

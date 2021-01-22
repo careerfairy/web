@@ -50,6 +50,18 @@ function RemoteVideoContainer(props) {
         }
     },[props.play])
 
+    useEffect(() => {
+        if (props.muted) {
+            // Had to add questionmarks because it would crash when handraising in demo mode
+            // (ONYL IN DEMO MODE) normal handraise works
+            props.stream?.stream?.muteAudio()
+        } else {
+            // Had to add questionmarks because it would crash when handraising in demo mode
+            // (ONYL IN DEMO MODE) normal handraise works
+            props.stream?.stream?.unmuteAudio()
+        }
+    },[props.muted])
+
     function generateDemoHandRaiser() {
         let video = document.createElement('video');
         const videoContainer = document.querySelector('#' + props.stream.streamId);

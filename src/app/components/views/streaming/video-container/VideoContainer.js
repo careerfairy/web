@@ -59,7 +59,7 @@ function VideoContainer(props) {
         props.currentLivestream.mode === 'desktop';
     const { localMediaStream, externalMediaStreams, numberOfViewers, setAddedStream, setRemovedStream } =
         useAgoraAsStreamer(
-            streamerReady,
+            true,
             false,
             localVideoId,
             screenSharingMode,
@@ -289,7 +289,7 @@ function VideoContainer(props) {
                     videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
                     speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
                     streamerReady={streamerReady} setStreamerReady={setStreamerReady}
-                    localStream={localMediaStream}
+                    localStream={displayableMediaStream}
                     connectionEstablished={connectionEstablished}
                     isTest={props.currentLivestream.test} viewer={props.viewer}
                     handleOpenDemoIntroModal={handleOpenDemoIntroModal}
