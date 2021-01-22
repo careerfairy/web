@@ -344,16 +344,16 @@ const FeedbackTable = ({
                     actions={[
                         exportSelectionAction(tableData.columns),
                         rowData => ({
-                            icon: tableIcons.EditIcon,
+                            icon: tableIcons.ThemedEditIcon,
                             iconProps: {color: "primary"},
-                            hidden: !isFeedback(),
+                            hidden: !isFeedback() || !canEdit(rowData),
                             disabled: !canEdit(rowData),
                             position: "row",
                             tooltip: 'Edit',
                             onClick: (event, rowData) => handleEditFeedback(rowData),
                         })
                         , {
-                            icon: tableIcons.DeleteForeverIcon,
+                            icon: tableIcons.RedDeleteForeverIcon,
                             iconProps: {color: "primary"},
                             hidden: !isFeedback(),
                             position: "row",
@@ -361,10 +361,10 @@ const FeedbackTable = ({
                             onClick: (event, rowData) => handleOpenAreYouSureModal(rowData)
                         },
                         {
-                            icon: tableIcons.Add,
+                            icon: tableIcons.ThemedAdd,
                             hidden: !isFeedback(),
-                            position: "toolbar",
-                            iconProps: {color: "green"},
+                            isFreeAction: true,
+                            iconProps: {color: "primary"},
                             tooltip: 'Add Question',
                             onClick: handleCreateFeedback
 

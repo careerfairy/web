@@ -167,10 +167,10 @@ const CategoryBreakdown = ({
             {...rest}
         >
             <CardHeader
-                title={`Breakdown of ${localUserType.displayName}`}
+                title={`${localUserType.displayName}`}
                 ref={breakdownRef}
                 subheader={
-                    currentStream ? `That attended ${currentStream.company} on ${prettyDate(currentStream.start)}` : "on average"
+                    currentStream ? `That attended ${currentStream.company} on ${prettyDate(currentStream.start)}` : "For All Events"
                 }
                 action={
                     currentStream &&

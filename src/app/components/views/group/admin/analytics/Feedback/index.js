@@ -142,7 +142,7 @@ const Feedback = ({
                         userType={userType}
                         group={group}/>
                 </Grid>
-                <Grid item lg={6} md={12} xl={6} xs={12}>
+                <Grid item lg={12} md={12} xl={6} xs={12}>
                     {isRating() &&
                     <RatingSideTable
                         streamDataType={streamDataType}

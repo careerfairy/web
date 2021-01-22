@@ -43,6 +43,7 @@ import Linkify from "react-linkify";
 
 export const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref}/>),
+    ThemedAdd: forwardRef((props, ref) => <AddBox color="primary" {...props} ref={ref}/>),
     Check: forwardRef((props, ref) => <Check {...props} ref={ref}/>),
     Clear: forwardRef((props, ref) => <Clear {...props} ref={ref}/>),
     Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref}/>),
@@ -64,6 +65,7 @@ export const tableIcons = {
     BallotIcon: forwardRef((props, ref) => <BallotIcon {...props} ref={ref}/>),
     ArrowDownwardIcon: forwardRef((props, ref) => <ArrowDownwardIcon {...props} ref={ref}/>),
     EditIcon: forwardRef((props, ref) => <EditIcon {...props} ref={ref}/>),
+    ThemedEditIcon: forwardRef((props, ref) => <EditIcon color="primary" {...props} ref={ref}/>),
     EditOutlinedIcon: forwardRef((props, ref) => <EditOutlinedIcon {...props} ref={ref}/>),
     EmailIcon: forwardRef((props, ref) => <EmailIcon {...props} ref={ref}/>),
     LinkedInIcon: forwardRef((props, ref) => <LinkedInIcon {...props} ref={ref}/>),
@@ -73,6 +75,7 @@ export const tableIcons = {
     VideoLibraryOutlinedIcon: forwardRef((props, ref) => <VideoLibraryOutlinedIcon {...props} ref={ref}/>),
     LibraryAddOutlinedIcon: forwardRef((props, ref) => <LibraryAddOutlinedIcon {...props} ref={ref}/>),
     DeleteForeverIcon: forwardRef((props, ref) => <DeleteForeverIcon {...props} ref={ref}/>),
+    RedDeleteForeverIcon: forwardRef((props, ref) => <DeleteForeverIcon color="error" {...props} ref={ref}/>),
     RotateLeftIcon: forwardRef((props, ref) => <RotateLeftIcon {...props} ref={ref}/>),
     DeleteForeverOutlinedIcon: forwardRef((props, ref) => <DeleteForeverOutlinedIcon {...props} ref={ref}/>)
 };
