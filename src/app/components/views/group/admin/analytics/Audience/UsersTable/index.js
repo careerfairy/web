@@ -11,6 +11,8 @@ import {useAuth} from "../../../../../../../HOCs/AuthProvider";
 import {useRouter} from "next/router";
 import {theme} from "../../../../../../../materialUI";
 import UserInnerTable from "./UserInnerTable";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
 
 const useStyles = makeStyles(() => ({
     root: {},
@@ -70,10 +72,12 @@ const UsersTable = ({
                         currentStream,
                         group,
                         firebase,
+                        setUserType,
                         futureStreams,
                         totalUniqueUsers,
                         streamsFromTimeFrameAndFuture,
                         breakdownRef,
+                        userTypes,
                         className,
                         ...rest
                     }) => {
@@ -245,6 +249,11 @@ const UsersTable = ({
         )
     }
 
+    const handleMenuItemClick = (event, index) => {
+        setUserType(userTypes[index])
+    };
+
+
     const isTalentPool = () => userType.propertyName === "talentPool"
 
     return (
@@ -255,6 +264,22 @@ const UsersTable = ({
                 ref={breakdownRef}
                 {...rest}
             >
+                <Tabs
+                    value={userType.propertyName}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    scrollButtons="auto"
+                    aria-label="disabled tabs example"
+                >
+                    {userTypes.map(({displayName, propertyName}, index) => (
+                        <Tab
+                            key={propertyName}
+                            value={propertyName}
+                            onClick={(event) => handleMenuItemClick(event, index)}
+                            label={displayName}
+                        />
+                    ))}
+                </Tabs>
                 <MaterialTable
                     icons={tableIcons}
                     isLoading={fetchingStreams}
@@ -325,8 +350,9 @@ const UsersTable = ({
                     ]}
                     detailPanel={[
                         ({numberOfStreamsRegistered, streamsRegistered, firstName, lastName}) => ({
-                            icon: tableIcons.AddToPhotosIcon,
-                            tooltip: `See streams ${firstName} registered to`,
+                            icon: tableIcons.LibraryAddOutlinedIcon,
+                            openIcon: tableIcons.AddToPhotosIcon,
+                            tooltip: !(numberOfStreamsRegistered === 0) && `See streams ${firstName} registered to`,
                             disabled: numberOfStreamsRegistered === 0,
                             render: () => <UserInnerTable
                                 firstName={firstName}
@@ -338,8 +364,9 @@ const UsersTable = ({
                             />
                         }),
                         ({numberOfStreamsWatched, streamsWatched, firstName, lastName}) => ({
-                            icon: tableIcons.VideoLibraryIcon,
-                            tooltip: `See streams ${firstName} watched`,
+                            icon: tableIcons.VideoLibraryOutlinedIcon,
+                            openIcon: tableIcons.VideoLibraryIcon,
+                            tooltip: !(numberOfStreamsWatched === 0) && `See streams ${firstName} watched`,
                             disabled: numberOfStreamsWatched === 0,
                             render: () => <UserInnerTable
                                 firstName={firstName}
@@ -349,18 +376,19 @@ const UsersTable = ({
                                 streams={streamsWatched}
                             />
                         })
+
                     ]}
                     actions={[
                         exportSelectionAction(columns),
                         (rowData) => ({
-                            tooltip: "Copy Emails",
+                            tooltip: !(rowData.length === 0 || !isTalentPool()) && "Copy Emails",
                             position: "toolbarOnSelect",
                             icon: tableIcons.EmailIcon,
                             disabled: (rowData.length === 0 || !isTalentPool()),
                             onClick: handleCopyEmails
                         }),
                         (rowData) => ({
-                            tooltip: "Copy LinkedIn Addresses",
+                            tooltip: !(rowData.length === 0 || !isTalentPool()) && "Copy LinkedIn Addresses",
                             position: "toolbarOnSelect",
                             icon: tableIcons.LinkedInIcon,
                             disabled: (rowData.length === 0 || !isTalentPool()),
@@ -370,12 +398,7 @@ const UsersTable = ({
                     onSelectionChange={(rows) => {
                         setSelection(rows);
                     }}
-                    title={
-                        <CardHeader
-                            title={userType.displayName}
-                            subheader={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
-                        />
-                    }
+                    title={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
                 />
             </Card>
         </Slide>

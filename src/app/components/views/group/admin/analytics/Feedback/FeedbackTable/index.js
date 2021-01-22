@@ -7,6 +7,7 @@ import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import {
+    defaultTableOptions,
     exportSelectionAction,
     renderAppearAfter,
     renderRatingStars,
@@ -155,6 +156,9 @@ const FeedbackTable = ({
         {
             field: "question",
             title: "Question",
+            cellStyle: {
+                width: 400,
+            },
         },
         {
             title: "Votes",
@@ -179,6 +183,9 @@ const FeedbackTable = ({
             field: "title",
             title: "Question",
             width: 250,
+            cellStyle: {
+                width: 400,
+            },
         },
         {
             field: "votes",
@@ -203,6 +210,9 @@ const FeedbackTable = ({
             field: "question",
             title: "Question",
             width: 250,
+            cellStyle: {
+                width: 400,
+            },
         },
         {
             field: "average",
@@ -238,13 +248,13 @@ const FeedbackTable = ({
             field: "hasText",
             title: "Has Written Reviews",
             width: 140,
-            lookup: {true: 'Yes', false: 'No'},
+            type: "boolean"
         },
         {
             field: "isForEnd",
             title: "Ask on Stream End",
             width: 140,
-            lookup: {true: 'Yes', false: 'No'},
+            type: "boolean"
         },
     ]
 
@@ -301,23 +311,19 @@ const FeedbackTable = ({
                     icons={tableIcons}
                     {...tableData}
                     isLoading={fetchingStreams}
-                    options={{
-                        filtering: true,
-                        selection: true,
-                        pageSize: 5,
-                        pageSizeOptions: [5, 10, 25, 50, 100, 200],
-                        exportButton: {csv: true, pdf: false}// PDF is false because its buggy and throws errors
-                    }}
+                    options={defaultTableOptions}
                     actions={[
                         exportSelectionAction(tableData.columns),
                         {
                             icon: tableIcons.EditIcon,
+                            iconProps: {color: "primary"},
                             hidden: !isFeedback(),
                             position: "row",
                             tooltip: 'Edit',
                             onClick: (event, rowData) => handleEditFeedback(rowData)
                         }, {
                             icon: tableIcons.DeleteForeverIcon,
+                            iconProps: {color: "primary"},
                             hidden: !isFeedback(),
                             position: "row",
                             tooltip: 'Delete',
@@ -345,12 +351,7 @@ const FeedbackTable = ({
                     onSelectionChange={(rows) => {
                         setSelection(rows);
                     }}
-                    title={
-                        <CardHeader
-                            title={streamDataType.displayName}
-                            subheader={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
-                        />
-                    }
+                    title={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
                     detailPanel={
                         isPoll() ? [{
                             tooltip: "Show Chart",

@@ -345,10 +345,8 @@ const AnalyticsOverview = ({firebase, group}) => {
                         ...doc.data()
                     }))
                     const average = getAverageRating(voters)
-                    console.log("-> average", average);
                     feedback.push({...ratingData, voters, votes: voters.length, average: Number(average)})
                 }
-                console.log("-> feedback", feedback);
                 setCurrentStream(prevState => ({...prevState, feedback}))
                 setFetchingRatings(false)
             })

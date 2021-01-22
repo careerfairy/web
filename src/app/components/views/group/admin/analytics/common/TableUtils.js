@@ -33,6 +33,11 @@ import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import VideoLibraryIcon from '@material-ui/icons/VideoLibrary';
 import AddToPhotosIcon from '@material-ui/icons/AddToPhotos';
 import SettingsIcon from '@material-ui/icons/Settings';
+import VideoLibraryOutlinedIcon from '@material-ui/icons/VideoLibraryOutlined';
+import LibraryAddOutlinedIcon from '@material-ui/icons/LibraryAddOutlined';
+import DeleteForeverOutlinedIcon from '@material-ui/icons/DeleteForeverOutlined';
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
+
 import Linkify from "react-linkify";
 
 export const tableIcons = {
@@ -58,12 +63,16 @@ export const tableIcons = {
     BallotIcon: forwardRef((props, ref) => <BallotIcon {...props} ref={ref}/>),
     ArrowDownwardIcon: forwardRef((props, ref) => <ArrowDownwardIcon {...props} ref={ref}/>),
     EditIcon: forwardRef((props, ref) => <EditIcon {...props} ref={ref}/>),
+    EditOutlinedIcon: forwardRef((props, ref) => <EditOutlinedIcon {...props} ref={ref}/>),
     EmailIcon: forwardRef((props, ref) => <EmailIcon {...props} ref={ref}/>),
     LinkedInIcon: forwardRef((props, ref) => <LinkedInIcon {...props} ref={ref}/>),
     VideoLibraryIcon: forwardRef((props, ref) => <VideoLibraryIcon {...props} ref={ref}/>),
     AddToPhotosIcon: forwardRef((props, ref) => <AddToPhotosIcon {...props} ref={ref}/>),
     SettingsIcon: forwardRef((props, ref) => <SettingsIcon {...props} ref={ref}/>),
-    DeleteForeverIcon: forwardRef((props, ref) => <DeleteForeverIcon {...props} ref={ref}/>)
+    VideoLibraryOutlinedIcon: forwardRef((props, ref) => <VideoLibraryOutlinedIcon {...props} ref={ref}/>),
+    LibraryAddOutlinedIcon: forwardRef((props, ref) => <LibraryAddOutlinedIcon {...props} ref={ref}/>),
+    DeleteForeverIcon: forwardRef((props, ref) => <DeleteForeverIcon {...props} ref={ref}/>),
+    DeleteForeverOutlinedIcon: forwardRef((props, ref) => <DeleteForeverOutlinedIcon {...props} ref={ref}/>)
 };
 
 export const exportSelectionAction = (columns = []) => {
@@ -115,7 +124,7 @@ export const defaultTableOptions = {
     pageSize: 5,
     pageSizeOptions: [3, 5, 10, 25, 50, 100, 200],
     minBodyHeight: 200,
-    exportButton: {csv: true, pdf: false}// PDF is false because its buggy and throws errors
+    exportButton: {csv: true, pdf: true}// PDF is false because its buggy and throws errors
 }
 
 const useStyles = makeStyles(theme => ({

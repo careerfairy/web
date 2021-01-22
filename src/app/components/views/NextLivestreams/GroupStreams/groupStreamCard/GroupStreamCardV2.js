@@ -1,4 +1,4 @@
-import React, {createRef, Fragment, memo, useEffect, useMemo, useRef, useState} from 'react';
+import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
@@ -16,7 +16,7 @@ import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
 import {AttendButton, DetailsButton} from "./actionButtons";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
-import {DateDisplay, DateTimeDisplay, TimeDisplay} from "./TimeDisplay";
+import {DateTimeDisplay} from "./TimeDisplay";
 import EnhancedGroupStreamCard from "../../../group/admin/events/enhanced-group-stream-card/EnhancedGroupStreamCard";
 import SettingsIcon from '@material-ui/icons/Settings';
 import CopyToClipboard from "../../../common/CopyToClipboard";

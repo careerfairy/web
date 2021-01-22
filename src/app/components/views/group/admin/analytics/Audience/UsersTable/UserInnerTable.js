@@ -1,11 +1,12 @@
 import React from 'react';
-import {makeStyles} from "@material-ui/core/styles";
-import {Avatar, Collapse, Paper} from "@material-ui/core";
+import {fade, makeStyles} from "@material-ui/core/styles";
+import {Avatar, Collapse, Paper, useTheme} from "@material-ui/core";
 import MaterialTable from "material-table";
 import {defaultTableOptions, tableIcons} from "../../common/TableUtils";
 import EnhancedGroupStreamCard from "../../../events/enhanced-group-stream-card/EnhancedGroupStreamCard";
 import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {useRouter} from "next/router";
+
 
 const useStyles = makeStyles(theme => ({
     avatar: {
@@ -15,9 +16,10 @@ const useStyles = makeStyles(theme => ({
             objectFit: "contain"
         },
         boxShadow: theme.shadows[1],
-        padding: theme.spacing(1)
+        padding: theme.spacing(1),
+        background: theme.palette.common.white
     },
-    streamManage:{
+    streamManage: {
         background: theme.palette.navyBlue.main,
         color: theme.palette.common.white
     }
@@ -25,13 +27,21 @@ const useStyles = makeStyles(theme => ({
 
 const UserInnerTable = ({firstName, lastName, streams, group, registered, firebase}) => {
     const classes = useStyles()
+    const theme = useTheme()
     const router = useRouter()
+    const customOptions = {...defaultTableOptions}
+    const innerTableStyle = {background: fade(theme.palette.navyBlue.main, 0.05)}
+    customOptions.selection = false
+    customOptions.pageSize = 3
+    customOptions.headerStyle = innerTableStyle
+
     return (
         <Collapse in mountOnEnter unmountOnExit>
             <MaterialTable
+                style={innerTableStyle}
                 icons={tableIcons}
                 title={`Events that ${firstName} ${lastName} ${registered ? "registered to" : "participated in"}:`}
-                options={defaultTableOptions}
+                options={customOptions}
                 columns={[
                     {
                         field: "companyLogoUrl",
@@ -63,7 +73,7 @@ const UserInnerTable = ({firstName, lastName, streams, group, registered, fireba
                         icon: tableIcons.SettingsIcon,
                         tooltip: "Manage Event",
                         render: (rowData) => {
-                          return  (<Paper className={classes.streamManage} variant="outlined" key={rowData.id}>
+                            return (<Paper className={classes.streamManage} variant="outlined" key={rowData.id}>
                                 <EnhancedGroupStreamCard
                                     livestream={rowData}
                                     firebase={firebase}

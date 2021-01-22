@@ -1,11 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Card, CardHeader, makeStyles} from '@material-ui/core';
+import {Card, CardHeader, makeStyles, useTheme} from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
-import {exportSelectionAction, renderRatingStars, StarRatingInputValue, tableIcons} from "../../common/TableUtils";
+import {
+    defaultTableOptions,
+    exportSelectionAction,
+    renderRatingStars,
+    StarRatingInputValue,
+    tableIcons
+} from "../../common/TableUtils";
 import MaterialTable from "material-table";
 import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
+import {fade} from "@material-ui/core/styles";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -52,6 +59,7 @@ const RatingSideTable = ({
                              className,
                              ...rest
                          }) => {
+    const theme = useTheme()
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const [data, setData] = useState([]);
@@ -69,6 +77,13 @@ const RatingSideTable = ({
             currentRating
         )
     }
+
+    const customOptions = {...defaultTableOptions}
+    const innerTableStyle = {background: fade(theme.palette.navyBlue.main, 0.05)}
+    customOptions.selection = false
+    customOptions.pageSize = 3
+    customOptions.headerStyle = innerTableStyle
+    customOptions.exportButton.pdf = true
 
     return (
         <Card
@@ -102,24 +117,13 @@ const RatingSideTable = ({
                     },
                 ]}
                 data={data}
-                options={{
-                    filtering: true,
-                    selection: true,
-                    pageSize: 5,
-                    pageSizeOptions: [5, 10, 25, 50, 100, 200],
-                    exportButton: {csv: true, pdf: false}// PDF is false because its buggy and throws errors
-                }}
+                options={customOptions}
                 isLoading={fetchingStreams}
                 actions={[(exportSelectionAction(columns))]}
                 onSelectionChange={(rows) => {
                     setSelection(rows);
                 }}
-                title={
-                    <CardHeader
-                        title={`${streamDataType.displayName} Breakdown`}
-                        subheader={currentRating?.question}
-                    />
-                }
+                title={currentRating?.question}
             />
         </Card>
     );
