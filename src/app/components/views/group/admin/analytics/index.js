@@ -203,7 +203,7 @@ const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();
     const breakdownRef = useRef(null)
     const theme = useTheme()
-    const [value, setValue] = useState(2);
+    const [value, setValue] = useState(1);
 
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
     const [showBar, setShowBar] = useState(false);
@@ -268,6 +268,7 @@ const AnalyticsOverview = ({firebase, group}) => {
                     const livestreamsData = snapshots.docs.map(snap => {
                         const livestream = snap.data()
                         livestream.id = snap.id
+                        livestream.date = livestream.start?.toDate()
                         for (const userType of userTypes) {
                             if (currentUserDataSet.dataSet === "groupUniversityStudents") {// Change the graph and status data if we're looking at the groups university Students
                                 livestream[userType.propertyName] = livestream[userType.propertyName].filter(userEmail => {

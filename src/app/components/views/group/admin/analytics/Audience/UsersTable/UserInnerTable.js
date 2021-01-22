@@ -2,8 +2,9 @@ import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {Avatar, Collapse, Paper} from "@material-ui/core";
 import MaterialTable from "material-table";
-import {tableIcons} from "../../common/TableUtils";
+import {defaultTableOptions, tableIcons} from "../../common/TableUtils";
 import EnhancedGroupStreamCard from "../../../events/enhanced-group-stream-card/EnhancedGroupStreamCard";
+import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles(theme => ({
     avatar: {
@@ -27,10 +28,12 @@ const UserInnerTable = ({firstName, lastName, streams, group, registered}) => {
             <MaterialTable
                 icons={tableIcons}
                 title={`Events that ${firstName} ${lastName} ${registered ? "registered to" : "participated in"}:`}
+                options={defaultTableOptions}
                 columns={[
                     {
                         field: "companyLogoUrl",
                         title: "Logo",
+                        export: false,
                         render: rowData => (
                             <Avatar className={classes.avatar}
                                     variant="rounded"
@@ -45,20 +48,28 @@ const UserInnerTable = ({firstName, lastName, streams, group, registered}) => {
                         field: "title",
                         title: "Title"
                     },
+                    {
+                        field: "date",
+                        title: "Date",
+                        type: "date",
+                        render: rowData => prettyDate(rowData.start)
+                    },
                 ]}
                 detailPanel={[
                     {
                         icon: tableIcons.SettingsIcon,
                         tooltip: "Manage Event",
-                        render: (rowData) =>
-                            <Paper className={classes.streamManage} variant="outlined" key={rowData.id}>
+                        render: (rowData) => {
+                            console.log("-> rowData in detail panel of inner table", rowData);
+                          return  (<Paper className={classes.streamManage} variant="outlined" key={rowData.id}>
                                 <EnhancedGroupStreamCard
                                     livestream={rowData}
                                     firebase={firebase}
                                     id={rowData.id}
                                     group={group}
                                 />
-                            </Paper>
+                            </Paper>)
+                        }
                     }
                 ]}
                 data={streams}

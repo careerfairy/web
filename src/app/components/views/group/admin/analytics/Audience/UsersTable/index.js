@@ -1,32 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {
-    Avatar,
-    Box,
-    Button,
-    Card,
-    CardContent,
-    CardHeader,
-    Collapse,
-    Divider,
-    Grow,
-    makeStyles, Paper,
-    Slide,
-    Zoom
-} from '@material-ui/core';
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
-import {DataGrid} from '@material-ui/data-grid';
+import {Card, CardHeader, makeStyles, Slide} from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
-import {CustomLoadingOverlay, CustomNoRowsOverlay} from "../../common/Overlays";
 import MaterialTable from "material-table";
 import {defaultTableOptions, exportSelectionAction, LinkifyText, tableIcons} from "../../common/TableUtils";
-import GroupStreamCardV2 from "../../../../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2";
 import {useAuth} from "../../../../../../../HOCs/AuthProvider";
-import Grid from "@material-ui/core/Grid";
-import EnhancedGroupStreamCard from "../../../events/enhanced-group-stream-card/EnhancedGroupStreamCard";
 import {useRouter} from "next/router";
 import {theme} from "../../../../../../../materialUI";
 import UserInnerTable from "./UserInnerTable";
@@ -96,8 +77,6 @@ const UsersTable = ({
                         className,
                         ...rest
                     }) => {
-    const {userData, authenticatedUser} = useAuth()
-    const router = useRouter()
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const {enqueueSnackbar} = useSnackbar()
@@ -340,8 +319,8 @@ const UsersTable = ({
                             title: "Attended Event",
                             type: "boolean",
                             width: 170,
-                            export: currentStream,
-                            hidden: !currentStream
+                            export: Boolean(currentStream),
+                            hidden: Boolean(!currentStream)
                         }
                     ]}
                     detailPanel={[
@@ -349,7 +328,7 @@ const UsersTable = ({
                             icon: tableIcons.AddToPhotosIcon,
                             tooltip: 'See streams registered to',
                             disabled: numberOfStreamsRegistered === 0,
-                            render: <UserInnerTable
+                            render: () => <UserInnerTable
                                 firstName={firstName}
                                 lastName={lastName}
                                 group={group}
@@ -361,7 +340,7 @@ const UsersTable = ({
                             icon: tableIcons.VideoLibraryIcon,
                             tooltip: 'See streams watched',
                             disabled: numberOfStreamsWatched === 0,
-                            render: <UserInnerTable
+                            render: () => <UserInnerTable
                                 firstName={firstName}
                                 lastName={lastName}
                                 group={group}
