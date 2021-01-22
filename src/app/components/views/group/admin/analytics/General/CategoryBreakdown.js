@@ -61,7 +61,7 @@ const CategoryBreakdown = ({
 
     const [localColors, setLocalColors] = useState(colorsArray);
     const [total, setTotal] = useState(0);
-    const [showPercentage, setShowPercentage] = useState(false);
+    const [showPercentage, setShowPercentage] = useState(true);
     const [data, setData] = useState({
         datasets: [],
         labels: [],
