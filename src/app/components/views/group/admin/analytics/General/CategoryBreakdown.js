@@ -23,6 +23,7 @@ import Tab from "@material-ui/core/Tab";
 import CustomLegend from "../../../../../../materialUI/Legends";
 import Chart from 'chart.js';
 import 'chartjs-plugin-labels';
+import {customDonutConfig} from "../common/TableUtils";
 
 Chart.defaults.global.plugins.labels = false;
 
@@ -122,20 +123,7 @@ const CategoryBreakdown = ({
             titleFontColor: theme.palette.text.primary
         },
         plugins: {
-            labels: showPercentage && [{
-                display: false,
-                fontStyle: 'bold',
-                textShadow: true,
-                overlap: true,
-                fontColor: "white",
-                render: ({percentage}) => {
-                    // args will be something like:
-                    // { label: 'Label', value: 123, percentage: 50, index: 0, dataset: {...} }
-                    return percentage > 2 ? percentage + "%" : "";
-                    // return object if it is image
-                    // return { src: 'image.png', width: 16, height: 16 };
-                }
-            }]
+            labels: showPercentage && customDonutConfig
         },
     };
 

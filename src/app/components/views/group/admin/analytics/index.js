@@ -206,7 +206,7 @@ const AnalyticsOverview = ({firebase, group}) => {
     const classes = useStyles();
     const breakdownRef = useRef(null)
     const theme = useTheme()
-    const [value, setValue] = useState(1);
+    const [value, setValue] = useState(0);
 
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
     const [showBar, setShowBar] = useState(false);

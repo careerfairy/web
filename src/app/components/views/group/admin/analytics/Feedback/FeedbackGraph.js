@@ -22,6 +22,8 @@ import {convertStringToArray} from "../../../../../helperFunctions/HelperFunctio
 
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
+import CustomLegend from "../../../../../../materialUI/Legends";
+import {customDonutConfig} from "../common/TableUtils";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -58,7 +60,6 @@ const FeedbackGraph = ({
 
 
     const [localColors, setLocalColors] = useState(colorsArray);
-    const [legendLabels, setLegendLabels] = useState([]);
     const [data, setData] = useState(initialData);
 
     useEffect(() => {
@@ -81,8 +82,6 @@ const FeedbackGraph = ({
                 ],
                 labels: currentPoll.options.map(option => convertStringToArray(option.name))
             })
-            setLegendLabels(currentPoll.options.map(option => ({name: option.name, hidden: false})))
-
         } else {
             setData(initialData)
         }
@@ -116,40 +115,12 @@ const FeedbackGraph = ({
             }
         },
         plugins: {
-            labels: [{
-                fontColor: 'white',
-                render: 'percent',
-                fontStyle: 'bold',
-                arc: true,
-            }]
+            labels: customDonutConfig
         },
     };
 
     const hasNoData = () => {
         return Boolean(!data.datasets.length)
-    }
-
-    const handleClickLegend = (e, legendItem) => {
-        const index = legendItem.index;
-        const chart = chartRef?.current?.chartInstance;
-        let i, iLength, meta;
-        for (i = 0, iLength = (chart.data.datasets || []).length; i < iLength; ++i) {
-            meta = chart.getDatasetMeta(i);
-            // toggle visibility of index if exists
-            if (meta.data[index]) {
-                meta.data[index].hidden = !meta.data[index].hidden;
-                const newLabels = [...legendLabels]
-                newLabels[index].hidden = meta.data[index].hidden
-                setLegendLabels(newLabels)
-            }
-        }
-        chart.update();
-    }
-
-    const active = () => {
-        return Boolean(
-            currentPoll
-        )
     }
 
     return (
@@ -179,25 +150,21 @@ const FeedbackGraph = ({
                         />}
                 </Box>
                 {!hasNoData() &&
-                <List dense>
-                    {currentPoll?.options.map(option => {
-                        return (
-                            <ListItem dense key={option.index} onClick={(e) => handleClickLegend(e, option)} button>
-                                <ListItemIcon style={{minWidth: 0}}>
-                                    <Checkbox
-                                        edge="start"
-                                        style={{color: colorsArray[option.index]}}
-                                        checked={!legendLabels?.[option.index]?.hidden}
-                                    />
-                                </ListItemIcon>
-                                <ListItemText>
-                                    {option.name}
-                                    <br/><strong>[{option.votes} Vote{option.votes !== 1 && "s"}]</strong>
-                                </ListItemText>
-                            </ListItem>)
-                    })}
-                </List>
-                }
+                <Box
+                    display="flex"
+                    justifyContent="center"
+                    mt={2}
+                >
+                    <CustomLegend
+                        options={currentPoll.options}
+                        colors={localColors}
+                        chartRef={chartRef}
+                        fullWidth
+                        chartData={data}
+                        optionDataType="Student"
+                        optionValueProp="count"
+                    />
+                </Box>}
             </CardContent>
         </Card>
     );
