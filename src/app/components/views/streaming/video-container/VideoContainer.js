@@ -12,10 +12,9 @@ import ErrorMessageModal from "../modal/StreamPreparationModalV2/ErrorMessageMod
 import useDevices from 'components/custom-hook/useDevices';
 import SettingsModal from './SettingsModal';
 import {makeStyles} from '@material-ui/core';
-import TutorialContext from "../../../../context/tutorials/TutorialContext";
+import TutorialContext from "context/tutorials/TutorialContext";
 import DemoIntroModal from "../modal/DemoIntroModal";
 import DemoEndModal from "../modal/DemoEndModal";
-import LocalStorageUtil from 'util/LocalStorageUtil';
 import useMediaSources from 'components/custom-hook/useMediaSources';
 import ScreenSharePermissionDeniedModal from '../modal/ScreenSharePermissionDeniedModal';
 import StreamPreparationModal from '../modal/StreamPreparationModal';
@@ -30,14 +29,12 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-
 function VideoContainer(props) {
     const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles, handleConfirmStep, getActiveTutorialStepKey} = useContext(TutorialContext);
 
     const classes = useStyles();
     const devices = useDevices();
     const localVideoId = 'localVideo';
-    const isPlayMode = false;
     const isMainStreamer = props.streamerId === props.currentLivestream.id;
 
     const [errorMessage, setErrorMessage] = useState(null);
@@ -47,10 +44,6 @@ function VideoContainer(props) {
     const [connectionEstablished, setConnectionEstablished] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
 
-    const mediaConstraints = {
-        audio: true,
-        video: true
-    }
     const [audioCounter, setAudioCounter] = useState(0);
     const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
@@ -130,13 +123,23 @@ function VideoContainer(props) {
     }, [props.streamerId, props.currentLivestream.id])
 
     useEffect(() => {
+        if (localMediaStream) {
+            if (props.currentLivestream.currentSpeakerId === props.streamerId && props.currentLivestream.mode !== 'desktop' && props.currentLivestream.mode !== 'presentation') {
+                localMediaStream.setVideoProfile('360p_4')
+            } else {
+                localMediaStream.setVideoProfile('180p_1')
+            }
+        }  
+    }, [localMediaStream, props.currentLivestream.currentSpeakerId, props.currentLivestream.mode])
+
+    useEffect(() => {
         if (externalMediaStreams && props.currentLivestream.currentSpeakerId && isMainStreamer) {
             let existingCurrentSpeaker = externalMediaStreams.find(stream => stream.streamId === props.currentLivestream.currentSpeakerId)
             if (!existingCurrentSpeaker) {
                 setLivestreamCurrentSpeakerId(props.currentLivestream.id);
             }
         }
-    }, [externalMediaStreams]);
+    }, [externalMediaStreams])
 
     useEffect(() => {
         if (numberOfViewers && props.currentLivestream.hasStarted) {
@@ -231,13 +234,11 @@ function VideoContainer(props) {
                     <CurrentSpeakerDisplayer isPlayMode={false}
                         smallScreenMode={props.currentLivestream.mode === 'presentation' ||  props.currentLivestream.mode === 'desktop'}
                         speakerSwitchModeActive={isMainStreamer}
-                        setLivestreamCurrentSpeakerId={setLivestreamCurrentSpeakerId}
                         localId={props.streamerId}
                         localStream={localMediaStream}
                         speakerSource={speakerSource}
                         attachSinkId={attachSinkId}
                         streams={externalMediaStreams}
-                        mediaConstraints={mediaConstraints}
                         currentSpeaker={props.currentLivestream.currentSpeakerId}
                         {...props}
                         muted={false}/>

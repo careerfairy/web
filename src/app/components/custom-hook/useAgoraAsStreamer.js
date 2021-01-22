@@ -89,7 +89,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                     audio: true,
                     video: true
                 });
-                localStream.setVideoProfile("480p_9");
+                localStream.setVideoProfile("180p_1");
                 localStream.init(()=>{
                     setAgoraStatus("publish_stream");
                     localStream.play(videoId);
@@ -142,7 +142,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                     audio: true,
                     video: true
                 });
-                localStream.setVideoProfile("480p_9");
+                localStream.setVideoProfile("180p_1");
                 localStream.init(()=>{
                     localStream.play(videoId);
                     rtcClient.publish(localStream, handleError);
