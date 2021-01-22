@@ -30,6 +30,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import EmailIcon from '@material-ui/icons/Email';
 import LinkedInIcon from '@material-ui/icons/LinkedIn';
+import Linkify from "react-linkify";
 
 export const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref}/>),
@@ -86,6 +87,20 @@ export const exportSelectionAction = (columns = []) => {
                 .exportFile();
         },
     }
+}
+
+const componentDecorator = (href, text, key) => (
+    <a href={href} key={key} target="_blank">
+        {text}
+    </a>
+);
+
+export const LinkifyText = (text) => {
+    return(
+        <Linkify componentDecorator={componentDecorator}>
+            {text}
+        </Linkify>
+    )
 }
 
 export const defaultTableOptions = {

@@ -9,7 +9,7 @@ import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctio
 import {useSnackbar} from "notistack";
 import {CustomLoadingOverlay, CustomNoRowsOverlay} from "../../common/Overlays";
 import MaterialTable from "material-table";
-import {defaultTableOptions, exportSelectionAction, tableIcons} from "../../common/TableUtils";
+import {defaultTableOptions, exportSelectionAction, LinkifyText, tableIcons} from "../../common/TableUtils";
 
 const useStyles = makeStyles(() => ({
     root: {},
@@ -68,7 +68,6 @@ const UsersTable = ({
     const {enqueueSnackbar} = useSnackbar()
     const [expandTable, setExpandTable] = useState(false);
     const [users, setUsers] = useState([]);
-    console.log("-> users", users);
 
     const columns = [
         {
@@ -128,20 +127,6 @@ const UsersTable = ({
 
     }, [totalUniqueUsers])
 
-    const getGroupCategoryColumns = () => {
-        if (group.categories?.length) {
-            return group.categories.map(category => {
-                return {
-                    field: category.name,
-                    title: category.name,
-                    width: 170,
-                }
-            })
-        } else {
-            return []
-        }
-    }
-
     const getCategoryOptionName = (targetCategoryId, user) => {
         if (user.registeredGroups) {
             const targetGroup = user.registeredGroups.find(groupObj => groupObj.groupId === group.id)
@@ -177,14 +162,14 @@ const UsersTable = ({
 
     const mapStreamsWatched = () => {
         const updatedUsers = totalUniqueUsers.map(user => {
-            user.watchedEvent = "No"
+            user.watchedEvent = false
             const currentUserEmail = user.userEmail
             if (currentUserEmail) {
                 const watchedStreams = []
                 streamsFromTimeFrameAndFuture.forEach(stream => {
                     if (stream?.participatingStudents?.some(userEmail => userEmail === currentUserEmail)) {
                         watchedStreams.push(stream)
-                        user.watchedEvent = "Yes"
+                        user.watchedEvent = true
                     }
                 })
                 user.streamsWatched = watchedStreams.length
@@ -224,10 +209,16 @@ const UsersTable = ({
 
     const handleCopyLinkedin = () => {
         const linkedInAddresses = selection.filter(user => user.linkedinUrl).map(user => user.linkedinUrl).join(",")
-        copyStringToClipboard(linkedInAddresses)
-        enqueueSnackbar("LinkedIn addresses have been copied!", {
-            variant: "success"
-        })
+        if (linkedInAddresses?.length) {
+            copyStringToClipboard(linkedInAddresses)
+            enqueueSnackbar("LinkedIn addresses have been copied!", {
+                variant: "success"
+            })
+        } else {
+            enqueueSnackbar("None of your selections have linkedIn Addresses", {
+                variant: "warning"
+            })
+        }
     }
 
     const shouldHide = () => {
@@ -255,38 +246,37 @@ const UsersTable = ({
                         {
                             field: "firstName",
                             title: "First Name",
-                            width: 140,
                         },
                         {
                             field: "lastName",
                             title: "Last Name",
-                            width: 140,
                         },
                         {
                             field: "linkedinUrl",
                             title: "LinkedIn",
-                            width: 180,
+                            render: (rowData) => LinkifyText(rowData.linkedinUrl)
                         },
                         {
                             field: "universityName",
                             title: "University",
-                            width: 150,
                         },
                         {
                             field: "streamsWatched",
                             title: "Events Attended",
-                            width: 150,
+                            type: "numeric"
                         },
                         {
                             field: "streamsRegistered",
                             title: "Events Registered To",
                             width: 170,
+                            type: "numeric"
                         },
                         {
                             field: "userEmail",
                             title: "Email",
                             width: 200,
                             hidden: userType.propertyName !== "talentPool",
+                            export: userType.propertyName === "talentPool",
                             render: ({id}) => (
                                 <a href={`mailto:${id}`}>
                                     {id}
@@ -296,7 +286,9 @@ const UsersTable = ({
                         {
                             field: "watchedEvent",
                             title: "Attended Event",
+                            type: "boolean",
                             width: 170,
+                            export: currentStream,
                             hidden: !currentStream
                         }
                     ]}
