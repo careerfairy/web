@@ -93,6 +93,7 @@ const FeedbackTable = ({
 
     }, [streamDataType.propertyName, currentStream])
 
+
     const handleDisplayTable = (rowData) => {
         setCurrentRating(rowData)
         handleScrollToSideRef()

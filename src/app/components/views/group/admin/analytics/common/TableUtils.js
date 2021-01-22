@@ -4,17 +4,19 @@ import {getMinutes, prettyDate} from "../../../../../helperFunctions/HelperFunct
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import {Rating} from "@material-ui/lab";
-import {Box, useTheme} from "@material-ui/core";
+import {Box} from "@material-ui/core";
 import {CsvBuilder} from "filefy";
 
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import Check from '@material-ui/icons/Check';
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import Clear from '@material-ui/icons/Clear';
 import DeleteOutline from '@material-ui/icons/DeleteOutline';
 import Edit from '@material-ui/icons/Edit';
+import EditIcon from '@material-ui/icons/Edit';
 import FilterList from '@material-ui/icons/FilterList';
 import FirstPage from '@material-ui/icons/FirstPage';
 import LastPage from '@material-ui/icons/LastPage';
@@ -25,8 +27,6 @@ import ViewColumn from '@material-ui/icons/ViewColumn';
 import InsertChartOutlinedIcon from '@material-ui/icons/InsertChartOutlined';
 import InsertChartIcon from '@material-ui/icons/InsertChart';
 import BallotIcon from '@material-ui/icons/Ballot';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import EditIcon from "@material-ui/icons/Edit";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import EmailIcon from '@material-ui/icons/Email';
 import LinkedInIcon from '@material-ui/icons/LinkedIn';
@@ -37,6 +37,7 @@ import VideoLibraryOutlinedIcon from '@material-ui/icons/VideoLibraryOutlined';
 import LibraryAddOutlinedIcon from '@material-ui/icons/LibraryAddOutlined';
 import DeleteForeverOutlinedIcon from '@material-ui/icons/DeleteForeverOutlined';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
+import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 
 import Linkify from "react-linkify";
 
@@ -72,18 +73,19 @@ export const tableIcons = {
     VideoLibraryOutlinedIcon: forwardRef((props, ref) => <VideoLibraryOutlinedIcon {...props} ref={ref}/>),
     LibraryAddOutlinedIcon: forwardRef((props, ref) => <LibraryAddOutlinedIcon {...props} ref={ref}/>),
     DeleteForeverIcon: forwardRef((props, ref) => <DeleteForeverIcon {...props} ref={ref}/>),
+    RotateLeftIcon: forwardRef((props, ref) => <RotateLeftIcon {...props} ref={ref}/>),
     DeleteForeverOutlinedIcon: forwardRef((props, ref) => <DeleteForeverOutlinedIcon {...props} ref={ref}/>)
 };
 
-export const exportSelectionAction = (columns = []) => {
+export const exportSelectionAction = (columns = [], title="Selected_Table") => {
     return {
         position: "toolbarOnSelect",
         icon: SaveAlt,
         tooltip: "Export the selected rows!",
         onClick: (e, rowData) => {
-            const fileName = "TestDate_Table";
+            const tableTitle = title.split(" ").join("_")
             const builder = new CsvBuilder(
-                fileName + ".csv"
+                tableTitle + ".csv"
             );
             builder
                 .setColumns(
@@ -124,6 +126,7 @@ export const defaultTableOptions = {
     pageSize: 5,
     pageSizeOptions: [3, 5, 10, 25, 50, 100, 200],
     minBodyHeight: 200,
+    exportAllData: true,
     exportButton: {csv: true, pdf: true}// PDF is false because its buggy and throws errors
 }
 

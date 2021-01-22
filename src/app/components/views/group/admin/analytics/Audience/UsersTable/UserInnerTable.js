@@ -32,7 +32,7 @@ const UserInnerTable = ({firstName, lastName, streams, group, registered, fireba
     const customOptions = {...defaultTableOptions}
     const innerTableStyle = {background: fade(theme.palette.navyBlue.main, 0.05)}
     customOptions.selection = false
-    customOptions.pageSize = 3
+    customOptions.pageSize = 2
     customOptions.headerStyle = innerTableStyle
 
     return (

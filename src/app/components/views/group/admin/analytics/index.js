@@ -16,8 +16,6 @@ import {
     handleFlattenOptionsWithoutLvlOfStudy
 } from "../../../../helperFunctions/streamFormFunctions";
 import Feedback from "./Feedback";
-import {prettyDate} from "../../../../helperFunctions/HelperFunctions";
-import {number} from "prop-types";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -151,6 +149,12 @@ const globalTimeFrames = [
 
 const userTypes = [
     {
+        propertyName: "talentPool",
+        displayName: "Talent Pool",
+        propertyDataName: "talentPoolData",
+        universityPropertyDataName: "universityTalentPoolData"
+    },
+    {
         propertyName: "registeredUsers",
         displayName: "Registered Users",
         propertyDataName: "registeredUsersData",
@@ -162,12 +166,6 @@ const userTypes = [
         propertyDataName: "participatingStudentsData",
         universityPropertyDataName: "universityParticipatingStudentsData"
     },
-    {
-        propertyName: "talentPool",
-        displayName: "Talent Pool",
-        propertyDataName: "talentPoolData",
-        universityPropertyDataName: "universityTalentPoolData"
-    }
 ]
 const streamDataTypes = [
     {
@@ -407,6 +405,11 @@ const AnalyticsOverview = ({firebase, group}) => {
         setShowBar(!showBar)
     }
 
+    const handleReset = () => {
+        setCurrentStream(null)
+        setUserType(userTypes[0])
+    }
+
     const streamsFromTimeFrame = useMemo(() => getStreamsFromTimeFrame(globalTimeFrame.globalDate), [
         livestreams, globalTimeFrame
     ]);
@@ -455,6 +458,7 @@ const AnalyticsOverview = ({firebase, group}) => {
             currentStream,
             setCurrentStream,
             userType,
+            handleReset,
             userTypes,
             setUserType,
             groupOptions

@@ -47,6 +47,7 @@ const CategoryBreakdown = ({
                                breakdownRef,
                                setUserType,
                                userType,
+                               handleReset,
                                setCurrentCategory,
                                currentCategory,
                                className,
@@ -141,10 +142,7 @@ const CategoryBreakdown = ({
     const hasNoData = () => {
         return Boolean(typesOfOptions.length && total === 0)
     }
-    const handleReset = () => {
-        setCurrentStream(null)
-        setUserType(userTypes[0])
-    }
+
 
     const handleMenuItemClick = (event, index) => {
         setUserType(userTypes[index])

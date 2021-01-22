@@ -74,6 +74,7 @@ const UsersTable = ({
                         firebase,
                         setUserType,
                         futureStreams,
+                        handleReset,
                         totalUniqueUsers,
                         streamsFromTimeFrameAndFuture,
                         breakdownRef,
@@ -142,6 +143,7 @@ const UsersTable = ({
         mapUserCategories()
         mapStreamsWatched()
         mapStreamsRegistered()
+        setSelection([])
 
     }, [totalUniqueUsers])
 
@@ -255,6 +257,8 @@ const UsersTable = ({
 
 
     const isTalentPool = () => userType.propertyName === "talentPool"
+
+    const getTitle = () => currentStream ? `For ${currentStream.company} on ${prettyDate(currentStream.start)}` : "For all Events"
 
     return (
         <Slide direction="up" unmountOnExit mountOnEnter in={!shouldHide()}>
@@ -379,7 +383,7 @@ const UsersTable = ({
 
                     ]}
                     actions={[
-                        exportSelectionAction(columns),
+                        exportSelectionAction(columns, getTitle()),
                         (rowData) => ({
                             tooltip: !(rowData.length === 0 || !isTalentPool()) && "Copy Emails",
                             position: "toolbarOnSelect",
@@ -394,11 +398,19 @@ const UsersTable = ({
                             disabled: (rowData.length === 0 || !isTalentPool()),
                             onClick: handleCopyLinkedin
                         }),
+                        {
+                            disabled: !Boolean(currentStream),
+                            tooltip: currentStream && "Set back to overall",
+                            isFreeAction: true,
+                            icon: tableIcons.RotateLeftIcon,
+                            hidden: !Boolean(currentStream),
+                            onClick: handleReset
+                        }
                     ]}
                     onSelectionChange={(rows) => {
                         setSelection(rows);
                     }}
-                    title={currentStream && `For ${currentStream.company} on ${prettyDate(currentStream.start)}`}
+                    title={getTitle()}
                 />
             </Card>
         </Slide>

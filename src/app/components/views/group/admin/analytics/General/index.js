@@ -28,6 +28,7 @@ const General = ({
                      streamsFromTimeFrame,
                      streamsFromTimeFrameAndFuture,
                      handleScrollToBreakdown,
+                     handleReset,
                      totalFollowers,
                      userTypes,
                      userType,
@@ -271,6 +272,7 @@ const General = ({
                         typesOfOptions={typesOfOptions}
                         userType={userType}
                         userTypes={userTypes}
+                        handleReset={handleReset}
                         setCurrentCategory={setCurrentCategory}
                         currentCategory={currentCategory}
                         setUserType={setUserType}

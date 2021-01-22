@@ -24,6 +24,7 @@ const Audience = ({
                       userTypes,
                       fetchingStreams,
                       streamsFromTimeFrame,
+                      handleReset,
                       streamsFromTimeFrameAndFuture,
                       groupOptions,
                       handleToggleBar,
@@ -85,6 +86,7 @@ const Audience = ({
                         currentStream={currentStream}
                         fetchingStreams={fetchingStreams}
                         userTypes={userTypes}
+                        handleReset={handleReset}
                         setUserType={setUserType}
                         groupOptions={groupOptions}
                         breakdownRef={breakdownRef}
