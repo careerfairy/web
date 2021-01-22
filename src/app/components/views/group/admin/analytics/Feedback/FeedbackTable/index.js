@@ -21,6 +21,7 @@ import IconButton from "@material-ui/core/IconButton";
 import MaterialTable from "material-table";
 import FeedbackGraph from "../FeedbackGraph";
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import {fade} from "@material-ui/core/styles";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -258,6 +259,9 @@ const FeedbackTable = ({
         },
     ]
 
+    const customOptions = {...defaultTableOptions}
+    customOptions.selection = false
+
     const handleCloseFeedbackModal = () => {
         setFeedbackModal(prevState => ({...prevState, open: false}))
     }
@@ -278,6 +282,30 @@ const FeedbackTable = ({
     }
     const isPoll = () => {
         return Boolean(streamDataType.propertyName === "pollEntries")
+    }
+
+    function addMinutes(date, minutes) {
+        return new Date(date.getTime() + minutes * 60000);
+    }
+
+    const canEdit = ({appearAfter, isForEnd}) => {
+        if (currentStream && appearAfter) {
+            const {start, hasEnded} = currentStream
+            if (hasEnded) {
+                return false
+            }
+            const now = new Date()
+            const streamStart = start?.toDate()
+            const editDeadline = addMinutes(streamStart, appearAfter)
+            const editHardDeadline = addMinutes(streamStart, 720)
+            if (now > editDeadline) {
+                return false
+            }
+            return !(isForEnd && now > editHardDeadline);
+
+        } else {
+            return false
+        }
     }
 
 
@@ -311,17 +339,19 @@ const FeedbackTable = ({
                     icons={tableIcons}
                     {...tableData}
                     isLoading={fetchingStreams}
-                    options={defaultTableOptions}
+                    options={customOptions}
                     actions={[
                         exportSelectionAction(tableData.columns),
-                        {
+                        rowData => ({
                             icon: tableIcons.EditIcon,
                             iconProps: {color: "primary"},
                             hidden: !isFeedback(),
+                            disabled: !canEdit(rowData),
                             position: "row",
                             tooltip: 'Edit',
-                            onClick: (event, rowData) => handleEditFeedback(rowData)
-                        }, {
+                            onClick: (event, rowData) => handleEditFeedback(rowData),
+                        })
+                        , {
                             icon: tableIcons.DeleteForeverIcon,
                             iconProps: {color: "primary"},
                             hidden: !isFeedback(),
@@ -338,15 +368,15 @@ const FeedbackTable = ({
                             onClick: handleCreateFeedback
 
                         },
-                        // (rowData) => ({
-                        //     icon: tableIcons.ArrowDownwardIcon,
-                        //     hidden: !isFeedback(),
-                        //     position: "row",
-                        //     disabled: rowData?.votes === 0,
-                        //     iconProps: {color: "green"},
-                        //     tooltip: 'Display Table',
-                        //     onClick: (rowData) => handleDisplayTable(rowData)
-                        // })
+                        (rowData) => ({
+                            icon: tableIcons.ArrowDownwardIcon,
+                            hidden: !isFeedback(),
+                            position: "row",
+                            disabled: rowData?.votes === 0,
+                            iconProps: {color: "green"},
+                            tooltip: 'Display Table',
+                            onClick: (event, rowData) => handleDisplayTable(rowData)
+                        })
                     ]}
                     onSelectionChange={(rows) => {
                         setSelection(rows);
