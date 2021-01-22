@@ -5,6 +5,7 @@ import MaterialTable from "material-table";
 import {defaultTableOptions, tableIcons} from "../../common/TableUtils";
 import EnhancedGroupStreamCard from "../../../events/enhanced-group-stream-card/EnhancedGroupStreamCard";
 import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
+import {useRouter} from "next/router";
 
 const useStyles = makeStyles(theme => ({
     avatar: {
@@ -13,7 +14,8 @@ const useStyles = makeStyles(theme => ({
         "& img": {
             objectFit: "contain"
         },
-        boxShadow: theme.shadows[1]
+        boxShadow: theme.shadows[1],
+        padding: theme.spacing(1)
     },
     streamManage:{
         background: theme.palette.navyBlue.main,
@@ -21,8 +23,9 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const UserInnerTable = ({firstName, lastName, streams, group, registered}) => {
+const UserInnerTable = ({firstName, lastName, streams, group, registered, firebase}) => {
     const classes = useStyles()
+    const router = useRouter()
     return (
         <Collapse in mountOnEnter unmountOnExit>
             <MaterialTable
@@ -60,12 +63,12 @@ const UserInnerTable = ({firstName, lastName, streams, group, registered}) => {
                         icon: tableIcons.SettingsIcon,
                         tooltip: "Manage Event",
                         render: (rowData) => {
-                            console.log("-> rowData in detail panel of inner table", rowData);
                           return  (<Paper className={classes.streamManage} variant="outlined" key={rowData.id}>
                                 <EnhancedGroupStreamCard
                                     livestream={rowData}
                                     firebase={firebase}
                                     id={rowData.id}
+                                    router={router}
                                     group={group}
                                 />
                             </Paper>)

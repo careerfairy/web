@@ -113,7 +113,8 @@ export const defaultTableOptions = {
     filtering: true,
     selection: true,
     pageSize: 5,
-    pageSizeOptions: [5, 10, 25, 50, 100, 200],
+    pageSizeOptions: [3, 5, 10, 25, 50, 100, 200],
+    minBodyHeight: 200,
     exportButton: {csv: true, pdf: false}// PDF is false because its buggy and throws errors
 }
 

@@ -276,14 +276,6 @@ const UsersTable = ({
                             },
                         },
                         {
-                            field: "linkedinUrl",
-                            title: "LinkedIn",
-                            render: (rowData) => LinkifyText(rowData.linkedinUrl),
-                            cellStyle: {
-                                width: 300,
-                            },
-                        },
-                        {
                             field: "universityName",
                             title: "University",
                             cellStyle: {
@@ -315,6 +307,14 @@ const UsersTable = ({
                             },
                         },
                         {
+                            field: "linkedinUrl",
+                            title: "LinkedIn",
+                            render: (rowData) => LinkifyText(rowData.linkedinUrl),
+                            cellStyle: {
+                                width: 300,
+                            },
+                        },
+                        {
                             field: "watchedEvent",
                             title: "Attended Event",
                             type: "boolean",
@@ -326,23 +326,25 @@ const UsersTable = ({
                     detailPanel={[
                         ({numberOfStreamsRegistered, streamsRegistered, firstName, lastName}) => ({
                             icon: tableIcons.AddToPhotosIcon,
-                            tooltip: 'See streams registered to',
+                            tooltip: `See streams ${firstName} registered to`,
                             disabled: numberOfStreamsRegistered === 0,
                             render: () => <UserInnerTable
                                 firstName={firstName}
                                 lastName={lastName}
                                 group={group}
                                 streams={streamsRegistered}
+                                firebase={firebase}
                                 registered
                             />
                         }),
                         ({numberOfStreamsWatched, streamsWatched, firstName, lastName}) => ({
                             icon: tableIcons.VideoLibraryIcon,
-                            tooltip: 'See streams watched',
+                            tooltip: `See streams ${firstName} watched`,
                             disabled: numberOfStreamsWatched === 0,
                             render: () => <UserInnerTable
                                 firstName={firstName}
                                 lastName={lastName}
+                                firebase={firebase}
                                 group={group}
                                 streams={streamsWatched}
                             />
