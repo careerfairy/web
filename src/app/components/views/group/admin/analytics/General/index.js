@@ -45,6 +45,7 @@ const General = ({
                  }) => {
     const classes = useStyles()
     const [currentCategory, setCurrentCategory] = useState({options:[]});
+    const [localUserType, setLocalUserType] = useState(userTypes[0]);
 
     useEffect(() => {
         if (group.categories?.length) {
@@ -203,8 +204,8 @@ const General = ({
     );
 
     const typesOfOptions = useMemo(
-        () => getTypeOfStudents(userType.propertyDataName),
-        [streamsFromTimeFrameAndFuture, currentStream, userType, currentCategory.id]
+        () => getTypeOfStudents(localUserType.propertyDataName),
+        [streamsFromTimeFrameAndFuture, currentStream, localUserType, currentCategory.id]
     );
 
     return (
@@ -270,7 +271,8 @@ const General = ({
                         currentStream={currentStream}
                         breakdownRef={breakdownRef}
                         typesOfOptions={typesOfOptions}
-                        userType={userType}
+                        localUserType={localUserType}
+                        setLocalUserType={setLocalUserType}
                         userTypes={userTypes}
                         handleReset={handleReset}
                         setCurrentCategory={setCurrentCategory}

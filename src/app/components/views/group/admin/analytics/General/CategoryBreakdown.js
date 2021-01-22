@@ -46,10 +46,11 @@ const CategoryBreakdown = ({
                                userTypes,
                                breakdownRef,
                                setUserType,
-                               userType,
                                handleReset,
                                setCurrentCategory,
                                currentCategory,
+                               localUserType,
+                               setLocalUserType,
                                className,
                                ...rest
                            }) => {
@@ -145,7 +146,7 @@ const CategoryBreakdown = ({
 
 
     const handleMenuItemClick = (event, index) => {
-        setUserType(userTypes[index])
+        setLocalUserType(userTypes[index])
     };
 
     const handleGroupCategorySelect = ({target: {value}}) => {
@@ -166,7 +167,7 @@ const CategoryBreakdown = ({
             {...rest}
         >
             <CardHeader
-                title={`Breakdown of ${userType.displayName}`}
+                title={`Breakdown of ${localUserType.displayName}`}
                 ref={breakdownRef}
                 subheader={
                     currentStream ? `That attended ${currentStream.company} on ${prettyDate(currentStream.start)}` : "on average"
@@ -184,7 +185,7 @@ const CategoryBreakdown = ({
             />
             <Divider/>
             <Tabs
-                value={userType.propertyName}
+                value={localUserType.propertyName}
                 indicatorColor="primary"
                 textColor="primary"
                 variant="scrollable"
@@ -240,7 +241,7 @@ const CategoryBreakdown = ({
                     {hasNoData() ?
                         <>
                             <Typography>
-                                Not enough {userType.displayName} data
+                                Not enough {localUserType.displayName} data
                             </Typography>
                             <Button size="small"
                                     variant="text"

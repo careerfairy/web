@@ -167,6 +167,7 @@ const userTypes = [
         universityPropertyDataName: "universityParticipatingStudentsData"
     },
 ]
+
 const streamDataTypes = [
     {
         propertyName: "questions",
@@ -186,17 +187,21 @@ const AnalyticsOverview = ({firebase, group}) => {
     const userDataSets = [
         {
             id: uuid(),
-            dataSet: "followers",
-            displayName: "Subscribed students",
-            miscName: "All subscribed students"
-        },
-        {
-            id: uuid(),
             dataSet: "groupUniversityStudents",
             displayName: `${group.universityName} students`,
             miscName: `Only ${group.universityName} students`
         },
+        {
+            id: uuid(),
+            dataSet: "followers",
+            displayName: "Subscribed students",
+            miscName: "All subscribed students"
+        },
     ]
+
+    if (!group.universityCode) {
+        userDataSets.shift()
+    }
 
     const classes = useStyles();
     const breakdownRef = useRef(null)
@@ -217,10 +222,19 @@ const AnalyticsOverview = ({firebase, group}) => {
     const [fetchingQuestions, setFetchingQuestions] = useState(false);
     const [fetchingRatings, setFetchingRatings] = useState(false);
     const [fetchingPolls, setFetchingPolls] = useState(false);
+    const [limitedUserTypes, setLimitedUserTypes] = useState(userTypes);
     const [totalStudentsOfGroupUniversity, setTotalStudentsOfGroupUniversity] = useState(null);
     const [fetchingStudentsOfGroupUniversity, setFetchingStudentsOfGroupUniversity] = useState(false);
     const [currentUserDataSet, setCurrentUserDataSet] = useState(userDataSets[0]);
 
+    useEffect(() => {
+        if (currentUserDataSet.dataSet === "followers") {
+            const limitedUserTypes = userTypes.filter(({propertyName}) => propertyName === "talentPool")
+            setLimitedUserTypes(limitedUserTypes)
+        } else {
+            setLimitedUserTypes(userTypes)
+        }
+    }, [currentUserDataSet.dataSet])
 
     useEffect(() => {
         const flattenedGroupOptions = handleFlattenOptions(group)
@@ -425,6 +439,9 @@ const AnalyticsOverview = ({firebase, group}) => {
     const streamsFromTimeFrameAndFuture = useMemo(() => [...streamsFromTimeFrame, ...futureStreams], [
         futureStreams, streamsFromTimeFrame, globalTimeFrame
     ]);
+    const isFollowers = useMemo(() => currentUserDataSet.dataSet === "followers", [
+        currentUserDataSet
+    ]);
 
     const getTabProps = () => {
         return {
@@ -438,6 +455,7 @@ const AnalyticsOverview = ({firebase, group}) => {
             showBar,
             streamDataType,
             setStreamDataType,
+            isFollowers,
             fetchingPolls,
             fetchingQuestions,
             fetchingRatings,
@@ -450,6 +468,7 @@ const AnalyticsOverview = ({firebase, group}) => {
             setGlobalTimeFrame,
             fetchingFollowers,
             breakdownRef,
+            limitedUserTypes,
             handleScrollToBreakdown,
             totalFollowers,
             totalStudentsOfGroupUniversity,

@@ -74,6 +74,7 @@ const UsersTable = ({
                         firebase,
                         setUserType,
                         futureStreams,
+                        isFollowers,
                         handleReset,
                         totalUniqueUsers,
                         streamsFromTimeFrameAndFuture,
@@ -85,7 +86,6 @@ const UsersTable = ({
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const {enqueueSnackbar} = useSnackbar()
-    const [expandTable, setExpandTable] = useState(false);
     const [users, setUsers] = useState([]);
 
     const columns = [
@@ -214,11 +214,6 @@ const UsersTable = ({
             return currentUser
         })
         setUsers(updatedUsers)
-    }
-
-
-    const toggleTable = () => {
-        setExpandTable(!expandTable)
     }
 
     const handleCopyEmails = () => {

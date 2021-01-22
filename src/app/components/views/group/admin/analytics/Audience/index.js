@@ -19,9 +19,10 @@ const Audience = ({
                       group,
                       globalTimeFrame,
                       futureStreams,
+                      isFollowers,
                       userType,
                       setUserType,
-                      userTypes,
+                      limitedUserTypes,
                       fetchingStreams,
                       streamsFromTimeFrame,
                       handleReset,
@@ -71,7 +72,7 @@ const Audience = ({
                         fetchingStreams={fetchingStreams}
                         streamsFromTimeFrame={streamsFromTimeFrame}
                         userType={userType}
-                        userTypes={userTypes}
+                        userTypes={limitedUserTypes}
                         currentStream={currentStream}
                         handleToggleBar={handleToggleBar}
                         showBar={showBar}
@@ -85,10 +86,11 @@ const Audience = ({
                         totalUniqueUsers={totalUniqueUsers}
                         currentStream={currentStream}
                         fetchingStreams={fetchingStreams}
-                        userTypes={userTypes}
+                        userTypes={limitedUserTypes}
                         handleReset={handleReset}
                         setUserType={setUserType}
                         groupOptions={groupOptions}
+                        isFollowers={isFollowers}
                         breakdownRef={breakdownRef}
                         futureStreams={futureStreams}
                         streamsFromTimeFrameAndFuture={streamsFromTimeFrameAndFuture}
