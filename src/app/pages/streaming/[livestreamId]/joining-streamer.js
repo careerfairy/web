@@ -56,9 +56,15 @@ function StreamingPage(props) {
 
     useEffect(() => {
         if (livestreamId) {
-            let uuid = uuidv4()
-            let joiningId = uuid.replaceAll('-', '')
-            setStreamerId(livestreamId + joiningId)
+            if (localStorage.getItem('streamingUuid')) {
+                let storedUuid = localStorage.getItem('streamingUuid')
+                setStreamerId(livestreamId + storedUuid)
+            } else {
+                let uuid = uuidv4()
+                let joiningId = uuid.replaceAll('-', '')
+                localStorage.setItem('streamingUuid', joiningId)
+                setStreamerId(livestreamId + joiningId)
+            }        
         }
     }, [livestreamId])
 
