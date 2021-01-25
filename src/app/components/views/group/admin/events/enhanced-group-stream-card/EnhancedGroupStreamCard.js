@@ -335,16 +335,16 @@ const EnhancedGroupStreamCard = ({
                             <PDFDownloadLink fileName="somename.pdf"
                                              document={
                                                  <LivestreamPdfReport group={group}
-                                                                      livestream={livestream}
-                                                                      studentStats={studentStats}
-                                                                      speakers={livestream.speakers}
-                                                                      overallRating={overallRating}
-                                                                      contentRating={contentRating}
-                                                                      totalStudentsInTalentPool={talentPoolForReport.length}
-                                                                      totalViewerFromOutsideETH={participatingStudents.length - participatingStudentsFromGroup.length}
-                                                                      totalViewerFromETH={participatingStudentsFromGroup.length}
-                                                                      questions={questions} polls={polls}
-                                                                      icons={icons}/>}>
+                                                    livestream={livestream}
+                                                    studentStats={studentStats}
+                                                    speakers={livestreamSpeakers}
+                                                    overallRating={overallRating}
+                                                    contentRating={contentRating}
+                                                    totalStudentsInTalentPool={talentPoolForReport.length}
+                                                    totalViewerFromOutsideETH={participatingStudents.length - participatingStudentsFromGroup.length}
+                                                    totalViewerFromETH={participatingStudentsFromGroup.length}
+                                                    questions={questions} polls={polls}
+                                                    icons={icons}/>}>
                                 {({blob, url, loading, error}) => (
                                     <div>
                                         <Button className={classes.button} fullWidth variant='outlined' color='primary'>Download
