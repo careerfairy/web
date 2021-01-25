@@ -1,2 +1,4 @@
 export const speakerPlaceholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media"
 export const GENERAL_ERROR = "Something went wrong."
+
+export const LONG_NUMBER = 9999999

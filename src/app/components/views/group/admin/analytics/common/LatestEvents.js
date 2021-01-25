@@ -283,26 +283,26 @@ const LatestEvents = ({
                     }
                     title="Latest Events"
                 />
-                {!isFeedback &&
-                <>
-                    <Divider/>
-                    <Tabs
-                        value={userType.propertyName}
-                        indicatorColor="primary"
-                        textColor="primary"
-                        scrollButtons="auto"
-                        aria-label="disabled tabs example"
-                    >
-                        {userTypes.map(({displayName, propertyName}, index) => (
-                            <Tab
-                                key={propertyName}
-                                value={propertyName}
-                                onClick={(event) => handleMenuItemClick(event, index)}
-                                label={displayName}
-                            />
-                        ))}
-                    </Tabs>
-                </>}
+                {/*{!isFeedback &&*/}
+                {/*<>*/}
+                {/*    <Divider/>*/}
+                {/*    <Tabs*/}
+                {/*        value={userType.propertyName}*/}
+                {/*        indicatorColor="primary"*/}
+                {/*        textColor="primary"*/}
+                {/*        scrollButtons="auto"*/}
+                {/*        aria-label="disabled tabs example"*/}
+                {/*    >*/}
+                {/*        {userTypes.map(({displayName, propertyName}, index) => (*/}
+                {/*            <Tab*/}
+                {/*                key={propertyName}*/}
+                {/*                value={propertyName}*/}
+                {/*                onClick={(event) => handleMenuItemClick(event, index)}*/}
+                {/*                label={displayName}*/}
+                {/*            />*/}
+                {/*        ))}*/}
+                {/*    </Tabs>*/}
+                {/*</>}*/}
                 <Divider/>
                 <CardContent>
                     <Box display="flex" alignItems="center" justifyContent="center" height={400}>

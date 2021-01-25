@@ -20,9 +20,11 @@ import {Formik} from "formik";
 import FormControl from "@material-ui/core/FormControl";
 import {withFirebase} from "../../../../../../../context/firebase";
 import {useTheme} from "@material-ui/core/styles";
+import {LONG_NUMBER} from "../../../../../../util/constants";
+import {getMinutes} from "../../../../../../helperFunctions/HelperFunctions";
 
 const marks = [
-    5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150, 160, 180, 9999999
+    5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150, 160, 180, LONG_NUMBER
 ];
 
 const FeedbackModal = ({
@@ -34,9 +36,7 @@ const FeedbackModal = ({
     const theme = useTheme()
     const fullScreen = useMediaQuery(theme.breakpoints.down("xs"))
 
-    function valuetext(value) {
-        return value === 9999999 ? "stream Ends" : `${value} minutes`;
-    }
+
 
     const isForEnd = (appearAfter) => {
         return Boolean(appearAfter === marks[marks.length - 1])
@@ -147,7 +147,7 @@ const FeedbackModal = ({
                                     >
                                         {marks.map(value => (
                                             <MenuItem key={value} value={value}>
-                                                {valuetext(value)}
+                                                {getMinutes(value)}
                                             </MenuItem>
                                         ))}
                                     </Select>

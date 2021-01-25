@@ -1,10 +1,9 @@
-import React, {useMemo, useRef, useState} from "react";
+import React, {useMemo} from "react";
 import {Container, Grid} from "@material-ui/core";
 
 import {makeStyles} from "@material-ui/core/styles";
 import LatestEvents from "../common/LatestEvents";
 import UsersTable from "./UsersTable";
-import TypeOfParticipants from "../General/TypeOfParticipants";
 
 
 const useStyles = makeStyles(theme => ({
@@ -20,11 +19,13 @@ const Audience = ({
                       group,
                       globalTimeFrame,
                       futureStreams,
+                      isFollowers,
                       userType,
                       setUserType,
-                      userTypes,
+                      limitedUserTypes,
                       fetchingStreams,
                       streamsFromTimeFrame,
+                      handleReset,
                       streamsFromTimeFrameAndFuture,
                       groupOptions,
                       handleToggleBar,
@@ -71,7 +72,7 @@ const Audience = ({
                         fetchingStreams={fetchingStreams}
                         streamsFromTimeFrame={streamsFromTimeFrame}
                         userType={userType}
-                        userTypes={userTypes}
+                        userTypes={limitedUserTypes}
                         currentStream={currentStream}
                         handleToggleBar={handleToggleBar}
                         showBar={showBar}
@@ -85,7 +86,11 @@ const Audience = ({
                         totalUniqueUsers={totalUniqueUsers}
                         currentStream={currentStream}
                         fetchingStreams={fetchingStreams}
+                        userTypes={limitedUserTypes}
+                        handleReset={handleReset}
+                        setUserType={setUserType}
                         groupOptions={groupOptions}
+                        isFollowers={isFollowers}
                         breakdownRef={breakdownRef}
                         futureStreams={futureStreams}
                         streamsFromTimeFrameAndFuture={streamsFromTimeFrameAndFuture}

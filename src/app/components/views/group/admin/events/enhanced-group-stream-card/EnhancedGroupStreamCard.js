@@ -49,7 +49,7 @@ const EnhancedGroupStreamCard = ({
                                      livestream,
                                      group,
                                      isPastLivestream,
-                                     levelOfStudyModalOpen,
+                                     levelOfStudyModalOpen = false,
                                      handleCloseLevelOfStudyModal,
                                      handleOpenLevelOfStudyModal,
                                      switchToNextLivestreamsTab,
