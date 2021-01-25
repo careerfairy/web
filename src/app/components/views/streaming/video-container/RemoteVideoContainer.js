@@ -14,8 +14,6 @@ function RemoteVideoContainer(props) {
     const {getActiveTutorialStepKey, handleConfirmStep} = useContext(TutorialContext);
     const videoElement = useRef({ current: {} });
 
-    const [stoppedByUserAgent, setStoppedByUserAgent] = useState(false);
-
     const activeStep = getActiveTutorialStepKey();
 
     useEffect(() => {
@@ -51,13 +49,9 @@ function RemoteVideoContainer(props) {
     },[props.play])
 
     useEffect(() => {
-        if (props.muted) {
-            // Had to add questionmarks because it would crash when handraising in demo mode
-            // (ONYL IN DEMO MODE) normal handraise works
+        if (props.muted) { 
             props.stream?.stream?.muteAudio()
         } else {
-            // Had to add questionmarks because it would crash when handraising in demo mode
-            // (ONYL IN DEMO MODE) normal handraise works
             props.stream?.stream?.unmuteAudio()
         }
     },[props.muted])
@@ -73,9 +67,9 @@ function RemoteVideoContainer(props) {
 
     function playVideo() {
         if (!props.stream.stream.isPlaying()) {
-            props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover' }, err => {
-                if (!err) {
-                    setStoppedByUserAgent(false);
+            props.stream.stream.play(props.stream.streamId, { fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover', muted: true }, err => {
+                if (err) {
+                    props.setShowVideoButton({ paused: false, muted: true });
                 } else {
                     debugger;
                 }
