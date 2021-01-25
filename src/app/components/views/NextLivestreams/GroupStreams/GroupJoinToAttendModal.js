@@ -1,4 +1,5 @@
 import {Fragment, useState, useEffect} from "react";
+import {Formik} from 'formik';
 import React from "react";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
@@ -8,9 +9,11 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import {withFirebase} from "context/firebase";
 import UserCategorySelector from "components/views/profile/UserCategorySelector";
-import {Box, CardMedia, CircularProgress} from "@material-ui/core";
+import {Box, CardMedia, Checkbox, CircularProgress, FormControlLabel, FormLabel} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import LogoButtons from "./LogoButtons";
+import FormControl from "@material-ui/core/FormControl";
+import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
     media: {
@@ -35,6 +38,7 @@ const GroupJoinToAttendModal = ({
                                     firebase,
                                     open,
                                     closeModal,
+                                    groupsWithPolicies,
                                     userData,
                                     onConfirm,
                                     alreadyJoined,
@@ -44,6 +48,12 @@ const GroupJoinToAttendModal = ({
     const [group, setGroup] = useState({})
     const [allSelected, setAllSelected] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [localGroupsWithPolicies, setLocalGroupsWithPolicies] = useState([]);
+    console.log("-> localGroupsWithPolicies", localGroupsWithPolicies);
+
+    useEffect(() => {
+        setLocalGroupsWithPolicies(groupsWithPolicies)
+    }, [groupsWithPolicies])
 
     useEffect(() => {
         if (groups && groups.length && groups.length === 1) {
@@ -138,6 +148,16 @@ const GroupJoinToAttendModal = ({
         }
     };
 
+    const handleToggleAgree = index => {
+        const newGroupsWithPolicies = [...localGroupsWithPolicies]
+        newGroupsWithPolicies[index].needsToAgree = !newGroupsWithPolicies[index].needsToAgree
+        setLocalGroupsWithPolicies(newGroupsWithPolicies)
+    }
+
+    const stillNeedsToAgree = () => {
+        return localGroupsWithPolicies.some(group => group.needsToAgree)
+    }
+
     const renderCategories = categories.map((category, index) => {
         return (
             <Fragment key={category.id}>
@@ -151,10 +171,12 @@ const GroupJoinToAttendModal = ({
     });
 
     return (
-        <Dialog open={open} onClose={() => {
-            setGroup({})
-            closeModal()
-        }} fullWidth maxWidth="sm">
+        <Dialog
+            open={open}
+            onClose={() => {
+                setGroup({})
+                closeModal()
+            }} fullWidth maxWidth="sm">
             {!group.universityName ?
                 <>
                     <DialogTitle align="center">Please follow one of the following groups in order to
@@ -171,14 +193,36 @@ const GroupJoinToAttendModal = ({
                         <DialogContentText align="center" noWrap>
                             {group.description}
                         </DialogContentText>
-                        <Box className={classes.actions}>
+                        <Box p={2} className={classes.actions}>
                             {!!categories.length && renderCategories}
+                        </Box>
+                        <Box p={2} className={classes.actions}>
+                            {localGroupsWithPolicies.map((group, index) => (
+                                <FormControlLabel
+                                    key={group.id}
+                                    label={
+                                        <Typography>
+                                            I agree to <a target="_blank"
+                                                          href={group.privacyPolicyUrl}> {group.universityName}'s
+                                            privacy policy</a>
+                                        </Typography>
+                                    }
+                                    control={
+                                        <Checkbox
+                                            checked={!group.needsToAgree}
+                                            onChange={() => handleToggleAgree(index)}
+                                            name="checkedB"
+                                            color="primary"
+                                        />
+                                    }
+                                />
+                            ))}
                         </Box>
                     </DialogContent>
                     <DialogActions>
                         {((alreadyJoined && group.categories) || !alreadyJoined) && (
                             <Button
-                                disabled={!allSelected || submitting}
+                                disabled={!allSelected || submitting || stillNeedsToAgree()}
                                 variant="contained"
                                 size="large"
                                 endIcon={

@@ -362,6 +362,7 @@ const GroupStreamCardV2 = memo(({
     const [openJoinModal, setOpenJoinModal] = useState(false);
     const [levelOfStudyModalOpen, setLevelOfStudyModalOpen] = useState(false);
     const [fetchingCareerCenters, setFetchingCareerCenters] = useState(false);
+    const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
 
     const classes = useStyles({
         hideActions,
@@ -473,7 +474,7 @@ const GroupStreamCardV2 = memo(({
         firebase.deregisterFromLivestream(livestream.id, user.email);
     }
 
-    function startRegistrationProcess() {
+    async function startRegistrationProcess() {
         if (!user || !user.emailVerified) {
             return router.push({
                 pathname: `/login`,
@@ -487,7 +488,11 @@ const GroupStreamCardV2 = memo(({
                 query: "profile"
             });
         }
-        if (listenToUpcoming) {// If on next livestreams tab...
+        const {hasAgreedToAll, groupsWithPolicies} = await getPolicyStatus(careerCenters, user.email, firebase)
+        if (!hasAgreedToAll) {
+            setOpenJoinModal(true)
+            setGroupsWithPolicies(groupsWithPolicies)
+        } else if (listenToUpcoming) {// If on next livestreams tab...
             if (!userFollowingAnyGroup() && livestream.groupIds?.length) {
                 setOpenJoinModal(true)
             } else {
@@ -509,6 +514,27 @@ const GroupStreamCardV2 = memo(({
             }
         }
 
+    }
+
+    const getPolicyStatus = async (groups, userEmail, firebase) => {
+        let hasAgreedToAll = true
+        const updatedGroups = await Promise.all(groups.map(async group => {
+            let needsToAgree = false
+            if (group.privacyPolicyActive) {
+                needsToAgree = await firebase.checkIfUserAgreedToGroupPolicy(group.id, userEmail)
+                if (hasAgreedToAll && needsToAgree) {
+                    hasAgreedToAll = false
+                }
+            }
+            return ({
+                ...group,
+                needsToAgree
+            })
+        }))
+
+        const groupsWithPolicies = updatedGroups.filter(group => group.needsToAgree)
+
+        return {hasAgreedToAll, groupsWithPolicies}
     }
 
     function completeRegistrationProcess() {
@@ -760,6 +786,7 @@ const GroupStreamCardV2 = memo(({
             <GroupJoinToAttendModal
                 open={openJoinModal}
                 groups={getGroups()}
+                groupsWithPolicies={groupsWithPolicies}
                 alreadyJoined={false}
                 userData={userData}
                 onConfirm={completeRegistrationProcess}

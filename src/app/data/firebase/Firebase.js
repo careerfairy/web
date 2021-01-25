@@ -1379,6 +1379,16 @@ class Firebase {
         return batch.commit();
     }
 
+    checkIfUserAgreedToGroupPolicy = async (groupId, userEmail) => {
+        let userInPolicySnapshot = await this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("usersInPolicy")
+            .doc(userEmail)
+            .get()
+        return !userInPolicySnapshot.exists
+    }
+
     getRegisteredStudentsInLivestream = (livestreamId) => {
         let ref = this.firestore
             .collection("livestreams")
