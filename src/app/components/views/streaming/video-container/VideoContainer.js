@@ -137,7 +137,7 @@ function VideoContainer(props) {
         } else {
             props.setNumberOfViewers(0)
         }
-    }, [numberOfViewers]);
+    }, [numberOfViewers,  props.currentLivestream.hasStarted]);
 
     const setDesktopMode = async (mode, initiatorId) => {
         let screenSharerId = mode === 'desktop' ? initiatorId : props.currentLivestream.screenSharerId;

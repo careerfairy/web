@@ -60,7 +60,7 @@ const Toolbar = ({value,group, onChange, className, handleSubmit, handleRefresh,
     };
 
     const canCreateStream = () => {
-        return Boolean(userData?.isAdmin);
+        return Boolean(userData?.isAdmin || group?.adminEmail === userData?.userEmail);
     };
 
     const handleShareDraftLink = () => {
