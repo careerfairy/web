@@ -82,7 +82,7 @@ const NewLivestreamForm = ({firebase}) => {
     const {userData, authenticatedUser} = useAuth()
 
     const {
-        query: {livestreamId, draftStreamId, absolutePath},
+        query: {livestreamId, draftStreamId, absolutePath, groupId},
         push, replace
     } = router;
     const classes = useStyles()
@@ -174,20 +174,36 @@ const NewLivestreamForm = ({firebase}) => {
     }, [firebase])
 
     useEffect(() => {
-        const unsubscribe = firebase.listenToGroups(querySnapshot => {
-            let careerCenters = [];
-            querySnapshot.forEach(doc => {
-                let careerCenter = doc.data();
-                careerCenter.id = doc.id;
-                careerCenter.selected = false
-                careerCenters.push(careerCenter);
-            })
-            setFetchingGroups(false)
-            setExistingGroups(careerCenters);
-        });
-        return () => unsubscribe();
+        if (userData.isAdmin) {
+            const unsubscribe = firebase.listenToGroups(querySnapshot => {
+                let careerCenters = [];
+                querySnapshot.forEach(doc => {
+                    let careerCenter = doc.data();
+                    careerCenter.id = doc.id;
+                    careerCenter.selected = false
+                    careerCenters.push(careerCenter);
+                })
+                setFetchingGroups(false)
+                setExistingGroups(careerCenters);
+            });
+            return () => unsubscribe();
+        } else {
+            (async function () {
+                if (groupId) {
+                    const livestreamGroup = await firebase.getCareerCenterById(groupId)
+                    if (livestreamGroup.exists) {
+                        const groupData = livestreamGroup.data()
+                        const groupsToCheck = [...new Set([...groupData.partnerGroups, livestreamGroup.id])]
+                        const totalExistingGroups = await firebase.getCareerCentersByGroupId(groupData.partnerGroups || [])
 
-    }, []);
+                    }
+
+                }
+
+            })()
+        }
+
+    }, [userData?.isAdmin, groupId]);
 
     useEffect(() => {
         if (!fetchingBackgrounds && !fetchingLogos && !fetchingAvatars && !fetchingGroups) {
@@ -211,7 +227,7 @@ const NewLivestreamForm = ({firebase}) => {
     }
 
 
-    const handleSetDefaultGroups = (arrayOfGroupIds) => {
+    const handleSetDefaultGroups = async (arrayOfGroupIds) => {
         if (Array.isArray(arrayOfGroupIds)) {
             let groupsWithFlattenedOptions = []
             arrayOfGroupIds.forEach(id => {
@@ -363,7 +379,7 @@ const NewLivestreamForm = ({firebase}) => {
                                 label="Logo"
                                 handleBlur={handleBlur}
                                 formName="companyLogoUrl"
-                                isSuperAdmin={authenticatedUser.isAdmin}
+                                isSuperAdmin={userData.isAdmin}
                                 value={values.companyLogoUrl}
                                 options={existingLogos}
                                 loading={fetchingLogos}
@@ -374,7 +390,7 @@ const NewLivestreamForm = ({firebase}) => {
                                 getDownloadUrl={getDownloadUrl} values={values} firebase={firebase}
                                 setFieldValue={setFieldValue} isSubmitting={isSubmitting}
                                 path="illustration-images"
-                                isSuperAdmin={authenticatedUser.isAdmin}
+                                isSuperAdmin={userData.isAdmin}
                                 label="Company Background" handleBlur={handleBlur}
                                 formName="backgroundImageUrl"
                                 value={values.backgroundImageUrl} options={existingBackgrounds}
@@ -501,8 +517,8 @@ const NewLivestreamForm = ({firebase}) => {
                                 handleChange={handleChange}
                                 handleBlur={handleBlur}
                                 values={values}
-                                isSuperAdmin={authenticatedUser.isAdmin}
-                                adminEmail={authenticatedUser.email}
+                                isSuperAdmin={userData.isAdmin}
+                                adminEmail={userData.userEmail}
                                 isSubmitting={isSubmitting}
                                 selectedGroups={selectedGroups}
                                 setTargetCategories={setTargetCategories}

@@ -48,7 +48,7 @@ const Toolbar = ({value,group, onChange, className, handleSubmit, handleRefresh,
     };
 
     const handleCLickCreateNewLivestream = async () => {
-        if (userData?.isAdmin) {
+        if (canCreateStream()) {
             const targetPath = `/new-livestream`;
             await push({
                 pathname: targetPath,
