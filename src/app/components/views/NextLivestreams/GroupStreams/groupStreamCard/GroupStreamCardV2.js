@@ -23,7 +23,6 @@ import CopyToClipboard from "../../../common/CopyToClipboard";
 import LogosPlaceHolder from "./LogosPlaceholder";
 
 const useStyles = makeStyles((theme) => {
-    const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
     const paperColor = theme.palette.background.paper
     const frontHoveredScale = 0.7
     const dateHeight = 90
@@ -42,9 +41,10 @@ const useStyles = makeStyles((theme) => {
             height: "100%",
             position: "relative",
             webKitPosition: "relative",
-            transitionProperty: "transform",
-            transitionDuration: `${theme.transitions.duration.shorter}ms`,
-            transitionTimingFunction: theme.transitions.easing.easeInOut,
+            transition: theme.transitions.create(['transform'], {
+                easing: theme.transitions.easing.easeInOut,
+                duration: theme.transitions.duration.standard,
+            }),
             zIndex: ({cardHovered, isExpanded}) => (cardHovered || isExpanded) && 995,
             "& p": {
                 color: theme.palette.common.white
@@ -106,7 +106,10 @@ const useStyles = makeStyles((theme) => {
             fontWeight: "bold",
             alignItems: "center",
             width: ({cardHovered}) => cardHovered && "140%",
-            transition: "width 1s",
+            transition: theme.transitions.create(['width'], {
+                easing: theme.transitions.easing.easeInOut,
+                duration: theme.transitions.duration.complex,
+            }),
             padding: theme.spacing(0, 2),
             color: "white !important",
             justifyContent: "center",
@@ -122,8 +125,11 @@ const useStyles = makeStyles((theme) => {
             width: "100%",
             display: "flex",
             flexDirection: "column",
-            transform: ({cardHovered}) => cardHovered && `translateY(${-60}px) scale(${frontHoveredScale})`,
-            transition: '250ms',
+            transition: theme.transitions.create(['opacity', 'transform'], {
+                easing: theme.transitions.easing.easeInOut,
+                duration: theme.transitions.duration.standard,
+            }),
+            transform: ({cardHovered}) => cardHovered && `translateY(${-50}px) scale(${frontHoveredScale})`,
             background: ({
                              cardHovered,
                              registered
@@ -159,7 +165,6 @@ const useStyles = makeStyles((theme) => {
         optionsWrapper: {
             overflowX: 'hidden',
             overflowY: 'auto',
-            // maxHeight: 200,
         },
         expandedOptionsWrapper: {
             overflowX: 'hidden',
@@ -169,7 +174,10 @@ const useStyles = makeStyles((theme) => {
             paddingTop: 0,
         },
         background: {
-            transition: ({cardHovered}) => cardHovered && `${transition}, opacity 150ms linear`,
+            transition: theme.transitions.create(['opacity', 'transform'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.shortest,
+            }),
             transform: ({cardHovered}) => cardHovered ? 'scale(1.05, 1.05)' : 'scale(0.2, 0.9)',
             opacity: ({cardHovered}) => cardHovered ? 1 : 0,
             background: theme.palette.navyBlue.main,
