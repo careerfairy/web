@@ -496,7 +496,7 @@ const GroupStreamCardV2 = memo(({
             if (!userFollowingAnyGroup() && livestream.groupIds?.length) {
                 setOpenJoinModal(true)
             } else {
-                firebase.registerToLivestream(livestream.id, user.email).then(() => {
+                firebase.registerToLivestream(livestream.id, user.email, groupsWithPolicies).then(() => {
                     setCardHovered(false)
                     setBookingModalOpen(true);
                     sendEmailRegistrationConfirmation();
@@ -506,7 +506,7 @@ const GroupStreamCardV2 = memo(({
             if (!userFollowingCurrentGroup()) {
                 setOpenJoinModal(true)
             } else {
-                firebase.registerToLivestream(livestream.id, user.email).then(() => {
+                firebase.registerToLivestream(livestream.id, user.email, groupsWithPolicies).then(() => {
                     setCardHovered(false)
                     setBookingModalOpen(true);
                     sendEmailRegistrationConfirmation();
@@ -538,7 +538,7 @@ const GroupStreamCardV2 = memo(({
     }
 
     function completeRegistrationProcess() {
-        firebase.registerToLivestream(livestream.id, user.email).then(() => {
+        firebase.registerToLivestream(livestream.id, user.email, groupsWithPolicies).then(() => {
             setCardHovered(false)
             setBookingModalOpen(true);
             sendEmailRegistrationConfirmation();
