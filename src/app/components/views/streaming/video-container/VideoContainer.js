@@ -123,16 +123,6 @@ function VideoContainer(props) {
     }, [props.streamerId, props.currentLivestream.id])
 
     useEffect(() => {
-        if (localMediaStream) {
-            if (props.currentLivestream.currentSpeakerId === props.streamerId && props.currentLivestream.mode !== 'desktop' && props.currentLivestream.mode !== 'presentation') {
-                localMediaStream.setVideoProfile('360p_4')
-            } else {
-                localMediaStream.setVideoProfile('180p_1')
-            }
-        }  
-    }, [localMediaStream, props.currentLivestream.currentSpeakerId, props.currentLivestream.mode])
-
-    useEffect(() => {
         if (externalMediaStreams && props.currentLivestream.currentSpeakerId && isMainStreamer) {
             let existingCurrentSpeaker = externalMediaStreams.find(stream => stream.streamId === props.currentLivestream.currentSpeakerId)
             if (!existingCurrentSpeaker) {

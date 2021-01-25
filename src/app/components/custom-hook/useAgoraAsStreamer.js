@@ -84,6 +84,11 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         if (!isViewer) {
             rtcClient.setClientRole("host")
             rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
+                rtcClient.enableDualStream(() => {
+                    console.log("Enable dual stream success!")
+                  }, function(err) {
+                    console.log(err)
+                  });
                 setAgoraStatus("getting_media_access");
                 let localStream = AgoraRTC.createStream({
                     audio: true,
