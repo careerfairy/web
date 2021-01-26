@@ -2,7 +2,18 @@ import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
-import {Avatar, Box, Button, ClickAwayListener, Collapse, fade, Fade, Grow, Paper} from "@material-ui/core";
+import {
+    Avatar,
+    Box,
+    Button,
+    Chip,
+    ClickAwayListener,
+    Collapse,
+    fade,
+    Fade,
+    Grow,
+    Paper
+} from "@material-ui/core";
 import {AvatarGroup} from "@material-ui/lab";
 import Streamers from "./Streamers";
 import Wave from "./Wave";
@@ -264,7 +275,8 @@ const useStyles = makeStyles((theme) => {
         bookedText: {
             marginLeft: theme.spacing(1),
             fontWeight: "bold",
-            color: theme.palette.primary.main
+            color: theme.palette.primary.main,
+
         },
         expandArea: {
             borderRadius: ({hasGroups}) => !hasGroups && theme.spacing(2.5),
@@ -295,6 +307,20 @@ const useStyles = makeStyles((theme) => {
             flexDirection: "column",
             alignItems: "center"
         },
+        statusChip: {
+            zIndex: 1,
+            position: "absolute",
+            top: theme.spacing(1),
+            right: theme.spacing(1),
+            borderRadius: theme.spacing(2.5),
+            padding: theme.spacing(0.3),
+            background: ({pendingApproval}) => pendingApproval ? theme.palette.primary.main : theme.palette.warning.main,
+            wordWrap: "break-word",
+            maxWidth: theme.spacing(20),
+            height:"auto",
+            opacity: 0.8
+        },
+
         pulseAnimate: {
             animation: `$pulse 1s infinite`
         },
@@ -352,6 +378,8 @@ const GroupStreamCardV2 = memo(({
         return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1)
     }
 
+    const isPending = () => livestream?.status?.pendingApproval === true
+
     const registered = useMemo(() => userIsRegistered(), [livestream.registeredUsers])
     const [expanded, setExpanded] = useState(false);
 
@@ -369,6 +397,7 @@ const GroupStreamCardV2 = memo(({
         hideActions,
         isHighlighted,
         cardHovered,
+        pendingApproval: isPending(),
         mobile,
         hasGroups: careerCenters.length,
         registered,
@@ -626,6 +655,13 @@ const GroupStreamCardV2 = memo(({
                         <Paper
                             elevation={4}
                             className={classes.front}>
+                            {isDraft &&
+                            <Chip className={classes.statusChip} color="primary"
+                                   label={
+                                       <Typography style={{whiteSpace: 'normal', fontWeight: "bold"}} variant="body1">
+                                           {isPending() ? "Pending Approval" : "Work In Progress"}
+                                       </Typography>
+                                   }/>}
                             {!cardHovered &&
                             <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
                                  alt="background"/>}
@@ -635,6 +671,7 @@ const GroupStreamCardV2 = memo(({
                                                      date={livestream.start.toDate()}/>
                                 </div>
                             </div>
+
                             <div className={classes.companyLogoWrapper}>
                                 <Grow in={Boolean(userIsRegistered())}>
                                     <div className={classes.bookedIcon}>
@@ -655,7 +692,8 @@ const GroupStreamCardV2 = memo(({
                             <div className={classes.lowerFrontContent}>
                                 <div className={classes.speakersAndLogosWrapper}>
                                     <div className={classes.titleAndSpeakersWrapper}>
-                                        <Typography variant={mobile ? "h6" : cardHovered ? "h4" : "h5"} align="center"
+                                        <Typography variant={mobile ? "h6" : cardHovered ? "h4" : "h5"}
+                                                    align="center"
                                                     className={classes.companyName}>
                                             {livestream.title}
                                         </Typography>
@@ -758,6 +796,7 @@ const GroupStreamCardV2 = memo(({
                                     {fetchingCareerCenters ? <LogosPlaceHolder/> : logoElements}
                                 </div>
                             </Box>
+
                         </ClickAwayListener>
                     </Box>
                 </div>

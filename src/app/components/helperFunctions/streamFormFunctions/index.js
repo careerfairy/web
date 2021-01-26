@@ -68,7 +68,8 @@ export const buildLivestreamObject = (values, targetCategories, updateMode, stre
         hidden: values.hidden,
         universities: [],
         summary: values.summary,
-        speakers: buildSpeakersArray(values)
+        speakers: buildSpeakersArray(values),
+        lastUpdated: firebase.getServerTimestamp()
     }
 }
 
