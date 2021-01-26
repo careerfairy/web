@@ -97,15 +97,15 @@ const TopBar = ({className,notifications,setNotifications, links, onMobileNavOpe
                 <Hidden mdDown>
                     <Box>
                         {/* TODO : add notifications when companies submit drafts */}
-                        <IconButton color="inherit">
-                            <Badge
-                                badgeContent={notifications.length}
-                                color="primary"
-                                variant="dot"
-                            >
-                                <NotificationsIcon/>
-                            </Badge>
-                        </IconButton>
+                        {/*<IconButton color="inherit">*/}
+                        {/*    <Badge*/}
+                        {/*        badgeContent={notifications.length}*/}
+                        {/*        color="primary"*/}
+                        {/*        variant="dot"*/}
+                        {/*    >*/}
+                        {/*        <NotificationsIcon/>*/}
+                        {/*    </Badge>*/}
+                        {/*</IconButton>*/}
                         <IconButton
                             component={Link}
                             className={classes.navIconButton}

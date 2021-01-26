@@ -245,6 +245,9 @@ const EnhancedGroupStreamCard = ({
         })
     }
 
+    const isWorkInProgress = () => !livestream.status?.pendingApproval;
+
+
     let categoryElements = localCategories.map((category, index) => {
         return (
             <Chip
@@ -272,12 +275,12 @@ const EnhancedGroupStreamCard = ({
                 <Button
                     className={classes.button}
                     fullWidth
-                    disabled={publishingDraft}
+                    disabled={publishingDraft || isWorkInProgress()}
                     onClick={handlePublishStream}
                     startIcon={publishingDraft ? <CircularProgress size={20} color="inherit"/> : <PublishIcon/>}
                     variant='outlined'
                 >
-                    {publishingDraft ? "Publishing" : "Publish Stream"}
+                    {publishingDraft ? "Publishing" : isWorkInProgress() ? "Needs To Be Approved" : "Publish Stream"}
                 </Button>}
                 <Button
                     className={classes.button}

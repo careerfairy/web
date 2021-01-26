@@ -123,7 +123,7 @@ export const handleFlattenOptionsWithoutLvlOfStudy = (group) => {
     return optionsArray
 }
 
-export const validateStreamForm = (values, isDraft) => {
+export const validateStreamForm = (values, isDraft, noValidation = false) => {
     let errors = {speakers: {}};
     if (!values.companyLogoUrl) {
         errors.companyLogoUrl = 'Required';
@@ -162,5 +162,5 @@ export const validateStreamForm = (values, isDraft) => {
     if (!Object.keys(errors.speakers).length) {
         delete errors.speakers
     }
-    return errors;
+    return noValidation ? {} : errors;
 }

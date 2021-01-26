@@ -268,11 +268,13 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         )
     }
 
+    const noValidation = () => status === SAVING
+
     return (<Container className={classes.root}>
         {allFetched ? (submitted ? <SuccessMessage/> : <Formik
             initialValues={formData}
             enableReinitialize
-            validate={(values) => validateStreamForm(values, true)}
+            validate={(values) => validateStreamForm(values, true, noValidation())}
             onSubmit={async (values, {setSubmitting}) => {
                 try {
                     setGeneralError("")

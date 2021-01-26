@@ -49,7 +49,6 @@ const GroupJoinToAttendModal = ({
     const [allSelected, setAllSelected] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [localGroupsWithPolicies, setLocalGroupsWithPolicies] = useState([]);
-    console.log("-> localGroupsWithPolicies", localGroupsWithPolicies);
 
     useEffect(() => {
         setLocalGroupsWithPolicies(groupsWithPolicies)

@@ -128,7 +128,7 @@ const Toolbar = ({value, group, onChange, className, handleSubmit, handleRefresh
             icon: <DraftStreamIcon/>
         },
         {
-            name: "Generate a sharable draft link",
+            name: "Generate a draft link for companies",
             onClick: () => handleShareDraftLink(),
             icon: <ShareIcon/>
         },
