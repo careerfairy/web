@@ -16,6 +16,7 @@ import {
 } from "@material-ui/core";
 import UniversityCountrySelector from "../../universitySelect/UniversityCountrySelector";
 import UniversitySelector from "../../universitySelect/UniversitySelector";
+import {URL_REGEX} from "../../../util/constants";
 
 const LightTooltip = withStyles((theme) => ({
     tooltip: {
@@ -57,7 +58,7 @@ const PersonalInfo = ({firebase, userData}) => {
     const [open, setOpen] = useState(false);
     const [updated, setUpdated] = useState(false)
 
-    const urlRegex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/gm;
+
 
     useEffect(() => {
         if (updated) {
@@ -88,8 +89,8 @@ const PersonalInfo = ({firebase, userData}) => {
                 firstName: userData.firstName,
                 lastName: userData.lastName,
                 linkedinUrl: userData.linkedinUrl ? userData.linkedinUrl : '',
-                university: { 
-                    code: userData.universityCode, 
+                university: {
+                    code: userData.universityCode,
                     name: userData.universityName
                 },
                 universityCountryCode: userData.universityCountryCode
@@ -118,7 +119,7 @@ const PersonalInfo = ({firebase, userData}) => {
                 } else if (values.lastName.length > 50) {
                     errors.lastName = 'Cannot be longer than 50 characters';
                 }
-                if (values.linkedinUrl.length > 0 && !values.linkedinUrl.match(urlRegex)) {
+                if (values.linkedinUrl.length > 0 && !values.linkedinUrl.match(URL_REGEX)) {
                     errors.linkedinUrl = 'Please enter a valid URL';
                 }
                 if (!values.universityCountryCode) {

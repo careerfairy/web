@@ -1296,7 +1296,8 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    registerToLivestream = (livestreamId, userId) => {
+    registerToLivestream = (livestreamId, userId, groupsWithPolicies = []) => {
+        const idsOfGroupsWithPolicies = groupsWithPolicies.map(group => group.id)
         let userRef = this.firestore.collection("userData").doc(userId);
         let livestreamRef = this.firestore
             .collection("livestreams")
@@ -1312,6 +1313,16 @@ class Firebase {
                 transaction.update(livestreamRef, {
                     registeredUsers: firebase.firestore.FieldValue.arrayUnion(userId),
                 });
+
+                for (const groupId of idsOfGroupsWithPolicies) {
+                    let userInPolicyRef = this.firestore
+                        .collection("careerCenterData")
+                        .doc(groupId)
+                        .collection("usersInPolicy")
+                        .doc(userId)
+                    transaction.set(userInPolicyRef, user)
+                }
+
                 transaction.set(registeredUsersRef, user);
             });
         });
@@ -1377,6 +1388,16 @@ class Firebase {
         })
 
         return batch.commit();
+    }
+
+    checkIfUserAgreedToGroupPolicy = async (groupId, userEmail) => {
+        let userInPolicySnapshot = await this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("usersInPolicy")
+            .doc(userEmail)
+            .get()
+        return !userInPolicySnapshot.exists
     }
 
     getRegisteredStudentsInLivestream = (livestreamId) => {

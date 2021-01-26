@@ -142,6 +142,7 @@ export const defaultTableOptions = {
     filtering: true,
     selection: true,
     pageSize: 5,
+    columnsButton: true,
     pageSizeOptions: [3, 5, 10, 25, 50, 100, 200],
     minBodyHeight: 200,
     exportAllData: true,
