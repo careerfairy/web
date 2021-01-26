@@ -1,38 +1,75 @@
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
+import {Box, Card, CardContent, emphasize, InputAdornment, makeStyles, SvgIcon, TextField} from '@material-ui/core';
 import {
-    Box,
-    Card,
-    CardContent,
-    TextField,
-    InputAdornment,
-    SvgIcon,
-    makeStyles
-} from '@material-ui/core';
-import {Search as SearchIcon, RefreshCw as RefreshIcon} from 'react-feather';
-import {CustomSplitButton} from "../../../../materialUI/GlobalButtons/GlobalButtons";
+    FileText as DraftStreamIcon,
+    Film as StreamIcon,
+    RefreshCw as RefreshIcon,
+    Search as SearchIcon
+} from 'react-feather';
 import {copyStringToClipboard} from "../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
 import {useAuth} from "../../../../HOCs/AuthProvider";
 import IconButton from "@material-ui/core/IconButton";
 import {useRouter} from "next/router";
+import SpeedDial from '@material-ui/lab/SpeedDial';
+import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
+import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
+import ShareIcon from '@material-ui/icons/Share';
 
 const useStyles = makeStyles((theme) => ({
-    root: {},
+    root: {
+    },
     importButton: {
         marginRight: theme.spacing(1)
     },
     exportButton: {
         marginRight: theme.spacing(1)
+    },
+    speedDial: {
+        position: 'absolute',
+        top: theme.spacing(16),
+        right: theme.spacing(2),
+    },
+    tooltip:{
+        transition: "all 0.8s",
+        transitionTimingFunction: theme.transitions.easeInOut,
+        // display: ({open}) => open ? "block" : "none",
+        whiteSpace: "nowrap"
+    },
+    toolbarCard:{
+        width: "calc(100% - 100px)"
+    },
+    dialButton: {
+        // display: "none"
+    },
+    action:{
+        margin: 8,
+        color: theme.palette.common.white,
+        backgroundColor: emphasize(theme.palette.primary.main, 0.12),
+        '&:hover': {
+            backgroundColor: emphasize(theme.palette.primary.main, 0.15),
+        },
+        transition: `${theme.transitions.create('transform', {
+            duration: theme.transitions.duration.shorter,
+        })}, opacity 0.8s`,
+        opacity: 1,
     }
 }));
 
-const Toolbar = ({value,group, onChange, className, handleSubmit, handleRefresh, ...rest}) => {
+const Toolbar = ({value, group, onChange, className, handleSubmit, handleRefresh, ...rest}) => {
     const {enqueueSnackbar} = useSnackbar()
     const {userData} = useAuth()
-    const classes = useStyles();
+    const [open, setOpen] = useState(true);
+    const classes = useStyles({open});
     const {asPath, push} = useRouter()
+
+    const toggleOpen = () => {
+        setOpen(!open);
+    };
+
+
 
     const handleClickDraftNewStream = async () => {
         const groupId = group.id;
@@ -81,19 +118,22 @@ const Toolbar = ({value,group, onChange, className, handleSubmit, handleRefresh,
 
     const buttonOptions = [
         {
-            label: "Create a new draft",
+            name: "Create a new draft",
             onClick: () => handleClickDraftNewStream(),
+            icon: <DraftStreamIcon/>
         },
         {
-            label: "Generate a sharable draft link",
+            name: "Generate a sharable draft link",
             onClick: () => handleShareDraftLink(),
+            icon: <ShareIcon/>
         },
     ];
 
     if (canCreateStream()) {
         buttonOptions.unshift({
-            label: "Create a live stream",
+            name: "Create a live stream",
             onClick: () => handleCLickCreateNewLivestream(),
+            icon: <StreamIcon/>
         });
     }
 
@@ -102,19 +142,31 @@ const Toolbar = ({value,group, onChange, className, handleSubmit, handleRefresh,
             className={clsx(classes.root, className)}
             {...rest}
         >
-            <Box
-                display="flex"
-                justifyContent="flex-end"
+            <SpeedDial
+                ariaLabel="Stream actions"
+                className={classes.speedDial}
+                FabProps={{className: classes.dialButton, onClick:toggleOpen }}
+                icon={<SpeedDialIcon/>}
+                direction="down"
+                open={open}
             >
-                <CustomSplitButton
-                    slideDirection="left"
-                    className={classes.buttonGroup}
-                    size="large"
-                    options={buttonOptions}
-                />
-            </Box>
+                {buttonOptions.map((action) => (
+                    <SpeedDialAction
+                        key={action.name}
+                        icon={action.icon}
+                        FabProps={{
+                            size: "large",
+                            color: "primary"
+                        }}
+                        tooltipTitle={action.name}
+                        classes={{staticTooltipLabel: classes.tooltip, fab: classes.action}}
+                        tooltipOpen
+                        onClick={action.onClick}
+                        title={action.name}/>
+                ))}
+            </SpeedDial>
             <Box mt={3}>
-                <Card>
+                <Card className={classes.toolbarCard}>
                     <CardContent>
                         <Box maxWidth={500}>
                             <form onSubmit={handleSubmit}>
