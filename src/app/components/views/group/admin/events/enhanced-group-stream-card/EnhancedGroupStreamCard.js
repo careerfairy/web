@@ -202,7 +202,6 @@ const EnhancedGroupStreamCard = ({
         try {
             setDeletingStream(true)
             const targetCollection = isDraft ? "draftLivestreams" : "livestreams"
-            console.log("-> targetCollection", targetCollection);
             await firebase.deleteLivestream(livestream.id, targetCollection)
             setDeletingStream(false)
         } catch (e) {
@@ -266,6 +265,8 @@ const EnhancedGroupStreamCard = ({
         );
     });
 
+    const isCareerCenter = () => Boolean(group.universityCode)
+
     return (
         <>
             <Box p={2} style={{width: "100%"}}>
@@ -292,19 +293,15 @@ const EnhancedGroupStreamCard = ({
                 >
                     {isDraft ? "Edit Draft" : "Edit Stream"}
                 </Button>
-                {/*<Button className={classes.button} onClick={handleOpenLevelOfStudyModal}*/}
-                {/*        fullWidth*/}
-                {/*        startIcon={<EditIcon/>}*/}
-                {/*        variant='outlined'>*/}
-                {/*    Edit Categories*/}
-                {/*</Button>*/}
+
+                {isCareerCenter() &&
                 <CSVLink data={registeredStudentsFromGroup} separator={";"}
                          filename={'Registered Students ' + livestream.company + ' ' + livestream.id + '.csv'}
                          style={{color: 'red'}}>
                     <Button className={classes.button} fullWidth startIcon={<GetAppIcon/>} variant='outlined'>
                         Registered Students
                     </Button>
-                </CSVLink>
+                </CSVLink>}
                 <Fragment>
                     {!startDownloadingTalentPool || !hasDownloadedTalentPool ?
                         <div>
@@ -339,16 +336,16 @@ const EnhancedGroupStreamCard = ({
                             <PDFDownloadLink fileName="somename.pdf"
                                              document={
                                                  <LivestreamPdfReport group={group}
-                                                    livestream={livestream}
-                                                    studentStats={studentStats}
-                                                    speakers={livestream.speakers}
-                                                    overallRating={overallRating}
-                                                    contentRating={contentRating}
-                                                    totalStudentsInTalentPool={talentPoolForReport.length}
-                                                    totalViewerFromOutsideETH={participatingStudents.length - participatingStudentsFromGroup.length}
-                                                    totalViewerFromETH={participatingStudentsFromGroup.length}
-                                                    questions={questions} polls={polls}
-                                                    icons={icons}/>}>
+                                                                      livestream={livestream}
+                                                                      studentStats={studentStats}
+                                                                      speakers={livestream.speakers}
+                                                                      overallRating={overallRating}
+                                                                      contentRating={contentRating}
+                                                                      totalStudentsInTalentPool={talentPoolForReport.length}
+                                                                      totalViewerFromOutsideETH={participatingStudents.length - participatingStudentsFromGroup.length}
+                                                                      totalViewerFromETH={participatingStudentsFromGroup.length}
+                                                                      questions={questions} polls={polls}
+                                                                      icons={icons}/>}>
                                 {({blob, url, loading, error}) => (
                                     <div>
                                         <Button className={classes.button} fullWidth variant='outlined' color='primary'>Download
