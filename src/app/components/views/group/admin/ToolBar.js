@@ -35,14 +35,12 @@ const useStyles = makeStyles((theme) => ({
     tooltip:{
         transition: "all 0.8s",
         transitionTimingFunction: theme.transitions.easeInOut,
-        // display: ({open}) => open ? "block" : "none",
         whiteSpace: "nowrap"
     },
     toolbarCard:{
         width: "calc(100% - 100px)"
     },
     dialButton: {
-        // display: "none"
     },
     action:{
         margin: 8,
@@ -74,7 +72,6 @@ const Toolbar = ({value, group, onChange, className, handleSubmit, handleRefresh
     const handleClickDraftNewStream = async () => {
         const groupId = group.id;
         const targetPath = `/draft-stream`;
-        // const absolutePath = `/group/${groupId}/admin`;
         return await push({
             pathname: targetPath,
             query: {
@@ -145,7 +142,7 @@ const Toolbar = ({value, group, onChange, className, handleSubmit, handleRefresh
             <SpeedDial
                 ariaLabel="Stream actions"
                 className={classes.speedDial}
-                FabProps={{className: classes.dialButton, onClick:toggleOpen }}
+                FabProps={{className: classes.dialButton, onClick:toggleOpen, color: "secondary" }}
                 icon={<SpeedDialIcon/>}
                 direction="down"
                 open={open}
