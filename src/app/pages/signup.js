@@ -252,7 +252,7 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                     password: '',
                     confirmPassword: '',
                     agreeTerm: false,
-                    university: { id: 'other', name: 'Other' },
+                    university: { code: 'other', name: 'Other' },
                     universityCountryCode: ''
                 }}
                 validate={values => {
