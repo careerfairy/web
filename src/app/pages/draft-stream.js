@@ -13,6 +13,7 @@ import {useAuth} from "../HOCs/AuthProvider";
 const draftStream = () => {
 
     const [submitted, setSubmitted] = useState(false)
+    console.log("-> submitted", submitted);
 
     return (
         <TealBackground style={{paddingBottom: 0}}>

@@ -34,6 +34,8 @@ import {copyStringToClipboard} from "../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 
+const SAVING = "SAVING"
+const APPROVAL = "APPROVAL"
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -97,7 +99,8 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
     const [selectedGroups, setSelectedGroups] = useState([])
     const [updateMode, setUpdateMode] = useState(undefined)
     const [wantsApproval, setWantsApproval] = useState(false);
-
+    const [updated, setUpdated] = useState(false);
+    const [status, setStatus] = useState("");
     const [allFetched, setAllFetched] = useState(false)
 
     const [draftId, setDraftId] = useState("")
@@ -115,7 +118,9 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         hidden: false,
         summary: '',
         speakers: {[uuidv4()]: speakerObj},
+        status: {}
     })
+    console.log("-> formData", formData);
 
 
     const handleSetGroupIds = async (UrlIds, draftStreamGroupIds, newFormData) => {
@@ -157,7 +162,8 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                         start: livestream.start.toDate() || new Date(),
                         hidden: livestream.hidden || false,
                         summary: livestream.summary || "",
-                        speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery)
+                        speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery),
+                        status: livestream.status || {}
                     }
                     setFormData(newFormData)
                     if (careerCenterIds) {
@@ -176,7 +182,11 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         } else {
             setAllFetched(true)
         }
-    }, [draftStreamId])
+    }, [draftStreamId, router])
+
+    const isPending = () => {
+        return Boolean(formData?.status?.pendingApproval === true)
+    }
 
     const groupsSelected = () => {
         return Boolean(selectedGroups.length)
@@ -265,18 +275,20 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
             validate={(values) => validateStreamForm(values, true)}
             onSubmit={async (values, {setSubmitting}) => {
                 try {
-                    console.log("-> wantsApproval in submit", wantsApproval);
                     setGeneralError("")
                     setSubmitting(true)
                     const livestream = buildLivestreamObject(values, targetCategories, updateMode, draftStreamId, firebase);
+                    if(status === APPROVAL){
+                        livestream.status = {
+                            pendingApproval: true,
+                            seen: false,
+                        }
+                    }
                     let id;
                     if (updateMode) {
                         id = livestream.id
                         await firebase.updateLivestream(livestream, "draftLivestreams")
-                        enqueueSnackbar("You changes have been saved!", {
-                            variant: "default",
-                            preventDuplicate: true,
-                        });
+
                         console.log("-> Draft livestream was updated with id", id);
                     } else {
                         id = await firebase.addLivestream(livestream, "draftLivestreams")
@@ -290,9 +302,15 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                         })
                     }
                     setDraftId(id)
-
-                    setSubmitted(true)
-                    window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
+                    if (status === APPROVAL) {
+                        setSubmitted(true)
+                        window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
+                    } else if (status === SAVING) {
+                        enqueueSnackbar("You changes have been saved!", {
+                            variant: "default",
+                            preventDuplicate: true,
+                        });
+                    }
                 } catch (e) {
                     setGeneralError("Something went wrong")
                 }
@@ -308,7 +326,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                   isSubmitting,
                   setFieldValue,
                   setValues,
-                  validateForm
+                  validateForm,
                   /* and other goodies */
               }) => (<form onSubmit={async (event) => {
                 event.preventDefault()
@@ -515,26 +533,29 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     <Button
                         type="submit"
                         onClick={() => {
-                            setWantsApproval(true)
+                            setStatus(APPROVAL)
                         }}
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isPending()}
                         size="large"
                         className={classes.submit}
                         endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
                         variant="contained">
                         <Typography variant="h4">
-                            {isSubmitting ? "Submitting" : wantsApproval? "Pending for Approval" : "Submit Draft for Approval"}
+                            {isSubmitting ? "Submitting" : isPending() ? "Pending for Approval" : "Submit Draft for Approval"}
                         </Typography>
                     </Button>
                     <Button
                         type="submit"
                         disabled={isSubmitting}
                         size="large"
+                        onClick={() => {
+                            setStatus(SAVING)
+                        }}
                         className={classes.submit}
                         endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
                         variant="contained">
                         <Typography variant="h4">
-                            {isSubmitting ? "Updating" : "Save changes"}
+                            {isSubmitting ? "Saving" : "Save changes"}
                         </Typography>
                     </Button>
                 </ButtonGroup>
