@@ -1,7 +1,17 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
-import {Box, Card, CardContent, emphasize, InputAdornment, makeStyles, SvgIcon, TextField} from '@material-ui/core';
+import {
+    Box,
+    Card,
+    CardContent,
+    emphasize, Grow,
+    InputAdornment,
+    makeStyles,
+    Slide,
+    SvgIcon,
+    TextField
+} from '@material-ui/core';
 import {
     FileText as DraftStreamIcon,
     Film as StreamIcon,
@@ -19,8 +29,7 @@ import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
 import ShareIcon from '@material-ui/icons/Share';
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-    },
+    root: {},
     importButton: {
         marginRight: theme.spacing(1)
     },
@@ -32,17 +41,16 @@ const useStyles = makeStyles((theme) => ({
         top: theme.spacing(16),
         right: theme.spacing(2),
     },
-    tooltip:{
+    tooltip: {
         transition: "all 0.8s",
         transitionTimingFunction: theme.transitions.easeInOut,
         whiteSpace: "nowrap"
     },
-    toolbarCard:{
+    toolbarCard: {
         width: "calc(100% - 100px)"
     },
-    dialButton: {
-    },
-    action:{
+    dialButton: {},
+    action: {
         margin: 8,
         color: theme.palette.common.white,
         backgroundColor: emphasize(theme.palette.primary.main, 0.12),
@@ -66,7 +74,6 @@ const Toolbar = ({value, group, onChange, className, handleSubmit, handleRefresh
     const toggleOpen = () => {
         setOpen(!open);
     };
-
 
 
     const handleClickDraftNewStream = async () => {
@@ -135,76 +142,79 @@ const Toolbar = ({value, group, onChange, className, handleSubmit, handleRefresh
     }
 
     return (
-        <div
-            className={clsx(classes.root, className)}
-            {...rest}
-        >
-            <SpeedDial
-                ariaLabel="Stream actions"
-                className={classes.speedDial}
-                FabProps={{className: classes.dialButton, onClick:toggleOpen, color: "secondary" }}
-                icon={<SpeedDialIcon/>}
-                direction="down"
-                open={open}
+        <Slide direction="left" in>
+            <div
+                className={clsx(classes.root, className)}
+                {...rest}
             >
-                {buttonOptions.map((action) => (
-                    <SpeedDialAction
-                        key={action.name}
-                        icon={action.icon}
-                        FabProps={{
-                            size: "large",
-                            color: "primary"
-                        }}
-                        tooltipTitle={action.name}
-                        classes={{staticTooltipLabel: classes.tooltip, fab: classes.action}}
-                        tooltipOpen
-                        onClick={action.onClick}
-                        title={action.name}/>
-                ))}
-            </SpeedDial>
-            <Box mt={3}>
-                <Card className={classes.toolbarCard}>
-                    <CardContent>
-                        <Box maxWidth={500}>
-                            <form onSubmit={handleSubmit}>
-                                <TextField
-                                    fullWidth
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <SvgIcon
-                                                    fontSize="small"
-                                                    color="action"
-                                                >
-                                                    <SearchIcon/>
-                                                </SvgIcon>
-                                            </InputAdornment>
-                                        ),
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton onClick={handleRefresh}>
+                <SpeedDial
+                    ariaLabel="Stream actions"
+                    className={classes.speedDial}
+                    FabProps={{className: classes.dialButton, onClick: toggleOpen, color: "secondary"}}
+                    icon={<SpeedDialIcon/>}
+                    direction="down"
+                    open={open}
+                >
+                    {buttonOptions.map((action) => (
+                        <SpeedDialAction
+                            key={action.name}
+                            icon={action.icon}
+                            FabProps={{
+                                size: "large",
+                                color: "primary"
+                            }}
+                            tooltipTitle={action.name}
+                            classes={{staticTooltipLabel: classes.tooltip, fab: classes.action}}
+                            tooltipOpen
+                            onClick={action.onClick}
+                            title={action.name}/>
+                    ))}
+                </SpeedDial>
+
+                <Box mt={3}>
+                    <Card className={classes.toolbarCard}>
+                        <CardContent>
+                            <Box maxWidth={500}>
+                                <form onSubmit={handleSubmit}>
+                                    <TextField
+                                        fullWidth
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
                                                     <SvgIcon
                                                         fontSize="small"
                                                         color="action"
                                                     >
-                                                        <RefreshIcon/>
+                                                        <SearchIcon/>
                                                     </SvgIcon>
-                                                </IconButton>
-                                            </InputAdornment>
-                                        )
-                                    }}
-                                    onChange={onChange}
-                                    value={value}
-                                    placeholder="Search by title, description, hosts or company name"
-                                    label="Search streams"
-                                    variant="outlined"
-                                />
-                            </form>
-                        </Box>
-                    </CardContent>
-                </Card>
-            </Box>
-        </div>
+                                                </InputAdornment>
+                                            ),
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton onClick={handleRefresh}>
+                                                        <SvgIcon
+                                                            fontSize="small"
+                                                            color="action"
+                                                        >
+                                                            <RefreshIcon/>
+                                                        </SvgIcon>
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            )
+                                        }}
+                                        onChange={onChange}
+                                        value={value}
+                                        placeholder="Search by title, description, hosts or company name"
+                                        label="Search streams"
+                                        variant="outlined"
+                                    />
+                                </form>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Box>
+            </div>
+        </Slide>
     );
 };
 
