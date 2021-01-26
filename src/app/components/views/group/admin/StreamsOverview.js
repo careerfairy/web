@@ -88,7 +88,6 @@ const StreamsOverview = ({group, typeOfStream, query}) => {
                 livestream.title.toLowerCase().indexOf(searchParams.toLowerCase()) >= 0
                 || livestream.company.toLowerCase().indexOf(searchParams.toLowerCase()) >= 0
                 || livestream.summary.toLowerCase().indexOf(searchParams.toLowerCase()) >= 0
-                || livestream.status?.message?.toLowerCase().indexOf(searchParams.toLowerCase()) >= 0
                 // Checks speakers
                 || livestream.speakers.some(speaker =>
                     speaker.firstName.toLowerCase().indexOf(searchParams.toLowerCase()) >= 0
