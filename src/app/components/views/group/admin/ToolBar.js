@@ -41,7 +41,7 @@ const Toolbar = ({value,group, onChange, className, handleSubmit, handleRefresh,
         return await push({
             pathname: targetPath,
             query: {
-                absolutePath: asPath,
+                absolutePath: `/group/${groupId}/admin/drafts`,
                 careerCenterIds: groupId,
             },
         });
@@ -49,11 +49,13 @@ const Toolbar = ({value,group, onChange, className, handleSubmit, handleRefresh,
 
     const handleCLickCreateNewLivestream = async () => {
         if (canCreateStream()) {
+            const groupId = group.id;
             const targetPath = `/new-livestream`;
             await push({
                 pathname: targetPath,
                 query: {
-                    absolutePath: asPath,
+                    absolutePath: `/group/${group.id}/admin/upcoming-livestreams`,
+                    groupId
                 },
             });
         }

@@ -90,7 +90,7 @@ const NewLivestreamForm = ({firebase}) => {
     const {setGeneralError} = useContext(ErrorContext);
     const [targetCategories, setTargetCategories] = useState({})
     const [selectedGroups, setSelectedGroups] = useState([])
-
+    const [groupData, setGroupData] = useState(null);
     const [fetchingBackgrounds, setFetchingBackgrounds] = useState(true)
     const [fetchingLogos, setFetchingLogos] = useState(true)
     const [fetchingGroups, setFetchingGroups] = useState(true);
@@ -118,9 +118,11 @@ const NewLivestreamForm = ({firebase}) => {
 
     useEffect(() => {
         // If there are no relevant IDs and ur not a super admin, get lost...
-        if (!(livestreamId || draftStreamId) && !isAuthenticating() && !hasPermissionToCreate()) {
+        if (!(livestreamId || draftStreamId) && !isAuthenticating()
+            // && !hasPermissionToCreate()
+        ) {
             //re-direct! if no Ids in query!
-            replace("/")
+            // replace("/")
         }
         if ((livestreamId || draftStreamId) && allFetched) {
             (async () => {
@@ -158,14 +160,17 @@ const NewLivestreamForm = ({firebase}) => {
                     // If you're not a super admin and the Ids dont return any relevant draft or stream, get lost...
                     if (!hasPermissionToCreate()) {
                         //re-direct if no queries were found!
-                        replace("/")
+                        // replace("/")
                     }
                 }
             })()
         } else {
+            if(groupId){
+                handleSetDefaultGroups([groupId])
+            }
             setUpdateMode(false)
         }
-    }, [livestreamId, allFetched, draftStreamId])
+    }, [livestreamId, allFetched, draftStreamId, groupId])
 
     useEffect(() => {
         handleGetFiles('mentors-pictures', setFetchingAvatars, setExistingAvatars)
@@ -174,7 +179,6 @@ const NewLivestreamForm = ({firebase}) => {
     }, [firebase])
 
     useEffect(() => {
-        if (userData.isAdmin) {
             const unsubscribe = firebase.listenToGroups(querySnapshot => {
                 let careerCenters = [];
                 querySnapshot.forEach(doc => {
@@ -187,23 +191,8 @@ const NewLivestreamForm = ({firebase}) => {
                 setExistingGroups(careerCenters);
             });
             return () => unsubscribe();
-        } else {
-            (async function () {
-                if (groupId) {
-                    const livestreamGroup = await firebase.getCareerCenterById(groupId)
-                    if (livestreamGroup.exists) {
-                        const groupData = livestreamGroup.data()
-                        const groupsToCheck = [...new Set([...groupData.partnerGroups, livestreamGroup.id])]
-                        const totalExistingGroups = await firebase.getCareerCentersByGroupId(groupData.partnerGroups || [])
 
-                    }
-
-                }
-
-            })()
-        }
-
-    }, [userData?.isAdmin, groupId]);
+    }, [groupId]);
 
     useEffect(() => {
         if (!fetchingBackgrounds && !fetchingLogos && !fetchingAvatars && !fetchingGroups) {
@@ -241,7 +230,7 @@ const NewLivestreamForm = ({firebase}) => {
             // If ur not a super admin and ur also not an admin of any of the groups in the stream, get lost....
             if (!hasPermissionToEdit(groupsWithFlattenedOptions)) {
                 // redirect if ur not a group admin!
-                replace("/")
+                // replace("/")
             }
             setSelectedGroups(groupsWithFlattenedOptions)
         }
