@@ -66,9 +66,9 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const TopBar = ({className, links, onMobileNavOpen, ...rest}) => {
+const TopBar = ({className,notifications,setNotifications, links, onMobileNavOpen, ...rest}) => {
     const classes = useStyles();
-    const [notifications] = useState([2, 123, 3, 13]);
+
 
 
     return (
@@ -97,15 +97,15 @@ const TopBar = ({className, links, onMobileNavOpen, ...rest}) => {
                 <Hidden mdDown>
                     <Box>
                         {/* TODO : add notifications when companies submit drafts */}
-                        {/*<IconButton color="inherit">*/}
-                        {/*    <Badge*/}
-                        {/*        badgeContent={notifications.length}*/}
-                        {/*        color="primary"*/}
-                        {/*        variant="dot"*/}
-                        {/*    >*/}
-                        {/*        <NotificationsIcon/>*/}
-                        {/*    </Badge>*/}
-                        {/*</IconButton>*/}
+                        <IconButton color="inherit">
+                            <Badge
+                                badgeContent={notifications.length}
+                                color="primary"
+                                variant="dot"
+                            >
+                                <NotificationsIcon/>
+                            </Badge>
+                        </IconButton>
                         <IconButton
                             component={Link}
                             className={classes.navIconButton}
