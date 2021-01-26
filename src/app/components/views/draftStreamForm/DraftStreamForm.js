@@ -30,6 +30,9 @@ import {
     handleAddSpeaker,
     handleDeleteSpeaker, handleError, handleFlattenOptions, validateStreamForm
 } from "../../helperFunctions/streamFormFunctions";
+import {copyStringToClipboard} from "../../helperFunctions/HelperFunctions";
+import {useSnackbar} from "notistack";
+import ButtonGroup from "@material-ui/core/ButtonGroup";
 
 
 const useStyles = makeStyles(theme => ({
@@ -84,15 +87,16 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
     const router = useRouter()
     const {
         query: {careerCenterIds, draftStreamId, absolutePath},
-        push
+        push, replace
     } = router;
-
+    const {enqueueSnackbar} = useSnackbar()
     const classes = useStyles()
 
     const {setGeneralError} = useContext(ErrorContext);
     const [targetCategories, setTargetCategories] = useState({})
     const [selectedGroups, setSelectedGroups] = useState([])
     const [updateMode, setUpdateMode] = useState(undefined)
+    const [wantsApproval, setWantsApproval] = useState(false);
 
     const [allFetched, setAllFetched] = useState(false)
 
@@ -205,30 +209,63 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         }
     }
 
-    const SuccessMessage = (
-        <>
-            <Typography variant="h5" align="center" style={{color: "white"}}>Thanks for your
-                submission, the code for your created draft is <b>{draftId}</b>, please save it somewhere.
-                We will review the draft and get back to
-                you as soon as possible!</Typography>
-            <div style={{display: "flex", justifyContent: "space-between"}}>
-                <Button className={classes.whiteBtn} variant="contained" href="/profile">
-                    To Profile
-                </Button>
-                <Button className={classes.whiteBtn} variant="contained" href="/next-livestreams">
-                    To Next Livestreams
-                </Button>
-            </div>
-        </>
-    )
+    const getDirectLink = () => `/draft-stream?draftStreamId=${draftId}`
+    const buildFullUrl = (localPath) => {
+        let baseUrl = "https://careerfairy.io";
+        if (window?.location?.origin) {
+            baseUrl = window.location.origin;
+        }
+        return `${baseUrl}${localPath}`
+    }
+    const handleCopyDraftLink = () => {
+        const directLink = getDirectLink()
+        const targetPath = buildFullUrl(directLink)
+        copyStringToClipboard(targetPath);
+        enqueueSnackbar("Link has been copied to your clipboard", {
+            variant: "default",
+            preventDuplicate: true,
+        });
+    };
+
+
+    const SuccessMessage = () => {
+
+        const directLink = getDirectLink()
+        const targetPath = buildFullUrl(directLink)
+        return (
+            <>
+                <Typography variant="h5" align="center" style={{color: "white"}}>
+                    Thanks for your
+                    submission, the direct link to this draft you created is <a target="_blank"
+                                                                                href={directLink}>{targetPath}</a>,
+                    please save this link somewhere. We will review the draft and get back to you as soon as
+                    possible!</Typography>
+                <div style={{display: "flex", justifyContent: "space-between"}}>
+                    <Button className={classes.whiteBtn} variant="contained" href="/profile">
+                        To Profile
+                    </Button>
+                    <Button className={classes.whiteBtn} variant="contained" href="/next-livestreams">
+                        To Next Livestreams
+                    </Button>
+                    <Button onClick={handleCopyDraftLink} className={classes.whiteBtn} variant="contained">
+                        Copy Direct Link
+                    </Button>
+                    <Button onClick={() => setSubmitted(false)} className={classes.whiteBtn} variant="contained">
+                        Back to draft
+                    </Button>
+                </div>
+            </>
+        )
+    }
 
     return (<Container className={classes.root}>
-        {allFetched ? (submitted ? SuccessMessage : <Formik
+        {allFetched ? (submitted ? <SuccessMessage/> : <Formik
             initialValues={formData}
             enableReinitialize
             validate={(values) => validateStreamForm(values, true)}
             onSubmit={async (values, {setSubmitting}) => {
                 try {
+                    console.log("-> wantsApproval in submit", wantsApproval);
                     setGeneralError("")
                     setSubmitting(true)
                     const livestream = buildLivestreamObject(values, targetCategories, updateMode, draftStreamId, firebase);
@@ -236,17 +273,24 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     if (updateMode) {
                         id = livestream.id
                         await firebase.updateLivestream(livestream, "draftLivestreams")
+                        enqueueSnackbar("You changes have been saved!", {
+                            variant: "default",
+                            preventDuplicate: true,
+                        });
                         console.log("-> Draft livestream was updated with id", id);
                     } else {
                         id = await firebase.addLivestream(livestream, "draftLivestreams")
                         console.log("-> Draft livestream was created with id", id);
+                        replace(`/draft-stream?draftStreamId=${id}`)
                     }
+
                     if (absolutePath) {
                         return push({
                             pathname: absolutePath,
                         })
                     }
                     setDraftId(id)
+
                     setSubmitted(true)
                     window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
                 } catch (e) {
@@ -467,17 +511,33 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     </FormGroup>
                 </>
                 }
-                <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    size="large"
-                    className={classes.submit}
-                    endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
-                    variant="contained" fullWidth>
-                    <Typography variant="h4">
-                        {isSubmitting ? "Submitting" : updateMode ? "Update Draft" : "Submit Draft"}
-                    </Typography>
-                </Button>
+                <ButtonGroup fullWidth>
+                    <Button
+                        type="submit"
+                        onClick={() => {
+                            setWantsApproval(true)
+                        }}
+                        disabled={isSubmitting}
+                        size="large"
+                        className={classes.submit}
+                        endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
+                        variant="contained">
+                        <Typography variant="h4">
+                            {isSubmitting ? "Submitting" : wantsApproval? "Pending for Approval" : "Submit Draft for Approval"}
+                        </Typography>
+                    </Button>
+                    <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        size="large"
+                        className={classes.submit}
+                        endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
+                        variant="contained">
+                        <Typography variant="h4">
+                            {isSubmitting ? "Updating" : "Save changes"}
+                        </Typography>
+                    </Button>
+                </ButtonGroup>
             </form>)
             }
         </Formik>) : <CircularProgress style={{marginTop: "30vh", color: "white"}}/>}

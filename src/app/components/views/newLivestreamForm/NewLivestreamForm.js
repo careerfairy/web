@@ -328,7 +328,7 @@ const NewLivestreamForm = ({firebase}) => {
                                     variant="outlined"
                                     fullWidth
                                     id="title"
-                                    label="Livestream Title"
+                                    label="Live Stream Title"
                                     inputProps={{maxLength: 1000}}
                                     onBlur={handleBlur}
                                     value={values.title}
@@ -430,7 +430,7 @@ const NewLivestreamForm = ({firebase}) => {
                                 <DateTimePicker
                                     inputVariant="outlined" fullWidth variant="outlined"
                                     disabled={isSubmitting}
-                                    label="Livestream Start Date" value={values.start}
+                                    label="Live Stream Start Date" value={values.start}
                                     onChange={(value) => {
                                         setFieldValue('start', new Date(value), true)
                                     }}/>
@@ -535,7 +535,7 @@ const NewLivestreamForm = ({firebase}) => {
                         endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
                         variant="contained" fullWidth>
                         <Typography variant="h4">
-                            {updateMode ? isSubmitting ? "Updating" : "Update Livestream" : isSubmitting ? "Saving" : "Create Livestream"}
+                            {updateMode ? isSubmitting ? "Updating" : "Update Live Stream" : isSubmitting ? "Saving" : "Create Live Stream"}
                         </Typography>
                     </Button>
                 </form>)}

@@ -26,7 +26,7 @@ const draftStream = () => {
                         gutterBottom>
                 {submitted ? "Success!" : "Draft a Livestream"}
             </Typography>
-            <DraftStreamForm submitted={submitted} setSubmitted={setSubmitted}/>
+            <DraftStreamForm  submitted={submitted} setSubmitted={setSubmitted}/>
             <Footer/>
         </TealBackground>
     )
