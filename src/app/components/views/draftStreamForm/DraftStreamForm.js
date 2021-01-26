@@ -120,7 +120,6 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         speakers: {[uuidv4()]: speakerObj},
         status: {}
     })
-    console.log("-> formData", formData);
 
 
     const handleSetGroupIds = async (UrlIds, draftStreamGroupIds, newFormData) => {
@@ -245,11 +244,12 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         return (
             <>
                 <Typography variant="h5" align="center" style={{color: "white"}}>
-                    Thanks for your
-                    submission, the direct link to this draft you created is <a target="_blank"
-                                                                                href={directLink}>{targetPath}</a>,
-                    please save this link somewhere. We will review the draft and get back to you as soon as
-                    possible!</Typography>
+                    {status === SAVING ? "Your changes have been saved under the following link:" : "Thanks for your submission, the direct link to this draft you created is:"}
+                    <br/>
+                    <a target="_blank" href={directLink}>{targetPath}</a>
+                    <br/>
+                    Please save this link somewhere. We will review the draft and get back to you as soon as possible!
+                </Typography>
                 <div style={{display: "flex", justifyContent: "space-between"}}>
                     <Button className={classes.whiteBtn} variant="contained" href="/profile">
                         To Profile
@@ -278,11 +278,13 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     setGeneralError("")
                     setSubmitting(true)
                     const livestream = buildLivestreamObject(values, targetCategories, updateMode, draftStreamId, firebase);
-                    if(status === APPROVAL){
-                        livestream.status = {
+                    if (status === APPROVAL) {
+                        const newStatus = {
                             pendingApproval: true,
                             seen: false,
                         }
+                        livestream.status = newStatus
+                        setFormData({...formData, status: newStatus})
                     }
                     let id;
                     if (updateMode) {
@@ -302,10 +304,9 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                         })
                     }
                     setDraftId(id)
-                    if (status === APPROVAL) {
-                        setSubmitted(true)
-                        window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
-                    } else if (status === SAVING) {
+                    setSubmitted(true)
+                    window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
+                    if (status === SAVING) {
                         enqueueSnackbar("You changes have been saved!", {
                             variant: "default",
                             preventDuplicate: true,

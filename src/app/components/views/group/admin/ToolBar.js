@@ -44,7 +44,8 @@ const useStyles = makeStyles((theme) => ({
     tooltip: {
         transition: "all 0.8s",
         transitionTimingFunction: theme.transitions.easeInOut,
-        whiteSpace: "nowrap"
+        whiteSpace: "nowrap",
+        boxShadow: theme.shadows[16]
     },
     toolbarCard: {
         width: "calc(100% - 100px)"
