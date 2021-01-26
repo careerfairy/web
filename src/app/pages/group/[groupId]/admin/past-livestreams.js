@@ -8,7 +8,7 @@ const PastLivestreamsPage = ({group, firebase}) => {
     return (
         <Page title={`CareerFairy | Admin Past Streams of ${group.universityName}`}>
             <StreamsOverview
-                query={firebase.getPastLiveStreamsByGroupId}
+                query={firebase.listenToPastLiveStreamsByGroupId}
                 group={group}
                 firebase={firebase}
                 typeOfStream="past"

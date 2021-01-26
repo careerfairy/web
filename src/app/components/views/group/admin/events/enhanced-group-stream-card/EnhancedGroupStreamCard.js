@@ -202,6 +202,7 @@ const EnhancedGroupStreamCard = ({
         try {
             setDeletingStream(true)
             const targetCollection = isDraft ? "draftLivestreams" : "livestreams"
+            console.log("-> targetCollection", targetCollection);
             await firebase.deleteLivestream(livestream.id, targetCollection)
             setDeletingStream(false)
         } catch (e) {

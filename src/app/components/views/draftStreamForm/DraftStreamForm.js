@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        minHeight: "90vh",
+        minHeight: "20vh",
         borderRadius: 5,
         marginBottom: 30
     },

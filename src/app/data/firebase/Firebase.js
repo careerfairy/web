@@ -665,6 +665,14 @@ class Firebase {
         return ref.get()
     }
 
+    listenToDraftLiveStreamsByGroupId = (groupId, callback) => {
+        let ref = this.firestore
+            .collection("draftLivestreams")
+            .where("groupIds", "array-contains", groupId)
+            .orderBy("start", "asc")
+        return ref.onSnapshot(callback)
+    }
+
     queryPastLiveStreamsByGroupId = (groupId) => {
         let START_DATE_FOR_REPORTED_EVENTS = 'September 1, 2020 00:00:00';
         const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
@@ -686,6 +694,18 @@ class Firebase {
             .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
             .orderBy("start", "desc")
         return ref.get()
+    }
+
+    listenToPastLiveStreamsByGroupId = (groupId, callback) => {
+        let START_DATE_FOR_REPORTED_EVENTS = 'September 1, 2020 00:00:00';
+        const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
+        let ref = this.firestore
+            .collection("livestreams")
+            .where("groupIds", "array-contains", groupId)
+            .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
+            .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
+            .orderBy("start", "desc")
+        return ref.onSnapshot(callback)
     }
 
     getLivestreamSpeakers = (livestreamId) => {
