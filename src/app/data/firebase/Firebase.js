@@ -1314,7 +1314,6 @@ class Firebase {
                     registeredUsers: firebase.firestore.FieldValue.arrayUnion(userId),
                 });
 
-                console.log("-> idsOfGroupsWithPolicies", idsOfGroupsWithPolicies);
                 for (const groupId of idsOfGroupsWithPolicies) {
                     let userInPolicyRef = this.firestore
                         .collection("careerCenterData")

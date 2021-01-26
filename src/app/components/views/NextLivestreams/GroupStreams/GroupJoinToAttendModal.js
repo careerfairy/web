@@ -220,6 +220,12 @@ const GroupJoinToAttendModal = ({
                         </Box>
                     </DialogContent>
                     <DialogActions>
+                        <Button size="large" onClick={() => {
+                            setGroup({})
+                            closeModal()
+                        }}>
+                            Cancel
+                        </Button>
                         {((alreadyJoined && group.categories) || !alreadyJoined) && (
                             <Button
                                 disabled={!allSelected || submitting || stillNeedsToAgree()}
@@ -235,12 +241,6 @@ const GroupJoinToAttendModal = ({
                                 I'll attend
                             </Button>
                         )}
-                        <Button size="large" onClick={() => {
-                            setGroup({})
-                            closeModal()
-                        }}>
-                            Cancel
-                        </Button>
                     </DialogActions>
                 </>
             }

@@ -21,6 +21,7 @@ import EnhancedGroupStreamCard from "../../../group/admin/events/enhanced-group-
 import SettingsIcon from '@material-ui/icons/Settings';
 import CopyToClipboard from "../../../common/CopyToClipboard";
 import LogosPlaceHolder from "./LogosPlaceholder";
+import GroupsUtil from "../../../../../data/util/GroupsUtil";
 
 const useStyles = makeStyles((theme) => {
     const paperColor = theme.palette.background.paper
@@ -488,7 +489,7 @@ const GroupStreamCardV2 = memo(({
                 query: "profile"
             });
         }
-        const {hasAgreedToAll, groupsWithPolicies} = await getPolicyStatus(careerCenters, user.email, firebase)
+        const {hasAgreedToAll, groupsWithPolicies} = await GroupsUtil.getPolicyStatus(careerCenters, user.email, firebase)
         if (!hasAgreedToAll) {
             setOpenJoinModal(true)
             setGroupsWithPolicies(groupsWithPolicies)
@@ -514,27 +515,6 @@ const GroupStreamCardV2 = memo(({
             }
         }
 
-    }
-
-    const getPolicyStatus = async (groups, userEmail, firebase) => {
-        let hasAgreedToAll = true
-        const updatedGroups = await Promise.all(groups.map(async group => {
-            let needsToAgree = false
-            if (group.privacyPolicyActive) {
-                needsToAgree = await firebase.checkIfUserAgreedToGroupPolicy(group.id, userEmail)
-                if (hasAgreedToAll && needsToAgree) {
-                    hasAgreedToAll = false
-                }
-            }
-            return ({
-                ...group,
-                needsToAgree
-            })
-        }))
-
-        const groupsWithPolicies = updatedGroups.filter(group => group.needsToAgree)
-
-        return {hasAgreedToAll, groupsWithPolicies}
     }
 
     function completeRegistrationProcess() {

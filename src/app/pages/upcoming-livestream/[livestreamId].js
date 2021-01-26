@@ -26,6 +26,7 @@ import {Avatar} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../components/util/constants";
 import {useAuth} from "../../HOCs/AuthProvider";
+import GroupsUtil from "../../data/util/GroupsUtil";
 
 const useStyles = makeStyles(theme => ({
     speakerAvatar: {
@@ -54,7 +55,7 @@ function UpcomingLivestream(props) {
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [registered, setRegistered] = useState(false);
-
+    const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [careerCenters, setCareerCenters] = useState([]);
     const [currentGroup, setCurrentGroup] = useState(null);
@@ -237,7 +238,7 @@ function UpcomingLivestream(props) {
         })
     }
 
-    function startRegistrationProcess(livestreamId) {
+    const startRegistrationProcess = async (livestreamId) => {
         if (!user || !user.emailVerified) {
             return router.push(
                 absolutePath
@@ -253,13 +254,17 @@ function UpcomingLivestream(props) {
             return router.push("/profile");
         }
 
-        if (careerCenters.length > 0 && !userFollowsSomeCareerCenter()) {
+        const {hasAgreedToAll, groupsWithPolicies} = await GroupsUtil.getPolicyStatus(careerCenters, user.email, props.firebase)
+        if (!hasAgreedToAll) {
+            setOpenJoinModal(true)
+            setGroupsWithPolicies(groupsWithPolicies)
+        } else if (careerCenters.length > 0 && !userFollowsSomeCareerCenter()) {
             setOpenJoinModal(true)
         } else {
             setBookingModalOpen(true);
             setRegistration(true);
             props.firebase
-                .registerToLivestream(currentLivestream.id, user.email)
+                .registerToLivestream(currentLivestream.id, user.email, groupsWithPolicies)
                 .then(() => {
                     sendEmailRegistrationConfirmation();
                     setRegistration(false);
@@ -268,7 +273,7 @@ function UpcomingLivestream(props) {
     }
 
     function completeRegistrationProcess() {
-        props.firebase.registerToLivestream(currentLivestream.id, user.email).then(() => {
+        props.firebase.registerToLivestream(currentLivestream.id, user.email, groupsWithPolicies).then(() => {
             setBookingModalOpen(true);
             sendEmailRegistrationConfirmation();
         })
@@ -772,16 +777,15 @@ function UpcomingLivestream(props) {
                 </Container>
             </div>
             <Footer/>
-            {
-                careerCenters.length > 0 &&
                 <GroupJoinToAttendModal
                     open={openJoinModal}
+                    groupsWithPolicies={groupsWithPolicies}
                     groups={careerCenters}
                     alreadyJoined={false}
                     userData={userData}
                     onConfirm={completeRegistrationProcess}
                     closeModal={handleCloseJoinModal}
-                />}
+                />
             <BookingModal
                 careerCenters={careerCenters}
                 livestream={currentLivestream}
