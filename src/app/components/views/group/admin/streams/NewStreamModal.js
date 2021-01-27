@@ -56,6 +56,12 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
 
     const canPublish = () => Boolean(isDraft() && currentStream)
 
+    const handleCloseDialog = () => {
+        handleResetCurrentStream()
+        setSubmitted(false)
+        onClose()
+    }
+
     const handlePublishDraft = async () => {
         if (canPublish()) {
             try {
@@ -64,9 +70,9 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                 newStream.companyId = uuidv4()
                 await firebase.addLivestream(newStream, "livestreams")
                 await firebase.deleteLivestream(currentStream.id, "draftLivestreams")
-                handleResetCurrentStream()
+
                 push(`/group/${group.id}/admin/upcoming-livestreams`)
-                onClose()
+                handleCloseDialog()
             } catch (e) {
                 console.log("-> e", e);
                 enqueueSnackbar(GENERAL_ERROR, {
@@ -107,7 +113,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                 id = await firebase.addLivestream(livestream, targetCollection)
                 console.log(`-> ${!isActualLivestream() && "Draft "}livestream was created with id`, id);
             }
-            onClose()
+            handleCloseDialog()
 
             setDraftId(id)
             setSubmitted(true)
@@ -137,7 +143,6 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
     const handleSaveOrUpdate = () => {
         if (isDraft()) {
             saveChangesButtonRef?.current?.click()
-            console.log("-> saveChangesButtonRef", saveChangesButtonRef);
         }
     }
 
@@ -146,7 +151,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
         <Dialog
             keepMounted={false}
             TransitionComponent={Transition}
-            onClose={onClose}
+            onClose={handleCloseDialog}
             fullScreen
             open={open}
             PaperProps={{
@@ -155,7 +160,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
         >
             <AppBar className={classes.appBar} position="sticky">
                 <Toolbar>
-                    <IconButton edge="start" color="inherit" onClick={onClose} aria-label="close">
+                    <IconButton edge="start" color="inherit" onClick={handleCloseDialog} aria-label="close">
                         <CloseIcon/>
                     </IconButton>
                     <Typography variant="h6" className={classes.title}>

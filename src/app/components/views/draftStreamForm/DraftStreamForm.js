@@ -93,7 +93,6 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, fo
     } = router;
     const {enqueueSnackbar} = useSnackbar()
     const [status, setStatus] = useState("");
-    console.log("-> status", status);
 
     const classes = useStyles()
 
@@ -277,14 +276,8 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, fo
     }
 
     const noValidation = () => status === SAVE_WITH_NO_VALIDATION
-    console.log("-> status", status);
 
     const isGroupAdmin = () => Boolean(group?.id)
-
-    const saveDraftChanges = (values) => {
-
-    }
-
 
     return (<Container className={classes.root}>
         {allFetched ? (submitted ? <SuccessMessage/> : <Formik
