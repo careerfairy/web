@@ -120,7 +120,6 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit}) =
         speakers: {[uuidv4()]: speakerObj},
         status: {}
     })
-    console.log("-> formData", formData);
 
 
     const handleSetGroupIds = async (UrlIds, draftStreamGroupIds, newFormData) => {
@@ -276,6 +275,8 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit}) =
     }
 
     const noValidation = () => status === SAVING_CHANGES
+
+    const isGroupAdmin = () => Boolean(group?.id)
 
 
     return (<Container className={classes.root}>
@@ -500,7 +501,7 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit}) =
                     </FormGroup>
                 </>
                 }
-                <ButtonGroup fullWidth>
+                {!isGroupAdmin() && <ButtonGroup fullWidth>
                     <Button
                         type="submit"
                         onClick={() => {
@@ -529,7 +530,7 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit}) =
                             {isSubmitting ? "Saving" : "Save changes"}
                         </Typography>
                     </Button>
-                </ButtonGroup>
+                </ButtonGroup>}
             </form>)
             }
         </Formik>) : <CircularProgress style={{marginTop: "30vh", color: "white"}}/>}
