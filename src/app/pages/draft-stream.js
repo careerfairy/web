@@ -22,7 +22,7 @@ const draftStream = ({firebase}) => {
         push
     } = router;
 
-    const onSubmit = async (values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId) => {
+    const onSubmit = async (values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId, status) => {
         try {
             setSubmitting(true)
             const livestream = buildLivestreamObject(values, targetCategories, updateMode, draftStreamId, firebase);

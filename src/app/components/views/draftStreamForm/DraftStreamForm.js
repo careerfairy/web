@@ -120,6 +120,7 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit}) =
         speakers: {[uuidv4()]: speakerObj},
         status: {}
     })
+    console.log("-> formData", formData);
 
 
     const handleSetGroupIds = async (UrlIds, draftStreamGroupIds, newFormData) => {
@@ -165,6 +166,7 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit}) =
                         speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery),
                         status: livestream.status || {}
                     }
+                    console.log("-> newFormData", newFormData);
                     setFormData(newFormData)
                     if (careerCenterIds) {
                         const arrayOfUrlIds = careerCenterIds.split(",")
@@ -282,7 +284,7 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit}) =
             enableReinitialize
             validate={(values) => validateStreamForm(values, true, noValidation())}
             onSubmit={async (values, {setSubmitting}) => {
-                await onSubmit(values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId)
+                await onSubmit(values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId, status)
             }}
         >
             {({
