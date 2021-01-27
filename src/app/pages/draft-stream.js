@@ -15,6 +15,8 @@ import {withFirebase} from "../context/firebase";
 const draftStream = ({firebase}) => {
 
     const [submitted, setSubmitted] = useState(false)
+    const [status, setStatus] = useState("");
+
     const {enqueueSnackbar} = useSnackbar()
     const router = useRouter()
     const {
@@ -82,7 +84,7 @@ const draftStream = ({firebase}) => {
                         gutterBottom>
                 {submitted ? "Success!" : "Draft a Live Stream"}
             </Typography>
-            <DraftStreamForm onSubmit={onSubmit} submitted={submitted} setSubmitted={setSubmitted}/>
+            <DraftStreamForm status={status} setStatus={setStatus} onSubmit={onSubmit} submitted={submitted} setSubmitted={setSubmitted}/>
             <Footer/>
         </TealBackground>
     )

@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useRef, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {AppBar, CardActions, Dialog, Slide} from "@material-ui/core";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -35,9 +35,12 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentStream, handleResetCurrentStream}) => {
+    const formRef = useRef()
+    console.log("-> formRef", formRef);
     const router = useRouter()
     const {enqueueSnackbar} = useSnackbar()
     const [submitted, setSubmitted] = useState(false)
+    const [status, setStatus] = useState("");
     const [publishingDraft, setPublishingDraft] = useState(false);
     const classes = useStyles()
 
@@ -118,6 +121,12 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
         }
         setSubmitting(false)
     }
+    const handleSubmit = () => {
+        if (formRef.current) {
+            formRef.current.handleSubmit()
+        }
+    }
+
 
     return (
         <Dialog
@@ -141,13 +150,21 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                         <Button variant="contained" autoFocus color="secondary" onClick={handleSaveChanges}>
                             publish
                         </Button>
-                        <Button variant="contained" autoFocus color="primary" onClick={handleSaveChanges}>
+                        <Button variant="contained" autoFocus color="primary" onClick={handleSubmit}>
                             save changes
                         </Button>
                     </CardActions>
                 </Toolbar>
             </AppBar>
-            <DraftStreamForm group={group} onSubmit={onSubmit} submitted={submitted} setSubmitted={setSubmitted}/>
+            <DraftStreamForm
+                setStatus={setStatus}
+                status={status}
+                formRef={formRef}
+                group={group}
+                onSubmit={onSubmit}
+                submitted={submitted}
+                setSubmitted={setSubmitted}
+            />
         </Dialog>
     );
 };

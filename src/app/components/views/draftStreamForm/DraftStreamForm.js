@@ -1,4 +1,4 @@
-import React, {Fragment, useContext, useEffect, useState} from 'react';
+import React, {Fragment, useContext, useEffect, useRef, useState} from 'react';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {
     Button,
@@ -84,7 +84,7 @@ const speakerObj = {
 }
 
 
-const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit}) => {
+const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, formRef = useRef(), status, setStatus}) => {
     const router = useRouter()
     const {
         query: {careerCenterIds, draftStreamId, absolutePath},
@@ -99,7 +99,6 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit}) =
     const [selectedGroups, setSelectedGroups] = useState([])
     const [wantsApproval, setWantsApproval] = useState(false);
     const [updated, setUpdated] = useState(false);
-    const [status, setStatus] = useState("");
     const [allFetched, setAllFetched] = useState(false)
     const [updateMode, setUpdateMode] = useState(false);
 
@@ -282,6 +281,7 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit}) =
     return (<Container className={classes.root}>
         {allFetched ? (submitted ? <SuccessMessage/> : <Formik
             initialValues={formData}
+            innerRef={formRef}
             enableReinitialize
             validate={(values) => validateStreamForm(values, true, noValidation())}
             onSubmit={async (values, {setSubmitting}) => {
