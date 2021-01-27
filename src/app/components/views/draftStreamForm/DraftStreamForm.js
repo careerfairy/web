@@ -33,9 +33,8 @@ import {
 import {copyStringToClipboard} from "../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
+import {SAVING_CHANGES, SUBMIT_FOR_APPROVAL} from "../../util/constants";
 
-const SAVING = "SAVING"
-const APPROVAL = "APPROVAL"
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -85,23 +84,24 @@ const speakerObj = {
 }
 
 
-const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
+const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit}) => {
     const router = useRouter()
     const {
         query: {careerCenterIds, draftStreamId, absolutePath},
-        push, replace
+        push, replace,
+        pathname
     } = router;
     const {enqueueSnackbar} = useSnackbar()
     const classes = useStyles()
 
-    const {setGeneralError} = useContext(ErrorContext);
+
     const [targetCategories, setTargetCategories] = useState({})
     const [selectedGroups, setSelectedGroups] = useState([])
-    const [updateMode, setUpdateMode] = useState(undefined)
     const [wantsApproval, setWantsApproval] = useState(false);
     const [updated, setUpdated] = useState(false);
     const [status, setStatus] = useState("");
     const [allFetched, setAllFetched] = useState(false)
+    const [updateMode, setUpdateMode] = useState(false);
 
     const [draftId, setDraftId] = useState("")
 
@@ -142,6 +142,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
 
     useEffect(() => {
         if (draftStreamId) {
+            console.log("-> in the use effect draftStreamId", draftStreamId);
             (async () => {
                 const targetId = draftStreamId
                 const targetCollection = "draftLivestreams"
@@ -174,14 +175,18 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     setTargetCategories(livestream.targetCategories || {})
                     setAllFetched(true)
                     setUpdateMode(true)
+                } else {
+                    setAllFetched(true)
+                    setUpdateMode(false)
+                    replace(pathname)
                 }
             })()
-        } else if (careerCenterIds) {
+        } else if (careerCenterIds || group?.id) {
             handleSetOnlyUrlIds()
         } else {
             setAllFetched(true)
         }
-    }, [draftStreamId, router])
+    }, [draftStreamId, router, submitted])
 
     const isPending = () => {
         return Boolean(formData?.status?.pendingApproval === true)
@@ -198,7 +203,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
     }
 
     const handleSetOnlyUrlIds = async () => {
-        const arrayOfUrlIds = careerCenterIds.split(",")
+        const arrayOfUrlIds = careerCenterIds?.split(",") || [group.id]
         await handleSetGroupIds(arrayOfUrlIds, [], formData)
         setAllFetched(true)
     }
@@ -244,7 +249,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         return (
             <>
                 <Typography variant="h5" align="center" style={{color: "white"}}>
-                    {status === SAVING ? "Your changes have been saved under the following link:" : "Thanks for your submission, the direct link to this draft you created is:"}
+                    {status === SAVING_CHANGES ? "Your changes have been saved under the following link:" : "Thanks for your submission, the direct link to this draft you created is:"}
                     <br/>
                     <a target="_blank" href={directLink}>{targetPath}</a>
                     <br/>
@@ -268,7 +273,8 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         )
     }
 
-    const noValidation = () => status === SAVING
+    const noValidation = () => status === SAVING_CHANGES
+
 
     return (<Container className={classes.root}>
         {allFetched ? (submitted ? <SuccessMessage/> : <Formik
@@ -276,47 +282,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
             enableReinitialize
             validate={(values) => validateStreamForm(values, true, noValidation())}
             onSubmit={async (values, {setSubmitting}) => {
-                try {
-                    setGeneralError("")
-                    setSubmitting(true)
-                    const livestream = buildLivestreamObject(values, targetCategories, updateMode, draftStreamId, firebase);
-                    if (status === APPROVAL) {
-                        const newStatus = {
-                            pendingApproval: true,
-                            seen: false,
-                        }
-                        livestream.status = newStatus
-                        setFormData({...formData, status: newStatus})
-                    }
-                    let id;
-                    if (updateMode) {
-                        id = livestream.id
-                        await firebase.updateLivestream(livestream, "draftLivestreams")
-
-                        console.log("-> Draft livestream was updated with id", id);
-                    } else {
-                        id = await firebase.addLivestream(livestream, "draftLivestreams")
-                        console.log("-> Draft livestream was created with id", id);
-                        replace(`/draft-stream?draftStreamId=${id}`)
-                    }
-
-                    if (absolutePath) {
-                        return push({
-                            pathname: absolutePath,
-                        })
-                    }
-                    setDraftId(id)
-                    setSubmitted(true)
-                    window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
-                    if (status === SAVING) {
-                        enqueueSnackbar("You changes have been saved!", {
-                            variant: "default",
-                            preventDuplicate: true,
-                        });
-                    }
-                } catch (e) {
-                    setGeneralError("Something went wrong")
-                }
+                await onSubmit(values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId)
             }}
         >
             {({
@@ -536,7 +502,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     <Button
                         type="submit"
                         onClick={() => {
-                            setStatus(APPROVAL)
+                            setStatus(SUBMIT_FOR_APPROVAL)
                         }}
                         disabled={isSubmitting || isPending()}
                         size="large"
@@ -552,7 +518,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                         disabled={isSubmitting}
                         size="large"
                         onClick={() => {
-                            setStatus(SAVING)
+                            setStatus(SAVING_CHANGES)
                         }}
                         className={classes.submit}
                         endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
