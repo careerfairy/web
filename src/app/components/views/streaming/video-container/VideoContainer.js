@@ -230,6 +230,7 @@ function VideoContainer(props) {
                         attachSinkId={attachSinkId}
                         streams={externalMediaStreams}
                         currentSpeaker={props.currentLivestream.currentSpeakerId}
+                        setRemovedStream={setRemovedStream}
                         {...props}
                         muted={false}/>
                 </div>

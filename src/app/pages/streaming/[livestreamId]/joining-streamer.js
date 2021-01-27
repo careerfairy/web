@@ -61,7 +61,7 @@ function StreamingPage(props) {
                 setStreamerId(livestreamId + storedUuid)
             } else {
                 let uuid = uuidv4()
-                let joiningId = uuid.replaceAll('-', '')
+                let joiningId = uuid.replace('/-/g', '')
                 localStorage.setItem('streamingUuid', joiningId)
                 setStreamerId(livestreamId + joiningId)
             }        

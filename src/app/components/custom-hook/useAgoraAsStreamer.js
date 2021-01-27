@@ -118,6 +118,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         rtcClient.on("stream-subscribed", function(evt){
             let stream = evt.stream;
             let streamId = String(stream.getId());
+            rtcClient.setStreamFallbackOption(stream, 1);
             setAddedStream({
                 streamId: streamId,
                 stream: stream
