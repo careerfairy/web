@@ -32,6 +32,7 @@ const Index = ({group, typeOfStream, query}) => {
     const {page, action} = usePagination(filteredStreams, 6);
     const [searchParams, setSearchParams] = useState('');
     const [fetching, setFetching] = useState(false);
+    const [currentStream, setCurrentStream] = useState(null);
 
     useEffect(() => {
         if (group?.id) {
@@ -43,15 +44,8 @@ const Index = ({group, typeOfStream, query}) => {
                     setFilteredStreams(streamsData)
                     setFetching(false)
                 })
-
             return () => unsubscribe()
         }
-        //         enqueueSnackbar("something went Wrong, please refresh the page", {
-        //             variant: "error",
-        //             preventDuplicate: true
-        //         })
-        //     }
-
     }, [])
 
     const onPageChange = (event, number) => {
@@ -87,6 +81,12 @@ const Index = ({group, typeOfStream, query}) => {
     const handleCloseNewStreamModal = () => {
         setOpenNewStreamModal(false)
     }
+
+    const handleResetCurrentStream = () => {
+        setCurrentStream(null)
+    }
+
+
 
     const handleFilter = () => {
         const newFilteredStreams = upcomingStreams?.filter(livestream => {
@@ -184,7 +184,10 @@ const Index = ({group, typeOfStream, query}) => {
             </Container>
             <NewStreamModal
                 group={group}
+                typeOfStream={typeOfStream}
                 open={openNewStreamModal}
+                handleResetCurrentStream={handleResetCurrentStream}
+                currentStream={currentStream}
                 onClose={handleCloseNewStreamModal}
             />
         </Fragment>

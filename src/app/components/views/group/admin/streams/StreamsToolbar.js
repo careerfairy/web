@@ -136,7 +136,7 @@ const StreamsToolbar = ({value, group, onChange, className, handleSubmit,openNew
 
     if (canCreateStream()) {
         buttonOptions.unshift({
-            name: "Start drafting a stream",
+            name: "Draft or publish a new stream",
             onClick: () => handleOpenNewStreamModal(),
             icon: <StreamIcon/>
         });

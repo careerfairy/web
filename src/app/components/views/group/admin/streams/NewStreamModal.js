@@ -1,6 +1,6 @@
 import React, {Fragment, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {AppBar, Dialog, Slide} from "@material-ui/core";
+import {AppBar, CardActions, Dialog, Slide} from "@material-ui/core";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
@@ -34,7 +34,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const NewStreamModal = ({group, open, onClose, firebase}) => {
+const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentStream, handleResetCurrentStream}) => {
     const router = useRouter()
     const {enqueueSnackbar} = useSnackbar()
     const [submitted, setSubmitted] = useState(false)
@@ -49,6 +49,8 @@ const NewStreamModal = ({group, open, onClose, firebase}) => {
     const handleSaveChanges = () => {
 
     }
+
+    const isDraft = () => typeOfStream === "draft"
 
     const handlePublishDraft = async (livestream) => {
         try {
@@ -135,12 +137,14 @@ const NewStreamModal = ({group, open, onClose, firebase}) => {
                     <Typography variant="h6" className={classes.title}>
                         New Draft / Stream
                     </Typography>
-                    <Button autoFocus color="inherit" onClick={handleSaveChanges}>
-                        publish
-                    </Button>
-                    <Button autoFocus color="inherit" onClick={handleSaveChanges}>
-                        save changes
-                    </Button>
+                    <CardActions>
+                        <Button variant="contained" autoFocus color="secondary" onClick={handleSaveChanges}>
+                            publish
+                        </Button>
+                        <Button variant="contained" autoFocus color="primary" onClick={handleSaveChanges}>
+                            save changes
+                        </Button>
+                    </CardActions>
                 </Toolbar>
             </AppBar>
             <DraftStreamForm group={group} onSubmit={onSubmit} submitted={submitted} setSubmitted={setSubmitted}/>
