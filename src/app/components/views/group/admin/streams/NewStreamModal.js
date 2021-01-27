@@ -36,11 +36,12 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentStream, handleResetCurrentStream,}) => {
     const formRef = useRef()
+    const saveChangesButtonRef = useRef()
+    console.log("-> saveChangesButtonRef", saveChangesButtonRef);
     console.log("-> formRef", formRef);
     const router = useRouter()
     const {enqueueSnackbar} = useSnackbar()
     const [submitted, setSubmitted] = useState(false)
-    const [status, setStatus] = useState("");
     const classes = useStyles()
 
     const {push} = router;
@@ -55,8 +56,10 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
 
     const isActualLivestream = () => Boolean(currentStream && isUpcomingOrPastStreamsPage())
 
+    const canPublish = () => Boolean(isDraft() && currentStream)
+
     const handlePublishDraft = async () => {
-        if (isDraft()) {
+        if (canPublish()) {
             try {
                 formRef.current?.setSubmitting(true)
                 const newStream = {...currentStream}
@@ -67,6 +70,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                 push(`/group/${group.id}/admin/upcoming-livestreams`)
                 onClose()
             } catch (e) {
+                console.log("-> e", e);
                 enqueueSnackbar(GENERAL_ERROR, {
                     variant: "error",
                     preventDuplicate: true,
@@ -85,6 +89,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
     const onSubmit = async (values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId, status) => {
         try {
             setSubmitting(true)
+            console.log("-> in the submit");
             const livestream = buildLivestreamObject(values, targetCategories, updateMode, draftStreamId, firebase);
             if (status === SUBMIT_FOR_APPROVAL) {
                 const newStatus = {
@@ -103,7 +108,6 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
             } else {
                 id = await firebase.addLivestream(livestream, targetCollection)
                 console.log(`-> ${!isActualLivestream() && "Draft "}livestream was created with id`, id);
-                push(`/draft-stream?draftStreamId=${id}`)
             }
             onClose()
 
@@ -125,6 +129,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
         }
         setSubmitting(false)
     }
+
     const handleSubmit = () => {
         if (formRef.current) {
             formRef.current.handleSubmit()
@@ -133,16 +138,14 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
 
     const handleSaveOrUpdate = () => {
         if (isDraft()) {
-            setStatus(SAVE_WITH_NO_VALIDATION)
-        } else {
-            setStatus("")
+            saveChangesButtonRef?.current?.onclick()
         }
-        handleSubmit()
     }
 
 
     return (
         <Dialog
+            keepMounted={false}
             TransitionComponent={Transition}
             onClose={onClose}
             fullScreen
@@ -160,7 +163,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                         {isActualLivestream() ? "Update Stream" : currentStream ? "Update Draft" : "New draft"}
                     </Typography>
                     <CardActions>
-                        {isDraft() &&
+                        {canPublish() &&
                         <Button disabled={formRef.current?.isSubmitting} variant="contained" autoFocus color="secondary"
                                 onClick={handlePublishDraft}>
                             publish draft
@@ -173,10 +176,9 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                 </Toolbar>
             </AppBar>
             <DraftStreamForm
-                setStatus={setStatus}
-                status={status}
                 formRef={formRef}
                 group={group}
+                saveChangesButtonRef={saveChangesButtonRef}
                 onSubmit={onSubmit}
                 submitted={submitted}
                 setSubmitted={setSubmitted}

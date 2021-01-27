@@ -84,7 +84,7 @@ const speakerObj = {
 }
 
 
-const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, formRef = useRef(), status, setStatus}) => {
+const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, formRef = useRef(), saveChangesButtonRef= useRef()}) => {
     const router = useRouter()
     const {
         query: {careerCenterIds, draftStreamId, absolutePath},
@@ -92,6 +92,8 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, fo
         pathname
     } = router;
     const {enqueueSnackbar} = useSnackbar()
+    const [status, setStatus] = useState("");
+
     const classes = useStyles()
 
 
@@ -274,8 +276,13 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, fo
     }
 
     const noValidation = () => status === SAVE_WITH_NO_VALIDATION
+    console.log("-> status", status);
 
     const isGroupAdmin = () => Boolean(group?.id)
+
+    const saveDraftChanges = (values) => {
+
+    }
 
 
     return (<Container className={classes.root}>
@@ -283,7 +290,11 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, fo
             initialValues={formData}
             innerRef={formRef}
             enableReinitialize
-            validate={(values) => validateStreamForm(values, true, noValidation())}
+            validate={(values) => {
+                console.log("-> noValidation", noValidation());
+
+                validateStreamForm(values, true, noValidation())
+            }}
             onSubmit={async (values, {setSubmitting}) => {
                 await onSubmit(values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId, status)
             }}
@@ -501,7 +512,7 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, fo
                     </FormGroup>
                 </>
                 }
-                {!isGroupAdmin() && <ButtonGroup fullWidth>
+                <ButtonGroup style={{visibility: isGroupAdmin() && "hidden"}} fullWidth>
                     <Button
                         type="submit"
                         onClick={() => {
@@ -518,6 +529,7 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, fo
                     </Button>
                     <Button
                         type="submit"
+                        ref={saveChangesButtonRef}
                         disabled={isSubmitting}
                         size="large"
                         onClick={() => {
@@ -530,7 +542,7 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, fo
                             {isSubmitting ? "Saving" : "Save changes"}
                         </Typography>
                     </Button>
-                </ButtonGroup>}
+                </ButtonGroup>
             </form>)
             }
         </Formik>) : <CircularProgress style={{marginTop: "30vh", color: "white"}}/>}
