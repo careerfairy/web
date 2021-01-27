@@ -8,7 +8,7 @@ import DraftStreamForm from "../components/views/draftStreamForm/DraftStreamForm
 import {buildLivestreamObject} from "../components/helperFunctions/streamFormFunctions";
 import {useSnackbar} from "notistack";
 import {useRouter} from "next/router";
-import {GENERAL_ERROR, SAVING_CHANGES, SUBMIT_FOR_APPROVAL} from "../components/util/constants";
+import {GENERAL_ERROR, SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../components/util/constants";
 import {withFirebase} from "../context/firebase";
 
 
@@ -56,7 +56,7 @@ const draftStream = ({firebase}) => {
             setDraftId(id)
             setSubmitted(true)
             window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
-            if (status === SAVING_CHANGES) {
+            if (status === SAVE_WITH_NO_VALIDATION) {
                 enqueueSnackbar("You changes have been saved!", {
                     variant: "default",
                     preventDuplicate: true,

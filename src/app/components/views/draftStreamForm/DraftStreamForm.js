@@ -33,7 +33,7 @@ import {
 import {copyStringToClipboard} from "../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
-import {SAVING_CHANGES, SUBMIT_FOR_APPROVAL} from "../../util/constants";
+import {SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../../util/constants";
 
 
 const useStyles = makeStyles(theme => ({
@@ -249,7 +249,7 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, fo
         return (
             <>
                 <Typography variant="h5" align="center" style={{color: "white"}}>
-                    {status === SAVING_CHANGES ? "Your changes have been saved under the following link:" : "Thanks for your submission, the direct link to this draft you created is:"}
+                    {status === SAVE_WITH_NO_VALIDATION ? "Your changes have been saved under the following link:" : "Thanks for your submission, the direct link to this draft you created is:"}
                     <br/>
                     <a target="_blank" href={directLink}>{targetPath}</a>
                     <br/>
@@ -273,7 +273,7 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, fo
         )
     }
 
-    const noValidation = () => status === SAVING_CHANGES
+    const noValidation = () => status === SAVE_WITH_NO_VALIDATION
 
     const isGroupAdmin = () => Boolean(group?.id)
 
@@ -521,7 +521,7 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, fo
                         disabled={isSubmitting}
                         size="large"
                         onClick={() => {
-                            setStatus(SAVING_CHANGES)
+                            setStatus(SAVE_WITH_NO_VALIDATION)
                         }}
                         className={classes.submit}
                         endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}

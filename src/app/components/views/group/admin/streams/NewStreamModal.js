@@ -9,7 +9,7 @@ import Button from "@material-ui/core/Button";
 import DraftStreamForm from "../../../draftStreamForm/DraftStreamForm";
 import {withFirebase} from "../../../../../context/firebase";
 import {buildLivestreamObject} from "../../../../helperFunctions/streamFormFunctions";
-import {GENERAL_ERROR, SAVING_CHANGES, SUBMIT_FOR_APPROVAL} from "../../../../util/constants";
+import {GENERAL_ERROR, SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../../../../util/constants";
 import {useSnackbar} from "notistack";
 import {useRouter} from "next/router";
 import {v4 as uuidv4} from "uuid";
@@ -53,20 +53,36 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
 
     }
 
-    const isDraft = () => typeOfStream === "draft"
+    const isDraftsPage = () => typeOfStream === "draft"
+    const isUpcomingPage = () => typeOfStream === "upcoming"
+    const isPastPage = () => typeOfStream === "past"
 
-    const handlePublishDraft = async (livestream) => {
-        try {
-            setPublishingDraft(true)
-            const newStream = {...livestream}
-            newStream.companyId = uuidv4()
-            await firebase.addLivestream(newStream, "livestreams")
-            await firebase.deleteLivestream(livestream.id, "draftLivestreams")
-            push(`/group/${group.id}/admin/upcoming-livestreams`)
-            setPublishingDraft(false)
-        } catch (e) {
-            setPublishingDraft(false)
-            enqueueSnackbar(GENERAL_ERROR, {
+    const isUpcomingOrPastStreamsPage = () => isPastPage() || isUpcomingPage()
+
+    const canPublish = () => Boolean(currentStream && isDraftsPage() || !currentStream)
+
+    const isActualLivestream = () => Boolean(currentStream && isUpcomingOrPastStreamsPage())
+
+    const handlePublishDraft = async () => {
+        if (canPublish()) {
+            try {
+                setPublishingDraft(true)
+                const newStream = {...currentStream}
+                newStream.companyId = uuidv4()
+                await firebase.addLivestream(newStream, "livestreams")
+                await firebase.deleteLivestream(currentStream.id, "draftLivestreams")
+                handleResetCurrentStream()
+                push(`/group/${group.id}/admin/upcoming-livestreams`)
+                setPublishingDraft(false)
+            } catch (e) {
+                setPublishingDraft(false)
+                enqueueSnackbar(GENERAL_ERROR, {
+                    variant: "error",
+                    preventDuplicate: true,
+                });
+            }
+        } else {
+            enqueueSnackbar("You cannot publish a stream!", {
                 variant: "error",
                 preventDuplicate: true,
             });
@@ -87,14 +103,15 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                 setFormData(prevState => ({...prevState, status: newStatus}))
             }
             let id;
+            const targetCollection = isActualLivestream() ? "livestreams" : "draftLivestreams"
             if (updateMode) {
                 id = livestream.id
-                await firebase.updateLivestream(livestream, "draftLivestreams")
+                await firebase.updateLivestream(livestream, targetCollection)
 
-                console.log("-> Draft livestream was updated with id", id);
+                console.log(`-> ${!isActualLivestream() && "Draft "}livestream was updated with id`, id);
             } else {
-                id = await firebase.addLivestream(livestream, "draftLivestreams")
-                console.log("-> Draft livestream was created with id", id);
+                id = await firebase.addLivestream(livestream, targetCollection)
+                console.log(`-> ${!isActualLivestream() && "Draft "}livestream was created with id`, id);
                 push(`/draft-stream?draftStreamId=${id}`)
             }
 
@@ -106,7 +123,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
             setDraftId(id)
             setSubmitted(true)
             window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
-            if (status === SAVING_CHANGES) {
+            if (status === SAVE_WITH_NO_VALIDATION) {
                 enqueueSnackbar("You changes have been saved!", {
                     variant: "default",
                     preventDuplicate: true,
@@ -124,6 +141,12 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
     const handleSubmit = () => {
         if (formRef.current) {
             formRef.current.handleSubmit()
+        }
+    }
+
+    const handleSaveOrUpdate = () => {
+        if (isActualLivestream()) {
+            setStatus()
         }
     }
 
@@ -147,11 +170,12 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                         New Draft / Stream
                     </Typography>
                     <CardActions>
-                        <Button variant="contained" autoFocus color="secondary" onClick={handleSaveChanges}>
+                        {canPublish() &&
+                        <Button variant="contained" autoFocus color="secondary" onClick={handlePublishDraft}>
                             publish
-                        </Button>
-                        <Button variant="contained" autoFocus color="primary" onClick={handleSubmit}>
-                            save changes
+                        </Button>}
+                        <Button variant="contained" autoFocus color="primary" onClick={handleSaveOrUpdate}>
+                            {isActualLivestream() ? "update" : "save changes"}
                         </Button>
                     </CardActions>
                 </Toolbar>
