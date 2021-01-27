@@ -57,10 +57,10 @@ function RemoteVideoContainer(props) {
     },[props.muted])
 
     useEffect(() => {
-        if (props.stream.stream.audio === false && props.stream.stream.video === false) {
+        if (props.stream?.stream?.audio === false && props.stream?.stream?.video === false) {
             props.setRemovedStream(props.stream.streamId)
         }
-    },[props.stream.stream.audio, props.stream.stream.video])
+    },[props.stream?.stream?.audio, props.stream?.stream?.video])
 
     function generateDemoHandRaiser() {
         let video = document.createElement('video');
