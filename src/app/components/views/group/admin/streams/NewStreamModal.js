@@ -34,24 +34,16 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentStream, handleResetCurrentStream}) => {
+const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentStream, handleResetCurrentStream,}) => {
     const formRef = useRef()
     console.log("-> formRef", formRef);
     const router = useRouter()
     const {enqueueSnackbar} = useSnackbar()
     const [submitted, setSubmitted] = useState(false)
     const [status, setStatus] = useState("");
-    const [publishingDraft, setPublishingDraft] = useState(false);
     const classes = useStyles()
 
-    const {
-        query: {absolutePath},
-        push
-    } = router;
-
-    const handleSaveChanges = () => {
-
-    }
+    const {push} = router;
 
     const isDraftsPage = () => typeOfStream === "draft"
     const isUpcomingPage = () => typeOfStream === "upcoming"
@@ -59,28 +51,28 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
 
     const isUpcomingOrPastStreamsPage = () => isPastPage() || isUpcomingPage()
 
-    const canPublish = () => Boolean(currentStream && isDraftsPage() || !currentStream)
+    const isDraft = () => Boolean(currentStream && isDraftsPage() || !currentStream)
 
     const isActualLivestream = () => Boolean(currentStream && isUpcomingOrPastStreamsPage())
 
     const handlePublishDraft = async () => {
-        if (canPublish()) {
+        if (isDraft()) {
             try {
-                setPublishingDraft(true)
+                formRef.current?.setSubmitting(true)
                 const newStream = {...currentStream}
                 newStream.companyId = uuidv4()
                 await firebase.addLivestream(newStream, "livestreams")
                 await firebase.deleteLivestream(currentStream.id, "draftLivestreams")
                 handleResetCurrentStream()
                 push(`/group/${group.id}/admin/upcoming-livestreams`)
-                setPublishingDraft(false)
+                onClose()
             } catch (e) {
-                setPublishingDraft(false)
                 enqueueSnackbar(GENERAL_ERROR, {
                     variant: "error",
                     preventDuplicate: true,
                 });
             }
+            formRef.current?.setSubmitting(false)
         } else {
             enqueueSnackbar("You cannot publish a stream!", {
                 variant: "error",
@@ -107,27 +99,22 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
             if (updateMode) {
                 id = livestream.id
                 await firebase.updateLivestream(livestream, targetCollection)
-
                 console.log(`-> ${!isActualLivestream() && "Draft "}livestream was updated with id`, id);
             } else {
                 id = await firebase.addLivestream(livestream, targetCollection)
                 console.log(`-> ${!isActualLivestream() && "Draft "}livestream was created with id`, id);
                 push(`/draft-stream?draftStreamId=${id}`)
             }
+            onClose()
 
-            if (absolutePath) {
-                return push({
-                    pathname: absolutePath,
-                })
-            }
             setDraftId(id)
             setSubmitted(true)
-            window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
             if (status === SAVE_WITH_NO_VALIDATION) {
                 enqueueSnackbar("You changes have been saved!", {
                     variant: "default",
                     preventDuplicate: true,
                 });
+                setStatus("")
             }
         } catch (e) {
             enqueueSnackbar(GENERAL_ERROR, {
@@ -145,9 +132,12 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
     }
 
     const handleSaveOrUpdate = () => {
-        if (isActualLivestream()) {
-            setStatus()
+        if (isDraft()) {
+            setStatus(SAVE_WITH_NO_VALIDATION)
+        } else {
+            setStatus("")
         }
+        handleSubmit()
     }
 
 
@@ -167,15 +157,17 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                         <CloseIcon/>
                     </IconButton>
                     <Typography variant="h6" className={classes.title}>
-                        New Draft / Stream
+                        {isActualLivestream() ? "Update Stream" : currentStream ? "Update Draft" : "New draft"}
                     </Typography>
                     <CardActions>
-                        {canPublish() &&
-                        <Button variant="contained" autoFocus color="secondary" onClick={handlePublishDraft}>
-                            publish
+                        {isDraft() &&
+                        <Button disabled={formRef.current?.isSubmitting} variant="contained" autoFocus color="secondary"
+                                onClick={handlePublishDraft}>
+                            publish draft
                         </Button>}
-                        <Button variant="contained" autoFocus color="primary" onClick={handleSaveOrUpdate}>
-                            {isActualLivestream() ? "update" : "save changes"}
+                        <Button disabled={formRef.current?.isSubmitting} variant="contained" autoFocus color="primary"
+                                onClick={handleSaveOrUpdate}>
+                            {!currentStream ? "Create" : isActualLivestream() ? "update" : "save changes"}
                         </Button>
                     </CardActions>
                 </Toolbar>

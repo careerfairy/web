@@ -79,6 +79,7 @@ const Index = ({group, typeOfStream, query}) => {
     }
 
     const handleCloseNewStreamModal = () => {
+        handleResetCurrentStream()
         setOpenNewStreamModal(false)
     }
 
