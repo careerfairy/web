@@ -8,7 +8,7 @@ const UpcomingLivestreamsPage = ({group, firebase}) => {
     return (
         <Page title={`CareerFairy | Admin Upcoming Streams of ${group.universityName}`}>
             <StreamsOverview
-                query={firebase.getUpcomingLiveStreamsByGroupId}
+                query={firebase.listenToUpcomingLiveStreamsByGroupId}
                 group={group}
                 firebase={firebase}
                 typeOfStream="upcoming"

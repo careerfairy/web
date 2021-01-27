@@ -5,6 +5,7 @@ import Grid from "@material-ui/core/Grid";
 import Profile from "./Profile";
 import ProfileDetails from "./ProfileDetails";
 import ProfileCategories from "./ProfileCategories";
+import ProfilePrivacyPolicy from "./ProfilePrivacyPolicy";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -57,6 +58,15 @@ const EditOverview = ({firebase, group}) => {
                         >
 
                             <ProfileCategories firebase={firebase} group={group}/>
+                        </Grid>
+                        <Grid
+                            item
+                            lg={12}
+                            md={12}
+                            xs={12}
+                        >
+
+                            <ProfilePrivacyPolicy firebase={firebase} group={group}/>
                         </Grid>
                     </Grid>
                 </Grid>

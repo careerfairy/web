@@ -1,11 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {makeStyles} from "@material-ui/core/styles";
-import {
-    Box,
-    CircularProgress,
-    Container,
-    Grid,
-} from "@material-ui/core";
+import {Box, CircularProgress, Container, Grid,} from "@material-ui/core";
 import usePagination from '@itsfaqih/usepagination';
 import {Pagination} from "@material-ui/lab";
 import Typography from "@material-ui/core/Typography";
@@ -13,7 +8,6 @@ import GroupStreamCardV2 from "../../NextLivestreams/GroupStreams/groupStreamCar
 import Toolbar from "./ToolBar";
 import {useAuth} from "../../../../HOCs/AuthProvider";
 import {useSnackbar} from "notistack";
-import {snapShotsToData} from "../../../helperFunctions/HelperFunctions";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -37,23 +31,24 @@ const StreamsOverview = ({group, typeOfStream, query}) => {
     const [fetching, setFetching] = useState(false);
 
     useEffect(() => {
-        (async function () {
-            try {
-                setFetching(true)
-                const snapshots = await query(group.id)
-                const newStreams = snapShotsToData(snapshots)
-                setUpcomingStreams(newStreams)
-                setFilteredStreams(newStreams)
-                setFetching(false)
-            } catch (e) {
-                console.log("-> e", e);
-                setFetching(false)
-                enqueueSnackbar("something went Wrong, please refresh the page", {
-                    variant: "error",
-                    preventDuplicate: true
+        if (group?.id) {
+            setFetching(true)
+            const unsubscribe = query(group.id,
+                (querySnapshot) => {
+                    const streamsData = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                    setUpcomingStreams(streamsData)
+                    setFilteredStreams(streamsData)
+                    setFetching(false)
                 })
-            }
-        })()
+
+            return () => unsubscribe()
+        }
+        //         enqueueSnackbar("something went Wrong, please refresh the page", {
+        //             variant: "error",
+        //             preventDuplicate: true
+        //         })
+        //     }
+
     }, [])
 
     const onPageChange = (event, number) => {

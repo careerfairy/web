@@ -53,6 +53,7 @@ const GroupDashboardLayout = (props) => {
     const {children, firebase} = props
     const classes = useStyles();
     const {query: {groupId, careerCenterId}, replace, pathname} = useRouter()
+    const [notifications, setNotifications] = useState([]);
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
     const [group, setGroup] = useState({});
     const {userData, authenticatedUser} = useAuth()
@@ -156,6 +157,8 @@ const GroupDashboardLayout = (props) => {
         <div className={classes.root}>
             <TopBar
                 links={headerLinks}
+                notifications={notifications}
+                setNotifications={setNotifications}
                 onMobileNavOpen={() => setMobileNavOpen(true)}
             />
             <NavBar
@@ -170,7 +173,7 @@ const GroupDashboardLayout = (props) => {
             <div className={classes.wrapper}>
                 <div className={classes.contentContainer}>
                     <div className={classes.content}>
-                        {!isEmptyObject(group) && React.cloneElement(children, {group, ...props})}
+                        {!isEmptyObject(group) && React.cloneElement(children, {notifications, setNotifications, group, ...props})}
                     </div>
                 </div>
             </div>

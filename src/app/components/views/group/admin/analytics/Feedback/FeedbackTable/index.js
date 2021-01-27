@@ -92,8 +92,6 @@ const FeedbackTable = ({
     }, [streamDataType.propertyName, currentStream])
 
 
-
-
     const handleDisplayTable = (rowData) => {
         setCurrentRating(rowData)
         handleScrollToSideRef()
@@ -158,9 +156,7 @@ const FeedbackTable = ({
         {
             field: "question",
             title: "Question",
-            cellStyle: {
-                width: 400,
-            },
+            width: 300
         },
         {
             title: "Votes",
@@ -184,7 +180,6 @@ const FeedbackTable = ({
         {
             field: "title",
             title: "Question",
-            width: 250,
             cellStyle: {
                 width: 400,
             },
@@ -192,7 +187,6 @@ const FeedbackTable = ({
         {
             field: "votes",
             title: "Votes",
-            width: 90,
             type: 'numeric',
         },
         {
@@ -211,15 +205,13 @@ const FeedbackTable = ({
         {
             field: "question",
             title: "Question",
-            width: 250,
             cellStyle: {
-                width: 400,
+                width: 300,
             },
         },
         {
             field: "average",
             title: "Average Rating",
-            width: 150,
             render: (rowData) => renderRatingStars({rating: rowData.average, id: rowData.id}),
             filterComponent: StarRatingInputValue,
             customFilterAndSearch: (term, rowData) => Number(term) >= Number(rowData.average)
@@ -227,7 +219,6 @@ const FeedbackTable = ({
         {
             field: "appearAfter",
             title: "Appear After",
-            width: 180,
             type: "numeric",
             render: renderAppearAfter
         },
@@ -239,7 +230,6 @@ const FeedbackTable = ({
         {
             field: "options",
             title: "Breakdown",
-            width: 180,
             render: DisplayButton,
             filtering: false,
             sorting: false,
@@ -249,13 +239,11 @@ const FeedbackTable = ({
         {
             field: "hasText",
             title: "Has Written Reviews",
-            width: 140,
             type: "boolean"
         },
         {
             field: "isForEnd",
             title: "Ask on Stream End",
-            width: 140,
             type: "boolean"
         },
     ]

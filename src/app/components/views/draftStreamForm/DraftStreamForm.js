@@ -30,7 +30,12 @@ import {
     handleAddSpeaker,
     handleDeleteSpeaker, handleError, handleFlattenOptions, validateStreamForm
 } from "../../helperFunctions/streamFormFunctions";
+import {copyStringToClipboard} from "../../helperFunctions/HelperFunctions";
+import {useSnackbar} from "notistack";
+import ButtonGroup from "@material-ui/core/ButtonGroup";
 
+const SAVING = "SAVING"
+const APPROVAL = "APPROVAL"
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -38,7 +43,7 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        minHeight: "90vh",
+        minHeight: "20vh",
         borderRadius: 5,
         marginBottom: 30
     },
@@ -84,16 +89,18 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
     const router = useRouter()
     const {
         query: {careerCenterIds, draftStreamId, absolutePath},
-        push
+        push, replace
     } = router;
-
+    const {enqueueSnackbar} = useSnackbar()
     const classes = useStyles()
 
     const {setGeneralError} = useContext(ErrorContext);
     const [targetCategories, setTargetCategories] = useState({})
     const [selectedGroups, setSelectedGroups] = useState([])
     const [updateMode, setUpdateMode] = useState(undefined)
-
+    const [wantsApproval, setWantsApproval] = useState(false);
+    const [updated, setUpdated] = useState(false);
+    const [status, setStatus] = useState("");
     const [allFetched, setAllFetched] = useState(false)
 
     const [draftId, setDraftId] = useState("")
@@ -111,6 +118,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         hidden: false,
         summary: '',
         speakers: {[uuidv4()]: speakerObj},
+        status: {}
     })
 
 
@@ -153,7 +161,8 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                         start: livestream.start.toDate() || new Date(),
                         hidden: livestream.hidden || false,
                         summary: livestream.summary || "",
-                        speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery)
+                        speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery),
+                        status: livestream.status || {}
                     }
                     setFormData(newFormData)
                     if (careerCenterIds) {
@@ -172,7 +181,11 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         } else {
             setAllFetched(true)
         }
-    }, [draftStreamId])
+    }, [draftStreamId, router])
+
+    const isPending = () => {
+        return Boolean(formData?.status?.pendingApproval === true)
+    }
 
     const groupsSelected = () => {
         return Boolean(selectedGroups.length)
@@ -205,42 +218,88 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
         }
     }
 
-    const SuccessMessage = (
-        <>
-            <Typography variant="h5" align="center" style={{color: "white"}}>Thanks for your
-                submission, the code for your created draft is <b>{draftId}</b>, please save it somewhere.
-                We will review the draft and get back to
-                you as soon as possible!</Typography>
-            <div style={{display: "flex", justifyContent: "space-between"}}>
-                <Button className={classes.whiteBtn} variant="contained" href="/profile">
-                    To Profile
-                </Button>
-                <Button className={classes.whiteBtn} variant="contained" href="/next-livestreams">
-                    To Next Livestreams
-                </Button>
-            </div>
-        </>
-    )
+    const getDirectLink = () => `/draft-stream?draftStreamId=${draftId}`
+    const buildFullUrl = (localPath) => {
+        let baseUrl = "https://careerfairy.io";
+        if (window?.location?.origin) {
+            baseUrl = window.location.origin;
+        }
+        return `${baseUrl}${localPath}`
+    }
+    const handleCopyDraftLink = () => {
+        const directLink = getDirectLink()
+        const targetPath = buildFullUrl(directLink)
+        copyStringToClipboard(targetPath);
+        enqueueSnackbar("Link has been copied to your clipboard", {
+            variant: "default",
+            preventDuplicate: true,
+        });
+    };
+
+
+    const SuccessMessage = () => {
+
+        const directLink = getDirectLink()
+        const targetPath = buildFullUrl(directLink)
+        return (
+            <>
+                <Typography variant="h5" align="center" style={{color: "white"}}>
+                    {status === SAVING ? "Your changes have been saved under the following link:" : "Thanks for your submission, the direct link to this draft you created is:"}
+                    <br/>
+                    <a target="_blank" href={directLink}>{targetPath}</a>
+                    <br/>
+                    Please save this link somewhere. We will review the draft and get back to you as soon as possible!
+                </Typography>
+                <div style={{display: "flex", justifyContent: "space-between"}}>
+                    <Button className={classes.whiteBtn} variant="contained" href="/profile">
+                        To Profile
+                    </Button>
+                    <Button className={classes.whiteBtn} variant="contained" href="/next-livestreams">
+                        To Next Livestreams
+                    </Button>
+                    <Button onClick={handleCopyDraftLink} className={classes.whiteBtn} variant="contained">
+                        Copy Direct Link
+                    </Button>
+                    <Button onClick={() => setSubmitted(false)} className={classes.whiteBtn} variant="contained">
+                        Back to draft
+                    </Button>
+                </div>
+            </>
+        )
+    }
+
+    const noValidation = () => status === SAVING
 
     return (<Container className={classes.root}>
-        {allFetched ? (submitted ? SuccessMessage : <Formik
+        {allFetched ? (submitted ? <SuccessMessage/> : <Formik
             initialValues={formData}
             enableReinitialize
-            validate={(values) => validateStreamForm(values, true)}
+            validate={(values) => validateStreamForm(values, true, noValidation())}
             onSubmit={async (values, {setSubmitting}) => {
                 try {
                     setGeneralError("")
                     setSubmitting(true)
                     const livestream = buildLivestreamObject(values, targetCategories, updateMode, draftStreamId, firebase);
+                    if (status === APPROVAL) {
+                        const newStatus = {
+                            pendingApproval: true,
+                            seen: false,
+                        }
+                        livestream.status = newStatus
+                        setFormData({...formData, status: newStatus})
+                    }
                     let id;
                     if (updateMode) {
                         id = livestream.id
                         await firebase.updateLivestream(livestream, "draftLivestreams")
+
                         console.log("-> Draft livestream was updated with id", id);
                     } else {
                         id = await firebase.addLivestream(livestream, "draftLivestreams")
                         console.log("-> Draft livestream was created with id", id);
+                        replace(`/draft-stream?draftStreamId=${id}`)
                     }
+
                     if (absolutePath) {
                         return push({
                             pathname: absolutePath,
@@ -249,6 +308,12 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     setDraftId(id)
                     setSubmitted(true)
                     window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
+                    if (status === SAVING) {
+                        enqueueSnackbar("You changes have been saved!", {
+                            variant: "default",
+                            preventDuplicate: true,
+                        });
+                    }
                 } catch (e) {
                     setGeneralError("Something went wrong")
                 }
@@ -264,7 +329,7 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                   isSubmitting,
                   setFieldValue,
                   setValues,
-                  validateForm
+                  validateForm,
                   /* and other goodies */
               }) => (<form onSubmit={async (event) => {
                 event.preventDefault()
@@ -467,17 +532,36 @@ const DraftStreamForm = ({firebase, setSubmitted, submitted}) => {
                     </FormGroup>
                 </>
                 }
-                <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    size="large"
-                    className={classes.submit}
-                    endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
-                    variant="contained" fullWidth>
-                    <Typography variant="h4">
-                        {isSubmitting ? "Submitting" : updateMode ? "Update Draft" : "Submit Draft"}
-                    </Typography>
-                </Button>
+                <ButtonGroup fullWidth>
+                    <Button
+                        type="submit"
+                        onClick={() => {
+                            setStatus(APPROVAL)
+                        }}
+                        disabled={isSubmitting || isPending()}
+                        size="large"
+                        className={classes.submit}
+                        endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
+                        variant="contained">
+                        <Typography variant="h4">
+                            {isSubmitting ? "Submitting" : isPending() ? "Pending for Approval" : "Submit Draft for Approval"}
+                        </Typography>
+                    </Button>
+                    <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        size="large"
+                        onClick={() => {
+                            setStatus(SAVING)
+                        }}
+                        className={classes.submit}
+                        endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
+                        variant="contained">
+                        <Typography variant="h4">
+                            {isSubmitting ? "Saving" : "Save changes"}
+                        </Typography>
+                    </Button>
+                </ButtonGroup>
             </form>)
             }
         </Formik>) : <CircularProgress style={{marginTop: "30vh", color: "white"}}/>}
