@@ -84,13 +84,24 @@ const speakerObj = {
 }
 
 
-const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, formRef = useRef(), saveChangesButtonRef= useRef()}) => {
+const DraftStreamForm = ({
+                             firebase,
+                             group,
+                             setSubmitted,
+                             submitted,
+                             onSubmit,
+                             isActualLivestream,
+                             formRef = useRef(),
+                             saveChangesButtonRef = useRef(),
+                             currentStream
+                         }) => {
     const router = useRouter()
-    const {
+    let {
         query: {careerCenterIds, draftStreamId, absolutePath},
         push, replace,
         pathname
     } = router;
+    draftStreamId = draftStreamId || currentStream?.id
     const {enqueueSnackbar} = useSnackbar()
     const [status, setStatus] = useState("");
 
@@ -146,7 +157,7 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, fo
             console.log("-> in the use effect draftStreamId", draftStreamId);
             (async () => {
                 const targetId = draftStreamId
-                const targetCollection = "draftLivestreams"
+                const targetCollection = isActualLivestream ? "livestreams" : "draftLivestreams"
                 const livestreamQuery = await firebase.getStreamById(targetId, targetCollection)
                 const speakerQuery = await firebase.getStreamSpeakers(targetId, targetCollection)
                 if (livestreamQuery.exists) {

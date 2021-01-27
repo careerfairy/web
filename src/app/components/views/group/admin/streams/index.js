@@ -87,6 +87,12 @@ const Index = ({group, typeOfStream, query}) => {
         setCurrentStream(null)
     }
 
+    const handleEditStream = (streamObj) => {
+        if (streamObj) {
+            setCurrentStream(streamObj)
+            handleOpenNewStreamModal()
+        }
+    }
 
 
     const handleFilter = () => {
@@ -120,6 +126,7 @@ const Index = ({group, typeOfStream, query}) => {
                 <GroupStreamCardV2
                     mobile
                     isAdmin
+                    handleEditStream={handleEditStream}
                     isDraft={typeOfStream === "draft"}
                     hideActions
                     user={authenticatedUser}

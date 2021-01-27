@@ -36,6 +36,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentStream, handleResetCurrentStream,}) => {
     const formRef = useRef()
+    console.log("-> formRef", formRef);
     const saveChangesButtonRef = useRef()
     const router = useRouter()
     const {enqueueSnackbar} = useSnackbar()
@@ -116,7 +117,6 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
             handleCloseDialog()
 
             setDraftId(id)
-            setSubmitted(true)
             if (status === SAVE_WITH_NO_VALIDATION) {
                 enqueueSnackbar("You changes have been saved!", {
                     variant: "default",
@@ -143,6 +143,8 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
     const handleSaveOrUpdate = () => {
         if (isDraft()) {
             saveChangesButtonRef?.current?.click()
+        } else {
+            handleSubmit()
         }
     }
 
@@ -185,6 +187,8 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                 saveChangesButtonRef={saveChangesButtonRef}
                 onSubmit={onSubmit}
                 submitted={submitted}
+                isActualLivestream={isActualLivestream()}
+                currentStream={currentStream}
                 setSubmitted={setSubmitted}
             />
         </Dialog>

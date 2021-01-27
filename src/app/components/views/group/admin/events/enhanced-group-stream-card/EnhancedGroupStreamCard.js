@@ -53,6 +53,8 @@ const EnhancedGroupStreamCard = ({
                                      handleCloseLevelOfStudyModal,
                                      handleOpenLevelOfStudyModal,
                                      switchToNextLivestreamsTab,
+                                     handleEditStream,
+
                                      isDraft,
                                      router,
                                      hasOptions
@@ -227,23 +229,23 @@ const EnhancedGroupStreamCard = ({
         }
     }
 
-    const handleEditStream = async () => {
-        const groupId = group.id
-        const targetPath = isDraft ? `/draft-stream` : "/new-livestream"
-        const targetQuery = {
-            absolutePath: router.asPath,
-            careerCenterIds: groupId,
-        }
-        if (isDraft) {
-            targetQuery.draftStreamId = livestream.id
-        } else {
-            targetQuery.livestreamId = livestream.id
-        }
-        return await router.push({
-            pathname: targetPath,
-            query: targetQuery
-        })
-    }
+    // const handleEditStream = async () => {
+    //     const groupId = group.id
+    //     const targetPath = isDraft ? `/draft-stream` : "/new-livestream"
+    //     const targetQuery = {
+    //         absolutePath: router.asPath,
+    //         careerCenterIds: groupId,
+    //     }
+    //     if (isDraft) {
+    //         targetQuery.draftStreamId = livestream.id
+    //     } else {
+    //         targetQuery.livestreamId = livestream.id
+    //     }
+    //     return await router.push({
+    //         pathname: targetPath,
+    //         query: targetQuery
+    //     })
+    // }
 
     const isWorkInProgress = () => !livestream.status?.pendingApproval;
 
@@ -287,7 +289,7 @@ const EnhancedGroupStreamCard = ({
                 <Button
                     className={classes.button}
                     fullWidth
-                    onClick={handleEditStream}
+                    onClick={() => handleEditStream(livestream)}
                     startIcon={<ListAltIcon/>}
                     variant='outlined'
                 >
