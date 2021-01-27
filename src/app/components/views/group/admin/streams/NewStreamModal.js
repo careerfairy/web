@@ -37,8 +37,6 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentStream, handleResetCurrentStream,}) => {
     const formRef = useRef()
     const saveChangesButtonRef = useRef()
-    console.log("-> saveChangesButtonRef", saveChangesButtonRef);
-    console.log("-> formRef", formRef);
     const router = useRouter()
     const {enqueueSnackbar} = useSnackbar()
     const [submitted, setSubmitted] = useState(false)
@@ -86,7 +84,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
     }
 
 
-    const onSubmit = async (values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId, status) => {
+    const onSubmit = async (values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId, status, setStatus) => {
         try {
             setSubmitting(true)
             console.log("-> in the submit");
@@ -138,7 +136,8 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
 
     const handleSaveOrUpdate = () => {
         if (isDraft()) {
-            saveChangesButtonRef?.current?.onclick()
+            saveChangesButtonRef?.current?.click()
+            console.log("-> saveChangesButtonRef", saveChangesButtonRef);
         }
     }
 

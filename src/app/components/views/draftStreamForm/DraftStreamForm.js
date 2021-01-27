@@ -93,6 +93,7 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, fo
     } = router;
     const {enqueueSnackbar} = useSnackbar()
     const [status, setStatus] = useState("");
+    console.log("-> status", status);
 
     const classes = useStyles()
 
@@ -296,7 +297,7 @@ const DraftStreamForm = ({firebase, group, setSubmitted, submitted, onSubmit, fo
                 validateStreamForm(values, true, noValidation())
             }}
             onSubmit={async (values, {setSubmitting}) => {
-                await onSubmit(values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId, status)
+                await onSubmit(values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId, status, setStatus)
             }}
         >
             {({
