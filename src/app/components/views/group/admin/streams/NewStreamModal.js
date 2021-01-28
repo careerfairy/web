@@ -192,20 +192,24 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
     const Actions = ({size, className}) => (
         <>
             {canPublish() &&
-            <Button startIcon={<PublishIcon/>} disabled={formRef.current?.isSubmitting} variant="contained"
+            <Button startIcon={<PublishIcon fontSize={size}/>} disabled={formRef.current?.isSubmitting} variant="contained"
                     size={size}
                     className={className}
                     autoFocus color="secondary"
                     onClick={handleValidate}>
+                <Typography variant={size === "large" && "h5"}>
                 publish as stream
+                </Typography>
             </Button>}
             <Button disabled={formRef.current?.isSubmitting}
                     size={size}
                     className={className}
-                    startIcon={currentStream ? <SaveIcon/> : <AddIcon/>} variant="contained" autoFocus
+                    startIcon={currentStream && <SaveIcon fontSize={size}/>} variant="contained" autoFocus
                     color="primary"
                     onClick={handleSaveOrUpdate}>
+                <Typography variant={size === "large" && "h5"}>
                 {!currentStream ? "Create draft" : isActualLivestream() ? "update and close" : "save changes and close"}
+                </Typography>
             </Button>
         </>
     )
