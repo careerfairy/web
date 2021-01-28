@@ -154,7 +154,6 @@ const DraftStreamForm = ({
 
     useEffect(() => {
         if (draftStreamId) {
-            console.log("-> in the use effect draftStreamId", draftStreamId);
             (async () => {
                 const targetId = draftStreamId
                 const targetCollection = isActualLivestream ? "livestreams" : "draftLivestreams"
@@ -177,7 +176,6 @@ const DraftStreamForm = ({
                         speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery),
                         status: livestream.status || {}
                     }
-                    console.log("-> newFormData", newFormData);
                     setFormData(newFormData)
                     if (careerCenterIds) {
                         const arrayOfUrlIds = careerCenterIds.split(",")
@@ -295,11 +293,7 @@ const DraftStreamForm = ({
             initialValues={formData}
             innerRef={formRef}
             enableReinitialize
-            validate={(values) => {
-                console.log("-> noValidation", noValidation());
-
-                validateStreamForm(values, true, noValidation())
-            }}
+            validate={(values) => validateStreamForm(values, true, noValidation())}
             onSubmit={async (values, {setSubmitting}) => {
                 await onSubmit(values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId, status, setStatus)
             }}

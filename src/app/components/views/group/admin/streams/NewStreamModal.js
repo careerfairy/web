@@ -36,11 +36,11 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentStream, handleResetCurrentStream,}) => {
     const formRef = useRef()
-    console.log("-> formRef", formRef);
     const saveChangesButtonRef = useRef()
     const router = useRouter()
     const {enqueueSnackbar} = useSnackbar()
     const [submitted, setSubmitted] = useState(false)
+    const [publishDraft, setPublishDraft] = useState(false);
     const classes = useStyles()
 
     const {push} = router;
@@ -90,12 +90,21 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
         }
     }
 
+    const handleValidate = () => {
+        setPublishDraft(true)
+        handleSubmit()
+    }
+
 
     const onSubmit = async (values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId, status, setStatus) => {
         try {
             setSubmitting(true)
-            console.log("-> in the submit");
             const livestream = buildLivestreamObject(values, targetCategories, updateMode, draftStreamId, firebase);
+            if (status === SAVE_WITH_NO_VALIDATION) {
+                const newStatus = {}
+                livestream.status = newStatus
+                setFormData(prevState => ({...prevState, status: newStatus}))
+            }
             if (status === SUBMIT_FOR_APPROVAL) {
                 const newStatus = {
                     pendingApproval: true,
@@ -103,6 +112,12 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                 }
                 livestream.status = newStatus
                 setFormData(prevState => ({...prevState, status: newStatus}))
+            }
+
+            if (publishDraft) {
+                await handlePublishDraft()
+                setPublishDraft(false)
+                return
             }
             let id;
             const targetCollection = isActualLivestream() ? "livestreams" : "draftLivestreams"
@@ -148,7 +163,6 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
         }
     }
 
-
     return (
         <Dialog
             keepMounted={false}
@@ -171,8 +185,8 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                     <CardActions>
                         {canPublish() &&
                         <Button disabled={formRef.current?.isSubmitting} variant="contained" autoFocus color="secondary"
-                                onClick={handlePublishDraft}>
-                            publish draft
+                                onClick={handleValidate}>
+                            publish into stream
                         </Button>}
                         <Button disabled={formRef.current?.isSubmitting} variant="contained" autoFocus color="primary"
                                 onClick={handleSaveOrUpdate}>
