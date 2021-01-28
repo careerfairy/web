@@ -135,18 +135,25 @@ const DraftStreamForm = ({
 
 
     const handleSetGroupIds = async (UrlIds, draftStreamGroupIds, newFormData) => {
-        const totalGroups = [...new Set([...UrlIds, ...draftStreamGroupIds])]
-        if (totalGroups.length) {
-            const totalExistingGroups = await firebase.getCareerCentersByGroupId(totalGroups)
+        const initialGroups = [...new Set([...UrlIds, ...draftStreamGroupIds])]
+        let mergedGroups = [...initialGroups]
+        if (group?.partnerGroupIds?.length) {
+            mergedGroups = [...new Set([...mergedGroups, ...group.partnerGroupIds])]
+        }
+        if (mergedGroups.length) {
+            const totalExistingGroups = await firebase.getCareerCentersByGroupId(mergedGroups)
             const totalFlattenedGroups = totalExistingGroups.map(group => ({
                 ...group,
                 selected: true,
                 flattenedOptions: handleFlattenOptions(group)
             }))
-            // Uncomment if u want provided group Ids in urls to no be auto selected
-            // const flattenedDraftGroups = totalFlattenedGroups.filter(flattenedGroupObj => draftStreamGroupIds.some(draftId => flattenedGroupObj.id === draftId))
+
+            // Includes partner groups as non auto-selected options if they arent already part of the event
+            const selectedGroups = totalFlattenedGroups.filter(({id}) => !(mergedGroups.includes(id) && !initialGroups.includes(id)))
+
+
             setExistingGroups(totalFlattenedGroups)
-            setSelectedGroups(totalFlattenedGroups)
+            setSelectedGroups(selectedGroups)
             const arrayOfActualGroupIds = totalExistingGroups.map(groupObj => groupObj.id)
             setFormData({...newFormData, groupIds: arrayOfActualGroupIds})
         }
