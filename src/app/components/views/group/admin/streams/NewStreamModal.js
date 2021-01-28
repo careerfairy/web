@@ -1,4 +1,4 @@
-import React, {Fragment, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {AppBar, CardActions, Dialog, Slide} from "@material-ui/core";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -156,6 +156,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
     }
 
     const handleSaveOrUpdate = () => {
+        setPublishDraft(false)
         if (isDraft()) {
             saveChangesButtonRef?.current?.click()
         } else {
