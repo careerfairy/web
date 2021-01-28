@@ -122,11 +122,11 @@ const StreamsToolbar = ({value, group, onChange, className, handleSubmit,openNew
     };
 
     const buttonOptions = [
-        {
-            name: "Create a new draft",
-            onClick: () => handleClickDraftNewStream(),
-            icon: <DraftStreamIcon/>
-        },
+        // {
+        //     name: "Create a new draft",
+        //     onClick: () => handleClickDraftNewStream(),
+        //     icon: <DraftStreamIcon/>
+        // },
         {
             name: "Generate a draft link for companies",
             onClick: () => handleShareDraftLink(),
@@ -136,7 +136,7 @@ const StreamsToolbar = ({value, group, onChange, className, handleSubmit,openNew
 
     if (canCreateStream()) {
         buttonOptions.unshift({
-            name: "Draft or publish a new stream",
+            name: "Draft a new stream",
             onClick: () => handleOpenNewStreamModal(),
             icon: <StreamIcon/>
         });
