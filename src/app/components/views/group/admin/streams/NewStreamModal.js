@@ -1,6 +1,6 @@
 import React, {useRef, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {AppBar, CardActions, Dialog, Slide} from "@material-ui/core";
+import {AppBar, CardActions, Dialog, DialogContent, fade, Slide} from "@material-ui/core";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
@@ -10,9 +10,13 @@ import DraftStreamForm from "../../../draftStreamForm/DraftStreamForm";
 import {withFirebase} from "../../../../../context/firebase";
 import {buildLivestreamObject} from "../../../../helperFunctions/streamFormFunctions";
 import {GENERAL_ERROR, SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../../../../util/constants";
+import SaveIcon from '@material-ui/icons/Save';
 import {useSnackbar} from "notistack";
+import AddIcon from '@material-ui/icons/Add';
+import PublishIcon from '@material-ui/icons/Publish';
 import {useRouter} from "next/router";
 import {v4 as uuidv4} from "uuid";
+
 
 const useStyles = makeStyles(theme => ({
 
@@ -21,11 +25,10 @@ const useStyles = makeStyles(theme => ({
         flex: 1,
     },
     background: {
-        backgroundColor: theme.palette.primary.dark,
+        backgroundColor: fade(theme.palette.primary.dark, 0.7),
     },
     appBar: {
         backgroundColor: theme.palette.navyBlue.main,
-        marginBottom: theme.spacing(2)
     }
 }));
 
@@ -34,8 +37,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentStream, handleResetCurrentStream,}) => {
+const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentStream, handleResetCurrentStream}) => {
     const formRef = useRef()
+    const dialogRef = useRef()
     const saveChangesButtonRef = useRef()
     const router = useRouter()
     const {enqueueSnackbar} = useSnackbar()
@@ -150,8 +154,15 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
     }
 
     const handleSubmit = () => {
+        window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
         if (formRef.current) {
             formRef.current.handleSubmit()
+        }
+        if (dialogRef.current) {
+            dialogRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            })
         }
     }
 
@@ -168,11 +179,12 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
         <Dialog
             keepMounted={false}
             TransitionComponent={Transition}
+            scroll="body"
             onClose={handleCloseDialog}
             fullScreen
             open={open}
             PaperProps={{
-                className: classes.background
+                className: classes.background,
             }}
         >
             <AppBar className={classes.appBar} position="sticky">
@@ -180,32 +192,42 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                     <IconButton edge="start" color="inherit" onClick={handleCloseDialog} aria-label="close">
                         <CloseIcon/>
                     </IconButton>
-                    <Typography variant="h6" className={classes.title}>
+                    <Typography variant="h4" className={classes.title}>
                         {isActualLivestream() ? "Update Stream" : currentStream ? "Update Draft" : "New draft"}
                     </Typography>
                     <CardActions>
                         {canPublish() &&
-                        <Button disabled={formRef.current?.isSubmitting} variant="contained" autoFocus color="secondary"
+                        <Button startIcon={<PublishIcon/>} disabled={formRef.current?.isSubmitting} variant="contained"
+                                autoFocus color="secondary"
                                 onClick={handleValidate}>
-                            publish into stream
+                            publish as stream
                         </Button>}
-                        <Button disabled={formRef.current?.isSubmitting} variant="contained" autoFocus color="primary"
+                        <Button disabled={formRef.current?.isSubmitting}
+                                startIcon={currentStream ? <SaveIcon/> : <AddIcon/>} variant="contained" autoFocus
+                                color="primary"
                                 onClick={handleSaveOrUpdate}>
-                            {!currentStream ? "Create" : isActualLivestream() ? "update" : "save changes"}
+                            {!currentStream ? "Create draft" : isActualLivestream() ? "update and close" : "save changes and close"}
                         </Button>
                     </CardActions>
                 </Toolbar>
             </AppBar>
-            <DraftStreamForm
-                formRef={formRef}
-                group={group}
-                saveChangesButtonRef={saveChangesButtonRef}
-                onSubmit={onSubmit}
-                submitted={submitted}
-                isActualLivestream={isActualLivestream()}
-                currentStream={currentStream}
-                setSubmitted={setSubmitted}
-            />
+            <DialogContent>
+                {/*Have to nest DialogContent Elements in order for scroll to top in Dialogs to work (weird MUI bug: github.com/mui-org/material-ui/issues/9186)*/}
+                <div ref={dialogRef}>
+                    <DialogContent>
+                        <DraftStreamForm
+                            formRef={formRef}
+                            group={group}
+                            saveChangesButtonRef={saveChangesButtonRef}
+                            onSubmit={onSubmit}
+                            submitted={submitted}
+                            isActualLivestream={isActualLivestream()}
+                            currentStream={currentStream}
+                            setSubmitted={setSubmitted}
+                        />
+                    </DialogContent>
+                </div>
+            </DialogContent>
         </Dialog>
     );
 };

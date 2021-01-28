@@ -530,7 +530,10 @@ const DraftStreamForm = ({
                         </FormGroup>
                     </>
                     }
-                    <ButtonGroup style={{visibility: isGroupAdmin() && "hidden"}} fullWidth>
+                    <ButtonGroup style={{
+                        visibility: isGroupAdmin() && "hidden",
+                        height: isGroupAdmin() && 0,
+                    }} fullWidth>
                         <Button
                             type="submit"
                             onClick={() => {

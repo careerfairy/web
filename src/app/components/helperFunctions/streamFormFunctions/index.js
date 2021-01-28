@@ -192,29 +192,7 @@ export const languageCodes = [
         name: "Dutch",
     },
     {
-        code: "cs",
-        name: "Czech",
-    },
-    {
-        code: "da",
-        name: "Danish",
-    },
-
-    {
-        code: "no",
-        name: "Norwegian",
-    },
-
-    {
         code: "pt",
         name: "Portuguese",
-    },
-    {
-        code: "ru",
-        name: "Russian",
-    },
-    {
-        code: "sv",
-        name: "Swedish",
     },
 ];
