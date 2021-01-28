@@ -1,4 +1,6 @@
 import { CircularProgress } from '@material-ui/core';
+import VideocamOffIcon from '@material-ui/icons/VideocamOff';
+import VolumeOffIcon from '@material-ui/icons/VolumeOff';
 import React, {useState, useEffect, useRef, useContext} from 'react';
 import {Icon, Image} from "semantic-ui-react";
 import {
@@ -101,14 +103,19 @@ function RemoteVideoContainer(props) {
                 open={activeStep === 11 && props.stream.streamId === 'demoStream'}>
                 <div className='videoContainer' style={{ height: props.height }}>
                     <div ref={videoElement} id={props.stream.streamId} style={{ width: '100%', height: '100%' }}/>
-                    {/* <div className={ 'loader ' + (canPlay ? 'hidden' : '')}>
-                        <div style={{ position: 'absolute', width: '30%', maxWidth: '30px', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
-                            <CircularProgress style={{ maxWidth: '30px', height: 'auto'}} />
+                    { props.stream.videoMuted && 
+                        <div className='muted-overlay'>
+                            <div className='muted-overlay-content'>
+                                <VideocamOffIcon fontSize='large' color='error'/>
+                            </div>
                         </div>
-                    </div>
-                    <div className={ 'loader clickable ' + (stoppedByUserAgent ? '' : 'hidden')} onClick={(e) => {playVideo(); e.preventDefault();}}>
-                        <Icon name='play' size='big' style={{ color: 'white', width: '30%', maxWidth: '80px', height: 'auto', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}} />
-                    </div> */}
+                    }
+                    {
+                        props.stream.audioMuted && 
+                        <div className='audio-muted'>
+                            <VolumeOffIcon fontSize='large' color='error'/>
+                        </div>
+                    }
                 </div>      
             </WhiteTooltip>     
             <style jsx>{`
@@ -149,6 +156,30 @@ function RemoteVideoContainer(props) {
 
                 .clickable {
                     cursor: pointer;
+                }
+
+                .muted-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: white;
+                    z-index: 9901;
+                }
+
+                .muted-overlay-content {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                }
+
+                .audio-muted {
+                    position: absolute;
+                    bottom: 10px;
+                    left: 10px;
+                    z-index: 9902;
                 }
           `}</style>
         </>

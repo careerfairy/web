@@ -8,6 +8,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     const [localMediaStream, setLocalMediaStream] = useState(null);
 
     const [addedStream, setAddedStream] = useState(null);
+    const [updatedStream, setUpdatedStream] = useState(null);
     const [removedStream, setRemovedStream] = useState(null);
     const [externalMediaStreams, setExternalMediaStreams] = useState([]);
 
@@ -42,6 +43,24 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             setExternalMediaStreams([...cleanedExternalMediaStreams, addedStream]);
         }
     }, [addedStream]);
+
+    useEffect(() => {
+        if (updatedStream) {
+            let externalMediaStreamsCopy = [...externalMediaStreams]
+            externalMediaStreamsCopy.forEach( stream => {
+                if (stream.streamId === updatedStream.streamId) {
+                    Object.keys(updatedStream.propertiesToUpdate).forEach( key => {
+                        stream[key] = updatedStream.propertiesToUpdate[key]
+                    })
+                }
+            })
+            setExternalMediaStreams(externalMediaStreamsCopy);
+        }
+    }, [updatedStream]);
+
+    useEffect(() => {
+        console.log("externalMediaStreams", externalMediaStreams);
+    },[externalMediaStreams])
 
     useEffect(() => {
         if (removedStream) {
@@ -84,11 +103,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         if (!isViewer) {
             rtcClient.setClientRole("host")
             rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
-                rtcClient.enableDualStream(() => {
-                    console.log("Enable dual stream success!")
-                  }, function(err) {
-                    console.log(err)
-                  });
                 setAgoraStatus("getting_media_access");
                 let localStream = AgoraRTC.createStream({
                     audio: true,
@@ -99,6 +113,11 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                     setAgoraStatus("publish_stream");
                     localStream.play(videoId);
                     rtcClient.publish(localStream, handleError);
+                    rtcClient.enableDualStream(() => {
+                        console.log("Enable dual stream success!")
+                      }, function(err) {
+                        console.log(err)
+                      });
                     setLocalMediaStream(localStream);
                     // Publish the local stream
                 }, handleError);
@@ -107,6 +126,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             rtcClient.setClientRole("audience");
             rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {}, handleError);
         }
+        rtcClient.enableAudioVolumeIndicator()
         rtcClient.on("stream-published", function(evt){
             setAgoraStatus("stream_published");
         });
@@ -118,10 +138,14 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         rtcClient.on("stream-subscribed", function(evt){
             let stream = evt.stream;
             let streamId = String(stream.getId());
-            rtcClient.setStreamFallbackOption(stream, 1);
+            rtcClient.setStreamFallbackOption(stream, 2);
             setAddedStream({
                 streamId: streamId,
-                stream: stream
+                stream: stream,
+                streamQuality: 'high',
+                videoMuted: false,
+                audioMuted: false,
+                fallbackToAudio: false
             });
         });
         rtcClient.on("stream-removed", function(evt){
@@ -163,6 +187,82 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                 }
             }
         });  
+        rtcClient.on("stream-type-changed", evt => {
+            // SHOW MESSAGE DESCRIBING THAT THE USER WILL RECEIVE LOW QUALITY STREAMS DUE TO NETWORK CONDITIONS
+            console.log("stream-type-changed", evt)
+            let streamToUpdate = {
+                streamId: evt.uid,
+                propertiesToUpdate: {
+                    streamQuality: evt.streamType === 0 ? 'high' : 'low'
+                }
+            }
+            setUpdatedStream(streamToUpdate);
+        });
+        rtcClient.on("stream-fallback", evt => {
+            // SHOW MESSAGE DESCRIBING THAT THE USER WILL ONLY RECEIVE AUDIO STREAM DUE TO NETWORK CONDITIONS
+            console.log("stream-fallback", evt)
+            let streamToUpdate = {
+                streamId: evt.uid,
+                propertiesToUpdate: {
+                    fallbackToAudio: evt.attr === 1 ? true : false
+                }
+            }
+            setUpdatedStream(streamToUpdate);
+        });
+        rtcClient.on("network-quality", function(evt){
+            // NETWORK QUALITY
+        });
+        rtcClient.on("mute-audio", function(evt){
+            // STREAMER HAS MUTED AUDIO
+            console.log("mute-audio", evt)
+            let streamToUpdate = {
+                streamId: evt.uid,
+                propertiesToUpdate: {
+                    audioMuted: true
+                }
+            }
+            setUpdatedStream(streamToUpdate);
+        });
+        rtcClient.on("unmute-audio", function(evt){
+            // STREAMER HAS UNMUTED AUDIO
+            console.log("mute-audio", evt)
+            let streamToUpdate = {
+                streamId: evt.uid,
+                propertiesToUpdate: {
+                    audioMuted: false
+                }
+            }
+            setUpdatedStream(streamToUpdate);
+        });
+        rtcClient.on("mute-video", function(evt){
+            // STREAMER HAS MUTED VIDEO
+            console.log("mute-video", evt)
+            let streamToUpdate = {
+                streamId: evt.uid,
+                propertiesToUpdate: {
+                    videoMuted: true
+                }
+            }
+            setUpdatedStream(streamToUpdate);
+        });
+        rtcClient.on("unmute-video", function(evt){
+            // STREAMER HAS MUTED VIDEO
+            console.log("unmute-video", evt)
+            let streamToUpdate = {
+                streamId: evt.uid,
+                propertiesToUpdate: {
+                    videoMuted: false
+                }
+            }
+            setUpdatedStream(streamToUpdate);
+        });
+        rtcClient.on("volume-indicator", function(evt){
+            // STREAMER HAS MUTED VIDEO
+            console.log("volume-indicator", evt)
+        });
+        rtcClient.on("exception", function(evt){
+            // NETWORK QUALITY
+        });
         setRtcClient(rtcClient);
     }
 
