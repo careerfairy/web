@@ -1,4 +1,4 @@
-import {useState, useContext, Fragment} from 'react';
+import {useState, useContext, Fragment, useEffect} from 'react';
 import {withFirebasePage} from 'context/firebase';
 import useAgoraAsStreamer from 'components/custom-hook/useAgoraAsStreamer';
 import CurrentSpeakerDisplayer from 'components/views/streaming/video-container/CurrentSpeakerDisplayer';
@@ -8,11 +8,13 @@ import useMediaSources from 'components/custom-hook/useMediaSources';
 import VideoControlsContainer from 'components/views/streaming/video-container/VideoControlsContainer';
 import SettingsModal from 'components/views/streaming/video-container/SettingsModal';
 import { useAuth } from 'HOCs/AuthProvider';
+import { v4 as uuidv4 } from 'uuid';
 
 
 function ViewerComponent(props) {
 
     const [showSettings, setShowSettings] = useState(false);
+    const [streamerId, setStreamerId] = useState(null);
     const {userData, authenticatedUser} = useAuth();
 
     const streamerReady = true;
@@ -27,7 +29,7 @@ function ViewerComponent(props) {
             'localVideo',
             screenSharingMode,
             props.livestreamId,
-            authenticatedUser?.email,
+            streamerId,
             true
         );
 
@@ -42,9 +44,13 @@ function ViewerComponent(props) {
         audioLevel
     } = useMediaSources(devices, authenticatedUser?.email, localMediaStream, !streamerReady || showSettings);
 
-    if (!props.currentLivestream) {
-        return null;
-    }
+    useEffect(() => {
+        if (props.currentLivestream && props.currentLivestream.test) {
+            setStreamerId(uuidv4());
+        } else if (authenticatedUser?.email) {
+            setStreamerId(authenticatedUser.email)
+        }
+    }, [props.currentLivestream, authenticatedUser])
 
     const attachSinkId = (element, sinkId) => {
         if (typeof element.sinkId !== 'undefined') {
@@ -68,6 +74,10 @@ function ViewerComponent(props) {
     const setDesktopMode = async (mode, initiatorId) => {
         let screenSharerId = mode === 'desktop' ? initiatorId : props.currentLivestream.screenSharerId;
         await props.firebase.setDesktopMode(props.currentLivestream.id, mode, screenSharerId);
+    }
+
+    if (!props.currentLivestream) {
+        return null;
     }
 
     return (
