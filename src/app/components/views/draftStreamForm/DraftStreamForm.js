@@ -45,7 +45,7 @@ const useStyles = makeStyles(theme => ({
         alignItems: "center",
         minHeight: "20vh",
         borderRadius: 5,
-        marginBottom: 30
+        marginBottom: ({isGroupAdmin}) => !isGroupAdmin && 30
     },
     form: {
         width: "100%"
@@ -73,6 +73,10 @@ const useStyles = makeStyles(theme => ({
             color: 'white',
             background: theme.palette.primary.main,
         }
+    },
+    buttonGroup: {
+        visibility: ({isGroupAdmin}) => isGroupAdmin && "hidden",
+        position: ({isGroupAdmin}) => isGroupAdmin && "fixed",
     }
 }));
 
@@ -105,8 +109,10 @@ const DraftStreamForm = ({
     draftStreamId = draftStreamId || currentStream?.id
     const {enqueueSnackbar} = useSnackbar()
     const [status, setStatus] = useState("");
-
-    const classes = useStyles()
+    const isGroupAdmin = () => Boolean(group?.id)
+    const classes = useStyles({
+        isGroupAdmin: isGroupAdmin()
+    })
 
 
     const [targetCategories, setTargetCategories] = useState({})
@@ -296,7 +302,7 @@ const DraftStreamForm = ({
 
     const noValidation = () => status === SAVE_WITH_NO_VALIDATION
 
-    const isGroupAdmin = () => Boolean(group?.id)
+
 
     return (<Container className={classes.root}>
         {allFetched ? (submitted ? <SuccessMessage/> : <Formik
@@ -530,10 +536,7 @@ const DraftStreamForm = ({
                         </FormGroup>
                     </>
                     }
-                    <ButtonGroup style={{
-                        visibility: isGroupAdmin() && "hidden",
-                        height: isGroupAdmin() && 0,
-                    }} fullWidth>
+                    <ButtonGroup className={classes.buttonGroup} fullWidth>
                         <Button
                             type="submit"
                             onClick={() => {

@@ -1,6 +1,6 @@
 import React, {useRef, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {AppBar, CardActions, Dialog, DialogContent, fade, Slide} from "@material-ui/core";
+import {AppBar, CardActions, Dialog, DialogContent, fade, Slide, Zoom} from "@material-ui/core";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
@@ -16,7 +16,7 @@ import AddIcon from '@material-ui/icons/Add';
 import PublishIcon from '@material-ui/icons/Publish';
 import {useRouter} from "next/router";
 import {v4 as uuidv4} from "uuid";
-
+import ButtonGroup from "@material-ui/core/ButtonGroup";
 
 const useStyles = makeStyles(theme => ({
 
@@ -29,7 +29,21 @@ const useStyles = makeStyles(theme => ({
     },
     appBar: {
         backgroundColor: theme.palette.navyBlue.main,
-    }
+    },
+    content: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+    },
+    whiteBtn: {
+        color: theme.palette.primary.main,
+        background: "white",
+        margin: theme.spacing(1),
+        "&:hover": {
+            color: 'white',
+            background: theme.palette.primary.main,
+        }
+    },
 }));
 
 
@@ -175,6 +189,27 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
         }
     }
 
+    const Actions = ({size, className}) => (
+        <>
+            {canPublish() &&
+            <Button startIcon={<PublishIcon/>} disabled={formRef.current?.isSubmitting} variant="contained"
+                    size={size}
+                    className={className}
+                    autoFocus color="secondary"
+                    onClick={handleValidate}>
+                publish as stream
+            </Button>}
+            <Button disabled={formRef.current?.isSubmitting}
+                    size={size}
+                    className={className}
+                    startIcon={currentStream ? <SaveIcon/> : <AddIcon/>} variant="contained" autoFocus
+                    color="primary"
+                    onClick={handleSaveOrUpdate}>
+                {!currentStream ? "Create draft" : isActualLivestream() ? "update and close" : "save changes and close"}
+            </Button>
+        </>
+    )
+
     return (
         <Dialog
             keepMounted={false}
@@ -196,25 +231,14 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                         {isActualLivestream() ? "Update Stream" : currentStream ? "Update Draft" : "New draft"}
                     </Typography>
                     <CardActions>
-                        {canPublish() &&
-                        <Button startIcon={<PublishIcon/>} disabled={formRef.current?.isSubmitting} variant="contained"
-                                autoFocus color="secondary"
-                                onClick={handleValidate}>
-                            publish as stream
-                        </Button>}
-                        <Button disabled={formRef.current?.isSubmitting}
-                                startIcon={currentStream ? <SaveIcon/> : <AddIcon/>} variant="contained" autoFocus
-                                color="primary"
-                                onClick={handleSaveOrUpdate}>
-                            {!currentStream ? "Create draft" : isActualLivestream() ? "update and close" : "save changes and close"}
-                        </Button>
+                        <Actions/>
                     </CardActions>
                 </Toolbar>
             </AppBar>
             <DialogContent>
                 {/*Have to nest DialogContent Elements in order for scroll to top in Dialogs to work (weird MUI bug: github.com/mui-org/material-ui/issues/9186)*/}
                 <div ref={dialogRef}>
-                    <DialogContent>
+                    <DialogContent className={classes.content}>
                         <DraftStreamForm
                             formRef={formRef}
                             group={group}
@@ -225,6 +249,17 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                             currentStream={currentStream}
                             setSubmitted={setSubmitted}
                         />
+                        <Zoom
+                            in
+                            timeout={1500}
+                            style={{
+                                transitionDelay: "500ms",
+                            }}
+                        >
+                            <ButtonGroup>
+                                <Actions className={classes.whiteBtn} size="large"/>
+                            </ButtonGroup>
+                        </Zoom>
                     </DialogContent>
                 </div>
             </DialogContent>
