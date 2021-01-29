@@ -56,13 +56,15 @@ function StreamingPage(props) {
     const [numberOfViewers, setNumberOfViewers] = useState(0);
 
     useEffect(() => {
+        const regex = /-/g;
         if (livestreamId) {
             if (localStorage.getItem('streamingUuid')) {
                 let storedUuid = localStorage.getItem('streamingUuid')
-                setStreamerId(livestreamId + storedUuid)
+                let joiningId = storedUuid.replace(regex, '')
+                setStreamerId(livestreamId + joiningId)
             } else {
                 let uuid = uuidv4()
-                let joiningId = uuid.replace('/-/g', '')
+                let joiningId = uuid.replace(regex, '')
                 localStorage.setItem('streamingUuid', joiningId)
                 setStreamerId(livestreamId + joiningId)
             }        

@@ -37,7 +37,8 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
     useEffect(() => {
         if (streamId) {
-            let joiningId = streamId.replaceAll('-', '')
+            const regex = /-/g;
+            let joiningId = streamId.replace(regex, '')
             setUserUid(joiningId)
         }
     }, [streamId])
