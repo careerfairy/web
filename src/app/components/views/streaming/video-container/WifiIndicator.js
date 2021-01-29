@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {fade, makeStyles} from "@material-ui/core/styles";
 import SignalWifi0BarRoundedIcon from '@material-ui/icons/SignalWifi0BarRounded';
 import SignalWifi1BarRoundedIcon from '@material-ui/icons/SignalWifi1BarRounded';
@@ -9,8 +9,8 @@ import {ArrowUp, ArrowDown} from 'react-feather'
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import Box from "@material-ui/core/Box";
-import {WhiteTooltip} from "../../../../materialUI/GlobalTooltips";
 import {Tooltip} from "@material-ui/core";
+import Draggable from 'react-draggable';
 
 const gradient = [
     "rgba(0,0,0,0.89)",
@@ -25,6 +25,7 @@ const gradient = [
 const useStyles = makeStyles(theme => ({
     root: {
         position: "absolute",
+        cursor: "move",
         left: "10%",
         bottom: "7%",
         zIndex: 9999,
@@ -65,10 +66,29 @@ const useStyles = makeStyles(theme => ({
 
 const WifiIndicator = ({isDownLink, uplink, downlink, className, ...rest}) => {
 
+    const [defaultPosition, setDefaultPosition] = useState(undefined);
+
+
+    useEffect(() => {
+        getSavedPosition()
+    },[])
+
     const classes = useStyles({
         uplinkIndex: uplink,
         downlinkIndex: downlink
     })
+
+    const handleSave = (e, data) => {
+        const lastPosition = {x: data.x, y: data.y}
+        localStorage.setItem('wifiIconLocation', JSON.stringify(lastPosition));
+    }
+
+    const getSavedPosition = () => {
+        const lastPosition = localStorage.getItem('wifiIconLocation') || ''
+        if(lastPosition){
+            setDefaultPosition(JSON.parse(lastPosition))
+        }
+    }
 
     const getNetWorkInfo = (isUplink) => {
         let newClasses = isUplink ? classes.uplinkWifiIcon : classes.downlinkWifiIcon
@@ -78,7 +98,7 @@ const WifiIndicator = ({isDownLink, uplink, downlink, className, ...rest}) => {
                 rating: 0,
                 description: `The ${isUplink ? "upload" : "download"} network quality is unknown.`,
                 icon: <SignalWifi0BarRoundedIcon className={newClasses}/>,
-                color:  gradient[0]
+                color: gradient[0]
             },
             {
                 rating: 1,
@@ -119,22 +139,29 @@ const WifiIndicator = ({isDownLink, uplink, downlink, className, ...rest}) => {
         ]
     }
 
+    const uplinkInfo = useMemo(() => getNetWorkInfo(true)[uplink], [uplink])
+    const downlinkInfo = useMemo(() => getNetWorkInfo()[downlink], [downlink])
 
     return (
-        <Box {...rest} className={clsx(classes.root, className)}>
-            <Tooltip placement="top" title={getNetWorkInfo(true)[uplink].description}>
-                <Box marginRight={1} alignItems="center" display="flex">
-                    {getNetWorkInfo(true)[uplink].icon}
-                    <ArrowUp className={clsx(classes.arrowUplinkIcon, classes.svgShadow)}/>
-                </Box>
-            </Tooltip>
-            <Tooltip placement="top" title={getNetWorkInfo()[downlink].description}>
-                <Box alignItems="center" display="flex">
-                    {getNetWorkInfo()[downlink].icon}
-                    <ArrowDown className={clsx(classes.arrowDownlinkIcon, classes.svgShadow)}/>
-                </Box>
-            </Tooltip>
-        </Box>
+        <Draggable
+            onStop={handleSave}
+            defaultPosition={defaultPosition}
+            bounds="parent">
+            <Box {...rest} className={clsx(classes.root, className)}>
+                <Tooltip style={{color: uplinkInfo.color}} placement="top" title={uplinkInfo.description}>
+                    <Box marginRight={1} alignItems="center" display="flex">
+                        {uplinkInfo.icon}
+                        <ArrowUp className={clsx(classes.arrowUplinkIcon, classes.svgShadow)}/>
+                    </Box>
+                </Tooltip>
+                <Tooltip style={{color: downlinkInfo.color}} placement="top" title={downlinkInfo.description}>
+                    <Box alignItems="center" display="flex">
+                        {downlinkInfo.icon}
+                        <ArrowDown className={clsx(classes.arrowDownlinkIcon, classes.svgShadow)}/>
+                    </Box>
+                </Tooltip>
+            </Box>
+        </Draggable>
     );
 };
 
