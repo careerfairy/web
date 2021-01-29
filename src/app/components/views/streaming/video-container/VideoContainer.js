@@ -69,7 +69,6 @@ function VideoContainer(props) {
             props.streamerId,
             props.viewer
         );
-    console.log("-> networkQuality", networkQuality);
 
     const {
         audioSource,
