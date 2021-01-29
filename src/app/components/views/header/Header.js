@@ -4,13 +4,15 @@ import {Icon} from "semantic-ui-react";
 import AuthenticatedHeader from "./authenticated-header/AuthenticatedHeader";
 import NonAuthenticatedHeader from "./non-authenticated-header/NonAuthenticatedHeader";
 import {compose} from "redux"
-
+import * as actions from '../../../store/actions'
+import {connect} from 'react-redux'
 import Link from 'next/link';
 import {useRouter, withRouter} from 'next/router';
 import LandingHeader from './landing-header/LandingHeader';
 import {Button} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {useAuth} from "../../../HOCs/AuthProvider";
+
 
 const useStyles = makeStyles((theme) => ({
     nextLink: {
@@ -37,11 +39,10 @@ function Header(props) {
         }
     }, [userData]);
 
+    console.log("-> props", props);
     const handleLogout = () => {
+        props.logout()
         setUserData(undefined)
-        props.firebase.doSignOut().then(
-            push("/login")
-        )
     }
 
     const ConstantSideHeader = () => {
@@ -49,7 +50,8 @@ function Header(props) {
             <div className='sidebar'>
                 <Icon name='times circle outline' size='big' onClick={toggleSideBar} style={{cursor: 'pointer'}}/>
                 <ul>
-                    <li><Link className={`${isHighlighted ? "highlighted": ""}`} href='/next-livestreams'><a className={classes.nextLink}>Next Live
+                    <li><Link className={`${isHighlighted ? "highlighted" : ""}`} href='/next-livestreams'><a
+                        className={classes.nextLink}>Next Live
                         Streams</a></Link></li>
                     <li><Link href='/discover'><a>Past Live Streams</a></Link></li>
                     <li><Link href='/companies'><a>Companies</a></Link></li>
@@ -64,61 +66,61 @@ function Header(props) {
 
                 </ul>
                 <style jsx>{`
+                  .sidebar {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    bottom: 0;
+                    width: 300px;
+                    background-color: rgba(30, 30, 30, 0.95);
+                    z-index: 9999;
+                    color: white;
+                    padding: 20px;
+                    text-align: center;
+                  }
+
+                  .highlighted {
+                    border: 5px solid #00d2aa;
+                    border-radius: 5px;
+                  }
+
+                  .sidebar.hidden {
+                    display: none;
+                  }
+
+                  .sidebar ul {
+                    margin-top: 50px;
+                    list-style-type: none;
+                    padding: 0;
+                  }
+
+                  .sidebar ul li {
+                    font-size: 1.2em;
+                    margin-top: 30px;
+                  }
+
+                  .sidebar a, .sidebar div {
+                    font-weight: 600;
+                    color: white;
+                    text-transform: uppercase;
+                  }
+
+                  .sidebar a:hover, .sidebar div:hover {
+                    cursor: pointer;
+                    color: rgb(28, 184, 149);
+                  }
+
+                  @media screen and (max-width: 992px) {
+                    #sidebar-toggle {
+                      display: inline-block;
+                    }
+                  }
+
+                  @media screen and (max-width: 600px) {
                     .sidebar {
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-                        bottom: 0;
-                        width: 300px;
-                        background-color: rgba(30,30,30, 0.95);
-                        z-index: 9999;
-                        color: white;
-                        padding: 20px;
-                        text-align: center;
+                      width: 100%;
                     }
-                    
-                    .highlighted {
-                        border: 5px solid #00d2aa;
-                        border-radius: 5px;
-                    }
-
-                    .sidebar.hidden {
-                        display: none;
-                    }
-
-                    .sidebar ul {
-                        margin-top: 50px;
-                        list-style-type: none;
-                        padding: 0;
-                    }
-
-                    .sidebar ul li {
-                        font-size: 1.2em;
-                        margin-top: 30px;
-                    }
-
-                    .sidebar a, .sidebar div {
-                        font-weight: 600;
-                        color: white;
-                        text-transform: uppercase;
-                    }
-
-                    .sidebar a:hover, .sidebar div:hover {
-                        cursor: pointer;
-                        color: rgb(28,184, 149);
-                    }
-
-                    @media screen and (max-width: 992px) {
-                        #sidebar-toggle {
-                            display: inline-block;
-                        }
-                    }
-
-                    @media screen and (max-width: 600px) {
-                        .sidebar {
-                            width: 100%;
-                        }
-                    }
+                  }
                 `}</style>
             </div>
         );
@@ -163,7 +165,9 @@ function Header(props) {
                 className={sidebarState !== "opened" ? 'sidebar hidden' : sidebarState === "opened" ? 'sidebar animated slideInLeft faster' : 'sidebar animated slideOutLeft faster'}>
                 <Icon name='times circle outline' size='big' onClick={toggleSideBar} style={{cursor: 'pointer'}}/>
                 <ul>
-                    <li><Link  className="next-livestream-link" href='/next-livestreams'><a onClick={toggleSideBar} className={classes.nextLink}>Next Live Streams</a></Link>
+                    <li><Link className="next-livestream-link" href='/next-livestreams'><a onClick={toggleSideBar}
+                                                                                           className={classes.nextLink}>Next
+                        Live Streams</a></Link>
                     </li>
                     {authenticated && <li><a onClick={toggleSideBar} href='/groups'>Follow Groups</a></li>}
                     <li><Link href='/discover'><a onClick={toggleSideBar}>Past Live Streams</a></Link></li>
@@ -178,77 +182,93 @@ function Header(props) {
                 </ul>
             </div>
             <style jsx>{`
-                #mainHeader header #signupLink:hover, #mainHeader header #wishlistLink:hover {
-                    background-color: rgb(0,210,170);
-                }
-                
-                header {
-                    padding: 15px 20px;
-                    text-align: left;
-                    height: 80px;
-                }
+              #mainHeader header #signupLink:hover, #mainHeader header #wishlistLink:hover {
+                background-color: rgb(0, 210, 170);
+              }
 
-                i {
-                    cursor: pointer;
-                }
+              header {
+                padding: 15px 20px;
+                text-align: left;
+                height: 80px;
+              }
 
-                i:hover {
-                    color: rgba(220,220,220, 1);
-                }
+              i {
+                cursor: pointer;
+              }
 
+              i:hover {
+                color: rgba(220, 220, 220, 1);
+              }
+
+              .sidebar {
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 300px;
+                background-color: rgba(30, 30, 30, 0.95);
+                z-index: 9999;
+                color: white;
+                padding: 20px;
+                text-align: center;
+              }
+
+              .sidebar.hidden {
+                display: none;
+              }
+
+              .sidebar ul {
+                margin-top: 50px;
+                list-style-type: none;
+                padding: 0;
+              }
+
+              .sidebar ul li {
+                font-size: 1.2em;
+                margin-top: 30px;
+              }
+
+              .sidebar a, .sidebar div {
+                font-weight: 600;
+                color: white;
+                text-transform: uppercase;
+              }
+
+              .sidebar a:hover, .sidebar div:hover {
+                cursor: pointer;
+                color: rgb(28, 184, 149);
+              }
+
+              @media screen and (max-width: 992px) {
+                #sidebar-toggle {
+                  display: inline-block;
+                }
+              }
+
+              @media screen and (max-width: 600px) {
                 .sidebar {
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-                        bottom: 0;
-                        width: 300px;
-                        background-color: rgba(30,30,30, 0.95);
-                        z-index: 9999;
-                        color: white;
-                        padding: 20px;
-                        text-align: center;
-                    }
-
-                    .sidebar.hidden {
-                        display: none;
-                    }
-
-                    .sidebar ul {
-                        margin-top: 50px;
-                        list-style-type: none;
-                        padding: 0;
-                    }
-
-                    .sidebar ul li {
-                        font-size: 1.2em;
-                        margin-top: 30px;
-                    }
-
-                    .sidebar a, .sidebar div {
-                        font-weight: 600;
-                        color: white;
-                        text-transform: uppercase;
-                    }
-
-                    .sidebar a:hover, .sidebar div:hover {
-                        cursor: pointer;
-                        color: rgb(28,184, 149);
-                    }
-
-                    @media screen and (max-width: 992px) {
-                        #sidebar-toggle {
-                            display: inline-block;
-                        }
-                    }
-
-                    @media screen and (max-width: 600px) {
-                        .sidebar {
-                            width: 100%;
-                        }
-                    }
+                  width: 100%;
+                }
+              }
             `}</style>
         </Fragment>
     );
 }
 
-export default compose(withFirebase, withRouter)(Header);
+const mapDispatchToProps = {
+    logout: actions.signOut,
+}
+
+
+const enhance = compose(
+    withFirebase,
+    withFirebase,
+    connect(null, mapDispatchToProps)
+)
+
+export default enhance(Header);
+// export default connect(
+//     null,
+//     mapDispatchToProps
+// )(Header)
+//  compose(withFirebase, withRouter)(Header);

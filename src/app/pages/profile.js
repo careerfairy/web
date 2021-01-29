@@ -8,6 +8,7 @@ import Loader from "../components/views/loader/Loader";
 import Footer from "../components/views/footer/Footer";
 import ProfileNav from "../components/views/profile/ProfileNav";
 import {useAuth} from "../HOCs/AuthProvider";
+import { useSelector } from 'react-redux'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -24,6 +25,8 @@ const UserProfile = ({firebase}) => {
     const classes = useStyles();
     const router = useRouter();
     const {userData, authenticatedUser: user, loading} = useAuth();
+    const newState = useSelector(state => state)
+    console.log("-> newState", newState);
 
     return (
         <div className={classes.root}>

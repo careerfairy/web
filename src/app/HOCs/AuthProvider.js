@@ -1,6 +1,8 @@
 import React, {createContext, useContext, useState, useEffect} from "react";
 import {useRouter} from "next/router";
 import Loader from "../components/views/loader/Loader";
+import {useSelector} from "react-redux";
+import { useFirestoreConnect } from 'react-redux-firebase'
 
 const AuthContext = createContext();
 
@@ -21,15 +23,23 @@ const adminPaths = [
     "/group/create"
 ];
 const AuthProvider = ({children, firebase}) => {
+    const { auth} = useSelector((state) => state.firebase)
+    console.log("-> auth", auth);
+
     const {pathname, replace, asPath} = useRouter();
 
     const [authenticatedUser, setAuthenticatedUser] = useState(undefined);
     const [userData, setUserData] = useState(undefined);
+    console.log("-> userData", userData);
+
+    useFirestoreConnect(() => [
+        { collection: 'todos', doc: todoId } // or `todos/${props.todoId}`
+    ])
 
     useEffect(() => {
-        if (authenticatedUser?.email) {
+        if (auth.email) {
             const unsubscribe = firebase.listenToUserData(
-                authenticatedUser.email,
+                auth.email,
                 (querySnapshot) => {
                     if (querySnapshot.exists) {
                         let user = querySnapshot.data();
@@ -42,7 +52,7 @@ const AuthProvider = ({children, firebase}) => {
             );
             return () => unsubscribe();
         }
-    }, [authenticatedUser]);
+    }, [auth]);
 
     useEffect(() => {
         firebase.auth.onAuthStateChanged((user) => {
@@ -58,7 +68,7 @@ const AuthProvider = ({children, firebase}) => {
     useEffect(() => {
 
         // Check that initial route is OK
-        if (isSecurePath() && authenticatedUser === null) {
+        if (isSecurePath() && isLoggedOut()) {
             replace({
                 pathname: `/login`,
                 query: {absolutePath: asPath},
@@ -77,11 +87,9 @@ const AuthProvider = ({children, firebase}) => {
         return Boolean(adminPaths.includes(pathname))
     }
 
-    const isAuthenticating = () => {
-        return Boolean(authenticatedUser === undefined || userData === undefined)
-    }
+    const isLoggedOut = () => auth.isLoaded && auth.isEmpty
 
-    if ((isSecurePath() || isAdminPath()) && isAuthenticating()) {
+    if ((isSecurePath() || isAdminPath()) && !auth.isLoaded) {
         return <Loader/>;
     }
 

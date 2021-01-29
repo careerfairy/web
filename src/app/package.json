@@ -45,6 +45,7 @@
     "material-table": "^1.69.2",
     "moment": "^2.29.1",
     "next": "^9.2.0",
+    "next-redux-wrapper": "^6.0.2",
     "notistack": "^1.0.1",
     "react": "^16.14.0",
     "react-chartjs-2": "^2.10.0",

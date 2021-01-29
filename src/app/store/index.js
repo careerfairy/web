@@ -1,30 +1,34 @@
-import {compose, createStore, applyMiddleware} from 'redux';
-import thunk from 'redux-thunk';
-import firebase from '../Firebase/Firebase';
-import {reactReduxFirebase, getFirebase} from 'react-redux-firebase';
-import {reduxFirestore, getFirestore} from 'redux-firestore';
-
 import rootReducer from './reducers';
+import firebase from '../Firebase/Firebase';
 
-// react-redux-firebase config
-const rrfConfig = {
-    userProfile: 'userData',
-    useFirestoreForProfile: true, // Firestore for Profile instead of Realtime DB
-    attachAuthIsReady: true, // attaches auth is ready promise to store
+import thunk from 'redux-thunk';
+import {applyMiddleware, compose, createStore,} from 'redux';
+import {getFirebase, reactReduxFirebase} from 'react-redux-firebase';
+import {getFirestore, reduxFirestore} from 'redux-firestore';
+import {createWrapper} from "next-redux-wrapper";
+
+const initialState = {};
+
+export const newStore = () => {
+
+
+    let composeEnhancers = compose;
+    const isServer = typeof window === 'undefined';
+    //Check if function running on the sever or client
+    if (!isServer) {
+        //Setup Redux Debugger
+        composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+    }
+
+    return createStore(
+        rootReducer,
+        initialState,
+        composeEnhancers(
+            applyMiddleware(thunk.withExtraArgument({getFirebase, getFirestore})
+            ), reduxFirestore(firebase)
+        )
+    );
 };
 
-const composeEnhancers =
-    process.env.NODE_ENV === 'development' ?
-        typeof window === undefined?
-            compose: window?.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose : compose;
+export const wrapper = createWrapper(newStore, { debug: true });
 
-const store = createStore(
-    rootReducer,
-    composeEnhancers(
-        reactReduxFirebase(firebase, rrfConfig),
-        reduxFirestore(firebase),
-        applyMiddleware(thunk.withExtraArgument({getFirebase, getFirestore}))
-    )
-);
-
-export default store;
