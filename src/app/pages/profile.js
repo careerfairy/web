@@ -23,10 +23,7 @@ const useStyles = makeStyles((theme) => ({
 
 const UserProfile = ({firebase}) => {
     const classes = useStyles();
-    const router = useRouter();
-    const {userData, authenticatedUser: user, loading} = useAuth();
-    const newState = useSelector(state => state)
-    console.log("-> newState", newState);
+    const {userData, authenticatedUser: user} = useAuth();
 
     return (
         <div className={classes.root}>
@@ -34,7 +31,7 @@ const UserProfile = ({firebase}) => {
                 <title key="title">CareerFairy | My Profile</title>
             </Head>
             <Header classElement='relative white-background'/>
-            <ProfileNav user={user} userData={userData}/>
+            {userData && <ProfileNav user={user} userData={userData}/>}
             <Footer/>
         </div>
     );

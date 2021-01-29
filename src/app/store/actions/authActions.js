@@ -95,33 +95,33 @@ export const recoverPassword = data => async (
 };
 
 // Edit profile
-export const editProfile = data => async (
+export const editUserProfile = data => async (
     dispatch,
     getState,
     { getFirebase, getFirestore }
 ) => {
     const firebase = getFirebase();
     const firestore = getFirestore();
-    const user = firebase.auth().currentUser;
-    const { uid: userId, email: userEmail } = getState().firebase.auth;
+    // const user = firebase.auth().currentUser; // dont need it yet for updating email
+    const {
+        // uid: userId,
+        email: userEmail
+    } = getState().firebase.auth;
     dispatch({ type: actions.PROFILE_EDIT_START });
     try {
         //edit the user profile
-        if (data.email !== userEmail) {
-            await user.updateEmail(data.email);
-        }
+        // if (data.email !== userEmail) {
+        //     await user.updateEmail(data.email);
+        // }
 
         await firestore
-            .collection('users')
-            .doc(userId)
-            .set({
-                firstName: data.firstName,
-                lastName: data.lastName,
-            });
+            .collection('userData')
+            .doc(userEmail)
+            .update(data);
 
-        if (data.password.length > 0) {
-            await user.updatePassword(data.password);
-        }
+        // if (data.password.length > 0) { // dont need it
+        //     await user.updatePassword(data.password);
+        // }
         dispatch({ type: actions.PROFILE_EDIT_SUCCESS });
     } catch (err) {
         dispatch({ type: actions.PROFILE_EDIT_FAIL, payload: err.message });
@@ -137,18 +137,21 @@ export const deleteUser = () => async (
     const firebase = getFirebase();
     const firestore = getFirestore();
     const user = firebase.auth().currentUser;
-    const userId = getState().firebase.auth.uid;
+    const {
+        // uid: userId, // dont need uid yet
+        email: userEmail
+    } = getState().firebase.auth;
     dispatch({ type: actions.DELETE_START });
     try {
         await firestore
-            .collection('users')
-            .doc(userId)
+            .collection('userData')
+            .doc(userEmail)
             .delete();
 
-        await firestore
-            .collection('todos')
-            .doc(userId)
-            .delete();
+        // await firestore   // Need to delete all user doc references in firestore
+        //     .collection('todos')
+        //     .doc(userId)
+        //     .delete();
 
         await user.delete();
     } catch (err) {

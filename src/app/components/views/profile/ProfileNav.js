@@ -11,6 +11,9 @@ import PersonalInfo from "./personal-info/PersonalInfo";
 import {withFirebase} from "context/firebase";
 import JoinedGroups from "./my-groups/JoinedGroups";
 import AdminGroups from "./my-groups/AdminGroups";
+import {useAuth} from "../../../HOCs/AuthProvider";
+import {useFirestoreConnect} from "react-redux-firebase";
+import {useSelector} from "react-redux";
 
 function TabPanel(props) {
     const {children, value, index, ...other} = props;
@@ -48,32 +51,17 @@ const ProfileNav = ({userData, firebase}) => {
     const classes = useStyles();
     const theme = useTheme();
     const native = useMediaQuery(theme.breakpoints.down('xs'));
-    const [value, setValue] = useState(1);
-    const [adminGroups, setAdminGroups] = useState([]);
-
-    useEffect(() => {
-        if (userData?.isAdmin) {
-            firebase.listenCareerCenters(querySnapshot => {
-                let careerCenters = [];
-                querySnapshot.forEach(doc => {
-                    let careerCenter = doc.data();
-                    careerCenter.id = doc.id;
-                    careerCenters.push(careerCenter);
-                })
-                setAdminGroups(careerCenters);
-            })
-        } else if (userData) {
-            firebase.listenCareerCentersByAdminEmail(userData.id, querySnapshot => {
-                let careerCenters = [];
-                querySnapshot.forEach(doc => {
-                    let careerCenter = doc.data();
-                    careerCenter.id = doc.id;
-                    careerCenters.push(careerCenter);
-                })
-                setAdminGroups(careerCenters);
-            })
+    const [value, setValue] = useState(0);
+    useFirestoreConnect(() => [
+        {
+            collection: 'careerCenterData',
+            where: userData.isAdmin ? ["test", "==", false] : ["adminEmail", "==", userData.id]
         }
-    }, [userData])
+    ])
+    const careerCenterData = useSelector(state => state.firestore.ordered.careerCenterData) || []
+    const state = useSelector(state => state)
+    console.log("-> state", state);
+    console.log("-> careerCenterData", careerCenterData);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -87,16 +75,16 @@ const ProfileNav = ({userData, firebase}) => {
         <TabPanel key={0} value={value} index={0} dir={theme.direction}>
             <PersonalInfo userData={userData}/>
         </TabPanel>,
-        <TabPanel key={1} value={value} index={1} dir={theme.direction}>
-            <JoinedGroups userData={userData}/>
-        </TabPanel>
+        // <TabPanel key={1} value={value} index={1} dir={theme.direction}>
+        //     <JoinedGroups userData={userData}/>
+        // </TabPanel>
     ]
 
-    if (adminGroups.length) {
-    views.push(<TabPanel key={2} value={value} index={2} dir={theme.direction}>
-                <AdminGroups userData={userData} adminGroups={adminGroups}/>
-            </TabPanel>)
-}
+    if (careerCenterData.length) {
+        views.push(<TabPanel key={1} value={value} index={1} dir={theme.direction}>
+            <AdminGroups userData={userData} adminGroups={careerCenterData}/>
+        </TabPanel>)
+    }
 
     return (
         <Container style={{marginTop: '50px', flex: 1}}>
@@ -112,9 +100,9 @@ const ProfileNav = ({userData, firebase}) => {
                     <Tab wrapped fullWidth
                          label={<Typography noWrap
                                             variant="h5">{native ? "Personal" : "Personal Information"}</Typography>}/>
-                    <Tab wrapped fullWidth
-                         label={<Typography variant="h5">{native ? "Groups" : "Joined Groups"}</Typography>}/>
-                    {adminGroups.length ?
+                    {/*<Tab wrapped fullWidth*/}
+                    {/*     label={<Typography variant="h5">{native ? "Groups" : "Joined Groups"}</Typography>}/>*/}
+                    {careerCenterData.length ?
                         <Tab wrapped fullWidth
                              label={<Typography
                                  variant="h5">{native ? "Admin" : "Admin Groups"}</Typography>}/> : null}

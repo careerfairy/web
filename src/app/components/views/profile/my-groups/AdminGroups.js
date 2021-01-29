@@ -36,6 +36,7 @@ const AdminGroups = ({userData, firebase, adminGroups}) => {
             )
         });
     }
+    console.log("-> adminGroups", adminGroups);
 
     return (
         <Fragment>

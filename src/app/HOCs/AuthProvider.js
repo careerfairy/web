@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useState, useEffect} from "react";
+import React, {createContext, useContext, useEffect} from "react";
 import {useRouter} from "next/router";
 import Loader from "../components/views/loader/Loader";
 import {useSelector} from "react-redux";
@@ -22,51 +22,19 @@ const securePaths = [
 const adminPaths = [
     "/group/create"
 ];
-const AuthProvider = ({children, firebase}) => {
+const AuthProvider = ({children}) => {
     const { auth} = useSelector((state) => state.firebase)
-    console.log("-> auth", auth);
+    const {data} = useSelector((state) => state.firestore)
+    const userData = data?.userData?.[auth.email]
 
     const {pathname, replace, asPath} = useRouter();
 
-    const [authenticatedUser, setAuthenticatedUser] = useState(undefined);
-    const [userData, setUserData] = useState(undefined);
-    console.log("-> userData", userData);
-
     useFirestoreConnect(() => [
-        { collection: 'todos', doc: todoId } // or `todos/${props.todoId}`
+        { collection: 'userData', doc: auth.email } // or `userData/${auth.email}`
     ])
 
-    useEffect(() => {
-        if (auth.email) {
-            const unsubscribe = firebase.listenToUserData(
-                auth.email,
-                (querySnapshot) => {
-                    if (querySnapshot.exists) {
-                        let user = querySnapshot.data();
-                        user.id = querySnapshot.id;
-                        setUserData(user);
-                    } else {
-                        setUserData(null);
-                    }
-                }
-            );
-            return () => unsubscribe();
-        }
-    }, [auth]);
 
     useEffect(() => {
-        firebase.auth.onAuthStateChanged((user) => {
-            if (user) {
-                setAuthenticatedUser(user);
-            } else {
-                setAuthenticatedUser(null);
-                setUserData(null);
-            }
-        });
-    }, []);
-
-    useEffect(() => {
-
         // Check that initial route is OK
         if (isSecurePath() && isLoggedOut()) {
             replace({
@@ -78,7 +46,7 @@ const AuthProvider = ({children, firebase}) => {
         }
 
 
-    }, [authenticatedUser, userData, pathname]);
+    }, [auth, userData, pathname]);
 
     const isSecurePath = () => {
         return Boolean(securePaths.includes(pathname))
@@ -95,7 +63,7 @@ const AuthProvider = ({children, firebase}) => {
 
     return (
         <AuthContext.Provider
-            value={{authenticatedUser, userData, setUserData}}
+            value={{authenticatedUser: auth, userData}}
         >
             {children}
         </AuthContext.Provider>
