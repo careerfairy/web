@@ -26,7 +26,7 @@ const useStyles = makeStyles(theme => ({
     root: {
         position: "absolute",
         left: "10%",
-        bottom: "6%",
+        bottom: "7%",
         zIndex: 9999,
         display: "flex",
         borderRadius: theme.spacing(2),
@@ -44,14 +44,14 @@ const useStyles = makeStyles(theme => ({
     },
     uplinkWifiIcon: {
         color: ({uplinkIndex}) => gradient[uplinkIndex],
-        fontSize: "x-large",
+        fontSize: "xx-large",
     },
     svgShadow: {
         filter: "drop-shadow(0px 3px 3px rgba(0, 0, 0, 0.4))"
     },
     downlinkWifiIcon: {
         color: ({downlinkIndex}) => gradient[downlinkIndex],
-        fontSize: "x-large",
+        fontSize: "xx-large",
     },
     arrowUplinkIcon: {
         color: ({uplinkIndex}) => gradient[uplinkIndex],
@@ -78,36 +78,43 @@ const WifiIndicator = ({isDownLink, uplink, downlink, className, ...rest}) => {
                 rating: 0,
                 description: `The ${isUplink ? "upload" : "download"} network quality is unknown.`,
                 icon: <SignalWifi0BarRoundedIcon className={newClasses}/>,
+                color:  gradient[0]
             },
             {
                 rating: 1,
                 description: `The ${isUplink ? "upload" : "download"} network quality is excellent.`,
                 icon: <SignalWifi4BarRoundedIcon className={newClasses}/>,
+                color: gradient[1]
             },
             {
                 rating: 2,
                 description: `The ${isUplink ? "upload" : "download"} network quality is good, but the bitrate may be slightly lower than optimal.`,
                 icon: <SignalWifi3BarRoundedIcon className={newClasses}/>,
+                color: gradient[2]
             },
             {
                 rating: 3,
                 description: `Users experience slightly impaired communication with this ${isUplink ? "upload" : "download"} quality.`,
                 icon: <SignalWifi3BarRoundedIcon className={newClasses}/>,
+                color: gradient[3]
             },
             {
                 rating: 4,
                 description: `Users cannot communicate smoothly with this ${isUplink ? "upload" : "download"} quality.`,
                 icon: <SignalWifi2BarRoundedIcon className={newClasses}/>,
+                color: gradient[4]
             },
             {
                 rating: 5,
                 description: `The ${isUplink ? "upload" : "download"} network quality is so poor that users can barely communicate.`,
                 icon: <SignalWifi2BarRoundedIcon className={newClasses}/>,
+                color: gradient[5]
             },
             {
                 rating: 6,
                 description: `The ${isUplink ? "upload" : "download"} network quality is down and users cannot communicate at all.`,
                 icon: <SignalWifi1BarRoundedIcon className={newClasses}/>,
+                color: gradient[6]
             },
         ]
     }
