@@ -44,7 +44,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
     useEffect(() => {
         if (addedStream) {
-            let cleanedExternalMediaStreams = removeStreamFromList(addedStream, externalMediaStreams)
+            let cleanedExternalMediaStreams = removeStreamFromList(addedStream.streamId, externalMediaStreams)
             setExternalMediaStreams([...cleanedExternalMediaStreams, addedStream]);
         }
     }, [addedStream]);
@@ -154,15 +154,17 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                 fallbackToAudio: false
             });
         });
-        rtcClient.on("stream-removed", function (evt) {
+        rtcClient.on("stream-removed", function(evt){
+            console.log("stream-removed")
             if (evt.stream) {
                 let stream = evt.stream;
                 let streamId = String(stream.getId());
                 stream.close();
                 setRemovedStream(streamId);
             }
-        });
-        rtcClient.on("peer-leave", function (evt) {
+        }); 
+        rtcClient.on("peer-leave", function(evt){
+            console.log("peer-leave")
             if (evt.stream) {
                 let stream = evt.stream;
                 let streamId = String(stream.getId());
@@ -267,7 +269,10 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             // STREAMER HAS MUTED VIDEO
             console.log("volume-indicator", evt)
         });
-        rtcClient.on("exception", function (evt) {
+        rtcClient.on("reconnect", function(evt){
+            setExternalMediaStreams([]);
+        });
+        rtcClient.on("exception", function(evt){
             // NETWORK QUALITY
         });
         setRtcClient(rtcClient);

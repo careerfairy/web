@@ -1,7 +1,9 @@
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress, Tooltip } from '@material-ui/core';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import VolumeOffIcon from '@material-ui/icons/VolumeOff';
+import SignalCellularConnectedNoInternet2BarIcon from '@material-ui/icons/SignalCellularConnectedNoInternet2Bar';
 import React, {useState, useEffect, useRef, useContext} from 'react';
+import {makeStyles} from "@material-ui/core/styles";
 import {Icon, Image} from "semantic-ui-react";
 import {
     TooltipButtonComponent,
@@ -11,10 +13,19 @@ import {
 } from "materialUI/GlobalTooltips";
 import TutorialContext from "context/tutorials/TutorialContext";
 
+const useStyles = makeStyles(theme => ({
+    companyIcon: {
+        maxWidth: "75%",
+        margin: "10px"
+    },
+}))
+
 function RemoteVideoContainer(props) {
 
     const {getActiveTutorialStepKey, handleConfirmStep} = useContext(TutorialContext);
     const videoElement = useRef({ current: {} });
+
+    const classes = useStyles()
 
     const activeStep = getActiveTutorialStepKey();
 
@@ -106,14 +117,33 @@ function RemoteVideoContainer(props) {
                     { props.stream.videoMuted && 
                         <div className='muted-overlay'>
                             <div className='muted-overlay-content'>
-                                <VideocamOffIcon fontSize='large' color='error'/>
+                                <div>
+                                    <img src={props.currentLivestream.companyLogoUrl} className={classes.companyIcon}/>
+                                </div>
+                                <Tooltip title={'The streamer has turned the camera off'}>
+                                    <VideocamOffIcon fontSize='large' color='error'/>
+                                </Tooltip>
                             </div>
                         </div>
                     }
                     {
                         props.stream.audioMuted && 
                         <div className='audio-muted'>
-                            <VolumeOffIcon fontSize='large' color='error'/>
+                            <Tooltip title={'The streamer has muted his microphone'}>
+                                <VolumeOffIcon fontSize='large' color='error'/>
+                            </Tooltip>
+                        </div>
+                    }
+                    { (props.stream.fallbackToAudio && !props.stream.videoMuted) && 
+                        <div className='muted-overlay'>
+                            <div className='muted-overlay-content'>
+                                <div>
+                                    <img src={props.currentLivestream.companyLogoUrl} className={classes.companyIcon}/>
+                                </div>
+                                <Tooltip title={'Your connection is currently too weak to stream this video'}>
+                                    <SignalCellularConnectedNoInternet2BarIcon fontSize='large' color='error'/>
+                                </Tooltip>
+                            </div>
                         </div>
                     }
                 </div>      
