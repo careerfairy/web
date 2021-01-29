@@ -26,8 +26,8 @@ const useStyles = makeStyles(theme => ({
     root: {
         position: "absolute",
         cursor: "move",
-        left: "10%",
-        bottom: "7%",
+        right: "3%",
+        top: "2%",
         zIndex: 9999,
         display: "flex",
         borderRadius: theme.spacing(2),
@@ -71,7 +71,7 @@ const WifiIndicator = ({isDownLink, uplink, downlink, className, ...rest}) => {
 
     useEffect(() => {
         getSavedPosition()
-    },[])
+    }, [])
 
     const classes = useStyles({
         uplinkIndex: uplink,
@@ -84,10 +84,8 @@ const WifiIndicator = ({isDownLink, uplink, downlink, className, ...rest}) => {
     }
 
     const getSavedPosition = () => {
-        const lastPosition = localStorage.getItem('wifiIconLocation') || ''
-        if(lastPosition){
-            setDefaultPosition(JSON.parse(lastPosition))
-        }
+        const lastPosition = localStorage.getItem('wifiIconLocation') || "{}"
+        setDefaultPosition(JSON.parse(lastPosition))
     }
 
     const getNetWorkInfo = (isUplink) => {
@@ -142,7 +140,7 @@ const WifiIndicator = ({isDownLink, uplink, downlink, className, ...rest}) => {
     const uplinkInfo = useMemo(() => getNetWorkInfo(true)[uplink], [uplink])
     const downlinkInfo = useMemo(() => getNetWorkInfo()[downlink], [downlink])
 
-    return (
+    return defaultPosition ? (
         <Draggable
             onStop={handleSave}
             defaultPosition={defaultPosition}
@@ -162,7 +160,7 @@ const WifiIndicator = ({isDownLink, uplink, downlink, className, ...rest}) => {
                 </Tooltip>
             </Box>
         </Draggable>
-    );
+    ) :(<div/>);
 };
 
 WifiIndicator.propTypes = {
