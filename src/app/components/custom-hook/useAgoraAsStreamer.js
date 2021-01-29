@@ -39,7 +39,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
     useEffect(() => {
         if (addedStream) {
-            let cleanedExternalMediaStreams = removeStreamFromList(addedStream, externalMediaStreams)
+            let cleanedExternalMediaStreams = removeStreamFromList(addedStream.streamId, externalMediaStreams)
             setExternalMediaStreams([...cleanedExternalMediaStreams, addedStream]);
         }
     }, [addedStream]);
@@ -149,6 +149,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             });
         });
         rtcClient.on("stream-removed", function(evt){
+            console.log("stream-removed")
             if (evt.stream) {
                 let stream = evt.stream;
                 let streamId = String(stream.getId());
@@ -157,6 +158,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             }
         }); 
         rtcClient.on("peer-leave", function(evt){
+            console.log("peer-leave")
             if (evt.stream) {
                 let stream = evt.stream;
                 let streamId = String(stream.getId());
