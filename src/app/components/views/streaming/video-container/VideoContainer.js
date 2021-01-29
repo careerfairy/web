@@ -266,7 +266,10 @@ function VideoContainer(props) {
                     showSettings={showSettings}
                     setShowSettings={setShowSettings}
                 />
-                <WifiIndicator signalNumber={networkQuality.uplinkNetworkQuality || 0}/>
+                <WifiIndicator
+                    uplink={networkQuality.uplinkNetworkQuality}
+                    downlink={networkQuality.downlinkNetworkQuality}
+                />
             </div>
             <SettingsModal open={showSettings} close={() => setShowSettings(false)}
                            streamId={props.streamerId}

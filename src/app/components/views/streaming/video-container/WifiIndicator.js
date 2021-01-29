@@ -1,17 +1,18 @@
 import React from 'react';
-import {makeStyles} from "@material-ui/core/styles";
+import {fade, makeStyles} from "@material-ui/core/styles";
 import SignalWifi0BarRoundedIcon from '@material-ui/icons/SignalWifi0BarRounded';
 import SignalWifi1BarRoundedIcon from '@material-ui/icons/SignalWifi1BarRounded';
 import SignalWifi2BarRoundedIcon from '@material-ui/icons/SignalWifi2BarRounded';
 import SignalWifi3BarRoundedIcon from '@material-ui/icons/SignalWifi3BarRounded';
 import SignalWifi4BarRoundedIcon from '@material-ui/icons/SignalWifi4BarRounded';
+import {ArrowUp, ArrowDown} from 'react-feather'
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import Box from "@material-ui/core/Box";
 
 const gradient = [
     "rgba(0,0,0,0.89)",
-    "#00ff00",
+    "#54db00",
     "#aeca45",
     "#ca9f00",
     "#df6a00",
@@ -25,39 +26,71 @@ const useStyles = makeStyles(theme => ({
         left: "5%",
         bottom: "6%",
         zIndex: 9999,
+        display: "flex",
+        borderRadius: theme.spacing(2),
+        padding: theme.spacing(1),
+        boxShadow: theme.shadows[10],
+        backgroundColor: fade(theme.palette.common.black, 0.1),
+        backdropFilter: "blur(5px)"
     },
-    icon: {
-        color: ({colorIndex}) => gradient[colorIndex],
-        fontSize: "xxx-large"
+    uplinkWifiIcon: {
+        color: ({uplinkIndex}) => gradient[uplinkIndex],
+        fontSize: "xx-large",
+    },
+    svgShadow:{
+        filter: "drop-shadow(0px 3px 3px rgba(0, 0, 0, 0.4))"
+    },
+    downlinkWifiIcon: {
+        color: ({downlinkIndex}) => gradient[downlinkIndex],
+        fontSize: "xx-large",
+    },
+    arrowUplinkIcon: {
+        color: ({uplinkIndex}) => gradient[uplinkIndex],
+        width: theme.spacing(2)
+    },
+    arrowDownlinkIcon: {
+        color: ({downlinkIndex}) => gradient[downlinkIndex],
+        width: theme.spacing(2)
     }
 }));
 
-const WifiIndicator = ({signalNumber = 1, isUpLink, className, ...rest}) => {
+const WifiIndicator = ({isDownLink, uplink, downlink, className, ...rest}) => {
 
     const classes = useStyles({
-        colorIndex: signalNumber
+        uplinkIndex: uplink,
+        downlinkIndex: downlink
     })
 
-    const icons = [
-        <SignalWifi0BarRoundedIcon className={classes.icon}/>,
-        <SignalWifi4BarRoundedIcon className={classes.icon}/>,
-        <SignalWifi3BarRoundedIcon className={classes.icon}/>,
-        <SignalWifi3BarRoundedIcon className={classes.icon}/>,
-        <SignalWifi2BarRoundedIcon className={classes.icon}/>,
-        <SignalWifi2BarRoundedIcon className={classes.icon}/>,
-        <SignalWifi1BarRoundedIcon className={classes.icon}/>,
-    ]
+    const icons = (isUplink) => {
+        const newClasses = isUplink ? classes.uplinkWifiIcon : classes.downlinkWifiIcon
+        return [
+            <SignalWifi0BarRoundedIcon className={newClasses} classes={{root:classes.svgShadow}}/>,
+            <SignalWifi4BarRoundedIcon className={newClasses} classes={{root:classes.svgShadow}}/>,
+            <SignalWifi3BarRoundedIcon className={newClasses} classes={{root:classes.svgShadow}}/>,
+            <SignalWifi3BarRoundedIcon className={newClasses} classes={{root:classes.svgShadow}}/>,
+            <SignalWifi2BarRoundedIcon className={newClasses} classes={{root:classes.svgShadow}}/>,
+            <SignalWifi2BarRoundedIcon className={newClasses} classes={{root:classes.svgShadow}}/>,
+            <SignalWifi1BarRoundedIcon className={newClasses} classes={{root:classes.svgShadow}}/>,
+        ]
+    }
 
     return (
-        <Box className={clsx(classes.root, className)}>
-            {icons[signalNumber]}
+        <Box {...rest} className={clsx(classes.root, className)}>
+            <Box marginRight={1} alignItems="center" display="flex">
+                {icons(true)[uplink]}
+                <ArrowUp  className={clsx(classes.arrowUplinkIcon, classes.svgShadow)}/>
+            </Box>
+            <Box alignItems="center" display="flex">
+                {icons()[downlink]}
+                <ArrowDown className={clsx(classes.arrowDownlinkIcon, classes.svgShadow)}/>
+            </Box>
         </Box>
     );
 };
 
 WifiIndicator.propTypes = {
-    signalNumber: PropTypes.number.integerValue,
-    isUpLink: PropTypes.bool,
+    downlink: PropTypes.number,
+    uplink: PropTypes.number,
     className: PropTypes.string,
 };
 
