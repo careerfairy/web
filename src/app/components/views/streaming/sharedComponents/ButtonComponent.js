@@ -17,12 +17,13 @@ const useStyles = makeStyles((theme) => ({
     root: {
         position: "absolute",
         right: ({showMenu, isMobile}) => showMenu ? isMobile ? "-120px" : "-120px" : "-120px",
-        height: "100%",
+        height: ({isMobile}) => isMobile ? "100%" : "50%",
         width: 120,
         display: "flex",
         alignItems: "center",
         padding: 30,
         top: 0,
+        transform:  ({isMobile}) => !isMobile && "translateY(50%)"
     },
     speedDial: {
         transition: "transform 0.2s",
@@ -104,7 +105,7 @@ const ButtonComponent =
 
         useEffect(() => {
             setHasMounted(true)
-        },[])
+        }, [])
 
         const tutorialStepActive = () => {
             return Boolean(isOpen(3) || isOpen(8))
@@ -146,7 +147,7 @@ const ButtonComponent =
         }
 
         const getActions = () => {
-            if(!hasMounted){
+            if (!hasMounted) {
                 return []
             }
             const actions = [
@@ -177,7 +178,7 @@ const ButtonComponent =
             }
             if (!isMobile) {
                 actions.unshift({
-                    icon: <PanToolOutlinedIcon />,
+                    icon: <PanToolOutlinedIcon/>,
                     name: "Hand Raise",
                     disabled: showMenu && selectedState === 'hand',
                     onClick: () => handleStateChange("hand"),
