@@ -262,6 +262,9 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             // STREAMER HAS MUTED VIDEO
             console.log("volume-indicator", evt)
         });
+        rtcClient.on("reconnect", function(evt){
+            setExternalMediaStreams([]);
+        });
         rtcClient.on("exception", function(evt){
             // NETWORK QUALITY
         });
