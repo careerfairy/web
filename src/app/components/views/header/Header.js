@@ -42,7 +42,7 @@ function Header(props) {
     console.log("-> props", props);
     const handleLogout = () => {
         props.logout()
-        setUserData(undefined)
+        // setUserData(undefined)
     }
 
     const ConstantSideHeader = () => {

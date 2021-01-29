@@ -100,7 +100,7 @@ export const editUserProfile = data => async (
     getState,
     { getFirebase, getFirestore }
 ) => {
-    const firebase = getFirebase();
+    // const firebase = getFirebase();
     const firestore = getFirestore();
     // const user = firebase.auth().currentUser; // dont need it yet for updating email
     const {
@@ -119,7 +119,7 @@ export const editUserProfile = data => async (
             .doc(userEmail)
             .update(data);
 
-        // if (data.password.length > 0) { // dont need it
+        // if (data.password.length > 0) { // dont need it yet since we haven't implemented it on the front end
         //     await user.updatePassword(data.password);
         // }
         dispatch({ type: actions.PROFILE_EDIT_SUCCESS });

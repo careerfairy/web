@@ -17,6 +17,8 @@ import {
 import UniversityCountrySelector from "../../universitySelect/UniversityCountrySelector";
 import UniversitySelector from "../../universitySelect/UniversitySelector";
 import {URL_REGEX} from "../../../util/constants";
+import {useDispatch, useSelector} from "react-redux";
+import * as actions from '../../../../store/actions'
 
 const LightTooltip = withStyles((theme) => ({
     tooltip: {
@@ -53,12 +55,14 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const PersonalInfo = ({firebase, userData}) => {
+const PersonalInfo = ({userData}) => {
     const classes = useStyles()
     const [open, setOpen] = useState(false);
+
     const [updated, setUpdated] = useState(false)
-
-
+    const dispatch = useDispatch()
+    const {loading, error} = useSelector(state => state.auth.profileEdit)
+    console.log("-> profileEdit", profileEdit);
 
     useEffect(() => {
         if (updated) {
@@ -68,12 +72,11 @@ const PersonalInfo = ({firebase, userData}) => {
         }
     }, [updated])
 
-    function logout() {
-        setLoading(true);
-        firebase.doSignOut().then(() => {
-            router.replace('/login');
-        });
-    }
+    useEffect(() => {
+        if(loading === false && error === false){
+            en
+        }
+    },[loading, error])
 
     const handleClose = () => {
         setOpen(false);
@@ -83,24 +86,21 @@ const PersonalInfo = ({firebase, userData}) => {
         setOpen(true);
     };
 
+    const handleUpdate = async (values) => {
+        await dispatch(actions.editUserProfile(values))
+    }
+
     return (
         <Formik
-            initialValues={userData && userData.firstName ? {
-                firstName: userData.firstName,
-                lastName: userData.lastName,
-                linkedinUrl: userData.linkedinUrl ? userData.linkedinUrl : '',
+            initialValues={{
+                firstName: userData?.firstName || '',
+                lastName: userData?.lastName || '',
+                linkedinUrl: userData?.linkedinUrl || '' ? userData.linkedinUrl : '',
                 university: {
-                    code: userData.universityCode,
-                    name: userData.universityName
+                    code: userData?.universityCode || 'other',
+                    name: userData?.universityName || ''
                 },
-                universityCountryCode: userData.universityCountryCode
-            } : {
-                firstName: '',
-                lastName: '',
-                linkedinUrl: '',
-                universityCode: 'other',
-                universityName: '',
-                universityCountryCode: ''
+                universityCountryCode: userData?.universityCountryCode || ''
             }}
             enableReinitialize={true}
             validate={values => {
@@ -127,17 +127,7 @@ const PersonalInfo = ({firebase, userData}) => {
                 }
                 return errors;
             }}
-            onSubmit={(values, {setSubmitting}) => {
-                setSubmitting(true);
-                firebase.setUserData(userData.id, values.firstName, values.lastName, values.linkedinUrl, values.university.code, values.university.name, values.universityCountryCode)
-                    .then(() => {
-                        setSubmitting(false);
-                        setUpdated(true)
-                    }).catch(error => {
-                    setSubmitting(false);
-                    console.log(error);
-                });
-            }}
+            onSubmit={handleUpdate}
         >
             {({
                   values,

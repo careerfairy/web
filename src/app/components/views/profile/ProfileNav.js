@@ -58,10 +58,10 @@ const ProfileNav = ({userData, firebase}) => {
             where: userData.isAdmin ? ["test", "==", false] : ["adminEmail", "==", userData.id]
         }
     ])
-    const careerCenterData = useSelector(state => state.firestore.ordered.careerCenterData) || []
+    const careerCenters = useSelector(state => state.firestore.ordered.careerCenterData) || []
     const state = useSelector(state => state)
     console.log("-> state", state);
-    console.log("-> careerCenterData", careerCenterData);
+    console.log("-> careerCenters", careerCenters);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -80,9 +80,9 @@ const ProfileNav = ({userData, firebase}) => {
         // </TabPanel>
     ]
 
-    if (careerCenterData.length) {
+    if (careerCenters.length) {
         views.push(<TabPanel key={1} value={value} index={1} dir={theme.direction}>
-            <AdminGroups userData={userData} adminGroups={careerCenterData}/>
+            <AdminGroups userData={userData} adminGroups={careerCenters}/>
         </TabPanel>)
     }
 
@@ -102,7 +102,7 @@ const ProfileNav = ({userData, firebase}) => {
                                             variant="h5">{native ? "Personal" : "Personal Information"}</Typography>}/>
                     {/*<Tab wrapped fullWidth*/}
                     {/*     label={<Typography variant="h5">{native ? "Groups" : "Joined Groups"}</Typography>}/>*/}
-                    {careerCenterData.length ?
+                    {careerCenters.length ?
                         <Tab wrapped fullWidth
                              label={<Typography
                                  variant="h5">{native ? "Admin" : "Admin Groups"}</Typography>}/> : null}
