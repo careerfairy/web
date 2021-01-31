@@ -33,6 +33,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import CopyToClipboard from "../../../common/CopyToClipboard";
 import LogosPlaceHolder from "./LogosPlaceholder";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
+import {dynamicSort} from "../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => {
     const paperColor = theme.palette.background.paper
@@ -363,7 +364,8 @@ const GroupStreamCardV2 = memo(({
                                     isPastLivestream,
                                     hideActions,
                                     isDraft,
-                                    switchToNextLivestreamsTab
+                                    switchToNextLivestreamsTab,
+                                    handleEditStream
                                 }) => {
 
     const router = useRouter();
@@ -430,7 +432,7 @@ const GroupStreamCardV2 = memo(({
             }, []);
             const matchedOptions = livestream.targetCategories[groupId]
             if (matchedOptions) {
-                const filteredOptions = flattenedOptions.filter(option => matchedOptions.includes(option.id))
+                const filteredOptions = flattenedOptions.filter(option => matchedOptions.includes(option.id)).sort(dynamicSort("name")).reverse()
                 setTargetOptions(filteredOptions)
             }
         }
@@ -737,6 +739,7 @@ const GroupStreamCardV2 = memo(({
                                                     group={groupData}
                                                     isDraft={isDraft}
                                                     router={router}
+                                                    handleEditStream={handleEditStream}
                                                     hasOptions={Boolean(targetOptions.length)}
                                                     switchToNextLivestreamsTab={switchToNextLivestreamsTab}
                                                     handleOpenLevelOfStudyModal={handleOpenLevelOfStudyModal}

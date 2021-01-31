@@ -69,6 +69,7 @@ export const buildLivestreamObject = (values, targetCategories, updateMode, stre
         universities: [],
         summary: values.summary,
         speakers: buildSpeakersArray(values),
+        language: values.language,
         lastUpdated: firebase.getServerTimestamp()
     }
 }
@@ -164,3 +165,34 @@ export const validateStreamForm = (values, isDraft, noValidation = false) => {
     }
     return noValidation ? {} : errors;
 }
+
+export const languageCodes = [
+    {
+        code: "en",
+        name: "English",
+    },
+    {
+        code: "de",
+        name: "German",
+    },
+    {
+        code: "fr",
+        name: "French",
+    },
+    {
+        code: "it",
+        name: "Italian",
+    },
+    {
+        code: "es",
+        name: "Spanish",
+    },
+    {
+        code: "nl",
+        name: "Dutch",
+    },
+    {
+        code: "pt",
+        name: "Portuguese",
+    },
+];

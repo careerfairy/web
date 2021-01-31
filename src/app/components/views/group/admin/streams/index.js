@@ -1,13 +1,14 @@
-import React, {useEffect, useState} from "react";
+import React, {Fragment, useEffect, useState} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {Box, CircularProgress, Container, Grid,} from "@material-ui/core";
 import usePagination from '@itsfaqih/usepagination';
 import {Pagination} from "@material-ui/lab";
 import Typography from "@material-ui/core/Typography";
-import GroupStreamCardV2 from "../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2";
-import Toolbar from "./ToolBar";
-import {useAuth} from "../../../../HOCs/AuthProvider";
+import StreamsToolbar from "./StreamsToolbar";
 import {useSnackbar} from "notistack";
+import {useAuth} from "../../../../../HOCs/AuthProvider";
+import GroupStreamCardV2 from "../../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2";
+import NewStreamModal from "./NewStreamModal";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -17,18 +18,21 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: theme.spacing(2),
         display: "flex",
         flexDirection: "column"
-    }
+    },
+
 }));
 
-const StreamsOverview = ({group, typeOfStream, query}) => {
+const Index = ({group, typeOfStream, query}) => {
     const classes = useStyles();
     const {userData, authenticatedUser} = useAuth();
     const {enqueueSnackbar} = useSnackbar()
     const [upcomingStreams, setUpcomingStreams] = useState(null);
     const [filteredStreams, setFilteredStreams] = useState([]);
+    const [openNewStreamModal, setOpenNewStreamModal] = useState(false);
     const {page, action} = usePagination(filteredStreams, 6);
     const [searchParams, setSearchParams] = useState('');
     const [fetching, setFetching] = useState(false);
+    const [currentStream, setCurrentStream] = useState(null);
 
     useEffect(() => {
         if (group?.id) {
@@ -40,15 +44,8 @@ const StreamsOverview = ({group, typeOfStream, query}) => {
                     setFilteredStreams(streamsData)
                     setFetching(false)
                 })
-
             return () => unsubscribe()
         }
-        //         enqueueSnackbar("something went Wrong, please refresh the page", {
-        //             variant: "error",
-        //             preventDuplicate: true
-        //         })
-        //     }
-
     }, [])
 
     const onPageChange = (event, number) => {
@@ -76,6 +73,27 @@ const StreamsOverview = ({group, typeOfStream, query}) => {
         setSearchParams('')
         handleFilter()
     }
+
+    const handleOpenNewStreamModal = () => {
+        setOpenNewStreamModal(true)
+    }
+
+    const handleCloseNewStreamModal = () => {
+        handleResetCurrentStream()
+        setOpenNewStreamModal(false)
+    }
+
+    const handleResetCurrentStream = () => {
+        setCurrentStream(null)
+    }
+
+    const handleEditStream = (streamObj) => {
+        if (streamObj) {
+            setCurrentStream(streamObj)
+            handleOpenNewStreamModal()
+        }
+    }
+
 
     const handleFilter = () => {
         const newFilteredStreams = upcomingStreams?.filter(livestream => {
@@ -108,6 +126,7 @@ const StreamsOverview = ({group, typeOfStream, query}) => {
                 <GroupStreamCardV2
                     mobile
                     isAdmin
+                    handleEditStream={handleEditStream}
                     isDraft={typeOfStream === "draft"}
                     hideActions
                     user={authenticatedUser}
@@ -122,52 +141,64 @@ const StreamsOverview = ({group, typeOfStream, query}) => {
     })
 
     return (
-        <Container className={classes.root} maxWidth={false}>
-            <Toolbar
-                handleSubmit={handleSubmit}
-                onChange={onSearch}
-                group={group}
-                value={searchParams}
-                handleRefresh={handleRefreshSearch}
-            />
-            <Box mt={3}>
-                {fetching ? (
-                    <Box height="100%" alignItems="center" justifyContent="center" display="flex">
-                        <CircularProgress color="primary"/>
-                    </Box>
-                ) : (
-                    <Grid
-                        container
-                        spacing={3}
-                    >
-                        {noQueryHits() ?
-                            <SearchMessage message={`You currently have no ${typeOfStream} Streams`}/>
-                            :
-                            noFilterHits() ?
+        <Fragment>
+            <Container className={classes.root} maxWidth={false}>
+                <StreamsToolbar
+                    handleSubmit={handleSubmit}
+                    onChange={onSearch}
+                    group={group}
+                    openNewStreamModal={openNewStreamModal}
+                    handleOpenNewStreamModal={handleOpenNewStreamModal}
+                    value={searchParams}
+                    handleRefresh={handleRefreshSearch}
+                />
+                <Box mt={3}>
+                    {fetching ? (
+                        <Box height="100%" alignItems="center" justifyContent="center" display="flex">
+                            <CircularProgress color="primary"/>
+                        </Box>
+                    ) : (
+                        <Grid
+                            container
+                            spacing={3}
+                        >
+                            {noQueryHits() ?
                                 <SearchMessage message={`You currently have no ${typeOfStream} Streams`}/>
                                 :
-                                livestreamElements}
-                    </Grid>
-                )}
-            </Box>
-            <Box flexGrow={1}/>
-            <Box
-                display="flex"
-                justifyContent="center"
-                py={3}
-            >
-                <Pagination
-                    page={page.current}
-                    disabled={!page.data.length}
-                    count={page.last}
-                    showFirstButton
-                    showLastButton
-                    onChange={onPageChange}
-                    color="primary"
-                    size="large"
-                />
-            </Box>
-        </Container>
+                                noFilterHits() ?
+                                    <SearchMessage message={`You currently have no ${typeOfStream} Streams`}/>
+                                    :
+                                    livestreamElements}
+                        </Grid>
+                    )}
+                </Box>
+                <Box flexGrow={1}/>
+                <Box
+                    display="flex"
+                    justifyContent="center"
+                    py={3}
+                >
+                    <Pagination
+                        page={page.current}
+                        disabled={!page.data.length}
+                        count={page.last}
+                        showFirstButton
+                        showLastButton
+                        onChange={onPageChange}
+                        color="primary"
+                        size="large"
+                    />
+                </Box>
+            </Container>
+            <NewStreamModal
+                group={group}
+                typeOfStream={typeOfStream}
+                open={openNewStreamModal}
+                handleResetCurrentStream={handleResetCurrentStream}
+                currentStream={currentStream}
+                onClose={handleCloseNewStreamModal}
+            />
+        </Fragment>
     );
 };
 
@@ -180,4 +211,4 @@ const SearchMessage = ({message}) => (
 )
 
 
-export default StreamsOverview;
+export default Index;

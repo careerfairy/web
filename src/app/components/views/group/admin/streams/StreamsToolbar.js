@@ -18,15 +18,15 @@ import {
     RefreshCw as RefreshIcon,
     Search as SearchIcon
 } from 'react-feather';
-import {copyStringToClipboard} from "../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
-import {useAuth} from "../../../../HOCs/AuthProvider";
 import IconButton from "@material-ui/core/IconButton";
 import {useRouter} from "next/router";
 import SpeedDial from '@material-ui/lab/SpeedDial';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
 import ShareIcon from '@material-ui/icons/Share';
+import {useAuth} from "../../../../../HOCs/AuthProvider";
+import {copyStringToClipboard} from "../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Toolbar = ({value, group, onChange, className, handleSubmit, handleRefresh, ...rest}) => {
+const StreamsToolbar = ({value, group, onChange, className, handleSubmit,openNewStreamModal, handleOpenNewStreamModal, handleRefresh, ...rest}) => {
     const {enqueueSnackbar} = useSnackbar()
     const {userData} = useAuth()
     const [open, setOpen] = useState(true);
@@ -122,11 +122,11 @@ const Toolbar = ({value, group, onChange, className, handleSubmit, handleRefresh
     };
 
     const buttonOptions = [
-        {
-            name: "Create a new draft",
-            onClick: () => handleClickDraftNewStream(),
-            icon: <DraftStreamIcon/>
-        },
+        // {
+        //     name: "Create a new draft",
+        //     onClick: () => handleClickDraftNewStream(),
+        //     icon: <DraftStreamIcon/>
+        // },
         {
             name: "Generate a draft link for companies",
             onClick: () => handleShareDraftLink(),
@@ -136,8 +136,8 @@ const Toolbar = ({value, group, onChange, className, handleSubmit, handleRefresh
 
     if (canCreateStream()) {
         buttonOptions.unshift({
-            name: "Create a live stream",
-            onClick: () => handleCLickCreateNewLivestream(),
+            name: "Draft a new stream",
+            onClick: () => handleOpenNewStreamModal(),
             icon: <StreamIcon/>
         });
     }
@@ -219,8 +219,8 @@ const Toolbar = ({value, group, onChange, className, handleSubmit, handleRefresh
     );
 };
 
-Toolbar.propTypes = {
+StreamsToolbar.propTypes = {
     className: PropTypes.string
 };
 
-export default Toolbar;
+export default StreamsToolbar;

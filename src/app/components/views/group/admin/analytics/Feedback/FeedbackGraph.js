@@ -159,7 +159,7 @@ const FeedbackGraph = ({
                         options={currentPoll.options}
                         colors={localColors}
                         chartRef={chartRef}
-                        fullWidth
+                        fullWidth={false}
                         chartData={data}
                         optionDataType="Student"
                         optionValueProp="count"

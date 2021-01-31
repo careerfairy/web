@@ -32,10 +32,11 @@ import {
     handleAddSpeaker,
     handleDeleteSpeaker,
     handleError,
-    handleFlattenOptions,
+    handleFlattenOptions, languageCodes,
     validateStreamForm
 } from "../../helperFunctions/streamFormFunctions";
 import {useAuth} from "../../../HOCs/AuthProvider";
+import {LanguageSelect} from "../../helperFunctions/streamFormFunctions/components";
 
 
 const useStyles = makeStyles(theme => ({
@@ -114,6 +115,7 @@ const NewLivestreamForm = ({firebase}) => {
         hidden: false,
         summary: '',
         speakers: {[uuidv4()]: speakerObj},
+        language: languageCodes[0]
     })
 
     useEffect(() => {
@@ -148,7 +150,8 @@ const NewLivestreamForm = ({firebase}) => {
                         start: livestream.start.toDate() || new Date(),
                         hidden: livestream.hidden || false,
                         summary: livestream.summary || "",
-                        speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery)
+                        speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery),
+                        language: livestream.language || languageCodes[0]
                     }
                     setFormData(newFormData)
                     handleSetDefaultGroups(livestream.groupIds)
@@ -425,7 +428,7 @@ const NewLivestreamForm = ({firebase}) => {
                                 </Collapse>
                             </FormControl>
                         </Grid>
-                        <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                        <Grid xs={12} sm={7} md={8} item>
                             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                                 <DateTimePicker
                                     inputVariant="outlined" fullWidth variant="outlined"
@@ -435,6 +438,13 @@ const NewLivestreamForm = ({firebase}) => {
                                         setFieldValue('start', new Date(value), true)
                                     }}/>
                             </MuiPickersUtilsProvider>
+                        </Grid>
+                        <Grid xs={12} sm={5} md={4}  item>
+                            <LanguageSelect
+                                value={values.language}
+                                setFieldValue={setFieldValue}
+                                name="language"
+                            />
                         </Grid>
                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                             <FormControl fullWidth>
