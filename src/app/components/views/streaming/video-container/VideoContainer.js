@@ -143,28 +143,26 @@ function VideoContainer(props) {
     const [timeoutState, setTimeoutState] = useState(null);
 
     useEffect(() => {
-        if (localMediaStream) {
+        if (localMediaStream && externalMediaStreams && externalMediaStreams.length > 3) {
             if (props.streamerId === props.currentLivestream.currentSpeakerId && props.currentLivestream.mode !== "desktop" && props.currentLivestream.mode !== "presentation") {
                 if (timeoutState) {
                     clearTimeout(timeoutState);
                 }
                 let newTimeout = setTimeout(() => {
-                    debugger;
                     localMediaStream.setVideoProfile("480p_9")
-                }, 5000);
+                }, 8000);
                 setTimeoutState(newTimeout)
             } else {
                 if (timeoutState) {
                     clearTimeout(timeoutState);
                 }
                 let newTimeout = setTimeout(() => {
-                    debugger;
                     localMediaStream.setVideoProfile("180p")
-                }, 5000);
+                }, 8000);
                 setTimeoutState(newTimeout)
             }
         }    
-    },[localMediaStream, props.currentLivestream.currentSpeakerId, props.currentLivestream.mode])
+    },[localMediaStream, externalMediaStreams, props.currentLivestream.currentSpeakerId, props.currentLivestream.mode])
 
     useEffect(() => {
         if (numberOfViewers && props.currentLivestream.hasStarted) {
