@@ -16,6 +16,7 @@ import {
     handleFlattenOptionsWithoutLvlOfStudy
 } from "../../../../helperFunctions/streamFormFunctions";
 import Feedback from "./Feedback";
+import {universityCountriesMap} from "../../../../util/constants";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -249,7 +250,11 @@ const AnalyticsOverview = ({firebase, group}) => {
         (async function () {
             setFetchingFollowers(true);
             const snapshots = await firebase.getFollowers(group.id)
-            const followerData = snapshots.docs.map(doc => ({id: doc.id, ...doc.data()}))
+            const followerData = snapshots.docs.map(doc => ({
+                id: doc.id,
+                universityCountry: universityCountriesMap[doc.data().universityCountryCode],
+                ...doc.data()
+            }))
             setTotalFollowers(followerData);
             setFetchingFollowers(false);
         })()
@@ -260,7 +265,11 @@ const AnalyticsOverview = ({firebase, group}) => {
             if (group.universityCode) {
                 setFetchingStudentsOfGroupUniversity(true);
                 const snapshots = await firebase.getStudentsOfGroupUniversity(group.universityCode)
-                const uniStudentsData = snapshots.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                const uniStudentsData = snapshots.docs.map(doc => ({
+                    id: doc.id,
+                    universityCountry: universityCountriesMap[doc.data().universityCountryCode],
+                    ...doc.data()
+                }))
                 setTotalStudentsOfGroupUniversity(uniStudentsData);
                 setFetchingStudentsOfGroupUniversity(false);
             } else {
@@ -283,7 +292,7 @@ const AnalyticsOverview = ({firebase, group}) => {
                         livestream.date = livestream.start?.toDate()
                         for (const userType of userTypes) {
                             if (currentUserDataSet.dataSet === "groupUniversityStudents") {// Change the graph and status data if we're looking at the groups university Students
-                                livestream[userType.propertyName] = livestream[userType.propertyName].filter(userEmail => {
+                                livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => {
                                     return userDataSet?.some(userData => userData.userEmail === userEmail)
                                 })
                             }

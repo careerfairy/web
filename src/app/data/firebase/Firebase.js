@@ -265,7 +265,7 @@ class Firebase {
 
     // CREATE_LIVESTREAMS
 
-    addLivestream = async (livestream, collection) => {
+    addLivestream = async (livestream, collection, author = {}) => {
         try {
             const ratings = [
                 {
@@ -295,9 +295,11 @@ class Firebase {
             let livestreamsRef = this.firestore
                 .collection(collection)
                 .doc()
+            livestream.author = author
+            livestream.created = this.getServerTimestamp()
             livestream.currentSpeakerId = livestreamsRef.id
             livestream.id = livestreamsRef.id
-            batch.set(livestreamsRef, livestream)
+            batch.set(livestreamsRef, livestream, {merge: true})
 
             for (const rating of ratings) {
                 let ratingRef = this.firestore.collection(collection)
@@ -336,6 +338,7 @@ class Firebase {
             .doc()
         livestream.currentSpeakerId = livestreamsRef.id
         livestream.id = livestreamsRef.id
+        livestream.created = this.getServerTimestamp()
         batch.set(livestreamsRef, livestream)
         await batch.commit()
         return livestreamsRef.id
@@ -347,6 +350,7 @@ class Firebase {
             let livestreamsRef = this.firestore
                 .collection(collection)
                 .doc(livestream.id)
+            livestream.lastUpdated = this.getServerTimestamp()
             batch.update(livestreamsRef, livestream)
             await batch.commit()
             return livestream.id

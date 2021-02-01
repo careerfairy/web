@@ -58,7 +58,6 @@ export const buildLivestreamObject = (values, targetCategories, updateMode, stre
         companyId: values.companyId,
         title: values.title,
         companyLogoUrl: values.companyLogoUrl,
-        registeredUsers: [],
         start: firebase.getFirebaseTimestamp(values.start),
         targetGroups: [],
         targetCategories: targetCategories,
