@@ -25,7 +25,7 @@ const gradient = [
 const useStyles = makeStyles(theme => ({
     root: {
         position: "absolute",
-        cursor: "move",
+        // cursor: "move",
         right: "3%",
         top: "2%",
         zIndex: 9999,
