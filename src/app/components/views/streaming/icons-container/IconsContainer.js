@@ -9,6 +9,7 @@ import TutorialContext from "../../../../context/tutorials/TutorialContext";
 import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
 import ClappingSVG from "../../../util/CustomSVGs";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     actionBtn: {
@@ -86,7 +87,8 @@ const randomInteger = (min, max) => {
 const emotes = ["clapping", "like", "heart"]
 
 function IconsContainer({livestreamId, firebase}) {
-
+    const emotesData = useSelector(state => state.emotes.emotesData)
+    console.log("-> emotesData in Icons container", emotesData);
     const [livestreamIcons, setLivestreamIcons] = useState([])
     const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
 

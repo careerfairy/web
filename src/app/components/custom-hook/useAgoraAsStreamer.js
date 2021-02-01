@@ -11,8 +11,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
     const dispatch = useDispatch()
     const [localMediaStream, setLocalMediaStream] = useState(null);
-    const rtmChannelInStore = useSelector(state => state.rtmChannel)
-    console.log("-> rtmChannelInStore", rtmChannelInStore);
     const [addedStream, setAddedStream] = useState(null);
     const [updatedStream, setUpdatedStream] = useState(null);
     const [removedStream, setRemovedStream] = useState(null);
@@ -298,12 +296,8 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             channel.on('ChannelMessage', (message, memberId) => {
                 if (message.messageType === "TEXT") {
                     const messageData = JSON.parse(message.text)
-                    console.log("-> messageData", messageData);
                     if (messageData.textType === EMOTE_MESSAGE_TEXT_TYPE) {
-                        dispatch(setEmote({
-                            message,
-                            memberId
-                        }))
+                        dispatch(setEmote(messageData, memberId))
                     }
                 }
             });

@@ -11,8 +11,10 @@ const emotesReducer = (state = initialState, {type, payload}) => {
         case actions.SEND_EMOTE_START:
             return {...state, loading: true};
         case actions.ADD_EMOTE:
-            debugger
-            return {...state, emotes: [...state.emotesData, payload]};
+            if (state.emotesData.length > 40) {
+               return {...state, emotesData: [payload, ...state.emotesData.slice(-20)]};
+            }
+            return {...state, emotesData: [payload, ...state.emotesData]};
         case actions.SEND_EMOTE_FAIL:
             return {...state, loading: false, error: payload};
         case actions.SEND_EMOTE_SUCCESS:

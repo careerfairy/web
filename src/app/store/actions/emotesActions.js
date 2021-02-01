@@ -1,10 +1,23 @@
 import * as actions from './actionTypes';
 import {EMOTE_MESSAGE_TEXT_TYPE} from "../../components/util/constants";
-
+const tempId = new Date().getTime()
+const buildEmoteAction = (message, memberId) => {
+    return {
+        type: actions.ADD_EMOTE,
+        payload: {
+            textType: EMOTE_MESSAGE_TEXT_TYPE,
+            timestamp: message.timestamp,
+            emoteType: message.emoteType,
+            memberId: memberId,
+        }
+    }
+}
 // Send an emote through the channel reference in the store
 export const createEmote = (emoteType) => async (dispatch, getState,
-                                                 ) => {
-    const {rtmChannel} = getState()
+) => {
+    const {rtmChannel, firebase: {auth}} = getState()
+    const memberId = auth.id || tempId
+
     try {
         dispatch({type: actions.SEND_EMOTE_START})
         const message = {
@@ -18,7 +31,7 @@ export const createEmote = (emoteType) => async (dispatch, getState,
             text: stringMsg
         })
         dispatch({type: actions.SEND_EMOTE_SUCCESS})
-        return message
+        dispatch(setEmote(message, memberId))
     } catch (e) {
         dispatch({type: actions.SEND_EMOTE_FAIL, payload: e});
         return e
@@ -26,17 +39,10 @@ export const createEmote = (emoteType) => async (dispatch, getState,
 };
 
 // set an emote received from the channel socket listener
-export const setEmote = (emoteObj) => async (dispatch) => {
-    console.log("-> emoteObj", emoteObj);
-    const emoteData = JSON.parse(emoteObj.message)
-    dispatch({
-        type: actions.ADD_EMOTE,
-        payload: {
-            textType: EMOTE_MESSAGE_TYPE,
-            timestamp: emoteData.timestamp,
-            emoteType: emoteData.emoteType,
-            memberId: emoteObj.memberId,
-        }
-    })
-    return emoteData
+export const setEmote = (message, memberId) => async (dispatch) => {
+    console.log("-> message", message);
+    console.log("-> memberId", memberId);
+    const emoteAction = buildEmoteAction(message, memberId)
+    dispatch(emoteAction)
+    return emoteAction
 };
