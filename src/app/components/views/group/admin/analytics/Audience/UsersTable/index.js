@@ -80,6 +80,13 @@ const UsersTable = ({
             width: 150,
         },
         {
+            field: "universityCountry",
+            title: "University Country",
+            cellStyle: {
+                width: 300,
+            },
+        },
+        {
             field: "numberOfStreamsWatched",
             title: "Events Attended",
             width: 150,
@@ -279,6 +286,13 @@ const UsersTable = ({
                         {
                             field: "universityName",
                             title: "University",
+                            cellStyle: {
+                                width: 300,
+                            },
+                        },
+                        {
+                            field: "universityCountry",
+                            title: "University Country",
                             cellStyle: {
                                 width: 300,
                             },
