@@ -32,6 +32,7 @@ import {useSnackbar} from "notistack";
 import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import {copyStringToClipboard, dynamicSort} from "../../../../../helperFunctions/HelperFunctions";
+import {useAuth} from "../../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => {
     const themeWhite = theme.palette.common.white
@@ -62,7 +63,7 @@ const EnhancedGroupStreamCard = ({
                                      hasOptions
                                  }) => {
     const classes = useStyles()
-
+    const {authenticatedUser} = useAuth()
     const {enqueueSnackbar} = useSnackbar()
 
     const [localCategories, setLocalCategories] = useState([]);
@@ -236,7 +237,13 @@ const EnhancedGroupStreamCard = ({
             setPublishingDraft(true)
             const newStream = {...livestream}
             newStream.companyId = uuidv4()
-            await firebase.addLivestream(newStream, "livestreams")
+            const author = {
+                email: authenticatedUser.email
+            }
+            if (group?.id) {
+                author.groupId = group.id
+            }
+            await firebase.addLivestream(newStream, "livestreams", author)
             await firebase.deleteLivestream(livestream.id, "draftLivestreams")
             switchToNextLivestreamsTab()
             setPublishingDraft(false)
@@ -311,7 +318,7 @@ const EnhancedGroupStreamCard = ({
                     startIcon={<ShareIcon/>}
                     variant='outlined'
                 >
-                   Generate external Link to Edit Draft
+                    Generate external Link to Edit Draft
                 </Button>}
                 <Button
                     className={classes.button}

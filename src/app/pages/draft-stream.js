@@ -10,12 +10,13 @@ import {useSnackbar} from "notistack";
 import {useRouter} from "next/router";
 import {GENERAL_ERROR, SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../components/util/constants";
 import {withFirebase} from "../context/firebase";
+import {useAuth} from "../HOCs/AuthProvider";
 
 
 const draftStream = ({firebase}) => {
 
     const [submitted, setSubmitted] = useState(false)
-
+    const {authenticatedUser} = useAuth()
     const {enqueueSnackbar} = useSnackbar()
     const router = useRouter()
     const {
@@ -42,7 +43,10 @@ const draftStream = ({firebase}) => {
 
                 console.log("-> Draft livestream was updated with id", id);
             } else {
-                id = await firebase.addLivestream(livestream, "draftLivestreams")
+                const author = {
+                    email: authenticatedUser.email
+                }
+                id = await firebase.addLivestream(livestream, "draftLivestreams", author)
                 console.log("-> Draft livestream was created with id", id);
                 push(`/draft-stream?draftStreamId=${id}`)
             }

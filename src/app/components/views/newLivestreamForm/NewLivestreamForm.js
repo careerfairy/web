@@ -263,7 +263,10 @@ const NewLivestreamForm = ({firebase}) => {
                 id = livestream.id
                 await firebase.updateLivestream(livestream, "livestreams")
             } else {
-                id = await firebase.addLivestream(livestream, "livestreams")
+                const author = {
+                    email: authenticatedUser.email
+                }
+                id = await firebase.addLivestream(livestream, "livestreams", author)
             }
             if (absolutePath) {
                 return push({

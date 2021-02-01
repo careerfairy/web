@@ -17,6 +17,7 @@ import PublishIcon from '@material-ui/icons/Publish';
 import {useRouter} from "next/router";
 import {v4 as uuidv4} from "uuid";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
+import {useAuth} from "../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
 
@@ -55,6 +56,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
     const formRef = useRef()
     const dialogRef = useRef()
     const saveChangesButtonRef = useRef()
+    const {authenticatedUser} = useAuth()
     const router = useRouter()
     const {enqueueSnackbar} = useSnackbar()
     const [submitted, setSubmitted] = useState(false)
@@ -87,7 +89,11 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                 formRef.current?.setSubmitting(true)
                 const newStream = {...currentStream}
                 newStream.companyId = uuidv4()
-                await firebase.addLivestream(newStream, "livestreams")
+                const author = {
+                    groupId: group.id,
+                    email: authenticatedUser.email
+                }
+                await firebase.addLivestream(newStream, "livestreams", author)
                 await firebase.deleteLivestream(currentStream.id, "draftLivestreams")
 
                 push(`/group/${group.id}/admin/upcoming-livestreams`)
@@ -144,7 +150,11 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                 await firebase.updateLivestream(livestream, targetCollection)
                 console.log(`-> ${!isActualLivestream() && "Draft "}livestream was updated with id`, id);
             } else {
-                id = await firebase.addLivestream(livestream, targetCollection)
+                const author = {
+                    groupId: group.id,
+                    email: authenticatedUser.email
+                }
+                id = await firebase.addLivestream(livestream, targetCollection, author)
                 console.log(`-> ${!isActualLivestream() && "Draft "}livestream was created with id`, id);
             }
             handleCloseDialog()
@@ -192,13 +202,14 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
     const Actions = ({size, className}) => (
         <>
             {canPublish() &&
-            <Button startIcon={<PublishIcon fontSize={size}/>} disabled={formRef.current?.isSubmitting} variant="contained"
+            <Button startIcon={<PublishIcon fontSize={size}/>} disabled={formRef.current?.isSubmitting}
+                    variant="contained"
                     size={size}
                     className={className}
                     autoFocus color="secondary"
                     onClick={handleValidate}>
                 <Typography variant={size === "large" && "h5"}>
-                publish as stream
+                    publish as stream
                 </Typography>
             </Button>}
             <Button disabled={formRef.current?.isSubmitting}
@@ -208,7 +219,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                     color="primary"
                     onClick={handleSaveOrUpdate}>
                 <Typography variant={size === "large" && "h5"}>
-                {!currentStream ? "Create draft" : isActualLivestream() ? "update and close" : "save changes and close"}
+                    {!currentStream ? "Create draft" : isActualLivestream() ? "update and close" : "save changes and close"}
                 </Typography>
             </Button>
         </>
