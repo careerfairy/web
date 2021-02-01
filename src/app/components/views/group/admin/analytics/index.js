@@ -292,7 +292,7 @@ const AnalyticsOverview = ({firebase, group}) => {
                         livestream.date = livestream.start?.toDate()
                         for (const userType of userTypes) {
                             if (currentUserDataSet.dataSet === "groupUniversityStudents") {// Change the graph and status data if we're looking at the groups university Students
-                                livestream[userType.propertyName] = livestream[userType.propertyName].filter(userEmail => {
+                                livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => {
                                     return userDataSet?.some(userData => userData.userEmail === userEmail)
                                 })
                             }
