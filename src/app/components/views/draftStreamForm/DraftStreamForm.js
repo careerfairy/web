@@ -22,6 +22,7 @@ import MultiGroupSelect from "./MultiGroupSelect/MultiGroupSelect";
 import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
 import {useRouter} from "next/router";
 import FormGroup from "./FormGroup";
+import WarningIcon from '@material-ui/icons/Warning';
 import Fab from "@material-ui/core/Fab";
 import ErrorContext from "../../../context/error/ErrorContext";
 import {
@@ -35,6 +36,7 @@ import {useSnackbar} from "notistack";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import {SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../../util/constants";
 import {LanguageSelect} from "../../helperFunctions/streamFormFunctions/components";
+import Box from "@material-ui/core/Box";
 
 
 const useStyles = makeStyles(theme => ({
@@ -263,7 +265,7 @@ const DraftStreamForm = ({
         const targetPath = buildFullUrl(directLink)
         copyStringToClipboard(targetPath);
         enqueueSnackbar("Link has been copied to your clipboard", {
-            variant: "default",
+            variant: "success",
             preventDuplicate: true,
         });
     };
@@ -277,12 +279,17 @@ const DraftStreamForm = ({
             <>
                 <Typography variant="h5" align="center" style={{color: "white"}}>
                     {status === SAVE_WITH_NO_VALIDATION ? "Your changes have been saved under the following link:" : "Thanks for your submission, the direct link to this draft you created is:"}
-                    <br/>
-                    <a target="_blank" href={directLink}>{targetPath}</a>
-                    <br/>
-                    Please save this link somewhere. We will review the draft and get back to you as soon as possible!
+                    <br/><br/>
+                    <Box fontWeight={600} display="flex" justifyContent="center" alignItems="center">
+                        <WarningIcon fontSize="large"/>
+                        PLEASE SAVE THE FOLLOWING LINK BELOW SOMEWHERE
+                        <WarningIcon fontSize="large"/>
+                    </Box>
+                    <a onClick={handleCopyDraftLink} href={directLink}>{targetPath}</a>
+                    <br/><br/>
+                    We will review the draft and get back to you as soon as possible!
                 </Typography>
-                <div style={{display: "flex", justifyContent: "space-between"}}>
+                <div style={{display: "flex", justifyContent: "space-between", marginTop: 16}}>
                     <Button className={classes.whiteBtn} variant="contained" href="/profile">
                         To Profile
                     </Button>
@@ -301,7 +308,6 @@ const DraftStreamForm = ({
     }
 
     const noValidation = () => status === SAVE_WITH_NO_VALIDATION
-
 
 
     return (<Container className={classes.root}>
@@ -327,7 +333,7 @@ const DraftStreamForm = ({
                   validateForm,
                   /* and other goodies */
               }) => {
-               return (<form onSubmit={async (event) => {
+                return (<form onSubmit={async (event) => {
                     event.preventDefault()
                     const error = await validateForm()
                     if (Object.keys(error).length) {
@@ -418,7 +424,7 @@ const DraftStreamForm = ({
                                     }}/>
                             </MuiPickersUtilsProvider>
                         </Grid>
-                        <Grid xs={12} sm={5} md={4}  item>
+                        <Grid xs={12} sm={5} md={4} item>
                             <LanguageSelect
                                 value={values.language}
                                 setFieldValue={setFieldValue}

@@ -1,6 +1,7 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {withFirebase} from 'context/firebase';
 import EditIcon from '@material-ui/icons/Edit';
+import ShareIcon from '@material-ui/icons/Share';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import {v4 as uuidv4} from 'uuid';
 import {
@@ -30,6 +31,7 @@ import ListAltIcon from '@material-ui/icons/ListAlt';
 import {useSnackbar} from "notistack";
 import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import {copyStringToClipboard, dynamicSort} from "../../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles(theme => {
     const themeWhite = theme.palette.common.white
@@ -97,6 +99,7 @@ const EnhancedGroupStreamCard = ({
     useEffect(() => {
         if (livestream && livestream.targetCategories && livestream.targetCategories[group.id] && levelOfStudyModalOpen) {
             setLocalCategories(livestream.targetCategories[group.id])
+
         }
     }, [livestream, levelOfStudyModalOpen])
 
@@ -214,6 +217,20 @@ const EnhancedGroupStreamCard = ({
 
     }
 
+    const handleCreateExternalLink = () => {
+        let baseUrl = "https://careerfairy.io";
+        if (window?.location?.origin) {
+            baseUrl = window.location.origin;
+        }
+        const draftId = livestream.id;
+        const targetPath = `${baseUrl}/draft-stream?draftStreamId=${draftId}`;
+        copyStringToClipboard(targetPath);
+        enqueueSnackbar("Link has been copied to your clipboard!", {
+            variant: "success",
+            preventDuplicate: true,
+        });
+    }
+
     const handlePublishStream = async () => {
         try {
             setPublishingDraft(true)
@@ -285,6 +302,16 @@ const EnhancedGroupStreamCard = ({
                     variant='outlined'
                 >
                     {publishingDraft ? "Publishing" : isWorkInProgress() ? "Needs To Be Approved" : "Publish Stream"}
+                </Button>}
+                {isDraft &&
+                <Button
+                    className={classes.button}
+                    fullWidth
+                    onClick={handleCreateExternalLink}
+                    startIcon={<ShareIcon/>}
+                    variant='outlined'
+                >
+                   Generate external Link to Edit Draft
                 </Button>}
                 <Button
                     className={classes.button}
