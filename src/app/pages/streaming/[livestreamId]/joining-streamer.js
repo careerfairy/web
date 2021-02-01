@@ -1,7 +1,5 @@
 import React, {useState, useEffect} from 'react';
-
 import {withFirebasePage} from 'context/firebase';
-
 import {useRouter} from 'next/router';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
 import MiniChatContainer from 'components/views/streaming/LeftMenu/categories/chat/MiniChatContainer';
@@ -11,6 +9,7 @@ import NotificationsContainer from 'components/views/streaming/notifications-con
 import {v4 as uuidv4} from 'uuid';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import LeftMenu from "../../../components/views/streaming/LeftMenu/LeftMenu";
+import PreparationOverlay from 'components/views/streaming/preparation-overlay/PreparationOverlay';
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {
@@ -44,6 +43,8 @@ function StreamingPage(props) {
     const livestreamId = router.query.livestreamId;
     const [streamerId, setStreamerId] = useState(null)
 
+    const [streamerReady, setStreamerReady] = useState(false);
+
     const [currentLivestream, setCurrentLivestream] = useState(false);
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
 
@@ -55,13 +56,15 @@ function StreamingPage(props) {
     const [numberOfViewers, setNumberOfViewers] = useState(0);
 
     useEffect(() => {
+        const regex = /-/g;
         if (livestreamId) {
             if (localStorage.getItem('streamingUuid')) {
                 let storedUuid = localStorage.getItem('streamingUuid')
-                setStreamerId(livestreamId + storedUuid)
+                let joiningId = storedUuid.replace(regex, '')
+                setStreamerId(livestreamId + joiningId)
             } else {
                 let uuid = uuidv4()
-                let joiningId = uuid.replace('/-/g', '')
+                let joiningId = uuid.replace(regex, '')
                 localStorage.setItem('streamingUuid', joiningId)
                 setStreamerId(livestreamId + joiningId)
             }        
@@ -97,6 +100,12 @@ function StreamingPage(props) {
 
     const toggleShowMenu = () => {
         setShowMenu(!showMenu)
+    }
+
+    if (!streamerReady) {
+        return (
+            <PreparationOverlay livestream={currentLivestream} setStreamerReady={setStreamerReady}/>
+        )
     }
 
     return (
