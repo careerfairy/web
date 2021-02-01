@@ -17,6 +17,8 @@ import MiniChatContainer from "../../../components/views/streaming/LeftMenu/cate
 import EmoteButtons from "../../../components/views/viewer/EmoteButtons";
 import RatingContainer from "../../../components/views/viewer/rating-container/RatingContainer";
 import { useAuth } from 'HOCs/AuthProvider';
+import {useDispatch} from "react-redux";
+import {createEmote} from "../../../store/actions/emotesActions";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -50,7 +52,7 @@ function ViewerPage({firebase}) {
     const DELAY = 3000; //3 seconds
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
-
+const dispatch = useDispatch()
     const [showMenu, setShowMenu] = useState(false);
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
@@ -149,14 +151,17 @@ function ViewerPage({firebase}) {
     }
 
     const handleClap = () => {
-        postIcon('clapping')
+        dispatch(createEmote('clapping'))
+        // postIcon('clapping')
     }
 
     const handleLike = () => {
-        postIcon('like')
+        dispatch(createEmote('like'))
+        // postIcon('like')
     }
     const handleHeart = () => {
-        postIcon('heart')
+        dispatch(createEmote('heart'))
+        // postIcon('heart')
     }
     const toggleShowMenu = () => {
         setShowMenu(!showMenu)

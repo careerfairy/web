@@ -1,8 +1,6 @@
 import * as actions from '../actions/actionTypes';
 
-const initialState = {
-
-};
+const initialState = null;
 
 const rtmChannelReducer = (state = initialState, { type, payload }) => {
     switch (type) {
@@ -10,10 +8,7 @@ const rtmChannelReducer = (state = initialState, { type, payload }) => {
             return payload;
 
         case actions.REMOVE_RTM_CHANNEL:
-            return {
-                ...state,
-                deleteTodo: { ...state.deleteTodo, loading: false, error: payload },
-            };
+            return null
 
         default:
             return state;

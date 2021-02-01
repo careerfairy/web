@@ -4,6 +4,8 @@ import {v4 as uuidv4} from 'uuid';
 import {useAgoraToken} from './useAgoraToken';
 import {useDispatch, useSelector} from "react-redux";
 import {setRtmChannelObj} from "../../store/actions/rtmChannelActions";
+import {setEmote} from "../../store/actions/emotesActions";
+import {EMOTE_MESSAGE_TEXT_TYPE} from "../util/constants";
 
 export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer) {
 
@@ -293,6 +295,18 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             console.log('AgoraRTM client login success');
             const channel = rtmClient.createChannel(roomId);
             dispatch(setRtmChannelObj(channel))
+            channel.on('ChannelMessage', (message, memberId) => {
+                if (message.messageType === "TEXT") {
+                    const messageData = JSON.parse(message.text)
+                    console.log("-> messageData", messageData);
+                    if (messageData.textType === EMOTE_MESSAGE_TEXT_TYPE) {
+                        dispatch(setEmote({
+                            message,
+                            memberId
+                        }))
+                    }
+                }
+            });
             channel.join().then(() => {
                 console.log('Joined channel');
                 setRtmChannel(channel);
