@@ -45,11 +45,13 @@ function ViewerComponent(props) {
     } = useMediaSources(devices, authenticatedUser?.email, localMediaStream, !streamerReady || showSettings);
 
     useEffect(() => {
-        if (props.currentLivestream && props.currentLivestream.test) {
-            setStreamerId(uuidv4());
-        } else if (authenticatedUser?.email) {
-            setStreamerId(authenticatedUser.email)
-        }
+        if (props.currentLivestream) {
+            if (props.currentLivestream.test) {
+                setStreamerId(uuidv4());
+            } else if (authenticatedUser?.email) {
+                setStreamerId(authenticatedUser.email)
+            }
+        }   
     }, [props.currentLivestream, authenticatedUser])
 
     const attachSinkId = (element, sinkId) => {
