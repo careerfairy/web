@@ -295,7 +295,7 @@ class Firebase {
                 .doc()
             livestream.currentSpeakerId = livestreamsRef.id
             livestream.id = livestreamsRef.id
-            batch.set(livestreamsRef, livestream)
+            batch.set(livestreamsRef, livestream, {merge: true})
 
             for (const rating of ratings) {
                 let ratingRef = this.firestore.collection(collection)
