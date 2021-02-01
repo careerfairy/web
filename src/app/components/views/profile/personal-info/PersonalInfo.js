@@ -62,7 +62,6 @@ const PersonalInfo = ({userData}) => {
     const [updated, setUpdated] = useState(false)
     const dispatch = useDispatch()
     const {loading, error} = useSelector(state => state.auth.profileEdit)
-    console.log("-> profileEdit", profileEdit);
 
     useEffect(() => {
         if (updated) {
