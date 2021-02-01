@@ -2,11 +2,15 @@ import {useState, useEffect, useContext} from 'react';
 import window, {navigator, document} from 'global';
 import {v4 as uuidv4} from 'uuid';
 import {useAgoraToken} from './useAgoraToken';
+import {useDispatch, useSelector} from "react-redux";
+import {setRtmChannelObj} from "../../store/actions/rtmChannelActions";
 
 export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer) {
 
+    const dispatch = useDispatch()
     const [localMediaStream, setLocalMediaStream] = useState(null);
-
+    const rtmChannelInStore = useSelector(state => state.rtmChannel)
+    console.log("-> rtmChannelInStore", rtmChannelInStore);
     const [addedStream, setAddedStream] = useState(null);
     const [updatedStream, setUpdatedStream] = useState(null);
     const [removedStream, setRemovedStream] = useState(null);
@@ -155,7 +159,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                 fallbackToAudio: false
             });
         });
-        rtcClient.on("stream-removed", function(evt){
+        rtcClient.on("stream-removed", function (evt) {
             console.log("stream-removed")
             if (evt.stream) {
                 let stream = evt.stream;
@@ -163,8 +167,8 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                 stream.close();
                 setRemovedStream(streamId);
             }
-        }); 
-        rtcClient.on("peer-leave", function(evt){
+        });
+        rtcClient.on("peer-leave", function (evt) {
             console.log("peer-leave")
             if (evt.stream) {
                 let stream = evt.stream;
@@ -270,10 +274,10 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             // STREAMER HAS MUTED VIDEO
             console.log("volume-indicator", evt)
         });
-        rtcClient.on("reconnect", function(evt){
+        rtcClient.on("reconnect", function (evt) {
             setExternalMediaStreams([]);
         });
-        rtcClient.on("exception", function(evt){
+        rtcClient.on("exception", function (evt) {
             // NETWORK QUALITY
         });
         setRtcClient(rtcClient);
@@ -288,6 +292,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         rtmClient.login({token: agoraToken.rtmToken, uid: userUid}).then(() => {
             console.log('AgoraRTM client login success');
             const channel = rtmClient.createChannel(roomId);
+            dispatch(setRtmChannelObj(channel))
             channel.join().then(() => {
                 console.log('Joined channel');
                 setRtmChannel(channel);
