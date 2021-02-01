@@ -18,7 +18,8 @@ const securePaths = [
     "/group/create"
 ];
 const adminPaths = [
-    "/group/create"
+    "/group/create",
+    "/new-livestream"
 ];
 const AuthProvider = ({children, firebase}) => {
     const {pathname, replace, asPath} = useRouter();

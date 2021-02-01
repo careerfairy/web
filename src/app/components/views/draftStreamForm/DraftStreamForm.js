@@ -37,6 +37,7 @@ import ButtonGroup from "@material-ui/core/ButtonGroup";
 import {SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../../util/constants";
 import {LanguageSelect} from "../../helperFunctions/streamFormFunctions/components";
 import Box from "@material-ui/core/Box";
+import {useAuth} from "../../../HOCs/AuthProvider";
 
 
 const useStyles = makeStyles(theme => ({
@@ -103,6 +104,7 @@ const DraftStreamForm = ({
                              currentStream
                          }) => {
     const router = useRouter()
+    const {userData} = useAuth()
     let {
         query: {careerCenterIds, draftStreamId, absolutePath},
         push, replace,
@@ -269,6 +271,8 @@ const DraftStreamForm = ({
             preventDuplicate: true,
         });
     };
+
+    const isNotAdmin = () => !Boolean(userData?.isAdmin || group?.id)
 
 
     const SuccessMessage = () => {
@@ -520,7 +524,9 @@ const DraftStreamForm = ({
                                 <MultiGroupSelect
                                     handleChange={handleChange}
                                     handleBlur={handleBlur}
+                                    groupId={group?.id}
                                     values={values}
+                                    isNotAdmin={isNotAdmin()}
                                     isSubmitting={isSubmitting}
                                     selectedGroups={selectedGroups}
                                     setTargetCategories={setTargetCategories}
