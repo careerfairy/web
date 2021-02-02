@@ -100,7 +100,7 @@ const UsersTable = ({
             field: "userEmail",
             title: "Email",
             width: 200,
-            hidden: userType.propertyName !== "talentPool",
+            // hidden: userType.propertyName !== "talentPool",
             render: (params) => (
                 <a href={`mailto:${params.value}`}>
                     {params.value}
@@ -310,8 +310,8 @@ const UsersTable = ({
                         {
                             field: "userEmail",
                             title: "Email",
-                            hidden: userType.propertyName !== "talentPool",
-                            export: userType.propertyName === "talentPool",
+                            // hidden: userType.propertyName !== "talentPool",
+                            // export: userType.propertyName === "talentPool",
                             render: ({id}) => (
                                 <a href={`mailto:${id}`}>
                                     {id}
@@ -371,17 +371,25 @@ const UsersTable = ({
                     actions={[
                         exportSelectionAction(columns, getTitle()),
                         (rowData) => ({
-                            tooltip: !(rowData.length === 0 || !isTalentPool()) && "Copy Emails",
+                            tooltip: !(rowData.length === 0
+                                // || !isTalentPool()
+                            ) && "Copy Emails",
                             position: "toolbarOnSelect",
                             icon: tableIcons.EmailIcon,
-                            disabled: (rowData.length === 0 || !isTalentPool()),
+                            disabled: (rowData.length === 0
+                                // || !isTalentPool()
+                            ),
                             onClick: handleCopyEmails
                         }),
                         (rowData) => ({
-                            tooltip: !(rowData.length === 0 || !isTalentPool()) && "Copy LinkedIn Addresses",
+                            tooltip: !(rowData.length === 0
+                                // || !isTalentPool()
+                            ) && "Copy LinkedIn Addresses",
                             position: "toolbarOnSelect",
                             icon: tableIcons.LinkedInIcon,
-                            disabled: (rowData.length === 0 || !isTalentPool()),
+                            disabled: (rowData.length === 0
+                                // || !isTalentPool()
+                            ),
                             onClick: handleCopyLinkedin
                         }),
                         {
