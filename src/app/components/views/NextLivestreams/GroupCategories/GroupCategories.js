@@ -114,7 +114,7 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
                              alt={`${groupData.universityName} logo`}/>
                     </div>
                 </CardMedia>
-                {groupData.extraInfo && <Typography variant="body1" className={classes.groupDescription}>
+                {groupData.extraInfo && <Typography component="div" variant="body1" className={classes.groupDescription}>
                     <MultilineText text={groupData.extraInfo}/>
                 </Typography>}
                 {!!hasCategories && <CardContent>

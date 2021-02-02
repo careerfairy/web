@@ -49,7 +49,6 @@ const GroupJoinToAttendModal = ({
     const [allSelected, setAllSelected] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [localGroupsWithPolicies, setLocalGroupsWithPolicies] = useState([]);
-
     useEffect(() => {
         setLocalGroupsWithPolicies(groupsWithPolicies)
     }, [groupsWithPolicies])
@@ -140,7 +139,7 @@ const GroupJoinToAttendModal = ({
             if (onConfirm) {
                 onConfirm();
             }
-            closeModal();
+            handleClose();
         } catch (e) {
             console.log("error in handle join", e);
             setSubmitting(false);
@@ -169,13 +168,14 @@ const GroupJoinToAttendModal = ({
         );
     });
 
+    const handleClose = () => {
+        closeModal()
+    }
+
     return (
         <Dialog
             open={open}
-            onClose={() => {
-                setGroup({})
-                closeModal()
-            }} fullWidth maxWidth="sm">
+            onClose={handleClose} fullWidth maxWidth="sm">
             {!group.universityName ?
                 <>
                     <DialogTitle align="center">Please follow one of the following groups in order to
@@ -219,10 +219,7 @@ const GroupJoinToAttendModal = ({
                         </Box>
                     </DialogContent>
                     <DialogActions>
-                        <Button size="large" onClick={() => {
-                            setGroup({})
-                            closeModal()
-                        }}>
+                        <Button size="large" onClick={handleClose}>
                             Cancel
                         </Button>
                         {((alreadyJoined && group.categories) || !alreadyJoined) && (
