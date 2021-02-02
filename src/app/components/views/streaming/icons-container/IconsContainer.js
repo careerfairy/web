@@ -1,20 +1,19 @@
-import {useState, useEffect, useContext, useMemo} from 'react';
-
-var _ = require('lodash')
+import React, {memo, useContext, useEffect, useMemo, useState} from 'react';
+import * as actions from '../../../../store/actions'
 import RubberBand from 'react-reveal/RubberBand';
 import {withFirebasePage} from 'context/firebase';
-import React, {memo} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {v4 as uuidv4} from "uuid";
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
 import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
 import ClappingSVG from "../../../util/CustomSVGs";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {TransitionGroup} from "react-transition-group";
-import {Checkbox, Collapse, List, ListItem, Slide} from "@material-ui/core";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
+import {Slide} from "@material-ui/core";
+import {EMOTE_MESSAGE_TEXT_TYPE} from "../../../util/constants";
+
+var _ = require('lodash')
 
 const useStyles = makeStyles(theme => ({
     actionBtn: {
@@ -91,37 +90,10 @@ const randomInteger = (min, max) => {
 }
 const emotes = ["clapping", "like", "heart"]
 
-function IconsContainer({livestreamId, firebase}) {
+function IconsContainer() {
     const emotesData = useSelector(state => state.emotes.emotesData)
-    const [livestreamIcons, setLivestreamIcons] = useState([])
-    const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
-
-    // useEffect(() => {
-    //     if (livestreamId && !showBubbles) {
-    //         const unsubscribe = firebase.listenToLivestreamIcons(livestreamId, querySnapshot => {
-    //             let icons = []
-    //             querySnapshot.forEach((doc) => {
-    //                 const icon = doc.data()
-    //                 icon.id = doc.id
-    //                 icons.push(icon)
-    //             })
-    //             setLivestreamIcons(prevState => {
-    //                 if (prevState.length > 40) {
-    //                     return prevState.slice(-20)
-    //                 } else {
-    //                     if (icons[0]) {
-    //                         const filteredState = [...prevState, icons[0]]
-    //                         return _.uniqBy(filteredState, 'id')
-    //
-    //                     } else {
-    //                         return prevState
-    //                     }
-    //                 }
-    //             })
-    //         });
-    //         return () => unsubscribe()
-    //     }
-    // }, [livestreamId, showBubbles]);
+    const {showBubbles, setShowBubbles} = useContext(TutorialContext);
+    const dispatch = useDispatch()
 
     useEffect(() => {
         if (showBubbles) {
@@ -139,11 +111,13 @@ function IconsContainer({livestreamId, firebase}) {
 
     const simulateEmotes = () => {
         const index = randomInteger(1, 3)
-        const newIcon = {
-            id: uuidv4(),
-            name: emotes[index - 1],
+        const memberId = uuidv4()
+        const message = {
+            textType: EMOTE_MESSAGE_TEXT_TYPE,
+            emoteType: emotes[index - 1],
+            timestamp: new Date().getTime()
         }
-        setLivestreamIcons(prevState => [...prevState, newIcon])
+        dispatch(actions.setEmote(message, memberId))
     }
 
     function getRandomHorizontalPosition(maxDistance) {
@@ -164,21 +138,6 @@ function IconsContainer({livestreamId, firebase}) {
         }
     }
 
-    // let iconElements = emotesData.map((iconEl) => {
-    //     return (
-    //         <>
-    //
-    //             <ActionButton
-    //                 id={iconEl.timestamp}
-    //                 key={iconEl.timestamp}
-    //                 getRandomHorizontalPosition={getRandomHorizontalPosition}
-    //                 iconName={iconEl.emoteType}
-    //                 getRandomDuration={getRandomDuration}
-    //                 color={getColor(iconEl.emoteType)}/>
-    //         </>
-    //     );
-    // });
-
     return (
         <div style={{position: "relative"}} className='topLevelContainer'>
             <TransitionGroup>
@@ -186,13 +145,13 @@ function IconsContainer({livestreamId, firebase}) {
                     <Slide direction="up">
                         <TransitionGroup>
                             {emotesData.map((iconEl) => (
-                                    <ActionButton
-                                        id={iconEl.timestamp}
-                                        key={iconEl.timestamp}
-                                        getRandomHorizontalPosition={getRandomHorizontalPosition}
-                                        iconName={iconEl.emoteType}
-                                        getRandomDuration={getRandomDuration}
-                                        color={getColor(iconEl.emoteType)}/>
+                                <ActionButton
+                                    id={iconEl.timestamp}
+                                    key={iconEl.timestamp}
+                                    getRandomHorizontalPosition={getRandomHorizontalPosition}
+                                    iconName={iconEl.emoteType}
+                                    getRandomDuration={getRandomDuration}
+                                    color={getColor(iconEl.emoteType)}/>
                             ))}
                         </TransitionGroup>
                     </Slide>
