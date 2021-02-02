@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import SwipeableViews from 'react-swipeable-views';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -11,7 +11,6 @@ import PersonalInfo from "./personal-info/PersonalInfo";
 import {withFirebase} from "context/firebase";
 import JoinedGroups from "./my-groups/JoinedGroups";
 import AdminGroups from "./my-groups/AdminGroups";
-import {useAuth} from "../../../HOCs/AuthProvider";
 import {useFirestoreConnect} from "react-redux-firebase";
 import {useSelector} from "react-redux";
 

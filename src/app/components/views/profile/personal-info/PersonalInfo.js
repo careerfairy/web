@@ -52,7 +52,6 @@ const PersonalInfo = ({userData}) => {
     const dispatch = useDispatch()
     const {loading, error} = useSelector(state => state.auth.profileEdit)
 
-
     useEffect(() => {
         if (loading === false && error === false) {
             enqueueSnackbar("Your profile has been updated!", {
@@ -65,6 +64,8 @@ const PersonalInfo = ({userData}) => {
                 preventDuplicate: true
             })
         }
+
+        return () => dispatch(actions.clean())
     }, [loading, error])
 
     const handleClose = () => {
