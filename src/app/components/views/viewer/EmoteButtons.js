@@ -185,7 +185,7 @@ const EmoteButtons =
                                 <ThumbUpAltOutlinedIcon fontSize="default"/>
                             </Fab>
                             {iconsDisabled &&
-                            <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
+                            <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
                         </div>
                         <div className={classes.wrapper}>
                             <Fab disabled={iconsDisabled} onClick={handleClap}  className={classes.miniClap}
@@ -193,7 +193,7 @@ const EmoteButtons =
                                 <ClappingSVG style={{width: 21, height: 21}} fontSize="default"/>
                             </Fab>
                             {iconsDisabled &&
-                            <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
+                            <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
                         </div>
                         <div className={classes.wrapper}>
                             <Fab disabled={iconsDisabled} onClick={handleHeart}  className={classes.miniHeart}
@@ -201,7 +201,7 @@ const EmoteButtons =
                                 <FavoriteBorderOutlinedIcon fontSize="default"/>
                             </Fab>
                             {iconsDisabled &&
-                            <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
+                            <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
                         </div>
                     </Box>
                 </div>
