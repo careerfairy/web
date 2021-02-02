@@ -219,10 +219,7 @@ const GroupJoinToAttendModal = ({
                         </Box>
                     </DialogContent>
                     <DialogActions>
-                        <Button size="large" onClick={() => {
-                            setGroup({})
-                            closeModal()
-                        }}>
+                        <Button size="large" onClick={handleClose}>
                             Cancel
                         </Button>
                         {((alreadyJoined && group.categories) || !alreadyJoined) && (
