@@ -16,9 +16,10 @@ import {
 } from "@material-ui/core";
 import UniversityCountrySelector from "../../universitySelect/UniversityCountrySelector";
 import UniversitySelector from "../../universitySelect/UniversitySelector";
-import {URL_REGEX} from "../../../util/constants";
+import {GENERAL_ERROR, URL_REGEX} from "../../../util/constants";
 import {useDispatch, useSelector} from "react-redux";
 import * as actions from '../../../../store/actions'
+import {useSnackbar} from "notistack";
 
 const LightTooltip = withStyles((theme) => ({
     tooltip: {
@@ -58,24 +59,24 @@ const useStyles = makeStyles((theme) => ({
 const PersonalInfo = ({userData}) => {
     const classes = useStyles()
     const [open, setOpen] = useState(false);
-
-    const [updated, setUpdated] = useState(false)
+    const {enqueueSnackbar} = useSnackbar()
     const dispatch = useDispatch()
     const {loading, error} = useSelector(state => state.auth.profileEdit)
 
-    useEffect(() => {
-        if (updated) {
-            setTimeout(() => {
-                setUpdated(false);
-            }, 2000);
-        }
-    }, [updated])
 
     useEffect(() => {
-        if(loading === false && error === false){
-            en
+        if (loading === false && error === false) {
+            enqueueSnackbar("Your profile has been updated!", {
+                variant: "success",
+                preventDuplicate: true,
+            })
+        } else if (error) {
+            enqueueSnackbar(GENERAL_ERROR, {
+                variant: "error",
+                preventDuplicate: true
+            })
         }
-    },[loading, error])
+    }, [loading, error])
 
     const handleClose = () => {
         setOpen(false);
@@ -101,7 +102,7 @@ const PersonalInfo = ({userData}) => {
                 },
                 universityCountryCode: userData?.universityCountryCode || ''
             }}
-            enableReinitialize={true}
+            enableReinitialize
             validate={values => {
                 let errors = {};
                 if (!values.firstName) {
@@ -135,6 +136,7 @@ const PersonalInfo = ({userData}) => {
                   handleChange,
                   handleBlur,
                   handleSubmit,
+                  dirty,
                   setFieldValue,
                   isSubmitting,
                   /* and other goodies */
@@ -248,27 +250,17 @@ const PersonalInfo = ({userData}) => {
                                                         setFieldValue={setFieldValue}/>
                                 </Grid>
                             </Grid>
-                            <LightTooltip
-                                title="Updated!"
-                                open={updated}
-                                enterDelay={500}
-                                leaveDelay={200}
-                                arrow
-                                disableFocusListener
-                                disableHoverListener
-                                disableTouchListener>
-                                <Button
-                                    type="submit"
-                                    fullWidth
-                                    variant="contained"
-                                    color="primary"
-                                    disabled={isSubmitting}
-                                    endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
-                                    className={classes.submit}
-                                >
-                                    {isSubmitting ? "Updating" : "Update"}
-                                </Button>
-                            </LightTooltip>
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                color="primary"
+                                disabled={isSubmitting || !dirty}
+                                startIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
+                                className={classes.submit}
+                            >
+                                {isSubmitting ? "Updating" : "Update"}
+                            </Button>
                         </Box>
                     </Container>
                 </form>
