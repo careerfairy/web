@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const UserProfile = ({firebase}) => {
+const UserProfile = () => {
     const classes = useStyles();
     const {userData, authenticatedUser: user} = useAuth();
 

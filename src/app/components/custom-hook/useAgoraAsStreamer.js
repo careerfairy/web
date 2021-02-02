@@ -1,11 +1,9 @@
-import {useState, useEffect, useContext} from 'react';
-import window, {navigator, document} from 'global';
-import {v4 as uuidv4} from 'uuid';
+import {useEffect, useState} from 'react';
+import window, {document} from 'global';
 import {useAgoraToken} from './useAgoraToken';
-import {useDispatch, useSelector} from "react-redux";
-import {setRtmChannelObj} from "../../store/actions/rtmChannelActions";
-import {setEmote} from "../../store/actions/emotesActions";
+import {useDispatch} from "react-redux";
 import {EMOTE_MESSAGE_TEXT_TYPE} from "../util/constants";
+import * as actions from '../../store/actions'
 
 export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer) {
 
@@ -292,12 +290,12 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         rtmClient.login({token: agoraToken.rtmToken, uid: userUid}).then(() => {
             console.log('AgoraRTM client login success');
             const channel = rtmClient.createChannel(roomId);
-            dispatch(setRtmChannelObj(channel))
+            dispatch(actions.setRtmChannelObj(channel))
             channel.on('ChannelMessage', (message, memberId) => {
                 if (message.messageType === "TEXT") {
                     const messageData = JSON.parse(message.text)
                     if (messageData.textType === EMOTE_MESSAGE_TEXT_TYPE) {
-                        dispatch(setEmote(messageData, memberId))
+                        dispatch(actions.setEmote(messageData, memberId))
                     }
                 }
             });
