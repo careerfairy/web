@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Formik} from 'formik';
 
 import {withFirebase} from 'context/firebase';
-import {makeStyles, withStyles} from "@material-ui/core/styles";
+import {makeStyles} from "@material-ui/core/styles";
 import {
     Typography,
     TextField,
@@ -12,7 +12,7 @@ import {
     Box,
     Container,
     Collapse,
-    FormHelperText, FormControl, Tooltip
+    FormHelperText, FormControl
 } from "@material-ui/core";
 import UniversityCountrySelector from "../../universitySelect/UniversityCountrySelector";
 import UniversitySelector from "../../universitySelect/UniversitySelector";
@@ -21,17 +21,6 @@ import {useDispatch, useSelector} from "react-redux";
 import * as actions from '../../../../store/actions'
 import {useSnackbar} from "notistack";
 
-const LightTooltip = withStyles((theme) => ({
-    tooltip: {
-        backgroundColor: theme.palette.primary.main,
-        color: "white",
-        boxShadow: theme.shadows[1],
-        fontSize: "1rem",
-        "& .MuiTooltip-arrow": {
-            color: theme.palette.primary.main,
-        }
-    },
-}))(Tooltip);
 
 const useStyles = makeStyles((theme) => ({
     paper: {
