@@ -2,7 +2,7 @@ import React, {createContext, useContext, useEffect} from "react";
 import {useRouter} from "next/router";
 import Loader from "../components/views/loader/Loader";
 import {useSelector} from "react-redux";
-import { useFirestoreConnect } from 'react-redux-firebase'
+import {useFirestoreConnect} from 'react-redux-firebase'
 
 const AuthContext = createContext();
 
@@ -24,14 +24,20 @@ const adminPaths = [
     "/new-livestream"
 ];
 const AuthProvider = ({children}) => {
+
     const auth = useSelector((state) => state.firebase.auth)
-    const userData = useSelector((state) => state.firestore?.data?.userData?.[auth.email])
+
+    // const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'ownerObj'}]
 
     const {pathname, replace, asPath} = useRouter();
 
-    useFirestoreConnect(() => [
-        { collection: 'userData', doc: auth.email } // or `userData/${auth.email}`
+    useFirestoreConnect([
+        {collection: 'userData', doc: auth.email  // or `userData/${auth.email}`
+            // , populates
+        }
     ])
+    const userData = useSelector(({firestore}) => firestore.data.userData?.[auth?.email])
+
 
 
     useEffect(() => {
