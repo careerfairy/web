@@ -29,7 +29,7 @@ function Header(props) {
 
     const [authenticated, setAuthenticated] = useState(false);
     const [sidebarState, setSidebarState] = useState("unopened");
-    const {userData, setUserData} = useAuth()
+    const {userData} = useAuth()
 
     useEffect(() => {
         if (userData) {
