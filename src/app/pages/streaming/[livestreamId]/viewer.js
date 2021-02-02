@@ -151,17 +151,14 @@ const dispatch = useDispatch()
     }
 
     const handleClap = () => {
-        dispatch(createEmote('clapping'))
-        // postIcon('clapping')
+        postIcon('clapping')
     }
 
     const handleLike = () => {
-        dispatch(createEmote('like'))
-        // postIcon('like')
+        postIcon('like')
     }
     const handleHeart = () => {
-        dispatch(createEmote('heart'))
-        // postIcon('heart')
+        postIcon('heart')
     }
     const toggleShowMenu = () => {
         setShowMenu(!showMenu)
@@ -184,11 +181,10 @@ const dispatch = useDispatch()
     }
 
     function postIcon(iconName) {
-        let email = currentLivestream.test ? 'streamerEmail' : authenticatedUser.email;
-        firebase.postIcon(currentLivestream.id, iconName, email);
-        if (!iconsDisabled) {
-            setIconsDisabled(true);
-        }
+        dispatch(createEmote(iconName))
+        // if (!iconsDisabled) {
+        //     setIconsDisabled(true);
+        // }
     }
 
     function unmuteVideos() {

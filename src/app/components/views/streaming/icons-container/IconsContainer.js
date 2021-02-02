@@ -1,4 +1,5 @@
 import {useState, useEffect, useContext, useMemo} from 'react';
+
 var _ = require('lodash')
 import RubberBand from 'react-reveal/RubberBand';
 import {withFirebasePage} from 'context/firebase';
@@ -10,6 +11,10 @@ import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
 import ClappingSVG from "../../../util/CustomSVGs";
 import {useSelector} from "react-redux";
+import {TransitionGroup} from "react-transition-group";
+import {Checkbox, Collapse, List, ListItem, Slide} from "@material-ui/core";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
 
 const useStyles = makeStyles(theme => ({
     actionBtn: {
@@ -88,37 +93,35 @@ const emotes = ["clapping", "like", "heart"]
 
 function IconsContainer({livestreamId, firebase}) {
     const emotesData = useSelector(state => state.emotes.emotesData)
-    console.log("-> emotesData in Icons container", emotesData);
     const [livestreamIcons, setLivestreamIcons] = useState([])
     const {tutorialSteps, setTutorialSteps, showBubbles, setShowBubbles} = useContext(TutorialContext);
 
-    useEffect(() => {
-        if (livestreamId && !showBubbles) {
-            const unsubscribe = firebase.listenToLivestreamIcons(livestreamId, querySnapshot => {
-                let icons = []
-                querySnapshot.forEach((doc) => {
-                    const icon = doc.data()
-                    icon.id = doc.id
-                    icons.push(icon)
-                })
-                setLivestreamIcons(prevState => {
-                    if (prevState.length > 40) {
-                        return prevState.slice(-20)
-                    } else {
-                        if (icons[0]) {
-                            const filteredState = [...prevState, icons[0]]
-                            return _.uniqBy(filteredState, 'id')
-
-                        } else {
-                            return prevState
-                        }
-                    }
-                })
-            });
-            return () => unsubscribe()
-        }
-    }, [livestreamId, showBubbles]);
-
+    // useEffect(() => {
+    //     if (livestreamId && !showBubbles) {
+    //         const unsubscribe = firebase.listenToLivestreamIcons(livestreamId, querySnapshot => {
+    //             let icons = []
+    //             querySnapshot.forEach((doc) => {
+    //                 const icon = doc.data()
+    //                 icon.id = doc.id
+    //                 icons.push(icon)
+    //             })
+    //             setLivestreamIcons(prevState => {
+    //                 if (prevState.length > 40) {
+    //                     return prevState.slice(-20)
+    //                 } else {
+    //                     if (icons[0]) {
+    //                         const filteredState = [...prevState, icons[0]]
+    //                         return _.uniqBy(filteredState, 'id')
+    //
+    //                     } else {
+    //                         return prevState
+    //                     }
+    //                 }
+    //             })
+    //         });
+    //         return () => unsubscribe()
+    //     }
+    // }, [livestreamId, showBubbles]);
 
     useEffect(() => {
         if (showBubbles) {
@@ -161,20 +164,40 @@ function IconsContainer({livestreamId, firebase}) {
         }
     }
 
-    let iconElements = livestreamIcons.map((iconEl) => {
-        return (<ActionButton
-                id={iconEl.id}
-                key={iconEl.id}
-                getRandomHorizontalPosition={getRandomHorizontalPosition}
-                iconName={iconEl.name}
-                getRandomDuration={getRandomDuration}
-                color={getColor(iconEl.name)}/>
-        );
-    });
+    // let iconElements = emotesData.map((iconEl) => {
+    //     return (
+    //         <>
+    //
+    //             <ActionButton
+    //                 id={iconEl.timestamp}
+    //                 key={iconEl.timestamp}
+    //                 getRandomHorizontalPosition={getRandomHorizontalPosition}
+    //                 iconName={iconEl.emoteType}
+    //                 getRandomDuration={getRandomDuration}
+    //                 color={getColor(iconEl.emoteType)}/>
+    //         </>
+    //     );
+    // });
 
     return (
         <div style={{position: "relative"}} className='topLevelContainer'>
-            {iconElements}
+            <TransitionGroup>
+                {emotesData.length > 0 && (
+                    <Slide direction="up">
+                        <TransitionGroup>
+                            {emotesData.map((iconEl) => (
+                                    <ActionButton
+                                        id={iconEl.timestamp}
+                                        key={iconEl.timestamp}
+                                        getRandomHorizontalPosition={getRandomHorizontalPosition}
+                                        iconName={iconEl.emoteType}
+                                        getRandomDuration={getRandomDuration}
+                                        color={getColor(iconEl.emoteType)}/>
+                            ))}
+                        </TransitionGroup>
+                    </Slide>
+                )}
+            </TransitionGroup>
         </div>
     );
 }
