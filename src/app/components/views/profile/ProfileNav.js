@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const ProfileNav = ({userData, firebase}) => {
+const ProfileNav = ({userData}) => {
     const classes = useStyles();
     const theme = useTheme();
     const native = useMediaQuery(theme.breakpoints.down('xs'));
@@ -58,10 +58,7 @@ const ProfileNav = ({userData, firebase}) => {
             where: userData.isAdmin ? ["test", "==", false] : ["adminEmail", "==", userData.id]
         }
     ])
-    const careerCenters = useSelector(state => state.firestore.ordered.careerCenterData) || []
-    const state = useSelector(state => state)
-    console.log("-> state", state);
-    console.log("-> careerCenters", careerCenters);
+    const careerCenters = useSelector(state => state.firestore.ordered?.careerCenterData || [])
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -75,15 +72,25 @@ const ProfileNav = ({userData, firebase}) => {
         <TabPanel key={0} value={value} index={0} dir={theme.direction}>
             <PersonalInfo userData={userData}/>
         </TabPanel>,
-        // <TabPanel key={1} value={value} index={1} dir={theme.direction}>
-        //     <JoinedGroups userData={userData}/>
-        // </TabPanel>
+        <TabPanel key={1} value={value} index={1} dir={theme.direction}>
+            <JoinedGroups userData={userData}/>
+        </TabPanel>
+    ]
+    const tabsArray = [
+        <Tab key={0} wrapped fullWidth
+             label={<Typography noWrap
+                                variant="h5">{native ? "Personal" : "Personal Information"}</Typography>}/>,
+        <Tab key={1} wrapped fullWidth
+             label={<Typography variant="h5">{native ? "Groups" : "Joined Groups"}</Typography>}/>,
     ]
 
     if (careerCenters.length) {
-        views.push(<TabPanel key={1} value={value} index={1} dir={theme.direction}>
+        views.push(<TabPanel key={2} value={value} index={2} dir={theme.direction}>
             <AdminGroups userData={userData} adminGroups={careerCenters}/>
         </TabPanel>)
+        tabsArray.push(<Tab key={2} wrapped fullWidth
+                            label={<Typography
+                                variant="h5">{native ? "Admin" : "Admin Groups"}</Typography>}/>)
     }
 
     return (
@@ -97,15 +104,7 @@ const ProfileNav = ({userData, firebase}) => {
                     selectionFollowsFocus
                     centered
                 >
-                    <Tab wrapped fullWidth
-                         label={<Typography noWrap
-                                            variant="h5">{native ? "Personal" : "Personal Information"}</Typography>}/>
-                    {/*<Tab wrapped fullWidth*/}
-                    {/*     label={<Typography variant="h5">{native ? "Groups" : "Joined Groups"}</Typography>}/>*/}
-                    {careerCenters.length ?
-                        <Tab wrapped fullWidth
-                             label={<Typography
-                                 variant="h5">{native ? "Admin" : "Admin Groups"}</Typography>}/> : null}
+                    {tabsArray}
                 </Tabs>
             </AppBar>
             <SwipeableViews

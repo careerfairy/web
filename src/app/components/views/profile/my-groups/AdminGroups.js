@@ -1,11 +1,8 @@
-import React, {useEffect, useState, Fragment} from 'react'
-import {Button, Grid, Typography} from "@material-ui/core";
+import React, {Fragment} from 'react'
+import {Grid, Typography} from "@material-ui/core";
 import {withFirebase} from 'context/firebase';
 import CurrentGroup from 'components/views/profile/CurrentGroup';
 import {makeStyles} from "@material-ui/core/styles";
-import AddIcon from "@material-ui/icons/Add";
-import {useRouter} from "next/router";
-
 
 const useStyles = makeStyles((theme) => ({
     header: {
@@ -21,8 +18,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const AdminGroups = ({userData, firebase, adminGroups}) => {
-    const router = useRouter()
+const AdminGroups = ({userData, adminGroups}) => {
     const classes = useStyles()
 
     let adminGroupElements = [];
@@ -36,7 +32,6 @@ const AdminGroups = ({userData, firebase, adminGroups}) => {
             )
         });
     }
-    console.log("-> adminGroups", adminGroups);
 
     return (
         <Fragment>

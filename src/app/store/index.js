@@ -30,5 +30,7 @@ export const newStore = () => {
     );
 };
 
-export const wrapper = createWrapper(newStore, { debug: true });
+export const wrapper = createWrapper(newStore
+    // ,{ debug: true }
+);
 

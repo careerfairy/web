@@ -24,9 +24,8 @@ const adminPaths = [
     "/new-livestream"
 ];
 const AuthProvider = ({children}) => {
-    const { auth} = useSelector((state) => state.firebase)
-    const {data} = useSelector((state) => state.firestore)
-    const userData = data?.userData?.[auth.email]
+    const auth = useSelector((state) => state.firebase.auth)
+    const userData = useSelector((state) => state.firestore?.data?.userData?.[auth.email])
 
     const {pathname, replace, asPath} = useRouter();
 

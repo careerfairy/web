@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Header(props) {
-    const {push, pathname, query: {careerCenterId}} = useRouter()
+    const {pathname, query: {careerCenterId}} = useRouter()
     const isHighlighted = Boolean(pathname === "/next-livestreams" && careerCenterId)
     const classes = useStyles({isHighlighted})
 
@@ -39,10 +39,8 @@ function Header(props) {
         }
     }, [userData]);
 
-    console.log("-> props", props);
     const handleLogout = () => {
         props.logout()
-        // setUserData(undefined)
     }
 
     const ConstantSideHeader = () => {
@@ -262,13 +260,7 @@ const mapDispatchToProps = {
 
 const enhance = compose(
     withFirebase,
-    withFirebase,
     connect(null, mapDispatchToProps)
 )
 
 export default enhance(Header);
-// export default connect(
-//     null,
-//     mapDispatchToProps
-// )(Header)
-//  compose(withFirebase, withRouter)(Header);
