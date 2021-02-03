@@ -74,7 +74,7 @@ function ViewerPage({firebase}) {
 
     const {authenticatedUser, userData} = useAuth();
 
-    if (currentLivestream && !currentLivestream.test && authenticatedUser === null) {
+    if (currentLivestream && !currentLivestream.test && authenticatedUser?.isLoaded && authenticatedUser?.isEmpty) {
         router.replace({
             pathname: `/login`,
             query: {absolutePath: router.asPath},
