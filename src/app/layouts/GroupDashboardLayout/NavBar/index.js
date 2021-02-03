@@ -1,44 +1,12 @@
 import React, {useEffect} from 'react';
-import Link from 'next/link';
 import PropTypes from 'prop-types';
-import {
-    Avatar,
-    Box,
-    Button,
-    Divider,
-    Drawer,
-    Hidden,
-    List,
-    Typography,
-    makeStyles, ListItem, ListItemText, ListItemIcon
-} from '@material-ui/core';
-import {
-    AlertCircle as AlertCircleIcon,
-    BarChart as BarChartIcon,
-    Lock as LockIcon,
-    Settings as SettingsIcon,
-    ShoppingBag as ShoppingBagIcon,
-    User as UserIcon,
-    UserPlus as UserPlusIcon,
-    Users as UsersIcon,
-    Film as StreamIcon,
-    Archive as PastStreamIcon,
-    FileText as DraftStreamIcon,
-    Edit as EditGroupIcon,
-    LogOut as LogoutIcon
-} from 'react-feather';
+import {Avatar, Box, Divider, Drawer, Hidden, List, makeStyles, Typography} from '@material-ui/core';
+import {LogOut as LogoutIcon} from 'react-feather';
 import NavItem from './NavItem';
 import {useRouter} from "next/router";
 import {theme} from "../../../materialUI";
 import {fade} from "@material-ui/core/styles";
 import clsx from "clsx";
-
-const user = {
-    avatar: '/static/images/avatars/avatar_6.png',
-    jobTitle: 'Senior Developer',
-    name: 'Katarina Smith'
-};
-
 
 const useStyles = makeStyles(() => ({
     mobileDrawer: {
@@ -72,6 +40,7 @@ const useStyles = makeStyles(() => ({
             opacity: ".8",
             zIndex: -1,
         },
+        borderRight: "none",
         backgroundSize: "cover",
         backgroundPosition: "center center",
         backgroundImage: `url(/sidebar.jpg)`
