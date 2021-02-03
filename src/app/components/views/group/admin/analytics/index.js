@@ -240,54 +240,37 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         orderBy: ["start", "desc"]
     }])
 
-    // useEffect(() => {
-    //     firestore.get({
-    //         collection: "userData",
-    //         where: ["groupIds", "array-contains", group.id],
-    //         storeAs: "followers",
-    //     })
-    //     firestore.get({
-    //         collection: "userData",
-    //         where: ["universityCode", "==", group.universityCode],
-    //         storeAs: "groupUniversityStudents",
-    //     })
-    // }, [group?.universityCode])
-
     useEffect(() => {
-        getStudents()
+        (async function getStudents() {
+            try {
+                setFetchingStudentsOfGroupUniversity(true);
+                await firestore.get({
+                    collection: "userData",
+                    where: ["universityCode", "==", group.universityCode],
+                    storeAs: "groupUniversityStudents",
+                })
+            } catch (e) {
+                console.log("-> e in getting student", e);
+            }
+            setFetchingStudentsOfGroupUniversity(false);
+        })()
     }, [group?.universityCode]);
+
     useEffect(() => {
-        getFollowers()
+       (async function getFollowers() {
+           try {
+               setFetchingFollowers(true);
+               await firestore.get({
+                   collection: "userData",
+                   where: ["groupIds", "array-contains", group.id],
+                   storeAs: "followers",
+               })
+           } catch (e) {
+               console.log("-> e in getting followers", e);
+           }
+           setFetchingFollowers(false);
+        })()
     }, []);
-
-
-    const getFollowers = async () => {
-        try {
-            setFetchingFollowers(true);
-            await firestore.get({
-                collection: "userData",
-                where: ["groupIds", "array-contains", group.id],
-                storeAs: "followers",
-            })
-        } catch (e) {
-            console.log("-> e in getting followers", e);
-        }
-        setFetchingFollowers(false);
-    }
-    const getStudents = async () => {
-        try {
-            setFetchingStudentsOfGroupUniversity(true);
-            await firestore.get({
-                collection: "userData",
-                where: ["universityCode", "==", group.universityCode],
-                storeAs: "groupUniversityStudents",
-            })
-        } catch (e) {
-            console.log("-> e in getting student", e);
-        }
-        setFetchingStudentsOfGroupUniversity(false);
-    }
-
 
     useEffect(() => {
         if (currentUserDataSet.dataSet === "followers") {
