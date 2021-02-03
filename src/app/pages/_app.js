@@ -1,4 +1,4 @@
-import React, {Fragment, useState, useEffect} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import 'semantic/dist/semantic.min.css';
 import 'styles.css';
 import FirebaseContext from 'context/firebase/FirebaseContext';
@@ -8,10 +8,11 @@ import {makeStyles, ThemeProvider} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import config from 'react-reveal/globals';
 import DateFnsUtils from '@date-io/date-fns';
-
-config({ssrFadeout: true});
+import {createWrapper} from 'next-redux-wrapper';
+import {newStore, wrapper} from '../store';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import firebase from '../Firebase/Firebase';
 
 
 import Head from 'next/head';
@@ -23,6 +24,12 @@ import {SnackbarProvider} from "notistack";
 import TutorialContext from 'context/tutorials/TutorialContext';
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import {AuthProvider} from "../HOCs/AuthProvider";
+import {ReactReduxFirebaseProvider} from 'react-redux-firebase';
+import {createFirestoreInstance} from "redux-firestore";
+import {Provider} from "react-redux";
+
+
+config({ssrFadeout: true});
 
 const useStyles = makeStyles(({
     info: {
@@ -31,6 +38,20 @@ const useStyles = makeStyles(({
     },
 }))
 
+// react-redux-firebase config
+const rrfConfig = {
+    userProfile: 'userData',
+    useFirestoreForProfile: true, // Firestore for Profile instead of Realtime DB
+    attachAuthIsReady: true, // attaches auth is ready promise to store
+};
+
+const store = newStore();
+const rrfProps = {
+    firebase,
+    config: rrfConfig,
+    dispatch: store.dispatch,
+    createFirestoreInstance
+}
 
 function MyApp({Component, pageProps}) {
     const classes = useStyles()
@@ -96,40 +117,44 @@ function MyApp({Component, pageProps}) {
             <Head>
                 <title>CareerFairy | Watch live streams. Get hired.</title>
             </Head>
-            <AuthProvider firebase={firebase}>
-                <FirebaseContext.Provider value={firebase}>
-                    <ThemeProvider theme={theme}>
-                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                            <SnackbarProvider classes={{
-                                variantInfo: classes.info
-                            }} maxSnack={3}>
-                                <TutorialContext.Provider value={{
-                                    tutorialSteps,
-                                    setTutorialSteps,
-                                    showBubbles,
-                                    setShowBubbles,
-                                    getActiveTutorialStepKey,
-                                    handleConfirmStep,
-                                    isOpen
-                                }}>
-                                    <ErrorContext.Provider value={{generalError, setGeneralError}}>
-                                        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                                        <CssBaseline/>
-                                        {Component.layout ?
-                                            <Component.layout>
-                                                <Component {...pageProps} />
-                                            </Component.layout>
-                                            :
-                                            <Component {...pageProps} />}
-                                        <ErrorSnackBar handleClose={() => setGeneralError("")}
-                                                       errorMessage={generalError}/>
-                                    </ErrorContext.Provider>
-                                </TutorialContext.Provider>
-                            </SnackbarProvider>
-                        </MuiPickersUtilsProvider>
-                    </ThemeProvider>
-                </FirebaseContext.Provider>
-            </AuthProvider>
+            <Provider store={store}>
+                <ReactReduxFirebaseProvider {...rrfProps}>
+                    <AuthProvider firebase={firebase}>
+                        <FirebaseContext.Provider value={firebase}>
+                            <ThemeProvider theme={theme}>
+                                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                    <SnackbarProvider classes={{
+                                        variantInfo: classes.info
+                                    }} maxSnack={3}>
+                                        <TutorialContext.Provider value={{
+                                            tutorialSteps,
+                                            setTutorialSteps,
+                                            showBubbles,
+                                            setShowBubbles,
+                                            getActiveTutorialStepKey,
+                                            handleConfirmStep,
+                                            isOpen
+                                        }}>
+                                            <ErrorContext.Provider value={{generalError, setGeneralError}}>
+                                                {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                                                <CssBaseline/>
+                                                {Component.layout ?
+                                                    <Component.layout>
+                                                        <Component {...pageProps} />
+                                                    </Component.layout>
+                                                    :
+                                                    <Component {...pageProps} />}
+                                                <ErrorSnackBar handleClose={() => setGeneralError("")}
+                                                               errorMessage={generalError}/>
+                                            </ErrorContext.Provider>
+                                        </TutorialContext.Provider>
+                                    </SnackbarProvider>
+                                </MuiPickersUtilsProvider>
+                            </ThemeProvider>
+                        </FirebaseContext.Provider>
+                    </AuthProvider>
+                </ReactReduxFirebaseProvider>
+            </Provider>
         </Fragment>
     );
 }
@@ -146,4 +171,4 @@ function MyApp({Component, pageProps}) {
 //   return { ...appProps }
 // }
 
-export default MyApp
+export default wrapper.withRedux(MyApp)

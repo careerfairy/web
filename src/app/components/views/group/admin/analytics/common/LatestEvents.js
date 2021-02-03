@@ -13,7 +13,7 @@ import {
 } from "@material-ui/core";
 import {withFirebase} from "../../../../../../context/firebase";
 import {colorsArray} from "../../../../../util/colors";
-import {getLength, prettyDate} from "../../../../../helperFunctions/HelperFunctions";
+import {getLength, prettyDate, truncate} from "../../../../../helperFunctions/HelperFunctions";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
@@ -83,6 +83,8 @@ const LatestEvents = ({
             }
         }
 
+        const isCC = () => Boolean(group.universityCode)
+
 
         const data = {
             datasets: [
@@ -146,7 +148,7 @@ const LatestEvents = ({
                     ...lineConfig
                 },
             ],
-            labels: [...streamsFromTimeFrame, ...futureStreams].map(event => [`${event.company} `, `${prettyDate(event.start)}`, event.id]),
+            labels: [...streamsFromTimeFrame, ...futureStreams].map(event => [`${isCC() ? event.company : truncate(event.title, 35)} `, `${prettyDate(event.start)}`, event.id]),
         }
 
 
@@ -283,26 +285,26 @@ const LatestEvents = ({
                     }
                     title="Latest Events"
                 />
-                {!isFeedback &&
-                <>
-                    <Divider/>
-                    <Tabs
-                        value={userType.propertyName}
-                        indicatorColor="primary"
-                        textColor="primary"
-                        scrollButtons="auto"
-                        aria-label="disabled tabs example"
-                    >
-                        {userTypes.map(({displayName, propertyName}, index) => (
-                            <Tab
-                                key={propertyName}
-                                value={propertyName}
-                                onClick={(event) => handleMenuItemClick(event, index)}
-                                label={displayName}
-                            />
-                        ))}
-                    </Tabs>
-                </>}
+                {/*{!isFeedback &&*/}
+                {/*<>*/}
+                {/*    <Divider/>*/}
+                {/*    <Tabs*/}
+                {/*        value={userType.propertyName}*/}
+                {/*        indicatorColor="primary"*/}
+                {/*        textColor="primary"*/}
+                {/*        scrollButtons="auto"*/}
+                {/*        aria-label="disabled tabs example"*/}
+                {/*    >*/}
+                {/*        {userTypes.map(({displayName, propertyName}, index) => (*/}
+                {/*            <Tab*/}
+                {/*                key={propertyName}*/}
+                {/*                value={propertyName}*/}
+                {/*                onClick={(event) => handleMenuItemClick(event, index)}*/}
+                {/*                label={displayName}*/}
+                {/*            />*/}
+                {/*        ))}*/}
+                {/*    </Tabs>*/}
+                {/*</>}*/}
                 <Divider/>
                 <CardContent>
                     <Box display="flex" alignItems="center" justifyContent="center" height={400}>

@@ -32,7 +32,7 @@ function HandRaiseCategory(props) {
     }, [props.livestream, authenticatedUser]);
 
     useEffect(() => {
-        if (handRaiseState && (handRaiseState.state === "connecting" || handRaiseState.state === "connected")) {
+        if (props.livestream.handRaiseActive && handRaiseState && (handRaiseState.state === "connecting" || handRaiseState.state === "connected")) {
             props.setHandRaiseActive(true);
         } else {
             props.setHandRaiseActive(false);

@@ -1,6 +1,7 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import {withFirebase} from 'context/firebase';
 import EditIcon from '@material-ui/icons/Edit';
+import ShareIcon from '@material-ui/icons/Share';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import {v4 as uuidv4} from 'uuid';
 import {
@@ -30,6 +31,8 @@ import ListAltIcon from '@material-ui/icons/ListAlt';
 import {useSnackbar} from "notistack";
 import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import {copyStringToClipboard, dynamicSort} from "../../../../../helperFunctions/HelperFunctions";
+import {useAuth} from "../../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => {
     const themeWhite = theme.palette.common.white
@@ -49,16 +52,18 @@ const EnhancedGroupStreamCard = ({
                                      livestream,
                                      group,
                                      isPastLivestream,
-                                     levelOfStudyModalOpen,
+                                     levelOfStudyModalOpen = false,
                                      handleCloseLevelOfStudyModal,
                                      handleOpenLevelOfStudyModal,
                                      switchToNextLivestreamsTab,
+                                     handleEditStream,
+
                                      isDraft,
                                      router,
                                      hasOptions
                                  }) => {
     const classes = useStyles()
-
+    const {authenticatedUser} = useAuth()
     const {enqueueSnackbar} = useSnackbar()
 
     const [localCategories, setLocalCategories] = useState([]);
@@ -95,6 +100,7 @@ const EnhancedGroupStreamCard = ({
     useEffect(() => {
         if (livestream && livestream.targetCategories && livestream.targetCategories[group.id] && levelOfStudyModalOpen) {
             setLocalCategories(livestream.targetCategories[group.id])
+
         }
     }, [livestream, levelOfStudyModalOpen])
 
@@ -212,12 +218,32 @@ const EnhancedGroupStreamCard = ({
 
     }
 
+    const handleCreateExternalLink = () => {
+        let baseUrl = "https://careerfairy.io";
+        if (window?.location?.origin) {
+            baseUrl = window.location.origin;
+        }
+        const draftId = livestream.id;
+        const targetPath = `${baseUrl}/draft-stream?draftStreamId=${draftId}`;
+        copyStringToClipboard(targetPath);
+        enqueueSnackbar("Link has been copied to your clipboard!", {
+            variant: "success",
+            preventDuplicate: true,
+        });
+    }
+
     const handlePublishStream = async () => {
         try {
             setPublishingDraft(true)
             const newStream = {...livestream}
             newStream.companyId = uuidv4()
-            await firebase.addLivestream(newStream, "livestreams")
+            const author = {
+                email: authenticatedUser.email
+            }
+            if (group?.id) {
+                author.groupId = group.id
+            }
+            await firebase.addLivestream(newStream, "livestreams", author)
             await firebase.deleteLivestream(livestream.id, "draftLivestreams")
             switchToNextLivestreamsTab()
             setPublishingDraft(false)
@@ -227,23 +253,26 @@ const EnhancedGroupStreamCard = ({
         }
     }
 
-    const handleEditStream = async () => {
-        const groupId = group.id
-        const targetPath = isDraft ? `/draft-stream` : "/new-livestream"
-        const targetQuery = {
-            absolutePath: router.asPath,
-            careerCenterIds: groupId,
-        }
-        if (isDraft) {
-            targetQuery.draftStreamId = livestream.id
-        } else {
-            targetQuery.livestreamId = livestream.id
-        }
-        return await router.push({
-            pathname: targetPath,
-            query: targetQuery
-        })
-    }
+    // const handleEditStream = async () => {
+    //     const groupId = group.id
+    //     const targetPath = isDraft ? `/draft-stream` : "/new-livestream"
+    //     const targetQuery = {
+    //         absolutePath: router.asPath,
+    //         careerCenterIds: groupId,
+    //     }
+    //     if (isDraft) {
+    //         targetQuery.draftStreamId = livestream.id
+    //     } else {
+    //         targetQuery.livestreamId = livestream.id
+    //     }
+    //     return await router.push({
+    //         pathname: targetPath,
+    //         query: targetQuery
+    //     })
+    // }
+
+    const isWorkInProgress = () => !livestream.status?.pendingApproval;
+
 
     let categoryElements = localCategories.map((category, index) => {
         return (
@@ -262,6 +291,8 @@ const EnhancedGroupStreamCard = ({
         );
     });
 
+    const isCareerCenter = () => Boolean(group.universityCode)
+
     return (
         <>
             <Box p={2} style={{width: "100%"}}>
@@ -272,35 +303,41 @@ const EnhancedGroupStreamCard = ({
                 <Button
                     className={classes.button}
                     fullWidth
-                    disabled={publishingDraft}
+                    disabled={publishingDraft || isWorkInProgress()}
                     onClick={handlePublishStream}
                     startIcon={publishingDraft ? <CircularProgress size={20} color="inherit"/> : <PublishIcon/>}
                     variant='outlined'
                 >
-                    {publishingDraft ? "Publishing" : "Publish Stream"}
+                    {publishingDraft ? "Publishing" : isWorkInProgress() ? "Needs To Be Approved" : "Publish Stream"}
+                </Button>}
+                {isDraft &&
+                <Button
+                    className={classes.button}
+                    fullWidth
+                    onClick={handleCreateExternalLink}
+                    startIcon={<ShareIcon/>}
+                    variant='outlined'
+                >
+                    Generate external Link to Edit Draft
                 </Button>}
                 <Button
                     className={classes.button}
                     fullWidth
-                    onClick={handleEditStream}
+                    onClick={() => handleEditStream(livestream)}
                     startIcon={<ListAltIcon/>}
                     variant='outlined'
                 >
                     {isDraft ? "Edit Draft" : "Edit Stream"}
                 </Button>
-                {/*<Button className={classes.button} onClick={handleOpenLevelOfStudyModal}*/}
-                {/*        fullWidth*/}
-                {/*        startIcon={<EditIcon/>}*/}
-                {/*        variant='outlined'>*/}
-                {/*    Edit Categories*/}
-                {/*</Button>*/}
+
+                {isCareerCenter() &&
                 <CSVLink data={registeredStudentsFromGroup} separator={";"}
                          filename={'Registered Students ' + livestream.company + ' ' + livestream.id + '.csv'}
                          style={{color: 'red'}}>
                     <Button className={classes.button} fullWidth startIcon={<GetAppIcon/>} variant='outlined'>
                         Registered Students
                     </Button>
-                </CSVLink>
+                </CSVLink>}
                 <Fragment>
                     {!startDownloadingTalentPool || !hasDownloadedTalentPool ?
                         <div>
@@ -337,7 +374,7 @@ const EnhancedGroupStreamCard = ({
                                                  <LivestreamPdfReport group={group}
                                                                       livestream={livestream}
                                                                       studentStats={studentStats}
-                                                                      speakers={livestreamSpeakers}
+                                                                      speakers={livestream.speakers}
                                                                       overallRating={overallRating}
                                                                       contentRating={contentRating}
                                                                       totalStudentsInTalentPool={talentPoolForReport.length}

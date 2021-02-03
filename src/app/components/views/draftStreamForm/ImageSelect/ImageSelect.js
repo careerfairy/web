@@ -107,7 +107,7 @@ const ImageSelect =
                      alt={formName}/>
             </div>
         ) : (
-            <Box boxShadow={2} component={CardMedia} className={classes.media}>
+            <Box p={2} boxShadow={2} component={CardMedia} className={classes.media}>
                 <img src={value.length ? value : logoPlaceholder}
                      className={classes.image}
                      alt={formName}/>

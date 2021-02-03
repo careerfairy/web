@@ -17,13 +17,13 @@ const newLivestream = () => {
     return (
         <TealBackground style={{paddingBottom: 0}}>
             <Head>
-                <title key="title">CareerFairy | Create Livestreams</title>
+                <title key="title">CareerFairy | Create Live Streams</title>
             </Head>
             <div style={{background: "rgb(44, 66, 81)"}}>
                 <Header color="white"/>
             </div>
             <Typography variant="h3" align="center" style={{marginTop: "1.5rem", color: "white"}}>
-                Create a Livestream
+                Create a Live Stream
             </Typography>
             <NewLivestreamForm user={user}/>
             <Footer/>

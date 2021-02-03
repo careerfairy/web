@@ -28,7 +28,7 @@ const JoinedGroups = ({userData}) => {
     let existingGroupElements = [];
 
     if (userData && userData.groupIds) {
-        existingGroupElements = userData.groupIds.map(groupId => {
+        existingGroupElements = [...new Set(userData.groupIds)].map(groupId => { // new set to get rid of duplicate groupIds, dont know how they got there....
             return <CurrentGroup key={groupId} groupId={groupId} userData={userData}/>
         });
     }

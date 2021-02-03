@@ -6,7 +6,7 @@ const ScrollElements = ({scrollItems}) => {
     const [sticky] = useSticky(); //  In order for use sticky hook to work,
     useEffect(() => {//  the component must be the child of a scroll to bottom
         if(sticky){
-            scrollToBottom()
+            scrollToBottom({behavior: "smooth"})
         }
     }, [scrollItems])
 

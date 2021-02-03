@@ -32,10 +32,11 @@ import {
     handleAddSpeaker,
     handleDeleteSpeaker,
     handleError,
-    handleFlattenOptions,
+    handleFlattenOptions, languageCodes,
     validateStreamForm
 } from "../../helperFunctions/streamFormFunctions";
 import {useAuth} from "../../../HOCs/AuthProvider";
+import {LanguageSelect} from "../../helperFunctions/streamFormFunctions/components";
 
 
 const useStyles = makeStyles(theme => ({
@@ -82,7 +83,7 @@ const NewLivestreamForm = ({firebase}) => {
     const {userData, authenticatedUser} = useAuth()
 
     const {
-        query: {livestreamId, draftStreamId, absolutePath},
+        query: {livestreamId, draftStreamId, absolutePath, groupId},
         push, replace
     } = router;
     const classes = useStyles()
@@ -90,7 +91,7 @@ const NewLivestreamForm = ({firebase}) => {
     const {setGeneralError} = useContext(ErrorContext);
     const [targetCategories, setTargetCategories] = useState({})
     const [selectedGroups, setSelectedGroups] = useState([])
-
+    const [groupData, setGroupData] = useState(null);
     const [fetchingBackgrounds, setFetchingBackgrounds] = useState(true)
     const [fetchingLogos, setFetchingLogos] = useState(true)
     const [fetchingGroups, setFetchingGroups] = useState(true);
@@ -114,13 +115,16 @@ const NewLivestreamForm = ({firebase}) => {
         hidden: false,
         summary: '',
         speakers: {[uuidv4()]: speakerObj},
+        language: languageCodes[0]
     })
 
     useEffect(() => {
         // If there are no relevant IDs and ur not a super admin, get lost...
-        if (!(livestreamId || draftStreamId) && !isAuthenticating() && !hasPermissionToCreate()) {
+        if (!(livestreamId || draftStreamId) && !isAuthenticating()
+            // && !hasPermissionToCreate()
+        ) {
             //re-direct! if no Ids in query!
-            replace("/")
+            // replace("/")
         }
         if ((livestreamId || draftStreamId) && allFetched) {
             (async () => {
@@ -146,7 +150,8 @@ const NewLivestreamForm = ({firebase}) => {
                         start: livestream.start.toDate() || new Date(),
                         hidden: livestream.hidden || false,
                         summary: livestream.summary || "",
-                        speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery)
+                        speakers: getStreamSubCollectionSpeakers(livestream, speakerQuery),
+                        language: livestream.language || languageCodes[0]
                     }
                     setFormData(newFormData)
                     handleSetDefaultGroups(livestream.groupIds)
@@ -158,14 +163,17 @@ const NewLivestreamForm = ({firebase}) => {
                     // If you're not a super admin and the Ids dont return any relevant draft or stream, get lost...
                     if (!hasPermissionToCreate()) {
                         //re-direct if no queries were found!
-                        replace("/")
+                        // replace("/")
                     }
                 }
             })()
         } else {
+            if(groupId){
+                handleSetDefaultGroups([groupId])
+            }
             setUpdateMode(false)
         }
-    }, [livestreamId, allFetched, draftStreamId])
+    }, [livestreamId, allFetched, draftStreamId, groupId])
 
     useEffect(() => {
         handleGetFiles('mentors-pictures', setFetchingAvatars, setExistingAvatars)
@@ -174,20 +182,20 @@ const NewLivestreamForm = ({firebase}) => {
     }, [firebase])
 
     useEffect(() => {
-        const unsubscribe = firebase.listenToGroups(querySnapshot => {
-            let careerCenters = [];
-            querySnapshot.forEach(doc => {
-                let careerCenter = doc.data();
-                careerCenter.id = doc.id;
-                careerCenter.selected = false
-                careerCenters.push(careerCenter);
-            })
-            setFetchingGroups(false)
-            setExistingGroups(careerCenters);
-        });
-        return () => unsubscribe();
+            const unsubscribe = firebase.listenToGroups(querySnapshot => {
+                let careerCenters = [];
+                querySnapshot.forEach(doc => {
+                    let careerCenter = doc.data();
+                    careerCenter.id = doc.id;
+                    careerCenter.selected = false
+                    careerCenters.push(careerCenter);
+                })
+                setFetchingGroups(false)
+                setExistingGroups(careerCenters);
+            });
+            return () => unsubscribe();
 
-    }, []);
+    }, [groupId]);
 
     useEffect(() => {
         if (!fetchingBackgrounds && !fetchingLogos && !fetchingAvatars && !fetchingGroups) {
@@ -211,7 +219,7 @@ const NewLivestreamForm = ({firebase}) => {
     }
 
 
-    const handleSetDefaultGroups = (arrayOfGroupIds) => {
+    const handleSetDefaultGroups = async (arrayOfGroupIds) => {
         if (Array.isArray(arrayOfGroupIds)) {
             let groupsWithFlattenedOptions = []
             arrayOfGroupIds.forEach(id => {
@@ -225,7 +233,7 @@ const NewLivestreamForm = ({firebase}) => {
             // If ur not a super admin and ur also not an admin of any of the groups in the stream, get lost....
             if (!hasPermissionToEdit(groupsWithFlattenedOptions)) {
                 // redirect if ur not a group admin!
-                replace("/")
+                // replace("/")
             }
             setSelectedGroups(groupsWithFlattenedOptions)
         }
@@ -255,7 +263,10 @@ const NewLivestreamForm = ({firebase}) => {
                 id = livestream.id
                 await firebase.updateLivestream(livestream, "livestreams")
             } else {
-                id = await firebase.addLivestream(livestream, "livestreams")
+                const author = {
+                    email: authenticatedUser.email
+                }
+                id = await firebase.addLivestream(livestream, "livestreams", author)
             }
             if (absolutePath) {
                 return push({
@@ -323,7 +334,7 @@ const NewLivestreamForm = ({firebase}) => {
                                     variant="outlined"
                                     fullWidth
                                     id="title"
-                                    label="Livestream Title"
+                                    label="Live Stream Title"
                                     inputProps={{maxLength: 1000}}
                                     onBlur={handleBlur}
                                     value={values.title}
@@ -363,7 +374,7 @@ const NewLivestreamForm = ({firebase}) => {
                                 label="Logo"
                                 handleBlur={handleBlur}
                                 formName="companyLogoUrl"
-                                isSuperAdmin={authenticatedUser.isAdmin}
+                                isSuperAdmin={userData.isAdmin}
                                 value={values.companyLogoUrl}
                                 options={existingLogos}
                                 loading={fetchingLogos}
@@ -374,7 +385,7 @@ const NewLivestreamForm = ({firebase}) => {
                                 getDownloadUrl={getDownloadUrl} values={values} firebase={firebase}
                                 setFieldValue={setFieldValue} isSubmitting={isSubmitting}
                                 path="illustration-images"
-                                isSuperAdmin={authenticatedUser.isAdmin}
+                                isSuperAdmin={userData.isAdmin}
                                 label="Company Background" handleBlur={handleBlur}
                                 formName="backgroundImageUrl"
                                 value={values.backgroundImageUrl} options={existingBackgrounds}
@@ -420,16 +431,23 @@ const NewLivestreamForm = ({firebase}) => {
                                 </Collapse>
                             </FormControl>
                         </Grid>
-                        <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+                        <Grid xs={12} sm={7} md={8} item>
                             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                                 <DateTimePicker
                                     inputVariant="outlined" fullWidth variant="outlined"
                                     disabled={isSubmitting}
-                                    label="Livestream Start Date" value={values.start}
+                                    label="Live Stream Start Date" value={values.start}
                                     onChange={(value) => {
                                         setFieldValue('start', new Date(value), true)
                                     }}/>
                             </MuiPickersUtilsProvider>
+                        </Grid>
+                        <Grid xs={12} sm={5} md={4}  item>
+                            <LanguageSelect
+                                value={values.language}
+                                setFieldValue={setFieldValue}
+                                name="language"
+                            />
                         </Grid>
                         <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                             <FormControl fullWidth>
@@ -501,8 +519,8 @@ const NewLivestreamForm = ({firebase}) => {
                                 handleChange={handleChange}
                                 handleBlur={handleBlur}
                                 values={values}
-                                isSuperAdmin={authenticatedUser.isAdmin}
-                                adminEmail={authenticatedUser.email}
+                                isSuperAdmin={userData.isAdmin}
+                                adminEmail={userData.userEmail}
                                 isSubmitting={isSubmitting}
                                 selectedGroups={selectedGroups}
                                 setTargetCategories={setTargetCategories}
@@ -530,7 +548,7 @@ const NewLivestreamForm = ({firebase}) => {
                         endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
                         variant="contained" fullWidth>
                         <Typography variant="h4">
-                            {updateMode ? isSubmitting ? "Updating" : "Update Livestream" : isSubmitting ? "Saving" : "Create Livestream"}
+                            {updateMode ? isSubmitting ? "Updating" : "Update Live Stream" : isSubmitting ? "Saving" : "Create Live Stream"}
                         </Typography>
                     </Button>
                 </form>)}

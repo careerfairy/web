@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {Doughnut} from 'react-chartjs-2';
@@ -11,7 +11,7 @@ import {
     Typography,
     makeStyles,
     colors,
-    useTheme
+    useTheme, Select, MenuItem, Switch, FormControlLabel
 } from '@material-ui/core';
 import {colorsArray} from "../../../../../util/colors";
 import {withFirebase} from "../../../../../../context/firebase";
@@ -20,6 +20,13 @@ import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 import {prettyDate} from "../../../../../helperFunctions/HelperFunctions";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
+import CustomLegend from "../../../../../../materialUI/Legends";
+import Chart from 'chart.js';
+import 'chartjs-plugin-labels';
+import {customDonutConfig} from "../common/TableUtils";
+
+Chart.defaults.global.plugins.labels = false;
+
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -32,28 +39,41 @@ function randomColor() {
     return '#' + Math.round(Math.random() * max).toString(16);
 }
 
-const TypeOfParticipants = ({
-                                group,
-                                setCurrentStream,
-                                currentStream,
-                                typesOfOptions,
-                                userTypes,
-    breakdownRef,
-                                setUserType,
-                                userType,
-                                className,
-                                ...rest
-                            }) => {
+const CategoryBreakdown = ({
+                               group,
+                               setCurrentStream,
+                               currentStream,
+                               typesOfOptions,
+                               userTypes,
+                               breakdownRef,
+                               setUserType,
+                               handleReset,
+                               setCurrentCategory,
+                               currentCategory,
+                               localUserType,
+                               setLocalUserType,
+                               className,
+                               ...rest
+                           }) => {
     const classes = useStyles();
     const theme = useTheme();
+    const chartRef = useRef()
 
     const [localColors, setLocalColors] = useState(colorsArray);
     const [total, setTotal] = useState(0);
+    const [showPercentage, setShowPercentage] = useState(true);
+    const [data, setData] = useState({
+        datasets: [],
+        labels: [],
+        ids: []
+    });
 
 
     useEffect(() => {
         if (group.categories?.length) {
-            setLocalColors([...colorsArray, ...typesOfOptions.map(() => randomColor())])
+            if (localColors.length < typesOfOptions.length) { // only add more colors if there arent enough colors
+                setLocalColors([...colorsArray, ...typesOfOptions.map(() => randomColor())])
+            }
         }
     }, [group.categories, typesOfOptions.length])
 
@@ -66,19 +86,22 @@ const TypeOfParticipants = ({
         }
     }, [typesOfOptions])
 
+    useEffect(() => {
+        setData({
+            datasets: [
+                {
+                    data: typesOfOptions.map(option => option.count),
+                    backgroundColor: localColors,
+                    borderWidth: 8,
+                    borderColor: colors.common.white,
+                    hoverBorderColor: colors.common.white
+                }
+            ],
+            labels: typesOfOptions.map(option => option.name),
+            ids: typesOfOptions.map(option => option.id)
+        })
+    }, [typesOfOptions, localColors])
 
-    const data = {
-        datasets: [
-            {
-                data: typesOfOptions.map(option => option.count),
-                backgroundColor: localColors,
-                borderWidth: 8,
-                borderColor: colors.common.white,
-                hoverBorderColor: colors.common.white
-            }
-        ],
-        labels: typesOfOptions.map(option => option.name)
-    };
 
     const options = {
         cutoutPercentage: 70,
@@ -100,31 +123,30 @@ const TypeOfParticipants = ({
             titleFontColor: theme.palette.text.primary
         },
         plugins: {
-            labels: [{
-                fontColor: 'white',
-                render: 'percent',
-                fontStyle: 'bold',
-                arc: false,
-            }]
+            labels: showPercentage && customDonutConfig
         },
     };
 
-    const getPercentage = (count) => {
-        const percentage = Math.round((count / total) * 100)
-        return percentage + "%"
-    }
 
     const hasNoData = () => {
         return Boolean(typesOfOptions.length && total === 0)
     }
-    const handleReset = () => {
-        setCurrentStream(null)
-        setUserType(userTypes[0])
-    }
+
 
     const handleMenuItemClick = (event, index) => {
-        setUserType(userTypes[index])
+        setLocalUserType(userTypes[index])
     };
+
+    const handleGroupCategorySelect = ({target: {value}}) => {
+        const targetCategory = group.categories.find(category => category.id === value)
+        if (targetCategory) {
+            setCurrentCategory(targetCategory)
+        }
+    }
+
+    const togglePercentage = () => {
+        setShowPercentage(!showPercentage)
+    }
 
     return (
         <Card
@@ -133,10 +155,10 @@ const TypeOfParticipants = ({
             {...rest}
         >
             <CardHeader
-                title={`Breakdown of ${userType.displayName}`}
+                title={`${localUserType.displayName}`}
                 ref={breakdownRef}
                 subheader={
-                    currentStream ? `That attended ${currentStream.company} on ${prettyDate(currentStream.start)}` : "on average"
+                    currentStream ? `That attended ${currentStream.company} on ${prettyDate(currentStream.start)}` : "For All Events"
                 }
                 action={
                     currentStream &&
@@ -151,10 +173,11 @@ const TypeOfParticipants = ({
             />
             <Divider/>
             <Tabs
-                value={userType.propertyName}
+                value={localUserType.propertyName}
                 indicatorColor="primary"
                 textColor="primary"
-                aria-label="disabled tabs example"
+                variant="scrollable"
+                aria-label="students-type-tabs"
             >
                 {userTypes.map(({displayName, propertyName}, index) => (
                     <Tab
@@ -168,6 +191,33 @@ const TypeOfParticipants = ({
             </Tabs>
             <Divider/>
             <CardContent>
+                {currentCategory.id &&
+                <Box display="flex" justifyContent="space-between">
+                    <Select
+                        value={currentCategory.id}
+                        onChange={handleGroupCategorySelect}
+                    >
+                        {group.categories.map(({id, name}) => (
+                            <MenuItem key={id} value={id}>{name}</MenuItem>
+                        ))}
+                    </Select>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={showPercentage}
+                                onChange={togglePercentage}
+                                name="percentageToggle"
+                                color="primary"
+                            />
+                        }
+                        label={
+                            <Typography className={classes.toggleLabel}>
+                                Show Percentage
+                            </Typography>
+                        }
+                    />
+                </Box>
+                }
                 <Box
                     height={300}
                     position="relative"
@@ -179,7 +229,7 @@ const TypeOfParticipants = ({
                     {hasNoData() ?
                         <>
                             <Typography>
-                                Not enough {userType.displayName} data
+                                Not enough {localUserType.displayName} data
                             </Typography>
                             <Button size="small"
                                     variant="text"
@@ -192,6 +242,7 @@ const TypeOfParticipants = ({
                         :
                         <Doughnut
                             data={data}
+                            ref={chartRef}
                             options={options}
                         />}
                 </Box>
@@ -201,41 +252,23 @@ const TypeOfParticipants = ({
                     justifyContent="center"
                     mt={2}
                 >
-                    {typesOfOptions.slice(0, 3).map(({
-                                                         name,
-                                                         count,
-                                                         id
-                                                     }, index) => (
-                        <Box
-                            key={id}
-                            p={1}
-                            textAlign="center"
-                            display="flex"
-                            flexDirection="column"
-                            justifyContent="space-between"
-                        >
-                            <Typography
-                                color="textPrimary"
-                                variant="body1"
-                            >
-                                {name}
-                            </Typography>
-                            <Typography
-                                style={{color: localColors[index]}}
-                                variant="h3"
-                            >
-                                {getPercentage(count)}
-                            </Typography>
-                        </Box>
-                    ))}
+                    <CustomLegend
+                        options={currentCategory.options}
+                        colors={localColors}
+                        chartRef={chartRef}
+                        fullWidth
+                        chartData={data}
+                        optionDataType="Student"
+                        optionValueProp="count"
+                    />
                 </Box>}
             </CardContent>
         </Card>
     );
 };
 
-TypeOfParticipants.propTypes = {
+CategoryBreakdown.propTypes = {
     className: PropTypes.string
 };
 
-export default withFirebase(TypeOfParticipants);
+export default withFirebase(CategoryBreakdown);

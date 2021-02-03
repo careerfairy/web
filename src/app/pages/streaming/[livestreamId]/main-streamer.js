@@ -14,6 +14,7 @@ import {makeStyles, useTheme} from "@material-ui/core/styles";
 import LeftMenu from "../../../components/views/streaming/LeftMenu/LeftMenu";
 import {Button, Tooltip} from "@material-ui/core";
 import { StandartTooltip, TooltipTitle, TooltipText, TooltipButtonComponent } from 'materialUI/GlobalTooltips';
+import PreparationOverlay from 'components/views/streaming/preparation-overlay/PreparationOverlay';
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {
@@ -48,6 +49,8 @@ function StreamingPage(props) {
 
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
+
+    const [streamerReady, setStreamerReady] = useState(false);
 
     const [currentLivestream, setCurrentLivestream] = useState(false);
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
@@ -120,6 +123,12 @@ function StreamingPage(props) {
 
     const toggleShowMenu = () => {
         setShowMenu(!showMenu)
+    }
+
+    if (!streamerReady) {
+        return (
+            <PreparationOverlay livestream={currentLivestream} setStreamerReady={setStreamerReady}/>
+        )
     }
 
     return (

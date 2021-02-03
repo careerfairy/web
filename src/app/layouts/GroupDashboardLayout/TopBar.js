@@ -66,9 +66,9 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const TopBar = ({className, links, onMobileNavOpen, ...rest}) => {
+const TopBar = ({className,notifications,setNotifications, links, onMobileNavOpen, ...rest}) => {
     const classes = useStyles();
-    const [notifications] = useState([2, 123, 3, 13]);
+
 
 
     return (

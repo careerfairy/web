@@ -2,10 +2,9 @@ import {useState, useEffect, Fragment} from 'react';
 import VolumeUpRoundedIcon from '@material-ui/icons/VolumeUpRounded';
 import PlayArrowRoundedIcon from '@material-ui/icons/PlayArrowRounded';
 import {useRouter} from 'next/router';
-import {v4 as uuidv4} from 'uuid';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import {withFirebasePage} from '../../../context/firebase';
-import ViewerHandRaiseComponent from 'components/views/viewer/viewer-hand-raise-component/ViewerHandRaiseComponent';
+import * as actions from '../../../store/actions'
 import ViewerComponent from 'components/views/viewer/viewer-component/ViewerComponent';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 import {useWindowSize} from 'components/custom-hook/useWindowSize';
@@ -16,7 +15,8 @@ import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
 import MiniChatContainer from "../../../components/views/streaming/LeftMenu/categories/chat/MiniChatContainer";
 import EmoteButtons from "../../../components/views/viewer/EmoteButtons";
 import RatingContainer from "../../../components/views/viewer/rating-container/RatingContainer";
-import { useAuth } from 'HOCs/AuthProvider';
+import {useAuth} from 'HOCs/AuthProvider';
+import {useDispatch} from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -50,7 +50,7 @@ function ViewerPage({firebase}) {
     const DELAY = 3000; //3 seconds
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
-
+    const dispatch = useDispatch()
     const [showMenu, setShowMenu] = useState(false);
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
@@ -179,9 +179,8 @@ function ViewerPage({firebase}) {
     }
 
     function postIcon(iconName) {
-        let email = currentLivestream.test ? 'streamerEmail' : authenticatedUser.email;
-        firebase.postIcon(currentLivestream.id, iconName, email);
         if (!iconsDisabled) {
+            dispatch(actions.createEmote(iconName))
             setIconsDisabled(true);
         }
     }
@@ -252,7 +251,7 @@ function ViewerPage({firebase}) {
                 </div>
             </div>
             <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
-                
+
                 <ViewerComponent
                     livestreamId={livestreamId} streamerId={streamerId}
                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
@@ -307,173 +306,173 @@ function ViewerPage({firebase}) {
                 </div>
             </div>
             <style jsx>{`
-                .hidden {
-                    display: none
-                }
+              .hidden {
+                display: none
+              }
 
+              .top-menu {
+                background-color: rgba(245, 245, 245, 1);
+                padding: 15px 0;
+                height: 55px;
+                text-align: center;
+                position: relative;
+              }
+
+              @media (max-width: 768px) {
                 .top-menu {
-                    background-color: rgba(245,245,245,1);
-                    padding: 15px 0;
-                    height: 55px;
-                    text-align: center;
-                    position: relative;
+                  display: none;
                 }
+              }
 
-                @media(max-width: 768px) {
-                    .top-menu {
-                        display: none;
-                    }
-                }
-    
-                .top-menu div, .top-menu button {
-                    display: inline-block;
-                    vertical-align: middle;
-                }
-    
-                .top-menu #stream-button {
-                    margin: 0 50px;
-                }
-    
-                .top-menu.active {
-                    background-color: rgba(0, 210, 170, 1);
-                    color: white;
-                }
-    
-                .top-menu h3 {
-                    font-weight: 600;
-                }
+              .top-menu div, .top-menu button {
+                display: inline-block;
+                vertical-align: middle;
+              }
 
-                .top-menu-left {
-                    display: block;
-                    position: absolute;
-                    top: 50%;
-                    left: 20px;
-                    transform: translateY(-50%);
-                }
+              .top-menu #stream-button {
+                margin: 0 50px;
+              }
 
-                .top-menu-right {
-                    position: absolute;
-                    display: flex !important;
-                    align-items: center;
-                    top: 50%;
-                    right: 20px;
-                    transform: translateY(-50%);
-                }
+              .top-menu.active {
+                background-color: rgba(0, 210, 170, 1);
+                color: white;
+              }
 
+              .top-menu h3 {
+                font-weight: 600;
+              }
+
+              .top-menu-left {
+                display: block;
+                position: absolute;
+                top: 50%;
+                left: 20px;
+                transform: translateY(-50%);
+              }
+
+              .top-menu-right {
+                position: absolute;
+                display: flex !important;
+                align-items: center;
+                top: 50%;
+                right: 20px;
+                transform: translateY(-50%);
+              }
+
+              .mini-chat-container {
+                position: absolute;
+                bottom: 0;
+                right: 40px;
+                width: 20%;
+                min-width: 250px;
+                z-index: 7250;
+              }
+
+              @media (max-width: 768px) {
                 .mini-chat-container {
-                    position: absolute;
-                    bottom: 0;
-                    right: 40px;
-                    width: 20%;
-                    min-width: 250px;
-                    z-index: 7250;
+                  display: none;
                 }
+              }
 
-                @media(max-width: 768px) {
-                    .mini-chat-container{
-                        display:none;
-                    }
-                }
+              .icons-container {
+                position: absolute;
+                bottom: 50px;
+                right: 60px;
+                z-index: 100;
+                width: 80px;
+              }
 
-                .icons-container {
-                    position: absolute;
-                    bottom: 50px;
-                    right: 60px;
-                    z-index: 100;
-                    width: 80px;
-                }
+              .black-frame {
+                z-index: 10;
+                background-color: black;
+              }
 
+              @media (max-width: 768px) {
                 .black-frame {
-                    z-index: 10;
-                    background-color: black;
+                  position: absolute;
+                  width: 100%;
+                  top: 0;
+                  left: 0;
+                  right: 0;
+                  bottom: 0;
+                }
+              }
+
+              @media (min-width: 768px) {
+                .black-frame {
+                  position: absolute;
+                  top: 55px;
+                  bottom: 0;
+                  right: 0;
+                  left: 0;
                 }
 
-                @media(max-width: 768px) {
-                    .black-frame {
-                        position: absolute;
-                        width: 100%;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                    }
+                .black-frame.withMenu {
+                  position: absolute;
+                  top: 55px;
+                  bottom: 0;
+                  right: 0;
+                  left: 280px;
+                }
+              }
+
+              @media (max-width: 768px) {
+                .video-menu-left {
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 0;
+                  z-index: 15;
                 }
 
-                @media(min-width: 768px) {
-                    .black-frame {
-                        position: absolute;
-                        top: 55px;
-                        bottom: 0;
-                        right: 0;
-                        left: 0;
-                    }
+                .video-menu-left.withMenu {
+                  width: 100%;
+                }
+              }
 
-                    .black-frame.withMenu {
-                        position: absolute;
-                        top: 55px;
-                        bottom: 0;
-                        right: 0;
-                        left: 280px;
-                    }
+              @media (min-width: 768px) {
+                .video-menu-left {
+                  position: absolute;
+                  top: 55px;
+                  left: 0;
+                  bottom: 0;
+                  width: 0;
+                  z-index: 15;
                 }
 
-                @media(max-width: 768px) {
-                    .video-menu-left {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 0;
-                        z-index: 15;
-                    }
-
-                    .video-menu-left.withMenu {
-                        width: 100%;
-                    }
+                .video-menu-left.withMenu {
+                  width: 280px;
                 }
+              }
 
-                @media(min-width: 768px) {
-                    .video-menu-left {
-                        position: absolute;
-                        top: 55px;
-                        left: 0;
-                        bottom: 0;
-                        width: 0;
-                        z-index: 15;
-                    }
+              .playButton {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: white;
+                font-weight: 500;
+                text-align: center;
+              }
 
-                    .video-menu-left.withMenu {
-                        width: 280px;
-                    }
-                }
-
-                .playButton {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    color: white;
-                    font-weight: 500;
-                    text-align: center;
-                }
-
-                .playButtonContent {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(10,10,10,0.4);
-                    cursor: pointer;
-                    z-index: 200;
-                }
+              .playButtonContent {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(10, 10, 10, 0.4);
+                cursor: pointer;
+                z-index: 200;
+              }
             `}</style>
             <style jsx global>{`
-                body {
-                    min-height: 100vh;
-                  }
-                  
-                  html {
-                  }
+              body {
+                min-height: 100vh;
+              }
+
+              html {
+              }
             `}</style>
         </div>
     );

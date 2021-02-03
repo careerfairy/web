@@ -1,16 +1,24 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Box, Button, Card, CardHeader, Divider, makeStyles} from '@material-ui/core';
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
-import {DataGrid, getNumericColumnOperators} from '@material-ui/data-grid';
+import {Card, makeStyles, useTheme} from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
-import {filterModel, getDate, RatingInputValue, renderRating} from "../../common/TableUtils";
-import {CustomLoadingOverlay, CustomNoRowsOverlay} from "../../common/Overlays";
+import {
+    defaultTableOptions,
+    exportSelectionAction,
+    renderRatingStars,
+    StarRatingInputValue,
+    tableIcons
+} from "../../common/TableUtils";
+import MaterialTable from "material-table";
+import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
+import {fade} from "@material-ui/core/styles";
 
 
 const useStyles = makeStyles((theme) => ({
-    root: {},
+    root: {
+        padding: 0
+    },
     actions: {
         justifyContent: 'flex-end'
     },
@@ -20,26 +28,25 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const initialColumns = [
+const columns = [
     {
         field: "rating",
-        headerName: "Rating",
+        title: "Rating",
         width: 160,
-        renderCell: renderRating,
-        filterOperators: getNumericColumnOperators().map((operator) => ({
-            ...operator,
-            InputComponent: RatingInputValue,
-        }))
+        render: renderRatingStars,
+        filterComponent: StarRatingInputValue,
+        customFilterAndSearch: (term, rowData) => Number(term) >= Number(rowData.rating)
     },
     {
-        field: "timestamp",
-        headerName: "Voted On",
+        field: "date",
+        title: "Voted",
         width: 200,
-        valueGetter: getDate,
+        render: (rowData) => prettyDate(rowData.timestamp),
+        type: 'date'
     },
     {
         field: "message",
-        headerName: "Message",
+        title: "Message",
         width: 250,
     },
 ]
@@ -48,37 +55,41 @@ const RatingSideTable = ({
                              currentRating,
                              streamDataType,
                              fetchingStreams,
-    sideRef,
+                             sideRef,
                              className,
                              ...rest
                          }) => {
+    const dataTableRef = useRef(null)
+
+    const theme = useTheme()
     const classes = useStyles();
-    const [selection, setSelection] = useState([]);
     const [data, setData] = useState([]);
-    const [expandTable, setExpandTable] = useState(false);
 
     useEffect(() => {
-        if (currentRating) {
+        if (currentRating?.voters?.length) {
             setData(currentRating.voters)
         } else {
             setData([])
         }
     }, [currentRating])
 
-    const toggleTable = () => {
-        setExpandTable(!expandTable)
-    }
-
-    const newData = {
-        columns: initialColumns,
-        rows: data
-    }
+    useEffect(() => {
+        if (dataTableRef.current) {
+            dataTableRef.current.onAllSelected(false)
+        }
+    }, [currentRating?.id])
     const active = () => {
         return Boolean(
             currentRating
         )
     }
 
+    const customOptions = {...defaultTableOptions}
+    const innerTableStyle = {background: fade(theme.palette.navyBlue.main, 0.05)}
+    customOptions.selection = false
+    customOptions.pageSize = 3
+    customOptions.headerStyle = innerTableStyle
+    customOptions.exportButton.pdf = true
 
     return (
         <Card
@@ -87,40 +98,38 @@ const RatingSideTable = ({
             className={clsx(classes.root, className)}
             {...rest}
         >
-            <CardHeader
-                title={`${streamDataType.displayName} Breakdown`}
-                subheader={currentRating?.question}
+            <MaterialTable
+                icons={tableIcons}
+                tableRef={dataTableRef}
+                columns={[
+                    {
+                        field: "rating",
+                        title: "Rating",
+                        width: 160,
+                        render: renderRatingStars,
+                        filterComponent: StarRatingInputValue,
+                        customFilterAndSearch: (term, rowData) => Number(term) >= Number(rowData.rating)
+                    },
+                    {
+                        field: "date",
+                        title: "Voted",
+                        width: 200,
+                        render: (rowData) => prettyDate(rowData.timestamp),
+                        type: 'date'
+                    },
+                    {
+                        field: "message",
+                        title: "Message",
+                        width: 250,
+                    },
+                ]}
+                data={data}
+                options={customOptions}
+                isLoading={fetchingStreams}
+                actions={[(exportSelectionAction(columns))]}
+
+                title={currentRating?.question}
             />
-            <Divider/>
-            <Box height={expandTable ? 800 : 500} width="100%">
-                <DataGrid
-                    {...newData}
-                    filterModel={filterModel}
-                    loading={fetchingStreams}
-                    onSelectionChange={(newSelection) => {
-                        setSelection(newSelection.rowIds);
-                    }}
-                    components={{
-                        noRowsOverlay: CustomNoRowsOverlay,
-                        loadingOverlay: CustomLoadingOverlay,
-                    }}
-                />
-            </Box>
-            <Box
-                display="flex"
-                justifyContent="space-between"
-                p={2}
-            >
-                <Button
-                    color="primary"
-                    onClick={toggleTable}
-                    endIcon={!expandTable && <ArrowRightIcon/>}
-                    size="small"
-                    variant="text"
-                >
-                    {expandTable ? "Show Less" : "Expand"}
-                </Button>
-            </Box>
         </Card>
     );
 };

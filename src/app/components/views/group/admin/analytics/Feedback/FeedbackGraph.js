@@ -7,26 +7,27 @@ import {
     Card,
     CardContent,
     CardHeader,
-    Divider,
-    Typography,
-    makeStyles,
+    Checkbox,
     colors,
-    useTheme, ListItem, Checkbox, List, SvgIcon
+    Divider,
+    List,
+    ListItem,
+    makeStyles,
+    Typography,
+    useTheme
 } from '@material-ui/core';
 import {colorsArray} from "../../../../../util/colors";
 import {withFirebase} from "../../../../../../context/firebase";
-import Button from "@material-ui/core/Button";
-import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 import {convertStringToArray} from "../../../../../helperFunctions/HelperFunctions";
 
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import {OverlaySvg} from "../common/Overlays";
-import RatingSideTable from "./RatingSideTable";
+import CustomLegend from "../../../../../../materialUI/Legends";
+import {customDonutConfig} from "../common/TableUtils";
 
 const useStyles = makeStyles(() => ({
     root: {
-        height: '100%'
+        height: '100%',
     }
 }));
 
@@ -48,7 +49,6 @@ const FeedbackGraph = ({
                            userTypes,
                            setUserType,
                            currentPoll,
-                           sideRef,
                            userType,
                            streamDataType,
                            className,
@@ -60,8 +60,6 @@ const FeedbackGraph = ({
 
 
     const [localColors, setLocalColors] = useState(colorsArray);
-    const [total, setTotal] = useState(0);
-    const [legendLabels, setLegendLabels] = useState([]);
     const [data, setData] = useState(initialData);
 
     useEffect(() => {
@@ -84,8 +82,6 @@ const FeedbackGraph = ({
                 ],
                 labels: currentPoll.options.map(option => convertStringToArray(option.name))
             })
-            setLegendLabels(currentPoll.options.map(option => ({name: option.name, hidden: false})))
-
         } else {
             setData(initialData)
         }
@@ -119,57 +115,19 @@ const FeedbackGraph = ({
             }
         },
         plugins: {
-            labels: [{
-                fontColor: 'white',
-                render: 'percent',
-                fontStyle: 'bold',
-                arc: true,
-            }]
+            labels: customDonutConfig
         },
     };
 
     const hasNoData = () => {
         return Boolean(!data.datasets.length)
     }
-    const handleReset = () => {
-        setCurrentStream(null)
-        setUserType(userTypes[0])
-    }
-
-    const handleClickLegend = (e, legendItem) => {
-        const index = legendItem.index;
-        const chart = chartRef?.current?.chartInstance;
-        let i, iLength, meta;
-        for (i = 0, iLength = (chart.data.datasets || []).length; i < iLength; ++i) {
-            meta = chart.getDatasetMeta(i);
-            // toggle visibility of index if exists
-            if (meta.data[index]) {
-                meta.data[index].hidden = !meta.data[index].hidden;
-                const newLabels = [...legendLabels]
-                newLabels[index].hidden = meta.data[index].hidden
-                setLegendLabels(newLabels)
-            }
-        }
-        chart.update();
-    }
-
-    const active = () => {
-        return Boolean(
-            currentPoll
-        )
-    }
 
     return (
         <Card
-            ref={sideRef}
-            raised={active()}
             className={clsx(classes.root, className)}
             {...rest}
         >
-            <CardHeader
-                title={`${streamDataType.displayName.slice(0, -1)} Breakdown`}
-                subheader={currentPoll?.question}
-            />
             <Divider/>
             <CardContent>
                 <Box
@@ -192,25 +150,21 @@ const FeedbackGraph = ({
                         />}
                 </Box>
                 {!hasNoData() &&
-                <List dense>
-                    {currentPoll?.options.map(option => {
-                        return (
-                            <ListItem dense key={option.index} onClick={(e) => handleClickLegend(e, option)} button>
-                                <ListItemIcon style={{minWidth: 0}}>
-                                    <Checkbox
-                                        edge="start"
-                                        style={{color: colorsArray[option.index]}}
-                                        checked={!legendLabels?.[option.index]?.hidden}
-                                    />
-                                </ListItemIcon>
-                                <ListItemText>
-                                    {option.name}
-                                    <br/><strong>[{option.votes} Vote{option.votes !== 1 && "s"}]</strong>
-                                </ListItemText>
-                            </ListItem>)
-                    })}
-                </List>
-                }
+                <Box
+                    display="flex"
+                    justifyContent="center"
+                    mt={2}
+                >
+                    <CustomLegend
+                        options={currentPoll.options}
+                        colors={localColors}
+                        chartRef={chartRef}
+                        fullWidth={false}
+                        chartData={data}
+                        optionDataType="Student"
+                        optionValueProp="count"
+                    />
+                </Box>}
             </CardContent>
         </Card>
     );

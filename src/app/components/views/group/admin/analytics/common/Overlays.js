@@ -1,6 +1,8 @@
 import React from 'react'
-import { GridOverlay } from '@material-ui/data-grid';
+import {GridOverlay} from '@material-ui/data-grid';
 import {LinearProgress, makeStyles} from "@material-ui/core";
+import Box from "@material-ui/core/Box";
+import SentimentDissatisfiedIcon from '@material-ui/icons/SentimentDissatisfied';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -63,29 +65,39 @@ export const OverlaySvg = () => {
                     d="M149.121 33.292l-6.83 2.65a1 1 0 0 1-1.317-1.23l1.937-6.207c-2.589-2.944-4.109-6.534-4.109-10.408C138.802 8.102 148.92 0 161.402 0 173.881 0 184 8.102 184 18.097c0 9.995-10.118 18.097-22.599 18.097-4.528 0-8.744-1.066-12.28-2.902z"
                 />
                 <g className="ant-empty-img-4" transform="translate(149.65 15.383)">
-                    <ellipse cx="20.654" cy="3.167" rx="2.849" ry="2.815" />
-                    <path d="M5.698 5.63H0L2.898.704zM9.259.704h4.985V5.63H9.259z" />
+                    <ellipse cx="20.654" cy="3.167" rx="2.849" ry="2.815"/>
+                    <path d="M5.698 5.63H0L2.898.704zM9.259.704h4.985V5.63H9.259z"/>
                 </g>
             </g>
         </svg>
     )
 }
-export const  CustomNoRowsOverlay = ({text = ""}) => {
+export const CustomNoRowsOverlay = ({text = ""}) => {
     const classes = useStyles();
 
     return (
         <GridOverlay className={classes.root}>
             <OverlaySvg/>
-            <div className={classes.label}>{text||"No Data"}</div>
+            <div className={classes.label}>{text || "No Data"}</div>
         </GridOverlay>
     );
 }
+export const CustomNoRowsTableOverlay = ({text = "No Data"}) => {
+    const classes = useStyles();
 
-export const  CustomLoadingOverlay =() =>{
+    return (
+        <Box display="flex" width="100%" height={300} justifyContent="center" alignItems="center">
+            <SentimentDissatisfiedIcon/>
+            <div className={classes.label}>{text}</div>
+        </Box>
+    );
+}
+
+export const CustomLoadingOverlay = () => {
     return (
         <GridOverlay>
-            <div style={{ position: 'absolute', top: 0, width: '100%' }}>
-                <LinearProgress />
+            <div style={{position: 'absolute', top: 0, width: '100%'}}>
+                <LinearProgress/>
             </div>
         </GridOverlay>
     );

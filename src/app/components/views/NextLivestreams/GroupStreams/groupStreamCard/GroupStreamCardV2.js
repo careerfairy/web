@@ -1,8 +1,19 @@
-import React, {createRef, Fragment, memo, useEffect, useMemo, useRef, useState} from 'react';
+import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
-import {Avatar, Box, Button, ClickAwayListener, Collapse, fade, Fade, Grow, Paper} from "@material-ui/core";
+import {
+    Avatar,
+    Box,
+    Button,
+    Chip,
+    ClickAwayListener,
+    Collapse,
+    fade,
+    Fade,
+    Grow,
+    Paper
+} from "@material-ui/core";
 import {AvatarGroup} from "@material-ui/lab";
 import Streamers from "./Streamers";
 import Wave from "./Wave";
@@ -16,14 +27,15 @@ import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
 import {AttendButton, DetailsButton} from "./actionButtons";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
-import {DateDisplay, DateTimeDisplay, TimeDisplay} from "./TimeDisplay";
+import {DateTimeDisplay} from "./TimeDisplay";
 import EnhancedGroupStreamCard from "../../../group/admin/events/enhanced-group-stream-card/EnhancedGroupStreamCard";
 import SettingsIcon from '@material-ui/icons/Settings';
 import CopyToClipboard from "../../../common/CopyToClipboard";
 import LogosPlaceHolder from "./LogosPlaceholder";
+import GroupsUtil from "../../../../../data/util/GroupsUtil";
+import {dynamicSort} from "../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => {
-    const transition = `transform ${theme.transitions.duration.shorter}ms ${theme.transitions.easing.easeInOut}`
     const paperColor = theme.palette.background.paper
     const frontHoveredScale = 0.7
     const dateHeight = 90
@@ -33,7 +45,6 @@ const useStyles = makeStyles((theme) => {
             width: "100%",
             height: "100%",
             display: "flex",
-            cursor: "pointer"
         },
         streamCard: {
             display: "flex",
@@ -42,9 +53,10 @@ const useStyles = makeStyles((theme) => {
             height: "100%",
             position: "relative",
             webKitPosition: "relative",
-            transitionProperty: "transform",
-            transitionDuration: `${theme.transitions.duration.shorter}ms`,
-            transitionTimingFunction: theme.transitions.easing.easeInOut,
+            transition: theme.transitions.create(['transform'], {
+                easing: theme.transitions.easing.easeInOut,
+                duration: theme.transitions.duration.standard,
+            }),
             zIndex: ({cardHovered, isExpanded}) => (cardHovered || isExpanded) && 995,
             "& p": {
                 color: theme.palette.common.white
@@ -106,7 +118,10 @@ const useStyles = makeStyles((theme) => {
             fontWeight: "bold",
             alignItems: "center",
             width: ({cardHovered}) => cardHovered && "140%",
-            transition: "width 1s",
+            transition: theme.transitions.create(['width'], {
+                easing: theme.transitions.easing.easeInOut,
+                duration: theme.transitions.duration.complex,
+            }),
             padding: theme.spacing(0, 2),
             color: "white !important",
             justifyContent: "center",
@@ -122,8 +137,11 @@ const useStyles = makeStyles((theme) => {
             width: "100%",
             display: "flex",
             flexDirection: "column",
-            transform: ({cardHovered}) => cardHovered && `translateY(${-60}px) scale(${frontHoveredScale})`,
-            transition: '250ms',
+            transition: theme.transitions.create(['opacity', 'transform'], {
+                easing: theme.transitions.easing.easeInOut,
+                duration: theme.transitions.duration.standard,
+            }),
+            transform: ({cardHovered}) => cardHovered && `translateY(${-50}px) scale(${frontHoveredScale})`,
             background: ({
                              cardHovered,
                              registered
@@ -159,7 +177,6 @@ const useStyles = makeStyles((theme) => {
         optionsWrapper: {
             overflowX: 'hidden',
             overflowY: 'auto',
-            // maxHeight: 200,
         },
         expandedOptionsWrapper: {
             overflowX: 'hidden',
@@ -169,7 +186,10 @@ const useStyles = makeStyles((theme) => {
             paddingTop: 0,
         },
         background: {
-            transition: ({cardHovered}) => cardHovered && `${transition}, opacity 150ms linear`,
+            transition: theme.transitions.create(['opacity', 'transform'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.shortest,
+            }),
             transform: ({cardHovered}) => cardHovered ? 'scale(1.05, 1.05)' : 'scale(0.2, 0.9)',
             opacity: ({cardHovered}) => cardHovered ? 1 : 0,
             background: theme.palette.navyBlue.main,
@@ -255,7 +275,8 @@ const useStyles = makeStyles((theme) => {
         bookedText: {
             marginLeft: theme.spacing(1),
             fontWeight: "bold",
-            color: theme.palette.primary.main
+            color: theme.palette.primary.main,
+
         },
         expandArea: {
             borderRadius: ({hasGroups}) => !hasGroups && theme.spacing(2.5),
@@ -286,6 +307,20 @@ const useStyles = makeStyles((theme) => {
             flexDirection: "column",
             alignItems: "center"
         },
+        statusChip: {
+            zIndex: 1,
+            position: "absolute",
+            top: theme.spacing(1),
+            right: theme.spacing(1),
+            borderRadius: theme.spacing(2.5),
+            padding: theme.spacing(0.3),
+            background: ({pendingApproval}) => pendingApproval ? theme.palette.primary.main : theme.palette.warning.main,
+            wordWrap: "break-word",
+            maxWidth: theme.spacing(20),
+            height:"auto",
+            opacity: 0.8
+        },
+
         pulseAnimate: {
             animation: `$pulse 1s infinite`
         },
@@ -329,7 +364,8 @@ const GroupStreamCardV2 = memo(({
                                     isPastLivestream,
                                     hideActions,
                                     isDraft,
-                                    switchToNextLivestreamsTab
+                                    switchToNextLivestreamsTab,
+                                    handleEditStream
                                 }) => {
 
     const router = useRouter();
@@ -343,6 +379,8 @@ const GroupStreamCardV2 = memo(({
         return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1)
     }
 
+    const isPending = () => livestream?.status?.pendingApproval === true
+
     const registered = useMemo(() => userIsRegistered(), [livestream.registeredUsers])
     const [expanded, setExpanded] = useState(false);
 
@@ -354,11 +392,13 @@ const GroupStreamCardV2 = memo(({
     const [openJoinModal, setOpenJoinModal] = useState(false);
     const [levelOfStudyModalOpen, setLevelOfStudyModalOpen] = useState(false);
     const [fetchingCareerCenters, setFetchingCareerCenters] = useState(false);
+    const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
 
     const classes = useStyles({
         hideActions,
         isHighlighted,
         cardHovered,
+        pendingApproval: isPending(),
         mobile,
         hasGroups: careerCenters.length,
         registered,
@@ -392,7 +432,7 @@ const GroupStreamCardV2 = memo(({
             }, []);
             const matchedOptions = livestream.targetCategories[groupId]
             if (matchedOptions) {
-                const filteredOptions = flattenedOptions.filter(option => matchedOptions.includes(option.id))
+                const filteredOptions = flattenedOptions.filter(option => matchedOptions.includes(option.id)).sort(dynamicSort("name")).reverse()
                 setTargetOptions(filteredOptions)
             }
         }
@@ -465,7 +505,7 @@ const GroupStreamCardV2 = memo(({
         firebase.deregisterFromLivestream(livestream.id, user.email);
     }
 
-    function startRegistrationProcess() {
+    async function startRegistrationProcess() {
         if (!user || !user.emailVerified) {
             return router.push({
                 pathname: `/login`,
@@ -479,11 +519,15 @@ const GroupStreamCardV2 = memo(({
                 query: "profile"
             });
         }
-        if (listenToUpcoming) {// If on next livestreams tab...
+        const {hasAgreedToAll, groupsWithPolicies} = await GroupsUtil.getPolicyStatus(careerCenters, user.email, firebase)
+        if (!hasAgreedToAll) {
+            setOpenJoinModal(true)
+            setGroupsWithPolicies(groupsWithPolicies)
+        } else if (listenToUpcoming) {// If on next livestreams tab...
             if (!userFollowingAnyGroup() && livestream.groupIds?.length) {
                 setOpenJoinModal(true)
             } else {
-                firebase.registerToLivestream(livestream.id, user.email).then(() => {
+                firebase.registerToLivestream(livestream.id, user.email, groupsWithPolicies).then(() => {
                     setCardHovered(false)
                     setBookingModalOpen(true);
                     sendEmailRegistrationConfirmation();
@@ -493,7 +537,7 @@ const GroupStreamCardV2 = memo(({
             if (!userFollowingCurrentGroup()) {
                 setOpenJoinModal(true)
             } else {
-                firebase.registerToLivestream(livestream.id, user.email).then(() => {
+                firebase.registerToLivestream(livestream.id, user.email, groupsWithPolicies).then(() => {
                     setCardHovered(false)
                     setBookingModalOpen(true);
                     sendEmailRegistrationConfirmation();
@@ -504,7 +548,7 @@ const GroupStreamCardV2 = memo(({
     }
 
     function completeRegistrationProcess() {
-        firebase.registerToLivestream(livestream.id, user.email).then(() => {
+        firebase.registerToLivestream(livestream.id, user.email, groupsWithPolicies).then(() => {
             setCardHovered(false)
             setBookingModalOpen(true);
             sendEmailRegistrationConfirmation();
@@ -612,6 +656,13 @@ const GroupStreamCardV2 = memo(({
                         <Paper
                             elevation={4}
                             className={classes.front}>
+                            {isDraft &&
+                            <Chip className={classes.statusChip} color="primary"
+                                   label={
+                                       <Typography style={{whiteSpace: 'normal', fontWeight: "bold"}} variant="body1">
+                                           {isPending() ? "Pending Approval" : "Work In Progress"}
+                                       </Typography>
+                                   }/>}
                             {!cardHovered &&
                             <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
                                  alt="background"/>}
@@ -621,6 +672,7 @@ const GroupStreamCardV2 = memo(({
                                                      date={livestream.start.toDate()}/>
                                 </div>
                             </div>
+
                             <div className={classes.companyLogoWrapper}>
                                 <Grow in={Boolean(userIsRegistered())}>
                                     <div className={classes.bookedIcon}>
@@ -641,7 +693,8 @@ const GroupStreamCardV2 = memo(({
                             <div className={classes.lowerFrontContent}>
                                 <div className={classes.speakersAndLogosWrapper}>
                                     <div className={classes.titleAndSpeakersWrapper}>
-                                        <Typography variant={mobile ? "h6" : cardHovered ? "h4" : "h5"} align="center"
+                                        <Typography variant={mobile ? "h6" : cardHovered ? "h4" : "h5"}
+                                                    align="center"
                                                     className={classes.companyName}>
                                             {livestream.title}
                                         </Typography>
@@ -686,6 +739,7 @@ const GroupStreamCardV2 = memo(({
                                                     group={groupData}
                                                     isDraft={isDraft}
                                                     router={router}
+                                                    handleEditStream={handleEditStream}
                                                     hasOptions={Boolean(targetOptions.length)}
                                                     switchToNextLivestreamsTab={switchToNextLivestreamsTab}
                                                     handleOpenLevelOfStudyModal={handleOpenLevelOfStudyModal}
@@ -744,6 +798,7 @@ const GroupStreamCardV2 = memo(({
                                     {fetchingCareerCenters ? <LogosPlaceHolder/> : logoElements}
                                 </div>
                             </Box>
+
                         </ClickAwayListener>
                     </Box>
                 </div>
@@ -752,6 +807,7 @@ const GroupStreamCardV2 = memo(({
             <GroupJoinToAttendModal
                 open={openJoinModal}
                 groups={getGroups()}
+                groupsWithPolicies={groupsWithPolicies}
                 alreadyJoined={false}
                 userData={userData}
                 onConfirm={completeRegistrationProcess}

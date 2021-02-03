@@ -58,7 +58,6 @@ export const buildLivestreamObject = (values, targetCategories, updateMode, stre
         companyId: values.companyId,
         title: values.title,
         companyLogoUrl: values.companyLogoUrl,
-        registeredUsers: [],
         start: firebase.getFirebaseTimestamp(values.start),
         targetGroups: [],
         targetCategories: targetCategories,
@@ -68,7 +67,9 @@ export const buildLivestreamObject = (values, targetCategories, updateMode, stre
         hidden: values.hidden,
         universities: [],
         summary: values.summary,
-        speakers: buildSpeakersArray(values)
+        speakers: buildSpeakersArray(values),
+        language: values.language,
+        lastUpdated: firebase.getServerTimestamp()
     }
 }
 
@@ -122,7 +123,7 @@ export const handleFlattenOptionsWithoutLvlOfStudy = (group) => {
     return optionsArray
 }
 
-export const validateStreamForm = (values, isDraft) => {
+export const validateStreamForm = (values, isDraft, noValidation = false) => {
     let errors = {speakers: {}};
     if (!values.companyLogoUrl) {
         errors.companyLogoUrl = 'Required';
@@ -161,5 +162,36 @@ export const validateStreamForm = (values, isDraft) => {
     if (!Object.keys(errors.speakers).length) {
         delete errors.speakers
     }
-    return errors;
+    return noValidation ? {} : errors;
 }
+
+export const languageCodes = [
+    {
+        code: "en",
+        name: "English",
+    },
+    {
+        code: "de",
+        name: "German",
+    },
+    {
+        code: "fr",
+        name: "French",
+    },
+    {
+        code: "it",
+        name: "Italian",
+    },
+    {
+        code: "es",
+        name: "Spanish",
+    },
+    {
+        code: "nl",
+        name: "Dutch",
+    },
+    {
+        code: "pt",
+        name: "Portuguese",
+    },
+];

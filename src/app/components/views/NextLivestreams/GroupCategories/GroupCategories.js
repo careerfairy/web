@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
         left: "50%",
         transform: "translate(-50%,-50%)",
         maxWidth: "90%",
-        maxHeight: "90%",
+        maxHeight: "100%",
         borderRadius: theme.spacing(1)
     },
     groupDescription:{
@@ -114,7 +114,7 @@ const GroupCategories = ({groupData, alreadyJoined, handleToggleActive, mobile, 
                              alt={`${groupData.universityName} logo`}/>
                     </div>
                 </CardMedia>
-                {groupData.extraInfo && <Typography variant="body1" className={classes.groupDescription}>
+                {groupData.extraInfo && <Typography component="div" variant="body1" className={classes.groupDescription}>
                     <MultilineText text={groupData.extraInfo}/>
                 </Typography>}
                 {!!hasCategories && <CardContent>
