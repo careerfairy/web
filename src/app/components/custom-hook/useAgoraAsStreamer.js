@@ -173,6 +173,10 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                 setRemovedStream(streamId);
             }
         });
+        rtcClient.on("stream-published", function(evt){
+            console.log("stream-published")
+            setAgoraStatus("stream-published")
+        });
         let localStream = null;
         rtcClient.on("client-role-changed", function (evt) {
             let role = evt.role;
@@ -396,5 +400,5 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         console.log("Error: ", err);
     };
 
-    return {localMediaStream, externalMediaStreams, networkQuality, numberOfViewers, setAddedStream, setRemovedStream};
+    return {localMediaStream, externalMediaStreams, agoraStatus, networkQuality, numberOfViewers, setAddedStream, setRemovedStream};
 }
