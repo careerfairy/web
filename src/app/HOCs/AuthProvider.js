@@ -1,6 +1,8 @@
-import React, {createContext, useContext, useState, useEffect} from "react";
+import React, {createContext, useContext, useEffect} from "react";
 import {useRouter} from "next/router";
 import Loader from "../components/views/loader/Loader";
+import {useSelector} from "react-redux";
+import {useFirestoreConnect} from 'react-redux-firebase'
 
 const AuthContext = createContext();
 
@@ -21,45 +23,26 @@ const adminPaths = [
     "/group/create",
     "/new-livestream"
 ];
-const AuthProvider = ({children, firebase}) => {
+const AuthProvider = ({children}) => {
+
+    const auth = useSelector((state) => state.firebase.auth)
+
+    // const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'ownerObj'}]
+
     const {pathname, replace, asPath} = useRouter();
 
-    const [authenticatedUser, setAuthenticatedUser] = useState(undefined);
-    const [userData, setUserData] = useState(undefined);
-
-    useEffect(() => {
-        if (authenticatedUser?.email) {
-            const unsubscribe = firebase.listenToUserData(
-                authenticatedUser.email,
-                (querySnapshot) => {
-                    if (querySnapshot.exists) {
-                        let user = querySnapshot.data();
-                        user.id = querySnapshot.id;
-                        setUserData(user);
-                    } else {
-                        setUserData(null);
-                    }
-                }
-            );
-            return () => unsubscribe();
+    useFirestoreConnect([
+        {collection: 'userData', doc: auth.email  // or `userData/${auth.email}`
+            // , populates
         }
-    }, [authenticatedUser]);
+    ])
+    const userData = useSelector(({firestore}) => firestore.data.userData?.[auth?.email])
+
+
 
     useEffect(() => {
-        firebase.auth.onAuthStateChanged((user) => {
-            if (user) {
-                setAuthenticatedUser(user);
-            } else {
-                setAuthenticatedUser(null);
-                setUserData(null);
-            }
-        });
-    }, []);
-
-    useEffect(() => {
-
         // Check that initial route is OK
-        if (isSecurePath() && authenticatedUser === null) {
+        if (isSecurePath() && isLoggedOut()) {
             replace({
                 pathname: `/login`,
                 query: {absolutePath: asPath},
@@ -69,7 +52,7 @@ const AuthProvider = ({children, firebase}) => {
         }
 
 
-    }, [authenticatedUser, userData, pathname]);
+    }, [auth, userData, pathname]);
 
     const isSecurePath = () => {
         return Boolean(securePaths.includes(pathname))
@@ -78,17 +61,15 @@ const AuthProvider = ({children, firebase}) => {
         return Boolean(adminPaths.includes(pathname))
     }
 
-    const isAuthenticating = () => {
-        return Boolean(authenticatedUser === undefined || userData === undefined)
-    }
+    const isLoggedOut = () => auth.isLoaded && auth.isEmpty
 
-    if ((isSecurePath() || isAdminPath()) && isAuthenticating()) {
+    if ((isSecurePath() || isAdminPath()) && !auth.isLoaded) {
         return <Loader/>;
     }
 
     return (
         <AuthContext.Provider
-            value={{authenticatedUser, userData, setUserData}}
+            value={{authenticatedUser: auth, userData}}
         >
             {children}
         </AuthContext.Provider>

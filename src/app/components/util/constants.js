@@ -45,3 +45,6 @@ export const universityCountriesMap = {
     other: ""
 }
 
+
+
+export const EMOTE_MESSAGE_TEXT_TYPE = "EMOTE"

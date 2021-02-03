@@ -8,6 +8,8 @@ import Loader from "../components/views/loader/Loader";
 import Footer from "../components/views/footer/Footer";
 import ProfileNav from "../components/views/profile/ProfileNav";
 import {useAuth} from "../HOCs/AuthProvider";
+import { useSelector } from 'react-redux'
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -20,10 +22,9 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const UserProfile = ({firebase}) => {
+const UserProfile = () => {
     const classes = useStyles();
-    const router = useRouter();
-    const {userData, authenticatedUser: user, loading} = useAuth();
+    const {userData, authenticatedUser: user} = useAuth();
 
     return (
         <div className={classes.root}>
@@ -31,7 +32,7 @@ const UserProfile = ({firebase}) => {
                 <title key="title">CareerFairy | My Profile</title>
             </Head>
             <Header classElement='relative white-background'/>
-            <ProfileNav user={user} userData={userData}/>
+            {userData && <ProfileNav user={user} userData={userData}/>}
             <Footer/>
         </div>
     );

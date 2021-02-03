@@ -146,6 +146,7 @@ export const defaultTableOptions = {
     pageSizeOptions: [3, 5, 10, 25, 50, 100, 200],
     minBodyHeight: 200,
     exportAllData: true,
+    exportDelimiter: ";",
     exportButton: {csv: true, pdf: true}// PDF is false because its buggy and throws errors
 }
 
