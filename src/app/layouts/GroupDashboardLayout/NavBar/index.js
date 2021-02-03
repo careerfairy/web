@@ -29,6 +29,9 @@ import {
 } from 'react-feather';
 import NavItem from './NavItem';
 import {useRouter} from "next/router";
+import {theme} from "../../../materialUI";
+import {fade} from "@material-ui/core/styles";
+import clsx from "clsx";
 
 const user = {
     avatar: '/static/images/avatars/avatar_6.png',
@@ -44,16 +47,42 @@ const useStyles = makeStyles(() => ({
     desktopDrawer: {
         width: 256,
         top: 64,
-        height: 'calc(100% - 64px)'
+        height: 'calc(100% - 64px)',
     },
     avatar: {
+        padding: theme.spacing(1),
         cursor: 'pointer',
+        background: theme.palette.common.white,
         height: 100,
         width: '100%',
+        boxShadow: theme.shadows[15],
         "& img": {
             objectFit: "contain"
         }
-    }
+    },
+    background: {
+        "&:after": {
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            content: '""',
+            display: "block",
+            background: fade(theme.palette.common.black, 0.8),
+            opacity: ".8",
+            zIndex: -1,
+        },
+        backgroundSize: "cover",
+        backgroundPosition: "center center",
+        backgroundImage: `url(/sidebar.jpg)`
+    },
+    name: {
+        marginTop: theme.spacing(1)
+    },
+    drawerText: {
+        color: theme.palette.common.white
+    },
+
+
 }));
 
 const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, drawerBottomLinks, firebase}) => {
@@ -85,10 +114,10 @@ const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, 
                 <Avatar
                     className={classes.avatar}
                     src={group.logoUrl}
-                    variant="square"
+                    variant="rounded"
                 />
                 <Typography
-                    className={classes.name}
+                    className={clsx(classes.name, classes.drawerText)}
                     color="textPrimary"
                     variant="h5"
                 >
@@ -97,6 +126,7 @@ const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, 
                 <Typography
                     color="textSecondary"
                     variant="body2"
+                    className={classes.drawerText}
                 >
                     {group.description}
                 </Typography>
@@ -150,7 +180,8 @@ const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, 
             <Hidden lgUp>
                 <Drawer
                     anchor="left"
-                    classes={{paper: classes.mobileDrawer}}
+                    classes={{paper: clsx(classes.mobileDrawer, classes.background)}}
+                    className={classes.drawer}
                     onClose={onMobileClose}
                     open={openMobile}
                     variant="temporary"
@@ -161,7 +192,8 @@ const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, 
             <Hidden mdDown>
                 <Drawer
                     anchor="left"
-                    classes={{paper: classes.desktopDrawer}}
+                    classes={{paper: clsx(classes.desktopDrawer, classes.background)}}
+                    className={classes.drawer}
                     open
                     variant="persistent"
                 >

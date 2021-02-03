@@ -36,6 +36,9 @@ const useStyles = makeStyles((theme) => ({
     },
     title: {
         background: theme.palette.common.white
+    },
+    slide:{
+        // background: `linear-gradient(45deg, ${theme.palette.primary.main} 45%, ${fade(theme.palette.secondary.main, 1)} 75%)`
     }
 }));
 
@@ -524,6 +527,7 @@ const AnalyticsOverview = ({firebase, group}) => {
             <SwipeableViews
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
+                slideClassName={classes.slide}
                 disabled
                 onChangeIndex={handleChangeIndex}
             >

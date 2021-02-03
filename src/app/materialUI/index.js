@@ -53,7 +53,8 @@ let baseTheme = createMuiTheme({
 
     typography: {
         fontFamily: "Poppins,sans-serif",
-    }
+    },
+    whiteShadow:  "0 12px 20px -10px rgb(255 255 255 / 28%), 0 4px 20px 0 rgb(0 0 0 / 12%), 0 7px 8px -5px rgb(255 255 255 / 20%)"
 });
 
 
