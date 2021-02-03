@@ -48,9 +48,9 @@ const FeedbackModal = ({
             initialValues={{
                 question: data.question || "",
                 appearAfter: data.appearAfter || 15,
-                hasText: data.hasText || false,
-                isForEnd: data.isForEnd || false,
-                noStars: data.isForEnd || false
+                hasText: data.hasText ?? false,
+                isForEnd: data.isForEnd ?? false,
+                noStars: data.noStars ?? false
             }}
             enableReinitialize
             validate={(values) => {
@@ -83,7 +83,8 @@ const FeedbackModal = ({
                     }
                     handleClose();
                 } catch (e) {
-                    setFieldError("appearAfter", e);
+                    console.log("-> e", e);
+                    setFieldError("appearAfter", "internal error");
                 }
             }}
         >
