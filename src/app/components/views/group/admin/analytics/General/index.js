@@ -29,7 +29,7 @@ const General = ({
                      streamsFromTimeFrameAndFuture,
                      handleScrollToBreakdown,
                      handleReset,
-                     totalFollowers,
+                     userDataSet,
                      userTypes,
                      userType,
                      setUserType,
@@ -37,7 +37,6 @@ const General = ({
                      fetchingFollowers,
                      handleToggleBar,
                      setCurrentStream,
-                     totalStudentsOfGroupUniversity,
                      currentUserDataSet,
                      fetchingStudentsOfGroupUniversity,
                      currentStream,
@@ -173,7 +172,7 @@ const General = ({
     }
 
     const getTotalUserDataSetCount = () => {
-        return currentUserDataSet.dataSet === "followers"? totalFollowers?.length : totalStudentsOfGroupUniversity?.length
+        return userDataSet?.length
     }
 
 

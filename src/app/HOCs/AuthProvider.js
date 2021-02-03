@@ -32,13 +32,13 @@ const AuthProvider = ({children}) => {
     const {pathname, replace, asPath} = useRouter();
 
     useFirestoreConnect([
-        {collection: 'userData', doc: auth.email  // or `userData/${auth.email}`
-            // , populates
+        {
+            collection: 'userData', doc: auth.email,  // or `userData/${auth.email}`
+            storeAs: "userProfile"
         }
     ])
-    const userData = useSelector(({firestore}) => firestore.data.userData?.[auth?.email])
 
-
+    const userData = useSelector(({firestore}) => firestore.data.userProfile)
 
     useEffect(() => {
         // Check that initial route is OK
