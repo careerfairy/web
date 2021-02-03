@@ -658,6 +658,7 @@ exports.generateAgoraToken = functions.https.onRequest(async (req, res) => {
     }
 
     const channelName = req.body.channel;
+    const streamerToken = req.body.token;
     const rtcRole = req.body.isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
     const rtmRole = 0;
     const expirationTimeInSeconds = 5400
@@ -668,13 +669,27 @@ exports.generateAgoraToken = functions.https.onRequest(async (req, res) => {
     // IMPORTANT! Build token with either the uid or with the user account. Comment out the option you do not want to use below.
     
     // Build token with uid
-    const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
-    console.log("Token With Integer Number Uid: " + rtcToken);
-    const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
-    console.log("Token With Integer Number Uid: " + rtmToken);
-
-    return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
+    if (rtcRole === RtcRole.PUBLISHER) {
+        admin.firestore().collection('livestreams').doc(channelName).collection('tokens').doc('streamerToken').get().then( doc => {
+            const storedToken = doc.data().value;
+            if (storedToken === streamerToken) {
+                const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
+                console.log("Token With Integer Number Uid: " + rtcToken);
+                const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
+                console.log("Token With Integer Number Uid: " + rtmToken);
+                return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
+            } else {
+                return res.status(400).send();
+            }
+        })
+    } else {
+        const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
+        console.log("Token With Integer Number Uid: " + rtcToken);
+        const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
+        console.log("Token With Integer Number Uid: " + rtmToken);
     
+        return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
+    }   
 })
 
 
