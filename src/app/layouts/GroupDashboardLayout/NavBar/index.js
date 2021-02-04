@@ -10,7 +10,7 @@ import clsx from "clsx";
 
 const useStyles = makeStyles(() => ({
     mobileDrawer: {
-        width: 256
+        width: 256,
     },
     desktopDrawer: {
         width: 256,
@@ -30,20 +30,10 @@ const useStyles = makeStyles(() => ({
         }
     },
     background: {
-        "&:after": {
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            content: '""',
-            display: "block",
-            background: fade(theme.palette.common.black, 0.8),
-            opacity: ".8",
-            zIndex: -1,
-        },
         borderRight: "none",
         backgroundSize: "cover",
         backgroundPosition: "center center",
-        backgroundImage: `url(/sidebar.jpg)`
+        background: `linear-gradient(0deg, ${fade(theme.palette.common.black, 0.7)}, ${fade(theme.palette.common.black, 0.7)}), url(/sidebar.jpg)`,
     },
     name: {
         marginTop: theme.spacing(1)

@@ -17,9 +17,8 @@ import {
 } from "../../../../helperFunctions/streamFormFunctions";
 import Feedback from "./Feedback";
 import {universityCountriesMap} from "../../../../util/constants";
-import {firestoreConnect, useFirestoreConnect, withFirestore} from "react-redux-firebase";
+import {useFirestoreConnect, withFirestore} from "react-redux-firebase";
 import {useSelector} from "react-redux";
-import {isEmptyObject} from "../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -238,7 +237,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         collection: `livestreams`,
         where: [["start", ">", new Date(globalTimeFrame.double)], ["groupIds", "array-contains", group.id]],
         orderBy: ["start", "desc"]
-    }])
+    }],[globalTimeFrame])
 
     useEffect(() => {
         (async function getStudents() {

@@ -26,7 +26,7 @@ const adminPaths = [
 const AuthProvider = ({children}) => {
 
     const auth = useSelector((state) => state.firebase.auth)
-    console.log("-> auth", auth);
+    // console.log("-> auth", auth);
 
     // const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'ownerObj'}]
 
