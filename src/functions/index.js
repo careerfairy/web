@@ -669,27 +669,60 @@ exports.generateAgoraToken = functions.https.onRequest(async (req, res) => {
     // IMPORTANT! Build token with either the uid or with the user account. Comment out the option you do not want to use below.
     
     // Build token with uid
-    if (rtcRole === RtcRole.PUBLISHER) {
-        admin.firestore().collection('livestreams').doc(channelName).collection('tokens').doc('streamerToken').get().then( doc => {
-            const storedToken = doc.data().value;
-            if (storedToken === streamerToken) {
-                const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
-                console.log("Token With Integer Number Uid: " + rtcToken);
-                const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
-                console.log("Token With Integer Number Uid: " + rtmToken);
-                return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
-            } else {
-                return res.status(400).send();
-            }
-        })
-    } else {
         const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
         console.log("Token With Integer Number Uid: " + rtcToken);
         const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
         console.log("Token With Integer Number Uid: " + rtmToken);
     
         return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
-    }   
+})
+
+exports.generateAgoraTokenSecure = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    const channelName = req.body.channel;
+    const sentToken = req.body.token;
+    const rtcRole = req.body.isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
+    const rtmRole = 0;
+    const expirationTimeInSeconds = 5400
+    const uid = req.body.uid;
+    const currentTimestamp = Math.floor(Date.now() / 1000)
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+    
+    // IMPORTANT! Build token with either the uid or with the user account. Comment out the option you do not want to use below.
+    
+    // Build token with uid
+    if (rtcRole === RtcRole.PUBLISHER) {
+        let livestreamDoc = await admin.firestore().collection('livestreams').doc(channelName).get();
+        let storedTokenDoc =  await admin.firestore().collection('livestreams').doc(channelName).collection('tokens').doc('secureToken').get();
+
+        console.log(livestreamDoc.exists)
+        console.log(storedTokenDoc.exists)
+        let livestream = livestreamDoc.data();
+        let storedToken = storedTokenDoc.data().value;
+        if (!livestream.test && storedToken !== sentToken) {
+            return res.status(401).send();
+        } else {
+            const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
+            const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
+            return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
+        }
+    } else {
+        const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
+        const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
+    
+        return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
+    }    
 })
 
 

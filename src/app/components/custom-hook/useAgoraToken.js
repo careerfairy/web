@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from 'axios';
 
-export function useAgoraToken(roomId, uid, isStreamer, isScreenShareToken) {
+export function useAgoraToken(roomId, uid, isStreamer, securityToken, isScreenShareToken) {
 
     const [agoraToken, setAgoraToken] = useState(null);
   
@@ -12,9 +12,10 @@ export function useAgoraToken(roomId, uid, isStreamer, isScreenShareToken) {
                 data: {
                     isStreamer: isStreamer,
                     uid: isScreenShareToken ? uid + 'screen' : uid,
-                    channel: roomId,
+                    token: securityToken,
+                    channel: roomId
                 },
-                url: `https://us-central1-careerfairy-e1fd9.cloudfunctions.net/generateAgoraToken`,
+                url: `http://localhost:5001/careerfairy-e1fd9/us-central1/generateAgoraTokenSecure`,
             }).then( response => { 
                     console.log(response);
                     if (response.data) {

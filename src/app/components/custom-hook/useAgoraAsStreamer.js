@@ -4,6 +4,7 @@ import {useAgoraToken} from './useAgoraToken';
 import {useDispatch} from "react-redux";
 import {EMOTE_MESSAGE_TEXT_TYPE} from "../util/constants";
 import * as actions from '../../store/actions'
+import { useRouter } from 'next/router';
 
 export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer) {
 
@@ -18,6 +19,9 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         type: "network-quality",
         uplinkNetworkQuality: 0,
     });
+
+    const router = useRouter();
+    const token = router.query.token || '';
 
     const [agoraRTC, setAgoraRTC] = useState(null);
     const [rtcClient, setRtcClient] = useState(null);
@@ -34,8 +38,8 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     const [agoraStatus, setAgoraStatus] = useState("initial");
     const [agoraScreenShareStatus, setAgoraScreenShareStatus] = useState("initial");
 
-    const agoraToken = useAgoraToken(roomId, userUid, !isViewer, false);
-    const agoraScreenShareToken = useAgoraToken(roomId, userUid, !isViewer, true);
+    const agoraToken = useAgoraToken(roomId, userUid, !isViewer, token, false);
+    const agoraScreenShareToken = useAgoraToken(roomId, userUid, !isViewer, token, true);
 
     useEffect(() => {
         if (streamId) {
