@@ -22,7 +22,7 @@ function ViewerComponent(props) {
 
     const screenSharingMode = props.currentLivestream.screenSharerId === authenticatedUser?.email && 
         props.currentLivestream.mode === 'desktop';
-    const { externalMediaStreams, localMediaStream } =
+    const { externalMediaStreams, localMediaStream, agoraStatus } =
         useAgoraAsStreamer(
             streamerReady,
             !props.handRaiseActive,
@@ -53,6 +53,19 @@ function ViewerComponent(props) {
             }
         }   
     }, [props.currentLivestream, authenticatedUser])
+
+    useEffect(() => {
+        if (props.handRaiseActive && agoraStatus === 'stream-published') {
+            if (props.currentLivestream) {
+                if (props.currentLivestream.test) {
+                    props.firebase.updateHandRaiseRequest(props.currentLivestream.id, 'streamerEmail', "connected");
+                } else {
+                    props.firebase.updateHandRaiseRequest(props.currentLivestream.id, authenticatedUser.email, "connected");
+                }
+            }        
+        }
+    }, [agoraStatus])
+
 
     const attachSinkId = (element, sinkId) => {
         if (typeof element.sinkId !== 'undefined') {

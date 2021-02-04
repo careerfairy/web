@@ -59,7 +59,7 @@ function VideoContainer(props) {
 
     const screenSharingMode = props.currentLivestream.screenSharerId === props.streamerId &&
         props.currentLivestream.mode === 'desktop';
-    const {localMediaStream, externalMediaStreams, networkQuality, numberOfViewers, setAddedStream, setRemovedStream} =
+    const {localMediaStream, externalMediaStreams, agoraStatus, networkQuality, numberOfViewers, setAddedStream, setRemovedStream} =
         useAgoraAsStreamer(
             true,
             false,
