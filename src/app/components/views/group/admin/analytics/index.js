@@ -226,7 +226,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     const [limitedUserTypes, setLimitedUserTypes] = useState(userTypes);
     const [currentUserDataSet, setCurrentUserDataSet] = useState(userDataSets[0]);
 
-    useFirestoreConnect(() =>[{
+    useFirestoreConnect(() => [{
         collection: `livestreams`,
         where: [["start", ">", new Date(globalTimeFrame.double)], ["groupIds", "array-contains", group.id]],
         orderBy: ["start", "asc"]
@@ -239,29 +239,31 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         const livestream = {...streamObj}
         livestream.date = livestream.start?.toDate()
         for (const userType of userTypes) {
-            if (currentUserDataSet.dataSet === "groupUniversityStudents") {// Change the graph and status data if we're looking at the groups university Students
+            // if (currentUserDataSet.dataSet === "groupUniversityStudents") {// Change the graph and status data if we're looking at the groups university Students
                 livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary?.[userEmail])
-            }
+            // }
             livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
-                ...userDataSetDictionary[userEmail],
-                universityCountry: universityCountriesMap[userDataSetDictionary[userEmail]?.universityCountryCode]
+                ...userDataSetDictionary?.[userEmail],
+                universityCountry: universityCountriesMap[userDataSetDictionary?.[userEmail]?.universityCountryCode]
             }))
         }
         return livestream
     }) || [], [livestreamsInStore, userDataSet]);
 
     useEffect(() => {
-        (async function getStudents() {
-            try {
-                await firestore.get({
-                    collection: "userData",
-                    where: ["universityCode", "==", group.universityCode],
-                    storeAs: "groupUniversityStudents",
-                })
-            } catch (e) {
-                console.log("-> e in getting student", e);
-            }
-        })()
+        if (group.universityCode) {
+            (async function getStudents() {
+                try {
+                    await firestore.get({
+                        collection: "userData",
+                        where: ["universityCode", "==", group.universityCode],
+                        storeAs: "groupUniversityStudents",
+                    })
+                } catch (e) {
+                    console.log("-> e in getting student", e);
+                }
+            })()
+        }
     }, [group?.universityCode]);
 
     useEffect(() => {
