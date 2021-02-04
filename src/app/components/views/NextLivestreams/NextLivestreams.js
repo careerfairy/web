@@ -29,10 +29,6 @@ const NextLivestreams = ({firebase}) => {
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [listenToUpcoming, setListenToUpcoming] = useState(false);
 
-
-
-
-
     useEffect(() => {
         if (listenToUpcoming) { // && routerMounted
             const unsubscribe = firebase.listenToUpcomingLivestreams(
@@ -134,10 +130,10 @@ const NextLivestreams = ({firebase}) => {
 
     useEffect(() => {
         // This checks if the params from the next router have been defined and only then will it set groupIds
-        if (userData !== undefined) {
+        if (careerCenterId || userData !== undefined) {
             handleGetGroupIds();
         }
-    }, [userData, careerCenterId, router]);
+    }, [userData, careerCenterId]);
 
     useEffect(() => {
         if (groupIds.length > 1 && setToUpcomingSlide()) {
