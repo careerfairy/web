@@ -226,7 +226,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     const [limitedUserTypes, setLimitedUserTypes] = useState(userTypes);
     const [currentUserDataSet, setCurrentUserDataSet] = useState(userDataSets[0]);
 
-    useFirestoreConnect([{
+    useFirestoreConnect(() =>[{
         collection: `livestreams`,
         where: [["start", ">", new Date(globalTimeFrame.double)], ["groupIds", "array-contains", group.id]],
         orderBy: ["start", "asc"]
@@ -249,9 +249,6 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         }
         return livestream
     }) || [], [livestreamsInStore, userDataSet]);
-
-    console.log("-> isLoaded(userDataSet)", isLoaded(userDataSet));
-
 
     useEffect(() => {
         (async function getStudents() {
