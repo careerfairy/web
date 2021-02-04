@@ -18,7 +18,7 @@ import {
 import Feedback from "./Feedback";
 import {universityCountriesMap} from "../../../../util/constants";
 import {useFirestoreConnect, withFirestore} from "react-redux-firebase";
-import {useSelector} from "react-redux";
+import {useSelector, shallowEqual} from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -215,7 +215,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
 
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
     const [showBar, setShowBar] = useState(false);
-    const [livestreams, setLivestreams] = useState([]);
+    // const [livestreams, setLivestreams] = useState([]);
     const [fetchingStreams, setFetchingStreams] = useState(false);
     const [userType, setUserType] = useState(userTypes[0]);
     const [streamDataType, setStreamDataType] = useState(streamDataTypes[0]);
@@ -230,14 +230,32 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     const [fetchingStudentsOfGroupUniversity, setFetchingStudentsOfGroupUniversity] = useState(false);
     const [currentUserDataSet, setCurrentUserDataSet] = useState(userDataSets[0]);
 
-    const userDataSetDictionary = useSelector(state => state.firestore.data[currentUserDataSet.dataSet])
-    const userDataSet = useSelector(state => state.firestore.ordered[currentUserDataSet.dataSet])
-
+    const userDataSetDictionary = useSelector(state => state.firestore.data[currentUserDataSet.dataSet], shallowEqual)
+    const userDataSet = useSelector(state => state.firestore.ordered[currentUserDataSet.dataSet], shallowEqual)
+    const livestreamsInStore = useSelector(state => state.firestore.ordered.livestreams || [], shallowEqual)
     useFirestoreConnect([{
         collection: `livestreams`,
         where: [["start", ">", new Date(globalTimeFrame.double)], ["groupIds", "array-contains", group.id]],
-        orderBy: ["start", "desc"]
-    }],[globalTimeFrame])
+        orderBy: ["start", "asc"]
+    }],[globalTimeFrame, userDataSet])
+
+    const livestreams  = useMemo(() => livestreamsInStore.map(streamObj => {
+        const livestream = {...streamObj}
+        livestream.date = livestream.start?.toDate()
+        for (const userType of userTypes) {
+            if (currentUserDataSet.dataSet === "groupUniversityStudents") {// Change the graph and status data if we're looking at the groups university Students
+                livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary[userEmail])
+            }
+            livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
+                ...userDataSetDictionary[userEmail],
+                universityCountry: universityCountriesMap[userDataSetDictionary[userEmail]?.universityCountryCode]
+            }))
+        }
+        return livestream
+    }), [livestreamsInStore, userDataSet]);
+
+
+
 
     useEffect(() => {
         (async function getStudents() {
@@ -288,37 +306,6 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
 
     }, [group])
 
-
-    useEffect(() => {
-        if (userDataSet) {
-            setFetchingStreams(true);
-            console.log("-> listening to livestreams");
-            const unsubscribe = firebase.listenToAllLivestreamsOfGroup(
-                group.id,
-                (snapshots) => {
-                    const livestreamsData = snapshots.docs.map(snap => {
-                        const livestream = snap.data()
-                        livestream.id = snap.id
-                        livestream.date = livestream.start?.toDate()
-                        for (const userType of userTypes) {
-                            if (currentUserDataSet.dataSet === "groupUniversityStudents") {// Change the graph and status data if we're looking at the groups university Students
-                                livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary[userEmail])
-                            }
-                            livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
-                                ...userDataSetDictionary[userEmail],
-                                universityCountry: universityCountriesMap[userDataSetDictionary[userEmail]?.universityCountryCode]
-                            }))
-                        }
-                        return livestream
-                    })
-                    setLivestreams(livestreamsData.reverse())
-                    setFetchingStreams(false)
-                }, new Date(globalTimeFrame.double)
-            );
-            return () => unsubscribe();
-        }
-    }, [globalTimeFrame, group.id, userDataSet]);
-
     useEffect(() => {
         if (currentStream?.id) {
             setFetchingPolls(true)
@@ -345,7 +332,6 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
             const unsubscribeQuestions = firebase.listenToLivestreamQuestions(currentStream.id, querySnapshot => {
                 const questions = querySnapshot.docs.map(doc => {
                     const questionData = doc.data()
-                    // const userDataSet = getUserDataset()
                     const authorData = userDataSet.find(follower => follower.userEmail === questionData.author)
                     return {
                         id: doc.id,
@@ -400,7 +386,6 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
             }
         });
     }
-
 
     const handleScrollToBreakdown = () => {
         if (breakdownRef.current) {
