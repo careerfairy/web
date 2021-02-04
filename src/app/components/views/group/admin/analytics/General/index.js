@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => ({
 }))
 const General = ({
                      group,
-                     fetchingStreams,
+                     loading,
                      globalTimeFrame,
                      futureStreams,
                      streamsFromBeforeTimeFrame,
@@ -34,11 +34,9 @@ const General = ({
                      userType,
                      setUserType,
                      breakdownRef,
-                     fetchingFollowers,
                      handleToggleBar,
                      setCurrentStream,
                      currentUserDataSet,
-                     fetchingStudentsOfGroupUniversity,
                      currentStream,
                      showBar
                  }) => {
@@ -213,7 +211,7 @@ const General = ({
 
                 <Grid item lg={3} sm={6} xl={3} xs={12}>
                     <TotalRegistrations
-                        fetchingStreams={fetchingStreams}
+                        fetchingStreams={loading}
                         registrationsStatus={registrationsStatus}
                         totalRegistrations={totalRegistrations}
                         timeFrames={globalTimeFrame.timeFrames}
@@ -223,7 +221,7 @@ const General = ({
                 </Grid>
                 <Grid item lg={3} sm={6} xl={3} xs={12}>
                     <TotalUniqueRegistrations
-                        fetchingStreams={fetchingStreams}
+                        fetchingStreams={loading}
                         uniqueRegistrationsStatus={uniqueRegistrationsStatus}
                         totalUniqueRegistrations={totalUniqueRegistrations}
                         timeFrames={globalTimeFrame.timeFrames}
@@ -233,7 +231,7 @@ const General = ({
                 </Grid>
                 <Grid item lg={3} sm={6} xl={3} xs={12}>
                     <AverageRegistrations
-                        fetchingStreams={fetchingStreams}
+                        fetchingStreams={loading}
                         averageRegistrations={averageRegistrations}
                         timeFrames={globalTimeFrame.timeFrames}
                         group={group}
@@ -241,7 +239,7 @@ const General = ({
                 </Grid>
                 <Grid item lg={3} sm={6} xl={3} xs={12}>
                     <UserCount
-                        fetching={fetchingStudentsOfGroupUniversity || fetchingFollowers}
+                        fetching={loading}
                         totalUsers={getTotalUserDataSetCount()}
                         timeFrames={globalTimeFrame.timeFrames}
                         currentUserDataSet={currentUserDataSet}
@@ -252,7 +250,7 @@ const General = ({
                     <LatestEvents
                         timeFrames={globalTimeFrame.timeFrames}
                         setCurrentStream={setCurrentStream}
-                        fetchingStreams={fetchingStreams}
+                        fetchingStreams={loading}
                         currentStream={currentStream}
                         futureStreams={futureStreams}
                         streamsFromTimeFrame={streamsFromTimeFrame}

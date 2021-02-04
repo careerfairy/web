@@ -17,7 +17,7 @@ import {
 } from "../../../../helperFunctions/streamFormFunctions";
 import Feedback from "./Feedback";
 import {universityCountriesMap} from "../../../../util/constants";
-import {useFirestoreConnect, withFirestore} from "react-redux-firebase";
+import {useFirestoreConnect, withFirestore, isLoaded} from "react-redux-firebase";
 import {useSelector, shallowEqual} from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
@@ -215,36 +215,32 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
 
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
     const [showBar, setShowBar] = useState(false);
-    // const [livestreams, setLivestreams] = useState([]);
-    const [fetchingStreams, setFetchingStreams] = useState(false);
     const [userType, setUserType] = useState(userTypes[0]);
     const [streamDataType, setStreamDataType] = useState(streamDataTypes[0]);
     const [groupOptions, setGroupOptions] = useState([]);
     const [currentStream, setCurrentStream] = useState(null);
-    const [fetchingFollowers, setFetchingFollowers] = useState(false);
     const [groupOptionsWithoutLvlOfStudy, setGroupOptionsWithoutLvlOfStudy] = useState([]);
     const [fetchingQuestions, setFetchingQuestions] = useState(false);
     const [fetchingRatings, setFetchingRatings] = useState(false);
     const [fetchingPolls, setFetchingPolls] = useState(false);
     const [limitedUserTypes, setLimitedUserTypes] = useState(userTypes);
-    const [fetchingStudentsOfGroupUniversity, setFetchingStudentsOfGroupUniversity] = useState(false);
     const [currentUserDataSet, setCurrentUserDataSet] = useState(userDataSets[0]);
 
-    const userDataSetDictionary = useSelector(state => state.firestore.data[currentUserDataSet.dataSet], shallowEqual)
-    const userDataSet = useSelector(state => state.firestore.ordered[currentUserDataSet.dataSet], shallowEqual)
-    const livestreamsInStore = useSelector(state => state.firestore.ordered.livestreams || [], shallowEqual)
     useFirestoreConnect([{
         collection: `livestreams`,
         where: [["start", ">", new Date(globalTimeFrame.double)], ["groupIds", "array-contains", group.id]],
         orderBy: ["start", "asc"]
-    }],[globalTimeFrame, userDataSet])
+    }], [globalTimeFrame])
 
-    const livestreams  = useMemo(() => livestreamsInStore.map(streamObj => {
+    const userDataSetDictionary = useSelector(state => state.firestore.data[currentUserDataSet.dataSet], shallowEqual)
+    const userDataSet = useSelector(state => state.firestore.ordered[currentUserDataSet.dataSet], shallowEqual)
+    const livestreamsInStore = useSelector(state => state.firestore.ordered.livestreams, shallowEqual)
+    const livestreams = useMemo(() => livestreamsInStore?.map(streamObj => {
         const livestream = {...streamObj}
         livestream.date = livestream.start?.toDate()
         for (const userType of userTypes) {
             if (currentUserDataSet.dataSet === "groupUniversityStudents") {// Change the graph and status data if we're looking at the groups university Students
-                livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary[userEmail])
+                livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary?.[userEmail])
             }
             livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
                 ...userDataSetDictionary[userEmail],
@@ -252,15 +248,14 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
             }))
         }
         return livestream
-    }), [livestreamsInStore, userDataSet]);
+    }) || [], [livestreamsInStore, userDataSet]);
 
-
+    console.log("-> isLoaded(userDataSet)", isLoaded(userDataSet));
 
 
     useEffect(() => {
         (async function getStudents() {
             try {
-                setFetchingStudentsOfGroupUniversity(true);
                 await firestore.get({
                     collection: "userData",
                     where: ["universityCode", "==", group.universityCode],
@@ -269,23 +264,20 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
             } catch (e) {
                 console.log("-> e in getting student", e);
             }
-            setFetchingStudentsOfGroupUniversity(false);
         })()
     }, [group?.universityCode]);
 
     useEffect(() => {
-       (async function getFollowers() {
-           try {
-               setFetchingFollowers(true);
-               await firestore.get({
-                   collection: "userData",
-                   where: ["groupIds", "array-contains", group.id],
-                   storeAs: "followers",
-               })
-           } catch (e) {
-               console.log("-> e in getting followers", e);
-           }
-           setFetchingFollowers(false);
+        (async function getFollowers() {
+            try {
+                await firestore.get({
+                    collection: "userData",
+                    where: ["groupIds", "array-contains", group.id],
+                    storeAs: "followers",
+                })
+            } catch (e) {
+                console.log("-> e in getting followers", e);
+            }
         })()
     }, []);
 
@@ -449,7 +441,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
             livestreams,
             futureStreams,
             globalTimeFrame,
-            fetchingStreams: fetchingStreams || fetchingFollowers || fetchingStudentsOfGroupUniversity,
+            loading: !isLoaded(livestreamsInStore) || !isLoaded(userDataSet),
             streamsFromTimeFrame,
             showBar,
             streamDataType,
@@ -465,12 +457,10 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
             globalTimeFrames,
             groupOptionsWithoutLvlOfStudy,
             setGlobalTimeFrame,
-            fetchingFollowers,
             breakdownRef,
             limitedUserTypes,
             handleScrollToBreakdown,
             userDataSet,
-            fetchingStudentsOfGroupUniversity,
             currentUserDataSet,
             currentStream,
             setCurrentStream,
