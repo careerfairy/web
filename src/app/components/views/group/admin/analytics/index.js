@@ -404,8 +404,9 @@ const AnalyticsOverview = ({firebase, group}) => {
     }
 
     const getAverageRating = (voters) => {
-        const total = voters?.reduce((acc, curr) => acc + curr.rating, 0)
-        return total ? Number(total / voters.length).toFixed(2) : 0
+        const ratingVotes = voters.filter(voter => voter?.rating > 0)
+        const total = ratingVotes?.reduce((acc, curr) => acc + curr.rating, 0)
+        return total ? Number(total / ratingVotes.length).toFixed(2) : 0
     }
 
     const getStreamsFromTimeFrame = (timeframe) => {

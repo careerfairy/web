@@ -87,7 +87,7 @@ const RatingSideTable = ({
     const customOptions = {...defaultTableOptions}
     const innerTableStyle = {background: fade(theme.palette.navyBlue.main, 0.05)}
     customOptions.selection = false
-    customOptions.pageSize = 3
+    customOptions.pageSize = 20
     customOptions.headerStyle = innerTableStyle
     customOptions.exportButton.pdf = true
 
