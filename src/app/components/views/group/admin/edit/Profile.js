@@ -22,6 +22,8 @@ import {uploadLogo} from "../../../../helperFunctions/HelperFunctions";
 const useStyles = makeStyles(theme => ({
     root: {},
     avatar: {
+        padding: theme.spacing(1),
+        marginBottom: theme.spacing(1),
         height: "100%",
         width: "100%",
         "& img": {

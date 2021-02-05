@@ -64,6 +64,10 @@ const LatestEvents = ({
             pointRadius: 3,
             pointHitRadius: 4,
             spanGaps: true,
+            barThickness: 12,
+            maxBarThickness: 10,
+            barPercentage: 0.5,
+            categoryPercentage: 0.5,
         }
 
         const handlePastStreams = (prop) => {
@@ -188,10 +192,7 @@ const LatestEvents = ({
             scales: {
                 xAxes: [
                     {
-                        barThickness: 12,
-                        maxBarThickness: 10,
-                        barPercentage: 0.5,
-                        categoryPercentage: 0.5,
+
                         ticks: {
                             fontColor: theme.palette.text.secondary,
                             maxTicksLimit: 15,

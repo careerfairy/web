@@ -19,11 +19,11 @@ const Audience = ({
                       group,
                       globalTimeFrame,
                       futureStreams,
+                      loading,
                       isFollowers,
                       userType,
                       setUserType,
                       limitedUserTypes,
-                      fetchingStreams,
                       streamsFromTimeFrame,
                       handleReset,
                       streamsFromTimeFrameAndFuture,
@@ -69,7 +69,7 @@ const Audience = ({
                         timeFrames={globalTimeFrame.timeFrames}
                         setCurrentStream={setCurrentStream}
                         futureStreams={futureStreams}
-                        fetchingStreams={fetchingStreams}
+                        fetchingStreams={loading}
                         streamsFromTimeFrame={streamsFromTimeFrame}
                         userType={userType}
                         userTypes={limitedUserTypes}
@@ -85,7 +85,7 @@ const Audience = ({
                     <UsersTable
                         totalUniqueUsers={totalUniqueUsers}
                         currentStream={currentStream}
-                        fetchingStreams={fetchingStreams}
+                        fetchingStreams={loading}
                         userTypes={limitedUserTypes}
                         handleReset={handleReset}
                         setUserType={setUserType}
