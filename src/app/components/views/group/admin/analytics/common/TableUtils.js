@@ -150,6 +150,14 @@ export const defaultTableOptions = {
     exportButton: {csv: true, pdf: true}// PDF is false because its buggy and throws errors
 }
 
+export const getPageSize = (pageSizeOptions = [], totalData = []) => {
+    const numEntries = totalData.length
+    return pageSizeOptions.find((option, index) =>
+        ((option < numEntries) && pageSizeOptions[index + 1] >= numEntries)
+        || (numEntries <= pageSizeOptions[0])
+        || (option === pageSizeOptions[pageSizeOptions.length - 1]))
+}
+
 const useStyles = makeStyles(theme => ({
     ratingInput: {
         display: 'inline-flex',
