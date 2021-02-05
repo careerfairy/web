@@ -49,6 +49,7 @@ function StreamingPage(props) {
 
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
+    const token = router.query.token;
 
     const [streamerReady, setStreamerReady] = useState(false);
 
@@ -101,6 +102,24 @@ function StreamingPage(props) {
             setNotifications(updatedNotifications);
         }
     }, [notificationToRemove]);
+
+    useEffect(() => {
+        if (router && router.query && currentLivestream && !currentLivestream.test) {
+            if (!token) {
+                router.push('/streaming/error')
+            } else {
+                props.firebase.getLivestreamSecureToken(currentLivestream.id).then( doc => {
+                    if (!doc.exists) {
+                        router.push('/streaming/error')
+                    }
+                    let storedToken = doc.data().value;
+                    if (storedToken !== token) {
+                        router.push('/streaming/error')
+                    }
+                })
+            }
+        }
+    }, [router, token, currentLivestream]);
 
     useEffect(() => {
         if (currentLivestream.start) {
