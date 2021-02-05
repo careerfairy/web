@@ -26,19 +26,20 @@ const adminPaths = [
 const AuthProvider = ({children}) => {
 
     const auth = useSelector((state) => state.firebase.auth)
+    // console.log("-> auth", auth);
 
     // const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'ownerObj'}]
 
     const {pathname, replace, asPath} = useRouter();
 
     useFirestoreConnect([
-        {collection: 'userData', doc: auth.email  // or `userData/${auth.email}`
-            // , populates
+        {
+            collection: 'userData', doc: auth.email,  // or `userData/${auth.email}`
+            storeAs: "userProfile"
         }
     ])
-    const userData = useSelector(({firestore}) => firestore.data.userData?.[auth?.email])
 
-
+    const userData = useSelector(({firestore}) => firestore.data.userProfile)
 
     useEffect(() => {
         // Check that initial route is OK

@@ -1,59 +1,48 @@
 import React, {useEffect} from 'react';
-import Link from 'next/link';
 import PropTypes from 'prop-types';
-import {
-    Avatar,
-    Box,
-    Button,
-    Divider,
-    Drawer,
-    Hidden,
-    List,
-    Typography,
-    makeStyles, ListItem, ListItemText, ListItemIcon
-} from '@material-ui/core';
-import {
-    AlertCircle as AlertCircleIcon,
-    BarChart as BarChartIcon,
-    Lock as LockIcon,
-    Settings as SettingsIcon,
-    ShoppingBag as ShoppingBagIcon,
-    User as UserIcon,
-    UserPlus as UserPlusIcon,
-    Users as UsersIcon,
-    Film as StreamIcon,
-    Archive as PastStreamIcon,
-    FileText as DraftStreamIcon,
-    Edit as EditGroupIcon,
-    LogOut as LogoutIcon
-} from 'react-feather';
+import {Avatar, Box, Divider, Drawer, Hidden, List, makeStyles, Typography} from '@material-ui/core';
+import {LogOut as LogoutIcon} from 'react-feather';
 import NavItem from './NavItem';
 import {useRouter} from "next/router";
-
-const user = {
-    avatar: '/static/images/avatars/avatar_6.png',
-    jobTitle: 'Senior Developer',
-    name: 'Katarina Smith'
-};
-
+import {theme} from "../../../materialUI";
+import {fade} from "@material-ui/core/styles";
+import clsx from "clsx";
 
 const useStyles = makeStyles(() => ({
     mobileDrawer: {
-        width: 256
+        width: 256,
     },
     desktopDrawer: {
         width: 256,
         top: 64,
-        height: 'calc(100% - 64px)'
+        height: 'calc(100% - 64px)',
+        boxShadow: theme.shadows[15]
     },
     avatar: {
+        padding: theme.spacing(1),
         cursor: 'pointer',
+        background: theme.palette.common.white,
         height: 100,
         width: '100%',
+        boxShadow: theme.shadows[15],
         "& img": {
             objectFit: "contain"
         }
-    }
+    },
+    background: {
+        borderRight: "none",
+        backgroundSize: "cover",
+        backgroundPosition: "center center",
+        background: `linear-gradient(0deg, ${fade(theme.palette.common.black, 0.7)}, ${fade(theme.palette.common.black, 0.7)}), url(/sidebar.jpg)`,
+    },
+    name: {
+        marginTop: theme.spacing(1)
+    },
+    drawerText: {
+        color: theme.palette.common.white
+    },
+
+
 }));
 
 const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, drawerBottomLinks, firebase}) => {
@@ -85,10 +74,10 @@ const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, 
                 <Avatar
                     className={classes.avatar}
                     src={group.logoUrl}
-                    variant="square"
+                    variant="rounded"
                 />
                 <Typography
-                    className={classes.name}
+                    className={clsx(classes.name, classes.drawerText)}
                     color="textPrimary"
                     variant="h5"
                 >
@@ -97,6 +86,7 @@ const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, 
                 <Typography
                     color="textSecondary"
                     variant="body2"
+                    className={classes.drawerText}
                 >
                     {group.description}
                 </Typography>
@@ -150,7 +140,8 @@ const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, 
             <Hidden lgUp>
                 <Drawer
                     anchor="left"
-                    classes={{paper: classes.mobileDrawer}}
+                    classes={{paper: clsx(classes.mobileDrawer, classes.background)}}
+                    className={classes.drawer}
                     onClose={onMobileClose}
                     open={openMobile}
                     variant="temporary"
@@ -161,7 +152,8 @@ const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, 
             <Hidden mdDown>
                 <Drawer
                     anchor="left"
-                    classes={{paper: classes.desktopDrawer}}
+                    classes={{paper: clsx(classes.desktopDrawer, classes.background)}}
+                    className={classes.drawer}
                     open
                     variant="persistent"
                 >
