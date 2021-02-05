@@ -81,7 +81,7 @@ function LogInPage({firebase}) {
     // }, [authenticatedUser, absolutePath])
 
     useEffect(() => {
-        if (authenticatedUser && userData !== undefined) {
+        if (authenticatedUser.isLoaded && !authenticatedUser.isEmpty && userData !== undefined) {
             if (!authenticatedUser.emailVerified) {
                 router.replace(absolutePath ? {
                     pathname: '/signup',
