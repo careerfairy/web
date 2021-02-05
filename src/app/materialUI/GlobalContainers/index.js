@@ -22,11 +22,11 @@ const useStyles = makeStyles(theme => ({
         alignItems: "center",
         width: "100%",
         justifyContent: "space-evenly",
-        boxShadow: "0 4px 2px -2px rgb(200,200,200)",
+        boxShadow: theme.shadows[5],
         zIndex: 9000,
-        backgroundColor: "white",
-        padding: theme.spacing(2),
-        height: 130,
+        backgroundColor: theme.palette.background.paper,
+        // padding: theme.spacing(2),
+        // height: 130,
 
     },
     questionContainerTitleStyle: {
@@ -37,6 +37,7 @@ const useStyles = makeStyles(theme => ({
         fontSize: "1.2em",
         fontWeight: 500,
         textAlign: "center",
+        margin: theme.spacing(2, 0)
     }
 }))
 

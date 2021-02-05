@@ -27,6 +27,9 @@ const useStyles = makeStyles(theme => ({
         right: 10,
         textAlign: "center",
         zIndex: 9100,
+    },
+    slides:{
+        backgroundColor: theme.palette.background.default,
     }
 }))
 
@@ -116,6 +119,7 @@ const LeftMenu =
                     containerStyle={{WebkitOverflowScrolling: 'touch'}}
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                     index={value}
+                    slideClassName={classes.slides}
                     className={classes.root}
                     onChangeIndex={handleChange}>
                     {views}

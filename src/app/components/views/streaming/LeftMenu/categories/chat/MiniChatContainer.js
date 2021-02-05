@@ -47,7 +47,7 @@ const useStyles = makeStyles(theme => ({
             paddingRight: "0 !important",
             borderRadius: 10,
         },
-        background: "white"
+        // background: "white"
     },
     header: {
         height: "41px !important",
@@ -65,9 +65,9 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         flexDirection: "column",
         padding: 0,
-        backgroundColor: "rgb(245,245,245)"
     },
     scrollToBottom: {
+        backgroundColor: theme.palette.background.default,
         // display: "flex",
         // flexDirection: "column",
         height: "240px",

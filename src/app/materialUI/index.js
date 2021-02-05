@@ -1,6 +1,4 @@
-import {createMuiTheme, responsiveFontSizes} from "@material-ui/core/styles";
-
-let baseTheme = createMuiTheme({
+export const baseThemeObj = {
     palette: {
         primary: {
             main: "#00d2aa",
@@ -46,16 +44,23 @@ let baseTheme = createMuiTheme({
                 marginLeft: 0,
             }
         },
-        MuiSnackbar:{
-
-        }
+        MuiSnackbar: {}
+    },
+    breakpoints: {
+        values: {
+            lg: 1280,
+            md: 960,
+            sm: 600,
+            mobile: 768,
+            xl: 1920,
+            xs: 0,
+        },
+        keys: ["xs", "sm", "mobile", "md", "lg", "xl"]
     },
 
     typography: {
         fontFamily: "Poppins,sans-serif",
     },
-    whiteShadow:  "0 12px 20px -10px rgb(255 255 255 / 28%), 0 4px 20px 0 rgb(0 0 0 / 12%), 0 7px 8px -5px rgb(255 255 255 / 20%)"
-});
+    whiteShadow: "0 12px 20px -10px rgb(255 255 255 / 28%), 0 4px 20px 0 rgb(0 0 0 / 12%), 0 7px 8px -5px rgb(255 255 255 / 20%)"
+}
 
-
-export const theme = responsiveFontSizes(baseTheme);

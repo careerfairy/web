@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
     root: {
         position: "relative",
         height: "100%",
-        backgroundColor: "rgb(220,220,220)",
+        // backgroundColor: "rgb(220,220,220)",
         "& .react-swipeable-view-container": {
             height: "100%"
         }

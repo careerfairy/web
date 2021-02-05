@@ -1,4 +1,4 @@
-import {useState, useEffect, Fragment} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import VolumeUpRoundedIcon from '@material-ui/icons/VolumeUpRounded';
 import PlayArrowRoundedIcon from '@material-ui/icons/PlayArrowRounded';
 import {useRouter} from 'next/router';
@@ -8,7 +8,6 @@ import * as actions from '../../../store/actions'
 import ViewerComponent from 'components/views/viewer/viewer-component/ViewerComponent';
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 import {useWindowSize} from 'components/custom-hook/useWindowSize';
-import React from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
@@ -17,6 +16,13 @@ import EmoteButtons from "../../../components/views/viewer/EmoteButtons";
 import RatingContainer from "../../../components/views/viewer/rating-container/RatingContainer";
 import {useAuth} from 'HOCs/AuthProvider';
 import {useDispatch} from "react-redux";
+import {useThemeToggle} from "../../../context/theme/ThemeContext";
+import {Avatar, Switch, useTheme} from "@material-ui/core";
+import Toolbar from "@material-ui/core/Toolbar";
+import AppBar from '@material-ui/core/AppBar';
+import {MainLogo} from "../../../components/logos";
+import Box from "@material-ui/core/Box";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -33,25 +39,70 @@ const useStyles = makeStyles((theme) => ({
         width: "100%",
         touchAction: "manipulation"
     },
+    toolbar: {
+        minHeight: 55,
+        display: "flex",
+        justifyContent: "space-between"
+    },
     menuLeft: {
         position: "absolute",
         transition: "width 0.3s",
         transitionTimingFunction: theme.transitions.easeInOut,
         width: ({showMenu, mobile}) => showMenu ? (mobile ? "100%" : 280) : 0,
-        top: ({mobile}) => mobile ? 0 : 55,
+        top: 0,
         left: 0,
         bottom: 0,
-        zIndex: 20
+        zIndex: 20,
+        [theme.breakpoints.up("mobile")]: {
+            top: 55,
+        },
+    },
+    logo: {
+        padding: theme.spacing(0.5),
+        margin: theme.spacing(0, 1),
+        background: theme.palette.common.white,
+        width: 70,
+        boxShadow: theme.shadows[1],
+        "& img": {
+            objectFit: "contain"
+        }
+    },
+    blackFrame: {
+        zIndex: 10,
+        backgroundColor: "black",
+        position: "absolute",
+        left: "0",
+        right: "0",
+        bottom: "0",
+        top: 0,
+        [theme.breakpoints.down("mobile")]: {
+            width: "100%",
+        },
+        [theme.breakpoints.up("mobile")]: {
+            top: "55px",
+        }
+    },
+    withMenu: {
+        [theme.breakpoints.up("mobile")]: {
+            position: "absolute",
+            top: "55px",
+            bottom: "0",
+            right: "0",
+            left: "280px"
+        }
     },
 }));
 
+const groupLogo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fethccnew-logo.png?alt=media&token=9d3e2d5a-3517-4fe3-85e6-9600bf8d8bc4"
 
 function ViewerPage({firebase}) {
+    const {toggleTheme, themeMode} = useThemeToggle()
     const DELAY = 3000; //3 seconds
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
     const dispatch = useDispatch()
     const [showMenu, setShowMenu] = useState(false);
+    const theme = useTheme()
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
@@ -210,47 +261,38 @@ function ViewerPage({firebase}) {
 
     return (
         <div className={classes.root}>
-            <div className='top-menu'>
-                <div className='top-menu-left'>
-                    <img src='/logo_teal.png'
-                         style={{
-                             maxHeight: '50px',
-                             maxWidth: '150px',
-                             display: 'inline-block',
-                             marginRight: '2px'
-                         }}/>
+            {width >= 768 &&
+            <AppBar color="transparent" position="static">
+                <Toolbar className={classes.toolbar}>
+                    <MainLogo/>
                     {logoElements}
-                    <div style={{
-                        position: 'absolute',
-                        bottom: '13px',
-                        left: '120px',
-                        fontSize: '7em',
-                        fontWeight: '700',
-                        color: 'rgba(0, 210, 170, 0.2)',
-                        zIndex: '50'
-                    }}>
-                    </div>
-                </div>
-                <div className={'top-menu-right'}>
-                    <img src={currentLivestream.companyLogoUrl} style={{
-                        position: 'relative',
-                        zIndex: '100',
-                        maxHeight: '50px',
-                        maxWidth: '150px',
-                        display: 'inline-block',
-                        margin: '0 10px'
-                    }}/>
-                    {!currentLivestream.hasNoTalentPool ?
-                        <Button
-                            children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
-                            variant="contained"
-                            startIcon={<PeopleAltIcon/>}
-                            icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
-                            onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
-                            color={userIsInTalentPool ? "default" : "primary"}/> : null}
-                </div>
-            </div>
-            <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
+                    <Switch
+                        checked={themeMode === "dark"}
+                        onChange={toggleTheme}
+                        color="default"
+                    />
+                    <Box flexGrow={1}/>
+                    <Avatar
+                        className={classes.logo}
+                        src={groupLogo}
+                        variant="rounded"
+                    />
+                    {!currentLivestream.hasNoTalentPool &&
+                    <Button
+                        children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
+                        variant="contained"
+                        startIcon={<PeopleAltIcon/>}
+                        icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
+                        onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
+                        color={userIsInTalentPool ? "default" : "primary"}/>}
+                </Toolbar>
+            </AppBar>}
+            <div
+                className={clsx({
+                    [classes.blackFrame]: true,
+                    [classes.withMenu]: showMenu
+                })}
+            >
 
                 <ViewerComponent
                     livestreamId={livestreamId} streamerId={streamerId}
@@ -310,55 +352,6 @@ function ViewerPage({firebase}) {
                 display: none
               }
 
-              .top-menu {
-                background-color: rgba(245, 245, 245, 1);
-                padding: 15px 0;
-                height: 55px;
-                text-align: center;
-                position: relative;
-              }
-
-              @media (max-width: 768px) {
-                .top-menu {
-                  display: none;
-                }
-              }
-
-              .top-menu div, .top-menu button {
-                display: inline-block;
-                vertical-align: middle;
-              }
-
-              .top-menu #stream-button {
-                margin: 0 50px;
-              }
-
-              .top-menu.active {
-                background-color: rgba(0, 210, 170, 1);
-                color: white;
-              }
-
-              .top-menu h3 {
-                font-weight: 600;
-              }
-
-              .top-menu-left {
-                display: block;
-                position: absolute;
-                top: 50%;
-                left: 20px;
-                transform: translateY(-50%);
-              }
-
-              .top-menu-right {
-                position: absolute;
-                display: flex !important;
-                align-items: center;
-                top: 50%;
-                right: 20px;
-                transform: translateY(-50%);
-              }
-
               .mini-chat-container {
                 position: absolute;
                 bottom: 0;
@@ -380,69 +373,6 @@ function ViewerPage({firebase}) {
                 right: 60px;
                 z-index: 100;
                 width: 80px;
-              }
-
-              .black-frame {
-                z-index: 10;
-                background-color: black;
-              }
-
-              @media (max-width: 768px) {
-                .black-frame {
-                  position: absolute;
-                  width: 100%;
-                  top: 0;
-                  left: 0;
-                  right: 0;
-                  bottom: 0;
-                }
-              }
-
-              @media (min-width: 768px) {
-                .black-frame {
-                  position: absolute;
-                  top: 55px;
-                  bottom: 0;
-                  right: 0;
-                  left: 0;
-                }
-
-                .black-frame.withMenu {
-                  position: absolute;
-                  top: 55px;
-                  bottom: 0;
-                  right: 0;
-                  left: 280px;
-                }
-              }
-
-              @media (max-width: 768px) {
-                .video-menu-left {
-                  position: absolute;
-                  top: 0;
-                  left: 0;
-                  width: 0;
-                  z-index: 15;
-                }
-
-                .video-menu-left.withMenu {
-                  width: 100%;
-                }
-              }
-
-              @media (min-width: 768px) {
-                .video-menu-left {
-                  position: absolute;
-                  top: 55px;
-                  left: 0;
-                  bottom: 0;
-                  width: 0;
-                  z-index: 15;
-                }
-
-                .video-menu-left.withMenu {
-                  width: 280px;
-                }
               }
 
               .playButton {

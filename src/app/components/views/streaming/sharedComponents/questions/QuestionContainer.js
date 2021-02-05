@@ -28,10 +28,9 @@ const useStyles = makeStyles(theme => ({
             paddingRight: "0 !important",
             borderRadius: 10,
         },
-        background: "white"
     },
     questionContainer: {
-        backgroundColor: ({active}) => active ? theme.palette.primary.main : "rgb(250,250,250)",
+        backgroundColor: ({active}) => active && theme.palette.primary.main,
         color: ({active}) => active ? "white" : "inherit",
         position: "relative",
         padding: "20px 0 0 0",
@@ -39,6 +38,7 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
+        borderRadius: theme.spacing(1)
     },
     reactionsQuestion: {
         fontWeight: 700,
@@ -213,7 +213,7 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
                         <TooltipButtonComponent onConfirm={() => handleConfirmStep(0)} buttonText="Ok"/>
                     </React.Fragment>
                 } open={isOpen(0)}>
-                <Paper className={classes.questionContainer}>
+                <Paper elevation={4} className={classes.questionContainer}>
                     <div style={{padding: "20px 20px 5px 20px"}}>
                         <div className={classes.upVotes}>
                             {question.votes} <ThumbUpRoundedIcon color="inherit"

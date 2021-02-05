@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext, useRef, useLayoutEffect} from 'react';
-import {Button, Grid, Typography, useTheme} from "@material-ui/core";
+import {Badge, Button, Grid, Typography, useTheme} from "@material-ui/core";
 import QuestionContainer from './questions/QuestionContainer';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -23,6 +23,8 @@ import {makeStyles} from "@material-ui/core/styles";
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
 import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
 import {useAuth} from "../../../../HOCs/AuthProvider";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
 
 const useStyles = makeStyles(theme => ({
     view: {
@@ -34,6 +36,9 @@ const useStyles = makeStyles(theme => ({
             height: "100%"
         }
     },
+    addIcon: {
+        marginRight: theme.spacing(1)
+    }
 }))
 
 function QuestionCategory({livestream, selectedState, sliding, streamer, firebase, showMenu}) {
@@ -73,12 +78,14 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
         setShowQuestionModal(false)
     }
 
-    const handleChange = (event) => {
-        setValue(showNextQuestions ? 0 : 1);
-        setShowNextQuestions(!showNextQuestions);
+    const handleChange = (event, newValue) => {
+        console.log("-> newValue", newValue);
+        setValue(newValue);
     }
-
-
+    const handleChangeIndex = (index) => {
+        console.log("-> index", index);
+        setValue(index);
+    }
 
 
     const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming] = useInfiniteScroll(
@@ -88,16 +95,6 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     const [itemsPast, loadMorePast, hasMorePast] = useInfiniteScroll(
         firebase.listenToPastLivestreamQuestions(livestream.id), 10
     );
-
-    const handleClickUpcoming = () => {
-        setShowNextQuestions(true)
-        setValue(0)
-    }
-
-    const handleClickPast = () => {
-        setShowNextQuestions(false)
-        setValue(1)
-    }
 
     function addNewQuestion() {
         setTouched(true)
@@ -121,9 +118,9 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     }
 
     let upcomingQuestionsElements = itemsUpcoming.map((question, index) => {
-        return <QuestionContainer key={question.id} showNextQuestions={showNextQuestions}
+        return <QuestionContainer key={question.id}
                                   streamer={streamer}
-                                  isNextQuestions={showNextQuestions}
+                                  isNextQuestions={value === 0}
                                   livestream={livestream}
                                   index={index} sliding={sliding}
                                   showMenu={showMenu}
@@ -134,8 +131,8 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     });
 
     let pastQuestionsElements = itemsPast.map((question, index) => {
-        return <QuestionContainer key={question.id} showNextQuestions={showNextQuestions} streamer={streamer}
-                                  isNextQuestions={!showNextQuestions}
+        return <QuestionContainer key={question.id} streamer={streamer}
+                                  isNextQuestions={value === 1}
                                   livestream={livestream}
                                   index={index}
                                   showMenu={showMenu}
@@ -147,32 +144,27 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
 
     return (
         <CategoryContainerTopAligned>
-            <QuestionContainerHeader style={streamer ? {} : {height: 180, padding: 8}}>
+            <QuestionContainerHeader>
                 <QuestionContainerTitle>
                     Questions
                 </QuestionContainerTitle>
                 {!streamer &&
-                <Button variant="contained" children='Add a Question'
-                        endIcon={<AddIcon fontSize="large"/>}
-                        color="primary" onClick={handleOpen}/>}
-                <div style={{display: "flex", justifyContent: "center"}}>
-                    <Fab size="small" variant="extended" onClick={handleClickUpcoming} value="left"
-                         style={{
-                             background: showNextQuestions ? "Gray" : "#e0e0e0",
-                             marginRight: "0.5rem",
-                             color: showNextQuestions ? "white" : "black"
-                         }}>
-                        <Box fontSize={10}>Upcoming [{upcomingQuestionsElements.length}{hasMoreUpcoming && "+"}]</Box>
-                    </Fab>
-                    <Fab size="small" variant="extended" onClick={handleClickPast} value="center"
-                         style={{
-                             background: showNextQuestions ? "#E0E0E0" : "Gray",
-                             marginLeft: "0.5rem",
-                             color: showNextQuestions ? "black" : "white"
-                         }}>
-                        <Box fontSize={10}>Answered [{pastQuestionsElements.length}{hasMorePast && "+"}]</Box>
-                    </Fab>
-                </div>
+                <Fab onClick={handleOpen} size="medium" color="primary" variant="extended">
+                    <AddIcon className={classes.addIcon}/>
+                    Add a Question
+                </Fab>}
+                <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    indicatorColor="primary"
+                    textColor="primary"
+                >
+                    <Tab disabled={!Boolean(upcomingQuestionsElements.length)} label={
+                        `Upcoming [${upcomingQuestionsElements.length}${hasMoreUpcoming ? "+" : ""}]`
+                    }/>
+                    <Tab disabled={!Boolean(pastQuestionsElements.length)}
+                         label={`Answered [${pastQuestionsElements.length}${hasMorePast ? "+" : ""}]`}/>
+                </Tabs>
             </QuestionContainerHeader>
             <SwipeableViews
                 containerStyle={{WebkitOverflowScrolling: 'touch'}}
@@ -181,8 +173,8 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                 id="scrollable-container"
                 className={classes.view}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                index={value} onChangeIndex={handleChange}>
-                <TabPanel>
+                index={value} onChangeIndex={handleChangeIndex}>
+                <TabPanel value={value} index={0}>
                     <CustomInfiniteScroll
                         height={parentHeight}
                         hasMore={hasMoreUpcoming}
@@ -191,7 +183,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                         {upcomingQuestionsElements}
                     </CustomInfiniteScroll>
                 </TabPanel>
-                <TabPanel>
+                <TabPanel value={value} index={1}>
                     <CustomInfiniteScroll
                         hasMore={hasMorePast}
                         height={parentHeight}
