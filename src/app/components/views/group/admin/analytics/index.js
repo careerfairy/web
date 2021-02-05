@@ -234,13 +234,13 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
 
     const userDataSetDictionary = useSelector(state => state.firestore.data[currentUserDataSet.dataSet], shallowEqual)
     const userDataSet = useSelector(state => state.firestore.ordered[currentUserDataSet.dataSet], shallowEqual)
-    const livestreamsInStore = useSelector(state => state.firestore.ordered.livestreams, shallowEqual)
+    const livestreamsInStore = useSelector(state => state.firestore.ordered.livestreams)
     const livestreams = useMemo(() => livestreamsInStore?.map(streamObj => {
         const livestream = {...streamObj}
         livestream.date = livestream.start?.toDate()
         for (const userType of userTypes) {
             // if (currentUserDataSet.dataSet === "groupUniversityStudents") {// Change the graph and status data if we're looking at the groups university Students
-                livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary?.[userEmail])
+            livestream[userType.propertyName] = livestream[userType.propertyName]?.filter(userEmail => userDataSetDictionary?.[userEmail])
             // }
             livestream[userType.propertyDataName] = livestream[userType.propertyName]?.map(userEmail => ({
                 ...userDataSetDictionary?.[userEmail],
@@ -434,38 +434,32 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         currentUserDataSet
     ]);
 
-    const getTabProps = () => {
+    const getTabProps = (tab) => {
         return {
+            ...(tab === "feedback" && {
+                streamDataTypes,
+                fetchingRatings,
+                fetchingQuestions,
+                fetchingPolls,
+                streamDataType,
+                setStreamDataType,
+                handleReset
+            }),
+            ...(tab === "audience" && {isFollowers, limitedUserTypes}),
+            ...(tab === "general" && {streamsFromBeforeTimeFrame, userDataSet, currentUserDataSet}),
             group,
-            firebase,
-            livestreams,
             futureStreams,
             globalTimeFrame,
             loading: !isLoaded(livestreamsInStore) || !isLoaded(userDataSet),
             streamsFromTimeFrame,
             showBar,
-            streamDataType,
-            setStreamDataType,
-            isFollowers,
-            fetchingPolls,
-            fetchingQuestions,
-            fetchingRatings,
             handleToggleBar,
-            streamDataTypes,
-            streamsFromBeforeTimeFrame,
             streamsFromTimeFrameAndFuture,
-            globalTimeFrames,
-            groupOptionsWithoutLvlOfStudy,
-            setGlobalTimeFrame,
             breakdownRef,
-            limitedUserTypes,
             handleScrollToBreakdown,
-            userDataSet,
-            currentUserDataSet,
             currentStream,
             setCurrentStream,
             userType,
-            handleReset,
             userTypes,
             setUserType,
             groupOptions
@@ -509,17 +503,17 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
             >
                 <SwipeablePanel value={value} index={0} dir={theme.direction}>
                     <General
-                        {...getTabProps()}
+                        {...getTabProps("general")}
                     />
                 </SwipeablePanel>
                 <SwipeablePanel value={value} index={1} dir={theme.direction}>
                     <Audience
-                        {...getTabProps()}
+                        {...getTabProps("audience")}
                     />
                 </SwipeablePanel>
                 <SwipeablePanel value={value} index={2} dir={theme.direction}>
                     <Feedback
-                        {...getTabProps()}
+                        {...getTabProps("feedback")}
                     />
                 </SwipeablePanel>
             </SwipeableViews>
