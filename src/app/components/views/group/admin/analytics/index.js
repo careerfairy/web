@@ -434,26 +434,8 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         currentUserDataSet
     ]);
 
-    const getTabProps = (tab) => {
+    const getTabProps = (tabName) => {
         return {
-            ...(tab === "feedback" && {
-                streamDataTypes,
-                fetchingRatings,
-                fetchingQuestions,
-                fetchingPolls,
-                streamDataType,
-                setStreamDataType,
-                handleReset
-            }),
-            ...(tab === "audience" && {
-                isFollowers,
-                limitedUserTypes
-            }),
-            ...(tab === "general" && {
-                streamsFromBeforeTimeFrame,
-                userDataSet,
-                currentUserDataSet
-            }),
             group,
             futureStreams,
             globalTimeFrame,
@@ -469,7 +451,25 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
             userType,
             userTypes,
             setUserType,
-            groupOptions
+            groupOptions,
+            ...(tabName === "feedback" && {
+                streamDataTypes,
+                fetchingRatings,
+                fetchingQuestions,
+                fetchingPolls,
+                streamDataType,
+                setStreamDataType,
+                handleReset
+            }),
+            ...(tabName === "audience" && {
+                isFollowers,
+                limitedUserTypes
+            }),
+            ...(tabName === "general" && {
+                streamsFromBeforeTimeFrame,
+                userDataSet,
+                currentUserDataSet
+            }),
         }
     }
 

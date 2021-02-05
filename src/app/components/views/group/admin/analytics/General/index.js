@@ -92,7 +92,7 @@ const General = ({
     };
 
     const compareRegistrations = () => {
-        const registrationsFromTimeFrame = getTotal(streamsFromTimeFrameAndFuture, "registeredUsers").length
+        const registrationsFromTimeFrame = getTotal(streamsFromTimeFrame, "registeredUsers").length
         const registrationsFromBeforeTimeFrame = getTotal(streamsFromBeforeTimeFrame, "registeredUsers").length
         const {
             positive,
@@ -107,7 +107,7 @@ const General = ({
     }
 
     const compareUniqueRegistrations = () => {
-        const totalRegistrationsFromTimeFrame = getTotal(streamsFromTimeFrameAndFuture, "registeredUsers")
+        const totalRegistrationsFromTimeFrame = getTotal(streamsFromTimeFrame, "registeredUsers")
         const totalRegistrationsFromBeforeTimeFrame = getTotal(streamsFromBeforeTimeFrame, "registeredUsers")
         const uniqueRegistrationsFromTimeFrame = getUniqueIds(totalRegistrationsFromTimeFrame).length
         const uniqueRegistrationsFromBeforeTimeFrame = getUniqueIds(totalRegistrationsFromBeforeTimeFrame).length
