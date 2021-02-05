@@ -445,8 +445,15 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
                 setStreamDataType,
                 handleReset
             }),
-            ...(tab === "audience" && {isFollowers, limitedUserTypes}),
-            ...(tab === "general" && {streamsFromBeforeTimeFrame, userDataSet, currentUserDataSet}),
+            ...(tab === "audience" && {
+                isFollowers,
+                limitedUserTypes
+            }),
+            ...(tab === "general" && {
+                streamsFromBeforeTimeFrame,
+                userDataSet,
+                currentUserDataSet
+            }),
             group,
             futureStreams,
             globalTimeFrame,
