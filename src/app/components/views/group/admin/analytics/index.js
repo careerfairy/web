@@ -452,6 +452,9 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
             userTypes,
             setUserType,
             groupOptions,
+            ...(tabName !== "feedback" && {
+                handleReset
+            }),
             ...(tabName === "feedback" && {
                 streamDataTypes,
                 fetchingRatings,
@@ -459,7 +462,6 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
                 fetchingPolls,
                 streamDataType,
                 setStreamDataType,
-                handleReset
             }),
             ...(tabName === "audience" && {
                 isFollowers,

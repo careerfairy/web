@@ -148,7 +148,7 @@ const UsersTable = ({
     const mapUserCategories = () => {
         const groupCategories = group.categories ? [...group.categories] : []
         if (groupCategories.length) {
-            const updatedUsers = totalUniqueUsers.map(user => {
+            const updatedUsers = totalUniqueUsers?.map(user => {
                 const updatedUser = user
                 groupCategories.forEach(category => {
                     const targetCategoryId = category.id
