@@ -32,6 +32,7 @@ function RequestedHandRaiseElement(props) {
 
     const activeStep = getActiveTutorialStepKey()
 
+
     useEffect(() => {
         props.setNewNotification({
             id: notificationId,
@@ -41,6 +42,8 @@ function RequestedHandRaiseElement(props) {
             cancelMessage: 'Deny',
             cancel: () => props.updateHandRaiseRequest(props.request.id, 'denied'),
         });
+
+        return () => props.closeSnackbar(notificationId)
     }, []);
 
     function updateHandRaiseRequest(state) {
@@ -106,7 +109,6 @@ function InvitedHandRaiseElement(props) {
 
 function ConnectingHandRaiseElement(props) {
     const classes = useStyles()
-
     const [notificationId, setNotificationId] = useState(uuidv4());
 
     useEffect(() => {
@@ -119,6 +121,8 @@ function ConnectingHandRaiseElement(props) {
             cancelMessage: 'Stop Connection',
             cancel: () => props.updateHandRaiseRequest(props.request.id, 'denied'),
         });
+
+        return () => props.closeSnackbar(notificationId)
     }, [])
 
     function updateHandRaiseRequest(state) {
@@ -159,6 +163,8 @@ function ConnectedHandRaiseElement(props) {
             cancelMessage: 'Remove from Stream',
             cancel: () => props.updateHandRaiseRequest(props.request.id, 'denied'),
         });
+
+        return () => props.closeSnackbar(notificationId)
     }, [])
 
     function updateHandRaiseRequest(state) {

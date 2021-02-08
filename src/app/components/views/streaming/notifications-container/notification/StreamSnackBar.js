@@ -6,31 +6,36 @@ import {Button} from "@material-ui/core";
 const StreamSnackBar = ({index, notification}) => {
     const {enqueueSnackbar, closeSnackbar} = useSnackbar();
     useEffect(() => {
-
         enqueueSnackbar(notification.message, {
             variant: "default",
             persist: true,
-            action
+            action,
+            key: notification.id
         })
+
+        // Dismisses the notification once the component unmounts
+        return () => closeSnackbar(notification.id)
 
     }, [])
 
-    const action = key => (
-        <>
-            <Button style={{marginRight: "1rem"}} color="primary" variant="contained" size="small" onClick={() => {
-                notification.confirm()
-                closeSnackbar(key)
-            }}>
-                {notification.confirmMessage}
-            </Button>
-            <Button variant="contained" size="small" onClick={() => {
-                notification.cancel()
-                closeSnackbar(key)
-            }}>
-                {notification.cancelMessage}
-            </Button>
-        </>
-    );
+    const action = key => {
+        return (
+            <>
+                <Button style={{marginRight: "1rem"}} color="primary" variant="contained" size="small" onClick={() => {
+                    notification.confirm()
+                    closeSnackbar(key)
+                }}>
+                    {notification.confirmMessage}
+                </Button>
+                <Button variant="contained" size="small" onClick={() => {
+                    notification.cancel()
+                    closeSnackbar(key)
+                }}>
+                    {notification.cancelMessage}
+                </Button>
+            </>
+        )
+    };
 
     return (
         <div>

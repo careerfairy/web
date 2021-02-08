@@ -57,7 +57,6 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
         return Number(activeStep)
     }
 
-
     const pollElements = pollEntries.filter(poll => poll.state !== 'closed').map((poll, index) => {
         return (
             <Fragment key={index}>
