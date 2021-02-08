@@ -174,7 +174,8 @@ function MiniChatContainer({isStreamer, livestream, firebase}) {
             addNewChatEntry();
             if (isOpen(15)) {
                 handleConfirmStep(15)
-                setOpen(false)
+                // close the chat after two seconds
+                setTimeout(() => setOpen(false), 2000)
             }
         }
     }

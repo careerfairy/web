@@ -1,16 +1,20 @@
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect} from 'react';
 
 import {useSnackbar} from 'notistack';
 import {Button} from "@material-ui/core";
+import TutorialContext from "../../../../../context/tutorials/TutorialContext";
 
 const StreamSnackBar = ({index, notification}) => {
     const {enqueueSnackbar, closeSnackbar} = useSnackbar();
+    const {handleConfirmStep, isOpen} = useContext(TutorialContext);
+
     useEffect(() => {
         enqueueSnackbar(notification.message, {
             variant: "default",
             persist: true,
             action,
-            key: notification.id
+            key: notification.id,
+            preventDuplicate: true
         })
 
         // Dismisses the notification once the component unmounts
@@ -23,11 +27,14 @@ const StreamSnackBar = ({index, notification}) => {
             <>
                 <Button style={{marginRight: "1rem"}} color="primary" variant="contained" size="small" onClick={() => {
                     notification.confirm()
+                    if (isOpen(10)) {
+                        handleConfirmStep(10)
+                    }
                     closeSnackbar(key)
                 }}>
                     {notification.confirmMessage}
                 </Button>
-                <Button variant="contained" size="small" onClick={() => {
+                <Button disabled={isOpen(10)} variant="contained" size="small" onClick={() => {
                     notification.cancel()
                     closeSnackbar(key)
                 }}>

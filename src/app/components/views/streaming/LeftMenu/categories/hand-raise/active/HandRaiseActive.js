@@ -30,7 +30,7 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
     const classes = useStyles()
     const {closeSnackbar} = useSnackbar()
     const {setNewNotification, setNotificationToRemove} = useContext(NotificationsContext);
-    const {tutorialSteps, setTutorialSteps, getActiveTutorialStepKey} = useContext(TutorialContext);
+    const {tutorialSteps, setTutorialSteps, getActiveTutorialStepKey, isOpen: isStepOpen} = useContext(TutorialContext);
     const [handRaises, setHandRaises] = useState([]);
     const [hasEntered, setHasEntered] = useState(false);
     const [hasExited, setHasExited] = useState(false);
@@ -101,6 +101,7 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
                     {handRaiseElements}
                     <Button style={{margin: "auto 0 2rem 0"}} startIcon={<CloseRoundedIcon/>} variant="contained"
                             children='Deactivate Hand Raise'
+                            disabled={isStepOpen(11)}
                             onClick={() => setHandRaiseModeInactive()}/>
                 </CategoryContainerTopAligned>
             </Grow>

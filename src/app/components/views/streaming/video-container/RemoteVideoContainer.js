@@ -23,12 +23,11 @@ const useStyles = makeStyles(theme => ({
 function RemoteVideoContainer(props) {
 
     const {getActiveTutorialStepKey, handleConfirmStep} = useContext(TutorialContext);
+    const activeStep = getActiveTutorialStepKey();
     const videoElement = useRef({ current: {} });
 
     const classes = useStyles()
 
-    const activeStep = getActiveTutorialStepKey();
-    console.log("-> activeStep", activeStep);
 
     useEffect(() => {
         if (props.stream.streamId === 'demoStream') {
