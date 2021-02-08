@@ -1,5 +1,5 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
-import {Badge, Button, CircularProgress, Collapse, TextField, Typography, useTheme} from "@material-ui/core";
+import {Badge, Button, CircularProgress, Collapse, Paper, TextField, Typography, useTheme} from "@material-ui/core";
 import QuestionContainer from './questions/QuestionContainer';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -17,7 +17,7 @@ import {
 import SwipeableViews from "react-swipeable-views";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import {fade, makeStyles} from "@material-ui/core/styles";
-
+import AppBar from '@material-ui/core/AppBar';
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
 import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
 import {useAuth} from "../../../../HOCs/AuthProvider";
@@ -57,8 +57,15 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: fade(theme.palette.common.black, 0.2),
         backdropFilter: "blur(5px)",
     },
-    dialogInput:{
+    dialogInput: {
         background: fade(theme.palette.background.paper, 0.5),
+    },
+    bar: {
+        width: "100%",
+        background: theme.palette.background.default,
+    },
+    tabs: {
+        width: ({isMobile}) => isMobile ? "100%" : 280
     }
 }))
 
@@ -77,7 +84,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
         return null
     }
     const theme = useTheme()
-    const classes = useStyles()
+    const classes = useStyles({isMobile})
     const [showQuestionModal, setShowQuestionModal] = useState(false);
     const [touched, setTouched] = useState(false);
     const [value, setValue] = useState(0)
@@ -186,40 +193,43 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                     <AddIcon className={classes.addIcon}/>
                     Add a Question
                 </Fab>}
-                <Tabs
-                    value={value}
-                    onChange={handleChange}
-                    indicatorColor="primary"
-                    variant={isMobile ? "fullWidth" : "standard"}
-                    textColor="primary"
-                    className={clsx({
-                        [classes.fullwidth]: isMobile
-                    })}
-                >
-                    <Tab
-                        icon={
-                            <Badge color="secondary"
-                                   badgeContent={getCount(true)}>
-                                <HelpIcon/>
-                            </Badge>
-                        }
-                        // disabled={!Boolean(upcomingQuestionsElements.length)}
-                        label={`Upcoming`
-                        }/>
-                    <Tab
-                        icon={
-                            <HelpIcon/>
-                        }
-                        // disabled={!Boolean(pastQuestionsElements.length)}
-                        label={
-                            <Badge color="secondary"
-                                   badgeContent={getCount()}>
-                                <Typography>
-                                    Answered
-                                </Typography>
-                            </Badge>
-                        }/>
-                </Tabs>
+                <Paper elevation={3} square className={classes.bar}>
+                    <Tabs
+                        value={value}
+                        onChange={handleChange}
+                        indicatorColor="primary"
+                        variant={isMobile ? "fullWidth" : "standard"}
+                        textColor="primary"
+                        className={classes.tabs}
+                    >
+                        <Tab
+                            style={{minWidth: "50%"}}
+                            icon={
+                                <Badge color="secondary"
+                                       badgeContent={getCount(true)}>
+                                    <HelpIcon/>
+                                </Badge>
+                            }
+                            label={`Upcoming`
+                            }/>
+                        <Tab
+                            style={{minWidth: "50%"}}
+                            icon={
+                                <Badge color="secondary"
+                                       badgeContent={getCount()}>
+                                    <HelpIcon/>
+                                </Badge>
+                            }
+                            label={
+                                // <Badge color="secondary"
+                                //        badgeContent={getCount()}>
+                                //     <Typography>
+                                "Answered"
+                                //{/*</Typography>*/}
+                                //{/*</Badge>*/}
+                            }/>
+                    </Tabs>
+                </Paper>
             </QuestionContainerHeader>
             <SwipeableViews
                 containerStyle={{WebkitOverflowScrolling: 'touch'}}
@@ -256,17 +266,15 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                         <EmptyList/>}
                 </TabPanel>
             </SwipeableViews>
-            <Dialog TransitionComponent={Slide}  PaperProps={{className:classes.dialog}} fullWidth onClose={handleClose}
+            <Dialog TransitionComponent={Slide} PaperProps={{className: classes.dialog}} fullWidth onClose={handleClose}
                     open={showQuestionModal} basic size='small'>
                 <DialogTitle style={{color: "white"}}>
                     Add a Question
                 </DialogTitle>
-                <DialogContent style={{
-
-                }}>
+                <DialogContent style={{}}>
                     <TextField
                         autoFocus
-                        InputProps={{className: classes.dialogInput }}
+                        InputProps={{className: classes.dialogInput}}
                         error={Boolean(touched && newQuestionTitle.length < 5)}
                         onBlur={() => setTouched(true)}
                         variant="outlined" value={newQuestionTitle} placeholder='Your question goes here'
