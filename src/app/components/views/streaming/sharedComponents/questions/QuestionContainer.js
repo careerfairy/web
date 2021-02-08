@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme => ({
         },
     },
     questionContainer: {
-        backgroundColor: ({active}) => active && theme.palette.primary.main,
+        backgroundColor: ({active}) => active ? theme.palette.primary.main: theme.palette.type === "light" ? theme.palette.background.offWhite: theme.palette.background.paper,
         color: ({active}) => active ? "white" : "inherit",
         position: "relative",
         padding: "20px 0 0 0",
@@ -71,8 +71,8 @@ const useStyles = makeStyles(theme => ({
         fontWeight: 700,
         color: ({active}) => active ? "white" : theme.palette.primary.main,
     },
-    questionComment:{
-        background: theme.palette.background.level2
+    questionComment: {
+        background: theme.palette.type === "dark" ? theme.palette.background.default : theme.palette.background.paper
     }
 }))
 
@@ -87,7 +87,19 @@ const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
     )
 }
 
-const QuestionContainer = ({sliding, user, livestream, streamer, question, questions, firebase, index, isNextQuestions, selectedState, showMenu}) => {
+const QuestionContainer = ({
+                               sliding,
+                               user,
+                               livestream,
+                               streamer,
+                               question,
+                               questions,
+                               firebase,
+                               index,
+                               isNextQuestions,
+                               selectedState,
+                               showMenu
+                           }) => {
 
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);

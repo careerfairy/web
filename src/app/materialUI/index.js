@@ -30,6 +30,7 @@ export const baseThemeObj = {
         background:{
             level1: "#212121",
             level2: "#333",
+            offWhite: "#FAFAFA"
         }
     },
     overrides: {
