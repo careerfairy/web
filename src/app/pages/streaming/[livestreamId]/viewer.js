@@ -361,21 +361,6 @@ function ViewerPage({firebase}) {
                 display: none
               }
 
-              .mini-chat-container {
-                position: absolute;
-                bottom: 0;
-                right: 40px;
-                width: 20%;
-                min-width: 250px;
-                z-index: 7250;
-              }
-
-              @media (max-width: 768px) {
-                .mini-chat-container {
-                  display: none;
-                }
-              }
-
               .icons-container {
                 position: absolute;
                 bottom: 50px;
@@ -403,14 +388,6 @@ function ViewerPage({firebase}) {
                 background-color: rgba(10, 10, 10, 0.4);
                 cursor: pointer;
                 z-index: 200;
-              }
-            `}</style>
-            <style jsx global>{`
-              body {
-                min-height: 100vh;
-              }
-
-              html {
               }
             `}</style>
         </div>
