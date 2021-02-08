@@ -271,7 +271,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                 <DialogTitle style={{color: "white"}}>
                     Add a Question
                 </DialogTitle>
-                <DialogContent style={{}}>
+                <DialogContent>
                     <TextField
                         autoFocus
                         InputProps={{className: classes.dialogInput}}

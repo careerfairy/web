@@ -20,6 +20,12 @@ const useStyles = makeStyles(theme => ({
         textAlign: "center",
         fontWeight: 700,
     },
+    subTitleStyles: {
+        fontSize: "1em",
+        width: "90%",
+        color: theme.palette.text.secondary,
+        textAlign: "center",
+    },
     pollQuestionStyles: {
         textAlign: "center",
         fontWeight: 500,
@@ -39,6 +45,10 @@ export const GreyPermanentMarker = ({className, ...props}) => {
 export const ThemedPermanentMarker = ({className, ...props}) => {
     const classes = useStyles()
     return <Typography className={clsx(classes.themedPermanentMarkerStyles, className)} {...props}/>
+}
+export const CategorySubtitle = ({className, ...props}) => {
+    const classes = useStyles()
+    return <Typography className={clsx(classes.subTitleStyles, className)} {...props}/>
 }
 
 export const PollQuestion = ({className, ...props}) => {

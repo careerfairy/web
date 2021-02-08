@@ -41,12 +41,24 @@ const useStyles = makeStyles(theme => ({
         fontWeight: 500,
         textAlign: "center",
         margin: theme.spacing(2, 0)
+    },
+    categoryContainerContent:{
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "column",
+        '& > *:nth-last-child(n+2)': {
+            marginBottom: theme.spacing(2)
+        }
     }
 }))
 
 export const CategoryContainerCentered = ({...props}) => {
     const classes = useStyles()
     return <Box className={classes.categoryContainerCenteredStyle} {...props}/>
+}
+export const CategoryContainerContent = ({...props}) => {
+    const classes = useStyles()
+    return <Box className={classes.categoryContainerContent} {...props}/>
 }
 
 export const CategoryContainerTopAligned = ({...props}) => {
@@ -65,8 +77,6 @@ export const QuestionContainerTitle = ({...props}) => {
 }
 
 export const ResponsiveContainer = ({children, ...props}) => {
-    const theme = useTheme()
-    const isMobile = useMediaQuery(theme.breakpoints.up('sm'));
     return <Container maxWidth="lg" {...props}>
         {children}
     </Container>
