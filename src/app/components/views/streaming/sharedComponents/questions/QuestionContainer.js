@@ -44,7 +44,7 @@ const useStyles = makeStyles(theme => ({
         fontWeight: 700,
         fontSize: "1.3em",
         lineHeight: "1.3em",
-        color: ({active}) => active ? "white" : "rgb(50,50,50)",
+        color: ({active}) => active ? "white" : theme.palette.text.primary,
         margin: "5px 0",
         width: "85%",
         wordBreak: "break-word",

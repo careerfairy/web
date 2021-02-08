@@ -28,9 +28,9 @@ import Tab from "@material-ui/core/Tab";
 
 const useStyles = makeStyles(theme => ({
     view: {
-        position: "relative",
+        // position: "relative",
         height: "100%",
-        width: "100%",
+        // width: "100%",
         overflow: "auto",
         "& .react-swipeable-view-container": {
             height: "100%"
@@ -38,7 +38,7 @@ const useStyles = makeStyles(theme => ({
     },
     addIcon: {
         marginRight: theme.spacing(1)
-    }
+    },
 }))
 
 function QuestionCategory({livestream, selectedState, sliding, streamer, firebase, showMenu}) {

@@ -22,7 +22,7 @@ const useStyles = makeStyles(theme => ({
         alignItems: "center",
         width: "100%",
         justifyContent: "space-evenly",
-        boxShadow: theme.shadows[5],
+        // boxShadow: theme.shadows[5],
         zIndex: 9000,
         backgroundColor: theme.palette.background.paper,
         // padding: theme.spacing(2),
