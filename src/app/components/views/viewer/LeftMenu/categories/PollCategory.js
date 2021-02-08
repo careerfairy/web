@@ -6,18 +6,20 @@ import {GreyPermanentMarker, PollQuestion} from "../../../../../materialUI/Globa
 import {CategoryContainerCentered} from "../../../../../materialUI/GlobalContainers";
 import {colorsArray} from "../../../../util/colors";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
+import {isServer} from "../../../../helperFunctions/HelperFunctions";
 
 const PollWrapper = withStyles(theme => ({
     root: {
         borderRadius: 15,
         margin: 10,
-        backgroundColor: "white",
+        backgroundColor: theme.palette.background.paper,
         display: "flex",
         width: "90%",
         flexDirection: "column",
         alignItems: "center",
         textAlign: "center",
-        padding: theme.spacing(2, 0)
+        padding: theme.spacing(2, 0),
+        boxShadow: theme.shadows[3]
     },
 }))(Paper);
 
@@ -85,7 +87,7 @@ function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
             return (
                 <CategoryContainerCentered>
                     <PollWrapper>
-                        <CurrentPollGraph currentPoll={currentPoll}/>
+                        {!isServer() && <CurrentPollGraph currentPoll={currentPoll}/>}
                     </PollWrapper>
                 </CategoryContainerCentered>
             )

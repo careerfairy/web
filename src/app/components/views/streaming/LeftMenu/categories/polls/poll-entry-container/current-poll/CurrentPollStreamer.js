@@ -10,6 +10,7 @@ import {
     TooltipTitle,
     WhiteTooltip
 } from "../../../../../../../../materialUI/GlobalTooltips";
+import {isServer} from "../../../../../../../helperFunctions/HelperFunctions";
 
 function getRandomInt(min, max, index) {
     return (Math.floor((Math.random() * (max - min + 1) + min) / (index + 1)));
@@ -123,7 +124,7 @@ function CurrentPollStreamer({setDemoPolls, demoPolls, sliding, firebase, livest
             <div>
                 <div className={classes.pollContainer}>
                     <div className={classes.pollLabel}>ACTIVE POLL</div>
-                    {currentPoll && <CurrentPollGraph currentPoll={currentPoll}/>}
+                    {(currentPoll && !isServer() )&& <CurrentPollGraph currentPoll={currentPoll}/>}
                     <WhiteTooltip
                         placement="right-end"
                         title={

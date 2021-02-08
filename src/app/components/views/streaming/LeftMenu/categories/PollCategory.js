@@ -17,9 +17,16 @@ import {
     TooltipTitle,
     WhiteTooltip
 } from "../../../../../materialUI/GlobalTooltips";
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles(theme => ({
+    createPollBtn: {
+        marginBottom: theme.spacing(2)
+    }
+}))
 
 function PollCategory({firebase, streamer, livestream, selectedState, showMenu, user, userData, sliding}) {
-
+    const classes = useStyles()
     const [addNewPoll, setAddNewPoll] = useState(false);
     const [pollEntries, setPollEntries] = useState([]);
     const [demoPolls, setDemoPolls] = useState(false);
@@ -106,6 +113,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
                         </React.Fragment>
                     } open={isOpen(4)}>
                     <Button startIcon={<AddIcon/>} children='Create Poll'
+                            className={classes.createPollBtn}
                             onClick={() => {
                                 setAddNewPoll(true)
                                 isOpen(4) && handleConfirmStep(4)
