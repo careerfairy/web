@@ -15,6 +15,8 @@ import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
     root: {
+    },
+    viewRoot:{
         position: "relative",
         height: "100%",
         backgroundColor: "rgb(220,220,220)",
@@ -131,7 +133,7 @@ const LeftMenu =
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                     index={value}
                     slideClassName={classes.slides}
-                    className={classes.root}
+                    className={classes.viewRoot}
                     onChangeIndex={handleChange}>
                     {views}
                 </SwipeableViews>

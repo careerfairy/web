@@ -91,6 +91,14 @@ const useStyles = makeStyles((theme) => ({
             left: "280px"
         }
     },
+    miniChatContainer: {
+        position: "absolute",
+        bottom: "0",
+        right: "40px",
+        width: "20%",
+        minWidth: "250px",
+        zIndex: 7250
+    }
 }));
 
 const groupLogo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fethccnew-logo.png?alt=media&token=9d3e2d5a-3517-4fe3-85e6-9600bf8d8bc4"
@@ -299,9 +307,11 @@ function ViewerPage({firebase}) {
                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
                     setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton}
                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>
-                <div className='mini-chat-container'>
-                    <MiniChatContainer livestream={currentLivestream} isStreamer={false}/>
-                </div>
+
+                {width >= 768 &&
+                <MiniChatContainer className={classes.miniChatContainer} livestream={currentLivestream}
+                                   isStreamer={false}/>}
+
                 <EmoteButtons
                     handRaiseActive={handRaiseActive}
                     handleClose={handleClose}
