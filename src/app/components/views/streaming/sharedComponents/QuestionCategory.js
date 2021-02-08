@@ -28,9 +28,9 @@ import Tab from "@material-ui/core/Tab";
 
 const useStyles = makeStyles(theme => ({
     view: {
-        // position: "relative",
+        position: "relative",
         height: "100%",
-        // width: "100%",
+        width: "100%",
         overflow: "auto",
         "& .react-swipeable-view-container": {
             height: "100%"
@@ -39,6 +39,9 @@ const useStyles = makeStyles(theme => ({
     addIcon: {
         marginRight: theme.spacing(1)
     },
+    questionScroll:{
+        height: "100%"
+    }
 }))
 
 function QuestionCategory({livestream, selectedState, sliding, streamer, firebase, showMenu}) {
@@ -159,10 +162,12 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                     indicatorColor="primary"
                     textColor="primary"
                 >
-                    <Tab disabled={!Boolean(upcomingQuestionsElements.length)} label={
-                        `Upcoming [${upcomingQuestionsElements.length}${hasMoreUpcoming ? "+" : ""}]`
+                    <Tab
+                        // disabled={!Boolean(upcomingQuestionsElements.length)}
+                        label={`Upcoming [${upcomingQuestionsElements.length}${hasMoreUpcoming ? "+" : ""}]`
                     }/>
-                    <Tab disabled={!Boolean(pastQuestionsElements.length)}
+                    <Tab
+                        // disabled={!Boolean(pastQuestionsElements.length)}
                          label={`Answered [${pastQuestionsElements.length}${hasMorePast ? "+" : ""}]`}/>
                 </Tabs>
             </QuestionContainerHeader>
@@ -176,6 +181,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                 index={value} onChangeIndex={handleChangeIndex}>
                 <TabPanel value={value} index={0}>
                     <CustomInfiniteScroll
+                        className={classes.questionScroll}
                         height={parentHeight}
                         hasMore={hasMoreUpcoming}
                         next={loadMoreUpcoming}
@@ -185,6 +191,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                 </TabPanel>
                 <TabPanel value={value} index={1}>
                     <CustomInfiniteScroll
+                        className={classes.questionScroll}
                         hasMore={hasMorePast}
                         height={parentHeight}
                         next={loadMorePast}

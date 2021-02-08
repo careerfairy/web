@@ -28,8 +28,9 @@ const useStyles = makeStyles(theme => ({
         textAlign: "center",
         zIndex: 9100,
     },
-    slides:{
+    slides: {
         backgroundColor: theme.palette.background.default,
+        overflow: "visible !important"
     }
 }))
 
@@ -86,7 +87,8 @@ const LeftMenu =
 
         const views = [
             <TabPanel key={0} value={value} index={0} dir={theme.direction}>
-                <QuestionCategory showMenu={showMenu} streamer={streamer} livestream={livestream} selectedState={selectedState} user={user}
+                <QuestionCategory showMenu={showMenu} streamer={streamer} livestream={livestream}
+                                  selectedState={selectedState} user={user}
                                   userData={userData}/>
             </TabPanel>,
             <TabPanel key={1} value={value} index={1} dir={theme.direction}>
