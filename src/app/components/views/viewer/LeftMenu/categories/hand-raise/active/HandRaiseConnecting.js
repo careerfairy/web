@@ -7,8 +7,7 @@ import {ThemedPermanentMarker} from "../../../../../../../materialUI/GlobalTitle
 
 function HandRaiseRequested(props) {
 
-    return (
-        <Grow unmountOnExit
+    return (<Grow unmountOnExit
               in={Boolean(!(!props.handRaiseState || (props.handRaiseState.state !== 'connecting' && props.handRaiseState.state !== 'invited')))}>
             <CategoryContainerCentered>
                 <CategoryContainerContent>
@@ -17,10 +16,7 @@ function HandRaiseRequested(props) {
                             onClick={() => props.updateHandRaiseRequest("unrequested")}/>
                 </CategoryContainerContent>
             </CategoryContainerCentered>
-        </Grow>
-
-    )
-        ;
+        </Grow>);
 }
 
 export default HandRaiseRequested;
