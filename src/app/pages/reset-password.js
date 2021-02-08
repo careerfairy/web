@@ -8,25 +8,17 @@ import {Formik} from 'formik';
 import axios from 'axios';
 
 import Head from 'next/head';
+import {useAuth} from "../HOCs/AuthProvider";
 
 function ResetPasswordPage(props) {
 
-    const [user, setUser] = useState(null);
-    const [userEmailNotValidated, setUserEmailNotValidated] = useState(false);
+    const {authenticatedUser: user} = useAuth()
     const router = useRouter();
 
-    useEffect(() => {
-        props.firebase.auth.onAuthStateChanged(user => {
-            if (user !== null) {
-                setUser(user);
-            } else {
-                setUser(null);
-            }
-        })
-    },[]);
+
 
     useEffect(() => {
-        if (user) {
+        if (user.isLoaded && !user.isEmpty) {
             if (!user.emailVerified) {
                 router.replace('/signup');
             } else {
