@@ -6,7 +6,7 @@ import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import ExpandMoreRoundedIcon from '@material-ui/icons/ExpandMoreRounded';
 import {withFirebase} from 'context/firebase';
 import {Box, Button, Slide, TextField} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Collapse from "@material-ui/core/Collapse";
 import Card from "@material-ui/core/Card";
@@ -70,6 +70,9 @@ const useStyles = makeStyles(theme => ({
         margin: "0 0 0 30px",
         fontWeight: 700,
         color: ({active}) => active ? "white" : theme.palette.primary.main,
+    },
+    questionComment:{
+        background: theme.palette.background.level2
     }
 }))
 
@@ -185,7 +188,7 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
     let commentsElements = comments.map((comment, index) => {
         return (
             <Slide key={comment.id} in direction="right">
-                <Box borderRadius={8} mb={1} p={1} component={Card}>
+                <Box className={classes.questionComment} borderRadius={8} mb={1} p={1} component={Card}>
                     <div style={{wordBreak: "break-word"}}>
                         <Linkify componentDecorator={componentDecorator}>
                             {comment.title}
