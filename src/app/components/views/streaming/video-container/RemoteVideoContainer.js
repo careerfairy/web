@@ -28,6 +28,7 @@ function RemoteVideoContainer(props) {
     const classes = useStyles()
 
     const activeStep = getActiveTutorialStepKey();
+    console.log("-> activeStep", activeStep);
 
     useEffect(() => {
         if (props.stream.streamId === 'demoStream') {

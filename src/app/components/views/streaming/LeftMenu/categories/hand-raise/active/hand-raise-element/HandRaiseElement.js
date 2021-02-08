@@ -21,10 +21,8 @@ const useStyles = makeStyles(theme => ({
 function RequestedHandRaiseElement(props) {
 
     const classes = useStyles()
-    const [notificationId, setNotificationId] = useState(uuidv4());
+    const [notificationId] = useState(uuidv4());
     const {
-        tutorialSteps,
-        setTutorialSteps,
         getActiveTutorialStepKey,
         handleConfirmStep,
         isOpen
@@ -101,7 +99,8 @@ function InvitedHandRaiseElement(props) {
             />
             <CardActions>
                 <Button variant="contained" children='Remove' size='small'
-                        onClick={() => props.updateHandRaiseRequest(props.request.id, 'denied')}/>
+                        onClick={() => props.updateHandRaiseRequest(props.request.id, 'denied')
+                        }/>
             </CardActions>
         </Card>
     )
@@ -109,7 +108,7 @@ function InvitedHandRaiseElement(props) {
 
 function ConnectingHandRaiseElement(props) {
     const classes = useStyles()
-    const [notificationId, setNotificationId] = useState(uuidv4());
+    const [notificationId] = useState(uuidv4());
 
     useEffect(() => {
         props.setNewNotification({
@@ -147,7 +146,7 @@ function ConnectingHandRaiseElement(props) {
 function ConnectedHandRaiseElement(props) {
     const classes = useStyles()
 
-    const [notificationId, setNotificationId] = useState(uuidv4());
+    const [notificationId] = useState(uuidv4());
     const {getActiveTutorialStepKey, handleConfirmStep, isOpen} = useContext(TutorialContext);
 
     const activeStep = getActiveTutorialStepKey()
@@ -195,11 +194,14 @@ function ConnectedHandRaiseElement(props) {
                 />
                 <CardActions>
                     <Button variant="contained" children='Remove' size='small' onClick={() => {
+
                         if (isOpen(12)) {
                             handleConfirmStep(12)
                         }
                         updateHandRaiseRequest('denied')
-                    }}/>
+                    }}
+                            disabled={isOpen(11)}
+                    />
                 </CardActions>
             </Card>
         </WhiteTooltip>
