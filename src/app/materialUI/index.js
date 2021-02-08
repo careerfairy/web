@@ -26,7 +26,7 @@ export const baseThemeObj = {
             contrastText: "#FFFFFF",
             dark: "#00b08f",
         },
-        type: "light"
+        type: "dark"
     },
     overrides: {
         MuiButton: {
