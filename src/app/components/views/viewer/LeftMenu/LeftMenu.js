@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import {makeStyles, useTheme} from "@material-ui/core/styles";
+import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
 import SwipeableViews from "react-swipeable-views";
 import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
@@ -10,6 +10,7 @@ import PollCategory from "./categories/PollCategory";
 import HandRaiseCategory from "./categories/HandRaiseCategory";
 import ChatCategory from "../../streaming/LeftMenu/categories/ChatCategory";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
+import clsx from "clsx";
 
 
 const useStyles = makeStyles(theme => ({
@@ -31,6 +32,10 @@ const useStyles = makeStyles(theme => ({
     slides: {
         backgroundColor: theme.palette.background.default,
         overflow: "visible !important"
+    },
+    blur:{
+        backgroundColor: fade(theme.palette.common.black, 0.2),
+        backdropFilter: "blur(5px)",
     }
 }))
 
@@ -47,6 +52,7 @@ const LeftMenu =
          setShowMenu,
          showMenu,
          isMobile,
+         className,
          ...props
      }) => {
         const theme = useTheme()
@@ -113,7 +119,9 @@ const LeftMenu =
 
 
         return (
-            <>
+            <div className={clsx(classes.root, className, {
+                [classes.blur]: isMobile && showMenu
+            })}>
                 {isMobile && showMenu &&
                 <Fab className={classes.closeBtn} size='large' color='secondary' onClick={toggleShowMenu}>
                     <ChevronLeftRoundedIcon/>
@@ -129,7 +137,7 @@ const LeftMenu =
                 </SwipeableViews>
                 <ButtonComponent selectedState={selectedState} showMenu={showMenu} isMobile={isMobile}
                                  handleStateChange={handleStateChange} {...props}/>
-            </>
+            </div>
         );
     };
 

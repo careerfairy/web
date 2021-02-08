@@ -19,7 +19,6 @@ const StreamSnackBar = ({index, notification}) => {
 
         // Dismisses the notification once the component unmounts
         return () => closeSnackbar(notification.id)
-
     }, [])
 
     const action = key => {

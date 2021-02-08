@@ -39,7 +39,8 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        borderRadius: theme.spacing(1)
+        borderRadius: theme.spacing(1),
+        // width: "100%"
     },
     reactionsQuestion: {
         fontWeight: 700,

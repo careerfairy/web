@@ -317,19 +317,18 @@ function ViewerPage({firebase}) {
                     open={open}
                 />
             </div>
-            <div className={classes.menuLeft}>
-                <LeftMenu
-                    handRaiseActive={handRaiseActive}
-                    setHandRaiseActive={setHandRaiseActive}
-                    streamer={false}
-                    userData={userData}
-                    user={authenticatedUser}
-                    livestream={currentLivestream}
-                    showMenu={showMenu}
-                    setShowMenu={setShowMenu}
-                    isMobile={width < 768}
-                    toggleShowMenu={toggleShowMenu}/>
-            </div>
+            <LeftMenu
+                className={classes.menuLeft}
+                handRaiseActive={handRaiseActive}
+                setHandRaiseActive={setHandRaiseActive}
+                streamer={false}
+                userData={userData}
+                user={authenticatedUser}
+                livestream={currentLivestream}
+                showMenu={showMenu}
+                setShowMenu={setShowMenu}
+                isMobile={width < 768}
+                toggleShowMenu={toggleShowMenu}/>
             <div className='icons-container'>
                 <IconsContainer isTest={currentLivestream.test} livestreamId={currentLivestream.id}/>
             </div>

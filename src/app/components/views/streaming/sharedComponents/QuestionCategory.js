@@ -42,13 +42,17 @@ const useStyles = makeStyles(theme => ({
     },
     questionScroll: {
         height: "100%",
-        width: "100%"
+        width: "100%",
+
     },
     emptyMessage: {
         margin: "auto !important"
     },
     viewPanel: {
-        display: "flex"
+        display: "flex",
+        '& > *': {
+            width: "100%"
+        }
     },
     fullwidth: {
         width: "100%"
