@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: theme.palette.background.default,
         overflow: "visible !important"
     },
-    blur:{
+    blur: {
         backgroundColor: fade(theme.palette.common.black, 0.2),
         backdropFilter: "blur(5px)",
     }
@@ -87,8 +87,8 @@ const LeftMenu =
         }
 
         const handleChange = (event, newValue) => {
-            setValue(event);
-            setSelectedState(states[event])
+            setValue(newValue);
+            setSelectedState(states[newValue])
         }
 
         const views = [
