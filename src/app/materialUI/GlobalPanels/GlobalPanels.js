@@ -2,10 +2,10 @@ import React from 'react';
 import Box from "@material-ui/core/Box";
 import * as PropTypes from "prop-types";
 
-export const TabPanel = ({hidden, children, height, value, index, ...other}) => {
+export const TabPanel = ({hidden, children, height, value, index,className, ...other}) => {
 
     return (
-        <Box hidden={hidden} {...other} style={{height: height || "100%", ...other.style}}>
+        <Box hidden={hidden} className={className} {...other} style={{height: height || "100%", ...other.style}}>
             {children}
         </Box>
     );

@@ -22,9 +22,12 @@ const useStyles = makeStyles(theme => ({
         alignItems: "center",
         width: "100%",
         justifyContent: "space-evenly",
-        // boxShadow: theme.shadows[5],
+        boxShadow: theme.shadows[2],
         zIndex: 9000,
         backgroundColor: theme.palette.background.paper,
+        '& > *:nth-last-child(n+2)': {
+           marginBottom: theme.spacing(2)
+        },
         // padding: theme.spacing(2),
         // height: 130,
 
