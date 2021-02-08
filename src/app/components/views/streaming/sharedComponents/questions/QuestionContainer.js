@@ -23,6 +23,7 @@ import {useAuth} from "../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
     chatInput: {
+        background: theme.palette.background.paper,
         borderRadius: 10,
         "& .MuiInputBase-root": {
             paddingRight: "0 !important",
@@ -57,7 +58,7 @@ const useStyles = makeStyles(theme => ({
         alignItems: "center"
     },
     showText: {
-        color: "rgb(210,210,210)",
+        color: theme.palette.text.secondary,
         fontSize: "0.8em",
         fontWeight: 500
     },
@@ -73,6 +74,11 @@ const useStyles = makeStyles(theme => ({
     },
     questionComment: {
         background: theme.palette.type === "dark" ? theme.palette.background.default : theme.palette.background.paper
+    },
+    questionButton:{
+        borderRadius: "0 0 5px 5px",
+        padding: "10px 0",
+        color: theme.palette.text.primary
     }
 }))
 
@@ -313,7 +319,7 @@ const QuestionContainer = ({
                                 size='small'
                                 disableElevation
                                 disabled={old}
-                                style={{borderRadius: "0 0 5px 5px", padding: "10px 0"}}
+                                className={classes.questionButton}
                                 fullWidth
                                 color="primary"
                                 onClick={() => {
@@ -327,8 +333,8 @@ const QuestionContainer = ({
                             startIcon={<ThumbUpRoundedIcon/>}
                             children={!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
                             size='small'
-                            style={{borderRadius: "0 0 5px 5px", padding: "10px 0"}}
                             disableElevation
+                            className={classes.questionButton}
                             color="primary"
                             fullWidth
                             variant="contained"
