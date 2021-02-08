@@ -227,7 +227,7 @@ const UsersTable = ({
             (!group.universityCode &&
                 (userProp === "registeredUsers" || userProp === "participatingStudents")
             )
-            && !userData.isAdmin
+            && !userData?.isAdmin
         )
     }
 

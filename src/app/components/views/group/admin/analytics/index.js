@@ -283,7 +283,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     }, []);
 
     useEffect(() => {
-        if (currentUserDataSet.dataSet === "followers" && !userData.isAdmin) {
+        if (currentUserDataSet.dataSet === "followers" && !userData?.isAdmin) {
             const limitedUserTypes = userTypes.filter(({propertyName}) => propertyName === "talentPool")
             setLimitedUserTypes(limitedUserTypes)
         } else {
