@@ -67,9 +67,9 @@ export const CategoryContainerTopAligned = ({className, ...props}) => {
     return <Box className={clsx(classes.categoryContainerTopAlignedStyles, className)} {...props}/>
 }
 
-export const QuestionContainerHeader = ({...props}) => {
+export const QuestionContainerHeader = ({className,...props}) => {
     const classes = useStyles()
-    return <Box className={classes.questionContainerHeaderStyle} {...props}/>
+    return <Box className={clsx(classes.questionContainerHeaderStyle, className)} {...props}/>
 }
 
 export const QuestionContainerTitle = ({...props}) => {

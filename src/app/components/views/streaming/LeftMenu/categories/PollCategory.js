@@ -20,8 +20,8 @@ import {
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({
-    createPollBtn: {
-        marginBottom: theme.spacing(2)
+    pollHeader: {
+        paddingBottom: theme.spacing(2)
     }
 }))
 
@@ -93,7 +93,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
 
     return (
         <CategoryContainerTopAligned>
-            <QuestionContainerHeader>
+            <QuestionContainerHeader className={classes.pollHeader}>
                 <QuestionContainerTitle>
                     <BarChartIcon fontSize="large" color="primary"/> Polls
                 </QuestionContainerTitle>
@@ -113,7 +113,6 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
                         </React.Fragment>
                     } open={isOpen(4)}>
                     <Button startIcon={<AddIcon/>} children='Create Poll'
-                            className={classes.createPollBtn}
                             onClick={() => {
                                 setAddNewPoll(true)
                                 isOpen(4) && handleConfirmStep(4)

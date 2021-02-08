@@ -51,6 +51,7 @@ function RequestedHandRaiseElement(props) {
     return (
         <WhiteTooltip
             placement="right-start"
+            style={{width: "100%"}}
             title={
                 <React.Fragment>
                     <TooltipTitle>Hand Raise (2/5)</TooltipTitle>
@@ -79,7 +80,7 @@ function RequestedHandRaiseElement(props) {
                             updateHandRaiseRequest('invited')
                         }
                     }} color="primary"/>
-                    <Button variant="contained" children='Deny' size='small' disabled={isOpen(10)}
+                    <Button variant="contained" color="default" children='Deny' size='small' disabled={isOpen(10)}
                             onClick={() => updateHandRaiseRequest('denied')}/>
                 </CardActions>
             </Card>
@@ -168,6 +169,7 @@ function ConnectedHandRaiseElement(props) {
     return (
         <WhiteTooltip
             placement="right"
+            style={{width: "100%"}}
             title={
                 <React.Fragment>
                     <TooltipTitle>Hand Raise (4/5)</TooltipTitle>
