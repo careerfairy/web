@@ -1,6 +1,7 @@
 import {Box, Container, useMediaQuery} from "@material-ui/core";
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import React from "react";
+import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
     categoryContainerCenteredStyle: {
@@ -61,9 +62,9 @@ export const CategoryContainerContent = ({...props}) => {
     return <Box className={classes.categoryContainerContent} {...props}/>
 }
 
-export const CategoryContainerTopAligned = ({...props}) => {
+export const CategoryContainerTopAligned = ({className, ...props}) => {
     const classes = useStyles()
-    return <Box className={classes.categoryContainerTopAlignedStyles} {...props}/>
+    return <Box className={clsx(classes.categoryContainerTopAlignedStyles, className)} {...props}/>
 }
 
 export const QuestionContainerHeader = ({...props}) => {

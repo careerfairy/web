@@ -17,9 +17,15 @@ import {
     TooltipTitle,
     WhiteTooltip
 } from "../../../../../../../materialUI/GlobalTooltips";
+import {makeStyles} from "@material-ui/core/styles";
 
+const useStyles = makeStyles(theme => ({
+    activeHandRaiseContainer:{
+        padding: theme.spacing(1)
+    }
+}))
 function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding}) {
-
+    const classes = useStyles()
     const {setNewNotification, setNotificationToRemove} = useContext(NotificationsContext);
     const {tutorialSteps, setTutorialSteps, getActiveTutorialStepKey} = useContext(TutorialContext);
 
@@ -85,7 +91,7 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
     return (
         <>
             <Grow timeout={tutorialSteps.streamerReady ? 0 : 'auto'} onEntered={() => setHasEntered(true)} onExited={() => setHasExited(true)} mountOnEnter unmountOnExit in={Boolean(handRaiseElements.length)}>
-                <CategoryContainerTopAligned style={{background: "rgb(240,240,240)"}}>
+                <CategoryContainerTopAligned className={classes.activeHandRaiseContainer}>
                     {handRaiseElements}
                     <Button style={{margin: "auto 0 2rem 0"}} startIcon={<CloseRoundedIcon/>} variant="contained"
                             children='Deactivate Hand Raise'
