@@ -38,7 +38,6 @@ const useStyles = makeStyles(theme => ({
             paddingRight: "0 !important",
             borderRadius: 10,
         },
-        // background: "white"
     },
     scrollToBottom: {
         display: "flex",
