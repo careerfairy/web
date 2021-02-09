@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
     greyBackgroundStyles: {
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "rgb(230,230,230)",
+        backgroundColor: theme.palette.type === "dark" ? theme.palette.background.default : "rgb(230,230,230)",
         height: "100%",
         minHeight: "100vh",
     },

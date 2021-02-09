@@ -13,7 +13,7 @@ import GroupJoinModal from "./GroupJoinModal";
 import Link from "next/link";
 
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
     root: {
         maxWidth: 345,
     },
@@ -21,12 +21,13 @@ const useStyles = makeStyles({
         display: 'flex',
         justifyContent: 'center',
         padding: '1.5em 1em 1em 1em',
-        height: '120px'
+        height: '120px',
+        background: theme.palette.common.white
     },
     card: {
         flex: 1
     }
-});
+}));
 
 const CurrentGroup = ({firebase, userData, group, isAdmin, groupId}) => {
     const {push} = useRouter()

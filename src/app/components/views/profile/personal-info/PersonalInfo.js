@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     },
     box: {
         width: '100%', // Fix IE 11 issue.
-        backgroundColor: "white",
+        backgroundColor: theme.palette.background.paper,
         // marginTop: theme.spacing(3),
         borderRadius: 5
     },
@@ -43,6 +43,10 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(3, 0, 2),
         marginBottom: 0
     },
+    title:{
+        color: theme.palette.text.secondary,
+        marginBottom: 20
+    }
 }));
 
 const PersonalInfo = ({userData}) => {
@@ -134,7 +138,7 @@ const PersonalInfo = ({userData}) => {
                 <form onSubmit={handleSubmit}>
                     <Container component="main" maxWidth="sm">
                         <Box boxShadow={1} p={4} className={classes.box}>
-                            <Typography style={{color: 'rgb(160,160,160)', marginBottom: 20}} variant="h4">Personal
+                            <Typography className={classes.title}  variant="h4">Personal
                                 Info</Typography>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
