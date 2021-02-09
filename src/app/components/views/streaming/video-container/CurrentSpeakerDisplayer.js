@@ -1,11 +1,8 @@
-import React, {useEffect, Fragment, useRef, useState} from 'react';
-import {Grid, Icon} from "semantic-ui-react";
+import React from 'react';
 import RemoteVideoContainer from './RemoteVideoContainer';
 import {useWindowSize} from '../../../custom-hook/useWindowSize';
-import CreateLivestreamProposalStep
-    from 'components/views/group/admin/schedule-events/create-livestream-proposal-step/CreateLivestreamProposalStep';
 import {makeStyles} from "@material-ui/core/styles";
-import clsx from "clsx";
+
 
 const useStyles = makeStyles(theme => ({
 
@@ -163,6 +160,7 @@ function CurrentSpeakerDisplayer(props) {
     }
 
     let externalVideoElements = props.streams.filter(stream => !stream.streamId.includes("screen")).map((stream, index) => {
+       console.log("-> getVideoContainerClass in external", getVideoContainerClass(stream.streamId, "external"));
         return (
             <div key={stream.streamId} className={getVideoContainerClass(stream.streamId, "external")}
                  style={{padding: 0}}>
