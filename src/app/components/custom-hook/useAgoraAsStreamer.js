@@ -32,7 +32,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     const [numberOfViewers, setNumberOfViewers] = useState(0);
 
     const [agoraStatus, setAgoraStatus] = useState("initial");
-    const [agoraScreenShareStatus, setAgoraScreenShareStatus] = useState("initial");
 
     const agoraToken = useAgoraToken(roomId, userUid, !isViewer, false);
     const agoraScreenShareToken = useAgoraToken(roomId, userUid, !isViewer, true);
@@ -111,6 +110,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         if (!isViewer) {
             rtcClient.setClientRole("host")
             rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
+                setAgoraStatus("joining_channel");
                 setAgoraStatus("getting_media_access");
                 let localStream = AgoraRTC.createStream({
                     audio: true,
@@ -324,6 +324,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                         codec: "vp8",
                     });
                     screenShareClient.setClientRole('host')
+                    //screenShareClient.startProxyServer(3);
                     screenShareClient.init("53675bc6d3884026a72ecb1de3d19eb1", () => {
                         screenShareClient.join(agoraScreenShareToken.rtcToken, roomId, userUid + 'screen', (uid) => {
                             let screenShareStream = agoraRTC.createStream({
@@ -331,15 +332,24 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                                 audio: false,
                                 video: false,
                                 screen: true,
-                                screenAudio: true
-                                //optimizationMode: 'motion'
+                                screenAudio: true,
+                                optimizationMode: 'motion'
                             });
                             screenShareStream.setVideoProfile("480p_9");
+                            setAgoraStatus("screen-share-started")
                             screenShareStream.init(() => {
                                 screenShareStream.play("Screen");
                                 screenShareClient.publish(screenShareStream, handleError);
                                 setScreenShareRtcStream(screenShareStream);
-                            }, handleError);
+                            }, (err) => {
+                                if (err && err.type === "error" && err.msg === "NotAllowedError") {
+                                    setAgoraStatus("screen-share-stopped")
+                                }
+                            });
+                            screenShareStream.on("stopScreenSharing", function (evt) {
+                                // STREAMER HAS MUTED VIDEO
+                                setAgoraStatus("screen-share-stopped")
+                            });
                         }, handleError);
                     });
                     setScreenShareRtcClient(screenShareClient);
@@ -350,15 +360,24 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                             audio: false,
                             video: false,
                             screen: true,
-                            screenAudio: true
-                            //optimizationMode: 'motion'
+                            screenAudio: true,
+                            optimizationMode: 'motion'
                         });
                         screenShareStream.setVideoProfile("480p_9");
+                        setAgoraStatus("screen-share-started")
                         screenShareStream.init(() => {
                             screenShareStream.play("Screen");
                             screenShareRtcClient.publish(screenShareStream, handleError);
                             setScreenShareRtcStream(screenShareStream);
-                        }, handleError);
+                        }, (err) => {
+                            if (err && err.type === "error" && err.msg === "NotAllowedError") {
+                                setAgoraStatus("screen-share-stopped")
+                            }
+                        });
+                        screenShareStream.on("stopScreenSharing", function (evt) {
+                            // STREAMER HAS MUTED VIDEO
+                            setAgoraStatus("screen-share-stopped")
+                        });
                     });
                 }
             } else {
@@ -411,5 +430,5 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         console.log("Error: ", err);
     };
 
-    return {localMediaStream, externalMediaStreams, agoraStatus, networkQuality, numberOfViewers, setAddedStream, setRemovedStream};
+    return {localMediaStream, externalMediaStreams, agoraStatus, setAgoraStatus, networkQuality, numberOfViewers, setAddedStream, setRemovedStream};
 }

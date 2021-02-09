@@ -11,7 +11,7 @@ import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPr
 import ErrorMessageModal from "../modal/StreamPreparationModalV2/ErrorMessageModal";
 import useDevices from 'components/custom-hook/useDevices';
 import SettingsModal from './SettingsModal';
-import {makeStyles} from '@material-ui/core';
+import {DialogContent, makeStyles} from '@material-ui/core';
 import TutorialContext from "context/tutorials/TutorialContext";
 import DemoIntroModal from "../modal/DemoIntroModal";
 import DemoEndModal from "../modal/DemoEndModal";
@@ -20,6 +20,7 @@ import ScreenSharePermissionDeniedModal from '../modal/ScreenSharePermissionDeni
 import StreamPreparationModal from '../modal/StreamPreparationModal';
 import Button from "@material-ui/core/Button";
 import WifiIndicator from "./WifiIndicator";
+import LoadingModal from '../modal/LoadingModal';
 
 const useStyles = makeStyles((theme) => ({
     blackFrame: {
@@ -42,14 +43,16 @@ function VideoContainer(props) {
     } = useContext(TutorialContext);
 
     const classes = useStyles();
-    const devices = useDevices();
     const localVideoId = 'localVideo';
     const isMainStreamer = props.streamerId === props.currentLivestream.id;
 
     const [errorMessage, setErrorMessage] = useState(null);
     const [screenSharePermissionDenied, setScreenSharePermissionDenied] = useState(false);
     const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
+
+    const [streamerConnected, setStreamerConnected] = useState(false);
     const [streamerReady, setStreamerReady] = useState(false);
+
     const [connectionEstablished, setConnectionEstablished] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
 
@@ -59,7 +62,7 @@ function VideoContainer(props) {
 
     const screenSharingMode = props.currentLivestream.screenSharerId === props.streamerId &&
         props.currentLivestream.mode === 'desktop';
-    const {localMediaStream, externalMediaStreams, agoraStatus, networkQuality, numberOfViewers, setAddedStream, setRemovedStream} =
+    const {localMediaStream, externalMediaStreams, agoraStatus, setAgoraStatus, networkQuality, numberOfViewers, setAddedStream, setRemovedStream} =
         useAgoraAsStreamer(
             true,
             false,
@@ -69,6 +72,8 @@ function VideoContainer(props) {
             props.streamerId,
             props.viewer
         );
+
+    const devices = useDevices(agoraStatus === "stream_published");
 
     const {
         audioSource,
@@ -116,6 +121,18 @@ function VideoContainer(props) {
             return () => clearTimeout(timeout);
         }
     }, [audioCounter, props.currentLivestream.mode]);
+
+    useEffect(() => {
+        if (agoraStatus === "stream-published") {
+            setStreamerConnected(true)
+        }
+    }, [agoraStatus])
+
+    useEffect(() => {
+        if (agoraStatus === "screen-share-stopped" && props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
+            setDesktopMode("default", props.streamerId)
+        }
+    }, [agoraStatus])
 
     useEffect(() => {
         if (isMainStreamer && props.currentLivestream.mode === 'desktop') {
@@ -302,48 +319,20 @@ function VideoContainer(props) {
                            videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
                            speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
                            attachSinkId={attachSinkId}/>
-            <Modal open={showDisconnectionModal}>
-                <Modal.Header>You have been disconnected</Modal.Header>
-                <Modal.Content>
-                    <p>Don't panic! Follow these steps to quickly restart the stream:</p>
-                    <p>1. Check your internet connection</p>
-                    <p>2. Reload this page</p>
-                    <p>3. Restart the stream</p>
-                    <Button startIcon={<RefreshRoundedIcon/>} children='Reload Page' size='large' color="primary"
-                            onClick={() => reloadPage()}/>
-                </Modal.Content>
-            </Modal>
-            {!props.viewer && !streamerReady &&
             <StreamPreparationModalV2 readyToConnect={Boolean(props.currentLivestream && props.currentLivestream.id)}
-                                      audioSource={audioSource} updateAudioSource={updateAudioSource}
-                                      videoSource={videoSource} updateVideoSource={updateVideoSource}
-                                      audioLevel={audioLevel}
-                                      speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
-                                      streamerReady={streamerReady} setStreamerReady={setStreamerReady}
-                                      localStream={displayableMediaStream}
-                                      connectionEstablished={connectionEstablished}
-                                      isTest={props.currentLivestream.test} viewer={props.viewer}
-                                      handleOpenDemoIntroModal={handleOpenDemoIntroModal}
-                                      attachSinkId={attachSinkId} devices={devices}
-                                      setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
-                                      isStreaming={isStreaming}/>
-            }
-            {props.viewer &&
-            <StreamPreparationModal audioSource={audioSource} updateAudioSource={updateAudioSource}
-                                    videoSource={videoSource} updateVideoSource={updateVideoSource}
-                                    audioLevel={audioLevel}
-                                    speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
-                                    streamerReady={streamerReady} setStreamerReady={setStreamerReady}
-                                    localStream={localMediaStream} connectionEstablished={connectionEstablished}
-                                    devices={devices}
-                                    setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
-                                    isStreaming={isStreaming}/>
-            }
-            <ScreenSharePermissionDeniedModal screenSharePermissionDenied={screenSharePermissionDenied}
-                                              setScreenSharePermissionDenied={setScreenSharePermissionDenied}/>
-            {!props.viewer && <ErrorMessageModal isStreaming={isStreaming} connectionEstablished={connectionEstablished}
-                                                 errorMessage={errorMessage} streamerReady={streamerReady}/>
-            }
+                audioSource={audioSource} updateAudioSource={updateAudioSource}
+                videoSource={videoSource} updateVideoSource={updateVideoSource}
+                speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
+                audioLevel={audioLevel} streamerConnected={streamerConnected}
+                streamerReady={streamerReady} setStreamerReady={setStreamerReady}
+                localStream={displayableMediaStream}
+                connectionEstablished={connectionEstablished}
+                isTest={props.currentLivestream.test} viewer={props.viewer}
+                handleOpenDemoIntroModal={handleOpenDemoIntroModal}
+                attachSinkId={attachSinkId} devices={devices}
+                setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
+                isStreaming={isStreaming}/>
+            <LoadingModal/>
             <DemoIntroModal livestreamId={props.currentLivestream.id}
                             open={showDemoIntroModal}
                             handleClose={handleCloseDemoIntroModal}/>
