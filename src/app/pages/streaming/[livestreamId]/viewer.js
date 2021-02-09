@@ -69,9 +69,6 @@ function ViewerPage({firebase}) {
     const [open, setOpen] = React.useState(true);
     const [delayHandler, setDelayHandler] = useState(null)
 
-
-    const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
-
     const {authenticatedUser, userData} = useAuth();
 
     if (currentLivestream && !currentLivestream.test && authenticatedUser?.isLoaded && authenticatedUser?.isEmpty) {
@@ -253,7 +250,7 @@ function ViewerPage({firebase}) {
             <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
 
                 <ViewerComponent
-                    livestreamId={livestreamId} streamerId={streamerId}
+                    livestreamId={livestreamId} streamerId={authenticatedUser?.email}
                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
                     setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton}
                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>
