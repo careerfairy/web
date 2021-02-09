@@ -119,7 +119,6 @@ function SignUpPage({firebase}) {
 
     const verifyUserState = async () => {
         if (user.isLoaded && !user.isEmpty) {
-            await firebase.reloadUser();
             if (user.emailVerified && userData && userData.groupIds) {
                 router.push('/next-livestreams')
             } else if (!user.emailVerified) {

@@ -284,8 +284,6 @@ exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(async (req, r
         });
 });
 
-const axios = require('axios');
-
 exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onRequest(async (req, res) => {
 
     res.set('Access-Control-Allow-Origin', '*');
@@ -482,6 +480,64 @@ exports.sendPostmarkEmailUserDataAndUniWithName = functions.https.onRequest(asyn
     });
 });
 
+exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(async (req, res) => {
+
+    console.log("running");
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    let counter = 0;
+
+    let groupId = req.body.groupId;
+    let categoryId = req.body.categoryId;
+    let categoryValueId = req.body.categoryValueId;
+
+    let collectionRef = admin.firestore().collection("userData")
+        .where("groupIds", "array-contains", groupId);
+
+    collectionRef.get()
+        .then((querySnapshot) => {
+            console.log("snapshotSize:" + querySnapshot.size);
+            querySnapshot.forEach(doc => {
+                var id = doc.id;
+                var userData = doc.data()
+                let groupCategory = userData.registeredGroups.find(group => group.groupId === groupId);
+                if (groupCategory) {
+                    let filteringCategory = groupCategory.categories.find(category => category.id === categoryId);
+                    if (filteringCategory && filteringCategory.selectedValueId === categoryValueId) {
+                        console.log(userData.userEmail)
+                        counter++;
+                        const email = {
+                            "TemplateId": req.body.templateId,
+                            "From": 'CareerFairy <noreply@careerfairy.io>',
+                            "To": userData.userEmail,
+                            "TemplateModel": {
+                                userEmail: userData.userEmail
+                            }
+                        };
+                        client.sendEmailWithTemplate(email).then(() => {
+                            console.log("email sent to: " + userData.userEmail);
+                        }, error => {
+                            console.log('error:' + error);
+                        });
+                    }
+                }
+            });
+        }).catch(error => {
+        console.log('error:' + error);
+        return res.status(400).send();
+    })
+});
+
 
 const {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('agora-access-token')
 const appID = '53675bc6d3884026a72ecb1de3d19eb1';
@@ -519,6 +575,45 @@ exports.generateAgoraToken = functions.https.onRequest(async (req, res) => {
     
         return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
 })
+
+const axios = require('axios');
+
+exports.startRecordingLivestream = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        res.status(204).send('');
+    }
+
+    const customerKey = "fd45e86c6ffe445ebb87571344e945b1";
+    const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0";
+
+    let plainCredentials = `${customerKey}:${customerSecret}`;
+    let base64Credentials = Buffer.from(plainCredentials).toString('base64');
+
+    let authorizationHeader = `Basic ${base64Credentials}`;
+
+    let acquire = await axios({
+        method: 'post',
+        data: {
+            "cname": "bnruMEB6DGte14VNaZ9M",
+            "uid": 1234232,
+            "clientRequest": {}
+        },
+        url: `https://api.agora.io/dev/v1/apps/${appID}/cloud_recording/acquire`,
+        headers: {
+            'Authorization': authorizationHeader,
+            'Content-Type': 'application/json'
+        }
+    })
+    console.log(acquire);
+});
 
 exports.generateAgoraTokenSecure = functions.https.onRequest(async (req, res) => {
 
@@ -821,62 +916,4 @@ exports.scheduleTestLivestreamDeletion = functions.pubsub.schedule('every sunday
             });
         })
     });
-});
-
-exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(async (req, res) => {
-
-    console.log("running");
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
-
-    let counter = 0;
-
-    let groupId = req.body.groupId;
-    let categoryId = req.body.categoryId;
-    let categoryValueId = req.body.categoryValueId;
-
-    let collectionRef = admin.firestore().collection("userData")
-        .where("groupIds", "array-contains", groupId);
-
-    collectionRef.get()
-        .then((querySnapshot) => {
-            console.log("snapshotSize:" + querySnapshot.size);
-            querySnapshot.forEach(doc => {
-                var id = doc.id;
-                var userData = doc.data()
-                let groupCategory = userData.registeredGroups.find(group => group.groupId === groupId);
-                if (groupCategory) {
-                    let filteringCategory = groupCategory.categories.find(category => category.id === categoryId);
-                    if (filteringCategory && filteringCategory.selectedValueId === categoryValueId) {
-                        console.log(userData.userEmail)
-                        counter++;
-                        const email = {
-                            "TemplateId": req.body.templateId,
-                            "From": 'CareerFairy <noreply@careerfairy.io>',
-                            "To": userData.userEmail,
-                            "TemplateModel": {
-                                userEmail: userData.userEmail
-                            }
-                        };
-                        client.sendEmailWithTemplate(email).then(() => {
-                            console.log("email sent to: " + userData.userEmail);
-                        }, error => {
-                            console.log('error:' + error);
-                        });
-                    }
-                }
-            });
-        }).catch(error => {
-        console.log('error:' + error);
-        return res.status(400).send();
-    })
 });
