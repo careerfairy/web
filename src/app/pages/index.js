@@ -7,7 +7,6 @@ import Link from 'next/link';
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
 import {makeStyles} from "@material-ui/core/styles";
-import {GlobalBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import {Avatar} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 
@@ -48,7 +47,7 @@ const useStyles = makeStyles(theme => ({
     stepContainer: {
         boxShadow: theme.palette.type === "dark" && theme.shadows[7],
         borderRadius: theme.spacing(1),
-        padding: theme.spacing(1),
+        padding: theme.spacing(1.5, 1, 1, 1),
         width: "100%",
         textAlign: "center",
         cursor: "pointer",
@@ -238,7 +237,6 @@ function LandingPage(props) {
 
     return (
         <Fragment>
-            <GlobalBackground>
                 <div className={classes.videoContainer}>
                     <Header page='landing'/>
                     <div className='intro-mask'>
@@ -315,8 +313,16 @@ function LandingPage(props) {
                         </div>
                     </Container>
                 </div>
-            </GlobalBackground>
             <style jsx>{`
+
+             .introFullPage {
+                    position: relative;
+                    width: 100%;
+                    height: 550px;
+                    overflow: hidden;
+                    box-shadow: 0 0 5px grey;
+                    border: 2px solid
+                }
               .intro-mask {
                 position: absolute;
                 top: 0;
