@@ -26,7 +26,7 @@ export const baseThemeObj = {
             contrastText: "#FFFFFF",
             dark: "#00b08f",
         },
-        type: "dark",
+        type: "light",
         background:{
             level1: "#212121",
             level2: "#333",
