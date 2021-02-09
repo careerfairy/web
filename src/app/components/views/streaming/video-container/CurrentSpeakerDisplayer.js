@@ -66,7 +66,29 @@ const useStyles = makeStyles(theme => ({
         width: "100%",
         margin: "0 auto",
         zIndex: 2000
-    }
+    },
+    relativeContainer: {
+        position: "relative",
+        height: "100%",
+        minHeight: "calc(100vh - 55px)"
+    },
+    relativeContainerVideos: {
+        margin: "0",
+        backgroundColor: "rgb(30, 30, 30)",
+        overflowX: "scroll",
+        overflowY: "hidden",
+        whiteSpace: "nowrap",
+        textAlign: "center",
+        '&::-webkit-scrollbar': {
+            height: 5
+        },
+        '&::-webkit-scrollbar-track': {
+            background: theme.palette.common.black
+        },
+        '&::-webkit-scrollbar-thumb': {
+            background: theme.palette.primary.main
+        }
+    },
 }))
 
 function CurrentSpeakerDisplayer(props) {
@@ -165,47 +187,11 @@ function CurrentSpeakerDisplayer(props) {
     }
 
     return (
-        <Fragment>
-            <div className='relative-container'>
-                <div className='relative-container-videos' style={{height: getMinimizedSpeakersGridHeight()}}>
-                    {externalVideoElements}
-                </div>
+        <div className={classes.relativeContainer}>
+            <div className={classes.relativeContainerVideos} style={{height: getMinimizedSpeakersGridHeight()}}>
+                {externalVideoElements}
             </div>
-            <style jsx>{`
-              .relative-container {
-                position: relative;
-                height: 100%;
-                min-height: calc(100vh - 55px);
-              }
-
-              .relative-container-videos {
-                margin: 0;
-                background-color: rgb(30, 30, 30);
-                overflow-x: scroll;
-                overflow-y: hidden;
-                white-space: nowrap;
-                text-align: center;
-                scrollbar-color: black rgba(0, 210, 170, 0.8);
-
-              }
-
-              .relative-container-videos::-webkit-scrollbar {
-                height: 5px;
-              }
-
-              .relative-container-videos::-webkit-scrollbar-track {
-                background: black;
-              }
-
-              .relative-container-videos::-webkit-scrollbar-thumb {
-                background: rgba(0, 210, 170, 0.8);
-              }
-
-              .hidden {
-                display: none;
-              }
-            `}</style>
-        </Fragment>
+        </div>
     );
 }
 
