@@ -41,7 +41,7 @@ const General = ({
                      showBar
                  }) => {
     const classes = useStyles()
-    const [currentCategory, setCurrentCategory] = useState({options:[]});
+    const [currentCategory, setCurrentCategory] = useState({options: []});
     const [localUserType, setLocalUserType] = useState(userTypes[0]);
 
     useEffect(() => {
@@ -54,7 +54,7 @@ const General = ({
     const getTotalRegisteredUsers = (streamsArray) => {
         const total = streamsArray.reduce(
             (accumulator, {registeredUsers}) =>
-                accumulator + registeredUsers.length,
+                accumulator + registeredUsers?.length,
             0
         );
         // Checks if the result is a number
@@ -64,6 +64,9 @@ const General = ({
     const getTotal = (streamsArray, prop) => {
         return streamsArray.reduce(
             (accumulator, livestream) => {
+                if (livestream?.[prop] === undefined) {
+                    livestream[prop] = []
+                }
                 return [...accumulator, ...livestream[prop]];
             },
             []
@@ -93,6 +96,7 @@ const General = ({
 
     const compareRegistrations = () => {
         const registrationsFromTimeFrame = getTotal(streamsFromTimeFrame, "registeredUsers").length
+        console.log("-> registrationsFromTimeFrame", registrationsFromTimeFrame);
         const registrationsFromBeforeTimeFrame = getTotal(streamsFromBeforeTimeFrame, "registeredUsers").length
         const {
             positive,
