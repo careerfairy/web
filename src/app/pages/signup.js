@@ -33,6 +33,7 @@ import GroupProvider from "../components/views/signup/GroupProvider";
 import UniversitySelector from "../components/views/universitySelect/UniversitySelector";
 import UniversityCountrySelector from "../components/views/universitySelect/UniversityCountrySelector";
 import {useAuth} from "../HOCs/AuthProvider";
+import { firebaseConnect } from 'react-redux-firebase';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -113,12 +114,18 @@ function SignUpPage({firebase}) {
     // }, []);
 
     useEffect(() => {
-        if (user && user.emailVerified) {
-            router.push('/next-livestreams')
-        } else if (user && !user.emailVerified && userData) {
-            setActiveStep(1)
-        }
+        verifyUserState();
     }, [user, userData])
+
+    const verifyUserState = async () => {
+        if (user.isLoaded && !user.isEmpty) {
+            if (user.emailVerified && userData && userData.groupIds) {
+                router.push('/next-livestreams')
+            } else if (!user.emailVerified) {
+                setActiveStep(1)
+            }
+        }  
+    }
 
     function getStepContent(stepIndex) {
         switch (stepIndex) {
@@ -189,7 +196,7 @@ export default withFirebase(SignUpPage);
 
 const SignUpForm = withFirebase(SignUpFormBase);
 
-const SignUpFormSent = SignUpFormValidate;
+const SignUpFormSent = firebaseConnect()(SignUpFormValidate);
 
 function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEmailVerificationSent, setActiveStep}) {
     const classes = useStyles()
@@ -201,7 +208,7 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
     const [open, setOpen] = React.useState(false);
 
     useEffect(() => {
-        if (emailSent && user && !emailVerificationSent) {
+        if (emailSent && user.isLoaded && !user.isEmpty && !emailVerificationSent) {
             axios({
                 method: 'post',
                 url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailUserDataAndUniWithName',
@@ -522,7 +529,7 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
     )
 }
 
-function SignUpFormValidate({user, userData, setEmailVerificationSent, setActiveStep, absolutePath}) {
+function SignUpFormValidate({user, firebase: { reloadAuth }, setEmailVerificationSent, setActiveStep, absolutePath}) {
     const classes = useStyles()
     const router = useRouter()
 
@@ -572,7 +579,7 @@ function SignUpFormValidate({user, userData, setEmailVerificationSent, setActive
                         }
                     }).then(response => {
                         absolutePath ? router.push(absolutePath) : setActiveStep(2);
-                        user.reload();
+                        reloadAuth();
                     }).catch(error => {
                         console.log("error", error);
                         setIncorrectPin(true);

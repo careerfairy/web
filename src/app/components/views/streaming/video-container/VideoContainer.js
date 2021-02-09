@@ -150,7 +150,7 @@ function VideoContainer(props) {
                 }
                 let newTimeout = setTimeout(() => {
                     localMediaStream.setVideoProfile("480p_9")
-                }, 8000);
+                }, 20000);
                 setTimeoutState(newTimeout)
             } else {
                 if (timeoutState) {
@@ -158,7 +158,7 @@ function VideoContainer(props) {
                 }
                 let newTimeout = setTimeout(() => {
                     localMediaStream.setVideoProfile("180p")
-                }, 8000);
+                }, 20000);
                 setTimeoutState(newTimeout)
             }
         }    

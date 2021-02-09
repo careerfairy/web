@@ -373,7 +373,7 @@ const GroupStreamCardV2 = memo(({
     const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
 
     function userIsRegistered() {
-        if (!user || !livestream.registeredUsers || isAdmin) {
+        if (user.isLoaded && user.isEmpty || !livestream.registeredUsers || isAdmin) {
             return false;
         }
         return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1)
@@ -486,7 +486,7 @@ const GroupStreamCardV2 = memo(({
     }
 
     const checkIfUserFollows = (careerCenter) => {
-        if (user && userData && userData.groupIds) {
+        if (user.isLoaded && !user.isEmpty && userData && userData.groupIds) {
             const {groupId} = careerCenter
             return userData.groupIds.includes(groupId)
         } else {
@@ -495,7 +495,7 @@ const GroupStreamCardV2 = memo(({
     }
 
     function deregisterFromLivestream() {
-        if (!user) {
+        if (user.isLoaded && user.isEmpty) {
             return router.push({
                 pathname: '/login',
                 query: {absolutePath}
@@ -506,7 +506,7 @@ const GroupStreamCardV2 = memo(({
     }
 
     async function startRegistrationProcess() {
-        if (!user || !user.emailVerified) {
+        if (user.isLoaded && user.isEmpty || !user.emailVerified) {
             return router.push({
                 pathname: `/login`,
                 query: {absolutePath: linkToStream},

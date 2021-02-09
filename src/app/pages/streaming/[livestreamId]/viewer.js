@@ -128,9 +128,6 @@ function ViewerPage({firebase}) {
     const [open, setOpen] = React.useState(true);
     const [delayHandler, setDelayHandler] = useState(null)
 
-
-    const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
-
     const {authenticatedUser, userData} = useAuth();
 
     if (currentLivestream && !currentLivestream.test && authenticatedUser?.isLoaded && authenticatedUser?.isEmpty) {
@@ -149,7 +146,7 @@ function ViewerPage({firebase}) {
     }, [width]);
 
     useEffect(() => {
-        if (userData && livestreamId) {
+        if (userData && userData.userEmail && livestreamId) {
             firebase.setUserIsParticipating(livestreamId, userData);
         }
     }, [livestreamId, userData]);
@@ -303,7 +300,7 @@ function ViewerPage({firebase}) {
             >
 
                 <ViewerComponent
-                    livestreamId={livestreamId} streamerId={streamerId}
+                    livestreamId={livestreamId} streamerId={authenticatedUser?.email}
                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
                     setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton}
                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>

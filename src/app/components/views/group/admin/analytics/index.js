@@ -19,6 +19,7 @@ import Feedback from "./Feedback";
 import {universityCountriesMap} from "../../../../util/constants";
 import {useFirestoreConnect, withFirestore, isLoaded} from "react-redux-firebase";
 import {useSelector, shallowEqual} from "react-redux";
+import {useAuth} from "../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -212,6 +213,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     const breakdownRef = useRef(null)
     const theme = useTheme()
     const [value, setValue] = useState(0);
+    const {userData} = useAuth();
 
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
     const [showBar, setShowBar] = useState(false);
@@ -281,13 +283,13 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     }, []);
 
     useEffect(() => {
-        if (currentUserDataSet.dataSet === "followers") {
+        if (currentUserDataSet.dataSet === "followers" && !userData?.isAdmin) {
             const limitedUserTypes = userTypes.filter(({propertyName}) => propertyName === "talentPool")
             setLimitedUserTypes(limitedUserTypes)
         } else {
             setLimitedUserTypes(userTypes)
         }
-    }, [currentUserDataSet.dataSet])
+    }, [currentUserDataSet.dataSet, userData])
 
     useEffect(() => {
         const flattenedGroupOptions = handleFlattenOptions(group)
@@ -434,46 +436,44 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
         currentUserDataSet
     ]);
 
-    const getTabProps = (tabName) => {
-        return {
-            group,
-            futureStreams,
-            globalTimeFrame,
-            loading: !isLoaded(livestreamsInStore) || !isLoaded(userDataSet),
-            streamsFromTimeFrame,
-            showBar,
-            handleToggleBar,
-            streamsFromTimeFrameAndFuture,
-            breakdownRef,
-            handleScrollToBreakdown,
-            currentStream,
-            setCurrentStream,
-            userType,
-            userTypes,
-            setUserType,
-            groupOptions,
-            ...(tabName !== "feedback" && {
-                handleReset
-            }),
-            ...(tabName === "feedback" && {
-                streamDataTypes,
-                fetchingRatings,
-                fetchingQuestions,
-                fetchingPolls,
-                streamDataType,
-                setStreamDataType,
-            }),
-            ...(tabName === "audience" && {
-                isFollowers,
-                limitedUserTypes
-            }),
-            ...(tabName === "general" && {
-                streamsFromBeforeTimeFrame,
-                userDataSet,
-                currentUserDataSet
-            }),
-        }
-    }
+    const getTabProps = (tabName) => ({
+        group,
+        futureStreams,
+        globalTimeFrame,
+        loading: !isLoaded(livestreamsInStore) || !isLoaded(userDataSet),
+        streamsFromTimeFrame,
+        showBar,
+        handleToggleBar,
+        streamsFromTimeFrameAndFuture,
+        breakdownRef,
+        handleScrollToBreakdown,
+        currentStream,
+        setCurrentStream,
+        userType,
+        userTypes,
+        setUserType,
+        groupOptions,
+        ...(tabName !== "feedback" && {
+            handleReset
+        }),
+        ...(tabName === "feedback" && {
+            streamDataTypes,
+            fetchingRatings,
+            fetchingQuestions,
+            fetchingPolls,
+            streamDataType,
+            setStreamDataType,
+        }),
+        ...(tabName === "audience" && {
+            isFollowers,
+            limitedUserTypes
+        }),
+        ...(tabName === "general" && {
+            streamsFromBeforeTimeFrame,
+            userDataSet,
+            currentUserDataSet
+        }),
+    })
 
 
     return (

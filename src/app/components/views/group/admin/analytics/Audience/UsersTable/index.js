@@ -49,7 +49,7 @@ const UsersTable = ({
                         ...rest
                     }) => {
     const dataTableRef = useRef(null)
-
+    const {userData} = useAuth();
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const {enqueueSnackbar} = useSnackbar()
@@ -221,8 +221,10 @@ const UsersTable = ({
     const shouldHide = () => {
         const userProp = userType.propertyName
         return Boolean(
-            !group.universityCode &&
-            (userProp === "registeredUsers" || userProp === "participatingStudents")
+            (!group.universityCode &&
+                (userProp === "registeredUsers" || userProp === "participatingStudents")
+            )
+            && !userData?.isAdmin
         )
     }
 
