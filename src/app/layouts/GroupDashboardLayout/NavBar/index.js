@@ -7,6 +7,9 @@ import {useRouter} from "next/router";
 import {theme} from "../../../materialUI";
 import {fade} from "@material-ui/core/styles";
 import clsx from "clsx";
+import * as actions from "../../../store/actions";
+import {compose} from "redux";
+import {connect} from "react-redux";
 
 const useStyles = makeStyles(() => ({
     mobileDrawer: {
@@ -45,7 +48,15 @@ const useStyles = makeStyles(() => ({
 
 }));
 
-const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, drawerBottomLinks, firebase}) => {
+const NavBar = ({
+                    onMobileClose,
+                    openMobile,
+                    group,
+                    drawerTopLinks,
+                    headerLinks,
+                    drawerBottomLinks,
+                    logout
+                }) => {
     const classes = useStyles();
     const {pathname} = useRouter()
     useEffect(() => {
@@ -55,7 +66,7 @@ const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, 
     }, [pathname]);
 
     const signOut = () => {
-        firebase.doSignOut()
+        logout()
     }
 
 
@@ -175,4 +186,13 @@ NavBar.defaultProps = {
     openMobile: false
 };
 
-export default NavBar;
+const mapDispatchToProps = {
+    logout: actions.signOut,
+}
+
+
+const enhance = compose(
+    connect(null, mapDispatchToProps)
+)
+
+export default enhance(NavBar);

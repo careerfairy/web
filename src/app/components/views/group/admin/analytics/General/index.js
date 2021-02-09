@@ -96,7 +96,6 @@ const General = ({
 
     const compareRegistrations = () => {
         const registrationsFromTimeFrame = getTotal(streamsFromTimeFrame, "registeredUsers").length
-        console.log("-> registrationsFromTimeFrame", registrationsFromTimeFrame);
         const registrationsFromBeforeTimeFrame = getTotal(streamsFromBeforeTimeFrame, "registeredUsers").length
         const {
             positive,

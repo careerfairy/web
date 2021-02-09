@@ -35,12 +35,11 @@ const AuthProvider = ({children}) => {
             {
                 collection: 'userData', doc: auth.email,  // or `userData/${auth.email}`
                 storeAs: "userProfile",
-                limit: 1
             }
         ] : []
-    })
+    }, [auth.email])
 
-    const userData = useSelector(({firestore}) => firestore.data.userProfile)
+    const userData = useSelector(({firestore}) => auth.email ? firestore.data.userProfile : null)
 
     useEffect(() => {
         // Check that initial route is OK
