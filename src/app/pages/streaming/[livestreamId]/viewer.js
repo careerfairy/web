@@ -90,7 +90,7 @@ function ViewerPage({firebase}) {
     }, [width]);
 
     useEffect(() => {
-        if (userData && livestreamId) {
+        if (userData && userData.userEmail && livestreamId) {
             firebase.setUserIsParticipating(livestreamId, userData);
         }
     }, [livestreamId, userData]);
