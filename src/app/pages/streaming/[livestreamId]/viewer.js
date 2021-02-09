@@ -22,6 +22,8 @@ import Toolbar from "@material-ui/core/Toolbar";
 import AppBar from '@material-ui/core/AppBar';
 import {MainLogo} from "../../../components/logos";
 import Box from "@material-ui/core/Box";
+import Backdrop from '@material-ui/core/Backdrop';
+
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
@@ -47,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
     menuLeft: {
         position: "absolute",
         transition: "width 0.3s",
+        boxShadow: theme.shadows[5],
         transitionTimingFunction: theme.transitions.easeInOut,
         width: ({showMenu, mobile}) => showMenu ? (mobile ? "100%" : 280) : 0,
         top: 0,
@@ -98,6 +101,23 @@ const useStyles = makeStyles((theme) => ({
         width: "20%",
         minWidth: "250px",
         zIndex: 7250
+    },
+    iconsContainer: {
+        position: "absolute",
+        bottom: "50px",
+        right: "60px",
+        zIndex: 100,
+        width: "80px"
+    },
+    backdropContent: {
+      display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    backdrop: {
+        cursor: "pointer",
+        zIndex: 200
     }
 }));
 
@@ -267,7 +287,7 @@ function ViewerPage({firebase}) {
     return (
         <div className={classes.root}>
             {width >= 768 &&
-            <AppBar color="transparent" position="static">
+            <AppBar elevation={1} color="transparent">
                 <Toolbar className={classes.toolbar}>
                     <MainLogo/>
                     {logoElements}
@@ -292,13 +312,10 @@ function ViewerPage({firebase}) {
                         color={userIsInTalentPool ? "default" : "primary"}/>}
                 </Toolbar>
             </AppBar>}
-            <div
-                className={clsx({
-                    [classes.blackFrame]: true,
-                    [classes.withMenu]: showMenu
-                })}
-            >
-
+            <div className={clsx({
+                [classes.blackFrame]: true,
+                [classes.withMenu]: showMenu
+            })}>
                 <ViewerComponent
                     livestreamId={livestreamId} streamerId={authenticatedUser?.email}
                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
@@ -336,57 +353,30 @@ function ViewerPage({firebase}) {
                 setShowMenu={setShowMenu}
                 isMobile={width < 768}
                 toggleShowMenu={toggleShowMenu}/>
-            <div className='icons-container'>
-                <IconsContainer isTest={currentLivestream.test} livestreamId={currentLivestream.id}/>
-            </div>
+            <IconsContainer className={classes.iconsContainer}
+                            isTest={currentLivestream.test}
+                            livestreamId={currentLivestream.id}/>
             {currentLivestream && !currentLivestream.hasNoRatings &&
-            <RatingContainer livestreamId={currentLivestream.id} livestream={currentLivestream}/>}
-            <div className={'playButtonContent ' + (showVideoButton.muted ? '' : 'hidden')} onClick={unmuteVideos}>
-                <div className='playButton'>
+            <RatingContainer livestreamId={currentLivestream.id}
+                             livestream={currentLivestream}/>}
+            <Backdrop
+                open={Boolean(showVideoButton.muted)}
+                className={classes.backdrop}
+                onClick={unmuteVideos}>
+                <div className={classes.backdropContent}>
                     <VolumeUpRoundedIcon style={{fontSize: '3rem'}}/>
                     <div>Click to unmute</div>
                 </div>
-            </div>
-            <div className={'playButtonContent ' + (showVideoButton.paused ? '' : 'hidden')} onClick={playVideos}>
-                <div className='playButton'>
+            </Backdrop>
+            <Backdrop
+                open={Boolean(showVideoButton.paused)}
+                className={classes.backdrop}
+                onClick={playVideos}>
+                <div className={classes.backdropContent}>
                     <PlayArrowRoundedIcon style={{fontSize: '3rem'}}/>
                     <div>Click to play</div>
                 </div>
-            </div>
-            <style jsx>{`
-              .hidden {
-                display: none
-              }
-
-              .icons-container {
-                position: absolute;
-                bottom: 50px;
-                right: 60px;
-                z-index: 100;
-                width: 80px;
-              }
-
-              .playButton {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                color: white;
-                font-weight: 500;
-                text-align: center;
-              }
-
-              .playButtonContent {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(10, 10, 10, 0.4);
-                cursor: pointer;
-                z-index: 200;
-              }
-            `}</style>
+            </Backdrop>
         </div>
     );
 }

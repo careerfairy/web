@@ -12,10 +12,14 @@ import {useDispatch, useSelector} from "react-redux";
 import {TransitionGroup} from "react-transition-group";
 import {Slide} from "@material-ui/core";
 import {EMOTE_MESSAGE_TEXT_TYPE} from "../../../util/constants";
+import clsx from "clsx";
 
 var _ = require('lodash')
 
 const useStyles = makeStyles(theme => ({
+    root:{
+
+    },
     actionBtn: {
         borderRadius: "50%",
         backgroundColor: ({color}) => color,
@@ -39,7 +43,7 @@ const useStyles = makeStyles(theme => ({
     },
     animatedBox: {
         transition: ({durationTransform}) => `transform ${durationTransform}ms ease-in, opacity ${durationTransform}ms cubic-bezier(1,0,.83,.67)`,
-        position: "absolute",
+        position: "relative",
         opacity: ({opacity}) => opacity,
         right: ({right}) => right,
         transform: ({distance}) => `translateY(${distance}vh)`,
@@ -75,7 +79,7 @@ const ActionButton = React.memo(({iconName, color, getRandomDuration, getRandomH
 
 
     return (
-        <div className={classes.animatedBox}>
+        <div  className={classes.animatedBox}>
             <RubberBand style={{position: "absolute"}}>
                 <div className={classes.actionBtn}>
                     {renderIcon()}
@@ -90,7 +94,8 @@ const randomInteger = (min, max) => {
 }
 const emotes = ["clapping", "like", "heart"]
 
-function IconsContainer() {
+function IconsContainer({className}) {
+    const classes = useStyles()
     const emotesData = useSelector(state => state.emotes.emotesData)
     const {showBubbles, setShowBubbles} = useContext(TutorialContext);
     const dispatch = useDispatch()
@@ -139,7 +144,7 @@ function IconsContainer() {
     }
 
     return (
-        <div style={{position: "relative"}} className='topLevelContainer'>
+        <div className={clsx(classes.root, className)}>
             <TransitionGroup>
                 {emotesData.length > 0 && (
                     <Slide direction="up">

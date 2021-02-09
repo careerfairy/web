@@ -23,7 +23,9 @@ import {useAuth} from "../../../../../../HOCs/AuthProvider";
 import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
-    root: {},
+    root: {
+        boxShadow: theme.shadows[3]
+    },
     sendIcon: {
         background: "white",
         color: ({isEmpty}) => isEmpty ? "grey" : theme.palette.primary.main,
@@ -212,16 +214,19 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
                         }} buttonText="Ok"/>
                     </React.Fragment>
                 } open={isOpen(14)}>
-                <Accordion TransitionProps={{unmountOnExit: true}} onChange={() => {
+                <Accordion
+                    TransitionProps={{unmountOnExit: true}}
+                    onChange={() => {
                     !open && isOpen(14) && handleConfirmStep(14)
                     setOpen(!open)
-                }} expanded={open}>
+                }}
+                    expanded={open}
+                >
                     <AccordionSummary className={classes.header}
                                       expandIcon={<ExpandLessRoundedIcon/>}
                                       aria-controls="chat-header"
                                       id="chat-header"
                                       classes={{expanded: classes.expanded}}
-                                      style={{boxShadow: "0 0 2px grey"}}
                     >
                         <Badge badgeContent={numberOfMissedEntries} color="error">
                             <ForumOutlinedIcon fontSize="small"/>
