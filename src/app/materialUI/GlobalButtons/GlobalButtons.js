@@ -2,7 +2,7 @@ import IconButton from "@material-ui/core/IconButton";
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
-import {fade} from "@material-ui/core";
+import {fade, useTheme} from "@material-ui/core";
 import {grey} from "@material-ui/core/colors";
 import Slide from '@material-ui/core/Slide';
 import Button from '@material-ui/core/Button';
@@ -14,6 +14,8 @@ import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
+import CircularProgress from "@material-ui/core/CircularProgress";
+import {validateHTMLColor} from 'validate-color';
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -37,7 +39,19 @@ const useStyles = makeStyles(theme => ({
     buttonDisabled: {},
     popper: {
         zIndex: 102
-    }
+    },
+    dynamicButtonDisabled: {
+        background: `${theme.palette.action.disabledBackground} !important`,
+        color: `${theme.palette.action.disabled} !important`
+    },
+    dynamicButtonRoot: {
+        background: ({color}) => `linear-gradient(45deg, ${color || theme.palette.primary.main} 30%, ${fade(color || theme.palette.primary.main, 0.8)} 90%)`,
+        color: 'white',
+    },
+
+    dynamicLabel: {
+        textTransform: 'capitalize',
+    },
 }))
 
 export const PlayIconButton = ({addNewComment, isEmpty, IconProps, IconButtonProps, ...props}) => {
@@ -57,7 +71,25 @@ export const PlayIconButton = ({addNewComment, isEmpty, IconProps, IconButtonPro
         </div>
     )
 }
-
+export const DynamicColorButton = ({disabled, startIcon, loading, color, children, ...rest}) => {
+    const theme = useTheme()
+    color = color === "secondary" ? theme.palette.secondary.main : (color === "primary" || !validateHTMLColor(color)) ? theme.palette.primary.main : color
+    const classes = useStyles({color})
+    return (
+        <Button
+            {...rest}
+            disabled={loading || disabled}
+            startIcon={!loading && startIcon}
+            classes={{
+                root: classes.dynamicButtonRoot,
+                label: classes.dynamicLabel,
+                disabled: classes.dynamicButtonDisabled
+            }}
+        >
+            {loading ? <CircularProgress color="inherit" size={16}/> : children}
+        </Button>
+    )
+}
 
 //example
 // const options = [{
@@ -75,7 +107,13 @@ export const PlayIconButton = ({addNewComment, isEmpty, IconProps, IconButtonPro
 //     }
 // }];
 
-export const CustomSplitButton = ({options = [], mainButtonProps, slideDirection = "right", sideButtonProps, ...props}) => {
+export const CustomSplitButton = ({
+                                      options = [],
+                                      mainButtonProps,
+                                      slideDirection = "right",
+                                      sideButtonProps,
+                                      ...props
+                                  }) => {
     const classes = useStyles()
     const [open, setOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
@@ -121,7 +159,8 @@ export const CustomSplitButton = ({options = [], mainButtonProps, slideDirection
                     </Button>
                 </ButtonGroup>
             </Slide>
-            <Popper className={classes.popper} open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+            <Popper className={classes.popper} open={open} anchorEl={anchorRef.current} role={undefined} transition
+                    disablePortal>
                 {({TransitionProps, placement}) => (
                     <Grow
                         {...TransitionProps}
