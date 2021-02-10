@@ -23,7 +23,8 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: "black",
         width: "100%",
         height: "10vh",
-        margin: "0 auto"
+        margin: "0 auto",
+
     },
     mutedOverlay: {
         position: "absolute",
@@ -48,7 +49,14 @@ const useStyles = makeStyles(theme => ({
     },
     videoWrapper: {
         "& video": {
-            position: "static !important",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            maxHeight: "100%",
+            maxWidth: "100%",
+            zIndex: 9900,
+            backgroundColor: "black"
         }
     }
 }))
@@ -132,7 +140,6 @@ function RemoteVideoContainer(props) {
         }
     }
 
-    console.log("-> props.stream.streamId", props.stream.streamId);
     return (
         <WhiteTooltip
             placement="bottom"

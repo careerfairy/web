@@ -28,7 +28,6 @@ const useStyles = makeStyles(theme => ({
     },
 
     externalSpeakerVideoSolo: {
-        border: "5px solid blue",
         position: "absolute",
         top: "0",
         left: "0",
@@ -152,7 +151,7 @@ function CurrentSpeakerDisplayer(props) {
             }
         } else {
             if (props.streams.length > 0) {
-                return streamId === props.currentSpeaker ? classes[`${prop}SpeakerVideoSolo`] : classes[`${prop}QuarterWidth`]
+                return streamId === props.currentSpeaker ? classes[`${prop}SpeakerVideo`] : classes[`${prop}QuarterWidth`]
             } else {
                 return classes[`${prop}SpeakerVideoSolo`]
             }
@@ -160,7 +159,6 @@ function CurrentSpeakerDisplayer(props) {
     }
 
     let externalVideoElements = props.streams.filter(stream => !stream.streamId.includes("screen")).map((stream, index) => {
-       console.log("-> getVideoContainerClass in external", getVideoContainerClass(stream.streamId, "external"));
         return (
             <div key={stream.streamId} className={getVideoContainerClass(stream.streamId, "external")}
                  style={{padding: 0}}>
