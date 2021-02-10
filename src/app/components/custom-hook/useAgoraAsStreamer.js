@@ -41,7 +41,11 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         if (streamId) {
             const regex = /-/g;
             let joiningId = streamId.replace(regex, '')
-            setUserUid(joiningId)
+            if (isViewer) {
+                setUserUid(joiningId + roomId)
+            } else {
+                setUserUid(joiningId)
+            }
         }
     }, [streamId])
 
