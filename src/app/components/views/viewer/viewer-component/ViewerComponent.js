@@ -18,7 +18,6 @@ function ViewerComponent(props) {
     const {userData, authenticatedUser} = useAuth();
 
     const streamerReady = true;
-    const devices = useDevices();
 
     const screenSharingMode = props.currentLivestream.screenSharerId === authenticatedUser?.email && 
         props.currentLivestream.mode === 'desktop';
@@ -32,6 +31,8 @@ function ViewerComponent(props) {
             streamerId,
             true
         );
+
+    const devices = useDevices(agoraStatus === "stream_published");
 
     const {
         audioSource,

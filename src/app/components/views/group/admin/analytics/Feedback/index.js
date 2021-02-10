@@ -20,10 +20,10 @@ const Feedback = ({
                       group,
                       globalTimeFrame,
                       futureStreams,
+                      loading,
                       userType,
                       setUserType,
                       userTypes,
-                      fetchingStreams,
                       streamDataTypes,
                       streamsFromTimeFrame,
                       streamsFromTimeFrameAndFuture,
@@ -88,7 +88,7 @@ const Feedback = ({
 
     const isFetching = () => {
         return Boolean(
-            fetchingStreams || fetchingRatings || fetchingQuestions || fetchingPolls
+            loading || fetchingRatings || fetchingQuestions || fetchingPolls
         )
     }
 
@@ -106,7 +106,7 @@ const Feedback = ({
                         setCurrentStream={setCurrentStream}
                         futureStreams={futureStreams}
                         currentStream={currentStream}
-                        fetchingStreams={fetchingStreams}
+                        fetchingStreams={loading}
                         streamsFromTimeFrame={streamsFromTimeFrame}
                         userType={userType}
                         userTypes={userTypes}
@@ -146,7 +146,7 @@ const Feedback = ({
                     {isRating() &&
                     <RatingSideTable
                         streamDataType={streamDataType}
-                        fetchingStreams={fetchingStreams}
+                        fetchingStreams={loading}
                         sideRef={sideRef}
                         currentRating={currentRating}
                     />}

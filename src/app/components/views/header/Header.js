@@ -29,15 +29,15 @@ function Header(props) {
 
     const [authenticated, setAuthenticated] = useState(false);
     const [sidebarState, setSidebarState] = useState("unopened");
-    const {userData} = useAuth()
+    const {authenticatedUser, userData} = useAuth()
 
     useEffect(() => {
-        if (userData) {
+        if (authenticatedUser.isLoaded && !authenticatedUser.isEmpty) {
             setAuthenticated(true);
         } else {
             setAuthenticated(false);
         }
-    }, [userData]);
+    }, [authenticatedUser]);
 
     const handleLogout = () => {
         props.logout()

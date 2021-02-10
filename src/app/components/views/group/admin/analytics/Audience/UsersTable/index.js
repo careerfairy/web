@@ -52,7 +52,7 @@ const UsersTable = ({
                         ...rest
                     }) => {
     const dataTableRef = useRef(null)
-
+    const {userData} = useAuth();
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const {enqueueSnackbar} = useSnackbar()
@@ -148,7 +148,7 @@ const UsersTable = ({
     const mapUserCategories = () => {
         const groupCategories = group.categories ? [...group.categories] : []
         if (groupCategories.length) {
-            const updatedUsers = totalUniqueUsers.map(user => {
+            const updatedUsers = totalUniqueUsers?.map(user => {
                 const updatedUser = user
                 groupCategories.forEach(category => {
                     const targetCategoryId = category.id
@@ -224,8 +224,10 @@ const UsersTable = ({
     const shouldHide = () => {
         const userProp = userType.propertyName
         return Boolean(
-            !group.universityCode &&
-            (userProp === "registeredUsers" || userProp === "participatingStudents")
+            (!group.universityCode &&
+                (userProp === "registeredUsers" || userProp === "participatingStudents")
+            )
+            && !userData?.isAdmin
         )
     }
 

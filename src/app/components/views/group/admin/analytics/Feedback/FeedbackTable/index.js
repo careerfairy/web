@@ -120,6 +120,10 @@ const FeedbackTable = ({
     const handleEditFeedback = (row) => {
         setFeedbackModal({data: row, open: true})
     }
+    const handleCloseFeedbackModal = () => {
+        setFeedbackModal({data: {}, open: false})
+    }
+
     const handleCreateFeedback = () => {
         setFeedbackModal({data: {}, open: true})
     }
@@ -250,10 +254,6 @@ const FeedbackTable = ({
 
     const customOptions = {...defaultTableOptions}
     customOptions.selection = false
-
-    const handleCloseFeedbackModal = () => {
-        setFeedbackModal(prevState => ({...prevState, open: false}))
-    }
 
 
     const handleMenuItemClick = (event, index) => {

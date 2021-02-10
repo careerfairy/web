@@ -294,7 +294,7 @@ const NewLivestreamForm = ({firebase}) => {
     }
 
     const isAuthenticating = () => {
-        return Boolean(authenticatedUser === undefined)
+        return Boolean(!authenticatedUser.isLoaded && authenticatedUser.isEmpty)
     }
 
 

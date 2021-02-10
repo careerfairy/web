@@ -69,12 +69,9 @@ function ViewerPage({firebase}) {
     const [open, setOpen] = React.useState(true);
     const [delayHandler, setDelayHandler] = useState(null)
 
-
-    const streamerId = 'ehdwqgdewgzqzuedgquzwedgqwzeugdu';
-
     const {authenticatedUser, userData} = useAuth();
 
-    if (currentLivestream && !currentLivestream.test && authenticatedUser === null) {
+    if (currentLivestream && !currentLivestream.test && authenticatedUser?.isLoaded && authenticatedUser?.isEmpty) {
         router.replace({
             pathname: `/login`,
             query: {absolutePath: router.asPath},
@@ -90,7 +87,7 @@ function ViewerPage({firebase}) {
     }, [width]);
 
     useEffect(() => {
-        if (userData && livestreamId) {
+        if (userData && userData.userEmail && livestreamId) {
             firebase.setUserIsParticipating(livestreamId, userData);
         }
     }, [livestreamId, userData]);
@@ -253,7 +250,7 @@ function ViewerPage({firebase}) {
             <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
 
                 <ViewerComponent
-                    livestreamId={livestreamId} streamerId={streamerId}
+                    livestreamId={livestreamId} streamerId={`${authenticatedUser?.email}${livestreamId}`}
                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
                     setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton}
                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>

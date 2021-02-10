@@ -42,7 +42,6 @@ function VideoContainer(props) {
     } = useContext(TutorialContext);
 
     const classes = useStyles();
-    const devices = useDevices();
     const localVideoId = 'localVideo';
     const isMainStreamer = props.streamerId === props.currentLivestream.id;
 
@@ -69,6 +68,8 @@ function VideoContainer(props) {
             props.streamerId,
             props.viewer
         );
+
+    const devices = useDevices(agoraStatus === "stream_published");
 
     const {
         audioSource,
@@ -118,6 +119,12 @@ function VideoContainer(props) {
     }, [audioCounter, props.currentLivestream.mode]);
 
     useEffect(() => {
+        if (agoraStatus === "screen-share-stopped" && props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
+            setDesktopMode("default", props.streamerId)
+        }
+    }, [agoraStatus])
+
+    useEffect(() => {
         if (isMainStreamer && props.currentLivestream.mode === 'desktop') {
             setLivestreamCurrentSpeakerId(props.currentLivestream.screenSharerId);
         }
@@ -150,7 +157,7 @@ function VideoContainer(props) {
                 }
                 let newTimeout = setTimeout(() => {
                     localMediaStream.setVideoProfile("480p_9")
-                }, 8000);
+                }, 20000);
                 setTimeoutState(newTimeout)
             } else {
                 if (timeoutState) {
@@ -158,7 +165,7 @@ function VideoContainer(props) {
                 }
                 let newTimeout = setTimeout(() => {
                     localMediaStream.setVideoProfile("180p")
-                }, 8000);
+                }, 20000);
                 setTimeoutState(newTimeout)
             }
         }    

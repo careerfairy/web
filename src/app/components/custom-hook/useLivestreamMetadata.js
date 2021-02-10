@@ -136,7 +136,9 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
                 querySnapshot.forEach(doc => {
                     let cc = doc.data();
                     cc.id = doc.id;
-                    overallRatings.push(cc.rating);
+                    if (cc.rating > 0) {
+                        overallRatings.push(cc.rating);
+                    }
                 });
                 let value = overallRatings.length > 0 ? average(overallRatings).toFixed(2) : "N.A."
                 setOverallRating(value)

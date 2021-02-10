@@ -62,7 +62,7 @@ const MultiGroupSelect = (
                         <Chip variant="default"
                               label={option.universityName}
                               {...getTagProps({index})}
-                              disabled={option.groupId === groupId}
+                              disabled={(option.groupId === groupId) || isNotAdmin}
                         />
                     )
                 )

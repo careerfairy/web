@@ -9,7 +9,6 @@ const AuthContext = createContext();
 const securePaths = [
     "/profile",
     "/groups",
-    "/draft-stream",
     "/group/[groupId]/admin",
     "/group/[groupId]/admin/past-livestreams",
     "/group/[groupId]/admin/upcoming-livestreams",
@@ -31,14 +30,16 @@ const AuthProvider = ({children}) => {
 
     const {pathname, replace, asPath} = useRouter();
 
-    useFirestoreConnect([
-        {collection: 'userData', doc: auth.email  // or `userData/${auth.email}`
-            // , populates
-        }
-    ])
-    const userData = useSelector(({firestore}) => firestore.data.userData?.[auth?.email])
+    useFirestoreConnect(() => {
+        return auth.email ? [
+            {
+                collection: 'userData', doc: auth.email,  // or `userData/${auth.email}`
+                storeAs: "userProfile",
+            }
+        ] : []
+    }, [auth.email])
 
-
+    const userData = useSelector(({firestore}) => auth.email ? firestore.data.userProfile : null)
 
     useEffect(() => {
         // Check that initial route is OK

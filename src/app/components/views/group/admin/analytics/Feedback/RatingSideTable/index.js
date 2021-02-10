@@ -5,7 +5,7 @@ import {Card, makeStyles, useTheme} from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {
     defaultTableOptions,
-    exportSelectionAction,
+    exportSelectionAction, getPageSize,
     renderRatingStars,
     StarRatingInputValue,
     tableIcons
@@ -87,9 +87,10 @@ const RatingSideTable = ({
     const customOptions = {...defaultTableOptions}
     const innerTableStyle = {background: fade(theme.palette.navyBlue.main, 0.05)}
     customOptions.selection = false
-    customOptions.pageSize = 3
     customOptions.headerStyle = innerTableStyle
     customOptions.exportButton.pdf = true
+    customOptions.pageSize = getPageSize(customOptions.pageSizeOptions, data)
+
 
     return (
         <Card
@@ -99,6 +100,7 @@ const RatingSideTable = ({
             {...rest}
         >
             <MaterialTable
+                key={data.length}
                 icons={tableIcons}
                 tableRef={dataTableRef}
                 columns={[
@@ -127,15 +129,15 @@ const RatingSideTable = ({
                 options={customOptions}
                 isLoading={fetchingStreams}
                 actions={[(exportSelectionAction(columns))]}
-
                 title={currentRating?.question}
             />
         </Card>
     );
 };
 
-RatingSideTable.propTypes = {
-    className: PropTypes.string
-};
+RatingSideTable.propTypes =
+    {
+        className: PropTypes.string
+    };
 
 export default withFirebase(RatingSideTable);
