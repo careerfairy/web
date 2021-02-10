@@ -17,15 +17,14 @@ import {
 import SwipeableViews from "react-swipeable-views";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import {fade, makeStyles} from "@material-ui/core/styles";
-import AppBar from '@material-ui/core/AppBar';
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
 import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
 import {useAuth} from "../../../../HOCs/AuthProvider";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import {GreyPermanentMarker} from "../../../../materialUI/GlobalTitles";
-import clsx from "clsx";
 import Slide from "@material-ui/core/Slide";
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 
 const useStyles = makeStyles(theme => ({
     view: {
@@ -208,30 +207,24 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                     >
                         <Tab
                             style={{minWidth: "50%"}}
+                            label="Upcoming"
                             icon={
                                 <Badge color="secondary"
                                        badgeContent={getCount(true)}>
                                     <HelpIcon/>
                                 </Badge>
                             }
-                            label={`Upcoming`
-                            }/>
+                        />
                         <Tab
                             style={{minWidth: "50%"}}
+                            label="Answered"
                             icon={
                                 <Badge color="secondary"
                                        badgeContent={getCount()}>
-                                    <HelpIcon/>
+                                    <CheckCircleIcon/>
                                 </Badge>
                             }
-                            label={
-                                // <Badge color="secondary"
-                                //        badgeContent={getCount()}>
-                                //     <Typography>
-                                "Answered"
-                                //{/*</Typography>*/}
-                                //{/*</Badge>*/}
-                            }/>
+                        />
                     </Tabs>
                 </Paper>
             </QuestionContainerHeader>
