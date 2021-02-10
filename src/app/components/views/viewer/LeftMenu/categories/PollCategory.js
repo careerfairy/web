@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {withFirebase} from 'context/firebase';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import CurrentPollGraph from "../../../streaming/sharedComponents/CurrentPollGraph";
-import {Button, Paper, useTheme, withStyles} from "@material-ui/core";
+import {Paper, useTheme, withStyles} from "@material-ui/core";
 import {GreyPermanentMarker, PollQuestion} from "../../../../../materialUI/GlobalTitles";
 import {CategoryContainerCentered} from "../../../../../materialUI/GlobalContainers";
 import {colorsArray} from "../../../../util/colors";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
-import {fade, makeStyles} from "@material-ui/core/styles";
+import {makeStyles} from "@material-ui/core/styles";
 import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 
 const PollWrapper = withStyles(theme => ({

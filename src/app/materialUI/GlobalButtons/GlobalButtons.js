@@ -14,6 +14,7 @@ import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
+import PropTypes from 'prop-types';
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {validateHTMLColor} from 'validate-color';
 
@@ -71,7 +72,7 @@ export const PlayIconButton = ({addNewComment, isEmpty, IconProps, IconButtonPro
         </div>
     )
 }
-export const DynamicColorButton = ({disabled, startIcon, loading, color, children, ...rest}) => {
+const DynamicColorButton = ({disabled, startIcon, loading, color, children, ...rest}) => {
     const theme = useTheme()
     color = color === "secondary" ? theme.palette.secondary.main : (color === "primary" || !validateHTMLColor(color)) ? theme.palette.primary.main : color
     const classes = useStyles({color})
@@ -91,6 +92,16 @@ export const DynamicColorButton = ({disabled, startIcon, loading, color, childre
     )
 }
 
+DynamicColorButton.propTypes = {
+    className: PropTypes.string,
+    color: PropTypes.string,
+    startIcon: PropTypes.node,
+    disabled: PropTypes.bool,
+    loading: PropTypes.bool
+};
+
+
+
 //example
 // const options = [{
 //     label: 'Create a merge commit',
@@ -107,7 +118,7 @@ export const DynamicColorButton = ({disabled, startIcon, loading, color, childre
 //     }
 // }];
 
-export const CustomSplitButton = ({
+const CustomSplitButton = ({
                                       options = [],
                                       mainButtonProps,
                                       slideDirection = "right",
@@ -192,3 +203,5 @@ export const CustomSplitButton = ({
         </>
     );
 }
+
+export {DynamicColorButton, CustomSplitButton}

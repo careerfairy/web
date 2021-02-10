@@ -91,7 +91,7 @@ const useStyles = makeStyles((theme) => ({
         display: ({handRaiseActive}) => handRaiseActive ? "none" : "flex",
         "@media(min-width: 768px)": {
             position: "absolute",
-            width: "100%",
+            width: "50%",
             bottom: 5,
             left: "50%",
             transform: "translateX(-50%)",
