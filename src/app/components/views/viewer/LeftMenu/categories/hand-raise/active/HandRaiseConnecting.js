@@ -6,9 +6,9 @@ import {CategoryContainerCentered, CategoryContainerContent} from "../../../../.
 import {ThemedPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
 
 function HandRaiseRequested(props) {
-
-    return (<Grow unmountOnExit
-              in={Boolean(!(!props.handRaiseState || (props.handRaiseState.state !== 'connecting' && props.handRaiseState.state !== 'invited')))}>
+    const shouldRender = () => Boolean(!(!props.handRaiseState || (props.handRaiseState.state !== 'connecting' && props.handRaiseState.state !== 'invited')))
+    return shouldRender() && (
+        <Grow unmountOnExit in>
             <CategoryContainerCentered>
                 <CategoryContainerContent>
                     <ThemedPermanentMarker>Connecting to the stream...</ThemedPermanentMarker>
@@ -16,7 +16,8 @@ function HandRaiseRequested(props) {
                             onClick={() => props.updateHandRaiseRequest("unrequested")}/>
                 </CategoryContainerContent>
             </CategoryContainerCentered>
-        </Grow>);
+        </Grow>
+    );
 }
 
 export default HandRaiseRequested;

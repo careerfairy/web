@@ -26,11 +26,11 @@ export const baseThemeObj = {
             contrastText: "#FFFFFF",
             dark: "#00b08f",
         },
-        type: "dark",
+        type: "light",
         background: {
             level1: "#212121",
             level2: "#333",
-            offWhite: "#FAFAFA",
+            offWhite: "#F5F5F5",
             default: "#F5F5F5"
         }
     },
@@ -56,7 +56,7 @@ export const baseThemeObj = {
         values: {
             lg: 1280,
             md: 960,
-            sm: 768,
+            sm: 600,
             mobile: 768,
             xl: 1920,
             xs: 0,

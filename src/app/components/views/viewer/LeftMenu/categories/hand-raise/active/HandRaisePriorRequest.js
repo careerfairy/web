@@ -7,7 +7,6 @@ import {CategorySubtitle, ThemedPermanentMarker} from "../../../../../../../mate
 
 function HandRaisePriorRequest({ handRaiseState, updateHandRaiseRequest}) {
     const shouldRender = () => Boolean(!(handRaiseState && handRaiseState.state !== 'unrequested'))
-
     return shouldRender() &&(
         <Grow unmountOnExit in>
             <CategoryContainerCentered>

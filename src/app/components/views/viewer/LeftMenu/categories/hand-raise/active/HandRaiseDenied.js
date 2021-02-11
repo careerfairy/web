@@ -6,9 +6,9 @@ import {CategoryContainerCentered, CategoryContainerContent} from "../../../../.
 import {ThemedPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
 
 function HandRaiseRequested(props) {
-
-    return (
-        <Grow unmountOnExit in={!(!props.handRaiseState || (props.handRaiseState.state !== 'denied'))}>
+    const shouldRender = () => Boolean(!(!props.handRaiseState || (props.handRaiseState.state !== 'denied')))
+    return shouldRender() &&(
+        <Grow unmountOnExit in>
             <CategoryContainerCentered>
                 <CategoryContainerContent>
                     <ThemedPermanentMarker>Sorry we can't answer your question right now.</ThemedPermanentMarker>

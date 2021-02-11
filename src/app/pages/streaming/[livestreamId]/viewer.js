@@ -17,7 +17,7 @@ import RatingContainer from "../../../components/views/viewer/rating-container/R
 import {useAuth} from 'HOCs/AuthProvider';
 import {useDispatch} from "react-redux";
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
-import {Avatar, useTheme} from "@material-ui/core";
+import {Avatar, Tooltip, useTheme} from "@material-ui/core";
 import Toolbar from "@material-ui/core/Toolbar";
 import AppBar from '@material-ui/core/AppBar';
 import {MainLogo} from "../../../components/logos";
@@ -113,7 +113,7 @@ const useStyles = makeStyles((theme) => ({
         cursor: "pointer",
         zIndex: 200
     },
-    joinButton:{
+    joinButton: {
         marginLeft: theme.spacing(1)
     }
 }));
@@ -296,7 +296,7 @@ function ViewerPage({firebase}) {
         return (
             <Logo
                 key={careerCenter.groupId}
-            src={careerCenter.logoUrl}
+                src={careerCenter.logoUrl}
             />
         );
     });
@@ -309,16 +309,18 @@ function ViewerPage({firebase}) {
                     <MainLogo/>
                     {logoElements}
                     <Box flexGrow={1}/>
-                    <Logo
-                        src={currentLivestream.companyLogoUrl || logoPlaceholder}
-                    />
-                    <Checkbox
-                        checked={themeMode === "dark"}
-                        onChange={toggleTheme}
-                        icon={<Brightness4Icon/>}
-                        checkedIcon={<Brightness7Icon/>}
-                        color="default"
-                    />
+                    {currentLivestream.companyLogoUrl && <Logo
+                        src={currentLivestream.companyLogoUrl}
+                    />}
+                    <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
+                        <Checkbox
+                            checked={themeMode === "dark"}
+                            onChange={toggleTheme}
+                            icon={<Brightness4Icon/>}
+                            checkedIcon={<Brightness7Icon/>}
+                            color="default"
+                        />
+                    </Tooltip>
                     {!currentLivestream.hasNoTalentPool &&
                     <Button
                         children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
