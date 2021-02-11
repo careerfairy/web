@@ -1,4 +1,4 @@
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {useState, useEffect} from 'react';
 import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import {withFirebasePage} from 'context/firebase';
@@ -12,7 +12,7 @@ import NotificationsContainer from 'components/views/streaming/notifications-con
 import NotificationsContext from 'context/notifications/NotificationsContext';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import LeftMenu from "../../../components/views/streaming/LeftMenu/LeftMenu";
-import {Button, Tooltip} from "@material-ui/core";
+import {Button} from "@material-ui/core";
 import { StandartTooltip, TooltipTitle, TooltipText, TooltipButtonComponent } from 'materialUI/GlobalTooltips';
 import PreparationOverlay from 'components/views/streaming/preparation-overlay/PreparationOverlay';
 
@@ -133,7 +133,7 @@ function StreamingPage(props) {
 
     return (
             <NotificationsContext.Provider value={{setNewNotification, setNotificationToRemove}}>
-                <div>
+                <div style={{overflowY: "hidden"}}>
                     <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
                         <div style={{
                             position: 'absolute',

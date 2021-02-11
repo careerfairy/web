@@ -31,7 +31,8 @@ const useStyles = makeStyles((theme) => ({
         minHeight: "100vh",
         height: "100%",
         width: "100%",
-        touchAction: "manipulation"
+        touchAction: "manipulation",
+        overflowY: "hidden"
     },
     menuLeft: {
         position: "absolute",
