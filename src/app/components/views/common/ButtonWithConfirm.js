@@ -8,7 +8,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import ClearIcon from '@material-ui/icons/Clear';
 import {GlassDialog} from "../../../materialUI/GlobalModals";
 
-function ButtonWithConfirm({color, disabled, buttonAction, buttonLabel, confirmDescription, fluid}) {
+function ButtonWithConfirm({color, disabled, buttonAction, buttonLabel, confirmDescription, ...rest}) {
 
     const [modalOpen, setModalOpen] = useState(false);
 
@@ -19,7 +19,7 @@ function ButtonWithConfirm({color, disabled, buttonAction, buttonLabel, confirmD
 
     return (
         <Fragment>
-            <Button style={{background: color}} color="primary" variant="contained" onClick={() => setModalOpen(true)}
+            <Button {...rest} style={{background: color}} color="primary" variant="contained" onClick={() => setModalOpen(true)}
                     disabled={disabled}>{buttonLabel}</Button>
             <GlassDialog open={modalOpen} onClose={() => setModalOpen(false)} centered={false}>
                 <DialogTitle>
