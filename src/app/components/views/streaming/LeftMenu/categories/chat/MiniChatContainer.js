@@ -24,7 +24,10 @@ import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
     root: {
-        boxShadow: theme.shadows[3]
+    },
+    accordionRoot:{
+        boxShadow: theme.shadows[3],
+        background: theme.palette.background.paper
     },
     sendIcon: {
         background: "white",
@@ -220,6 +223,7 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
                     !open && isOpen(14) && handleConfirmStep(14)
                     setOpen(!open)
                 }}
+                    className={classes.accordionRoot}
                     expanded={open}
                 >
                     <AccordionSummary className={classes.header}

@@ -110,7 +110,7 @@ function StreamingPage(props) {
 
     return (
             <NotificationsContext.Provider value={{setNewNotification: setNewNotification}}>
-                <div style={{overflowY: "hidden"}} className='topLevelContainer'>
+                <div style={{overflow: "hidden"}} className='topLevelContainer'>
                     <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
                         <div style={{
                             position: 'absolute',

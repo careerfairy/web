@@ -14,9 +14,8 @@ import clsx from "clsx";
 
 
 const useStyles = makeStyles(theme => ({
-    root: {
-    },
-    viewRoot:{
+    root: {},
+    viewRoot: {
         position: "relative",
         height: "100%",
         backgroundColor: "rgb(220,220,220)",
@@ -30,6 +29,11 @@ const useStyles = makeStyles(theme => ({
         right: 10,
         textAlign: "center",
         zIndex: 9100,
+        background: theme.palette.type === "dark" && theme.palette.background.paper,
+        "&:hover": {
+            background: theme.palette.type === "dark" && theme.palette.background.default,
+        },
+        color: theme.palette.type === "dark" && theme.palette.secondary.main
     },
     slides: {
         backgroundColor: theme.palette.background.default,

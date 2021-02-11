@@ -79,7 +79,7 @@ const useStyles = makeStyles(theme => ({
     questionButton:{
         borderRadius: "0 0 5px 5px",
         padding: "10px 0",
-        color: theme.palette.text.primary
+        color: theme.palette.common.white
     }
 }))
 
