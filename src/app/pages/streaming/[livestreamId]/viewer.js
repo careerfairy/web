@@ -23,8 +23,10 @@ import AppBar from '@material-ui/core/AppBar';
 import {MainLogo} from "../../../components/logos";
 import Box from "@material-ui/core/Box";
 import Backdrop from '@material-ui/core/Backdrop';
-
+import Brightness4Icon from '@material-ui/icons/Brightness4';
+import Brightness7Icon from '@material-ui/icons/Brightness7';
 import clsx from "clsx";
+import Checkbox from '@material-ui/core/Checkbox';
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -60,16 +62,7 @@ const useStyles = makeStyles((theme) => ({
             top: 55,
         },
     },
-    logo: {
-        padding: theme.spacing(0.5),
-        margin: theme.spacing(0, 1),
-        background: theme.palette.common.white,
-        width: 70,
-        boxShadow: theme.shadows[1],
-        "& img": {
-            objectFit: "contain"
-        }
-    },
+
     blackFrame: {
         zIndex: 10,
         backgroundColor: "black",
@@ -110,7 +103,7 @@ const useStyles = makeStyles((theme) => ({
         width: "80px"
     },
     backdropContent: {
-      display: "flex",
+        display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center"
@@ -118,10 +111,36 @@ const useStyles = makeStyles((theme) => ({
     backdrop: {
         cursor: "pointer",
         zIndex: 200
+    },
+    joinButton:{
+        marginLeft: theme.spacing(1)
     }
 }));
 
 const groupLogo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fethccnew-logo.png?alt=media&token=9d3e2d5a-3517-4fe3-85e6-9600bf8d8bc4"
+
+const useLogoStyles = makeStyles(theme => ({
+    logo: {
+        padding: theme.spacing(0.5),
+        margin: theme.spacing(0, 1),
+        background: theme.palette.common.white,
+        width: 70,
+        boxShadow: theme.shadows[1],
+        "& img": {
+            objectFit: "contain"
+        }
+    },
+}))
+const Logo = ({src}) => {
+    const classes = useLogoStyles()
+    return (
+        <Avatar
+            className={classes.logo}
+            src={src}
+            variant="rounded"
+        />
+    )
+}
 
 function ViewerPage({firebase}) {
     const {toggleTheme, themeMode} = useThemeToggle()
@@ -275,12 +294,15 @@ function ViewerPage({firebase}) {
         setPlay(true);
     }
 
-    let logoElements = careerCenters.map((careerCenter, index) => {
+    let logoElements = ["careerCenters", "", ""].map((careerCenter, index) => {
         return (
-            <Fragment key={index}>
-                <img src={careerCenter.logoUrl}
-                     style={{maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block'}}/>
-            </Fragment>
+            // <Fragment key={index}>
+            //     <img src={careerCenter.logoUrl}
+            //          style={{maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block'}}/>
+            // </Fragment>
+            <Logo
+            src={groupLogo}
+            />
         );
     });
 
@@ -291,21 +313,22 @@ function ViewerPage({firebase}) {
                 <Toolbar className={classes.toolbar}>
                     <MainLogo/>
                     {logoElements}
-                    <Switch
+                    <Box flexGrow={1}/>
+                    <Logo
+                        src={groupLogo}
+                    />
+                    <Checkbox
                         checked={themeMode === "dark"}
                         onChange={toggleTheme}
+                        icon={<Brightness4Icon/>}
+                        checkedIcon={<Brightness7Icon/>}
                         color="default"
-                    />
-                    <Box flexGrow={1}/>
-                    <Avatar
-                        className={classes.logo}
-                        src={groupLogo}
-                        variant="rounded"
                     />
                     {!currentLivestream.hasNoTalentPool &&
                     <Button
                         children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
                         variant="contained"
+                        className={classes.joinButton}
                         startIcon={<PeopleAltIcon/>}
                         icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
                         onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}

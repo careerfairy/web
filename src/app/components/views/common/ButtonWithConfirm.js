@@ -6,6 +6,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogActions from "@material-ui/core/DialogActions";
 import CheckIcon from '@material-ui/icons/Check';
 import ClearIcon from '@material-ui/icons/Clear';
+import {GlassDialog} from "../../../materialUI/GlobalModals";
 
 function ButtonWithConfirm({color, disabled, buttonAction, buttonLabel, confirmDescription, fluid}) {
 
@@ -20,7 +21,7 @@ function ButtonWithConfirm({color, disabled, buttonAction, buttonLabel, confirmD
         <Fragment>
             <Button style={{background: color}} color="primary" variant="contained" onClick={() => setModalOpen(true)}
                     disabled={disabled}>{buttonLabel}</Button>
-            <Dialog open={modalOpen} onClose={() => setModalOpen(false)} centered={false}>
+            <GlassDialog open={modalOpen} onClose={() => setModalOpen(false)} centered={false}>
                 <DialogTitle>
                     Just making sure
                 </DialogTitle>
@@ -38,7 +39,7 @@ function ButtonWithConfirm({color, disabled, buttonAction, buttonLabel, confirmD
                         Confirm
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </GlassDialog>
         </Fragment>
     );
 }
