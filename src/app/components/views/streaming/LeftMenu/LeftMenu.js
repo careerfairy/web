@@ -7,9 +7,13 @@ import QuestionCategory from "../sharedComponents/QuestionCategory";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import SwipeableViews from "react-swipeable-views";
+import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
-    root: {
+    root:{
+
+    },
+    viewRoot: {
         position: "relative",
         height: "100%",
         // backgroundColor: "rgb(220,220,220)",
@@ -28,7 +32,7 @@ const useStyles = makeStyles(theme => ({
 
 
 const states = ["questions", "polls", "hand"]
-const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, ...props}) => {
+const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, className,...props}) => {
     const theme = useTheme()
     const classes = useStyles()
     const [selectedState, setSelectedState] = useState("questions");
@@ -95,13 +99,13 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
     ]
 
     return (
-        <>
+        <div className={clsx(classes.root, className)}>
             <SwipeableViews
                 containerStyle={{WebkitOverflowScrolling: 'touch'}}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
                 onTransitionEnd={() => setSliding(false)}
-                className={classes.root}
+                className={classes.viewRoot}
                 onChangeIndex={handleChange}>
                 {views}
             </SwipeableViews>
@@ -112,7 +116,7 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
                 selectedState={selectedState}
                 showMenu={showMenu}
                 handleStateChange={handleStateChange} {...props}/>
-        </>
+        </div>
     )
 };
 

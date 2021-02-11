@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {withFirebasePage} from 'context/firebase';
 import {useRouter} from 'next/router';
 import VideoContainer from 'components/views/streaming/video-container/VideoContainer';
@@ -10,6 +10,14 @@ import {v4 as uuidv4} from 'uuid';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import LeftMenu from "../../../components/views/streaming/LeftMenu/LeftMenu";
 import PreparationOverlay from 'components/views/streaming/preparation-overlay/PreparationOverlay';
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import Toolbar from "@material-ui/core/Toolbar";
+import {Badge, Hidden, Tooltip} from "@material-ui/core";
+import {MainLogo, MiniLogo} from "../../../components/logos";
+import Typography from "@material-ui/core/Typography";
+import Box from "@material-ui/core/Box";
+import PeopleIcon from "@material-ui/icons/People";
+import AppBar from "@material-ui/core/AppBar";
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {
@@ -33,13 +41,35 @@ const useStyles = makeStyles((theme) => ({
         height: "calc(100% - 55px)",
         zIndex: 10,
         backgroundColor: "black",
-    }
+    },
+    toolbar: {
+        minHeight: 55,
+        display: "flex",
+        justifyContent: "space-between"
+    },
+    viewCount: {
+        // background: theme.palette.primary.main,
+        color: theme.palette.primary.main,
+        padding: theme.spacing(1),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    viewCountText: {
+        fontWeight: 600,
+        marginLeft: theme.spacing(0.5)
+    },
+    streamStatusText: {
+        fontWeight: 600,
+        color: ({hasStarted}) => hasStarted ? theme.palette.primary.main : theme.palette.warning.main
+    },
 }));
 
 function StreamingPage(props) {
 
     const theme = useTheme()
     const router = useRouter();
+    const mobile = useMediaQuery(theme.breakpoints.down('md'))
     const livestreamId = router.query.livestreamId;
     const [streamerId, setStreamerId] = useState(null)
 
@@ -49,7 +79,10 @@ function StreamingPage(props) {
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
 
     const [showMenu, setShowMenu] = useState(true);
-    const classes = useStyles({showMenu})
+    const classes = useStyles({
+        showMenu,
+        hasStarted: currentLivestream.hasStarted
+    })
 
     const [newNotification, setNewNotification] = useState(null);
     const [notifications, setNotifications] = useState([]);
@@ -110,39 +143,42 @@ function StreamingPage(props) {
 
     return (
             <NotificationsContext.Provider value={{setNewNotification: setNewNotification}}>
-                <div className='topLevelContainer'>
-                    <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
-                        <div style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '20px',
-                            transform: 'translateY(-50%)',
-                            verticalAlign: 'middle'
-                        }}>
-                        </div>
-                        <div style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            display: 'inline-block',
-                            padding: '10px',
-                            verticalAlign: 'middle',
-                            fontSize: '0.8em'
-                        }}>
-                            <h3 style={{color: (currentLivestream.hasStarted ? 'teal' : 'orange')}}>{currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}</h3>
-                            {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
-                        </div>
-                        <div style={{
-                            float: 'right',
-                            margin: '0 20px',
-                            fontSize: '1em',
-                            padding: '3px',
-                            verticalAlign: 'middle'
-                        }}>
-                            Viewers: {numberOfViewers}
-                        </div>
-                    </div>
+                <div >
+                    <AppBar elevation={1} color="transparent">
+                        <Toolbar className={classes.toolbar}>
+                            <Hidden smDown>
+                                <MainLogo/>
+                            </Hidden>
+                            <Hidden mdUp>
+                                <MiniLogo/>
+                            </Hidden>
+                            {mobile ?
+                                <Tooltip
+                                    title={currentLivestream.hasStarted ? 'You are currently actively streaming' : 'You are currently not streaming'}>
+                                    <Typography className={classes.streamStatusText} variant="h5">
+                                        {currentLivestream.hasStarted ? 'LIVE' : 'NOT LIVE'}
+                                    </Typography>
+                                </Tooltip>
+                                :
+                                <Box display="flex" flexDirection="column" justifyContent="center">
+                                    <Typography className={classes.streamStatusText} variant="h5">
+                                        {currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}
+                                    </Typography>
+                                    {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
+                                </Box>}
+                            <Box className={classes.viewCount}>
+                                <Tooltip title="Number of viewers">
+                                    <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
+                                        <PeopleIcon/>
+                                    </Badge>
+                                </Tooltip>
+                                {!mobile &&
+                                <Typography className={classes.viewCountText}>
+                                    Viewers : {numberOfViewers}
+                                </Typography>}
+                            </Box>
+                        </Toolbar>
+                    </AppBar>
                     <div className={classes.blackFrame}>
                         <VideoContainer currentLivestream={currentLivestream} streamerId={streamerId} viewer={false} setNumberOfViewers={setNumberOfViewers} />
                     </div>

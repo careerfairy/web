@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import {withFirebasePage} from 'context/firebase';
@@ -12,8 +12,8 @@ import NotificationsContainer from 'components/views/streaming/notifications-con
 import NotificationsContext from 'context/notifications/NotificationsContext';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import LeftMenu from "../../../components/views/streaming/LeftMenu/LeftMenu";
-import {Badge, Button, Hidden, Paper, Tooltip} from "@material-ui/core";
-import {StandartTooltip, TooltipTitle, TooltipText, TooltipButtonComponent} from 'materialUI/GlobalTooltips';
+import {Badge, Button, Hidden, Tooltip} from "@material-ui/core";
+import {StandartTooltip, TooltipButtonComponent, TooltipText, TooltipTitle} from 'materialUI/GlobalTooltips';
 import PreparationOverlay from 'components/views/streaming/preparation-overlay/PreparationOverlay';
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -24,7 +24,6 @@ import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import PlayCircleFilledWhiteIcon from '@material-ui/icons/PlayCircleFilledWhite';
-import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import StopIcon from '@material-ui/icons/Stop';
 import PeopleIcon from '@material-ui/icons/People';
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
@@ -40,7 +39,8 @@ const useStyles = makeStyles((theme) => ({
         top: 55,
         left: 0,
         bottom: 0,
-        zIndex: 20
+        zIndex: 20,
+        boxShadow: theme.shadows[10]
     },
     blackFrame: {
         left: ({showMenu}) => showMenu ? 280 : 0,
@@ -77,6 +77,21 @@ const useStyles = makeStyles((theme) => ({
     streamStatusText: {
         fontWeight: 600,
         color: ({hasStarted}) => hasStarted ? theme.palette.primary.main : theme.palette.warning.main
+    },
+    miniChatContainer: {
+        position: "absolute",
+        bottom: "0",
+        right: "120px",
+        width: "20%",
+        minWidth: "250px",
+        zIndex: 100
+    },
+    iconsContainer: {
+        position: "absolute",
+        bottom: "50px",
+        right: "130px",
+        zIndex: 100,
+        width: "80px"
     }
 }));
 
@@ -176,7 +191,6 @@ function StreamingPage(props) {
             <div>
                 <AppBar elevation={1} color="transparent">
                     <Toolbar className={classes.toolbar}>
-                        {/*<MainLogo/>*/}
                         <Hidden smDown>
                             <MainLogo/>
                         </Hidden>
@@ -254,7 +268,6 @@ function StreamingPage(props) {
                                 startIcon={<OpenInBrowserIcon color="inherit"/>}
                             />
                         }
-                        {/*<Box flexGrow={1}/>*/}
                         <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
                             <Checkbox
                                 checked={themeMode === "dark"}
@@ -277,77 +290,25 @@ function StreamingPage(props) {
                         </Box>
                     </Toolbar>
                 </AppBar>
-                {/*<div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>*/}
-                {/*</div>*/}
                 <div className={classes.blackFrame}>
                     <VideoContainer currentLivestream={currentLivestream} streamerId={currentLivestream.id}
                                     setNumberOfViewers={setNumberOfViewers} showMenu={showMenu} viewer={false}/>
                 </div>
-                <div className={classes.menuLeft}>
-                    <LeftMenu
-                        streamer
-                        livestream={currentLivestream}
-                        showMenu={showMenu}
-                        setShowMenu={setShowMenu}
-                        toggleShowMenu={toggleShowMenu}/>
-                </div>
-                <div className='mini-chat-container'>
-                    <MiniChatContainer livestream={currentLivestream} isStreamer={true}/>
-                </div>
-                <div className='icons-container'>
-                    <IconsContainer isTest={currentLivestream.test} livestreamId={currentLivestream.id}/>
-                </div>
-                <div className='notifications-container'>
-                    <NotificationsContainer notifications={notifications}/>
-                </div>
+                <LeftMenu
+                    className={classes.menuLeft}
+                    streamer
+                    livestream={currentLivestream}
+                    showMenu={showMenu}
+                    setShowMenu={setShowMenu}
+                    toggleShowMenu={toggleShowMenu}/>
+                <MiniChatContainer className={classes.miniChatContainer} livestream={currentLivestream}
+                                   isStreamer={true}/>
+                <IconsContainer className={classes.iconsContainer} isTest={currentLivestream.test}
+                                livestreamId={currentLivestream.id}/>
+                <NotificationsContainer notifications={notifications}/>
                 <SpeakerManagementModal livestreamId={currentLivestream.id} open={speakerManagementOpen}
                                         joiningStreamerLink={joiningStreamerLink}
                                         setOpen={setSpeakerManagementOpen}/>
-                <style jsx>{`
-                  .top-menu {
-                    position: relative;
-                    background-color: rgba(245, 245, 245, 1);
-                    padding: 15px 0;
-                    height: 55px;
-                    text-align: center;
-                    box-shadow: 0 0 4px grey;
-                    z-index: 1000;
-                  }
-
-                  .top-menu.active {
-                    color: rgba(0, 210, 170, 1);
-                  }
-
-                  .top-menu h3 {
-                    font-weight: 600;
-                  }
-
-                  .mini-chat-container {
-                    position: absolute;
-                    bottom: 0;
-                    right: 120px;
-                    width: 20%;
-                    min-width: 250px;
-                    z-index: 100;
-                  }
-
-                  .icons-container {
-                    position: absolute;
-                    bottom: 50px;
-                    right: 130px;
-                    z-index: 100;
-                    width: 80px;
-                  }
-
-                  .notifications-container {
-                    position: absolute;
-                    top: 55px;
-                    right: 130px;
-                    width: 20%;
-                    z-index: 200;
-                    padding: 10px 0;
-                  }
-                `}</style>
             </div>
         </NotificationsContext.Provider>
     );
