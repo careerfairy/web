@@ -1,7 +1,6 @@
 import React, {memo, useContext, useEffect, useMemo, useState} from 'react';
 import * as actions from '../../../../store/actions'
 import RubberBand from 'react-reveal/RubberBand';
-import {withFirebasePage} from 'context/firebase';
 import {makeStyles} from "@material-ui/core/styles";
 import {v4 as uuidv4} from "uuid";
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
@@ -10,22 +9,19 @@ import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutline
 import ClappingSVG from "../../../util/CustomSVGs";
 import {useDispatch, useSelector} from "react-redux";
 import {TransitionGroup} from "react-transition-group";
-import {Slide} from "@material-ui/core";
 import {EMOTE_MESSAGE_TEXT_TYPE} from "../../../util/constants";
 import clsx from "clsx";
 
 var _ = require('lodash')
 
 const useStyles = makeStyles(theme => ({
-    root:{
-
-    },
+    root: {},
     actionBtn: {
         borderRadius: "50%",
         backgroundColor: ({color}) => color,
         width: 50,
         height: 50,
-        boxShadow: "0 0 8px rgb(120,120,120)",
+        boxShadow: theme.shadows[10],
         position: 'absolute',
         top: '50%',
         left: '50%',
@@ -53,9 +49,9 @@ const useStyles = makeStyles(theme => ({
     },
 }))
 
-
+const START_DISTANCE = 0
 const ActionButton = React.memo(({iconName, color, getRandomDuration, getRandomHorizontalPosition, id}) => {
-    const [distance, setDistance] = useState(0)
+    const [distance, setDistance] = useState(START_DISTANCE)
     const [opacity, setOpacity] = useState(1)
 
     useEffect(() => {
@@ -79,7 +75,7 @@ const ActionButton = React.memo(({iconName, color, getRandomDuration, getRandomH
 
 
     return (
-        <div  className={classes.animatedBox}>
+        <div className={classes.animatedBox}>
             <RubberBand style={{position: "absolute"}}>
                 <div className={classes.actionBtn}>
                     {renderIcon()}
@@ -147,23 +143,21 @@ function IconsContainer({className}) {
         <div className={clsx(classes.root, className)}>
             <TransitionGroup>
                 {emotesData.length > 0 && (
-                    <Slide direction="up">
-                        <TransitionGroup>
-                            {emotesData.map((iconEl) => (
-                                <ActionButton
-                                    id={iconEl.timestamp}
-                                    key={iconEl.timestamp}
-                                    getRandomHorizontalPosition={getRandomHorizontalPosition}
-                                    iconName={iconEl.emoteType}
-                                    getRandomDuration={getRandomDuration}
-                                    color={getColor(iconEl.emoteType)}/>
-                            ))}
-                        </TransitionGroup>
-                    </Slide>
+                    <TransitionGroup>
+                        {emotesData.map((iconEl) => (
+                            <ActionButton
+                                id={iconEl.timestamp}
+                                key={iconEl.timestamp}
+                                getRandomHorizontalPosition={getRandomHorizontalPosition}
+                                iconName={iconEl.emoteType}
+                                getRandomDuration={getRandomDuration}
+                                color={getColor(iconEl.emoteType)}/>
+                        ))}
+                    </TransitionGroup>
                 )}
             </TransitionGroup>
         </div>
     );
 }
 
-export default memo(withFirebasePage(IconsContainer));
+export default memo(IconsContainer);

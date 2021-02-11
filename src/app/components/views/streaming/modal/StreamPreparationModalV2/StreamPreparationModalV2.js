@@ -22,6 +22,7 @@ import Step5Confirm from "./Step5Confirm";
 import {makeStyles} from "@material-ui/core/styles";
 import window from 'global';
 import CircularProgress from "@material-ui/core/CircularProgress";
+import {GlassDialog} from "../../../../../materialUI/GlobalModals";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -37,7 +38,8 @@ const useStyles = makeStyles(theme => ({
     },
     stepper: {
         paddingLeft: 0,
-        paddingRight: 0
+        paddingRight: 0,
+        background: "transparent"
     }
 }))
 
@@ -269,7 +271,7 @@ const StreamPreparationModalV2 = ({
     }
 
     return (
-        <Dialog fullScreen={fullScreen} fullWidth maxWidth="sm" open={!streamerReady || !connectionEstablished}>
+        <GlassDialog fullScreen={fullScreen} fullWidth maxWidth="sm" open={!streamerReady || !connectionEstablished}>
             <DialogTitle disableTypography hidden={streamerReady && connectionEstablished}>
                 <h3 style={{color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3>
             </DialogTitle>
@@ -339,7 +341,7 @@ const StreamPreparationModalV2 = ({
                 <p style={{fontSize: '0.8em', color: 'grey'}}>If anything is unclear or not working, please <a
                     href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
             </DialogContent>
-        </Dialog>
+        </GlassDialog>
     )
 }
 

@@ -40,7 +40,6 @@ const useStyles = makeStyles((theme) => ({
         height: "100%",
         width: "100%",
         touchAction: "manipulation",
-        overflow: "hidden"
     },
     toolbar: {
         minHeight: 55,

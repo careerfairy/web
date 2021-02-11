@@ -10,7 +10,7 @@ const StreamSnackBar = ({index, notification}) => {
 
     useEffect(() => {
         enqueueSnackbar(notification.message, {
-            variant: "default",
+            variant: "info",
             persist: true,
             action,
             key: notification.id,

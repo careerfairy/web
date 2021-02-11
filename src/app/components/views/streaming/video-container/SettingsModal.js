@@ -5,6 +5,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core';
 import VideoTab from "./SettingsModal/VideoTab";
 import AudioTab from "./SettingsModal/AudioTab";
+import {GlassDialog} from "../../../../materialUI/GlobalModals";
 
 const useStyles = makeStyles((theme) => ({
     grid: {
@@ -66,7 +67,7 @@ function SettingsModal({ open,
     };
 
     return (
-        <Dialog fullScreen={false} fullWidth maxWidth="sm" open={open} PaperProps={{ style: { minHeight: 500 }}}>
+        <GlassDialog fullScreen={false} fullWidth maxWidth="sm" open={open} PaperProps={{ style: { minHeight: 500 }}}>
             <DialogTitle>
                 <div style={{ color: 'lightgrey'}}>
                     <SettingsIcon style={{ verticalAlign: "middle", marginRight: "10px" }}/>
@@ -106,7 +107,7 @@ function SettingsModal({ open,
                     Close
                 </Button>
             </DialogActions>
-        </Dialog>
+        </GlassDialog>
     );
 }
 
