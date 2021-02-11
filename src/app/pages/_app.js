@@ -27,12 +27,7 @@ import {ThemeProviderWrapper} from "../context/theme/ThemeContext";
 
 config({ssrFadeout: true});
 
-// const useStyles = makeStyles(({
-//     info: {
-//         background: `${theme.palette.info.contrastText} !important`,
-//         color: `black !important`,
-//     },
-// }))
+
 
 // react-redux-firebase config
 const rrfConfig = {
@@ -118,11 +113,7 @@ function MyApp({Component, pageProps}) {
                         <FirebaseContext.Provider value={firebase}>
                             <ThemeProviderWrapper>
                                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                    <SnackbarProvider
-                                        // classes={{
-                                        //     variantInfo: classes.info
-                                        // }}
-                                        maxSnack={3}>
+
                                         <TutorialContext.Provider value={{
                                             tutorialSteps,
                                             setTutorialSteps,
@@ -145,7 +136,6 @@ function MyApp({Component, pageProps}) {
                                                                errorMessage={generalError}/>
                                             </ErrorContext.Provider>
                                         </TutorialContext.Provider>
-                                    </SnackbarProvider>
                                 </MuiPickersUtilsProvider>
                             </ThemeProviderWrapper>
                         </FirebaseContext.Provider>

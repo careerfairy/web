@@ -55,7 +55,7 @@ const useStyles = makeStyles(theme => ({
             transform: "translate(-50%, -50%)",
             maxHeight: "100%",
             maxWidth: "100%",
-            zIndex: 9900,
+            // zIndex: 9900,
             backgroundColor: "black"
         }
     }

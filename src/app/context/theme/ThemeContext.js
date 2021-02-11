@@ -1,25 +1,44 @@
 import React, {createContext, useContext, useState} from "react";
-import {baseThemeObj} from "../../materialUI";
-import {createMuiTheme, responsiveFontSizes, ThemeProvider} from '@material-ui/core/styles';
+import {baseThemeObj, darkThemeObj} from "../../materialUI";
+import {createMuiTheme, responsiveFontSizes, ThemeProvider, makeStyles} from '@material-ui/core/styles';
+import {SnackbarProvider} from "notistack";
 
 const ThemeContext = createContext();
 
 const ThemeProviderWrapper = ({children}) => {
-    const [themeMode, setThemeMode] = useState(baseThemeObj.palette.type);
+    const [themeMode, setThemeMode] = useState("dark");
 
     const toggleTheme = () => {
         setThemeMode(themeMode === "light" ? "dark" : "light")
     }
 
-    baseThemeObj.palette.type = themeMode
+    const themeObj = themeMode === "light" ? baseThemeObj : darkThemeObj
 
-    const createdTheme = createMuiTheme(baseThemeObj);
+    themeObj.palette.type = themeMode
+
+    const createdTheme = createMuiTheme(themeObj);
     const theme = responsiveFontSizes(createdTheme)
+    const useStyles = makeStyles(({
+        // success: {backgroundColor: 'purple'},
+        // error: {backgroundColor: 'blue'},
+        // warning: {backgroundColor: 'green'},
+        info: {
+            backgroundColor: `${theme.palette.background.paper} !important`,
+            color: `${theme.palette.text.primary} !important`,
+        },
+    }));
+    const classes = useStyles()
 
     return (
         <ThemeContext.Provider value={{toggleTheme, themeMode}}>
             <ThemeProvider theme={theme}>
-                {children}
+                <SnackbarProvider
+                    classes={{
+                        variantInfo: classes.info
+                    }}
+                    maxSnack={3}>
+                    {children}
+                </SnackbarProvider>
             </ThemeProvider>
         </ThemeContext.Provider>
     );
