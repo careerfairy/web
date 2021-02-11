@@ -38,7 +38,7 @@ const useStyles = makeStyles(theme => {
             zIndex: "100",
             borderRadius: "5px",
             textAlign: "center",
-            backgroundColor: theme.palette.background.default,
+            backgroundColor: theme.palette.common.white,
             boxShadow: theme.shadows[3],
             fontWeight: "500",
             textTransform: "uppercase",

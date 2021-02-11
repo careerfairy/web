@@ -39,7 +39,7 @@ const useStyles = makeStyles(theme => ({
     },
     animatedBox: {
         transition: ({durationTransform}) => `transform ${durationTransform}ms ease-in, opacity ${durationTransform}ms cubic-bezier(1,0,.83,.67)`,
-        position: "relative",
+        position: "absolute",
         opacity: ({opacity}) => opacity,
         right: ({right}) => right,
         transform: ({distance}) => `translateY(${distance}vh)`,

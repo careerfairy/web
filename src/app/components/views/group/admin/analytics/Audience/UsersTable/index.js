@@ -10,6 +10,7 @@ import {defaultTableOptions, exportSelectionAction, LinkifyText, tableIcons} fro
 import UserInnerTable from "./UserInnerTable";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
+import {useAuth} from "../../../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({
     root: {},

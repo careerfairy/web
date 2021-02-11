@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import VolumeUpRoundedIcon from '@material-ui/icons/VolumeUpRounded';
 import PlayArrowRoundedIcon from '@material-ui/icons/PlayArrowRounded';
 import {useRouter} from 'next/router';
@@ -17,7 +17,7 @@ import RatingContainer from "../../../components/views/viewer/rating-container/R
 import {useAuth} from 'HOCs/AuthProvider';
 import {useDispatch} from "react-redux";
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
-import {Avatar, Switch, useTheme} from "@material-ui/core";
+import {Avatar, useTheme} from "@material-ui/core";
 import Toolbar from "@material-ui/core/Toolbar";
 import AppBar from '@material-ui/core/AppBar';
 import {MainLogo} from "../../../components/logos";
@@ -27,6 +27,7 @@ import Brightness4Icon from '@material-ui/icons/Brightness4';
 import Brightness7Icon from '@material-ui/icons/Brightness7';
 import clsx from "clsx";
 import Checkbox from '@material-ui/core/Checkbox';
+import {logoPlaceholder} from "../../../components/util/constants";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -117,8 +118,6 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const groupLogo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fethccnew-logo.png?alt=media&token=9d3e2d5a-3517-4fe3-85e6-9600bf8d8bc4"
-
 const useLogoStyles = makeStyles(theme => ({
     logo: {
         padding: theme.spacing(0.5),
@@ -149,7 +148,6 @@ function ViewerPage({firebase}) {
     const livestreamId = router.query.livestreamId;
     const dispatch = useDispatch()
     const [showMenu, setShowMenu] = useState(false);
-    const theme = useTheme()
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
@@ -294,14 +292,11 @@ function ViewerPage({firebase}) {
         setPlay(true);
     }
 
-    let logoElements = ["careerCenters", "", ""].map((careerCenter, index) => {
+    let logoElements = careerCenters.map((careerCenter, index) => {
         return (
-            // <Fragment key={index}>
-            //     <img src={careerCenter.logoUrl}
-            //          style={{maxWidth: '150px', maxHeight: '50px', marginRight: '15px', display: 'inline-block'}}/>
-            // </Fragment>
             <Logo
-            src={groupLogo}
+                key={careerCenter.groupId}
+            src={careerCenter.logoUrl}
             />
         );
     });
@@ -315,7 +310,7 @@ function ViewerPage({firebase}) {
                     {logoElements}
                     <Box flexGrow={1}/>
                     <Logo
-                        src={groupLogo}
+                        src={currentLivestream.companyLogoUrl || logoPlaceholder}
                     />
                     <Checkbox
                         checked={themeMode === "dark"}

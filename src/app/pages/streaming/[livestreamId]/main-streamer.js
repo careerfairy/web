@@ -89,7 +89,7 @@ const useStyles = makeStyles((theme) => ({
     iconsContainer: {
         position: "absolute",
         bottom: "50px",
-        right: "130px",
+        right: "100px",
         zIndex: 100,
         width: "80px"
     }
@@ -182,7 +182,10 @@ function StreamingPage(props) {
 
     if (!streamerReady) {
         return (
-            <PreparationOverlay livestream={currentLivestream} setStreamerReady={setStreamerReady}/>
+            <PreparationOverlay
+                livestream={currentLivestream}
+                setStreamerReady={setStreamerReady}
+            />
         )
     }
 
@@ -248,7 +251,10 @@ function StreamingPage(props) {
                                 </Typography>
                             </Tooltip>
                             :
-                            <Box display="flex" flexDirection="column" justifyContent="center">
+                            <Box display="flex"
+                                 flexDirection="column"
+                                 justifyContent="center"
+                            >
                                 <Typography className={classes.streamStatusText} variant="h5">
                                     {currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}
                                 </Typography>
@@ -290,9 +296,14 @@ function StreamingPage(props) {
                         </Box>
                     </Toolbar>
                 </AppBar>
-                <div className={classes.blackFrame}>
-                    <VideoContainer currentLivestream={currentLivestream} streamerId={currentLivestream.id}
-                                    setNumberOfViewers={setNumberOfViewers} showMenu={showMenu} viewer={false}/>
+                <div
+                    className={classes.blackFrame}
+                >
+                    <VideoContainer currentLivestream={currentLivestream}
+                                    streamerId={currentLivestream.id}
+                                    setNumberOfViewers={setNumberOfViewers}
+                                    showMenu={showMenu} viewer={false}
+                    />
                 </div>
                 <LeftMenu
                     className={classes.menuLeft}
@@ -301,14 +312,24 @@ function StreamingPage(props) {
                     showMenu={showMenu}
                     setShowMenu={setShowMenu}
                     toggleShowMenu={toggleShowMenu}/>
-                <MiniChatContainer className={classes.miniChatContainer} livestream={currentLivestream}
-                                   isStreamer={true}/>
-                <IconsContainer className={classes.iconsContainer} isTest={currentLivestream.test}
-                                livestreamId={currentLivestream.id}/>
-                <NotificationsContainer notifications={notifications}/>
-                <SpeakerManagementModal livestreamId={currentLivestream.id} open={speakerManagementOpen}
-                                        joiningStreamerLink={joiningStreamerLink}
-                                        setOpen={setSpeakerManagementOpen}/>
+                <MiniChatContainer
+                    className={classes.miniChatContainer}
+                    livestream={currentLivestream}
+                    isStreamer={true}
+                />
+                <IconsContainer
+                    className={classes.iconsContainer}
+                    isTest={currentLivestream.test}
+                    livestreamId={currentLivestream.id}/>
+                <NotificationsContainer
+                    notifications={notifications}
+                />
+                <SpeakerManagementModal
+                    livestreamId={currentLivestream.id}
+                    open={speakerManagementOpen}
+                    joiningStreamerLink={joiningStreamerLink}
+                    setOpen={setSpeakerManagementOpen}
+                />
             </div>
         </NotificationsContext.Provider>
     );
