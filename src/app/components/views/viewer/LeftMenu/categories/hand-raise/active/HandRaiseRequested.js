@@ -5,16 +5,17 @@ import Grow from "@material-ui/core/Grow";
 import {CategoryContainerCentered, CategoryContainerContent} from "../../../../../../../materialUI/GlobalContainers";
 import {CategorySubtitle, ThemedPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
 
-function HandRaiseRequested(props) {
-    return (
-        <Grow unmountOnExit in={Boolean(!(!props.handRaiseState || props.handRaiseState.state !== 'requested'))}>
+function HandRaiseRequested({handRaiseState, updateHandRaiseRequest}) {
+    const shouldRender = () => Boolean(!(!handRaiseState || handRaiseState.state !== 'requested'))
+    return shouldRender() && (
+        <Grow unmountOnExit in>
             <CategoryContainerCentered>
                 <CategoryContainerContent>
                     <ThemedPermanentMarker>You raised your&nbsp;hand!</ThemedPermanentMarker>
                     <CategorySubtitle>Please wait to be invited to join by
                         the&nbsp;speaker.</CategorySubtitle>
                     <Button size='large' startIcon={<ClearRoundedIcon/>} variant="contained" children='Cancel'
-                            onClick={() => props.updateHandRaiseRequest("unrequested")}/>
+                            onClick={() => updateHandRaiseRequest("unrequested")}/>
                 </CategoryContainerContent>
             </CategoryContainerCentered>
         </Grow>

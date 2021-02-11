@@ -114,6 +114,8 @@ function ViewerComponent(props) {
         await props.firebase.setDesktopMode(props.currentLivestream.id, mode, screenSharerId);
     }
 
+    const shareDesktopOrSlides = () => (props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop')
+
     if (!props.currentLivestream) {
         return null;
     }
@@ -126,7 +128,7 @@ function ViewerComponent(props) {
                                      streams={externalMediaStreams} localId={props.streamerId}
                                      currentSpeaker={props.currentLivestream.currentSpeakerId}
                                      muted={!props.currentLivestream.hasStarted} {...props}/>
-            {props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop' &&
+            {shareDesktopOrSlides() &&
             <SmallStreamerVideoDisplayer
                 livestreamId={props.currentLivestream.id}
                 presentation={props.currentLivestream.mode === 'presentation'}

@@ -5,10 +5,11 @@ import Grow from "@material-ui/core/Grow";
 import {CategoryContainerCentered, CategoryContainerContent} from "../../../../../../../materialUI/GlobalContainers";
 import {CategorySubtitle, ThemedPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
 
-function HandRaisePriorRequest(props) {
+function HandRaisePriorRequest({ handRaiseState, updateHandRaiseRequest}) {
+    const shouldRender = () => Boolean(!(handRaiseState && handRaiseState.state !== 'unrequested'))
 
-    return (
-        <Grow unmountOnExit in={Boolean(!(props.handRaiseState && props.handRaiseState.state !== 'unrequested'))}>
+    return shouldRender() &&(
+        <Grow unmountOnExit in>
             <CategoryContainerCentered>
                 <CategoryContainerContent>
                     <div className='animated bounce infinite slow'>
@@ -20,7 +21,7 @@ function HandRaisePriorRequest(props) {
                         and video
                         and ask your questions face-to-face.</CategorySubtitle>
                     <Button variant="contained" size='large' startIcon={<PanToolOutlinedIcon fontSize="large"/>}
-                            children='Raise my hand' onClick={() => props.updateHandRaiseRequest("requested")}
+                            children='Raise my hand' onClick={() => updateHandRaiseRequest("requested")}
                             color="primary"/>
                 </CategoryContainerContent>
 
