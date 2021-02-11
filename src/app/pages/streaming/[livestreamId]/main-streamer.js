@@ -12,12 +12,12 @@ import NotificationsContainer from 'components/views/streaming/notifications-con
 import NotificationsContext from 'context/notifications/NotificationsContext';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import LeftMenu from "../../../components/views/streaming/LeftMenu/LeftMenu";
-import {Badge, Button, Paper} from "@material-ui/core";
+import {Badge, Button, Hidden, Paper, Tooltip} from "@material-ui/core";
 import {StandartTooltip, TooltipTitle, TooltipText, TooltipButtonComponent} from 'materialUI/GlobalTooltips';
 import PreparationOverlay from 'components/views/streaming/preparation-overlay/PreparationOverlay';
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import {MainLogo} from "../../../components/logos";
+import {MainLogo, MiniLogo} from "../../../components/logos";
 import Box from "@material-ui/core/Box";
 import Checkbox from "@material-ui/core/Checkbox";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
@@ -84,7 +84,6 @@ function StreamingPage(props) {
     const theme = useTheme()
     const {toggleTheme, themeMode} = useThemeToggle()
     const mobile = useMediaQuery(theme.breakpoints.down('md'))
-    console.log("-> mobile", mobile);
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
 
@@ -177,7 +176,13 @@ function StreamingPage(props) {
             <div>
                 <AppBar elevation={1} color="transparent">
                     <Toolbar className={classes.toolbar}>
-                        <MainLogo/>
+                        {/*<MainLogo/>*/}
+                        <Hidden smDown>
+                            <MainLogo/>
+                        </Hidden>
+                        <Hidden mdUp>
+                            <MiniLogo/>
+                        </Hidden>
                         <StandartTooltip
                             arrow
                             open={!streamStartTimeIsNow && !hideTooltip}
@@ -197,6 +202,8 @@ function StreamingPage(props) {
                             <ButtonWithConfirm
                                 color={currentLivestream.hasStarted ? theme.palette.error.main : theme.palette.primary.main}
                                 fluid
+                                hasStarted={currentLivestream.hasStarted}
+                                mobile={mobile}
                                 disabled={!streamStartTimeIsNow}
                                 startIcon={currentLivestream.hasStarted ? <StopIcon/> : <PlayCircleFilledWhiteIcon/>}
                                 buttonAction={() => setStreamingStarted(!currentLivestream.hasStarted)}
@@ -204,29 +211,41 @@ function StreamingPage(props) {
                                 buttonLabel={currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming'}/>
                         </StandartTooltip>
                         {mobile ?
-                            <IconButton onClick={() => {
-                                setSpeakerManagementOpen(true)
-                            }}>
-                                <PersonAddIcon color="inherit"/>
-                            </IconButton>
+                            <Tooltip title="Invite an additional streamer">
+                                <IconButton onClick={() => {
+                                    setSpeakerManagementOpen(true)
+                                }}>
+                                    <PersonAddIcon color="inherit"/>
+                                </IconButton>
+                            </Tooltip>
                             :
                             <Button
-                                children="Invite additional streamer"
+                                children="Invite a streamer"
                                 startIcon={<PersonAddIcon color="inherit"/>}
                                 onClick={() => {
                                     setSpeakerManagementOpen(true)
                                 }}
                             />}
-                        <Box display="flex" flexDirection="column" justifyContent="center">
-                            <Typography className={classes.streamStatusText} variant="h5">
-                                {currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}
-                            </Typography>
-                            {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
-                        </Box>
                         {mobile ?
-                            <IconButton target="_blank" href={`/streaming/${currentLivestream.id}/viewer`}>
-                                <OpenInBrowserIcon color="inherit"/>
-                            </IconButton>
+                            <Tooltip
+                                title={currentLivestream.hasStarted ? 'You are currently actively streaming' : 'You are currently not streaming'}>
+                                <Typography className={classes.streamStatusText} variant="h5">
+                                    {currentLivestream.hasStarted ? 'LIVE' : 'NOT LIVE'}
+                                </Typography>
+                            </Tooltip>
+                            :
+                            <Box display="flex" flexDirection="column" justifyContent="center">
+                                <Typography className={classes.streamStatusText} variant="h5">
+                                    {currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}
+                                </Typography>
+                                {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
+                            </Box>}
+                        {mobile ?
+                            <Tooltip title="Open Student View">
+                                <IconButton target="_blank" href={`/streaming/${currentLivestream.id}/viewer`}>
+                                    <OpenInBrowserIcon color="inherit"/>
+                                </IconButton>
+                            </Tooltip>
                             :
                             <Button
                                 href={`/streaming/${currentLivestream.id}/viewer`}
@@ -236,17 +255,21 @@ function StreamingPage(props) {
                             />
                         }
                         {/*<Box flexGrow={1}/>*/}
-                        <Checkbox
-                            checked={themeMode === "dark"}
-                            onChange={toggleTheme}
-                            icon={<Brightness4Icon/>}
-                            checkedIcon={<Brightness7Icon/>}
-                            color="default"
-                        />
+                        <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
+                            <Checkbox
+                                checked={themeMode === "dark"}
+                                onChange={toggleTheme}
+                                icon={<Brightness4Icon/>}
+                                checkedIcon={<Brightness7Icon/>}
+                                color="default"
+                            />
+                        </Tooltip>
                         <Box className={classes.viewCount}>
-                            <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
-                                <PeopleIcon/>
-                            </Badge>
+                            <Tooltip title="Number of viewers">
+                                <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
+                                    <PeopleIcon/>
+                                </Badge>
+                            </Tooltip>
                             {!mobile &&
                             <Typography className={classes.viewCountText}>
                                 Viewers : {numberOfViewers}

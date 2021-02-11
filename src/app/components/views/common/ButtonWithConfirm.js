@@ -1,5 +1,5 @@
 import React, {Fragment, useState} from 'react'
-import {Button, DialogContentText} from "@material-ui/core";
+import {Button, DialogContentText, Tooltip} from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -7,9 +7,26 @@ import DialogActions from "@material-ui/core/DialogActions";
 import CheckIcon from '@material-ui/icons/Check';
 import ClearIcon from '@material-ui/icons/Clear';
 import {GlassDialog} from "../../../materialUI/GlobalModals";
+import IconButton from "@material-ui/core/IconButton";
+import {makeStyles} from "@material-ui/core/styles";
 
-function ButtonWithConfirm({color, disabled, buttonAction, buttonLabel, confirmDescription, ...rest}) {
+const useStyles = makeStyles(theme => ({
+    iconInButton: {
+        color: ({hasStarted}) => hasStarted ? theme.palette.error.main : theme.palette.primary.main
+    }
+}))
 
+function ButtonWithConfirm({
+                               color,
+                               disabled,
+                               buttonAction,
+                               mobile,
+                               buttonLabel,
+                               hasStarted,
+                               confirmDescription,
+                               ...rest
+                           }) {
+    const classes = useStyles({hasStarted})
     const [modalOpen, setModalOpen] = useState(false);
 
     function performConfirmAction() {
@@ -19,8 +36,17 @@ function ButtonWithConfirm({color, disabled, buttonAction, buttonLabel, confirmD
 
     return (
         <Fragment>
-            <Button {...rest} style={{background: color}} color="primary" variant="contained" onClick={() => setModalOpen(true)}
-                    disabled={disabled}>{buttonLabel}</Button>
+            {mobile ?
+                <Tooltip title={buttonLabel}>
+                    <IconButton className={classes.iconInButton} disabled={disabled} onClick={() => setModalOpen(true)}>
+                        {rest.startIcon}
+                    </IconButton>
+                </Tooltip>
+                :
+                <Button {...rest} style={{background: color}} color="primary" variant="contained"
+                        onClick={() => setModalOpen(true)}
+                        disabled={disabled}>{buttonLabel}</Button>
+            }
             <GlassDialog open={modalOpen} onClose={() => setModalOpen(false)} centered={false}>
                 <DialogTitle>
                     Just making sure
