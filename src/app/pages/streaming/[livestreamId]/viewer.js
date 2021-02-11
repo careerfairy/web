@@ -39,7 +39,8 @@ const useStyles = makeStyles((theme) => ({
         minHeight: "100vh",
         height: "100%",
         width: "100%",
-        touchAction: "manipulation"
+        touchAction: "manipulation",
+        overflowY: "hidden"
     },
     toolbar: {
         minHeight: 55,
@@ -317,7 +318,7 @@ function ViewerPage({firebase}) {
                 [classes.withMenu]: showMenu
             })}>
                 <ViewerComponent
-                    livestreamId={livestreamId} streamerId={authenticatedUser?.email}
+                    livestreamId={livestreamId} streamerId={`${authenticatedUser?.email}${livestreamId}`}
                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
                     setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton}
                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>

@@ -48,7 +48,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySound, localStream, speakerSource, attachSinkId, streamerReady, handleMarkIncomplete, handleMarkComplete, isCompleted}) => {
+const Step4Mic = ({audioLevel, audioSource, devices, setAudioSource, setPlaySound, localStream, speakerSource, attachSinkId, handleMarkIncomplete, handleMarkComplete, isCompleted}) => {
     const classes = useStyles()
     const [localMicrophones, setLocalMicrophones] = useState([])
     const [clickedNo, setClickedNo] = useState(false)
