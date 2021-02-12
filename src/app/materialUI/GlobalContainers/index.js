@@ -38,8 +38,9 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         alignItems: "flex-end",
         justifyContent: "center",
-        fontSize: "1.2em",
+        fontSize: "1.6em",
         fontWeight: 500,
+        color: theme.palette.text.secondary,
         textAlign: "center",
         margin: theme.spacing(2, 0)
     },

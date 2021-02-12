@@ -32,7 +32,8 @@ const useStyles = makeStyles((theme) => ({
         top: 55,
         left: 0,
         bottom: 0,
-        zIndex: 20
+        zIndex: 20,
+        boxShadow: theme.shadows[7]
     },
     blackFrame: {
         left: ({showMenu}) => showMenu ? 280 : 0,

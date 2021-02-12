@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {withFirebase} from "../../../../context/firebase";
-import Dialog from "@material-ui/core/Dialog";
 import {Box, Button, DialogContentText, Typography} from "@material-ui/core";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -9,9 +8,8 @@ import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import Grow from "@material-ui/core/Grow";
 import Collapse from "@material-ui/core/Collapse";
-import {
-    TooltipHighlight,
-} from "../../../../materialUI/GlobalTooltips";
+import {TooltipHighlight,} from "../../../../materialUI/GlobalTooltips";
+import {GlassDialog} from "../../../../materialUI/GlobalModals";
 
 
 const pdfLink = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-documents%2FExampleReport.pdf?alt=media&token=bbec2b79-a30d-48f7-927f-bd0941ec5d73"
@@ -37,7 +35,7 @@ const DemoEndModal = ({open, handleClose}) => {
 
     return (
         <>
-            <Dialog TransitionComponent={Grow} open={Boolean(activePage === 0 && open)}>
+            <GlassDialog TransitionComponent={Grow} open={Boolean(activePage === 0 && open)}>
                 <DialogTitle>
                     Talent Pool
                 </DialogTitle>
@@ -71,8 +69,8 @@ const DemoEndModal = ({open, handleClose}) => {
                         children={'Next'}
                         color={"primary"}/>
                 </DialogActions>
-            </Dialog>
-            <Dialog TransitionComponent={Grow} open={Boolean(activePage === 1 && open)}>
+            </GlassDialog>
+            <GlassDialog TransitionComponent={Grow} open={Boolean(activePage === 1 && open)}>
                 <DialogTitle>
                     Analytics Report
                 </DialogTitle>
@@ -103,8 +101,8 @@ const DemoEndModal = ({open, handleClose}) => {
                             color={"primary"}/>
                     </DialogActions>
                 </Collapse>
-            </Dialog>
-            <Dialog TransitionComponent={Grow} open={Boolean(activePage === 2 && open)}>
+            </GlassDialog>
+            <GlassDialog TransitionComponent={Grow} open={Boolean(activePage === 2 && open)}>
                 <DialogTitle>
                     Congratulations!!
                 </DialogTitle>
@@ -123,7 +121,7 @@ const DemoEndModal = ({open, handleClose}) => {
                         children={'Back to Stream'}
                         color={"primary"}/>
                 </DialogActions>
-            </Dialog>
+            </GlassDialog>
         </>
     )
         ;

@@ -8,7 +8,8 @@ import CheckIcon from '@material-ui/icons/Check';
 import ClearIcon from '@material-ui/icons/Clear';
 import {GlassDialog} from "../../../materialUI/GlobalModals";
 import IconButton from "@material-ui/core/IconButton";
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 const useStyles = makeStyles(theme => ({
     iconInButton: {
@@ -24,8 +25,11 @@ function ButtonWithConfirm({
                                buttonLabel,
                                hasStarted,
                                confirmDescription,
+                               tooltipTitle,
                                ...rest
                            }) {
+    const theme = useTheme()
+    const extraSmallScreen = useMediaQuery(theme.breakpoints.down('xs'))
     const classes = useStyles({hasStarted})
     const [modalOpen, setModalOpen] = useState(false);
 
@@ -36,17 +40,17 @@ function ButtonWithConfirm({
 
     return (
         <Fragment>
-            {mobile ?
-                <Tooltip title={buttonLabel}>
+            <Tooltip title={tooltipTitle}>
+                {extraSmallScreen ?
                     <IconButton className={classes.iconInButton} disabled={disabled} onClick={() => setModalOpen(true)}>
                         {rest.startIcon}
                     </IconButton>
-                </Tooltip>
-                :
-                <Button {...rest} style={{background: color}} color="primary" variant="contained"
-                        onClick={() => setModalOpen(true)}
-                        disabled={disabled}>{buttonLabel}</Button>
-            }
+                    :
+                    <Button {...rest} style={{background: color}} color="primary" variant="contained"
+                            onClick={() => setModalOpen(true)}
+                            disabled={disabled}>{buttonLabel}</Button>
+                }
+            </Tooltip>
             <GlassDialog open={modalOpen} onClose={() => setModalOpen(false)} centered={false}>
                 <DialogTitle>
                     Just making sure

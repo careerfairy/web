@@ -1,8 +1,6 @@
 import React, {Fragment, useContext, useEffect, useState} from 'react';
-import {Modal} from "semantic-ui-react";
 
 import {withFirebasePage} from 'context/firebase';
-import RefreshRoundedIcon from '@material-ui/icons/RefreshRounded';
 import useAgoraAsStreamer from 'components/custom-hook/useAgoraAsStreamer';
 import CurrentSpeakerDisplayer from './CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
@@ -18,7 +16,6 @@ import DemoEndModal from "../modal/DemoEndModal";
 import useMediaSources from 'components/custom-hook/useMediaSources';
 import ScreenSharePermissionDeniedModal from '../modal/ScreenSharePermissionDeniedModal';
 import StreamPreparationModal from '../modal/StreamPreparationModal';
-import Button from "@material-ui/core/Button";
 import WifiIndicator from "./WifiIndicator";
 
 const useStyles = makeStyles((theme) => ({
@@ -53,7 +50,7 @@ function VideoContainer(props) {
     const [isStreaming, setIsStreaming] = useState(false);
 
     const [audioCounter, setAudioCounter] = useState(0);
-    const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
+    // const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
 
     const screenSharingMode = props.currentLivestream.screenSharerId === props.streamerId &&
@@ -309,17 +306,17 @@ function VideoContainer(props) {
                            videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
                            speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
                            attachSinkId={attachSinkId}/>
-            <Modal open={showDisconnectionModal}>
-                <Modal.Header>You have been disconnected</Modal.Header>
-                <Modal.Content>
-                    <p>Don't panic! Follow these steps to quickly restart the stream:</p>
-                    <p>1. Check your internet connection</p>
-                    <p>2. Reload this page</p>
-                    <p>3. Restart the stream</p>
-                    <Button startIcon={<RefreshRoundedIcon/>} children='Reload Page' size='large' color="primary"
-                            onClick={() => reloadPage()}/>
-                </Modal.Content>
-            </Modal>
+            {/*<Modal open={showDisconnectionModal}>*/}
+            {/*    <Modal.Header>You have been disconnected</Modal.Header>*/}
+            {/*    <Modal.Content>*/}
+            {/*        <p>Don't panic! Follow these steps to quickly restart the stream:</p>*/}
+            {/*        <p>1. Check your internet connection</p>*/}
+            {/*        <p>2. Reload this page</p>*/}
+            {/*        <p>3. Restart the stream</p>*/}
+            {/*        <Button startIcon={<RefreshRoundedIcon/>} children='Reload Page' size='large' color="primary"*/}
+            {/*                onClick={() => reloadPage()}/>*/}
+            {/*    </Modal.Content>*/}
+            {/*</Modal>*/}
             {!props.viewer && !streamerReady &&
             <StreamPreparationModalV2 readyToConnect={Boolean(props.currentLivestream && props.currentLivestream.id)}
                                       audioSource={audioSource} updateAudioSource={updateAudioSource}
@@ -355,40 +352,6 @@ function VideoContainer(props) {
                             open={showDemoIntroModal}
                             handleClose={handleCloseDemoIntroModal}/>
             <DemoEndModal open={isOpen(17)} handleClose={handleCloseDemoEndModal}/>
-            <style jsx>{`
-              .screen-container {
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                border: 2px solid red;
-              }
-
-              .button-container {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                cursor: pointer;
-                padding: 17px;
-                z-index: 8000;
-              }
-
-              .countdown {
-                margin: 0 0 20px 0;
-                color: white;
-                padding: 20px 0;
-                border-radius: 10px;
-                font-size: 1.2em;
-                background-color: rgba(0, 0, 0, 0.8);
-                min-height: 100px;
-              }
-
-              .countdown .label {
-                color: white;
-              }
-            `}</style>
         </Fragment>
     );
 }

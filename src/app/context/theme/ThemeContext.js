@@ -18,7 +18,7 @@ const ThemeProviderWrapper = ({children}) => {
 
     useEffect(() => {
         getThemeObj()
-    }, [])
+    }, [pathname])
 
     const toggleTheme = () => {
         const newThemeObj = theme.palette.type === "dark" ? baseThemeObj : darkThemeObj
@@ -32,7 +32,7 @@ const ThemeProviderWrapper = ({children}) => {
         if (pathsReadyForDarkMode.includes(pathname)) {
             const cachedThemeMode = localStorage.getItem("themeMode")
             if (cachedThemeMode === "dark" || cachedThemeMode === "light") {
-                if(cachedThemeMode === "dark"){
+                if (cachedThemeMode === "dark") {
                     newThemeObj = darkThemeObj
                 } else {
                     newThemeObj = baseThemeObj
@@ -42,7 +42,9 @@ const ThemeProviderWrapper = ({children}) => {
 
         // newThemeObj.palette.type = themeMode
         const createdTheme = createMuiTheme(newThemeObj);
-        setTheme(responsiveFontSizes(createdTheme))
+        if (theme.palette.type !== createdTheme.palette.type) {
+            setTheme(responsiveFontSizes(createdTheme))
+        }
     }
 
     // const themeObj = getThemeObj()

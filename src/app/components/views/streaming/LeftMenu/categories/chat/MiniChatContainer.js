@@ -1,12 +1,18 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
 import {withFirebase} from 'context/firebase';
 import ChevronRightRoundedIcon from '@material-ui/icons/ChevronRightRounded';
 import ChatEntryContainer from './chat-entry-container/ChatEntryContainer';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
+    Badge,
+    Collapse,
+    fade,
     TextField,
-    AccordionDetails, Badge, Typography, Accordion, AccordionSummary, Collapse, FormHelperText, FormControl, fade,
+    Typography,
 } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import {makeStyles} from "@material-ui/core/styles";
@@ -54,7 +60,6 @@ const useStyles = makeStyles(theme => ({
             paddingRight: "0 !important",
             borderRadius: 10,
         },
-        // background: "white"
     },
     header: {
         height: "41px !important",
@@ -75,8 +80,6 @@ const useStyles = makeStyles(theme => ({
     },
     scrollToBottom: {
         backgroundColor: theme.palette.background.default,
-        // display: "flex",
-        // flexDirection: "column",
         height: "240px",
         "& div": {
             overflowX: "hidden",

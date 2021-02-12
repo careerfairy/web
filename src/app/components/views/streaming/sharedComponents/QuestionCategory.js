@@ -65,7 +65,7 @@ const useStyles = makeStyles(theme => ({
     },
     bar: {
         width: "100%",
-        background: theme.palette.background.default,
+        background: theme.palette.background.paper,
     },
     tabs: {
         width: ({isMobile}) => isMobile ? "100%" : 280
@@ -188,6 +188,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     return (
         <CategoryContainerTopAligned>
             <QuestionContainerHeader>
+                <Paper elevation={1} square className={classes.bar}>
                 <QuestionContainerTitle>
                     Questions
                 </QuestionContainerTitle>
@@ -196,7 +197,6 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                     <AddIcon className={classes.addIcon}/>
                     Add a Question
                 </Fab>}
-                <Paper elevation={3} square className={classes.bar}>
                     <Tabs
                         value={value}
                         onChange={handleChange}

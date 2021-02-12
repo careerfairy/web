@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
         left: 0,
         bottom: 0,
         zIndex: 20,
-        boxShadow: theme.shadows[10]
+        boxShadow: theme.shadows[7]
     },
     blackFrame: {
         left: ({showMenu}) => showMenu ? 280 : 0,
@@ -225,7 +225,10 @@ function StreamingPage(props) {
                                 startIcon={currentLivestream.hasStarted ? <StopIcon/> : <PlayCircleFilledWhiteIcon/>}
                                 buttonAction={() => setStreamingStarted(!currentLivestream.hasStarted)}
                                 confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'}
-                                buttonLabel={currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming'}/>
+                                buttonLabel={currentLivestream.hasStarted ? `Stop ${mobile ? "" : "Streaming"}` : `Start ${mobile ? "" : "Streaming"}`}
+                                tooltipTitle={currentLivestream.hasStarted ? `Click here to stop streaming` : `Click here to start streaming`}
+
+                            />
                         </StandartTooltip>
                         {mobile ?
                             <Tooltip title="Invite an additional streamer">
