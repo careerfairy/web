@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {
@@ -8,7 +8,6 @@ import {
     Hidden,
     IconButton,
     Toolbar,
-    makeStyles
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
@@ -17,6 +16,7 @@ import Link from '../../materialUI/NextNavLink'
 import {MainLogo, MiniLogo} from "../../components/logos";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
+import {makeStyles} from "@material-ui/core/styles"
 
 const useStyles = makeStyles((theme) => ({
     avatar: {

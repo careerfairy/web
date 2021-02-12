@@ -1,12 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Doughnut} from "react-chartjs-2";
 import 'chartjs-plugin-labels'
-import {Box, Checkbox, List, ListItem, Typography, withStyles} from "@material-ui/core";
+import {Box, Checkbox, List, ListItem, Typography} from "@material-ui/core";
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import {PollQuestion} from "../../../../materialUI/GlobalTitles";
 import {colorsArray} from "../../../util/colors";
-import {useTheme} from "@material-ui/core/styles";
+import { useTheme, withStyles} from "@material-ui/core/styles";
 
 const GraphWrapper = withStyles(theme => ({
     root: {

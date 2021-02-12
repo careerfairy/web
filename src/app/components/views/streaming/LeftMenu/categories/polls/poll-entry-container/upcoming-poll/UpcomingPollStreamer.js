@@ -1,9 +1,9 @@
-import React, {useState, Fragment, useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import EditIcon from '@material-ui/icons/Edit';
 import {withFirebase} from 'context/firebase';
 import PollCreationModal from '../../poll-creation-modal/PollCreationModal';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import {Box, Button, Chip, IconButton, List, ListItem, Menu, MenuItem, Typography, withStyles} from "@material-ui/core";
+import {Box, Button, IconButton, List, ListItem, Menu, MenuItem, Typography} from "@material-ui/core";
 import {CloseRounded} from "@material-ui/icons";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -16,11 +16,7 @@ import {
     TooltipTitle,
     WhiteTooltip
 } from "../../../../../../../../materialUI/GlobalTooltips";
-import {
-    CategoryContainerTopAligned,
-    QuestionContainerHeader
-} from "../../../../../../../../materialUI/GlobalContainers";
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, withStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({
     upcomingPoll: {

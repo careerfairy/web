@@ -7,16 +7,16 @@ import {
     Card,
     CardContent,
     CardHeader,
+    CircularProgress,
     Divider,
-    useTheme,
-    makeStyles, CircularProgress, fade, FormControlLabel, Switch,
+    FormControlLabel,
+    Switch,
 } from "@material-ui/core";
 import {withFirebase} from "../../../../../../context/firebase";
 import {colorsArray} from "../../../../../util/colors";
 import {getLength, prettyDate, truncate} from "../../../../../helperFunctions/HelperFunctions";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
+import {makeStyles, useTheme, fade} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
     root: {},

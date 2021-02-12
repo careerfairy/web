@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Card, makeStyles, Slide} from '@material-ui/core';
+import {Card, Slide} from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
@@ -11,6 +11,7 @@ import UserInnerTable from "./UserInnerTable";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import {useAuth} from "../../../../../../../HOCs/AuthProvider";
+import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
     root: {},

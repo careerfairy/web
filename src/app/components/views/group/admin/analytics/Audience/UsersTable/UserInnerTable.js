@@ -1,6 +1,6 @@
 import React from 'react';
-import {fade, makeStyles} from "@material-ui/core/styles";
-import {Avatar, Collapse, Paper, useTheme} from "@material-ui/core";
+import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
+import {Avatar, Collapse, Paper} from "@material-ui/core";
 import MaterialTable from "material-table";
 import {defaultTableOptions, getPageSize, tableIcons} from "../../common/TableUtils";
 import EnhancedGroupStreamCard from "../../../events/enhanced-group-stream-card/EnhancedGroupStreamCard";

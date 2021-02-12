@@ -1,12 +1,11 @@
 import React, {Fragment, useEffect, useMemo, useRef, useState} from "react";
-import {fade, makeStyles} from "@material-ui/core";
 import {v4 as uuid} from 'uuid';
 import SwipeableViews from 'react-swipeable-views';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import General from "./General";
-import {useTheme} from "@material-ui/core/styles";
+import {useTheme, fade, makeStyles} from "@material-ui/core/styles";
 import {SwipeablePanel} from "../../../../../materialUI/GlobalPanels/GlobalPanels";
 import Audience from "./Audience";
 import Title from "./Title";

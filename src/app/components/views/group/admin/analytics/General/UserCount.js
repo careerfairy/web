@@ -7,18 +7,19 @@ import {
     CardContent,
     Grid,
     Typography,
-    makeStyles,
-    colors, CircularProgress
+     CircularProgress
 } from '@material-ui/core';
 import PeopleIcon from '@material-ui/icons/PeopleOutlined';
 import {withFirebase} from "../../../../../../context/firebase";
+import indigo from "@material-ui/core/colors/indigo";
+import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(() => ({
     root: {
         height: '100%'
     },
     avatar: {
-        backgroundColor: colors.indigo[600],
+        backgroundColor: indigo[600],
         height: 56,
         width: 56
     }

@@ -1,10 +1,10 @@
 import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
-import {Avatar, Box, Divider, Drawer, Hidden, List, makeStyles, Typography} from '@material-ui/core';
+import {Avatar, Box, Divider, Drawer, Hidden, List, Typography} from '@material-ui/core';
 import {LogOut as LogoutIcon} from 'react-feather';
 import NavItem from './NavItem';
 import {useRouter} from "next/router";
-import {fade} from "@material-ui/core/styles";
+import {fade, makeStyles} from "@material-ui/core/styles";
 import clsx from "clsx";
 import * as actions from "../../../store/actions";
 import {compose} from "redux";

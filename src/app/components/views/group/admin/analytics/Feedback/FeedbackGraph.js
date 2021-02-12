@@ -2,28 +2,13 @@ import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {Doughnut} from 'react-chartjs-2';
-import {
-    Box,
-    Card,
-    CardContent,
-    CardHeader,
-    Checkbox,
-    colors,
-    Divider,
-    List,
-    ListItem,
-    makeStyles,
-    Typography,
-    useTheme
-} from '@material-ui/core';
+import {Box, Card, CardContent,  Divider, Typography} from '@material-ui/core';
 import {colorsArray} from "../../../../../util/colors";
 import {withFirebase} from "../../../../../../context/firebase";
 import {convertStringToArray} from "../../../../../helperFunctions/HelperFunctions";
-
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
 import CustomLegend from "../../../../../../materialUI/Legends";
 import {customDonutConfig} from "../common/TableUtils";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -76,8 +61,8 @@ const FeedbackGraph = ({
                         data: currentPoll.options.map(option => option.votes),
                         backgroundColor: localColors,
                         borderWidth: 8,
-                        borderColor: colors.common.white,
-                        hoverBorderColor: colors.common.white
+                        borderColor: theme.palette.common.white,
+                        hoverBorderColor: theme.palette.common.white
                     }
                 ],
                 labels: currentPoll.options.map(option => convertStringToArray(option.name))

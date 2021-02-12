@@ -1,8 +1,7 @@
 import IconButton from "@material-ui/core/IconButton";
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import React from "react";
-import {makeStyles} from "@material-ui/core/styles";
-import {fade, useTheme} from "@material-ui/core";
+import {makeStyles, fade, useTheme} from "@material-ui/core/styles";
 import {grey} from "@material-ui/core/colors";
 import Slide from '@material-ui/core/Slide';
 import Button from '@material-ui/core/Button';

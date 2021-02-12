@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Box, Card, Divider, Grow, makeStyles} from '@material-ui/core';
+import {Box, Card, Divider, Grow} from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import Tabs from "@material-ui/core/Tabs";
@@ -21,6 +21,7 @@ import IconButton from "@material-ui/core/IconButton";
 import MaterialTable from "material-table";
 import FeedbackGraph from "../FeedbackGraph";
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import {makeStyles} from "@material-ui/core/styles";
 
 
 const useStyles = makeStyles((theme) => ({

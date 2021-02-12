@@ -2,10 +2,11 @@ import React from 'react';
 import clsx from 'clsx';
 import {Formik} from 'formik';
 import PropTypes from 'prop-types';
-import {Box, Button, Card, CardContent, CardHeader, Divider, Grid, makeStyles, TextField} from '@material-ui/core';
+import {Box, Button, Card, CardContent, CardHeader, Divider, Grid, TextField} from '@material-ui/core';
 import {useSnackbar} from "notistack";
 import {GENERAL_ERROR} from "../../../../util/constants";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(() => ({
     root: {}

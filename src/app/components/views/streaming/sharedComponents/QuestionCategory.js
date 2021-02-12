@@ -1,5 +1,5 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
-import {Badge, Button, CircularProgress, Collapse, Paper, TextField, Typography, useTheme} from "@material-ui/core";
+import {Badge, Button, CircularProgress, Collapse, TextField, Typography} from "@material-ui/core";
 import QuestionContainer from './questions/QuestionContainer';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -16,7 +16,7 @@ import {
 } from "../../../../materialUI/GlobalContainers";
 import SwipeableViews from "react-swipeable-views";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
-import {fade, makeStyles} from "@material-ui/core/styles";
+import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
 import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
 import {useAuth} from "../../../../HOCs/AuthProvider";

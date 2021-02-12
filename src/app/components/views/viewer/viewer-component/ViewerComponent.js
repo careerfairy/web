@@ -6,11 +6,11 @@ import SmallStreamerVideoDisplayer from 'components/views/streaming/video-contai
 import useDevices from 'components/custom-hook/useDevices';
 import useMediaSources from 'components/custom-hook/useMediaSources';
 import VideoControlsContainer from 'components/views/streaming/video-container/VideoControlsContainer';
-import SettingsModal from 'components/views/streaming/video-container/SettingsModal';
 import {useAuth} from 'HOCs/AuthProvider';
 import {v4 as uuidv4} from 'uuid';
 import {makeStyles} from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
+import SettingsModal from "../../streaming/video-container/SettingsModal";
 
 const useStyles = makeStyles(theme => ({
     waitingOverlay: {

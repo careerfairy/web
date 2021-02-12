@@ -1,25 +1,11 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
-import {
-    Box,
-    Card,
-    CardContent,
-    emphasize, Grow,
-    InputAdornment,
-    makeStyles,
-    Slide,
-    SvgIcon,
-    TextField
-} from '@material-ui/core';
-import {
-    FileText as DraftStreamIcon,
-    Film as StreamIcon,
-    RefreshCw as RefreshIcon,
-    Search as SearchIcon
-} from 'react-feather';
+import {Box, Card, CardContent, InputAdornment, Slide, SvgIcon, TextField} from '@material-ui/core';
+import {Film as StreamIcon, RefreshCw as RefreshIcon, Search as SearchIcon} from 'react-feather';
 import {useSnackbar} from "notistack";
 import IconButton from "@material-ui/core/IconButton";
+import {emphasize, makeStyles} from "@material-ui/core/styles";
 import {useRouter} from "next/router";
 import SpeedDial from '@material-ui/lab/SpeedDial';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';

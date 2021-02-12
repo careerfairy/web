@@ -1,25 +1,12 @@
-import React, {Fragment, useState} from 'react';
-import clsx from 'clsx';
-import {Formik} from 'formik';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {
-    Box,
-    Button,
-    Card,
-    CardContent,
-    CardHeader,
-    Divider,
-    Grid,
-    TextField,
-    makeStyles, Grow
-} from '@material-ui/core';
-import {validateStreamForm} from "../../../../helperFunctions/streamFormFunctions";
+import {Box, Button, Card, CardContent, CardHeader, Divider, Grid, Grow} from '@material-ui/core';
 import {useSnackbar} from "notistack";
 import {GENERAL_ERROR} from "../../../../util/constants";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import AddIcon from "@material-ui/icons/Add";
 import CategoryElement from "../settings/Category/CategoryElement";
 import CategoryEdit from "../settings/Category/CategoryEdit";
+import {makeStyles} from "@material-ui/core/styles";
 
 const states = [
     {

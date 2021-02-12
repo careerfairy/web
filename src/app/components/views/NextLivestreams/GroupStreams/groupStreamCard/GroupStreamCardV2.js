@@ -1,6 +1,6 @@
 import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from "context/firebase";
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, fade} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
 import {
     Avatar,
@@ -9,7 +9,6 @@ import {
     Chip,
     ClickAwayListener,
     Collapse,
-    fade,
     Fade,
     Grow,
     Paper

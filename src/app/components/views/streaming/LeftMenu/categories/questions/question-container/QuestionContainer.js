@@ -1,13 +1,10 @@
-import React, {useState, useEffect, useContext} from 'react';
-import {Input, Icon, Button, Label} from "semantic-ui-react";
+import React, {useEffect, useState} from 'react';
+import {Button, Icon, Input} from "semantic-ui-react";
 import Linkify from 'react-linkify';
 
 import {withFirebase} from 'context/firebase';
-import {makeStyles} from "@material-ui/core/styles";
-import {fade} from "@material-ui/core";
+import {fade, makeStyles} from "@material-ui/core/styles";
 import {grey} from "@material-ui/core/colors";
-import IconButton from "@material-ui/core/IconButton";
-import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import ExpandLessRoundedIcon from "@material-ui/icons/ExpandLessRounded";
 import ExpandMoreRoundedIcon from "@material-ui/icons/ExpandMoreRounded";
 import Typography from "@material-ui/core/Typography";
