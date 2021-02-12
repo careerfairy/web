@@ -1,5 +1,5 @@
-import React, {useState, useEffect, useRef} from 'react';
 import { CircularProgress, Dialog, DialogContent, makeStyles } from '@material-ui/core';
+import React, {useState, useEffect, useRef} from 'react';
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -23,17 +23,12 @@ function LoadingModal({ status }) {
 
     const classes = useStyles();
 
-    const [active, setActive] = useState(true)
     const [state, setState] = useState("connecting")
 
     const LOADING_AGORA_STATI = []
 
-    useEffect(() => {
-        if ()
-    }, [status]);
-
     return (
-        <Dialog open={active}>
+        <Dialog open={LOADING_AGORA_STATI.includes(status)}>
             <DialogContent> 
                 <div className={classes.container}>
                     <div className={classes.content}>
