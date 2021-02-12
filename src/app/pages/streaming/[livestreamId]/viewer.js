@@ -31,7 +31,8 @@ const useStyles = makeStyles((theme) => ({
         minHeight: "100vh",
         height: "100%",
         width: "100%",
-        touchAction: "manipulation"
+        touchAction: "manipulation",
+        overflowY: "hidden"
     },
     menuLeft: {
         position: "absolute",
@@ -250,7 +251,7 @@ function ViewerPage({firebase}) {
             <div className={'black-frame ' + (showMenu ? 'withMenu' : '')}>
 
                 <ViewerComponent
-                    livestreamId={livestreamId} streamerId={authenticatedUser?.email}
+                    livestreamId={livestreamId} streamerId={`${authenticatedUser?.email}${livestreamId}`}
                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
                     setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton}
                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>

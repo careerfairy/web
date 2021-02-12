@@ -94,7 +94,7 @@ const ActionComponent = ({
                         <FormControl error={errors[ratingId]}>
                             <Rating
                                 name={ratingId}
-                                value={values[ratingId]}
+                                value={Number(values[ratingId])}
                                 size="large"
                                 className={classes.stars}
                                 disabled={isSubmitting}
@@ -215,9 +215,9 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
     const hasNotRatedAndNotTimeYetButStreamEndedAndRatingIsForEnd = (rating) => {
         return Boolean(
             !rating.hasRated &&
-            minutesPassed < rating.appearAfter &&
+            // minutesPassed < rating.appearAfter &&
             authenticatedUser?.email &&
-            rating.isForEnd &&
+            // rating.isForEnd && // I dont care if rating is for end or not, just ask it when stream ends
             livestream.hasEnded
         )
     }
