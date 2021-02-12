@@ -95,7 +95,9 @@
     "maintained node versions"
   ],
   "devDependencies": {
+    "@material-ui/codemod": "^4.5.0",
     "clsx": "^1.1.1",
+    "jscodeshift": "^0.11.0",
     "node-sass": "^5.0.0",
     "prop-types": "^15.7.2",
     "react-perfect-scrollbar": "^1.5.8",

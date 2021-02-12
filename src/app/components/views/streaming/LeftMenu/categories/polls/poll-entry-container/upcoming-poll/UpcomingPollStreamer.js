@@ -3,11 +3,20 @@ import EditIcon from '@material-ui/icons/Edit';
 import {withFirebase} from 'context/firebase';
 import PollCreationModal from '../../poll-creation-modal/PollCreationModal';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import {Box, Button, IconButton, List, ListItem, Menu, MenuItem, Typography} from "@material-ui/core";
+import {
+    Box,
+    Button,
+    IconButton,
+    List,
+    ListItem,
+    Menu,
+    MenuItem,
+    Typography,
+    ListItemIcon,
+    ListItemText,
+    Paper,
+} from "@material-ui/core";
 import {CloseRounded} from "@material-ui/icons";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import Paper from "@material-ui/core/Paper";
 import {colorsArray} from "../../../../../../../util/colors";
 import TutorialContext from "../../../../../../../../context/tutorials/TutorialContext";
 import {

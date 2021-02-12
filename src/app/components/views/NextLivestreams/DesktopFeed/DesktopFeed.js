@@ -1,9 +1,8 @@
 import React from 'react';
-import {Box, Container, Grid} from "@material-ui/core";
+import { Box, Container, Grid, withWidth } from "@material-ui/core";
 import GroupCategories from "../GroupCategories/GroupCategories";
 import GroupStreams from "../GroupStreams/GroupStreams";
 import {useTheme} from "@material-ui/core/styles";
-import withWidth from '@material-ui/core/withWidth';
 
 
 const DesktopFeed = ({groupData, hasCategories, userData, alreadyJoined, handleToggleActive, mobile, user, livestreams, searching, livestreamId, careerCenterId, listenToUpcoming, selectedOptions, width}) => {

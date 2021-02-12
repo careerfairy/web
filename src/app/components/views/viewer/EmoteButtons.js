@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {Box, ClickAwayListener, Fab} from "@material-ui/core";
+import { Box, ClickAwayListener, Fab, CircularProgress } from "@material-ui/core";
 import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
 import {makeStyles, fade} from "@material-ui/core/styles";
 import {amber, deepOrange, grey, red} from "@material-ui/core/colors";

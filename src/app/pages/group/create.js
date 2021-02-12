@@ -6,14 +6,13 @@ import {withFirebase} from '../../context/firebase';
 import Header from '../../components/views/header/Header';
 import Footer from '../../components/views/footer/Footer';
 import CreateBaseGroup from "../../components/views/group/create/CreateBaseGroup";
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
 import CreateCategories from "../../components/views/group/create/CreateCategories";
 import CompleteGroup from "../../components/views/group/create/CompleteGroup";
 import {GlobalBackground} from "../../materialUI/GlobalBackground/GlobalBackGround";
 import Loader from "../../components/views/loader/Loader";
 import {useAuth} from "../../HOCs/AuthProvider";
+
+import { Stepper, Step, StepLabel } from '@material-ui/core';
 
 function getSteps() {
     return ['Create your base group', 'Setup your categories and sub-categories', 'Finish'];

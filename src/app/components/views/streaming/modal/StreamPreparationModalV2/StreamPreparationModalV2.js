@@ -9,9 +9,10 @@ import {
     StepButton,
     Typography,
     useMediaQuery,
-} from '@material-ui/core'
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
+    Stepper,
+    Step,
+    CircularProgress,
+} from '@material-ui/core';
 import Step1Chrome from "./Step1Chrome";
 import Step2Camera from "./Step2Camera";
 import Step3Speakers from "./Step3Speakers";
@@ -19,7 +20,6 @@ import Step4Mic from "./Step4Mic";
 import Step5Confirm from "./Step5Confirm";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import window from 'global';
-import CircularProgress from "@material-ui/core/CircularProgress";
 import {GlassDialog} from "../../../../../materialUI/GlobalModals";
 
 const useStyles = makeStyles(theme => ({

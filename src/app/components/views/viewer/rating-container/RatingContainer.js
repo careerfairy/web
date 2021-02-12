@@ -3,12 +3,9 @@ import {withFirebasePage} from "context/firebase";
 import {Rating} from "@material-ui/lab";
 import {useSnackbar} from "notistack";
 import {useAuth} from "../../../../HOCs/AuthProvider";
-import {FormHelperText, TextField} from "@material-ui/core";
+import { FormHelperText, TextField, Button, Grid, FormControl } from "@material-ui/core";
 import {fade, makeStyles} from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
 import {Formik} from "formik";
-import FormControl from "@material-ui/core/FormControl";
 
 const useStyles = makeStyles((theme) => ({
     snackbar: {

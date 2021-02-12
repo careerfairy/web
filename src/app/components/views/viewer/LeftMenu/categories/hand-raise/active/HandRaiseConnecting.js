@@ -1,7 +1,6 @@
 import React from 'react';
-import {Button} from "@material-ui/core";
+import { Button, Grow } from "@material-ui/core";
 import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
-import Grow from "@material-ui/core/Grow";
 import {CategoryContainerCentered, CategoryContainerContent} from "../../../../../../../materialUI/GlobalContainers";
 import {ThemedPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
 

@@ -9,8 +9,8 @@ import VideoControlsContainer from 'components/views/streaming/video-container/V
 import {useAuth} from 'HOCs/AuthProvider';
 import {v4 as uuidv4} from 'uuid';
 import {makeStyles} from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
 import SettingsModal from "../../streaming/video-container/SettingsModal";
+import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     waitingOverlay: {

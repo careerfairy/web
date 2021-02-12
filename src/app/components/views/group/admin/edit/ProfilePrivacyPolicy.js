@@ -15,11 +15,11 @@ import {
     FormHelperText,
     Grid,
     Switch,
-    TextField
+    TextField,
+    CircularProgress,
 } from '@material-ui/core';
 import {useSnackbar} from "notistack";
 import {GENERAL_ERROR, URL_REGEX} from "../../../../util/constants";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(() => ({

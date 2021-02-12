@@ -8,8 +8,7 @@ import SignalWifi4BarRoundedIcon from '@material-ui/icons/SignalWifi4BarRounded'
 import {ArrowUp, ArrowDown} from 'react-feather'
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import Box from "@material-ui/core/Box";
-import {Tooltip} from "@material-ui/core";
+import { Tooltip, Box } from "@material-ui/core";
 import Draggable from 'react-draggable';
 
 const gradient = [

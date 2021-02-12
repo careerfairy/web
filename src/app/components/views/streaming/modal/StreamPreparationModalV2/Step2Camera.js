@@ -1,5 +1,4 @@
 import React, {useEffect, useRef, useState} from 'react';
-import OutlinedInput from "@material-ui/core/OutlinedInput";
 import {
     Button,
     Grid,
@@ -9,7 +8,9 @@ import {
     InputLabel,
     FormControl,
     FormControlLabel,
-    Checkbox, DialogContent
+    Checkbox,
+    DialogContent,
+    OutlinedInput,
 } from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 

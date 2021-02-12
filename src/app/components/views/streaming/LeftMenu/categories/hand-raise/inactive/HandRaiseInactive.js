@@ -1,9 +1,8 @@
 import React, {useContext} from 'react';
 import {withFirebase} from 'context/firebase';
-import {Button, Typography} from "@material-ui/core";
+import { Button, Typography, Grow } from "@material-ui/core";
 import {CategoryContainerCentered} from "../../../../../../../materialUI/GlobalContainers";
 import {GreyPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
-import Grow from "@material-ui/core/Grow";
 import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";
 import {
     TooltipButtonComponent,

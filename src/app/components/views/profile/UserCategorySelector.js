@@ -1,11 +1,7 @@
 import React from 'react';
 import {Fragment} from 'react'
 import {makeStyles, useTheme} from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import {Typography, useMediaQuery} from "@material-ui/core";
+import { Typography, useMediaQuery, InputLabel, MenuItem, FormControl, Select } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     formControl: {

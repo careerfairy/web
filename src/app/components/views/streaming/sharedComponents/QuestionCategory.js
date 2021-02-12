@@ -1,14 +1,24 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
-import {Badge, Button, CircularProgress, Collapse, TextField, Typography} from "@material-ui/core";
+import {
+    Badge,
+    Button,
+    CircularProgress,
+    Collapse,
+    TextField,
+    Typography,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Fab,
+    Tabs,
+    Tab,
+    Slide,
+} from "@material-ui/core";
 import QuestionContainer from './questions/QuestionContainer';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
 import HelpIcon from '@material-ui/icons/Help';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import {withFirebase} from 'context/firebase';
 import AddIcon from '@material-ui/icons/Add';
-import Fab from "@material-ui/core/Fab";
 import {
     CategoryContainerTopAligned,
     QuestionContainerHeader,
@@ -20,10 +30,7 @@ import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
 import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
 import {useAuth} from "../../../../HOCs/AuthProvider";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
 import {GreyPermanentMarker} from "../../../../materialUI/GlobalTitles";
-import Slide from "@material-ui/core/Slide";
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 
 const useStyles = makeStyles(theme => ({

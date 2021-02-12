@@ -4,7 +4,6 @@ import 'styles.css';
 import FirebaseContext from 'context/firebase/FirebaseContext';
 import Firebase from 'context/firebase';
 import * as Sentry from '@sentry/browser';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import config from 'react-reveal/globals';
 import DateFnsUtils from '@date-io/date-fns';
 import {newStore, wrapper} from '../store';
@@ -23,6 +22,7 @@ import {ReactReduxFirebaseProvider} from 'react-redux-firebase';
 import {createFirestoreInstance} from "redux-firestore";
 import {Provider} from "react-redux";
 import {ThemeProviderWrapper} from "../context/theme/ThemeContext";
+import { CssBaseline } from '@material-ui/core';
 
 
 config({ssrFadeout: true});

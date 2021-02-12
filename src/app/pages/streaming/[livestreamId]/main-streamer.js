@@ -12,23 +12,28 @@ import NotificationsContainer from 'components/views/streaming/notifications-con
 import NotificationsContext from 'context/notifications/NotificationsContext';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import LeftMenu from "../../../components/views/streaming/LeftMenu/LeftMenu";
-import {Badge, Button, Hidden, Tooltip} from "@material-ui/core";
+import {
+    Badge,
+    Button,
+    Hidden,
+    Tooltip,
+    AppBar,
+    Toolbar,
+    Box,
+    Checkbox,
+    useMediaQuery,
+    Typography,
+    IconButton,
+} from "@material-ui/core";
 import {StandartTooltip, TooltipButtonComponent, TooltipText, TooltipTitle} from 'materialUI/GlobalTooltips';
 import PreparationOverlay from 'components/views/streaming/preparation-overlay/PreparationOverlay';
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
 import {MainLogo, MiniLogo} from "../../../components/logos";
-import Box from "@material-ui/core/Box";
-import Checkbox from "@material-ui/core/Checkbox";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
-import useMediaQuery from '@material-ui/core/useMediaQuery';
 import PlayCircleFilledWhiteIcon from '@material-ui/icons/PlayCircleFilledWhite';
 import StopIcon from '@material-ui/icons/Stop';
 import PeopleIcon from '@material-ui/icons/People';
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {

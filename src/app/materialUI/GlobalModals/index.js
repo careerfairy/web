@@ -1,7 +1,7 @@
 import React from 'react';
 import {fade, makeStyles} from "@material-ui/core/styles";
-import Dialog from '@material-ui/core/Dialog';
 import PropTypes from "prop-types";
+import { Dialog } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     glass: {

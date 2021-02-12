@@ -11,7 +11,10 @@ import {
     Switch,
     TextField,
     Tooltip,
-    Typography
+    Typography,
+    Fab,
+    ButtonGroup,
+    Box,
 } from "@material-ui/core";
 import {Formik} from 'formik';
 import {v4 as uuidv4} from 'uuid';
@@ -26,7 +29,6 @@ import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
 import {useRouter} from "next/router";
 import FormGroup from "./FormGroup";
 import WarningIcon from '@material-ui/icons/Warning';
-import Fab from "@material-ui/core/Fab";
 import {
     getStreamSubCollectionSpeakers,
     handleAddSpeaker,
@@ -38,10 +40,8 @@ import {
 } from "../../helperFunctions/streamFormFunctions";
 import {copyStringToClipboard} from "../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
 import {SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../../util/constants";
 import {LanguageSelect} from "../../helperFunctions/streamFormFunctions/components";
-import Box from "@material-ui/core/Box";
 import {useAuth} from "../../../HOCs/AuthProvider";
 
 

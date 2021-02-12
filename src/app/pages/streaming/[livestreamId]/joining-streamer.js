@@ -10,15 +10,19 @@ import {v4 as uuidv4} from 'uuid';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import LeftMenu from "../../../components/views/streaming/LeftMenu/LeftMenu";
 import PreparationOverlay from 'components/views/streaming/preparation-overlay/PreparationOverlay';
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import Toolbar from "@material-ui/core/Toolbar";
-import {Badge, Hidden, Tooltip} from "@material-ui/core";
+import {
+    Badge,
+    Hidden,
+    Tooltip,
+    useMediaQuery,
+    Toolbar,
+    Typography,
+    Box,
+    AppBar,
+    Checkbox,
+} from "@material-ui/core";
 import {MainLogo, MiniLogo} from "../../../components/logos";
-import Typography from "@material-ui/core/Typography";
-import Box from "@material-ui/core/Box";
 import PeopleIcon from "@material-ui/icons/People";
-import AppBar from "@material-ui/core/AppBar";
-import Checkbox from "@material-ui/core/Checkbox";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
 import {useThemeToggle} from "../../../context/theme/ThemeContext";

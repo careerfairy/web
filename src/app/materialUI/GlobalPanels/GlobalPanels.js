@@ -1,6 +1,6 @@
 import React from 'react';
-import Box from "@material-ui/core/Box";
 import * as PropTypes from "prop-types";
+import { Box } from '@material-ui/core';
 
 export const TabPanel = ({hidden, children, height, value, index,className, ...other}) => {
 

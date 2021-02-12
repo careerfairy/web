@@ -1,9 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Doughnut} from "react-chartjs-2";
 import 'chartjs-plugin-labels'
-import {Box, Checkbox, List, ListItem, Typography} from "@material-ui/core";
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
+import { Box, Checkbox, List, ListItem, Typography, ListItemIcon, ListItemText } from "@material-ui/core";
 import {PollQuestion} from "../../../../materialUI/GlobalTitles";
 import {colorsArray} from "../../../util/colors";
 import { useTheme, withStyles} from "@material-ui/core/styles";

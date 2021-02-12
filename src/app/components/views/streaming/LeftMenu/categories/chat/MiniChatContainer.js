@@ -12,8 +12,8 @@ import {
     Collapse,
     TextField,
     Typography,
+    IconButton,
 } from "@material-ui/core";
-import IconButton from "@material-ui/core/IconButton";
 import {makeStyles, fade} from "@material-ui/core/styles";
 import {grey} from "@material-ui/core/colors";
 import TutorialContext from "../../../../../../context/tutorials/TutorialContext";

@@ -11,9 +11,6 @@ import axios from 'axios';
 import {FormControl, Link as MuiLink, MenuItem, Select} from '@material-ui/core';
 
 import Head from 'next/head';
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
 import {
     Box,
     CircularProgress,
@@ -25,7 +22,11 @@ import {
     Container,
     Button,
     Checkbox,
-    FormHelperText, Typography
+    FormHelperText,
+    Typography,
+    Stepper,
+    Step,
+    StepLabel,
 } from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {TealBackground} from "../materialUI/GlobalBackground/GlobalBackGround";

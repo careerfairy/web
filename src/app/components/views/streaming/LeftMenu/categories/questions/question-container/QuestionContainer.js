@@ -7,7 +7,7 @@ import {fade, makeStyles} from "@material-ui/core/styles";
 import {grey} from "@material-ui/core/colors";
 import ExpandLessRoundedIcon from "@material-ui/icons/ExpandLessRounded";
 import ExpandMoreRoundedIcon from "@material-ui/icons/ExpandMoreRounded";
-import Typography from "@material-ui/core/Typography";
+import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {

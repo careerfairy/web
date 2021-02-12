@@ -11,11 +11,11 @@ import {
     Divider,
     FormControlLabel,
     Switch,
+    Typography,
 } from "@material-ui/core";
 import {withFirebase} from "../../../../../../context/firebase";
 import {colorsArray} from "../../../../../util/colors";
 import {getLength, prettyDate, truncate} from "../../../../../helperFunctions/HelperFunctions";
-import Typography from "@material-ui/core/Typography";
 import {makeStyles, useTheme, fade} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({

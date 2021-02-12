@@ -7,8 +7,7 @@ import Link from 'next/link';
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
 import {makeStyles} from "@material-ui/core/styles";
-import {Avatar} from "@material-ui/core";
-import Button from "@material-ui/core/Button";
+import { Avatar, Button } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     videoContainer: {

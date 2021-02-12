@@ -11,11 +11,11 @@ import {
     Divider,
     FormHelperText,
     Grow,
-    Typography
+    Typography,
+    CircularProgress,
 } from '@material-ui/core';
 import FilePickerContainer from "../../../../ssr/FilePickerContainer";
 import PublishIcon from "@material-ui/icons/Publish";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import {useSnackbar} from "notistack";
 import {GENERAL_ERROR} from "../../../../util/constants";
 import {uploadLogo} from "../../../../helperFunctions/HelperFunctions";

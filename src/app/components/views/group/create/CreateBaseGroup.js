@@ -1,11 +1,10 @@
 import React, {useState} from 'react'
 import {withFirebase} from '../../../../context/firebase';
 import PublishIcon from '@material-ui/icons/Publish';
-import TextField from '@material-ui/core/TextField';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import {Form as UiForm, Formik} from 'formik';
 import FilePickerContainer from '../../../../components/ssr/FilePickerContainer';
-import {Box, Button, Container, FormControl, FormHelperText, Typography} from "@material-ui/core";
+import { Box, Button, Container, FormControl, FormHelperText, Typography, TextField } from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {useAuth} from "../../../../HOCs/AuthProvider";
 

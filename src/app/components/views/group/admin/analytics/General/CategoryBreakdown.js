@@ -9,15 +9,18 @@ import {
     CardHeader,
     Divider,
     Typography,
-     Select, MenuItem, Switch, FormControlLabel
+    Select,
+    MenuItem,
+    Switch,
+    FormControlLabel,
+    Button,
+    Tabs,
+    Tab,
 } from '@material-ui/core';
 import {colorsArray} from "../../../../../util/colors";
 import {withFirebase} from "../../../../../../context/firebase";
-import Button from "@material-ui/core/Button";
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 import {prettyDate} from "../../../../../helperFunctions/HelperFunctions";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
 import CustomLegend from "../../../../../../materialUI/Legends";
 import Chart from 'chart.js';
 import 'chartjs-plugin-labels';
