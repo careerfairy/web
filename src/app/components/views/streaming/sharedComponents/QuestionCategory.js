@@ -188,7 +188,6 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     return (
         <CategoryContainerTopAligned>
             <QuestionContainerHeader>
-                <Paper elevation={1} square className={classes.bar}>
                 <QuestionContainerTitle>
                     Questions
                 </QuestionContainerTitle>
@@ -226,7 +225,6 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                             }
                         />
                     </Tabs>
-                </Paper>
             </QuestionContainerHeader>
             <SwipeableViews
                 containerStyle={{WebkitOverflowScrolling: 'touch'}}

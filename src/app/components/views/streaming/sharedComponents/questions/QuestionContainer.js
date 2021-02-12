@@ -23,16 +23,17 @@ import {useAuth} from "../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
     chatInput: {
-        background: theme.palette.background.paper,
+        background: ({active}) => active ? theme.palette.common.white : theme.palette.background.paper,
         borderRadius: 10,
         "& .MuiInputBase-root": {
+            color: ({active}) => active ? theme.palette.common.black : theme.palette.text.primary,
             paddingRight: "0 !important",
             borderRadius: 10,
         },
     },
     questionContainer: {
-        backgroundColor: ({active}) => active ? theme.palette.primary.main: theme.palette.type === "light" ? theme.palette.background.offWhite: theme.palette.background.paper,
-        color: ({active}) => active ? "white" : "inherit",
+        backgroundColor: ({active}) => active ? theme.palette.primary.main : theme.palette.type === "light" ? theme.palette.background.offWhite : theme.palette.background.paper,
+        color: ({active}) => active ? theme.palette.common.white : "inherit",
         position: "relative",
         padding: "20px 0 0 0",
         margin: 10,
@@ -59,7 +60,7 @@ const useStyles = makeStyles(theme => ({
         alignItems: "center"
     },
     showText: {
-        color: theme.palette.text.secondary,
+        color: ({active}) => active ? "rgb(200,200,200)" : theme.palette.text.secondary,
         fontSize: "0.8em",
         fontWeight: 500
     },
@@ -74,9 +75,10 @@ const useStyles = makeStyles(theme => ({
         color: ({active}) => active ? "white" : theme.palette.primary.main,
     },
     questionComment: {
-        background: theme.palette.type === "dark" ? theme.palette.background.default : theme.palette.background.paper
+        background: ({active}) => active ? theme.palette.common.white : theme.palette.type === "dark" ? theme.palette.background.default : theme.palette.background.paper,
+        color: ({active}) => active ? theme.palette.common.black : theme.palette.text.primary
     },
-    questionButton:{
+    questionButton: {
         borderRadius: "0 0 5px 5px",
         padding: "10px 0",
         color: theme.palette.common.white
