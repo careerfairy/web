@@ -279,6 +279,7 @@ function VideoContainer(props) {
                         externalMediaStreams={externalMediaStreams}
                         isLocalScreen={screenSharingMode}
                         attachSinkId={attachSinkId}
+                        {...props}
                         presenter={true}/>
                     : null
                 }
