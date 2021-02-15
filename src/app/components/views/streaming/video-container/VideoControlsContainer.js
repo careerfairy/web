@@ -79,7 +79,7 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
     const desktopMode = mode === "desktop"
 
     useEffect(() => {
-        if (isOpen(13)) {
+        if (isOpen(16)) {
             setOpen(true)
         }
     }, [tutorialSteps])

@@ -5,6 +5,7 @@ import { useWindowSize } from '../../../custom-hook/useWindowSize';
 import RemoteVideoContainer from './RemoteVideoContainer';
 
 function SmallStreamerVideoDisplayer(props) {
+    console.log("-> props in small", props);
     return (
         <Fragment>
                 <div style={{ position: 'absolute', top: '20vh', width: '100%', backgroundColor: 'rgb(30,30,30)'}}>

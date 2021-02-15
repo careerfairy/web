@@ -1,14 +1,36 @@
 import React, {Fragment, useState} from 'react'
-import {Button, DialogContentText} from "@material-ui/core";
+import {Button, DialogContentText, Tooltip} from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogActions from "@material-ui/core/DialogActions";
 import CheckIcon from '@material-ui/icons/Check';
 import ClearIcon from '@material-ui/icons/Clear';
+import {GlassDialog} from "../../../materialUI/GlobalModals";
+import IconButton from "@material-ui/core/IconButton";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
-function ButtonWithConfirm({color, disabled, buttonAction, buttonLabel, confirmDescription, fluid}) {
+const useStyles = makeStyles(theme => ({
+    iconInButton: {
+        color: ({hasStarted}) => hasStarted ? theme.palette.error.main : theme.palette.primary.main
+    }
+}))
 
+function ButtonWithConfirm({
+                               color,
+                               disabled,
+                               buttonAction,
+                               mobile,
+                               buttonLabel,
+                               hasStarted,
+                               confirmDescription,
+                               tooltipTitle,
+                               ...rest
+                           }) {
+    const theme = useTheme()
+    const extraSmallScreen = useMediaQuery(theme.breakpoints.down('xs'))
+    const classes = useStyles({hasStarted})
     const [modalOpen, setModalOpen] = useState(false);
 
     function performConfirmAction() {
@@ -18,9 +40,18 @@ function ButtonWithConfirm({color, disabled, buttonAction, buttonLabel, confirmD
 
     return (
         <Fragment>
-            <Button style={{background: color}} color="primary" variant="contained" onClick={() => setModalOpen(true)}
-                    disabled={disabled}>{buttonLabel}</Button>
-            <Dialog open={modalOpen} onClose={() => setModalOpen(false)} centered={false}>
+            <Tooltip title={tooltipTitle}>
+                {extraSmallScreen ?
+                    <IconButton className={classes.iconInButton} disabled={disabled} onClick={() => setModalOpen(true)}>
+                        {rest.startIcon}
+                    </IconButton>
+                    :
+                    <Button {...rest} style={{background: color}} color="primary" variant="contained"
+                            onClick={() => setModalOpen(true)}
+                            disabled={disabled}>{buttonLabel}</Button>
+                }
+            </Tooltip>
+            <GlassDialog open={modalOpen} onClose={() => setModalOpen(false)} centered={false}>
                 <DialogTitle>
                     Just making sure
                 </DialogTitle>
@@ -38,7 +69,7 @@ function ButtonWithConfirm({color, disabled, buttonAction, buttonLabel, confirmD
                         Confirm
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </GlassDialog>
         </Fragment>
     );
 }

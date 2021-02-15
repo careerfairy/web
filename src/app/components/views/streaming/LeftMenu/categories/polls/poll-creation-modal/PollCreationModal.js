@@ -16,6 +16,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import DialogActions from "@material-ui/core/DialogActions";
 import TextField from "@material-ui/core/TextField";
 import Grow from "@material-ui/core/Grow";
+import {GlassDialog} from "../../../../../../../materialUI/GlobalModals";
 
 function PollCreationModal({open, handleClose, livestreamId, initialOptions, initialPoll, firebase}) {
 
@@ -109,7 +110,7 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
     ;
 
     return (
-        <Dialog TransitionComponent={Slide} maxWidth="sm" fullWidth open={open} onClose={handleClose}>
+        <GlassDialog TransitionComponent={Slide} maxWidth="sm" fullWidth open={open} onClose={handleClose}>
             <DialogTitle disableTypography
                          style={{display: "flex", justifyContent: "center", alignItems: "flex-end"}} align="center">
                 <BarChart color="primary" fontSize="large"/> <Typography color="primary"
@@ -139,7 +140,7 @@ function PollCreationModal({open, handleClose, livestreamId, initialOptions, ini
                             variant="contained" onClick={savePoll}/>
                 </DialogActions>
             </DialogContent>
-        </Dialog>
+        </GlassDialog>
     );
 }
 

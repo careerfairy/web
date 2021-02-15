@@ -8,6 +8,9 @@ export const GENERAL_ERROR = "Something went wrong."
 // Maybe other websites do to?
 export const URL_REGEX = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,9}(:[0-9]{1,5})?(\/.*)?$/gm;
 
+export const logoPlaceholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
+
+
 // Stream form Constants
 export const SAVE_WITH_NO_VALIDATION = "SAVE_WITH_NO_VALIDATION"
 export const SUBMIT_FOR_APPROVAL = "SUBMIT_FOR_APPROVAL"

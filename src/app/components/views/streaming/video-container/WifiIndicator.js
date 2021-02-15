@@ -13,7 +13,7 @@ import {Tooltip} from "@material-ui/core";
 import Draggable from 'react-draggable';
 
 const gradient = [
-    "rgba(0,0,0,0.89)",
+    "rgba(0,0,0,0.5)",
     "#54db00",
     "#aeca45",
     "#ca9f00",
@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         borderRadius: theme.spacing(2),
         padding: theme.spacing(1),
-        boxShadow: theme.shadows[10],
+        boxShadow: theme.shadows[2],
         backgroundColor: fade(theme.palette.common.black, 0.1),
         backdropFilter: "blur(5px)",
         transition: theme.transitions.create("transform", {
@@ -48,7 +48,7 @@ const useStyles = makeStyles(theme => ({
         fontSize: "xx-large",
     },
     svgShadow: {
-        filter: "drop-shadow(0px 3px 3px rgba(0, 0, 0, 0.4))"
+        filter: `drop-shadow(0px 0px 2px rgba(0,0,0,0.4))`
     },
     downlinkWifiIcon: {
         color: ({downlinkIndex}) => gradient[downlinkIndex],

@@ -1,10 +1,94 @@
-import React, {useEffect, Fragment, useRef, useState} from 'react';
-import {Grid, Icon} from "semantic-ui-react";
+import React from 'react';
 import RemoteVideoContainer from './RemoteVideoContainer';
-import { useWindowSize } from '../../../custom-hook/useWindowSize';
-import CreateLivestreamProposalStep from 'components/views/group/admin/schedule-events/create-livestream-proposal-step/CreateLivestreamProposalStep';
+import {useWindowSize} from '../../../custom-hook/useWindowSize';
+import {makeStyles} from "@material-ui/core/styles";
+
+
+const useStyles = makeStyles(theme => ({
+
+    externalQuarterWidth: {
+        height: "100%",
+        display: "inline-block",
+        width: 250,
+        [theme.breakpoints.down("mobile")]: {
+            width: 150
+        },
+    },
+    externalSpeakerVideo: {
+        position: "absolute",
+        left: "0",
+        width: "100%",
+        zIndex: 101,
+        top: "20vh",
+        height: "calc(80vh - 160px)",
+        [theme.breakpoints.down("mobile")]: {
+            top: "15vh",
+            height: "45vh",
+        },
+    },
+
+    externalSpeakerVideoSolo: {
+        position: "absolute",
+        top: "0",
+        left: "0",
+        width: "100%",
+        height: "calc(100vh - 160px)",
+        zIndex: 100
+    },
+    localQuarterWidth: {
+        width: "250px",
+        height: "100%",
+        display: "inline-block",
+        verticalAlign: "top",
+        margin: "0"
+    },
+    localSpeakerVideo: {
+        position: "absolute",
+        top: "20vh",
+        left: "0",
+        width: "100%",
+        height: "calc(80vh - 160px)"
+    },
+    localSpeakerVideoSolo: {
+        position: "absolute",
+        top: "0",
+        left: "0",
+        width: "100%",
+        height: "calc(100vh - 160px)"
+    },
+    localVideoContainer: {
+        position: "relative",
+        backgroundColor: "black",
+        width: "100%",
+        margin: "0 auto",
+        zIndex: 2000
+    },
+    relativeContainer: {
+        position: "relative",
+        height: "100%",
+        minHeight: "calc(100vh - 55px)"
+    },
+    relativeContainerVideos: {
+        margin: "0",
+        backgroundColor: "rgb(30, 30, 30)",
+        overflowX: "scroll",
+        overflowY: "hidden",
+        whiteSpace: "nowrap",
+        textAlign: "center",
+        '&::-webkit-scrollbar': {
+            height: 5
+        },
+        '&::-webkit-scrollbar-track': {
+            background: theme.palette.common.black
+        },
+        '&::-webkit-scrollbar-thumb': {
+            background: theme.palette.primary.main
+        }
+    },
+}))
 
 function CurrentSpeakerDisplayer(props) {
+    const classes = useStyles()
 
     const windowSize = useWindowSize();
 
@@ -36,7 +120,7 @@ function CurrentSpeakerDisplayer(props) {
                 return 'calc(100vh - 55px)';
             }
         }
-    } 
+    }
 
     function getMinimizedSpeakersGridHeight() {
         if (props.isPlayMode) {
@@ -52,167 +136,58 @@ function CurrentSpeakerDisplayer(props) {
                 return '0';
             }
         }
-    } 
+    }
 
-    
 
-    function getVideoContainerClass(streamId) {
+    function getVideoContainerClass(streamId, prop) {
         if (props.smallScreenMode) {
-            return 'quarter-width';
+            return classes[`${prop}QuarterWidth`]
         }
         if (props.isPlayMode) {
             if (props.streams.length > 1) {
-                return streamId === props.currentSpeaker ? 'speaker-video' : 'quarter-width';
+                return streamId === props.currentSpeaker ? classes[`${prop}SpeakerVideo`] : classes[`${prop}QuarterWidth`]
             } else {
-                return 'speaker-video-solo';
+                return classes[`${prop}SpeakerVideoSolo`]
             }
         } else {
             if (props.streams.length > 0) {
-                return streamId === props.currentSpeaker ? 'speaker-video' : 'quarter-width';
+                return streamId === props.currentSpeaker ? classes[`${prop}SpeakerVideo`] : classes[`${prop}QuarterWidth`]
             } else {
-                return 'speaker-video-solo';
+                return classes[`${prop}SpeakerVideoSolo`]
             }
         }
     }
 
-    let externalVideoElements = props.streams.filter(stream => !stream.streamId.includes("screen")).map( (stream, index) => {
+    let externalVideoElements = props.streams.filter(stream => !stream.streamId.includes("screen")).map((stream, index) => {
         return (
-            <div key={stream.streamId} className={getVideoContainerClass(stream.streamId)} style={{ padding: 0 }}>
-                <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream} height={getVideoContainerHeight(stream.streamId)} index={index}/>
-                <style jsx>{`
-                    .quarter-width {
-                        height: 100%;
-                        display: inline-block;
-                    }
-
-                    .speaker-video {
-                        position: absolute;
-                        left: 0;
-                        width: 100%;
-                        z-index: 101;
-                    }
-
-                    .speaker-video-solo {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: calc(100vh - 160px);
-                        z-index: 100;
-                    }     
-
-                    @media(max-width: 768px) {
-                        .quarter-width {
-                            width: 150px;
-                        }
-
-                        .speaker-video {
-                            top: 15vh;
-                            height: 45vh;
-                        }
-                    }
-
-                    @media(min-width: 768px) {
-                        .quarter-width {
-                            width: 250px;
-                        }
-
-                        .speaker-video {
-                            top: 20vh;
-                            height: calc(80vh - 160px);
-                        }
-                    }
-                `}</style>
+            <div key={stream.streamId} className={getVideoContainerClass(stream.streamId, "external")}
+                 style={{padding: 0}}>
+                <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream}
+                                      height={getVideoContainerHeight(stream.streamId)} index={index}/>
             </div>
         );
     });
 
     if (!props.isPlayMode) {
         let localVideoElement =
-            <div className={getVideoContainerClass(props.localId)} style={{ padding: '0', margin: '0' }} key={"localVideoId"}>
-                <div className='video-container' style={{ height: getVideoContainerHeight(props.localId) }}>
-                    <div id="localVideo" style={{ width: '100%', height: '100%' }}/> 
+            <div
+                className={getVideoContainerClass(props.localId, "local")}
+                style={{padding: '0', margin: '0'}}
+                key={"localVideoId"}>
+                <div className={classes.localVideoContainer} style={{height: getVideoContainerHeight(props.localId)}}>
+                    <div id="localVideo" style={{width: '100%', height: '100%'}}/>
                 </div>
-                <style jsx>{`
-                    .quarter-width {
-                        width: 250px;
-                        height: 100%;
-                        display: inline-block;
-                        vertical-align: top;
-                        margin: 0;
-                    }
-
-                    .speaker-video {
-                        position: absolute;
-                        top: 20vh;
-                        left: 0;
-                        width: 100%;
-                        height: calc(80vh - 160px);
-                    } 
-
-                    .speaker-video-solo {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: calc(100vh - 160px);
-                    } 
-
-                    .video-container {
-                        position: relative;
-                        background-color: black;
-                        width: 100%; 
-                        margin: 0 auto;
-                        z-index: 2000;
-                    }
-            `}</style>
             </div>;
 
         externalVideoElements.unshift(localVideoElement);
     }
 
     return (
-        <Fragment>
-            <div className='relative-container'>
-                <div className='relative-container-videos' style={{ height: getMinimizedSpeakersGridHeight() }}>
-                    { externalVideoElements }
-                </div> 
-            </div>             
-            <style jsx>{`
-                .relative-container {
-                    position: relative;
-                    height: 100%;
-                    min-height: calc(100vh - 55px);
-                }
-
-                .relative-container-videos {
-                    margin: 0;
-                    background-color: rgb(30,30,30);
-                    overflow-x: scroll;
-                    overflow-y: hidden;
-                    white-space: nowrap;
-                    text-align: center;
-                    scrollbar-color: black rgba(0, 210, 170, 0.8);
-
-                }
-
-                .relative-container-videos::-webkit-scrollbar {
-                    height: 5px;
-                }
-
-                .relative-container-videos::-webkit-scrollbar-track {
-                    background: black;
-                }
-
-                .relative-container-videos::-webkit-scrollbar-thumb {
-                    background: rgba(0, 210, 170, 0.8);
-                }
-                
-                .hidden {
-                    display: none;
-                }
-          `}</style>
-        </Fragment>
+        <div className={classes.relativeContainer}>
+            <div className={classes.relativeContainerVideos} style={{height: getMinimizedSpeakersGridHeight()}}>
+                {externalVideoElements}
+            </div>
+        </div>
     );
 }
 
