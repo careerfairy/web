@@ -128,7 +128,7 @@ function ViewerComponent(props) {
                                      speakerSwitchModeActive={false} localStream={null} attachSinkId={attachSinkId}
                                      streams={externalMediaStreams} localId={props.streamerId}
                                      currentSpeaker={props.currentLivestream.currentSpeakerId}
-                                     muted={!props.currentLivestream.hasStarted} {...props}/>
+                                     muted={false} {...props}/>
             {shareDesktopOrSlides() &&
             <SmallStreamerVideoDisplayer
                 livestreamId={props.currentLivestream.id}
@@ -161,12 +161,12 @@ function ViewerComponent(props) {
                                attachSinkId={attachSinkId}/>
             </Fragment>
             }
-            {!props.currentLivestream.hasStarted &&
+            {/* {!props.currentLivestream.hasStarted &&
             <div className={classes.waitingOverlay}>
                 <Typography className={classes.waitingText}>
                     {props.currentLivestream.test ? 'The streamer has to press Start Streaming to be visible to students' : 'Thank you for joining!'}
                 </Typography>
-            </div>}
+            </div>} */}
         </div>
     );
 }
