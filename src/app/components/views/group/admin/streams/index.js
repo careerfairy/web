@@ -107,6 +107,8 @@ const Index = ({group, typeOfStream, query}) => {
                     || speaker.lastName.toLowerCase().indexOf(searchParams.toLowerCase()) >= 0)
             )
         })
+        // Reset back to page one on a new search
+        action.goTo(1)
         setFilteredStreams(newFilteredStreams)
     }
 
