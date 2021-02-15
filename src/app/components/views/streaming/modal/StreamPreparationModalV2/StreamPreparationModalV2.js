@@ -269,7 +269,7 @@ const StreamPreparationModalV2 = ({
     }
 
     return (
-        <Dialog fullScreen={fullScreen} fullWidth maxWidth="sm" open={streamerConnected && !streamerReady}>
+        <GlassDialog fullScreen={fullScreen} fullWidth maxWidth="sm" open={streamerConnected && !streamerReady}>
             <DialogTitle disableTypography>
                 <h3 style={{color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3>
             </DialogTitle>

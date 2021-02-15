@@ -517,67 +517,11 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                     //screenShareClient.startProxyServer(3);
 
                     screenShareClient.init(AGORA_APP_ID, () => {
-
-                        screenShareClient.join(agoraScreenShareToken.rtcToken, roomId, userUid + 'screen', (uid) => {
-
-                            let screenShareStream = agoraRTC.createStream({
-                                streamID: uid,
-                                audio: false,
-                                video: false,
-                                screen: true,
-                                screenAudio: true,
-                                optimizationMode: 'motion'
-                            });
-                            screenShareStream.setVideoProfile("480p_9");
-                            setAgoraStatus("screen-share-started")
-
-                            screenShareStream.init(() => {
-                                screenShareStream.play("Screen");
-                                screenShareClient.publish(screenShareStream, handleError);
-                                setScreenShareRtcStream(screenShareStream);
-                            }, (err) => {
-                                if (err && err.type === "error" && err.msg === "NotAllowedError") {
-                                    setAgoraStatus("screen-share-stopped")
-                                }
-                            });
-                            screenShareStream.on("stopScreenSharing", function (evt) {
-                                // STREAMER HAS MUTED VIDEO
-                                setAgoraStatus("screen-share-stopped")
-                            });
-                        }, handleError);
+                        publishScreenShareStream(screenShareClient)
                     });
                     setScreenShareRtcClient(screenShareClient);
                 } else {
-                    screenShareRtcClient.join(agoraScreenShareToken.rtcToken, roomId, userUid + 'screen', (uid) => {
-
-                        let screenShareStream = agoraRTC.createStream({
-                            streamID: uid,
-                            audio: false,
-                            video: false,
-                            screen: true,
-                            screenAudio: true,
-                            optimizationMode: 'motion'
-                        });
-                        screenShareStream.setVideoProfile("480p_9");
-                        setAgoraStatus("screen-share-started")
-
-                        screenShareStream.init(() => {
-                            screenShareStream.play("Screen");
-                            screenShareRtcClient.publish(screenShareStream, handleError);
-                            setScreenShareRtcStream(screenShareStream);
-                        }, (err) => {
-                            if (err) {
-                                if (err.type === "error" && err.msg === "NotAllowedError") {
-                                    setAgoraStatus("screen-share-stopped")
-                                }
-                            }     
-                        });
-
-                        screenShareStream.on("stopScreenSharing", function (evt) {
-                            // STREAMER HAS MUTED VIDEO
-                            setAgoraStatus("screen-share-stopped")
-                        });
-                    });
+                    publishScreenShareStream(screenShareRtcClient)
                 }
             } else {
                 if (screenShareRtcClient) {
@@ -591,6 +535,40 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
             }
         }
     }, [agoraRTC, screenSharingMode, isPlayMode, agoraScreenShareToken])
+
+    const publishScreenShareStream = (client) => {
+        client.join(agoraScreenShareToken.rtcToken, roomId, userUid + 'screen', (uid) => {
+
+            let screenShareStream = agoraRTC.createStream({
+                streamID: uid,
+                audio: false,
+                video: false,
+                screen: true,
+                screenAudio: true,
+                //optimizationMode: 'motion'
+            });
+
+            screenShareStream.setVideoProfile("480p_9");
+            setAgoraStatus("screen-share-started")
+
+            screenShareStream.init(() => {
+                screenShareStream.play("Screen");
+                client.publish(screenShareStream, handleError);
+                setScreenShareRtcStream(screenShareStream);
+            }, (err) => {
+                if (err) {
+                    alert(JSON.stringify(err));
+                    if (err.type === "error" && err.msg === "NotAllowedError") {
+                        setAgoraStatus("screen-share-stopped")
+                    }
+                }     
+            });
+            screenShareStream.on("stopScreenSharing", function (evt) {
+                // STREAMER HAS MUTED VIDEO
+                setAgoraStatus("screen-share-stopped")
+            });
+        });
+    }
 
     useEffect(() => {
         if (isViewer && agoraRTC && rtcClient) {
