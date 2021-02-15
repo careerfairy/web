@@ -34,6 +34,7 @@
     "@material-ui/lab": "^4.0.0-alpha.56",
     "@material-ui/pickers": "^3.2.10",
     "@material-ui/x-grid-data-generator": "^4.0.0-alpha.15",
+    "@next/bundle-analyzer": "^10.0.6",
     "@react-pdf/renderer": "^1.6.11",
     "@react-pdf/styled-components": "^1.4.0",
     "@sentry/browser": "^5.13.2",

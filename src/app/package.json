@@ -96,11 +96,13 @@
   ],
   "devDependencies": {
     "@material-ui/codemod": "^4.5.0",
+    "@next/bundle-analyzer": "^10.0.6",
     "clsx": "^1.1.1",
     "jscodeshift": "^0.11.0",
     "node-sass": "^5.0.0",
     "prop-types": "^15.7.2",
     "react-perfect-scrollbar": "^1.5.8",
-    "styled-jsx-plugin-sass": "^1.0.0"
+    "styled-jsx-plugin-sass": "^1.0.0",
+    "webpack-bundle-analyzer": "^4.4.0"
   }
 }

@@ -14,6 +14,7 @@ import {
     Typography,
     DialogContentText,
 } from '@material-ui/core';
+import {demoVideo} from "../../../../util/constants";
 
 const useStyles = makeStyles(theme => ({}));
 
@@ -24,18 +25,33 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare}) => {
     return (
         <GlassDialog fullWidth maxWidth="sm" onClose={handleClose} open={open}>
             <DialogTitle>
-                Would you like to share:
+                <Typography align="center" variant="h4">
+                    Would you like to share
+                </Typography>
             </DialogTitle>
             <DialogContent>
                 <Grid container spacing={1}>
                     <Grid item xs={12} sm={6}>
                         <GraphicButton
                             buttonTitle="Video"
+                            videoUrl={demoVideo}
+                            buttonText={
+                                "Chose this option if you would" +
+                                " like to share content that is fast moving" +
+                                " like videos with high frame rates"
+                            }
+                            backgroundImageUrl={"https://media.giphy.com/media/duzpaTbCUy9Vu/giphy.gif"}
                         />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <GraphicButton
                             buttonTitle="Screen"
+                            videoUrl={demoVideo}
+                            buttonText={
+                                "Chose this option if you would like" +
+                                " to share your desktop preferring video " +
+                                "quality over frame rates"
+                            }
                         />
                     </Grid>
                 </Grid>

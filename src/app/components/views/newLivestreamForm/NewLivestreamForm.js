@@ -374,7 +374,7 @@ const NewLivestreamForm = ({firebase}) => {
                                 label="Logo"
                                 handleBlur={handleBlur}
                                 formName="companyLogoUrl"
-                                isSuperAdmin={userData.isAdmin}
+                                isSuperAdmin={userData?.isAdmin}
                                 value={values.companyLogoUrl}
                                 options={existingLogos}
                                 loading={fetchingLogos}

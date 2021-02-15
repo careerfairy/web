@@ -1,99 +1,121 @@
 import React from 'react';
 import {makeStyles} from '@material-ui/core/styles';
-import { ButtonBase, Typography } from '@material-ui/core';
+import {ButtonBase, Typography} from '@material-ui/core';
+import {demoVideo} from "../../components/util/constants";
 
 
-const useStyles = makeStyles((theme) => ({
-    graphicButtonRoot: {
-        display: 'flex',
-        justifyContent: "center",
-        flexWrap: 'wrap',
-        minWidth: 250,
-        padding: "1rem",
-        paddingTop: 0,
-        width: '100%',
-    },
-    graphicButtonBase: {
-        position: 'relative',
-        height: 200,
-        flex: 1,
-        minWidth: 200,
-        margin: "0.5rem",
-        [theme.breakpoints.down('xs')]: {
-            width: '100% !important', // Overrides inline-style
-            height: 100,
+const useStyles = makeStyles((theme) => {
+    const customTransition = theme.transitions.create("all", {
+        easing: theme.transitions.easing.easeInOut,
+        duration: theme.transitions.duration.standard,
+    })
+    return ({
+        graphicButtonRoot: {
+            display: 'flex',
+            justifyContent: "center",
+            flexWrap: 'wrap',
+            minWidth: 250,
+            padding: "1rem",
+            paddingTop: 0,
+            width: '100%',
+        },
+        video:{
+          position: "absolute",
+          width: "100%",
+          height: "100%"
+        },
+        graphicButtonBase: {
+            position: 'relative',
+            height: 200,
+            flex: 1,
+            minWidth: 200,
+            margin: "0.5rem",
+            [theme.breakpoints.down('xs')]: {
+                width: '100% !important', // Overrides inline-style
+                height: 100,
+            },
+
+
+            '&:hover, &$focusVisible': {
+                zIndex: 1,
+                '& $imageBackdrop': {
+                    // opacity: 0.15,
+                },
+                '& $buttonText': {
+                    opacity: 1,
+                },
+                '& $imageMarked': {
+                    // opacity: 0,
+                    width: "100%"
+                },
+                '& $imageTitle': {
+
+                    marginTop: 0
+                },
+            },
         },
 
-        '&:hover, &$focusVisible': {
-            zIndex: 1,
-            '& $imageBackdrop': {
-                opacity: 0.15,
-            },
-            '& $imageMarked': {
-                opacity: 0,
-            },
-            '& $imageTitle': {
-                transition: theme.transitions.create("all", {
-                    easing: theme.transitions.easing.easeInOut,
-                    duration: theme.transitions.duration.standard,
-                }),
-                borderBottom: '4px solid currentColor',
-                marginTop: 0
-            },
+        focusVisible: {
+            opacity: 0.3
         },
-    },
+        imageButton: {
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            display: 'flex',
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: 'space-between',
+            color: theme.palette.common.white,
+        },
+        imageSrc: {
+            width: "100%",
+            height: "100%",
+            backgroundSize: "contain",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
+            maxWidth: "80%",
+            maxHeight: "80%",
+        },
+        imageBackdrop: {
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            borderRadius: 5,
+            backgroundColor: theme.palette.common.black,
+            opacity: 0.6,
+        },
+        imageTitle: {
+            position: 'relative',
+            marginTop: "30%",
+            transition: customTransition,
+            padding: theme.spacing(1, 2, 0, 2)
+        },
+        buttonText: {
+            transition: customTransition,
+            opacity: 0,
+            padding: theme.spacing(1)
+        },
+        imageMarked: {
+            height: 3,
+            width: 18,
+            transition: customTransition,
+            backgroundColor: theme.palette.common.white,
+        },
+    })
+});
 
-    focusVisible: {
-        opacity: 0.3
-    },
-    imageButton: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        display: 'flex',
-        justifyContent: 'center',
-        color: theme.palette.common.white,
-    },
-    imageSrc: {
-        width: "100%",
-        height: "100%",
-        backgroundSize: "contain",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-        maxWidth: "80%",
-        maxHeight: "80%"
-    },
-    imageBackdrop: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        borderRadius: 5,
-        backgroundColor: theme.palette.common.black,
-        opacity: 0.6,
-        transition: theme.transitions.create('opacity'),
-    },
-    imageTitle: {
-        position: 'relative',
-        marginTop: "30%",
-        padding: `${theme.spacing(2)}px ${theme.spacing(4)}px ${theme.spacing(1) + 6}px`,
-
-    },
-    imageMarked: {
-        height: 3,
-        width: 18,
-        backgroundColor: theme.palette.common.white,
-        position: 'absolute',
-        bottom: -2,
-        left: 'calc(50% - 9px)',
-        transition: theme.transitions.create('opacity'),
-    },
-}));
-
-const GraphicButton = ({buttonTitle, buttonText, onClick, backgroundImageUrl}) => {
+const GraphicButton = ({
+                           buttonTitle,
+                           buttonText = "",
+                           onClick,
+                           backgroundImageUrl,
+    videoUrl
+                       }) => {
     const classes = useStyles();
 
     return (
@@ -104,12 +126,13 @@ const GraphicButton = ({buttonTitle, buttonText, onClick, backgroundImageUrl}) =
                 className={classes.graphicButtonBase}
                 focusVisibleClassName={classes.focusVisible}
             >
-                <div
-                    className={classes.imageSrc}
-                    style={{
-                        backgroundImage: `url(${backgroundImageUrl})`,
-                    }}
-                />
+                <video loop autoPlay className={classes.video} src={videoUrl} />
+                {/*<div*/}
+                {/*    className={classes.imageSrc}*/}
+                {/*    style={{*/}
+                {/*        backgroundImage: `url(${backgroundImageUrl})`,*/}
+                {/*    }}*/}
+                {/*/>*/}
                 <span className={classes.imageBackdrop}/>
                 <span className={classes.imageButton}>
             <Typography
@@ -119,8 +142,14 @@ const GraphicButton = ({buttonTitle, buttonText, onClick, backgroundImageUrl}) =
                 className={classes.imageTitle}
             >
               {buttonTitle}
-                <span className={classes.imageMarked}/>
             </Typography>
+                    <Typography
+                        align="center"
+                        className={classes.buttonText}
+                    >
+                        {buttonText}
+                    </Typography>
+                <span className={classes.imageMarked}/>
           </span>
             </ButtonBase>
         </div>);
