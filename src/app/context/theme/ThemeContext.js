@@ -40,14 +40,10 @@ const ThemeProviderWrapper = ({children}) => {
             }
         }
 
-        // newThemeObj.palette.type = themeMode
         const createdTheme = createMuiTheme(newThemeObj);
-        if (theme.palette.type !== createdTheme.palette.type) {
-            setTheme(responsiveFontSizes(createdTheme))
-        }
+        setTheme(responsiveFontSizes(createdTheme))
     }
 
-    // const themeObj = getThemeObj()
 
     const useStyles = makeStyles(({
         // success: {backgroundColor: 'purple'},
