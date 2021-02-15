@@ -50,13 +50,15 @@ function VideoContainer(props) {
     const [connectionEstablished, setConnectionEstablished] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
     const [showScreenShareModal, setShowScreenShareModal] = useState(false);
+    const [optimizationMode, setOptimizationMode] = useState("detail");
 
     const [audioCounter, setAudioCounter] = useState(0);
     // const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
 
-    const screenSharingMode = props.currentLivestream.screenSharerId === props.streamerId &&
-        props.currentLivestream.mode === 'desktop';
+    const screenSharingMode = (props.currentLivestream.screenSharerId === props.streamerId &&
+        props.currentLivestream.mode === 'desktop') ? optimizationMode : "";
+    // console.log("-> screenSharingMode", screenSharingMode);
     const {
         localMediaStream,
         externalMediaStreams,
@@ -73,7 +75,7 @@ function VideoContainer(props) {
             screenSharingMode,
             props.currentLivestream.id,
             props.streamerId,
-            props.viewer
+            props.viewer,
         );
 
     const devices = useDevices(agoraStatus === "stream_published");
@@ -191,7 +193,8 @@ function VideoContainer(props) {
         await props.firebase.setDesktopMode(props.currentLivestream.id, mode, screenSharerId);
     }
 
-    const handleScreenShare = async () => {
+    const handleScreenShare = async (optimizationMode = "detail") => {
+        setOptimizationMode(optimizationMode)
         await setDesktopMode(props.currentLivestream.mode === "desktop" ? "default" : "desktop", props.streamerId)
     }
 
@@ -271,7 +274,10 @@ function VideoContainer(props) {
     const handleCloseScreenShareModal = () => {
         setShowScreenShareModal(false)
     }
-    const handleOpenScreenShareModal = () => {
+    const handleClickScreenShareButton = async () => {
+        if (props.currentLivestream.mode === "desktop") {
+            return await setDesktopMode("default", props.streamerId)
+        }
         setShowScreenShareModal(true)
     }
 
@@ -310,7 +316,7 @@ function VideoContainer(props) {
                     viewer={props.viewer}
                     streamerId={props.streamerId}
                     joining={!isMainStreamer}
-                    handleOpenScreenShareModal={handleOpenScreenShareModal}
+                    handleClickScreenShareButton={handleClickScreenShareButton}
                     localMediaStream={localMediaStream}
                     isMainStreamer={isMainStreamer}
                     showSettings={showSettings}

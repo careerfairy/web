@@ -70,7 +70,7 @@ function VideoControlsContainer({
                                     showSettings,
                                     firebase,
                                     streamerId,
-                                    handleOpenScreenShareModal,
+                                    handleClickScreenShareButton,
                                     isMainStreamer,
                                     localMediaStream,
                                 }) {
@@ -186,7 +186,7 @@ function VideoControlsContainer({
         actions.unshift({
             icon: <ScreenShareIcon color={desktopMode ? "primary" : "inherit"}/>,
             name: desktopMode ? 'Stop sharing desktop' : 'Share desktop',
-            onClick: () => handleOpenScreenShareModal()
+            onClick: () => handleClickScreenShareButton()
         })
     }
 
@@ -255,7 +255,7 @@ VideoControlsContainer.prototypes = {
     viewer: PropTypes.bool,
     setShowSettings: PropTypes.func.isRequired,
     streamerId: PropTypes.string,
-    handleOpenScreenShareModal: PropTypes.func,
+    handleClickScreenShareButton: PropTypes.func,
     isMainStreamer: PropTypes.bool,
     localMediaStream: PropTypes.object,
     showSettings: PropTypes.bool,

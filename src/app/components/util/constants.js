@@ -11,7 +11,7 @@ export const URL_REGEX = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)
 export const logoPlaceholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
 
 export const demoVideo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/speaker-video%2Fvideoblocks-confident-male-coach-lector-recording-educational-video-lecture_r_gjux7cu_1080__D.mp4?alt=media"
-
+export const demoSlides = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/background-videos%2Fslides-demo.mp4?alt=media&token=44532e6a-7355-4b78-9f62-88c81f7edbe1"
 // Stream form Constants
 export const SAVE_WITH_NO_VALIDATION = "SAVE_WITH_NO_VALIDATION"
 export const SUBMIT_FOR_APPROVAL = "SUBMIT_FOR_APPROVAL"

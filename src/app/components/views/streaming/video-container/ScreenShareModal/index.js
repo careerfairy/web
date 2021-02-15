@@ -4,23 +4,19 @@ import {GlassDialog} from "../../../../../materialUI/GlobalModals";
 import PropTypes from 'prop-types';
 import GraphicButton from "../../../../../materialUI/GlobalButtons/GraphicButton";
 
-import {
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Button,
-    Box,
-    Grid,
-    Typography,
-    DialogContentText,
-} from '@material-ui/core';
-import {demoVideo} from "../../../../util/constants";
+import {Button, DialogActions, DialogContent, DialogTitle, Grid, Typography,} from '@material-ui/core';
+import {demoSlides, demoVideo} from "../../../../util/constants";
 
 const useStyles = makeStyles(theme => ({}));
 
 const ScreenShareModal = ({open, handleClose, handleScreenShare}) => {
 
     const classes = useStyles()
+
+    const handleClick = (optimizationMode = "detail") => {
+        handleScreenShare(optimizationMode)
+        handleClose()
+    }
 
     return (
         <GlassDialog fullWidth maxWidth="sm" onClose={handleClose} open={open}>
@@ -34,23 +30,22 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare}) => {
                     <Grid item xs={12} sm={6}>
                         <GraphicButton
                             buttonTitle="Video"
+                            onClick={() => handleClick("motion")}
                             videoUrl={demoVideo}
                             buttonText={
                                 "Chose this option if you would" +
-                                " like to share content that is fast moving" +
-                                " like videos with high frame rates"
+                                " like to share a fluid video"
                             }
-                            backgroundImageUrl={"https://media.giphy.com/media/duzpaTbCUy9Vu/giphy.gif"}
                         />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <GraphicButton
                             buttonTitle="Screen"
-                            videoUrl={demoVideo}
+                            videoUrl={demoSlides}
+                            onClick={() => handleClick("detail")}
                             buttonText={
                                 "Chose this option if you would like" +
-                                " to share your desktop preferring video " +
-                                "quality over frame rates"
+                                " to share a screen in high detail "
                             }
                         />
                     </Grid>
