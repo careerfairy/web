@@ -20,9 +20,19 @@ import {
     CategoryContainerTopAligned,
     QuestionContainerHeader
 } from "../../../../../../../../materialUI/GlobalContainers";
+import {makeStyles} from "@material-ui/core/styles";
 
+const useStyles = makeStyles(theme => ({
+    upcomingPoll: {
+        borderRadius: theme.spacing(2)
+    },
+    askButton:{
+        borderRadius: theme.spacing(0, 0, 2, 2)
+    }
+}))
 const Overlay = withStyles(theme => ({
     root: {
+        borderRadius: theme.spacing(2),
         position: "absolute",
         height: "100%",
         top: 0,
@@ -54,8 +64,20 @@ const ListNumber = withStyles(theme => ({
     }
 }))(Box)
 
-function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream, poll, showMenu, selectedState, index, setDemoPolls, addNewPoll}) {
+function UpcomingPollStreamer({
+                                  firebase,
+                                  sliding,
+                                  somePollIsCurrent,
+                                  livestream,
+                                  poll,
+                                  showMenu,
+                                  selectedState,
+                                  index,
+                                  setDemoPolls,
+                                  addNewPoll
+                              }) {
 
+    const classes = useStyles()
     const [editPoll, setEditPoll] = useState(false);
     const [showNotEditableMessage, setShowNotEditableMessage] = useState(false);
 
@@ -146,7 +168,8 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
                     <TooltipButtonComponent onConfirm={() => handleConfirmStep(5)} buttonText="Ok"/>
                 </React.Fragment>
             } open={isOpen(5)}>
-            <Paper style={{margin: 10, position: "relative"}} onMouseEnter={handleSetIsNotEditablePoll}
+            <Paper className={classes.upcomingPoll} style={{margin: 10, position: "relative"}}
+                   onMouseEnter={handleSetIsNotEditablePoll}
                    onMouseLeave={() => setShowNotEditableMessage(false)}>
                 <Box p={2}>
                     <Typography gutterBottom variant="h6" style={{margin: "1.5rem 0 0.5rem 0"}}>
@@ -196,14 +219,14 @@ function UpcomingPollStreamer({firebase, sliding, somePollIsCurrent, livestream,
                     } open={isOpen(6)}>
                     <Button fullWidth disableElevation variant="contained" color="primary"
                             children={'Ask the Audience Now'} disabled={somePollIsCurrent || tutorialActive()}
+                            className={classes.askButton}
                             onClick={() => {
                                 if (isOpen(6)) {
                                     handleConfirmStep(6)
                                     setDemoPolls(true)
                                 }
                                 setPollState('current')
-                            }}
-                            style={{borderRadius: '0 0 5px 5px'}}/>
+                            }}/>
                 </WhiteTooltip>
                 {showNotEditableMessage && <Overlay>
                     <div>

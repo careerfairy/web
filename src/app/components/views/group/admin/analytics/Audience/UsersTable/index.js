@@ -1,20 +1,18 @@
 import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Card, CardHeader, makeStyles, Slide} from '@material-ui/core';
+import {Card, makeStyles, Slide} from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
 import MaterialTable from "material-table";
 import {defaultTableOptions, exportSelectionAction, LinkifyText, tableIcons} from "../../common/TableUtils";
-import {useAuth} from "../../../../../../../HOCs/AuthProvider";
-import {useRouter} from "next/router";
-import {theme} from "../../../../../../../materialUI";
 import UserInnerTable from "./UserInnerTable";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
+import {useAuth} from "../../../../../../../HOCs/AuthProvider";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
     root: {},
     actions: {
         justifyContent: 'flex-end'

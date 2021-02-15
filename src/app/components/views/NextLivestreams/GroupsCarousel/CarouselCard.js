@@ -20,15 +20,20 @@ const useStyles = makeStyles((theme) => ({
         position: "relative",
         display: "flex",
         justifyContent: "center",
+        background: theme.palette.common.white,
+        borderRadius: theme.spacing(1)
     },
     image: {
         position: "absolute",
         top: "50%",
         transform: "translateY(-50%)",
         objectFit: "contain",
-        width: "35%",
+        width: "45%",
         maxWidth: "120px",
         maxHeight: "60px"
+    },
+    companyName:{
+        marginTop: theme.spacing(1)
     }
 }));
 const placeholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
@@ -93,7 +98,7 @@ const CarouselCard = ({groupId, firebase, handleSetGroup, groupIdsToRemove, mobi
                         <img src={localGroup.logoUrl || placeholder} className={classes.image}
                              alt={`${localGroup.universityName} Logo`}/>
                     </CardMedia>{!mobile &&
-                <Typography align="center" noWrap>{localGroup.universityName}</Typography>}
+                <Typography className={classes.companyName} align="center" noWrap>{localGroup.universityName}</Typography>}
                 </Card>
             </div>
         </Grow>

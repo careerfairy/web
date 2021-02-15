@@ -1,11 +1,11 @@
 import React, {useState} from 'react';
 import {withFirebase} from "../../../../context/firebase";
-import Dialog from "@material-ui/core/Dialog";
 import {Button, DialogContentText} from "@material-ui/core";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import {GlassDialog} from "../../../../materialUI/GlobalModals";
 
 const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
     const [loading, setLoading] = useState(false)
@@ -73,7 +73,7 @@ const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
     }
 
     return (
-        <Dialog open={open}>
+        <GlassDialog open={open}>
             <DialogTitle>
                 Welcome to the Testing platform
             </DialogTitle>
@@ -93,7 +93,7 @@ const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {
                     </Button>
                 </DialogActions>
             </DialogContent>
-        </Dialog>
+        </GlassDialog>
     );
 };
 

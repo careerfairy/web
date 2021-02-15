@@ -93,7 +93,7 @@ const ProfileNav = ({userData}) => {
     }
 
     return (
-        <Container style={{marginTop: '50px', flex: 1}}>
+        <Container style={{marginTop: '50px'}}>
             <AppBar className={classes.bar} position="static" color="default">
                 <Tabs
                     value={value}

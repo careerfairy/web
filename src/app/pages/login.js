@@ -25,7 +25,7 @@ import {useAuth} from "../HOCs/AuthProvider";
 const useStyles = makeStyles((theme) => ({
     box: {
         width: '100%', // Fix IE 11 issue.
-        backgroundColor: "white",
+        backgroundColor: theme.palette.background.paper,
         marginTop: theme.spacing(3),
         borderRadius: 5
     },

@@ -7,14 +7,14 @@ import {Button} from "@material-ui/core";
 const useStyles = makeStyles(theme => {
     return {
         tooltip: {
-            backgroundColor: theme.palette.common.white,
-            color: theme.palette.common.black,
+            backgroundColor: theme.palette.background.paper,
+            color: theme.palette.text.primary,
             boxShadow: theme.shadows[1],
             fontSize: 11,
             padding: theme.spacing(2)
         },
         arrow: {
-            color: theme.palette.common.white,
+            color: theme.palette.background.paper,
         },
         title: {
             fontWeight: 600,

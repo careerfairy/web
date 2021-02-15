@@ -4,14 +4,13 @@ import {Avatar, Box, Divider, Drawer, Hidden, List, makeStyles, Typography} from
 import {LogOut as LogoutIcon} from 'react-feather';
 import NavItem from './NavItem';
 import {useRouter} from "next/router";
-import {theme} from "../../../materialUI";
 import {fade} from "@material-ui/core/styles";
 import clsx from "clsx";
 import * as actions from "../../../store/actions";
 import {compose} from "redux";
 import {connect} from "react-redux";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
     mobileDrawer: {
         width: 256,
     },

@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
         flexWrap: 'wrap'
     },
     title: {
-        color: 'rgb(160,160,160)',
+        color: theme.palette.text.secondary,
         margin: '0 0 10px 0',
         fontWeight: '300'
     }

@@ -6,7 +6,7 @@ import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import ExpandMoreRoundedIcon from '@material-ui/icons/ExpandMoreRounded';
 import {withFirebase} from 'context/firebase';
 import {Box, Button, Slide, TextField} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Collapse from "@material-ui/core/Collapse";
 import Card from "@material-ui/core/Card";
@@ -23,28 +23,31 @@ import {useAuth} from "../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
     chatInput: {
+        background: ({active}) => active ? theme.palette.common.white : theme.palette.background.paper,
         borderRadius: 10,
         "& .MuiInputBase-root": {
+            color: ({active}) => active ? theme.palette.common.black : theme.palette.text.primary,
             paddingRight: "0 !important",
             borderRadius: 10,
         },
-        background: "white"
     },
     questionContainer: {
-        backgroundColor: ({active}) => active ? theme.palette.primary.main : "rgb(250,250,250)",
-        color: ({active}) => active ? "white" : "inherit",
+        backgroundColor: ({active}) => active ? theme.palette.primary.main : theme.palette.type === "light" ? theme.palette.background.offWhite : theme.palette.background.paper,
+        color: ({active}) => active ? theme.palette.common.white : "inherit",
         position: "relative",
         padding: "20px 0 0 0",
         margin: 10,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
+        borderRadius: theme.spacing(1),
+        // width: "100%"
     },
     reactionsQuestion: {
         fontWeight: 700,
         fontSize: "1.3em",
         lineHeight: "1.3em",
-        color: ({active}) => active ? "white" : "rgb(50,50,50)",
+        color: ({active}) => active ? "white" : theme.palette.text.primary,
         margin: "5px 0",
         width: "85%",
         wordBreak: "break-word",
@@ -57,7 +60,7 @@ const useStyles = makeStyles(theme => ({
         alignItems: "center"
     },
     showText: {
-        color: "rgb(210,210,210)",
+        color: ({active}) => active ? "rgb(200,200,200)" : theme.palette.text.secondary,
         fontSize: "0.8em",
         fontWeight: 500
     },
@@ -70,6 +73,15 @@ const useStyles = makeStyles(theme => ({
         margin: "0 0 0 30px",
         fontWeight: 700,
         color: ({active}) => active ? "white" : theme.palette.primary.main,
+    },
+    questionComment: {
+        background: ({active}) => active ? theme.palette.common.white : theme.palette.type === "dark" ? theme.palette.background.default : theme.palette.background.paper,
+        color: ({active}) => active ? theme.palette.common.black : theme.palette.text.primary
+    },
+    questionButton: {
+        borderRadius: "0 0 5px 5px",
+        padding: "10px 0",
+        color: theme.palette.common.white
     }
 }))
 
@@ -84,7 +96,19 @@ const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
     )
 }
 
-const QuestionContainer = ({sliding, user, livestream, streamer, question, questions, firebase, index, isNextQuestions, selectedState, showMenu}) => {
+const QuestionContainer = ({
+                               sliding,
+                               user,
+                               livestream,
+                               streamer,
+                               question,
+                               questions,
+                               firebase,
+                               index,
+                               isNextQuestions,
+                               selectedState,
+                               showMenu
+                           }) => {
 
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
@@ -185,7 +209,7 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
     let commentsElements = comments.map((comment, index) => {
         return (
             <Slide key={comment.id} in direction="right">
-                <Box borderRadius={8} mb={1} p={1} component={Card}>
+                <Box className={classes.questionComment} borderRadius={8} mb={1} p={1} component={Card}>
                     <div style={{wordBreak: "break-word"}}>
                         <Linkify componentDecorator={componentDecorator}>
                             {comment.title}
@@ -213,7 +237,7 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
                         <TooltipButtonComponent onConfirm={() => handleConfirmStep(0)} buttonText="Ok"/>
                     </React.Fragment>
                 } open={isOpen(0)}>
-                <Paper className={classes.questionContainer}>
+                <Paper elevation={4} className={classes.questionContainer}>
                     <div style={{padding: "20px 20px 5px 20px"}}>
                         <div className={classes.upVotes}>
                             {question.votes} <ThumbUpRoundedIcon color="inherit"
@@ -298,7 +322,7 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
                                 size='small'
                                 disableElevation
                                 disabled={old}
-                                style={{borderRadius: "0 0 5px 5px", padding: "10px 0"}}
+                                className={classes.questionButton}
                                 fullWidth
                                 color="primary"
                                 onClick={() => {
@@ -312,8 +336,8 @@ const QuestionContainer = ({sliding, user, livestream, streamer, question, quest
                             startIcon={<ThumbUpRoundedIcon/>}
                             children={!livestream.test && (question.emailOfVoters && user && question.emailOfVoters.indexOf(user.email) > -1) ? 'UPVOTED!' : 'UPVOTE'}
                             size='small'
-                            style={{borderRadius: "0 0 5px 5px", padding: "10px 0"}}
                             disableElevation
+                            className={classes.questionButton}
                             color="primary"
                             fullWidth
                             variant="contained"

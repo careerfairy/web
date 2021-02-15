@@ -3,7 +3,7 @@ import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
 import HelpIcon from '@material-ui/icons/Help';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
@@ -12,6 +12,7 @@ import ChevronLeftRoundedIcon from '@material-ui/icons/ChevronLeftRounded';
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
 import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "../../../../materialUI/GlobalTooltips";
 import Grow from "@material-ui/core/Grow";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -23,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
         alignItems: "center",
         padding: 30,
         top: 0,
-        transform:  ({isMobile}) => !isMobile && "translateY(50%)"
+        transform: ({isMobile}) => !isMobile && "translateY(50%)"
     },
     speedDial: {
         transition: "transform 0.2s",
@@ -44,6 +45,17 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: theme.palette.primary.dark,
         },
     },
+    darkActionButton: {
+        backgroundColor: theme.palette.background.paper,
+        color: theme.palette.grey["400"],
+        "&:disabled": {
+            backgroundColor: fade(theme.palette.background.paper, 0.5),
+            color: theme.palette.primary.main,
+        },
+        "&:hover": {
+            backgroundColor: theme.palette.background.default,
+        },
+    },
     actionButtonPink: {
         backgroundColor: theme.palette.secondary.main,
         color: "white",
@@ -53,6 +65,13 @@ const useStyles = makeStyles((theme) => ({
         },
         "&:hover": {
             backgroundColor: theme.palette.secondary.dark,
+        },
+    },
+    darkActionButtonPink: {
+        backgroundColor: theme.palette.background.paper,
+        color: theme.palette.secondary.main,
+        "&:hover": {
+            backgroundColor: theme.palette.background.default,
         },
     },
     cardHovered: {},
@@ -99,6 +118,7 @@ const ButtonComponent =
      }) => {
         const DELAY = 3000; //3 seconds
         const [hasMounted, setHasMounted] = useState(false)
+        const theme = useTheme()
         const [open, setOpen] = useState(true);
         const [delayHandler, setDelayHandler] = useState(null)
         const {tutorialSteps, handleConfirmStep} = useContext(TutorialContext);
@@ -225,7 +245,15 @@ const ButtonComponent =
                                     }}
                                     FabProps={{
                                         size: "large",
-                                        classes: {root: action.name.length ? isOpen(action.tutorialNum, action.disabled) ? classes.actionButtonHighlight : classes.actionButton : classes.actionButtonPink},
+                                        classes: {
+                                            root: clsx({
+                                                [classes.actionButtonHighlight]: isOpen(action.tutorialNum, action.disabled),
+                                                [classes.actionButton]: action.name.length,
+                                                [classes.actionButtonPink]: !action.name.length,
+                                                [classes.darkActionButton]: theme.palette.type === "dark",
+                                                [classes.darkActionButtonPink]: !action.name.length && theme.palette.type === "dark"
+                                            })
+                                        },
                                         disabled: action.disabled,
                                     }}
                                 />

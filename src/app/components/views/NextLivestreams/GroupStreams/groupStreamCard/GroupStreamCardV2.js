@@ -87,7 +87,7 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center",
             justifyContent: "center",
             borderRadius: ({cardHovered}) => cardHovered && `${theme.spacing(2)}px 0px`,
-            background: fade(paperColor, 1),
+            background: fade(theme.palette.common.white, 1),
             boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
         },
         dateTimeWrapper: {
@@ -164,7 +164,7 @@ const useStyles = makeStyles((theme) => {
         },
         companyLogosFrontWrapper: {
             boxShadow: ({isExpanded}) => isExpanded && theme.shadows[24],
-            background: "white",
+            background: theme.palette.common.white,
             padding: theme.spacing(1),
             display: "flex",
             justifyContent: "space-evenly",
@@ -228,7 +228,7 @@ const useStyles = makeStyles((theme) => {
         logosBackWrapper: {
             display: "flex",
             width: "100%",
-            background: paperColor,
+            background: theme.palette.common.white,
             overflowX: "auto",
             overflowY: "hidden",
         },

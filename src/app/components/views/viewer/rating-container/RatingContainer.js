@@ -4,7 +4,7 @@ import {Rating} from "@material-ui/lab";
 import {useSnackbar} from "notistack";
 import {useAuth} from "../../../../HOCs/AuthProvider";
 import {FormHelperText, TextField} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
+import {fade, makeStyles} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import {Formik} from "formik";
@@ -35,6 +35,9 @@ const useStyles = makeStyles((theme) => ({
     },
     stars: {
         marginBottom: theme.spacing(1)
+    },
+    emptyIcon:{
+        // color: fade(theme.palette.background.default, 0.5)
     }
 }));
 
@@ -99,6 +102,7 @@ const ActionComponent = ({
                                 className={classes.stars}
                                 disabled={isSubmitting}
                                 max={5}
+                                classes={{iconEmpty:classes.emptyIcon}}
                                 onChange={async (e) => {
                                     handleChange(e)
                                     if (!hasText) {
