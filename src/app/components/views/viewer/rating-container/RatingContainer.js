@@ -155,35 +155,36 @@ const ActionComponent = ({
                                     className={classes.input}
                                 />
                             </Grid>
+                            <Grid
+                                xl={12}
+                                lg={12}
+                                md={12}
+                                sm={12}
+                                xs={12}
+                                item
+                                className={classes.actionItems}
+                            >
+                                <Button
+                                    disabled={isSubmitting}
+                                    onClick={() => handleDismiss(setSubmitting)}
+                                    className={classes.button}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    color="primary"
+                                    disabled={isSubmitting}
+                                    onClick={handleSubmit}
+                                    variant="contained"
+                                    className={clsx(classes.button, classes.submitButton)}
+                                >
+                                    Submit
+                                </Button>
+                            </Grid>
 
                         </>
                     ) : null}
-                    <Grid
-                        xl={12}
-                        lg={12}
-                        md={12}
-                        sm={12}
-                        xs={12}
-                        item
-                        className={classes.actionItems}
-                    >
-                        {hasText ? <Button
-                            color="primary"
-                            disabled={isSubmitting}
-                            onClick={handleSubmit}
-                            variant="contained"
-                            className={clsx(classes.button, classes.submitButton)}
-                        >
-                            Submit
-                        </Button> : null}
-                        <Button
-                            disabled={isSubmitting}
-                            onClick={() => handleDismiss(setSubmitting)}
-                            className={classes.button}
-                        >
-                            Cancel
-                        </Button>
-                    </Grid>
+
                 </Grid>)}
         </Formik>
 
