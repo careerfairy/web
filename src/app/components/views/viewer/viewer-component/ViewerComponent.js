@@ -158,6 +158,7 @@ function ViewerComponent(props) {
                 externalMediaStreams={externalMediaStreams}
                 isLocalScreen={false}
                 attachSinkId={attachSinkId}
+                {...props}
                 presenter={false}/>}
             {props.handRaiseActive &&
             <Fragment>

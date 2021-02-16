@@ -24,11 +24,18 @@ const TopView = styled.View`
     margin-bottom: 10vw;
 `;
 
-const CFLogo = styled.Image`
-    max-height: 15vw;
+const CFLogoContainer = styled.View`
+    width: 25vw;
 `;
 
+const CFLogoContainerSmall = styled.View`
+    width: 15vw;
+`;
 
+const CFLogo = styled.Image`
+    min-width: 15vw;
+    width: auto;
+`;
 
 const CompanyLogo = styled.Image`
     max-height: 25vw;
@@ -109,11 +116,11 @@ const LargeNumber = styled.Text`
 `;
 
 const LargeText = styled.Text`
-    font-size: 9px;
-    width: 30vw;
-    padding: 2px;
+    font-size: 8px;
+    width: 15vw;
+    padding: 1px;
     font-weight: bold;
-    margin-right: 10vw;
+    margin-right: 5vw;
     text-transform: uppercase;
     color: #314150;
 `;
@@ -132,7 +139,7 @@ const SmallNumber = styled.Text`
 
 const SmallText = styled.Text`
     font-weight: bold;
-    font-size: 10px;
+    font-size: 8px;
     color: grey;
 `;
 
@@ -188,6 +195,7 @@ const SmallView = styled.View`
     font-size: 10px;
     width: 10vw;
     height: 30px;
+    padding: 0 0 0 2px;
 `;
 
 const SpecializedSubCategoryElement = ({ subOption }) => {
@@ -203,7 +211,7 @@ const SpecializedCategoryElement = ({ option, index }) => {
         return <SpecializedSubCategoryElement subOption={option.subOptions[entry]}/>
     })
     return (
-        <Border>
+        <Border wrap={false}>
             <LargeText>{ option.name }</LargeText> 
             <LargeNumber>{ option.entries }</LargeNumber>
             <SubCategoryParent>
@@ -312,12 +320,12 @@ const LivestreamPdfReport = ({ group, livestream, studentStats, overallRating, c
         <Document>
             <CFPage>
                 <TopView>
-                    <View style={{ maxWidth: '25vw' }}>
+                    <CFLogoContainer>
                         <CFLogo source={group.logoUrl}/>
-                    </View>
-                    <View style={{ maxWidth: '15vw' }}>
+                    </CFLogoContainer>
+                    <CFLogoContainerSmall>
                         <CFLogo source='https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fcareerfairy.png?alt=media&token=bb70f6e3-9c0d-47e7-8c56-66063b4a211e'/>
-                    </View>
+                    </CFLogoContainerSmall>
                 </TopView>     
                 <View>
                     <View style={{ maxWidth: '25vw', marginBottom: '20px' }}>

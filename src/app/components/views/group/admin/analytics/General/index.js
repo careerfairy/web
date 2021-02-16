@@ -54,7 +54,7 @@ const General = ({
     const getTotalRegisteredUsers = (streamsArray) => {
         const total = streamsArray.reduce(
             (accumulator, {registeredUsers}) =>
-                accumulator + registeredUsers?.length,
+                accumulator + mustBeNumber(registeredUsers?.length || 0),
             0
         );
         // Checks if the result is a number

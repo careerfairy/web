@@ -415,19 +415,19 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     }
 
     const streamsFromTimeFrame = useMemo(() => getStreamsFromTimeFrame(globalTimeFrame.globalDate), [
-        livestreams, globalTimeFrame
+        livestreams
     ]);
 
     const streamsFromBeforeTimeFrame = useMemo(() => getStreamsFromBeforeTimeFrame(globalTimeFrame.globalDate), [
-        livestreams, globalTimeFrame
+        livestreams
     ]);
 
     const futureStreams = useMemo(() => getFutureEvents(globalTimeFrame.globalDate), [
-        livestreams, globalTimeFrame
+        livestreams
     ]);
 
     const streamsFromTimeFrameAndFuture = useMemo(() => [...streamsFromTimeFrame, ...futureStreams], [
-        futureStreams, streamsFromTimeFrame, globalTimeFrame
+        futureStreams, streamsFromTimeFrame
     ]);
     const isFollowers = useMemo(() => currentUserDataSet.dataSet === "followers", [
         currentUserDataSet

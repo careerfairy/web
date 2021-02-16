@@ -168,7 +168,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
             setDraftId(id)
             if (status === SAVE_WITH_NO_VALIDATION) {
                 enqueueSnackbar("You changes have been saved!", {
-                    variant: "default",
+                    variant: "success",
                     preventDuplicate: true,
                 });
                 setStatus("")

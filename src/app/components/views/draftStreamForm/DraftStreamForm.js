@@ -159,17 +159,29 @@ const DraftStreamForm = ({
             const totalExistingGroups = await firebase.getCareerCentersByGroupId(mergedGroups)
             const totalFlattenedGroups = totalExistingGroups.map(group => ({
                 ...group,
-                selected: true,
+                selected: false,
                 flattenedOptions: handleFlattenOptions(group)
             }))
 
-            // Includes partner groups as non auto-selected options if they arent already part of the event
-            const selectedGroups = totalFlattenedGroups.filter(({id}) => !(mergedGroups.includes(id) && !initialGroups.includes(id)))
-
+            let selectedGroups = []
+            draftStreamGroupIds.forEach((id) => {
+                const targetGroup = totalFlattenedGroups.find(flattenedGroup => flattenedGroup.groupId === id)
+                if (targetGroup) {
+                    targetGroup.selected = true
+                    selectedGroups.push(targetGroup)
+                }
+            })
+            if(!selectedGroups.length && group?.id){
+                selectedGroups.push({
+                    ...group,
+                    flattenedOptions: handleFlattenOptions(group),
+                    selected: true
+                })
+            }
 
             setExistingGroups(totalFlattenedGroups)
             setSelectedGroups(selectedGroups)
-            const arrayOfActualGroupIds = totalExistingGroups.map(groupObj => groupObj.id)
+            const arrayOfActualGroupIds = selectedGroups.map(groupObj => groupObj.id)
             setFormData({...newFormData, groupIds: arrayOfActualGroupIds})
         }
     }
