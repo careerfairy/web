@@ -42,7 +42,11 @@ const Audience = ({
         } else {
             const totalViewers = streamsFromTimeFrameAndFuture.reduce(
                 (accumulator, livestream) => {
-                    return [...accumulator, ...livestream[userType.propertyDataName]];
+                    if (livestream[userType.propertyDataName]) {
+                        return [...accumulator, ...livestream[userType.propertyDataName]];
+                    } else {
+                        return accumulator
+                    }
                 },
                 []
             );
