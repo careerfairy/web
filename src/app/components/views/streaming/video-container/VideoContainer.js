@@ -280,7 +280,7 @@ function VideoContainer(props) {
     const handleScreenShare = useCallback(async (optimizationMode = "detail") => {
         setOptimizationMode(optimizationMode)
         await setDesktopMode(props.currentLivestream.mode === "desktop" ? "default" : "desktop", props.streamerId)
-    }, [])
+    }, [optimizationMode, props.currentLivestream?.mode, props.streamerId])
 
 
     const sharingContent = () => (props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop')
