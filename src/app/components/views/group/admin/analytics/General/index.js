@@ -46,7 +46,7 @@ const General = ({
 
     useEffect(() => {
         if (group.categories?.length) {
-            setCurrentCategory(group.categories[0])
+            setCurrentCategory({...group.categories[0]})
         }
 
     }, [group.categories])
@@ -165,9 +165,9 @@ const General = ({
             students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop)
         }
         const aggregateCategories = getAggregateCategories(students)
-        const flattenedGroupOptions = [...currentCategory.options]
-        flattenedGroupOptions.forEach(option => {
-            option.count = aggregateCategories.filter(category => category.categories.some(userOption => userOption.selectedValueId === option.id)).length
+        const flattenedGroupOptions = [...currentCategory.options].map(option => {
+            const count = aggregateCategories.filter(category => category.categories.some(userOption => userOption.selectedValueId === option.id)).length
+            return {...option, count}
         })
         return flattenedGroupOptions.sort((a, b) => b.count - a.count);
     }
