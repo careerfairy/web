@@ -1,8 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {Container, Grid, Typography} from "@material-ui/core";
 import MembersTable from "./MembersTables";
 import {useSelector} from "react-redux";
+import {useFirestoreConnect} from "react-redux-firebase";
+import AddMemberModal from "./AddMemberModal";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -17,6 +19,13 @@ const RolesOverview = ({firebase, group}) => {
 
     const classes = useStyles()
     const firestore = useSelector(state => state.firestore)
+    const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+    const openAddMemberModal = () => {
+        setShowAddMemberModal(true)
+    }
+    const closeAddMemberModal = () => {
+        setShowAddMemberModal(false)
+    }
     console.log("-> firestore", firestore);
 
     return (
@@ -30,10 +39,15 @@ const RolesOverview = ({firebase, group}) => {
             >
                 <Grid item xs={12} sm={12}>
                     <MembersTable
+                        openAddMemberModal={openAddMemberModal}
                         group={group}
                     />
                 </Grid>
             </Grid>
+            <AddMemberModal
+                open={showAddMemberModal}
+                onClose={closeAddMemberModal}
+            />
         </Container>
     );
 };

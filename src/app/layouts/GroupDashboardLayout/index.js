@@ -60,22 +60,30 @@ const GroupDashboardLayout = (props) => {
     const {userData, authenticatedUser} = useAuth()
 
     const populates = [
-        {child: 'adminEmail', root: 'userData', childAlias: "admin"}, // replace owner with user object
-        {child: 'subAdminEmails', root: 'userData', childAlias: 'subAdmins'} // replace owner with user object
+        {child: 'adminEmails', root: 'userData', childAlias: 'admins'} // replace owner with user object
     ]
-
-    useFirestoreConnect(() => [{
-        collection: `careerCenterData`,
-        doc: groupId || careerCenterId,
-        storeAs: "group",
-        populates
-    }], [groupId, careerCenterId])
+console.log("-> groupId ", groupId || careerCenterId);
+    useFirestoreConnect(() => (groupId || careerCenterId) &&[
+        {
+            collection: `careerCenterData`,
+            doc: groupId || careerCenterId,
+            storeAs: "group",
+            populates
+        },
+        {
+            collection: `careerCenterData`,
+            doc: groupId || careerCenterId,
+            subcollections: [{
+                collection: "roles",
+            }],
+            storeAs: "roles",
+        }
+    ], [groupId, careerCenterId])
 
     const group = useSelector(state => populate(state.firestore, "group", populates) || {})
 
 
-
-    if(!isEmptyObject(group)){
+    if (!isEmptyObject(group)) {
         group.id = groupId || careerCenterId
     }
 
@@ -88,7 +96,7 @@ const GroupDashboardLayout = (props) => {
     const isAdmin = () => {
         return userData?.isAdmin
             || (authenticatedUser?.email === group?.adminEmail)
-            || (group?.subAdminEmails?.includes(authenticatedUser?.email))
+            || (group?.adminEmails?.includes(authenticatedUser?.email))
     }
 
     const unAuthorized = () => {
