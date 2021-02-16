@@ -164,14 +164,15 @@ const DraftStreamForm = ({
             }))
 
             let selectedGroups = []
-            draftStreamGroupIds.forEach((id) => {
+            const targetSelectedGroupIds = [...new Set([...UrlIds, ...draftStreamGroupIds])]
+            targetSelectedGroupIds.forEach((id) => {
                 const targetGroup = totalFlattenedGroups.find(flattenedGroup => flattenedGroup.groupId === id)
                 if (targetGroup) {
                     targetGroup.selected = true
                     selectedGroups.push(targetGroup)
                 }
             })
-            if(!selectedGroups.length && group?.id){
+            if (!selectedGroups.length && group?.id) {
                 selectedGroups.push({
                     ...group,
                     flattenedOptions: handleFlattenOptions(group),
@@ -253,7 +254,9 @@ const DraftStreamForm = ({
     }
 
     const handleSetOnlyUrlIds = async () => {
+        console.log("-> in the handle set only");
         const arrayOfUrlIds = careerCenterIds?.split(",") || [group.id]
+        console.log("-> arrayOfUrlIds", arrayOfUrlIds);
         await handleSetGroupIds(arrayOfUrlIds, [], formData)
     }
 
