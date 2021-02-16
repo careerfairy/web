@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {GlassDialog} from "../../../../../materialUI/GlobalModals";
 import PropTypes from 'prop-types';
@@ -12,7 +12,8 @@ import {
     DialogTitle,
     Grid,
     Grow,
-    Typography,
+    Checkbox,
+    Typography, FormControlLabel,
 } from '@material-ui/core';
 import {demoSlides, demoVideo} from "../../../../util/constants";
 
@@ -20,13 +21,30 @@ const sharAudioDemo = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e
 const useStyles = makeStyles(theme => ({
     shareAudioVideo: {
         maxWidth: 550
+    },
+    shareAudioList: {
+        paddingLeft: theme.spacing(2)
+    },
+    hasSeenShareAudioTip: {
+        marginRight: "auto"
+    },
+    dialogActions: {
+        padding: theme.spacing(1, 4)
     }
 }));
 
 const ScreenShareModal = ({open, handleClose, handleScreenShare}) => {
 
     const [showShareAudioHint, setShowShareAudioHint] = useState(false);
+    const [hasSeenShareAudioTip, setHasSeenShareAudioTip] = useState(false);
     const classes = useStyles()
+
+    useEffect(() => {
+        const hasSeenShareAudioTip = localStorage.getItem("hasSeenShareAudioTip")
+        if (JSON.parse(hasSeenShareAudioTip)) {
+            setHasSeenShareAudioTip(true)
+        }
+    }, [])
 
     const handleClick = (optimizationMode = "detail") => {
         handleScreenShare(optimizationMode)
@@ -42,6 +60,32 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare}) => {
         setShowShareAudioHint(!showShareAudioHint)
     }
 
+    const markAsSeen = () => {
+        localStorage.setItem('hasSeenShareAudioTip', JSON.stringify(true))
+    }
+
+    const handleSeen = () => {
+
+        setHasSeenShareAudioTip(true)
+    }
+
+    const handleClickVideoButton = () => {
+        if (hasSeenShareAudioTip) {
+            return handleClick("motion")
+        }
+        toggleShowShareAudioHint()
+    }
+
+    const handleCheckBox = () => {
+        setHasSeenShareAudioTip(!hasSeenShareAudioTip)
+    }
+
+    const handleProceed = () => {
+        if (hasSeenShareAudioTip) {
+            markAsSeen()
+        }
+        handleClick("motion")
+    }
 
     return (
         <GlassDialog fullWidth maxWidth="sm" onClose={closeScreenShareModal} open={open}>
@@ -55,7 +99,7 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare}) => {
                         </DialogTitle>
                         <DialogContent>
                             <DialogContentText color="textPrimary">
-                                <ol>
+                                <ol className={classes.shareAudioList}>
                                     <li>
                                         After clicking "Proceed", please click "Chrome Tabs"
                                     </li>
@@ -81,11 +125,18 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare}) => {
                                 </Grid>
                             </Grid>
                         </DialogContent>
-                        <DialogActions>
+                        <DialogActions className={classes.dialogActions}>
+                            <FormControlLabel
+                                className={classes.hasSeenShareAudioTip}
+                                control={<Checkbox checked={hasSeenShareAudioTip} onChange={handleCheckBox}
+                                                   color="primary"
+                                                   name="hasSeenShareAudioTip"/>}
+                                label="Don't remind me again"
+                            />
                             <Button onClick={toggleShowShareAudioHint}>
                                 Back
                             </Button>
-                            <Button variant="contained" color="primary" onClick={() => handleClick("motion")}>
+                            <Button variant="contained" color="primary" onClick={handleProceed}>
                                 Proceed
                             </Button>
                         </DialogActions>
@@ -104,7 +155,7 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare}) => {
                                 <Grid item xs={12} sm={6}>
                                     <GraphicButton
                                         buttonTitle="Video"
-                                        onClick={toggleShowShareAudioHint}
+                                        onClick={handleClickVideoButton}
                                         videoUrl={demoVideo}
                                         buttonText={
                                             "Chose this option if you would" +
@@ -125,7 +176,7 @@ const ScreenShareModal = ({open, handleClose, handleScreenShare}) => {
                                 </Grid>
                             </Grid>
                         </DialogContent>
-                        <DialogActions>
+                        <DialogActions className={classes.dialogActions}>
                             <Button onClick={handleClose}>
                                 Close
                             </Button>
@@ -141,4 +192,4 @@ ScreenShareModal.prototypes = {
     handleClose: PropTypes.func.isRequired,
     handleScreenShare: PropTypes.func.isRequired
 }
-export default ScreenShareModal;
+export default memo(ScreenShareModal);

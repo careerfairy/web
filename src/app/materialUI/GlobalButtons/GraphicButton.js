@@ -44,13 +44,13 @@ const useStyles = makeStyles((theme) => {
                 '& $buttonText': {
                     opacity: 1,
                 },
-                '& $imageMarked': {
+                '& $underline': {
                     // opacity: 0,
                     width: "100%"
                 },
                 '& $imageTitle': {
 
-                    marginTop: 0
+                    marginTop: "10%"
                 },
             },
         },
@@ -100,11 +100,11 @@ const useStyles = makeStyles((theme) => {
             opacity: 0,
             padding: theme.spacing(1)
         },
-        imageMarked: {
+        underline: {
             height: 3,
             width: 18,
             transition: customTransition,
-            backgroundColor: theme.palette.common.white,
+            backgroundColor: theme.palette.text.primary,
         },
     })
 });
@@ -145,11 +145,12 @@ const GraphicButton = ({
             </Typography>
                     <Typography
                         align="center"
+                        variant="body1"
                         className={classes.buttonText}
                     >
                         {buttonText}
                     </Typography>
-                <span className={classes.imageMarked}/>
+                <span className={classes.underline}/>
           </span>
             </ButtonBase>
         </div>);

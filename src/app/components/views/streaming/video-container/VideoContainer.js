@@ -1,4 +1,4 @@
-import React, {Fragment, useContext, useEffect, useState} from 'react';
+import React, {Fragment, useCallback, useContext, useEffect, useState} from 'react';
 
 import {withFirebasePage} from 'context/firebase';
 import useAgoraAsStreamer from 'components/custom-hook/useAgoraAsStreamer';
@@ -53,12 +53,11 @@ function VideoContainer(props) {
     const [optimizationMode, setOptimizationMode] = useState("detail");
 
     const [audioCounter, setAudioCounter] = useState(0);
-    // const [showDisconnectionModal, setShowDisconnectionModal] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
 
     const screenSharingMode = (props.currentLivestream.screenSharerId === props.streamerId &&
         props.currentLivestream.mode === 'desktop') ? optimizationMode : "";
-    // console.log("-> screenSharingMode", screenSharingMode);
+
     const {
         localMediaStream,
         externalMediaStreams,
@@ -193,10 +192,6 @@ function VideoContainer(props) {
         await props.firebase.setDesktopMode(props.currentLivestream.id, mode, screenSharerId);
     }
 
-    const handleScreenShare = async (optimizationMode = "detail") => {
-        setOptimizationMode(optimizationMode)
-        await setDesktopMode(props.currentLivestream.mode === "desktop" ? "default" : "desktop", props.streamerId)
-    }
 
     const setLivestreamCurrentSpeakerId = (id) => {
         props.firebase.setLivestreamCurrentSpeakerId(props.currentLivestream.id, id);
@@ -271,15 +266,22 @@ function VideoContainer(props) {
         setShowBubbles(true)
     }
 
-    const handleCloseScreenShareModal = () => {
+    const handleCloseScreenShareModal = useCallback(() => {
         setShowScreenShareModal(false)
-    }
+    }, [])
+
     const handleClickScreenShareButton = async () => {
         if (props.currentLivestream.mode === "desktop") {
             return await setDesktopMode("default", props.streamerId)
         }
         setShowScreenShareModal(true)
     }
+
+    const handleScreenShare = useCallback(async (optimizationMode = "detail") => {
+        setOptimizationMode(optimizationMode)
+        await setDesktopMode(props.currentLivestream.mode === "desktop" ? "default" : "desktop", props.streamerId)
+    }, [])
+
 
     const sharingContent = () => (props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop')
 
@@ -335,17 +337,6 @@ function VideoContainer(props) {
                            videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
                            speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
                            attachSinkId={attachSinkId}/>
-            {/*<Modal open={showDisconnectionModal}>*/}
-            {/*    <Modal.Header>You have been disconnected</Modal.Header>*/}
-            {/*    <Modal.Content>*/}
-            {/*        <p>Don't panic! Follow these steps to quickly restart the stream:</p>*/}
-            {/*        <p>1. Check your internet connection</p>*/}
-            {/*        <p>2. Reload this page</p>*/}
-            {/*        <p>3. Restart the stream</p>*/}
-            {/*        <Button startIcon={<RefreshRoundedIcon/>} children='Reload Page' size='large' color="primary"*/}
-            {/*                onClick={() => reloadPage()}/>*/}
-            {/*    </Modal.Content>*/}
-            {/*</Modal>*/}
             {!props.viewer && !streamerReady &&
             <StreamPreparationModalV2 readyToConnect={Boolean(props.currentLivestream && props.currentLivestream.id)}
                                       audioSource={audioSource} updateAudioSource={updateAudioSource}
