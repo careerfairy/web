@@ -72,15 +72,14 @@ const GroupDashboardLayout = (props) => {
 
     const group = useSelector(state => populate(state.firestore, "group", populates) || {})
 
-    console.log("-> group", group);
 
 
     if(!isEmptyObject(group)){
         group.id = groupId || careerCenterId
     }
 
-    console.log("-> group", group);
     const firestore = useSelector(state => state.firestore)
+    console.log("-> group", group);
     console.log("-> firestore", firestore);
 
 
@@ -157,7 +156,6 @@ const GroupDashboardLayout = (props) => {
             title: 'Analytics'
         }
     ];
-    console.log("-> group.id", group.id);
 
     if (authenticatedUser?.emailVerified) {
         headerLinks.push({
