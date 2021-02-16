@@ -261,6 +261,11 @@ const NewLivestreamForm = ({firebase}) => {
             let id
             if (updateMode) {
                 id = livestream.id
+                if(!livestream.author){
+                    livestream.author = {
+                        email: authenticatedUser.email
+                    }
+                }
                 await firebase.updateLivestream(livestream, "livestreams")
             } else {
                 const author = {

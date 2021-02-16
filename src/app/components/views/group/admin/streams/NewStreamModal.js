@@ -89,16 +89,20 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
         onClose()
     }
 
+    const getAuthor = (livestream) => {
+        return livestream?.author?.email ? livestream.author : {
+            email: authenticatedUser.email,
+            ...(group?.id && {groupId: group.id})
+        }
+    }
+
     const handlePublishDraft = async () => {
         if (canPublish()) {
             try {
                 formRef.current?.setSubmitting(true)
                 const newStream = {...currentStream}
                 newStream.companyId = uuidv4()
-                const author = {
-                    groupId: group.id,
-                    email: authenticatedUser.email
-                }
+                const author = getAuthor(newStream)
                 await firebase.addLivestream(newStream, "livestreams", author)
                 await firebase.deleteLivestream(currentStream.id, "draftLivestreams")
 
@@ -153,6 +157,12 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
             const targetCollection = isActualLivestream() ? "livestreams" : "draftLivestreams"
             if (updateMode) {
                 id = livestream.id
+                if(!livestream.author){
+                    livestream.author = {
+                        groupId: group.id,
+                        email: authenticatedUser.email
+                    }
+                }
                 await firebase.updateLivestream(livestream, targetCollection)
                 console.log(`-> ${!isActualLivestream() && "Draft "}livestream was updated with id`, id);
             } else {

@@ -8,13 +8,14 @@ import {isEmptyObject} from "../../components/helperFunctions/HelperFunctions";
 import {useAuth} from "../../HOCs/AuthProvider";
 import {
     Archive as PastStreamIcon,
+    BarChart2 as AnalyticsIcon,
     Edit as EditGroupIcon,
     FileText as DraftStreamIcon,
     Film as StreamIcon,
-    Settings as SettingsIcon,
-    User as ProfileIcon,
-    BarChart2 as AnalyticsIcon
+    User as ProfileIcon
 } from "react-feather";
+import {useFirestoreConnect, populate} from "react-redux-firebase";
+import {useSelector} from "react-redux";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -55,23 +56,34 @@ const GroupDashboardLayout = (props) => {
     const {query: {groupId, careerCenterId}, replace} = useRouter()
     const [notifications, setNotifications] = useState([]);
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
-    const [group, setGroup] = useState({});
     const {userData, authenticatedUser} = useAuth()
 
-    useEffect(() => {
-        if (groupId || careerCenterId) {
-            const targetGroupId = groupId || careerCenterId
-            const unsubscribe = firebase.listenToCareerCenterById(
-                targetGroupId,
-                (querySnapshot) => {
-                    let careerCenter = querySnapshot.data();
-                    careerCenter.id = querySnapshot.id;
-                    setGroup(careerCenter);
-                }
-            );
-            return () => unsubscribe();
-        }
-    }, [groupId, careerCenterId]);
+    const populates = [
+        {child: 'adminEmail', root: 'userData', childAlias: "admin"}, // replace owner with user object
+        {child: 'subAdminEmails', root: 'userData', childAlias: 'subAdmins'} // replace owner with user object
+    ]
+
+    useFirestoreConnect(() => [{
+        collection: `careerCenterData`,
+        doc: groupId || careerCenterId,
+        storeAs: "group",
+        populates
+    }], [groupId, careerCenterId])
+
+    const group = useSelector(state => populate(state.firestore, "group", populates) || {})
+
+    console.log("-> group", group);
+
+
+    if(!isEmptyObject(group)){
+        group.id = groupId || careerCenterId
+    }
+
+    console.log("-> group", group);
+    const firestore = useSelector(state => state.firestore)
+    console.log("-> firestore", firestore);
+
+
 
     useEffect(() => {
         if (unAuthorized()) {
@@ -79,10 +91,15 @@ const GroupDashboardLayout = (props) => {
         }
     }, [group, authenticatedUser, userData]);
 
+    const isAdmin = () => {
+        return userData?.isAdmin
+            || (authenticatedUser?.email === group?.adminEmail)
+            || (group?.subAdminEmails?.includes(authenticatedUser?.email))
+    }
+
     const unAuthorized = () => {
         return Boolean(
-            (!isEmptyObject(group) && authenticatedUser && userData)
-            && (authenticatedUser.email !== group.adminEmail) && !userData.isAdmin
+            (!isEmptyObject(group) && authenticatedUser && userData) && !isAdmin()
         )
     }
 
@@ -140,6 +157,7 @@ const GroupDashboardLayout = (props) => {
             title: 'Analytics'
         }
     ];
+    console.log("-> group.id", group.id);
 
     if (authenticatedUser?.emailVerified) {
         headerLinks.push({
@@ -174,6 +192,7 @@ const GroupDashboardLayout = (props) => {
                     <div className={classes.content}>
                         {!isEmptyObject(group) && React.cloneElement(children, {
                             notifications,
+                            isAdmin: isAdmin(),
                             setNotifications,
                             group, ...props
                         })}

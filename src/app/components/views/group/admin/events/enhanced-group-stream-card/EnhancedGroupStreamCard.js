@@ -237,12 +237,7 @@ const EnhancedGroupStreamCard = ({
             setPublishingDraft(true)
             const newStream = {...livestream}
             newStream.companyId = uuidv4()
-            const author = {
-                email: authenticatedUser.email
-            }
-            if (group?.id) {
-                author.groupId = group.id
-            }
+            const author = getAuthor(newStream)
             await firebase.addLivestream(newStream, "livestreams", author)
             await firebase.deleteLivestream(livestream.id, "draftLivestreams")
             switchToNextLivestreamsTab()
@@ -250,6 +245,13 @@ const EnhancedGroupStreamCard = ({
         } catch (e) {
             setPublishingDraft(false)
             sendErrorMessage()
+        }
+    }
+
+    const getAuthor = (livestream) => {
+        return livestream?.author?.email ? livestream.author : {
+            email: authenticatedUser.email,
+            ...(group?.id && {groupId: group.id})
         }
     }
 

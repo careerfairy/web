@@ -344,7 +344,7 @@ class Firebase {
         return livestreamsRef.id
     }
 
-    updateLivestream = async (livestream, collection) => {
+    updateLivestream = async (livestream, collection ) => {
         try {
             let batch = this.firestore.batch();
             let livestreamsRef = this.firestore

@@ -3,7 +3,7 @@ import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout";
 import Page from "../../../../components/page";
 import StreamsOverview from "../../../../components/views/group/admin/streams";
 
-const DraftStreamsPage = ({group, firebase}) => {
+const DraftStreamsPage = ({group, firebase, isAdmin}) => {
 
     return (
         <Page title={`CareerFairy | Admin Manage Drafts of ${group.universityName}`}>
@@ -11,6 +11,7 @@ const DraftStreamsPage = ({group, firebase}) => {
                 query={firebase.listenToDraftLiveStreamsByGroupId}
                 group={group}
                 firebase={firebase}
+                isAdmin={isAdmin}
                 typeOfStream="draft"
             />
         </Page>

@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-const Index = ({group, typeOfStream, query}) => {
+const Index = ({group, typeOfStream, query, isAdmin}) => {
     const classes = useStyles();
     const {userData, authenticatedUser} = useAuth();
     const {enqueueSnackbar} = useSnackbar()
@@ -148,6 +148,7 @@ const Index = ({group, typeOfStream, query}) => {
                     handleSubmit={handleSubmit}
                     onChange={onSearch}
                     group={group}
+                    isAdmin={isAdmin}
                     openNewStreamModal={openNewStreamModal}
                     handleOpenNewStreamModal={handleOpenNewStreamModal}
                     value={searchParams}
