@@ -12,7 +12,8 @@ import {
     Edit as EditGroupIcon,
     FileText as DraftStreamIcon,
     Film as StreamIcon,
-    User as ProfileIcon
+    User as ProfileIcon,
+    Users as RolesIcon
 } from "react-feather";
 import {useFirestoreConnect, populate} from "react-redux-firebase";
 import {useSelector} from "react-redux";
@@ -77,12 +78,6 @@ const GroupDashboardLayout = (props) => {
     if(!isEmptyObject(group)){
         group.id = groupId || careerCenterId
     }
-
-    const firestore = useSelector(state => state.firestore)
-    console.log("-> group", group);
-    console.log("-> firestore", firestore);
-
-
 
     useEffect(() => {
         if (unAuthorized()) {
@@ -154,6 +149,11 @@ const GroupDashboardLayout = (props) => {
             href: `/group/${group.id}/admin/analytics`,
             icon: AnalyticsIcon,
             title: 'Analytics'
+        },
+        {
+            href: `/group/${group.id}/admin/roles`,
+            icon: RolesIcon,
+            title: 'Roles'
         }
     ];
 
