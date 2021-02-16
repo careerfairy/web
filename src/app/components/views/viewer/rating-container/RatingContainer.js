@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(1)
     },
     submitButton: {
-        marginRight: theme.spacing(0.5)
+        marginLeft: theme.spacing(0.5)
     },
     input: {
         marginBottom: theme.spacing(1),
