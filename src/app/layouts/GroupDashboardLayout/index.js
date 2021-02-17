@@ -62,7 +62,6 @@ const GroupDashboardLayout = (props) => {
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
     const [joiningGroup, setJoiningGroup] = useState(false);
     const {userData, authenticatedUser} = useAuth()
-    console.log("-> userData", userData);
 
     const populates = [
         {child: 'adminEmails', root: 'userData', childAlias: 'admins'} // replace owner with user object
@@ -83,9 +82,8 @@ const GroupDashboardLayout = (props) => {
             storeAs: "admins",
         }
     ], [groupId, careerCenterId])
+
     const group = useSelector(state => populate(state.firestore, "group", populates))
-    console.log("-> isLoaded(group)", isLoaded(group));
-    console.log("-> isEmpty(group)", isEmpty(group));
 
     if (isLoaded(group) && !isEmpty(group)) {
         group.id = groupId || careerCenterId
@@ -151,19 +149,13 @@ const GroupDashboardLayout = (props) => {
                 })
             } else {
                 setJoiningGroup(true)
-                console.log("-> in success");
-                // console.log("-> group.id", group.id);
-                // console.log("-> userData.userEmail", userData.userEmail);
-                // console.log("-> dashboardInviteId", dashboardInviteId);
                 await firebase.joinGroupDashboard(group.id, userData.userEmail, dashboardInviteId)
                 await replace(`/group/${group.id}/admin/analytics`)
                 enqueueSnackbar(`Congrats, you are now an admin of ${group.universityName}`, {
                     variant: "success",
                     preventDuplicate: true,
                 })
-
             }
-
         } catch (error) {
             console.error("-> error", error);
             enqueueSnackbar(GENERAL_ERROR, {
