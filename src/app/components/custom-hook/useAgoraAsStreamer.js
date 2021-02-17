@@ -5,7 +5,7 @@ import {useDispatch} from "react-redux";
 import {EMOTE_MESSAGE_TEXT_TYPE} from "../util/constants";
 import * as actions from '../../store/actions'
 
-export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer) {
+export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer, optimizationMode) {
 
     const dispatch = useDispatch()
     const [localMediaStream, setLocalMediaStream] = useState(null);
@@ -180,7 +180,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                 setRemovedStream(streamId);
             }
         });
-        rtcClient.on("stream-published", function(evt){
+        rtcClient.on("stream-published", function (evt) {
             console.log("stream-published")
             setAgoraStatus("stream-published")
         });
@@ -336,8 +336,8 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                                 audio: false,
                                 video: false,
                                 screen: true,
-                                screenAudio: true
-                                //optimizationMode: 'motion'
+                                screenAudio: true,
+                                optimizationMode: screenSharingMode
                             });
                             screenShareStream.setVideoProfile("480p_9");
                             setAgoraStatus("screen-share-started")
@@ -364,8 +364,8 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                             audio: false,
                             video: false,
                             screen: true,
-                            screenAudio: true
-                            //optimizationMode: 'motion'
+                            screenAudio: true,
+                            optimizationMode: screenSharingMode
                         });
                         screenShareStream.setVideoProfile("480p_9");
                         setAgoraStatus("screen-share-started")
@@ -434,5 +434,16 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         console.log("Error: ", err);
     };
 
-    return {localMediaStream, externalMediaStreams, agoraStatus, networkQuality, numberOfViewers, setAddedStream, setRemovedStream};
+    const getShareAudio = () => {
+        return screenSharingMode === "detail" ? false : true
+    }
+    return {
+        localMediaStream,
+        externalMediaStreams,
+        agoraStatus,
+        networkQuality,
+        numberOfViewers,
+        setAddedStream,
+        setRemovedStream
+    };
 }

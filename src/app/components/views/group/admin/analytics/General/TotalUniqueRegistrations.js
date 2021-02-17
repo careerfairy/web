@@ -1,28 +1,19 @@
 import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {
-    Avatar,
-    Box,
-    Card,
-    CardContent,
-    Grid,
-    Typography,
-    colors,
-    makeStyles, CircularProgress, LinearProgress
-} from '@material-ui/core';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import {Avatar, Card, CardContent, CircularProgress, Grid, Typography} from '@material-ui/core';
 import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
 import {withFirebase} from "../../../../../../context/firebase";
-import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import PercentageDisplay from "./common/PercentageDisplay";
+import {makeStyles} from "@material-ui/core/styles";
+import green from "@material-ui/core/colors/green";
 
 const useStyles = makeStyles((theme) => ({
     root: {
         height: '100%'
     },
     avatar: {
-        backgroundColor: colors.green[600],
+        backgroundColor: green[600],
         height: 56,
         width: 56
     },

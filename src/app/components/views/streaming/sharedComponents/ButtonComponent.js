@@ -3,15 +3,13 @@ import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
 import HelpIcon from '@material-ui/icons/Help';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
-import {makeStyles, useTheme} from "@material-ui/core/styles";
+import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
-import {ClickAwayListener, fade} from "@material-ui/core";
+import {ClickAwayListener} from "@material-ui/core";
 import ChevronLeftRoundedIcon from '@material-ui/icons/ChevronLeftRounded';
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
-import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "../../../../materialUI/GlobalTooltips";
-import Grow from "@material-ui/core/Grow";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({

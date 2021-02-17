@@ -11,7 +11,10 @@ import {
     Switch,
     TextField,
     Tooltip,
-    Typography
+    Typography,
+    Fab,
+    ButtonGroup,
+    Box,
 } from "@material-ui/core";
 import {Formik} from 'formik';
 import {v4 as uuidv4} from 'uuid';
@@ -26,7 +29,6 @@ import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
 import {useRouter} from "next/router";
 import FormGroup from "./FormGroup";
 import WarningIcon from '@material-ui/icons/Warning';
-import Fab from "@material-ui/core/Fab";
 import {
     getStreamSubCollectionSpeakers,
     handleAddSpeaker,
@@ -38,10 +40,8 @@ import {
 } from "../../helperFunctions/streamFormFunctions";
 import {copyStringToClipboard} from "../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
 import {SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../../util/constants";
 import {LanguageSelect} from "../../helperFunctions/streamFormFunctions/components";
-import Box from "@material-ui/core/Box";
 import {useAuth} from "../../../HOCs/AuthProvider";
 
 
@@ -159,17 +159,30 @@ const DraftStreamForm = ({
             const totalExistingGroups = await firebase.getCareerCentersByGroupId(mergedGroups)
             const totalFlattenedGroups = totalExistingGroups.map(group => ({
                 ...group,
-                selected: true,
+                selected: false,
                 flattenedOptions: handleFlattenOptions(group)
             }))
 
-            // Includes partner groups as non auto-selected options if they arent already part of the event
-            const selectedGroups = totalFlattenedGroups.filter(({id}) => !(mergedGroups.includes(id) && !initialGroups.includes(id)))
-
+            let selectedGroups = []
+            const targetSelectedGroupIds = [...new Set([...UrlIds, ...draftStreamGroupIds])]
+            targetSelectedGroupIds.forEach((id) => {
+                const targetGroup = totalFlattenedGroups.find(flattenedGroup => flattenedGroup.groupId === id)
+                if (targetGroup) {
+                    targetGroup.selected = true
+                    selectedGroups.push(targetGroup)
+                }
+            })
+            if (!selectedGroups.length && group?.id) {
+                selectedGroups.push({
+                    ...group,
+                    flattenedOptions: handleFlattenOptions(group),
+                    selected: true
+                })
+            }
 
             setExistingGroups(totalFlattenedGroups)
             setSelectedGroups(selectedGroups)
-            const arrayOfActualGroupIds = totalExistingGroups.map(groupObj => groupObj.id)
+            const arrayOfActualGroupIds = selectedGroups.map(groupObj => groupObj.id)
             setFormData({...newFormData, groupIds: arrayOfActualGroupIds})
         }
     }
@@ -241,7 +254,9 @@ const DraftStreamForm = ({
     }
 
     const handleSetOnlyUrlIds = async () => {
+        console.log("-> in the handle set only");
         const arrayOfUrlIds = careerCenterIds?.split(",") || [group.id]
+        console.log("-> arrayOfUrlIds", arrayOfUrlIds);
         await handleSetGroupIds(arrayOfUrlIds, [], formData)
     }
 

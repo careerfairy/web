@@ -1,17 +1,12 @@
 import React, {useState, useEffect, useContext} from 'react';
-import Grow from '@material-ui/core/Grow';
 import ThumbUpRoundedIcon from '@material-ui/icons/ThumbUpRounded';
 import Linkify from 'react-linkify';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import ExpandMoreRoundedIcon from '@material-ui/icons/ExpandMoreRounded';
 import {withFirebase} from 'context/firebase';
-import {Box, Button, Slide, TextField} from "@material-ui/core";
+import { Box, Button, Slide, TextField, Grow, Typography, Collapse, Card, Paper } from "@material-ui/core";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import Collapse from "@material-ui/core/Collapse";
-import Card from "@material-ui/core/Card";
 import {PlayIconButton} from "materialUI/GlobalButtons/GlobalButtons";
-import Paper from "@material-ui/core/Paper";
 import {
     TooltipButtonComponent,
     TooltipText,

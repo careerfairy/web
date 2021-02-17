@@ -1,23 +1,22 @@
 import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from "context/firebase";
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, fade} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
 import {
-    Avatar,
-    Box,
     Button,
     Chip,
     ClickAwayListener,
     Collapse,
-    fade,
     Fade,
     Grow,
-    Paper
+    Paper,
+    Typography,
+    Avatar,
+    Box,
 } from "@material-ui/core";
 import {AvatarGroup} from "@material-ui/lab";
 import Streamers from "./Streamers";
 import Wave from "./Wave";
-import Typography from "@material-ui/core/Typography";
 import LogoElement from "../LogoElement";
 import TargetOptions from "../../GroupsCarousel/TargetOptions";
 import UserUtil from "../../../../../data/util/UserUtil";

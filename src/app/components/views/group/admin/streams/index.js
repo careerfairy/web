@@ -1,9 +1,8 @@
 import React, {Fragment, useEffect, useState} from "react";
 import {makeStyles} from "@material-ui/core/styles";
-import {Box, CircularProgress, Container, Grid,} from "@material-ui/core";
+import { Box, CircularProgress, Container, Grid, Typography } from "@material-ui/core";
 import usePagination from '@itsfaqih/usepagination';
 import {Pagination} from "@material-ui/lab";
-import Typography from "@material-ui/core/Typography";
 import StreamsToolbar from "./StreamsToolbar";
 import {useSnackbar} from "notistack";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
@@ -107,6 +106,8 @@ const Index = ({group, typeOfStream, query}) => {
                     || speaker.lastName.toLowerCase().indexOf(searchParams.toLowerCase()) >= 0)
             )
         })
+        // Reset back to page one on a new search
+        action.goTo(1)
         setFilteredStreams(newFilteredStreams)
     }
 

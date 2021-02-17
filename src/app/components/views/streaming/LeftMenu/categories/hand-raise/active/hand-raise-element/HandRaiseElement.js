@@ -10,11 +10,12 @@ const useStyles = makeStyles(theme => ({
     handRaiseContainerInvited: {
         width: "100%",
         background: theme.palette.primary.main,
-        marginBottom: theme.spacing(1)
+        marginBottom: theme.spacing(1),
+        color: theme.palette.common.white
     },
     handRaiseContainerRequested: {
         width: "100%",
-        marginBottom: theme.spacing(1)
+        marginBottom: theme.spacing(1),
     },
 }))
 
@@ -33,8 +34,9 @@ function RequestedHandRaiseElement(props) {
 
     useEffect(() => {
         props.setNewNotification({
+            status: "requested",
             id: notificationId,
-            message: props.request.name + ' has haised a hand and requested to join the stream',
+            message: props.request.name + ' has raised a hand and requested to join the stream',
             confirmMessage: 'Invite',
             confirm: () => props.updateHandRaiseRequest(props.request.id, 'invited'),
             cancelMessage: 'Deny',
@@ -112,6 +114,7 @@ function ConnectingHandRaiseElement(props) {
 
     useEffect(() => {
         props.setNewNotification({
+            status: "connecting",
             id: notificationId,
             message: props.request.name + ' is now connecting to the stream',
             confirmMessage: 'OK',
@@ -154,6 +157,7 @@ function ConnectedHandRaiseElement(props) {
 
     useEffect(() => {
         props.setNewNotification({
+            status: "connected",
             id: notificationId,
             message: props.request.name + ' is now connected to the stream',
             confirmMessage: 'OK',

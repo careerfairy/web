@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import CurrentPollGraph from "../../../streaming/sharedComponents/CurrentPollGraph";
-import {Paper, useTheme, withStyles} from "@material-ui/core";
+import {Paper} from "@material-ui/core";
 import {GreyPermanentMarker, PollQuestion} from "../../../../../materialUI/GlobalTitles";
 import {CategoryContainerCentered} from "../../../../../materialUI/GlobalContainers";
 import {colorsArray} from "../../../../util/colors";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, useTheme, withStyles} from "@material-ui/core/styles";
 import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import {isServer} from "../../../../helperFunctions/HelperFunctions";
 
@@ -25,7 +25,7 @@ const PollWrapper = withStyles(theme => ({
     },
 }))(Paper);
 const useStyles = makeStyles(theme => ({
-    pollButton:{
+    pollButton: {
         marginTop: theme.spacing(1)
     }
 }))

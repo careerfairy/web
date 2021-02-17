@@ -1,7 +1,6 @@
 import React from 'react'
 import {GridOverlay} from '@material-ui/data-grid';
-import {LinearProgress, makeStyles} from "@material-ui/core";
-import Box from "@material-ui/core/Box";
+import { LinearProgress, makeStyles, Box } from "@material-ui/core";
 import SentimentDissatisfiedIcon from '@material-ui/icons/SentimentDissatisfied';
 
 const useStyles = makeStyles((theme) => ({

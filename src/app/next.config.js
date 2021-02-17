@@ -1,4 +1,7 @@
 'use strict';
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+    enabled: process.env.ANALYZE === 'true',
+})
 
 const {PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD} = require('next/constants')
 
@@ -26,6 +29,6 @@ module.exports = (phase, {defaultConfig}) => {
         config.distDir = '../../dist/client'
     }
     /* config options for all phases except development here */
-    return config
+    return withBundleAnalyzer(config)
 }
 

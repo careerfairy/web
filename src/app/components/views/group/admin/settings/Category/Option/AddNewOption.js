@@ -1,9 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import TextField from "@material-ui/core/TextField";
-import { Button } from "@material-ui/core";
+import { Button, Dialog, DialogTitle, TextField } from "@material-ui/core";
 
 const AddNewOption = ({ updateMode, handleAdd, setUpdateMode, open }) => {
   if (!updateMode.mode) {

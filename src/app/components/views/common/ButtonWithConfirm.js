@@ -1,15 +1,19 @@
 import React, {Fragment, useState} from 'react'
-import {Button, DialogContentText, Tooltip} from "@material-ui/core";
-import Dialog from "@material-ui/core/Dialog";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogActions from "@material-ui/core/DialogActions";
+import {
+    Button,
+    DialogContentText,
+    Tooltip,
+    Dialog,
+    DialogContent,
+    DialogTitle,
+    DialogActions,
+    IconButton,
+    useMediaQuery,
+} from "@material-ui/core";
 import CheckIcon from '@material-ui/icons/Check';
 import ClearIcon from '@material-ui/icons/Clear';
 import {GlassDialog} from "../../../materialUI/GlobalModals";
-import IconButton from "@material-ui/core/IconButton";
 import {makeStyles, useTheme} from "@material-ui/core/styles";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 const useStyles = makeStyles(theme => ({
     iconInButton: {
