@@ -353,6 +353,37 @@ exports.sendPhysicalEventRegistrationConfirmationEmail = functions.https.onReque
         return res.status(400).send(error);
     });
 });
+exports.sendDashboardInviteEmail = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    const email = {
+        "TemplateId": 22272783,
+        "From": 'CareerFairy <noreply@careerfairy.io>',
+        "To": req.body.recipientEmail,
+        "TemplateModel": {
+            sender_first_name: req.body.sender_first_name,
+            group_name: req.body.group_name,
+            invite_link: req.body.invite_link,
+        }
+    };
+
+    client.sendEmailWithTemplate(email).then(response => {
+        return res.send(200);
+    }, error => {
+        console.log('error:' + error);
+        return res.status(400).send(error);
+    });
+});
 
 exports.updateFakeUser = functions.https.onRequest(async (req, res) => {
 

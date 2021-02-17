@@ -62,7 +62,6 @@ const GroupDashboardLayout = (props) => {
     const populates = [
         {child: 'adminEmails', root: 'userData', childAlias: 'admins'} // replace owner with user object
     ]
-console.log("-> groupId ", groupId || careerCenterId);
     useFirestoreConnect(() => (groupId || careerCenterId) &&[
         {
             collection: `careerCenterData`,
@@ -81,6 +80,10 @@ console.log("-> groupId ", groupId || careerCenterId);
     ], [groupId, careerCenterId])
 
     const group = useSelector(state => populate(state.firestore, "group", populates) || {})
+    if(group.adminEmails){
+    console.log("-> group", group);
+
+    }
 
 
     if (!isEmptyObject(group)) {

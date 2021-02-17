@@ -38,6 +38,7 @@ const MembersTable = ({
     const [selection, setSelection] = useState([]);
     const [data, setData] = useState([]);
     const roles = useSelector(({firestore}) => firestore.data.roles || {})
+    console.log("-> roles", roles);
 
 
     useEffect(() => {
@@ -48,7 +49,7 @@ const MembersTable = ({
             }
         })
         setData(data)
-    }, [group, roles])
+    }, [group])
 
     const getRoleLookup = () => {
         const roleOptions = {};

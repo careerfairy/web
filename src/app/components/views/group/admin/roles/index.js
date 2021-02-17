@@ -26,7 +26,6 @@ const RolesOverview = ({firebase, group}) => {
     const closeAddMemberModal = () => {
         setShowAddMemberModal(false)
     }
-    console.log("-> firestore", firestore);
 
     return (
         <Container className={classes.root} maxWidth="lg">
