@@ -140,7 +140,6 @@ const GroupDashboardLayout = (props) => {
         try {
             if (joiningGroup) return
             const isValidInvite = await firebase.validateDashboardInvite(dashboardInviteId, group.id)
-            console.log("-> isValidInvite", isValidInvite);
             if (!isValidInvite) {
                 await replace("/")
                 enqueueSnackbar("This invite link provided is no longer valid", {

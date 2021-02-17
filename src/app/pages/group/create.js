@@ -12,7 +12,9 @@ import {GlobalBackground} from "../../materialUI/GlobalBackground/GlobalBackGrou
 import Loader from "../../components/views/loader/Loader";
 import {useAuth} from "../../HOCs/AuthProvider";
 
-import { Stepper, Step, StepLabel } from '@material-ui/core';
+import {Stepper, Step, StepLabel} from '@material-ui/core';
+import {useSnackbar} from "notistack";
+import {GENERAL_ERROR} from "../../components/util/constants";
 
 function getSteps() {
     return ['Create your base group', 'Setup your categories and sub-categories', 'Finish'];
@@ -21,6 +23,7 @@ function getSteps() {
 
 const CreateGroup = ({firebase}) => {
     const router = useRouter();
+    const {enqueueSnackbar} = useSnackbar()
     const [activeStep, setActiveStep] = useState(0);
     const [baseGroupInfo, setBaseGroupInfo] = useState({});
     const [arrayOfCategories, setArrayOfCategories] = useState([]);
@@ -115,24 +118,25 @@ const CreateGroup = ({firebase}) => {
             const downloadURL = await uploadLogo(baseGroupInfo.logoFileObj)
             const careerCenter = {
                 universityName: baseGroupInfo.universityName,
-                adminEmail: user.email,
+                adminEmails: [user.email],
                 logoUrl: downloadURL,
                 description: baseGroupInfo.description,
                 test: false,
                 categories: arrayOfCategories
             }
-            let ref = await firebase.createCareerCenter(careerCenter);
-            firebase.updateCareerCenter(ref.id, {groupId: ref.id}).then(() => {
-                router.push(`/group/${ref.id}/admin`)
+            let ref = await firebase.createCareerCenter(careerCenter, user.email);
+            await router.push(`/group/${ref.id}/admin`)
+            enqueueSnackbar(`Congrats! Your group ${baseGroupInfo.universityName} has now been created`, {
+                variant: "success",
+                preventDuplicate: true
             })
 
-            // const careerCenterId = careerCenterRef.id
-            // await firebase.addMultipleGroupCategoryWithElements(careerCenterRef.id, arrayOfCategories)
-            // return careerCenterId
-
         } catch (e) {
-            console.log("error in async 2", e);
-
+            console.log("error in creating group", e);
+            enqueueSnackbar(GENERAL_ERROR, {
+                variant: "error",
+                preventDuplicate: true
+            })
         }
     }
 
