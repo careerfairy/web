@@ -6,7 +6,6 @@ import CurrentSpeakerDisplayer from './CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
 import VideoControlsContainer from './VideoControlsContainer';
 import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
-import ErrorMessageModal from "../modal/StreamPreparationModalV2/ErrorMessageModal";
 import useDevices from 'components/custom-hook/useDevices';
 import SettingsModal from './SettingsModal';
 import {DialogContent, makeStyles} from '@material-ui/core';
@@ -14,10 +13,9 @@ import TutorialContext from "context/tutorials/TutorialContext";
 import DemoIntroModal from "../modal/DemoIntroModal";
 import DemoEndModal from "../modal/DemoEndModal";
 import useMediaSources from 'components/custom-hook/useMediaSources';
-import ScreenSharePermissionDeniedModal from '../modal/ScreenSharePermissionDeniedModal';
-import StreamPreparationModal from '../modal/StreamPreparationModal';
 import WifiIndicator from "./WifiIndicator";
 import LoadingModal from '../modal/LoadingModal';
+import ErrorModal from '../modal/ErrorModal';
 
 const useStyles = makeStyles((theme) => ({
     blackFrame: {
@@ -59,7 +57,7 @@ function VideoContainer(props) {
 
     const screenSharingMode = props.currentLivestream.screenSharerId === props.streamerId &&
         props.currentLivestream.mode === 'desktop';
-    const {localMediaStream, externalMediaStreams, agoraStatus, setAgoraStatus, networkQuality, numberOfViewers, setAddedStream, setRemovedStream} =
+    const {localMediaStream, externalMediaStreams, agoraRtcStatus, agoraRtmStatus, networkQuality, numberOfViewers, setAddedStream, setRemovedStream} =
         useAgoraAsStreamer(
             true,
             false,
@@ -70,7 +68,7 @@ function VideoContainer(props) {
             props.viewer
         );
 
-    const devices = useDevices(agoraStatus === "stream_published");
+    const devices = useDevices(agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED");
 
     const {
         audioSource,
@@ -120,16 +118,16 @@ function VideoContainer(props) {
     }, [audioCounter, props.currentLivestream.mode]);
 
     useEffect(() => {
-        if (agoraStatus === "stream-published") {
+        if (agoraRtcStatus && agoraRtcStatus.type === "INFO" && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED") {
             setStreamerConnected(true)
         }
-    }, [agoraStatus])
+    }, [agoraRtcStatus])
 
     useEffect(() => {
-        if (agoraStatus === "screen-share-stopped" && props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
+        if (agoraRtcStatus && (agoraRtcStatus.msg === "RTC_SCREEN_SHARE_STOPPED" || agoraRtcStatus.msg === "RTC_SCREEN_SHARE_NOT_ALLOWED") && props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
             setDesktopMode("default", props.streamerId)
         }
-    }, [agoraStatus])
+    }, [agoraRtcStatus])
 
     useEffect(() => {
         if (isMainStreamer && props.currentLivestream.mode === 'desktop') {
@@ -330,7 +328,8 @@ function VideoContainer(props) {
                 attachSinkId={attachSinkId} devices={devices}
                 setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
                 isStreaming={isStreaming}/>
-            <LoadingModal/>
+            <LoadingModal agoraRtcStatus={agoraRtcStatus} />
+            <ErrorModal agoraRtcStatus={agoraRtcStatus} agoraRtmStatus={agoraRtmStatus} />
             <DemoIntroModal livestreamId={props.currentLivestream.id}
                             open={showDemoIntroModal}
                             handleClose={handleCloseDemoIntroModal}/>

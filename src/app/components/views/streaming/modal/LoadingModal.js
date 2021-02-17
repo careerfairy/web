@@ -19,22 +19,29 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function LoadingModal({ status }) {
+function LoadingModal({ agoraRtcStatus }) {
 
     const classes = useStyles();
 
-    const [state, setState] = useState("connecting")
-
-    const LOADING_AGORA_STATI = []
+    const LOADING_AGORA_STATI = [
+        "RTC_INITIAL",
+        "RTC_INITIALIZING",
+        "RTC_JOINING_CHANNEL",
+        "RTC_JOINED_CHANNEL",
+        "RTC_REQUEST_MEDIA_ACCESS",
+        "RTC_PUBLISH_STREAM",
+        "RTM_DISCONNECTED",
+        "RTM_RECONNECTING"
+    ]
 
     return (
-        <Dialog open={LOADING_AGORA_STATI.includes(status)}>
+        <Dialog open={agoraRtcStatus && agoraRtcStatus.type === "INFO" && LOADING_AGORA_STATI.includes(agoraRtcStatus.msg)}>
             <DialogContent> 
                 <div className={classes.container}>
                     <div className={classes.content}>
                         <CircularProgress />
                         <div className={classes.text}>
-                            { state === "connecting" ? 'Connecting...' : 'Reconnecting...' }
+                            { 'Connecting...' }
                         </div>
                     </div>
                 </div>
