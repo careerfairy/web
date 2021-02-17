@@ -344,7 +344,7 @@ class Firebase {
         return livestreamsRef.id
     }
 
-    updateLivestream = async (livestream, collection ) => {
+    updateLivestream = async (livestream, collection) => {
         try {
             let batch = this.firestore.batch();
             let livestreamsRef = this.firestore
@@ -1630,7 +1630,62 @@ class Firebase {
         return dataArray
     }
 
+    // Notification Queries
+    createNotification = async (notification, options = {force: false}) => {
+        const prevNotification = await this.checkForNotification(
+            notification.requester,
+            notification.receiver,
+            notification.type
+        )
+        if (!prevNotification.empty && options.force === true) {
+            const prevNotificationData = prevNotification.docs.map(doc => ({id: doc.id}))
+            const notificationId = prevNotificationData[0].id
+            if (options.force === true) {
+                return await this.updateNotification(notificationId, notification)
+            }
+            return throw `Notification Already Exists as document ${notificationId}`
+        }
+        notification.created = this.getServerTimestamp()
+        let ref = this.firestore.collection("notifications");
+        return ref.add(notification);
+    }
 
+    updateNotification = async (notificationId, data) => {
+        data.updated = this.getServerTimestamp()
+        let ref = this.firestore.collection("notifications")
+            .doc(notificationId)
+        await ref.update(data);
+        return {id: notificationId}
+    }
+
+    validateDashboardInvite = async (notificationId) => {
+        let ref = this.firestore.collection("notifications")
+            .doc(notificationId)
+        const refSnap = await ref.get()
+        if (!refSnap.exists) {
+            return false
+        }
+        const notification = refSnap.data()
+        return notification.type === "dashboardInvite" && notification.open
+    }
+
+    checkForNotification = (requesterId, receiverId, type) => {
+        let ref = this.firestore.collection("notifications")
+            .where("receiver", "==", receiverId)
+            .where("requester", "==", requesterId)
+            .where("type", "==", type)
+            .limit(1)
+        return ref.get()
+    }
+    // Custom Exeptions
+    CustomException = (message) => {
+        const exception = (message) => {
+            return new Error(message);
+        }
+        exception.prototype = Object.create(Error.prototype);
+        return exception(message)
+    }
+    // DB functions
     getStorageRef = () => {
         return this.storage.ref();
     }

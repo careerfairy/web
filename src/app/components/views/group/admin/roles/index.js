@@ -44,6 +44,7 @@ const RolesOverview = ({firebase, group}) => {
                 </Grid>
             </Grid>
             <AddMemberModal
+                group={group}
                 open={showAddMemberModal}
                 onClose={closeAddMemberModal}
             />

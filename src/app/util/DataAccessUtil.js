@@ -26,6 +26,18 @@ export default class DataAccessUtil {
             }
         });
     }
+    static sendDashboardInvite(recipientEmail, userData, group, invite_link) {
+        return axios({
+            method: 'post',
+            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDashboardInviteEmail',
+            data: {
+                recipientEmail: recipientEmail,
+                sender_first_name: userData.firstName,
+                group_name: group.universityName,
+                invite_link: invite_link
+            }
+        });
+    }
 
     static sendPhysicalEventEmailRegistrationConfirmation(user, userData, event) {
         return axios({

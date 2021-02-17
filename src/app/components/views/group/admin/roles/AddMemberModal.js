@@ -6,21 +6,24 @@ import {
     Button,
     CircularProgress,
     DialogActions,
-    DialogContent,
+    DialogContent, DialogContentText,
     DialogTitle,
     Slide,
     TextField
 } from "@material-ui/core";
 import {Formik} from "formik";
-import {EMAIL_REGEX} from "../../../../util/constants";
+import {EMAIL_REGEX, GENERAL_ERROR} from "../../../../util/constants";
+import DataAccessUtil from "../../../../../util/DataAccessUtil";
+import {useAuth} from "../../../../../HOCs/AuthProvider";
+import {useSnackbar} from "notistack";
+import {withFirebase} from "../../../../../context/firebase";
 
 const useStyles = makeStyles(theme => ({}));
 
-const AddMemberModal = ({open = false, onClose}) => {
-
-
+const AddMemberModal = ({open = false, onClose, group, firebase}) => {
+        const {enqueueSnackbar} = useSnackbar()
         const classes = useStyles()
-
+        const {userData} = useAuth()
         const handleClose = (resetCallback) => {
             onClose()
             if (resetCallback) {
@@ -28,9 +31,42 @@ const AddMemberModal = ({open = false, onClose}) => {
             }
         }
 
-        const handleSubmit = (values, {resetForm}) => {
+        const buildInviteLink = (notificationId) => {
+            let baseUrl = "https://careerfairy.io"
+            if (window?.location?.origin) {
+                baseUrl = window.location.origin
+            }
+            return `${baseUrl}/group/${group.id || group.groupId}/admin?dashboardInviteId=${notificationId}`
+        }
 
-            resetForm()
+        const handleSubmit = async (values, {resetForm}) => {
+            try {
+                const notificationType = "dashboardInvite"
+                let successMessage = `An invitation email has been sent to ${values.email}`
+                const notification = {
+                    open: true,
+                    receiver: values.email,
+                    requester: group.id,
+                    type: notificationType
+                }
+
+                const invitationRef = await firebase.createNotification(notification, {force: true});
+                console.log("-> invitationRef", invitationRef);
+                const notificationId = invitationRef.id
+                const inviteLink = buildInviteLink(notificationId)
+                await DataAccessUtil.sendDashboardInvite(values.email, userData, group, inviteLink)
+                enqueueSnackbar(successMessage, {
+                    preventDuplicate: true,
+                    variant: "success",
+                })
+            } catch (error) {
+                console.error("-> error", error);
+                enqueueSnackbar(GENERAL_ERROR, {
+                    preventDuplicate: true,
+                    variant: "error",
+                })
+            }
+            handleClose(resetForm)
         }
 
 
@@ -67,11 +103,14 @@ const AddMemberModal = ({open = false, onClose}) => {
                     <GlassDialog TransitionComponent={Slide} onClose={() => handleClose(resetForm)} open={open}>
                         <DialogTitle>Invite Member</DialogTitle>
                         <DialogContent>
-                            <Box marginY={2}>
+                            <DialogContentText>
+                               Please provide an email that you would like to invite
+                            </DialogContentText>
                                 <TextField
                                     fullWidth
                                     helperText={errors.email}
                                     label="Email"
+                                    autoFocus
                                     autoComplete="email"
                                     disabled={isSubmitting}
                                     name="email"
@@ -79,9 +118,7 @@ const AddMemberModal = ({open = false, onClose}) => {
                                     required
                                     error={Boolean(errors.email)}
                                     value={values.email}
-                                    variant="outlined"
                                 />
-                            </Box>
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={() => handleClose(resetForm)}>Cancel</Button>
@@ -94,7 +131,7 @@ const AddMemberModal = ({open = false, onClose}) => {
                                 onClick={handleSubmit}
                                 color="primary"
                             >
-                                {!isSubmitting && "Send"}
+                                {!isSubmitting && "Send Invite"}
                             </Button>
                         </DialogActions>
                     </GlassDialog>
@@ -104,4 +141,4 @@ const AddMemberModal = ({open = false, onClose}) => {
     }
 ;
 
-export default AddMemberModal;
+export default withFirebase(AddMemberModal);

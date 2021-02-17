@@ -17,6 +17,7 @@ import {
 } from "react-feather";
 import {useFirestoreConnect, populate} from "react-redux-firebase";
 import {useSelector} from "react-redux";
+import {useSnackbar} from "notistack";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -54,7 +55,8 @@ const useStyles = makeStyles((theme) => ({
 const GroupDashboardLayout = (props) => {
     const {children, firebase} = props
     const classes = useStyles();
-    const {query: {groupId, careerCenterId}, replace} = useRouter()
+    const {query: {groupId, careerCenterId, dashboardInviteId}, pathname, replace} = useRouter()
+    const {enqueueSnackbar} = useSnackbar()
     const [notifications, setNotifications] = useState([]);
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
     const {userData, authenticatedUser} = useAuth()
@@ -62,7 +64,7 @@ const GroupDashboardLayout = (props) => {
     const populates = [
         {child: 'adminEmails', root: 'userData', childAlias: 'admins'} // replace owner with user object
     ]
-    useFirestoreConnect(() => (groupId || careerCenterId) &&[
+    useFirestoreConnect(() => (groupId || careerCenterId) && [
         {
             collection: `careerCenterData`,
             doc: groupId || careerCenterId,
@@ -78,12 +80,8 @@ const GroupDashboardLayout = (props) => {
             storeAs: "roles",
         }
     ], [groupId, careerCenterId])
-
+    console.log("-> layout");
     const group = useSelector(state => populate(state.firestore, "group", populates) || {})
-    if(group.adminEmails){
-    console.log("-> group", group);
-
-    }
 
 
     if (!isEmptyObject(group)) {
@@ -91,10 +89,32 @@ const GroupDashboardLayout = (props) => {
     }
 
     useEffect(() => {
-        if (unAuthorized()) {
-            replace("/");
-        }
-    }, [group, authenticatedUser, userData]);
+        (async function () {
+            if (
+                pathname === "/group/[groupId]/admin"
+                && dashboardInviteId
+                && isLoggedIn()
+                && unAuthorized()
+            ) {
+                // If you're logged in and are on the base admin page
+                console.log("-> dashboardInviteId", dashboardInviteId);
+                const isValidInvite = await firebase.validateDashboardInvite(dashboardInviteId)
+                if (!isValidInvite) {
+                    await replace("/")
+                    enqueueSnackbar("This invite link provided is no longer valid", {
+                        variant: "error",
+                        preventDuplicate: true,
+                    })
+                }
+                console.log("-> isValidInvite", isValidInvite);
+                return
+            }
+            if (unAuthorized()) {
+                console.log("-> dashboardInviteId in unauthorized", dashboardInviteId);
+                replace("/");
+            }
+        })()
+    }, [group, authenticatedUser, userData, pathname, dashboardInviteId]);
 
     const isAdmin = () => {
         return userData?.isAdmin
@@ -104,9 +124,11 @@ const GroupDashboardLayout = (props) => {
 
     const unAuthorized = () => {
         return Boolean(
-            (!isEmptyObject(group) && authenticatedUser && userData) && !isAdmin()
+            (!isEmptyObject(group) && authenticatedUser.isLoaded && userData) && !isAdmin()
         )
     }
+
+    const isLoggedIn = () => authenticatedUser.isLoaded && !authenticatedUser.isEmpty
 
 
     const headerLinks = [
