@@ -1669,6 +1669,12 @@ class Firebase {
         return notification.type === "dashboardInvite" && notification.open
     }
 
+    getNotification = (notificationId) => {
+        let ref = this.firestore.collection("notifications")
+            .doc(notificationId)
+        return ref.get()
+    }
+
     checkForNotification = (requesterId, receiverId, type) => {
         let ref = this.firestore.collection("notifications")
             .where("receiver", "==", receiverId)
@@ -1677,14 +1683,7 @@ class Firebase {
             .limit(1)
         return ref.get()
     }
-    // Custom Exeptions
-    CustomException = (message) => {
-        const exception = (message) => {
-            return new Error(message);
-        }
-        exception.prototype = Object.create(Error.prototype);
-        return exception(message)
-    }
+
     // DB functions
     getStorageRef = () => {
         return this.storage.ref();

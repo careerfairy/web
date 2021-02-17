@@ -97,15 +97,7 @@ const GroupDashboardLayout = (props) => {
                 && unAuthorized()
             ) {
                 // If you're logged in and are on the base admin page
-                console.log("-> dashboardInviteId", dashboardInviteId);
-                const isValidInvite = await firebase.validateDashboardInvite(dashboardInviteId)
-                if (!isValidInvite) {
-                    await replace("/")
-                    enqueueSnackbar("This invite link provided is no longer valid", {
-                        variant: "error",
-                        preventDuplicate: true,
-                    })
-                }
+                await handleJoinDashboard()
                 console.log("-> isValidInvite", isValidInvite);
                 return
             }
@@ -129,6 +121,20 @@ const GroupDashboardLayout = (props) => {
     }
 
     const isLoggedIn = () => authenticatedUser.isLoaded && !authenticatedUser.isEmpty
+
+    const handleJoinDashboard = async () => {
+        console.log("-> dashboardInviteId", dashboardInviteId);
+        const isValidInvite = await firebase.validateDashboardInvite(dashboardInviteId)
+        if (!isValidInvite) {
+            await replace("/")
+            enqueueSnackbar("This invite link provided is no longer valid", {
+                variant: "error",
+                preventDuplicate: true,
+            })
+        } else {
+
+        }
+    }
 
 
     const headerLinks = [
