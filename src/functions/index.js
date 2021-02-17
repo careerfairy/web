@@ -88,6 +88,7 @@ exports.addToIndex = functions.firestore.document('careerCenterData/{careerCente
         data.groupId = objectID
         // deletes personal Identifiable data
         delete data.adminEmail
+        delete data.adminEmails
         return groupIndex.saveObject({...data, objectID})
             .then(() => {
                 functions.logger.log('Groups imported into Algolia');
@@ -122,6 +123,7 @@ exports.updateIndex = functions.firestore.document('careerCenterData/{careerCent
         const newData = change.after.data();
         // deletes personal Identifiable data
         delete newData.adminEmail
+        delete newData.adminEmails
 
         const objectID = change.after.id;
         return groupIndex.saveObject({...newData, objectID})

@@ -118,7 +118,7 @@ const CreateGroup = ({firebase}) => {
             const downloadURL = await uploadLogo(baseGroupInfo.logoFileObj)
             const careerCenter = {
                 universityName: baseGroupInfo.universityName,
-                adminEmails: [user.email],
+                adminEmails: baseGroupInfo.adminEmails,
                 logoUrl: downloadURL,
                 description: baseGroupInfo.description,
                 test: false,

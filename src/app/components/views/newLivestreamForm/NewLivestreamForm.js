@@ -291,7 +291,7 @@ const NewLivestreamForm = ({firebase}) => {
     const hasPermissionToEdit = (arrayOfGroups) => {
         return Boolean(
             userData.isAdmin
-            || arrayOfGroups.some(group => group.adminEmail === authenticatedUser?.email
+            || arrayOfGroups.some(group => group.adminEmails.includes(authenticatedUser?.email)
             ))
     }
     const hasPermissionToCreate = () => {
@@ -525,7 +525,6 @@ const NewLivestreamForm = ({firebase}) => {
                                 handleBlur={handleBlur}
                                 values={values}
                                 isSuperAdmin={userData.isAdmin}
-                                adminEmail={userData.userEmail}
                                 isSubmitting={isSubmitting}
                                 selectedGroups={selectedGroups}
                                 setTargetCategories={setTargetCategories}

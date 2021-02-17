@@ -1007,7 +1007,7 @@ class Firebase {
     listenCareerCentersByAdminEmail = (email, callback) => {
         let ref = this.firestore
             .collection("careerCenterData")
-            .where("adminEmail", "==", email);
+            .where("adminEmails", "array-contains", email);
         return ref.onSnapshot(callback);
     };
 

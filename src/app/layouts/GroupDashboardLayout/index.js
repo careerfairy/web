@@ -123,7 +123,6 @@ const GroupDashboardLayout = (props) => {
 
     const isAdmin = () => {
         return userData?.isAdmin
-            || (authenticatedUser?.email === group?.adminEmail)
             || (group?.adminEmails?.includes(authenticatedUser?.email))
     }
 
