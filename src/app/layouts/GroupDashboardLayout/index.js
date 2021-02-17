@@ -83,6 +83,7 @@ const GroupDashboardLayout = (props) => {
         }
     ], [groupId, careerCenterId])
 
+    const roles = useSelector(({firestore}) => firestore.data.admins || {})
     const group = useSelector(state => populate(state.firestore, "group", populates))
 
     if (isLoaded(group) && !isEmpty(group)) {
@@ -217,12 +218,17 @@ const GroupDashboardLayout = (props) => {
             icon: AnalyticsIcon,
             title: 'Analytics'
         },
-        {
+
+    ] : [];
+
+    if (roles?.[authenticatedUser.email]?.role === "mainAdmin") {
+        //Only mainAdmin has access to this button in their nav
+        drawerTopLinks.push({
             href: `/group/${group.id}/admin/roles`,
             icon: RolesIcon,
             title: 'Roles'
-        }
-    ] : [];
+        })
+    }
 
     if (authenticatedUser?.emailVerified) {
         headerLinks.push({

@@ -18,7 +18,6 @@ const useStyles = makeStyles(theme => ({
 const RolesOverview = ({firebase, group}) => {
 
     const classes = useStyles()
-    const firestore = useSelector(state => state.firestore)
     const [showAddMemberModal, setShowAddMemberModal] = useState(false);
     const openAddMemberModal = () => {
         setShowAddMemberModal(true)

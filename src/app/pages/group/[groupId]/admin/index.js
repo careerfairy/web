@@ -1,5 +1,4 @@
-import React, {useEffect} from "react";
-import {useRouter} from "next/router";
+import React from "react";
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout";
 import Page from "../../../../components/page";
 
