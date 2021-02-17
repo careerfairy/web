@@ -101,6 +101,7 @@ const GroupDashboardLayout = (props) => {
                 })
                 return
             }
+
             if (
                 pathname === "/group/[groupId]/admin"
                 && dashboardInviteId
@@ -114,6 +115,10 @@ const GroupDashboardLayout = (props) => {
             if (unAuthorized()) {
                 console.log("-> dashboardInviteId in unauthorized", dashboardInviteId);
                 replace("/");
+                return
+            }
+            if (pathname === "/group/[groupId]/admin") {
+                await replace(`/group/${group.id}/admin/analytics`)
             }
         })()
     }, [group, authenticatedUser, userData, pathname]);
@@ -151,7 +156,7 @@ const GroupDashboardLayout = (props) => {
                 // console.log("-> userData.userEmail", userData.userEmail);
                 // console.log("-> dashboardInviteId", dashboardInviteId);
                 await firebase.joinGroupDashboard(group.id, userData.userEmail, dashboardInviteId)
-                await push(`/group/${group.id}/admin/analytics`)
+                await replace(`/group/${group.id}/admin/analytics`)
                 enqueueSnackbar(`Congrats, you are now an admin of ${group.universityName}`, {
                     variant: "success",
                     preventDuplicate: true,
