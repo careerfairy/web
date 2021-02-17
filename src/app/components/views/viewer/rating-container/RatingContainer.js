@@ -9,6 +9,9 @@ import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import {Formik} from "formik";
 import FormControl from "@material-ui/core/FormControl";
+import CloseIcon from "@material-ui/icons/Close";
+import IconButton from "@material-ui/core/IconButton";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     snackbar: {
@@ -16,7 +19,8 @@ const useStyles = makeStyles((theme) => ({
         alignItems: "flex-start",
         "& #notistack-snackbar": {
             paddingLeft: theme.spacing(2)
-        }
+        },
+        maxWidth: 350
     },
     action: {
         display: "flex",
@@ -25,6 +29,9 @@ const useStyles = makeStyles((theme) => ({
     button: {
         marginBottom: theme.spacing(2.5),
         marginTop: theme.spacing(1)
+    },
+    submitButton: {
+        marginRight: theme.spacing(0.5)
     },
     input: {
         marginBottom: theme.spacing(1),
@@ -36,9 +43,9 @@ const useStyles = makeStyles((theme) => ({
     stars: {
         marginBottom: theme.spacing(1)
     },
-    emptyIcon:{
+    emptyIcon: {
         // color: fade(theme.palette.background.default, 0.5)
-    }
+    },
 }));
 
 const ActionComponent = ({
@@ -65,6 +72,17 @@ const ActionComponent = ({
         setSubmitting(false)
         closeSnackbar(ratingId);
     };
+
+    const handleDismiss = async (setSubmitting) => {
+        setSubmitting(true)
+        try {
+            await firebase.optOutOfRating(livestreamId, email, ratingId);
+        } catch (e) {
+        }
+        setSubmitting(false)
+        closeSnackbar(ratingId);
+    }
+
     return (
         <Formik
             autoComplete="off"
@@ -102,7 +120,7 @@ const ActionComponent = ({
                                 className={classes.stars}
                                 disabled={isSubmitting}
                                 max={5}
-                                classes={{iconEmpty:classes.emptyIcon}}
+                                classes={{iconEmpty: classes.emptyIcon}}
                                 onChange={async (e) => {
                                     handleChange(e)
                                     if (!hasText) {
@@ -144,19 +162,29 @@ const ActionComponent = ({
                                 sm={12}
                                 xs={12}
                                 item
+                                className={classes.actionItems}
                             >
+                                <Button
+                                    disabled={isSubmitting}
+                                    onClick={() => handleDismiss(setSubmitting)}
+                                    className={classes.button}
+                                >
+                                    Cancel
+                                </Button>
                                 <Button
                                     color="primary"
                                     disabled={isSubmitting}
                                     onClick={handleSubmit}
                                     variant="contained"
-                                    className={classes.button}
+                                    className={clsx(classes.button, classes.submitButton)}
                                 >
                                     Submit
                                 </Button>
                             </Grid>
+
                         </>
                     ) : null}
+
                 </Grid>)}
         </Formik>
 
