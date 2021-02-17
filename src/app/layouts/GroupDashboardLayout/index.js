@@ -15,9 +15,10 @@ import {
     User as ProfileIcon,
     Users as RolesIcon
 } from "react-feather";
-import {useFirestoreConnect, populate} from "react-redux-firebase";
+import {useFirestoreConnect, populate, isLoaded, isEmpty} from "react-redux-firebase";
 import {useSelector} from "react-redux";
 import {useSnackbar} from "notistack";
+import {GENERAL_ERROR} from "../../components/util/constants";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -55,11 +56,13 @@ const useStyles = makeStyles((theme) => ({
 const GroupDashboardLayout = (props) => {
     const {children, firebase} = props
     const classes = useStyles();
-    const {query: {groupId, careerCenterId, dashboardInviteId}, pathname, replace} = useRouter()
+    const {query: {groupId, careerCenterId, dashboardInviteId}, pathname, replace, push} = useRouter()
     const {enqueueSnackbar} = useSnackbar()
     const [notifications, setNotifications] = useState([]);
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
+    const [joiningGroup, setJoiningGroup] = useState(false);
     const {userData, authenticatedUser} = useAuth()
+    console.log("-> userData", userData);
 
     const populates = [
         {child: 'adminEmails', root: 'userData', childAlias: 'admins'} // replace owner with user object
@@ -75,21 +78,29 @@ const GroupDashboardLayout = (props) => {
             collection: `careerCenterData`,
             doc: groupId || careerCenterId,
             subcollections: [{
-                collection: "roles",
+                collection: "admins",
             }],
-            storeAs: "roles",
+            storeAs: "admins",
         }
     ], [groupId, careerCenterId])
-    console.log("-> layout");
-    const group = useSelector(state => populate(state.firestore, "group", populates) || {})
+    const group = useSelector(state => populate(state.firestore, "group", populates))
+    console.log("-> isLoaded(group)", isLoaded(group));
+    console.log("-> isEmpty(group)", isEmpty(group));
 
-
-    if (!isEmptyObject(group)) {
+    if (isLoaded(group) && !isEmpty(group)) {
         group.id = groupId || careerCenterId
     }
 
     useEffect(() => {
         (async function () {
+            if (isEmpty(group) && isLoaded(group)) {
+                await replace("/");
+                enqueueSnackbar("The page you tried to visit is invalid", {
+                    variant: "error",
+                    preventDuplicate: true,
+                })
+                return
+            }
             if (
                 pathname === "/group/[groupId]/admin"
                 && dashboardInviteId
@@ -98,7 +109,6 @@ const GroupDashboardLayout = (props) => {
             ) {
                 // If you're logged in and are on the base admin page
                 await handleJoinDashboard()
-                console.log("-> isValidInvite", isValidInvite);
                 return
             }
             if (unAuthorized()) {
@@ -106,7 +116,7 @@ const GroupDashboardLayout = (props) => {
                 replace("/");
             }
         })()
-    }, [group, authenticatedUser, userData, pathname, dashboardInviteId]);
+    }, [group, authenticatedUser, userData, pathname]);
 
     const isAdmin = () => {
         return userData?.isAdmin
@@ -116,24 +126,47 @@ const GroupDashboardLayout = (props) => {
 
     const unAuthorized = () => {
         return Boolean(
-            (!isEmptyObject(group) && authenticatedUser.isLoaded && userData) && !isAdmin()
+            ((isLoaded(group) && authenticatedUser.isLoaded && userData) && !isAdmin())
+            || (isLoaded(group) && isEmpty(group))
         )
     }
 
     const isLoggedIn = () => authenticatedUser.isLoaded && !authenticatedUser.isEmpty
 
     const handleJoinDashboard = async () => {
-        console.log("-> dashboardInviteId", dashboardInviteId);
-        const isValidInvite = await firebase.validateDashboardInvite(dashboardInviteId)
-        if (!isValidInvite) {
-            await replace("/")
-            enqueueSnackbar("This invite link provided is no longer valid", {
-                variant: "error",
-                preventDuplicate: true,
-            })
-        } else {
+        try {
+            if (joiningGroup) return
+            const isValidInvite = await firebase.validateDashboardInvite(dashboardInviteId, group.id)
+            console.log("-> isValidInvite", isValidInvite);
+            if (!isValidInvite) {
+                await replace("/")
+                enqueueSnackbar("This invite link provided is no longer valid", {
+                    variant: "error",
+                    preventDuplicate: true,
+                })
+            } else {
+                setJoiningGroup(true)
+                console.log("-> in success");
+                // console.log("-> group.id", group.id);
+                // console.log("-> userData.userEmail", userData.userEmail);
+                // console.log("-> dashboardInviteId", dashboardInviteId);
+                await firebase.joinGroupDashboard(group.id, userData.userEmail, dashboardInviteId)
+                await push(`/group/${group.id}/admin/analytics`)
+                enqueueSnackbar(`Congrats, you are now an admin of ${group.universityName}`, {
+                    variant: "success",
+                    preventDuplicate: true,
+                })
 
+            }
+
+        } catch (error) {
+            console.error("-> error", error);
+            enqueueSnackbar(GENERAL_ERROR, {
+                preventDuplicate: true,
+                variant: "error",
+            })
         }
+        setJoiningGroup(false)
     }
 
 
@@ -163,7 +196,7 @@ const GroupDashboardLayout = (props) => {
         }
     ]
 
-    const drawerTopLinks = [
+    const drawerTopLinks = (isLoaded(group) && !isEmpty(group)) ? [
         {
             href: `/group/${group.id}/admin/upcoming-livestreams`,
             icon: StreamIcon,
@@ -194,7 +227,7 @@ const GroupDashboardLayout = (props) => {
             icon: RolesIcon,
             title: 'Roles'
         }
-    ];
+    ] : [];
 
     if (authenticatedUser?.emailVerified) {
         headerLinks.push({
@@ -216,18 +249,18 @@ const GroupDashboardLayout = (props) => {
                 setNotifications={setNotifications}
                 onMobileNavOpen={() => setMobileNavOpen(true)}
             />
-            <NavBar
+            {(isLoaded(group) && !isEmpty(group)) && <NavBar
                 drawerTopLinks={drawerTopLinks}
                 drawerBottomLinks={drawerBottomLinks}
                 headerLinks={headerLinks}
                 group={group}
                 onMobileClose={() => setMobileNavOpen(false)}
                 openMobile={isMobileNavOpen}
-            />
+            />}
             <div className={classes.wrapper}>
                 <div className={classes.contentContainer}>
                     <div className={classes.content}>
-                        {!isEmptyObject(group) && React.cloneElement(children, {
+                        {(isLoaded(group) && !isEmpty(group)) && React.cloneElement(children, {
                             notifications,
                             isAdmin: isAdmin(),
                             setNotifications,

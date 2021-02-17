@@ -37,7 +37,7 @@ const MembersTable = ({
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const [data, setData] = useState([]);
-    const roles = useSelector(({firestore}) => firestore.data.roles || {})
+    const roles = useSelector(({firestore}) => firestore.data.admins || {})
     console.log("-> roles", roles);
 
 
@@ -54,10 +54,10 @@ const MembersTable = ({
     const getRoleLookup = () => {
         const roleOptions = {};
         const convertCamelToSentence = (string) => {
-            return string.replace( /([A-Z])/g, " $1" )
-                .charAt(0).toUpperCase()
+            return string.replace(/([A-Z])/g, " $1")
+                    .charAt(0).toUpperCase()
                 +
-                string.replace( /([A-Z])/g, " $1" )
+                string.replace(/([A-Z])/g, " $1")
                     .slice(1)
         }
         data.forEach(admin => {
@@ -78,7 +78,7 @@ const MembersTable = ({
             sorting: false,
             filtering: false,
             render: rowData => <Avatar src={rowData.avatarUrl} alt={`${rowData.firstName}'s Avatar`}>
-                {`${rowData.firstName[0] + rowData.lastName[0]}`}
+                {rowData.firstName ? `${rowData.firstName[0] + rowData.lastName[0]}` : ""}
             </Avatar>
 
         },

@@ -1630,6 +1630,41 @@ class Firebase {
         return dataArray
     }
 
+    //Dashboard Queries
+
+    joinGroupDashboard = (groupId, userEmail, invitationId) => {
+        let groupRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+
+        let userRef = this.firestore
+            .collection("userData")
+            .doc(userEmail)
+
+        let notificationRef = this.firestore
+            .collection("notifications")
+            .doc(invitationId)
+
+        return this.firestore.runTransaction((transaction) => {
+            return transaction.get(userRef).then((userDoc) => {
+                const userData = userDoc.data()
+                transaction.update(groupRef, {
+                    adminEmails: firebase.firestore.FieldValue.arrayUnion(userData.userEmail),
+                });
+                let groupAdminRef = this.firestore
+                    .collection("careerCenterData")
+                    .doc(groupId)
+                    .collection("admins")
+                    .doc(userData.userEmail)
+                transaction.set(groupAdminRef, {
+                    role: "subAdmin",
+                });
+
+                transaction.delete(notificationRef)
+            });
+        });
+    }
+
     // Notification Queries
     createNotification = async (notification, options = {force: false}) => {
         const prevNotification = await this.checkForNotification(
@@ -1658,7 +1693,7 @@ class Firebase {
         return {id: notificationId}
     }
 
-    validateDashboardInvite = async (notificationId) => {
+    validateDashboardInvite = async (notificationId, groupId) => {
         let ref = this.firestore.collection("notifications")
             .doc(notificationId)
         const refSnap = await ref.get()
@@ -1666,7 +1701,7 @@ class Firebase {
             return false
         }
         const notification = refSnap.data()
-        return notification.type === "dashboardInvite" && notification.open
+        return notification.type === "dashboardInvite" && notification.open && notification.requester === groupId
     }
 
     getNotification = (notificationId) => {
