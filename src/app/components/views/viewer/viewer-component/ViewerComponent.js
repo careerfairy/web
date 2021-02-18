@@ -7,11 +7,12 @@ import useDevices from 'components/custom-hook/useDevices';
 import useMediaSources from 'components/custom-hook/useMediaSources';
 import VideoControlsContainer from 'components/views/streaming/video-container/VideoControlsContainer';
 import {useAuth} from 'HOCs/AuthProvider';
-import {v4 as uuidv4} from 'uuid';
 import {makeStyles} from "@material-ui/core/styles";
 import SettingsModal from "../../streaming/video-container/SettingsModal";
 import {Typography} from '@material-ui/core';
 import ScreenShareModal from "../../streaming/video-container/ScreenShareModal";
+import LoadingModal from 'components/views/streaming/modal/LoadingModal';
+import ErrorModal from 'components/views/streaming/modal/ErrorModal';
 
 const useStyles = makeStyles(theme => ({
     waitingOverlay: {
@@ -38,7 +39,6 @@ const useStyles = makeStyles(theme => ({
 function ViewerComponent(props) {
     const classes = useStyles()
     const [showSettings, setShowSettings] = useState(false);
-    const [streamerId, setStreamerId] = useState(null);
     const [showScreenShareModal, setShowScreenShareModal] = useState(false);
     const [optimizationMode, setOptimizationMode] = useState("detail");
 
@@ -49,18 +49,18 @@ function ViewerComponent(props) {
     const screenSharingMode = (props.currentLivestream.screenSharerId === authenticatedUser?.email &&
         props.currentLivestream.mode === 'desktop') ? optimizationMode : "";
 
-    const {externalMediaStreams, localMediaStream, agoraStatus} =
+    const {externalMediaStreams, localMediaStream, agoraRtcStatus, agoraRtmStatus} =
         useAgoraAsStreamer(
             streamerReady,
             !props.handRaiseActive,
             'localVideo',
             screenSharingMode,
             props.livestreamId,
-            streamerId,
+            props.streamerId,
             true
         );
 
-    const devices = useDevices(agoraStatus === "stream_published");
+    const devices = useDevices(agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED");
 
     const {
         audioSource,
@@ -74,17 +74,7 @@ function ViewerComponent(props) {
     } = useMediaSources(devices, authenticatedUser?.email, localMediaStream, !streamerReady || showSettings);
 
     useEffect(() => {
-        if (props.currentLivestream) {
-            if (props.currentLivestream.test) {
-                setStreamerId(uuidv4());
-            } else if (authenticatedUser?.email) {
-                setStreamerId(authenticatedUser.email)
-            }
-        }
-    }, [props.currentLivestream, authenticatedUser])
-
-    useEffect(() => {
-        if (props.handRaiseActive && agoraStatus === 'stream-published') {
+        if (props.handRaiseActive && agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED") {
             if (props.currentLivestream) {
                 if (props.currentLivestream.test) {
                     props.firebase.updateHandRaiseRequest(props.currentLivestream.id, 'streamerEmail', "connected");
@@ -93,7 +83,7 @@ function ViewerComponent(props) {
                 }
             }
         }
-    }, [agoraStatus])
+    }, [agoraRtcStatus])
 
 
     const attachSinkId = (element, sinkId) => {
@@ -185,6 +175,8 @@ function ViewerComponent(props) {
                     handleClose={handleCloseScreenShareModal}
                     handleScreenShare={handleScreenShare}
                 />
+                <LoadingModal agoraRtcStatus={agoraRtcStatus} />
+                <ErrorModal agoraRtcStatus={agoraRtcStatus} agoraRtmStatus={agoraRtmStatus} />
             </Fragment>
             }
 

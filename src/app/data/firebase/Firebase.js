@@ -1,4 +1,5 @@
 import firebase from '../../Firebase/Firebase';
+import {v4 as uuidv4} from 'uuid';
 
 // import firebase from "firebase/app";
 // import "firebase/auth";
@@ -315,6 +316,18 @@ class Firebase {
             livestream.id = livestreamsRef.id
             batch.set(livestreamsRef, livestream, {merge: true})
 
+            if (collection === 'livestreams') {
+                let tokenRef = this.firestore.collection(collection)
+                .doc(livestreamsRef.id)
+                .collection('tokens')
+                .doc('secureToken');
+            
+                let token = uuidv4();
+                batch.set(tokenRef, {
+                    value: token,
+                })
+            }
+            
             for (const rating of ratings) {
                 let ratingRef = this.firestore.collection(collection)
                     .doc(livestreamsRef.id)
@@ -735,6 +748,15 @@ class Firebase {
             .collection("speakers");
         return ref.get();
     };
+
+    getLivestreamSecureToken = (livestreamId) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("tokens")
+            .doc("secureToken");
+        return ref.get();
+    }
 
     getLegacyScheduledLivestreamById = (livestreamId) => {
         let ref = this.firestore

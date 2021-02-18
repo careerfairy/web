@@ -45,17 +45,6 @@ function CompanyWatchPage(props) {
         );
     })
 
-    let meetFooter = null;
-    if (props.company.companyId === 'Axpo') {
-        meetFooter = 
-            <Container textAlign="center" className="titleFooter dark" onClick={() => props.fullpageApi.moveSectionDown()}>
-                <p id='footer'>
-                    Read {props.company.name }
-                </p>
-                <Icon name='angle down' size='big' id='footer_icon'/>
-            </Container>;
-    }
-
     return (
         <div className='paddingContainer'>
             <Container>
@@ -80,7 +69,6 @@ function CompanyWatchPage(props) {
                     }
                 `}</style>
             </Container>
-            {meetFooter}
         </div>
     );
 }

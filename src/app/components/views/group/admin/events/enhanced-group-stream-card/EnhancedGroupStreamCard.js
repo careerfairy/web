@@ -33,6 +33,7 @@ import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSur
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import {copyStringToClipboard} from "../../../../../helperFunctions/HelperFunctions";
 import {useAuth} from "../../../../../../HOCs/AuthProvider";
+import StreamerLinksDialog from './StreamerLinksDialog';
 
 const useStyles = makeStyles(theme => {
     const themeWhite = theme.palette.common.white
@@ -77,6 +78,7 @@ const EnhancedGroupStreamCard = ({
     const [deletingStream, setDeletingStream] = useState(false);
     const [openAreYouSureModal, setOpenAreYouSureModal] = useState(false);
     const [startDownloadingReport, setStartDownloadingReport] = useState(false);
+    const [openStreamerLinksDialog, setOpenStreamerLinksDialog] = useState(false);
     const {
         hasDownloadedReport,
         questions,
@@ -313,7 +315,17 @@ const EnhancedGroupStreamCard = ({
                 >
                     {isDraft ? "Edit Draft" : "Edit Stream"}
                 </Button>
-
+                {!isDraft &&
+                <Button
+                    className={classes.button}
+                    fullWidth
+                    onClick={() => setOpenStreamerLinksDialog(true)}
+                    startIcon={<ShareIcon/>}
+                    variant='outlined'
+                >
+                    Get Streamer Links
+                </Button>}
+                <StreamerLinksDialog livestreamId={livestream.id} openDialog={openStreamerLinksDialog} setOpenDialog={setOpenStreamerLinksDialog}/>
                 {isCareerCenter() || userData?.isAdmin &&
                 <CSVLink data={registeredStudentsFromGroup} separator={";"}
                          filename={'Registered Students ' + livestream.company + ' ' + livestream.id + '.csv'}
@@ -356,16 +368,16 @@ const EnhancedGroupStreamCard = ({
                             <PDFDownloadLink fileName={`General Report ${livestream.company} ${livestream.id}.pdf`}
                                              document={
                                                  <LivestreamPdfReport group={group}
-                                                                      livestream={livestream}
-                                                                      studentStats={studentStats}
-                                                                      speakers={livestream.speakers}
-                                                                      overallRating={overallRating}
-                                                                      contentRating={contentRating}
-                                                                      totalStudentsInTalentPool={talentPoolForReport.length}
-                                                                      totalViewerFromOutsideETH={participatingStudents.length - participatingStudentsFromGroup.length}
-                                                                      totalViewerFromETH={participatingStudentsFromGroup.length}
-                                                                      questions={questions} polls={polls}
-                                                                      icons={icons}/>}>
+                                                    livestream={livestream}
+                                                    studentStats={studentStats}
+                                                    speakers={livestream.speakers}
+                                                    overallRating={overallRating}
+                                                    contentRating={contentRating}
+                                                    totalStudentsInTalentPool={talentPoolForReport.length}
+                                                    totalViewerFromOutsideETH={participatingStudents.length - participatingStudentsFromGroup.length}
+                                                    totalViewerFromETH={participatingStudentsFromGroup.length}
+                                                    questions={questions} polls={polls}
+                                                    icons={icons}/>}>
                                 {({blob, url, loading, error}) => (
                                     <div>
                                         <Button className={classes.button} fullWidth variant='outlined' color='primary'>Download
