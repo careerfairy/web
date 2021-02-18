@@ -96,6 +96,8 @@ function StreamingPage(props) {
     const router = useRouter();
     const mobile = useMediaQuery(theme.breakpoints.down('md'))
     const livestreamId = router.query.livestreamId;
+    const token = router.query.token;
+
     const [streamerId, setStreamerId] = useState(null)
 
     const [streamerReady, setStreamerReady] = useState(false);
@@ -151,6 +153,24 @@ function StreamingPage(props) {
             }, 1000)
         }
     }, [currentLivestream.start]);
+
+    useEffect(() => {
+        if (router && router.query && currentLivestream && !currentLivestream.test) {
+            if (!token) {
+                router.push('/streaming/error')
+            } else {
+                props.firebase.getLivestreamSecureToken(currentLivestream.id).then( doc => {
+                    if (!doc.exists) {
+                        router.push('/streaming/error')
+                    }
+                    let storedToken = doc.data().value;
+                    if (storedToken !== token) {
+                        router.push('/streaming/error')
+                    }
+                })
+            }
+        }
+    }, [router, token, currentLivestream]);
 
     function dateIsInUnder2Minutes(date) {
         return new Date(date).getTime() - Date.now() < 1000 * 60 * 2 || Date.now() > new Date(date).getTime();

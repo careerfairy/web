@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from 'axios';
+import { useSnackbar } from "notistack";
 
-export function useAgoraToken(roomId, uid, isStreamer, isScreenShareToken) {
+export function useAgoraToken(roomId, uid, isStreamer, securityToken, isScreenShareToken) {
 
     const [agoraToken, setAgoraToken] = useState(null);
+    const { enqueueSnackbar } = useSnackbar();
   
     useEffect(() => {
         if (roomId && uid) { 
@@ -12,15 +14,25 @@ export function useAgoraToken(roomId, uid, isStreamer, isScreenShareToken) {
                 data: {
                     isStreamer: isStreamer,
                     uid: isScreenShareToken ? uid + 'screen' : uid,
-                    channel: roomId,
+                    token: securityToken,
+                    channel: roomId
                 },
-                url: `https://us-central1-careerfairy-e1fd9.cloudfunctions.net/generateAgoraToken`,
+                url: `https://us-central1-careerfairy-e1fd9.cloudfunctions.net/generateAgoraTokenSecure`,
             }).then( response => { 
                     console.log(response);
                     if (response.data) {
                         setAgoraToken(response.data);
                     }
                 }).catch(error => {
+                    enqueueSnackbar("Invalid streamer link", {
+                        variant: 'error',
+                        preventDuplicate: true,
+                        anchorOrigin: {
+                            vertical: 'bottom',
+                            horizontal: 'center',
+                        },
+                        persist: true
+                    })
                     console.log(error);
             });
         }
