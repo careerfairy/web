@@ -11,7 +11,10 @@ import {
     Switch,
     TextField,
     Tooltip,
-    Typography
+    Typography,
+    Fab,
+    ButtonGroup,
+    Box,
 } from "@material-ui/core";
 import {Formik} from 'formik';
 import {v4 as uuidv4} from 'uuid';
@@ -26,7 +29,6 @@ import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
 import {useRouter} from "next/router";
 import FormGroup from "./FormGroup";
 import WarningIcon from '@material-ui/icons/Warning';
-import Fab from "@material-ui/core/Fab";
 import {
     getStreamSubCollectionSpeakers,
     handleAddSpeaker,
@@ -38,10 +40,8 @@ import {
 } from "../../helperFunctions/streamFormFunctions";
 import {copyStringToClipboard} from "../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
 import {SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../../util/constants";
 import {LanguageSelect} from "../../helperFunctions/streamFormFunctions/components";
-import Box from "@material-ui/core/Box";
 import {useAuth} from "../../../HOCs/AuthProvider";
 
 
@@ -164,14 +164,15 @@ const DraftStreamForm = ({
             }))
 
             let selectedGroups = []
-            draftStreamGroupIds.forEach((id) => {
+            const targetSelectedGroupIds = [...new Set([...UrlIds, ...draftStreamGroupIds])]
+            targetSelectedGroupIds.forEach((id) => {
                 const targetGroup = totalFlattenedGroups.find(flattenedGroup => flattenedGroup.groupId === id)
                 if (targetGroup) {
                     targetGroup.selected = true
                     selectedGroups.push(targetGroup)
                 }
             })
-            if(!selectedGroups.length && group?.id){
+            if (!selectedGroups.length && group?.id) {
                 selectedGroups.push({
                     ...group,
                     flattenedOptions: handleFlattenOptions(group),
@@ -253,7 +254,9 @@ const DraftStreamForm = ({
     }
 
     const handleSetOnlyUrlIds = async () => {
+        console.log("-> in the handle set only");
         const arrayOfUrlIds = careerCenterIds?.split(",") || [group.id]
+        console.log("-> arrayOfUrlIds", arrayOfUrlIds);
         await handleSetGroupIds(arrayOfUrlIds, [], formData)
     }
 

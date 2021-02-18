@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {makeStyles} from '@material-ui/core';
+import {makeStyles} from '@material-ui/core/styles';
 import NavBar from './NavBar';
 import TopBar from './TopBar';
 import {useRouter} from "next/router";

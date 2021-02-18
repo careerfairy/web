@@ -1,4 +1,4 @@
-import {Fragment, useEffect, useState} from 'react';
+import React, {Fragment, useCallback, useEffect, useState} from 'react';
 import {withFirebasePage} from 'context/firebase';
 import useAgoraAsStreamer from 'components/custom-hook/useAgoraAsStreamer';
 import CurrentSpeakerDisplayer from 'components/views/streaming/video-container/CurrentSpeakerDisplayer';
@@ -6,11 +6,12 @@ import SmallStreamerVideoDisplayer from 'components/views/streaming/video-contai
 import useDevices from 'components/custom-hook/useDevices';
 import useMediaSources from 'components/custom-hook/useMediaSources';
 import VideoControlsContainer from 'components/views/streaming/video-container/VideoControlsContainer';
-import SettingsModal from 'components/views/streaming/video-container/SettingsModal';
 import {useAuth} from 'HOCs/AuthProvider';
 import {v4 as uuidv4} from 'uuid';
 import {makeStyles} from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
+import SettingsModal from "../../streaming/video-container/SettingsModal";
+import {Typography} from '@material-ui/core';
+import ScreenShareModal from "../../streaming/video-container/ScreenShareModal";
 
 const useStyles = makeStyles(theme => ({
     waitingOverlay: {
@@ -38,12 +39,16 @@ function ViewerComponent(props) {
     const classes = useStyles()
     const [showSettings, setShowSettings] = useState(false);
     const [streamerId, setStreamerId] = useState(null);
+    const [showScreenShareModal, setShowScreenShareModal] = useState(false);
+    const [optimizationMode, setOptimizationMode] = useState("detail");
+
     const {userData, authenticatedUser} = useAuth();
 
     const streamerReady = true;
 
-    const screenSharingMode = props.currentLivestream.screenSharerId === authenticatedUser?.email &&
-        props.currentLivestream.mode === 'desktop';
+    const screenSharingMode = (props.currentLivestream.screenSharerId === authenticatedUser?.email &&
+        props.currentLivestream.mode === 'desktop') ? optimizationMode : "";
+
     const {externalMediaStreams, localMediaStream, agoraStatus} =
         useAgoraAsStreamer(
             streamerReady,
@@ -117,6 +122,22 @@ function ViewerComponent(props) {
 
     const shareDesktopOrSlides = () => (props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop')
 
+    const handleCloseScreenShareModal = useCallback(() => {
+        setShowScreenShareModal(false)
+    }, [])
+
+    const handleClickScreenShareButton = async () => {
+        if (props.currentLivestream.mode === "desktop") {
+            return await setDesktopMode("default", authenticatedUser.email)
+        }
+        setShowScreenShareModal(true)
+    }
+
+    const handleScreenShare = useCallback(async (optimizationMode = "detail") => {
+        setOptimizationMode(optimizationMode)
+        await setDesktopMode(props.currentLivestream.mode === "desktop" ? "default" : "desktop", authenticatedUser.email)
+    }, [props.currentLivestream?.mode, optimizationMode, props.streamerId])
+
     if (!props.currentLivestream) {
         return null;
     }
@@ -146,9 +167,9 @@ function ViewerComponent(props) {
                     viewer={true}
                     streamerId={authenticatedUser.email}
                     joining={true}
-                    localMediaStream={localMediaStream} e
+                    localMediaStream={localMediaStream}
+                    handleClickScreenShareButton={handleClickScreenShareButton}
                     isMainStreamer={false}
-                    setDesktopMode={setDesktopMode}
                     showSettings={showSettings}
                     setShowSettings={setShowSettings}
                 />
@@ -159,8 +180,14 @@ function ViewerComponent(props) {
                                videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
                                speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
                                attachSinkId={attachSinkId}/>
+                <ScreenShareModal
+                    open={showScreenShareModal}
+                    handleClose={handleCloseScreenShareModal}
+                    handleScreenShare={handleScreenShare}
+                />
             </Fragment>
             }
+
             {!props.currentLivestream.hasStarted &&
             <div className={classes.waitingOverlay}>
                 <Typography className={classes.waitingText}>

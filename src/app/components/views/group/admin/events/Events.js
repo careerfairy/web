@@ -13,6 +13,7 @@ import {
     Tabs,
     useTheme,
     Zoom,
+    Fab,
 } from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import GroupStreamCardV2 from "../../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2";
@@ -23,7 +24,6 @@ import {
 } from "../../../../helperFunctions/HelperFunctions";
 import AddIcon from "@material-ui/icons/Add";
 import clsx from "clsx";
-import Fab from "@material-ui/core/Fab";
 import {CustomSplitButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import {useSnackbar} from "notistack";
 import {useAuth} from "../../../../../HOCs/AuthProvider";

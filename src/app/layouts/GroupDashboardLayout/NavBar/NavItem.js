@@ -1,11 +1,8 @@
 import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {
-    Button,
-    ListItem,
-    makeStyles
-} from '@material-ui/core';
+import {Button, ListItem,} from '@material-ui/core';
+import {makeStyles} from '@material-ui/core/styles';
 import {useRouter} from "next/router";
 import Link from '../../../materialUI/NextNavLink'
 

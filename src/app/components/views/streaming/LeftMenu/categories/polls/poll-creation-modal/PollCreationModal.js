@@ -9,13 +9,14 @@ import {
     Typography,
     Button,
     Fab,
-    Box, Slide
+    Box,
+    Slide,
+    CircularProgress,
+    DialogActions,
+    TextField,
+    Grow,
 } from '@material-ui/core';
 import {BarChart} from "@material-ui/icons";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import DialogActions from "@material-ui/core/DialogActions";
-import TextField from "@material-ui/core/TextField";
-import Grow from "@material-ui/core/Grow";
 import {GlassDialog} from "../../../../../../../materialUI/GlobalModals";
 
 function PollCreationModal({open, handleClose, livestreamId, initialOptions, initialPoll, firebase}) {

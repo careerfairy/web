@@ -1,6 +1,5 @@
 import React from 'react';
-import {Slide, Snackbar, SnackbarContent} from "@material-ui/core";
-import IconButton from "@material-ui/core/IconButton";
+import { Slide, Snackbar, SnackbarContent, IconButton } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import {makeStyles} from "@material-ui/core/styles";
 

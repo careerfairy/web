@@ -19,13 +19,11 @@ import MulitLineText from "../../components/views/common/MultiLineText";
 import TargetOptions from "../../components/views/NextLivestreams/GroupsCarousel/TargetOptions";
 import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
 import DataAccessUtil from "util/DataAccessUtil";
-import Paper from '@material-ui/core/Paper';
-import Avatar from '@material-ui/core/Avatar';
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../components/util/constants";
 import {useAuth} from "../../HOCs/AuthProvider";
 import GroupsUtil from "../../data/util/GroupsUtil";
-import Box from "@material-ui/core/Box";
+import { Paper, Avatar, Box } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     speakerAvatar: {

@@ -4,14 +4,14 @@ import {useSnackbar} from 'notistack';
 import {Button} from "@material-ui/core";
 import TutorialContext from "../../../../../context/tutorials/TutorialContext";
 
-const StreamSnackBar = ({index, notification}) => {
+const StreamSnackBar = ({ notification}) => {
     const {enqueueSnackbar, closeSnackbar} = useSnackbar();
     const {handleConfirmStep, isOpen} = useContext(TutorialContext);
 
     useEffect(() => {
         enqueueSnackbar(notification.message, {
             variant: "info",
-            persist: true,
+            persist: notification.status !== "connected",
             action,
             key: notification.id,
             preventDuplicate: true

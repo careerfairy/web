@@ -1,8 +1,6 @@
 import React from "react";
-import Tooltip from "@material-ui/core/Tooltip";
 import {makeStyles} from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import {Button} from "@material-ui/core";
+import { Button, Tooltip, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => {
     return {

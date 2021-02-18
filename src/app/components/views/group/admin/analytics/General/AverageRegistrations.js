@@ -1,26 +1,18 @@
 import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {
-    Avatar,
-    Box,
-    Card,
-    CardContent,
-    Grid,
-    LinearProgress,
-    Typography,
-    makeStyles,
-    colors, CircularProgress
-} from '@material-ui/core';
+import {Avatar, Card, CardContent, CircularProgress, Grid, Typography} from '@material-ui/core';
 import InsertChartIcon from '@material-ui/icons/InsertChartOutlined';
 import {withFirebase} from "../../../../../../context/firebase";
+import orange from "@material-ui/core/colors/orange";
+import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(() => ({
     root: {
         height: '100%'
     },
     avatar: {
-        backgroundColor: colors.orange[600],
+        backgroundColor: orange[600],
         height: 56,
         width: 56
     }

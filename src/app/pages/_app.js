@@ -4,7 +4,6 @@ import 'styles.css';
 import FirebaseContext from 'context/firebase/FirebaseContext';
 import Firebase from 'context/firebase';
 import * as Sentry from '@sentry/browser';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import config from 'react-reveal/globals';
 import DateFnsUtils from '@date-io/date-fns';
 import {newStore, wrapper} from '../store';
@@ -15,7 +14,6 @@ import Head from 'next/head';
 import TagManager from 'react-gtm-module'
 import ErrorSnackBar from "../components/views/common/ErrorSnackBar/ErrorSnackBar";
 import ErrorContext from "../context/error/ErrorContext";
-import {SnackbarProvider} from "notistack";
 import TutorialContext from 'context/tutorials/TutorialContext';
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import {AuthProvider} from "../HOCs/AuthProvider";
@@ -23,6 +21,7 @@ import {ReactReduxFirebaseProvider} from 'react-redux-firebase';
 import {createFirestoreInstance} from "redux-firestore";
 import {Provider} from "react-redux";
 import {ThemeProviderWrapper} from "../context/theme/ThemeContext";
+import {CssBaseline} from '@material-ui/core';
 
 
 config({ssrFadeout: true});

@@ -1,22 +1,24 @@
-import IconButton from "@material-ui/core/IconButton";
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import React from "react";
-import {makeStyles} from "@material-ui/core/styles";
-import {fade, useTheme} from "@material-ui/core";
+import {makeStyles, fade, useTheme} from "@material-ui/core/styles";
 import {grey} from "@material-ui/core/colors";
-import Slide from '@material-ui/core/Slide';
-import Button from '@material-ui/core/Button';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Grow from '@material-ui/core/Grow';
-import Paper from '@material-ui/core/Paper';
-import Popper from '@material-ui/core/Popper';
-import MenuItem from '@material-ui/core/MenuItem';
-import MenuList from '@material-ui/core/MenuList';
 import PropTypes from 'prop-types';
-import CircularProgress from "@material-ui/core/CircularProgress";
 import {validateHTMLColor} from 'validate-color';
+
+import {
+    IconButton,
+    Slide,
+    Button,
+    ButtonGroup,
+    ClickAwayListener,
+    Grow,
+    Paper,
+    Popper,
+    MenuItem,
+    MenuList,
+    CircularProgress,
+} from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {

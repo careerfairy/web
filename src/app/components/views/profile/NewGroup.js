@@ -2,16 +2,8 @@ import React, {useState} from "react";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 import EditIcon from "@material-ui/icons/Edit";
 import {withFirebase} from "context/firebase";
-import {
-    Button,
-    Card,
-    CardContent,
-    CardMedia,
-    Typography,
-} from "@material-ui/core";
-import CardActions from "@material-ui/core/CardActions";
+import { Button, Card, CardContent, CardMedia, Typography, CardActions, Grid } from "@material-ui/core";
 import GroupJoinModal from "./GroupJoinModal";
-import Grid from "@material-ui/core/Grid";
 import {Fade} from "react-reveal";
 
 const NewGroup = ({group, userData, makeSix, selected}) => {

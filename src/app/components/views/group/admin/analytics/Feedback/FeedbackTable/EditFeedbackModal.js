@@ -11,13 +11,14 @@ import {
     InputLabel,
     MenuItem,
     Select,
-    TextField, useMediaQuery,
+    TextField,
+    useMediaQuery,
+    Slide,
+    Button,
+    CircularProgress,
+    FormControl,
 } from "@material-ui/core";
-import Slide from "@material-ui/core/Slide";
-import Button from "@material-ui/core/Button";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import {Formik} from "formik";
-import FormControl from "@material-ui/core/FormControl";
 import {withFirebase} from "../../../../../../../context/firebase";
 import {useTheme} from "@material-ui/core/styles";
 import {LONG_NUMBER} from "../../../../../../util/constants";

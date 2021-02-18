@@ -1,8 +1,7 @@
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../../util/constants";
 import React from "react";
-import {Avatar} from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
+import { Avatar, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     streamers: {

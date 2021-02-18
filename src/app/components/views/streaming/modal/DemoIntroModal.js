@@ -1,10 +1,13 @@
 import React, {useState} from 'react';
 import {withFirebase} from "../../../../context/firebase";
-import {Button, DialogContentText} from "@material-ui/core";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import {
+    Button,
+    DialogContentText,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    CircularProgress,
+} from "@material-ui/core";
 import {GlassDialog} from "../../../../materialUI/GlobalModals";
 
 const DemoIntroModal = ({firebase, livestreamId, open, handleClose}) => {

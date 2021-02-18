@@ -3,14 +3,9 @@ import {withFirebasePage} from "context/firebase";
 import {Rating} from "@material-ui/lab";
 import {useSnackbar} from "notistack";
 import {useAuth} from "../../../../HOCs/AuthProvider";
-import {FormHelperText, TextField} from "@material-ui/core";
-import {fade, makeStyles} from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
+import { FormHelperText, TextField, Button, Grid, FormControl } from "@material-ui/core";
+import { makeStyles} from "@material-ui/core/styles";
 import {Formik} from "formik";
-import FormControl from "@material-ui/core/FormControl";
-import CloseIcon from "@material-ui/icons/Close";
-import IconButton from "@material-ui/core/IconButton";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
@@ -31,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(1)
     },
     submitButton: {
-        marginRight: theme.spacing(0.5)
+        marginLeft: theme.spacing(0.5)
     },
     input: {
         marginBottom: theme.spacing(1),

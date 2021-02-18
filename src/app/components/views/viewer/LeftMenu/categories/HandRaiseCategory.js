@@ -6,9 +6,8 @@ import HandRaiseDenied from './hand-raise/active/HandRaiseDenied';
 import HandRaiseConnecting from './hand-raise/active/HandRaiseConnecting';
 import HandRaiseConnected from './hand-raise/active/HandRaiseConnected';
 import HandRaiseInactive from './hand-raise/inactive/HandRaiseInactive';
-import DialogActions from "@material-ui/core/DialogActions";
-import {Button, Typography, useTheme} from "@material-ui/core";
-import DialogContent from "@material-ui/core/DialogContent";
+import { Button, Typography, DialogActions, DialogContent } from "@material-ui/core";
+import {useTheme} from "@material-ui/core/styles";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import {GlassDialog} from "../../../../../materialUI/GlobalModals";
 

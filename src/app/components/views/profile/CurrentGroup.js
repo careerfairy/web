@@ -1,11 +1,20 @@
 import React, {useEffect, useState, Fragment} from 'react'
-import CardActions from '@material-ui/core/CardActions';
 import {useRouter} from 'next/router';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
 import {withFirebase} from 'context/firebase';
-import {Card, CardContent, CardMedia, Typography, Button, Grow, IconButton, Grid} from "@material-ui/core";
+import {
+    Card,
+    CardContent,
+    CardMedia,
+    Typography,
+    Button,
+    Grow,
+    IconButton,
+    Grid,
+    CardActions,
+    Menu,
+    MenuItem,
+} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal";
 import Skeleton from '@material-ui/lab/Skeleton';

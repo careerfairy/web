@@ -1,13 +1,18 @@
 import React, {useState} from 'react';
 import {withFirebase} from "../../../../context/firebase";
-import {Box, Button, DialogContentText, Typography} from "@material-ui/core";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
+import {
+    Box,
+    Button,
+    DialogContentText,
+    Typography,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Grow,
+    Collapse,
+} from "@material-ui/core";
 import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
-import Grow from "@material-ui/core/Grow";
-import Collapse from "@material-ui/core/Collapse";
 import {TooltipHighlight,} from "../../../../materialUI/GlobalTooltips";
 import {GlassDialog} from "../../../../materialUI/GlobalModals";
 

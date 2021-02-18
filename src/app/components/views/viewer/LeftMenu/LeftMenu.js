@@ -1,6 +1,5 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
-import Box from "@material-ui/core/Box";
 import SwipeableViews from "react-swipeable-views";
 import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
 import {Fab} from "@material-ui/core";

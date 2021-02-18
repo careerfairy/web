@@ -2,14 +2,12 @@ import React, {useContext, useEffect, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import HandRaiseElement from './hand-raise-element/HandRaiseElement';
 import NotificationsContext from 'context/notifications/NotificationsContext';
-import Grow from "@material-ui/core/Grow";
 import CloseRoundedIcon from '@material-ui/icons/CloseRounded';
 import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
 
-import {Box, Button, Typography} from "@material-ui/core";
+import { Box, Button, Typography, Grow, Paper } from "@material-ui/core";
 import {CategoryContainerCentered, CategoryContainerTopAligned} from "../../../../../../../materialUI/GlobalContainers";
 import {ThemedPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
-import Paper from "@material-ui/core/Paper";
 import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";
 import {
     TooltipButtonComponent,

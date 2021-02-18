@@ -64,6 +64,7 @@ const AuthProvider = ({children}) => {
 
     const isLoggedOut = () => auth.isLoaded && auth.isEmpty
 
+
     if ((isSecurePath() || isAdminPath()) && !auth.isLoaded) {
         return <Loader/>;
     }

@@ -1,7 +1,8 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {withFirebase} from "../../../context/firebase";
 import GroupsCarousel from "./GroupsCarousel/GroupsCarousel";
-import {useMediaQuery, useTheme} from "@material-ui/core";
+import {useMediaQuery} from "@material-ui/core";
+import {useTheme} from "@material-ui/core/styles";
 import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import MobileFeed from "./MobileFeed";
 import {useRouter} from "next/router";

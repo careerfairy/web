@@ -9,7 +9,6 @@ import ViewerComponent from 'components/views/viewer/viewer-component/ViewerComp
 import IconsContainer from 'components/views/streaming/icons-container/IconsContainer';
 import {useWindowSize} from 'components/custom-hook/useWindowSize';
 import {makeStyles} from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import LeftMenu from "../../../components/views/viewer/LeftMenu/LeftMenu";
 import MiniChatContainer from "../../../components/views/streaming/LeftMenu/categories/chat/MiniChatContainer";
 import EmoteButtons from "../../../components/views/viewer/EmoteButtons";
@@ -17,16 +16,21 @@ import RatingContainer from "../../../components/views/viewer/rating-container/R
 import {useAuth} from 'HOCs/AuthProvider';
 import {useDispatch} from "react-redux";
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
-import {Avatar, Tooltip, useTheme} from "@material-ui/core";
-import Toolbar from "@material-ui/core/Toolbar";
-import AppBar from '@material-ui/core/AppBar';
+import {
+    Avatar,
+    Tooltip,
+    useTheme,
+    Button,
+    Toolbar,
+    AppBar,
+    Box,
+    Backdrop,
+    Checkbox,
+} from "@material-ui/core";
 import {MainLogo} from "../../../components/logos";
-import Box from "@material-ui/core/Box";
-import Backdrop from '@material-ui/core/Backdrop';
 import Brightness4Icon from '@material-ui/icons/Brightness4';
 import Brightness7Icon from '@material-ui/icons/Brightness7';
 import clsx from "clsx";
-import Checkbox from '@material-ui/core/Checkbox';
 import {logoPlaceholder} from "../../../components/util/constants";
 
 const useStyles = makeStyles((theme) => ({

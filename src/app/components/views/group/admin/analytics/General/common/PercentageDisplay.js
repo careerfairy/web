@@ -1,15 +1,17 @@
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {Box, colors, LinearProgress, Typography} from "@material-ui/core";
+import {Box, LinearProgress, Typography} from "@material-ui/core";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
+import red from "@material-ui/core/colors/red";
+import green from "@material-ui/core/colors/green";
 
 const useStyles = makeStyles(theme => ({
     differenceIcon: {
-        color: ({positive}) => positive ? colors.green[900] : colors.red[900]
+        color: ({positive}) => positive ? green[900] : red[900]
     },
     differenceValue: {
-        color: ({positive}) => positive ? colors.green[900] : colors.red[900],
+        color: ({positive}) => positive ? green[900] : red[900],
         marginRight: theme.spacing(1)
     }
 }));

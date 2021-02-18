@@ -5,7 +5,7 @@ import {useDispatch} from "react-redux";
 import {EMOTE_MESSAGE_TEXT_TYPE} from "../util/constants";
 import * as actions from '../../store/actions'
 
-export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer) {
+export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, screenSharingMode, roomId, streamId, isViewer, optimizationMode) {
 
     const dispatch = useDispatch()
     const [localMediaStream, setLocalMediaStream] = useState(null);
@@ -220,7 +220,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                 setRemovedStream(streamId);
             }
         });
-
+        
         let localStream = null;
         rtcClient.on("client-role-changed", function (evt) {
             let role = evt.role;
@@ -438,7 +438,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                 video: false,
                 screen: true,
                 screenAudio: true,
-                //optimizationMode: 'motion'
+                optimizationMode: screenSharingMode
             });
 
             screenShareStream.setVideoProfile("480p_9");
@@ -643,5 +643,14 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         }
     };
 
-    return {localMediaStream, externalMediaStreams, agoraRtcStatus, setAgoraRtcStatus, agoraRtmStatus, setAgoraRtmStatus, networkQuality, numberOfViewers, setAddedStream, setRemovedStream};
+    return {
+        localMediaStream,
+        externalMediaStreams,
+        agoraRtcStatus,
+        agoraRtmStatus,
+        networkQuality,
+        numberOfViewers,
+        setAddedStream,
+        setRemovedStream
+    };
 }

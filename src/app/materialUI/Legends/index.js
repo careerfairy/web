@@ -1,9 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import {Checkbox, Collapse, List, ListItem, Slide} from "@material-ui/core";
+import { Checkbox, Collapse, List, ListItem, Slide, ListItemIcon, ListItemText } from "@material-ui/core";
 import {colorsArray} from "../../components/util/colors";
-import ListItemText from "@material-ui/core/ListItemText";
 import {TransitionGroup} from "react-transition-group";
 
 const useStyles = makeStyles(theme => ({
