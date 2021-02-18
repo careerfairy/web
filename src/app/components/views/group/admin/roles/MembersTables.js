@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Avatar, Badge, Box, Card, Typography} from '@material-ui/core';
+import {Avatar, Badge, Box, Card, Container, Typography} from '@material-ui/core';
 import MaterialTable from "material-table";
 import {makeStyles} from "@material-ui/core/styles";
 import {defaultTableOptions, tableIcons} from "../../../../util/tableUtils";
@@ -9,6 +9,7 @@ import {useSelector} from "react-redux";
 import {exportSelectionAction} from "../analytics/common/TableUtils";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import {convertCamelToSentence} from "../../../../helperFunctions/HelperFunctions";
+import AreYouSureModal from "../../../../../materialUI/GlobalModals/AreYouSureModal";
 
 
 const customOptions = {...defaultTableOptions}
@@ -63,27 +64,30 @@ const AdminBadge = ({badgeContent, ...props}) =>
 const MembersTable = ({
                           group,
                           openAddMemberModal,
-                          handleKickAdmin,
+                          handleCloseAreYouSureModal,
                           loading,
-                          handleMakeAdmin,
+                          handleClickKickButton,
+                          handleClickPromoteButton,
+                          handleConfirm,
+                          areYouSureModalOpen,
+                          areYouSureModalMessage,
                           className,
                           ...rest
                       }) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const [data, setData] = useState([]);
+    console.log("-> data", data);
     const {authenticatedUser} = useAuth()
+
     const adminRoles = useSelector(({firestore}) => firestore.data.adminRoles)
     const userRole = useSelector(({firestore}) => firestore.data.userRole || {})
-
     useEffect(() => {
         if (group.admins?.length) {
             const newData = group?.admins?.map(userData => {
                 let newUserData = {...userData, displayName: `${userData.firstName} ${userData.lastName}`}
-                const userRole = adminRoles?.[userData.userEmail]
-                if (userRole) {
-                    newUserData = {...newUserData, ...userRole}
-                }
+                const userRole = adminRoles?.[userData.userEmail] || {}
+                newUserData = {...newUserData, ...userRole}
                 return newUserData
             })
             setData(newData)
@@ -156,6 +160,7 @@ const MembersTable = ({
 
     const getTitle = () => `Admin Members of ${group.universityName}`
 
+
     return (
         <Card
             className={clsx(classes.root, className)}
@@ -180,7 +185,7 @@ const MembersTable = ({
                         iconProps: {color: "primary"},
                         position: "row",
                         tooltip: 'Kick from dashboard',
-                        onClick: (event, rowData) => handleKickAdmin(rowData),
+                        onClick: (event, rowData) => handleClickKickButton(rowData),
                         disabled: rowData.role === "mainAdmin" || userRole.role !== "mainAdmin" || loading,
                         hidden: rowData.role === "mainAdmin" || userRole.role !== "mainAdmin",
                     }),
@@ -189,7 +194,7 @@ const MembersTable = ({
                         iconProps: {color: "primary"},
                         position: "row",
                         tooltip: 'Make main Admin',
-                        onClick: (event, rowData) => handleMakeAdmin(rowData),
+                        onClick: (event, rowData) => handleClickPromoteButton(rowData),
                         disabled: rowData.role === "mainAdmin" || userRole.role !== "mainAdmin" || loading,
                         hidden: rowData.role === "mainAdmin" || userRole.role !== "mainAdmin",
                     })
@@ -198,6 +203,14 @@ const MembersTable = ({
                     setSelection(rows);
                 }}
                 title={getTitle()}
+            />
+            <AreYouSureModal
+                open={areYouSureModalOpen}
+                handleClose={handleCloseAreYouSureModal}
+                loading={loading}
+                title="Are you sure?"
+                handleConfirm={handleConfirm}
+                message={areYouSureModalMessage}
             />
         </Card>
     );

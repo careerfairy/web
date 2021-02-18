@@ -240,14 +240,16 @@ const GroupDashboardLayout = (props) => {
 
     ] : [];
 
-    // if (userRole.role === "mainAdmin" && (isLoaded(group) && !isEmpty(group))) {
+    if (
         //Only mainAdmin has access to this button in their nav
+        // userRole.role === "mainAdmin" &&
+        (isLoaded(group) && !isEmpty(group))) {
         drawerTopLinks.push({
             href: `/group/${group.id}/admin/roles`,
             icon: RolesIcon,
             title: 'Roles'
         })
-    // }
+    }
 
     if (authenticatedUser?.emailVerified) {
         headerLinks.push({

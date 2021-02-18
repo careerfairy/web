@@ -22,6 +22,8 @@ const RolesOverview = ({firebase, group}) => {
     const classes = useStyles()
     const [kicking, setKicking] = useState(false);
     const [promoting, setPromoting] = useState(false);
+    const [modalContext, setModalContext] = useState("");
+    const [selectedRowData, setSelectedRowData] = useState({});
     const userRole = useSelector(({firestore}) => firestore.data.userRole || {})
 
     const [showAddMemberModal, setShowAddMemberModal] = useState(false);
@@ -31,6 +33,33 @@ const RolesOverview = ({firebase, group}) => {
     const closeAddMemberModal = () => {
         setShowAddMemberModal(false)
     }
+
+
+    const handleCloseAreYouSureModal = () => {
+        setModalContext("")
+        setSelectedRowData({})
+    }
+
+
+    const handleClickKickButton = (rowData) => {
+        setModalContext("kick")
+        setSelectedRowData(rowData)
+    }
+    const handleClickPromoteButton = (rowData) => {
+        setModalContext("promote")
+        setSelectedRowData(rowData)
+    }
+
+    const handleConfirm = () => {
+        return modalContext === "kick" ? () => handleKickAdmin(selectedRowData) : modalContext === "promote" ? () => handleMakeAdmin(selectedRowData) : null
+    }
+
+    const getAreYouSureModalOpen = () => (modalContext === "kick" || modalContext === "promote") && Boolean(selectedRowData.userEmail)
+
+    const getAreYouSureModalMessage = () => modalContext === "kick" ?
+        `Are you sure you want to kick ${selectedRowData.displayName}?` :
+        modalContext === "promote" ? `Are you sure you want to promote ${selectedRowData.displayName}?` : ""
+
 
     const handleKickAdmin = async (adminRole) => {
         try {
@@ -55,8 +84,10 @@ const RolesOverview = ({firebase, group}) => {
                 preventDuplicate: true
             })
         }
+        handleCloseAreYouSureModal()
         setKicking(false)
     }
+
 
     const handleMakeAdmin = async (adminRole) => {
         try {
@@ -67,7 +98,7 @@ const RolesOverview = ({firebase, group}) => {
                 })
 
             } else {
-                setPromoting(promoting)
+                setPromoting(true)
                 await firebase.promoteToMainAdmin(group.id, adminRole.id)
                 enqueueSnackbar(`${adminRole.id} has been successfully promoted to mainAdmin`, {
                     variant: "info",
@@ -81,7 +112,8 @@ const RolesOverview = ({firebase, group}) => {
                 preventDuplicate: true
             })
         }
-        setPromoting(promoting)
+        handleCloseAreYouSureModal()
+        setPromoting(false)
     }
 
 
@@ -93,9 +125,15 @@ const RolesOverview = ({firebase, group}) => {
             >
                 <Grid item xs={12} sm={12}>
                     <MembersTable
+                        areYouSureModalOpen={getAreYouSureModalOpen()}
                         handleKickAdmin={handleKickAdmin}
                         handleMakeAdmin={handleMakeAdmin}
-                        loading={kicking ||promoting}
+                        handleCloseAreYouSureModal={handleCloseAreYouSureModal}
+                        handleClickKickButton={handleClickKickButton}
+                        handleClickPromoteButton={handleClickPromoteButton}
+                        handleConfirm={handleConfirm}
+                        areYouSureModalMessage={getAreYouSureModalMessage()}
+                        loading={kicking || promoting}
                         openAddMemberModal={openAddMemberModal}
                         group={group}
                     />

@@ -1709,7 +1709,9 @@ class Firebase {
         let batch = this.firestore.batch()
 
         let adminToPromoteRef = this.firestore
-            .collection("userData")
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("admins")
             .doc(userEmail)
 
         let groupAdminsRef = this.firestore
@@ -1729,7 +1731,7 @@ class Firebase {
             batch.update(mainAdminRef, {role: "subAdmin"})
         }
 
-        batch.update(adminToPromoteRef, {role: "mainAdmin"})
+        batch.set(adminToPromoteRef, {role: "mainAdmin"}, {merge: true})
 
         return batch.commit()
     }
