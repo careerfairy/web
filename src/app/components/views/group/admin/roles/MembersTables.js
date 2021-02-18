@@ -84,7 +84,10 @@ const MembersTable = ({
     useEffect(() => {
         if (group.admins?.length) {
             const newData = group?.admins?.map(userData => {
-                let newUserData = {...userData, displayName: `${userData.firstName} ${userData.lastName}`}
+                let newUserData = {
+                    ...userData,
+                    displayName: userData.firstName ? `${userData.firstName} ${userData.lastName}` : userData.id
+                }
                 const userRole = adminRoles?.[userData.userEmail] || {}
                 newUserData = {...newUserData, ...userRole}
                 return newUserData
@@ -157,6 +160,7 @@ const MembersTable = ({
         },
     ]
 
+    console.log("-> areYouSureModalOpen", areYouSureModalOpen);
     const getTitle = () => `Admin Members of ${group.universityName}`
 
 

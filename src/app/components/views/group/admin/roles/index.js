@@ -24,6 +24,8 @@ const RolesOverview = ({firebase, group}) => {
     const [promoting, setPromoting] = useState(false);
     const [modalContext, setModalContext] = useState("");
     const [selectedRowData, setSelectedRowData] = useState({});
+    console.log("-> selectedRowData", selectedRowData);
+    console.log("-> modalContext", modalContext);
     const userRole = useSelector(({firestore}) => firestore.data.userRole || {})
 
     const [showAddMemberModal, setShowAddMemberModal] = useState(false);
@@ -50,8 +52,10 @@ const RolesOverview = ({firebase, group}) => {
         setSelectedRowData(rowData)
     }
 
+
     const handleConfirm = () => {
         if (modalContext === "kick") {
+            console.log("-> selectedRowData", selectedRowData);
             return handleKickAdmin(selectedRowData)
         }
         if (modalContext === "promote") {
@@ -59,7 +63,7 @@ const RolesOverview = ({firebase, group}) => {
         }
     }
 
-    const getAreYouSureModalOpen = () => (modalContext === "kick" || modalContext === "promote") && Boolean(selectedRowData.userEmail)
+    const getAreYouSureModalOpen = () => (modalContext === "kick" || modalContext === "promote") && Boolean(selectedRowData.id)
 
     const getAreYouSureModalMessage = () => modalContext === "kick" ?
         `Are you sure you want to kick ${selectedRowData.displayName}?` :
@@ -67,6 +71,7 @@ const RolesOverview = ({firebase, group}) => {
 
 
     const handleKickAdmin = async (adminRole) => {
+        console.log("-> adminRole", adminRole);
         try {
             if (adminRole === "mainAdmin" || userRole.role !== "mainAdmin") {
                 enqueueSnackbar("You cannot kick a head admin or you do not have permission", {

@@ -1713,14 +1713,17 @@ class Firebase {
         return this.firestore.runTransaction((transaction) => {
             return transaction.get(userRef).then((userDoc) => {
                 const userData = userDoc.data()
+
+                const email = userData?.userEmail || userEmail
+
                 transaction.update(groupRef, {
-                    adminEmails: firebase.firestore.FieldValue.arrayRemove(userData.userEmail),
+                    adminEmails: firebase.firestore.FieldValue.arrayRemove(email),
                 });
                 let groupAdminRef = this.firestore
                     .collection("careerCenterData")
                     .doc(groupId)
                     .collection("admins")
-                    .doc(userData.userEmail)
+                    .doc(email)
                 transaction.delete(groupAdminRef);
             });
         });

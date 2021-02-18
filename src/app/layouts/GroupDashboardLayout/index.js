@@ -103,7 +103,7 @@ const GroupDashboardLayout = (props) => {
 
     useFirestoreConnect(getQueries(), [groupId, careerCenterId, authenticatedUser])
 
-    const userRole = useSelector(({firestore}) => firestore.data.userRole || {})
+    // const userRole = useSelector(({firestore}) => firestore.data.userRole || {})
     const group = useSelector(state => populate(state.firestore, "group", populates))
 
     if (isLoaded(group) && !isEmpty(group)) {
@@ -112,7 +112,9 @@ const GroupDashboardLayout = (props) => {
 
     useEffect(() => {
         (async function () {
-            if (joiningGroup) return
+            if (joiningGroup) {
+                return
+            }
             if (isEmpty(group) && isLoaded(group)) {
                 await replace("/");
                 enqueueSnackbar("The page you tried to visit is invalid", {
@@ -131,8 +133,8 @@ const GroupDashboardLayout = (props) => {
                 await handleJoinDashboard()
                 return
             }
-            if (unAuthorized()) {
-                replace("/");
+            if (unAuthorized() && !joiningGroup) {
+                await replace("/");
                 return
             }
             if (pathname === "/group/[groupId]/admin" && isLoaded(group) && !isEmpty(group) && isAdmin()) {
@@ -171,7 +173,6 @@ const GroupDashboardLayout = (props) => {
                     variant: "success",
                     preventDuplicate: true,
                 })
-                setJoiningGroup(false)
             }
         } catch (error) {
             console.error("-> error", error);
