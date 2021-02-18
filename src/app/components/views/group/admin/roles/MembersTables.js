@@ -160,7 +160,6 @@ const MembersTable = ({
         },
     ]
 
-    console.log("-> areYouSureModalOpen", areYouSureModalOpen);
     const getTitle = () => `Admin Members of ${group.universityName}`
 
 
