@@ -560,7 +560,7 @@ exports.generateAgoraToken = functions.https.onRequest(async (req, res) => {
     const streamerToken = req.body.token;
     const rtcRole = req.body.isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
     const rtmRole = 0;
-    const expirationTimeInSeconds = 5400
+    const expirationTimeInSeconds = 21600
     const uid = req.body.uid;
     const currentTimestamp = Math.floor(Date.now() / 1000)
     const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
@@ -632,7 +632,7 @@ exports.generateAgoraTokenSecure = functions.https.onRequest(async (req, res) =>
     const sentToken = req.body.token;
     const rtcRole = req.body.isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
     const rtmRole = 0;
-    const expirationTimeInSeconds = 5400
+    const expirationTimeInSeconds = 21600
     const uid = req.body.uid;
     const currentTimestamp = Math.floor(Date.now() / 1000)
     const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
@@ -640,17 +640,18 @@ exports.generateAgoraTokenSecure = functions.https.onRequest(async (req, res) =>
     // Build token with uid
     if (rtcRole === RtcRole.PUBLISHER) {
         let livestreamDoc = await admin.firestore().collection('livestreams').doc(channelName).get();
-        let storedTokenDoc =  await admin.firestore().collection('livestreams').doc(channelName).collection('tokens').doc('secureToken').get();
-
         let livestream = livestreamDoc.data();
-        let storedToken = storedTokenDoc.data().value;
-        if (!livestream.test && storedToken !== sentToken) {
-            return res.status(401).send();
-        } else {
-            const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
-            const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
-            return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
+
+        if (!livestream.test) {
+            let storedTokenDoc =  await admin.firestore().collection('livestreams').doc(channelName).collection('tokens').doc('secureToken').get();
+            let storedToken = storedTokenDoc.data().value;
+            if (storedToken !== sentToken) {
+                return res.status(401).send();
+            }
         }
+        const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
+        const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
+        return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
     } else {
         const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
         const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
