@@ -92,6 +92,7 @@ const GroupDashboardLayout = (props) => {
 
     useEffect(() => {
         (async function () {
+            if (joiningGroup) return
             if (isEmpty(group) && isLoaded(group)) {
                 await replace("/");
                 enqueueSnackbar("The page you tried to visit is invalid", {
@@ -100,23 +101,22 @@ const GroupDashboardLayout = (props) => {
                 })
                 return
             }
-
             if (
                 pathname === "/group/[groupId]/admin"
                 && dashboardInviteId
                 && isLoggedIn()
                 && unAuthorized()
             ) {
+                console.log("-> was in the handle join");
                 // If you're logged in and are on the base admin page
                 await handleJoinDashboard()
                 return
             }
             if (unAuthorized()) {
-                console.log("-> dashboardInviteId in unauthorized", dashboardInviteId);
                 replace("/");
                 return
             }
-            if (pathname === "/group/[groupId]/admin") {
+            if (pathname === "/group/[groupId]/admin" && isLoaded(group) && !isEmpty(group) && isAdmin()) {
                 await replace(`/group/${group.id}/admin/analytics`)
             }
         })()
@@ -129,8 +129,7 @@ const GroupDashboardLayout = (props) => {
 
     const unAuthorized = () => {
         return Boolean(
-            ((isLoaded(group) && authenticatedUser.isLoaded && userData) && !isAdmin())
-            || (isLoaded(group) && isEmpty(group))
+            ((isLoaded(group) && !isEmpty(group) && authenticatedUser.isLoaded && userData) && !isAdmin())
         )
     }
 
@@ -138,7 +137,6 @@ const GroupDashboardLayout = (props) => {
 
     const handleJoinDashboard = async () => {
         try {
-            if (joiningGroup) return
             const isValidInvite = await firebase.validateDashboardInvite(dashboardInviteId, group.id)
             if (!isValidInvite) {
                 await replace("/")
@@ -154,6 +152,7 @@ const GroupDashboardLayout = (props) => {
                     variant: "success",
                     preventDuplicate: true,
                 })
+                setJoiningGroup(false)
             }
         } catch (error) {
             console.error("-> error", error);
@@ -161,8 +160,8 @@ const GroupDashboardLayout = (props) => {
                 preventDuplicate: true,
                 variant: "error",
             })
+            setJoiningGroup(false)
         }
-        setJoiningGroup(false)
     }
 
 

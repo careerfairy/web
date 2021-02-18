@@ -182,9 +182,9 @@ class Firebase {
 
         careerCenter.groupId = groupRef.id
         batch.set(groupRef, careerCenter)
-        batch.set(groupAdminRef,{role: "mainAdmin"})
+        batch.set(groupAdminRef, {role: "mainAdmin"})
 
-         await batch.commit();
+        await batch.commit();
 
         return groupRef
     }
@@ -1681,11 +1681,7 @@ class Firebase {
 
     // Notification Queries
     createNotification = async (notification, options = {force: false}) => {
-        const prevNotification = await this.checkForNotification(
-            notification.requester,
-            notification.receiver,
-            notification.type
-        )
+        const prevNotification = await this.checkForNotification(notification)
         if (!prevNotification.empty && options.force === true) {
             const prevNotificationData = prevNotification.docs.map(doc => ({id: doc.id}))
             const notificationId = prevNotificationData[0].id
@@ -1696,14 +1692,14 @@ class Firebase {
         }
         notification.created = this.getServerTimestamp()
         let ref = this.firestore.collection("notifications");
-        return ref.add(notification);
+        return ref.add({notificationInfo: notification});
     }
 
     updateNotification = async (notificationId, data) => {
         data.updated = this.getServerTimestamp()
         let ref = this.firestore.collection("notifications")
             .doc(notificationId)
-        await ref.update(data);
+        await ref.set({notificationInfo: data}, {merge: true});
         return {id: notificationId}
     }
 
@@ -1724,13 +1720,17 @@ class Firebase {
         return ref.get()
     }
 
-    checkForNotification = (requesterId, receiverId, type) => {
-        let ref = this.firestore.collection("notifications")
-            .where("receiver", "==", receiverId)
-            .where("requester", "==", requesterId)
-            .where("type", "==", type)
-            .limit(1)
-        return ref.get()
+    checkForNotification = (fieldsToCheck = {property1: "value1", property2: "property2"}) => {
+        let query = this.firestore.collection("notifications")
+
+        for (const [key, value] of Object.entries(fieldsToCheck)) {
+            if (key !== "created" && key !== "updated" && key !== "open") {
+                query = query.where(`notificationInfo.${key}`, "==", value)
+            }
+        }
+
+        query.limit(1)
+        return query.get()
     }
 
     // DB functions
