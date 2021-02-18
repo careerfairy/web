@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Avatar, Badge, Card} from '@material-ui/core';
+import {Avatar, Badge, Box, Card, Typography} from '@material-ui/core';
 import MaterialTable from "material-table";
 import {makeStyles} from "@material-ui/core/styles";
 import {defaultTableOptions, tableIcons} from "../../../../util/tableUtils";
@@ -24,22 +24,36 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.common.white
     },
     userAvatar: {
-        width: 80,
-        height: 80,
-        boxShadow: theme.shadows[1]
+        width: 60,
+        height: 60,
+        boxShadow: theme.shadows[1],
+    },
+    displayName: {
+        marginLeft: theme.spacing(4)
     }
 }));
 
 
-const SelfBadge = ({...props}) =>
+const SelfBadge = ({badgeContent, ...props}) =>
     <Badge
+        badgeContent={
+            badgeContent ? <Typography style={{fontSize: 8}}>
+                {badgeContent}
+            </Typography> : 0
+        }
         anchorOrigin={{
             vertical: 'bottom',
             horizontal: 'right',
         }} color="primary" {...props}
     />
-const AdminBadge = ({...props}) =>
+
+const AdminBadge = ({badgeContent, ...props}) =>
     <Badge
+        badgeContent={
+            badgeContent ? <Typography style={{fontSize: 8}}>
+                {badgeContent}
+            </Typography> : 0
+        }
         anchorOrigin={{
             vertical: 'top',
             horizontal: 'right',
@@ -50,13 +64,13 @@ const MembersTable = ({
                           group,
                           openAddMemberModal,
                           handleKickAdmin,
-                          kicking,
+                          loading,
+                          handleMakeAdmin,
                           className,
                           ...rest
                       }) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
-    const firestore = useSelector(({firestore}) => firestore)
     const [data, setData] = useState([]);
     const {authenticatedUser} = useAuth()
     const adminRoles = useSelector(({firestore}) => firestore.data.adminRoles)
@@ -65,7 +79,7 @@ const MembersTable = ({
     useEffect(() => {
         if (group.admins?.length) {
             const newData = group?.admins?.map(userData => {
-                let newUserData = {...userData}
+                let newUserData = {...userData, displayName: `${userData.firstName} ${userData.lastName}`}
                 const userRole = adminRoles?.[userData.userEmail]
                 if (userRole) {
                     newUserData = {...newUserData, ...userRole}
@@ -91,31 +105,38 @@ const MembersTable = ({
 
     const columns = [
         {
-            field: "avatarUrl",
-            title: "Avatar",
-            searchable: false,
+            field: "displayName",
+            title: "Admin",
             export: false,
             sorting: false,
-            filtering: false,
             width: 150,
             render: rowData =>
-                <AdminBadge color={rowData.role === "mainAdmin" ? "secondary" : "primary"}
-                            badgeContent={convertCamelToSentence(rowData.role) || 0}>
-                    <SelfBadge badgeContent={rowData.userEmail === authenticatedUser.email ? "Me" : 0}>
-                        <Avatar className={classes.userAvatar} src={rowData.avatarUrl}
-                                alt={`${rowData.firstName}'s Avatar`}>
-                            {rowData.firstName ? `${rowData.firstName[0] + rowData.lastName[0]}` : ""}
-                        </Avatar>
-                    </SelfBadge>
-                </AdminBadge>
+                <Box display="flex" alignItems="center">
+                    <AdminBadge color={rowData.role === "mainAdmin" ? "secondary" : "primary"}
+                                badgeContent={convertCamelToSentence(rowData.role) || 0}>
+                        <SelfBadge badgeContent={rowData.userEmail === authenticatedUser.email ? "You" : 0}>
+                            <Avatar className={classes.userAvatar} src={rowData.avatarUrl}
+                                    alt={`${rowData.firstName}'s Avatar`}>
+                                {rowData.firstName ? `${rowData.firstName[0] + rowData.lastName[0]}` : ""}
+                            </Avatar>
+                        </SelfBadge>
+                    </AdminBadge>
+                    <Typography className={classes.displayName}>
+                        {rowData.displayName}
+                    </Typography>
+                </Box>
         },
         {
             field: "firstName",
             title: "First Name",
+            hidden: true,
+            export: true
         },
         {
             field: "lastName",
             title: "Last Name",
+            hidden: true,
+            export: true
         },
         {
             field: "role",
@@ -160,7 +181,16 @@ const MembersTable = ({
                         position: "row",
                         tooltip: 'Kick from dashboard',
                         onClick: (event, rowData) => handleKickAdmin(rowData),
-                        disabled: rowData.role === "mainAdmin" || userRole.role !== "mainAdmin" || kicking,
+                        disabled: rowData.role === "mainAdmin" || userRole.role !== "mainAdmin" || loading,
+                        hidden: rowData.role === "mainAdmin" || userRole.role !== "mainAdmin",
+                    }),
+                    (rowData) => ({
+                        icon: tableIcons.SupervisorAccountIcon,
+                        iconProps: {color: "primary"},
+                        position: "row",
+                        tooltip: 'Make main Admin',
+                        onClick: (event, rowData) => handleMakeAdmin(rowData),
+                        disabled: rowData.role === "mainAdmin" || userRole.role !== "mainAdmin" || loading,
                         hidden: rowData.role === "mainAdmin" || userRole.role !== "mainAdmin",
                     })
                 ]}

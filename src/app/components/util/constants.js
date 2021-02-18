@@ -3,6 +3,7 @@ import React from "react";
 
 export const speakerPlaceholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media"
 export const GENERAL_ERROR = "Something went wrong."
+export const PERMISSION_ERROR = "You do not have permission to perform this action."
 // increased max domain name length from 5 to 9 since
 // propulsion academy has a long domain name for their privacy policy.
 // Maybe other websites do to?

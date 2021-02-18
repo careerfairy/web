@@ -6,7 +6,7 @@ import {useSelector} from "react-redux";
 import {useFirestoreConnect} from "react-redux-firebase";
 import AddMemberModal from "./AddMemberModal";
 import {useSnackbar} from "notistack";
-import {GENERAL_ERROR} from "../../../../util/constants";
+import {GENERAL_ERROR, PERMISSION_ERROR} from "../../../../util/constants";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -21,6 +21,7 @@ const RolesOverview = ({firebase, group}) => {
     const {enqueueSnackbar} = useSnackbar()
     const classes = useStyles()
     const [kicking, setKicking] = useState(false);
+    const [promoting, setPromoting] = useState(false);
     const userRole = useSelector(({firestore}) => firestore.data.userRole || {})
 
     const [showAddMemberModal, setShowAddMemberModal] = useState(false);
@@ -57,12 +58,35 @@ const RolesOverview = ({firebase, group}) => {
         setKicking(false)
     }
 
+    const handleMakeAdmin = async (adminRole) => {
+        try {
+            if (userRole.role !== "mainAdmin") {
+                enqueueSnackbar(PERMISSION_ERROR, {
+                    variant: "error",
+                    preventDuplicate: true
+                })
+
+            } else {
+                setPromoting(promoting)
+                await firebase.promoteToMainAdmin(group.id, adminRole.id)
+                enqueueSnackbar(`${adminRole.id} has been successfully promoted to mainAdmin`, {
+                    variant: "info",
+                    preventDuplicate: true
+                })
+            }
+        } catch (e) {
+            console.error("-> error", e);
+            enqueueSnackbar(GENERAL_ERROR, {
+                variant: "error",
+                preventDuplicate: true
+            })
+        }
+        setPromoting(promoting)
+    }
+
 
     return (
         <Container className={classes.root} maxWidth="lg">
-            <Typography variant="h1">
-                Roles
-            </Typography>
             <Grid
                 container
                 spacing={3}
@@ -70,7 +94,8 @@ const RolesOverview = ({firebase, group}) => {
                 <Grid item xs={12} sm={12}>
                     <MembersTable
                         handleKickAdmin={handleKickAdmin}
-                        kicking={kicking}
+                        handleMakeAdmin={handleMakeAdmin}
+                        loading={kicking ||promoting}
                         openAddMemberModal={openAddMemberModal}
                         group={group}
                     />

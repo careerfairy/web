@@ -1704,6 +1704,36 @@ class Firebase {
         });
     }
 
+    promoteToMainAdmin = async (groupId, userEmail) => {
+
+        let batch = this.firestore.batch()
+
+        let adminToPromoteRef = this.firestore
+            .collection("userData")
+            .doc(userEmail)
+
+        let groupAdminsRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("admins")
+            .where("role", "==", "mainAdmin")
+
+        const adminSnaps = await groupAdminsRef.get()
+        // Demote all main Admins to subAdmins to ensure that there is always no main admins when promoting
+        for (const mainAdminDoc of adminSnaps.docs) {
+            const mainAdminRef = this.firestore
+                .collection("careerCenterData")
+                .doc(groupId)
+                .collection("admins")
+                .doc(mainAdminDoc.id)
+            batch.update(mainAdminRef, {role: "subAdmin"})
+        }
+
+        batch.update(adminToPromoteRef, {role: "mainAdmin"})
+
+        return batch.commit()
+    }
+
     // Notification Queries
     createNotification = async (details, options = {force: false}) => {
         const prevNotification = await this.checkForNotification(details)
