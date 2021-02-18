@@ -77,7 +77,6 @@ const MembersTable = ({
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const [data, setData] = useState([]);
-    console.log("-> data", data);
     const {authenticatedUser} = useAuth()
 
     const adminRoles = useSelector(({firestore}) => firestore.data.adminRoles)

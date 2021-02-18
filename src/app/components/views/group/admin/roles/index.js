@@ -51,7 +51,12 @@ const RolesOverview = ({firebase, group}) => {
     }
 
     const handleConfirm = () => {
-        return modalContext === "kick" ? () => handleKickAdmin(selectedRowData) : modalContext === "promote" ? () => handleMakeAdmin(selectedRowData) : null
+        if (modalContext === "kick") {
+            return handleKickAdmin(selectedRowData)
+        }
+        if (modalContext === "promote") {
+            return handleMakeAdmin(selectedRowData)
+        }
     }
 
     const getAreYouSureModalOpen = () => (modalContext === "kick" || modalContext === "promote") && Boolean(selectedRowData.userEmail)
@@ -126,8 +131,6 @@ const RolesOverview = ({firebase, group}) => {
                 <Grid item xs={12} sm={12}>
                     <MembersTable
                         areYouSureModalOpen={getAreYouSureModalOpen()}
-                        handleKickAdmin={handleKickAdmin}
-                        handleMakeAdmin={handleMakeAdmin}
                         handleCloseAreYouSureModal={handleCloseAreYouSureModal}
                         handleClickKickButton={handleClickKickButton}
                         handleClickPromoteButton={handleClickPromoteButton}
