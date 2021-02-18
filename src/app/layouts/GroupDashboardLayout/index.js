@@ -127,7 +127,6 @@ const GroupDashboardLayout = (props) => {
                 && isLoggedIn()
                 && unAuthorized()
             ) {
-                console.log("-> was in the handle join");
                 // If you're logged in and are on the base admin page
                 await handleJoinDashboard()
                 return
