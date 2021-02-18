@@ -63,7 +63,7 @@ const RolesOverview = ({firebase, group}) => {
 
     const getAreYouSureModalMessage = () => modalContext === "kick" ?
         `Are you sure you want to kick ${selectedRowData.displayName}?` :
-        modalContext === "promote" ? `Are you sure you want to promote ${selectedRowData.displayName}?` : ""
+        modalContext === "promote" ? `Are you sure you want to promote ${selectedRowData.displayName} to main admin? You will no longer have the main admin title` : ""
 
 
     const handleKickAdmin = async (adminRole) => {
