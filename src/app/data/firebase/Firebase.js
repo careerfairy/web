@@ -1680,26 +1680,34 @@ class Firebase {
     }
 
     // Notification Queries
-    createNotification = async (notification, options = {force: false}) => {
-        const prevNotification = await this.checkForNotification(notification)
+    createNotification = async (details, options = {force: false}) => {
+        const prevNotification = await this.checkForNotification(details)
         if (!prevNotification.empty && options.force === true) {
             const prevNotificationData = prevNotification.docs.map(doc => ({id: doc.id}))
             const notificationId = prevNotificationData[0].id
             if (options.force === true) {
-                return await this.updateNotification(notificationId, notification)
+                return await this.updateNotification(notificationId, details)
             }
             return throw `Notification Already Exists as document ${notificationId}`
         }
-        notification.created = this.getServerTimestamp()
         let ref = this.firestore.collection("notifications");
-        return ref.add({notificationInfo: notification});
+        const newNotification = {
+            details: details,
+            open: true,
+            created: this.getServerTimestamp()
+        }
+        return ref.add(newNotification);
     }
 
-    updateNotification = async (notificationId, data) => {
-        data.updated = this.getServerTimestamp()
+    updateNotification = async (notificationId, details, open = true) => {
+        const newNotification = {
+            details,
+            open,
+            updated: this.getServerTimestamp()
+        }
         let ref = this.firestore.collection("notifications")
             .doc(notificationId)
-        await ref.set({notificationInfo: data}, {merge: true});
+        await ref.set(newNotification, {merge: true});
         return {id: notificationId}
     }
 
@@ -1711,7 +1719,7 @@ class Firebase {
             return false
         }
         const notification = refSnap.data()
-        return notification.type === "dashboardInvite" && notification.open && notification.requester === groupId
+        return notification.details.type === "dashboardInvite" && notification.open && notification.details.requester === groupId
     }
 
     getNotification = (notificationId) => {
@@ -1720,16 +1728,11 @@ class Firebase {
         return ref.get()
     }
 
-    checkForNotification = (fieldsToCheck = {property1: "value1", property2: "property2"}) => {
+    checkForNotification = (detailFieldsToCheck = {property1: "value1", property2: "property2"}) => {
         let query = this.firestore.collection("notifications")
+            .where("details", "==", detailFieldsToCheck)
+            .limit(1)
 
-        for (const [key, value] of Object.entries(fieldsToCheck)) {
-            if (key !== "created" && key !== "updated" && key !== "open") {
-                query = query.where(`notificationInfo.${key}`, "==", value)
-            }
-        }
-
-        query.limit(1)
         return query.get()
     }
 

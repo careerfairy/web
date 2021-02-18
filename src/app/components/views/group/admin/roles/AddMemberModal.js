@@ -43,15 +43,13 @@ const AddMemberModal = ({open = false, onClose, group, firebase}) => {
             try {
                 const notificationType = "dashboardInvite"
                 let successMessage = `An invitation email has been sent to ${values.email}`
-                const notification = {
-                    open: true,
+                const notificationDetails = {
+                    type: notificationType,
                     receiver: values.email,
                     requester: group.id,
-                    type: notificationType
                 }
 
-                const invitationRef = await firebase.createNotification(notification, {force: true});
-                console.log("-> invitationRef", invitationRef);
+                const invitationRef = await firebase.createNotification(notificationDetails, {force: true});
                 const notificationId = invitationRef.id
                 const inviteLink = buildInviteLink(notificationId)
                 await DataAccessUtil.sendDashboardInvite(values.email, userData, group, inviteLink)
