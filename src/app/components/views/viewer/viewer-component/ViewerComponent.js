@@ -12,6 +12,8 @@ import {makeStyles} from "@material-ui/core/styles";
 import SettingsModal from "../../streaming/video-container/SettingsModal";
 import {Typography} from '@material-ui/core';
 import ScreenShareModal from "../../streaming/video-container/ScreenShareModal";
+import LoadingModal from 'components/views/streaming/modal/LoadingModal';
+import ErrorModal from 'components/views/streaming/modal/ErrorModal';
 
 const useStyles = makeStyles(theme => ({
     waitingOverlay: {
@@ -49,7 +51,7 @@ function ViewerComponent(props) {
     const screenSharingMode = (props.currentLivestream.screenSharerId === authenticatedUser?.email &&
         props.currentLivestream.mode === 'desktop') ? optimizationMode : "";
 
-    const {externalMediaStreams, localMediaStream, agoraStatus} =
+    const {externalMediaStreams, localMediaStream, agoraRtcStatus, agoraRtmStatus} =
         useAgoraAsStreamer(
             streamerReady,
             !props.handRaiseActive,
@@ -60,7 +62,7 @@ function ViewerComponent(props) {
             true
         );
 
-    const devices = useDevices(agoraStatus === "stream_published");
+    const devices = useDevices(agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED");
 
     const {
         audioSource,
@@ -84,7 +86,7 @@ function ViewerComponent(props) {
     }, [props.currentLivestream, authenticatedUser])
 
     useEffect(() => {
-        if (props.handRaiseActive && agoraStatus === 'stream-published') {
+        if (props.handRaiseActive && agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED") {
             if (props.currentLivestream) {
                 if (props.currentLivestream.test) {
                     props.firebase.updateHandRaiseRequest(props.currentLivestream.id, 'streamerEmail', "connected");
@@ -93,7 +95,7 @@ function ViewerComponent(props) {
                 }
             }
         }
-    }, [agoraStatus])
+    }, [agoraRtcStatus])
 
 
     const attachSinkId = (element, sinkId) => {
@@ -185,6 +187,8 @@ function ViewerComponent(props) {
                     handleClose={handleCloseScreenShareModal}
                     handleScreenShare={handleScreenShare}
                 />
+                <LoadingModal agoraRtcStatus={agoraRtcStatus} />
+                <ErrorModal agoraRtcStatus={agoraRtcStatus} agoraRtmStatus={agoraRtmStatus} />
             </Fragment>
             }
 
