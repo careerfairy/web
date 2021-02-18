@@ -36,6 +36,7 @@ import LibraryAddOutlinedIcon from '@material-ui/icons/LibraryAddOutlined';
 import DeleteForeverOutlinedIcon from '@material-ui/icons/DeleteForeverOutlined';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
+import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 
 import Linkify from "react-linkify";
 
@@ -75,6 +76,7 @@ export const tableIcons = {
     DeleteForeverIcon: forwardRef((props, ref) => <DeleteForeverIcon {...props} ref={ref}/>),
     RedDeleteForeverIcon: forwardRef((props, ref) => <DeleteForeverIcon color="error" {...props} ref={ref}/>),
     RotateLeftIcon: forwardRef((props, ref) => <RotateLeftIcon {...props} ref={ref}/>),
+    RemoveCircleOutlineIcon: forwardRef((props, ref) => <RemoveCircleOutlineIcon {...props} ref={ref}/>),
     DeleteForeverOutlinedIcon: forwardRef((props, ref) => <DeleteForeverOutlinedIcon {...props} ref={ref}/>)
 };
 

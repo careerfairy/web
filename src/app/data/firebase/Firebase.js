@@ -1679,6 +1679,31 @@ class Firebase {
         });
     }
 
+    kickFromDashboard = (groupId, userEmail) => {
+        let groupRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+
+        let userRef = this.firestore
+            .collection("userData")
+            .doc(userEmail)
+
+        return this.firestore.runTransaction((transaction) => {
+            return transaction.get(userRef).then((userDoc) => {
+                const userData = userDoc.data()
+                transaction.update(groupRef, {
+                    adminEmails: firebase.firestore.FieldValue.arrayRemove(userData.userEmail),
+                });
+                let groupAdminRef = this.firestore
+                    .collection("careerCenterData")
+                    .doc(groupId)
+                    .collection("admins")
+                    .doc(userData.userEmail)
+                transaction.delete(groupAdminRef);
+            });
+        });
+    }
+
     // Notification Queries
     createNotification = async (details, options = {force: false}) => {
         const prevNotification = await this.checkForNotification(details)

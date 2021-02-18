@@ -1,66 +1,85 @@
 import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Avatar, Card} from '@material-ui/core';
+import {Avatar, Badge, Card} from '@material-ui/core';
 import MaterialTable from "material-table";
 import {makeStyles} from "@material-ui/core/styles";
 import {defaultTableOptions, tableIcons} from "../../../../util/tableUtils";
 import {useSelector} from "react-redux";
 import {exportSelectionAction} from "../analytics/common/TableUtils";
+import {useAuth} from "../../../../../HOCs/AuthProvider";
+import {convertCamelToSentence} from "../../../../helperFunctions/HelperFunctions";
+
+
+const customOptions = {...defaultTableOptions}
+customOptions.selection = false
 
 const useStyles = makeStyles((theme) => ({
     root: {},
     actions: {
         justifyContent: 'flex-end'
     },
-    avatar: {
-        height: 70,
-        width: '80%',
-        "& img": {
-            objectFit: "contain"
-        },
-        boxShadow: theme.shadows[1]
-    },
     streamManage: {
         background: theme.palette.navyBlue.main,
         color: theme.palette.common.white
+    },
+    userAvatar: {
+        width: 80,
+        height: 80,
+        boxShadow: theme.shadows[1]
     }
 }));
 
 
+const SelfBadge = ({...props}) =>
+    <Badge
+        anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+        }} color="primary" {...props}
+    />
+const AdminBadge = ({...props}) =>
+    <Badge
+        anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+        }} {...props}
+    />
+
 const MembersTable = ({
                           group,
                           openAddMemberModal,
+                          handleKickAdmin,
+                          kicking,
                           className,
                           ...rest
                       }) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const firestore = useSelector(({firestore}) => firestore)
+    const [data, setData] = useState([]);
+    const {authenticatedUser} = useAuth()
+    const adminRoles = useSelector(({firestore}) => firestore.data.adminRoles)
+    const userRole = useSelector(({firestore}) => firestore.data.userRole || {})
 
-    const data = useSelector(({firestore}) => {
-        return group?.admins?.map(userData => {
-            let newUserData = {...userData}
-            const userRole = firestore.data.adminRoles?.[userData.userEmail]
-            if (userRole) {
-                newUserData = {...newUserData, ...userRole}
-            }
-            return newUserData
-        }) || []
-    })
-    console.log("-> data", data);
-    console.log("-> firestore", firestore);
+    useEffect(() => {
+        if (group.admins?.length) {
+            const newData = group?.admins?.map(userData => {
+                let newUserData = {...userData}
+                const userRole = adminRoles?.[userData.userEmail]
+                if (userRole) {
+                    newUserData = {...newUserData, ...userRole}
+                }
+                return newUserData
+            })
+            setData(newData)
+        }
+    }, [group.admins])
 
 
     const getRoleLookup = () => {
         const roleOptions = {};
-        const convertCamelToSentence = (string) => {
-            return string.replace(/([A-Z])/g, " $1")
-                    .charAt(0).toUpperCase()
-                +
-                string.replace(/([A-Z])/g, " $1")
-                    .slice(1)
-        }
+
         data.forEach(admin => {
             const {role} = admin;
             if (role) {
@@ -79,10 +98,16 @@ const MembersTable = ({
             sorting: false,
             filtering: false,
             width: 150,
-            render: rowData => <Avatar src={rowData.avatarUrl} alt={`${rowData.firstName}'s Avatar`}>
-                {rowData.firstName ? `${rowData.firstName[0] + rowData.lastName[0]}` : ""}
-            </Avatar>
-
+            render: rowData =>
+                <AdminBadge color={rowData.role === "mainAdmin" ? "secondary" : "primary"}
+                            badgeContent={convertCamelToSentence(rowData.role) || 0}>
+                    <SelfBadge badgeContent={rowData.userEmail === authenticatedUser.email ? "Me" : 0}>
+                        <Avatar className={classes.userAvatar} src={rowData.avatarUrl}
+                                alt={`${rowData.firstName}'s Avatar`}>
+                            {rowData.firstName ? `${rowData.firstName[0] + rowData.lastName[0]}` : ""}
+                        </Avatar>
+                    </SelfBadge>
+                </AdminBadge>
         },
         {
             field: "firstName",
@@ -97,6 +122,15 @@ const MembersTable = ({
             title: "Role",
             lookup: getRoleLookup(),
         },
+        {
+            field: "userEmail",
+            title: "Email",
+            render: ({userEmail}) => (
+                <a href={`mailto:${userEmail}`}>
+                    {userEmail}
+                </a>
+            )
+        },
     ]
 
     const getTitle = () => `Admin Members of ${group.universityName}`
@@ -110,7 +144,7 @@ const MembersTable = ({
                 icons={tableIcons}
                 data={data}
                 columns={columns}
-                options={defaultTableOptions}
+                options={customOptions}
                 actions={[
                     exportSelectionAction(columns, getTitle()),
                     {
@@ -120,6 +154,15 @@ const MembersTable = ({
                         iconProps: {color: "primary"},
                         onClick: openAddMemberModal
                     },
+                    (rowData) => ({
+                        icon: tableIcons.RemoveCircleOutlineIcon,
+                        iconProps: {color: "primary"},
+                        position: "row",
+                        tooltip: 'Kick from dashboard',
+                        onClick: (event, rowData) => handleKickAdmin(rowData),
+                        disabled: rowData.role === "mainAdmin" || userRole.role !== "mainAdmin" || kicking,
+                        hidden: rowData.role === "mainAdmin" || userRole.role !== "mainAdmin",
+                    })
                 ]}
                 onSelectionChange={(rows) => {
                     setSelection(rows);

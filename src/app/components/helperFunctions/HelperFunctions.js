@@ -93,7 +93,17 @@ export const isEmptyObject = (obj) => {
 export const isServer = () => {
     return typeof window === 'undefined'
 }
-
+export const convertCamelToSentence = (string) => {
+    if (typeof string === 'string' || string instanceof String){
+    return string.replace(/([A-Z])/g, " $1")
+            .charAt(0).toUpperCase()
+        +
+        string.replace(/([A-Z])/g, " $1")
+            .slice(1)
+    } else {
+        return ""
+    }
+}
 export const getServerSideRouterQuery = (queryKey, router) => {
     if (router.query[queryKey]) {
         return router.query[queryKey]
@@ -203,6 +213,6 @@ export const dynamicSort = (property) => {
         return result * sortOrder;
     }
 }
-export const truncate = (str, n) =>{
-    return (str.length > n) ? str.substr(0, n-1) + '...' : str;
+export const truncate = (str, n) => {
+    return (str.length > n) ? str.substr(0, n - 1) + '...' : str;
 };
