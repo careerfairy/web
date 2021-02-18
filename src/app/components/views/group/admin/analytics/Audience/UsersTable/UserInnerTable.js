@@ -1,8 +1,8 @@
 import React from 'react';
-import {fade, makeStyles} from "@material-ui/core/styles";
-import {Avatar, Collapse, Paper, useTheme} from "@material-ui/core";
+import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
+import {Avatar, Collapse, Paper} from "@material-ui/core";
 import MaterialTable from "material-table";
-import {defaultTableOptions, tableIcons} from "../../common/TableUtils";
+import {defaultTableOptions, getPageSize, tableIcons} from "../../common/TableUtils";
 import EnhancedGroupStreamCard from "../../../events/enhanced-group-stream-card/EnhancedGroupStreamCard";
 import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {useRouter} from "next/router";
@@ -32,7 +32,7 @@ const UserInnerTable = ({firstName, lastName, streams, group, registered, fireba
     const customOptions = {...defaultTableOptions}
     const innerTableStyle = {background: fade(theme.palette.navyBlue.main, 0.05)}
     customOptions.selection = false
-    customOptions.pageSize = 2
+    customOptions.pageSize = getPageSize(customOptions.pageSizeOptions, streams)
     customOptions.headerStyle = innerTableStyle
 
     return (

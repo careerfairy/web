@@ -1,5 +1,4 @@
-import React, {useState, useEffect, Fragment, useContext} from 'react';
-import {Grid, Icon, Button} from "semantic-ui-react";
+import React, {useContext, useEffect, useState} from 'react';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import MicIcon from '@material-ui/icons/Mic';
 import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
@@ -7,15 +6,15 @@ import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import ScreenShareIcon from '@material-ui/icons/ScreenShare';
 import SettingsIcon from '@material-ui/icons/Settings';
-import HearingIcon from '@material-ui/icons/Hearing';
 import {withFirebasePage} from 'context/firebase';
-import {makeStyles, useTheme} from "@material-ui/core/styles";
-import {ClickAwayListener, fade} from "@material-ui/core";
+import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
+import {ClickAwayListener} from "@material-ui/core";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import TutorialContext from 'context/tutorials/TutorialContext';
 import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "../../../../materialUI/GlobalTooltips";
+import PropTypes from "prop-types";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -64,7 +63,17 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode, screenSharerId, test}, webRTCAdaptor, devices, viewer, joining, setShowSettings, showSettings, firebase, streamerId, isMainStreamer, localMediaStream, setDesktopMode}) {
+function VideoControlsContainer({
+                                    currentLivestream: {mode, id, speakerSwitchMode, screenSharerId, test},
+                                    viewer,
+                                    setShowSettings,
+                                    showSettings,
+                                    firebase,
+                                    streamerId,
+                                    handleClickScreenShareButton,
+                                    isMainStreamer,
+                                    localMediaStream,
+                                }) {
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
     const theme = useTheme();
     const DELAY = 3000; //3 seconds
@@ -79,7 +88,7 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
     const desktopMode = mode === "desktop"
 
     useEffect(() => {
-        if (isOpen(13)) {
+        if (isOpen(16)) {
             setOpen(true)
         }
     }, [tutorialSteps])
@@ -154,11 +163,13 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
     }
 
     const actions = [{
-        icon: isLocalMicMuted ? <MicOffIcon fontSize="large" style={{ color: "red" }}/> : <MicIcon fontSize="large" color="primary"/>,
+        icon: isLocalMicMuted ? <MicOffIcon fontSize="large" style={{color: "red"}}/> :
+            <MicIcon fontSize="large" color="primary"/>,
         name: isLocalMicMuted ? 'Unmute microphone' : 'Mute microphone',
         onClick: toggleMicrophone,
-    },{
-        icon: isVideoInactive ? <VideocamOffIcon fontSize="large" style={{ color: "red" }}/> : <VideocamIcon fontSize="large" color="primary"/>,
+    }, {
+        icon: isVideoInactive ? <VideocamOffIcon fontSize="large" style={{color: "red"}}/> :
+            <VideocamIcon fontSize="large" color="primary"/>,
         name: isVideoInactive ? 'Switch camera on' : 'Switch camera off',
         onClick: toggleVideo,
     }];
@@ -175,11 +186,11 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
         actions.unshift({
             icon: <ScreenShareIcon color={desktopMode ? "primary" : "inherit"}/>,
             name: desktopMode ? 'Stop sharing desktop' : 'Share desktop',
-            onClick: () => setDesktopMode(desktopMode ? "default" : "desktop", streamerId)
+            onClick: () => handleClickScreenShareButton()
         })
     }
 
-   
+
     actions.unshift({
         icon: <SettingsIcon fontSize="large"/>,
         name: "Settings",
@@ -187,8 +198,8 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
     })
 
     return (
-            <ClickAwayListener onClickAway={handleClose}>
-                <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className={classes.root}>
+        <ClickAwayListener onClickAway={handleClose}>
+            <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className={classes.root}>
                 <WhiteTooltip
                     placement="top"
                     style={{
@@ -233,10 +244,22 @@ function VideoControlsContainer({currentLivestream: {mode, id, speakerSwitchMode
                             />
                         ))}
                     </SpeedDial>
-                    </WhiteTooltip>
-                </div>
-            </ClickAwayListener>
+                </WhiteTooltip>
+            </div>
+        </ClickAwayListener>
     );
+}
+
+VideoControlsContainer.prototypes = {
+    currentLivestream: PropTypes.object.isRequired,
+    viewer: PropTypes.bool,
+    setShowSettings: PropTypes.func.isRequired,
+    streamerId: PropTypes.string,
+    handleClickScreenShareButton: PropTypes.func,
+    isMainStreamer: PropTypes.bool,
+    localMediaStream: PropTypes.object,
+    showSettings: PropTypes.bool,
+    joining: PropTypes.bool
 }
 
 export default withFirebasePage(VideoControlsContainer);

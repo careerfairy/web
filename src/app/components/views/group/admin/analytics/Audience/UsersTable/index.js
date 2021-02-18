@@ -1,20 +1,17 @@
 import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Card, CardHeader, makeStyles, Slide} from '@material-ui/core';
+import { Card, Slide, Tabs, Tab } from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {copyStringToClipboard, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
 import MaterialTable from "material-table";
 import {defaultTableOptions, exportSelectionAction, LinkifyText, tableIcons} from "../../common/TableUtils";
-import {useAuth} from "../../../../../../../HOCs/AuthProvider";
-import {useRouter} from "next/router";
-import {theme} from "../../../../../../../materialUI";
 import UserInnerTable from "./UserInnerTable";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
+import {useAuth} from "../../../../../../../HOCs/AuthProvider";
+import {makeStyles} from "@material-ui/core/styles";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
     root: {},
     actions: {
         justifyContent: 'flex-end'
@@ -52,7 +49,7 @@ const UsersTable = ({
                         ...rest
                     }) => {
     const dataTableRef = useRef(null)
-
+    const {userData} = useAuth();
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
     const {enqueueSnackbar} = useSnackbar()
@@ -148,7 +145,7 @@ const UsersTable = ({
     const mapUserCategories = () => {
         const groupCategories = group.categories ? [...group.categories] : []
         if (groupCategories.length) {
-            const updatedUsers = totalUniqueUsers.map(user => {
+            const updatedUsers = totalUniqueUsers?.map(user => {
                 const updatedUser = user
                 groupCategories.forEach(category => {
                     const targetCategoryId = category.id
@@ -224,8 +221,10 @@ const UsersTable = ({
     const shouldHide = () => {
         const userProp = userType.propertyName
         return Boolean(
-            !group.universityCode &&
-            (userProp === "registeredUsers" || userProp === "participatingStudents")
+            (!group.universityCode &&
+                (userProp === "registeredUsers" || userProp === "participatingStudents")
+            )
+            && !userData?.isAdmin
         )
     }
 

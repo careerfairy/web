@@ -1,9 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {Button, Card, CardHeader, Grid, Menu, MenuItem} from "@material-ui/core";
+import { Button, Card, CardHeader, Grid, Menu, MenuItem, Box, Typography } from "@material-ui/core";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
-import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
 import {StyledTooltipWithButton, TooltipHighlight} from "../../../../../materialUI/GlobalTooltips";
 
 const useStyles = makeStyles(theme => ({

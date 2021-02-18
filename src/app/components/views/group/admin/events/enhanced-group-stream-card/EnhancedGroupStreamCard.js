@@ -1,6 +1,5 @@
-import React, {Fragment, useState, useEffect} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {withFirebase} from 'context/firebase';
-import EditIcon from '@material-ui/icons/Edit';
 import ShareIcon from '@material-ui/icons/Share';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import {v4 as uuidv4} from 'uuid';
@@ -12,7 +11,8 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle, Divider,
+    DialogTitle,
+    Divider,
     FormControl,
     InputLabel,
     MenuItem,
@@ -31,7 +31,7 @@ import ListAltIcon from '@material-ui/icons/ListAlt';
 import {useSnackbar} from "notistack";
 import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import {copyStringToClipboard, dynamicSort} from "../../../../../helperFunctions/HelperFunctions";
+import {copyStringToClipboard} from "../../../../../helperFunctions/HelperFunctions";
 import {useAuth} from "../../../../../../HOCs/AuthProvider";
 import StreamerLinksDialog from './StreamerLinksDialog';
 
@@ -64,7 +64,7 @@ const EnhancedGroupStreamCard = ({
                                      hasOptions
                                  }) => {
     const classes = useStyles()
-    const {authenticatedUser} = useAuth()
+    const {authenticatedUser, userData} = useAuth()
     const {enqueueSnackbar} = useSnackbar()
 
     const [localCategories, setLocalCategories] = useState([]);
@@ -255,24 +255,6 @@ const EnhancedGroupStreamCard = ({
         }
     }
 
-    // const handleEditStream = async () => {
-    //     const groupId = group.id
-    //     const targetPath = isDraft ? `/draft-stream` : "/new-livestream"
-    //     const targetQuery = {
-    //         absolutePath: router.asPath,
-    //         careerCenterIds: groupId,
-    //     }
-    //     if (isDraft) {
-    //         targetQuery.draftStreamId = livestream.id
-    //     } else {
-    //         targetQuery.livestreamId = livestream.id
-    //     }
-    //     return await router.push({
-    //         pathname: targetPath,
-    //         query: targetQuery
-    //     })
-    // }
-
     const isWorkInProgress = () => !livestream.status?.pendingApproval;
 
 
@@ -342,7 +324,7 @@ const EnhancedGroupStreamCard = ({
                     Get Streamer Links
                 </Button>}
                 <StreamerLinksDialog livestreamId={livestream.id} openDialog={openStreamerLinksDialog} setOpenDialog={setOpenStreamerLinksDialog}/>
-                {isCareerCenter() &&
+                {isCareerCenter() || userData?.isAdmin &&
                 <CSVLink data={registeredStudentsFromGroup} separator={";"}
                          filename={'Registered Students ' + livestream.company + ' ' + livestream.id + '.csv'}
                          style={{color: 'red'}}>
@@ -381,7 +363,7 @@ const EnhancedGroupStreamCard = ({
                                         variant='outlined' onClick={() => setStartDownloadingReport(true)}
                                         disabled={startDownloadingReport}>{startDownloadingReport ? 'Generating Report...' : 'Generate Report'}</Button>
                             </div> :
-                            <PDFDownloadLink fileName="somename.pdf"
+                            <PDFDownloadLink fileName={`General Report ${livestream.company} ${livestream.id}.pdf`}
                                              document={
                                                  <LivestreamPdfReport group={group}
                                                     livestream={livestream}

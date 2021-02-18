@@ -1,18 +1,24 @@
 import React from 'react';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import CheckIcon from '@material-ui/icons/Check';
-import Dialog from '@material-ui/core/Dialog';
 import {withFirebase} from 'context/firebase';
-import {DialogContentText, DialogTitle, Typography, Slide} from "@material-ui/core";
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
+import {
+    DialogContentText,
+    DialogTitle,
+    Typography,
+    Slide,
+    DialogContent as MuiDialogContent,
+    DialogActions as MuiDialogActions,
+    Dialog,
+    TextField,
+    Button,
+} from "@material-ui/core";
+import {GlassDialog} from "../../../../materialUI/GlobalModals";
 
 function SpeakerManagementModal({open, setOpen, joiningStreamerLink}) {
 
     return (
-        <Dialog TransitionComponent={Slide} fullWidth onClose={() => setOpen(false)} open={open}>
+        <GlassDialog TransitionComponent={Slide} fullWidth onClose={() => setOpen(false)} open={open}>
             <DialogTitle disableTypography
                          style={{display: "flex", justifyContent: "center", alignItems: "flex-end"}} align="center">
                 <PersonAddIcon style={{marginRight: "1rem"}} fontSize="large"/> <Typography
@@ -43,7 +49,7 @@ function SpeakerManagementModal({open, setOpen, joiningStreamerLink}) {
                     onClick={() => setOpen(false)}
                 />
             </MuiDialogActions>
-        </Dialog>
+        </GlassDialog>
     )
 }
 

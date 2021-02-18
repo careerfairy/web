@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
-import { Button, makeStyles} from "@material-ui/core";
+import { Button} from "@material-ui/core";
+import { makeStyles} from "@material-ui/core/styles";
 import GroupJoinModal from "../../profile/GroupJoinModal";
 import {useRouter} from "next/router";
 

@@ -1,22 +1,28 @@
 import React, {useRef, useState} from 'react';
-import {makeStyles} from "@material-ui/core/styles";
-import {AppBar, CardActions, Dialog, DialogContent, fade, Slide, Zoom} from "@material-ui/core";
-import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
+import {fade, makeStyles} from "@material-ui/core/styles";
+import {
+    AppBar,
+    CardActions,
+    Dialog,
+    DialogContent,
+    Slide,
+    Zoom,
+    Toolbar,
+    IconButton,
+    Typography,
+    Button,
+    ButtonGroup,
+} from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
 import DraftStreamForm from "../../../draftStreamForm/DraftStreamForm";
 import {withFirebase} from "../../../../../context/firebase";
 import {buildLivestreamObject} from "../../../../helperFunctions/streamFormFunctions";
 import {GENERAL_ERROR, SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../../../../util/constants";
 import SaveIcon from '@material-ui/icons/Save';
 import {useSnackbar} from "notistack";
-import AddIcon from '@material-ui/icons/Add';
 import PublishIcon from '@material-ui/icons/Publish';
 import {useRouter} from "next/router";
 import {v4 as uuidv4} from "uuid";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
@@ -162,7 +168,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
             setDraftId(id)
             if (status === SAVE_WITH_NO_VALIDATION) {
                 enqueueSnackbar("You changes have been saved!", {
-                    variant: "default",
+                    variant: "success",
                     preventDuplicate: true,
                 });
                 setStatus("")

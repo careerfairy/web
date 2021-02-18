@@ -167,77 +167,6 @@ const postmark = require("postmark");
 var serverToken = "3f6d5713-5461-4453-adfd-71f5fdad4e63";
 var client = new postmark.ServerClient(serverToken);
 
-exports.sendPostmarkEmailVerificationEmail = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
-    }
-
-    const recipient_email = req.body.recipientEmail;
-    const redirect_link = req.body.redirect_link;
-
-    const actionCodeSettings = {
-        url: redirect_link
-    };
-
-    admin.auth().generateEmailVerificationLink(recipient_email, actionCodeSettings)
-        .then((link) => {
-            const email = {
-                "TemplateId": 16531011,
-                "From": 'CareerFairy <noreply@careerfairy.io>',
-                "To": recipient_email,
-                "TemplateModel": {verification_link: link}
-            };
-            return client.sendEmailWithTemplate(email).then(response => {
-                res.send(200);
-            }, error => {
-                res.send('Error: ' + error);
-            });
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-});
-
-exports.sendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
-
-    const recipient_email = req.body.recipientEmail;
-    const pinCode = getRandomInt(9999);
-
-    await admin.firestore().collection("userData").doc(recipient_email).set({validationPin: pinCode});
-
-    const email = {
-        "TemplateId": 17669843,
-        "From": 'CareerFairy <noreply@careerfairy.io>',
-        "To": recipient_email,
-        "TemplateModel": {pinCode: pinCode}
-    };
-
-    return client.sendEmailWithTemplate(email).then(response => {
-        res.sendStatus(200);
-    }, error => {
-        res.sendStatus(500);
-    });
-});
-
 exports.resendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(async (req, res) => {
 
     res.set('Access-Control-Allow-Origin', '*');
@@ -255,92 +184,6 @@ exports.resendPostmarkEmailVerificationEmailWithPin = functions.https.onRequest(
     const pinCode = getRandomInt(9999);
 
     await admin.firestore().collection("userData").doc(recipient_email).update({validationPin: pinCode});
-
-    const email = {
-        "TemplateId": 17669843,
-        "From": 'CareerFairy <noreply@careerfairy.io>',
-        "To": recipient_email,
-        "TemplateModel": {pinCode: pinCode}
-    };
-
-    return client.sendEmailWithTemplate(email).then(response => {
-        res.sendStatus(200);
-    }, error => {
-        res.sendStatus(500);
-    });
-});
-
-exports.sendPostmarkEmailVerificationEmailWithPinAndUpdateUserData = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
-
-    const recipient_email = req.body.recipientEmail;
-    const recipient_first_name = req.body.firstName;
-    const recipient_last_name = req.body.lastName;
-    const pinCode = getRandomInt(9999);
-
-    await admin.firestore().collection("userData").doc(recipient_email).set(
-        {
-            id: recipient_email,
-            validationPin: pinCode,
-            firstName: recipient_first_name,
-            lastName: recipient_last_name,
-            userEmail: recipient_email,
-        });
-
-    const email = {
-        "TemplateId": 17669843,
-        "From": 'CareerFairy <noreply@careerfairy.io>',
-        "To": recipient_email,
-        "TemplateModel": {pinCode: pinCode}
-    };
-
-    return client.sendEmailWithTemplate(email).then(response => {
-        res.sendStatus(200);
-    }, error => {
-        res.sendStatus(500);
-    });
-});
-
-exports.sendPostmarkEmailVerificationEmailWithPinAndUpdateUserDataAndUni = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
-
-    const recipient_email = req.body.recipientEmail;
-    const recipient_first_name = req.body.firstName;
-    const recipient_last_name = req.body.lastName;
-    const recipient_university = req.body.university;
-    const recipient_university_country_code = req.body.universityCountryCode;
-    const pinCode = getRandomInt(9999);
-
-    await admin.firestore().collection("userData").doc(recipient_email).set(
-        {
-            id: recipient_email,
-            validationPin: pinCode,
-            firstName: recipient_first_name,
-            lastName: recipient_last_name,
-            userEmail: recipient_email,
-            university: recipient_university,
-            universityCountryCode: recipient_university_country_code,
-        });
 
     const email = {
         "TemplateId": 17669843,
@@ -440,8 +283,6 @@ exports.sendPostmarkResetPasswordEmail = functions.https.onRequest(async (req, r
             console.log(error);
         });
 });
-
-const axios = require('axios');
 
 exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onRequest(async (req, res) => {
 
@@ -639,6 +480,64 @@ exports.sendPostmarkEmailUserDataAndUniWithName = functions.https.onRequest(asyn
     });
 });
 
+exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(async (req, res) => {
+
+    console.log("running");
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    let counter = 0;
+
+    let groupId = req.body.groupId;
+    let categoryId = req.body.categoryId;
+    let categoryValueId = req.body.categoryValueId;
+
+    let collectionRef = admin.firestore().collection("userData")
+        .where("groupIds", "array-contains", groupId);
+
+    collectionRef.get()
+        .then((querySnapshot) => {
+            console.log("snapshotSize:" + querySnapshot.size);
+            querySnapshot.forEach(doc => {
+                var id = doc.id;
+                var userData = doc.data()
+                let groupCategory = userData.registeredGroups.find(group => group.groupId === groupId);
+                if (groupCategory) {
+                    let filteringCategory = groupCategory.categories.find(category => category.id === categoryId);
+                    if (filteringCategory && filteringCategory.selectedValueId === categoryValueId) {
+                        console.log(userData.userEmail)
+                        counter++;
+                        const email = {
+                            "TemplateId": req.body.templateId,
+                            "From": 'CareerFairy <noreply@careerfairy.io>',
+                            "To": userData.userEmail,
+                            "TemplateModel": {
+                                userEmail: userData.userEmail
+                            }
+                        };
+                        client.sendEmailWithTemplate(email).then(() => {
+                            console.log("email sent to: " + userData.userEmail);
+                        }, error => {
+                            console.log('error:' + error);
+                        });
+                    }
+                }
+            });
+        }).catch(error => {
+        console.log('error:' + error);
+        return res.status(400).send();
+    })
+});
+
 
 const {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('agora-access-token')
 const appID = '53675bc6d3884026a72ecb1de3d19eb1';
@@ -677,6 +576,45 @@ exports.generateAgoraToken = functions.https.onRequest(async (req, res) => {
         return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
 })
 
+const axios = require('axios');
+
+exports.startRecordingLivestream = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        res.status(204).send('');
+    }
+
+    const customerKey = "fd45e86c6ffe445ebb87571344e945b1";
+    const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0";
+
+    let plainCredentials = `${customerKey}:${customerSecret}`;
+    let base64Credentials = Buffer.from(plainCredentials).toString('base64');
+
+    let authorizationHeader = `Basic ${base64Credentials}`;
+
+    let acquire = await axios({
+        method: 'post',
+        data: {
+            "cname": "bnruMEB6DGte14VNaZ9M",
+            "uid": 1234232,
+            "clientRequest": {}
+        },
+        url: `https://api.agora.io/dev/v1/apps/${appID}/cloud_recording/acquire`,
+        headers: {
+            'Authorization': authorizationHeader,
+            'Content-Type': 'application/json'
+        }
+    })
+    console.log(acquire);
+});
+
 exports.generateAgoraTokenSecure = functions.https.onRequest(async (req, res) => {
 
     res.set('Access-Control-Allow-Origin', '*');
@@ -698,16 +636,12 @@ exports.generateAgoraTokenSecure = functions.https.onRequest(async (req, res) =>
     const uid = req.body.uid;
     const currentTimestamp = Math.floor(Date.now() / 1000)
     const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-    
-    // IMPORTANT! Build token with either the uid or with the user account. Comment out the option you do not want to use below.
-    
+        
     // Build token with uid
     if (rtcRole === RtcRole.PUBLISHER) {
         let livestreamDoc = await admin.firestore().collection('livestreams').doc(channelName).get();
         let storedTokenDoc =  await admin.firestore().collection('livestreams').doc(channelName).collection('tokens').doc('secureToken').get();
 
-        console.log(livestreamDoc.exists)
-        console.log(storedTokenDoc.exists)
         let livestream = livestreamDoc.data();
         let storedToken = storedTokenDoc.data().value;
         if (!livestream.test && storedToken !== sentToken) {
@@ -822,62 +756,6 @@ exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(async
             console.error(`Error sending email to ${recipient}`, error);
         });
     })
-});
-
-exports.getXirsysNtsToken = functions.https.onRequest(async (req, res) => {
-
-    const https = require('https');
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', '');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
-    }
-
-    axios({
-        method: 'put',
-        url: 'https://mvoss:a1319174-e353-11e9-b4f0-0242ac110003@global.xirsys.net/_turn/CareerFairy',
-        data: JSON.stringify({'format': 'urls'}),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }).then(response => {
-        console.log(response.data);
-        res.status(200).send(response.data);
-    }).catch(error => {
-        console.log(error);
-        res.status(400).send(error);
-    });
-});
-
-exports.getNumberOfViewers = functions.https.onRequest(async (req, res) => {
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-    res.set('Content-Type', 'application/json');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', '');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
-    }
-
-    axios({
-        method: 'get',
-        url: 'https://streaming.careerfairy.io/WebRTCAppEE/rest/v2/broadcasts/' + req.query.livestreamId,
-    }).then(response => {
-        console.log(response.data);
-        return res.status(200).send(response.data);
-    }).catch(error => {
-        console.log(error);
-    });
 });
 
 exports.scheduleReminderEmailSendTestOnRun = functions.pubsub.schedule('every 45 minutes').timeZone('Europe/Zurich').onRun((context) => {
@@ -1036,62 +914,4 @@ exports.scheduleTestLivestreamDeletion = functions.pubsub.schedule('every sunday
             });
         })
     });
-});
-
-exports.sendReminderEmailToUserFromUniversity = functions.https.onRequest(async (req, res) => {
-
-    console.log("running");
-
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.set('Access-Control-Max-Age', '3600');
-        return res.status(204).send('');
-    }
-
-    let counter = 0;
-
-    let groupId = req.body.groupId;
-    let categoryId = req.body.categoryId;
-    let categoryValueId = req.body.categoryValueId;
-
-    let collectionRef = admin.firestore().collection("userData")
-        .where("groupIds", "array-contains", groupId);
-
-    collectionRef.get()
-        .then((querySnapshot) => {
-            console.log("snapshotSize:" + querySnapshot.size);
-            querySnapshot.forEach(doc => {
-                var id = doc.id;
-                var userData = doc.data()
-                let groupCategory = userData.registeredGroups.find(group => group.groupId === groupId);
-                if (groupCategory) {
-                    let filteringCategory = groupCategory.categories.find(category => category.id === categoryId);
-                    if (filteringCategory && filteringCategory.selectedValueId === categoryValueId) {
-                        console.log(userData.userEmail)
-                        counter++;
-                        const email = {
-                            "TemplateId": req.body.templateId,
-                            "From": 'CareerFairy <noreply@careerfairy.io>',
-                            "To": userData.userEmail,
-                            "TemplateModel": {
-                                userEmail: userData.userEmail
-                            }
-                        };
-                        client.sendEmailWithTemplate(email).then(() => {
-                            console.log("email sent to: " + userData.userEmail);
-                        }, error => {
-                            console.log('error:' + error);
-                        });
-                    }
-                }
-            });
-        }).catch(error => {
-        console.log('error:' + error);
-        return res.status(400).send();
-    })
 });

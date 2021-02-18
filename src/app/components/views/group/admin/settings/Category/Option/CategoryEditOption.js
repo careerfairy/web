@@ -1,9 +1,15 @@
 import React, {Fragment, useState, useEffect} from 'react';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-
-import TextField from '@material-ui/core/TextField';
-import {Button, Typography, DialogActions, DialogTitle, FormHelperText, Box} from "@material-ui/core";
+import {
+    Button,
+    Typography,
+    DialogActions,
+    DialogTitle,
+    FormHelperText,
+    Box,
+    Dialog,
+    DialogContent,
+    TextField,
+} from "@material-ui/core";
 import {v4 as uuidv4} from 'uuid'
 import {Warning} from "@material-ui/icons";
 

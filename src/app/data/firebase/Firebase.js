@@ -1112,6 +1112,19 @@ class Firebase {
         });
     }
 
+    optOutOfRating = (livestreamId, userEmail, ratingId) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("rating")
+            .doc(ratingId)
+            .collection("nonVoters")
+            .doc(userEmail);
+        return ref.set({
+            timestamp: this.getServerTimestamp(),
+        });
+    }
+
     rateStreamingCompany = (livestreamId, userEmail, rating) => {
         let ref = this.firestore
             .collection("livestreams")
@@ -1141,15 +1154,28 @@ class Firebase {
     }
 
     checkIfUserRated = async (livestreamId, userEmail, typeOfRating) => {
-        let ref = this.firestore
-            .collection("livestreams")
-            .doc(livestreamId)
-            .collection("rating")
-            .doc(typeOfRating)
-            .collection("voters")
-            .doc(userEmail);
-        const docSnapshot = await ref.get()
-        return docSnapshot.exists
+        try {
+            let voterInVotersRef = this.firestore
+                .collection("livestreams")
+                .doc(livestreamId)
+                .collection("rating")
+                .doc(typeOfRating)
+                .collection("voters")
+                .doc(userEmail);
+            let voterInNonVotersRef = this.firestore
+                .collection("livestreams")
+                .doc(livestreamId)
+                .collection("rating")
+                .doc(typeOfRating)
+                .collection("nonVoters")
+                .doc(userEmail);
+            const voterInVotersSnap = await voterInVotersRef.get()
+            const voterInNonVotersSnap = await voterInNonVotersRef.get()
+            return voterInVotersSnap.exists || voterInNonVotersSnap.exists
+        } catch (e) {
+            console.log("-> e", e);
+        }
+
     }
 
     createLivestreamPoll = (livestreamId, pollQuestion, pollOptions) => {

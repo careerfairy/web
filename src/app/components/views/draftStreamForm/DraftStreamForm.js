@@ -1,14 +1,20 @@
-import React, {Fragment, useContext, useEffect, useRef, useState} from 'react';
+import React, {Fragment, useEffect, useRef, useState} from 'react';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {
     Button,
     CircularProgress,
     Collapse,
     Container,
-    FormControl, FormControlLabel,
-    Grid, Switch,
-    TextField, Tooltip,
-    Typography
+    FormControl,
+    FormControlLabel,
+    Grid,
+    Switch,
+    TextField,
+    Tooltip,
+    Typography,
+    Fab,
+    ButtonGroup,
+    Box,
 } from "@material-ui/core";
 import {Formik} from 'formik';
 import {v4 as uuidv4} from 'uuid';
@@ -23,20 +29,19 @@ import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
 import {useRouter} from "next/router";
 import FormGroup from "./FormGroup";
 import WarningIcon from '@material-ui/icons/Warning';
-import Fab from "@material-ui/core/Fab";
-import ErrorContext from "../../../context/error/ErrorContext";
 import {
-    buildLivestreamObject,
     getStreamSubCollectionSpeakers,
     handleAddSpeaker,
-    handleDeleteSpeaker, handleError, handleFlattenOptions, languageCodes, validateStreamForm
+    handleDeleteSpeaker,
+    handleError,
+    handleFlattenOptions,
+    languageCodes,
+    validateStreamForm
 } from "../../helperFunctions/streamFormFunctions";
 import {copyStringToClipboard} from "../../helperFunctions/HelperFunctions";
 import {useSnackbar} from "notistack";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
 import {SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../../util/constants";
 import {LanguageSelect} from "../../helperFunctions/streamFormFunctions/components";
-import Box from "@material-ui/core/Box";
 import {useAuth} from "../../../HOCs/AuthProvider";
 
 
@@ -106,8 +111,8 @@ const DraftStreamForm = ({
     const router = useRouter()
     const {userData} = useAuth()
     let {
-        query: {careerCenterIds, draftStreamId, absolutePath},
-        push, replace,
+        query: {careerCenterIds, draftStreamId},
+        replace,
         pathname
     } = router;
     draftStreamId = draftStreamId || currentStream?.id
@@ -121,8 +126,6 @@ const DraftStreamForm = ({
 
     const [targetCategories, setTargetCategories] = useState({})
     const [selectedGroups, setSelectedGroups] = useState([])
-    const [wantsApproval, setWantsApproval] = useState(false);
-    const [updated, setUpdated] = useState(false);
     const [allFetched, setAllFetched] = useState(false)
     const [updateMode, setUpdateMode] = useState(false);
 
@@ -156,17 +159,30 @@ const DraftStreamForm = ({
             const totalExistingGroups = await firebase.getCareerCentersByGroupId(mergedGroups)
             const totalFlattenedGroups = totalExistingGroups.map(group => ({
                 ...group,
-                selected: true,
+                selected: false,
                 flattenedOptions: handleFlattenOptions(group)
             }))
 
-            // Includes partner groups as non auto-selected options if they arent already part of the event
-            const selectedGroups = totalFlattenedGroups.filter(({id}) => !(mergedGroups.includes(id) && !initialGroups.includes(id)))
-
+            let selectedGroups = []
+            const targetSelectedGroupIds = [...new Set([...UrlIds, ...draftStreamGroupIds])]
+            targetSelectedGroupIds.forEach((id) => {
+                const targetGroup = totalFlattenedGroups.find(flattenedGroup => flattenedGroup.groupId === id)
+                if (targetGroup) {
+                    targetGroup.selected = true
+                    selectedGroups.push(targetGroup)
+                }
+            })
+            if (!selectedGroups.length && group?.id) {
+                selectedGroups.push({
+                    ...group,
+                    flattenedOptions: handleFlattenOptions(group),
+                    selected: true
+                })
+            }
 
             setExistingGroups(totalFlattenedGroups)
             setSelectedGroups(selectedGroups)
-            const arrayOfActualGroupIds = totalExistingGroups.map(groupObj => groupObj.id)
+            const arrayOfActualGroupIds = selectedGroups.map(groupObj => groupObj.id)
             setFormData({...newFormData, groupIds: arrayOfActualGroupIds})
         }
     }
@@ -174,6 +190,7 @@ const DraftStreamForm = ({
     useEffect(() => {
         if (draftStreamId) {
             (async () => {
+                setAllFetched(false)
                 const targetId = draftStreamId
                 const targetCollection = isActualLivestream ? "livestreams" : "draftLivestreams"
                 const livestreamQuery = await firebase.getStreamById(targetId, targetCollection)
@@ -197,6 +214,7 @@ const DraftStreamForm = ({
                         language: livestream.language || languageCodes[0]
                     }
                     setFormData(newFormData)
+                    setAllFetched(false)
                     if (careerCenterIds) {
                         const arrayOfUrlIds = careerCenterIds.split(",")
                         await handleSetGroupIds(arrayOfUrlIds, livestream.groupIds, newFormData)
@@ -204,19 +222,21 @@ const DraftStreamForm = ({
                         await handleSetGroupIds([], livestream.groupIds, newFormData)
                     }
                     setTargetCategories(livestream.targetCategories || {})
-                    setAllFetched(true)
                     setUpdateMode(true)
                 } else {
-                    setAllFetched(true)
                     setUpdateMode(false)
                     replace(pathname)
                 }
+                setAllFetched(true)
             })()
         } else if (careerCenterIds || group?.id) {
-            handleSetOnlyUrlIds()
-        } else {
-            setAllFetched(true)
+            (async function () {
+                setAllFetched(false)
+                await handleSetOnlyUrlIds()
+                setAllFetched(true)
+            })()
         }
+
     }, [draftStreamId, router, submitted])
 
     const isPending = () => {
@@ -234,9 +254,10 @@ const DraftStreamForm = ({
     }
 
     const handleSetOnlyUrlIds = async () => {
+        console.log("-> in the handle set only");
         const arrayOfUrlIds = careerCenterIds?.split(",") || [group.id]
+        console.log("-> arrayOfUrlIds", arrayOfUrlIds);
         await handleSetGroupIds(arrayOfUrlIds, [], formData)
-        setAllFetched(true)
     }
 
     const handleSetGroupCategories = (groupId, targetOptionIds) => {
@@ -294,9 +315,10 @@ const DraftStreamForm = ({
                     We will review the draft and get back to you as soon as possible!
                 </Typography>
                 <div style={{display: "flex", justifyContent: "space-between", marginTop: 16}}>
+                    {userData &&
                     <Button className={classes.whiteBtn} variant="contained" href="/profile">
                         To Profile
-                    </Button>
+                    </Button>}
                     <Button className={classes.whiteBtn} variant="contained" href="/next-livestreams">
                         To Next Livestreams
                     </Button>
@@ -582,7 +604,7 @@ const DraftStreamForm = ({
                 </form>)
             }
             }
-        </Formik>) : <CircularProgress style={{marginTop: "30vh", color: "white"}}/>}
+        </Formik>) : <CircularProgress style={{margin: "auto", color: "white"}}/>}
     </Container>);
 };
 

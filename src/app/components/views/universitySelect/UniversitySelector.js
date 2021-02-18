@@ -1,11 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import {withFirebase} from "../../../context/firebase";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
-import {Collapse, FormControl, FormHelperText} from "@material-ui/core";
+import { Collapse, FormControl, FormHelperText, TextField, CircularProgress } from "@material-ui/core";
 
 const otherObj = {name: "other", id: "other"}
 const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, error, handleBlur, submitting, values}) => {

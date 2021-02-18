@@ -4,6 +4,7 @@ import {withFirebase} from 'context/firebase';
 import {Modal, Input, Icon, Button, Form, Image, Grid, Dropdown} from 'semantic-ui-react';
 import SoundLevelDisplayer from 'components/views/common/SoundLevelDisplayer';
 import { CircularProgress, Dialog, DialogContent } from '@material-ui/core';
+import {GlassDialog} from "../../../../materialUI/GlobalModals";
 
 function StreamPreparationModal(props) {
 
@@ -19,7 +20,7 @@ function StreamPreparationModal(props) {
     }, [props.localStream]);
 
     return (
-        <Dialog open={!props.streamerReady && !props.connectionEstablished}>
+        <GlassDialog open={!props.streamerReady && !props.connectionEstablished}>
             <DialogContent> 
                 {
                     props.localStream ? 
@@ -76,7 +77,7 @@ function StreamPreparationModal(props) {
                         </div>           
                         }
             </DialogContent>
-        </Dialog>
+        </GlassDialog>
     );
 }
 

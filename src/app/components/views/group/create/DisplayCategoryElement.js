@@ -1,8 +1,7 @@
 import React from "react";
-import Paper from "@material-ui/core/Paper";
 import {withFirebase} from "context/firebase";
 import {makeStyles} from "@material-ui/core/styles";
-import {Box, Chip} from "@material-ui/core";
+import { Box, Chip, Paper } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     whiteBox: {

@@ -9,19 +9,23 @@ import {
     CardActions,
     CardContent,
     Divider,
+    FormHelperText,
+    Grow,
     Typography,
-    makeStyles, FormHelperText, Grow
+    CircularProgress,
 } from '@material-ui/core';
 import FilePickerContainer from "../../../../ssr/FilePickerContainer";
 import PublishIcon from "@material-ui/icons/Publish";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import {useSnackbar} from "notistack";
 import {GENERAL_ERROR} from "../../../../util/constants";
 import {uploadLogo} from "../../../../helperFunctions/HelperFunctions";
+import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({
     root: {},
     avatar: {
+        padding: theme.spacing(1),
+        marginBottom: theme.spacing(1),
         height: "100%",
         width: "100%",
         "& img": {

@@ -1,23 +1,22 @@
 import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from "context/firebase";
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, fade} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
 import {
-    Avatar,
-    Box,
     Button,
     Chip,
     ClickAwayListener,
     Collapse,
-    fade,
     Fade,
     Grow,
-    Paper
+    Paper,
+    Typography,
+    Avatar,
+    Box,
 } from "@material-ui/core";
 import {AvatarGroup} from "@material-ui/lab";
 import Streamers from "./Streamers";
 import Wave from "./Wave";
-import Typography from "@material-ui/core/Typography";
 import LogoElement from "../LogoElement";
 import TargetOptions from "../../GroupsCarousel/TargetOptions";
 import UserUtil from "../../../../../data/util/UserUtil";
@@ -87,7 +86,7 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center",
             justifyContent: "center",
             borderRadius: ({cardHovered}) => cardHovered && `${theme.spacing(2)}px 0px`,
-            background: fade(paperColor, 1),
+            background: fade(theme.palette.common.white, 1),
             boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
         },
         dateTimeWrapper: {
@@ -164,7 +163,7 @@ const useStyles = makeStyles((theme) => {
         },
         companyLogosFrontWrapper: {
             boxShadow: ({isExpanded}) => isExpanded && theme.shadows[24],
-            background: "white",
+            background: theme.palette.common.white,
             padding: theme.spacing(1),
             display: "flex",
             justifyContent: "space-evenly",
@@ -228,7 +227,7 @@ const useStyles = makeStyles((theme) => {
         logosBackWrapper: {
             display: "flex",
             width: "100%",
-            background: paperColor,
+            background: theme.palette.common.white,
             overflowX: "auto",
             overflowY: "hidden",
         },
@@ -373,7 +372,7 @@ const GroupStreamCardV2 = memo(({
     const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
 
     function userIsRegistered() {
-        if (!user || !livestream.registeredUsers || isAdmin) {
+        if (user.isLoaded && user.isEmpty || !livestream.registeredUsers || isAdmin) {
             return false;
         }
         return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1)
@@ -486,7 +485,7 @@ const GroupStreamCardV2 = memo(({
     }
 
     const checkIfUserFollows = (careerCenter) => {
-        if (user && userData && userData.groupIds) {
+        if (user.isLoaded && !user.isEmpty && userData && userData.groupIds) {
             const {groupId} = careerCenter
             return userData.groupIds.includes(groupId)
         } else {
@@ -495,7 +494,7 @@ const GroupStreamCardV2 = memo(({
     }
 
     function deregisterFromLivestream() {
-        if (!user) {
+        if (user.isLoaded && user.isEmpty) {
             return router.push({
                 pathname: '/login',
                 query: {absolutePath}
@@ -506,7 +505,7 @@ const GroupStreamCardV2 = memo(({
     }
 
     async function startRegistrationProcess() {
-        if (!user || !user.emailVerified) {
+        if (user.isLoaded && user.isEmpty || !user.emailVerified) {
             return router.push({
                 pathname: `/login`,
                 query: {absolutePath: linkToStream},

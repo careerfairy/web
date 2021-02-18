@@ -1,19 +1,26 @@
 import {Fragment, useState, useEffect} from "react";
 import {Formik} from 'formik';
 import React from "react";
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
 import {withFirebase} from "context/firebase";
 import UserCategorySelector from "components/views/profile/UserCategorySelector";
-import {Box, CardMedia, Checkbox, CircularProgress, FormControlLabel, FormLabel} from "@material-ui/core";
+import {
+    Box,
+    CardMedia,
+    Checkbox,
+    CircularProgress,
+    FormControlLabel,
+    FormLabel,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    FormControl,
+    Typography,
+} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import LogoButtons from "./LogoButtons";
-import FormControl from "@material-ui/core/FormControl";
-import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
     media: {

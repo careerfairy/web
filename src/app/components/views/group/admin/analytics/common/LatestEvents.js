@@ -7,16 +7,16 @@ import {
     Card,
     CardContent,
     CardHeader,
+    CircularProgress,
     Divider,
-    useTheme,
-    makeStyles, CircularProgress, fade, FormControlLabel, Switch,
+    FormControlLabel,
+    Switch,
+    Typography,
 } from "@material-ui/core";
 import {withFirebase} from "../../../../../../context/firebase";
 import {colorsArray} from "../../../../../util/colors";
 import {getLength, prettyDate, truncate} from "../../../../../helperFunctions/HelperFunctions";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import Typography from "@material-ui/core/Typography";
+import {makeStyles, useTheme, fade} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -64,6 +64,10 @@ const LatestEvents = ({
             pointRadius: 3,
             pointHitRadius: 4,
             spanGaps: true,
+            barThickness: 12,
+            maxBarThickness: 10,
+            barPercentage: 0.5,
+            categoryPercentage: 0.5,
         }
 
         const handlePastStreams = (prop) => {
@@ -188,10 +192,7 @@ const LatestEvents = ({
             scales: {
                 xAxes: [
                     {
-                        barThickness: 12,
-                        maxBarThickness: 10,
-                        barPercentage: 0.5,
-                        categoryPercentage: 0.5,
+
                         ticks: {
                             fontColor: theme.palette.text.secondary,
                             maxTicksLimit: 15,

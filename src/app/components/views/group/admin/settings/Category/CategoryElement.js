@@ -3,9 +3,20 @@ import {Grid, Icon} from "semantic-ui-react";
 import EditIcon from '@material-ui/icons/Edit';
 import {withFirebase} from 'context/firebase';
 import CategoryEdit from './CategoryEdit';
-import {Box, Card, CardContent, CardHeader, Chip, Divider, Fade, IconButton, TextField, Zoom} from "@material-ui/core";
+import {
+    Box,
+    Card,
+    CardContent,
+    CardHeader,
+    Chip,
+    Divider,
+    Fade,
+    IconButton,
+    TextField,
+    Zoom,
+    Paper,
+} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
 
 const useStyles = makeStyles((theme) => ({
     whiteBox: {

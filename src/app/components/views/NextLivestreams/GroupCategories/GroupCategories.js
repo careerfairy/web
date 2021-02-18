@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
         left: "50%",
         transform: "translate(-50%,-50%)",
         maxWidth: "90%",
-        maxHeight: "100%",
+        maxHeight: "90%",
         borderRadius: theme.spacing(1)
     },
     groupDescription:{

@@ -1,11 +1,8 @@
 import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {
-    Button,
-    ListItem,
-    makeStyles
-} from '@material-ui/core';
+import {Button, ListItem,} from '@material-ui/core';
+import {makeStyles} from '@material-ui/core/styles';
 import {useRouter} from "next/router";
 import Link from '../../../materialUI/NextNavLink'
 
@@ -14,24 +11,30 @@ const useStyles = makeStyles((theme) => ({
     item: {
         display: 'flex',
         paddingTop: 0,
-        paddingBottom: 0
+        paddingBottom: 0,
     },
     button: {
-        color: theme.palette.text.secondary,
-        fontWeight: theme.typography.fontWeightMedium,
+        color: theme.palette.common.white,
+        fontWeight: theme.typography.fontWeightLight,
         justifyContent: 'flex-start',
         letterSpacing: 0,
         padding: '10px 8px',
         textTransform: 'none',
         width: '100%',
         textDecoration: "none !important",
+        "&:hover": {
+            color: theme.palette.common.white,
+        },
         "&.active": {
-            color: theme.palette.primary.main,
+            background: theme.palette.common.white,
+            color: theme.palette.text.secondary,
+            // color: theme.palette.primary.main,
+            boxShadow: theme.whiteShadow,
             '& $title': {
                 fontWeight: theme.typography.fontWeightMedium
             },
             '& $icon': {
-                color: theme.palette.primary.main
+                // color: theme.palette.primary.main
             }
         }
     },

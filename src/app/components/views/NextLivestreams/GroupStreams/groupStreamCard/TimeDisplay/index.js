@@ -1,4 +1,5 @@
-import {makeStyles, Typography} from "@material-ui/core";
+import { Typography} from "@material-ui/core";
+import { makeStyles} from "@material-ui/core/styles";
 import React from "react";
 import dayjs from "dayjs";
 
@@ -38,8 +39,8 @@ const useStyles = makeStyles(theme => {
             zIndex: "100",
             borderRadius: "5px",
             textAlign: "center",
-            backgroundColor: "rgb(245,245,245)",
-            boxShadow: "0 0 2px grey",
+            backgroundColor: theme.palette.common.white,
+            boxShadow: theme.shadows[3],
             fontWeight: "500",
             textTransform: "uppercase",
             padding: "5px 15px",

@@ -1,10 +1,8 @@
 import React, {forwardRef, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {getMinutes, prettyDate} from "../../../../../helperFunctions/HelperFunctions";
-import Tooltip from "@material-ui/core/Tooltip";
-import Typography from "@material-ui/core/Typography";
 import {Rating} from "@material-ui/lab";
-import {Box} from "@material-ui/core";
+import { Box, Tooltip, Typography } from "@material-ui/core";
 import {CsvBuilder} from "filefy";
 
 import AddBox from '@material-ui/icons/AddBox';
@@ -148,6 +146,14 @@ export const defaultTableOptions = {
     exportAllData: true,
     exportDelimiter: ";",
     exportButton: {csv: true, pdf: true}// PDF is false because its buggy and throws errors
+}
+
+export const getPageSize = (pageSizeOptions = [], totalData = []) => {
+    const numEntries = totalData.length
+    return pageSizeOptions.find((option, index) =>
+        ((option < numEntries) && pageSizeOptions[index + 1] >= numEntries)
+        || (numEntries <= pageSizeOptions[0])
+        || (option === pageSizeOptions[pageSizeOptions.length - 1]))
 }
 
 const useStyles = makeStyles(theme => ({
