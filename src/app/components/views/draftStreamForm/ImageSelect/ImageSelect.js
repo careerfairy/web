@@ -8,10 +8,10 @@ import {
     FormControl,
     FormHelperText,
     Avatar,
-    Typography
+    Typography,
+    TextField,
+    CircularProgress,
 } from "@material-ui/core";
-import TextField from "@material-ui/core/TextField";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import match from "autosuggest-highlight/match";
 import PublishIcon from '@material-ui/icons/Publish';
 import parse from "autosuggest-highlight/parse";
@@ -107,7 +107,7 @@ const ImageSelect =
                      alt={formName}/>
             </div>
         ) : (
-            <Box boxShadow={2} component={CardMedia} className={classes.media}>
+            <Box p={2} boxShadow={2} component={CardMedia} className={classes.media}>
                 <img src={value.length ? value : logoPlaceholder}
                      className={classes.image}
                      alt={formName}/>

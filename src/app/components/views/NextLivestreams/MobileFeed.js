@@ -1,47 +1,23 @@
 import React, {useEffect, useState} from 'react';
 import SwipeableViews from 'react-swipeable-views';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Box from '@material-ui/core/Box';
 
-import {Button, Typography,} from "@material-ui/core";
+import { Button, Grid, Typography, AppBar, Tabs, Tab, Box } from "@material-ui/core";
 import {withFirebase} from "../../../context/firebase";
 import GroupCategories from "./GroupCategories/GroupCategories";
 import GroupStreams from "./GroupStreams/GroupStreams";
 import {useRouter} from "next/router";
 import GroupJoinModal from "../profile/GroupJoinModal";
+import {bindKeyboard} from 'react-swipeable-views-utils';
 
+const BindKeyboardSwipeableViews = bindKeyboard(SwipeableViews);
 
-function TabPanel({children, value, index, ...other}) {
-
-    return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`full-width-tabpanel-${index}`}
-            aria-labelledby={`full-width-tab-${index}`}
-            {...other}
-        >
-            {value === index && (
-                <Box p={2}>
-                    {children}
-                </Box>
-            )}
-        </div>
-    );
-}
-
-function a11yProps(index) {
-    return {
-        id: `full-width-tab-${index}`,
-        'aria-controls': `full-width-tabpanel-${index}`,
-    };
-}
 
 const useStyles = makeStyles((theme) => ({
-
+    streamsGrid: {
+        // marginBottom: theme.spacing(1)
+        height: "100%"
+    },
     bar: {
         boxShadow: "none",
         position: "sticky",
@@ -56,11 +32,44 @@ const useStyles = makeStyles((theme) => ({
         position: "sticky",
         top: 165,
         zIndex: 20
+    },
+    tabPanel: {
+
     }
 }));
 
+function TabPanel({children, value, index, ...other}) {
+    const classes = useStyles()
+    return (
+        <Box className={classes.tabPanel} p={1} {...other}>
+            {children}
+        </Box>
+    );
+}
 
-const MobileFeed = ({handleToggleActive, hasCategories, groupData, userData, alreadyJoined, user, livestreams, searching, scrollToTop, livestreamId, careerCenterId, listenToUpcoming, selectedOptions}) => {
+function a11yProps(index) {
+    return {
+        id: `full-width-tab-${index}`,
+        'aria-controls': `full-width-tabpanel-${index}`,
+    };
+}
+
+
+const MobileFeed = ({
+                        handleToggleActive,
+                        hasCategories,
+                        groupData,
+                        userData,
+                        alreadyJoined,
+                        user,
+                        livestreams,
+                        searching,
+                        scrollToTop,
+                        livestreamId,
+                        careerCenterId,
+                        listenToUpcoming,
+                        selectedOptions
+                    }) => {
     const classes = useStyles();
     const theme = useTheme();
     const router = useRouter()
@@ -122,7 +131,7 @@ const MobileFeed = ({handleToggleActive, hasCategories, groupData, userData, alr
                 >
                     <Tab wrapped value={0}  {...a11yProps(0)} fullWidth
                          label={<Typography variant="h5">Events</Typography>}/>
-                    {hasCategories() ?
+                    {hasCategories ?
                         <Tab value={1} wrapped fullWidth disabled={!groupData.categories}
                              {...a11yProps(1)}
                              label={<Typography variant="h5">Filter</Typography>}/>
@@ -145,37 +154,42 @@ const MobileFeed = ({handleToggleActive, hasCategories, groupData, userData, alr
                 />
             </>
             }
-            <SwipeableViews
+            <BindKeyboardSwipeableViews
+                style={{overflow: "hidden", flex: 1}}
                 disabled={!Boolean(groupData.categories)}
-                style={{minHeight: 200}}
-                containerStyle={{WebkitOverflowScrolling: 'touch'}}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
+                slideStyle={{overflow: "hidden", height: "max-content"}}
                 onChangeIndex={handleChangeIndex}>
                 <TabPanel dir={theme.direction}>
-                    <GroupStreams user={user}
-                                  mobile={true}
-                                  livestreamId={livestreamId}
-                                  listenToUpcoming={listenToUpcoming}
-                                  careerCenterId={careerCenterId}
-                                  selectedOptions={selectedOptions}
-                                  searching={searching}
-                                  alreadyJoined={alreadyJoined}
-                                  livestreams={livestreams}
-                                  userData={userData}
-                                  groupData={groupData}/>
+                    <Grid className={classes.streamsGrid} container spacing={2}>
+                        <GroupStreams user={user}
+                                      mobile={true}
+                                      hasCategories={hasCategories}
+                                      livestreamId={livestreamId}
+                                      listenToUpcoming={listenToUpcoming}
+                                      careerCenterId={careerCenterId}
+                                      selectedOptions={selectedOptions}
+                                      searching={searching}
+                                      alreadyJoined={alreadyJoined}
+                                      livestreams={livestreams}
+                                      userData={userData}
+                                      groupData={groupData}/>
+                    </Grid>
                 </TabPanel>
                 <TabPanel dir={theme.direction}>
-                    <GroupCategories alreadyJoined={alreadyJoined}
-                                     groupData={groupData}
-                                     user={user}
-                                     hasCategories={hasCategories}
-                                     livestreams={livestreams}
-                                     userData={userData}
-                                     handleToggleActive={handleToggleActive}
-                                     mobile={true}/>
+                    <Grid className={classes.streamsGrid} container spacing={2}>
+                        <GroupCategories alreadyJoined={alreadyJoined}
+                                         groupData={groupData}
+                                         user={user}
+                                         hasCategories={hasCategories}
+                                         livestreams={livestreams}
+                                         userData={userData}
+                                         handleToggleActive={handleToggleActive}
+                                         mobile={true}/>
+                    </Grid>
                 </TabPanel>
-            </SwipeableViews>
+            </BindKeyboardSwipeableViews>
         </>
     );
 }

@@ -1,36 +1,34 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {withFirebase} from "../../../context/firebase";
 import GroupsCarousel from "./GroupsCarousel/GroupsCarousel";
-import {useMediaQuery, useTheme} from "@material-ui/core";
+import {useMediaQuery} from "@material-ui/core";
+import {useTheme} from "@material-ui/core/styles";
 import DesktopFeed from "./DesktopFeed/DesktopFeed";
 import MobileFeed from "./MobileFeed";
 import {useRouter} from "next/router";
-import UserContext from "../../../context/user/UserContext"
+import {getServerSideRouterQuery} from "../../helperFunctions/HelperFunctions";
+import {useAuth} from "../../../HOCs/AuthProvider";
 
 const NextLivestreams = ({firebase}) => {
-    const {userData, authenticatedUser} = useContext(UserContext);
-    const router = useRouter();
-    // console.log("router.asPath :", router.asPath, "router.route :", router.route, "router.query: ", router.query);
-    const {
-        query: {livestreamId},
-    } = router;
-    const {
-        query: {careerCenterId},
-    } = router;
-
+    const {userData, authenticatedUser} = useAuth();
     const theme = useTheme();
     const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+    const router = useRouter();
+
+    // const {
+    //     query:{ livestreamId, careerCenterId}
+    // } = router
+
+    const livestreamId = getServerSideRouterQuery("livestreamId", router)
+    const careerCenterId = getServerSideRouterQuery("careerCenterId", router)
 
     const [groupData, setGroupData] = useState({});
     const [groupIds, setGroupIds] = useState(["upcoming"]);
     const [livestreams, setLivestreams] = useState([]);
     const [groupIdsToRemove, setGroupIdsToRemove] = useState([])
-    // const [paramsLivestreamId, setParamsLivestreamId] = useState(null);
-    // const [paramsCareerCenterId, setParamsCareerCenterId] = useState(null);
     const [searching, setSearching] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [listenToUpcoming, setListenToUpcoming] = useState(false);
-    // const routerMounted = paramsLivestreamId !== null && paramsCareerCenterId !== null;
 
     useEffect(() => {
         if (listenToUpcoming) { // && routerMounted
@@ -69,15 +67,6 @@ const NextLivestreams = ({firebase}) => {
             return firebase.updateUserGroups(userId, filteredGroupIds, filteredRegisteredGroups)
         }
     }, [groupIdsToRemove])
-
-    // useEffect(() => {
-    //     // will set the params once the router is loaded whether it be undefined or truthy
-    //     if (paramsLivestreamId === null && router) {
-    //         console.log("paramsLivestreamId");
-    //         setParamsCareerCenterId(careerCenterId);
-    //         setParamsLivestreamId(livestreamId);
-    //     }
-    // }, [router]);
 
     useEffect(() => {
         if (groupData && groupData.groupId) {
@@ -142,7 +131,7 @@ const NextLivestreams = ({firebase}) => {
 
     useEffect(() => {
         // This checks if the params from the next router have been defined and only then will it set groupIds
-        if (userData !== undefined) {
+        if (careerCenterId || userData !== undefined) {
             handleGetGroupIds();
         }
     }, [userData, careerCenterId]);
@@ -157,6 +146,7 @@ const NextLivestreams = ({firebase}) => {
             setGroupIds([...new Set(newGroupIds)]);
         }
     }, [livestreamId, careerCenterId, router])
+
 
     const setToUpcomingSlide = () => {
         return livestreamId && !careerCenterId || (!livestreamId && !careerCenterId)
@@ -273,8 +263,6 @@ const NextLivestreams = ({firebase}) => {
                 mobile={mobile}
                 groupIdsToRemove={groupIdsToRemove}
                 setGroupIdsToRemove={setGroupIdsToRemove}
-                livestreamId={livestreamId}
-                careerCenterId={careerCenterId}
                 user={authenticatedUser}
                 handleResetGroup={handleResetGroup}
                 handleSetGroup={handleSetGroup}
@@ -283,7 +271,7 @@ const NextLivestreams = ({firebase}) => {
             {mobile ? (
                 <MobileFeed
                     groupData={groupData}
-                    hasCategories={hasCategories}
+                    hasCategories={hasCategories()}
                     user={authenticatedUser}
                     selectedOptions={selectedOptions}
                     scrollToTop={scrollToTop}
@@ -302,7 +290,7 @@ const NextLivestreams = ({firebase}) => {
                     alreadyJoined={groupData.alreadyJoined}
                     handleToggleActive={handleToggleActive}
                     userData={userData}
-                    hasCategories={hasCategories}
+                    hasCategories={hasCategories()}
                     listenToUpcoming={listenToUpcoming}
                     livestreamId={livestreamId}
                     searching={searching}

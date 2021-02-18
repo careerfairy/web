@@ -1,10 +1,9 @@
-import React, {useState, useEffect, useContext} from "react";
-import {Container, Button, Grid, Icon, Input, Image} from "semantic-ui-react";
+import React, {useEffect, useState} from "react";
+import {Button, Container, Grid, Icon, Image, Input} from "semantic-ui-react";
 
 import Header from "../../components/views/header/Header";
 
 import {withFirebasePage} from "context/firebase";
-import TargetElementList from "../../components/views/common/TargetElementList";
 import Loader from "../../components/views/loader/Loader";
 import DateUtil from "../../util/DateUtil";
 import {useRouter} from "next/router";
@@ -17,28 +16,31 @@ import StringUtils from "../../util/StringUtils";
 import Head from "next/head";
 import UserUtil from "../../data/util/UserUtil";
 import MulitLineText from "../../components/views/common/MultiLineText";
-import CurrentGroup from "components/views/profile/CurrentGroup";
 import TargetOptions from "../../components/views/NextLivestreams/GroupsCarousel/TargetOptions";
-import UserContext from "../../context/user/UserContext";
 import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
-import axios from "axios";
 import DataAccessUtil from "util/DataAccessUtil";
-import {Avatar} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
+import {speakerPlaceholder} from "../../components/util/constants";
+import {useAuth} from "../../HOCs/AuthProvider";
+import GroupsUtil from "../../data/util/GroupsUtil";
+import { Paper, Avatar, Box } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     speakerAvatar: {
         width: 110,
-        height: 110
+        height: 110,
+        boxShadow: theme.shadows[6]
     },
     speakerWrapper: {
         display: "flex !important",
         flexDirection: "column !important",
         alignItems: "center !important"
+    },
+    logoWrapper:{
+        padding: theme.spacing(2)
     }
 }))
 
-const speakerPlaceholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media"
 
 function UpcomingLivestream(props) {
     const classes = useStyles()
@@ -46,9 +48,7 @@ function UpcomingLivestream(props) {
     const {livestreamId, groupId} = router.query;
     const absolutePath = router.asPath;
 
-    const {userData, authenticatedUser: user} = useContext(UserContext);
-
-    const [livestreamSpeakers, setLivestreamSpeakers] = useState([]);
+    const {userData, authenticatedUser: user} = useAuth();
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
     const [currentLivestream, setCurrentLivestream] = useState(null);
@@ -56,7 +56,7 @@ function UpcomingLivestream(props) {
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [registered, setRegistered] = useState(false);
-
+    const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [careerCenters, setCareerCenters] = useState([]);
     const [currentGroup, setCurrentGroup] = useState(null);
@@ -134,14 +134,11 @@ function UpcomingLivestream(props) {
             const flattenedOptions = totalOptions.reduce(function (a, b) {
                 return a.concat(b);
             }, []);
-            // console.log("flattenedOptions", flattenedOptions);
             const matchedOptions = currentLivestream.targetCategories[groupId];
-            // console.log(matchedOptions);
             if (matchedOptions) {
                 const filteredOptions = flattenedOptions.filter((option) =>
                     matchedOptions.includes(option.id)
                 );
-                // console.log("filteredOptions", filteredOptions);
                 setTargetOptions(filteredOptions);
             }
         }
@@ -175,23 +172,6 @@ function UpcomingLivestream(props) {
         }
     }, [currentLivestream, userData]);
 
-
-    useEffect(() => {
-        if (livestreamId) {
-            props.firebase
-                .getLivestreamSpeakers(livestreamId)
-                .then((querySnapshot) => {
-                    var speakerList = [];
-                    querySnapshot.forEach((doc) => {
-                        let speaker = doc.data();
-                        speaker.id = doc.id;
-                        speakerList.push(speaker);
-                    });
-                    setLivestreamSpeakers(speakerList);
-                });
-        }
-    }, [livestreamId]);
-
     function goToSeparateRoute(route) {
         window.open("http://careerfairy.io" + route, "_blank");
     }
@@ -219,7 +199,8 @@ function UpcomingLivestream(props) {
 
         props.firebase.joinCompanyTalentPool(
             currentLivestream.companyId,
-            user.email
+            user.email,
+            currentLivestream.id
         );
     }
 
@@ -234,7 +215,8 @@ function UpcomingLivestream(props) {
 
         props.firebase.leaveCompanyTalentPool(
             currentLivestream.companyId,
-            user.email
+            user.email,
+            currentLivestream.id
         );
     }
 
@@ -245,7 +227,7 @@ function UpcomingLivestream(props) {
         return currentLivestream.registeredUsers.indexOf(user.email) > -1;
     }
 
-    function sendEmailRegistrationConfirmation() {    
+    function sendEmailRegistrationConfirmation() {
         return DataAccessUtil.sendRegistrationConfirmationEmail(user, userData, currentLivestream);
     }
 
@@ -257,7 +239,7 @@ function UpcomingLivestream(props) {
         })
     }
 
-    function startRegistrationProcess(livestreamId) {
+    const startRegistrationProcess = async (livestreamId) => {
         if (!user || !user.emailVerified) {
             return router.push(
                 absolutePath
@@ -273,13 +255,20 @@ function UpcomingLivestream(props) {
             return router.push("/profile");
         }
 
-        if (careerCenters.length > 0 && !userFollowsSomeCareerCenter()) {
+        const {
+            hasAgreedToAll,
+            groupsWithPolicies
+        } = await GroupsUtil.getPolicyStatus(careerCenters, user.email, props.firebase)
+        if (!hasAgreedToAll) {
+            setOpenJoinModal(true)
+            setGroupsWithPolicies(groupsWithPolicies)
+        } else if (careerCenters.length > 0 && !userFollowsSomeCareerCenter()) {
             setOpenJoinModal(true)
         } else {
             setBookingModalOpen(true);
             setRegistration(true);
             props.firebase
-                .registerToLivestream(currentLivestream.id, user.email)
+                .registerToLivestream(currentLivestream.id, user.email, groupsWithPolicies)
                 .then(() => {
                     sendEmailRegistrationConfirmation();
                     setRegistration(false);
@@ -288,7 +277,7 @@ function UpcomingLivestream(props) {
     }
 
     function completeRegistrationProcess() {
-        props.firebase.registerToLivestream(currentLivestream.id, user.email).then(() => {
+        props.firebase.registerToLivestream(currentLivestream.id, user.email, groupsWithPolicies).then(() => {
             setBookingModalOpen(true);
             sendEmailRegistrationConfirmation();
         })
@@ -345,7 +334,7 @@ function UpcomingLivestream(props) {
             );
     }
 
-    let speakerElements = livestreamSpeakers.map((speaker, index) => {
+    let speakerElements = currentLivestream?.speakers?.map((speaker, index) => {
         return (
             <Grid.Column
                 className={classes.speakerWrapper}
@@ -354,10 +343,11 @@ function UpcomingLivestream(props) {
                 mobile="16"
                 tablet="8"
                 computer="5"
-                key={index}
+                key={speaker.id}
             >
                 <div className="livestream-speaker-avatar-capsule">
-                    <Avatar src={speaker?.avatar?.length? speaker.avatar : speakerPlaceholder} className={classes.speakerAvatar}/>
+                    <Avatar src={speaker?.avatar?.length ? speaker.avatar : speakerPlaceholder}
+                            className={classes.speakerAvatar}/>
                 </div>
                 <div className="livestream-speaker-description">
                     <div
@@ -392,32 +382,32 @@ function UpcomingLivestream(props) {
                     </div>
                 </div>
                 <style jsx>{`
-          .livestream-speaker-avatar-capsule {
-            border: 2px solid rgb(0, 210, 170);
-            display: inline-block;
-            margin: 20px auto;
-            padding: 8px;
-            border-radius: 50%;
-          }
+                  .livestream-speaker-avatar-capsule {
+                    border: 2px solid rgb(0, 210, 170);
+                    display: inline-block;
+                    margin: 20px auto;
+                    padding: 8px;
+                    border-radius: 50%;
+                  }
 
-          .livestream-speaker-avatar {
-            width: 110px;
-            padding-top: 110px;
-            border-radius: 50%;
-            vertical-align: middle;
-            display: inline-block;
-            box-shadow: 0 0 2px grey;
-            background-size: cover;
-          }
+                  .livestream-speaker-avatar {
+                    width: 110px;
+                    padding-top: 110px;
+                    border-radius: 50%;
+                    vertical-align: middle;
+                    display: inline-block;
+                    box-shadow: 0 0 2px grey;
+                    background-size: cover;
+                  }
 
-          .livestream-speaker-description {
-            display: inline-block;
-            vertical-align: middle;
-            width: 100%;
-            text-align: center;
-            margin: 0 0 0 10px;
-          }
-        `}</style>
+                  .livestream-speaker-description {
+                    display: inline-block;
+                    vertical-align: middle;
+                    width: 100%;
+                    text-align: center;
+                    margin: 0 0 0 10px;
+                  }
+                `}</style>
             </Grid.Column>
         );
     });
@@ -436,16 +426,16 @@ function UpcomingLivestream(props) {
 
     let logoElements = careerCenters.map((careerCenter, index) => {
         return (
-            <Grid.Column key={careerCenter.groupId} mobile="5" computer="3">
-                <Image
-                    src={careerCenter.logoUrl}
-                    style={{
-                        filter: userIsRegistered() ? "brightness(0) invert(1)" : "",
-                        maxWidth: "120px",
-                        maxHeight: "60px",
-                        margin: "10px auto 5px auto",
-                    }}
-                />
+            <Grid.Column key={careerCenter.groupId} mobile="6" computer="4">
+                <Paper className={classes.logoWrapper}>
+                    <Image
+                        src={careerCenter.logoUrl}
+                        style={{
+                            maxHeight: "60px",
+                            margin: "10px auto 5px auto",
+                        }}
+                    />
+                </Paper>
             </Grid.Column>
         );
     });
@@ -543,27 +533,24 @@ function UpcomingLivestream(props) {
                             <div style={{margin: "30px 0"}}>
                                 <Grid className="middle aligned" centered>
                                     <Grid.Row>
-                                        <Grid.Column textAlign="center"
-                                                     mobile="16" computer="5">
-                                            <Image
-                                                src={currentLivestream.companyLogoUrl}
-                                                style={{
-                                                    filter: userIsRegistered()
-                                                        ? "brightness(0) invert(1)"
-                                                        : "",
-                                                    maxWidth: "230px",
-                                                    maxHeight: "140px",
-                                                    margin: "10px auto 5px auto",
-                                                }}
-                                            />
-                                        </Grid.Column>
+                                        <Box>
+                                            <Paper className={classes.logoWrapper}>
+                                                <Image
+                                                    src={currentLivestream.companyLogoUrl}
+                                                    style={{
+                                                        maxWidth: "230px",
+                                                        maxHeight: "140px",
+                                                        margin: "10px auto 5px auto",
+                                                    }}
+                                                />
+                                            </Paper>
+                                        </Box>
                                     </Grid.Row>
                                     <Grid.Row>{speakerElements}</Grid.Row>
                                 </Grid>
                             </div>
                             <div style={{margin: "40px 0", width: "100%"}}>
                                 <div>
-                                    {/* <Button size='big' content={ 'Ready To Join' } icon={ 'play' } style={{ margin: '5px' }} onClick={() => setUserIsReady(true)} disabled={!currentLivestream.hasStarted} color='pink'/>  */}
                                     <Button
                                         size="big"
                                         id="register-button"
@@ -712,21 +699,23 @@ function UpcomingLivestream(props) {
                         className="middle aligned"
                         centered
                     >
-                        <Grid.Column computer="8" mobile="16">
-                            <Image
-                                src={
-                                    currentLivestream.companyLogoUrl
-                                        ? currentLivestream.companyLogoUrl
-                                        : "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media"
-                                }
-                                style={{
-                                    margin: "0 auto",
-                                    maxHeight: "100px",
-                                    maxWidth: "50%",
-                                    filter: userIsInTalentPool ? "brightness(0) invert(1)" : "",
-                                }}
-                            />
-                        </Grid.Column>
+                        <div>
+                            <Box>
+                                <Paper style={{maxWidth: 300}} className={classes.logoWrapper}>
+                                    <Image
+                                        src={
+                                            currentLivestream.companyLogoUrl
+                                                ? currentLivestream.companyLogoUrl
+                                                : "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media"
+                                        }
+                                        style={{
+                                            margin: "0 auto",
+                                            maxHeight: "100px",
+                                        }}
+                                    />
+                                </Paper>
+                            </Box>
+                        </div>
                         <Grid.Column
                             computer="8"
                             mobile="16"
@@ -793,16 +782,15 @@ function UpcomingLivestream(props) {
                 </Container>
             </div>
             <Footer/>
-            {
-                careerCenters.length > 0 &&
-                <GroupJoinToAttendModal
-                    open={openJoinModal}
-                    groups={careerCenters}
-                    alreadyJoined={false}
-                    userData={userData}
-                    onConfirm={completeRegistrationProcess}
-                    closeModal={handleCloseJoinModal}
-                />}
+            <GroupJoinToAttendModal
+                open={openJoinModal}
+                groupsWithPolicies={groupsWithPolicies}
+                groups={careerCenters}
+                alreadyJoined={false}
+                userData={userData}
+                onConfirm={completeRegistrationProcess}
+                closeModal={handleCloseJoinModal}
+            />
             <BookingModal
                 careerCenters={careerCenters}
                 livestream={currentLivestream}
@@ -814,243 +802,245 @@ function UpcomingLivestream(props) {
                 user={user}
             />
             <style jsx>{`
-                .hidden {
-                    display: none;
-                }
-    
-                .topLevelContainer {
-                    background-color: rgb(44, 66, 81);
-                    position: relative;
-                    width: 100%;
-                }
+              .hidden {
+                display: none;
+              }
 
-                .topDescriptionContainer {
-                    width: 100%;
-                    position: relative;
-                    margin: 0 0 40px 0;
-                    padding: 0 30px;
-                }
-    
-                .top-menu {
-                    background-color: rgba(250,250,250,1);
-                    padding: 15px 0;
-                    height: 80px;
-                    text-align: center;
-                    position: relative;
-                    box-shadow: 0 0 5px grey;
-                }
-    
-                .top-menu div, .top-menu button {
-                    display: inline-block;
-                    vertical-align: middle;
-                }
-    
-                .top-menu #stream-button {
-                    margin: 0 50px;
-                }
-    
-                .top-menu.active {
-                    background-color: rgba(0, 210, 170, 1);
-                    color: white;
-                }
-    
-                .top-menu h3 {
-                    font-weight: 600;
-                }
-    
-                .video-mask {
-                    width: 100%;
-                    background-color: rgb(230,230,230);
-                    background-size: cover;
-                    text-align: center;
-                }
-    
-                .mask {
-                    width: 100%;
-                    padding: 20px 0 60px 0;
-                    background-color: rgba(255, 255, 255,0.9);
-                }
+              .topLevelContainer {
+                background-color: rgb(44, 66, 81);
+                position: relative;
+                width: 100%;
+              }
 
-                .livestream-label {
-                    color: rgb(44, 66, 81);
-                    font-size: 1.3em;
-                    border: 3px solid rgb(44, 66, 81);
-                    display: inline-block;
-                    font-weight: 700;
-                    text-transform: uppercase;
-                    padding: 5px 10px;
-                    vertical-align: middle;
-                    margin: 20px 0 20px 0;
-                }
-    
-                .livestream-title {
-                    font-size: calc(1.5em + 1.5vw);
-                    color: rgb(44, 66, 81);
-                    text-align: let;
-                    line-height: 1.4em;
-                    font-weight: 700;
-                    max-width: 800px;
-                    margin: 0 auto;
-                }
+              .topDescriptionContainer {
+                width: 100%;
+                position: relative;
+                margin: 0 0 40px 0;
+                padding: 0 30px;
+              }
 
-                .livestream-speaker-avatar-capsule {
-                    border: 2px solid rgb(0, 210, 170);
-                    display: inline-block;
-                    margin: 20px auto;
-                    padding 8px;
-                    border-radius: 50%;
-                }
+              .top-menu {
+                background-color: rgba(250, 250, 250, 1);
+                padding: 15px 0;
+                height: 80px;
+                text-align: center;
+                position: relative;
+                box-shadow: 0 0 5px grey;
+              }
 
-                .livestream-speaker-avatar {
-                    width: 110px;
-                    padding-top: 110px;
-                    border-radius: 50%;
-                    vertical-align: middle;
-                    display: inline-block;
-                    box-shadow: 0 0 2px grey;
-                    display: inline-block;
-                    background-size: cover;
-                }
-    
-                .livestream-date {
-                    text-align: center;
-                    font-size: 1.3em;
-                    font-weight: 700;
-                    color: rgb(255, 20, 147);
-                    vertical-align: middle;
-                    margin: 20px 0;
-                    width: 100%;
-                    text-transform: uppercase;
-                }
+              .top-menu div, .top-menu button {
+                display: inline-block;
+                vertical-align: middle;
+              }
 
-                .livestream-speaker-image-container {
-                    display: inline-block;
-                    border: 2px solid rgb(0, 210, 170);
-                    border-radius: 50%;
-                }
-    
-                .livestream-speaker-image {     
-                    min-height: 100px;
-                    min-width: 100px;
-                    border-radius: 9999px;
-                    background-size: cover;
-                    background-position: center center;
-                    vertical-align: middle;
-                    margin: 20px auto;
-                }
+              .top-menu #stream-button {
+                margin: 0 50px;
+              }
 
-                .livestream-speaker-description {
-                    display: inline-block;
-                    vertical-align: middle;
-                    width: 100%;
-                    text-align: center;
-                    margin: 0 0 0 10px;
-                }
-    
-                .livestream-speaker-name {
-                    display: inline-block;
-                    color: rgb(44, 66, 81);
-                    vertical-align: middle;
-                }
-    
-                .livestream-speaker-name div:first-child {
-                    font-size: 1.4em;
-                    margin: 0 0 5px 0;
-                    font-weight: 600;
-                }
-    
-                .video-mask-title {
-                    width: 100%;
-                    text-align: center;
-                    font-weight: 600;
-                    color: white;
-                    z-index: 4000;
-                    padding: 15px 0;
-                }
+              .top-menu.active {
+                background-color: rgba(0, 210, 170, 1);
+                color: white;
+              }
 
-                .countdown-title {
-                    text-transform: uppercase;
-                    font-weight: 700;
-                    color: rgb(120,120,120);
-                    margin: 40px 0 0 0;
-                }
-    
-                .live-now {
-                    margin-bottom: 30px;
-                    text-transform: uppercase;
-                    font-size: 1.8em;
-                    vertical-align: middle;
-                    color: red;
-                }
-                .live-now span {
-                    margin-left: 10px;
-                }
-                .live-now i, .live-now span {
-                    vertical-align: middle;
-                }
-    
-                .bottom-icon {
-                    color: rgb(44, 66, 81);
-                    position: absolute;
-                    bottom: 10px;
-                    width: 100%;
-                    text-align: center;
-                    font-size: 1.4em;
-                }
+              .top-menu h3 {
+                font-weight: 600;
+              }
 
-                .container-title {
-                    text-transform: uppercase;
-                    text-align: center;
-                    font-size: 1.1em;
-                    font-weight: 700;
-                    margin-bottom: 20px;
-                    color: rgb(150,150,150);
-                }
+              .video-mask {
+                width: 100%;
+                background-color: rgb(230, 230, 230);
+                background-size: cover;
+                text-align: center;
+              }
 
-                .white-container {
-                    padding: 40px 0 50px 0;
-                    text-align: center;
-                }
-    
-                .grey-container {
-                    position: relative;
-                    width: 100%;
-                    padding: 40px 0 50px 0;
-                    background-color: rgb(245,245,245);
-                }
+              .mask {
+                width: 100%;
+                padding: 20px 0 60px 0;
+                background-color: rgba(255, 255, 255, 0.9);
+              }
 
-                .description {
-                    width: 70%;
-                    margin: 30px auto;
-                    line-height: 1.4em;
-                    text-align:center;
-                }
+              .livestream-label {
+                color: rgb(44, 66, 81);
+                font-size: 1.3em;
+                border: 3px solid rgb(44, 66, 81);
+                display: inline-block;
+                font-weight: 700;
+                text-transform: uppercase;
+                padding: 5px 10px;
+                vertical-align: middle;
+                margin: 20px 0 20px 0;
+              }
 
-                .spots-left {
-                    position: absolute;
-                    right: 40px;
-                    bottom: 40px;
-                    height: 100px;
-                    width: 100px;
-                    border-radius: 50%;
-                    background-color: white;
-                    text-align: center;
-                    padding: 28px 0;
-                }
+              .livestream-title {
+                font-size: calc(1.5em + 1.5vw);
+                color: rgb(44, 66, 81);
+                line-height: 1.4em;
+                font-weight: 700;
+                max-width: 800px;
+                margin: 0 auto;
+                text-align: center;
+              }
 
-                .spots-left-number {
-                    font-size: 1.8em;
-                    font-weight: 700;
-                    color: rgb(0, 210, 170);
-                }
+              .livestream-speaker-avatar-capsule {
+                border: 2px solid rgb(0, 210, 170);
+                display: inline-block;
+                margin: 20px auto;
+                padding: 8px;
+                border-radius: 50%;
+              }
 
-                .spots-left-label {
-                    font-size: 1em;
-                    font-weight: 700;
-                    margin: 5px 0;
-                    color: rgb(44, 66, 81);
-                }
-          `}</style>
+              .livestream-speaker-avatar {
+                width: 110px;
+                padding-top: 110px;
+                border-radius: 50%;
+                vertical-align: middle;
+                display: inline-block;
+                box-shadow: 0 0 2px grey;
+                display: inline-block;
+                background-size: cover;
+              }
+
+              .livestream-date {
+                text-align: center;
+                font-size: 1.3em;
+                font-weight: 700;
+                color: rgb(255, 20, 147);
+                vertical-align: middle;
+                margin: 20px 0;
+                width: 100%;
+                text-transform: uppercase;
+              }
+
+              .livestream-speaker-image-container {
+                display: inline-block;
+                border: 2px solid rgb(0, 210, 170);
+                border-radius: 50%;
+              }
+
+              .livestream-speaker-image {
+                min-height: 100px;
+                min-width: 100px;
+                border-radius: 9999px;
+                background-size: cover;
+                background-position: center center;
+                vertical-align: middle;
+                margin: 20px auto;
+              }
+
+              .livestream-speaker-description {
+                display: inline-block;
+                vertical-align: middle;
+                width: 100%;
+                text-align: center;
+                margin: 0 0 0 10px;
+              }
+
+              .livestream-speaker-name {
+                display: inline-block;
+                color: rgb(44, 66, 81);
+                vertical-align: middle;
+              }
+
+              .livestream-speaker-name div:first-child {
+                font-size: 1.4em;
+                margin: 0 0 5px 0;
+                font-weight: 600;
+              }
+
+              .video-mask-title {
+                width: 100%;
+                text-align: center;
+                font-weight: 600;
+                color: white;
+                z-index: 4000;
+                padding: 15px 0;
+              }
+
+              .countdown-title {
+                text-transform: uppercase;
+                font-weight: 700;
+                color: rgb(120, 120, 120);
+                margin: 40px 0 0 0;
+              }
+
+              .live-now {
+                margin-bottom: 30px;
+                text-transform: uppercase;
+                font-size: 1.8em;
+                vertical-align: middle;
+                color: red;
+              }
+
+              .live-now span {
+                margin-left: 10px;
+              }
+
+              .live-now i, .live-now span {
+                vertical-align: middle;
+              }
+
+              .bottom-icon {
+                color: rgb(44, 66, 81);
+                position: absolute;
+                bottom: 10px;
+                width: 100%;
+                text-align: center;
+                font-size: 1.4em;
+              }
+
+              .container-title {
+                text-transform: uppercase;
+                text-align: center;
+                font-size: 1.1em;
+                font-weight: 700;
+                margin-bottom: 20px;
+                color: rgb(150, 150, 150);
+              }
+
+              .white-container {
+                padding: 40px 0 50px 0;
+                text-align: center;
+              }
+
+              .grey-container {
+                position: relative;
+                width: 100%;
+                padding: 40px 0 50px 0;
+                background-color: rgb(245, 245, 245);
+              }
+
+              .description {
+                width: 70%;
+                margin: 30px auto;
+                line-height: 1.4em;
+                text-align: center;
+              }
+
+              .spots-left {
+                position: absolute;
+                right: 40px;
+                bottom: 40px;
+                height: 100px;
+                width: 100px;
+                border-radius: 50%;
+                background-color: white;
+                text-align: center;
+                padding: 28px 0;
+              }
+
+              .spots-left-number {
+                font-size: 1.8em;
+                font-weight: 700;
+                color: rgb(0, 210, 170);
+              }
+
+              .spots-left-label {
+                font-size: 1em;
+                font-weight: 700;
+                margin: 5px 0;
+                color: rgb(44, 66, 81);
+              }
+            `}</style>
         </div>
     );
 }

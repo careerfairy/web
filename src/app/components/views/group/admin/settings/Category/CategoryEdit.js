@@ -11,7 +11,7 @@ import {
     Paper,
     Typography,
     TextField,
-    Menu, MenuItem, Chip
+    Menu, MenuItem, Chip, Card, CardContent, Divider, CardHeader, CardActions
 } from "@material-ui/core";
 import {v4 as uuidv4} from 'uuid'
 import {makeStyles} from "@material-ui/core/styles";
@@ -53,14 +53,28 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: "rgb(230,230,230)",
         margin: "20px 0",
     },
-    errorButton:{
-        background: theme.palette.error.main,
-        color: theme.palette.error.contrastText
+    errorButton: {
+        color: theme.palette.error.main
+    },
+    nameError:{
+        height: theme.spacing(2),
+        margin: theme.spacing(1)
     }
 }));
 
 
-function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCategory, newCategory, firebase, setEditMode, handleAddTempCategory, group, groupId, isLocal}) {
+function CategoryEditModal({
+                               category,
+                               handleDeleteLocalCategory,
+                               handleUpdateCategory,
+                               newCategory,
+                               firebase,
+                               setEditMode,
+                               handleAddTempCategory,
+                               group,
+                               groupId,
+                               isLocal
+                           }) {
     const classes = useStyles()
 
     const [categoryName, setCategoryName] = useState('');
@@ -241,74 +255,79 @@ function CategoryEditModal({category, handleDeleteLocalCategory, handleUpdateCat
     })
 
     return (
-        <Paper className={classes.root}>
-            <Box display="flex" flexDirection="column">
+        <Card elevation={3}>
+            <CardContent>
                 <TextField autoFocus
-                           style={{marginBottom: "10px"}}
-                           label={<Typography align="left" className={classes.label}>Category Name</Typography>}
+                           variant="outlined"
+                           fullWidth
+                           label={"Category Name"}
                            inputProps={{maxLength: 40}}
                            error={Boolean(touched && !categoryName.length)}
                            onBlur={handleBlur}
-                           helperText={touched && !categoryName.length && "Required"}
                            value={categoryName}
                            onChange={(e) => setCategoryName(e.currentTarget.value)}/>
-                <Box>
-                    <Typography align="left" className={classes.label}>Category Options</Typography>
-                    <div style={{display: "flex", flexWrap: "wrap"}}>
-                        {optionElements}
-                        <IconButton size="small"
-                                    onClick={() => setUpdateMode({mode: 'add', options: editableOptions})}>
-                            <AddIcon fontSize="large" color="primary"/>
-                        </IconButton>
+                <FormHelperText className={classes.nameError} error>
+                    {touched && !categoryName.length && "Required"}
+                </FormHelperText>
+                <Card>
+                    <CardHeader subheader="Category Options"/>
+                    <Divider/>
+                    <CardActions>
+                        <div style={{display: "flex", flexWrap: "wrap"}}>
+                            {optionElements}
+                            <IconButton size="small"
+                                        onClick={() => setUpdateMode({mode: 'add', options: editableOptions})}>
+                                <AddIcon fontSize="large" color="primary"/>
+                            </IconButton>
+                        </div>
+                        <FormHelperText
+                            error>{errorObj.optionError && "You must add at least 2 options"}</FormHelperText>
+                    </CardActions>
+                </Card>
+                <Divider/>
+                <Box display="flex" paddingTop={2} justifyContent={newCategory ? "flex-end" : "space-between"}>
+                    {!newCategory &&
+                    <Button onClick={() => setUpdateMode({mode: 'deleteCategory', option: {name: categoryName}})}
+                            className={classes.errorButton}
+                            size="small">
+                        Delete
+                    </Button>}
+                    <div>
+                        <Button onClick={() => setEditMode(false)}
+                                size="small"
+                                style={{marginRight: 10}}>
+                            Cancel
+                        </Button>
+                        <Button onClick={() => saveChanges()}
+                                color="primary"
+                                size="small"
+                                variant="contained">
+                            {newCategory ? 'Create' : 'Update'}
+                        </Button>
                     </div>
-                    <FormHelperText
-                        error>{errorObj.optionError && "You must add at least 2 options"}</FormHelperText>
                 </Box>
-            </Box>
-            <div className={classes.separate}/>
-            <Box display="flex" justifyContent="space-between">
-                <div>
-                    <Button onClick={() => saveChanges()}
-                            color="primary"
-                            size="small"
-                            style={{marginRight: 10}}
-                            variant="contained">
-                        {newCategory ? 'Create' : 'Update'}
-                    </Button>
-                    <Button onClick={() => setEditMode(false)}
-                            size="small"
-                            variant="contained">
-                        Cancel
-                    </Button>
-                </div>
-                {!newCategory &&
-                <Button onClick={() => setUpdateMode({mode: 'deleteCategory', option: {name: categoryName}})}
-                        className={classes.errorButton}
-                        size="small"
-                        variant="outlined">
-                    Delete
-                </Button>}
-            </Box>
-            <Menu anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleClose}>
-                <MenuItem onClick={handleDropDownDel}>Delete</MenuItem>
-                <MenuItem onClick={handleDropDownRename}>Rename</MenuItem>
-            </Menu>
-            {<AddCategory open={updateMode.mode === 'add'} handleAdd={handleAdd} updateMode={updateMode}
-                          setUpdateMode={setUpdateMode}/>}
-            {updateMode.mode === 'delete' &&
-            <DeleteOption open={updateMode.mode === 'delete'} handleDelete={handleDelete} setUpdateMode={setUpdateMode}
-                          updateMode={updateMode}/>}
-            {updateMode.mode === "rename" &&
-            <RenameOption open={updateMode.mode === "rename"} handleRename={handleRename} updateMode={updateMode}
-                          setUpdateMode={setUpdateMode}/>}
-            {updateMode.mode === "deleteCategory" &&
-            <DeleteCategory open={updateMode.mode === "deleteCategory"}
-                            handleDeleteCategory={handleDeleteCategory}
-                            categoryName={categoryName}
-                            updateMode={updateMode} setUpdateMode={setUpdateMode}/>}
-        </Paper>
+                <Menu anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={handleClose}>
+                    <MenuItem onClick={handleDropDownDel}>Delete</MenuItem>
+                    <MenuItem onClick={handleDropDownRename}>Rename</MenuItem>
+                </Menu>
+                {<AddCategory open={updateMode.mode === 'add'} handleAdd={handleAdd} updateMode={updateMode}
+                              setUpdateMode={setUpdateMode}/>}
+                {updateMode.mode === 'delete' &&
+                <DeleteOption open={updateMode.mode === 'delete'} handleDelete={handleDelete}
+                              setUpdateMode={setUpdateMode}
+                              updateMode={updateMode}/>}
+                {updateMode.mode === "rename" &&
+                <RenameOption open={updateMode.mode === "rename"} handleRename={handleRename} updateMode={updateMode}
+                              setUpdateMode={setUpdateMode}/>}
+                {updateMode.mode === "deleteCategory" &&
+                <DeleteCategory open={updateMode.mode === "deleteCategory"}
+                                handleDeleteCategory={handleDeleteCategory}
+                                categoryName={categoryName}
+                                updateMode={updateMode} setUpdateMode={setUpdateMode}/>}
+            </CardContent>
+        </Card>
     );
 }
 

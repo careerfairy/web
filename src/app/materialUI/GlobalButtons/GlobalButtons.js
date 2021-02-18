@@ -1,9 +1,24 @@
-import IconButton from "@material-ui/core/IconButton";
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import React from "react";
-import {makeStyles} from "@material-ui/core/styles";
-import {fade} from "@material-ui/core";
+import {makeStyles, fade, useTheme} from "@material-ui/core/styles";
 import {grey} from "@material-ui/core/colors";
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import PropTypes from 'prop-types';
+import {validateHTMLColor} from 'validate-color';
+
+import {
+    IconButton,
+    Slide,
+    Button,
+    ButtonGroup,
+    ClickAwayListener,
+    Grow,
+    Paper,
+    Popper,
+    MenuItem,
+    MenuList,
+    CircularProgress,
+} from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -25,6 +40,21 @@ const useStyles = makeStyles(theme => ({
         margin: "0.5rem"
     },
     buttonDisabled: {},
+    popper: {
+        zIndex: 102
+    },
+    dynamicButtonDisabled: {
+        background: `${theme.palette.action.disabledBackground} !important`,
+        color: `${theme.palette.action.disabled} !important`
+    },
+    dynamicButtonRoot: {
+        background: ({color}) => `linear-gradient(45deg, ${color || theme.palette.primary.main} 30%, ${fade(color || theme.palette.primary.main, 0.8)} 90%)`,
+        color: 'white',
+    },
+
+    dynamicLabel: {
+        textTransform: 'capitalize',
+    },
 }))
 
 export const PlayIconButton = ({addNewComment, isEmpty, IconProps, IconButtonProps, ...props}) => {
@@ -44,3 +74,136 @@ export const PlayIconButton = ({addNewComment, isEmpty, IconProps, IconButtonPro
         </div>
     )
 }
+const DynamicColorButton = ({disabled, startIcon, loading, color, children, ...rest}) => {
+    const theme = useTheme()
+    color = color === "secondary" ? theme.palette.secondary.main : (color === "primary" || !validateHTMLColor(color)) ? theme.palette.primary.main : color
+    const classes = useStyles({color})
+    return (
+        <Button
+            {...rest}
+            disabled={loading || disabled}
+            startIcon={!loading && startIcon}
+            classes={{
+                root: classes.dynamicButtonRoot,
+                label: classes.dynamicLabel,
+                disabled: classes.dynamicButtonDisabled
+            }}
+        >
+            {loading ? <CircularProgress color="inherit" size={16}/> : children}
+        </Button>
+    )
+}
+
+DynamicColorButton.propTypes = {
+    className: PropTypes.string,
+    color: PropTypes.string,
+    startIcon: PropTypes.node,
+    disabled: PropTypes.bool,
+    loading: PropTypes.bool
+};
+
+
+
+//example
+// const options = [{
+//     label: 'Create a merge commit',
+//     onClick: () => {
+//     }
+// }, {
+//     label: 'Squash and merge',
+//     onClick: () => {
+//     }
+// }, {
+//     label: 'Rebase and merge',
+//     onClick: () => {
+//
+//     }
+// }];
+
+const CustomSplitButton = ({
+                                      options = [],
+                                      mainButtonProps,
+                                      slideDirection = "right",
+                                      sideButtonProps,
+                                      ...props
+                                  }) => {
+    const classes = useStyles()
+    const [open, setOpen] = React.useState(false);
+    const anchorRef = React.useRef(null);
+    const [selectedIndex, setSelectedIndex] = React.useState(0);
+
+
+    const handleMenuItemClick = (event, index) => {
+        setSelectedIndex(index);
+        setOpen(false);
+    };
+
+    const handleToggle = () => {
+        setOpen((prevOpen) => !prevOpen);
+    };
+
+    const handleClose = (event) => {
+        if (anchorRef.current && anchorRef.current.contains(event.target)) {
+            return;
+        }
+
+        setOpen(false);
+    };
+
+    return (
+        <>
+            <Slide timeout={500} in direction={slideDirection}>
+                <ButtonGroup {...props} variant="contained" color="primary" ref={anchorRef} aria-label="split button">
+                    <Button {...mainButtonProps}
+                            onClick={options[selectedIndex].onClick}>{options[selectedIndex].label}</Button>
+                    <Button
+                        {...sideButtonProps}
+                        color="primary"
+                        aria-controls={open ? 'split-button-menu' : undefined}
+                        aria-expanded={open ? 'true' : undefined}
+                        aria-label="Select draft create strategy"
+                        aria-haspopup="menu"
+                        startIcon={
+                            <ArrowDropDownIcon/>
+                        }
+                        onClick={handleToggle}
+                    >
+                        More options
+                    </Button>
+                </ButtonGroup>
+            </Slide>
+            <Popper className={classes.popper} open={open} anchorEl={anchorRef.current} role={undefined} transition
+                    disablePortal>
+                {({TransitionProps, placement}) => (
+                    <Grow
+                        {...TransitionProps}
+                        style={{
+                            transformOrigin: placement === 'bottom' ? 'center top' : 'center top',
+                        }}
+                    >
+                        <Paper>
+                            <ClickAwayListener onClickAway={handleClose}>
+                                <MenuList id="split-button-menu">
+                                    {options.map((option, index) => (
+                                        <MenuItem
+                                            key={option.label}
+                                            selected={index === selectedIndex}
+                                            onClick={(event) => {
+                                                handleMenuItemClick(event, index)
+                                                option.onClick()
+                                            }}
+                                        >
+                                            {option.label}
+                                        </MenuItem>
+                                    ))}
+                                </MenuList>
+                            </ClickAwayListener>
+                        </Paper>
+                    </Grow>
+                )}
+            </Popper>
+        </>
+    );
+}
+
+export {DynamicColorButton, CustomSplitButton}

@@ -11,9 +11,6 @@ import axios from 'axios';
 import {FormControl, Link as MuiLink, MenuItem, Select} from '@material-ui/core';
 
 import Head from 'next/head';
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
 import {
     Box,
     CircularProgress,
@@ -25,14 +22,19 @@ import {
     Container,
     Button,
     Checkbox,
-    FormHelperText, Typography
+    FormHelperText,
+    Typography,
+    Stepper,
+    Step,
+    StepLabel,
 } from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {TealBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import GroupProvider from "../components/views/signup/GroupProvider";
-import UserContext from "../context/user/UserContext";
 import UniversitySelector from "../components/views/universitySelect/UniversitySelector";
 import UniversityCountrySelector from "../components/views/universitySelect/UniversityCountrySelector";
+import {useAuth} from "../HOCs/AuthProvider";
+import { firebaseConnect } from 'react-redux-firebase';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -92,7 +94,7 @@ function SignUpPage({firebase}) {
     const classes = useStyles()
     const router = useRouter();
     const {absolutePath} = router.query
-    const {authenticatedUser: user, userData} = useContext(UserContext)
+    const {authenticatedUser: user, userData} = useAuth()
     const steps = getSteps(absolutePath);
 
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
@@ -113,12 +115,18 @@ function SignUpPage({firebase}) {
     // }, []);
 
     useEffect(() => {
-        if (user && user.emailVerified) {
-            router.push('/next-livestreams')
-        } else if (user && !user.emailVerified && userData) {
-            setActiveStep(1)
-        }
+        verifyUserState();
     }, [user, userData])
+
+    const verifyUserState = async () => {
+        if (user.isLoaded && !user.isEmpty) {
+            if (user.emailVerified && userData && userData.groupIds) {
+                router.push('/next-livestreams')
+            } else if (!user.emailVerified) {
+                setActiveStep(1)
+            }
+        }  
+    }
 
     function getStepContent(stepIndex) {
         switch (stepIndex) {
@@ -189,7 +197,7 @@ export default withFirebase(SignUpPage);
 
 const SignUpForm = withFirebase(SignUpFormBase);
 
-const SignUpFormSent = SignUpFormValidate;
+const SignUpFormSent = firebaseConnect()(SignUpFormValidate);
 
 function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEmailVerificationSent, setActiveStep}) {
     const classes = useStyles()
@@ -201,15 +209,17 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
     const [open, setOpen] = React.useState(false);
 
     useEffect(() => {
-        if (emailSent && user && !emailVerificationSent) {
+        if (emailSent && user.isLoaded && !user.isEmpty && !emailVerificationSent) {
             axios({
                 method: 'post',
-                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailUserDataAndUni',
+                url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendPostmarkEmailUserDataAndUniWithName',
                 data: {
                     recipientEmail: user.email,
                     firstName: formData.firstName,
                     lastName: formData.lastName,
-                    universityCode: formData.universityCode,
+                    linkedinUrl: formData.linkedinUrl,
+                    universityCode: formData.university.code,
+                    universityName: formData.university.name,
                     universityCountryCode: formData.universityCountryCode,
                 }
             }).then(response => {
@@ -250,7 +260,7 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                     password: '',
                     confirmPassword: '',
                     agreeTerm: false,
-                    universityCode: 'other',
+                    university: { code: 'other', name: 'Other' },
                     universityCountryCode: ''
                 }}
                 validate={values => {
@@ -273,9 +283,6 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                         errors.lastName = 'Cannot be longer than 50 characters';
                     } else if (!/^\D+$/i.test(values.lastName)) {
                         errors.lastName = 'Please enter a valid last name';
-                    }
-                    if (!values.universityCode) {
-                        errors.universityCode = 'Select a university or type "other"';
                     }
                     if (!values.password) {
                         errors.password = 'A password is required';
@@ -414,7 +421,7 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <UniversitySelector handleBlur={handleBlur}
-                                                    error={errors.universityCode && touched.universityCode && errors.universityCode}
+                                                    error={errors.university && touched.university && errors.university}
                                                     universityCountryCode={values.universityCountryCode}
                                                     values={values}
                                                     submitting={submitting(isSubmitting)}
@@ -523,7 +530,7 @@ function SignUpFormBase({firebase, user, userData, emailVerificationSent, setEma
     )
 }
 
-function SignUpFormValidate({user, userData, setEmailVerificationSent, setActiveStep, absolutePath}) {
+function SignUpFormValidate({user, firebase: { reloadAuth }, setEmailVerificationSent, setActiveStep, absolutePath}) {
     const classes = useStyles()
     const router = useRouter()
 
@@ -573,7 +580,7 @@ function SignUpFormValidate({user, userData, setEmailVerificationSent, setActive
                         }
                     }).then(response => {
                         absolutePath ? router.push(absolutePath) : setActiveStep(2);
-                        user.reload();
+                        reloadAuth();
                     }).catch(error => {
                         console.log("error", error);
                         setIncorrectPin(true);

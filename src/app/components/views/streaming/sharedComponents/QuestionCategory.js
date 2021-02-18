@@ -1,17 +1,24 @@
-import React, {useState, useEffect, useContext} from 'react';
-import UserContext from 'context/user/UserContext';
-import {Button, Typography, useTheme} from "@material-ui/core";
+import React, {useLayoutEffect, useRef, useState} from 'react';
+import {
+    Badge,
+    Button,
+    CircularProgress,
+    Collapse,
+    TextField,
+    Typography,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Fab,
+    Tabs,
+    Tab,
+    Slide,
+} from "@material-ui/core";
 import QuestionContainer from './questions/QuestionContainer';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import {TextField, Collapse} from "@material-ui/core";
-
-import DialogTitle from '@material-ui/core/DialogTitle';
+import HelpIcon from '@material-ui/icons/Help';
 import {withFirebase} from 'context/firebase';
 import AddIcon from '@material-ui/icons/Add';
-import Fab from "@material-ui/core/Fab";
-import Box from "@material-ui/core/Box";
 import {
     CategoryContainerTopAligned,
     QuestionContainerHeader,
@@ -19,33 +26,97 @@ import {
 } from "../../../../materialUI/GlobalContainers";
 import SwipeableViews from "react-swipeable-views";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
-import {makeStyles} from "@material-ui/core/styles";
+import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
+import CustomInfiniteScroll from "../../../util/CustomInfiteScroll";
+import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
+import {useAuth} from "../../../../HOCs/AuthProvider";
+import {GreyPermanentMarker} from "../../../../materialUI/GlobalTitles";
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 
 const useStyles = makeStyles(theme => ({
     view: {
         position: "relative",
         height: "100%",
         width: "100%",
+        overflow: "auto",
         "& .react-swipeable-view-container": {
             height: "100%"
         }
     },
+    addIcon: {
+        marginRight: theme.spacing(1)
+    },
+    questionScroll: {
+        height: "100%",
+        width: "100%",
+
+    },
+    emptyMessage: {
+        margin: "auto !important"
+    },
+    viewPanel: {
+        display: "flex",
+        '& > *': {
+            width: "100%"
+        }
+    },
+    fullwidth: {
+        width: "100%"
+    },
+    dialog: {
+        backgroundColor: fade(theme.palette.common.black, 0.2),
+        backdropFilter: "blur(5px)",
+    },
+    dialogInput: {
+        background: fade(theme.palette.background.paper, 0.5),
+    },
+    bar: {
+        width: "100%",
+        background: theme.palette.background.paper,
+    },
+    tabs: {
+        width: ({isMobile}) => isMobile ? "100%" : 280
+    }
 }))
 
-function QuestionCategory({livestream, selectedState, sliding, streamer, firebase, showMenu}) {
-    const theme = useTheme()
+const EmptyList = ({isUpcoming}) => {
     const classes = useStyles()
-    const [showNextQuestions, setShowNextQuestions] = useState(true);
+    return (
+        <GreyPermanentMarker className={classes.emptyMessage}>
+            No {isUpcoming ? "upcoming" : "answered"} questions
+        </GreyPermanentMarker>
+    )
+}
+
+
+function QuestionCategory({livestream, selectedState, sliding, streamer, firebase, showMenu, isMobile}) {
+    if (!livestream?.id) {
+        return null
+    }
+    const theme = useTheme()
+    const classes = useStyles({isMobile})
     const [showQuestionModal, setShowQuestionModal] = useState(false);
     const [touched, setTouched] = useState(false);
     const [value, setValue] = useState(0)
-
-    const [upcomingQuestions, setUpcomingQuestions] = useState([]);
-    const [pastQuestions, setPastQuestions] = useState([]);
+    const [parentHeight, setParentHeight] = useState(400)
+    const [submittingQuestion, setSubmittingQuestion] = useState(false);
 
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
 
-    const {authenticatedUser, userData} = useContext(UserContext);
+    const {authenticatedUser, userData} = useAuth();
+
+    const parentRef = useRef()
+
+    useLayoutEffect(() => {
+        function updateSize() {
+            setParentHeight(parentRef.current.containerNode.offsetHeight);
+        }
+
+        window.addEventListener('resize', updateSize);
+        updateSize();
+        return () => window.removeEventListener('resize', updateSize);
+    }, []);
+
     const handleOpen = () => {
         setTouched(false)
         setShowQuestionModal(true)
@@ -55,130 +126,149 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
         setShowQuestionModal(false)
     }
 
-    const handleChange = (event) => {
-        setValue(showNextQuestions ? 0 : 1);
-        setShowNextQuestions(!showNextQuestions);
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    }
+    const handleChangeIndex = (index) => {
+        setValue(index);
     }
 
-    useEffect(() => {
-        if (livestream.id) {
-            const unsubscribe = firebase.listenToLivestreamQuestions(livestream.id, querySnapshot => {
-                var upcomingQuestionsList = [];
-                var pastQuestionsList = [];
-                querySnapshot.forEach(doc => {
-                    let question = doc.data();
-                    question.id = doc.id;
-                    if (question.type !== 'done') {
-                        upcomingQuestionsList.push(question);
-                    } else {
-                        pastQuestionsList.push(question);
-                    }
-                });
-                setUpcomingQuestions(upcomingQuestionsList);
-                setPastQuestions(pastQuestionsList);
-            });
-            return () => unsubscribe();
-        }
-    }, [livestream.id]);
 
-    const handleClickUpcoming = () => {
-        setShowNextQuestions(true)
-        setValue(0)
-    }
+    const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming] = useInfiniteScroll(
+        firebase.listenToUpcomingLivestreamQuestions(livestream.id), 10
+    );
 
-    const handleClickPast = () => {
-        setShowNextQuestions(false)
-        setValue(1)
-    }
+    const [itemsPast, loadMorePast, hasMorePast] = useInfiniteScroll(
+        firebase.listenToPastLivestreamQuestions(livestream.id), 10
+    );
 
-    function addNewQuestion() {
+    const addNewQuestion = async () => {
         setTouched(true)
         if ((!userData && !livestream.test) || !(newQuestionTitle.trim()) || newQuestionTitle.trim().length < 5) {
             return;
         }
-
-        const newQuestion = {
-            title: newQuestionTitle,
-            votes: 0,
-            type: "new",
-            author: !livestream.test ? authenticatedUser.email : 'test@careerfairy.io'
+        setSubmittingQuestion(true)
+        try {
+            const newQuestion = {
+                title: newQuestionTitle,
+                votes: 0,
+                type: "new",
+                author: !livestream.test ? authenticatedUser.email : 'test@careerfairy.io'
+            }
+            await firebase.putLivestreamQuestion(livestream.id, newQuestion)
+        } catch (e) {
+            console.log("Error", e);
         }
-        firebase.putLivestreamQuestion(livestream.id, newQuestion)
-            .then(() => {
-                setNewQuestionTitle("");
-                handleClose()
-            }, () => {
-                console.log("Error");
-            })
+        setSubmittingQuestion(false)
+        setNewQuestionTitle("");
+        handleClose()
     }
 
-    let upcomingQuestionsElements = upcomingQuestions.map((question, index) => {
-        return <QuestionContainer key={question.id} showNextQuestions={showNextQuestions} streamer={streamer}
-                                  isNextQuestions={showNextQuestions}
-                                  livestream={livestream} 
+    let upcomingQuestionsElements = itemsUpcoming.map((question, index) => {
+        return <QuestionContainer key={question.id}
+                                  streamer={streamer}
+                                  isNextQuestions={value === 0}
+                                  livestream={livestream}
                                   index={index} sliding={sliding}
                                   showMenu={showMenu}
                                   selectedState={selectedState}
-                                  questions={upcomingQuestions} question={question} user={authenticatedUser}
+                                  questions={itemsUpcoming} question={question} user={authenticatedUser}
                                   userData={userData}/>
 
     });
 
-    let pastQuestionsElements = pastQuestions.map((question, index) => {
-        return <QuestionContainer key={question.id} showNextQuestions={showNextQuestions} streamer={streamer}
-                                  isNextQuestions={!showNextQuestions}
+    let pastQuestionsElements = itemsPast.map((question, index) => {
+        return <QuestionContainer key={question.id} streamer={streamer}
+                                  isNextQuestions={value === 1}
                                   livestream={livestream}
                                   index={index}
                                   showMenu={showMenu}
                                   selectedState={selectedState}
-                                  questions={pastQuestions} question={question} user={authenticatedUser}
+                                  questions={itemsPast} question={question} user={authenticatedUser}
                                   userData={userData}/>
     });
-
-
+    const getCount = (isUpcoming) => {
+        const elements = isUpcoming ? upcomingQuestionsElements : pastQuestionsElements
+        const hasMore = isUpcoming ? hasMoreUpcoming : hasMorePast
+        return elements.length ? `${elements.length}${hasMore ? "+" : ""}` : 0
+    }
     return (
         <CategoryContainerTopAligned>
-            <QuestionContainerHeader style={streamer ? {} : {height: 180, padding: 8}}>
+            <QuestionContainerHeader>
                 <QuestionContainerTitle>
                     Questions
                 </QuestionContainerTitle>
                 {!streamer &&
-                <Button variant="contained" children='Add a Question'
-                        endIcon={<AddIcon fontSize="large"/>}
-                        color="primary" onClick={handleOpen}/>}
-                <div style={{display: "flex", justifyContent: "center"}}>
-                    <Fab size="small" variant="extended" onClick={handleClickUpcoming} value="left"
-                         style={{
-                             background: showNextQuestions ? "Gray" : "#e0e0e0",
-                             marginRight: "0.5rem",
-                             color: showNextQuestions ? "white" : "black"
-                         }}>
-                        <Box fontSize={10}>Upcoming [{upcomingQuestionsElements.length}]</Box>
-                    </Fab>
-                    <Fab size="small" variant="extended" onClick={handleClickPast} value="center"
-                         style={{
-                             background: showNextQuestions ? "#E0E0E0" : "Gray",
-                             marginLeft: "0.5rem",
-                             color: showNextQuestions ? "black" : "white"
-                         }}>
-                        <Box fontSize={10}>Answered [{pastQuestionsElements.length}]</Box>
-                    </Fab>
-                </div>
+                <Fab onClick={handleOpen} size="medium" color="primary" variant="extended">
+                    <AddIcon className={classes.addIcon}/>
+                    Add a Question
+                </Fab>}
+                    <Tabs
+                        value={value}
+                        onChange={handleChange}
+                        indicatorColor="primary"
+                        variant={isMobile ? "fullWidth" : "standard"}
+                        textColor="primary"
+                        className={classes.tabs}
+                    >
+                        <Tab
+                            style={{minWidth: "50%"}}
+                            label="Upcoming"
+                            icon={
+                                <Badge color="secondary"
+                                       badgeContent={getCount(true)}>
+                                    <HelpIcon/>
+                                </Badge>
+                            }
+                        />
+                        <Tab
+                            style={{minWidth: "50%"}}
+                            label="Answered"
+                            icon={
+                                <Badge color="secondary"
+                                       badgeContent={getCount()}>
+                                    <CheckCircleIcon/>
+                                </Badge>
+                            }
+                        />
+                    </Tabs>
             </QuestionContainerHeader>
             <SwipeableViews
                 containerStyle={{WebkitOverflowScrolling: 'touch'}}
                 disabled
+                ref={parentRef}
+                id="scrollable-container"
                 className={classes.view}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                index={value} onChangeIndex={handleChange}>
-                <TabPanel height="auto" value={value} index={0} dir={theme.direction}>
-                    {upcomingQuestionsElements}
+                index={value} onChangeIndex={handleChangeIndex}>
+                <TabPanel className={classes.viewPanel} value={value} index={0}>
+                    {itemsUpcoming.length ?
+                        <CustomInfiniteScroll
+                            className={classes.questionScroll}
+                            height={parentHeight}
+                            hasMore={hasMoreUpcoming}
+                            next={loadMoreUpcoming}
+                            dataLength={itemsUpcoming.length}>
+                            {upcomingQuestionsElements}
+                        </CustomInfiniteScroll>
+                        :
+                        <EmptyList isUpcoming/>}
                 </TabPanel>
-                <TabPanel height="auto" value={value} index={1} dir={theme.direction}>
-                    {pastQuestionsElements}
+                <TabPanel className={classes.viewPanel} value={value} index={1}>
+                    {itemsPast.length ?
+                        <CustomInfiniteScroll
+                            className={classes.questionScroll}
+                            hasMore={hasMorePast}
+                            height={parentHeight}
+                            next={loadMorePast}
+                            dataLength={itemsPast.length}>
+                            {pastQuestionsElements}
+                        </CustomInfiniteScroll>
+                        :
+                        <EmptyList/>}
                 </TabPanel>
             </SwipeableViews>
-            <Dialog PaperProps={{style: {background: "transparent", boxShadow: "none"}}} fullWidth onClose={handleClose}
+            <Dialog TransitionComponent={Slide} PaperProps={{className: classes.dialog}} fullWidth onClose={handleClose}
                     open={showQuestionModal} basic size='small'>
                 <DialogTitle style={{color: "white"}}>
                     Add a Question
@@ -186,7 +276,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                 <DialogContent>
                     <TextField
                         autoFocus
-                        InputProps={{style: {background: "white"}}}
+                        InputProps={{className: classes.dialogInput}}
                         error={Boolean(touched && newQuestionTitle.length < 5)}
                         onBlur={() => setTouched(true)}
                         variant="outlined" value={newQuestionTitle} placeholder='Your question goes here'
@@ -201,8 +291,9 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                 </DialogContent>
                 <DialogActions>
                     <Button variant="contained" color="primary" size='large'
+                            disabled={submittingQuestion}
                             onClick={() => addNewQuestion()}>
-                        Submit
+                        {submittingQuestion ? <CircularProgress color="inherit" size={20}/> : "Submit"}
                     </Button>
                     <Button variant="contained" size='large' onClick={handleClose}>
                         Cancel

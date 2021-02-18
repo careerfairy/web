@@ -1,51 +1,122 @@
-import React, {Fragment, useState, useEffect} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {withFirebase} from 'context/firebase';
-import EditIcon from '@material-ui/icons/Edit';
+import ShareIcon from '@material-ui/icons/Share';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import {Box, Button, CardMedia, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, IconButton, InputLabel, Menu, MenuItem, Select, Typography} from "@material-ui/core";
-import GroupStreamCard from 'components/views/NextLivestreams/GroupStreams/GroupStreamCard';
-import { CSVLink } from "react-csv";
+import {v4 as uuidv4} from 'uuid';
+import {
+    Box,
+    Button,
+    Chip,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Divider,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    Typography
+} from "@material-ui/core";
+import {CSVLink} from "react-csv";
 import StatsUtil from 'data/util/StatsUtil';
-import { PDFDownloadLink, Document, Page, View, Text } from '@react-pdf/renderer';
+import {PDFDownloadLink} from '@react-pdf/renderer';
 import LivestreamPdfReport from './LivestreamPdfReport';
-import { useLivestreamMetadata } from 'components/custom-hook/useLivestreamMetadata';
+import {useLivestreamMetadata} from 'components/custom-hook/useLivestreamMetadata';
+import {useTalentPoolMetadata} from 'components/custom-hook/useTalentPoolMetadata';
+import {makeStyles} from "@material-ui/core/styles";
+import PublishIcon from '@material-ui/icons/Publish';
+import ListAltIcon from '@material-ui/icons/ListAlt';
+import {useSnackbar} from "notistack";
+import AreYouSureModal from "../../../../../../materialUI/GlobalModals/AreYouSureModal";
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import {copyStringToClipboard} from "../../../../../helperFunctions/HelperFunctions";
+import {useAuth} from "../../../../../../HOCs/AuthProvider";
+import StreamerLinksDialog from './StreamerLinksDialog';
 
-const EnhancedGroupStreamCard = (props) => {
+const useStyles = makeStyles(theme => {
+    const themeWhite = theme.palette.common.white
+    return ({
+        button: {
+            color: themeWhite,
+            border: `2px solid ${themeWhite}`,
+            marginBottom: theme.spacing(1)
+        },
+        divider: {
+            background: theme.palette.common.white
+        }
+    })
+})
+const EnhancedGroupStreamCard = ({
+                                     firebase,
+                                     livestream,
+                                     group,
+                                     isPastLivestream,
+                                     levelOfStudyModalOpen = false,
+                                     handleCloseLevelOfStudyModal,
+                                     handleOpenLevelOfStudyModal,
+                                     switchToNextLivestreamsTab,
+                                     handleEditStream,
 
-    const [modalOpen, setModalOpen] = useState(false);
+                                     isDraft,
+                                     router,
+                                     hasOptions
+                                 }) => {
+    const classes = useStyles()
+    const {authenticatedUser, userData} = useAuth()
+    const {enqueueSnackbar} = useSnackbar()
+
     const [localCategories, setLocalCategories] = useState([]);
     const [groupCategories, setGroupCategories] = useState([]);
     const [allGroups, setAllGroups] = useState([]);
 
     const [registeredStudents, setRegisteredStudents] = useState([]);
     const [registeredStudentsFromGroup, setRegisteredStudentsFromGroup] = useState([]);
-    const [participatingStudents, setParticipatingStudents] = useState([]);
-    const [participatingStudentsFromGroup, setParticipatingStudentsFromGroup] = useState([]);
+    const [publishingDraft, setPublishingDraft] = useState(false);
 
-    const [studentStats, setStudentStats] = useState(null);
-    const [talentPool, setTalentPool] = useState([]);
+    const [deletingStream, setDeletingStream] = useState(false);
+    const [openAreYouSureModal, setOpenAreYouSureModal] = useState(false);
+    const [startDownloadingReport, setStartDownloadingReport] = useState(false);
+    const [openStreamerLinksDialog, setOpenStreamerLinksDialog] = useState(false);
+    const {
+        hasDownloadedReport,
+        questions,
+        polls,
+        icons,
+        livestreamSpeakers,
+        overallRating,
+        contentRating,
+        talentPoolForReport,
+        participatingStudents,
+        participatingStudentsFromGroup,
+        studentStats
+    } = useLivestreamMetadata(livestream, group, firebase, startDownloadingReport);
 
-    const [startDownloading, setStartDownloading] = useState(false);
-    const { hasDownloaded, questions, polls, icons, livestreamSpeakers } = useLivestreamMetadata(props.livestream, props.firebase, startDownloading);
-
+    const [startDownloadingTalentPool, setStartDownloadingTalentPool] = useState(false);
+    const {
+        hasDownloadedTalentPool,
+        talentPool
+    } = useTalentPoolMetadata(livestream, allGroups, group, firebase, registeredStudentsFromGroup, startDownloadingTalentPool);
 
     useEffect(() => {
-        if (props.livestream && props.livestream.targetCategories && props.livestream.targetCategories[props.group.id] && modalOpen) {
-            setLocalCategories(props.livestream.targetCategories[props.group.id])
+        if (livestream && livestream.targetCategories && livestream.targetCategories[group.id] && levelOfStudyModalOpen) {
+            setLocalCategories(livestream.targetCategories[group.id])
+
         }
-    },[props.livestream, modalOpen])
+    }, [livestream, levelOfStudyModalOpen])
 
     useEffect(() => {
-        if (props.group && props.group.categories) {
-            let fieldOfStudyCategories = props.group.categories.find(category => category.name?.toLowerCase() === "field of study");
+        if (group && group.categories) {
+            let fieldOfStudyCategories = group.categories.find(category => category.name?.toLowerCase() === "field of study");
             if (fieldOfStudyCategories && fieldOfStudyCategories.options) {
                 setGroupCategories(fieldOfStudyCategories.options);
             }
         }
-    },[props.group])
+    }, [group])
 
     useEffect(() => {
-        props.firebase.getAllCareerCenters().then(querySnapshot => {
+        firebase.getAllCareerCenters().then(querySnapshot => {
             let careerCenters = [];
             querySnapshot.forEach(doc => {
                 let cc = doc.data();
@@ -57,8 +128,8 @@ const EnhancedGroupStreamCard = (props) => {
     }, []);
 
     useEffect(() => {
-        if (props.livestream && props.group) {
-            props.firebase.getLivestreamRegisteredStudents(props.livestream.id).then(querySnapshot => {
+        if (livestream && group) {
+            firebase.getLivestreamRegisteredStudents(livestream.id).then(querySnapshot => {
                 let registeredStudents = [];
                 querySnapshot.forEach(doc => {
                     let student = doc.data();
@@ -67,92 +138,39 @@ const EnhancedGroupStreamCard = (props) => {
                 });
                 setRegisteredStudents(registeredStudents);
             })
-        }      
-    }, [props.livestream]);
-
-    useEffect(() => {
-        if (props.livestream && props.group) {
-            props.firebase.getLivestreamParticipatingStudents(props.livestream.id).then(querySnapshot => {
-                let participatingStudents = [];
-                querySnapshot.forEach(doc => {
-                    let student = doc.data();
-                    student.id = doc.id;
-                    participatingStudents.push(student);
-                });
-                setParticipatingStudents(participatingStudents);
-            })
-        }      
-    }, [props.livestream]);
+        }
+    }, [livestream]);
 
     useEffect(() => {
         if (registeredStudents && registeredStudents.length) {
             let studentsOfGroup = [];
-            registeredStudents.forEach( registeredStudent => {
+            registeredStudents.forEach(registeredStudent => {
                 if (studentBelongsToGroup(registeredStudent)) {
-                    let publishedStudent = StatsUtil.getStudentInGroupDataObject(registeredStudent, props.group);
+                    let publishedStudent = StatsUtil.getStudentInGroupDataObject(registeredStudent, group);
                     studentsOfGroup.push(publishedStudent);
                 }
             });
             setRegisteredStudentsFromGroup(studentsOfGroup);
-        }      
+        }
     }, [registeredStudents]);
 
-    useEffect(() => {
-        if (participatingStudents && participatingStudents.length) {
-            let studentsOfGroup = [];
-            participatingStudents.forEach( student => {
-                if (studentBelongsToGroup(student)) {
-                    let publishedStudent = StatsUtil.getStudentInGroupDataObject(student, props.group);
-                    studentsOfGroup.push(publishedStudent);
-                }
-            });
-            setParticipatingStudentsFromGroup(studentsOfGroup);
-        }      
-    }, [participatingStudents]);
-
-    useEffect(() => {
-        if (participatingStudents && participatingStudents.length) {
-            let listOfStudents = participatingStudents.filter( student => studentBelongsToGroup(student));
-            let stats = StatsUtil.getRegisteredStudentsStats(listOfStudents, props.group);
-            setStudentStats(stats);
-        }      
-    }, [participatingStudents]);
-
-    useEffect(() => {
-        if (props.livestream && allGroups.length && registeredStudentsFromGroup) {
-            props.firebase.getLivestreamTalentPoolMembers(props.livestream.companyId).then(querySnapshot => {
-                let registeredStudents = [];
-                querySnapshot.forEach(doc => {
-                    let element = doc.data();
-                    if (registeredStudentsFromGroup.some( student => student.id === doc.id)) {
-                        let publishedStudent = StatsUtil.getStudentInGroupDataObject(element, props.group);
-                        registeredStudents.push(publishedStudent);
-                    } else {
-                        let publishedStudent = StatsUtil.getStudentOutsideGroupDataObject(element, props.group, allGroups);
-                        registeredStudents.push(publishedStudent);
-                    }    
-                });
-                setTalentPool(registeredStudents);
-            })
-        }      
-    }, [props.livestream, allGroups, registeredStudentsFromGroup]);
 
     function studentBelongsToGroup(student) {
-        if (props.group.universityCode) {
-            if (student.universityCode === props.group.universityCode) {
-                return student.groupIds && student.groupIds.includes(props.group.groupId);
+        if (group.universityCode) {
+            if (student.universityCode === group.universityCode) {
+                return student.groupIds && student.groupIds.includes(group.groupId);
             } else {
                 return false;
             }
         } else {
-            return student.groupIds && student.groupIds.includes(props.group.groupId);
+            return student.groupIds && student.groupIds.includes(group.groupId);
         }
     }
 
     function getOptionName(optionId) {
         let correspondingOption = {};
-        correspondingOption = groupCategories.find( option => option.id === optionId );
-        return correspondingOption.name || 'CATEGORY_UNDEFINED';
+        correspondingOption = groupCategories.find(option => option.id === optionId);
+        return correspondingOption?.name || 'CATEGORY_UNDEFINED';
     }
 
     function addElement(optionId) {
@@ -162,112 +180,263 @@ const EnhancedGroupStreamCard = (props) => {
     }
 
     function removeElement(optionId) {
-        const filteredOptions = localCategories.filter( option => option !== optionId);
+        const filteredOptions = localCategories.filter(option => option !== optionId);
         setLocalCategories(filteredOptions);
     }
 
     function updateLivestreamCategories() {
-        let categoryCopy = props.livestream.targetCategories ? props.livestream.targetCategories : {};
-        categoryCopy[props.group.id] = localCategories;
-        props.firebase.updateLivestreamCategories(props.livestream.id, categoryCopy).then(() => {
-            setModalOpen(false);
+        let categoryCopy = livestream.targetCategories ? livestream.targetCategories : {};
+        categoryCopy[group.id] = localCategories;
+        firebase.updateLivestreamCategories(livestream.id, categoryCopy).then(() => {
+            handleCloseLevelOfStudyModal()
         });
     }
-    
-    let categoryElements = localCategories.map( category => {
+
+    const sendErrorMessage = () => {
+        enqueueSnackbar("something went Wrong, please refresh the page", {
+            variant: "error",
+            preventDuplicate: true
+        })
+    }
+
+    const handleCloseAreYouSureModal = () => {
+        setOpenAreYouSureModal(false)
+    }
+    const handleOPenAreYouSureModal = () => {
+        setOpenAreYouSureModal(true)
+    }
+
+    const handleDeleteStream = async () => {
+        try {
+            setDeletingStream(true)
+            const targetCollection = isDraft ? "draftLivestreams" : "livestreams"
+            await firebase.deleteLivestream(livestream.id, targetCollection)
+            setDeletingStream(false)
+        } catch (e) {
+            setDeletingStream(false)
+            console.log("-> e", e);
+            sendErrorMessage()
+        }
+
+    }
+
+    const handleCreateExternalLink = () => {
+        let baseUrl = "https://careerfairy.io";
+        if (window?.location?.origin) {
+            baseUrl = window.location.origin;
+        }
+        const draftId = livestream.id;
+        const targetPath = `${baseUrl}/draft-stream?draftStreamId=${draftId}`;
+        copyStringToClipboard(targetPath);
+        enqueueSnackbar("Link has been copied to your clipboard!", {
+            variant: "success",
+            preventDuplicate: true,
+        });
+    }
+
+    const handlePublishStream = async () => {
+        try {
+            setPublishingDraft(true)
+            const newStream = {...livestream}
+            newStream.companyId = uuidv4()
+            const author = {
+                email: authenticatedUser.email
+            }
+            if (group?.id) {
+                author.groupId = group.id
+            }
+            await firebase.addLivestream(newStream, "livestreams", author)
+            await firebase.deleteLivestream(livestream.id, "draftLivestreams")
+            switchToNextLivestreamsTab()
+            setPublishingDraft(false)
+        } catch (e) {
+            setPublishingDraft(false)
+            sendErrorMessage()
+        }
+    }
+
+    const isWorkInProgress = () => !livestream.status?.pendingApproval;
+
+
+    let categoryElements = localCategories.map((category, index) => {
         return (
             <Chip
                 size={"medium"}
                 variant={"outlined"}
+                key={category.id || index}
                 onDelete={() => removeElement(category)}
-                label={getOptionName(category)} /> 
+                label={getOptionName(category)}/>
         );
     });
 
-    let menuItems = groupCategories.map( group => {
+    let menuItems = groupCategories.map(group => {
         return (
-            <MenuItem value={group.id}>{group?.name}</MenuItem>
+            <MenuItem value={group.id} key={group.id}>{group?.name}</MenuItem>
         );
     });
+
+    const isCareerCenter = () => Boolean(group.universityCode)
 
     return (
         <>
-            <IconButton style={{ position: 'absolute', top: '140px', right: '10px', zIndex: '2000' }} onClick={() => setModalOpen(true)}>
-                <EditIcon fontSize="large" color="inherit"/>
-            </IconButton>
-            <div style={{ position: 'absolute', top: '210px', right: '10px', zIndex: '2000', fontWeight: '600' }}>{ registeredStudentsFromGroup.length } students registered</div>
-            <CSVLink data={registeredStudentsFromGroup} filename={'Registered Students ' + props.livestream.company + ' ' + props.livestream.id + '.csv'} style={{ color: 'red' }}>
-            <Button startIcon={<GetAppIcon />} variant='outlined' style={{ position: 'absolute', top: '240px', right: '10px', zIndex: '2000' }}>
-                    Registered Students
+            <Box p={2} style={{width: "100%"}}>
+                <Typography gutterBottom align="center" style={{fontWeight: "bold"}} variant="h5">
+                    {registeredStudentsFromGroup.length} students registered
+                </Typography>
+                {isDraft &&
+                <Button
+                    className={classes.button}
+                    fullWidth
+                    disabled={publishingDraft || isWorkInProgress()}
+                    onClick={handlePublishStream}
+                    startIcon={publishingDraft ? <CircularProgress size={20} color="inherit"/> : <PublishIcon/>}
+                    variant='outlined'
+                >
+                    {publishingDraft ? "Publishing" : isWorkInProgress() ? "Needs To Be Approved" : "Publish Stream"}
+                </Button>}
+                {isDraft &&
+                <Button
+                    className={classes.button}
+                    fullWidth
+                    onClick={handleCreateExternalLink}
+                    startIcon={<ShareIcon/>}
+                    variant='outlined'
+                >
+                    Generate external Link to Edit Draft
+                </Button>}
+                <Button
+                    className={classes.button}
+                    fullWidth
+                    onClick={() => handleEditStream(livestream)}
+                    startIcon={<ListAltIcon/>}
+                    variant='outlined'
+                >
+                    {isDraft ? "Edit Draft" : "Edit Stream"}
                 </Button>
-            </CSVLink>
-            <CSVLink data={talentPool} filename={'TalentPool ' + props.livestream.company + ' ' + props.livestream.id + '.csv'} style={{ color: 'red' }}>
-            <Button startIcon={<GetAppIcon />} variant='outlined' style={{ position: 'absolute', top: '290px', right: '10px', zIndex: '2000' }}>
-                    Talent Pool
-                </Button>
-            </CSVLink>{
-                props.isPastLivestream &&
+                {!isDraft &&
+                <Button
+                    className={classes.button}
+                    fullWidth
+                    onClick={() => setOpenStreamerLinksDialog(true)}
+                    startIcon={<ShareIcon/>}
+                    variant='outlined'
+                >
+                    Get Streamer Links
+                </Button>}
+                <StreamerLinksDialog livestreamId={livestream.id} openDialog={openStreamerLinksDialog} setOpenDialog={setOpenStreamerLinksDialog}/>
+                {isCareerCenter() || userData?.isAdmin &&
+                <CSVLink data={registeredStudentsFromGroup} separator={";"}
+                         filename={'Registered Students ' + livestream.company + ' ' + livestream.id + '.csv'}
+                         style={{color: 'red'}}>
+                    <Button className={classes.button} fullWidth startIcon={<GetAppIcon/>} variant='outlined'>
+                        Registered Students
+                    </Button>
+                </CSVLink>}
                 <Fragment>
-                    { !startDownloading || !hasDownloaded ? 
-                        <div style={{ position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }}>
-                            <Button variant='outlined' primary onClick={() => setStartDownloading(true)} disabled={ startDownloading } loading={ startDownloading }>{ startDownloading ? 'Generating Report...' : 'Generate Report'}</Button>
+                    {!startDownloadingTalentPool || !hasDownloadedTalentPool ?
+                        <div>
+                            <Button className={classes.button} fullWidth variant='outlined'
+                                    onClick={() => setStartDownloadingTalentPool(true)}
+                                    disabled={startDownloadingTalentPool}>
+                                {startDownloadingTalentPool ? 'Generating Talent Pool...' : 'Generate Talent Pool'}
+                            </Button>
                         </div> :
-                        <PDFDownloadLink fileName="somename.pdf" style={{ position: 'absolute', top: '340px', right: '10px', zIndex: '2000' }} document={ 
-                            <LivestreamPdfReport group={props.group} 
-                                livestream={props.livestream} 
-                                studentStats={studentStats} 
-                                speakers={livestreamSpeakers}
-                                totalStudentsInTalentPool={talentPool.length}
-                                totalViewerFromOutsideETH={participatingStudents.length - participatingStudentsFromGroup.length} 
-                                totalViewerFromETH={participatingStudentsFromGroup.length} questions={questions} polls={polls} icons={icons}/>} >
-                            {({ blob, url, loading, error }) => (
-                                <div>
-                                    <Button variant='outlined' color='primary' >Download Report</Button>
-                                </div>
-                            )}
-                        </PDFDownloadLink>                    
+                        <CSVLink data={talentPool} separator={";"}
+                                 filename={'TalentPool ' + livestream.company + ' ' + livestream.id + '.csv'}
+                                 style={{color: 'red'}}>
+                            <Button className={classes.button} fullWidth startIcon={<GetAppIcon/>} variant='outlined'>
+                                Talent Pool
+                            </Button>
+                        </CSVLink>
                     }
-                    
                 </Fragment>
-            }
-            <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
-                <DialogTitle align="center">Update Target Groups</DialogTitle>
-                <DialogContent>
-                    <DialogContentText align="left">
-                    <FormControl variant="outlined" fullWidth style={{ marginBottom: "10px"}}>
-                        <InputLabel>Add a Target Group</InputLabel>
-                        <Select
-                            value={null}
-                            placeholder="Select a target group"
-                            onChange={(e) => addElement(e.target.value) }
-                            label="New target group"
+                {
+                    isPastLivestream &&
+                    <Fragment>
+                        {!startDownloadingReport || !hasDownloadedReport ?
+                            <div>
+                                <Button className={classes.button}
+                                        fullWidth
+                                        style={{color: "white"}}
+                                        startIcon={startDownloadingReport &&
+                                        <CircularProgress size={20} color="inherit"/>}
+                                        variant='outlined' onClick={() => setStartDownloadingReport(true)}
+                                        disabled={startDownloadingReport}>{startDownloadingReport ? 'Generating Report...' : 'Generate Report'}</Button>
+                            </div> :
+                            <PDFDownloadLink fileName={`General Report ${livestream.company} ${livestream.id}.pdf`}
+                                             document={
+                                                 <LivestreamPdfReport group={group}
+                                                    livestream={livestream}
+                                                    studentStats={studentStats}
+                                                    speakers={livestream.speakers}
+                                                    overallRating={overallRating}
+                                                    contentRating={contentRating}
+                                                    totalStudentsInTalentPool={talentPoolForReport.length}
+                                                    totalViewerFromOutsideETH={participatingStudents.length - participatingStudentsFromGroup.length}
+                                                    totalViewerFromETH={participatingStudentsFromGroup.length}
+                                                    questions={questions} polls={polls}
+                                                    icons={icons}/>}>
+                                {({blob, url, loading, error}) => (
+                                    <div>
+                                        <Button className={classes.button} fullWidth variant='outlined' color='primary'>Download
+                                            Report</Button>
+                                    </div>
+                                )}
+                            </PDFDownloadLink>
+                        }
+
+                    </Fragment>
+                }
+                <Button
+                    className={classes.button}
+                    fullWidth
+                    onClick={handleOPenAreYouSureModal}
+                    startIcon={<DeleteForeverIcon/>}
+                    variant='outlined'
+                >
+                    {isDraft ? "Delete Draft" : "Delete Stream"}
+                </Button>
+                <AreYouSureModal
+                    open={openAreYouSureModal}
+                    handleClose={handleCloseAreYouSureModal}
+                    handleConfirm={handleDeleteStream}
+                    loading={deletingStream}
+                    message={`Are you sure this ${isDraft ? "draft" : "stream"}? you will be no longer able to recover it`}
+                />
+                <Dialog open={levelOfStudyModalOpen} onClose={handleCloseLevelOfStudyModal} fullWidth maxWidth="sm">
+                    <DialogTitle align="center">Update Target Groups</DialogTitle>
+                    <DialogContent>
+                        <FormControl variant="outlined" fullWidth style={{marginBottom: "10px"}}>
+                            <InputLabel>Add a Target Group</InputLabel>
+                            <Select
+                                value={''}
+                                placeholder="Select a target group"
+                                onChange={(e) => addElement(e.target.value)}
+                                label="New target group"
                             >
-                        { menuItems }
-                        </Select>
-                    </FormControl>
-                        { categoryElements }
-                    </DialogContentText>
-                    <Box>
-                    </Box>
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        variant="contained"
-                        size="large"
-                        color="primary"
-                        onClick={updateLivestreamCategories}
-                        autoFocus>
-                        Confirm
-                    </Button>
-                    <Button
-                        size="large"
-                        onClick={() => setModalOpen(false)}>
-                        Cancel
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            <GroupStreamCard livestream={props.livestream} user={props.user} userData={props.userData} fields={null}
-                grid={props.grid} groupData={props.group}/>
+                                {menuItems}
+                            </Select>
+                        </FormControl>
+                        {categoryElements}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            variant="contained"
+                            size="large"
+                            color="primary"
+                            onClick={updateLivestreamCategories}
+                            autoFocus>
+                            Confirm
+                        </Button>
+                        <Button
+                            size="large"
+                            onClick={handleCloseLevelOfStudyModal}>
+                            Cancel
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </Box>
+            {hasOptions && <Divider className={classes.divider} variant="middle"/>}
         </>
     );
 }

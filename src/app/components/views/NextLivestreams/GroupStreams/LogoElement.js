@@ -1,12 +1,35 @@
 import React, {useState} from 'react';
-import {Box, Button} from "@material-ui/core";
+import { Button} from "@material-ui/core";
+import { makeStyles} from "@material-ui/core/styles";
 import GroupJoinModal from "../../profile/GroupJoinModal";
-import {Image} from "semantic-ui-react";
 import {useRouter} from "next/router";
 
 
-const LogoElement = ({careerCenter, userData, userfollows, livestreamId}) => {
+const useStyles = makeStyles(theme => ({
+    root: {
+        display: "flex",
+        justifyContent: "space-between",
+        flexDirection: "column"
+    },
+    logoImage: {
+        // minWidth: "90",
+        // height: "auto",
+        maxHeight: "90%"
+    },
+    imageWrapper: {
+        height: 50,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
+    },
+    followButton:{
+        marginTop: theme.spacing(1)
+    }
+}))
 
+const LogoElement = ({careerCenter, userData, userFollows, livestreamId, hideFollow}) => {
+    const classes = useStyles()
     const router = useRouter()
 
     const linkToStream = `/next-livestreams?careerCenterId=${careerCenter.groupId}&livestreamId=${livestreamId}`
@@ -30,19 +53,22 @@ const LogoElement = ({careerCenter, userData, userfollows, livestreamId}) => {
 
 
     return (
-        <Box display="flex" justifyContent="space-between" flexDirection="column" alignItems="center"
-             style={{margin: '0 auto', width: '65px', height: "100%"}}>
-                <Image alt={`${careerCenter.universityName} logo`} src={careerCenter.logoUrl}/>
-                {userfollows ? null :
-                    <Button onClick={handleJoin} style={{marginTop: 10}} variant="outlined" color="primary"> Follow </Button>}
-                <GroupJoinModal
-                    open={openJoinModal}
-                    group={careerCenter}
-                    alreadyJoined={false}
-                    userData={userData}
-                    closeModal={handleCloseJoinModal}
-                />
-        </Box>
+        <div className={classes.root}>
+            <div className={classes.imageWrapper}>
+                <img className={classes.logoImage} alt={`${careerCenter.universityName} logo`}
+                     src={careerCenter.logoUrl}/>
+            </div>
+            {(!userFollows && !hideFollow) &&
+                <Button size="small" onClick={handleJoin} className={classes.followButton} variant="outlined"
+                        color="primary"> Follow </Button>}
+            <GroupJoinModal
+                open={openJoinModal}
+                group={careerCenter}
+                alreadyJoined={false}
+                userData={userData}
+                closeModal={handleCloseJoinModal}
+            />
+        </div>
     );
 };
 

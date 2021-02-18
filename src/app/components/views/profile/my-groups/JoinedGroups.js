@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
         flexWrap: 'wrap'
     },
     title: {
-        color: 'rgb(160,160,160)',
+        color: theme.palette.text.secondary,
         margin: '0 0 10px 0',
         fontWeight: '300'
     }
@@ -28,7 +28,7 @@ const JoinedGroups = ({userData}) => {
     let existingGroupElements = [];
 
     if (userData && userData.groupIds) {
-        existingGroupElements = userData.groupIds.map(groupId => {
+        existingGroupElements = [...new Set(userData.groupIds)].map(groupId => { // new set to get rid of duplicate groupIds, dont know how they got there....
             return <CurrentGroup key={groupId} groupId={groupId} userData={userData}/>
         });
     }

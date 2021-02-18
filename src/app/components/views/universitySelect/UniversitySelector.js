@@ -1,11 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import {withFirebase} from "../../../context/firebase";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
-import {Collapse, FormControl, FormHelperText} from "@material-ui/core";
+import { Collapse, FormControl, FormHelperText, TextField, CircularProgress } from "@material-ui/core";
 
 const otherObj = {name: "other", id: "other"}
 const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, error, handleBlur, submitting, values}) => {
@@ -23,8 +21,8 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
                         const querySnapshot = await firebase.getUniversitiesFromCountryCode(universityCountryCode)
                         const fetchedUniversities = querySnapshot.data().universities
                         setUniversities([...fetchedUniversities, otherObj])
-                    } else {
-                        setFieldValue("universityCode", "other")
+                    }  else {
+                        setFieldValue("university", {code: "othe", name: "Other"})
                     }
                     return setLoading(false)
                 } catch (e) {
@@ -40,7 +38,7 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
 
 
     const getSelectedItem = () => {// Autocomplete will always complain because of async filtering... :( So ignore the warning
-        const item = universities.find((uni) => uni.id === values.universityCode)
+        const item = universities.find((uni) => uni.id === values.university.code)
         return item || otherObj
     }
 
@@ -55,7 +53,7 @@ const UniversitySelector = ({firebase, universityCountryCode, setFieldValue, err
             autoHighlight
             onChange={(e, value) => {
                 if (value) {
-                    setFieldValue("universityCode", value.id)
+                    setFieldValue("university", {code: value.id, name: value.name})
                 }
             }}
             open={open}

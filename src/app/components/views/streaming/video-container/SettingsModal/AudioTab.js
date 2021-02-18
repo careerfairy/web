@@ -18,7 +18,8 @@ import { useAudio } from 'components/custom-hook/useAudio';
 
 const useStyles = makeStyles(theme => ({
     button: {
-        height: "100%"
+        marginTop: 10,
+        marginBottom: 10,
     },
     warning: {
         display: "flex",
@@ -29,7 +30,6 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         justifyContent: "center",
         marginBottom: 5,
-        width: "100%",
         "& .MuiButton-root": {
             margin: "0 5px"
         }
@@ -46,13 +46,10 @@ const useStyles = makeStyles(theme => ({
         "& <": {
             margin: "0 5px"
         }
-    },
-    button: {
-        margin: "10px 0"
     }
 }))
 
-const AudioTab = ({audioLevel, audioSource, devices, setAudioSource, setSpeakerSource, localStream, speakerSource, attachSinkId, sinkId}) => {
+const AudioTab = ({audioLevel, audioSource, devices, setAudioSource, setSpeakerSource, speakerSource, attachSinkId, sinkId}) => {
     const classes = useStyles()
     const [playing, toggle, audio] = useAudio("https://www.kozco.com/tech/piano2-CoolEdit.mp3")
 

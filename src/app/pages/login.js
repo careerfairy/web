@@ -20,12 +20,12 @@ import {makeStyles} from "@material-ui/core/styles";
 import TheatersRoundedIcon from "@material-ui/icons/TheatersRounded";
 import BusinessCenterRoundedIcon from "@material-ui/icons/BusinessCenterRounded";
 import MicOutlinedIcon from '@material-ui/icons/MicOutlined';
-import UserContext from "../context/user/UserContext";
+import {useAuth} from "../HOCs/AuthProvider";
 
 const useStyles = makeStyles((theme) => ({
     box: {
         width: '100%', // Fix IE 11 issue.
-        backgroundColor: "white",
+        backgroundColor: theme.palette.background.paper,
         marginTop: theme.spacing(3),
         borderRadius: 5
     },
@@ -68,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function LogInPage({firebase}) {
-    const {authenticatedUser, userData} = useContext(UserContext)
+    const {authenticatedUser, userData} = useAuth()
     const [userEmailNotValidated, setUserEmailNotValidated] = useState(false);
     const [generalLoading, setGeneralLoading] = useState(false);
     const router = useRouter();
@@ -81,18 +81,14 @@ function LogInPage({firebase}) {
     // }, [authenticatedUser, absolutePath])
 
     useEffect(() => {
-        if (authenticatedUser && userData !== undefined) {
+        if (authenticatedUser.isLoaded && !authenticatedUser.isEmpty && userData !== undefined) {
             if (!authenticatedUser.emailVerified) {
                 router.replace(absolutePath ? {
                     pathname: '/signup',
                     query: {absolutePath}
                 } : '/signup');
             } else {
-                if (userData) {
-                    router.replace(absolutePath || '/next-livestreams');
-                } else {
-                    router.replace(absolutePath || '/next-livestreams');
-                }
+                router.replace(absolutePath || '/next-livestreams');
                 setGeneralLoading(false);
             }
         }
@@ -121,7 +117,14 @@ export default withFirebase(LogInPage);
 
 const LogInForm = withFirebase(LogInFormBase);
 
-export function LogInFormBase({userEmailNotValidated, absolutePath, setGeneralLoading, setUserEmailNotValidated, firebase, generalLoading}) {
+export function LogInFormBase({
+                                  userEmailNotValidated,
+                                  absolutePath,
+                                  setGeneralLoading,
+                                  setUserEmailNotValidated,
+                                  firebase,
+                                  generalLoading
+                              }) {
     const classes = useStyles()
 
     const [errorMessageShown, setErrorMessageShown] = useState(false);

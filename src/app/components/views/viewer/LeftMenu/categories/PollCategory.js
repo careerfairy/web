@@ -1,32 +1,42 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {withFirebase} from 'context/firebase';
-import UserContext from 'context/user/UserContext';
 import CurrentPollGraph from "../../../streaming/sharedComponents/CurrentPollGraph";
-import {Button, Paper, useTheme, withStyles} from "@material-ui/core";
+import {Paper} from "@material-ui/core";
 import {GreyPermanentMarker, PollQuestion} from "../../../../../materialUI/GlobalTitles";
 import {CategoryContainerCentered} from "../../../../../materialUI/GlobalContainers";
 import {colorsArray} from "../../../../util/colors";
+import {useAuth} from "../../../../../HOCs/AuthProvider";
+import {makeStyles, useTheme, withStyles} from "@material-ui/core/styles";
+import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
+import {isServer} from "../../../../helperFunctions/HelperFunctions";
 
 const PollWrapper = withStyles(theme => ({
     root: {
         borderRadius: 15,
         margin: 10,
-        backgroundColor: "white",
+        backgroundColor: theme.palette.background.paper,
         display: "flex",
         width: "90%",
         flexDirection: "column",
         alignItems: "center",
         textAlign: "center",
-        padding: theme.spacing(2, 0)
+        padding: theme.spacing(2, 0),
+        boxShadow: theme.shadows[3]
     },
 }))(Paper);
-
+const useStyles = makeStyles(theme => ({
+    pollButton: {
+        marginTop: theme.spacing(1)
+    }
+}))
 
 function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
     const theme = useTheme()
-    const {authenticatedUser} = React.useContext(UserContext);
+    const classes = useStyles()
+    const {authenticatedUser} = useAuth();
     const [currentPoll, setCurrentPoll] = useState(null);
     const [currentPollId, setCurrentPollId] = useState(null);
+    const [voting, setVoting] = useState(false);
 
     useEffect(() => {
         if (livestream) {
@@ -52,9 +62,11 @@ function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
         }
     }, [currentPoll]);
 
-    function voteForPollOption(index) {
+    const voteForPollOption = async (index) => {
         let authEmail = livestream.test ? 'streamerEmail' : authenticatedUser.email;
-        firebase.voteForPollOption(livestream.id, currentPoll.id, authEmail, index);
+        setVoting(true)
+        await firebase.voteForPollOption(livestream.id, currentPoll.id, authEmail, index);
+        setVoting(false)
     }
 
     let authEmail = (authenticatedUser && authenticatedUser.email && !livestream.test) ? authenticatedUser.email : 'streamerEmail';
@@ -63,16 +75,23 @@ function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
         if (currentPoll.voters.indexOf(authEmail) === -1) {
             let optionElementsLarge = currentPoll.options.map((option, index) => {
                 return (
-                    <Button key={index} variant="contained" children={option.name} fullWidth
-                            style={{background: colorsArray[index], color: "white", marginTop: "0.5rem"}}
-                            onClick={() => voteForPollOption(index)}
-                            size='small'/>
+                    <DynamicColorButton
+                        key={index}
+                        variant="contained"
+                        loading={voting}
+                        className={classes.pollButton}
+                        color={colorsArray[index]}
+                        children={option.name}
+                        fullWidth
+                        disabled={voting}
+                        onClick={() => voteForPollOption(index)}
+                        size='small'/>
                 );
             });
             return (
                 <CategoryContainerCentered>
                     <PollWrapper style={{padding: theme.spacing(2)}}>
-                        <PollQuestion style={{ margin: "1.5rem 0"}}>
+                        <PollQuestion style={{margin: "1.5rem 0"}}>
                             {currentPoll.question}
                         </PollQuestion>
                         <div>
@@ -85,7 +104,7 @@ function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
             return (
                 <CategoryContainerCentered>
                     <PollWrapper>
-                        <CurrentPollGraph currentPoll={currentPoll}/>
+                        {!isServer() && <CurrentPollGraph currentPoll={currentPoll}/>}
                     </PollWrapper>
                 </CategoryContainerCentered>
             )

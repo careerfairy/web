@@ -5,14 +5,15 @@ import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({
     globalBackgroundStyles: {
-        backgroundColor: "rgb(250,250,250)",
         height: "100%",
         minHeight: "100vh",
+        backgroundColor: theme.palette.type === "dark" ? theme.palette.background.default :"rgb(250,250,250)",
+
     },
     greyBackgroundStyles: {
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "rgb(230,230,230)",
+        backgroundColor: theme.palette.type === "dark" ? theme.palette.background.default : "rgb(230,230,230)",
         height: "100%",
         minHeight: "100vh",
     },
@@ -37,6 +38,14 @@ const useStyles = makeStyles(theme => ({
         height: "100%",
         minHeight: "100vh",
         padding: "0 0 40px 0"
+    },
+    darkThemedBackgroundStyles: {
+        backgroundColor: theme.palette.primary.dark,
+        height: "100%",
+        minHeight: "100vh",
+        padding: "0 0 40px 0",
+        display: "flex",
+        flexDirection: "column"
     }
 }))
 
@@ -63,6 +72,10 @@ export const MobileBackground = ({...props}) => {
 export const TealBackground = ({...props}) => {
     const classes = useStyles()
     return <Box className={classes.tealBackgroundStyles} {...props}/>
+}
+export const DarkThemedBackground = ({...props}) => {
+    const classes = useStyles()
+    return <Box className={classes.darkThemedBackgroundStyles} {...props}/>
 }
 
 

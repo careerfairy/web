@@ -1,28 +1,28 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
 import HelpIcon from '@material-ui/icons/Help';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
-import {makeStyles} from "@material-ui/core/styles";
+import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
-import {ClickAwayListener, fade} from "@material-ui/core";
+import {ClickAwayListener} from "@material-ui/core";
 import ChevronLeftRoundedIcon from '@material-ui/icons/ChevronLeftRounded';
 import TutorialContext from "../../../../context/tutorials/TutorialContext";
-import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "../../../../materialUI/GlobalTooltips";
-import Grow from "@material-ui/core/Grow";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     root: {
         position: "absolute",
         right: ({showMenu, isMobile}) => showMenu ? isMobile ? "-120px" : "-120px" : "-120px",
-        height: "100%",
+        height: ({isMobile}) => isMobile ? "100%" : "50%",
         width: 120,
         display: "flex",
         alignItems: "center",
         padding: 30,
         top: 0,
+        transform: ({isMobile}) => !isMobile && "translateY(50%)"
     },
     speedDial: {
         transition: "transform 0.2s",
@@ -43,6 +43,17 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: theme.palette.primary.dark,
         },
     },
+    darkActionButton: {
+        backgroundColor: theme.palette.background.paper,
+        color: theme.palette.grey["400"],
+        "&:disabled": {
+            backgroundColor: fade(theme.palette.background.paper, 0.5),
+            color: theme.palette.primary.main,
+        },
+        "&:hover": {
+            backgroundColor: theme.palette.background.default,
+        },
+    },
     actionButtonPink: {
         backgroundColor: theme.palette.secondary.main,
         color: "white",
@@ -52,6 +63,13 @@ const useStyles = makeStyles((theme) => ({
         },
         "&:hover": {
             backgroundColor: theme.palette.secondary.dark,
+        },
+    },
+    darkActionButtonPink: {
+        backgroundColor: theme.palette.background.paper,
+        color: theme.palette.secondary.main,
+        "&:hover": {
+            backgroundColor: theme.palette.background.default,
         },
     },
     cardHovered: {},
@@ -97,9 +115,15 @@ const ButtonComponent =
          setShowMenu
      }) => {
         const DELAY = 3000; //3 seconds
+        const [hasMounted, setHasMounted] = useState(false)
+        const theme = useTheme()
         const [open, setOpen] = useState(true);
         const [delayHandler, setDelayHandler] = useState(null)
         const {tutorialSteps, handleConfirmStep} = useContext(TutorialContext);
+
+        useEffect(() => {
+            setHasMounted(true)
+        }, [])
 
         const tutorialStepActive = () => {
             return Boolean(isOpen(3) || isOpen(8))
@@ -112,7 +136,6 @@ const ButtonComponent =
             return tutorialSteps.streamerReady && isValid(actionTutorialNum, actionDisabled)
         }
         const classes = useStyles({open: open || tutorialStepActive(), showMenu, isMobile});
-
 
         const handleMouseEnter = event => {
             clearTimeout(delayHandler)
@@ -141,50 +164,58 @@ const ButtonComponent =
             return null;
         }
 
-        const actions = [
-            {
-                icon: <BarChartIcon fontSize="large"/>,
-                name: "Polls",
-                disabled: showMenu && selectedState === 'polls',
-                onClick: () => handleStateChange("polls"),
-                tutorialNum: 3
-            },
-            {
-                icon: <HelpIcon fontSize="large"/>,
-                name: "Q&A",
-                disabled: showMenu && selectedState === 'questions',
-                onClick: () => handleStateChange("questions"),
-                tutorialNum: 2334
-            },
-        ];
+        const getActions = () => {
+            if (!hasMounted) {
+                return []
+            }
+            const actions = [
+                {
+                    icon: <BarChartIcon fontSize="large"/>,
+                    name: "Polls",
+                    disabled: showMenu && selectedState === 'polls',
+                    onClick: () => handleStateChange("polls"),
+                    tutorialNum: 3
+                },
+                {
+                    icon: <HelpIcon fontSize="large"/>,
+                    name: "Q&A",
+                    disabled: showMenu && selectedState === 'questions',
+                    onClick: () => handleStateChange("questions"),
+                    tutorialNum: 2334
+                },
+            ];
 
-        if (isMobile) {
-            actions.unshift({
-                icon: <ForumOutlinedIcon fontSize="large"/>,
-                name: "Chat",
-                disabled: showMenu && selectedState === 'chat',
-                onClick: () => handleStateChange("chat"),
-                tutorialNum: 234
-            })
-        } else {
-            actions.unshift({
-                icon: <PanToolOutlinedIcon />,
-                name: "Hand Raise",
-                disabled: showMenu && selectedState === 'hand',
-                onClick: () => handleStateChange("hand"),
-                tutorialNum: 8
-            })
+            if (isMobile) {
+                actions.unshift({
+                    icon: <ForumOutlinedIcon fontSize="large"/>,
+                    name: "Chat",
+                    disabled: showMenu && selectedState === 'chat',
+                    onClick: () => handleStateChange("chat"),
+                    tutorialNum: 234
+                })
+            }
+            if (!isMobile) {
+                actions.unshift({
+                    icon: <PanToolOutlinedIcon/>,
+                    name: "Hand Raise",
+                    disabled: showMenu && selectedState === 'hand',
+                    onClick: () => handleStateChange("hand"),
+                    tutorialNum: 8
+                })
+            }
+
+            if (streamer && showMenu) {
+                actions.unshift({
+                    icon: <ChevronLeftRoundedIcon fontSize="large"/>,
+                    name: "",
+                    disabled: false,
+                    onClick: () => setShowMenu(!showMenu),
+                    tutorialNum: 9999999
+                })
+            }
+            return actions
         }
 
-        if (streamer && showMenu) {
-            actions.unshift({
-                icon: <ChevronLeftRoundedIcon fontSize="large"/>,
-                name: "",
-                disabled: false,
-                onClick: () => setShowMenu(!showMenu),
-                tutorialNum: 9999999
-            })
-        }
 
         return (
             <ClickAwayListener onClickAway={handleClose}>
@@ -197,10 +228,10 @@ const ButtonComponent =
                         onFocus={handleOpen}
                         open
                     >
-                        {actions.map((action) => {
+                        {getActions().map((action) => {
                             return (
                                 <SpeedDialAction
-                                    key={action.name}
+                                    key={action.tutorialNum}
                                     icon={action.icon}
                                     tooltipPlacement="right"
                                     tooltipTitle={action.name}
@@ -212,7 +243,15 @@ const ButtonComponent =
                                     }}
                                     FabProps={{
                                         size: "large",
-                                        classes: {root: action.name.length ? isOpen(action.tutorialNum, action.disabled) ? classes.actionButtonHighlight : classes.actionButton : classes.actionButtonPink},
+                                        classes: {
+                                            root: clsx({
+                                                [classes.actionButtonHighlight]: isOpen(action.tutorialNum, action.disabled),
+                                                [classes.actionButton]: action.name.length,
+                                                [classes.actionButtonPink]: !action.name.length,
+                                                [classes.darkActionButton]: theme.palette.type === "dark",
+                                                [classes.darkActionButtonPink]: !action.name.length && theme.palette.type === "dark"
+                                            })
+                                        },
                                         disabled: action.disabled,
                                     }}
                                 />

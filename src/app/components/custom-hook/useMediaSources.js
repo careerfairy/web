@@ -4,65 +4,56 @@ import {isEmptyArray} from 'formik';
 import LocalStorageUtil from 'util/LocalStorageUtil';
 import { useSoundMeter } from './useSoundMeter';
 
-export default function useMediaSources(devices, webRTCAdaptor, streamId, localStream, showSoundMeter) {
+export default function useMediaSources(devices, streamId, localStream, showSoundMeter) {
 
     const [audioSource, setAudioSource] = useState(null);
     const [videoSource, setVideoSource] = useState(null);
     const [speakerSource, setSpeakerSource] = useState(null);
     const [soundMediaUpdateCounter, setSoundMeterUpdateCounter] = useState(0);
 
-    const audioLevel = useSoundMeter(showSoundMeter, localStream, soundMediaUpdateCounter);
+    const [localMediaStream, setLocalMediaStream] = useState(null);
 
     useEffect(() => {
-        const storedAudioSource = LocalStorageUtil.getAudioInputFromLocalStorage();
-        const storedVideoSource = LocalStorageUtil.getVideoInputFromLocalStorage();
-        const storedSpeakerSource = LocalStorageUtil.getAudioOutputFromLocalStorage();
+        if (localStream) {
+            const mediaStream = new MediaStream();
+            mediaStream.addTrack(localStream.getAudioTrack());
+            mediaStream.addTrack(localStream.getVideoTrack());
+            setLocalMediaStream(mediaStream);
+        }
+    }, [localStream, audioSource, videoSource])
 
-        if (devices && webRTCAdaptor && localStream) {
+    const audioLevel = useSoundMeter(showSoundMeter, localMediaStream, soundMediaUpdateCounter);
+
+    useEffect(() => {
+        if (devices && localStream) {
             if (devices.audioInputList && devices.audioInputList.length > 0 && (!audioSource || !devices.audioInputList.some( device => device.value === audioSource))) {
-                if (storedAudioSource && devices.audioInputList.some( device => device.value === storedAudioSource)) { 
-                    updateAudioSource(storedAudioSource) 
-                } else {
-                    updateAudioSource(devices.audioInputList[0].value)
-                }
+                setAudioSource(devices.audioInputList[0].value)
             }
-            if (devices.videoDeviceList && devices.videoDeviceList.length > 0 && !videoSource || !devices.videoDeviceList.some( device => device.value === videoSource)) {
-                if (storedVideoSource && devices.videoDeviceList.some( device => device.value === storedVideoSource)) { 
-                    updateVideoSource(storedVideoSource) 
-                } else {
-                    updateVideoSource(devices.videoDeviceList[0].value)
-                }
+            if (devices.videoDeviceList && devices.videoDeviceList.length > 0 && (!videoSource || !devices.videoDeviceList.some( device => device.value === videoSource))) {
+                setVideoSource(devices.videoDeviceList[0].value)
             }
-            if (devices.audioOutputList && devices.audioOutputList.length > 0 && !speakerSource || !devices.audioOutputList.some( device => device.value === speakerSource)) {
-                if (storedSpeakerSource && devices.audioOutputList.some( device => device.value === storedSpeakerSource)) {
-                    updateSpeakerSource(storedSpeakerSource) 
-                } else {
-                    updateSpeakerSource(devices.audioOutputList[0].value);
-                }
+            if (devices.audioOutputList && devices.audioOutputList.length > 0 && (!speakerSource || !devices.audioOutputList.some( device => device.value === speakerSource))) {
+                setSpeakerSource(devices.audioOutputList[0].value);
             }
         }   
-    },[devices, webRTCAdaptor, localStream]);
+    },[devices, localStream]);
 
     function updateAudioSource(deviceId) {
-        webRTCAdaptor.switchAudioInputSource(streamId, deviceId)
-        setAudioSource(deviceId);
-        LocalStorageUtil.setAudioInputFromLocalStorage(deviceId);
-        setTimeout(() => {
-            setSoundMeterUpdateCounter(soundMediaUpdateCounter + 1);
-        }, 500);
+        localStream.switchDevice("audio", deviceId, () => {
+            setAudioSource(deviceId);
+        })
     }
 
     function updateVideoSource(deviceId) {
-        webRTCAdaptor.switchVideoCameraCapture(streamId, deviceId)
-        setVideoSource(deviceId);
-        LocalStorageUtil.setVideoInputFromLocalStorage(deviceId);
+        localStream.switchDevice("video", deviceId, () => {
+            setVideoSource(deviceId);
+        })
     }
 
     function updateSpeakerSource(deviceId) {
         setSpeakerSource(deviceId);
-        LocalStorageUtil.setAudioOutputFromLocalStorage(deviceId);
     }
 
   
-    return { audioSource, updateAudioSource, videoSource, updateVideoSource, speakerSource, updateSpeakerSource, audioLevel };
+    return { audioSource, updateAudioSource, videoSource, updateVideoSource, speakerSource, updateSpeakerSource, localMediaStream, audioLevel };
 }

@@ -1,12 +1,11 @@
 import {useState, useEffect} from 'react';
 
 import { withFirebasePage } from 'context/firebase';
-import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Header from 'components/views/header/Header';
-import {Button, Container, Typography} from "@material-ui/core";
+import { Button, Container, Typography, CircularProgress } from "@material-ui/core";
 
 function TestStreamingPage(props) {
 

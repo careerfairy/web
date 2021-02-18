@@ -1,5 +1,6 @@
 import React from 'react';
-import {Box, Grid, withStyles} from "@material-ui/core";
+import {Box, Grid} from "@material-ui/core";
+import {withStyles} from "@material-ui/core/styles";
 
 const StyledBox = withStyles(theme => ({
     root: {

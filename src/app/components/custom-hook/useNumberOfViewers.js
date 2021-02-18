@@ -12,7 +12,7 @@ export function useNumberOfViewers(currentLivestream) {
                 setInterval(() => {
                     axios({
                         method: 'get',
-                        url: 'https://streaming.careerfairy.io/WebRTCAppEE/rest/v2/broadcasts/' + currentLivestream.id,
+                        url: `https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getNumberOfViewers?livestreamId=${currentLivestream.id}`,
                     }).then( response => { 
                             if (response.data.webRTCViewerCount > -1) {
                                 setNumberOfViewers(response.data.webRTCViewerCount);

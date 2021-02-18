@@ -3,9 +3,20 @@ import {Grid, Icon} from "semantic-ui-react";
 import EditIcon from '@material-ui/icons/Edit';
 import {withFirebase} from 'context/firebase';
 import CategoryEdit from './CategoryEdit';
-import {Box, Chip, IconButton, Zoom} from "@material-ui/core";
+import {
+    Box,
+    Card,
+    CardContent,
+    CardHeader,
+    Chip,
+    Divider,
+    Fade,
+    IconButton,
+    TextField,
+    Zoom,
+    Paper,
+} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
 
 const useStyles = makeStyles((theme) => ({
     whiteBox: {
@@ -34,9 +45,20 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: "700",
         color: "rgb(80,80,80)",
     },
+    headerTitle: {
+
+    }
 }));
 
-function CategoryElement({handleUpdateCategory, category, firebase, handleAddTempCategory, handleDeleteLocalCategory, group, isLocal}) {
+function CategoryElement({
+                             handleUpdateCategory,
+                             category,
+                             firebase,
+                             handleAddTempCategory,
+                             handleDeleteLocalCategory,
+                             group,
+                             isLocal
+                         }) {
     const classes = useStyles()
     const [editMode, setEditMode] = useState(false)
 
@@ -71,22 +93,24 @@ function CategoryElement({handleUpdateCategory, category, firebase, handleAddTem
 
     if (editMode === false) {
         return (
-            <Zoom in={category.id}>
-                <Paper className={classes.whiteBox}>
-                    <Box style={{minWidth: "120px"}}>
-                        <div className={classes.label}>Category Name</div>
-                        <div className="white-box-title">{category.name}</div>
-                    </Box>
-                    <Box style={{minWidth: "240px"}}>
-                        <div className={classes.label}>Category Options</div>
+            <Fade in>
+                <Card elevation={2}>
+                    <CardHeader
+                        titleTypographyProps={{className: classes.headerTitle, gutterBottom: true}}
+                        title={category.name}
+                        action={
+                            <IconButton onClick={() => setEditMode(true)} aria-label="settings">
+                                <EditIcon color="primary"/>
+                            </IconButton>
+                        }
+                        subheader="Category Options"
+                    />
+                    <Divider/>
+                    <CardContent>
                         {optionElements}
-                    </Box>
-                    <IconButton className={classes.icon}
-                                onClick={() => setEditMode(true)}>
-                        <EditIcon color="primary"/>
-                    </IconButton>
-                </Paper>
-            </Zoom>
+                    </CardContent>
+                </Card>
+            </Fade>
         );
     }
 

@@ -1,6 +1,7 @@
 import {Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import React from "react";
+import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
     greyPermanentMarkerStyles: {
@@ -19,26 +20,38 @@ const useStyles = makeStyles(theme => ({
         textAlign: "center",
         fontWeight: 700,
     },
+    subTitleStyles: {
+        fontSize: "1em",
+        width: "90%",
+        color: theme.palette.text.secondary,
+        textAlign: "center",
+    },
     pollQuestionStyles: {
         textAlign: "center",
         fontWeight: 500,
         fontSize: "2.2em",
-        overflowWrap: "break-word"
+        overflowWrap: "break-word",
+        wordBreak: "break-word",
+        msWordBreak: "break-word"
     }
 }))
 
 
-export const GreyPermanentMarker = ({...props}) => {
+export const GreyPermanentMarker = ({className, ...props}) => {
     const classes = useStyles()
-    return <Typography className={classes.greyPermanentMarkerStyles} {...props}/>
+    return <Typography className={clsx(classes.greyPermanentMarkerStyles, className)} {...props}/>
 }
 
-export const ThemedPermanentMarker = ({...props}) => {
+export const ThemedPermanentMarker = ({className, ...props}) => {
     const classes = useStyles()
-    return <Typography className={classes.themedPermanentMarkerStyles} {...props}/>
+    return <Typography className={clsx(classes.themedPermanentMarkerStyles, className)} {...props}/>
+}
+export const CategorySubtitle = ({className, ...props}) => {
+    const classes = useStyles()
+    return <Typography className={clsx(classes.subTitleStyles, className)} {...props}/>
 }
 
-export const PollQuestion = ({...props}) => {
+export const PollQuestion = ({className, ...props}) => {
     const classes = useStyles()
-    return <Typography className={classes.pollQuestionStyles} {...props}/>
+    return <Typography className={clsx(classes.pollQuestionStyles, className)} {...props}/>
 }

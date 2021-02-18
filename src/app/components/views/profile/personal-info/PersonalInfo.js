@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Formik} from 'formik';
 
 import {withFirebase} from 'context/firebase';
-import {makeStyles, withStyles} from "@material-ui/core/styles";
+import {makeStyles} from "@material-ui/core/styles";
 import {
     Typography,
     TextField,
@@ -12,22 +12,15 @@ import {
     Box,
     Container,
     Collapse,
-    FormHelperText, FormControl, Tooltip
+    FormHelperText, FormControl
 } from "@material-ui/core";
 import UniversityCountrySelector from "../../universitySelect/UniversityCountrySelector";
 import UniversitySelector from "../../universitySelect/UniversitySelector";
+import {GENERAL_ERROR, URL_REGEX} from "../../../util/constants";
+import {useDispatch, useSelector} from "react-redux";
+import * as actions from '../../../../store/actions'
+import {useSnackbar} from "notistack";
 
-const LightTooltip = withStyles((theme) => ({
-    tooltip: {
-        backgroundColor: theme.palette.primary.main,
-        color: "white",
-        boxShadow: theme.shadows[1],
-        fontSize: "1rem",
-        "& .MuiTooltip-arrow": {
-            color: theme.palette.primary.main,
-        }
-    },
-}))(Tooltip);
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -42,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     },
     box: {
         width: '100%', // Fix IE 11 issue.
-        backgroundColor: "white",
+        backgroundColor: theme.palette.background.paper,
         // marginTop: theme.spacing(3),
         borderRadius: 5
     },
@@ -50,27 +43,34 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(3, 0, 2),
         marginBottom: 0
     },
+    title:{
+        color: theme.palette.text.secondary,
+        marginBottom: 20
+    }
 }));
 
-const PersonalInfo = ({firebase, userData}) => {
+const PersonalInfo = ({userData}) => {
     const classes = useStyles()
     const [open, setOpen] = useState(false);
-    const [updated, setUpdated] = useState(false)
+    const {enqueueSnackbar} = useSnackbar()
+    const dispatch = useDispatch()
+    const {loading, error} = useSelector(state => state.auth.profileEdit)
 
     useEffect(() => {
-        if (updated) {
-            setTimeout(() => {
-                setUpdated(false);
-            }, 2000);
+        if (loading === false && error === false) {
+            enqueueSnackbar("Your profile has been updated!", {
+                variant: "success",
+                preventDuplicate: true,
+            })
+        } else if (error) {
+            enqueueSnackbar(GENERAL_ERROR, {
+                variant: "error",
+                preventDuplicate: true
+            })
         }
-    }, [updated])
 
-    function logout() {
-        setLoading(true);
-        firebase.doSignOut().then(() => {
-            router.replace('/login');
-        });
-    }
+        return () => dispatch(actions.clean())
+    }, [loading, error])
 
     const handleClose = () => {
         setOpen(false);
@@ -80,20 +80,23 @@ const PersonalInfo = ({firebase, userData}) => {
         setOpen(true);
     };
 
+    const handleUpdate = async (values) => {
+        await dispatch(actions.editUserProfile(values))
+    }
+
     return (
         <Formik
-            initialValues={userData && userData.firstName ? {
-                firstName: userData.firstName,
-                lastName: userData.lastName,
-                universityCode: userData.universityCode,
-                universityCountryCode: userData.universityCountryCode
-            } : {
-                firstName: '',
-                lastName: '',
-                universityCode: 'other',
-                universityCountryCode: ''
+            initialValues={{
+                firstName: userData?.firstName || '',
+                lastName: userData?.lastName || '',
+                linkedinUrl: userData?.linkedinUrl || '' ? userData.linkedinUrl : '',
+                university: {
+                    code: userData?.universityCode || 'other',
+                    name: userData?.universityName || ''
+                },
+                universityCountryCode: userData?.universityCountryCode || ''
             }}
-            enableReinitialize={true}
+            enableReinitialize
             validate={values => {
                 let errors = {};
                 if (!values.firstName) {
@@ -110,25 +113,15 @@ const PersonalInfo = ({firebase, userData}) => {
                 } else if (values.lastName.length > 50) {
                     errors.lastName = 'Cannot be longer than 50 characters';
                 }
-                if (!values.universityCode) {
-                    errors.universityCode = 'Select a university or type "other"';
+                if (values.linkedinUrl.length > 0 && !values.linkedinUrl.match(URL_REGEX)) {
+                    errors.linkedinUrl = 'Please enter a valid URL';
                 }
                 if (!values.universityCountryCode) {
                     errors.universityCountryCode = 'Please chose a country code';
                 }
                 return errors;
             }}
-            onSubmit={(values, {setSubmitting}) => {
-                setSubmitting(true);
-                firebase.setUserData(userData.id, values.firstName, values.lastName, values.universityCode, values.universityCountryCode)
-                    .then(() => {
-                        setSubmitting(false);
-                        setUpdated(true)
-                    }).catch(error => {
-                    setSubmitting(false);
-                    console.log(error);
-                });
-            }}
+            onSubmit={handleUpdate}
         >
             {({
                   values,
@@ -137,6 +130,7 @@ const PersonalInfo = ({firebase, userData}) => {
                   handleChange,
                   handleBlur,
                   handleSubmit,
+                  dirty,
                   setFieldValue,
                   isSubmitting,
                   /* and other goodies */
@@ -144,7 +138,7 @@ const PersonalInfo = ({firebase, userData}) => {
                 <form onSubmit={handleSubmit}>
                     <Container component="main" maxWidth="sm">
                         <Box boxShadow={1} p={4} className={classes.box}>
-                            <Typography style={{color: 'rgb(160,160,160)', marginBottom: 20}} variant="h4">Personal
+                            <Typography className={classes.title}  variant="h4">Personal
                                 Info</Typography>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
@@ -207,6 +201,30 @@ const PersonalInfo = ({firebase, userData}) => {
                                         </Collapse>
                                     </FormControl>
                                 </Grid>
+                                <Grid item xs={12}>
+                                    <FormControl fullWidth>
+                                        <TextField
+                                            variant="outlined"
+                                            fullWidth
+                                            id="linkedinUrl"
+                                            label="LinkedIn (optional)"
+                                            name="linkedinUrl"
+                                            autoComplete="lname"
+                                            placeholder="https://www.linkedin.com/in/username/"
+                                            disabled={isSubmitting}
+                                            onBlur={handleBlur}
+                                            value={values.linkedinUrl}
+                                            error={Boolean(errors.linkedinUrl && touched.linkedinUrl && errors.linkedinUrl)}
+                                            onChange={handleChange}
+                                        />
+                                        <Collapse
+                                            in={Boolean(errors.linkedinUrl && touched.linkedinUrl && errors.linkedinUrl)}>
+                                            <FormHelperText error>
+                                                {errors.linkedinUrl}
+                                            </FormHelperText>
+                                        </Collapse>
+                                    </FormControl>
+                                </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <UniversityCountrySelector value={values.universityCountryCode}
                                                                handleClose={handleClose}
@@ -219,34 +237,24 @@ const PersonalInfo = ({firebase, userData}) => {
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <UniversitySelector handleBlur={handleBlur}
-                                                        error={errors.universityCode && touched.universityCode && errors.universityCode}
+                                                        error={errors.university && touched.university && errors.university}
                                                         universityCountryCode={values.universityCountryCode}
                                                         values={values}
                                                         submitting={isSubmitting}
                                                         setFieldValue={setFieldValue}/>
                                 </Grid>
                             </Grid>
-                            <LightTooltip
-                                title="Updated!"
-                                open={updated}
-                                enterDelay={500}
-                                leaveDelay={200}
-                                arrow
-                                disableFocusListener
-                                disableHoverListener
-                                disableTouchListener>
-                                <Button
-                                    type="submit"
-                                    fullWidth
-                                    variant="contained"
-                                    color="primary"
-                                    disabled={isSubmitting}
-                                    endIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
-                                    className={classes.submit}
-                                >
-                                    {isSubmitting ? "Updating" : "Update"}
-                                </Button>
-                            </LightTooltip>
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                color="primary"
+                                disabled={isSubmitting || !dirty}
+                                startIcon={isSubmitting && <CircularProgress size={20} color="inherit"/>}
+                                className={classes.submit}
+                            >
+                                {isSubmitting ? "Updating" : "Update"}
+                            </Button>
                         </Box>
                     </Container>
                 </form>

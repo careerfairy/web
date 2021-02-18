@@ -24,14 +24,23 @@ const TopView = styled.View`
     margin-bottom: 10vw;
 `;
 
-const CFLogo = styled.Image`
-    max-height: 15vw;
+const CFLogoContainer = styled.View`
+    width: 25vw;
 `;
 
+const CFLogoContainerSmall = styled.View`
+    width: 15vw;
+`;
 
+const CFLogo = styled.Image`
+    min-width: 15vw;
+    width: auto;
+`;
 
 const CompanyLogo = styled.Image`
     max-height: 25vw;
+    width: auto;
+    height: auto;
 `;
 
 const SpeakerAvatar = styled.Image`
@@ -66,7 +75,7 @@ const CategoriesParent = styled.View`
     margin: 5vw 0;
 `;
 
-const EngagementParent = styled.View`
+const FlexParent = styled.View`
     display: flex;
     flex-direction: row;
 `;
@@ -74,6 +83,17 @@ const EngagementParent = styled.View`
 const EngagementChild = styled.View`
     width: 25vw;
     margin-right: 5vw;
+`;
+
+const RatingChild = styled.View`
+    width: 40vw;
+    margin-right: 5vw;
+`;
+
+const RatingText = styled.Text`
+    font-weight: bold;
+    font-size: 12px;
+    color: black;
 `;
 
 const SubCategoryParent = styled.View`
@@ -90,17 +110,17 @@ const SpeakersView = styled.View`
 
 const LargeNumber = styled.Text`
     font-weight: bold;
-    font-size: 17px;
+    font-size: 14px;
     width: 10vw;
     color: #314150;
 `;
 
 const LargeText = styled.Text`
-    font-size: 9px;
-    width: 30vw;
-    padding: 2px;
+    font-size: 8px;
+    width: 15vw;
+    padding: 1px;
     font-weight: bold;
-    margin-right: 10vw;
+    margin-right: 5vw;
     text-transform: uppercase;
     color: #314150;
 `;
@@ -119,7 +139,7 @@ const SmallNumber = styled.Text`
 
 const SmallText = styled.Text`
     font-weight: bold;
-    font-size: 10px;
+    font-size: 8px;
     color: grey;
 `;
 
@@ -167,6 +187,7 @@ const Border = styled.View`
     flex-wrap: wrap;
     vertical-align: middle;
     margin-bottom: 5px;
+    //height: 40px;
 `;
 
 const SmallView = styled.View`
@@ -174,6 +195,7 @@ const SmallView = styled.View`
     font-size: 10px;
     width: 10vw;
     height: 30px;
+    padding: 0 0 0 2px;
 `;
 
 const SpecializedSubCategoryElement = ({ subOption }) => {
@@ -189,7 +211,7 @@ const SpecializedCategoryElement = ({ option, index }) => {
         return <SpecializedSubCategoryElement subOption={option.subOptions[entry]}/>
     })
     return (
-        <Border>
+        <Border wrap={false}>
             <LargeText>{ option.name }</LargeText> 
             <LargeNumber>{ option.entries }</LargeNumber>
             <SubCategoryParent>
@@ -237,10 +259,11 @@ const PollView = ({ poll, index }) => {
 }
 
 const SpeakerView = ({ speaker }) => {
+    let avatarUrl = speaker.avatar || 'https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media';
     return (
         <View>
             <View style={{ maxWidth: '15vw', borderRadius: '50%', marginRight: '10vw', marginBottom: '5px', border: '2px solid #00d2aa' }}>
-                <SpeakerAvatar source={speaker.avatar} />
+                <SpeakerAvatar source={avatarUrl} />
             </View>
             <SmallLabel>{ speaker.firstName } { speaker.lastName }</SmallLabel>
         </View>
@@ -258,7 +281,7 @@ const SpeakersViewElement = ({ speakers }) => {
     );
 }
 
-const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromETH, totalViewerFromOutsideETH, totalStudentsInTalentPool, questions, polls, icons, speakers }) => {
+const LivestreamPdfReport = ({ group, livestream, studentStats, overallRating, contentRating, totalViewerFromETH, totalViewerFromOutsideETH, totalStudentsInTalentPool, questions, polls, icons, speakers }) => {
 
     let categoryElements = [];
     let nameElements = [];
@@ -277,7 +300,7 @@ const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromE
                 </SmallView>
             )
         })
-        categoryElements = Object.keys(studentStats.options).sort(compareOptions).map( (option, index) => {
+        categoryElements = Object.keys(studentStats.options).sort(compareOptions).filter(option => studentStats.options[option].entries > 0).map( (option, index) => {
             return <SpecializedCategoryElement option={studentStats.options[option]} index={index}/>
         })
     }
@@ -297,12 +320,12 @@ const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromE
         <Document>
             <CFPage>
                 <TopView>
-                    <View style={{ maxWidth: '15vw' }}>
+                    <CFLogoContainer>
                         <CFLogo source={group.logoUrl}/>
-                    </View>
-                    <View style={{ maxWidth: '15vw' }}>
+                    </CFLogoContainer>
+                    <CFLogoContainerSmall>
                         <CFLogo source='https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fcareerfairy.png?alt=media&token=bb70f6e3-9c0d-47e7-8c56-66063b4a211e'/>
-                    </View>
+                    </CFLogoContainerSmall>
                 </TopView>     
                 <View>
                     <View style={{ maxWidth: '25vw', marginBottom: '20px' }}>
@@ -333,23 +356,40 @@ const LivestreamPdfReport = ({ group, livestream, studentStats, totalViewerFromE
                         </Border>
                         { categoryElements }
                     </CategoriesParent>
-                    <SubTitle>Engagement Figures</SubTitle>
-                    <EngagementParent>
-                        <EngagementChild>
-                            <View><Text># Questions</Text></View>
-                            <ColorText><Text>{ questions.length }</Text></ColorText>
-                        </EngagementChild>
-                        <EngagementChild>
-                            <View><Text># Reactions</Text></View>
-                            <ColorText><Text>{ icons.length }</Text></ColorText>
-                        </EngagementChild>
-                        <EngagementChild>
-                            <View><Text># Upvotes</Text></View>
-                            <ColorText><Text>{ numberOfUpvotes }</Text></ColorText>
-                        </EngagementChild>
-                    </EngagementParent>
-                    <SubTitle>Most upvoted questions</SubTitle>
-                    { questionElements }
+                    <View wrap={false}>
+                        <SubTitle>Viewer Ratings</SubTitle>
+                        <FlexParent>
+                            <RatingChild>
+                                <View><RatingText>How would you rate this live stream?</RatingText></View>
+                                <ColorText><Text>{ overallRating } / 5.0</Text></ColorText>
+                            </RatingChild>
+                            <RatingChild>
+                                <View><RatingText>How happy are you with the content of this livestream ?</RatingText></View>
+                                <ColorText><Text>{ contentRating } / 5.0</Text></ColorText>
+                            </RatingChild>
+                        </FlexParent>
+                    </View>     
+                    <View wrap={false}>    
+                        <SubTitle>Engagement Figures</SubTitle>
+                        <FlexParent>
+                            <EngagementChild>
+                                <View><Text># Questions</Text></View>
+                                <ColorText><Text>{ questions.length }</Text></ColorText>
+                            </EngagementChild>
+                            <EngagementChild>
+                                <View><Text># Reactions</Text></View>
+                                <ColorText><Text>{ icons.length }</Text></ColorText>
+                            </EngagementChild>
+                            <EngagementChild>
+                                <View><Text># Upvotes</Text></View>
+                                <ColorText><Text>{ numberOfUpvotes }</Text></ColorText>
+                            </EngagementChild>
+                        </FlexParent>
+                    </View>
+                    <View wrap={false}>
+                        <SubTitle>Most upvoted questions</SubTitle>
+                        { questionElements }
+                    </View>      
                     {/* <SubTitle>Your polls</SubTitle>
                     { pollElements } */}
                 </View>

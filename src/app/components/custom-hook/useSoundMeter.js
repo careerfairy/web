@@ -70,8 +70,12 @@ export function useSoundMeter(showAudioMeter, localStream, update) {
     };
     
     SoundMeter.prototype.stop = function() {
-        this.mic.disconnect();
-        this.script.disconnect();
+        if (this.mic) {
+            this.mic.disconnect();
+        }
+        if (this.script) {
+            this.script.disconnect();
+        }
     };
 
     function connectStream(stream) {

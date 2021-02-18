@@ -1,11 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Doughnut} from "react-chartjs-2";
-import {Box, Checkbox, List, ListItem, Typography, withStyles} from "@material-ui/core";
 import 'chartjs-plugin-labels'
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
+import { Box, Checkbox, List, ListItem, Typography, ListItemIcon, ListItemText } from "@material-ui/core";
 import {PollQuestion} from "../../../../materialUI/GlobalTitles";
 import {colorsArray} from "../../../util/colors";
+import { useTheme, withStyles} from "@material-ui/core/styles";
 
 const GraphWrapper = withStyles(theme => ({
     root: {
@@ -27,8 +26,9 @@ const CountWrapper = withStyles(theme => ({
     },
 }))(Box);
 
-const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
+const CurrentPollGraph = ({currentPoll: {options, question}}) => {
     const chartRef = useRef()
+    const theme = useTheme()
     const [legendElements, setLegendElements] = useState([])
     const [legendLabels, setLegendLabels] = useState([])
     const [chartData, setChartData] = useState({
@@ -85,10 +85,11 @@ const CurrentPollGraph = ({currentPoll: {options, question}, background}) => {
                 label: question,
                 data: options.map(option => option.votes),
                 backgroundColor: options.map((option, index) => colorsArray[index]),
-                hoverBackgroundColor: options.map((option, index) => colorsArray[index])
+                hoverBackgroundColor: options.map((option, index) => colorsArray[index]),
+                borderColor: theme.palette.background.paper
             }],
         })
-    }, [options])
+    }, [options, theme.palette.type])
 
     useEffect(() => {
         if (chartRef.current) {

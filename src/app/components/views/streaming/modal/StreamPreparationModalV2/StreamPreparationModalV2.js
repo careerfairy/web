@@ -1,35 +1,43 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState} from 'react';
 
 import {withFirebase} from 'context/firebase';
 import {
-    Dialog,
-    DialogTitle,
+    Button,
+    DialogActions,
     DialogContent,
-    Paper,
+    DialogTitle,
     StepButton,
     Typography,
-    DialogActions,
-    Button, useMediaQuery, useTheme
-} from '@material-ui/core'
-import {useSoundMeter} from 'components/custom-hook/useSoundMeter';
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
+    useMediaQuery,
+    Stepper,
+    Step,
+    CircularProgress,
+} from '@material-ui/core';
 import Step1Chrome from "./Step1Chrome";
 import Step2Camera from "./Step2Camera";
 import Step3Speakers from "./Step3Speakers";
 import Step4Mic from "./Step4Mic";
 import Step5Confirm from "./Step5Confirm";
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 import window from 'global';
+import {GlassDialog} from "../../../../../materialUI/GlobalModals";
 
 const useStyles = makeStyles(theme => ({
     root: {
         display: "flex",
-        flexDirection: "column"
+        flexDirection: "column",
+        overflowY: "hidden"
+    },
+    loaderWrapper: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: 100
     },
     stepper: {
         paddingLeft: 0,
-        paddingRight: 0
+        paddingRight: 0,
+        background: "transparent"
     }
 }))
 
@@ -42,25 +50,25 @@ function getSteps() {
 
 
 const StreamPreparationModalV2 = ({
-                                    readyToConnect,
-                                    streamerReady,
-                                    setStreamerReady,
-                                    localStream,
-                                    connectionEstablished,
-                                    setConnectionEstablished,
-                                    isStreaming,
-                                    audioSource,
-                                    updateAudioSource,
-                                    videoSource,
-                                    updateVideoSource,
-                                    setSpeakerSource,
-                                    speakerSource,
-                                    devices,
-                                    audioLevel,
-                                    attachSinkId,
-                                    isTest,
-                                    viewer,
-                                    handleOpenDemoIntroModal
+                                      readyToConnect,
+                                      streamerConnected,
+                                      streamerReady,
+                                      setStreamerReady,
+                                      localStream,
+                                      setConnectionEstablished,
+                                      isStreaming,
+                                      audioSource,
+                                      updateAudioSource,
+                                      videoSource,
+                                      updateVideoSource,
+                                      setSpeakerSource,
+                                      speakerSource,
+                                      devices,
+                                      audioLevel,
+                                      attachSinkId,
+                                      isTest,
+                                      viewer,
+                                      handleOpenDemoIntroModal
                                   }) => {
     const classes = useStyles()
     const theme = useTheme()
@@ -193,16 +201,20 @@ const StreamPreparationModalV2 = ({
     }
 
     const hasDevicesInLocalStorage = () => {
-        return localStorage.getItem('selectedAudioInput') && 
-        localStorage.getItem('selectedVideoInput') &&
-        localStorage.getItem('selectedAudioOutput');
+        return localStorage.getItem('selectedAudioInput') &&
+            localStorage.getItem('selectedVideoInput') &&
+            localStorage.getItem('selectedAudioOutput');
+    }
+
+    const shouldDisplayButton = () => {
+        return Boolean(hasDevicesInLocalStorage() && activeStep !== 4)
     }
 
     function getStepContent(stepIndex) {
         switch (stepIndex) {
             case 0:
                 return <Step1Chrome handleMarkComplete={handleMarkComplete}
-                                    isChromium={isChromium}                                    
+                                    isChromium={isChromium}
                                     localStream={localStream}
                                     isCompleted={isCompleted()}/>;
             case 1:
@@ -238,7 +250,6 @@ const StreamPreparationModalV2 = ({
                                  handleMarkComplete={handleMarkComplete}
                                  isCompleted={isCompleted()}
                                  playSound={playSound}
-                                 streamerReady={streamerReady}
                                  speakerSource={speakerSource}
                                  setPlaySound={setPlaySound}
                                  audioSource={audioSource}/>
@@ -249,20 +260,19 @@ const StreamPreparationModalV2 = ({
                                      devices={devices}
                                      setStreamerReady={setStreamerReady}
                                      speakerSource={speakerSource}
-                                     videoSource={videoSource}
-                                     streamerReady={streamerReady}/>
+                                     videoSource={videoSource}/>
             default:
                 return 'Unknown stepIndex';
         }
     }
 
     return (
-        <Dialog fullScreen={fullScreen} fullWidth maxWidth="sm" open={!streamerReady || !connectionEstablished}>
-            <DialogTitle disableTypography hidden={streamerReady && connectionEstablished}>
+        <GlassDialog fullScreen={fullScreen} fullWidth maxWidth="sm" open={streamerConnected && !streamerReady}>
+            <DialogTitle disableTypography>
                 <h3 style={{color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3>
             </DialogTitle>
             <DialogContent className={classes.root}>
-                { isChromium && 
+                {isChromium &&
                 <Stepper className={classes.stepper} activeStep={activeStep} alternativeLabel>
                     {steps.map((label, index) => {
                         const stepProps = {};
@@ -284,7 +294,7 @@ const StreamPreparationModalV2 = ({
                     })}
                 </Stepper>}
                 {getStepContent(activeStep)}
-                { isChromium && 
+                {isChromium &&
                 <DialogActions>
                     <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
                         Back
@@ -307,7 +317,8 @@ const StreamPreparationModalV2 = ({
                         </Button>
                     )}
                     {
-                        hasDevicesInLocalStorage() && activeStep !== 4 && 
+                        activeStep !== 4 &&
+
                         <Button
                             variant="contained"
                             color="primary"
@@ -325,10 +336,18 @@ const StreamPreparationModalV2 = ({
                 </DialogActions>}
                 <p style={{fontSize: '0.8em', color: 'grey'}}>If anything is unclear or not working, please <a
                     href='mailto:thomas@careerfairy.io'>contact us</a>!</p>
-                
             </DialogContent>
-        </Dialog>
-    );
+        </GlassDialog>
+    )
+}
+
+const Spinner = () => {
+    const classes = useStyles()
+    return (
+        <DialogContent className={classes.loaderWrapper}>
+            <CircularProgress color={"primary"} size={50}/>
+        </DialogContent>
+    )
 }
 
 export default withFirebase(StreamPreparationModalV2);

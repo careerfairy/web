@@ -1,65 +1,139 @@
-import React, {Fragment, useState, useEffect} from 'react';
-import {withFirebase} from 'context/firebase';
-import {useRouter} from 'next/router';
-import {AppBar, Box, Grid, Menu, MenuItem, Tab, Tabs} from "@material-ui/core";
-import EnhancedGroupStreamCard from './enhanced-group-stream-card/EnhancedGroupStreamCard';
+import React, {useContext, useEffect, useMemo, useState} from "react";
+import {withFirebase} from "context/firebase";
+import {useRouter} from "next/router";
+import {
+    AppBar,
+    Box,
+    Button,
+    CircularProgress,
+    Grid,
+    Menu,
+    MenuItem,
+    Tab,
+    Tabs,
+    useTheme,
+    Zoom,
+    Fab,
+} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
+import GroupStreamCardV2 from "../../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2";
+import usePagination from "firestore-pagination-hook";
+import {
+    copyStringToClipboard,
+    snapShotsToData,
+} from "../../../../helperFunctions/HelperFunctions";
+import AddIcon from "@material-ui/icons/Add";
+import clsx from "clsx";
+import {CustomSplitButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
+import {useSnackbar} from "notistack";
+import {useAuth} from "../../../../../HOCs/AuthProvider";
+
+const useStyles = makeStyles((theme) => ({
+    streamsWrapper: {
+        overflowY: "hidden !important",
+    },
+    grid: {
+        margin: 0,
+        marginTop: 8,
+        width: "100%",
+    },
+    loadMoreButton: {
+        marginTop: theme.spacing(1),
+        marginBottom: theme.spacing(1),
+    },
+    fab: {
+        position: "fixed",
+        bottom: theme.spacing(8),
+        right: theme.spacing(2),
+        zIndex: 1,
+        fontWeight: 600,
+    },
+    buttonGroup: {
+        borderRadius: theme.spacing(3),
+        background: theme.palette.primary.main,
+        position: "fixed",
+        bottom: theme.spacing(20),
+        right: theme.spacing(2),
+        zIndex: 1,
+        fontWeight: 600,
+    },
+    mainButton: {
+        fontSize: theme.spacing(1.8),
+        borderRadius: theme.spacing(3, 0, 0, 3),
+    },
+    sideButton: {
+        fontSize: theme.spacing(1.8),
+        borderRadius: theme.spacing(0, 3, 3, 0),
+    },
+}));
 
 const Events = (props) => {
-
+    if (!props.group.id) {
+        return null;
+    }
+    const classes = useStyles();
     const router = useRouter();
+    const {
+        query: {eventTab},
+    } = router;
+    const theme = useTheme();
+    const {enqueueSnackbar} = useSnackbar();
 
-    const [grid, setGrid] = useState(null);
+    const {authenticatedUser, userData} = useAuth();
+
     const [anchorEl, setAnchorEl] = useState(null);
-    const [livestreams, setLivestreams] = useState([]);
-    const [pastLivestreams, setPastLivestreams] = useState([]);
 
     const [value, setValue] = React.useState(0);
 
     useEffect(() => {
-        if (props.group.id) {
-            const unsubscribe = props.firebase.listenToUpcomingLiveStreamsByGroupId(props.group.id, querySnapshot => {
-                var livestreams = [];
-                querySnapshot.forEach(doc => {
-                    let livestream = doc.data();
-                    livestream.id = doc.id;
-                    livestreams.push(livestream);
-                });
-                setLivestreams(livestreams);
-            }, error => {
-                console.log(error);
-            });
-            return () => unsubscribe();
+        if (eventTab) {
+            setValue(Number(eventTab));
         }
-    }, [props.group.id]);
+    }, [router, eventTab]);
 
-    useEffect(() => {
-        if (props.group.id) {
-            const unsubscribe = props.firebase.listenToPastLiveStreamsByGroupId(props.group.id, querySnapshot => {
-                var livestreams = [];
-                querySnapshot.forEach(doc => {
-                    let livestream = doc.data();
-                    livestream.id = doc.id;
-                    livestreams.push(livestream);
-                });
-                setPastLivestreams(livestreams);
-            }, error => {
-                console.log(error);
-            });
-            return () => unsubscribe();
+    const {
+        loading: loadingPast,
+        loadingError,
+        loadingMore: loadingMorePast,
+        loadingMoreError,
+        hasMore: hasMorePast,
+        items: itemsPast,
+        loadMore: loadMorePast,
+    } = usePagination(
+        props.firebase.queryPastLiveStreamsByGroupId(props.group.id),
+        {
+            limit: 12,
         }
-    }, [props.group.id]);
+    );
 
-    useEffect(() => {
-        if (grid) {
-            setTimeout(() => {
-                grid.updateLayout();
-            }, 10);
+    const {
+        loading: loadingUpcoming,
+        loadingError: loadingErrorUpcoming,
+        loadingMore: loadingMoreUpcoming,
+        loadingMoreError: loadingMoreErrorUpcoming,
+        hasMore: hasMoreUpcoming,
+        items: itemsUpcoming,
+        loadMore: loadMoreUpcoming,
+    } = usePagination(
+        props.firebase.queryUpcomingLiveStreamsByGroupId(props.group.id),
+        {
+            limit: 12,
         }
-    }, [grid, livestreams, props.menuItem]);
-
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+    );
+    const {
+        loading: loadingDrafts,
+        loadingError: loadingErrorDrafts,
+        loadingMore: loadingMoreDrafts,
+        loadingMoreError: loadingMoreErrorDrafts,
+        hasMore: hasMoreDrafts,
+        items: itemsDrafts,
+        loadMore: loadMoreDrafts,
+    } = usePagination(
+        props.firebase.queryDraftLiveStreamsByGroupId(props.group.id),
+        {
+            limit: 12,
+        }
+    );
 
     const handleClose = () => {
         setAnchorEl(null);
@@ -69,134 +143,356 @@ const Events = (props) => {
         setValue(newValue);
     };
 
-    function TabPanel(props) {
-  const { children, value, index, ...other } = props;
+    const switchToNextLivestreamsTab = () => {
+        setValue(0);
+    };
 
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`nav-tabpanel-${index}`}
-      aria-labelledby={`nav-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box p={3}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
+    function TabPanel(props) {
+        const {children, value, index, ...other} = props;
+
+        return (
+            value === index && (
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        width: "100%",
+                        height: "100%",
+                    }}
+                >
+                    {children}
+                </div>
+            )
+        );
+    }
 
     function a11yProps(index) {
         return {
-          id: `simple-tab-${index}`,
-          'aria-controls': `simple-tabpanel-${index}`,
+            id: `simple-tab-${index}`,
+            "aria-controls": `simple-tabpanel-${index}`,
         };
-      }
+    }
 
-    let livestreamElements = livestreams.map((livestream, index) => {
-        return (
-            <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
-                <div style={{position: "relative"}}>
-                <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid} group={props.group} isPastLivestream={false}/>
-                </div>
-            </Grid>
-        );
-    });
+    const handleClickDraftNewStream = async () => {
+        const groupId = props.group.id;
+        const targetPath = `/draft-stream`;
+        const absolutePath = `/group/${groupId}/admin`;
+        return await router.push({
+            pathname: targetPath,
+            query: {
+                absolutePath,
+                careerCenterIds: groupId,
+            },
+        });
+    };
 
-    let pastLivestreamElements = pastLivestreams.map((livestream, index) => {
-        return (
-            <Grid style={{width: "100%"}} key={livestream.id} md={12} lg={12} item>
-                <div style={{position: "relative"}}>
-                <EnhancedGroupStreamCard livestream={livestream} {...props} fields={null} grid={grid} group={props.group} isPastLivestream={true}/>
-                </div>
-            </Grid>
-        );
-    });
+    const handleCLickCreateNewLivestream = async () => {
+        const groupId = props.group.id;
+        const absolutePath = `/group/${groupId}/admin`;
+        if (userData?.isAdmin) {
+            const targetPath = `/new-livestream`;
+            await router.push({
+                pathname: targetPath,
+                query: {
+                    absolutePath,
+                },
+            });
+        }
+    };
 
+    const canCreateStream = () => {
+        return Boolean(userData?.isAdmin);
+    };
+
+    const handleShareDraftLink = () => {
+        let baseUrl = "https://careerfairy.io";
+        if (window?.location?.origin) {
+            baseUrl = window.location.origin;
+        }
+        const groupId = props.group.id;
+        const targetPath = `${baseUrl}/draft-stream?careerCenterIds=${groupId}`;
+        copyStringToClipboard(targetPath);
+        enqueueSnackbar("Link has been copied to your clipboard", {
+            variant: "default",
+            preventDuplicate: true,
+        });
+    };
+
+    const draftButtonOptions = [
+        {
+            label: "Create a new draft",
+            onClick: () => handleClickDraftNewStream(),
+        },
+        {
+            label: "Generate a sharable draft link",
+            onClick: () => handleShareDraftLink(),
+        },
+    ];
+
+    if (canCreateStream()) {
+        draftButtonOptions.unshift({
+            label: "Create a live stream",
+            onClick: () => handleCLickCreateNewLivestream(),
+        });
+    }
+
+    let livestreamElements = useMemo(
+        () =>
+            snapShotsToData(itemsUpcoming).map((livestream) => {
+                return (
+                    <Grid
+                        style={{height: 620}}
+                        key={livestream.id}
+                        xs={12}
+                        sm={6}
+                        md={4}
+                        lg={4}
+                        xl={4}
+                        item
+                    >
+                        <GroupStreamCardV2
+                            mobile
+                            isAdmin
+                            hideActions
+                            user={props.user}
+                            livestream={livestream}
+                            groupData={props.group}
+                            userData={props.userData}
+                            livestreamId={livestream.id}
+                        />
+                    </Grid>
+                );
+            }),
+        [loadMoreUpcoming]
+    );
+
+    let pastLivestreamElements = useMemo(
+        () =>
+            snapShotsToData(itemsPast).map((livestream) => {
+                return (
+                    <Grid
+                        style={{height: 620}}
+                        key={livestream.id}
+                        xs={12}
+                        sm={6}
+                        md={4}
+                        lg={4}
+                        xl={4}
+                        item
+                    >
+                        <GroupStreamCardV2
+                            mobile
+                            isAdmin
+                            hideActions
+                            isPastLivestream
+                            key={livestream.id}
+                            livestreamId={livestream.id}
+                            livestream={livestream}
+                            user={props.user}
+                            userData={props.userData}
+                            groupData={props.group}
+                        />
+                    </Grid>
+                );
+            }),
+        [loadMorePast]
+    );
+
+    let draftLivestreamElements = useMemo(
+        () =>
+            snapShotsToData(itemsDrafts).map((livestream) => {
+                return (
+                    <Grid
+                        style={{height: 620}}
+                        key={livestream.id}
+                        xs={12}
+                        sm={6}
+                        md={4}
+                        lg={4}
+                        xl={4}
+                        item
+                    >
+                        <GroupStreamCardV2
+                            mobile
+                            isDraft
+                            isAdmin
+                            hideActions
+                            isPastLivestream
+                            key={livestream.id}
+                            livestreamId={livestream.id}
+                            livestream={livestream}
+                            user={props.user}
+                            switchToNextLivestreamsTab={switchToNextLivestreamsTab}
+                            userData={props.userData}
+                            groupData={props.group}
+                        />
+                    </Grid>
+                );
+            }),
+        [loadMoreDrafts]
+    );
 
     return (
-        <Fragment>
-            <div style={{width: '100%', textAlign: 'left', margin: '20px 0 20px 0'}}>
-                <AppBar color='default' position="static">
-                    <Tabs
+        <div
+            style={{
+                width: "100%",
+                textAlign: "left",
+                height: "100%",
+                position: "relative",
+            }}
+        >
+            <AppBar color="default" position="sticky">
+                <Tabs
                     variant="fullWidth"
                     value={value}
                     onChange={handleChange}
-                    indicatorColor='primary'
+                    indicatorColor="primary"
                     aria-label="nav tabs example"
-                    >
-                        <Tab label="Next Live streams" {...a11yProps(0)}/>
-                        <Tab label="Past Live streams" {...a11yProps(1)}/>
-                    </Tabs>
-                </AppBar>
-                <TabPanel value={value} index={0}>
-                    <Grid container spacing={2}>
+                >
+                    <Tab label="Next Live streams" {...a11yProps(0)} />
+                    <Tab label="Past Live streams" {...a11yProps(1)} />
+                    <Tab label="Unpublished Drafts" {...a11yProps(2)} />
+                </Tabs>
+            </AppBar>
+            <TabPanel value={value} index={0}>
+                {loadingMoreUpcoming ? (
+                    <Box justifyContent="center" display="flex">
+                        <CircularProgress color="primary"/>
+                    </Box>
+                ) : (
+                    <Grid className={classes.grid} container spacing={2}>
                         {livestreamElements}
                     </Grid>
-                </TabPanel>
-                <TabPanel value={value} index={1}>
-                    <Grid container spacing={2}>
+                )}
+                {hasMoreUpcoming && (
+                    <Button
+                        fullWidth
+                        disabled={loadingMorePast}
+                        variant="outlined"
+                        className={classes.loadMoreButton}
+                        startIcon={
+                            loadingMoreUpcoming && (
+                                <CircularProgress color="inherit" size={20}/>
+                            )
+                        }
+                        onClick={loadMoreUpcoming}
+                    >
+                        {loadingMoreUpcoming ? "Loading" : "Load More"}
+                    </Button>
+                )}
+            </TabPanel>
+            <TabPanel value={value} index={1}>
+                {loadingPast ? (
+                    <Box justifyContent="center" display="flex">
+                        <CircularProgress color="primary"/>
+                    </Box>
+                ) : (
+                    <Grid className={classes.grid} container spacing={2}>
                         {pastLivestreamElements}
                     </Grid>
-                </TabPanel>
-                {/* <Button variant="contained"
-                        color="primary"
-                        size="medium"
-                        style={{float: 'right', verticalAlign: 'middle', margin: '0'}}
-                        onClick={handleClick}
-                        endIcon={<AddIcon/>}>
-                    New Live Stream
-                </Button> */}
-                <Menu
-                    anchorEl={anchorEl}
-                    keepMounted
-                    open={Boolean(anchorEl)}
-                    onClose={handleClose}
-                >
-                <MenuItem onClick={() => router.push('/group/' + props.group.id + '/admin/schedule-event')}>Send a Company Request</MenuItem>
-                <MenuItem onClick={handleClose}>Schedule a Live Stream</MenuItem>
-                </Menu>
-            </div>
-            <style jsx>{`
-                .hidden {
-                    display: none;
-                }
-                
-                .white-box {
-                    background-color: white;
-                    box-shadow: 0 0 5px rgb(190,190,190);
-                    border-radius: 5px;
-                    padding: 20px;
-                    margin: 10px;
-                    text-align: left;
-                }
-
-                .white-box-label {
-                    font-size: 0.8em;
-                    font-weight: 700;
-                    color: rgb(160,160,160);
-                    margin: 5px 0 5px 0; 
-                }
-
-                .white-box-title {
-                    font-size: 1.2em;
-                    font-weight: 700;
-                    color: rgb(80,80,80);
-                }
-
-                .sublabel {
-                    text-align: left;
-                    display: inline-block;
-                    vertical-align: middle;
-                    margin: 9px 0;
-                    color: rgb(80,80,80);
-                }
-            `}</style>
-        </Fragment>
+                )}
+                {hasMorePast && (
+                    <Button
+                        disabled={loadingMorePast}
+                        startIcon={
+                            loadingMorePast && <CircularProgress color="inherit" size={20}/>
+                        }
+                        variant="outlined"
+                        className={classes.loadMoreButton}
+                        fullWidth
+                        onClick={loadMorePast}
+                    >
+                        {loadingMorePast ? "Loading" : "Load More"}
+                    </Button>
+                )}
+            </TabPanel>
+            <TabPanel value={value} index={2}>
+                {loadingDrafts ? (
+                    <Box justifyContent="center" display="flex">
+                        <CircularProgress color="primary"/>
+                    </Box>
+                ) : (
+                    <Grid className={classes.grid} container spacing={2}>
+                        {draftLivestreamElements}
+                    </Grid>
+                )}
+                {hasMoreDrafts && (
+                    <Button
+                        disabled={loadingMoreDrafts}
+                        startIcon={
+                            loadingMoreDrafts && (
+                                <CircularProgress color="inherit" size={20}/>
+                            )
+                        }
+                        variant="outlined"
+                        className={classes.loadMoreButton}
+                        fullWidth
+                        onClick={loadMoreDrafts}
+                    >
+                        {loadingMoreDrafts ? "Loading" : "Load More"}
+                    </Button>
+                )}
+            </TabPanel>
+            {/*{shouldRenderFab() &&*/}
+            {/*<Fab*/}
+            {/*    onClick={handleCLickCreateNewLivestream}*/}
+            {/*    variant="extended"*/}
+            {/*    aria-label={'Create a new Stream'}*/}
+            {/*    className={classes.fab}*/}
+            {/*    color="primary">*/}
+            {/*    <AddIcon/>*/}
+            {/*    Create a new Stream*/}
+            {/*</Fab>}*/}
+                <CustomSplitButton
+                    slideDirection="left"
+                    mainButtonProps={{
+                        classes: {root: classes.mainButton},
+                        disableElevation: true,
+                        size: "large"
+                    }}
+                    sideButtonProps={{
+                        classes: {root: classes.sideButton},
+                        disableElevation: true,
+                        size: "large"
+                    }}
+                    className={classes.buttonGroup}
+                    size="large"
+                    options={draftButtonOptions}
+                />
+            {/*<Menu*/}
+            {/*    anchorEl={anchorEl}*/}
+            {/*    keepMounted*/}
+            {/*    open={Boolean(anchorEl)}*/}
+            {/*    onClose={handleClose}*/}
+            {/*>*/}
+            {/*    <MenuItem onClick={() => router.push('/group/' + props.group.id + '/admin/schedule-event')}>Send a*/}
+            {/*        Company Request</MenuItem>*/}
+            {/*    <MenuItem onClick={handleClose}>Schedule a Live Stream</MenuItem>*/}
+            {/*</Menu>*/}
+        </div>
     );
-}
+};
+
+const CustomZoom = ({children, zoomIn, shouldRenderFab, ...props}) => {
+    const theme = useTheme();
+    const transitionDuration = {
+        enter: theme.transitions.duration.enteringScreen,
+        exit: theme.transitions.duration.leavingScreen,
+    };
+
+    return (
+        <Zoom
+            {...props}
+            timeout={transitionDuration}
+            in={zoomIn}
+            unmountOnExit
+            style={{
+                transitionDelay: `${zoomIn ? transitionDuration.exit : 0}ms`,
+            }}
+        >
+            {children}
+        </Zoom>
+    );
+};
 
 export default withFirebase(Events);

@@ -2,14 +2,13 @@ import React, {useState, useEffect, useContext} from 'react';
 import {withFirebase} from '../../../../../context/firebase';
 import {grey} from "@material-ui/core/colors";
 import {css} from 'glamor';
-import {Collapse, fade, TextField, Typography} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
-import ScrollToBottom from 'react-scroll-to-bottom';
-import IconButton from "@material-ui/core/IconButton";
+import { Collapse, TextField, Typography, IconButton } from "@material-ui/core";
+import {makeStyles, fade} from "@material-ui/core/styles";
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
 import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
-import UserContext from 'context/user/UserContext';
+import CustomScrollToBottom from "../../../../util/CustomScrollToBottom";
+import {useAuth} from "../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -37,31 +36,60 @@ const useStyles = makeStyles(theme => ({
             paddingRight: "0 !important",
             borderRadius: 10,
         },
-        background: "white"
     },
+    scrollToBottom: {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-end",
+        height: "calc(100vh - 118px)",
+        "& div": {
+            overflowX: "hidden",
+        }
+    },
+    chatContainer:{
+        height: "100vh", display: "flex", flexDirection: "column"
+    },
+    chatContent: {
+        display: "flex",
+        flexDirection: "column",
+        boxShadow: theme.shadows[10],
+        zIndex: 9000,
+        padding: theme.spacing(1.4),
+        background: theme.palette.background.paper
+    },
+    chatTitle:{
+        display: "flex",
+        width: "100%",
+        justifyContent: "center",
+        fontSize: "1.2em",
+        fontWeight: 500,
+        textAlign: "center",
+        margin: "5px 0 15px 0"
+    }
 }))
 
 function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
 
 
-    const {authenticatedUser, userData} = useContext(UserContext);
+    const {authenticatedUser, userData} = useAuth();
     const [focused, setFocused] = useState(false);
 
 
     const [newChatEntry, setNewChatEntry] = useState('');
     const [chatEntries, setChatEntries] = useState([]);
+    const [submitting, setSubmitting] = useState(false);
 
     const isEmpty = (!(newChatEntry.trim()) || (!userData && !livestream.test && !isStreamer))
     const classes = useStyles({isEmpty})
 
     useEffect(() => {
         if (livestream.id) {
-            const unsubscribe = firebase.listenToChatEntries(livestream.id, querySnapshot => {
+            const unsubscribe = firebase.listenToChatEntries(livestream.id, 150, querySnapshot => {
                 var chatEntries = [];
                 querySnapshot.forEach(doc => {
                     let entry = doc.data();
                     entry.id = doc.id;
-                    chatEntries.push(entry);
+                    chatEntries.unshift(entry);
                 });
                 setChatEntries(chatEntries);
             });
@@ -70,16 +98,10 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
     }, [livestream.id]);
 
     function addNewChatEntry() {
-        if (!(newChatEntry.trim())) {
+        if (!(newChatEntry.trim()) || submitting) {
             return;
         }
-
-        // const newChatEntryObject = {
-        //     message: newChatEntry,
-        //     authorName: isStreamer ? 'Streamer' : userData.firstName + ' ' + userData.lastName.charAt(0),
-        //     authorEmail: isStreamer ? 'Streamer' : authenticatedUser.email,
-        //     votes: 0
-        // }
+        setSubmitting(true)
 
         const newChatEntryObject = {
             message: newChatEntry,
@@ -90,8 +112,10 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
 
         firebase.putChatEntry(livestream.id, newChatEntryObject)
             .then(() => {
+                setSubmitting(false)
                 setNewChatEntry('');
             }, error => {
+                setSubmitting(false)
                 console.log("Error: " + error);
             });
     }
@@ -111,9 +135,7 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
 
     let chatElements = chatEntries.map((chatEntry, index) => {
         return (
-            <div key={index}>
-                <ChatEntryContainer chatEntry={chatEntry}/>
-            </div>
+            <ChatEntryContainer key={chatEntry?.id} chatEntry={chatEntry}/>
         );
     });
 
@@ -125,9 +147,10 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
     </div>)
 
     return (
-        <div>
-            <div className='questionToggle'>
-                <div className='questionToggleTitle'>
+        <div className={classes.chatContainer}>
+            <CustomScrollToBottom className={classes.scrollToBottom} scrollItems={chatElements}/>
+            <div className={classes.chatContent}>
+                <div className={classes.chatTitle}>
                     <ForumOutlinedIcon color="primary" fontSize="small"/>
                     <Typography style={{marginLeft: "0.6rem"}}>
                         Main Chat
@@ -150,61 +173,8 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
                             maxLength: 340,
                             endAdornment: playIcon,
                         }}/>
-                    <Collapse align="center"
-                              style={{color: "grey", fontSize: "1em", marginTop: 3, padding: "0 0.8em"}}
-                              in={focused && !isStreamer}>
-                        For questions, please use the Q&A tool!
-                    </Collapse>
                 </div>
             </div>
-            <div>
-                <ScrollToBottom className={ROOT_CSS}>
-                    {chatElements}
-                </ScrollToBottom>
-            </div>
-            <style jsx>{`
-                .questionToggle {
-                    display: flex;
-                    flex-direction: column;
-                    box-shadow: 0 4px 2px -2px rgb(200,200,200);
-                    z-index: 9000;
-                    padding: 10px;
-                    background: white;
-                }
-
-                .questionToggleTitle {
-                    display: flex;
-                    width: 100%;
-                    justify-content: center;
-                    font-size: 1.2em;
-                    font-weight: 500;
-                    text-align: center;
-                    margin: 5px 0 15px 0;
-                }
-
-                .hidden {
-                    display: none;
-                }
-
-                .chat-scrollable {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    bottom: 0;
-                    width: 100%;
-                    overflow-y: scroll;
-                    overflow-x: hidden;
-                    padding: 0 0 10px 0;
-                }
-
-                ::-webkit-scrollbar {
-                    width: 5px;
-                }
-
-                ::-webkit-scrollbar-thumb {
-                    background-color: rgb(130,130,130);
-                }
-          `}</style>
         </div>
     );
 }

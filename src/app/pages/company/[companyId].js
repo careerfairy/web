@@ -40,54 +40,27 @@ function CompanyProfile(props) {
         return <Loader/>;
     }
 
-    if (company.companyId === 'Axpo') {
-        return (
-            <Fragment>
-                <div className="sectionOne">
-                    <CompanyLandingPage company={company} scrollToSecond={() => scrollToRef(sectionTwoRef)} scrollToThird={() => scrollToRef(sectionThreeRef)}/>
-                </div>
-                <div className="section" ref={sectionTwoRef}>
-                    <CompanyDiscoverPage company={company}/>
-                </div>
-                <div className="section" ref={sectionThreeRef}>
-                    <CompanyWatchPage company={company}/>
-                </div>
-                <div className="section">
-                    <CompanyMeetPage company={company}/>
-                </div>
-                <style jsx>{`
-                    .sectionOne {
-                        position: relative;
-                        width: 100%;
-                        height: 100%;
-                        min-height: 800px;
-                    }
-                `}</style>
-            </Fragment>
-        );
-    } else {
-        return (
-            <Fragment>
-                <div className="sectionOne">
-                    <CompanyLandingPage {...props} company={company} scrollToSecond={() => scrollToRef(sectionTwoRef)} scrollToThird={() => scrollToRef(sectionThreeRef)}/>
-                </div>
-                <div className="section" ref={sectionTwoRef}>
-                    <CompanyDiscoverPage {...props} company={company}/>
-                </div>
-                <div className="section" ref={sectionThreeRef}>
-                    <CompanyWatchPage {...props} company={company}/>
-                </div>
-                <style jsx>{`
-                    .sectionOne {
-                        position: relative;
-                        width: 100%;
-                        height: 100%;
-                        min-height: 800px;
-                    }
-                `}</style>
-            </Fragment>
-        );
-    }
+    return (
+        <Fragment>
+            <div className="sectionOne">
+                <CompanyLandingPage {...props} company={company} scrollToSecond={() => scrollToRef(sectionTwoRef)} scrollToThird={() => scrollToRef(sectionThreeRef)}/>
+            </div>
+            <div className="section" ref={sectionTwoRef}>
+                <CompanyDiscoverPage {...props} company={company}/>
+            </div>
+            <div className="section" ref={sectionThreeRef}>
+                <CompanyWatchPage {...props} company={company}/>
+            </div>
+            <style jsx>{`
+                .sectionOne {
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                    min-height: 800px;
+                }
+            `}</style>
+        </Fragment>
+    );
 }
 
 CompanyProfile.getInitialProps = ({ query }) => {

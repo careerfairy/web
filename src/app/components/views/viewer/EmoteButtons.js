@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {Box, ClickAwayListener, Fab, fade} from "@material-ui/core";
+import { Box, ClickAwayListener, Fab, CircularProgress } from "@material-ui/core";
 import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, fade} from "@material-ui/core/styles";
 import {amber, deepOrange, grey, red} from "@material-ui/core/colors";
+import ClappingSVG from "../../util/CustomSVGs";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -90,7 +90,7 @@ const useStyles = makeStyles((theme) => ({
         display: ({handRaiseActive}) => handRaiseActive ? "none" : "flex",
         "@media(min-width: 768px)": {
             position: "absolute",
-            width: "100%",
+            width: "50%",
             bottom: 5,
             left: "50%",
             transform: "translateX(-50%)",
@@ -179,29 +179,28 @@ const EmoteButtons =
                 <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className={classes.actionArea}>
                     <Box className={classes.miniButtons} classes={{root: open ? classes.cardHovered : ""}}>
                         <div className={classes.wrapper}>
-                            <Fab onClick={handleLike} disabled={iconsDisabled} className={classes.miniLike}
+                            <Fab disabled={iconsDisabled} onClick={handleLike} className={classes.miniLike}
                                  aria-label="like">
                                 <ThumbUpAltOutlinedIcon fontSize="default"/>
                             </Fab>
                             {iconsDisabled &&
-                            <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
+                            <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
                         </div>
                         <div className={classes.wrapper}>
-                            <Fab onClick={handleClap} disabled={iconsDisabled} className={classes.miniClap}
+                            <Fab disabled={iconsDisabled} onClick={handleClap} className={classes.miniClap}
                                  aria-label="clap">
-                                <img alt="clap button" style={{width: 23}} src='/clapping.png'
-                                     className={classes.image}/>
+                                <ClappingSVG style={{width: 21, height: 21}} fontSize="default"/>
                             </Fab>
                             {iconsDisabled &&
-                            <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
+                            <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
                         </div>
                         <div className={classes.wrapper}>
-                            <Fab onClick={handleHeart} disabled={iconsDisabled} className={classes.miniHeart}
+                            <Fab disabled={iconsDisabled} onClick={handleHeart} className={classes.miniHeart}
                                  aria-label="heart">
                                 <FavoriteBorderOutlinedIcon fontSize="default"/>
                             </Fab>
                             {iconsDisabled &&
-                            <CircularProgress variant="static" value={progress} className={classes.fabProgress}/>}
+                            <CircularProgress variant="determinate" value={progress} className={classes.fabProgress}/>}
                         </div>
                     </Box>
                 </div>

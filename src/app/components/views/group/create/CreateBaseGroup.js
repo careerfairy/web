@@ -1,13 +1,12 @@
-import React, {useEffect, useState} from 'react'
-import {useRouter} from 'next/router';
+import React, {useState} from 'react'
 import {withFirebase} from '../../../../context/firebase';
 import PublishIcon from '@material-ui/icons/Publish';
-import TextField from '@material-ui/core/TextField';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-import {Formik, Form as UiForm} from 'formik';
+import {Form as UiForm, Formik} from 'formik';
 import FilePickerContainer from '../../../../components/ssr/FilePickerContainer';
-import {Box, Button, Container, FormControl, FormHelperText, Typography} from "@material-ui/core";
+import { Box, Button, Container, FormControl, FormHelperText, Typography, TextField } from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
+import {useAuth} from "../../../../HOCs/AuthProvider";
 
 const placeholder = "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
 
@@ -34,21 +33,10 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const CreateBaseGroup = ({handleNext, firebase, setBaseGroupInfo, baseGroupInfo}) => {
+const CreateBaseGroup = ({handleNext, setBaseGroupInfo, baseGroupInfo}) => {
     const classes = useStyles()
     const [filePickerError, setFilePickerError] = useState("")
-    const [user, setUser] = useState(null);
-    const router = useRouter();
-
-    useEffect(() => {
-        firebase.auth.onAuthStateChanged(user => {
-            if (user) {
-                setUser(user);
-            } else {
-                router.replace('/login');
-            }
-        })
-    }, []);
+    const {authenticatedUser: user} = useAuth()
 
     return (
         <Container className={classes.root}>

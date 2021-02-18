@@ -2,18 +2,18 @@ import {useState, useEffect} from 'react';
 import {navigator} from 'global';
 import {isEmptyArray} from 'formik';
 
-export default function useDevices() {
+export default function useDevices(refreshDevices) {
 
     const [deviceList, setDeviceList] = useState({audioInputList: [], audioOutputList: [], videoDeviceList: []});
 
     useEffect(() => {
-        if (navigator && isEmpty(deviceList)) {
+        if (navigator && isEmpty(deviceList) && refreshDevices) {
             navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
             navigator.mediaDevices.ondevicechange = () => {
                 navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
             }
         }
-    },[]);
+    },[refreshDevices]);
 
     function gotDevices(deviceInfos) {
         
@@ -29,7 +29,6 @@ export default function useDevices() {
                 option.text = deviceInfo.label || `microphone ${audioInputList.length + 1}`;
                 audioInputList.push(option);
             } else if (deviceInfo.kind === 'audiooutput' && deviceInfo.deviceId !== "default") {
-                console.log("deviceInfo", deviceInfo);
                 option.text = deviceInfo.label || `speaker ${audioOutputList.length + 1}`;
                 audioOutputList.push(option);
             } else if (deviceInfo.kind === 'videoinput' && deviceInfo.deviceId !== "default") {
