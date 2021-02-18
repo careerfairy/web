@@ -647,7 +647,7 @@ class Firebase {
             .where("groupIds", "array-contains", groupId)
             .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
             .orderBy("start", "asc")
-        return ref.onSnapshot(callback
+        return ref.onSnapshot(callback)
     }
 //
     getUpcomingLiveStreamsByGroupId = (groupId) => {
