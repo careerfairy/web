@@ -4,7 +4,6 @@ import NavBar from './NavBar';
 import TopBar from './TopBar';
 import {useRouter} from "next/router";
 import {withFirebase} from "../../context/firebase";
-import {isEmptyObject} from "../../components/helperFunctions/HelperFunctions";
 import {useAuth} from "../../HOCs/AuthProvider";
 import {
     Archive as PastStreamIcon,
@@ -15,7 +14,7 @@ import {
     User as ProfileIcon,
     Users as RolesIcon
 } from "react-feather";
-import {useFirestoreConnect, populate, isLoaded, isEmpty} from "react-redux-firebase";
+import {isEmpty, isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
 import {useSelector} from "react-redux";
 import {useSnackbar} from "notistack";
 import {GENERAL_ERROR} from "../../components/util/constants";
@@ -66,24 +65,45 @@ const GroupDashboardLayout = (props) => {
     const populates = [
         {child: 'adminEmails', root: 'userData', childAlias: 'admins'} // replace owner with user object
     ]
-    useFirestoreConnect(() => (groupId || careerCenterId) && [
-        {
-            collection: `careerCenterData`,
-            doc: groupId || careerCenterId,
-            storeAs: "group",
-            populates
-        },
-        {
-            collection: `careerCenterData`,
-            doc: groupId || careerCenterId,
-            subcollections: [{
-                collection: "admins",
-            }],
-            storeAs: "admins",
-        }
-    ], [groupId, careerCenterId])
 
-    const roles = useSelector(({firestore}) => firestore.data.admins || {})
+    const getQueries = () => {
+        let queriesArray = []
+        const targetId = groupId || careerCenterId
+        if (targetId) {
+            queriesArray.push(...[{
+                collection: `careerCenterData`,
+                doc: targetId,
+                storeAs: "group",
+                populates
+            },
+                {
+                    collection: `careerCenterData`,
+                    doc: targetId,
+                    subcollections: [{
+                        collection: "admins",
+                    }],
+                    storeAs: "adminRoles",
+                }
+            ])
+            if (authenticatedUser) {
+                queriesArray.push({
+                    collection: `careerCenterData`,
+                    doc: targetId,
+                    subcollections: [{
+                        collection: "admins",
+                        doc: authenticatedUser.email
+                    }],
+                    storeAs: "userRole",
+                })
+            }
+        }
+
+        return queriesArray
+    }
+
+    useFirestoreConnect(getQueries(), [groupId, careerCenterId, authenticatedUser])
+
+    const userRole = useSelector(({firestore}) => firestore.data.userRole || {})
     const group = useSelector(state => populate(state.firestore, "group", populates))
 
     if (isLoaded(group) && !isEmpty(group)) {
@@ -220,7 +240,7 @@ const GroupDashboardLayout = (props) => {
 
     ] : [];
 
-    if (roles?.[authenticatedUser.email]?.role === "mainAdmin") {
+    if (userRole.role === "mainAdmin" && (isLoaded(group) && !isEmpty(group))) {
         //Only mainAdmin has access to this button in their nav
         drawerTopLinks.push({
             href: `/group/${group.id}/admin/roles`,

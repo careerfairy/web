@@ -36,20 +36,21 @@ const MembersTable = ({
                       }) => {
     const classes = useStyles();
     const [selection, setSelection] = useState([]);
-    const [data, setData] = useState([]);
-    const roles = useSelector(({firestore}) => firestore.data.admins || {})
-    console.log("-> roles", roles);
+    const firestore = useSelector(({firestore}) => firestore)
 
-
-    useEffect(() => {
-        const data = group?.admins.map(admin => {
-            return {
-                ...admin,
-                role: roles[admin.id]?.role
+    const data = useSelector(({firestore}) => {
+        return group?.admins?.map(userData => {
+            let newUserData = {...userData}
+            const userRole = firestore.data.adminRoles?.[userData.userEmail]
+            if (userRole) {
+                newUserData = {...newUserData, ...userRole}
             }
-        })
-        setData(data)
-    }, [group])
+            return newUserData
+        }) || []
+    })
+    console.log("-> data", data);
+    console.log("-> firestore", firestore);
+
 
     const getRoleLookup = () => {
         const roleOptions = {};
@@ -77,6 +78,7 @@ const MembersTable = ({
             export: false,
             sorting: false,
             filtering: false,
+            width: 150,
             render: rowData => <Avatar src={rowData.avatarUrl} alt={`${rowData.firstName}'s Avatar`}>
                 {rowData.firstName ? `${rowData.firstName[0] + rowData.lastName[0]}` : ""}
             </Avatar>
