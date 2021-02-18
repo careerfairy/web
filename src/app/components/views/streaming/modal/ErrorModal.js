@@ -1,4 +1,5 @@
-import { Button, CircularProgress, Dialog, DialogContent, makeStyles, Typography } from '@material-ui/core';
+import { Button, CircularProgress, Dialog, DialogContent, Typography } from '@material-ui/core';
+import {makeStyles} from "@material-ui/core/styles";
 import { ErrorOutline } from '@material-ui/icons';
 import React, {useState, useEffect, useRef} from 'react';
 

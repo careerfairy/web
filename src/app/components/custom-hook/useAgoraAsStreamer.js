@@ -171,6 +171,10 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         } else {
             rtcClient.setClientRole("audience");
             rtcClient.join(agoraToken.rtcToken, roomId, userUid, (uid) => {
+                setAgoraRtcStatus({
+                    type: "INFO",
+                    msg: "RTC_STREAM_JOINED_AS_VIEWER"
+                });
             }, handleClientJoinChannelError);
         }
         rtcClient.enableAudioVolumeIndicator()
@@ -220,7 +224,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
                 setRemovedStream(streamId);
             }
         });
-        
+
         let localStream = null;
         rtcClient.on("client-role-changed", function (evt) {
             let role = evt.role;

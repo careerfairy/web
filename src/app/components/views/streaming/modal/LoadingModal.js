@@ -1,4 +1,5 @@
-import { CircularProgress, Dialog, DialogContent, makeStyles } from '@material-ui/core';
+import { CircularProgress, Dialog, DialogContent } from '@material-ui/core';
+import {makeStyles} from "@material-ui/core/styles";
 import React, {useState, useEffect, useRef} from 'react';
 
 const useStyles = makeStyles((theme) => ({
