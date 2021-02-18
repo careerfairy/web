@@ -7,7 +7,6 @@ import useDevices from 'components/custom-hook/useDevices';
 import useMediaSources from 'components/custom-hook/useMediaSources';
 import VideoControlsContainer from 'components/views/streaming/video-container/VideoControlsContainer';
 import {useAuth} from 'HOCs/AuthProvider';
-import {v4 as uuidv4} from 'uuid';
 import {makeStyles} from "@material-ui/core/styles";
 import SettingsModal from "../../streaming/video-container/SettingsModal";
 import {Typography} from '@material-ui/core';
@@ -40,7 +39,6 @@ const useStyles = makeStyles(theme => ({
 function ViewerComponent(props) {
     const classes = useStyles()
     const [showSettings, setShowSettings] = useState(false);
-    const [streamerId, setStreamerId] = useState(null);
     const [showScreenShareModal, setShowScreenShareModal] = useState(false);
     const [optimizationMode, setOptimizationMode] = useState("detail");
 
@@ -58,7 +56,7 @@ function ViewerComponent(props) {
             'localVideo',
             screenSharingMode,
             props.livestreamId,
-            streamerId,
+            props.streamerId,
             true
         );
 
@@ -74,16 +72,6 @@ function ViewerComponent(props) {
         localMediaStream: displayableMediaStream,
         audioLevel
     } = useMediaSources(devices, authenticatedUser?.email, localMediaStream, !streamerReady || showSettings);
-
-    useEffect(() => {
-        if (props.currentLivestream) {
-            if (props.currentLivestream.test) {
-                setStreamerId(uuidv4());
-            } else if (authenticatedUser?.email) {
-                setStreamerId(authenticatedUser.email)
-            }
-        }
-    }, [props.currentLivestream, authenticatedUser])
 
     useEffect(() => {
         if (props.handRaiseActive && agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED") {

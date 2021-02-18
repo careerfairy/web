@@ -50,13 +50,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
 
     useEffect(() => {
         if (streamId) {
-            const regex = /-/g;
-            let joiningId = streamId.replace(regex, '')
-            if (isViewer) {
-                setUserUid(joiningId + roomId)
-            } else {
-                setUserUid(joiningId)
-            }
+            setUserUid(streamId)
         }
     }, [streamId])
 
