@@ -11,10 +11,12 @@ import {useRouter} from "next/router";
 import {GENERAL_ERROR, SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../components/util/constants";
 import {withFirebase} from "../context/firebase";
 import {useAuth} from "../HOCs/AuthProvider";
+import DataAccessUtil from "../util/DataAccessUtil";
 
 
 const draftStream = ({firebase}) => {
 
+    const [showEnterDetailsModal, setShowEnterDetailsModal] = useState(false);
     const [submitted, setSubmitted] = useState(false)
     const {authenticatedUser} = useAuth()
     const {enqueueSnackbar} = useSnackbar()
@@ -23,6 +25,8 @@ const draftStream = ({firebase}) => {
         query: {absolutePath},
         push
     } = router;
+
+
 
     const onSubmit = async (values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId, status) => {
         try {
@@ -35,11 +39,13 @@ const draftStream = ({firebase}) => {
                 }
                 livestream.status = newStatus
                 setFormData(prevState => ({...prevState, status: newStatus}))
+                const adminEmails = await firebase.getAllGroupAdminEmails(livestream.groupIds || [])
+                await DataAccessUtil.sendDraftApprovalRequestEmail(adminEmails, )
             }
             let id;
             if (updateMode) {
                 id = livestream.id
-                if(!livestream.author){
+                if (!livestream.author) {
                     livestream.author = {
                         email: authenticatedUser.email
                     }

@@ -318,16 +318,16 @@ class Firebase {
 
             if (collection === 'livestreams') {
                 let tokenRef = this.firestore.collection(collection)
-                .doc(livestreamsRef.id)
-                .collection('tokens')
-                .doc('secureToken');
-            
+                    .doc(livestreamsRef.id)
+                    .collection('tokens')
+                    .doc('secureToken');
+
                 let token = uuidv4();
                 batch.set(tokenRef, {
                     value: token,
                 })
             }
-            
+
             for (const rating of ratings) {
                 let ratingRef = this.firestore.collection(collection)
                     .doc(livestreamsRef.id)
@@ -1760,6 +1760,25 @@ class Firebase {
 
         return batch.commit()
     }
+
+    // Approval Queries
+
+    getAllGroupAdminEmails = async (arrayOfGroupIds = ["groupId"]) => {
+        let adminEmails = []
+        for (const groupId of arrayOfGroupIds) {
+            const groupRef = this.firestore.collection("careerCenterData")
+                .doc(groupId)
+            const groupSnap = await groupRef.get()
+            groupSnap.docs.forEach(doc => {
+                const docData = doc.data()
+                if(docData.adminEmails?.length){
+                    adminEmails = [...adminEmails, ...docData.adminEmails]
+                }
+            })
+        }
+        return adminEmails
+    }
+
 
     // Notification Queries
     createNotification = async (details, options = {force: false}) => {
