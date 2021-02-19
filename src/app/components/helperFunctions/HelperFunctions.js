@@ -5,6 +5,12 @@ import {LONG_NUMBER} from "../util/constants";
 var dayjs = require('dayjs');
 var relativeTime = require('dayjs/plugin/relativeTime')
 var localizedFormat = require('dayjs/plugin/localizedFormat')
+var advancedFormat = require('dayjs/plugin/advancedFormat')
+var utc = require('dayjs/plugin/utc') // dependent on utc plugin
+var timezone = require('dayjs/plugin/timezone')
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(advancedFormat)
 dayjs.extend(localizedFormat)
 dayjs.extend(relativeTime)
 
@@ -75,6 +81,13 @@ export function getTimeFromNow(firebaseTimestamp) {
 export const prettyDate = (firebaseTimestamp) => {
     if (firebaseTimestamp) {
         return dayjs(firebaseTimestamp.toDate()).format('LL LT')
+    } else {
+        return ""
+    }
+}
+export const prettyLocalizedDate = (javascriptDate) => {
+    if (javascriptDate) {
+        return dayjs(javascriptDate).format('LL LT zzz')
     } else {
         return ""
     }

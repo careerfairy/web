@@ -13,6 +13,7 @@ import {withFirebase} from "../context/firebase";
 import {useAuth} from "../HOCs/AuthProvider";
 import DataAccessUtil from "../util/DataAccessUtil";
 import EnterDetailsModal from "../components/views/draftStreamForm/EnterDetailsModal";
+import {prettyLocalizedDate} from "../components/helperFunctions/HelperFunctions";
 
 
 const draftStream = ({firebase}) => {
@@ -31,7 +32,11 @@ const draftStream = ({firebase}) => {
 
     useEffect(() => {
         if (userData) {
-            setUserInfo({...userData, name: `${userData.firstName} ${userData.lastName}`})
+            setUserInfo({
+                ...userData,
+                name: `${userData.firstName} ${userData.lastName}`,
+                email: userData.email || userData.userEmail
+            })
         }
     }, [userData])
 
@@ -89,8 +94,8 @@ const draftStream = ({firebase}) => {
                 push(`/draft-stream?draftStreamId=${id}`)
             }
 
-            if(status === SUBMIT_FOR_APPROVAL){
-                const submitTime = new Date()
+            if (status === SUBMIT_FOR_APPROVAL) {
+                const submitTime = prettyLocalizedDate(new Date())
                 const adminsInfo = await firebase.getAllGroupAdminInfo(livestream.groupIds || [], id)
                 const senderName = userInfo.name
                 await DataAccessUtil.sendDraftApprovalRequestEmail(adminsInfo, senderName, livestream, submitTime)
