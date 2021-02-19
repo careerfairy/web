@@ -49,7 +49,6 @@ const draftStream = ({firebase}) => {
 
     const handleSubmit = () => {
         window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
-        console.log("-> formRef.current", formRef.current);
         if (formRef.current) {
 
             formRef.current.handleSubmit()
@@ -98,7 +97,8 @@ const draftStream = ({firebase}) => {
                 const submitTime = prettyLocalizedDate(new Date())
                 const adminsInfo = await firebase.getAllGroupAdminInfo(livestream.groupIds || [], id)
                 const senderName = userInfo.name
-                await DataAccessUtil.sendDraftApprovalRequestEmail(adminsInfo, senderName, livestream, submitTime)
+                const senderEmail = userInfo.email
+                await DataAccessUtil.sendDraftApprovalRequestEmail(adminsInfo, senderName, livestream, submitTime, senderEmail)
             }
 
             if (absolutePath) {

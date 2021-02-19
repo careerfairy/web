@@ -96,11 +96,11 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
         }
     }
 
-    const handlePublishDraft = async () => {
+    const handlePublishDraft = async (streamToPublish) => {
         if (canPublish()) {
             try {
                 formRef.current?.setSubmitting(true)
-                const newStream = {...currentStream}
+                const newStream = {...streamToPublish}
                 newStream.companyId = uuidv4()
                 const author = getAuthor(newStream)
                 await firebase.addLivestream(newStream, "livestreams", author)
@@ -149,7 +149,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
             }
 
             if (publishDraft) {
-                await handlePublishDraft()
+                await handlePublishDraft(livestream)
                 setPublishDraft(false)
                 return
             }
@@ -157,7 +157,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
             const targetCollection = isActualLivestream() ? "livestreams" : "draftLivestreams"
             if (updateMode) {
                 id = livestream.id
-                if(!livestream.author){
+                if (!livestream.author) {
                     livestream.author = {
                         groupId: group.id,
                         email: authenticatedUser.email
@@ -224,7 +224,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                     className={className}
                     autoFocus color="secondary"
                     onClick={handleValidate}>
-                <Typography variant={size === "large" && "h5"}>
+                <Typography variant={size === "large" ? "h5" : undefined}>
                     publish as stream
                 </Typography>
             </Button>}

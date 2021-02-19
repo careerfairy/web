@@ -39,7 +39,8 @@ export default class DataAccessUtil {
         });
     }
 
-    static sendDraftApprovalRequestEmail(adminsInfo, senderName, stream, submitTime) {
+    static sendDraftApprovalRequestEmail(adminsInfo, senderName, stream, submitTime, senderEmail) {
+        // TODO Update the cloud function to send the sender an email of the draft they submitted
         return axios({
             method: 'post',
             url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDraftApprovalRequestEmail',
@@ -49,6 +50,7 @@ export default class DataAccessUtil {
                 livestream_title: stream.title,
                 livestream_company_name: stream.company,
                 submit_time: submitTime,
+                sender_email: senderEmail
             }
         });
     }
