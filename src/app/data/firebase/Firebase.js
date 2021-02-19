@@ -1776,7 +1776,7 @@ class Firebase {
                     const newAdminsInfo = groupData.adminEmails.map(email => ({
                         groupId,
                         email,
-                        link: `${baseUrl}/group/${groupId}/admin/drafts?targetDraft=${streamId}`
+                        link: `${baseUrl}/group/${groupId}/admin/drafts?livestreamId=${streamId}`
                     }))
                     adminsInfo = [...adminsInfo, ...newAdminsInfo]
                 }

@@ -93,6 +93,12 @@ export const prettyLocalizedDate = (javascriptDate) => {
     }
 }
 
+export const repositionElement = (arr, fromIndex, toIndex) => {
+    const element = arr[fromIndex];
+    arr.splice(fromIndex, 1);
+    arr.splice(toIndex, 0, element);
+};
+
 export const getLength = (arr, prop) => {
     return arr.map((el) => {
         return el?.[prop]?.length || 0
