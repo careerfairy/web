@@ -14,17 +14,21 @@ import {EMAIL_REGEX} from "../../util/constants";
 import PropTypes from 'prop-types';
 
 const useStyles = makeStyles(theme => ({}));
-
-const EnterDetailsModal = ({open, onClose, handleSubmit, userInfo}) => {
+const defaultFunc = () => {
+}
+const EnterDetailsModal = ({open = false, onClose, setUserInfo, handleSubmit, userInfo = {}}) => {
 
     const formik = useFormik({
         initialValues: {
-            name: `${userInfo.firstName} ${userInfo.lastName}`,
-            email: '',
+            name: userInfo.firstName ? `${userInfo.firstName} ${userInfo.lastName}` : '',
+            email: userInfo.email || '',
         },
         onSubmit: async values => {
+            setUserInfo(values)
             await handleSubmit;
+            handleClose()
         },
+        enableReinitialize: true,
         validate: values => {
             let errors = {};
             if (!values.email) {
@@ -102,12 +106,16 @@ EnterDetailsModal.prototypes = {
     open: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     handleSubmit: PropTypes.func.isRequired,
+    userInfo: PropTypes.object,
 }
 
 EnterDetailsModal.defaultProps = {
     open: false,
-    onClose: () => {},
-    handleSubmit: () => {},
+    onClose: () => {
+    },
+    handleSubmit: () => {
+    },
+    userInfo: {},
 }
 
 export default EnterDetailsModal;

@@ -2,7 +2,7 @@ import {TealBackground} from "../materialUI/GlobalBackground/GlobalBackGround";
 import Head from "next/head";
 import Header from "../components/views/header/Header";
 import Footer from "../components/views/footer/Footer";
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Typography} from "@material-ui/core";
 import DraftStreamForm from "../components/views/draftStreamForm/DraftStreamForm";
 import {buildLivestreamObject} from "../components/helperFunctions/streamFormFunctions";
@@ -12,20 +12,42 @@ import {GENERAL_ERROR, SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../co
 import {withFirebase} from "../context/firebase";
 import {useAuth} from "../HOCs/AuthProvider";
 import DataAccessUtil from "../util/DataAccessUtil";
+import EnterDetailsModal from "../components/views/draftStreamForm/EnterDetailsModal";
 
 
 const draftStream = ({firebase}) => {
 
     const [showEnterDetailsModal, setShowEnterDetailsModal] = useState(false);
     const [submitted, setSubmitted] = useState(false)
-    const {authenticatedUser} = useAuth()
+    const {authenticatedUser, userData} = useAuth()
+    const [userInfo, setUserInfo] = useState({});
     const {enqueueSnackbar} = useSnackbar()
     const router = useRouter()
+    const formRef = useRef()
     const {
         query: {absolutePath},
         push
     } = router;
 
+    useEffect(() => {
+        if (userData) {
+            setUserInfo(userData)
+        }
+    }, [userData])
+
+    const handleOpenShowEnterDetailsModal = () => {
+        setShowEnterDetailsModal(true)
+    }
+    const handleCloseShowEnterDetailsModal = () => {
+        setShowEnterDetailsModal(false)
+    }
+
+    const handleSubmit = () => {
+        window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
+        if (formRef.current) {
+            formRef.current.handleSubmit()
+        }
+    }
 
 
     const onSubmit = async (values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId, status) => {
@@ -33,6 +55,9 @@ const draftStream = ({firebase}) => {
             setSubmitting(true)
             const livestream = buildLivestreamObject(values, targetCategories, updateMode, draftStreamId, firebase);
             if (status === SUBMIT_FOR_APPROVAL) {
+                if (!userInfo.firstName) {
+                    handleOpenShowEnterDetailsModal()
+                }
                 const newStatus = {
                     pendingApproval: true,
                     seen: false,
@@ -40,7 +65,7 @@ const draftStream = ({firebase}) => {
                 livestream.status = newStatus
                 setFormData(prevState => ({...prevState, status: newStatus}))
                 const adminEmails = await firebase.getAllGroupAdminEmails(livestream.groupIds || [])
-                await DataAccessUtil.sendDraftApprovalRequestEmail(adminEmails, )
+                await DataAccessUtil.sendDraftApprovalRequestEmail(adminEmails,)
             }
             let id;
             if (updateMode) {
@@ -98,7 +123,18 @@ const draftStream = ({firebase}) => {
                         gutterBottom>
                 {submitted ? "Success!" : "Draft a Live Stream"}
             </Typography>
-            <DraftStreamForm onSubmit={onSubmit} submitted={submitted} setSubmitted={setSubmitted}/>
+            <DraftStreamForm
+                onSubmit={onSubmit}
+                formRef={formRef}
+                submitted={submitted}
+                setSubmitted={setSubmitted}
+            />
+            <EnterDetailsModal
+                open={showEnterDetailsModal}
+                handleSubmit={handleSubmit}
+                onClose={handleCloseShowEnterDetailsModal}
+                setUserInfo={setUserInfo}
+            />
             <Footer/>
         </TealBackground>
     )
