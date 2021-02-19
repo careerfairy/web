@@ -39,6 +39,22 @@ export default class DataAccessUtil {
         });
     }
 
+    static sendDraftApprovalRequestEmail(adminEmails, sender_name, stream, draft_stream_link, submit_time) {
+        return axios({
+            method: 'post',
+            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDashboardInviteEmail',
+            data: {
+                adminEmails: adminEmails,
+                sender_name: sender_name,
+                livestream_title: stream.title,
+                livestream_company_name: stream.company,
+                draft_stream_link: draft_stream_link,
+                submit_time: submit_time,
+
+            }
+        });
+    }
+
     static sendPhysicalEventEmailRegistrationConfirmation(user, userData, event) {
         return axios({
             method: 'post',
