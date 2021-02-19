@@ -31,7 +31,7 @@ const draftStream = ({firebase}) => {
 
     useEffect(() => {
         if (userData) {
-            setUserInfo(userData)
+            setUserInfo({...userData, name: `${userData.firstName} ${userData.lastName}`})
         }
     }, [userData])
 
@@ -44,7 +44,9 @@ const draftStream = ({firebase}) => {
 
     const handleSubmit = () => {
         window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
+        console.log("-> formRef.current", formRef.current);
         if (formRef.current) {
+
             formRef.current.handleSubmit()
         }
     }
@@ -55,8 +57,9 @@ const draftStream = ({firebase}) => {
             setSubmitting(true)
             const livestream = buildLivestreamObject(values, targetCategories, updateMode, draftStreamId, firebase);
             if (status === SUBMIT_FOR_APPROVAL) {
-                if (!userInfo.firstName) {
+                if (!userInfo.email || !userInfo.name) {
                     handleOpenShowEnterDetailsModal()
+                    return
                 }
                 const newStatus = {
                     pendingApproval: true,
@@ -64,8 +67,13 @@ const draftStream = ({firebase}) => {
                 }
                 livestream.status = newStatus
                 setFormData(prevState => ({...prevState, status: newStatus}))
-                const adminEmails = await firebase.getAllGroupAdminEmails(livestream.groupIds || [])
-                await DataAccessUtil.sendDraftApprovalRequestEmail(adminEmails,)
+                const submitTime = new Date()
+                const adminsInfo = await firebase.getAllGroupAdminInfo(livestream.groupIds || [])
+                const senderName = userInfo.name
+                console.log("-> submitTime", submitTime);
+                console.log("-> senderName", senderName);
+                console.log("-> adminsInfo", adminsInfo);
+                // await DataAccessUtil.sendDraftApprovalRequestEmail(adminsInfo, senderName, livestream, submitTime)
             }
             let id;
             if (updateMode) {
@@ -134,6 +142,7 @@ const draftStream = ({firebase}) => {
                 handleSubmit={handleSubmit}
                 onClose={handleCloseShowEnterDetailsModal}
                 setUserInfo={setUserInfo}
+                userInfo={userInfo}
             />
             <Footer/>
         </TealBackground>

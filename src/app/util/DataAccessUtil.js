@@ -39,16 +39,15 @@ export default class DataAccessUtil {
         });
     }
 
-    static sendDraftApprovalRequestEmail(adminEmails, sender_name, stream, draft_stream_link, submit_time) {
+    static sendDraftApprovalRequestEmail(adminsInfo, sender_name, stream, submit_time) {
         return axios({
             method: 'post',
-            url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDashboardInviteEmail',
+            // url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDashboardInviteEmail',
             data: {
-                adminEmails: adminEmails,
+                adminsInfo: adminsInfo,
                 sender_name: sender_name,
                 livestream_title: stream.title,
                 livestream_company_name: stream.company,
-                draft_stream_link: draft_stream_link,
                 submit_time: submit_time,
 
             }

@@ -400,19 +400,19 @@ exports.sendDraftApprovalRequestEmail = functions.https.onRequest(async (req, re
         return res.status(204).send('');
     }
 
-    const adminEmails = req.body.adminEmails || []
+    const adminsInfo = req.body.adminsInfo || []
 
-    functions.logger.log("admin Emails in approval request", adminEmails)
+    functions.logger.log("admins Info in approval request", adminsInfo)
 
-    const emails = adminEmails.map(adminEmail => ({
+    const emails = adminsInfo.map(({email, link}) => ({
         "TemplateId": 22299429,
         "From": 'CareerFairy <noreply@careerfairy.io>',
-        "To": adminEmail,
+        "To": {email},
         "TemplateModel": {
             sender_name: req.body.sender_name,
             livestream_title: req.body.livestream_title,
             livestream_company_name: req.body.livestream_company_name,
-            draft_stream_link: req.body.draft_stream_link,
+            draft_stream_link: link,
             submit_time: req.body.submit_time,
         }
     }))

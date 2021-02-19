@@ -1763,20 +1763,21 @@ class Firebase {
 
     // Approval Queries
 
-    getAllGroupAdminEmails = async (arrayOfGroupIds = ["groupId"]) => {
-        let adminEmails = []
+    getAllGroupAdminInfo = async (arrayOfGroupIds = ["groupId"]) => {
+        let adminsInfo = []
         for (const groupId of arrayOfGroupIds) {
             const groupRef = this.firestore.collection("careerCenterData")
                 .doc(groupId)
             const groupSnap = await groupRef.get()
-            groupSnap.docs.forEach(doc => {
-                const docData = doc.data()
-                if(docData.adminEmails?.length){
-                    adminEmails = [...adminEmails, ...docData.adminEmails]
+            if (groupSnap.exists) {
+                const groupData = groupSnap.data()
+                if (groupData.adminEmails?.length) {
+                    const newAdminsInfo = groupData.adminEmails.map(email => ({groupId, email}))
+                    adminsInfo = [...adminsInfo, ...newAdminsInfo]
                 }
-            })
+            }
         }
-        return adminEmails
+        return adminsInfo
     }
 
 
