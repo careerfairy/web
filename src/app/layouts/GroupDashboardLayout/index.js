@@ -215,27 +215,32 @@ const GroupDashboardLayout = (props) => {
         {
             href: `/group/${group.id}/admin/upcoming-livestreams`,
             icon: StreamIcon,
-            title: 'Upcoming Streams'
+            title: 'Upcoming Streams',
+            basePath: '/group/[groupId]/admin/upcoming-livestreams'
         },
         {
             href: `/group/${group.id}/admin/past-livestreams`,
             icon: PastStreamIcon,
-            title: 'Past Streams'
+            title: 'Past Streams',
+            basePath: '/group/[groupId]/admin/past-livestreams'
         },
         {
             href: `/group/${group.id}/admin/drafts`,
             icon: DraftStreamIcon,
-            title: 'Manage and Approve Drafts'
+            title: 'Manage and Approve Drafts',
+            basePath: '/group/[groupId]/admin/drafts'
         },
         {
             href: `/group/${group.id}/admin/edit`,
             icon: EditGroupIcon,
-            title: 'Edit Group Profile'
+            title: 'Edit Group Profile',
+            basePath: '/group/[groupId]/admin/edit'
         },
         {
             href: `/group/${group.id}/admin/analytics`,
             icon: AnalyticsIcon,
-            title: 'Analytics'
+            title: 'Analytics',
+            basePath: '/group/[groupId]/admin/analytics'
         },
 
     ] : [];
@@ -247,19 +252,22 @@ const GroupDashboardLayout = (props) => {
         drawerTopLinks.push({
             href: `/group/${group.id}/admin/roles`,
             icon: RolesIcon,
-            title: 'Roles'
+            title: 'Roles',
+            basePath: '/group/[groupId]/admin/roles'
         })
     }
 
     if (authenticatedUser?.emailVerified) {
         headerLinks.push({
             href: `/groups`,
-            title: 'FOLLOW GROUPS'
+            title: 'FOLLOW GROUPS',
+            basePath: '/groups'
         })
         drawerBottomLinks.push({
             href: `/profile`,
             title: 'PROFILE',
-            icon: ProfileIcon
+            icon: ProfileIcon,
+            basePath: '/profile'
         })
     }
 

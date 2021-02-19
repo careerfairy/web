@@ -110,6 +110,7 @@ const NavBar = ({
                             key={item.title}
                             title={item.title}
                             icon={item.icon}
+                            basePath={item.basePath}
                         />
                     ))}
                 </List>
