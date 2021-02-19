@@ -1763,7 +1763,7 @@ class Firebase {
 
     // Approval Queries
 
-    getAllGroupAdminInfo = async (arrayOfGroupIds = ["groupId"]) => {
+    getAllGroupAdminInfo = async (arrayOfGroupIds = ["groupId"], streamId="") => {
         let adminsInfo = []
         for (const groupId of arrayOfGroupIds) {
             const groupRef = this.firestore.collection("careerCenterData")
@@ -1772,7 +1772,12 @@ class Firebase {
             if (groupSnap.exists) {
                 const groupData = groupSnap.data()
                 if (groupData.adminEmails?.length) {
-                    const newAdminsInfo = groupData.adminEmails.map(email => ({groupId, email}))
+                    const baseUrl = this.getBaseUrl()
+                    const newAdminsInfo = groupData.adminEmails.map(email => ({
+                        groupId,
+                        email,
+                        link: `${baseUrl}/group/${groupId}/admin/drafts?targetDraft=${streamId}`
+                    }))
                     adminsInfo = [...adminsInfo, ...newAdminsInfo]
                 }
             }
@@ -1841,6 +1846,14 @@ class Firebase {
     // DB functions
     getStorageRef = () => {
         return this.storage.ref();
+    }
+
+    getBaseUrl = () => {
+        let baseUrl = "https://careerfairy.io";
+        if (window?.location?.origin) {
+            baseUrl = window.location.origin;
+        }
+        return baseUrl
     }
 
     getServerTimestamp = () => {

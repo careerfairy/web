@@ -67,13 +67,7 @@ const draftStream = ({firebase}) => {
                 }
                 livestream.status = newStatus
                 setFormData(prevState => ({...prevState, status: newStatus}))
-                const submitTime = new Date()
-                const adminsInfo = await firebase.getAllGroupAdminInfo(livestream.groupIds || [])
-                const senderName = userInfo.name
-                console.log("-> submitTime", submitTime);
-                console.log("-> senderName", senderName);
-                console.log("-> adminsInfo", adminsInfo);
-                // await DataAccessUtil.sendDraftApprovalRequestEmail(adminsInfo, senderName, livestream, submitTime)
+
             }
             let id;
             if (updateMode) {
@@ -93,6 +87,13 @@ const draftStream = ({firebase}) => {
                 id = await firebase.addLivestream(livestream, "draftLivestreams", author)
                 console.log("-> Draft livestream was created with id", id);
                 push(`/draft-stream?draftStreamId=${id}`)
+            }
+
+            if(status === SUBMIT_FOR_APPROVAL){
+                const submitTime = new Date()
+                const adminsInfo = await firebase.getAllGroupAdminInfo(livestream.groupIds || [], id)
+                const senderName = userInfo.name
+                await DataAccessUtil.sendDraftApprovalRequestEmail(adminsInfo, senderName, livestream, submitTime)
             }
 
             if (absolutePath) {

@@ -407,7 +407,7 @@ exports.sendDraftApprovalRequestEmail = functions.https.onRequest(async (req, re
     const emails = adminsInfo.map(({email, link}) => ({
         "TemplateId": 22299429,
         "From": 'CareerFairy <noreply@careerfairy.io>',
-        "To": {email},
+        "To": email,
         "TemplateModel": {
             sender_name: req.body.sender_name,
             livestream_title: req.body.livestream_title,
@@ -417,8 +417,8 @@ exports.sendDraftApprovalRequestEmail = functions.https.onRequest(async (req, re
         }
     }))
 
-    client.sendEmailBatchWithTemplates(emails).then(response => {
-        response.forEach(response => functions.logger.log('sent batch DraftApprovalRequestEmail email with response:', response))
+    client.sendEmailBatchWithTemplates(emails).then(responses => {
+        responses.forEach(response => functions.logger.log('sent batch DraftApprovalRequestEmail email with response:', response))
         return res.send(200);
     }, error => {
         console.log('error:' + error);

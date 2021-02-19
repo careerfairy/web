@@ -33,7 +33,7 @@ const EnterDetailsModal = ({open = false, onClose, setUserInfo, handleSubmit, us
             if (!values.email) {
                 errors.email = 'Please enter your email';
             } else if (!EMAIL_REGEX.test(values.email)) {
-                errors.email = 'Please enter a valid Email';
+                errors.email = 'Please enter a valid email';
             }
             if (!values.name) {
                 errors.firstName = 'Name is required';
