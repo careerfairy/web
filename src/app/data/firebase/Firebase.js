@@ -1812,6 +1812,12 @@ class Firebase {
         return {id: notificationId}
     }
 
+    deleteNotification = async (notificationId) => {
+        const notificationRef = this.firestore.collection("notifications")
+            .doc(notificationId)
+        await notificationRef.delete()
+    }
+
     validateDashboardInvite = async (notificationId, groupId) => {
         let ref = this.firestore.collection("notifications")
             .doc(notificationId)

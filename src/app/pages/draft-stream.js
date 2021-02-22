@@ -55,6 +55,19 @@ const draftStream = ({firebase}) => {
         }
     }
 
+    const sendApprovalNotifications = async (groupIds = ["groupIds"], streamId = "streamId") => {
+        for (const groupId of groupIds) {
+            const notificationDetails = {
+                requester: authenticatedUser?.email || userInfo.email || "anonymous",
+                receiver: groupId,
+                draftId: streamId,
+                type: "draftApprovalRequest",
+            }
+            const notificationRef = await firebase.createNotification(notificationDetails, {force: true});
+            console.info(`notification Ref was created with ID ${notificationRef.id}`)
+        }
+    }
+
 
     const onSubmit = async (values, {setSubmitting}, targetCategories, updateMode, draftStreamId, setFormData, setDraftId, status) => {
         try {
@@ -78,7 +91,7 @@ const draftStream = ({firebase}) => {
                 id = livestream.id
                 if (!livestream.author) {
                     livestream.author = {
-                        email: authenticatedUser.email || userInfo.email || "anonymous"
+                        email: authenticatedUser?.email || userInfo.email || "anonymous"
                     }
                 }
                 await firebase.updateLivestream(livestream, "draftLivestreams")
@@ -99,6 +112,7 @@ const draftStream = ({firebase}) => {
                 const senderName = userInfo.name
                 const senderEmail = userInfo.email
                 await DataAccessUtil.sendDraftApprovalRequestEmail(adminsInfo, senderName, livestream, submitTime, senderEmail)
+                await sendApprovalNotifications(livestream.groupIds || [], id)
             }
 
             if (absolutePath) {

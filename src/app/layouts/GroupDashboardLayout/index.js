@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import NavBar from './NavBar';
-import TopBar from './TopBar';
 import {useRouter} from "next/router";
 import {withFirebase} from "../../context/firebase";
 import {useAuth} from "../../HOCs/AuthProvider";
@@ -18,6 +17,7 @@ import {isEmpty, isLoaded, populate, useFirestoreConnect} from "react-redux-fire
 import {useSelector} from "react-redux";
 import {useSnackbar} from "notistack";
 import {GENERAL_ERROR} from "../../components/util/constants";
+import TopBar from "./TopBar";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -57,10 +57,10 @@ const GroupDashboardLayout = (props) => {
     const classes = useStyles();
     const {query: {groupId, careerCenterId, dashboardInviteId}, pathname, replace, push} = useRouter()
     const {enqueueSnackbar} = useSnackbar()
-    const [notifications, setNotifications] = useState([]);
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
     const [joiningGroup, setJoiningGroup] = useState(false);
     const {userData, authenticatedUser} = useAuth()
+    const notifications = useSelector(({firestore}) => firestore.ordered.notifications || [])
 
     const populates = [
         {child: 'adminEmails', root: 'userData', childAlias: 'admins'} // replace owner with user object
@@ -71,20 +71,25 @@ const GroupDashboardLayout = (props) => {
         const targetId = groupId || careerCenterId
         if (targetId) {
             queriesArray.push(...[{
-                collection: `careerCenterData`,
-                doc: targetId,
-                storeAs: "group",
-                populates
-            },
-                {
                     collection: `careerCenterData`,
                     doc: targetId,
-                    subcollections: [{
-                        collection: "admins",
-                    }],
-                    storeAs: "adminRoles",
-                }
-            ])
+                    storeAs: "group",
+                    populates
+                },
+                    {
+                        collection: `careerCenterData`,
+                        doc: targetId,
+                        subcollections: [{
+                            collection: "admins",
+                        }],
+                        storeAs: "adminRoles",
+                    },
+                    {
+                        collection: `notifications`,
+                        where: [["details.receiver", "==", targetId], ["open", "==", true]]
+                    }
+                ]
+            )
             if (authenticatedUser) {
                 queriesArray.push({
                     collection: `careerCenterData`,
@@ -105,6 +110,10 @@ const GroupDashboardLayout = (props) => {
 
     // const userRole = useSelector(({firestore}) => firestore.data.userRole || {})
     const group = useSelector(state => populate(state.firestore, "group", populates))
+
+    // const firestore = useSelector(({firestore}) => firestore)
+    // console.log("-> firestore", firestore);
+
 
     if (isLoaded(group) && !isEmpty(group)) {
         group.id = groupId || careerCenterId
@@ -276,7 +285,6 @@ const GroupDashboardLayout = (props) => {
             <TopBar
                 links={headerLinks}
                 notifications={notifications}
-                setNotifications={setNotifications}
                 onMobileNavOpen={() => setMobileNavOpen(true)}
             />
             {(isLoaded(group) && !isEmpty(group)) && <NavBar
@@ -293,7 +301,6 @@ const GroupDashboardLayout = (props) => {
                         {(isLoaded(group) && !isEmpty(group)) && React.cloneElement(children, {
                             notifications,
                             isAdmin: isAdmin(),
-                            setNotifications,
                             group, ...props
                         })}
                     </div>
