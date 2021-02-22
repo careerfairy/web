@@ -30,6 +30,9 @@ const useStyles = makeStyles((theme) => ({
         fontSize: "1.3rem",
         fontWeight: "bold"
     },
+    select: {
+        minWidth: 200
+    },
     speakerFunction: {
         fontSize: "1rem",
         color: theme.palette.text.secondary
@@ -108,6 +111,7 @@ function PreparationOverlay ({ livestream, streamerUuid, setStreamerReady, fireb
     const joinStream = () => {
         setLoading(true)
         if (!formHasErrors()) {
+            debugger;
             speaker.speakerUuid = streamerUuid;
             speaker.showLinkedIn = showLinkedIn;
             speaker.linkedIn = linkedInUrl;
@@ -207,6 +211,7 @@ function PreparationOverlay ({ livestream, streamerUuid, setStreamerReady, fireb
                                     labelId="demo-customized-select-label"
                                     id="demo-customized-select"
                                     value={speaker}
+                                    className={classes.select}
                                     onChange={handleChangeSpeaker}
                                 >
                                     { speakers }

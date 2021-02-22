@@ -26,6 +26,7 @@ import PeopleIcon from "@material-ui/icons/People";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
+import Loader from 'components/views/loader/Loader';
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {
@@ -101,6 +102,7 @@ function StreamingPage(props) {
     const [streamerId, setStreamerId] = useState(null)
 
     const [streamerReady, setStreamerReady] = useState(false);
+    const [tokenChecked, setTokenChecked] = useState(false);
 
     const [currentLivestream, setCurrentLivestream] = useState(false);
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
@@ -166,6 +168,8 @@ function StreamingPage(props) {
                     let storedToken = doc.data().value;
                     if (storedToken !== token) {
                         router.push('/streaming/error')
+                    } else {
+                        setTokenChecked(true);
                     }
                 })
             }
@@ -180,7 +184,11 @@ function StreamingPage(props) {
         setShowMenu(!showMenu)
     }
 
-    if (!streamerReady) {
+    if (!currentLivestream || !tokenChecked) {
+        return <Loader />
+    }
+
+    if (!streamerReady && tokenChecked) {
         return (
             <PreparationOverlay
                 livestream={currentLivestream}
@@ -189,7 +197,6 @@ function StreamingPage(props) {
             />
         )
     }
-
     return (
         <NotificationsContext.Provider
             value={{setNewNotification: setNewNotification}}

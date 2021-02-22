@@ -69,13 +69,14 @@ function RemoteVideoContainer(props) {
 
     const classes = useStyles()
 
+    const isScreenShareVideo = props.stream.streamId.includes("screen");
 
     useEffect(() => {
         if (props.stream.streamId === 'demoStream') {
             generateDemoHandRaiser()
         } else {
             if (!props.stream.stream.isPlaying()) {
-                props.stream.stream.play(props.stream.streamId, {fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover'}, err => {
+                props.stream.stream.play(props.stream.streamId, {fit: isScreenShareVideo ? 'contain' : 'cover'}, err => {
                     if (err) {
                         props.setShowVideoButton({paused: false, muted: true});
                     }
@@ -128,7 +129,7 @@ function RemoteVideoContainer(props) {
     function playVideo() {
         if (!props.stream.stream.isPlaying()) {
             props.stream.stream.play(props.stream.streamId, {
-                fit: props.stream.streamId.includes("screen") ? 'contain' : 'cover',
+                fit: isScreenShareVideo ? 'contain' : 'cover',
                 muted: true
             }, err => {
                 if (err) {
@@ -138,7 +139,7 @@ function RemoteVideoContainer(props) {
         }
     }
 
-    const speaker = props.currentLivestream.speakers.find( speaker => speaker.speakerUuid === props.stream.streamId );
+    const speaker = !isScreenShareVideo ? props.currentLivestream.speakers.find( speaker => speaker.speakerUuid === props.stream.streamId ) : null;
 
     return (
         <WhiteTooltip
