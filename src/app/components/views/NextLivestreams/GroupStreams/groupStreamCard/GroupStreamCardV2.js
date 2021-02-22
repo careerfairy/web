@@ -163,17 +163,23 @@ const useStyles = makeStyles((theme) => {
             zIndex: 1,
         },
         companyLogosFrontWrapper: {
-            boxShadow: ({isExpanded}) => isExpanded && theme.shadows[24],
+            boxShadow: ({isExpanded}) => isExpanded && theme.shadows[3],
             background: theme.palette.common.white,
             padding: theme.spacing(1),
             display: "flex",
-            justifyContent: "space-evenly",
+            justifyContent: "space-between",
             width: "100%",
             borderRadius: "inherit",
             flex: ({mobile}) => mobile && 1,
-            maxHeight: 125
+            maxHeight: 125,
         },
-
+        logosFrontInnerWrapper:{
+            width: "inherit",
+            overflow: "auto",
+            display: "flex",
+            overflowY: "hidden",
+            justifyContent: "space-between"
+        },
         optionsWrapper: {
             overflowX: 'hidden',
             overflowY: 'auto',
@@ -231,13 +237,14 @@ const useStyles = makeStyles((theme) => {
             background: theme.palette.common.white,
             overflowX: "auto",
             overflowY: "hidden",
+            justifyContent: "space-between"
         },
         logoElement: {
             display: "flex",
             alignItems: "center",
             margin: "0 auto",
             padding: `${theme.spacing(1)}px ${theme.spacing(0.5)}px`,
-            height: ({cardHovered}) => !cardHovered && 90
+            height: ({cardHovered}) => !cardHovered && 90,
         },
         backgroundImage: {
             position: "absolute",
@@ -762,7 +769,9 @@ const GroupStreamCardV2 = memo(({
                                         </div>}
                                         <Fade in={Boolean(logoElements.length)}>
                                             <div className={classes.companyLogosFrontWrapper}>
-                                                {fetchingCareerCenters ? <LogosPlaceHolder/> : logoElements}
+                                                <div className={classes.logosFrontInnerWrapper}>
+                                                    {fetchingCareerCenters ? <LogosPlaceHolder/> : logoElements}
+                                                </div>
                                             </div>
                                         </Fade>
                                     </>
