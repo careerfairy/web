@@ -142,19 +142,19 @@ function CurrentSpeakerDisplayer(props) {
 
     function getVideoContainerClass(streamId, prop) {
         if (props.smallScreenMode) {
-            return classes[`${prop}QuarterWidth`]
+            return `${prop}QuarterWidth`
         }
         if (props.isPlayMode) {
             if (props.streams.length > 1) {
-                return streamId === props.currentSpeaker ? classes[`${prop}SpeakerVideo`] : classes[`${prop}QuarterWidth`]
+                return streamId === props.currentSpeaker ? `${prop}SpeakerVideo` : `${prop}QuarterWidth`
             } else {
-                return classes[`${prop}SpeakerVideoSolo`]
+                return `${prop}SpeakerVideoSolo`
             }
         } else {
             if (props.streams.length > 0) {
-                return streamId === props.currentSpeaker ? classes[`${prop}SpeakerVideo`] : classes[`${prop}QuarterWidth`]
+                return streamId === props.currentSpeaker ? `${prop}SpeakerVideo` : `${prop}QuarterWidth`
             } else {
-                return classes[`${prop}SpeakerVideoSolo`]
+                return `${prop}SpeakerVideoSolo`
             }
         }
     }
@@ -162,10 +162,10 @@ function CurrentSpeakerDisplayer(props) {
     let externalVideoElements = props.streams.filter(stream => !stream.streamId.includes("screen")).map((stream, index) => {
         const videoClass = getVideoContainerClass(stream.streamId, "external");
         return (
-            <div key={stream.streamId} className={ videoClass }
+            <div key={stream.streamId} className={ classes[videoClass] }
                  style={{padding: 0}}>
                 <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream}
-                                      height={ getVideoContainerHeight(stream.streamId) } small={ videoClass.includes("QuarterWidth") } index={index}/>
+                    height={ getVideoContainerHeight(stream.streamId) } small={ videoClass.includes("QuarterWidth") } index={index}/>
             </div>
         );
     });
@@ -175,7 +175,7 @@ function CurrentSpeakerDisplayer(props) {
         const localSpeaker = props.currentLivestream.speakers.find( speaker => speaker.speakerUuid === props.localId );
         let localVideoElement =
             <div
-                className={ localVideoClass }
+                className={ classes[localVideoClass] }
                 style={{padding: '0', margin: '0'}}
                 key={"localVideoId"}>
                 <div className={classes.localVideoContainer} style={{ height: getVideoContainerHeight(props.localId)}}>
