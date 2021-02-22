@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const StreamsToolbar = ({value, group, onChange, className, handleSubmit,openNewStreamModal, handleOpenNewStreamModal, handleRefresh, ...rest}) => {
+const StreamsToolbar = ({value, group, onChange, className, handleSubmit,openNewStreamModal, handleOpenNewStreamModal,isAdmin, handleRefresh, ...rest}) => {
     const {enqueueSnackbar} = useSnackbar()
     const {userData} = useAuth()
     const [open, setOpen] = useState(true);
@@ -84,7 +84,7 @@ const StreamsToolbar = ({value, group, onChange, className, handleSubmit,openNew
     };
 
     const handleCLickCreateNewLivestream = async () => {
-        if (canCreateStream()) {
+        if (isAdmin) {
             const groupId = group.id;
             const targetPath = `/new-livestream`;
             await push({
@@ -97,9 +97,6 @@ const StreamsToolbar = ({value, group, onChange, className, handleSubmit,openNew
         }
     };
 
-    const canCreateStream = () => {
-        return Boolean(userData?.isAdmin || group?.adminEmail === userData?.userEmail);
-    };
 
     const handleShareDraftLink = () => {
         let baseUrl = "https://careerfairy.io";
@@ -128,7 +125,7 @@ const StreamsToolbar = ({value, group, onChange, className, handleSubmit,openNew
         },
     ];
 
-    if (canCreateStream()) {
+    if (isAdmin) {
         buttonOptions.unshift({
             name: "Draft a new stream",
             onClick: () => handleOpenNewStreamModal(),

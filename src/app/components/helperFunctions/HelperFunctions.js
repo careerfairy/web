@@ -5,6 +5,12 @@ import {LONG_NUMBER} from "../util/constants";
 var dayjs = require('dayjs');
 var relativeTime = require('dayjs/plugin/relativeTime')
 var localizedFormat = require('dayjs/plugin/localizedFormat')
+var advancedFormat = require('dayjs/plugin/advancedFormat')
+var utc = require('dayjs/plugin/utc') // dependent on utc plugin
+var timezone = require('dayjs/plugin/timezone')
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(advancedFormat)
 dayjs.extend(localizedFormat)
 dayjs.extend(relativeTime)
 
@@ -79,6 +85,19 @@ export const prettyDate = (firebaseTimestamp) => {
         return ""
     }
 }
+export const prettyLocalizedDate = (javascriptDate) => {
+    if (javascriptDate) {
+        return dayjs(javascriptDate).format('LL LT zzz')
+    } else {
+        return ""
+    }
+}
+
+export const repositionElement = (arr, fromIndex, toIndex) => {
+    const element = arr[fromIndex];
+    arr.splice(fromIndex, 1);
+    arr.splice(toIndex, 0, element);
+};
 
 export const getLength = (arr, prop) => {
     return arr.map((el) => {
@@ -93,7 +112,17 @@ export const isEmptyObject = (obj) => {
 export const isServer = () => {
     return typeof window === 'undefined'
 }
-
+export const convertCamelToSentence = (string) => {
+    if (typeof string === 'string' || string instanceof String) {
+        return string.replace(/([A-Z])/g, " $1")
+                .charAt(0).toUpperCase()
+            +
+            string.replace(/([A-Z])/g, " $1")
+                .slice(1)
+    } else {
+        return ""
+    }
+}
 export const getServerSideRouterQuery = (queryKey, router) => {
     if (router.query[queryKey]) {
         return router.query[queryKey]
@@ -203,6 +232,14 @@ export const dynamicSort = (property) => {
         return result * sortOrder;
     }
 }
-export const truncate = (str, n) =>{
-    return (str.length > n) ? str.substr(0, n-1) + '...' : str;
+export const truncate = (str, n) => {
+    return (str.length > n) ? str.substr(0, n - 1) + '...' : str;
 };
+
+export const getBaseUrl = () => {
+    let baseUrl = "https://careerfairy.io";
+    if (window?.location?.origin) {
+        baseUrl = window.location.origin;
+    }
+    return baseUrl
+}

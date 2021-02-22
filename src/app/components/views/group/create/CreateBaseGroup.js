@@ -69,7 +69,7 @@ const CreateBaseGroup = ({handleNext, setBaseGroupInfo, baseGroupInfo}) => {
                 }}
                 onSubmit={(values, {setSubmitting}) => {
                     let careerCenter = {
-                        adminEmail: user.email,
+                        adminEmails: [user.email],
                         logoUrl: values.logoUrl,
                         logoFileObj: values.logoFileObj || baseGroupInfo.logoFileObj,
                         description: values.description,
