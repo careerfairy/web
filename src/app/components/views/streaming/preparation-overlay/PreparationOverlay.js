@@ -234,8 +234,7 @@ function PreparationOverlay ({ livestream, streamerUuid, setStreamerReady, fireb
                                 }
                                 <Button size="small" onClick={toggleEmptyProfileForm} className={classes.button}>{ profileInList ? "My Profile is not in the list" : `Show list of profiles`}</Button>
                             </FormControl>
-                        }
-                        
+                        }                       
                         <FormControlLabel
                             className={classes.linkedInSwitch}
                             control={

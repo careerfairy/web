@@ -1,10 +1,9 @@
-import {CircularProgress, Tooltip} from '@material-ui/core';
+import {Tooltip} from '@material-ui/core';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import VolumeOffIcon from '@material-ui/icons/VolumeOff';
 import SignalCellularConnectedNoInternet2BarIcon from '@material-ui/icons/SignalCellularConnectedNoInternet2Bar';
-import React, {useState, useEffect, useRef, useContext} from 'react';
+import React, {useEffect, useRef, useContext} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {Icon, Image} from "semantic-ui-react";
 import {
     TooltipButtonComponent,
     TooltipText,
@@ -12,6 +11,7 @@ import {
     WhiteTooltip
 } from "materialUI/GlobalTooltips";
 import TutorialContext from "context/tutorials/TutorialContext";
+import SpeakerInfoOverlay from './SpeakerInfoOverlay';
 
 const useStyles = makeStyles(theme => ({
     companyIcon: {
@@ -37,8 +37,8 @@ const useStyles = makeStyles(theme => ({
     },
     audioMuted: {
         position: "absolute",
-        bottom: "10px",
-        left: "10px",
+        bottom: 10,
+        right: 10,
         zIndex: 9902
     },
     mutedOverlayContent: {
@@ -133,12 +133,12 @@ function RemoteVideoContainer(props) {
             }, err => {
                 if (err) {
                     props.setShowVideoButton({paused: false, muted: true});
-                } else {
-                    debugger;
-                }
+                } 
             });
         }
     }
+
+    const speaker = props.currentLivestream.speakers.find( speaker => speaker.speakerUuid === props.stream.streamId );
 
     return (
         <WhiteTooltip
@@ -158,17 +158,22 @@ function RemoteVideoContainer(props) {
             <div className={classes.videoContainer} style={{height: props.height}}>
                 <div ref={videoElement} id={props.stream.streamId} className={classes.videoWrapper}
                      style={{width: '100%', height: '100%'}}/>
-                {props.stream.videoMuted &&
-                <div className={classes.mutedOverlay}>
-                    <div className={classes.mutedOverlayContent}>
-                        <div>
-                            <img src={props.currentLivestream.companyLogoUrl} className={classes.companyIcon}/>
+                {
+                    speaker && 
+                    <SpeakerInfoOverlay speaker={speaker} small={ props.small }/>
+                }
+                {
+                    props.stream.videoMuted &&
+                    <div className={classes.mutedOverlay}>
+                        <div className={classes.mutedOverlayContent}>
+                            <div>
+                                <img src={props.currentLivestream.companyLogoUrl} className={classes.companyIcon}/>
+                            </div>
+                            <Tooltip title={'The streamer has turned the camera off'}>
+                                <VideocamOffIcon fontSize='large' color='error'/>
+                            </Tooltip>
                         </div>
-                        <Tooltip title={'The streamer has turned the camera off'}>
-                            <VideocamOffIcon fontSize='large' color='error'/>
-                        </Tooltip>
                     </div>
-                </div>
                 }
                 {
                     props.stream.audioMuted &&
@@ -178,17 +183,18 @@ function RemoteVideoContainer(props) {
                         </Tooltip>
                     </div>
                 }
-                {(props.stream.fallbackToAudio && !props.stream.videoMuted) &&
-                <div className={classes.mutedOverlay}>
-                    <div className={classes.mutedOverlayContent}>
-                        <div>
-                            <img src={props.currentLivestream.companyLogoUrl} className={classes.companyIcon}/>
+                {
+                    (props.stream.fallbackToAudio && !props.stream.videoMuted) &&
+                    <div className={classes.mutedOverlay}>
+                        <div className={classes.mutedOverlayContent}>
+                            <div>
+                                <img src={props.currentLivestream.companyLogoUrl} className={classes.companyIcon}/>
+                            </div>
+                            <Tooltip title={'Your connection is currently too weak to stream this video'}>
+                                <SignalCellularConnectedNoInternet2BarIcon fontSize='large' color='error'/>
+                            </Tooltip>
                         </div>
-                        <Tooltip title={'Your connection is currently too weak to stream this video'}>
-                            <SignalCellularConnectedNoInternet2BarIcon fontSize='large' color='error'/>
-                        </Tooltip>
                     </div>
-                </div>
                 }
             </div>
         </WhiteTooltip>

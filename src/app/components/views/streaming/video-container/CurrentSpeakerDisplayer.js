@@ -2,6 +2,7 @@ import React from 'react';
 import RemoteVideoContainer from './RemoteVideoContainer';
 import {useWindowSize} from '../../../custom-hook/useWindowSize';
 import {makeStyles} from "@material-ui/core/styles";
+import SpeakerInfoOverlay from './SpeakerInfoOverlay';
 
 
 const useStyles = makeStyles(theme => ({
@@ -159,23 +160,30 @@ function CurrentSpeakerDisplayer(props) {
     }
 
     let externalVideoElements = props.streams.filter(stream => !stream.streamId.includes("screen")).map((stream, index) => {
+        const videoClass = getVideoContainerClass(stream.streamId, "external");
         return (
-            <div key={stream.streamId} className={getVideoContainerClass(stream.streamId, "external")}
+            <div key={stream.streamId} className={ videoClass }
                  style={{padding: 0}}>
                 <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream}
-                                      height={getVideoContainerHeight(stream.streamId)} index={index}/>
+                                      height={ getVideoContainerHeight(stream.streamId) } small={ videoClass.includes("QuarterWidth") } index={index}/>
             </div>
         );
     });
 
     if (!props.isPlayMode) {
+        const localVideoClass = getVideoContainerClass(props.localId, "local");
+        const localSpeaker = props.currentLivestream.speakers.find( speaker => speaker.speakerUuid === props.localId );
         let localVideoElement =
             <div
-                className={getVideoContainerClass(props.localId, "local")}
+                className={ localVideoClass }
                 style={{padding: '0', margin: '0'}}
                 key={"localVideoId"}>
-                <div className={classes.localVideoContainer} style={{height: getVideoContainerHeight(props.localId)}}>
+                <div className={classes.localVideoContainer} style={{ height: getVideoContainerHeight(props.localId)}}>
                     <div id="localVideo" style={{width: '100%', height: '100%'}}/>
+                    {
+                        localSpeaker && 
+                        <SpeakerInfoOverlay speaker={localSpeaker} small={ localVideoClass.includes("QuarterWidth") }/>
+                    }
                 </div>
             </div>;
 
