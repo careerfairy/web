@@ -78,7 +78,7 @@ const draftStream = ({firebase}) => {
                 id = livestream.id
                 if (!livestream.author) {
                     livestream.author = {
-                        email: authenticatedUser.email
+                        email: authenticatedUser.email || userInfo.email || "anonymous"
                     }
                 }
                 await firebase.updateLivestream(livestream, "draftLivestreams")
@@ -86,7 +86,7 @@ const draftStream = ({firebase}) => {
                 console.log("-> Draft livestream was updated with id", id);
             } else {
                 const author = {
-                    email: authenticatedUser?.email || "anonymous"
+                    email: authenticatedUser?.email || userInfo.email || "anonymous"
                 }
                 id = await firebase.addLivestream(livestream, "draftLivestreams", author)
                 console.log("-> Draft livestream was created with id", id);

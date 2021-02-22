@@ -372,18 +372,12 @@ class Firebase {
     }
 
     updateLivestream = async (livestream, collection) => {
-        try {
-            let batch = this.firestore.batch();
-            let livestreamsRef = this.firestore
-                .collection(collection)
-                .doc(livestream.id)
-            livestream.lastUpdated = this.getServerTimestamp()
-            batch.update(livestreamsRef, livestream)
-            await batch.commit()
-            return livestream.id
-        } catch (error) {
-            return error
-        }
+        let livestreamsRef = this.firestore
+            .collection(collection)
+            .doc(livestream.id)
+        livestream.lastUpdated = this.getServerTimestamp()
+        await livestreamsRef.update(livestream)
+        return livestream.id
     }
 
     addLivestreamSpeaker = (livestreamId, speaker) => {
@@ -1763,7 +1757,7 @@ class Firebase {
 
     // Approval Queries
 
-    getAllGroupAdminInfo = async (arrayOfGroupIds = ["groupId"], streamId="") => {
+    getAllGroupAdminInfo = async (arrayOfGroupIds = ["groupId"], streamId = "") => {
         let adminsInfo = []
         for (const groupId of arrayOfGroupIds) {
             const groupRef = this.firestore.collection("careerCenterData")
