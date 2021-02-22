@@ -961,6 +961,17 @@ class Firebase {
             .collection("participatingStudents");
         return ref.get();
     }
+    listenToLivestreamParticipatingStudents = (livestreamId, callback) => {
+        const now = new Date()
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("participatingStudents")
+            .where("joined", ">", now)
+            .orderBy("joined", "asc")
+            .limit(1)
+        return ref.onSnapshot(callback);
+    }
 
     getLivestreamTalentPoolMembers = (companyId) => {
         let ref = this.firestore
@@ -1464,7 +1475,10 @@ class Firebase {
             .collection("participatingStudents")
             .doc(userData.userEmail)
 
-        batch.set(participantsRef, userData)
+        batch.set(participantsRef, {
+            ...userData,
+            joined: this.getServerTimestamp()
+        })
         batch.update(livestreamRef, {
             participatingStudents: firebase.firestore.FieldValue.arrayUnion(userData.userEmail),
         })

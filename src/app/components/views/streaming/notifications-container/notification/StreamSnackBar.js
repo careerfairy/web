@@ -14,7 +14,7 @@ const StreamSnackBar = ({ notification}) => {
             persist: notification.status !== "connected",
             action,
             key: notification.id,
-            preventDuplicate: true
+            preventDuplicate: true,
         })
 
         // Dismisses the notification once the component unmounts

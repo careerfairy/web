@@ -349,6 +349,7 @@ function StreamingPage(props) {
                     isTest={currentLivestream.test}
                     livestreamId={currentLivestream.id}/>
                 <NotificationsContainer
+                    livestreamId={currentLivestream.id}
                     notifications={notifications}
                 />
                 <SpeakerManagementModal

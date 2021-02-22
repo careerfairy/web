@@ -274,6 +274,7 @@ function StreamingPage(props) {
                     livestreamId={currentLivestream.id}
                 />
                 <NotificationsContainer
+                    livestreamId={currentLivestream.id}
                     notifications={notifications}
                 />
             </div>
