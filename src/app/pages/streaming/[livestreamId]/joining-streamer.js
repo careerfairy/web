@@ -184,6 +184,7 @@ function StreamingPage(props) {
         return (
             <PreparationOverlay
                 livestream={currentLivestream}
+                streamerUuid={streamerId}
                 setStreamerReady={setStreamerReady}
             />
         )

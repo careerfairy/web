@@ -34,6 +34,7 @@ import PlayCircleFilledWhiteIcon from '@material-ui/icons/PlayCircleFilledWhite'
 import StopIcon from '@material-ui/icons/Stop';
 import PeopleIcon from '@material-ui/icons/People';
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
+import { useFirestoreConnect } from 'react-redux-firebase';
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {
@@ -208,6 +209,7 @@ function StreamingPage(props) {
         return (
             <PreparationOverlay
                 livestream={currentLivestream}
+                streamerUuid={currentLivestream.id}
                 setStreamerReady={setStreamerReady}
             />
         )
