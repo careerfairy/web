@@ -3,6 +3,7 @@ import {withFirebase} from 'context/firebase';
 import {makeStyles} from "@material-ui/core/styles";
 import {isEmpty} from 'lodash/fp'
 import {Button, CircularProgress, Collapse, FormControl, FormControlLabel, FormGroup, InputLabel, MenuItem, Paper, Select, Switch, TextField, Typography} from "@material-ui/core";
+import { ControlPoint } from '@material-ui/icons';
 import { URL_REGEX } from 'components/util/constants';
 
 const useStyles = makeStyles((theme) => ({
@@ -32,6 +33,17 @@ const useStyles = makeStyles((theme) => ({
     },
     select: {
         minWidth: 200
+    },
+    selectNewProfile: {
+        padding: "10px 0",
+        textTransform: "uppercase",
+        fontWeight: "bold",
+        fontSize: "1rem",
+        margin: 5,
+        color: theme.palette.text.secondary,
+    },
+    selectNewProfileIcon: {
+        color: theme.palette.text.secondary,
     },
     speakerFunction: {
         fontSize: "1rem",
@@ -81,7 +93,11 @@ function PreparationOverlay ({ livestream, streamerUuid, setStreamerReady, fireb
     
     const handleChangeSpeaker = (event) => {
         const selectedSpeaker = event.target.value;
-        if (selectedSpeaker.linkedIn) {
+        if (selectedSpeaker === undefined) {
+            resetSpeaker()
+            return setProfileInList(false)
+        }
+        else if (selectedSpeaker.linkedIn) {
             setLinkedInUrl(selectedSpeaker.linkedIn)
         } else {
             setLinkedInUrl("")
@@ -111,7 +127,6 @@ function PreparationOverlay ({ livestream, streamerUuid, setStreamerReady, fireb
     const joinStream = () => {
         setLoading(true)
         if (!formHasErrors()) {
-            debugger;
             speaker.speakerUuid = streamerUuid;
             speaker.showLinkedIn = showLinkedIn;
             speaker.linkedIn = linkedInUrl;
@@ -156,13 +171,6 @@ function PreparationOverlay ({ livestream, streamerUuid, setStreamerReady, fireb
         setSpeaker(selectedSpeaker)
         setShowLinkedIn(selectedSpeaker.showLinkedIn ? true : false)
         setLinkedInUrl(selectedSpeaker.linkedIn ? selectedSpeaker.linkedIn : "")
-    }
-
-    const toggleEmptyProfileForm = () => {
-        if (profileInList) {
-            resetSpeaker();
-        }
-        setProfileInList(!profileInList);
     }
 
     const resetSpeaker = () => {
@@ -215,6 +223,10 @@ function PreparationOverlay ({ livestream, streamerUuid, setStreamerReady, fireb
                                     onChange={handleChangeSpeaker}
                                 >
                                     { speakers }
+                                    <MenuItem value={undefined}>
+                                        <ControlPoint className={classes.selectNewProfileIcon} />
+                                        <div className={classes.selectNewProfile}>Add a profile</div>
+                                    </MenuItem>
                                 </Select>
                             </FormControl>
                         </Collapse>
@@ -234,10 +246,10 @@ function PreparationOverlay ({ livestream, streamerUuid, setStreamerReady, fireb
                         {
                             speakers.length > 0 &&
                             <FormControl  className={classes.block}>
-                                { profileInList && 
-                                    <Button size="small" onClick={() => setProfileInList(false)} className={classes.button}>Edit Profile</Button>
+                                { profileInList ? 
+                                    <Button size="small" onClick={() => setProfileInList(false)} className={classes.button}>Edit Profile</Button> :
+                                    <Button size="small" onClick={() => setProfileInList(true)} className={classes.button}>{ `Show list of profiles`}</Button>
                                 }
-                                <Button size="small" onClick={toggleEmptyProfileForm} className={classes.button}>{ profileInList ? "My Profile is not in the list" : `Show list of profiles`}</Button>
                             </FormControl>
                         }                       
                         <FormControlLabel
