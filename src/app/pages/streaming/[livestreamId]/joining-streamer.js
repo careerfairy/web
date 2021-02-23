@@ -184,11 +184,19 @@ function StreamingPage(props) {
         setShowMenu(!showMenu)
     }
 
-    if (!currentLivestream || !tokenChecked) {
+    const tokenIsValidated = () => {
+        if (currentLivestream.test) {
+            return true;
+        } else {
+            return tokenChecked;
+        }
+    }
+
+    if (!currentLivestream || !tokenIsValidated()) {
         return <Loader />
     }
 
-    if (!streamerReady && tokenChecked) {
+    if (!streamerReady && tokenIsValidated()) {
         return (
             <PreparationOverlay
                 livestream={currentLivestream}
@@ -197,6 +205,7 @@ function StreamingPage(props) {
             />
         )
     }
+
     return (
         <NotificationsContext.Provider
             value={{setNewNotification: setNewNotification}}
