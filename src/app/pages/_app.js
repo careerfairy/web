@@ -27,7 +27,6 @@ import {CssBaseline} from '@material-ui/core';
 config({ssrFadeout: true});
 
 
-
 // react-redux-firebase config
 const rrfConfig = {
     userProfile: 'userData',
@@ -113,28 +112,23 @@ function MyApp({Component, pageProps}) {
                             <ThemeProviderWrapper>
                                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
 
-                                        <TutorialContext.Provider value={{
-                                            tutorialSteps,
-                                            setTutorialSteps,
-                                            showBubbles,
-                                            setShowBubbles,
-                                            getActiveTutorialStepKey,
-                                            handleConfirmStep,
-                                            isOpen
-                                        }}>
-                                            <ErrorContext.Provider value={{generalError, setGeneralError}}>
-                                                {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                                                <CssBaseline/>
-                                                {Component.layout ?
-                                                    <Component.layout>
-                                                        <Component {...pageProps} />
-                                                    </Component.layout>
-                                                    :
-                                                    <Component {...pageProps} />}
-                                                <ErrorSnackBar handleClose={() => setGeneralError("")}
-                                                               errorMessage={generalError}/>
-                                            </ErrorContext.Provider>
-                                        </TutorialContext.Provider>
+                                    <TutorialContext.Provider value={{
+                                        tutorialSteps,
+                                        setTutorialSteps,
+                                        showBubbles,
+                                        setShowBubbles,
+                                        getActiveTutorialStepKey,
+                                        handleConfirmStep,
+                                        isOpen
+                                    }}>
+                                        <ErrorContext.Provider value={{generalError, setGeneralError}}>
+                                            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                                            <CssBaseline/>
+                                            <Component {...pageProps} />
+                                            <ErrorSnackBar handleClose={() => setGeneralError("")}
+                                                           errorMessage={generalError}/>
+                                        </ErrorContext.Provider>
+                                    </TutorialContext.Provider>
                                 </MuiPickersUtilsProvider>
                             </ThemeProviderWrapper>
                         </FirebaseContext.Provider>
