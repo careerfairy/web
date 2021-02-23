@@ -121,6 +121,7 @@ function PreparationOverlay ({ livestream, streamerUuid, setStreamerReady, fireb
             setProfileInList(true);
         } else {
             setProfileInList(false);
+            resetSpeaker()
         }
     },[livestream])
 
