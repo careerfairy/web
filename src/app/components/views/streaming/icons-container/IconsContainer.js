@@ -91,6 +91,7 @@ const randomInteger = (min, max) => {
 const emotes = ["clapping", "like", "heart"]
 
 function IconsContainer({className}) {
+
     const classes = useStyles()
     const emotesData = useSelector(state => state.emotes.emotesData)
     const {showBubbles, setShowBubbles} = useContext(TutorialContext);

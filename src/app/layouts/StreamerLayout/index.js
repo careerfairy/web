@@ -1,4 +1,4 @@
-import React, {createContext, useCallback, useContext, useEffect, useState} from 'react';
+import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import {withFirebase} from "../../context/firebase";
 import {useAuth} from "../../HOCs/AuthProvider";
@@ -26,6 +26,10 @@ const useStyles = makeStyles((theme) => ({
         overflow: 'hidden',
         paddingTop: 55,
         paddingLeft: ({showMenu}) => showMenu ? 280 : 0,
+        transition: theme.transitions.create("padding-left", {
+            duration: theme.transitions.duration.standard,
+            easing: theme.transitions.easing.easeInOut
+        })
     },
     contentContainer: {
         display: 'flex',
@@ -35,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
     content: {
         flex: '1 1 auto',
         height: '100%',
-        overflow: 'auto'
+        // overflow: 'auto'
     },
     menuLeft: {
         position: "absolute",
@@ -52,13 +56,14 @@ const useStyles = makeStyles((theme) => ({
 
 const StreamerLayout = (props) => {
     const {children, firebase} = props
-    const {query: {token, livestreamId}} = useRouter()
+    const {query: {token, livestreamId}, pathname} = useRouter()
     const router = useRouter();
     const [currentLivestream, setCurrentLivestream] = useState(false);
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [newNotification, setNewNotification] = useState(null);
     const [notificationToRemove, setNotificationToRemove] = useState(null);
     const [notifications, setNotifications] = useState([]);
+    const [streamerId, setStreamerId] = useState(null);
 
     const [streamerReady, setStreamerReady] = useState(false);
     const [tokenChecked, setTokenChecked] = useState(false);
@@ -68,6 +73,9 @@ const StreamerLayout = (props) => {
         showMenu,
         hasStarted: currentLivestream?.hasStarted
     });
+
+    const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
+    const isMainStreamer = useMemo(() => pathname === "/streaming/[livestreamId]/main-streamer", [pathname])
 
 
     useEffect(() => {
@@ -102,7 +110,25 @@ const StreamerLayout = (props) => {
                 })
             }
         }
-    }, [router, token, currentLivestream]);
+    }, [router, token, currentLivestream?.test, currentLivestream?.id]);
+
+    useEffect(() => {
+        const regex = /-/g;
+        if (livestreamId && !isMainStreamer) {
+            if (localStorage.getItem('streamingUuid')) {
+                let storedUuid = localStorage.getItem('streamingUuid')
+                let joiningId = storedUuid.replace(regex, '')
+                setStreamerId(livestreamId + joiningId)
+            } else {
+                let uuid = uuidv4()
+                let joiningId = uuid.replace(regex, '')
+                localStorage.setItem('streamingUuid', joiningId)
+                setStreamerId(livestreamId + joiningId)
+            }
+        } else if (currentLivestream?.id) {
+            setStreamerId(currentLivestream.id)
+        }
+    }, [livestreamId, isMainStreamer, currentLivestream?.id])
 
     useEffect(() => {
         if (newNotification) {
@@ -116,8 +142,6 @@ const StreamerLayout = (props) => {
             setNotifications(updatedNotifications);
         }
     }, [notificationToRemove]);
-
-    const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
 
 
     const tokenIsValidated = () => {
@@ -139,7 +163,7 @@ const StreamerLayout = (props) => {
         return (
             <PreparationOverlay
                 livestream={currentLivestream}
-                streamerUuid={currentLivestream.id}
+                streamerUuid={streamerId}
                 setStreamerReady={setStreamerReady}
             />
         )
@@ -152,6 +176,7 @@ const StreamerLayout = (props) => {
                 <div className={classes.root}>
                     <StreamerTopBar
                         firebase={firebase}
+                        isMainStreamer={isMainStreamer}
                         numberOfViewers={numberOfViewers}
                     />
                     <LeftMenu
@@ -168,7 +193,10 @@ const StreamerLayout = (props) => {
                                 {React.cloneElement(children, {
                                     ...props,
                                     newNotification,
+                                    isMainStreamer,
+                                    showMenu,
                                     notifications,
+                                    streamerId,
                                     setNumberOfViewers: handleSetNumberOfViewers
                                 })}
                             </div>

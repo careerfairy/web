@@ -25,26 +25,23 @@ const useStyles = makeStyles(theme => ({
     },
     miniChatContainer: {
         position: "absolute",
-        bottom: "0",
-        right: "120px",
+        bottom: 0,
+        right: 120,
         width: "20%",
-        minWidth: "250px",
+        minWidth: 250,
         zIndex: 100
     },
     iconsContainer: {
         position: "absolute",
-        bottom: "50px",
-        right: "100px",
+        bottom: 60,
+        right: 100,
         zIndex: 100,
-        width: "80px"
+        width: 80
     }
 }));
 
-const StreamerOverview = ({isStreamer, setNumberOfViewers, showMenu, notifications, isMainStreamer}) => {
+const StreamerOverview = ({isStreamer, setNumberOfViewers, showMenu, notifications, streamerId}) => {
     const {currentLivestream} = useCurrentStream()
-
-    console.log("-> currentLivestream in overview", currentLivestream);
-
     const classes = useStyles()
 
     return (
@@ -53,7 +50,7 @@ const StreamerOverview = ({isStreamer, setNumberOfViewers, showMenu, notificatio
                 className={classes.blackFrame}
             >
                 <VideoContainer currentLivestream={currentLivestream}
-                                streamerId={currentLivestream.id}
+                                streamerId={streamerId}
                                 setNumberOfViewers={setNumberOfViewers}
                                 showMenu={showMenu} viewer={false}
                 />

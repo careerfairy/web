@@ -16,14 +16,14 @@ const AdminPage = () => {
     const classes = useStyles()
 
     return (
-        <Page title="CareerFairy | Admin">
-            <Container className={classes.root} maxWidth="xl">
-                <CircularProgress/>
-            </Container>
-        </Page>
+        <GroupDashboardLayout>
+            <Page title="CareerFairy | Admin">
+                <Container className={classes.root} maxWidth="xl">
+                    <CircularProgress/>
+                </Container>
+            </Page>
+        </GroupDashboardLayout>
     )
 };
-
-AdminPage.layout = GroupDashboardLayout
 
 export default AdminPage;

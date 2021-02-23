@@ -6,17 +6,18 @@ import StreamsOverview from "../../../../components/views/group/admin/streams";
 const PastLivestreamsPage = ({group, firebase, isAdmin}) => {
 
     return (
-        <Page title={`CareerFairy | Admin Past Streams of ${group.universityName}`}>
-            <StreamsOverview
-                query={firebase.listenToPastLiveStreamsByGroupId}
-                group={group}
-                firebase={firebase}
-                isAdmin={isAdmin}
-                typeOfStream="past"
-            />
-        </Page>
+        <GroupDashboardLayout>
+            <Page title={`CareerFairy | Admin Past Streams of ${group.universityName}`}>
+                <StreamsOverview
+                    query={firebase.listenToPastLiveStreamsByGroupId}
+                    group={group}
+                    firebase={firebase}
+                    isAdmin={isAdmin}
+                    typeOfStream="past"
+                />
+            </Page>
+        </GroupDashboardLayout>
     );
 };
-PastLivestreamsPage.layout = GroupDashboardLayout
 
 export default PastLivestreamsPage;

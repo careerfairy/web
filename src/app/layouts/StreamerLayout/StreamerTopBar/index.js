@@ -51,7 +51,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const StreamerTopBar = ({firebase, numberOfViewers}) => {
+const StreamerTopBar = ({firebase, numberOfViewers, isMainStreamer}) => {
     const {currentLivestream} = useCurrentStream()
 
     const classes = useStyles()
@@ -94,6 +94,8 @@ const StreamerTopBar = ({firebase, numberOfViewers}) => {
 
     function setStreamingStarted(started) {
         firebase.setLivestreamHasStarted(started, currentLivestream.id);
+
+
     }
 
     return (
@@ -106,52 +108,57 @@ const StreamerTopBar = ({firebase, numberOfViewers}) => {
                     <Hidden mdUp>
                         <MiniLogo/>
                     </Hidden>
-                    <StandartTooltip
-                        arrow
-                        open={!streamStartTimeIsNow && !hideTooltip}
-                        interactive
-                        placement='bottom'
-                        title={
-                            <React.Fragment>
-                                <TooltipTitle>Start Streaming</TooltipTitle>
-                                <TooltipText>
-                                    The Start Streaming button will become active 2 minutes before the stream's
-                                    official start time.
-                                </TooltipText>
-                                <TooltipButtonComponent onConfirm={() => setHideTooltip(true)} buttonText="Ok"/>
-                            </React.Fragment>
-                        }
-                    >
-                        <ButtonWithConfirm
-                            color={currentLivestream.hasStarted ? theme.palette.error.main : theme.palette.primary.main}
-                            fluid
-                            hasStarted={currentLivestream.hasStarted}
-                            mobile={mobile}
-                            disabled={!streamStartTimeIsNow}
-                            startIcon={currentLivestream.hasStarted ? <StopIcon/> : <PlayCircleFilledWhiteIcon/>}
-                            buttonAction={() => setStreamingStarted(!currentLivestream.hasStarted)}
-                            confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'}
-                            buttonLabel={currentLivestream.hasStarted ? `Stop ${mobile ? "" : "Streaming"}` : `Start ${mobile ? "" : "Streaming"}`}
-                            tooltipTitle={currentLivestream.hasStarted ? `Click here to stop streaming` : `Click here to start streaming`}
+                    {isMainStreamer &&
+                    <Fragment>
+                        <StandartTooltip
+                            arrow
+                            open={!streamStartTimeIsNow && !hideTooltip}
+                            interactive
+                            placement='bottom'
+                            title={
+                                <React.Fragment>
+                                    <TooltipTitle>Start Streaming</TooltipTitle>
+                                    <TooltipText>
+                                        The Start Streaming button will become active 2 minutes before the stream's
+                                        official start time.
+                                    </TooltipText>
+                                    <TooltipButtonComponent onConfirm={() => setHideTooltip(true)} buttonText="Ok"/>
+                                </React.Fragment>
+                            }
+                        >
+                            <ButtonWithConfirm
+                                color={currentLivestream.hasStarted ? theme.palette.error.main : theme.palette.primary.main}
+                                fluid
+                                hasStarted={currentLivestream.hasStarted}
+                                mobile={mobile}
+                                disabled={!streamStartTimeIsNow}
+                                startIcon={currentLivestream.hasStarted ? <StopIcon/> : <PlayCircleFilledWhiteIcon/>}
+                                buttonAction={() => setStreamingStarted(!currentLivestream.hasStarted)}
+                                confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'}
+                                buttonLabel={currentLivestream.hasStarted ? `Stop ${mobile ? "" : "Streaming"}` : `Start ${mobile ? "" : "Streaming"}`}
+                                tooltipTitle={currentLivestream.hasStarted ? `Click here to stop streaming` : `Click here to start streaming`}
 
-                        />
-                    </StandartTooltip>
-                    {mobile ?
-                        <Tooltip title="Invite an additional streamer">
-                            <IconButton onClick={() => {
-                                setSpeakerManagementOpen(true)
-                            }}>
-                                <PersonAddIcon color="inherit"/>
-                            </IconButton>
-                        </Tooltip>
-                        :
-                        <Button
-                            children="Invite a streamer"
-                            startIcon={<PersonAddIcon color="inherit"/>}
-                            onClick={() => {
-                                setSpeakerManagementOpen(true)
-                            }}
-                        />}
+                            />
+                        </StandartTooltip>
+
+                        {mobile ?
+                            <Tooltip title="Invite an additional streamer">
+                                <IconButton onClick={() => {
+                                    setSpeakerManagementOpen(true)
+                                }}>
+                                    <PersonAddIcon color="inherit"/>
+                                </IconButton>
+                            </Tooltip>
+                            :
+                            <Button
+                                children="Invite a streamer"
+                                startIcon={<PersonAddIcon color="inherit"/>}
+                                onClick={() => {
+                                    setSpeakerManagementOpen(true)
+                                }}
+                            />}
+                    </Fragment>
+                    }
                     {mobile ?
                         <Tooltip
                             title={currentLivestream.hasStarted ? 'You are currently actively streaming' : 'You are currently not streaming'}>
@@ -169,39 +176,44 @@ const StreamerTopBar = ({firebase, numberOfViewers}) => {
                             </Typography>
                             {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
                         </Box>}
-                    {mobile ?
-                        <Tooltip title="Open Student View">
-                            <IconButton target="_blank" href={`/streaming/${currentLivestream.id}/viewer`}>
-                                <OpenInBrowserIcon color="inherit"/>
-                            </IconButton>
+                    {isMainStreamer &&
+                    <Fragment>
+                        {mobile ?
+                            <Tooltip title="Open Student View">
+                                <IconButton target="_blank" href={`/streaming/${currentLivestream.id}/viewer`}>
+                                    <OpenInBrowserIcon color="inherit"/>
+                                </IconButton>
+                            </Tooltip>
+                            :
+                            <Button
+                                href={`/streaming/${currentLivestream.id}/viewer`}
+                                target="_blank"
+                                children="Open Student View"
+                                startIcon={<OpenInBrowserIcon color="inherit"/>}
+                            />
+                        }
+                    </Fragment>}
+                    <Box display="flex" alignItems="center">
+                        <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
+                            <Checkbox
+                                checked={themeMode === "dark"}
+                                onChange={toggleTheme}
+                                icon={<Brightness4Icon/>}
+                                checkedIcon={<Brightness7Icon/>}
+                                color="default"
+                            />
                         </Tooltip>
-                        :
-                        <Button
-                            href={`/streaming/${currentLivestream.id}/viewer`}
-                            target="_blank"
-                            children="Open Student View"
-                            startIcon={<OpenInBrowserIcon color="inherit"/>}
-                        />
-                    }
-                    <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
-                        <Checkbox
-                            checked={themeMode === "dark"}
-                            onChange={toggleTheme}
-                            icon={<Brightness4Icon/>}
-                            checkedIcon={<Brightness7Icon/>}
-                            color="default"
-                        />
-                    </Tooltip>
-                    <Box className={classes.viewCount}>
-                        <Tooltip title="Number of viewers">
-                            <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
-                                <PeopleIcon/>
-                            </Badge>
-                        </Tooltip>
-                        {!mobile &&
-                        <Typography className={classes.viewCountText}>
-                            Viewers : {numberOfViewers}
-                        </Typography>}
+                        <Box className={classes.viewCount}>
+                            <Tooltip title="Number of viewers">
+                                <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
+                                    <PeopleIcon/>
+                                </Badge>
+                            </Tooltip>
+                            {!mobile &&
+                            <Typography className={classes.viewCountText}>
+                                Viewers : {numberOfViewers}
+                            </Typography>}
+                        </Box>
                     </Box>
                 </Toolbar>
             </AppBar>

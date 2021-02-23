@@ -199,7 +199,7 @@ function PreparationOverlay ({ livestream, streamerUuid, setStreamerReady, fireb
                 <MenuItem value={speaker}>
                     <CustomSpeakerDisplay speaker={speaker}/>
                 </MenuItem>
-            ) 
+            )
         })
     }
 

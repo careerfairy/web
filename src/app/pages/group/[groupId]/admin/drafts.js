@@ -6,17 +6,18 @@ import StreamsOverview from "../../../../components/views/group/admin/streams";
 const DraftStreamsPage = ({group, firebase, isAdmin}) => {
 
     return (
-        <Page title={`CareerFairy | Admin Manage Drafts of ${group.universityName}`}>
-            <StreamsOverview
-                query={firebase.listenToDraftLiveStreamsByGroupId}
-                group={group}
-                firebase={firebase}
-                isAdmin={isAdmin}
-                typeOfStream="draft"
-            />
-        </Page>
+        <GroupDashboardLayout>
+            <Page title={`CareerFairy | Admin Manage Drafts of ${group.universityName}`}>
+                <StreamsOverview
+                    query={firebase.listenToDraftLiveStreamsByGroupId}
+                    group={group}
+                    firebase={firebase}
+                    isAdmin={isAdmin}
+                    typeOfStream="draft"
+                />
+            </Page>
+        </GroupDashboardLayout>
     );
 };
-DraftStreamsPage.layout = GroupDashboardLayout
 
 export default DraftStreamsPage;

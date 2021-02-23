@@ -6,14 +6,15 @@ import RolesOverview from "../../../../components/views/group/admin/roles";
 
 const RolesPage = ({group, firebase}) => {
     return (
-        <Page title={`CareerFairy | Member Roles of ${group.universityName}`}>
-            <RolesOverview
-                group={group}
-                firebase={firebase}
-            />
-        </Page>
+        <GroupDashboardLayout>
+            <Page title={`CareerFairy | Member Roles of ${group.universityName}`}>
+                <RolesOverview
+                    group={group}
+                    firebase={firebase}
+                />
+            </Page>
+        </GroupDashboardLayout>
     );
 };
-RolesPage.layout = GroupDashboardLayout
 
 export default RolesPage;
