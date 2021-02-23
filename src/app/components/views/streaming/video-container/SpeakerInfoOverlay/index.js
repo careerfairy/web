@@ -1,0 +1,108 @@
+import React from 'react';
+import {fade, makeStyles} from "@material-ui/core/styles";
+import LinkedInIcon from '@material-ui/icons/LinkedIn';
+import PropTypes from 'prop-types';
+import { IconButton, Tooltip } from '@material-ui/core';
+
+const useStyles = makeStyles(theme => ({
+    speakerInformation: {
+        position: "absolute",
+        left: props => props.small ? 10 : 40,
+        bottom: props => props.small ? 10 : 40,
+        padding: props => props.small ? 10 : 15,
+        borderRadius: props => props.small ? 5 : 10,
+        textAlign: "left",
+        color: theme.palette.common.white,
+        boxShadow: theme.shadows[2],
+        backgroundColor: fade(theme.palette.common.black, 0.4),
+        backdropFilter: "blur(5px)",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        maxWidth: props => props.small ? "230px" : "100%",
+    },
+    speakerName: {
+        fontSize: props => props.small ? "0.8rem" : "1rem",
+        maxWidth: props => props.small ? "180px" : "100%",
+    },
+    speakerData: {
+        maxWidth: props => props.small ? "180px" : "100%",
+        
+    },
+    speakerPosition: {
+        fontWeight: "normal",
+        fontSize: props => props.small ? "0.7rem" : "1rem",
+        maxWidth: props => props.small ? "180px" : "100%",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
+    },
+    speakerLinkedIn: {
+        marginLeft: 10
+    },
+    speakerLinkedInIconButton: {
+        padding: 0,
+    },
+    speakerLinkedInButton: {
+        color: theme.palette.common.white,
+        fontSize:  props => props.small ? 20 : 30,
+    },
+}));
+
+const SpeakerInfoOverlay = ({ speaker, small }) => {
+    const classes = useStyles({ small: small })
+
+    const handleClick = () => {
+        window.open( speaker.linkedIn, '_blank' )
+    }
+
+    if (small) {
+        return (
+            <div className={classes.speakerInformation}>
+                <div className={classes.speakerData}>
+                    <div>
+                        <h5 className={classes.speakerName}>{`${speaker.firstName} ${speaker.lastName}`}</h5>
+                    </div>
+                    <div>
+                        <h5 className={classes.speakerPosition}>{`${speaker.position}`}</h5>
+                    </div>
+                </div> 
+                <div className={ classes.speakerLinkedIn }>
+                    <Tooltip title={`Open ${speaker.firstName}'s LinkedIn profile in a new tab`}>
+                        <IconButton className={classes.speakerLinkedInIconButton} onClick={handleClick}>
+                            <LinkedInIcon className={classes.speakerLinkedInButton}/>
+                        </IconButton>
+                    </Tooltip>         
+                </div>          
+            </div>
+        );
+    } else {
+        return (
+            <div className={classes.speakerInformation}>
+                <div>
+                    <div>
+                        <h3>{`${speaker.firstName} ${speaker.lastName}`}</h3>
+                    </div>
+                    <div>
+                        <h4 className={classes.speakerPosition}>{`${speaker.position}`}</h4>
+                    </div>
+                </div> 
+                { 
+                    speaker.showLinkedIn && 
+                    <div className={ classes.speakerLinkedIn }>
+                        <Tooltip title={`Open ${speaker.firstName}'s LinkedIn profile in a new tab`}>
+                            <IconButton className={classes.speakerLinkedInIconButton} onClick={handleClick}>
+                                <LinkedInIcon className={classes.speakerLinkedInButton}/>
+                            </IconButton>
+                        </Tooltip>         
+                    </div>   
+                }     
+            </div>
+        );
+    }    
+};
+SpeakerInfoOverlay.prototypes = {
+    speaker: PropTypes.string.isRequired,
+    small: PropTypes.bool.isRequired
+}
+export default SpeakerInfoOverlay;

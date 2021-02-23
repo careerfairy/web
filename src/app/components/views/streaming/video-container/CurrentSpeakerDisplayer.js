@@ -2,6 +2,8 @@ import React from 'react';
 import RemoteVideoContainer from './RemoteVideoContainer';
 import {useWindowSize} from '../../../custom-hook/useWindowSize';
 import {makeStyles} from "@material-ui/core/styles";
+import SpeakerInfoOverlay from './SpeakerInfoOverlay';
+import LocalVideoContainer from './LocalVideoContainer';
 
 
 const useStyles = makeStyles(theme => ({
@@ -141,43 +143,41 @@ function CurrentSpeakerDisplayer(props) {
 
     function getVideoContainerClass(streamId, prop) {
         if (props.smallScreenMode) {
-            return classes[`${prop}QuarterWidth`]
+            return `${prop}QuarterWidth`
         }
         if (props.isPlayMode) {
             if (props.streams.length > 1) {
-                return streamId === props.currentSpeaker ? classes[`${prop}SpeakerVideo`] : classes[`${prop}QuarterWidth`]
+                return streamId === props.currentSpeaker ? `${prop}SpeakerVideo` : `${prop}QuarterWidth`
             } else {
-                return classes[`${prop}SpeakerVideoSolo`]
+                return `${prop}SpeakerVideoSolo`
             }
         } else {
             if (props.streams.length > 0) {
-                return streamId === props.currentSpeaker ? classes[`${prop}SpeakerVideo`] : classes[`${prop}QuarterWidth`]
+                return streamId === props.currentSpeaker ? `${prop}SpeakerVideo` : `${prop}QuarterWidth`
             } else {
-                return classes[`${prop}SpeakerVideoSolo`]
+                return `${prop}SpeakerVideoSolo`
             }
         }
     }
 
     let externalVideoElements = props.streams.filter(stream => !stream.streamId.includes("screen")).map((stream, index) => {
+        const videoClass = getVideoContainerClass(stream.streamId, "external");
         return (
-            <div key={stream.streamId} className={getVideoContainerClass(stream.streamId, "external")}
+            <div key={stream.streamId} className={ classes[videoClass] }
                  style={{padding: 0}}>
                 <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream}
-                                      height={getVideoContainerHeight(stream.streamId)} index={index}/>
+                    height={ getVideoContainerHeight(stream.streamId) } small={ videoClass.includes("QuarterWidth") } index={index}/>
             </div>
         );
     });
 
     if (!props.isPlayMode) {
-        let localVideoElement =
-            <div
-                className={getVideoContainerClass(props.localId, "local")}
-                style={{padding: '0', margin: '0'}}
-                key={"localVideoId"}>
-                <div className={classes.localVideoContainer} style={{height: getVideoContainerHeight(props.localId)}}>
-                    <div id="localVideo" style={{width: '100%', height: '100%'}}/>
-                </div>
-            </div>;
+        const localVideoClass = getVideoContainerClass(props.localId, "local");
+        const localSpeaker = props.currentLivestream.speakers?.find( speaker => speaker.speakerUuid === props.localId );
+        let localVideoElement = 
+            <div key={"localVideo"} className={ classes[localVideoClass] }>
+                <LocalVideoContainer localId={props.localId} localSpeaker={localSpeaker} height={getVideoContainerHeight(props.localId)} small={localVideoClass.includes("QuarterWidth")} {...props}/>
+            </div>
 
         externalVideoElements.unshift(localVideoElement);
     }

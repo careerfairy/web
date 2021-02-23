@@ -34,6 +34,8 @@ import PlayCircleFilledWhiteIcon from '@material-ui/icons/PlayCircleFilledWhite'
 import StopIcon from '@material-ui/icons/Stop';
 import PeopleIcon from '@material-ui/icons/People';
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
+import { useFirestoreConnect } from 'react-redux-firebase';
+import Loader from 'components/views/loader/Loader';
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {
@@ -109,6 +111,7 @@ function StreamingPage(props) {
     const token = router.query.token;
 
     const [streamerReady, setStreamerReady] = useState(false);
+    const [tokenChecked, setTokenChecked] = useState(false);
 
     const [currentLivestream, setCurrentLivestream] = useState(false);
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
@@ -167,6 +170,7 @@ function StreamingPage(props) {
         if (router && router.query && currentLivestream && !currentLivestream.test) {
             if (!token) {
                 router.push('/streaming/error')
+
             } else {
                 props.firebase.getLivestreamSecureToken(currentLivestream.id).then( doc => {
                     if (!doc.exists) {
@@ -175,6 +179,8 @@ function StreamingPage(props) {
                     let storedToken = doc.data().value;
                     if (storedToken !== token) {
                         router.push('/streaming/error')
+                    } else {
+                        setTokenChecked(true);
                     }
                 })
             }
@@ -204,10 +210,23 @@ function StreamingPage(props) {
         setShowMenu(!showMenu)
     }
 
-    if (!streamerReady) {
+    const tokenIsValidated = () => {
+        if (currentLivestream.test) {
+            return true;
+        } else {
+            return tokenChecked;
+        }
+    }
+
+    if (!currentLivestream || !tokenIsValidated()) {
+        return <Loader />
+    }
+
+    if (!streamerReady && tokenIsValidated()) {
         return (
             <PreparationOverlay
                 livestream={currentLivestream}
+                streamerUuid={currentLivestream.id}
                 setStreamerReady={setStreamerReady}
             />
         )
