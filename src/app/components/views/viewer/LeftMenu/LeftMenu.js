@@ -1,6 +1,5 @@
-import React, {Fragment, useEffect, useState} from 'react';
-import {makeStyles, useTheme} from "@material-ui/core/styles";
-import Box from "@material-ui/core/Box";
+import React, {useEffect, useState} from 'react';
+import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
 import SwipeableViews from "react-swipeable-views";
 import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
 import {Fab} from "@material-ui/core";
@@ -10,13 +9,15 @@ import PollCategory from "./categories/PollCategory";
 import HandRaiseCategory from "./categories/HandRaiseCategory";
 import ChatCategory from "../../streaming/LeftMenu/categories/ChatCategory";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
+import clsx from "clsx";
 
 
 const useStyles = makeStyles(theme => ({
-    root: {
+    root: {},
+    viewRoot: {
         position: "relative",
         height: "100%",
-        backgroundColor: "rgb(220,220,220)",
+        backgroundColor: theme.palette.background.default,
         "& .react-swipeable-view-container": {
             height: "100%"
         }
@@ -27,6 +28,19 @@ const useStyles = makeStyles(theme => ({
         right: 10,
         textAlign: "center",
         zIndex: 9100,
+        background: theme.palette.type === "dark" && theme.palette.background.paper,
+        "&:hover": {
+            background: theme.palette.type === "dark" && theme.palette.background.default,
+        },
+        color: theme.palette.type === "dark" && theme.palette.secondary.main
+    },
+    slides: {
+        backgroundColor: theme.palette.background.default,
+        overflow: "visible !important"
+    },
+    blur: {
+        backgroundColor: fade(theme.palette.common.black, 0.2),
+        backdropFilter: "blur(5px)",
     }
 }))
 
@@ -43,6 +57,7 @@ const LeftMenu =
          setShowMenu,
          showMenu,
          isMobile,
+         className,
          ...props
      }) => {
         const theme = useTheme()
@@ -77,13 +92,15 @@ const LeftMenu =
         }
 
         const handleChange = (event, newValue) => {
-            setValue(event);
-            setSelectedState(states[event])
+            setValue(newValue);
+            setSelectedState(states[newValue])
         }
 
         const views = [
             <TabPanel key={0} value={value} index={0} dir={theme.direction}>
-                <QuestionCategory showMenu={showMenu} streamer={streamer} livestream={livestream} selectedState={selectedState} user={user}
+                <QuestionCategory showMenu={showMenu} streamer={streamer} livestream={livestream}
+                                  isMobile={isMobile}
+                                  selectedState={selectedState} user={user}
                                   userData={userData}/>
             </TabPanel>,
             <TabPanel key={1} value={value} index={1} dir={theme.direction}>
@@ -107,7 +124,9 @@ const LeftMenu =
 
 
         return (
-            <>
+            <div className={clsx(classes.root, className, {
+                [classes.blur]: isMobile && showMenu
+            })}>
                 {isMobile && showMenu &&
                 <Fab className={classes.closeBtn} size='large' color='secondary' onClick={toggleShowMenu}>
                     <ChevronLeftRoundedIcon/>
@@ -116,13 +135,14 @@ const LeftMenu =
                     containerStyle={{WebkitOverflowScrolling: 'touch'}}
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                     index={value}
-                    className={classes.root}
+                    slideClassName={classes.slides}
+                    className={classes.viewRoot}
                     onChangeIndex={handleChange}>
                     {views}
                 </SwipeableViews>
                 <ButtonComponent selectedState={selectedState} showMenu={showMenu} isMobile={isMobile}
                                  handleStateChange={handleStateChange} {...props}/>
-            </>
+            </div>
         );
     };
 

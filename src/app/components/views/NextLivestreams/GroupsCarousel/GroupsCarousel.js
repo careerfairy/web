@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
         WebkitPerspective: 1000
     },
     slider: {
-        boxShadow: "0 3px 3px grey",
+        boxShadow: theme.shadows[5],
         width: "100%",
         "& .slick-next:before, .slick-prev:before": {
             content: "'' !important",

@@ -2,14 +2,12 @@ import React, {useContext, useEffect, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import HandRaiseElement from './hand-raise-element/HandRaiseElement';
 import NotificationsContext from 'context/notifications/NotificationsContext';
-import Grow from "@material-ui/core/Grow";
 import CloseRoundedIcon from '@material-ui/icons/CloseRounded';
 import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
 
-import {Box, Button, Typography} from "@material-ui/core";
+import { Box, Button, Typography, Grow, Paper } from "@material-ui/core";
 import {CategoryContainerCentered, CategoryContainerTopAligned} from "../../../../../../../materialUI/GlobalContainers";
 import {ThemedPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
-import Paper from "@material-ui/core/Paper";
 import TutorialContext from "../../../../../../../context/tutorials/TutorialContext";
 import {
     TooltipButtonComponent,
@@ -17,14 +15,24 @@ import {
     TooltipTitle,
     WhiteTooltip
 } from "../../../../../../../materialUI/GlobalTooltips";
+import {makeStyles} from "@material-ui/core/styles";
+import {useSnackbar} from "notistack";
+
+const useStyles = makeStyles(theme => ({
+    activeHandRaiseContainer: {
+        padding: theme.spacing(1)
+    }
+}))
 
 function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding}) {
-
+    const classes = useStyles()
+    const {closeSnackbar} = useSnackbar()
     const {setNewNotification, setNotificationToRemove} = useContext(NotificationsContext);
-    const {tutorialSteps, setTutorialSteps, getActiveTutorialStepKey} = useContext(TutorialContext);
-
+    const {tutorialSteps, setTutorialSteps, getActiveTutorialStepKey, isOpen: isStepOpen} = useContext(TutorialContext);
+    const [handRaises, setHandRaises] = useState([]);
     const [hasEntered, setHasEntered] = useState(false);
     const [hasExited, setHasExited] = useState(false);
+
 
     useEffect(() => {
         if (livestream) {
@@ -60,8 +68,6 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
         })
     }
 
-    const [handRaises, setHandRaises] = useState([]);
-
 
     function setHandRaiseModeInactive() {
         firebase.setHandRaiseMode(livestream.id, false);
@@ -72,10 +78,13 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
     }
 
     let handRaiseElements = handRaises.filter(handRaise => (handRaise.state !== 'unrequested' && handRaise.state !== 'denied')).map(handRaise => {
-        return (   
-                <HandRaiseElement request={handRaise} hasEntered={hasEntered} updateHandRaiseRequest={updateHandRaiseRequest}
-                    setNewNotification={setNewNotification}
-                    setNotificationToRemove={setNotificationToRemove}/>
+        return (
+            <HandRaiseElement request={handRaise} hasEntered={hasEntered}
+                              key={handRaise.timestamp.toMillis()}
+                              updateHandRaiseRequest={updateHandRaiseRequest}
+                              setNewNotification={setNewNotification}
+                              closeSnackbar={closeSnackbar}
+                              setNotificationToRemove={setNotificationToRemove}/>
         );
     })
 
@@ -84,11 +93,13 @@ function HandRaiseActive({firebase, livestream, showMenu, selectedState, sliding
     }
     return (
         <>
-            <Grow timeout={tutorialSteps.streamerReady ? 0 : 'auto'} onEntered={() => setHasEntered(true)} onExited={() => setHasExited(true)} mountOnEnter unmountOnExit in={Boolean(handRaiseElements.length)}>
-                <CategoryContainerTopAligned style={{background: "rgb(240,240,240)"}}>
+            <Grow timeout={tutorialSteps.streamerReady ? 0 : 'auto'} onEntered={() => setHasEntered(true)}
+                  onExited={() => setHasExited(true)} mountOnEnter unmountOnExit in={Boolean(handRaiseElements.length)}>
+                <CategoryContainerTopAligned className={classes.activeHandRaiseContainer}>
                     {handRaiseElements}
                     <Button style={{margin: "auto 0 2rem 0"}} startIcon={<CloseRoundedIcon/>} variant="contained"
                             children='Deactivate Hand Raise'
+                            disabled={isStepOpen(11)}
                             onClick={() => setHandRaiseModeInactive()}/>
                 </CategoryContainerTopAligned>
             </Grow>

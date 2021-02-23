@@ -1,7 +1,7 @@
 import React from 'react';
-import Typography from "@material-ui/core/Typography";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import InfiniteScroll from "react-infinite-scroll-component";
+
+import { Typography, CircularProgress } from '@material-ui/core';
 
 const CustomInfiniteScroll = ({children, ...props}) => {
     return (

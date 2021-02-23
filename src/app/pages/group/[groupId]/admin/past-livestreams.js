@@ -3,7 +3,7 @@ import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout";
 import Page from "../../../../components/page";
 import StreamsOverview from "../../../../components/views/group/admin/streams";
 
-const PastLivestreamsPage = ({group, firebase}) => {
+const PastLivestreamsPage = ({group, firebase, isAdmin}) => {
 
     return (
         <Page title={`CareerFairy | Admin Past Streams of ${group.universityName}`}>
@@ -11,6 +11,7 @@ const PastLivestreamsPage = ({group, firebase}) => {
                 query={firebase.listenToPastLiveStreamsByGroupId}
                 group={group}
                 firebase={firebase}
+                isAdmin={isAdmin}
                 typeOfStream="past"
             />
         </Page>

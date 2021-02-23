@@ -17,9 +17,16 @@ import {
     TooltipTitle,
     WhiteTooltip
 } from "../../../../../materialUI/GlobalTooltips";
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles(theme => ({
+    pollHeader: {
+        paddingBottom: theme.spacing(2)
+    }
+}))
 
 function PollCategory({firebase, streamer, livestream, selectedState, showMenu, user, userData, sliding}) {
-
+    const classes = useStyles()
     const [addNewPoll, setAddNewPoll] = useState(false);
     const [pollEntries, setPollEntries] = useState([]);
     const [demoPolls, setDemoPolls] = useState(false);
@@ -49,7 +56,6 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
         })
         return Number(activeStep)
     }
-
 
     const pollElements = pollEntries.filter(poll => poll.state !== 'closed').map((poll, index) => {
         return (
@@ -86,7 +92,7 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
 
     return (
         <CategoryContainerTopAligned>
-            <QuestionContainerHeader>
+            <QuestionContainerHeader className={classes.pollHeader}>
                 <QuestionContainerTitle>
                     <BarChartIcon fontSize="large" color="primary"/> Polls
                 </QuestionContainerTitle>

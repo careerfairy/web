@@ -4,39 +4,29 @@ import 'styles.css';
 import FirebaseContext from 'context/firebase/FirebaseContext';
 import Firebase from 'context/firebase';
 import * as Sentry from '@sentry/browser';
-import {makeStyles, ThemeProvider} from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import config from 'react-reveal/globals';
 import DateFnsUtils from '@date-io/date-fns';
-import {createWrapper} from 'next-redux-wrapper';
 import {newStore, wrapper} from '../store';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import firebase from '../Firebase/Firebase';
-
-
 import Head from 'next/head';
-import {theme} from "../materialUI";
 import TagManager from 'react-gtm-module'
 import ErrorSnackBar from "../components/views/common/ErrorSnackBar/ErrorSnackBar";
 import ErrorContext from "../context/error/ErrorContext";
-import {SnackbarProvider} from "notistack";
 import TutorialContext from 'context/tutorials/TutorialContext';
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import {AuthProvider} from "../HOCs/AuthProvider";
 import {ReactReduxFirebaseProvider} from 'react-redux-firebase';
 import {createFirestoreInstance} from "redux-firestore";
 import {Provider} from "react-redux";
+import {ThemeProviderWrapper} from "../context/theme/ThemeContext";
+import {CssBaseline} from '@material-ui/core';
 
 
 config({ssrFadeout: true});
 
-const useStyles = makeStyles(({
-    info: {
-        background: `${theme.palette.info.contrastText} !important`,
-        color: `black !important`,
-    },
-}))
+
 
 // react-redux-firebase config
 const rrfConfig = {
@@ -54,7 +44,7 @@ const rrfProps = {
 }
 
 function MyApp({Component, pageProps}) {
-    const classes = useStyles()
+    // const classes = useStyles()
     Sentry.init({dsn: "https://6852108b71ce4fbab24839792f82fa90@sentry.io/4261031"});
 
 
@@ -111,7 +101,6 @@ function MyApp({Component, pageProps}) {
         const activeStep = getActiveTutorialStepKey()
         return Boolean(activeStep === property)
     }
-
     return (
         <Fragment>
             <Head>
@@ -121,11 +110,9 @@ function MyApp({Component, pageProps}) {
                 <ReactReduxFirebaseProvider {...rrfProps}>
                     <AuthProvider firebase={firebase}>
                         <FirebaseContext.Provider value={firebase}>
-                            <ThemeProvider theme={theme}>
+                            <ThemeProviderWrapper>
                                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                    <SnackbarProvider classes={{
-                                        variantInfo: classes.info
-                                    }} maxSnack={3}>
+
                                         <TutorialContext.Provider value={{
                                             tutorialSteps,
                                             setTutorialSteps,
@@ -148,9 +135,8 @@ function MyApp({Component, pageProps}) {
                                                                errorMessage={generalError}/>
                                             </ErrorContext.Provider>
                                         </TutorialContext.Provider>
-                                    </SnackbarProvider>
                                 </MuiPickersUtilsProvider>
-                            </ThemeProvider>
+                            </ThemeProviderWrapper>
                         </FirebaseContext.Provider>
                     </AuthProvider>
                 </ReactReduxFirebaseProvider>

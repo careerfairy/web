@@ -1,22 +1,28 @@
 import React, {useRef, useState} from 'react';
-import {makeStyles} from "@material-ui/core/styles";
-import {AppBar, CardActions, Dialog, DialogContent, fade, Slide, Zoom} from "@material-ui/core";
-import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
+import {fade, makeStyles} from "@material-ui/core/styles";
+import {
+    AppBar,
+    CardActions,
+    Dialog,
+    DialogContent,
+    Slide,
+    Zoom,
+    Toolbar,
+    IconButton,
+    Typography,
+    Button,
+    ButtonGroup,
+} from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
 import DraftStreamForm from "../../../draftStreamForm/DraftStreamForm";
 import {withFirebase} from "../../../../../context/firebase";
 import {buildLivestreamObject} from "../../../../helperFunctions/streamFormFunctions";
 import {GENERAL_ERROR, SAVE_WITH_NO_VALIDATION, SUBMIT_FOR_APPROVAL} from "../../../../util/constants";
 import SaveIcon from '@material-ui/icons/Save';
 import {useSnackbar} from "notistack";
-import AddIcon from '@material-ui/icons/Add';
 import PublishIcon from '@material-ui/icons/Publish';
 import {useRouter} from "next/router";
 import {v4 as uuidv4} from "uuid";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
@@ -83,16 +89,20 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
         onClose()
     }
 
-    const handlePublishDraft = async () => {
+    const getAuthor = (livestream) => {
+        return livestream?.author?.email ? livestream.author : {
+            email: authenticatedUser.email,
+            ...(group?.id && {groupId: group.id})
+        }
+    }
+
+    const handlePublishDraft = async (streamToPublish) => {
         if (canPublish()) {
             try {
                 formRef.current?.setSubmitting(true)
-                const newStream = {...currentStream}
+                const newStream = {...streamToPublish}
                 newStream.companyId = uuidv4()
-                const author = {
-                    groupId: group.id,
-                    email: authenticatedUser.email
-                }
+                const author = getAuthor(newStream)
                 await firebase.addLivestream(newStream, "livestreams", author)
                 await firebase.deleteLivestream(currentStream.id, "draftLivestreams")
 
@@ -139,7 +149,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
             }
 
             if (publishDraft) {
-                await handlePublishDraft()
+                await handlePublishDraft(livestream)
                 setPublishDraft(false)
                 return
             }
@@ -147,6 +157,12 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
             const targetCollection = isActualLivestream() ? "livestreams" : "draftLivestreams"
             if (updateMode) {
                 id = livestream.id
+                if (!livestream.author) {
+                    livestream.author = {
+                        groupId: group.id,
+                        email: authenticatedUser.email
+                    }
+                }
                 await firebase.updateLivestream(livestream, targetCollection)
                 console.log(`-> ${!isActualLivestream() && "Draft "}livestream was updated with id`, id);
             } else {
@@ -162,7 +178,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
             setDraftId(id)
             if (status === SAVE_WITH_NO_VALIDATION) {
                 enqueueSnackbar("You changes have been saved!", {
-                    variant: "default",
+                    variant: "success",
                     preventDuplicate: true,
                 });
                 setStatus("")
@@ -208,7 +224,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                     className={className}
                     autoFocus color="secondary"
                     onClick={handleValidate}>
-                <Typography variant={size === "large" && "h5"}>
+                <Typography variant={size === "large" ? "h5" : undefined}>
                     publish as stream
                 </Typography>
             </Button>}

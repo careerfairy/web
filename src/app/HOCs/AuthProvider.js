@@ -9,7 +9,6 @@ const AuthContext = createContext();
 const securePaths = [
     "/profile",
     "/groups",
-    "/draft-stream",
     "/group/[groupId]/admin",
     "/group/[groupId]/admin/past-livestreams",
     "/group/[groupId]/admin/upcoming-livestreams",
@@ -26,20 +25,21 @@ const adminPaths = [
 const AuthProvider = ({children}) => {
 
     const auth = useSelector((state) => state.firebase.auth)
-    // console.log("-> auth", auth);
 
     // const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'ownerObj'}]
 
     const {pathname, replace, asPath} = useRouter();
 
-    useFirestoreConnect([
-        {
-            collection: 'userData', doc: auth.email,  // or `userData/${auth.email}`
-            storeAs: "userProfile"
-        }
-    ])
+    useFirestoreConnect(() => {
+        return auth.email ? [
+            {
+                collection: 'userData', doc: auth.email,  // or `userData/${auth.email}`
+                storeAs: "userProfile",
+            }
+        ] : []
+    }, [auth.email])
 
-    const userData = useSelector(({firestore}) => firestore.data.userProfile)
+    const userData = useSelector(({firestore}) => auth.email ? firestore.data.userProfile : null)
 
     useEffect(() => {
         // Check that initial route is OK
@@ -63,6 +63,7 @@ const AuthProvider = ({children}) => {
     }
 
     const isLoggedOut = () => auth.isLoaded && auth.isEmpty
+
 
     if ((isSecurePath() || isAdminPath()) && !auth.isLoaded) {
         return <Loader/>;

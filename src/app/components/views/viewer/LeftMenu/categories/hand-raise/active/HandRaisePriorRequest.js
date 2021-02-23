@@ -1,56 +1,30 @@
 import React from 'react';
 import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
-import {Button} from "@material-ui/core";
-import Grow from "@material-ui/core/Grow";
+import { Button, Grow } from "@material-ui/core";
+import {CategoryContainerCentered, CategoryContainerContent} from "../../../../../../../materialUI/GlobalContainers";
+import {CategorySubtitle, ThemedPermanentMarker} from "../../../../../../../materialUI/GlobalTitles";
 
-function HandRaisePriorRequest(props) {
-
-    return (
-        <>
-            <Grow unmountOnExit in={Boolean(!(props.handRaiseState && props.handRaiseState.state !== 'unrequested'))}>
-                <div className='handraise-container'>
-                    <div className='central-container'>
-                        <div className='animated bounce infinite slow'>
-                            <PanToolOutlinedIcon color="primary" style={{fontSize: 40}}/>
-                        </div>
-                        <h2>Raise your hand and join the stream!</h2>
-                        <p>By raising your hand, you can request to join the stream with your computer's audio and video
-                            and ask your questions face-to-face.</p>
-                        <Button variant="contained" size='large' startIcon={<PanToolOutlinedIcon fontSize="large"/>}
-                                children='Raise my hand' onClick={() => props.updateHandRaiseRequest("requested")}
-                                color="primary"/>
+function HandRaisePriorRequest({ handRaiseState, updateHandRaiseRequest}) {
+    const shouldRender = () => Boolean(!(handRaiseState && handRaiseState.state !== 'unrequested'))
+    return shouldRender() &&(
+        <Grow unmountOnExit in>
+            <CategoryContainerCentered>
+                <CategoryContainerContent>
+                    <div className='animated bounce infinite slow'>
+                        <PanToolOutlinedIcon color="primary" style={{fontSize: 40}}/>
                     </div>
+                    <ThemedPermanentMarker>Raise your hand and join the stream!</ThemedPermanentMarker>
+                    <CategorySubtitle>By raising your hand, you can request to join the stream with your computer's
+                        audio
+                        and video
+                        and ask your questions face-to-face.</CategorySubtitle>
+                    <Button variant="contained" size='large' startIcon={<PanToolOutlinedIcon fontSize="large"/>}
+                            children='Raise my hand' onClick={() => updateHandRaiseRequest("requested")}
+                            color="primary"/>
+                </CategoryContainerContent>
 
-                </div>
-            </Grow>
-            <style jsx>{`
-                .handraise-container {
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgb(240,240,240);
-                }
-
-                .central-container {
-                    text-align: center;
-                    width: 90%;
-                    color: rgb(40,40,40);
-                }
-
-                .central-container h2 {
-                    font-family: 'Permanent Marker';
-                    font-size: 2.3em;
-                    color: rgb(0, 210, 170);
-                }
-
-                .central-container p {
-                    margin: 20px 0 30px 0;
-                }
-          `}</style>
-        </>
+            </CategoryContainerCentered>
+        </Grow>
     );
 }
 

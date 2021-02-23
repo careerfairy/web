@@ -11,21 +11,24 @@ import {
     InputLabel,
     MenuItem,
     Select,
-    TextField, useMediaQuery,
+    TextField,
+    useMediaQuery,
+    Slide,
+    Button,
+    CircularProgress,
+    FormControl,
 } from "@material-ui/core";
-import Slide from "@material-ui/core/Slide";
-import Button from "@material-ui/core/Button";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import {Formik} from "formik";
-import FormControl from "@material-ui/core/FormControl";
 import {withFirebase} from "../../../../../../../context/firebase";
 import {useTheme} from "@material-ui/core/styles";
 import {LONG_NUMBER} from "../../../../../../util/constants";
 import {getMinutes} from "../../../../../../helperFunctions/HelperFunctions";
 
 const marks = [
-    5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150, 160, 180, LONG_NUMBER
+    5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150, 160, 180
 ];
+// JUst to ensure LONG_NUMBER is always last
+marks.push(LONG_NUMBER)
 
 const FeedbackModal = ({
                            state: {open, data},
@@ -35,7 +38,6 @@ const FeedbackModal = ({
                        }) => {
     const theme = useTheme()
     const fullScreen = useMediaQuery(theme.breakpoints.down("xs"))
-
 
 
     const isForEnd = (appearAfter) => {
@@ -142,6 +144,8 @@ const FeedbackModal = ({
                                             handleChange(e)
                                             if (isForEnd(e.target.value)) {
                                                 setFieldValue("isForEnd", true)
+                                            } else if (values.isForEnd) {
+                                                setFieldValue("isForEnd", false)
                                             }
                                         }}
                                         value={values.appearAfter}
@@ -177,33 +181,33 @@ const FeedbackModal = ({
                                     <FormControlLabel
                                         control={
                                             <Checkbox
-                                                onChange={(e) => handleChange(e)}
-                                                checked={Boolean(values.noStars)}
+                                                onChange={() => setFieldValue("noStars", !values.noStars)}
+                                                checked={!values.noStars}
                                                 name="noStars"
                                                 color="primary"
                                             />
                                         }
-                                        label="Disable Star Rating"
+                                        label="Enable Star Rating"
                                     />
                                     <FormHelperText>{errors.noStars}</FormHelperText>
                                 </FormControl>
                             </Box>
-                            <Box marginY={2}>
-                                <FormControl disabled={isForEnd(values.appearAfter)} variant="outlined" fullWidth
-                                             required>
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                onChange={(e) => handleChange(e)}
-                                                checked={Boolean(values.isForEnd)}
-                                                name="isForEnd"
-                                                color="primary"
-                                            />
-                                        }
-                                        label="Prompt Question When Stream Ends"
-                                    />
-                                </FormControl>
-                            </Box>
+                            {/*<Box marginY={2}>*/}
+                            {/*    <FormControl disabled={isForEnd(values.appearAfter)} variant="outlined" fullWidth*/}
+                            {/*                 required>*/}
+                            {/*        <FormControlLabel*/}
+                            {/*            control={*/}
+                            {/*                <Checkbox*/}
+                            {/*                    onChange={(e) => handleChange(e)}*/}
+                            {/*                    checked={Boolean(values.isForEnd)}*/}
+                            {/*                    name="isForEnd"*/}
+                            {/*                    color="primary"*/}
+                            {/*                />*/}
+                            {/*            }*/}
+                            {/*            label="Prompt Question When Stream Ends"*/}
+                            {/*        />*/}
+                            {/*    </FormControl>*/}
+                            {/*</Box>*/}
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleClose}>Cancel</Button>

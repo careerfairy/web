@@ -1,7 +1,6 @@
 import React from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import Chip from '@material-ui/core/Chip';
-import {TextField} from '@material-ui/core'
+import { TextField, Chip } from '@material-ui/core';
 import {handleAddTargetCategories} from "../../../helperFunctions/streamFormFunctions";
 
 
@@ -62,7 +61,7 @@ const MultiGroupSelect = (
                         <Chip variant="default"
                               label={option.universityName}
                               {...getTagProps({index})}
-                              disabled={option.groupId === groupId}
+                              disabled={(option.groupId === groupId) || isNotAdmin}
                         />
                     )
                 )

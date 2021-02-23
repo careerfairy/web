@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {Card, makeStyles, useTheme} from '@material-ui/core';
+import {Card} from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
 import {
     defaultTableOptions,
@@ -12,7 +12,7 @@ import {
 } from "../../common/TableUtils";
 import MaterialTable from "material-table";
 import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
-import {fade} from "@material-ui/core/styles";
+import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
 
 
 const useStyles = makeStyles((theme) => ({

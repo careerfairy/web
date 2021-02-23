@@ -1,10 +1,8 @@
 import React, {forwardRef, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {getMinutes, prettyDate} from "../../../../../helperFunctions/HelperFunctions";
-import Tooltip from "@material-ui/core/Tooltip";
-import Typography from "@material-ui/core/Typography";
 import {Rating} from "@material-ui/lab";
-import {Box} from "@material-ui/core";
+import { Box, Tooltip, Typography } from "@material-ui/core";
 import {CsvBuilder} from "filefy";
 
 import AddBox from '@material-ui/icons/AddBox';

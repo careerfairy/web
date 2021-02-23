@@ -1,9 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import {Button, Typography} from "@material-ui/core";
-import Grid from "@material-ui/core/Grid";
+import { Button, Typography, Grid, TextField } from "@material-ui/core";
 import NewGroup from "../profile/NewGroup";
 import {Fade} from 'react-reveal';
-import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';

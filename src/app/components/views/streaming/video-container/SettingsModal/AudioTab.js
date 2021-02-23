@@ -18,7 +18,8 @@ import { useAudio } from 'components/custom-hook/useAudio';
 
 const useStyles = makeStyles(theme => ({
     button: {
-        height: "100%"
+        marginTop: 10,
+        marginBottom: 10,
     },
     warning: {
         display: "flex",
@@ -29,7 +30,6 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         justifyContent: "center",
         marginBottom: 5,
-        width: "100%",
         "& .MuiButton-root": {
             margin: "0 5px"
         }

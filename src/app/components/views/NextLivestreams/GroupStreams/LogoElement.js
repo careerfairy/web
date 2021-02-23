@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
-import { Button, makeStyles} from "@material-ui/core";
+import { Button} from "@material-ui/core";
+import { makeStyles} from "@material-ui/core/styles";
 import GroupJoinModal from "../../profile/GroupJoinModal";
 import {useRouter} from "next/router";
 
@@ -11,11 +12,11 @@ const useStyles = makeStyles(theme => ({
         flexDirection: "column"
     },
     logoImage: {
-        // minWidth: "90",
-        // height: "auto",
+        maxWidth: "100%",
         maxHeight: "90%"
     },
     imageWrapper: {
+        width: 100,
         height: 50,
         display: "flex",
         alignItems: "center",

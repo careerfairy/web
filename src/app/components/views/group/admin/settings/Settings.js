@@ -2,11 +2,9 @@ import React, {Fragment, useState, useEffect} from 'react';
 import {withFirebase} from 'context/firebase';
 import CategoryElement from 'components/views/group/admin/settings/Category/CategoryElement';
 import CategoryEdit from "./Category/CategoryEdit";
-import CircularProgress from '@material-ui/core/CircularProgress';
 import EditIcon from '@material-ui/icons/Edit';
-import {Button, Typography} from "@material-ui/core";
+import { Button, Typography, CircularProgress, TextField } from "@material-ui/core";
 import AddIcon from '@material-ui/icons/Add';
-import TextField from "@material-ui/core/TextField";
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({

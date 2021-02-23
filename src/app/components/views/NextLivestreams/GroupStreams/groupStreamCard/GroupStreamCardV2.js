@@ -1,23 +1,22 @@
 import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from "context/firebase";
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, fade} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
 import {
-    Avatar,
-    Box,
     Button,
     Chip,
     ClickAwayListener,
     Collapse,
-    fade,
     Fade,
     Grow,
-    Paper
+    Paper,
+    Typography,
+    Avatar,
+    Box,
 } from "@material-ui/core";
 import {AvatarGroup} from "@material-ui/lab";
 import Streamers from "./Streamers";
 import Wave from "./Wave";
-import Typography from "@material-ui/core/Typography";
 import LogoElement from "../LogoElement";
 import TargetOptions from "../../GroupsCarousel/TargetOptions";
 import UserUtil from "../../../../../data/util/UserUtil";
@@ -34,6 +33,7 @@ import CopyToClipboard from "../../../common/CopyToClipboard";
 import LogosPlaceHolder from "./LogosPlaceholder";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
 import {dynamicSort} from "../../../../helperFunctions/HelperFunctions";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => {
     const paperColor = theme.palette.background.paper
@@ -87,7 +87,7 @@ const useStyles = makeStyles((theme) => {
             alignItems: "center",
             justifyContent: "center",
             borderRadius: ({cardHovered}) => cardHovered && `${theme.spacing(2)}px 0px`,
-            background: fade(paperColor, 1),
+            background: fade(theme.palette.common.white, 1),
             boxShadow: ({cardHovered}) => cardHovered && theme.shadows[24]
         },
         dateTimeWrapper: {
@@ -163,20 +163,27 @@ const useStyles = makeStyles((theme) => {
             zIndex: 1,
         },
         companyLogosFrontWrapper: {
-            boxShadow: ({isExpanded}) => isExpanded && theme.shadows[24],
-            background: "white",
+            boxShadow: ({isExpanded}) => isExpanded && theme.shadows[3],
+            background: theme.palette.common.white,
             padding: theme.spacing(1),
             display: "flex",
-            justifyContent: "space-evenly",
+            justifyContent: "space-between",
             width: "100%",
             borderRadius: "inherit",
             flex: ({mobile}) => mobile && 1,
-            maxHeight: 125
+            maxHeight: 125,
         },
-
+        logosFrontInnerWrapper:{
+            width: "inherit",
+            overflow: "auto",
+            display: "flex",
+            overflowY: "hidden",
+            justifyContent: "space-between"
+        },
         optionsWrapper: {
             overflowX: 'hidden',
             overflowY: 'auto',
+            padding: theme.spacing(1)
         },
         expandedOptionsWrapper: {
             overflowX: 'hidden',
@@ -228,16 +235,17 @@ const useStyles = makeStyles((theme) => {
         logosBackWrapper: {
             display: "flex",
             width: "100%",
-            background: paperColor,
+            background: theme.palette.common.white,
             overflowX: "auto",
             overflowY: "hidden",
+            justifyContent: "space-between"
         },
         logoElement: {
             display: "flex",
             alignItems: "center",
             margin: "0 auto",
             padding: `${theme.spacing(1)}px ${theme.spacing(0.5)}px`,
-            height: ({cardHovered}) => !cardHovered && 90
+            height: ({cardHovered}) => !cardHovered && 90,
         },
         backgroundImage: {
             position: "absolute",
@@ -317,7 +325,7 @@ const useStyles = makeStyles((theme) => {
             background: ({pendingApproval}) => pendingApproval ? theme.palette.primary.main : theme.palette.warning.main,
             wordWrap: "break-word",
             maxWidth: theme.spacing(20),
-            height:"auto",
+            height: "auto",
             opacity: 0.8
         },
 
@@ -356,7 +364,9 @@ const GroupStreamCardV2 = memo(({
                                     groupData,
                                     listenToUpcoming,
                                     hasCategories,
+                                    className,
                                     index,
+                                    isTargetDraft,
                                     width,
                                     setGlobalCardHighlighted,
                                     globalCardHighlighted,
@@ -373,7 +383,7 @@ const GroupStreamCardV2 = memo(({
     const linkToStream = listenToUpcoming ? `/next-livestreams?livestreamId=${livestream.id}` : `/next-livestreams?careerCenterId=${groupData.groupId}&livestreamId=${livestream.id}`
 
     function userIsRegistered() {
-        if (!user || !livestream.registeredUsers || isAdmin) {
+        if (user.isLoaded && user.isEmpty || !livestream.registeredUsers || isAdmin) {
             return false;
         }
         return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1)
@@ -411,7 +421,7 @@ const GroupStreamCardV2 = memo(({
     useEffect(() => {
         if (checkIfHighlighted() && !isHighlighted) {
             setIsHighlighted(true)
-            setGlobalCardHighlighted(true)
+            setGlobalCardHighlighted?.(true)
             if (mobile) {
                 setExpanded(true)
             } else {
@@ -474,19 +484,20 @@ const GroupStreamCardV2 = memo(({
 
     const handleMouseLeft = () => {
         if (isHighlighted) {
-            setGlobalCardHighlighted(false)
+            setGlobalCardHighlighted?.(false)
         }
         cardHovered && setCardHovered(false)
     }
 
     const checkIfHighlighted = () => {
-        if (careerCenterId && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId) {
+        if (isTargetDraft) return true
+        if ((careerCenterId) && livestreamId && id && livestreamId === id && groupData.groupId === careerCenterId) {
             return true
         } else return livestreamId && !careerCenterId && !groupData.id && livestreamId === id;
     }
 
     const checkIfUserFollows = (careerCenter) => {
-        if (user && userData && userData.groupIds) {
+        if (user.isLoaded && !user.isEmpty && userData && userData.groupIds) {
             const {groupId} = careerCenter
             return userData.groupIds.includes(groupId)
         } else {
@@ -495,7 +506,7 @@ const GroupStreamCardV2 = memo(({
     }
 
     function deregisterFromLivestream() {
-        if (!user) {
+        if (user.isLoaded && user.isEmpty) {
             return router.push({
                 pathname: '/login',
                 query: {absolutePath}
@@ -506,7 +517,7 @@ const GroupStreamCardV2 = memo(({
     }
 
     async function startRegistrationProcess() {
-        if (!user || !user.emailVerified) {
+        if (user.isLoaded && user.isEmpty || !user.emailVerified) {
             return router.push({
                 pathname: `/login`,
                 query: {absolutePath: linkToStream},
@@ -519,7 +530,10 @@ const GroupStreamCardV2 = memo(({
                 query: "profile"
             });
         }
-        const {hasAgreedToAll, groupsWithPolicies} = await GroupsUtil.getPolicyStatus(careerCenters, user.email, firebase)
+        const {
+            hasAgreedToAll,
+            groupsWithPolicies
+        } = await GroupsUtil.getPolicyStatus(careerCenters, user.email, firebase)
         if (!hasAgreedToAll) {
             setOpenJoinModal(true)
             setGroupsWithPolicies(groupsWithPolicies)
@@ -607,12 +621,10 @@ const GroupStreamCardV2 = memo(({
         return Boolean((width === "md" && hasCategories) || isAdmin)
     }
 
-    const handlePulseFront = () => {
-        return isHighlighted && !cardHovered && classes.pulseAnimate
-    }
-    const handlePulseBackground = () => {
-        return isHighlighted && cardHovered && classes.pulseAnimate
-    }
+
+    const shouldPulseBackground = () => isHighlighted && cardHovered
+    const shouldPulseForeground = () => isHighlighted && !cardHovered
+
 
     let logoElements = careerCenters.map(careerCenter => {
         return (
@@ -645,12 +657,14 @@ const GroupStreamCardV2 = memo(({
         <Fragment>
             <ClickAwayListener onClickAway={handleClickAwayDetails}>
                 <div
-                    className={classes.root}>
+                    className={clsx(classes.root, className)}>
                     <Box
                         onMouseEnter={handleMouseEntered}
                         onMouseLeave={handleMouseLeft}
                         classes={{
-                            root: handlePulseFront()
+                            root: clsx({
+                                [classes.pulseAnimate]: shouldPulseForeground()
+                            })
                         }}
                         className={classes.streamCard}>
                         <Paper
@@ -658,11 +672,11 @@ const GroupStreamCardV2 = memo(({
                             className={classes.front}>
                             {isDraft &&
                             <Chip className={classes.statusChip} color="primary"
-                                   label={
-                                       <Typography style={{whiteSpace: 'normal', fontWeight: "bold"}} variant="body1">
-                                           {isPending() ? "Pending Approval" : "Work In Progress"}
-                                       </Typography>
-                                   }/>}
+                                  label={
+                                      <Typography style={{whiteSpace: 'normal', fontWeight: "bold"}} variant="body1">
+                                          {isPending() ? "Pending Approval" : "Work In Progress"}
+                                      </Typography>
+                                  }/>}
                             {!cardHovered &&
                             <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
                                  alt="background"/>}
@@ -682,7 +696,7 @@ const GroupStreamCardV2 = memo(({
                                         </Typography>
                                     </div>
                                 </Grow>
-                                {mobile &&
+                                {(mobile && !isDraft) &&
                                 <CopyToClipboard
                                     color={cardHovered && "white"}
                                     className={classes.copyToClipBoard}
@@ -756,7 +770,9 @@ const GroupStreamCardV2 = memo(({
                                         </div>}
                                         <Fade in={Boolean(logoElements.length)}>
                                             <div className={classes.companyLogosFrontWrapper}>
-                                                {fetchingCareerCenters ? <LogosPlaceHolder/> : logoElements}
+                                                <div className={classes.logosFrontInnerWrapper}>
+                                                    {fetchingCareerCenters ? <LogosPlaceHolder/> : logoElements}
+                                                </div>
                                             </div>
                                         </Fade>
                                     </>
@@ -768,14 +784,18 @@ const GroupStreamCardV2 = memo(({
                             <Box
                                 className={classes.background}
                                 classes={{
-                                    root: handlePulseBackground()
+                                    root: clsx({
+                                        [classes.pulseAnimate]: shouldPulseBackground()
+                                    })
                                 }}>
                                 <img className={classes.backgroundImage} src={livestream.backgroundImageUrl}
                                      alt="background"/>
+                                {!isDraft &&
                                 <CopyToClipboard
+                                    text="Copy Link"
                                     color="white"
                                     className={classes.copyToClipBoard}
-                                    value={linkToStream}/>
+                                    value={linkToStream}/>}
                                 {!hideActions && <div className={classes.buttonsWrapper}>
                                     <DetailsButton
                                         groupData={groupData}

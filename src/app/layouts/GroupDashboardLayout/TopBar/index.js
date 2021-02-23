@@ -1,22 +1,16 @@
-import React, {useState} from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {
-    AppBar,
-    Badge,
-    Box,
-    Hidden,
-    IconButton,
-    Toolbar,
-    makeStyles
-} from '@material-ui/core';
+import {AppBar, Badge, Box, Hidden, IconButton, Tab, Tabs, Toolbar, Tooltip} from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
-import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
+import NotificationIcon from '@material-ui/icons/NotificationsOutlined';
+import ActiveNotificationIcon from '@material-ui/icons/Notifications';
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
-import Link from '../../materialUI/NextNavLink'
-import {MainLogo, MiniLogo} from "../../components/logos";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
+import Link from '../../../materialUI/NextNavLink'
+import {MainLogo, MiniLogo} from "../../../components/logos";
+import {makeStyles} from "@material-ui/core/styles"
+import {maybePluralize} from "../../../components/helperFunctions/HelperFunctions";
+import Notifications from "./Notifications";
 
 const useStyles = makeStyles((theme) => ({
     avatar: {
@@ -66,10 +60,17 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const TopBar = ({className,notifications,setNotifications, links, onMobileNavOpen, ...rest}) => {
+const TopBar = ({className, notifications, links, onMobileNavOpen, ...rest}) => {
     const classes = useStyles();
+    const [notificationAnchor, setNotificationAnchor] = React.useState(null);
 
+    const handleClick = (event) => {
+        setNotificationAnchor(event.currentTarget);
+    };
 
+    const handleClose = () => {
+        setNotificationAnchor(null);
+    };
 
     return (
         <AppBar elevation={1} className={clsx(classes.root, className)} {...rest}>
@@ -94,18 +95,24 @@ const TopBar = ({className,notifications,setNotifications, links, onMobileNavOpe
                         })}
                     </Tabs>
                 </Hidden>
-                <Hidden mdDown>
-                    <Box>
-                        {/* TODO : add notifications when companies submit drafts */}
-                        {/*<IconButton color="inherit">*/}
-                        {/*    <Badge*/}
-                        {/*        badgeContent={notifications.length}*/}
-                        {/*        color="primary"*/}
-                        {/*        variant="dot"*/}
-                        {/*    >*/}
-                        {/*        <NotificationsIcon/>*/}
-                        {/*    </Badge>*/}
-                        {/*</IconButton>*/}
+                <Box>
+                    <Tooltip
+                        title={`You have ${notifications.length} unread ${maybePluralize(notifications.length, "notification")}`}>
+                        <IconButton onClick={handleClick} color="inherit">
+                            <Badge
+                                badgeContent={notifications.length}
+                                color="secondary"
+                            >
+                                {notificationAnchor ? <ActiveNotificationIcon/> : <NotificationIcon/>}
+                            </Badge>
+                        </IconButton>
+                    </Tooltip>
+                    <Notifications
+                        notifications={notifications}
+                        handleClose={handleClose}
+                        anchorEl={notificationAnchor}
+                    />
+                    <Hidden mdDown>
                         <IconButton
                             component={Link}
                             className={classes.navIconButton}
@@ -113,13 +120,13 @@ const TopBar = ({className,notifications,setNotifications, links, onMobileNavOpe
                         >
                             <AccountCircleOutlinedIcon/>
                         </IconButton>
-                    </Box>
-                </Hidden>
-                <Hidden lgUp>
-                    <IconButton color="inherit" onClick={onMobileNavOpen}>
-                        <MenuIcon/>
-                    </IconButton>
-                </Hidden>
+                    </Hidden>
+                    <Hidden lgUp>
+                        <IconButton color="inherit" onClick={onMobileNavOpen}>
+                            <MenuIcon/>
+                        </IconButton>
+                    </Hidden>
+                </Box>
             </Toolbar>
         </AppBar>
     );

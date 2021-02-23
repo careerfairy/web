@@ -10,7 +10,8 @@ import {
     Grid,
     Switch,
     TextField,
-    Typography
+    Typography,
+    Fab,
 } from "@material-ui/core";
 import {Formik} from 'formik';
 import {v4 as uuidv4} from 'uuid';
@@ -24,7 +25,6 @@ import MultiGroupSelect from "./MultiGroupSelect/MultiGroupSelect";
 import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect";
 import {useRouter} from "next/router";
 import FormGroup from "./FormGroup";
-import Fab from "@material-ui/core/Fab";
 import ErrorContext from "../../../context/error/ErrorContext";
 import {
     buildLivestreamObject,
@@ -261,6 +261,11 @@ const NewLivestreamForm = ({firebase}) => {
             let id
             if (updateMode) {
                 id = livestream.id
+                if(!livestream.author){
+                    livestream.author = {
+                        email: authenticatedUser.email
+                    }
+                }
                 await firebase.updateLivestream(livestream, "livestreams")
             } else {
                 const author = {
@@ -286,7 +291,7 @@ const NewLivestreamForm = ({firebase}) => {
     const hasPermissionToEdit = (arrayOfGroups) => {
         return Boolean(
             userData.isAdmin
-            || arrayOfGroups.some(group => group.adminEmail === authenticatedUser?.email
+            || arrayOfGroups.some(group => group.adminEmails.includes(authenticatedUser?.email)
             ))
     }
     const hasPermissionToCreate = () => {
@@ -294,7 +299,7 @@ const NewLivestreamForm = ({firebase}) => {
     }
 
     const isAuthenticating = () => {
-        return Boolean(authenticatedUser === undefined)
+        return Boolean(!authenticatedUser.isLoaded && authenticatedUser.isEmpty)
     }
 
 
@@ -374,7 +379,7 @@ const NewLivestreamForm = ({firebase}) => {
                                 label="Logo"
                                 handleBlur={handleBlur}
                                 formName="companyLogoUrl"
-                                isSuperAdmin={userData.isAdmin}
+                                isSuperAdmin={userData?.isAdmin}
                                 value={values.companyLogoUrl}
                                 options={existingLogos}
                                 loading={fetchingLogos}
@@ -520,7 +525,6 @@ const NewLivestreamForm = ({firebase}) => {
                                 handleBlur={handleBlur}
                                 values={values}
                                 isSuperAdmin={userData.isAdmin}
-                                adminEmail={userData.userEmail}
                                 isSubmitting={isSubmitting}
                                 selectedGroups={selectedGroups}
                                 setTargetCategories={setTargetCategories}

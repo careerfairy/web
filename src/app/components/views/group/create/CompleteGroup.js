@@ -1,6 +1,14 @@
 import React, { useState} from 'react'
-import {Box, Button, Card, CardContent, CardMedia, Container, Typography} from "@material-ui/core";
-import CircularProgress from '@material-ui/core/CircularProgress';
+import {
+    Box,
+    Button,
+    Card,
+    CardContent,
+    CardMedia,
+    Container,
+    Typography,
+    CircularProgress,
+} from "@material-ui/core";
 import {makeStyles} from '@material-ui/core/styles';
 import DisplayCategoryElement from "./DisplayCategoryElement";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";

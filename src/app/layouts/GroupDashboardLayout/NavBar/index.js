@@ -1,14 +1,16 @@
 import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
-import {Avatar, Box, Divider, Drawer, Hidden, List, makeStyles, Typography} from '@material-ui/core';
+import {Avatar, Box, Divider, Drawer, Hidden, List, Typography} from '@material-ui/core';
 import {LogOut as LogoutIcon} from 'react-feather';
 import NavItem from './NavItem';
 import {useRouter} from "next/router";
-import {theme} from "../../../materialUI";
-import {fade} from "@material-ui/core/styles";
+import {fade, makeStyles} from "@material-ui/core/styles";
 import clsx from "clsx";
+import * as actions from "../../../store/actions";
+import {compose} from "redux";
+import {connect} from "react-redux";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
     mobileDrawer: {
         width: 256,
     },
@@ -45,7 +47,15 @@ const useStyles = makeStyles(() => ({
 
 }));
 
-const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, drawerBottomLinks, firebase}) => {
+const NavBar = ({
+                    onMobileClose,
+                    openMobile,
+                    group,
+                    drawerTopLinks,
+                    headerLinks,
+                    drawerBottomLinks,
+                    logout
+                }) => {
     const classes = useStyles();
     const {pathname} = useRouter()
     useEffect(() => {
@@ -55,7 +65,7 @@ const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, 
     }, [pathname]);
 
     const signOut = () => {
-        firebase.doSignOut()
+        logout()
     }
 
 
@@ -100,6 +110,7 @@ const NavBar = ({onMobileClose, openMobile, group, drawerTopLinks, headerLinks, 
                             key={item.title}
                             title={item.title}
                             icon={item.icon}
+                            basePath={item.basePath}
                         />
                     ))}
                 </List>
@@ -175,4 +186,13 @@ NavBar.defaultProps = {
     openMobile: false
 };
 
-export default NavBar;
+const mapDispatchToProps = {
+    logout: actions.signOut,
+}
+
+
+const enhance = compose(
+    connect(null, mapDispatchToProps)
+)
+
+export default enhance(NavBar);

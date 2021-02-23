@@ -1,11 +1,8 @@
 import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import {
-    Button,
-    ListItem,
-    makeStyles
-} from '@material-ui/core';
+import {Button, ListItem,} from '@material-ui/core';
+import {makeStyles} from '@material-ui/core/styles';
 import {useRouter} from "next/router";
 import Link from '../../../materialUI/NextNavLink'
 
@@ -52,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
 
 const NavItem = ({
                      className,
+                     basePath,
                      href,
                      icon: Icon,
                      title,
@@ -59,7 +57,7 @@ const NavItem = ({
                      ...rest
                  }) => {
     const classes = useStyles();
-    const {asPath} = useRouter()
+    const {pathname} = useRouter()
 
     return (
         <ListItem
@@ -70,7 +68,9 @@ const NavItem = ({
             <Button
                 href={href}
                 component={Link}
-                className={classes.button}
+                className={clsx(classes.button, {
+                    ["active"]: basePath === pathname
+                })}
             >
                 {svgIcon ?
                     <div className={classes.icon}>

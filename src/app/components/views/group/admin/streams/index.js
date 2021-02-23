@@ -1,14 +1,15 @@
 import React, {Fragment, useEffect, useState} from "react";
 import {makeStyles} from "@material-ui/core/styles";
-import {Box, CircularProgress, Container, Grid,} from "@material-ui/core";
+import {Box, CircularProgress, Container, Grid, Typography} from "@material-ui/core";
 import usePagination from '@itsfaqih/usepagination';
 import {Pagination} from "@material-ui/lab";
-import Typography from "@material-ui/core/Typography";
 import StreamsToolbar from "./StreamsToolbar";
 import {useSnackbar} from "notistack";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import GroupStreamCardV2 from "../../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2";
 import NewStreamModal from "./NewStreamModal";
+import {useRouter} from "next/router";
+import {repositionElement} from "../../../../helperFunctions/HelperFunctions";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -19,10 +20,12 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         flexDirection: "column"
     },
-
+    streamCard: {
+    },
+    highlighted: {}
 }));
 
-const Index = ({group, typeOfStream, query}) => {
+const Index = ({group, typeOfStream, query, isAdmin}) => {
     const classes = useStyles();
     const {userData, authenticatedUser} = useAuth();
     const {enqueueSnackbar} = useSnackbar()
@@ -33,6 +36,7 @@ const Index = ({group, typeOfStream, query}) => {
     const [searchParams, setSearchParams] = useState('');
     const [fetching, setFetching] = useState(false);
     const [currentStream, setCurrentStream] = useState(null);
+    const {query: {livestreamId}} = useRouter()
 
     useEffect(() => {
         if (group?.id) {
@@ -40,13 +44,23 @@ const Index = ({group, typeOfStream, query}) => {
             const unsubscribe = query(group.id,
                 (querySnapshot) => {
                     const streamsData = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                    if (livestreamId && typeOfStream === "draft") {
+                        const currentIndex = streamsData.findIndex(
+                            (el) => el.id === livestreamId
+                        );
+                        if (currentIndex > -1) {
+                            if (isTargetDraft(streamsData[currentIndex])) {
+                                repositionElement(streamsData, currentIndex, 0);
+                            }
+                        }
+                    }
                     setUpcomingStreams(streamsData)
                     setFilteredStreams(streamsData)
                     setFetching(false)
                 })
             return () => unsubscribe()
         }
-    }, [])
+    }, [livestreamId])
 
     const onPageChange = (event, number) => {
         action.goTo(number)
@@ -93,6 +107,7 @@ const Index = ({group, typeOfStream, query}) => {
             handleOpenNewStreamModal()
         }
     }
+    const isTargetDraft = (livestream) => isAdmin && (typeOfStream === "draft") && livestream.id === livestreamId
 
 
     const handleFilter = () => {
@@ -107,11 +122,14 @@ const Index = ({group, typeOfStream, query}) => {
                     || speaker.lastName.toLowerCase().indexOf(searchParams.toLowerCase()) >= 0)
             )
         })
+        // Reset back to page one on a new search
+        action.goTo(1)
         setFilteredStreams(newFilteredStreams)
     }
 
 
     const livestreamElements = page.data.map((livestream) => {
+
         return (
             <Grid
                 style={{height: 500}}
@@ -126,15 +144,18 @@ const Index = ({group, typeOfStream, query}) => {
                 <GroupStreamCardV2
                     mobile
                     isAdmin
+                    id={livestream.id}
                     handleEditStream={handleEditStream}
                     isDraft={typeOfStream === "draft"}
                     hideActions
+                    isTargetDraft={isTargetDraft(livestream)}
+                    className={classes.streamCard}
                     user={authenticatedUser}
                     livestream={livestream}
                     isPastLivestream={typeOfStream === "past"}
                     groupData={group}
                     userData={userData}
-                    livestreamId={livestream.id}
+                    livestreamId={livestreamId}
                 />
             </Grid>
         );
@@ -147,6 +168,7 @@ const Index = ({group, typeOfStream, query}) => {
                     handleSubmit={handleSubmit}
                     onChange={onSearch}
                     group={group}
+                    isAdmin={isAdmin}
                     openNewStreamModal={openNewStreamModal}
                     handleOpenNewStreamModal={handleOpenNewStreamModal}
                     value={searchParams}

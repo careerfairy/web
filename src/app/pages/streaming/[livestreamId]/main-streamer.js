@@ -1,4 +1,4 @@
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {useEffect, useState} from 'react';
 import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import {withFirebasePage} from 'context/firebase';
@@ -12,9 +12,30 @@ import NotificationsContainer from 'components/views/streaming/notifications-con
 import NotificationsContext from 'context/notifications/NotificationsContext';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import LeftMenu from "../../../components/views/streaming/LeftMenu/LeftMenu";
-import {Button, Tooltip} from "@material-ui/core";
-import { StandartTooltip, TooltipTitle, TooltipText, TooltipButtonComponent } from 'materialUI/GlobalTooltips';
+import {
+    Badge,
+    Button,
+    Hidden,
+    Tooltip,
+    AppBar,
+    Toolbar,
+    Box,
+    Checkbox,
+    useMediaQuery,
+    Typography,
+    IconButton,
+} from "@material-ui/core";
+import {StandartTooltip, TooltipButtonComponent, TooltipText, TooltipTitle} from 'materialUI/GlobalTooltips';
 import PreparationOverlay from 'components/views/streaming/preparation-overlay/PreparationOverlay';
+import {MainLogo, MiniLogo} from "../../../components/logos";
+import Brightness4Icon from "@material-ui/icons/Brightness4";
+import Brightness7Icon from "@material-ui/icons/Brightness7";
+import PlayCircleFilledWhiteIcon from '@material-ui/icons/PlayCircleFilledWhite';
+import StopIcon from '@material-ui/icons/Stop';
+import PeopleIcon from '@material-ui/icons/People';
+import {useThemeToggle} from "../../../context/theme/ThemeContext";
+import { useFirestoreConnect } from 'react-redux-firebase';
+import Loader from 'components/views/loader/Loader';
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {
@@ -25,7 +46,8 @@ const useStyles = makeStyles((theme) => ({
         top: 55,
         left: 0,
         bottom: 0,
-        zIndex: 20
+        zIndex: 20,
+        boxShadow: theme.shadows[7]
     },
     blackFrame: {
         left: ({showMenu}) => showMenu ? 280 : 0,
@@ -42,20 +64,62 @@ const useStyles = makeStyles((theme) => ({
     typography: {
         padding: theme.spacing(2),
     },
+    toolbar: {
+        minHeight: 55,
+        display: "flex",
+        justifyContent: "space-between"
+    },
+    viewCount: {
+        // background: theme.palette.primary.main,
+        color: theme.palette.primary.main,
+        padding: theme.spacing(1),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    viewCountText: {
+        fontWeight: 600,
+        marginLeft: theme.spacing(0.5)
+    },
+    streamStatusText: {
+        fontWeight: 600,
+        color: ({hasStarted}) => hasStarted ? theme.palette.primary.main : theme.palette.warning.main
+    },
+    miniChatContainer: {
+        position: "absolute",
+        bottom: "0",
+        right: "120px",
+        width: "20%",
+        minWidth: "250px",
+        zIndex: 100
+    },
+    iconsContainer: {
+        position: "absolute",
+        bottom: "50px",
+        right: "100px",
+        zIndex: 100,
+        width: "80px"
+    }
 }));
 
 function StreamingPage(props) {
     const theme = useTheme()
-
+    const {toggleTheme, themeMode} = useThemeToggle()
+    const mobile = useMediaQuery(theme.breakpoints.down('md'))
     const router = useRouter();
     const livestreamId = router.query.livestreamId;
+    const token = router.query.token;
 
     const [streamerReady, setStreamerReady] = useState(false);
+    const [tokenChecked, setTokenChecked] = useState(false);
 
     const [currentLivestream, setCurrentLivestream] = useState(false);
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
     const [showMenu, setShowMenu] = useState(true);
-    const classes = useStyles({showMenu})
+    const classes = useStyles({
+        showMenu,
+        hasStarted: currentLivestream.hasStarted
+    })
 
     const [newNotification, setNewNotification] = useState(null);
     const [notificationToRemove, setNotificationToRemove] = useState(null);
@@ -103,6 +167,27 @@ function StreamingPage(props) {
     }, [notificationToRemove]);
 
     useEffect(() => {
+        if (router && router.query && currentLivestream && !currentLivestream.test) {
+            if (!token) {
+                router.push('/streaming/error')
+
+            } else {
+                props.firebase.getLivestreamSecureToken(currentLivestream.id).then( doc => {
+                    if (!doc.exists) {
+                        router.push('/streaming/error')
+                    }
+                    let storedToken = doc.data().value;
+                    if (storedToken !== token) {
+                        router.push('/streaming/error')
+                    } else {
+                        setTokenChecked(true);
+                    }
+                })
+            }
+        }
+    }, [router, token, currentLivestream]);
+
+    useEffect(() => {
         if (currentLivestream.start) {
             let interval = setInterval(() => {
                 if (dateIsInUnder2Minutes(currentLivestream.start.toDate())) {
@@ -125,170 +210,174 @@ function StreamingPage(props) {
         setShowMenu(!showMenu)
     }
 
-    if (!streamerReady) {
+    const tokenIsValidated = () => {
+        if (currentLivestream.test) {
+            return true;
+        } else {
+            return tokenChecked;
+        }
+    }
+
+    if (!currentLivestream || !tokenIsValidated()) {
+        return <Loader />
+    }
+
+    if (!streamerReady && tokenIsValidated()) {
         return (
-            <PreparationOverlay livestream={currentLivestream} setStreamerReady={setStreamerReady}/>
+            <PreparationOverlay
+                livestream={currentLivestream}
+                streamerUuid={currentLivestream.id}
+                setStreamerReady={setStreamerReady}
+            />
         )
     }
 
     return (
-            <NotificationsContext.Provider value={{setNewNotification, setNotificationToRemove}}>
-                <div>
-                    <div className={'top-menu ' + (currentLivestream.hasStarted ? 'active' : '')}>
-                        <div style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '20px',
-                            transform: 'translateY(-50%)',
-                            verticalAlign: 'middle'
-                        }}>
-                            <StandartTooltip
-                                arrow
-                                open={!streamStartTimeIsNow && !hideTooltip}
-                                interactive
-                                placement='bottom'
-                                title={
-                                    <React.Fragment>
-                                        <TooltipTitle>Start Streaming</TooltipTitle>
-                                        <TooltipText>
-                                            The Start Streaming button will become active 2 minutes before the stream's official start time.
-                                        </TooltipText>
-                                        <TooltipButtonComponent onConfirm={() => setHideTooltip(true)} buttonText="Ok"/>
-                                    </React.Fragment>
-                                }
-                                >
+        <NotificationsContext.Provider value={{setNewNotification, setNotificationToRemove}}>
+            <div>
+                <AppBar elevation={1} color="transparent">
+                    <Toolbar className={classes.toolbar}>
+                        <Hidden smDown>
+                            <MainLogo/>
+                        </Hidden>
+                        <Hidden mdUp>
+                            <MiniLogo/>
+                        </Hidden>
+                        <StandartTooltip
+                            arrow
+                            open={!streamStartTimeIsNow && !hideTooltip}
+                            interactive
+                            placement='bottom'
+                            title={
+                                <React.Fragment>
+                                    <TooltipTitle>Start Streaming</TooltipTitle>
+                                    <TooltipText>
+                                        The Start Streaming button will become active 2 minutes before the stream's
+                                        official start time.
+                                    </TooltipText>
+                                    <TooltipButtonComponent onConfirm={() => setHideTooltip(true)} buttonText="Ok"/>
+                                </React.Fragment>
+                            }
+                        >
                             <ButtonWithConfirm
                                 color={currentLivestream.hasStarted ? theme.palette.error.main : theme.palette.primary.main}
                                 fluid
+                                hasStarted={currentLivestream.hasStarted}
+                                mobile={mobile}
                                 disabled={!streamStartTimeIsNow}
+                                startIcon={currentLivestream.hasStarted ? <StopIcon/> : <PlayCircleFilledWhiteIcon/>}
                                 buttonAction={() => setStreamingStarted(!currentLivestream.hasStarted)}
                                 confirmDescription={currentLivestream.hasStarted ? 'Are you sure that you want to end your livestream now?' : 'Are you sure that you want to start your livestream now?'}
-                                buttonLabel={currentLivestream.hasStarted ? 'Stop Streaming' : 'Start Streaming'}/>
-                            </StandartTooltip>
-                            
-                        </div>
-                        <Button
-                            children="Invite additional streamer"
-                            startIcon={<PersonAddIcon color="inherit"/>}
-                            onClick={() => {
-                                setSpeakerManagementOpen(true)
-                            }}
-                            style={{
-                                position: 'absolute',
-                                top: '50%',
-                                color: 'rgb(80,80,80)',
-                                left: '220px',
-                                transform: 'translateY(-50%)',
-                            }}
-                        />
-                        <div style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            display: 'inline-block',
-                            padding: '10px',
-                            verticalAlign: 'middle',
-                            fontSize: '0.9em'
-                        }}>
-                            <h3 style={{color: (currentLivestream.hasStarted ? 'rgb(0, 210, 170)' : 'orange')}}>{currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}</h3>
-                            {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
-                        </div>
-                        <Button
-                            href={`/streaming/${currentLivestream.id}/viewer`}
-                            target="_blank"
-                            children="Open Student View"
-                            startIcon={<OpenInBrowserIcon color="inherit"/>}
-                            style={{
-                                color: 'rgb(80,80,80)',
-                                position: 'absolute',
-                                top: '50%',
-                                right: '130px',
-                                transform: 'translateY(-50%)'
-                            }}
-                        />
-                        <div style={{
-                            float: 'right',
-                            margin: '0 20px',
-                            fontSize: '1em',
-                            padding: '3px',
-                            verticalAlign: 'middle',
-                            fontWeight: '700'
-                        }}>
-                            Viewers: {numberOfViewers}
-                        </div>
-                    </div>
-                    <div className={classes.blackFrame}>
-                        <VideoContainer currentLivestream={currentLivestream} streamerId={currentLivestream.id}
-                                        setNumberOfViewers={setNumberOfViewers} showMenu={showMenu} viewer={false}/>
-                    </div>
-                    <div className={classes.menuLeft}>
-                        <LeftMenu
-                            streamer
-                            livestream={currentLivestream}
-                            showMenu={showMenu}
-                            setShowMenu={setShowMenu}
-                            toggleShowMenu={toggleShowMenu}/>
-                    </div>
-                    <div className='mini-chat-container'>
-                        <MiniChatContainer livestream={currentLivestream} isStreamer={true}/>
-                    </div>
-                    <div className='icons-container'>
-                        <IconsContainer isTest={currentLivestream.test} livestreamId={currentLivestream.id}/>
-                    </div>
-                    <div className='notifications-container'>
-                        <NotificationsContainer notifications={notifications}/>
-                    </div>
-                    <SpeakerManagementModal livestreamId={currentLivestream.id} open={speakerManagementOpen}
-                                            joiningStreamerLink={joiningStreamerLink}
-                                            setOpen={setSpeakerManagementOpen}/>
-                    <style jsx>{`
-                    .top-menu {
-                        position: relative;
-                        background-color: rgba(245,245,245,1);
-                        padding: 15px 0;
-                        height: 55px;
-                        text-align: center;
-                        box-shadow: 0 0 4px grey;
-                        z-index: 1000;
-                    }
+                                buttonLabel={currentLivestream.hasStarted ? `Stop ${mobile ? "" : "Streaming"}` : `Start ${mobile ? "" : "Streaming"}`}
+                                tooltipTitle={currentLivestream.hasStarted ? `Click here to stop streaming` : `Click here to start streaming`}
 
-                    .top-menu.active {
-                        color: rgba(0, 210, 170, 1);
-                    }
-
-                    .top-menu h3 {
-                        font-weight: 600;
-                    }
-
-                    .mini-chat-container {
-                        position: absolute;
-                        bottom: 0;
-                        right: 120px;
-                        width: 20%;
-                        min-width: 250px;
-                        z-index: 100;
-                    }
-
-                    .icons-container {
-                        position: absolute;
-                        bottom: 50px;
-                        right: 130px;
-                        z-index: 100;
-                        width: 80px;
-                    }
-
-                    .notifications-container {
-                        position: absolute;
-                        top: 55px;
-                        right: 130px;
-                        width: 20%;
-                        z-index: 200;
-                        padding: 10px 0;
-                    }
-                `}</style>
+                            />
+                        </StandartTooltip>
+                        {mobile ?
+                            <Tooltip title="Invite an additional streamer">
+                                <IconButton onClick={() => {
+                                    setSpeakerManagementOpen(true)
+                                }}>
+                                    <PersonAddIcon color="inherit"/>
+                                </IconButton>
+                            </Tooltip>
+                            :
+                            <Button
+                                children="Invite a streamer"
+                                startIcon={<PersonAddIcon color="inherit"/>}
+                                onClick={() => {
+                                    setSpeakerManagementOpen(true)
+                                }}
+                            />}
+                        {mobile ?
+                            <Tooltip
+                                title={currentLivestream.hasStarted ? 'You are currently actively streaming' : 'You are currently not streaming'}>
+                                <Typography className={classes.streamStatusText} variant="h5">
+                                    {currentLivestream.hasStarted ? 'LIVE' : 'NOT LIVE'}
+                                </Typography>
+                            </Tooltip>
+                            :
+                            <Box display="flex"
+                                 flexDirection="column"
+                                 justifyContent="center"
+                            >
+                                <Typography className={classes.streamStatusText} variant="h5">
+                                    {currentLivestream.hasStarted ? 'YOU ARE LIVE' : 'YOU ARE NOT LIVE'}
+                                </Typography>
+                                {currentLivestream.hasStarted ? '' : 'Press Start Streaming to begin'}
+                            </Box>}
+                        {mobile ?
+                            <Tooltip title="Open Student View">
+                                <IconButton target="_blank" href={`/streaming/${currentLivestream.id}/viewer`}>
+                                    <OpenInBrowserIcon color="inherit"/>
+                                </IconButton>
+                            </Tooltip>
+                            :
+                            <Button
+                                href={`/streaming/${currentLivestream.id}/viewer`}
+                                target="_blank"
+                                children="Open Student View"
+                                startIcon={<OpenInBrowserIcon color="inherit"/>}
+                            />
+                        }
+                        <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
+                            <Checkbox
+                                checked={themeMode === "dark"}
+                                onChange={toggleTheme}
+                                icon={<Brightness4Icon/>}
+                                checkedIcon={<Brightness7Icon/>}
+                                color="default"
+                            />
+                        </Tooltip>
+                        <Box className={classes.viewCount}>
+                            <Tooltip title="Number of viewers">
+                                <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
+                                    <PeopleIcon/>
+                                </Badge>
+                            </Tooltip>
+                            {!mobile &&
+                            <Typography className={classes.viewCountText}>
+                                Viewers : {numberOfViewers}
+                            </Typography>}
+                        </Box>
+                    </Toolbar>
+                </AppBar>
+                <div
+                    className={classes.blackFrame}
+                >
+                    <VideoContainer currentLivestream={currentLivestream}
+                                    streamerId={currentLivestream.id}
+                                    setNumberOfViewers={setNumberOfViewers}
+                                    showMenu={showMenu} viewer={false}
+                    />
                 </div>
-            </NotificationsContext.Provider>
+                <LeftMenu
+                    className={classes.menuLeft}
+                    streamer
+                    livestream={currentLivestream}
+                    showMenu={showMenu}
+                    setShowMenu={setShowMenu}
+                    toggleShowMenu={toggleShowMenu}/>
+                <MiniChatContainer
+                    className={classes.miniChatContainer}
+                    livestream={currentLivestream}
+                    isStreamer={true}
+                />
+                <IconsContainer
+                    className={classes.iconsContainer}
+                    isTest={currentLivestream.test}
+                    livestreamId={currentLivestream.id}/>
+                <NotificationsContainer
+                    notifications={notifications}
+                />
+                <SpeakerManagementModal
+                    livestreamId={currentLivestream.id}
+                    open={speakerManagementOpen}
+                    joiningStreamerLink={joiningStreamerLink}
+                    setOpen={setSpeakerManagementOpen}
+                />
+            </div>
+        </NotificationsContext.Provider>
     );
 }
 

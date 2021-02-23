@@ -6,14 +6,15 @@ import {withFirebase} from '../../context/firebase';
 import Header from '../../components/views/header/Header';
 import Footer from '../../components/views/footer/Footer';
 import CreateBaseGroup from "../../components/views/group/create/CreateBaseGroup";
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
 import CreateCategories from "../../components/views/group/create/CreateCategories";
 import CompleteGroup from "../../components/views/group/create/CompleteGroup";
 import {GlobalBackground} from "../../materialUI/GlobalBackground/GlobalBackGround";
 import Loader from "../../components/views/loader/Loader";
 import {useAuth} from "../../HOCs/AuthProvider";
+
+import {Stepper, Step, StepLabel} from '@material-ui/core';
+import {useSnackbar} from "notistack";
+import {GENERAL_ERROR} from "../../components/util/constants";
 
 function getSteps() {
     return ['Create your base group', 'Setup your categories and sub-categories', 'Finish'];
@@ -22,6 +23,7 @@ function getSteps() {
 
 const CreateGroup = ({firebase}) => {
     const router = useRouter();
+    const {enqueueSnackbar} = useSnackbar()
     const [activeStep, setActiveStep] = useState(0);
     const [baseGroupInfo, setBaseGroupInfo] = useState({});
     const [arrayOfCategories, setArrayOfCategories] = useState([]);
@@ -116,24 +118,25 @@ const CreateGroup = ({firebase}) => {
             const downloadURL = await uploadLogo(baseGroupInfo.logoFileObj)
             const careerCenter = {
                 universityName: baseGroupInfo.universityName,
-                adminEmail: user.email,
+                adminEmails: baseGroupInfo.adminEmails,
                 logoUrl: downloadURL,
                 description: baseGroupInfo.description,
                 test: false,
                 categories: arrayOfCategories
             }
-            let ref = await firebase.createCareerCenter(careerCenter);
-            firebase.updateCareerCenter(ref.id, {groupId: ref.id}).then(() => {
-                router.push(`/group/${ref.id}/admin`)
+            let ref = await firebase.createCareerCenter(careerCenter, user.email);
+            await router.push(`/group/${ref.id}/admin`)
+            enqueueSnackbar(`Congrats! Your group ${baseGroupInfo.universityName} has now been created`, {
+                variant: "success",
+                preventDuplicate: true
             })
 
-            // const careerCenterId = careerCenterRef.id
-            // await firebase.addMultipleGroupCategoryWithElements(careerCenterRef.id, arrayOfCategories)
-            // return careerCenterId
-
         } catch (e) {
-            console.log("error in async 2", e);
-
+            console.log("error in creating group", e);
+            enqueueSnackbar(GENERAL_ERROR, {
+                variant: "error",
+                preventDuplicate: true
+            })
         }
     }
 

@@ -1,18 +1,17 @@
-import React, {Fragment, useRef, useState, useEffect} from 'react';
-import {Grid} from "semantic-ui-react";
+import React, {Fragment} from 'react';
 import LivestreamPdfViewer from '../../../util/LivestreamPdfViewer';
-import { useWindowSize } from '../../../custom-hook/useWindowSize';
+import {useWindowSize} from '../../../custom-hook/useWindowSize';
 import RemoteVideoContainer from './RemoteVideoContainer';
 
 function SmallStreamerVideoDisplayer(props) {
     return (
         <Fragment>
                 <div style={{ position: 'absolute', top: '20vh', width: '100%', backgroundColor: 'rgb(30,30,30)'}}>
-                    { props.presentation ? 
-                        <LivestreamPdfViewer livestreamId={props.livestreamId} presenter={props.presenter} showMenu={props.showMenu}/> : 
+                    { props.presentation ?
+                        <LivestreamPdfViewer livestreamId={props.livestreamId} presenter={props.presenter} showMenu={props.showMenu}/> :
                         <SharedScreenViewer {...props}/>
                     }
-                </div>         
+                </div>
         </Fragment>
     )
 }
@@ -24,11 +23,13 @@ const SharedScreenViewer = (props) => {
     return (
         <Fragment>
                 <div>
-                    { !props.isLocalScreen && screenShareStream ? 
+                    { !props.isLocalScreen && screenShareStream ?
                         <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={false} stream={screenShareStream} height={windowSize.width > 768 ? 'calc(80vh - 55px)' : '45vh'} index={0}/> :
-                        <div id={"Screen"} style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: windowSize.width > 768 ? 'calc(80vh - 55px)' : '45vh', backgroundColor: 'rgb(30,30,30)'}}/>
+                        <div id={"Screen"} style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: windowSize.width > 768 ? 'calc(80vh - 55px)' : '45vh', backgroundColor: 'rgb(30,30,30)'}}>
+
+                        </div>
                     }
-                </div>         
+                </div>
         </Fragment>
     )
 }
