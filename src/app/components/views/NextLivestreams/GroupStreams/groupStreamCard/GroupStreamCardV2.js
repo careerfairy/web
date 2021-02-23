@@ -183,6 +183,7 @@ const useStyles = makeStyles((theme) => {
         optionsWrapper: {
             overflowX: 'hidden',
             overflowY: 'auto',
+            padding: theme.spacing(1)
         },
         expandedOptionsWrapper: {
             overflowX: 'hidden',
@@ -695,7 +696,7 @@ const GroupStreamCardV2 = memo(({
                                         </Typography>
                                     </div>
                                 </Grow>
-                                {mobile &&
+                                {(mobile && !isDraft) &&
                                 <CopyToClipboard
                                     color={cardHovered && "white"}
                                     className={classes.copyToClipBoard}
@@ -789,10 +790,12 @@ const GroupStreamCardV2 = memo(({
                                 }}>
                                 <img className={classes.backgroundImage} src={livestream.backgroundImageUrl}
                                      alt="background"/>
+                                {!isDraft &&
                                 <CopyToClipboard
+                                    text="Copy Link"
                                     color="white"
                                     className={classes.copyToClipBoard}
-                                    value={linkToStream}/>
+                                    value={linkToStream}/>}
                                 {!hideActions && <div className={classes.buttonsWrapper}>
                                     <DetailsButton
                                         groupData={groupData}
