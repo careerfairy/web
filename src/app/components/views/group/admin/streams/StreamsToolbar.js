@@ -18,9 +18,11 @@ import {useRouter} from "next/router";
 import SpeedDial from '@material-ui/lab/SpeedDial';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
+import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
+
 import ShareIcon from '@material-ui/icons/Share';
 import {useAuth} from "../../../../../HOCs/AuthProvider";
-import {copyStringToClipboard} from "../../../../helperFunctions/HelperFunctions";
+import {copyStringToClipboard, getBaseUrl} from "../../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
     root: {},
@@ -112,12 +114,18 @@ const StreamsToolbar = ({value, group, onChange, className, handleSubmit,openNew
         });
     };
 
+    const handleOpenStudentView = () => {
+        const baseUrl = getBaseUrl()
+
+    }
+
     const buttonOptions = [
-        // {
-        //     name: "Create a new draft",
-        //     onClick: () => handleClickDraftNewStream(),
-        //     icon: <DraftStreamIcon/>
-        // },
+        {
+            name: "View streams on students page",
+            onClick: () => {},
+            icon: <OpenInBrowserIcon/>,
+            href: `/next-livestreams?careerCenterId=${group.id}`
+        },
         {
             name: "Generate a draft link for companies",
             onClick: () => handleShareDraftLink(),
@@ -153,7 +161,8 @@ const StreamsToolbar = ({value, group, onChange, className, handleSubmit,openNew
                             icon={action.icon}
                             FabProps={{
                                 size: "large",
-                                color: "primary"
+                                color: "primary",
+                                href: buttonOptions.href || ""
                             }}
                             tooltipTitle={action.name}
                             classes={{staticTooltipLabel: classes.tooltip, fab: classes.action}}
