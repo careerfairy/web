@@ -19,13 +19,23 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
+        maxWidth: props => props.small ? "230px" : "100%",
     },
     speakerName: {
-        fontSize: props => props.small ? "0.8rem" : "1rem"
+        fontSize: props => props.small ? "0.8rem" : "1rem",
+        maxWidth: props => props.small ? "180px" : "100%",
+    },
+    speakerData: {
+        maxWidth: props => props.small ? "180px" : "100%",
+        
     },
     speakerPosition: {
         fontWeight: "normal",
-        fontSize: props => props.small ? "0.7rem" : "1rem"
+        fontSize: props => props.small ? "0.7rem" : "1rem",
+        maxWidth: props => props.small ? "180px" : "100%",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
     },
     speakerLinkedIn: {
         marginLeft: 10
@@ -49,7 +59,7 @@ const SpeakerInfoOverlay = ({ speaker, small }) => {
     if (small) {
         return (
             <div className={classes.speakerInformation}>
-                <div>
+                <div className={classes.speakerData}>
                     <div>
                         <h5 className={classes.speakerName}>{`${speaker.firstName} ${speaker.lastName}`}</h5>
                     </div>

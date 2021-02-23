@@ -3,6 +3,7 @@ import RemoteVideoContainer from './RemoteVideoContainer';
 import {useWindowSize} from '../../../custom-hook/useWindowSize';
 import {makeStyles} from "@material-ui/core/styles";
 import SpeakerInfoOverlay from './SpeakerInfoOverlay';
+import LocalVideoContainer from './LocalVideoContainer';
 
 
 const useStyles = makeStyles(theme => ({
@@ -173,19 +174,10 @@ function CurrentSpeakerDisplayer(props) {
     if (!props.isPlayMode) {
         const localVideoClass = getVideoContainerClass(props.localId, "local");
         const localSpeaker = props.currentLivestream.speakers.find( speaker => speaker.speakerUuid === props.localId );
-        let localVideoElement =
-            <div
-                className={ classes[localVideoClass] }
-                style={{padding: '0', margin: '0'}}
-                key={"localVideoId"}>
-                <div className={classes.localVideoContainer} style={{ height: getVideoContainerHeight(props.localId)}}>
-                    <div id="localVideo" style={{width: '100%', height: '100%'}}/>
-                    {
-                        localSpeaker && 
-                        <SpeakerInfoOverlay speaker={localSpeaker} small={ localVideoClass.includes("QuarterWidth") }/>
-                    }
-                </div>
-            </div>;
+        let localVideoElement = 
+            <div key={"localVideo"} className={ classes[localVideoClass] }>
+                <LocalVideoContainer localId={props.localId} localSpeaker={localSpeaker} height={getVideoContainerHeight(props.localId)} small={localVideoClass.includes("QuarterWidth")} {...props}/>
+            </div>
 
         externalVideoElements.unshift(localVideoElement);
     }
