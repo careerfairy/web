@@ -107,9 +107,9 @@ function MyApp({Component, pageProps}) {
             </Head>
             <Provider store={store}>
                 <ReactReduxFirebaseProvider {...rrfProps}>
-                    <AuthProvider firebase={firebase}>
-                        <FirebaseContext.Provider value={firebase}>
-                            <ThemeProviderWrapper>
+                    <ThemeProviderWrapper>
+                        <AuthProvider firebase={firebase}>
+                            <FirebaseContext.Provider value={firebase}>
                                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
 
                                     <TutorialContext.Provider value={{
@@ -130,9 +130,9 @@ function MyApp({Component, pageProps}) {
                                         </ErrorContext.Provider>
                                     </TutorialContext.Provider>
                                 </MuiPickersUtilsProvider>
-                            </ThemeProviderWrapper>
-                        </FirebaseContext.Provider>
-                    </AuthProvider>
+                            </FirebaseContext.Provider>
+                        </AuthProvider>
+                    </ThemeProviderWrapper>
                 </ReactReduxFirebaseProvider>
             </Provider>
         </Fragment>

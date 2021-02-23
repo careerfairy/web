@@ -186,8 +186,7 @@ const streamDataTypes = [
     }]
 
 
-const AnalyticsOverview = ({firebase, group, firestore, title}) => {
-    console.log("-> group in AnalyticsOverview", group);
+const AnalyticsOverview = ({firebase, group, firestore}) => {
     const userDataSets = [
         {
             id: uuid(),

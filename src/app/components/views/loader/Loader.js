@@ -1,5 +1,4 @@
 import { CircularProgress } from '@material-ui/core';
-import { Image } from 'semantic-ui-react';
 
 const Loader = () => {
     return (

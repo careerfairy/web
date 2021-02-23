@@ -298,11 +298,16 @@ const GroupDashboardLayout = (props) => {
             <div className={classes.wrapper}>
                 <div className={classes.contentContainer}>
                     <div className={classes.content}>
-                        {(isLoaded(group) && !isEmpty(group)) && React.cloneElement(children, {
+                        {(isLoaded(group) && !isEmpty(group)) && React.Children.map(children, child => React.cloneElement(child, {
                             notifications,
                             isAdmin: isAdmin(),
                             group, ...props
-                        })}
+                        }))}
+                        {/*{(isLoaded(group) && !isEmpty(group)) && React.cloneElement(children, {*/}
+                        {/*    notifications,*/}
+                        {/*    isAdmin: isAdmin(),*/}
+                        {/*    group, ...props*/}
+                        {/*})}*/}
                     </div>
                 </div>
             </div>
