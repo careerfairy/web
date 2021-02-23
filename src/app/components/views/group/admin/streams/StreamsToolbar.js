@@ -149,7 +149,7 @@ const StreamsToolbar = ({
     }
 
     buttonOptions.push({
-        name: "View your upcoming streams on student page",
+        name: "View your upcoming streams on the student page",
         onClick: () => handleOpenStudentView(),
         icon: <OpenInBrowserIcon/>,
     })
