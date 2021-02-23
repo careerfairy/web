@@ -1,6 +1,7 @@
 import {isEmpty} from 'lodash/fp'
 import React from "react";
 import {LONG_NUMBER} from "../util/constants";
+import {v4 as uuidv4} from 'uuid';
 
 var dayjs = require('dayjs');
 var relativeTime = require('dayjs/plugin/relativeTime')
@@ -16,7 +17,7 @@ dayjs.extend(relativeTime)
 
 export const uploadLogo = (location, fileObject, firebase, callback) => {
     var storageRef = firebase.getStorageRef();
-    let fullPath = location + '/' + fileObject.name;
+    let fullPath = location + '/' + fileObject.name + "_" + uuidv4();
     let companyLogoRef = storageRef.child(fullPath);
 
     var uploadTask = companyLogoRef.put(fileObject);
@@ -243,3 +244,6 @@ export const getBaseUrl = () => {
     }
     return baseUrl
 }
+
+export const maybePluralize = (count, noun, suffix = 's') =>
+    `${noun}${count !== 1 ? suffix : ''}`;
