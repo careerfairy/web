@@ -61,7 +61,18 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const StreamsToolbar = ({value, group, onChange, className, handleSubmit,openNewStreamModal, handleOpenNewStreamModal,isAdmin, handleRefresh, ...rest}) => {
+const StreamsToolbar = ({
+                            value,
+                            group,
+                            onChange,
+                            className,
+                            handleSubmit,
+                            openNewStreamModal,
+                            handleOpenNewStreamModal,
+                            isAdmin,
+                            handleRefresh,
+                            ...rest
+                        }) => {
     const {enqueueSnackbar} = useSnackbar()
     const {userData} = useAuth()
     const [open, setOpen] = useState(true);
@@ -116,16 +127,12 @@ const StreamsToolbar = ({value, group, onChange, className, handleSubmit,openNew
 
     const handleOpenStudentView = () => {
         const baseUrl = getBaseUrl()
+        const studentPage = `${baseUrl}/next-livestreams?careerCenterId=${group.id}`
+        window?.open?.(studentPage, '_blank');
 
     }
 
     const buttonOptions = [
-        {
-            name: "View streams on students page",
-            onClick: () => {},
-            icon: <OpenInBrowserIcon/>,
-            href: `/next-livestreams?careerCenterId=${group.id}`
-        },
         {
             name: "Generate a draft link for companies",
             onClick: () => handleShareDraftLink(),
@@ -140,6 +147,12 @@ const StreamsToolbar = ({value, group, onChange, className, handleSubmit,openNew
             icon: <StreamIcon/>
         });
     }
+
+    buttonOptions.push({
+        name: "View your upcoming streams on student page",
+        onClick: () => handleOpenStudentView(),
+        icon: <OpenInBrowserIcon/>,
+    })
 
     return (
         <Slide direction="left" in>
@@ -162,7 +175,6 @@ const StreamsToolbar = ({value, group, onChange, className, handleSubmit,openNew
                             FabProps={{
                                 size: "large",
                                 color: "primary",
-                                href: buttonOptions.href || ""
                             }}
                             tooltipTitle={action.name}
                             classes={{staticTooltipLabel: classes.tooltip, fab: classes.action}}
