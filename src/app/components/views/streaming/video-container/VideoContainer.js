@@ -62,6 +62,7 @@ function VideoContainer(props) {
 
     const {
         localMediaStream,
+        setLocalMediaStream,
         externalMediaStreams,
         agoraRtcStatus,
         agoraRtmStatus,
@@ -329,6 +330,7 @@ function VideoContainer(props) {
                     joining={!isMainStreamer}
                     handleClickScreenShareButton={handleClickScreenShareButton}
                     localMediaStream={localMediaStream}
+                    setLocalMediaStream={setLocalMediaStream}
                     isMainStreamer={isMainStreamer}
                     showSettings={showSettings}
                     setShowSettings={setShowSettings}

@@ -73,6 +73,7 @@ function VideoControlsContainer({
                                     handleClickScreenShareButton,
                                     isMainStreamer,
                                     localMediaStream,
+                                    setLocalMediaStream
                                 }) {
     const {tutorialSteps, setTutorialSteps} = useContext(TutorialContext);
     const theme = useTheme();
@@ -134,18 +135,30 @@ function VideoControlsContainer({
 
     function toggleMicrophone() {
         if (isLocalMicMuted) {
-            localMediaStream.enableAudio()
+            localMediaStream.unmuteAudio()
+            let localMediaStreamCopy = { ...localMediaStream }
+            localMediaStreamCopy.audioMuted = false;
+            setLocalMediaStream(localMediaStreamCopy)
         } else {
-            localMediaStream.disableAudio()
+            localMediaStream.muteAudio()
+            let localMediaStreamCopy = { ...localMediaStream }
+            localMediaStreamCopy.audioMuted = true;
+            setLocalMediaStream(localMediaStreamCopy)
         }
         setIsLocalMicMuted(!isLocalMicMuted);
     }
 
     function toggleVideo() {
         if (isVideoInactive) {
-            localMediaStream.enableVideo()
+            localMediaStream.unmuteVideo()
+            let localMediaStreamCopy = { ...localMediaStream }
+            localMediaStreamCopy.videoMuted = false;
+            setLocalMediaStream(localMediaStreamCopy)
         } else {
-            localMediaStream.disableVideo()
+            localMediaStream.muteVideo()
+            let localMediaStreamCopy = { ...localMediaStream }
+            localMediaStreamCopy.videoMuted = true;
+            setLocalMediaStream(localMediaStreamCopy)
         }
         setIsVideoInactive(!isVideoInactive);
     }

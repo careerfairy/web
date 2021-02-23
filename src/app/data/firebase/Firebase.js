@@ -798,6 +798,50 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
+    updateSpeakersInLivestream = (livestream, speaker) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestream.id);
+        return this.firestore.runTransaction((transaction) => {
+            return transaction.get(ref).then((livestreamDoc) => {
+                let livestream = livestreamDoc.data()
+                let updatedSpeakers = livestream.speakers.filter( existingSpeaker => existingSpeaker.id !== speaker.id )
+                updatedSpeakers.forEach( existingSpeaker => {
+                    if ( existingSpeaker.speakerUuid === speaker.speakerUuid ) {
+                        delete existingSpeaker.speakerUuid;
+                    }
+                });
+                updatedSpeakers.push(speaker)
+                transaction.update(ref, {
+                    speakers: updatedSpeakers
+                });
+            });
+        });
+    }
+
+    addSpeakerInLivestream = (livestream, speaker) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestream.id);
+        return this.firestore.runTransaction((transaction) => {
+            return transaction.get(ref).then((livestreamDoc) => {
+                let livestream = livestreamDoc.data()
+                let speakerRef = this.firestore.collection("livestreams").doc(livestreamDoc.id).collection("speakers").doc();
+                speaker.id = speakerRef.id;
+                let updatedSpeakers = livestream.speakers ? [ ...livestream.speakers ] : []
+                updatedSpeakers.forEach( existingSpeaker => {
+                    if ( existingSpeaker.speakerUuid === speaker.speakerUuid ) {
+                        delete existingSpeaker.speakerUuid;
+                    }
+                });
+                updatedSpeakers.push(speaker)
+                transaction.update(ref, {
+                    speakers: updatedSpeakers
+                });
+            });
+        });
+    }
+
     putQuestionComment = (livestreamId, questionId, comment) => {
         comment.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
         let ref = this.firestore
