@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
     viewRoot: {
         position: "relative",
         height: "100%",
-        backgroundColor: theme.palette.background.default,
+        // backgroundColor: theme.palette.background.default,
         "& .react-swipeable-view-container": {
             height: "100%"
         }
