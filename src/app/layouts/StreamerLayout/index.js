@@ -9,6 +9,8 @@ import {useRouter} from "next/router";
 import NotificationsContext from "../../context/notifications/NotificationsContext";
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
 import {v4 as uuidv4} from "uuid";
+import {populate, useFirestoreConnect} from "react-redux-firebase";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -56,7 +58,6 @@ const StreamerLayout = (props) => {
     const {children, firebase} = props
     const {query: {token, livestreamId}, pathname} = useRouter()
     const router = useRouter();
-    const [currentLivestream, setCurrentLivestream] = useState(false);
     const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [newNotification, setNewNotification] = useState(null);
     const [notificationToRemove, setNotificationToRemove] = useState(null);
@@ -67,26 +68,29 @@ const StreamerLayout = (props) => {
     const [tokenChecked, setTokenChecked] = useState(false);
     const [showMenu, setShowMenu] = useState(true);
 
+
+
+    const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
+    const isMainStreamer = useMemo(() => pathname === "/streaming/[livestreamId]/main-streamer", [pathname])
+    const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'careerCenters'}]
+    useFirestoreConnect(() => livestreamId ? [
+        {
+            collection: "livestreams",
+            doc: livestreamId,
+            storeAs: "currentLivestream",
+            populates
+        }
+    ] : [], [livestreamId])
+
+    const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
+        ...populate(firestore, "currentLivestream", populates),
+        id: livestreamId
+    })
+
     const classes = useStyles({
         showMenu,
         hasStarted: currentLivestream?.hasStarted
     });
-
-    const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
-    const isMainStreamer = useMemo(() => pathname === "/streaming/[livestreamId]/main-streamer", [pathname])
-
-
-    useEffect(() => {
-        if (livestreamId) {
-            props.firebase.listenToScheduledLivestreamById(livestreamId, querySnapshot => {
-                if (!querySnapshot.isEmpty) {
-                    let livestream = querySnapshot.data();
-                    livestream.id = querySnapshot.id;
-                    setCurrentLivestream(livestream);
-                }
-            });
-        }
-    }, [livestreamId]);
 
 
     useEffect(() => {

@@ -12,6 +12,7 @@ import Logo from "./Logo";
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
 import {useAuth} from "../../../HOCs/AuthProvider";
 import {withFirebase} from "../../../context/firebase";
+import {useCurrentStream} from "../../../context/stream/StreamContext";
 
 const useStyles = makeStyles(theme => ({
     joinButton: {
@@ -24,12 +25,13 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const ViewerTopBar = ({currentLivestream, firebase, mobile}) => {
+const ViewerTopBar = ({firebase, mobile}) => {
 
     const classes = useStyles()
     const {authenticatedUser, userData} = useAuth();
     const {toggleTheme, themeMode} = useThemeToggle()
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
+    const {currentLivestream} = useCurrentStream()
 
     useEffect(() => {
         if (userData?.talentPools && currentLivestream && userData.talentPools.indexOf(currentLivestream.companyId) > -1) {
