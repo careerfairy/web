@@ -206,6 +206,14 @@ function StreamingPage(props) {
         props.firebase.setLivestreamHasStarted(started, currentLivestream.id);
     }
 
+    function hashCode(s) {
+        let h;
+        for(let i = 0; i < s.length; i++) 
+              h = Math.imul(31, h) + s.charCodeAt(i) | 0;
+    
+        return Math.abs(h).toString();
+    }
+
     const toggleShowMenu = () => {
         setShowMenu(!showMenu)
     }
@@ -346,7 +354,7 @@ function StreamingPage(props) {
                     className={classes.blackFrame}
                 >
                     <VideoContainer currentLivestream={currentLivestream}
-                                    streamerId={currentLivestream.id}
+                                    streamerId={hashCode(currentLivestream.id)}
                                     setNumberOfViewers={setNumberOfViewers}
                                     showMenu={showMenu} viewer={false}
                     />

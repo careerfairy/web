@@ -675,16 +675,78 @@ exports.startRecordingLivestream = functions.https.onRequest(async (req, res) =>
         method: 'post',
         data: {
             "cname": "bnruMEB6DGte14VNaZ9M",
-            "uid": 1234232,
+            "uid": "1234232",
             "clientRequest": {}
         },
-        url: `https://api.agora.io/dev/v1/apps/${appID}/cloud_recording/acquire`,
+        url: `https://api.agora.io/v1/apps/${appID}/cloud_recording/acquire`,
         headers: {
             'Authorization': authorizationHeader,
             'Content-Type': 'application/json'
         }
     })
-    console.log(acquire);
+
+    let resourceId = acquire.data.resourceId;
+    const expirationTimeInSeconds = 21600
+    const currentTimestamp = Math.floor(Date.now() / 1000)
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+    const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, "bnruMEB6DGte14VNaZ9M", "1234232", RtcRole.SUBSCRIBER, privilegeExpiredTs);
+
+    let start = null;
+
+    try{
+        start = await axios({
+            method: 'post',
+            data: {
+                "cname": "bnruMEB6DGte14VNaZ9M",
+                "uid": "1234232",
+                "clientRequest": {
+                    "token": rtcToken,
+                    "extensionServiceConfig": {
+                        "errorHandlePolicy": "error_abort",
+                        "extensionServices":[{
+                                "serviceName":"web_recorder_service",
+                                "errorHandlePolicy": "error_abort",
+                                "serviceParam": {
+                                    "url": "https://www.careerfairy.io/streaming/bnruMEB6DGte14VNaZ9M/viewer",
+                                    "audioProfile": 0,
+                                    "videoWidth": 1280,
+                                    "videoHeight": 720,
+                                    "maxRecordingHour": 72
+                            }
+                        }]
+                    },
+                    "recordingFileConfig":{
+                        "avFileType":[
+                            "hls",
+                            "mp4"
+                        ]
+                    },
+                    "storageConfig":{
+                        "vendor": 2,
+                        "region": 3,
+                        "bucket":"agora-cf-cloud-recordings",
+                        "accessKey":"xxxxx",
+                        "secretKey":"xxxxx",
+                        "fileNamePrefix":[
+                            "directory1",
+                            "directory2"
+                        ]
+                    }
+                }
+            },
+            url: `https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resourceId}/mode/mix/start`,
+            headers: {
+                'Authorization': authorizationHeader,
+                'Content-Type': 'application/json'
+            }
+        })
+    } catch (e) {
+        console.log("Error", e.response)
+    }
+
+    let startResponse = start.data;
+
+    console.log(startResponse);
 });
 
 exports.generateAgoraTokenSecure = functions.https.onRequest(async (req, res) => {
