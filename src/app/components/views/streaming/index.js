@@ -1,10 +1,10 @@
 import React, {Fragment} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {useCurrentStream} from "../../../layouts/StreamerLayout";
 import VideoContainer from "./video-container/VideoContainer";
 import NotificationsContainer from "./notifications-container/NotificationsContainer";
 import MiniChatContainer from "./LeftMenu/categories/chat/MiniChatContainer";
 import IconsContainer from "./icons-container/IconsContainer";
+import {useCurrentStream} from "../../../context/stream/StreamContext";
 
 const useStyles = makeStyles(theme => ({
     blackFrame: {

@@ -173,7 +173,7 @@ const EmoteButtons =
                 };
             }
         }, [iconsDisabled]);
-
+console.log("-> open", open);
         return (
             <ClickAwayListener onClickAway={handleClose}>
                 <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className={classes.actionArea}>

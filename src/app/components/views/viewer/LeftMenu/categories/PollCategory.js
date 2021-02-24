@@ -9,6 +9,7 @@ import {useAuth} from "../../../../../HOCs/AuthProvider";
 import {makeStyles, useTheme, withStyles} from "@material-ui/core/styles";
 import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import {isServer} from "../../../../helperFunctions/HelperFunctions";
+import {v4 as uuid} from 'uuid';
 
 const PollWrapper = withStyles(theme => ({
     root: {
@@ -76,7 +77,7 @@ function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
             let optionElementsLarge = currentPoll.options.map((option, index) => {
                 return (
                     <DynamicColorButton
-                        key={index}
+                        key={option.index || uuid()}
                         variant="contained"
                         loading={voting}
                         className={classes.pollButton}

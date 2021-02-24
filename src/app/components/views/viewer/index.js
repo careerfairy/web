@@ -9,61 +9,108 @@ import {Backdrop} from "@material-ui/core";
 import VolumeUpRoundedIcon from "@material-ui/icons/VolumeUpRounded";
 import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
+import clsx from "clsx";
 
-const useStyles = makeStyles(theme => ({}));
+const useStyles = makeStyles(theme => ({
+    iconsContainer: {
+        position: "absolute",
+        bottom: ({mobile}) => mobile ? 80 : 60,
+        right: 60,
+        // zIndex: 100,
+        width: 80,
+        zIndex: 7250
+    },
+    backdrop: {
+        cursor: "pointer",
+        zIndex: 200
+    },
+    backdropContent: {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        color: theme.palette.common.white
+    },
+    miniChatContainer: {
+        position: "absolute",
+        bottom: "0",
+        right: "40px",
+        width: "20%",
+        minWidth: "250px",
+        zIndex: 7250
+    },
+    blackFrame: {
+        zIndex: 10,
+        backgroundColor: "black",
+        position: "absolute",
+        left: "0",
+        right: "0",
+        bottom: "0",
+        top: 0,
+        [theme.breakpoints.down("mobile")]: {
+            width: "100%",
+        },
+    },
+}));
 
 const ViewerOverview = ({
                             handRaiseActive,
-                            livestreamId,
-                            showMenu,
                             streamerId,
                             showVideoButton,
                             handleClap,
                             unmute,
                             play,
+                            open,
                             handleHeart,
                             handleLike,
                             handleMouseEnter,
                             playVideos,
                             enableIcons,
                             handleMouseLeave,
+                            showMenu,
                             iconsDisabled,
+                            mobile,
                             unmuteVideos,
                             DELAY,
                             setShowVideoButton,
                             handleClose
                         }) => {
 
-   const {currentLivestream} = useCurrentStream()
+    const {currentLivestream} = useCurrentStream()
 
-    const classes = useStyles()
+    const classes = useStyles({mobile})
 
     return (
         <Fragment>
-            <ViewerComponent
-                livestreamId={currentLivestream.id} streamerId={streamerId}
-                currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
-                showVideoButton={showVideoButton}
-                setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>
+            <div className={clsx({
+                [classes.blackFrame]: true,
+            })}>
+                <ViewerComponent
+                    livestreamId={currentLivestream.id} streamerId={streamerId}
+                    currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
+                    showVideoButton={showVideoButton}
+                    setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}
+                />
 
-            {width >= 768 &&
-            <MiniChatContainer className={classes.miniChatContainer} livestream={currentLivestream}
-                               isStreamer={false}/>}
+                {!mobile &&
+                <MiniChatContainer className={classes.miniChatContainer} livestream={currentLivestream}
+                                   isStreamer={false}/>}
 
-            <EmoteButtons
-                handRaiseActive={handRaiseActive}
-                handleClose={handleClose}
-                handleClap={handleClap}
-                handleHeart={handleHeart}
-                handleLike={handleLike}
-                handleMouseEnter={handleMouseEnter}
-                handleMouseLeave={handleMouseLeave}
-                iconsDisabled={iconsDisabled}
-                enableIcons={enableIcons}
-                delay={DELAY}
-                smoothness={2}
-                open={open}
-            />
+                <EmoteButtons
+                    handRaiseActive={handRaiseActive}
+                    handleClose={handleClose}
+                    handleClap={handleClap}
+                    handleHeart={handleHeart}
+                    handleLike={handleLike}
+                    handleMouseEnter={handleMouseEnter}
+                    handleMouseLeave={handleMouseLeave}
+                    iconsDisabled={iconsDisabled}
+                    enableIcons={enableIcons}
+                    delay={DELAY}
+                    smoothness={2}
+                    open={open}
+                />
+            </div>
             <IconsContainer className={classes.iconsContainer}
                             isTest={currentLivestream.test}
                             livestreamId={currentLivestream.id}/>

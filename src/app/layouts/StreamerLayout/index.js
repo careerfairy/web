@@ -8,7 +8,7 @@ import Loader from "../../components/views/loader/Loader";
 import {useRouter} from "next/router";
 import NotificationsContext from "../../context/notifications/NotificationsContext";
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
-
+import {v4 as uuidv4} from "uuid";
 
 const useStyles = makeStyles((theme) => ({
     root: {

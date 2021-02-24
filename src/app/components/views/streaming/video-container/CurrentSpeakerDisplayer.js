@@ -77,6 +77,12 @@ const useStyles = makeStyles(theme => ({
         overflowY: "hidden",
         whiteSpace: "nowrap",
         textAlign: "center",
+        '& > div': {
+            margin: theme.spacing(0.2),
+        },
+        // '& > *:nth-last-child(n+2)': {
+        //     margin: theme.spacing(0, 0.2)
+        // },
         '&::-webkit-scrollbar': {
             height: 5
         },
@@ -97,13 +103,16 @@ function CurrentSpeakerDisplayer(props) {
     function getVideoContainerHeight(streamId) {
         if (props.isPlayMode) {
             if (props.smallScreenMode) {
-                return windowSize.width > 768 ? '20vh' : '15vh';
+                return "20vh"
+                // return windowSize.width > 768 ? '20vh' : '15vh';
             }
             if (props.streams.length > 1) {
                 if (streamId === props.currentSpeaker) {
-                    return windowSize.width > 768 ? 'calc(80vh - 55px)' : '45vh';
+                    return windowSize.width > 768 ? 'calc(80vh - 55px)' : '80vh';
+                    // return windowSize.width > 768 ? 'calc(80vh - 55px)' : '45vh';
                 } else {
-                    return windowSize.width > 768 ? '20vh' : '15vh';
+                    return "20vh";
+                    // return windowSize.width > 768 ? '20vh' : '15vh';
                 }
             } else {
                 return windowSize.width > 768 ? 'calc(100vh - 55px)' : '60vh';
@@ -127,7 +136,8 @@ function CurrentSpeakerDisplayer(props) {
     function getMinimizedSpeakersGridHeight() {
         if (props.isPlayMode) {
             if (props.streams.length > 1 || props.smallScreenMode) {
-                return windowSize.width > 768 ? '20vh' : '15vh';
+                return "20vh";
+                // return windowSize.width > 768 ? '20vh' : '15vh';
             } else {
                 return '0';
             }

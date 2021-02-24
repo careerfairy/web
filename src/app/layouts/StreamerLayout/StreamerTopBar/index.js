@@ -25,7 +25,7 @@ import PeopleIcon from "@material-ui/icons/People";
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
 import SpeakerManagementModal from "../../../components/views/streaming/modal/SpeakerManagementModal";
 import {useRouter} from "next/router";
-import {useCurrentStream} from "../index";
+import {useCurrentStream} from "../../../context/stream/StreamContext";
 
 const useStyles = makeStyles(theme => ({
     toolbar: {

@@ -15,18 +15,34 @@ import * as actions from "../../store/actions";
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
 
 const useStyles = makeStyles((theme) => ({
+    root: {
+        position: "relative",
+        // minHeight: "100vh",
+        height: "100vh",
+        width: "100%",
+        // touchAction: "manipulation",
+        // border: "6px solid pink",
+        backgroundColor: theme.palette.background.dark,
+        display: 'flex',
+        // height: '100vh',
+        overflow: 'hidden',
+    },
     wrapper: {
         display: 'flex',
         flex: '1 1 auto',
         overflow: 'hidden',
-        paddingTop: 55,
-        paddingLeft: ({showMenu}) => showMenu ? 280 : 0,
+        paddingLeft: ({showMenu, mobile}) => (showMenu && !mobile) ? 280 : 0,
         transition: theme.transitions.create("padding-left", {
             duration: theme.transitions.duration.standard,
             easing: theme.transitions.easing.easeInOut
         }),
         [theme.breakpoints.down("mobile")]: {
             width: "100%",
+            paddingTop: 0,
+            paddingLeft: 0,
+        },
+        [theme.breakpoints.up("mobile")]: {
+            paddingTop: 55,
         },
     },
     contentContainer: {
@@ -37,6 +53,8 @@ const useStyles = makeStyles((theme) => ({
     content: {
         flex: '1 1 auto',
         height: '100%',
+        background: theme.palette.common.black,
+        position: "relative"
         // overflow: 'auto'
     },
 }));
@@ -117,13 +135,13 @@ const ViewerLayout = (props) => {
     const handleMouseEnter = useCallback((event) => {
         clearTimeout(delayHandler)
         handleOpen()
-    }, [])
+    }, [delayHandler])
 
     const handleMouseLeave = useCallback(() => {
         setDelayHandler(setTimeout(() => {
             handleClose()
         }, DELAY))
-    }, [])
+    }, [delayHandler])
 
     const handleClap = useCallback(() => {
         postIcon('clapping')
@@ -197,8 +215,13 @@ const ViewerLayout = (props) => {
                                 playVideos,
                                 handRaiseActive,
                                 unmuteVideos,
+                                showVideoButton,
+                                unmute,
+                                play,
                                 showMenu,
                                 streamerId,
+                                mobile,
+                                open,
                                 handleHeart,
                                 handleLike,
                                 handleClap,
@@ -206,6 +229,7 @@ const ViewerLayout = (props) => {
                                 handleMouseLeave,
                                 iconsDisabled,
                                 handleMouseEnter,
+                                setShowVideoButton,
                                 handleClose,
                                 DELAY
                             })}

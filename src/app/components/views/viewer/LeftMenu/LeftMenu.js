@@ -20,7 +20,7 @@ const useStyles = makeStyles(theme => ({
         top: 0,
         left: 0,
         bottom: 0,
-        zIndex: 20,
+        zIndex: 101,
         [theme.breakpoints.up("mobile")]: {
             top: 55,
         },

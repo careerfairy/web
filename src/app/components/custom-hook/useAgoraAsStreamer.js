@@ -277,7 +277,6 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
         });
 
         rtcClient.on("mute-audio", function (evt) {
-            debugger;
             // STREAMER HAS MUTED AUDIO
             console.log("mute-audio", evt)
             let streamToUpdate = {
