@@ -1,7 +1,6 @@
 import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import {withFirebase} from "../../context/firebase";
-import {useAuth} from "../../HOCs/AuthProvider";
 import StreamerTopBar from "./StreamerTopBar";
 import PreparationOverlay from "../../components/views/streaming/preparation-overlay/PreparationOverlay";
 import LeftMenu from "../../components/views/streaming/LeftMenu/LeftMenu";
@@ -194,6 +193,7 @@ const StreamerLayout = (props) => {
                                     ...props,
                                     newNotification,
                                     isMainStreamer,
+                                    isStreamer: true,
                                     showMenu,
                                     notifications,
                                     streamerId,

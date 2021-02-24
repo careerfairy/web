@@ -8,7 +8,7 @@ const Loader = dynamic(
 import {useSelector} from "react-redux";
 import {useFirestoreConnect} from 'react-redux-firebase'
 
-const AuthContext = createContext();
+const AuthContext = createContext({authenticatedUser: undefined, userData: undefined});
 
 const securePaths = [
     "/profile",

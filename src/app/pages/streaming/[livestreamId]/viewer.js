@@ -33,6 +33,8 @@ import Brightness4Icon from '@material-ui/icons/Brightness4';
 import Brightness7Icon from '@material-ui/icons/Brightness7';
 import clsx from "clsx";
 import {logoPlaceholder} from "../../../components/util/constants";
+import ViewerLayout from "../../../layouts/ViewerLayout";
+import ViewerOverview from "../../../components/views/viewer";
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -147,7 +149,16 @@ const Logo = ({src}) => {
     )
 }
 
-function ViewerPage({firebase}) {
+const ViewerPage = () => {
+    return(
+        <ViewerLayout>
+            <ViewerOverview/>
+        </ViewerLayout>
+    )
+}
+
+export default ViewerPage;
+function ViewerPageOld({firebase}) {
     const {toggleTheme, themeMode} = useThemeToggle()
     const DELAY = 3000; //3 seconds
     const router = useRouter();
@@ -420,4 +431,3 @@ function ViewerPage({firebase}) {
     );
 }
 
-export default withFirebasePage(ViewerPage);
