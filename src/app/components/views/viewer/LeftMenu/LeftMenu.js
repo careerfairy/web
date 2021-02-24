@@ -13,7 +13,22 @@ import clsx from "clsx";
 
 
 const useStyles = makeStyles(theme => ({
-    root: {},
+    root: {
+        position: "absolute",
+        boxShadow: theme.shadows[5],
+        width: ({showMenu, isMobile}) => showMenu ? (isMobile ? "100%" : 280) : 0,
+        top: 0,
+        left: 0,
+        bottom: 0,
+        zIndex: 20,
+        [theme.breakpoints.up("mobile")]: {
+            top: 55,
+        },
+        transition: theme.transitions.create("width", {
+            duration: theme.transitions.duration.standard,
+            easing: theme.transitions.easing.easeInOut
+        }),
+    },
     viewRoot: {
         position: "relative",
         height: "100%",
@@ -35,7 +50,7 @@ const useStyles = makeStyles(theme => ({
         color: theme.palette.type === "dark" && theme.palette.secondary.main
     },
     slides: {
-        backgroundColor: theme.palette.background.default,
+        // backgroundColor: theme.palette.background.default,
         overflow: "visible !important"
     },
     blur: {
@@ -61,7 +76,7 @@ const LeftMenu =
          ...props
      }) => {
         const theme = useTheme()
-        const classes = useStyles()
+        const classes = useStyles({showMenu, isMobile})
         const [value, setValue] = useState(0);
         const [selectedState, setSelectedState] = useState("questions");
 

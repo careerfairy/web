@@ -1,4 +1,4 @@
-import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import {withFirebase} from "../../context/firebase";
 import StreamerTopBar from "./StreamerTopBar";
@@ -7,8 +7,7 @@ import LeftMenu from "../../components/views/streaming/LeftMenu/LeftMenu";
 import Loader from "../../components/views/loader/Loader";
 import {useRouter} from "next/router";
 import NotificationsContext from "../../context/notifications/NotificationsContext";
-
-const CurrentStreamContext = createContext({currentLivestream: false});
+import {CurrentStreamContext} from "../../context/stream/StreamContext";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -207,7 +206,5 @@ const StreamerLayout = (props) => {
         </NotificationsContext.Provider>
     );
 };
-
-export const useCurrentStream = () => useContext(CurrentStreamContext);
 
 export default withFirebase(StreamerLayout);
