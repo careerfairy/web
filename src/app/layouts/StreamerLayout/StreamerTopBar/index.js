@@ -47,7 +47,8 @@ const useStyles = makeStyles(theme => ({
     },
     viewCountText: {
         fontWeight: 600,
-        marginLeft: theme.spacing(0.5)
+        marginLeft: theme.spacing(0.5),
+
     },
 }));
 

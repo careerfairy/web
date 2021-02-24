@@ -1,6 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import {makeStyles, useTheme} from "@material-ui/core/styles";
-import {AppBar, Box, Button, Checkbox, Toolbar, Tooltip, useMediaQuery} from "@material-ui/core";
+import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
+import {
+    AppBar,
+    Badge,
+    Box,
+    Button,
+    Checkbox,
+    Fab,
+    Toolbar,
+    Tooltip,
+    Typography,
+    useMediaQuery
+} from "@material-ui/core";
 import {MainLogo} from "../../../components/logos";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
@@ -13,6 +24,7 @@ import {useThemeToggle} from "../../../context/theme/ThemeContext";
 import {useAuth} from "../../../HOCs/AuthProvider";
 import {withFirebase} from "../../../context/firebase";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
+import PeopleIcon from "@material-ui/icons/People";
 
 const useStyles = makeStyles(theme => ({
     joinButton: {
@@ -23,9 +35,32 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         justifyContent: "space-between"
     },
+    viewCount: {
+        // background: theme.palette.primary.main,
+        color: theme.palette.primary.main,
+        padding: theme.spacing(1),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    viewCountText: {
+        fontWeight: 600,
+        marginLeft: theme.spacing(0.5)
+    },
+    floatingViewCount: {
+        position: 'absolute',
+        top: theme.spacing(1),
+        right: theme.spacing(2),
+        zIndex: 120,
+        color: theme.palette.primary.main,
+        background: "transparent",
+        "&:hover":{
+            background: fade(theme.palette.primary.main, 0.1),
+        }
+    }
 }));
 
-const ViewerTopBar = ({firebase, mobile}) => {
+const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience}) => {
 
     const classes = useStyles()
     const {authenticatedUser, userData} = useAuth();
@@ -56,8 +91,16 @@ const ViewerTopBar = ({firebase, mobile}) => {
     }
 
 
-    if(mobile){
-        return null
+    if (mobile) {
+        return (
+            <Tooltip title="See who's here">
+                <Fab onClick={showAudience} size="small" className={classes.floatingViewCount}>
+                    <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
+                        <PeopleIcon/>
+                    </Badge>
+                </Fab>
+            </Tooltip>
+        )
     }
 
 
@@ -71,7 +114,6 @@ const ViewerTopBar = ({firebase, mobile}) => {
     }).filter(cc => cc.logoUrl || cc.groupId)
 
 
-
     return (
         <AppBar elevation={1} color="transparent">
             <Toolbar className={classes.toolbar}>
@@ -81,15 +123,28 @@ const ViewerTopBar = ({firebase, mobile}) => {
                 {currentLivestream.companyLogoUrl && <Logo
                     src={currentLivestream.companyLogoUrl}
                 />}
-                <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
-                    <Checkbox
-                        checked={themeMode === "dark"}
-                        onChange={toggleTheme}
-                        icon={<Brightness4Icon/>}
-                        checkedIcon={<Brightness7Icon/>}
-                        color="default"
-                    />
-                </Tooltip>
+                <Box display="flex" alignItems="center">
+                    <Tooltip title={themeMode === "dark" ? "Switch to light theme" : "Switch to dark mode"}>
+                        <Checkbox
+                            checked={themeMode === "dark"}
+                            onChange={toggleTheme}
+                            icon={<Brightness4Icon/>}
+                            checkedIcon={<Brightness7Icon/>}
+                            color="default"
+                        />
+                    </Tooltip>
+                    <Box className={classes.viewCount}>
+                        <Tooltip title="Number of viewers">
+                            <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
+                                <PeopleIcon/>
+                            </Badge>
+                        </Tooltip>
+                        {!mobile &&
+                        <Typography className={classes.viewCountText}>
+                            Viewers : {numberOfViewers}
+                        </Typography>}
+                    </Box>
+                </Box>
                 {!currentLivestream.hasNoTalentPool &&
                 <Button
                     children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
@@ -105,9 +160,10 @@ const ViewerTopBar = ({firebase, mobile}) => {
 };
 
 ViewerTopBar.propTypes = {
-  currentLivestream: PropTypes.object.isRequired,
-  firebase: PropTypes.object,
-  mobile: PropTypes.bool.isRequired
+    firebase: PropTypes.object,
+    mobile: PropTypes.bool.isRequired,
+    numberOfViewers: PropTypes.number.isRequired,
+    showAudience: PropTypes.func.isRequired
 }
 
 export default withFirebase(ViewerTopBar);

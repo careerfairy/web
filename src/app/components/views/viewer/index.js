@@ -10,6 +10,8 @@ import VolumeUpRoundedIcon from "@material-ui/icons/VolumeUpRounded";
 import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
 import clsx from "clsx";
+import StreamNotifications from "../streaming/sharedComponents/StreamNotifications";
+import AudienceDrawer from "../streaming/AudienceDrawer";
 
 const useStyles = makeStyles(theme => ({
     iconsContainer: {
@@ -67,13 +69,16 @@ const ViewerOverview = ({
                             playVideos,
                             enableIcons,
                             handleMouseLeave,
-                            showMenu,
                             iconsDisabled,
                             mobile,
                             unmuteVideos,
+                            setNumberOfViewers,
                             DELAY,
                             setShowVideoButton,
-                            handleClose
+                            handleClose,
+                            showAudience,
+                            hideAudience,
+                            audienceDrawerOpen,
                         }) => {
 
     const {currentLivestream} = useCurrentStream()
@@ -85,8 +90,14 @@ const ViewerOverview = ({
             <div className={clsx({
                 [classes.blackFrame]: true,
             })}>
+                <AudienceDrawer
+                    livestreamId={currentLivestream.id}
+                    hideAudience={hideAudience}
+                    audienceDrawerOpen={audienceDrawerOpen}
+                />
                 <ViewerComponent
                     livestreamId={currentLivestream.id} streamerId={streamerId}
+                    setNumberOfViewers={setNumberOfViewers}
                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
                     showVideoButton={showVideoButton}
                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}
@@ -117,6 +128,7 @@ const ViewerOverview = ({
             {currentLivestream && !currentLivestream.hasNoRatings &&
             <RatingContainer livestreamId={currentLivestream.id}
                              livestream={currentLivestream}/>}
+            <StreamNotifications isStreamer={false}/>
             <Backdrop
                 open={Boolean(showVideoButton.muted)}
                 className={classes.backdrop}

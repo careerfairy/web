@@ -71,6 +71,8 @@ const ViewerLayout = (props) => {
     const [open, setOpen] = React.useState(true);
     const [delayHandler, setDelayHandler] = useState(null)
     const [iconsDisabled, setIconsDisabled] = useState(false);
+    const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
+    const [numberOfViewers, setNumberOfViewers] = useState(0);
     const [showVideoButton, setShowVideoButton] = useState({paused: false, muted: false});
     const [play, setPlay] = useState(false);
     const [unmute, setUnmute] = useState(false);
@@ -123,6 +125,16 @@ const ViewerLayout = (props) => {
             }
         }
     }, [currentLivestream, authenticatedUser])
+
+    const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
+
+    const showAudience = useCallback(() => {
+        setAudienceDrawerOpen(true)
+    }, []);
+
+    const hideAudience = useCallback(() => {
+        setAudienceDrawerOpen(false)
+    }, []);
 
     const handleOpen = useCallback(() => {
         setOpen(true);
@@ -192,6 +204,8 @@ const ViewerLayout = (props) => {
         <CurrentStreamContext.Provider value={{currentLivestream}}>
             <div className={classes.root}>
                 <ViewerTopBar
+                    showAudience={showAudience}
+                    numberOfViewers={numberOfViewers}
                     mobile={mobile}
                 />
                 <LeftMenu
@@ -225,6 +239,10 @@ const ViewerLayout = (props) => {
                                 handleLike,
                                 handleClap,
                                 enableIcons,
+                                showAudience,
+                                setNumberOfViewers: handleSetNumberOfViewers,
+                                hideAudience,
+                                audienceDrawerOpen,
                                 handleMouseLeave,
                                 iconsDisabled,
                                 handleMouseEnter,
