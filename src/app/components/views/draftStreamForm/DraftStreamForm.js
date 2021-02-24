@@ -254,9 +254,7 @@ const DraftStreamForm = ({
     }
 
     const handleSetOnlyUrlIds = async () => {
-        console.log("-> in the handle set only");
         const arrayOfUrlIds = careerCenterIds?.split(",") || [group.id]
-        console.log("-> arrayOfUrlIds", arrayOfUrlIds);
         await handleSetGroupIds(arrayOfUrlIds, [], formData)
     }
 
@@ -292,6 +290,10 @@ const DraftStreamForm = ({
             preventDuplicate: true,
         });
     };
+
+    const handleClickSubmitForApproval = () => {
+        setStatus(SUBMIT_FOR_APPROVAL)
+    }
 
     const isNotAdmin = () => !Boolean(userData?.isAdmin || group?.id)
 
@@ -573,9 +575,7 @@ const DraftStreamForm = ({
                     <ButtonGroup className={classes.buttonGroup} fullWidth>
                         <Button
                             type="submit"
-                            onClick={() => {
-                                setStatus(SUBMIT_FOR_APPROVAL)
-                            }}
+                            onClick={handleClickSubmitForApproval}
                             disabled={isSubmitting || isPending()}
                             size="large"
                             className={classes.submit}

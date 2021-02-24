@@ -15,6 +15,7 @@ import EmoteButtons from "../../../components/views/viewer/EmoteButtons";
 import RatingContainer from "../../../components/views/viewer/rating-container/RatingContainer";
 import {useAuth} from 'HOCs/AuthProvider';
 import {useDispatch} from "react-redux";
+import {v4 as uuidv4} from 'uuid';
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
 import {
     Avatar,
@@ -156,6 +157,7 @@ function ViewerPage({firebase}) {
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
     const [currentLivestream, setCurrentLivestream] = useState(false);
+    const [streamerId, setStreamerId] = useState(null);
 
     const [careerCenters, setCareerCenters] = useState([]);
     const [handRaiseActive, setHandRaiseActive] = useState(false);
@@ -225,6 +227,18 @@ function ViewerPage({firebase}) {
             setUserIsInTalentPool(false);
         }
     }, [currentLivestream, userData]);
+
+    useEffect(() => {
+        if (currentLivestream && !streamerId) {
+            if (currentLivestream.test) {
+                let uuid = uuidv4()
+                let joiningId = uuid.replace(/-/g, '')
+                setStreamerId(currentLivestream.id + joiningId)
+            } else if (authenticatedUser?.email) {
+                setStreamerId(currentLivestream.id + authenticatedUser.email)
+            }
+        }
+    }, [currentLivestream, authenticatedUser])
 
 
     const handleOpen = () => {
@@ -342,7 +356,7 @@ function ViewerPage({firebase}) {
                 [classes.withMenu]: showMenu
             })}>
                 <ViewerComponent
-                    livestreamId={livestreamId} streamerId={`${authenticatedUser?.email}${livestreamId}`}
+                    livestreamId={livestreamId} streamerId={streamerId}
                     currentLivestream={currentLivestream} handRaiseActive={handRaiseActive}
                     setHandRaiseActive={setHandRaiseActive} showVideoButton={showVideoButton}
                     setShowVideoButton={setShowVideoButton} unmute={unmute} play={play}/>

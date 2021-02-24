@@ -6,17 +6,16 @@ import CurrentSpeakerDisplayer from './CurrentSpeakerDisplayer';
 import SmallStreamerVideoDisplayer from './SmallStreamerVideoDisplayer';
 import VideoControlsContainer from './VideoControlsContainer';
 import StreamPreparationModalV2 from "../modal/StreamPreparationModalV2/StreamPreparationModalV2";
-import ErrorMessageModal from "../modal/StreamPreparationModalV2/ErrorMessageModal";
 import useDevices from 'components/custom-hook/useDevices';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from "@material-ui/core/styles";
 import TutorialContext from "context/tutorials/TutorialContext";
 import DemoIntroModal from "../modal/DemoIntroModal";
 import DemoEndModal from "../modal/DemoEndModal";
 
 import useMediaSources from 'components/custom-hook/useMediaSources';
-import ScreenSharePermissionDeniedModal from '../modal/ScreenSharePermissionDeniedModal';
-import StreamPreparationModal from '../modal/StreamPreparationModal';
 import WifiIndicator from "./WifiIndicator";
+import LoadingModal from '../modal/LoadingModal';
+import ErrorModal from '../modal/ErrorModal';
 import SettingsModal from "./SettingsModal";
 import ScreenShareModal from "./ScreenShareModal";
 
@@ -46,7 +45,10 @@ function VideoContainer(props) {
     const [errorMessage, setErrorMessage] = useState(null);
     const [screenSharePermissionDenied, setScreenSharePermissionDenied] = useState(false);
     const [showDemoIntroModal, setShowDemoIntroModal] = useState(false);
+
+    const [streamerConnected, setStreamerConnected] = useState(false);
     const [streamerReady, setStreamerReady] = useState(false);
+
     const [connectionEstablished, setConnectionEstablished] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
     const [showScreenShareModal, setShowScreenShareModal] = useState(false);
@@ -60,8 +62,10 @@ function VideoContainer(props) {
 
     const {
         localMediaStream,
+        setLocalMediaStream,
         externalMediaStreams,
-        agoraStatus,
+        agoraRtcStatus,
+        agoraRtmStatus,
         networkQuality,
         numberOfViewers,
         setAddedStream,
@@ -77,7 +81,7 @@ function VideoContainer(props) {
             props.viewer,
         );
 
-    const devices = useDevices(agoraStatus === "stream_published");
+    const devices = useDevices(agoraRtcStatus && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED");
 
     const {
         audioSource,
@@ -127,10 +131,16 @@ function VideoContainer(props) {
     }, [audioCounter, props.currentLivestream.mode]);
 
     useEffect(() => {
-        if (agoraStatus === "screen-share-stopped" && props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
+        if (agoraRtcStatus && agoraRtcStatus.type === "INFO" && agoraRtcStatus.msg === "RTC_STREAM_PUBLISHED") {
+            setStreamerConnected(true)
+        }
+    }, [agoraRtcStatus])
+
+    useEffect(() => {
+        if (agoraRtcStatus && (agoraRtcStatus.msg === "RTC_SCREEN_SHARE_STOPPED" || agoraRtcStatus.msg === "RTC_SCREEN_SHARE_NOT_ALLOWED") && props.currentLivestream.mode === 'desktop' && props.currentLivestream.screenSharerId === props.streamerId) {
             setDesktopMode("default", props.streamerId)
         }
-    }, [agoraStatus])
+    }, [agoraRtcStatus])
 
     useEffect(() => {
         if (isMainStreamer && props.currentLivestream.mode === 'desktop') {
@@ -320,6 +330,7 @@ function VideoContainer(props) {
                     joining={!isMainStreamer}
                     handleClickScreenShareButton={handleClickScreenShareButton}
                     localMediaStream={localMediaStream}
+                    setLocalMediaStream={setLocalMediaStream}
                     isMainStreamer={isMainStreamer}
                     showSettings={showSettings}
                     setShowSettings={setShowSettings}
@@ -337,51 +348,30 @@ function VideoContainer(props) {
                            videoSource={videoSource} updateVideoSource={updateVideoSource} audioLevel={audioLevel}
                            speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
                            attachSinkId={attachSinkId}/>
-            {!props.viewer && !streamerReady &&
             <StreamPreparationModalV2 readyToConnect={Boolean(props.currentLivestream && props.currentLivestream.id)}
-                                      audioSource={audioSource} updateAudioSource={updateAudioSource}
-                                      videoSource={videoSource} updateVideoSource={updateVideoSource}
-                                      audioLevel={audioLevel}
-                                      speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
-                                      streamerReady={streamerReady} setStreamerReady={setStreamerReady}
-                                      localStream={displayableMediaStream}
-                                      connectionEstablished={connectionEstablished}
-                                      isTest={props.currentLivestream.test} viewer={props.viewer}
-                                      handleOpenDemoIntroModal={handleOpenDemoIntroModal}
-                                      attachSinkId={attachSinkId} devices={devices}
-                                      setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
-                                      isStreaming={isStreaming}/>
-            }
-            {props.viewer &&
-            <StreamPreparationModal audioSource={audioSource} updateAudioSource={updateAudioSource}
-                                    videoSource={videoSource} updateVideoSource={updateVideoSource}
-                                    audioLevel={audioLevel}
-                                    speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
-                                    streamerReady={streamerReady} setStreamerReady={setStreamerReady}
-                                    localStream={localMediaStream} connectionEstablished={connectionEstablished}
-                                    devices={devices}
-                                    setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
-                                    isStreaming={isStreaming}/>
-            }
-            <ScreenSharePermissionDeniedModal screenSharePermissionDenied={screenSharePermissionDenied}
-                                              setScreenSharePermissionDenied={setScreenSharePermissionDenied}/>
-            {!props.viewer && <ErrorMessageModal isStreaming={isStreaming} connectionEstablished={connectionEstablished}
-                                                 errorMessage={errorMessage} streamerReady={streamerReady}/>
-            }
+                audioSource={audioSource} updateAudioSource={updateAudioSource}
+                videoSource={videoSource} updateVideoSource={updateVideoSource}
+                speakerSource={speakerSource} setSpeakerSource={updateSpeakerSource}
+                audioLevel={audioLevel} streamerConnected={streamerConnected}
+                streamerReady={streamerReady} setStreamerReady={setStreamerReady}
+                localStream={displayableMediaStream}
+                connectionEstablished={connectionEstablished}
+                isTest={props.currentLivestream.test} viewer={props.viewer}
+                handleOpenDemoIntroModal={handleOpenDemoIntroModal}
+                attachSinkId={attachSinkId} devices={devices}
+                setConnectionEstablished={setConnectionEstablished} errorMessage={errorMessage}
+                isStreaming={isStreaming}/>
+            <LoadingModal agoraRtcStatus={agoraRtcStatus} />
+            <ErrorModal agoraRtcStatus={agoraRtcStatus} agoraRtmStatus={agoraRtmStatus} />
             <ScreenShareModal
                 open={showScreenShareModal}
                 handleClose={handleCloseScreenShareModal}
                 handleScreenShare={handleScreenShare}
             />
-            <DemoIntroModal
-                livestreamId={props.currentLivestream.id}
-                open={showDemoIntroModal}
-                handleClose={handleCloseDemoIntroModal}
-            />
-            <DemoEndModal
-                open={isOpen(17)}
-                handleClose={handleCloseDemoEndModal}
-            />
+            <DemoIntroModal livestreamId={props.currentLivestream.id}
+                            open={showDemoIntroModal}
+                            handleClose={handleCloseDemoIntroModal}/>
+            <DemoEndModal open={isOpen(17)} handleClose={handleCloseDemoEndModal}/>
         </Fragment>
     );
 }

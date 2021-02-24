@@ -88,6 +88,7 @@ exports.addToIndex = functions.firestore.document('careerCenterData/{careerCente
         data.groupId = objectID
         // deletes personal Identifiable data
         delete data.adminEmail
+        delete data.adminEmails
         return groupIndex.saveObject({...data, objectID})
             .then(() => {
                 functions.logger.log('Groups imported into Algolia');
@@ -122,6 +123,7 @@ exports.updateIndex = functions.firestore.document('careerCenterData/{careerCent
         const newData = change.after.data();
         // deletes personal Identifiable data
         delete newData.adminEmail
+        delete newData.adminEmails
 
         const objectID = change.after.id;
         return groupIndex.saveObject({...newData, objectID})
@@ -353,6 +355,76 @@ exports.sendPhysicalEventRegistrationConfirmationEmail = functions.https.onReque
         return res.status(400).send(error);
     });
 });
+exports.sendDashboardInviteEmail = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    const email = {
+        "TemplateId": 22272783,
+        "From": 'CareerFairy <noreply@careerfairy.io>',
+        "To": req.body.recipientEmail,
+        "TemplateModel": {
+            sender_first_name: req.body.sender_first_name,
+            group_name: req.body.group_name,
+            invite_link: req.body.invite_link,
+        }
+    };
+
+    client.sendEmailWithTemplate(email).then(response => {
+        return res.send(200);
+    }, error => {
+        console.log('error:' + error);
+        return res.status(400).send(error);
+    });
+});
+
+exports.sendDraftApprovalRequestEmail = functions.https.onRequest(async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        res.set('Access-Control-Allow-Methods', 'GET');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
+
+    const adminsInfo = req.body.adminsInfo || []
+
+    functions.logger.log("admins Info in approval request", adminsInfo)
+
+    const emails = adminsInfo.map(({email, link}) => ({
+        "TemplateId": 22299429,
+        "From": 'CareerFairy <noreply@careerfairy.io>',
+        "To": email,
+        "TemplateModel": {
+            sender_name: req.body.sender_name,
+            livestream_title: req.body.livestream_title,
+            livestream_company_name: req.body.livestream_company_name,
+            draft_stream_link: link,
+            submit_time: req.body.submit_time,
+        }
+    }))
+
+    client.sendEmailBatchWithTemplates(emails).then(responses => {
+        responses.forEach(response => functions.logger.log('sent batch DraftApprovalRequestEmail email with response:', response))
+        return res.send(200);
+    }, error => {
+        console.log('error:' + error);
+        return res.status(400).send(error);
+    });
+});
 
 exports.updateFakeUser = functions.https.onRequest(async (req, res) => {
 
@@ -560,7 +632,7 @@ exports.generateAgoraToken = functions.https.onRequest(async (req, res) => {
     const streamerToken = req.body.token;
     const rtcRole = req.body.isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
     const rtmRole = 0;
-    const expirationTimeInSeconds = 5400
+    const expirationTimeInSeconds = 21600
     const uid = req.body.uid;
     const currentTimestamp = Math.floor(Date.now() / 1000)
     const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
@@ -632,27 +704,26 @@ exports.generateAgoraTokenSecure = functions.https.onRequest(async (req, res) =>
     const sentToken = req.body.token;
     const rtcRole = req.body.isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
     const rtmRole = 0;
-    const expirationTimeInSeconds = 5400
+    const expirationTimeInSeconds = 21600
     const uid = req.body.uid;
     const currentTimestamp = Math.floor(Date.now() / 1000)
     const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-    
-    // IMPORTANT! Build token with either the uid or with the user account. Comment out the option you do not want to use below.
-    
+        
     // Build token with uid
     if (rtcRole === RtcRole.PUBLISHER) {
         let livestreamDoc = await admin.firestore().collection('livestreams').doc(channelName).get();
-        let storedTokenDoc =  await admin.firestore().collection('livestreams').doc(channelName).collection('tokens').doc('secureToken').get();
-
         let livestream = livestreamDoc.data();
-        let storedToken = storedTokenDoc.data().value;
-        if (!livestream.test && storedToken !== sentToken) {
-            return res.status(401).send();
-        } else {
-            const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
-            const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
-            return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
+
+        if (!livestream.test) {
+            let storedTokenDoc =  await admin.firestore().collection('livestreams').doc(channelName).collection('tokens').doc('secureToken').get();
+            let storedToken = storedTokenDoc.data().value;
+            if (storedToken !== sentToken) {
+                return res.status(401).send();
+            }
         }
+        const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
+        const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);
+        return res.status(200).send({ rtcToken: rtcToken, rtmToken: rtmToken });
     } else {
         const rtcToken = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, rtcRole, privilegeExpiredTs);
         const rtmToken = RtmTokenBuilder.buildToken(appID, appCertificate, uid, rtmRole, privilegeExpiredTs);

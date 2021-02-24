@@ -89,16 +89,20 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
         onClose()
     }
 
-    const handlePublishDraft = async () => {
+    const getAuthor = (livestream) => {
+        return livestream?.author?.email ? livestream.author : {
+            email: authenticatedUser.email,
+            ...(group?.id && {groupId: group.id})
+        }
+    }
+
+    const handlePublishDraft = async (streamToPublish) => {
         if (canPublish()) {
             try {
                 formRef.current?.setSubmitting(true)
-                const newStream = {...currentStream}
+                const newStream = {...streamToPublish}
                 newStream.companyId = uuidv4()
-                const author = {
-                    groupId: group.id,
-                    email: authenticatedUser.email
-                }
+                const author = getAuthor(newStream)
                 await firebase.addLivestream(newStream, "livestreams", author)
                 await firebase.deleteLivestream(currentStream.id, "draftLivestreams")
 
@@ -145,7 +149,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
             }
 
             if (publishDraft) {
-                await handlePublishDraft()
+                await handlePublishDraft(livestream)
                 setPublishDraft(false)
                 return
             }
@@ -153,6 +157,12 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
             const targetCollection = isActualLivestream() ? "livestreams" : "draftLivestreams"
             if (updateMode) {
                 id = livestream.id
+                if (!livestream.author) {
+                    livestream.author = {
+                        groupId: group.id,
+                        email: authenticatedUser.email
+                    }
+                }
                 await firebase.updateLivestream(livestream, targetCollection)
                 console.log(`-> ${!isActualLivestream() && "Draft "}livestream was updated with id`, id);
             } else {
@@ -214,7 +224,7 @@ const NewStreamModal = ({group, open, onClose, firebase, typeOfStream, currentSt
                     className={className}
                     autoFocus color="secondary"
                     onClick={handleValidate}>
-                <Typography variant={size === "large" && "h5"}>
+                <Typography variant={size === "large" ? "h5" : undefined}>
                     publish as stream
                 </Typography>
             </Button>}

@@ -26,6 +26,7 @@ import PeopleIcon from "@material-ui/icons/People";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
+import Loader from 'components/views/loader/Loader';
 
 const useStyles = makeStyles((theme) => ({
     menuLeft: {
@@ -96,9 +97,12 @@ function StreamingPage(props) {
     const router = useRouter();
     const mobile = useMediaQuery(theme.breakpoints.down('md'))
     const livestreamId = router.query.livestreamId;
+    const token = router.query.token;
+
     const [streamerId, setStreamerId] = useState(null)
 
     const [streamerReady, setStreamerReady] = useState(false);
+    const [tokenChecked, setTokenChecked] = useState(false);
 
     const [currentLivestream, setCurrentLivestream] = useState(false);
     const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false);
@@ -152,6 +156,26 @@ function StreamingPage(props) {
         }
     }, [currentLivestream.start]);
 
+    useEffect(() => {
+        if (router && router.query && currentLivestream && !currentLivestream.test) {
+            if (!token) {
+                router.push('/streaming/error')
+            } else {
+                props.firebase.getLivestreamSecureToken(currentLivestream.id).then( doc => {
+                    if (!doc.exists) {
+                        router.push('/streaming/error')
+                    }
+                    let storedToken = doc.data().value;
+                    if (storedToken !== token) {
+                        router.push('/streaming/error')
+                    } else {
+                        setTokenChecked(true);
+                    }
+                })
+            }
+        }
+    }, [router, token, currentLivestream]);
+
     function dateIsInUnder2Minutes(date) {
         return new Date(date).getTime() - Date.now() < 1000 * 60 * 2 || Date.now() > new Date(date).getTime();
     }
@@ -160,10 +184,23 @@ function StreamingPage(props) {
         setShowMenu(!showMenu)
     }
 
-    if (!streamerReady) {
+    const tokenIsValidated = () => {
+        if (currentLivestream.test) {
+            return true;
+        } else {
+            return tokenChecked;
+        }
+    }
+
+    if (!currentLivestream || !tokenIsValidated()) {
+        return <Loader />
+    }
+
+    if (!streamerReady && tokenIsValidated()) {
         return (
             <PreparationOverlay
                 livestream={currentLivestream}
+                streamerUuid={streamerId}
                 setStreamerReady={setStreamerReady}
             />
         )

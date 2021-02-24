@@ -12,11 +12,11 @@ const useStyles = makeStyles(theme => ({
         flexDirection: "column"
     },
     logoImage: {
-        // minWidth: "90",
-        // height: "auto",
+        maxWidth: "100%",
         maxHeight: "90%"
     },
     imageWrapper: {
+        width: 100,
         height: 50,
         display: "flex",
         alignItems: "center",

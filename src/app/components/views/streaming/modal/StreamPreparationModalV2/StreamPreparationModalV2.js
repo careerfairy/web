@@ -51,10 +51,10 @@ function getSteps() {
 
 const StreamPreparationModalV2 = ({
                                       readyToConnect,
+                                      streamerConnected,
                                       streamerReady,
                                       setStreamerReady,
                                       localStream,
-                                      connectionEstablished,
                                       setConnectionEstablished,
                                       isStreaming,
                                       audioSource,
@@ -250,7 +250,6 @@ const StreamPreparationModalV2 = ({
                                  handleMarkComplete={handleMarkComplete}
                                  isCompleted={isCompleted()}
                                  playSound={playSound}
-                                 streamerReady={streamerReady}
                                  speakerSource={speakerSource}
                                  setPlaySound={setPlaySound}
                                  audioSource={audioSource}/>
@@ -261,16 +260,15 @@ const StreamPreparationModalV2 = ({
                                      devices={devices}
                                      setStreamerReady={setStreamerReady}
                                      speakerSource={speakerSource}
-                                     videoSource={videoSource}
-                                     streamerReady={streamerReady}/>
+                                     videoSource={videoSource}/>
             default:
                 return 'Unknown stepIndex';
         }
     }
 
     return (
-        <GlassDialog fullScreen={fullScreen} fullWidth maxWidth="sm" open={!streamerReady || !connectionEstablished}>
-            <DialogTitle disableTypography hidden={streamerReady && connectionEstablished}>
+        <GlassDialog fullScreen={fullScreen} fullWidth maxWidth="sm" open={streamerConnected && !streamerReady}>
+            <DialogTitle disableTypography>
                 <h3 style={{color: 'rgb(0, 210, 170)'}}>CareerFairy Streaming</h3>
             </DialogTitle>
             <DialogContent className={classes.root}>

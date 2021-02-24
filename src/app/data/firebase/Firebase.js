@@ -1,4 +1,5 @@
 import firebase from '../../Firebase/Firebase';
+import {v4 as uuidv4} from 'uuid';
 
 // import firebase from "firebase/app";
 // import "firebase/auth";
@@ -170,9 +171,23 @@ class Firebase {
         return ref.get();
     };
 
-    createCareerCenter = (careerCenter) => {
-        let ref = this.firestore.collection("careerCenterData");
-        return ref.add(careerCenter);
+    createCareerCenter = async (careerCenter, userEmail) => {
+        let batch = this.firestore.batch();
+        let groupRef = this.firestore.collection("careerCenterData")
+            .doc()
+        let groupAdminRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupRef.id)
+            .collection("admins")
+            .doc(userEmail)
+
+        careerCenter.groupId = groupRef.id
+        batch.set(groupRef, careerCenter)
+        batch.set(groupAdminRef, {role: "mainAdmin"})
+
+        await batch.commit();
+
+        return groupRef
     }
 
     updateCareerCenter = (groupId, newCareerCenter) => {
@@ -301,6 +316,18 @@ class Firebase {
             livestream.id = livestreamsRef.id
             batch.set(livestreamsRef, livestream, {merge: true})
 
+            if (collection === 'livestreams') {
+                let tokenRef = this.firestore.collection(collection)
+                    .doc(livestreamsRef.id)
+                    .collection('tokens')
+                    .doc('secureToken');
+
+                let token = uuidv4();
+                batch.set(tokenRef, {
+                    value: token,
+                })
+            }
+
             for (const rating of ratings) {
                 let ratingRef = this.firestore.collection(collection)
                     .doc(livestreamsRef.id)
@@ -345,18 +372,12 @@ class Firebase {
     }
 
     updateLivestream = async (livestream, collection) => {
-        try {
-            let batch = this.firestore.batch();
-            let livestreamsRef = this.firestore
-                .collection(collection)
-                .doc(livestream.id)
-            livestream.lastUpdated = this.getServerTimestamp()
-            batch.update(livestreamsRef, livestream)
-            await batch.commit()
-            return livestream.id
-        } catch (error) {
-            return error
-        }
+        let livestreamsRef = this.firestore
+            .collection(collection)
+            .doc(livestream.id)
+        livestream.lastUpdated = this.getServerTimestamp()
+        await livestreamsRef.update(livestream)
+        return livestream.id
     }
 
     addLivestreamSpeaker = (livestreamId, speaker) => {
@@ -722,6 +743,15 @@ class Firebase {
         return ref.get();
     };
 
+    getLivestreamSecureToken = (livestreamId) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("tokens")
+            .doc("secureToken");
+        return ref.get();
+    }
+
     getLegacyScheduledLivestreamById = (livestreamId) => {
         let ref = this.firestore
             .collection("scheduledLivestreams")
@@ -767,6 +797,50 @@ class Firebase {
             .orderBy("timestamp", "asc");
         return ref.onSnapshot(callback);
     };
+
+    updateSpeakersInLivestream = (livestream, speaker) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestream.id);
+        return this.firestore.runTransaction((transaction) => {
+            return transaction.get(ref).then((livestreamDoc) => {
+                let livestream = livestreamDoc.data()
+                let updatedSpeakers = livestream.speakers.filter( existingSpeaker => existingSpeaker.id !== speaker.id )
+                updatedSpeakers.forEach( existingSpeaker => {
+                    if ( existingSpeaker.speakerUuid === speaker.speakerUuid ) {
+                        delete existingSpeaker.speakerUuid;
+                    }
+                });
+                updatedSpeakers.push(speaker)
+                transaction.update(ref, {
+                    speakers: updatedSpeakers
+                });
+            });
+        });
+    }
+
+    addSpeakerInLivestream = (livestream, speaker) => {
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestream.id);
+        return this.firestore.runTransaction((transaction) => {
+            return transaction.get(ref).then((livestreamDoc) => {
+                let livestream = livestreamDoc.data()
+                let speakerRef = this.firestore.collection("livestreams").doc(livestreamDoc.id).collection("speakers").doc();
+                speaker.id = speakerRef.id;
+                let updatedSpeakers = livestream.speakers ? [ ...livestream.speakers ] : []
+                updatedSpeakers.forEach( existingSpeaker => {
+                    if ( existingSpeaker.speakerUuid === speaker.speakerUuid ) {
+                        delete existingSpeaker.speakerUuid;
+                    }
+                });
+                updatedSpeakers.push(speaker)
+                transaction.update(ref, {
+                    speakers: updatedSpeakers
+                });
+            });
+        });
+    }
 
     putQuestionComment = (livestreamId, questionId, comment) => {
         comment.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
@@ -993,7 +1067,7 @@ class Firebase {
     listenCareerCentersByAdminEmail = (email, callback) => {
         let ref = this.firestore
             .collection("careerCenterData")
-            .where("adminEmail", "==", email);
+            .where("adminEmails", "array-contains", email);
         return ref.onSnapshot(callback);
     };
 
@@ -1630,9 +1704,200 @@ class Firebase {
         return dataArray
     }
 
+    //Dashboard Queries
 
+    joinGroupDashboard = (groupId, userEmail, invitationId) => {
+        let groupRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+
+        let userRef = this.firestore
+            .collection("userData")
+            .doc(userEmail)
+
+        let notificationRef = this.firestore
+            .collection("notifications")
+            .doc(invitationId)
+
+        return this.firestore.runTransaction((transaction) => {
+            return transaction.get(userRef).then((userDoc) => {
+                const userData = userDoc.data()
+                transaction.update(groupRef, {
+                    adminEmails: firebase.firestore.FieldValue.arrayUnion(userData.userEmail),
+                });
+                let groupAdminRef = this.firestore
+                    .collection("careerCenterData")
+                    .doc(groupId)
+                    .collection("admins")
+                    .doc(userData.userEmail)
+                transaction.set(groupAdminRef, {
+                    role: "subAdmin",
+                });
+
+                transaction.delete(notificationRef)
+            });
+        });
+    }
+
+    kickFromDashboard = (groupId, userEmail) => {
+        let groupRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+
+        let userRef = this.firestore
+            .collection("userData")
+            .doc(userEmail)
+
+        return this.firestore.runTransaction((transaction) => {
+            return transaction.get(userRef).then((userDoc) => {
+                const userData = userDoc.data()
+
+                const email = userData?.userEmail || userEmail
+
+                transaction.update(groupRef, {
+                    adminEmails: firebase.firestore.FieldValue.arrayRemove(email),
+                });
+                let groupAdminRef = this.firestore
+                    .collection("careerCenterData")
+                    .doc(groupId)
+                    .collection("admins")
+                    .doc(email)
+                transaction.delete(groupAdminRef);
+            });
+        });
+    }
+
+    promoteToMainAdmin = async (groupId, userEmail) => {
+
+        let batch = this.firestore.batch()
+
+        let adminToPromoteRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("admins")
+            .doc(userEmail)
+
+        let groupAdminsRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("admins")
+            .where("role", "==", "mainAdmin")
+
+        const adminSnaps = await groupAdminsRef.get()
+        // Demote all main Admins to subAdmins to ensure that there is always no main admins when promoting
+        for (const mainAdminDoc of adminSnaps.docs) {
+            const mainAdminRef = this.firestore
+                .collection("careerCenterData")
+                .doc(groupId)
+                .collection("admins")
+                .doc(mainAdminDoc.id)
+            batch.update(mainAdminRef, {role: "subAdmin"})
+        }
+
+        batch.set(adminToPromoteRef, {role: "mainAdmin"}, {merge: true})
+
+        return batch.commit()
+    }
+
+    // Approval Queries
+
+    getAllGroupAdminInfo = async (arrayOfGroupIds = ["groupId"], streamId = "") => {
+        let adminsInfo = []
+        for (const groupId of arrayOfGroupIds) {
+            const groupRef = this.firestore.collection("careerCenterData")
+                .doc(groupId)
+            const groupSnap = await groupRef.get()
+            if (groupSnap.exists) {
+                const groupData = groupSnap.data()
+                if (groupData.adminEmails?.length) {
+                    const baseUrl = this.getBaseUrl()
+                    const newAdminsInfo = groupData.adminEmails.map(email => ({
+                        groupId,
+                        email,
+                        link: `${baseUrl}/group/${groupId}/admin/drafts?livestreamId=${streamId}`
+                    }))
+                    adminsInfo = [...adminsInfo, ...newAdminsInfo]
+                }
+            }
+        }
+        return adminsInfo
+    }
+
+
+    // Notification Queries
+    createNotification = async (details, options = {force: false}) => {
+        const prevNotification = await this.checkForNotification(details)
+        if (!prevNotification.empty && options.force === true) {
+            const prevNotificationData = prevNotification.docs.map(doc => ({id: doc.id}))
+            const notificationId = prevNotificationData[0].id
+            if (options.force === true) {
+                return await this.updateNotification(notificationId, details)
+            }
+            return throw `Notification Already Exists as document ${notificationId}`
+        }
+        let ref = this.firestore.collection("notifications");
+        const newNotification = {
+            details: details,
+            open: true,
+            created: this.getServerTimestamp()
+        }
+        return ref.add(newNotification);
+    }
+
+    updateNotification = async (notificationId, details, open = true) => {
+        const newNotification = {
+            details,
+            open,
+            updated: this.getServerTimestamp()
+        }
+        let ref = this.firestore.collection("notifications")
+            .doc(notificationId)
+        await ref.set(newNotification, {merge: true});
+        return {id: notificationId}
+    }
+
+    deleteNotification = async (notificationId) => {
+        const notificationRef = this.firestore.collection("notifications")
+            .doc(notificationId)
+        await notificationRef.delete()
+    }
+
+    validateDashboardInvite = async (notificationId, groupId) => {
+        let ref = this.firestore.collection("notifications")
+            .doc(notificationId)
+        const refSnap = await ref.get()
+        if (!refSnap.exists) {
+            return false
+        }
+        const notification = refSnap.data()
+        return notification.details.type === "dashboardInvite" && notification.open && notification.details.requester === groupId
+    }
+
+    getNotification = (notificationId) => {
+        let ref = this.firestore.collection("notifications")
+            .doc(notificationId)
+        return ref.get()
+    }
+
+    checkForNotification = (detailFieldsToCheck = {property1: "value1", property2: "property2"}) => {
+        let query = this.firestore.collection("notifications")
+            .where("details", "==", detailFieldsToCheck)
+            .limit(1)
+
+        return query.get()
+    }
+
+    // DB functions
     getStorageRef = () => {
         return this.storage.ref();
+    }
+
+    getBaseUrl = () => {
+        let baseUrl = "https://careerfairy.io";
+        if (window?.location?.origin) {
+            baseUrl = window.location.origin;
+        }
+        return baseUrl
     }
 
     getServerTimestamp = () => {
