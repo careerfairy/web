@@ -45,6 +45,14 @@ const useStyles = makeStyles((theme) => ({
     },
     title:{
         color: theme.palette.text.secondary,
+        textTransform: "uppercase",
+        fontSize: "1.8rem",
+        marginBottom: 30
+    },
+    subtitle:{
+        textTransform: "uppercase",
+        fontSize: "0.8rem",
+        fontWeight: "bold",
         marginBottom: 20
     }
 }));
@@ -138,8 +146,7 @@ const PersonalInfo = ({userData}) => {
                 <form onSubmit={handleSubmit}>
                     <Container component="main" maxWidth="sm">
                         <Box boxShadow={1} p={4} className={classes.box}>
-                            <Typography className={classes.title}  variant="h4">Personal
-                                Info</Typography>
+                            <Typography className={classes.title}  variant="h4">Personal Info</Typography>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
                                     <TextField
@@ -202,6 +209,38 @@ const PersonalInfo = ({userData}) => {
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={12}>
+                                    <Button
+                                        variant="contained"
+                                        fullWidth
+                                    >
+                                        Upload Resume
+                                    </Button>
+                                </Grid>
+                                <Grid item xs={12}>
+                                     <Typography className={classes.subtitle}  variant="h5">University</Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <UniversityCountrySelector value={values.universityCountryCode}
+                                                               handleClose={handleClose}
+                                                               submitting={isSubmitting}
+                                                               handleChange={handleChange}
+                                                               error={errors.universityCountryCode && touched.universityCountryCode && errors.universityCountryCode}
+                                                               handleBlur={handleBlur}
+                                                               handleOpen={handleOpen}
+                                                               open={open}/>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <UniversitySelector handleBlur={handleBlur}
+                                                        error={errors.university && touched.university && errors.university}
+                                                        universityCountryCode={values.universityCountryCode}
+                                                        values={values}
+                                                        submitting={isSubmitting}
+                                                        setFieldValue={setFieldValue}/>
+                                </Grid>
+                                <Grid item xs={12}>
+                                     <Typography className={classes.subtitle}  variant="h5">Social</Typography>
+                                </Grid>
+                                <Grid item xs={12}>
                                     <FormControl fullWidth>
                                         <TextField
                                             variant="outlined"
@@ -225,24 +264,7 @@ const PersonalInfo = ({userData}) => {
                                         </Collapse>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <UniversityCountrySelector value={values.universityCountryCode}
-                                                               handleClose={handleClose}
-                                                               submitting={isSubmitting}
-                                                               handleChange={handleChange}
-                                                               error={errors.universityCountryCode && touched.universityCountryCode && errors.universityCountryCode}
-                                                               handleBlur={handleBlur}
-                                                               handleOpen={handleOpen}
-                                                               open={open}/>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <UniversitySelector handleBlur={handleBlur}
-                                                        error={errors.university && touched.university && errors.university}
-                                                        universityCountryCode={values.universityCountryCode}
-                                                        values={values}
-                                                        submitting={isSubmitting}
-                                                        setFieldValue={setFieldValue}/>
-                                </Grid>
+                                
                             </Grid>
                             <Button
                                 type="submit"
