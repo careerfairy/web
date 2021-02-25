@@ -97,9 +97,9 @@ const StreamerLayout = (props) => {
         ...populate(firestore, "currentLivestream", populates),
         id: livestreamId
     })
-    const firestore = useSelector(({firestore}) => firestore)
-    console.log("-> firestore", firestore);
-    console.log("-> currentLivestream", currentLivestream);
+
+    // const firestore = useSelector(({firestore}) => firestore)
+    // console.log("-> firestore", firestore);
 
     const classes = useStyles({
         showMenu,

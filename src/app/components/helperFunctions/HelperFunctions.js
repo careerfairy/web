@@ -247,3 +247,17 @@ export const getBaseUrl = () => {
 
 export const maybePluralize = (count, noun, suffix = 's') =>
     `${noun}${count !== 1 ? suffix : ''}`;
+
+export const getMinutesPassed = (livestream) => {
+    const now = new Date();
+    if (livestream?.start?.toDate()) {
+        const diff = Math.abs(now - livestream.start.toDate());
+        return Math.floor(diff / 1000 / 60);
+    } else {
+        return null;
+    }
+};
+
+export const  addMinutes = (date, minutes) => {
+    return new Date(date.getTime() + minutes * 60000);
+}

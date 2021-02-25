@@ -100,8 +100,6 @@ const QuestionContainer = memo( ({
                                goToThisQuestion,
                                showMenu
                            }) => {
-    console.log("-> QuestionContainer");
-
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);

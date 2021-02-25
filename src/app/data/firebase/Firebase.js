@@ -1429,6 +1429,7 @@ class Firebase {
         let ref = this.firestore
             .collection("livestreams")
             .where("start", ">", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
+            .where("test", "!=", true)
             .orderBy("start", "asc");
         return ref.onSnapshot(callback);
     };

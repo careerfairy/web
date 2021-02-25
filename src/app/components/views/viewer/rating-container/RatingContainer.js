@@ -7,6 +7,7 @@ import { FormHelperText, TextField, Button, Grid, FormControl } from "@material-
 import { makeStyles} from "@material-ui/core/styles";
 import {Formik} from "formik";
 import clsx from "clsx";
+import {getMinutesPassed} from "../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles((theme) => ({
     snackbar: {
@@ -191,6 +192,7 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
     const classes = useStyles();
     const {enqueueSnackbar} = useSnackbar();
     const [minutesPassed, setMinutesPassed] = useState(null);
+    console.log("-> minutesPassed in rating", minutesPassed);
     const [ratings, setRatings] = useState([]);
 
     useEffect(() => {
@@ -218,8 +220,8 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setMinutesPassed(getMinutesPassed());
-        }, 10 * 1000); // check for minutes passed every 10 seconds
+            setMinutesPassed(getMinutesPassed(livestream));
+        }, 1 * 1000); // check for minutes passed every 10 seconds
         return () => clearInterval(interval);
     }, [livestream.start]);
 
@@ -289,16 +291,6 @@ const RatingContainer = ({firebase, livestream, livestreamId}) => {
                     }
                 }
             }
-        }
-    };
-
-    const getMinutesPassed = () => {
-        const now = new Date();
-        if (livestream?.start?.toDate()) {
-            const diff = Math.abs(now - livestream.start.toDate());
-            return Math.floor(diff / 1000 / 60);
-        } else {
-            return null;
         }
     };
 

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {useLayoutEffect, useRef, useState, useEffect, useCallback} from 'react';
 import {
     Badge,
@@ -93,7 +94,7 @@ const EmptyList = ({isUpcoming}) => {
 
 const now = new Date()
 
-function QuestionCategory({livestream, selectedState, sliding, streamer, firebase, showMenu, isMobile}) {
+const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebase, showMenu, isMobile}) => {
     if (!livestream?.id) {
         return null
     }
@@ -209,7 +210,7 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
             }
             await firebase.putLivestreamQuestion(livestream.id, newQuestion)
         } catch (e) {
-            console.log("Error", e);
+            dispatch(actions.sendGeneralError(e))
         }
         setSubmittingQuestion(false)
         setNewQuestionTitle("");
@@ -358,5 +359,15 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
         </CategoryContainerTopAligned>
     );
 }
+QuestionCategory.propTypes = {
+  firebase: PropTypes.object,
+  isMobile: PropTypes.bool.isRequired,
+  livestream: PropTypes.object.isRequired,
+  selectedState: PropTypes.string.isRequired,
+  showMenu: PropTypes.bool.isRequired,
+  sliding: PropTypes.bool,
+  streamer: PropTypes.bool
+}
 
 export default withFirebase(QuestionCategory);
+

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import CurrentPollGraph from "../../../streaming/sharedComponents/CurrentPollGraph";
@@ -31,7 +32,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
+const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => {
     const theme = useTheme()
     const classes = useStyles()
     const {authenticatedUser} = useAuth();
@@ -121,5 +122,11 @@ function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
         );
     }
 }
-
+PollCategory.propTypes = {
+    firebase: PropTypes.any,
+    livestream: PropTypes.object.isRequired,
+    setSelectedState: PropTypes.func.isRequired,
+    setShowMenu: PropTypes.func.isRequired
+}
 export default withFirebase(PollCategory);
+
