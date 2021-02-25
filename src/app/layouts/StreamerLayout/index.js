@@ -9,7 +9,7 @@ import {useRouter} from "next/router";
 import NotificationsContext from "../../context/notifications/NotificationsContext";
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
 import {v4 as uuidv4} from "uuid";
-import {populate, useFirestoreConnect} from "react-redux-firebase";
+import {isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
 import {useSelector} from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
@@ -86,6 +86,7 @@ const StreamerLayout = (props) => {
         ...populate(firestore, "currentLivestream", populates),
         id: livestreamId
     })
+    console.log("-> currentLivestream", currentLivestream);
 
     const classes = useStyles({
         showMenu,
@@ -157,9 +158,10 @@ const StreamerLayout = (props) => {
         setShowMenu(!showMenu)
     }
 
-    if (!currentLivestream || !tokenIsValidated()) {
+    if (!isLoaded(currentLivestream) || !tokenIsValidated()) {
         return <Loader/>
     }
+    console.log("-> streamerId", streamerId);
 
     if (!streamerReady && tokenIsValidated()) {
         return (

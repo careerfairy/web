@@ -3,18 +3,28 @@ import React, {useContext, useEffect} from 'react';
 import {useSnackbar} from 'notistack';
 import {Button} from "@material-ui/core";
 import TutorialContext from "../../../../../context/tutorials/TutorialContext";
+import {
+    enqueueSnackbar as enqueueSnackbarAction,
+    closeSnackbar as closeSnackbarAction,
+} from '../../../../../store/actions/snackbarActions';
+import {useDispatch} from "react-redux";
 
-const StreamSnackBar = ({ notification}) => {
-    const {enqueueSnackbar, closeSnackbar} = useSnackbar();
+const StreamSnackBar = ({notification}) => {
+    const dispatch = useDispatch();
     const {handleConfirmStep, isOpen} = useContext(TutorialContext);
+    const enqueueSnackbar = (...args) => dispatch(enqueueSnackbarAction(...args));
+    const closeSnackbar = (...args) => dispatch(closeSnackbarAction(...args))
 
     useEffect(() => {
-        enqueueSnackbar(notification.message, {
-            variant: "info",
-            persist: notification.status !== "connected",
-            action,
-            key: notification.id,
-            preventDuplicate: true,
+        enqueueSnackbar({
+            message: notification.message,
+            options: {
+                variant: "info",
+                persist: notification.status !== "connected",
+                action,
+                key: notification.id,
+                preventDuplicate: true,
+            }
         })
 
         // Dismisses the notification once the component unmounts

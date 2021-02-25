@@ -22,6 +22,7 @@ import {createFirestoreInstance} from "redux-firestore";
 import {Provider} from "react-redux";
 import {ThemeProviderWrapper} from "../context/theme/ThemeContext";
 import {CssBaseline} from '@material-ui/core';
+import Notifier from "../components/views/notifier";
 
 
 config({ssrFadeout: true});
@@ -125,6 +126,7 @@ function MyApp({Component, pageProps}) {
                                             {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                                             <CssBaseline/>
                                             <Component {...pageProps} />
+                                            <Notifier/>
                                             <ErrorSnackBar handleClose={() => setGeneralError("")}
                                                            errorMessage={generalError}/>
                                         </ErrorContext.Provider>
