@@ -211,7 +211,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
     if (livestream && livestream.speakers) {
         speakers = livestream.speakers.map(speaker => {
             return (
-                <MenuItem value={speaker}>
+                <MenuItem key={speaker.id} value={speaker}>
                     <CustomSpeakerDisplay speaker={speaker}/>
                 </MenuItem>
             )

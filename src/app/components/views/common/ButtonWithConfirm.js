@@ -50,7 +50,8 @@ function ButtonWithConfirm({
                         {rest.startIcon}
                     </IconButton>
                     :
-                    <Button {...rest} style={{background: color}} color="primary" variant="contained"
+                    <Button
+                        style={{background: color}} color="primary" variant="contained"
                             onClick={() => setModalOpen(true)}
                             disabled={disabled}>{buttonLabel}</Button>
                 }

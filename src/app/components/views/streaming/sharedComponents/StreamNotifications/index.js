@@ -1,45 +1,49 @@
 import PropTypes from 'prop-types'
 import React, {Fragment, useEffect} from 'react';
-import {useSnackbar} from "notistack";
+import * as actions from '../../../../../store/actions/index';
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 import {withFirebase} from "../../../../../context/firebase";
+import {useDispatch} from "react-redux";
+import {useAuth} from "../../../../../HOCs/AuthProvider";
 
 const StreamNotifications = ({isStreamer, firebase}) => {
-//TODO Implement a redux Notifier for app
-    const {enqueueSnackbar} = useSnackbar()
+    const dispatch = useDispatch()
+    const {userData} = useAuth()
     const {currentLivestream} = useCurrentStream()
 
     useEffect(() => {
-        if (currentLivestream?.id) {
+        if (currentLivestream?.id && (userData || isStreamer)) {
             firebase.listenToLivestreamParticipatingStudents(currentLivestream.id, querySnapshot => {
                 querySnapshot.docChanges().forEach(change => {
-                    console.log("-> change", change);
-                    if (change.type === "added") {
+                    if (change.type === "added" || change.type === "modified") {
                         if (change.doc.exists) {
                             const docData = change.doc.data()
-                            sendJoinMessage(docData)
+                            if (userData?.userEmail !== docData?.userEmail) {
+                                sendJoinMessage(docData, change.type === "modified")
+                            }
                         }
                     }
                 })
             })
         }
-    }, [currentLivestream?.id])
+    }, [currentLivestream?.id, userData])
 
-    const getJoinMessage = (userData) => {
-        console.log("-> userData", userData);
-        const {firstName, lastName, joined} = userData
-        const displayName = firstName ? `${firstName} ${lastName[0]}`: "An anonymous user"
-        return `${displayName} joined the room at ${joined?.toDate()}!`
+    const getJoinMessage = (userData, rejoined) => {
+        const {firstName, lastName} = userData
+        const displayName = firstName ? `${firstName} ${lastName[0]}` : "An anonymous user"
+        return `${displayName} ${rejoined ? "rejoined" : "joined"} the room!`
     }
 
-    const sendJoinMessage = (userData) => {
-        const message = getJoinMessage(userData)
-        enqueueSnackbar(message, {
-            variant: "info",
-            preventDuplicate: true,
-            key: userData?.userEmail,
-            // persist: true
-        })
+    const sendJoinMessage = (userData, rejoined) => {
+        const message = getJoinMessage(userData, rejoined)
+        dispatch(actions.enqueueSnackbar({
+            message,
+            options: {
+                variant: "info",
+                preventDuplicate: true,
+                key: userData?.userEmail,
+            }
+        }))
     }
 
 
@@ -50,7 +54,7 @@ const StreamNotifications = ({isStreamer, firebase}) => {
 }
 
 StreamNotifications.propTypes = {
-  isStreamer: PropTypes.bool
+    isStreamer: PropTypes.bool
 }
 
 export default withFirebase(StreamNotifications);

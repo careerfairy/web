@@ -1,19 +1,14 @@
 import React, {useContext, useEffect} from 'react';
-
-import {useSnackbar} from 'notistack';
 import {Button} from "@material-ui/core";
 import TutorialContext from "../../../../../context/tutorials/TutorialContext";
-import {
-    enqueueSnackbar as enqueueSnackbarAction,
-    closeSnackbar as closeSnackbarAction,
-} from '../../../../../store/actions/snackbarActions';
+import * as actions from '../../../../../store/actions';
 import {useDispatch} from "react-redux";
 
 const StreamSnackBar = ({notification}) => {
     const dispatch = useDispatch();
     const {handleConfirmStep, isOpen} = useContext(TutorialContext);
-    const enqueueSnackbar = (...args) => dispatch(enqueueSnackbarAction(...args));
-    const closeSnackbar = (...args) => dispatch(closeSnackbarAction(...args))
+    const enqueueSnackbar = (...args) => dispatch(actions.enqueueSnackbar(...args));
+    const closeSnackbar = (...args) => dispatch(actions.closeSnackbar(...args))
 
     useEffect(() => {
         enqueueSnackbar({

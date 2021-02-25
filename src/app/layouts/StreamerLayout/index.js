@@ -79,6 +79,17 @@ const StreamerLayout = (props) => {
             doc: livestreamId,
             storeAs: "currentLivestream",
             populates
+        },
+        {
+            collection: "livestreams",
+            doc: livestreamId,
+            subcollections: [
+                {
+                    collection: "participatingStudents",
+                    // orderBy: ["joined", "asc"],
+                }
+            ],
+            storeAs: "audience"
         }
     ] : [], [livestreamId])
 
@@ -86,6 +97,8 @@ const StreamerLayout = (props) => {
         ...populate(firestore, "currentLivestream", populates),
         id: livestreamId
     })
+    const firestore = useSelector(({firestore}) => firestore)
+    console.log("-> firestore", firestore);
     console.log("-> currentLivestream", currentLivestream);
 
     const classes = useStyles({
@@ -161,7 +174,6 @@ const StreamerLayout = (props) => {
     if (!isLoaded(currentLivestream) || !tokenIsValidated()) {
         return <Loader/>
     }
-    console.log("-> streamerId", streamerId);
 
     if (!streamerReady && tokenIsValidated()) {
         return (

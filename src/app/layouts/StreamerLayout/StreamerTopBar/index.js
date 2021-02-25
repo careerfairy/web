@@ -129,7 +129,6 @@ const StreamerTopBar = ({firebase, numberOfViewers, isMainStreamer}) => {
                         >
                             <ButtonWithConfirm
                                 color={currentLivestream.hasStarted ? theme.palette.error.main : theme.palette.primary.main}
-                                fluid
                                 hasStarted={currentLivestream.hasStarted}
                                 mobile={mobile}
                                 disabled={!streamStartTimeIsNow}

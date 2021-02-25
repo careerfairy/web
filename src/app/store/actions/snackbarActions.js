@@ -22,3 +22,4 @@ export const removeSnackbar = key => ({
     type: REMOVE_SNACKBAR,
     key,
 });
+
