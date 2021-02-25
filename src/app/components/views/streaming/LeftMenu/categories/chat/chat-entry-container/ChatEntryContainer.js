@@ -6,6 +6,7 @@ import {getTimeFromNow} from "../../../../../../helperFunctions/HelperFunctions"
 import {useAuth} from "../../../../../../../HOCs/AuthProvider";
 import {withFirebase} from "../../../../../../../context/firebase";
 import {useCurrentStream} from "../../../../../../../context/stream/StreamContext";
+import clsx from "clsx";
 
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
@@ -27,8 +28,23 @@ const useStyles = makeStyles((theme) => {
                 display: "flex",
                 position: "relative"
             },
+            emotesPreviewPaperWrapper: {
+                bottom: "-10px !important",
+                display: "flex",
+                alignItems: "center",
+                zIndex: 1,
+                padding: theme.spacing(0.1),
+                position: "absolute",
+                right: 0,
+                overflow: "hidden",
+                borderRadius: theme.spacing(2),
+                "&  > *":{
+                    margin: theme.spacing(0, 0.3)
+                }
+            },
             emotesPaperWrapper: {
                 display: "flex",
+                alignItems: "center",
                 zIndex: 1,
                 padding: theme.spacing(0.4),
                 position: "absolute",
@@ -36,21 +52,26 @@ const useStyles = makeStyles((theme) => {
                 right: 0,
                 overflow: "hidden",
                 borderRadius: theme.spacing(2),
-                "& img": {
-                    marginRight: theme.spacing(0.3),
-                    cursor: "pointer",
-                    transition: theme.transitions.create("transform", {
-                        duration: theme.transitions.duration.short,
-                        easing: theme.transitions.easing.easeInOut
-                    }),
-                    "&:hover": {
-                        transform: "scale(1.2) rotate(25deg)"
-                    }
-                }
             },
             emoteImg: {
+                marginRight: theme.spacing(0.3),
+                cursor: "pointer",
+                transition: theme.transitions.create("transform", {
+                    duration: theme.transitions.duration.short,
+                    easing: theme.transitions.easing.easeInOut
+                }),
+                "&:hover": {
+                    transform: "scale(1.2) rotate(25deg)"
+                },
                 width: theme.spacing(3),
                 height: theme.spacing(3)
+            },
+            previewImg: {
+                width: theme.spacing(1.5),
+                height: theme.spacing(1.5)
+            },
+            totalText:{
+              fontSize: theme.spacing(1.3)
             },
             chatBubble: {
                 borderRadius: ({isMe}) => isMe ? "23px 23px 5px 23px" : "23px 23px 23px 5px",
@@ -108,21 +129,27 @@ const Emotes = ({hovered, handleMouseLeave, firebase, chatEntryId}) => {
         </Zoom>
     )
 }
-const EmotesPreview = ({chatEntry:{wow, heart, thumbsUp, laughing}}) => {
+const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}}) => {
 
     const classes = useStyles()
     const {currentLivestream: {id}} = useCurrentStream()
     const {userData} = useAuth()
 
     const shouldPreview = () => Boolean(laughing?.length || wow?.length || thumbsUp?.length || heart?.length)
+    const total = [...(wow ? wow : []), ...(heart ? heart : []), ...(thumbsUp ? thumbsUp : []), ...(laughing ? laughing : [])].length
+    console.log("-> total", total);
+
     return (
         <Zoom unmountOnExit mountOnEnter in={shouldPreview()}>
-            <div>
-                {laughing?.length && <img className={classes.emoteImg} alt="😆" src="/emojis/laughing.png"/>}
-                {wow?.length && <img className={classes.emoteImg} alt="😮" src="/emojis/wow.png"/>}
-                {heart?.length && <img className={classes.emoteImg} alt="❤" src="/emojis/heart.png"/>}
-                {thumbsUp?.length && <img className={classes.emoteImg} alt="👍" src="/emojis/thumbsUp.png"/>}
-            </div>
+            <Paper className={classes.emotesPreviewPaperWrapper}>
+                {!!laughing?.length && <img className={classes.previewImg} alt="😆" src="/emojis/laughing.png"/>}
+                {!!wow?.length && <img className={classes.previewImg} alt="😮" src="/emojis/wow.png"/>}
+                {!!heart?.length && <img className={classes.previewImg} alt="❤" src="/emojis/heart.png"/>}
+                {!!thumbsUp?.length && <img className={classes.previewImg} alt="👍" src="/emojis/thumbsUp.png"/>}
+                <Typography className={classes.totalText}>
+                    {total}
+                </Typography>
+            </Paper>
         </Zoom>
     )
 }
