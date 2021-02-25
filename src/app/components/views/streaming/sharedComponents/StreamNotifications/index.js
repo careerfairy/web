@@ -1,19 +1,25 @@
 import PropTypes from 'prop-types'
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import * as actions from '../../../../../store/actions/index';
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 import {withFirebase} from "../../../../../context/firebase";
 import {useDispatch} from "react-redux";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import {addMinutes, getMinutesPassed} from "../../../../helperFunctions/HelperFunctions";
+import {makeStyles} from "@material-ui/core/styles";
 
+const useStyles = makeStyles(theme => ({
+    snackBar: {
+        maxWidth: 400
+    }
+}))
 const StreamNotifications = ({isStreamer, firebase}) => {
+    const classes = useStyles()
     const dispatch = useDispatch()
     const {userData} = useAuth()
     const {currentLivestream} = useCurrentStream()
     const [feedbackQuestions, setFeedbackQuestions] = useState([]);
     const [minutesPassed, setMinutesPassed] = useState(null);
-    console.log("-> minutesPassed in stream notif", minutesPassed);
 
     useEffect(() => {
         if (currentLivestream?.id && (userData || isStreamer)) {
@@ -60,7 +66,7 @@ const StreamNotifications = ({isStreamer, firebase}) => {
         if (feedbackQuestions.length && isStreamer && currentLivestream?.start) {
             const interval = setInterval(() => {
                 setMinutesPassed(getMinutesPassed(currentLivestream));
-            }, 1 * 1000); // check for minutes passed every 10 seconds
+            }, 10 * 1000); // check for minutes passed every 10 seconds
             return () => clearInterval(interval);
         }
     }, [currentLivestream.start, isStreamer, feedbackQuestions]);
@@ -75,27 +81,32 @@ const StreamNotifications = ({isStreamer, firebase}) => {
 
     const isQuestionActive = (question) => {
         const now = new Date()
+        const activeMinutesDuration = 1
         const streamStart = currentLivestream.start.toDate()
         const questionActiveStart = addMinutes(streamStart, question.appearAfter)
         // Questions will stay active for 2 minutes
-        const questionActiveEnd = addMinutes(questionActiveStart, 2)
-        return !question.hasBeenAsked && (now >= questionActiveStart && now <= questionActiveEnd)
+        const questionActiveEnd = addMinutes(questionActiveStart, activeMinutesDuration)
+        return (now >= questionActiveStart && now <= questionActiveEnd)
     }
 
     const handleCheckFeedback = async () => {
         for (const [index, feedbackQuestion] of feedbackQuestions.entries()) {
             const questionActive = isQuestionActive(feedbackQuestion)
-            if (questionActive) {
-                if (!feedbackQuestion.hasBeenAsked) {
-                    const newFeedbackQuestions = [...feedbackQuestions];
-                    newFeedbackQuestions[index].hasBeenAsked = true; // mark that particular rating as already rated
-                    setFeedbackQuestions(newFeedbackQuestions); // set updated ratings with new has rated status
-                }
+            if (questionActive
+                // && !feedbackQuestion.hasBeenAsked
+            ) {
+                // const newFeedbackQuestions = [...feedbackQuestions];
+                // newFeedbackQuestions[index].hasBeenAsked = true; // mark that particular rating as already rated
+                // setFeedbackQuestions(newFeedbackQuestions); // set updated ratings with new has rated status
+
                 const message = `Your audience is now being asked the following question: ${feedbackQuestion.question}`
                 dispatch(actions.enqueueSnackbar({
                     message,
-                    options:{
+                    options: {
                         variant: "info",
+                        key: feedbackQuestion.id,
+                        preventDuplicate: true,
+                        className: classes.snackBar
                     }
                 }))
             }
@@ -121,9 +132,7 @@ const StreamNotifications = ({isStreamer, firebase}) => {
     }
 
 
-    return (
-        <Fragment/>
-    )
+    return null
 
 }
 

@@ -1,7 +1,7 @@
 import {CLOSE_SNACKBAR, ENQUEUE_SNACKBAR, REMOVE_SNACKBAR} from "./actionTypes";
 import {GENERAL_ERROR} from "../../components/util/constants";
 
-export const enqueueSnackbar = (notification) => {
+export const enqueueSnackbar = (notification = {message: "", options: {}}) => {
     const key = notification.options && notification.options.key;
 
     return {
@@ -24,11 +24,11 @@ export const removeSnackbar = key => ({
     key,
 });
 
-export const sendGeneralError = (error = "") => async (dispatch) =>{
+export const sendGeneralError = (error = "") => async (dispatch) => {
     console.error("error", error)
     dispatch(enqueueSnackbar({
         message: GENERAL_ERROR,
-        options:{
+        options: {
             variant: "error",
             preventDuplicate: true
         }

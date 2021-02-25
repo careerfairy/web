@@ -6,7 +6,7 @@ import {
     Box,
     Button,
     Checkbox,
-    Fab,
+    Fab, IconButton,
     Toolbar,
     Tooltip,
     Typography,
@@ -38,7 +38,6 @@ const useStyles = makeStyles(theme => ({
     viewCount: {
         // background: theme.palette.primary.main,
         color: theme.palette.primary.main,
-        padding: theme.spacing(1),
         display: "flex",
         alignItems: "center",
         justifyContent: "center"
@@ -49,14 +48,14 @@ const useStyles = makeStyles(theme => ({
     },
     floatingViewCount: {
         position: 'absolute',
-        top: theme.spacing(1),
+        top: theme.spacing(2),
         right: theme.spacing(2),
         zIndex: 120,
         color: theme.palette.primary.main,
-        background: "transparent",
-        "&:hover":{
-            background: fade(theme.palette.primary.main, 0.1),
-        }
+        // background: "transparent",
+        // "&:hover":{
+        //     background: fade(theme.palette.primary.main, 0.1),
+        // }
     }
 }));
 
@@ -94,11 +93,11 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience}) => {
     if (mobile) {
         return (
             <Tooltip title="See who's here">
-                <Fab onClick={showAudience} size="small" className={classes.floatingViewCount}>
-                    <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
+                <IconButton onClick={showAudience} size="small" className={classes.floatingViewCount}>
+                    <Badge color="secondary" badgeContent={numberOfViewers}>
                         <PeopleIcon/>
                     </Badge>
-                </Fab>
+                </IconButton>
             </Tooltip>
         )
     }
@@ -134,15 +133,13 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience}) => {
                         />
                     </Tooltip>
                     <Box className={classes.viewCount}>
-                        <Tooltip title="Number of viewers">
-                            <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
-                                <PeopleIcon/>
-                            </Badge>
+                        <Tooltip title="See who's here">
+                            <IconButton color="primary" onClick={showAudience}>
+                                <Badge color="secondary" badgeContent={numberOfViewers}>
+                                    <PeopleIcon/>
+                                </Badge>
+                            </IconButton>
                         </Tooltip>
-                        {!mobile &&
-                        <Typography className={classes.viewCountText}>
-                            Viewers : {numberOfViewers}
-                        </Typography>}
                     </Box>
                 </Box>
                 {!currentLivestream.hasNoTalentPool &&
