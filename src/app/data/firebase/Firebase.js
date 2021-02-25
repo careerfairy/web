@@ -812,9 +812,9 @@ class Firebase {
         return this.firestore.runTransaction((transaction) => {
             return transaction.get(ref).then((livestreamDoc) => {
                 let livestream = livestreamDoc.data()
-                let updatedSpeakers = livestream.speakers.filter( existingSpeaker => existingSpeaker.id !== speaker.id )
-                updatedSpeakers.forEach( existingSpeaker => {
-                    if ( existingSpeaker.speakerUuid === speaker.speakerUuid ) {
+                let updatedSpeakers = livestream.speakers.filter(existingSpeaker => existingSpeaker.id !== speaker.id)
+                updatedSpeakers.forEach(existingSpeaker => {
+                    if (existingSpeaker.speakerUuid === speaker.speakerUuid) {
                         delete existingSpeaker.speakerUuid;
                     }
                 });
@@ -835,9 +835,9 @@ class Firebase {
                 let livestream = livestreamDoc.data()
                 let speakerRef = this.firestore.collection("livestreams").doc(livestreamDoc.id).collection("speakers").doc();
                 speaker.id = speakerRef.id;
-                let updatedSpeakers = livestream.speakers ? [ ...livestream.speakers ] : []
-                updatedSpeakers.forEach( existingSpeaker => {
-                    if ( existingSpeaker.speakerUuid === speaker.speakerUuid ) {
+                let updatedSpeakers = livestream.speakers ? [...livestream.speakers] : []
+                updatedSpeakers.forEach(existingSpeaker => {
+                    if (existingSpeaker.speakerUuid === speaker.speakerUuid) {
                         delete existingSpeaker.speakerUuid;
                     }
                 });
@@ -908,18 +908,46 @@ class Firebase {
             .collection("livestreams")
             .doc(livestreamId)
             .collection("chatEntries")
-            .orderBy("timestamp", "desc")
             .limit(limit)
+            .orderBy("timestamp", "asc")
         return ref.onSnapshot(callback);
     }
 
     putChatEntry = (livestreamId, chatEntry) => {
         chatEntry.timestamp = this.getServerTimestamp()
+        const newChatEntry = {
+            ...chatEntry,
+            laughing: [],
+            wow: [],
+            heart: [],
+            thumbsUp: []
+        }
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("chatEntries");
-        return ref.add(chatEntry);
+        return ref.add(newChatEntry);
+    }
+
+    emoteComment = (livestreamId, chatEntryId, fieldProp, userEmail) => {
+        const chatEntryRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("chatEntries")
+            .doc(chatEntryId)
+        return chatEntryRef.update({
+            [fieldProp]: firebase.firestore.FieldValue.arrayUnion(userEmail)
+        })
+    }
+    unEmoteComment = (livestreamId, chatEntryId, fieldProp, userEmail) => {
+        const chatEntryRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("chatEntries")
+            .doc(chatEntryId)
+        return chatEntryRef.update({
+            [fieldProp]: firebase.firestore.FieldValue.arrayRemove(userEmail)
+        })
     }
 
     setLivestreamHasStarted = (hasStarted, livestreamId) => {

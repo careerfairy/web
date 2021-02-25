@@ -1,9 +1,9 @@
-import React, {useState, useEffect, useContext} from 'react';
+import PropTypes from 'prop-types'
+import React, {useEffect, useState} from 'react';
 import {withFirebase} from '../../../../../context/firebase';
 import {grey} from "@material-ui/core/colors";
-import {css} from 'glamor';
-import { Collapse, TextField, Typography, IconButton } from "@material-ui/core";
-import {makeStyles, fade} from "@material-ui/core/styles";
+import {IconButton, TextField, Typography} from "@material-ui/core";
+import {fade, makeStyles} from "@material-ui/core/styles";
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
 import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
@@ -68,7 +68,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
+const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
 
 
     const {authenticatedUser, userData} = useAuth();
@@ -85,13 +85,8 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
     useEffect(() => {
         if (livestream.id) {
             const unsubscribe = firebase.listenToChatEntries(livestream.id, 150, querySnapshot => {
-                var chatEntries = [];
-                querySnapshot.forEach(doc => {
-                    let entry = doc.data();
-                    entry.id = doc.id;
-                    chatEntries.unshift(entry);
-                });
-                setChatEntries(chatEntries);
+                const newEntries = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                setChatEntries(newEntries);
             });
             return () => unsubscribe();
         }
@@ -126,14 +121,7 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
         }
     }
 
-    const ROOT_CSS = css({
-        height: '100%',
-        zIndex: 9000,
-        display: "flex",
-        flexDirection: "column",
-    });
-
-    let chatElements = chatEntries.map((chatEntry, index) => {
+    let chatElements = chatEntries.map(chatEntry => {
         return (
             <ChatEntryContainer key={chatEntry?.id} chatEntry={chatEntry}/>
         );
@@ -179,4 +167,12 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
     );
 }
 
+ChatCategory.propTypes = {
+  firebase: PropTypes.object,
+  isStreamer: PropTypes.bool,
+  livestream: PropTypes.object.isRequired,
+  selectedState: PropTypes.string
+}
+
 export default withFirebase(ChatCategory);
+

@@ -106,13 +106,8 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
     useEffect(() => {
         if (livestream.id) {
             const unsubscribe = firebase.listenToChatEntries(livestream.id, 150, querySnapshot => {
-                var chatEntries = [];
-                querySnapshot.forEach(doc => {
-                    let entry = doc.data();
-                    entry.id = doc.id;
-                    chatEntries.unshift(entry);
-                });
-                setChatEntries(chatEntries);
+                const newEntries = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                setChatEntries(newEntries);
                 if (!open) {
                     let number = 0;
                     querySnapshot.docChanges().forEach(change => {
