@@ -109,9 +109,7 @@ const ViewerLayout = (props) => {
     }, [mobile]);
 
     useEffect(() => {
-        console.log("-> userData", userData);
         if (userData?.userEmail && livestreamId) {
-            console.log("-> setting participation");
             firebase.setUserIsParticipating(livestreamId, userData);
         }
     }, [livestreamId, userData]);
