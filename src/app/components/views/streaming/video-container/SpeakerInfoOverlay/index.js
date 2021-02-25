@@ -67,13 +67,16 @@ const SpeakerInfoOverlay = ({ speaker, small }) => {
                         <h5 className={classes.speakerPosition}>{`${speaker.position}`}</h5>
                     </div>
                 </div> 
-                <div className={ classes.speakerLinkedIn }>
-                    <Tooltip title={`Open ${speaker.firstName}'s LinkedIn profile in a new tab`}>
-                        <IconButton className={classes.speakerLinkedInIconButton} onClick={handleClick}>
-                            <LinkedInIcon className={classes.speakerLinkedInButton}/>
-                        </IconButton>
-                    </Tooltip>         
-                </div>          
+                { 
+                    speaker.showLinkedIn && 
+                    <div className={ classes.speakerLinkedIn }>
+                        <Tooltip title={`Open ${speaker.firstName}'s LinkedIn profile in a new tab`}>
+                            <IconButton className={classes.speakerLinkedInIconButton} onClick={handleClick}>
+                                <LinkedInIcon className={classes.speakerLinkedInButton}/>
+                            </IconButton>
+                        </Tooltip>         
+                    </div>    
+                }        
             </div>
         );
     } else {

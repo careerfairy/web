@@ -227,7 +227,7 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
 
     useFirestoreConnect(() => [{
         collection: `livestreams`,
-        where: [["start", ">", new Date(globalTimeFrame.double)], ["groupIds", "array-contains", group.id]],
+        where: [["start", ">", new Date(globalTimeFrame.double)], ["groupIds", "array-contains", group.id], ["test", "==", false]],
         orderBy: ["start", "asc"]
     }], [globalTimeFrame])
 
