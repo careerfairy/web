@@ -268,7 +268,7 @@ const General = ({
                         group={group}
                     />
                 </Grid>
-                {mediumScreen &&
+                {(mediumScreen && !group.universityCode) &&
                 <Grid item xs={12} md={12} sm={12}>
                     <TotalUniqueParticipatingStudents
                         fetchingStreams={loading}
@@ -299,7 +299,7 @@ const General = ({
                 </Grid>
                 <Grid item lg={4} md={6} xl={3} xs={12}>
                     <Grid container spacing={3}>
-                        {!mediumScreen &&
+                        {(!mediumScreen && !group.universityCode) &&
                         <Grid xs={12} item>
                             <TotalUniqueParticipatingStudents
                                 fetchingStreams={loading}
