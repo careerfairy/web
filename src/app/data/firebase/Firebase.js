@@ -643,6 +643,7 @@ class Firebase {
         let ref = this.firestore
             .collection("livestreams")
             .where("universities", "array-contains", universityId)
+            .where("test", "==", false)
             .where("start", ">", currentTime)
             .orderBy("start", "asc")
         return ref.onSnapshot(callback)
@@ -653,6 +654,7 @@ class Firebase {
         let ref = this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
+            .where("test", "==", false)
             .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
             .orderBy("start", "asc")
         return ref.onSnapshot(callback)
@@ -663,6 +665,7 @@ class Firebase {
         let ref = this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
+            .where("test", "==", false)
             .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
             .orderBy("start", "asc")
         return ref.get()
@@ -673,6 +676,7 @@ class Firebase {
         return this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
+            .where("test", "==", false)
             .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
             .orderBy("start", "asc")
     }
@@ -706,6 +710,7 @@ class Firebase {
         return this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
+            .where("test", "==", false)
             .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
             .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
             .orderBy("start", "desc")
@@ -716,6 +721,7 @@ class Firebase {
         const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
         let ref = this.firestore
             .collection("livestreams")
+            .where("test", "==", false)
             .where("groupIds", "array-contains", groupId)
             .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
             .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
@@ -728,6 +734,7 @@ class Firebase {
         const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
         let ref = this.firestore
             .collection("livestreams")
+            .where("test", "==", false)
             .where("groupIds", "array-contains", groupId)
             .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
             .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
@@ -1418,6 +1425,7 @@ class Firebase {
         let ref = this.firestore
             .collection("livestreams")
             .where("start", ">", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
+            .where("test", "==", false)
             .orderBy("start", "asc");
         return ref.onSnapshot(callback);
     };
@@ -1616,6 +1624,7 @@ class Firebase {
         const maxDate = timeframe || oneYearAgo
         let ref = this.firestore
             .collection("livestreams")
+            .where("test", "==", false)
             .where("start", ">", maxDate)
             .where("groupIds", "array-contains", groupId)
             .orderBy("start", "desc")
