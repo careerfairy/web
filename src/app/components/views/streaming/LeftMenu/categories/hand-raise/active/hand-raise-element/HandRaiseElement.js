@@ -83,7 +83,8 @@ function RequestedHandRaiseElement(props) {
                             updateHandRaiseRequest('invited')
                         }
                     }} color="primary"/>
-                    <Button variant="contained" color="default" children='Deny' size='small' disabled={isOpen(10)}
+                    <Button variant="contained" color="default" children='Deny' size='small'
+                            disabled={isOpen(10)}
                             onClick={() => updateHandRaiseRequest('denied')}/>
                 </CardActions>
             </Card>

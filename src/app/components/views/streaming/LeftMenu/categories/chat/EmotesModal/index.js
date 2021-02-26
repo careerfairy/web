@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
-import React, {useCallback, useEffect} from 'react';
-import {useDispatch, useSelector} from "react-redux";
+import React, {useCallback, useEffect, useMemo} from 'react';
+import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import {v4 as uuidv4} from 'uuid'
-import {Button, DialogActions, DialogContent, DialogTitle, List, Tab, Tabs} from "@material-ui/core";
+import {Button, CircularProgress, DialogActions, DialogContent, DialogTitle, List, Tab, Tabs} from "@material-ui/core";
 
 import * as actions from '../../../../../../../store/actions'
 import {GlassDialog} from "../../../../../../../materialUI/GlobalModals";
@@ -13,20 +13,73 @@ import {useCurrentStream} from "../../../../../../../context/stream/StreamContex
 import PanelDisplay from "./PanelDisplay";
 import EmotesModalUser from "./EmotesModalUser";
 import {TEST_EMAIL} from "./utils";
+import {populate, useFirestoreConnect, isLoaded} from "react-redux-firebase";
+import {makeStyles} from "@material-ui/core/styles";
 
+const useStyles = makeStyles(theme => ({
+    loaderContent: {
+        display: "grid",
+        placeItems: "center",
+        minHeight: "20vh"
+    }
+}))
 const EmotesModal = ({onClose, chatEntry, firebase}) => {
+    const classes = useStyles()
     const dispatch = useDispatch()
-    const audienceMap = useSelector(state => state.firestore.data.audience || {})
     const {currentLivestream: {id}} = useCurrentStream()
     const [value, setValue] = React.useState(0);
-    const [emotes, setEmotes] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
-    const [all, setAll] = React.useState([]);
+    const populates = [
+        {child: 'wow', root: 'userData'},
+        {child: 'heart', root: 'userData',},
+        {child: 'laughing', root: 'userData'},
+        {child: 'thumbsUp', root: 'userData'},
+    ]
 
-    useEffect(() => {
-        if (chatEntry) {
-            const {wow, heart, thumbsUp, laughing} = chatEntry
-            const emotesWithData = [
+    useFirestoreConnect(() => chatEntry?.id ? [
+        {
+            collection: "livestreams",
+            doc: id,
+            subcollections: [{
+                collection: "chatEntries",
+                doc: chatEntry.id,
+            }],
+            populates,
+            storeAs: "currentChatEntry"
+        }
+    ] : [])
+
+    const populatedChatEntry = useSelector(({firestore}) => populate(firestore, "currentChatEntry", populates), shallowEqual)
+
+    const getInitials = (userObj) => {
+        const {firstName, lastName} = userObj
+        let initials = ""
+        if (firstName) {
+            initials = `${firstName[0]}`
+            if (lastName) {
+                initials = `${initials} ${lastName[0]}`
+            }
+        }
+        return initials
+    }
+    const getDisplayName = (userObj) => {
+        const {firstName, lastName, id} = userObj
+        let displayName = "Anonymous user"
+        if (firstName && lastName) {
+            displayName = `${firstName} ${lastName[0]}`
+        } else if (id === TEST_EMAIL) {
+            displayName = "Test user"
+        }
+        return displayName
+    }
+
+
+    const {emotes, all} = useMemo(() => {
+        let emotesWithData = []
+        let allUsers = []
+        if (populatedChatEntry) {
+            const {wow, heart, thumbsUp, laughing} = populatedChatEntry
+            emotesWithData = [
                 {label: "Wow", prop: "wow", data: wow, src: "/emojis/wow.png", alt: "😮"},
                 {label: "Heart", prop: "heart", data: heart, src: "/emojis/heart.png", alt: "❤"},
                 {label: "Thumbs Up", prop: "thumbsUp", data: thumbsUp, src: "/emojis/thumbsUp.png", alt: "👍"},
@@ -37,21 +90,20 @@ const EmotesModal = ({onClose, chatEntry, firebase}) => {
                     ({
                         ...obj,
                         index: index + 1,
-                        data: obj.data.map(email => ({
-                            email,
-                            displayName: getDisplayNameFromEmail(email),
-                            initials: getInitialsFromEmail(email),
-                            avatar: audienceMap?.[email]?.avatarUrl || "",
+                        data: obj.data.map(userObj => ({
+                            email: userObj.id,
+                            displayName: getDisplayName(userObj),
+                            initials: getInitials(userObj),
+                            avatar: userObj.avatarUrl || "",
                             emojiSrc: obj.src,
                             emojiAlt: obj.alt,
                             prop: obj.prop
                         }))
                     }))
-            const allUsers = emotesWithData.reduce((acc, currentEmoteObj) => [...acc, ...currentEmoteObj.data], [])
-            setAll(allUsers)
-            setEmotes(emotesWithData)
+            allUsers = emotesWithData.reduce((acc, currentEmoteObj) => [...acc, ...currentEmoteObj.data], [])
         }
-    }, [chatEntry, audienceMap])
+        return {all: allUsers, emotes: emotesWithData}
+    }, [populatedChatEntry]);
 
     useEffect(() => {
         if (value > 0 && !emotes?.[value - 1]) {
@@ -61,28 +113,6 @@ const EmotesModal = ({onClose, chatEntry, firebase}) => {
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
-
-    const getDisplayNameFromEmail = (email = "") => {
-        let displayName = "Anonymous user"
-        const userData = audienceMap?.[email]
-        if (userData?.firstName && userData?.lastName) {
-            displayName = `${userData.firstName} ${userData.lastName[0]}`
-        } else if (email === TEST_EMAIL) {
-            displayName = "Test user"
-        }
-        return displayName
-    }
-    const getInitialsFromEmail = (email = "") => {
-        let initials = ""
-        const userData = audienceMap?.[email]
-        if (userData?.firstName) {
-            initials = `${userData.firstName[0]}`
-            if (userData?.lastName) {
-                initials = `${initials} ${userData.lastName[0]}`
-            }
-        }
-        return initials
-    }
 
     const handleUnEmote = useCallback(async (emoteProp, emoteEmail) => {
         try {
@@ -97,7 +127,6 @@ const EmotesModal = ({onClose, chatEntry, firebase}) => {
     const handleClose = () => {
         onClose()
     }
-
 
     return (
         <GlassDialog maxWidth="sm" fullWidth open={Boolean(chatEntry)} onClose={handleClose}>
@@ -117,44 +146,48 @@ const EmotesModal = ({onClose, chatEntry, firebase}) => {
                         }
                     />)}
             </Tabs>
-            <DialogContent dividers>
-                <SwipeablePanel index={0} value={value}>
-                    <List>
-                        {all.map(({avatar, email, initials, displayName, emojiAlt, emojiSrc, prop}) =>
-                            <EmotesModalUser key={email + prop}
-                                             avatar={avatar}
-                                             email={email}
-                                             loading={loading}
-                                             prop={prop}
-                                             handleUnEmote={handleUnEmote}
-                                             firebase={firebase}
-                                             emojiAlt={emojiAlt}
-                                             emojiSrc={emojiSrc}
-                                             initials={initials}
-                                             displayName={displayName}/>
-                        )}
-                    </List>
-                </SwipeablePanel>
-                {emotes.map(({data, index}) =>
-                    <SwipeablePanel key={index} value={value} index={index}>
+            {!isLoaded(populatedChatEntry) ?
+                <DialogContent className={classes.loaderContent} dividers>
+                    <CircularProgress/>
+                </DialogContent>
+                : <DialogContent dividers>
+                    <SwipeablePanel index={0} value={value}>
                         <List>
-                            {data.map(({avatar, email, initials, displayName, emojiAlt, emojiSrc, prop}) =>
-                                <EmotesModalUser
-                                    key={email || uuidv4()}
-                                    avatar={avatar}
-                                    prop={prop}
-                                    email={email}
-                                    loading={loading}
-                                    firebase={firebase}
-                                    emojiSrc={emojiSrc}
-                                    handleUnEmote={handleUnEmote}
-                                    emojiAlt={emojiAlt}
-                                    initials={initials}
-                                    displayName={displayName}/>
+                            {all.map(({avatar, email, initials, displayName, emojiAlt, emojiSrc, prop}) =>
+                                <EmotesModalUser key={email + prop}
+                                                 avatar={avatar}
+                                                 email={email}
+                                                 loading={loading}
+                                                 prop={prop}
+                                                 handleUnEmote={handleUnEmote}
+                                                 firebase={firebase}
+                                                 emojiAlt={emojiAlt}
+                                                 emojiSrc={emojiSrc}
+                                                 initials={initials}
+                                                 displayName={displayName}/>
                             )}
                         </List>
-                    </SwipeablePanel>)}
-            </DialogContent>
+                    </SwipeablePanel>
+                    {emotes.map(({data, index}) =>
+                        <SwipeablePanel key={index} value={value} index={index}>
+                            <List>
+                                {data.map(({avatar, email, initials, displayName, emojiAlt, emojiSrc, prop}) =>
+                                    <EmotesModalUser
+                                        key={email || uuidv4()}
+                                        avatar={avatar}
+                                        prop={prop}
+                                        email={email}
+                                        loading={loading}
+                                        firebase={firebase}
+                                        emojiSrc={emojiSrc}
+                                        handleUnEmote={handleUnEmote}
+                                        emojiAlt={emojiAlt}
+                                        initials={initials}
+                                        displayName={displayName}/>
+                                )}
+                            </List>
+                        </SwipeablePanel>)}
+                </DialogContent>}
             <DialogActions>
                 <Button onClick={handleClose}>
                     Close

@@ -98,8 +98,8 @@ const StreamerLayout = (props) => {
         id: livestreamId
     })
 
-    // const firestore = useSelector(({firestore}) => firestore)
-    // console.log("-> firestore", firestore);
+    const firestore = useSelector(({firestore}) => firestore)
+    console.log("-> firestore", firestore);
 
     const classes = useStyles({
         showMenu,
@@ -197,7 +197,7 @@ const StreamerLayout = (props) => {
                     />
                     <LeftMenu
                         className={classes.menuLeft}
-                        streamer
+                        streamer={true}
                         livestream={currentLivestream}
                         showMenu={showMenu}
                         setShowMenu={setShowMenu}

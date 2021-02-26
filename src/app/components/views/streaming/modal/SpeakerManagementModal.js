@@ -16,7 +16,7 @@ import {
 import {GlassDialog} from "../../../../materialUI/GlobalModals";
 
 function SpeakerManagementModal({open, setOpen, joiningStreamerLink}) {
-
+console.log("-> Slide", Slide);
     return (
         <GlassDialog TransitionComponent={Slide} fullWidth onClose={() => setOpen(false)} open={open}>
             <DialogTitle disableTypography

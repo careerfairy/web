@@ -55,11 +55,11 @@ GlassDialog.propTypes = {
     onClose: PropTypes.func,
     PaperProps: PropTypes.object,
     scroll: PropTypes.oneOf(['body', 'paper']),
-    TransitionComponent: PropTypes.node,
+    TransitionComponent: PropTypes.object,
     disableBackdropClick: PropTypes.bool,
     disableEscapeKeyDown: PropTypes.bool,
     classes: PropTypes.object,
-    TransitionProps: PropTypes.node
+    TransitionProps: PropTypes.object
 }
 export {GlassDialog}
 
