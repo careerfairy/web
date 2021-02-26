@@ -9,6 +9,7 @@ import {withFirebase} from "../../../../../../../context/firebase";
 import {useCurrentStream} from "../../../../../../../context/stream/StreamContext";
 import EmojiEmotionsOutlinedIcon from '@material-ui/icons/EmojiEmotionsOutlined';
 import {heartPng, laughingPng, thumbsUpPng, wowPng} from "../EmotesModal/utils";
+import clsx from "clsx";
 
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
@@ -24,6 +25,10 @@ const useStyles = makeStyles((theme) => {
                 right: "-30px",
                 transform: "translateY(-50%)",
                 opacity: 0.3
+            },
+            active: {
+                // background: "blue"
+                background: theme.palette.action.hover
             },
             chatWrapper: {
                 marginLeft: ({isMe}) => isMe ? "auto" : 0,
@@ -52,10 +57,10 @@ const useStyles = makeStyles((theme) => {
                 display: "flex",
                 alignItems: "center",
                 zIndex: 1,
-                padding: theme.spacing(0.4),
-                // position: "absolute",
-                // top: -7,
-                // right: 0,
+                padding: theme.spacing(1),
+                "&  > *": {
+                    marginRight: theme.spacing(0.5)
+                },
                 overflow: "hidden",
                 borderRadius: theme.spacing(2),
             },
@@ -69,8 +74,8 @@ const useStyles = makeStyles((theme) => {
                 "&:hover": {
                     transform: "scale(1.2) rotate(25deg)"
                 },
-                width: theme.spacing(2.5),
-                height: theme.spacing(2.5)
+                width: theme.spacing(3),
+                height: theme.spacing(3)
             },
             previewImg: {
                 width: theme.spacing(1.5),
@@ -110,7 +115,7 @@ const useStyles = makeStyles((theme) => {
 
 ;
 
-const Emotes = ({handleCloseEmotesMenu, firebase, chatEntryId}) => {
+const Emotes = ({handleCloseEmotesMenu, firebase, chatEntry: {id: chatEntryId, wow, heart, thumbsUp, laughing}}) => {
 
     const classes = useStyles()
     const {currentLivestream: {id}} = useCurrentStream()
@@ -122,38 +127,53 @@ const Emotes = ({handleCloseEmotesMenu, firebase, chatEntryId}) => {
         handleCloseEmotesMenu()
     }
 
+    const getActive = (arrayOfEmails) => {
+        return arrayOfEmails?.includes(userData?.userEmail) || arrayOfEmails?.includes("test@careerfairy.io")
+    }
+
+
     const emotes = [
         {
             onClick: () => handleEmote("laughing"),
             src: laughingPng.src,
             alt: laughingPng.alt,
-            prop: "laughing"
+            prop: "laughing",
+            active: getActive(laughing)
         },
         {
             onClick: () => handleEmote("wow"),
             src: wowPng.src,
             alt: wowPng.alt,
-            prop: "wow"
+            prop: "wow",
+            active: getActive(wow)
         },
         {
             onClick: () => handleEmote("heart"),
             src: heartPng.src,
             alt: heartPng.alt,
-            prop: "heart"
+            prop: "heart",
+            active: getActive(heart)
         },
         {
             onClick: () => handleEmote("thumbsUp"),
             src: thumbsUpPng.src,
             alt: thumbsUpPng.alt,
-            prop: "thumbsUp"
+            prop: "thumbsUp",
+            active: getActive(thumbsUp)
         },
     ]
 
 
     return (
         <Fragment>
-            {emotes.map(({prop, src, alt}) =>
-                <IconButton size="medium" key={prop}>
+            {emotes.map(({prop, src, alt, active}) =>
+                <IconButton
+                    key={prop}
+                    size="medium"
+                    className={clsx({
+                        [classes.active]: active
+                    })}
+                >
                     <img onClick={() => handleEmote(prop)} className={classes.emoteImg} alt={alt}
                          src={src}/>
                 </IconButton>)}
@@ -281,7 +301,7 @@ function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry, current
                     onClose={handleCloseEmotesMenu}
                     // disableRestoreFocus
                 >
-                    <Emotes chatEntryId={chatEntry.id} firebase={firebase}
+                    <Emotes chatEntry={chatEntry} firebase={firebase}
                             handleCloseEmotesMenu={handleCloseEmotesMenu}/>
                 </Popover>
                 <Box component={Card} className={classes.chatBubble}>
