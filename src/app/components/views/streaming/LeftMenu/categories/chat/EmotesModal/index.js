@@ -1,14 +1,17 @@
 import PropTypes from 'prop-types'
 import React, {useCallback, useEffect} from 'react';
-import {GlassDialog} from "../../../../../../../materialUI/GlobalModals";
 import {useDispatch, useSelector} from "react-redux";
-import {Button, DialogActions, DialogContent, DialogTitle, List, Tab, Tabs} from "@material-ui/core";
-import {SwipeablePanel} from "../../../../../../../materialUI/GlobalPanels/GlobalPanels";
 import {v4 as uuidv4} from 'uuid'
+import {Button, DialogActions, DialogContent, DialogTitle, List, Tab, Tabs} from "@material-ui/core";
+
+import * as actions from '../../../../../../../store/actions'
+import {GlassDialog} from "../../../../../../../materialUI/GlobalModals";
+import {SwipeablePanel} from "../../../../../../../materialUI/GlobalPanels/GlobalPanels";
 import {withFirebase} from "../../../../../../../context/firebase";
 import {useCurrentStream} from "../../../../../../../context/stream/StreamContext";
-import * as actions from '../../../../../../../store/actions'
+
 import PanelDisplay from "./PanelDisplay";
+import EmotesModalUser from "./EmotesModalUser";
 
 const EmotesModal = ({onClose, chatEntry, firebase}) => {
     const dispatch = useDispatch()
@@ -117,17 +120,17 @@ const EmotesModal = ({onClose, chatEntry, firebase}) => {
                 <SwipeablePanel index={0} value={value}>
                     <List>
                         {all.map(({avatar, email, initials, displayName, emojiAlt, emojiSrc, prop}) =>
-                            <User key={email + prop}
-                                  avatar={avatar}
-                                  email={email}
-                                  loading={loading}
-                                  prop={prop}
-                                  handleUnEmote={handleUnEmote}
-                                  firebase={firebase}
-                                  emojiAlt={emojiAlt}
-                                  emojiSrc={emojiSrc}
-                                  initials={initials}
-                                  displayName={displayName}/>
+                            <EmotesModalUser key={email + prop}
+                                             avatar={avatar}
+                                             email={email}
+                                             loading={loading}
+                                             prop={prop}
+                                             handleUnEmote={handleUnEmote}
+                                             firebase={firebase}
+                                             emojiAlt={emojiAlt}
+                                             emojiSrc={emojiSrc}
+                                             initials={initials}
+                                             displayName={displayName}/>
                         )}
                     </List>
                 </SwipeablePanel>
