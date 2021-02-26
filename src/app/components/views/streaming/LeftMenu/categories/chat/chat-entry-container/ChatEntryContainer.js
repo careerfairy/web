@@ -24,7 +24,8 @@ const useStyles = makeStyles((theme) => {
             emotesMenuButton: {
                 position: "absolute",
                 top: "50%",
-                right: "-30px",
+                right: ({isMe}) => !isMe && "-30px",
+                left: ({isMe}) => isMe && "-30px",
                 transform: "translateY(-50%)",
                 opacity: 0.3
             },
@@ -253,12 +254,6 @@ function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry, current
     useEffect(() => {
         setIsStreamer(chatEntry?.authorEmail === "Streamer")
     }, [chatEntry?.authorEmail])
-
-    useEffect(() => {
-        if (currentEntry?.id === chatEntry?.id) {
-            handleSetCurrentEntry(chatEntry)
-        }
-    }, [currentEntry, chatEntry])
 
     const handleOpenEmotesMenu = (event) => {
         setAnchorEl(event.currentTarget)

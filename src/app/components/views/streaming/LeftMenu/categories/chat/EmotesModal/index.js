@@ -154,7 +154,7 @@ const EmotesModal = ({onClose, chatEntry, firebase}) => {
                     <SwipeablePanel index={0} value={value}>
                         <List>
                             {all.map(({avatar, email, initials, displayName, emojiAlt, emojiSrc, prop}) =>
-                                <EmotesModalUser key={email + prop}
+                                <EmotesModalUser key={(email + prop) || uuidv4()}
                                                  avatar={avatar}
                                                  email={email}
                                                  loading={loading}
