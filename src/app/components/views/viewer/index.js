@@ -90,11 +90,11 @@ const ViewerOverview = ({
             <div className={clsx({
                 [classes.blackFrame]: true,
             })}>
-                <AudienceDrawer
-                    livestreamId={currentLivestream.id}
-                    hideAudience={hideAudience}
-                    audienceDrawerOpen={audienceDrawerOpen}
-                />
+                {/*<AudienceDrawer*/}
+                {/*    livestreamId={currentLivestream.id}*/}
+                {/*    hideAudience={hideAudience}*/}
+                {/*    audienceDrawerOpen={audienceDrawerOpen}*/}
+                {/*/>*/}
                 <ViewerComponent
                     livestreamId={currentLivestream.id} streamerId={streamerId}
                     setNumberOfViewers={setNumberOfViewers}

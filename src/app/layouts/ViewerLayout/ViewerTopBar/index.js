@@ -40,7 +40,8 @@ const useStyles = makeStyles(theme => ({
         color: theme.palette.primary.main,
         display: "flex",
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        margin: theme.spacing(0, 1)
     },
     viewCountText: {
         fontWeight: 600,
@@ -48,18 +49,14 @@ const useStyles = makeStyles(theme => ({
     },
     floatingViewCount: {
         position: 'absolute',
-        top: theme.spacing(2),
-        right: theme.spacing(2),
+        top: theme.spacing(2.5),
+        right: theme.spacing(2.5),
         zIndex: 120,
         color: theme.palette.primary.main,
-        // background: "transparent",
-        // "&:hover":{
-        //     background: fade(theme.palette.primary.main, 0.1),
-        // }
     }
 }));
 
-const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience}) => {
+const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu}) => {
 
     const classes = useStyles()
     const {authenticatedUser, userData} = useAuth();
@@ -90,16 +87,20 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience}) => {
     }
 
 
-    if (mobile) {
+    if (mobile && !showMenu) {
         return (
-            <Tooltip title="See who's here">
-                <IconButton onClick={showAudience} size="small" className={classes.floatingViewCount}>
-                    <Badge color="secondary" badgeContent={numberOfViewers}>
-                        <PeopleIcon/>
-                    </Badge>
-                </IconButton>
+            <Tooltip title="Number of viewers">
+                {/*<IconButton onClick={showAudience} size="small" className={classes.floatingViewCount}>*/}
+                <Badge color="secondary" className={classes.floatingViewCount} badgeContent={numberOfViewers}>
+                    <PeopleIcon/>
+                </Badge>
+                {/*</IconButton>*/}
             </Tooltip>
         )
+    }
+
+    if (mobile && showMenu) {
+        return null
     }
 
 
@@ -133,12 +134,12 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience}) => {
                         />
                     </Tooltip>
                     <Box className={classes.viewCount}>
-                        <Tooltip title="See who's here">
-                            <IconButton color="primary" onClick={showAudience}>
-                                <Badge color="secondary" badgeContent={numberOfViewers}>
-                                    <PeopleIcon/>
-                                </Badge>
-                            </IconButton>
+                        <Tooltip title="Number of Viewers">
+                            {/*    <IconButton color="primary" onClick={showAudience}>*/}
+                            <Badge color="secondary" badgeContent={numberOfViewers}>
+                                <PeopleIcon/>
+                            </Badge>
+                            {/*    </IconButton>*/}
                         </Tooltip>
                     </Box>
                 </Box>
@@ -160,7 +161,8 @@ ViewerTopBar.propTypes = {
     firebase: PropTypes.object,
     mobile: PropTypes.bool.isRequired,
     numberOfViewers: PropTypes.number.isRequired,
-    showAudience: PropTypes.func.isRequired
+    showAudience: PropTypes.func.isRequired,
+    showMenu: PropTypes.bool.isRequired
 }
 
 export default withFirebase(ViewerTopBar);

@@ -92,6 +92,17 @@ const ViewerLayout = (props) => {
             doc: livestreamId,
             storeAs: "currentLivestream",
             populates
+        },
+        {
+            collection: "livestreams",
+            doc: livestreamId,
+            subcollections: [
+                {
+                    collection: "participatingStudents",
+                    orderBy: ["joined", "asc"],
+                }
+            ],
+            storeAs: "audience"
         }
     ] : [], [livestreamId])
 
@@ -205,6 +216,7 @@ const ViewerLayout = (props) => {
             <div className={classes.root}>
                 <ViewerTopBar
                     showAudience={showAudience}
+                    showMenu={showMenu}
                     numberOfViewers={numberOfViewers}
                     mobile={mobile}
                 />

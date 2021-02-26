@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {withFirebase} from '../../../../../context/firebase';
 import {grey} from "@material-ui/core/colors";
 import {IconButton, TextField, Typography} from "@material-ui/core";
@@ -9,6 +9,7 @@ import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
 import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
 import CustomScrollToBottom from "../../../../util/CustomScrollToBottom";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
+import EmotesModal from "./chat/EmotesModal";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -81,6 +82,7 @@ const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
     const [newChatEntry, setNewChatEntry] = useState('');
     const [chatEntries, setChatEntries] = useState([]);
     const [submitting, setSubmitting] = useState(false);
+    const [currentEntry, setCurrentEntry] = useState(null);
 
     const isEmpty = (!(newChatEntry.trim()) || (!userData && !livestream.test && !isStreamer))
     const classes = useStyles({isEmpty})
@@ -124,7 +126,22 @@ const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
         }
     }
 
-    const chatElements = chatEntries.map(chatEntry => <ChatEntryContainer key={chatEntry?.id} chatEntry={chatEntry}/>);
+    const handleClearCurrentEntry = () => {
+        setCurrentEntry(null)
+    }
+
+
+    const handleSetCurrentEntry = useCallback((chatEntry) => {
+        setCurrentEntry(chatEntry)
+    }, [])
+
+    const chatElements = chatEntries.map(chatEntry =>
+        <ChatEntryContainer
+            handleSetCurrentEntry={handleSetCurrentEntry}
+            currentEntry={currentEntry}
+        key={chatEntry?.id}
+        chatEntry={chatEntry}
+    />);
 
     const playIcon = (<div>
         <IconButton classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}} disabled={isEmpty}
@@ -162,6 +179,7 @@ const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
                         }}/>
                 </div>
             </div>
+            <EmotesModal chatEntry={currentEntry} onClose={handleClearCurrentEntry}/>
         </div>
     );
 }
