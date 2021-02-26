@@ -3,13 +3,15 @@ import React, {memo, useEffect, useState, Fragment} from 'react';
 import Linkify from 'react-linkify';
 import {makeStyles} from "@material-ui/core/styles";
 import {Box, Card, IconButton, Paper, Popover, Slide, Typography, Zoom} from "@material-ui/core";
+import * as actions from '../../../../../../../store/actions'
 import {getTimeFromNow} from "../../../../../../helperFunctions/HelperFunctions";
 import {useAuth} from "../../../../../../../HOCs/AuthProvider";
 import {withFirebase} from "../../../../../../../context/firebase";
 import {useCurrentStream} from "../../../../../../../context/stream/StreamContext";
 import EmojiEmotionsOutlinedIcon from '@material-ui/icons/EmojiEmotionsOutlined';
-import {heartPng, laughingPng, thumbsUpPng, wowPng} from "../EmotesModal/utils";
+import {heartPng, laughingPng, TEST_EMAIL, thumbsUpPng, wowPng} from "../EmotesModal/utils";
 import clsx from "clsx";
+import {useDispatch} from "react-redux";
 
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
@@ -120,42 +122,47 @@ const Emotes = ({handleCloseEmotesMenu, firebase, chatEntry: {id: chatEntryId, w
     const classes = useStyles()
     const {currentLivestream: {id}} = useCurrentStream()
     const {userData} = useAuth()
+    const dispatch = useDispatch()
 
-    const handleEmote = async (emoteProp) => {
-        const userEmail = userData?.userEmail || "test@careerfairy.io"
-        await firebase.emoteComment(id, chatEntryId, emoteProp, userEmail)
+    const handleEmote = async (emoteProp, active) => {
+        try {
+            if (active && userData?.userEmail) {
+                await firebase.unEmoteComment(id, chatEntryId, emoteProp, userData.userEmail)
+            } else {
+                const userEmail = userData?.userEmail || TEST_EMAIL
+                await firebase.emoteComment(id, chatEntryId, emoteProp, userEmail)
+            }
+        } catch (e) {
+            dispatch(actions.sendGeneralError(e))
+        }
         handleCloseEmotesMenu()
     }
 
     const getActive = (arrayOfEmails) => {
-        return arrayOfEmails?.includes(userData?.userEmail) || arrayOfEmails?.includes("test@careerfairy.io")
+        return arrayOfEmails?.includes(userData?.userEmail)
     }
 
 
     const emotes = [
         {
-            onClick: () => handleEmote("laughing"),
             src: laughingPng.src,
             alt: laughingPng.alt,
             prop: "laughing",
             active: getActive(laughing)
         },
         {
-            onClick: () => handleEmote("wow"),
             src: wowPng.src,
             alt: wowPng.alt,
             prop: "wow",
             active: getActive(wow)
         },
         {
-            onClick: () => handleEmote("heart"),
             src: heartPng.src,
             alt: heartPng.alt,
             prop: "heart",
             active: getActive(heart)
         },
         {
-            onClick: () => handleEmote("thumbsUp"),
             src: thumbsUpPng.src,
             alt: thumbsUpPng.alt,
             prop: "thumbsUp",
@@ -174,7 +181,7 @@ const Emotes = ({handleCloseEmotesMenu, firebase, chatEntry: {id: chatEntryId, w
                         [classes.active]: active
                     })}
                 >
-                    <img onClick={() => handleEmote(prop)} className={classes.emoteImg} alt={alt}
+                    <img onClick={() => handleEmote(prop, active)} className={classes.emoteImg} alt={alt}
                          src={src}/>
                 </IconButton>)}
         </Fragment>
@@ -183,12 +190,7 @@ const Emotes = ({handleCloseEmotesMenu, firebase, chatEntry: {id: chatEntryId, w
 const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}, onClick}) => {
 
     const classes = useStyles()
-    const {currentLivestream: {id}} = useCurrentStream()
-    const {userData} = useAuth()
     const [emotes, setEmotes] = useState([]);
-
-    const shouldPreview = () => Boolean(laughing?.length || wow?.length || thumbsUp?.length || heart?.length)
-    const total = [...(wow ? wow : []), ...(heart ? heart : []), ...(thumbsUp ? thumbsUp : []), ...(laughing ? laughing : [])].length
 
     useEffect(() => {
         const newEmotes = [
@@ -223,11 +225,11 @@ const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}, onClick}) =
 
 
     return (
-        <Zoom unmountOnExit mountOnEnter in={shouldPreview()}>
+        <Zoom unmountOnExit mountOnEnter in={Boolean(emotes.length)}>
             <Paper onClick={onClick} className={classes.emotesPreviewPaperWrapper}>
                 {emotes.map(({alt, src, prop}) => <img key={prop} className={classes.previewImg} alt={alt} src={src}/>)}
                 <Typography className={classes.totalText}>
-                    {total}
+                    {emotes.length}
                 </Typography>
             </Paper>
         </Zoom>

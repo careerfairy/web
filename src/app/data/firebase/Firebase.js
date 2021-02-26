@@ -930,14 +930,19 @@ class Firebase {
     }
 
     emoteComment = (livestreamId, chatEntryId, fieldProp, userEmail) => {
+        const otherProps = ["wow", "laughing", "heart", "thumbsUp"].filter(prop => prop !== fieldProp)
         const chatEntryRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("chatEntries")
             .doc(chatEntryId)
-        return chatEntryRef.update({
+        const data = {
             [fieldProp]: firebase.firestore.FieldValue.arrayUnion(userEmail)
+        }
+        otherProps.forEach(otherProp => {
+            data[otherProp] = firebase.firestore.FieldValue.arrayRemove(userEmail)
         })
+        return chatEntryRef.update(data)
     }
     unEmoteComment = (livestreamId, chatEntryId, fieldProp, userEmail) => {
         const chatEntryRef = this.firestore

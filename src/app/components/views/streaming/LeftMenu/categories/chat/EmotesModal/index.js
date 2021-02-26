@@ -12,6 +12,7 @@ import {useCurrentStream} from "../../../../../../../context/stream/StreamContex
 
 import PanelDisplay from "./PanelDisplay";
 import EmotesModalUser from "./EmotesModalUser";
+import {TEST_EMAIL} from "./utils";
 
 const EmotesModal = ({onClose, chatEntry, firebase}) => {
     const dispatch = useDispatch()
@@ -66,7 +67,7 @@ const EmotesModal = ({onClose, chatEntry, firebase}) => {
         const userData = audienceMap?.[email]
         if (userData?.firstName && userData?.lastName) {
             displayName = `${userData.firstName} ${userData.lastName[0]}`
-        } else if (email === "test@careerfairy.io") {
+        } else if (email === TEST_EMAIL) {
             displayName = "Test user"
         }
         return displayName
