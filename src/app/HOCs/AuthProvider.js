@@ -73,7 +73,6 @@ const AuthProvider = ({children}) => {
         return <Loader/>;
     }
 
-    console.log("-> userData", userData);
     return (
         <AuthContext.Provider
             value={{authenticatedUser: auth, userData}}

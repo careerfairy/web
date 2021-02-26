@@ -8,7 +8,6 @@ let displayed = [];
 const Notifier = () => {
     const dispatch = useDispatch();
     const notifications = useSelector(store => store.snackbars.notifications || []);
-    console.log("-> notifications in notifier", notifications);
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
     const storeDisplayed = (id) => {

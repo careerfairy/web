@@ -67,7 +67,6 @@ const useStyles = makeStyles((theme) => {
                 borderRadius: theme.spacing(2),
             },
             emoteImg: {
-                marginRight: theme.spacing(0.3),
                 cursor: "pointer",
                 transition: theme.transitions.create("transform", {
                     duration: theme.transitions.duration.short,
