@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React, {memo, useEffect, useState} from 'react';
 import Linkify from 'react-linkify';
 import {makeStyles} from "@material-ui/core/styles";
-import {Box, Card, Paper, Slide, Typography, Zoom} from "@material-ui/core";
+import {Box, Card, IconButton, Paper, Popover, Slide, Typography, Zoom} from "@material-ui/core";
 import {getTimeFromNow} from "../../../../../../helperFunctions/HelperFunctions";
 import {useAuth} from "../../../../../../../HOCs/AuthProvider";
 import {withFirebase} from "../../../../../../../context/firebase";
@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => {
                 maxWidth: "80%",
                 width: "min-content",
                 display: "flex",
-                position: "relative"
+                position: "relative",
             },
             emotesPreviewPaperWrapper: {
                 cursor: "pointer",
@@ -44,9 +44,9 @@ const useStyles = makeStyles((theme) => {
                 alignItems: "center",
                 zIndex: 1,
                 padding: theme.spacing(0.4),
-                position: "absolute",
-                top: -7,
-                right: 0,
+                // position: "absolute",
+                // top: -7,
+                // right: 0,
                 overflow: "hidden",
                 borderRadius: theme.spacing(2),
             },
@@ -82,7 +82,6 @@ const useStyles = makeStyles((theme) => {
                                       isMe,
                                       isStreamer
                                   }) => isMe ? theme.palette.primary.main : isStreamer ? "#ff1493" : paperColor,
-                // backgroundColor: ({hovered}) => hovered && "pink",
                 color: ({isMe, isStreamer}) => isMe || isStreamer ? "white" : "inherit",
                 overflowWrap: "break-word",
             },
@@ -96,13 +95,13 @@ const useStyles = makeStyles((theme) => {
                 fontSize: "0.7em",
                 marginBottom: 0,
                 color: ({isMe, isStreamer}) => isMe || isStreamer ? "white" : "rgb(180,180,180)",
-            }
+            },
         }
     })
 
 ;
 
-const Emotes = ({hovered, handleMouseLeave, firebase, chatEntryId}) => {
+const Emotes = ({handleMouseLeave, firebase, chatEntryId}) => {
 
     const classes = useStyles()
     const {currentLivestream: {id}} = useCurrentStream()
@@ -113,17 +112,29 @@ const Emotes = ({hovered, handleMouseLeave, firebase, chatEntryId}) => {
         await firebase.emoteComment(id, chatEntryId, emoteProp, userEmail)
         handleMouseLeave()
     }
+
+
     return (
-        <Zoom style={{transitionDelay: hovered ? '200ms' : '0ms'}} unmountOnExit mountOnEnter in={hovered}>
-            <Paper className={classes.emotesPaperWrapper}>
+        // <Zoom style={{transitionDelay: anchorEl ? '200ms' : '0ms'}} unmountOnExit mountOnEnter in={anchorEl}>
+        <>
+            <IconButton size="medium">
                 <img onClick={() => handleEmote("laughing")} className={classes.emoteImg} alt="😆"
                      src="/emojis/laughing.png"/>
-                <img onClick={() => handleEmote("wow")} className={classes.emoteImg} alt="😮" src="/emojis/wow.png"/>
-                <img onClick={() => handleEmote("heart")} className={classes.emoteImg} alt="❤" src="/emojis/heart.png"/>
+            </IconButton>
+            <IconButton size="medium">
+                <img onClick={() => handleEmote("wow")} className={classes.emoteImg} alt="😮"
+                     src="/emojis/wow.png"/>
+            </IconButton>
+            <IconButton size="medium">
+                <img onClick={() => handleEmote("heart")} className={classes.emoteImg} alt="❤"
+                     src="/emojis/heart.png"/>
+            </IconButton>
+            <IconButton color="primary" size="medium">
                 <img onClick={() => handleEmote("thumbsUp")} className={classes.emoteImg} alt="👍"
                      src="/emojis/thumbsUp.png"/>
-            </Paper>
-        </Zoom>
+            </IconButton>
+        </>
+        // {/*</Zoom>*/
     )
 }
 const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}, handleMouseLeave, onClick}) => {
@@ -151,7 +162,8 @@ const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}, handleMouse
 }
 
 function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry, currentEntry}) {
-    const [hovered, setHovered] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    console.log("-> anchorEl", anchorEl);
     const {authenticatedUser} = useAuth();
     const [isMe, setIsMe] = useState(chatEntry?.authorEmail === authenticatedUser?.email);
     const [isStreamer, setIsStreamer] = useState(chatEntry?.authorEmail === "Streamer");
@@ -159,7 +171,6 @@ function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry, current
     const classes = useStyles({
         isMe,
         isStreamer,
-        hovered
     })
 
     useEffect(() => {
@@ -176,8 +187,13 @@ function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry, current
         }
     }, [currentEntry, chatEntry])
 
-    const handleMouseEnter = () => setHovered(true)
-    const handleMouseLeave = () => setHovered(false)
+    const handleMouseEnter = (event) => {
+        setAnchorEl(event.currentTarget)
+    }
+    const handleMouseLeave = () => {
+        console.log("-> in the mouse Leave");
+        setAnchorEl(null)
+    }
     const handleClickPreview = () => handleSetCurrentEntry(chatEntry)
 
 
@@ -187,11 +203,37 @@ function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry, current
         </a>
     );
 
+    const open = Boolean(anchorEl)
     return (
         <Slide in direction={isMe ? "left" : "right"}>
-            <span className={classes.chatWrapper} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-            <Emotes chatEntryId={chatEntry.id} firebase={firebase} handleMouseLeave={handleMouseLeave}
-                    hovered={hovered}/>
+            <span className={classes.chatWrapper} onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+            >
+                <Popover
+                    id="mouse-over-popover"
+                    elevation={20}
+                    classes={{
+                        paper: classes.emotesPaperWrapper,
+                    }}
+                    PaperProps={{
+                        onMouseLeave: () => handleMouseLeave()
+                    }}
+                    open={open}
+                    anchorEl={anchorEl}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                    }}
+                    onClose={handleMouseLeave}
+                    // disableRestoreFocus
+                >
+                    <Emotes chatEntryId={chatEntry.id} firebase={firebase}
+                            handleMouseLeave={handleMouseLeave}/>
+                </Popover>
                 <Box component={Card} className={classes.chatBubble}>
                     <Linkify componentDecorator={componentDecorator}>
                         {chatEntry.message}
@@ -211,10 +253,10 @@ function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry, current
 }
 
 ChatEntryContainer.propTypes = {
-  chatEntry: PropTypes.object.isRequired,
-  currentEntry: PropTypes.object,
-  firebase: PropTypes.object,
-  handleSetCurrentEntry: PropTypes.func.isRequired
+    chatEntry: PropTypes.object.isRequired,
+    currentEntry: PropTypes.object,
+    firebase: PropTypes.object,
+    handleSetCurrentEntry: PropTypes.func.isRequired
 }
 
 export default withFirebase(memo(ChatEntryContainer));

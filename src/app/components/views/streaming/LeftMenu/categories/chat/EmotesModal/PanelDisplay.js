@@ -4,7 +4,7 @@ import {makeStyles} from "@material-ui/core/styles";
 
 import React from "react";
 
-const makeStyles = makeStyles(theme => ({
+const useStyles = makeStyles(theme => ({
     panelContentWrapper: {
         display: "flex",
         alignItems: "center",

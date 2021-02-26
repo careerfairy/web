@@ -111,7 +111,7 @@ const EmotesModal = ({onClose, chatEntry, firebase}) => {
                     <Tab
                         key={index}
                         label={
-                            <PanelDisplay className={classes.emojiImg} count={data.length} imageAlt={alt}
+                            <PanelDisplay count={data.length} imageAlt={alt}
                                           imageSrc={src}/>
                         }
                     />)}
