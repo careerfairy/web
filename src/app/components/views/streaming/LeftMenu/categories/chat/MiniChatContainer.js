@@ -194,8 +194,13 @@ function MiniChatContainer({isStreamer, livestream, firebase, className}) {
         }
     }
 
-    const chatElements = chatEntries.map(chatEntry => <ChatEntryContainer handleSetCurrentEntry={handleSetCurrentEntry}
-                                                                          key={chatEntry.id} chatEntry={chatEntry}/>);
+    const chatElements = chatEntries.map(chatEntry =>
+        <ChatEntryContainer
+            handleSetCurrentEntry={handleSetCurrentEntry}
+            currentEntry={currentEntry}
+            key={chatEntry.id}
+            chatEntry={chatEntry}/>
+    );
 
     const playIcon = (<div>
         <IconButton classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}} disabled={isEmpty}

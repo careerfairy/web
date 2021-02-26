@@ -1,20 +1,16 @@
+import PropTypes from 'prop-types'
 import React, {memo, useEffect, useState} from 'react';
 import Linkify from 'react-linkify';
 import {makeStyles} from "@material-ui/core/styles";
-import {Box, Card, Typography, Slide, Paper, Zoom, Badge} from "@material-ui/core";
+import {Box, Card, Paper, Slide, Typography, Zoom} from "@material-ui/core";
 import {getTimeFromNow} from "../../../../../../helperFunctions/HelperFunctions";
 import {useAuth} from "../../../../../../../HOCs/AuthProvider";
 import {withFirebase} from "../../../../../../../context/firebase";
 import {useCurrentStream} from "../../../../../../../context/stream/StreamContext";
-import clsx from "clsx";
 
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
 dayjs.extend(relativeTime)
-const laughingAlt = "😆"
-const wowAlt = "😮"
-const heartAlt = "❤"
-const thumbsUpAlt = "👍"
 
 
 const useStyles = makeStyles((theme) => {
@@ -154,7 +150,7 @@ const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}, handleMouse
     )
 }
 
-function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry}) {
+function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry, currentEntry}) {
     const [hovered, setHovered] = useState(false);
     const {authenticatedUser} = useAuth();
     const [isMe, setIsMe] = useState(chatEntry?.authorEmail === authenticatedUser?.email);
@@ -174,9 +170,15 @@ function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry}) {
         setIsStreamer(chatEntry?.authorEmail === "Streamer")
     }, [chatEntry?.authorEmail])
 
+    useEffect(() => {
+        if (currentEntry?.id === chatEntry?.id) {
+            handleSetCurrentEntry(chatEntry)
+        }
+    }, [currentEntry, chatEntry])
 
     const handleMouseEnter = () => setHovered(true)
     const handleMouseLeave = () => setHovered(false)
+    const handleClickPreview = () => handleSetCurrentEntry(chatEntry)
 
 
     const componentDecorator = (href, text, key) => (
@@ -201,10 +203,18 @@ function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry}) {
                         {getTimeFromNow(chatEntry.timestamp)}
                     </Typography>
                 </Box>
-                <EmotesPreview onClick={() => handleSetCurrentEntry(chatEntry)} handleSetCurrentEntry={handleSetCurrentEntry} handleMouseLeave={handleMouseLeave} chatEntry={chatEntry}/>
+                <EmotesPreview onClick={handleClickPreview} handleMouseLeave={handleMouseLeave}
+                               chatEntry={chatEntry}/>
             </span>
         </Slide>
     );
+}
+
+ChatEntryContainer.propTypes = {
+  chatEntry: PropTypes.object.isRequired,
+  currentEntry: PropTypes.object,
+  firebase: PropTypes.object,
+  handleSetCurrentEntry: PropTypes.func.isRequired
 }
 
 export default withFirebase(memo(ChatEntryContainer));
