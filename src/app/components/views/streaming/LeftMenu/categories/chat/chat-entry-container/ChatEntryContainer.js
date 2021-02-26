@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, {memo, useEffect, useState} from 'react';
+import React, {memo, useEffect, useState, Fragment} from 'react';
 import Linkify from 'react-linkify';
 import {makeStyles} from "@material-ui/core/styles";
 import {Box, Card, IconButton, Paper, Popover, Slide, Typography, Zoom} from "@material-ui/core";
@@ -7,6 +7,8 @@ import {getTimeFromNow} from "../../../../../../helperFunctions/HelperFunctions"
 import {useAuth} from "../../../../../../../HOCs/AuthProvider";
 import {withFirebase} from "../../../../../../../context/firebase";
 import {useCurrentStream} from "../../../../../../../context/stream/StreamContext";
+import EmojiEmotionsOutlinedIcon from '@material-ui/icons/EmojiEmotionsOutlined';
+import {heartPng, laughingPng, thumbsUpPng, wowPng} from "../EmotesModal/utils";
 
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
@@ -16,6 +18,13 @@ dayjs.extend(relativeTime)
 const useStyles = makeStyles((theme) => {
         const paperColor = theme.palette.background.paper;
         return {
+            emotesMenuButton: {
+                position: "absolute",
+                top: "50%",
+                right: "-30px",
+                transform: "translateY(-50%)",
+                opacity: 0.3
+            },
             chatWrapper: {
                 marginLeft: ({isMe}) => isMe ? "auto" : 0,
                 marginBottom: theme.spacing(1),
@@ -101,7 +110,7 @@ const useStyles = makeStyles((theme) => {
 
 ;
 
-const Emotes = ({handleMouseLeave, firebase, chatEntryId}) => {
+const Emotes = ({handleCloseEmotesMenu, firebase, chatEntryId}) => {
 
     const classes = useStyles()
     const {currentLivestream: {id}} = useCurrentStream()
@@ -110,49 +119,93 @@ const Emotes = ({handleMouseLeave, firebase, chatEntryId}) => {
     const handleEmote = async (emoteProp) => {
         const userEmail = userData?.userEmail || "test@careerfairy.io"
         await firebase.emoteComment(id, chatEntryId, emoteProp, userEmail)
-        handleMouseLeave()
+        handleCloseEmotesMenu()
     }
+
+    const emotes = [
+        {
+            onClick: () => handleEmote("laughing"),
+            src: laughingPng.src,
+            alt: laughingPng.alt,
+            prop: "laughing"
+        },
+        {
+            onClick: () => handleEmote("wow"),
+            src: wowPng.src,
+            alt: wowPng.alt,
+            prop: "wow"
+        },
+        {
+            onClick: () => handleEmote("heart"),
+            src: heartPng.src,
+            alt: heartPng.alt,
+            prop: "heart"
+        },
+        {
+            onClick: () => handleEmote("thumbsUp"),
+            src: thumbsUpPng.src,
+            alt: thumbsUpPng.alt,
+            prop: "thumbsUp"
+        },
+    ]
 
 
     return (
-        // <Zoom style={{transitionDelay: anchorEl ? '200ms' : '0ms'}} unmountOnExit mountOnEnter in={anchorEl}>
-        <>
-            <IconButton size="medium">
-                <img onClick={() => handleEmote("laughing")} className={classes.emoteImg} alt="😆"
-                     src="/emojis/laughing.png"/>
-            </IconButton>
-            <IconButton size="medium">
-                <img onClick={() => handleEmote("wow")} className={classes.emoteImg} alt="😮"
-                     src="/emojis/wow.png"/>
-            </IconButton>
-            <IconButton size="medium">
-                <img onClick={() => handleEmote("heart")} className={classes.emoteImg} alt="❤"
-                     src="/emojis/heart.png"/>
-            </IconButton>
-            <IconButton color="primary" size="medium">
-                <img onClick={() => handleEmote("thumbsUp")} className={classes.emoteImg} alt="👍"
-                     src="/emojis/thumbsUp.png"/>
-            </IconButton>
-        </>
-        // {/*</Zoom>*/
+        <Fragment>
+            {emotes.map(({prop, src, alt}) =>
+                <IconButton size="medium" key={prop}>
+                    <img onClick={() => handleEmote(prop)} className={classes.emoteImg} alt={alt}
+                         src={src}/>
+                </IconButton>)}
+        </Fragment>
     )
 }
-const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}, handleMouseLeave, onClick}) => {
+const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}, onClick}) => {
 
     const classes = useStyles()
     const {currentLivestream: {id}} = useCurrentStream()
     const {userData} = useAuth()
+    const [emotes, setEmotes] = useState([]);
 
     const shouldPreview = () => Boolean(laughing?.length || wow?.length || thumbsUp?.length || heart?.length)
     const total = [...(wow ? wow : []), ...(heart ? heart : []), ...(thumbsUp ? thumbsUp : []), ...(laughing ? laughing : [])].length
 
+    useEffect(() => {
+        const newEmotes = [
+            {
+                src: laughingPng.src,
+                alt: laughingPng.alt,
+                prop: "laughing",
+                data: laughing
+            },
+            {
+                src: wowPng.src,
+                alt: wowPng.alt,
+                prop: "wow",
+                data: wow
+            },
+            {
+                src: heartPng.src,
+                alt: heartPng.alt,
+                prop: "heart",
+                data: heart
+            },
+            {
+                src: thumbsUpPng.src,
+                alt: thumbsUpPng.alt,
+                prop: "thumbsUp",
+                data: thumbsUp
+            },
+        ].filter(emote => emote.data?.length)
+        setEmotes(newEmotes)
+
+    }, [wow, heart, thumbsUp, laughing])
+
+
     return (
         <Zoom unmountOnExit mountOnEnter in={shouldPreview()}>
-            <Paper onClick={onClick} onMouseEnter={handleMouseLeave} className={classes.emotesPreviewPaperWrapper}>
-                {!!laughing?.length && <img className={classes.previewImg} alt="😆" src="/emojis/laughing.png"/>}
-                {!!wow?.length && <img className={classes.previewImg} alt="😮" src="/emojis/wow.png"/>}
-                {!!heart?.length && <img className={classes.previewImg} alt="❤" src="/emojis/heart.png"/>}
-                {!!thumbsUp?.length && <img className={classes.previewImg} alt="👍" src="/emojis/thumbsUp.png"/>}
+            <Paper onClick={onClick} className={classes.emotesPreviewPaperWrapper}>
+                {emotes.map(({alt, src, prop}) => <img key={prop} className={classes.previewImg} alt={alt} src={src}/>)}
                 <Typography className={classes.totalText}>
                     {total}
                 </Typography>
@@ -163,7 +216,6 @@ const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}, handleMouse
 
 function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry, currentEntry}) {
     const [anchorEl, setAnchorEl] = useState(null);
-    console.log("-> anchorEl", anchorEl);
     const {authenticatedUser} = useAuth();
     const [isMe, setIsMe] = useState(chatEntry?.authorEmail === authenticatedUser?.email);
     const [isStreamer, setIsStreamer] = useState(chatEntry?.authorEmail === "Streamer");
@@ -187,13 +239,13 @@ function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry, current
         }
     }, [currentEntry, chatEntry])
 
-    const handleMouseEnter = (event) => {
+    const handleOpenEmotesMenu = (event) => {
         setAnchorEl(event.currentTarget)
     }
-    const handleMouseLeave = () => {
-        console.log("-> in the mouse Leave");
+    const handleCloseEmotesMenu = () => {
         setAnchorEl(null)
     }
+
     const handleClickPreview = () => handleSetCurrentEntry(chatEntry)
 
 
@@ -206,8 +258,8 @@ function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry, current
     const open = Boolean(anchorEl)
     return (
         <Slide in direction={isMe ? "left" : "right"}>
-            <span className={classes.chatWrapper} onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
+            <span className={classes.chatWrapper}
+
             >
                 <Popover
                     id="mouse-over-popover"
@@ -215,9 +267,7 @@ function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry, current
                     classes={{
                         paper: classes.emotesPaperWrapper,
                     }}
-                    PaperProps={{
-                        onMouseLeave: () => handleMouseLeave()
-                    }}
+                    PaperProps={{}}
                     open={open}
                     anchorEl={anchorEl}
                     anchorOrigin={{
@@ -228,11 +278,11 @@ function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry, current
                         vertical: 'top',
                         horizontal: 'left',
                     }}
-                    onClose={handleMouseLeave}
+                    onClose={handleCloseEmotesMenu}
                     // disableRestoreFocus
                 >
                     <Emotes chatEntryId={chatEntry.id} firebase={firebase}
-                            handleMouseLeave={handleMouseLeave}/>
+                            handleCloseEmotesMenu={handleCloseEmotesMenu}/>
                 </Popover>
                 <Box component={Card} className={classes.chatBubble}>
                     <Linkify componentDecorator={componentDecorator}>
@@ -245,7 +295,10 @@ function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry, current
                         {getTimeFromNow(chatEntry.timestamp)}
                     </Typography>
                 </Box>
-                <EmotesPreview onClick={handleClickPreview} handleMouseLeave={handleMouseLeave}
+                <IconButton size="small" className={classes.emotesMenuButton} onClick={handleOpenEmotesMenu}>
+                    <EmojiEmotionsOutlinedIcon/>
+                </IconButton>
+                <EmotesPreview onClick={handleClickPreview}
                                chatEntry={chatEntry}/>
             </span>
         </Slide>
