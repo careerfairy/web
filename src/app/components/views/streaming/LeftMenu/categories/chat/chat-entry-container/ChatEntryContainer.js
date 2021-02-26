@@ -1,4 +1,4 @@
-import React, {memo, useState} from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import Linkify from 'react-linkify';
 import {makeStyles} from "@material-ui/core/styles";
 import {Box, Card, Typography, Slide, Paper, Zoom, Badge} from "@material-ui/core";
@@ -21,14 +21,15 @@ const useStyles = makeStyles((theme) => {
         const paperColor = theme.palette.background.paper;
         return {
             chatWrapper: {
-                marginLeft: ({isMe}) => isMe ? "auto" : 8,
-                margin: 8,
+                marginLeft: ({isMe}) => isMe ? "auto" : 0,
+                marginBottom: theme.spacing(1),
                 maxWidth: "80%",
                 width: "min-content",
                 display: "flex",
                 position: "relative"
             },
             emotesPreviewPaperWrapper: {
+                cursor: "pointer",
                 bottom: "-10px !important",
                 display: "flex",
                 alignItems: "center",
@@ -38,7 +39,7 @@ const useStyles = makeStyles((theme) => {
                 right: 0,
                 overflow: "hidden",
                 borderRadius: theme.spacing(2),
-                "&  > *":{
+                "&  > *": {
                     margin: theme.spacing(0, 0.3)
                 }
             },
@@ -48,7 +49,7 @@ const useStyles = makeStyles((theme) => {
                 zIndex: 1,
                 padding: theme.spacing(0.4),
                 position: "absolute",
-                top: -15,
+                top: -7,
                 right: 0,
                 overflow: "hidden",
                 borderRadius: theme.spacing(2),
@@ -63,15 +64,15 @@ const useStyles = makeStyles((theme) => {
                 "&:hover": {
                     transform: "scale(1.2) rotate(25deg)"
                 },
-                width: theme.spacing(3),
-                height: theme.spacing(3)
+                width: theme.spacing(2.5),
+                height: theme.spacing(2.5)
             },
             previewImg: {
                 width: theme.spacing(1.5),
                 height: theme.spacing(1.5)
             },
-            totalText:{
-              fontSize: theme.spacing(1.3)
+            totalText: {
+                fontSize: theme.spacing(1.3)
             },
             chatBubble: {
                 borderRadius: ({isMe}) => isMe ? "23px 23px 5px 23px" : "23px 23px 23px 5px",
@@ -112,7 +113,7 @@ const Emotes = ({hovered, handleMouseLeave, firebase, chatEntryId}) => {
     const {userData} = useAuth()
 
     const handleEmote = async (emoteProp) => {
-        const userEmail = userData.userEmail || "test@careerfairy.io"
+        const userEmail = userData?.userEmail || "test@careerfairy.io"
         await firebase.emoteComment(id, chatEntryId, emoteProp, userEmail)
         handleMouseLeave()
     }
@@ -129,7 +130,7 @@ const Emotes = ({hovered, handleMouseLeave, firebase, chatEntryId}) => {
         </Zoom>
     )
 }
-const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}}) => {
+const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}, handleMouseLeave, onClick}) => {
 
     const classes = useStyles()
     const {currentLivestream: {id}} = useCurrentStream()
@@ -137,11 +138,10 @@ const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}}) => {
 
     const shouldPreview = () => Boolean(laughing?.length || wow?.length || thumbsUp?.length || heart?.length)
     const total = [...(wow ? wow : []), ...(heart ? heart : []), ...(thumbsUp ? thumbsUp : []), ...(laughing ? laughing : [])].length
-    console.log("-> total", total);
 
     return (
         <Zoom unmountOnExit mountOnEnter in={shouldPreview()}>
-            <Paper className={classes.emotesPreviewPaperWrapper}>
+            <Paper onClick={onClick} onMouseEnter={handleMouseLeave} className={classes.emotesPreviewPaperWrapper}>
                 {!!laughing?.length && <img className={classes.previewImg} alt="😆" src="/emojis/laughing.png"/>}
                 {!!wow?.length && <img className={classes.previewImg} alt="😮" src="/emojis/wow.png"/>}
                 {!!heart?.length && <img className={classes.previewImg} alt="❤" src="/emojis/heart.png"/>}
@@ -154,17 +154,26 @@ const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}}) => {
     )
 }
 
-function ChatEntryContainer({chatEntry, firebase}) {
+function ChatEntryContainer({chatEntry, firebase, handleSetCurrentEntry}) {
     const [hovered, setHovered] = useState(false);
-    console.log("-> chatEntry", chatEntry);
     const {authenticatedUser} = useAuth();
-    const isMe = chatEntry?.authorEmail === authenticatedUser?.email
-    const isStreamer = chatEntry?.authorEmail === "Streamer"
+    const [isMe, setIsMe] = useState(chatEntry?.authorEmail === authenticatedUser?.email);
+    const [isStreamer, setIsStreamer] = useState(chatEntry?.authorEmail === "Streamer");
+
     const classes = useStyles({
         isMe,
         isStreamer,
         hovered
     })
+
+    useEffect(() => {
+        setIsMe(chatEntry?.authorEmail === authenticatedUser?.email)
+    }, [chatEntry?.authorEmail, authenticatedUser?.email])
+
+    useEffect(() => {
+        setIsStreamer(chatEntry?.authorEmail === "Streamer")
+    }, [chatEntry?.authorEmail])
+
 
     const handleMouseEnter = () => setHovered(true)
     const handleMouseLeave = () => setHovered(false)
@@ -192,7 +201,7 @@ function ChatEntryContainer({chatEntry, firebase}) {
                         {getTimeFromNow(chatEntry.timestamp)}
                     </Typography>
                 </Box>
-                <EmotesPreview chatEntry={chatEntry}/>
+                <EmotesPreview onClick={() => handleSetCurrentEntry(chatEntry)} handleSetCurrentEntry={handleSetCurrentEntry} handleMouseLeave={handleMouseLeave} chatEntry={chatEntry}/>
             </span>
         </Slide>
     );

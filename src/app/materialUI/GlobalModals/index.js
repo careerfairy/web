@@ -1,7 +1,7 @@
+import PropTypes from 'prop-types'
 import React from 'react';
 import {fade, makeStyles} from "@material-ui/core/styles";
-import PropTypes from "prop-types";
-import { Dialog } from '@material-ui/core';
+import {Dialog} from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     glass: {
@@ -10,15 +10,42 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const GlassDialog = (props) => {
-    const {PaperProps, ...rest} = props
-    const classes = useStyles()
+const GlassDialog = ({
+                         open,
+                         PaperProps,
+                         className,
+                         fullWidth,
+                         maxWidth,
+                         onBackdropClick,
+                         onClose,
+                         scroll,
+                         TransitionComponent,
+                         disableBackdropClick,
+                         classes,
+                         TransitionProps,
+                         ...rest
+                     }) => {
+    const paperClasses = useStyles()
     return (
-        <Dialog PaperProps={{...PaperProps, className: classes.glass}} {...rest}/>
+        <Dialog
+            PaperProps={{...PaperProps, className: paperClasses.glass}}
+            open={open}
+            className={className}
+            fullWidth={fullWidth}
+            maxWidth={maxWidth}
+            onBackdropClick={onBackdropClick}
+            onClose={onClose}
+            scroll={scroll}
+            TransitionComponent={TransitionComponent}
+            disableBackdropClick={disableBackdropClick}
+            classes={classes}
+            TransitionProps={TransitionProps}
+            {...rest}
+        />
     );
 };
 
-GlassDialog.prototypes = {
+GlassDialog.propTypes = {
     open: PropTypes.bool.isRequired,
     className: PropTypes.string,
     fullScreen: PropTypes.bool,
@@ -34,7 +61,5 @@ GlassDialog.prototypes = {
     classes: PropTypes.object,
     TransitionProps: PropTypes.node
 }
-
-GlassDialog.defaultProps = {
-};
 export {GlassDialog}
+

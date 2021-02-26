@@ -46,6 +46,9 @@ const useStyles = makeStyles(theme => ({
             overflowX: "hidden",
         }
     },
+    entriesWrapper:{
+      padding: theme.spacing(1)
+    },
     chatContainer:{
         height: "100vh", display: "flex", flexDirection: "column"
     },
@@ -121,11 +124,7 @@ const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
         }
     }
 
-    let chatElements = chatEntries.map(chatEntry => {
-        return (
-            <ChatEntryContainer key={chatEntry?.id} chatEntry={chatEntry}/>
-        );
-    });
+    const chatElements = chatEntries.map(chatEntry => <ChatEntryContainer key={chatEntry?.id} chatEntry={chatEntry}/>);
 
     const playIcon = (<div>
         <IconButton classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}} disabled={isEmpty}
@@ -136,7 +135,7 @@ const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
 
     return (
         <div className={classes.chatContainer}>
-            <CustomScrollToBottom className={classes.scrollToBottom} scrollItems={chatElements}/>
+            <CustomScrollToBottom scrollViewClassName={classes.entriesWrapper} className={classes.scrollToBottom} scrollItems={chatElements}/>
             <div className={classes.chatContent}>
                 <div className={classes.chatTitle}>
                     <ForumOutlinedIcon color="primary" fontSize="small"/>
