@@ -84,6 +84,17 @@ const UsersTable = ({
             },
         },
         {
+            field: "Field of study",
+            title: "Field of Study",
+            width: 300
+        },
+        {
+            field: "Level of study",
+            title: "Level of study",
+            width: 300
+
+        },
+        {
             field: "numberOfStreamsWatched",
             title: "Events Attended",
             width: 150,
@@ -295,6 +306,15 @@ const UsersTable = ({
                             cellStyle: {
                                 width: 300,
                             },
+                        },
+                        {
+                            field: "Field of study",
+                            title: "Field of Study",
+                        },
+                        {
+                            field: "Level of study",
+                            title: "Level of study",
+
                         },
                         {
                             field: "numberOfStreamsWatched",
