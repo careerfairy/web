@@ -76,7 +76,7 @@ export default function useAgoraAsStreamer(streamerReady, isPlayMode, videoId, s
     }, [updatedStream]);
 
     useEffect(() => {
-        console.log("externalMediaStreams", externalMediaStreams);
+        // console.log("externalMediaStreams", externalMediaStreams);
     }, [externalMediaStreams])
 
     useEffect(() => {

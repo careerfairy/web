@@ -61,7 +61,7 @@ function HandRaiseCategory(props) {
             <HandRaiseDenied handRaiseState={handRaiseState} updateHandRaiseRequest={updateHandRaiseRequest}/>
             <HandRaiseConnecting handRaiseState={handRaiseState} updateHandRaiseRequest={updateHandRaiseRequest}/>
             <HandRaiseConnected handRaiseState={handRaiseState} updateHandRaiseRequest={updateHandRaiseRequest}/>
-            <GlassDialog open={handRaiseState && handRaiseState.state === "invited"}>
+            <GlassDialog open={Boolean(handRaiseState && handRaiseState.state === "invited")}>
                 <DialogContent>
                     <Typography align="center" style={{
                         fontFamily: 'Permanent Marker',
