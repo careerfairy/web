@@ -13,8 +13,10 @@ import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
 import {useFirestoreConnect} from "react-redux-firebase";
 import {useSelector} from "react-redux";
+import {FixedSizeList} from 'react-window'
+import AutoSizer from "react-virtualized-auto-sizer";
 import User from "./User";
-import {Typography} from "@material-ui/core";
+import {ListSubheader, TextField, Typography} from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     list: {
@@ -26,33 +28,33 @@ const useStyles = makeStyles(theme => ({
     },
     titleWrapper: {
         padding: theme.spacing(2),
-        position: "fixed",
+        position: "sticky",
         height: 40,
-        zIndex:1,
+        zIndex: 1,
         background: theme.palette.background.paper,
         width: "100%"
     }
 }));
 
+function renderRow(props) {
+    const { index, style } = props;
+
+    return (
+        <ListItem button style={style} key={index}>
+            <ListItemText primary={`Item ${index + 1}`} />
+        </ListItem>
+    );
+}
+
+renderRow.propTypes = {
+    index: PropTypes.number.isRequired,
+    style: PropTypes.object.isRequired,
+};
 const AudienceDrawer = ({audienceDrawerOpen, hideAudience, livestreamId}) => {
     const classes = useStyles();
 
-    useFirestoreConnect(() => [
-        {
-            collection: "livestreams",
-            doc: livestreamId,
-            subcollections: [
-                {
-                    collection: "participatingStudents",
-                    // orderBy: ["joined", "asc"],
-                }
-            ],
-            storeAs: "audience"
-        }
-    ])
-
     const audience = useSelector(({firestore: {ordered}}) => ordered.audience || [])
-    console.log("-> audience", audience);
+    console.log("-> audience in AudienceDrawer", audience);
 
     const list = (anchor) => (
         <div
@@ -82,19 +84,28 @@ const AudienceDrawer = ({audienceDrawerOpen, hideAudience, livestreamId}) => {
     );
 
     return (
-        <React.Fragment>
-            <Drawer anchor="right" open={audienceDrawerOpen} onClose={hideAudience}>
-                {/*{list("right")}*/}
-                <div className={classes.titleWrapper}>
-                    <Typography variant="h5">
-                        Members
-                    </Typography>
-                </div>
-                <List className={classes.list}>
-                    {audience.map(user => <User key={user.id} user={user}/>)}
-                </List>
-            </Drawer>
-        </React.Fragment>
+        <Drawer anchor="right" open={audienceDrawerOpen} onClose={hideAudience}>
+            <div>
+                {/*<div className={classes.titleWrapper}>*/}
+                {/*    <Typography variant="h5">*/}
+                {/*       */}
+                {/*    </Typography>*/}
+                {/*</div>*/}
+                <TextField
+                    fullWidth
+                    label="Search for people..."
+                />
+                <ListSubheader>Members</ListSubheader>
+                <AutoSizer>
+                    {({height, width}) => (
+                        <FixedSizeList itemSize={46} itemCount={audience.length} height={height} width={width} className={classes.list}>
+                            {/*{audience.map(user => <User key={user.id} user={user}/>)}*/}
+                            {renderRow}
+                        </FixedSizeList>
+                    )}
+                </AutoSizer>
+            </div>
+        </Drawer>
     );
 }
 

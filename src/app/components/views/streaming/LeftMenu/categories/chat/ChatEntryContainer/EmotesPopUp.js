@@ -87,12 +87,13 @@ const EmotesPopUp = ({handleCloseEmotesMenu, firebase, chatEntry: {id: chatEntry
             {emotes.map(({prop, src, alt, active}) =>
                 <IconButton
                     key={prop}
+                    onClick={() => handleEmote(prop, active)}
                     size="medium"
                     className={clsx({
                         [classes.active]: active
                     })}
                 >
-                    <img onClick={() => handleEmote(prop, active)} className={classes.emoteImg} alt={alt}
+                    <img className={classes.emoteImg} alt={alt}
                          src={src}/>
                 </IconButton>)}
         </Fragment>

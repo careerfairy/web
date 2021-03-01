@@ -28,7 +28,7 @@ const StreamNotifications = ({isStreamer, firebase}) => {
                     if (change.type === "added" || change.type === "modified") {
                         if (change.doc.exists) {
                             const docData = change.doc.data()
-                            if (userData?.userEmail !== docData?.userEmail) {
+                            if (userData?.userEmail !== docData?.userEmail) { // make sure you dont see your self joining
                                 sendJoinMessage(docData, change.type === "modified")
                             }
                         }

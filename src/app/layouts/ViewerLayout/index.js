@@ -99,7 +99,8 @@ const ViewerLayout = (props) => {
             subcollections: [
                 {
                     collection: "participatingStudents",
-                    orderBy: ["joined", "asc"],
+                    // orderBy: ["joined", "asc"],
+                    // orderBy:["joined", "asc"]
                 }
             ],
             storeAs: "audience"

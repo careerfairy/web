@@ -9,6 +9,7 @@ const useStyles = makeStyles(theme => ({
         cursor: "pointer",
         bottom: "-10px !important",
         display: "flex",
+        boxShadow: theme.shadows[10],
         alignItems: "center",
         zChatEntryContainer: 1,
         padding: theme.spacing(0.1),
