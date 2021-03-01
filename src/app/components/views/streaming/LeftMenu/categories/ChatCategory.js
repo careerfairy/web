@@ -6,7 +6,7 @@ import {IconButton, TextField, Typography} from "@material-ui/core";
 import {fade, makeStyles} from "@material-ui/core/styles";
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
-import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
+import ChatEntryContainer from './chat/ChatEntryContainer';
 import CustomScrollToBottom from "../../../../util/CustomScrollToBottom";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import EmotesModal from "./chat/EmotesModal";

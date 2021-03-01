@@ -2,7 +2,7 @@ import React, {useCallback, useContext, useEffect, useState} from 'react';
 import ForumOutlinedIcon from '@material-ui/icons/ForumOutlined';
 import {withFirebase} from 'context/firebase';
 import ChevronRightRoundedIcon from '@material-ui/icons/ChevronRightRounded';
-import ChatEntryContainer from './chat-entry-container/ChatEntryContainer';
+import ChatEntryContainer from './ChatEntryContainer';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import {
     Accordion,
