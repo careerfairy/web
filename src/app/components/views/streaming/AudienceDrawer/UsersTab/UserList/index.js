@@ -17,14 +17,13 @@ const UserList = ({audience}) => {
             <AutoSizer>
                 {({height, width}) => (
                     <FixedSizeList
-                        itemSize={64}
+                        itemSize={70}
                         itemCount={audience.length} height={height} width={width}
-                        // className={classes.list}
                     >
                         {({style, index}) => <User
                             style={style}
                             key={index}
-                            inTalentPool={Boolean(talentPoolMap[audience[index]?.id])}
+                            inTalentPool={audience[index]?.inTalentPool}
                             user={audience[index]}/>}
                     </FixedSizeList>
                 )}

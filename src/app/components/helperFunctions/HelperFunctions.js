@@ -261,3 +261,19 @@ export const getMinutesPassed = (livestream) => {
 export const  addMinutes = (date, minutes) => {
     return new Date(date.getTime() + minutes * 60000);
 }
+
+export const makeExternalLink = (url) => {
+    const urlPattern = new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/);
+    let string = url
+
+    if(urlPattern.test(string)){
+        //string is url
+
+        ///clear http && https from string
+        string = string.replace("https://","").replace("http://","");
+
+        //add https to string
+        string = `https://${string}`;
+    }
+    return string
+}
