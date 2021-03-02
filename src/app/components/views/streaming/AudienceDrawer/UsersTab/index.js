@@ -4,12 +4,15 @@ import {makeStyles} from "@material-ui/core/styles";
 import {FormControl, Grid, InputLabel, MenuItem, Select, TextField} from "@material-ui/core";
 import UserList from "./UserList";
 import {useSelector} from "react-redux";
+import {isEmpty, isLoaded} from "react-redux-firebase";
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
+import EmptyDisplay from "../displays/EmptyDisplay";
+import LoadingDisplay from "../displays/LoadingDisplay";
 
 const useStyles = makeStyles(theme => ({
     searchGridWrapper: {
         padding: theme.spacing(1, 1, 0, 1),
-    }
+    },
 }));
 const TALENT_POOL_OPTION = "Talent pool"
 const ALL_OPTION = "All"
@@ -39,15 +42,21 @@ const UsersTab = ({isStreamer}) => {
         return filtered.map(user => ({...user, inTalentPool: talentPool?.includes(user.id)}))
     }
 
-    const audience = useSelector(({firestore: {ordered: {audience}}}) => audience && handleFilter(audience) || [])
+    const audience = useSelector(({firestore: {ordered: {audience}}}) => audience && handleFilter(audience))
 
     const handleSearch = (e) => {
         setSearchParams(e.currentTarget.value.toLowerCase())
     }
-
     const handleFilterOptions = (e) => {
         const value = e.target.value
         setCurrentOption(value)
+    }
+
+    if (!isLoaded(audience)) {
+        return <LoadingDisplay/>
+    }
+    if (isEmpty(audience)) {
+        return <EmptyDisplay/>
     }
 
     return (

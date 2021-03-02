@@ -54,7 +54,7 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
     const chartRef = useRef()
     const [value, setValue] = useState(0);
     const [total, setTotal] = useState(0);
-    const [currentGroup, setCurrentGroup] = useState(careerCenters[0]);
+    const [currentGroup, setCurrentGroup] = useState(careerCenters?.[0] || {});
     const [localColors, setLocalColors] = useState(colorsArray);
     const [currentCategory, setCurrentCategory] = useState({options: []});
     const [chartOptions, setChartOptions] = useState(getChartOptions(theme));
@@ -164,7 +164,7 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
                 textColor="primary"
                 variant="fullWidth"
             >
-                {careerCenters.map(cc => <Tab key={cc.id} wrapped label={cc.universityName}/>)}
+                {careerCenters?.map(cc => <Tab key={cc.id} wrapped label={cc.universityName}/>)}
             </Tabs>
             <CardContent>
                 <Select
@@ -173,7 +173,7 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
                     value={currentCategory.id || ""}
                     onChange={handleGroupCategorySelect}
                 >
-                    {currentGroup.categories.map(({id, name}) => (
+                    {currentGroup.categories?.map(({id, name}) => (
                         <MenuItem key={id} value={id}>{name}</MenuItem>
                     ))}
                 </Select>
