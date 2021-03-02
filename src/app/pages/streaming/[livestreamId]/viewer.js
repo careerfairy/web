@@ -33,6 +33,7 @@ import Brightness4Icon from '@material-ui/icons/Brightness4';
 import Brightness7Icon from '@material-ui/icons/Brightness7';
 import clsx from "clsx";
 import {logoPlaceholder} from "../../../components/util/constants";
+import JoinTalentPoolModal from 'components/views/common/join-talent-pool-modal/JoinTalentPoolModal';
 
 const useStyles = makeStyles((theme) => ({
     image: {
@@ -156,6 +157,8 @@ function ViewerPage({firebase}) {
     const [showMenu, setShowMenu] = useState(false);
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
+    const [openTalentPoolModal, setOpenTalentPoolModal] = useState(false);
+
     const [currentLivestream, setCurrentLivestream] = useState(false);
     const [streamerId, setStreamerId] = useState(null);
 
@@ -279,7 +282,7 @@ function ViewerPage({firebase}) {
             return router.replace('/signup');
         }
 
-        firebase.joinCompanyTalentPool(currentLivestream.companyId, authenticatedUser.email, currentLivestream.id);
+        setOpenTalentPoolModal(true)
     }
 
     function leaveTalentPool() {
@@ -398,6 +401,12 @@ function ViewerPage({firebase}) {
             {currentLivestream && !currentLivestream.hasNoRatings &&
             <RatingContainer livestreamId={currentLivestream.id}
                              livestream={currentLivestream}/>}
+            <JoinTalentPoolModal
+                livestream={currentLivestream}
+                modalOpen={openTalentPoolModal}
+                setModalOpen={setOpenTalentPoolModal}
+                userData={userData}
+            />
             <Backdrop
                 open={Boolean(showVideoButton.muted)}
                 className={classes.backdrop}

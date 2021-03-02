@@ -24,6 +24,7 @@ import {speakerPlaceholder} from "../../components/util/constants";
 import {useAuth} from "../../HOCs/AuthProvider";
 import GroupsUtil from "../../data/util/GroupsUtil";
 import { Paper, Avatar, Box } from '@material-ui/core';
+import JoinTalentPoolModal from "components/views/common/join-talent-pool-modal/JoinTalentPoolModal";
 
 const useStyles = makeStyles(theme => ({
     speakerAvatar: {
@@ -63,6 +64,7 @@ function UpcomingLivestream(props) {
     const [targetOptions, setTargetOptions] = useState([]);
 
     const [openJoinModal, setOpenJoinModal] = useState(false);
+    const [openTalentPoolModal, setOpenTalentPoolModal] = useState(false);
 
 
     useEffect(() => {
@@ -197,11 +199,7 @@ function UpcomingLivestream(props) {
             return router.push("/profile");
         }
 
-        props.firebase.joinCompanyTalentPool(
-            currentLivestream.companyId,
-            user.email,
-            currentLivestream.id
-        );
+        setOpenTalentPoolModal(true)
     }
 
     function leaveTalentPool() {
@@ -800,6 +798,12 @@ function UpcomingLivestream(props) {
                 registration={registration}
                 setRegistration={(value) => setRegistration(value)}
                 user={user}
+            />
+            <JoinTalentPoolModal 
+                livestream={currentLivestream}
+                modalOpen={openTalentPoolModal}
+                setModalOpen={setOpenTalentPoolModal}
+                userData={userData}
             />
             <style jsx>{`
               .hidden {
