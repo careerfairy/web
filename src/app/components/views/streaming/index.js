@@ -42,7 +42,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const StreamerOverview = ({isStreamer, setNumberOfViewers, showMenu, notifications, streamerId, hideAudience, audienceDrawerOpen}) => {
+const StreamerOverview = ({isStreamer, showAudience, setNumberOfViewers, showMenu, notifications, streamerId, hideAudience, audienceDrawerOpen}) => {
     const {currentLivestream} = useCurrentStream()
     const classes = useStyles()
 
@@ -66,7 +66,7 @@ const StreamerOverview = ({isStreamer, setNumberOfViewers, showMenu, notificatio
                 livestreamId={currentLivestream.id}
                 notifications={notifications}
             />
-            <StreamNotifications isStreamer={true}/>
+            <StreamNotifications showAudience={showAudience} isStreamer={true}/>
             <MiniChatContainer
                 className={classes.miniChatContainer}
                 livestream={currentLivestream}

@@ -222,6 +222,7 @@ const StreamerLayout = (props) => {
                                     isStreamer: true,
                                     hideAudience,
                                     audienceDrawerOpen,
+                                    showAudience,
                                     showMenu,
                                     notifications,
                                     streamerId,

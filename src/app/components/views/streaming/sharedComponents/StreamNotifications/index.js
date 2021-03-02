@@ -7,13 +7,14 @@ import {useDispatch} from "react-redux";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import {addMinutes, getMinutesPassed} from "../../../../helperFunctions/HelperFunctions";
 import {makeStyles} from "@material-ui/core/styles";
+import {Button} from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     snackBar: {
         maxWidth: 400
     }
 }))
-const StreamNotifications = ({isStreamer, firebase}) => {
+const StreamNotifications = ({isStreamer, firebase, showAudience}) => {
     const classes = useStyles()
     const dispatch = useDispatch()
     const {userData} = useAuth()
@@ -24,7 +25,10 @@ const StreamNotifications = ({isStreamer, firebase}) => {
     useEffect(() => {
         if (currentLivestream?.id && (userData || isStreamer)) {
             firebase.listenToLivestreamParticipatingStudents(currentLivestream.id, querySnapshot => {
-                querySnapshot.docChanges().forEach(change => {
+                console.log("-> querySnapshot.docChanges()", querySnapshot.docChanges());
+                querySnapshot.docChanges().forEach((change, index) => {
+                        console.log("-> change", change);
+                        // console.log("-> index", index);
                     if (change.type === "added") {
                         if (change.doc.exists) {
                             const docData = change.doc.data()
@@ -36,7 +40,7 @@ const StreamNotifications = ({isStreamer, firebase}) => {
                 })
             })
         }
-    }, [currentLivestream?.id, userData])
+    }, [currentLivestream?.id, userData?.userEmail])
 
     useEffect(() => {
         if (currentLivestream?.id && isStreamer) {
@@ -120,13 +124,26 @@ const StreamNotifications = ({isStreamer, firebase}) => {
     }
 
     const sendJoinMessage = (userData, rejoined) => {
-        const message = getJoinMessage(userData, rejoined)
+        let message = getJoinMessage(userData, rejoined)
+        console.log("-> userData", userData);
+        message = `${message} at ${userData.joined.toDate()}`
+        const action = key => {
+            return (
+                <Button color="primary" variant="contained" size="small" onClick={() => {
+                    showAudience()
+                    dispatch(actions.closeSnackbar(key))
+                }}>
+                    See who else joined
+                </Button>
+            )
+        };
         dispatch(actions.enqueueSnackbar({
             message,
             options: {
                 variant: "info",
                 preventDuplicate: true,
                 key: userData?.userEmail,
+                action
             }
         }))
     }
@@ -137,7 +154,9 @@ const StreamNotifications = ({isStreamer, firebase}) => {
 }
 
 StreamNotifications.propTypes = {
-    isStreamer: PropTypes.bool
+    firebase: PropTypes.any,
+    isStreamer: PropTypes.bool,
+    showAudience: PropTypes.func.isRequired
 }
 
 export default withFirebase(StreamNotifications);
