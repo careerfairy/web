@@ -11,7 +11,7 @@ const useStyles = makeStyles(theme => ({
         padding: theme.spacing(1, 1, 0, 1),
     }
 }));
-const TALENT_POOL_OPTION = "In talent pool"
+const TALENT_POOL_OPTION = "Talent pool"
 const ALL_OPTION = "All"
 const options = [
     ALL_OPTION,
@@ -53,7 +53,7 @@ const UsersTab = ({isStreamer}) => {
     return (
         <Fragment>
             <Grid className={classes.searchGridWrapper} container spacing={1}>
-                <Grid item xs={isStreamer ? 10 : 12}>
+                <Grid item xs={isStreamer ? 9 : 12}>
                     <TextField
                         fullWidth
                         value={searchParams}
@@ -62,7 +62,7 @@ const UsersTab = ({isStreamer}) => {
                     />
                 </Grid>
                 {isStreamer &&
-                <Grid item xs={2}>
+                <Grid item xs={3}>
                     <FormControl fullWidth>
                         <InputLabel id="audience-select">filter:</InputLabel>
                         <Select

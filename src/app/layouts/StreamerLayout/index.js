@@ -11,7 +11,6 @@ import {CurrentStreamContext} from "../../context/stream/StreamContext";
 import {v4 as uuidv4} from "uuid";
 import {isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
 import {useSelector} from "react-redux";
-import ViewerTopBar from "../ViewerLayout/ViewerTopBar";
 
 const useStyles = makeStyles((theme) => ({
     root: {

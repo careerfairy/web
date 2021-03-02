@@ -90,7 +90,7 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
     if (mobile && !showMenu) {
         return (
             <Tooltip title="See who's here">
-                <IconButton onClick={showAudience} size="small" className={classes.floatingViewCount}>
+                <IconButton onClick={showAudience} className={classes.floatingViewCount}>
                     <Badge color="secondary" badgeContent={numberOfViewers}>
                         <PeopleIcon/>
                     </Badge>
@@ -134,12 +134,12 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
                         />
                     </Tooltip>
                     <Box className={classes.viewCount}>
-                        <Tooltip title="Number of Viewers">
-                            {/*    <IconButton color="primary" onClick={showAudience}>*/}
-                            <Badge color="secondary" badgeContent={numberOfViewers}>
-                                <PeopleIcon/>
-                            </Badge>
-                            {/*    </IconButton>*/}
+                        <Tooltip title="See who's here">
+                            <IconButton color="inherit" onClick={showAudience}>
+                                <Badge color="secondary" badgeContent={numberOfViewers}>
+                                    <PeopleIcon/>
+                                </Badge>
+                            </IconButton>
                         </Tooltip>
                     </Box>
                 </Box>
