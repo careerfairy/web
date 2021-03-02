@@ -3,13 +3,12 @@ import React, {useEffect, useRef, useState} from 'react';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 import clsx from "clsx";
-import {Box, Button, Card, CardContent, CardHeader, MenuItem, Select, Tab, Tabs, Typography} from "@material-ui/core";
+import {Box, Card, CardContent, CardHeader, MenuItem, Select, Tab, Tabs, Typography} from "@material-ui/core";
 import {colorsArray} from "../../../../util/colors";
 import {getRandomColor} from "../../../../helperFunctions/HelperFunctions";
 import Chart from 'chart.js';
 import 'chartjs-plugin-labels';
 import {percentageDonutConfig} from "../../../../util/chartUtils";
-import RotateLeftIcon from "@material-ui/icons/RotateLeft";
 import {Doughnut} from "react-chartjs-2";
 import CustomLegend from "../../../../../materialUI/Legends";
 
@@ -24,6 +23,30 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
+const getChartOptions = (theme) => ({
+    cutoutPercentage: 70,
+    layout: {padding: 0},
+    legend: {
+        display: false
+    },
+    maintainAspectRatio: false,
+    responsive: true,
+    tooltips: {
+        backgroundColor: theme.palette.background.default,
+        bodyFontColor: theme.palette.text.secondary,
+        borderColor: theme.palette.divider,
+        borderWidth: 1,
+        enabled: true,
+        footerFontColor: theme.palette.text.secondary,
+        intersect: false,
+        mode: 'index',
+        titleFontColor: theme.palette.text.primary
+    },
+    plugins: {
+        labels: percentageDonutConfig
+    },
+})
+
 const AudienceCategoryChart = ({className, audience, ...rest}) => {
     const theme = useTheme()
     const classes = useStyles()
@@ -34,6 +57,7 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
     const [currentGroup, setCurrentGroup] = useState(careerCenters[0]);
     const [localColors, setLocalColors] = useState(colorsArray);
     const [currentCategory, setCurrentCategory] = useState({options: []});
+    const [chartOptions, setChartOptions] = useState(getChartOptions(theme));
     const [typesOfOptions, setTypesOfOptions] = useState([]);
 
     const [data, setData] = useState({
@@ -86,6 +110,10 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
         })
     }, [typesOfOptions, localColors, theme.palette.type])
 
+    useEffect(() => {
+        setChartOptions(getChartOptions(theme))
+    }, [theme.palette.type])
+
     const getAggregateCategories = (participants) => {
         let categories = []
         participants.forEach(user => {
@@ -108,6 +136,7 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
 
     const handleChange = (event, newValue) => {
         setCurrentGroup(careerCenters[newValue])
+        setCurrentCategory(careerCenters[newValue].categories[0])
         setValue(newValue);
     };
 
@@ -121,31 +150,6 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
     const hasNoData = () => {
         return Boolean(typesOfOptions.length && total === 0)
     }
-
-    const options = {
-        cutoutPercentage: 70,
-        layout: {padding: 0},
-        legend: {
-            display: false
-        },
-        maintainAspectRatio: false,
-        responsive: true,
-        tooltips: {
-            backgroundColor: theme.palette.background.default,
-            bodyFontColor: theme.palette.text.secondary,
-            borderColor: theme.palette.divider,
-            borderWidth: 1,
-            enabled: true,
-            footerFontColor: theme.palette.text.secondary,
-            intersect: false,
-            mode: 'index',
-            titleFontColor: theme.palette.text.primary
-        },
-        plugins: {
-            labels: percentageDonutConfig
-        },
-    };
-
 
     return (
         <Card className={clsx(classes.root, className)} {...rest}>
@@ -166,7 +170,7 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
                 <Select
                     fullWidth
                     variant="outlined"
-                    value={currentCategory.id}
+                    value={currentCategory.id || ""}
                     onChange={handleGroupCategorySelect}
                 >
                     {currentGroup.categories.map(({id, name}) => (
@@ -192,7 +196,7 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
                         <Doughnut
                             data={data}
                             ref={chartRef}
-                            options={options}
+                            options={chartOptions}
                         />}
                 </Box>
                 {!hasNoData() &&
