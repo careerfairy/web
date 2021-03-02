@@ -151,7 +151,6 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
     const hasNoData = () => {
         return Boolean(!typesOfOptions.length && total === 0)
     }
-    console.log("-> hasNoData()", hasNoData());
 
     return (
         <Card className={clsx(classes.root, className)} {...rest}>
