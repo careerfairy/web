@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
 import React, {memo} from 'react';
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, withStyles} from "@material-ui/core/styles";
 import {
-    Avatar,
+    Avatar, Badge,
     IconButton,
     ListItem,
     ListItemAvatar,
@@ -14,12 +14,13 @@ import {
     Typography
 } from "@material-ui/core";
 import clsx from "clsx";
-import HowToRegIcon from '@material-ui/icons/HowToReg';
+import HowToRegRoundedIcon from '@material-ui/icons/HowToRegRounded';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import EmailIcon from '@material-ui/icons/Email';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import {makeExternalLink} from "../../../../../helperFunctions/HelperFunctions";
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -49,6 +50,15 @@ const useStyles = makeStyles(theme => ({
         marginTop: 0
     }
 }));
+
+const SmallAvatar = withStyles((theme) => ({
+    root: {
+        width: 22,
+        height: 22,
+        border: `2px solid ${theme.palette.background.paper}`,
+        background: theme.palette.background.paper
+    },
+}))(Avatar);
 
 const User = ({user, style, inTalentPool}) => {
         const classes = useStyles()
@@ -96,17 +106,22 @@ const User = ({user, style, inTalentPool}) => {
                 })}
                 style={style}
                 button={inTalentPool} alignItems="flex-start">
-                {inTalentPool &&
-                <Tooltip color="primary" title="Is in talent pool">
-                    <ListItemIcon className={classes.talentPoolIcon}>
-                        <HowToRegIcon color="primary"/>
-                    </ListItemIcon>
-                </Tooltip>}
+                <Tooltip color="primary" title={inTalentPool ?"Is in talent pool": ""}>
                 <ListItemAvatar>
-                    <Avatar alt={`${firstName} ${lastName}`} src={avatarUrl}>
-                        {firstName ? `${firstName[0] + lastName[0]}` : ""}
-                    </Avatar>
+                    <Badge anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                    }} overlap="circle" badgeContent={inTalentPool ?
+                        <SmallAvatar>
+                            <HowToRegRoundedIcon color="primary"/>
+                        </SmallAvatar>
+                        : 0}>
+                        <Avatar alt={`${firstName} ${lastName}`} src={avatarUrl}>
+                            {firstName ? `${firstName[0] + lastName[0]}` : ""}
+                        </Avatar>
+                    </Badge>
                 </ListItemAvatar>
+                </Tooltip>
                 <ListItemText
                     disableTypography
                     primary={
@@ -115,7 +130,7 @@ const User = ({user, style, inTalentPool}) => {
                             variant="body1"
                             className={classes.secondary}
                         >
-                            {inTalentPool ? `${firstName} ${lastName}` : `${firstName}`}
+                            {inTalentPool ? `${firstName} ${lastName}` : `${firstName} ${lastName?.[0]}`}
                         </Typography>
                     }
                     secondary={

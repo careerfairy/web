@@ -25,6 +25,7 @@ import {useAuth} from "../../../HOCs/AuthProvider";
 import {withFirebase} from "../../../context/firebase";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
 import PeopleIcon from "@material-ui/icons/People";
+import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
 
 const useStyles = makeStyles(theme => ({
     joinButton: {
@@ -135,11 +136,11 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
                     </Tooltip>
                     <Box className={classes.viewCount}>
                         <Tooltip title="See who's here">
-                            <IconButton color="inherit" onClick={showAudience}>
-                                <Badge color="secondary" badgeContent={numberOfViewers}>
-                                    <PeopleIcon/>
-                                </Badge>
-                            </IconButton>
+                            <Button color="primary" size="large" startIcon={  <Badge color="secondary" badgeContent={numberOfViewers}>
+                                <PeopleIcon/>
+                            </Badge>} onClick={showAudience}>
+                                See who's here
+                            </Button>
                         </Tooltip>
                     </Box>
                 </Box>
@@ -148,7 +149,7 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
                     children={userIsInTalentPool ? 'Leave Talent Pool' : 'Join Talent Pool'}
                     variant="contained"
                     className={classes.joinButton}
-                    startIcon={<PeopleAltIcon/>}
+                    startIcon={<HowToRegRoundedIcon/>}
                     icon={userIsInTalentPool ? 'delete' : 'handshake outline'}
                     onClick={userIsInTalentPool ? () => leaveTalentPool() : () => joinTalentPool()}
                     color={userIsInTalentPool ? "default" : "primary"}/>}

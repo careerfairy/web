@@ -73,7 +73,7 @@ const UsersTab = ({isStreamer}) => {
                             value={currentOption}
                             onChange={handleFilterOptions}
                         >
-                            {options.map(option => <MenuItem value={option}>{option}</MenuItem>)}
+                            {options.map(option => <MenuItem key={option} value={option}>{option}</MenuItem>)}
                         </Select>
                     </FormControl>
                 </Grid>}

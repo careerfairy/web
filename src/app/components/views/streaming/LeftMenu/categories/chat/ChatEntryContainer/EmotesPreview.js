@@ -6,10 +6,11 @@ import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({
     emotesPreviewPaperWrapper: {
+        zIndex: 1,
         cursor: "pointer",
         bottom: "-10px !important",
         display: "flex",
-        boxShadow: theme.shadows[10],
+        boxShadow: theme.shadows[3],
         alignItems: "center",
         zChatEntryContainer: 1,
         padding: theme.spacing(0.1),

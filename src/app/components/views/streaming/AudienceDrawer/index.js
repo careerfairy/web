@@ -41,7 +41,7 @@ const AudienceDrawer = ({audienceDrawerOpen, hideAudience, isStreamer}) => {
     const classes = useStyles();
 
     const theme = useTheme();
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = React.useState(isStreamer ? 1 : 0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);

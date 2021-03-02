@@ -26,6 +26,7 @@ import {useThemeToggle} from "../../../context/theme/ThemeContext";
 import SpeakerManagementModal from "../../../components/views/streaming/modal/SpeakerManagementModal";
 import {useRouter} from "next/router";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
+import {maybePluralize} from "../../../components/helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles(theme => ({
     toolbar: {
@@ -40,7 +41,7 @@ const useStyles = makeStyles(theme => ({
     viewCount: {
         // background: theme.palette.primary.main,
         color: theme.palette.primary.main,
-        padding: theme.spacing(0,1),
+        padding: theme.spacing(0, 1),
         display: "flex",
         alignItems: "center",
         justifyContent: "center"
@@ -204,17 +205,28 @@ const StreamerTopBar = ({firebase, numberOfViewers, isMainStreamer, showAudience
                             />
                         </Tooltip>
                         <Box className={classes.viewCount}>
-                            <Tooltip title="See who's here">
-                                <IconButton color="inherit" onClick={showAudience} >
-                                    <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
-                                        <PeopleIcon/>
-                                    </Badge>
-                                </IconButton>
-                            </Tooltip>
-                            {!mobile &&
-                            <Typography className={classes.viewCountText}>
-                                Viewers : {numberOfViewers}
-                            </Typography>}
+                            {mobile ? <Tooltip title="See who's here">
+                                    <IconButton color="inherit" onClick={showAudience}>
+                                        <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
+                                            <PeopleIcon/>
+                                        </Badge>
+                                    </IconButton>
+                                </Tooltip> :
+                                <Tooltip title={`You currently have ${numberOfViewers} ${maybePluralize(numberOfViewers, "viewer")}`}>
+                                <Button color="primary" size="large"
+                                        startIcon={
+                                            <Badge color="secondary"
+                                                   anchorOrigin={{
+                                                       vertical: 'top',
+                                                       horizontal: 'right',
+                                                   }}
+                                                   badgeContent={numberOfViewers}>
+                                                <PeopleIcon/>
+                                            </Badge>
+                                        } onClick={showAudience}>
+                                    See who's here
+                                </Button>
+                                </Tooltip>}
                         </Box>
                     </Box>
                 </Toolbar>
