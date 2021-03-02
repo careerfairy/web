@@ -7,6 +7,7 @@ import {AppBar, Box, IconButton, Tab, Tabs} from "@material-ui/core";
 import SwipeableViews from 'react-swipeable-views';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import {SwipeablePanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
+import BreakdownTab from "./BreakdownTab";
 
 const useStyles = makeStyles(theme => ({
     drawerContent: {
@@ -14,10 +15,10 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         flexDirection: "column",
         [theme.breakpoints.down("sm")]: {
-            minWidth: "100vw"
+            width: "100vw"
         },
         [theme.breakpoints.up("sm")]: {
-            minWidth: 400,
+            width: 400,
         }
     },
     panel: {
@@ -66,7 +67,7 @@ const AudienceDrawer = ({audienceDrawerOpen, hideAudience, isStreamer}) => {
         )
         panels.push(
             <SwipeablePanel className={classes.panel} value={value} key={1} index={1} dir={theme.direction}>
-                Item Two
+                <BreakdownTab/>
             </SwipeablePanel>
         )
     }

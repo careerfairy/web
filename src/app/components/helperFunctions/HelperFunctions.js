@@ -277,3 +277,8 @@ export const makeExternalLink = (url) => {
     }
     return string
 }
+
+export const getRandomColor = () => {
+    const max = 0xffffff;
+    return '#' + Math.round(Math.random() * max).toString(16);
+}
