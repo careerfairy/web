@@ -1,11 +1,19 @@
 import PropTypes from 'prop-types'
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 import clsx from "clsx";
-import {Box, Card, CardContent, CardHeader, MenuItem, Select, Tab, Tabs} from "@material-ui/core";
+import {Box, Button, Card, CardContent, CardHeader, MenuItem, Select, Tab, Tabs, Typography} from "@material-ui/core";
 import {colorsArray} from "../../../../util/colors";
 import {getRandomColor} from "../../../../helperFunctions/HelperFunctions";
+import Chart from 'chart.js';
+import 'chartjs-plugin-labels';
+import {percentageDonutConfig} from "../../../../util/chartUtils";
+import RotateLeftIcon from "@material-ui/icons/RotateLeft";
+import {Doughnut} from "react-chartjs-2";
+import CustomLegend from "../../../../../materialUI/Legends";
+
+Chart.defaults.global.plugins.labels = false;
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -20,7 +28,9 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
     const theme = useTheme()
     const classes = useStyles()
     const {currentLivestream: {careerCenters}} = useCurrentStream()
+    const chartRef = useRef()
     const [value, setValue] = useState(0);
+    const [total, setTotal] = useState(0);
     const [currentGroup, setCurrentGroup] = useState(careerCenters[0]);
     const [localColors, setLocalColors] = useState(colorsArray);
     const [currentCategory, setCurrentCategory] = useState({options: []});
@@ -31,8 +41,6 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
         labels: [],
         ids: []
     });
-    console.log("-> data", data);
-    console.log("-> currentGroup", currentGroup);
 
     useEffect(() => {
         if (currentGroup.categories?.length) {
@@ -50,10 +58,18 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
     }, [currentGroup.categories])
 
     useEffect(() => {
-        console.log("-> In the getTypeOfStudents");
         const newTypeOfOptions = getTypeOfStudents()
         setTypesOfOptions(newTypeOfOptions)
     }, [audience, currentCategory])
+
+    useEffect(() => {
+        if (typesOfOptions.length) {
+            const totalCount = typesOfOptions.reduce((acc, curr) => {
+                return acc + curr.count
+            }, 0)
+            setTotal(totalCount)
+        }
+    }, [typesOfOptions])
 
     useEffect(() => {
         setData({
@@ -61,15 +77,14 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
                 {
                     data: typesOfOptions.map(option => option.count),
                     backgroundColor: localColors,
-                    borderWidth: 8,
-                    borderColor: theme.palette.common.white,
-                    hoverBorderColor: theme.palette.common.white
+                    hoverBorderColor: theme.palette.common.white,
+                    borderColor: theme.palette.background.default
                 }
             ],
             labels: typesOfOptions.map(option => option.name),
             ids: typesOfOptions.map(option => option.id)
         })
-    }, [typesOfOptions, localColors])
+    }, [typesOfOptions, localColors, theme.palette.type])
 
     const getAggregateCategories = (participants) => {
         let categories = []
@@ -103,6 +118,34 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
         }
     }
 
+    const hasNoData = () => {
+        return Boolean(typesOfOptions.length && total === 0)
+    }
+
+    const options = {
+        cutoutPercentage: 70,
+        layout: {padding: 0},
+        legend: {
+            display: false
+        },
+        maintainAspectRatio: false,
+        responsive: true,
+        tooltips: {
+            backgroundColor: theme.palette.background.default,
+            bodyFontColor: theme.palette.text.secondary,
+            borderColor: theme.palette.divider,
+            borderWidth: 1,
+            enabled: true,
+            footerFontColor: theme.palette.text.secondary,
+            intersect: false,
+            mode: 'index',
+            titleFontColor: theme.palette.text.primary
+        },
+        plugins: {
+            labels: percentageDonutConfig
+        },
+    };
+
 
     return (
         <Card className={clsx(classes.root, className)} {...rest}>
@@ -130,7 +173,44 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
                         <MenuItem key={id} value={id}>{name}</MenuItem>
                     ))}
                 </Select>
-
+                <Box
+                    height={300}
+                    marginTop={2}
+                    position="relative"
+                    display="flex"
+                    flexDirection="column"
+                    justifyContent="center"
+                    alignItems="center"
+                >
+                    {hasNoData() ?
+                        <>
+                            <Typography>
+                                Not enough participant data
+                            </Typography>
+                        </>
+                        :
+                        <Doughnut
+                            data={data}
+                            ref={chartRef}
+                            options={options}
+                        />}
+                </Box>
+                {!hasNoData() &&
+                <Box
+                    display="flex"
+                    justifyContent="center"
+                    mt={2}
+                >
+                    <CustomLegend
+                        options={currentCategory.options}
+                        colors={localColors}
+                        chartRef={chartRef}
+                        fullWidth
+                        chartData={data}
+                        optionDataType="Student"
+                        optionValueProp="count"
+                    />
+                </Box>}
             </CardContent>
         </Card>
     );
