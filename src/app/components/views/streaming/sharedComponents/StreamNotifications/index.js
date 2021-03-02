@@ -25,7 +25,10 @@ const StreamNotifications = ({isStreamer, firebase}) => {
         if (currentLivestream?.id && (userData || isStreamer)) {
             firebase.listenToLivestreamParticipatingStudents(currentLivestream.id, querySnapshot => {
                 querySnapshot.docChanges().forEach(change => {
-                    if (change.type === "added" || change.type === "modified") {
+                    console.log("-> change", change);
+                    if (change.type === "added"
+                        // || change.type === "modified"
+                    ) {
                         if (change.doc.exists) {
                             const docData = change.doc.data()
                             if (userData?.userEmail !== docData?.userEmail) { // make sure you dont see your self joining

@@ -40,7 +40,7 @@ const useStyles = makeStyles(theme => ({
     viewCount: {
         // background: theme.palette.primary.main,
         color: theme.palette.primary.main,
-        padding: theme.spacing(1),
+        padding: theme.spacing(0,1),
         display: "flex",
         alignItems: "center",
         justifyContent: "center"
@@ -52,7 +52,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const StreamerTopBar = ({firebase, numberOfViewers, isMainStreamer}) => {
+const StreamerTopBar = ({firebase, numberOfViewers, isMainStreamer, showAudience}) => {
     const {currentLivestream} = useCurrentStream()
 
     const classes = useStyles()
@@ -204,10 +204,12 @@ const StreamerTopBar = ({firebase, numberOfViewers, isMainStreamer}) => {
                             />
                         </Tooltip>
                         <Box className={classes.viewCount}>
-                            <Tooltip title="Number of viewers">
-                                <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
-                                    <PeopleIcon/>
-                                </Badge>
+                            <Tooltip title="See who's here">
+                                <IconButton color="inherit" onClick={showAudience} >
+                                    <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
+                                        <PeopleIcon/>
+                                    </Badge>
+                                </IconButton>
                             </Tooltip>
                             {!mobile &&
                             <Typography className={classes.viewCountText}>

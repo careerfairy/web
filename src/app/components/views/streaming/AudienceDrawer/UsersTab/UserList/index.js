@@ -1,16 +1,10 @@
 import PropTypes from 'prop-types'
 import React, {memo} from 'react';
-import {makeStyles} from "@material-ui/core/styles";
 import AutoSizer from "react-virtualized-auto-sizer";
 import {FixedSizeList} from "react-window";
 import User from "./User";
 
-const useStyles = makeStyles(theme => ({}));
-
-const UserList = ({audience}) => {
-
-    const classes = useStyles()
-    const talentPoolMap = {}
+const UserList = ({audience, isStreamer}) => {
 
     return (
         <div style={{flex: '1 1 auto'}}>
@@ -22,8 +16,9 @@ const UserList = ({audience}) => {
                     >
                         {({style, index}) => <User
                             style={style}
-                            key={index}
-                            inTalentPool={audience[index]?.inTalentPool}
+                            key={audience[index].id}
+                            isStreamer={isStreamer}
+                            inTalentPool={Boolean(isStreamer && audience[index]?.inTalentPool)}
                             user={audience[index]}/>}
                     </FixedSizeList>
                 )}
@@ -34,6 +29,7 @@ const UserList = ({audience}) => {
 
 
 UserList.propTypes = {
-  audience: PropTypes.array.isRequired
+    audience: PropTypes.array.isRequired,
+    isStreamer: PropTypes.bool.isRequired
 }
 export default memo(UserList);

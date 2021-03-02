@@ -6,6 +6,7 @@ import MiniChatContainer from "./LeftMenu/categories/chat/MiniChatContainer";
 import IconsContainer from "./icons-container/IconsContainer";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
 import StreamNotifications from "./sharedComponents/StreamNotifications";
+import AudienceDrawer from "./AudienceDrawer";
 
 const useStyles = makeStyles(theme => ({
     blackFrame: {
@@ -41,7 +42,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const StreamerOverview = ({isStreamer, setNumberOfViewers, showMenu, notifications, streamerId}) => {
+const StreamerOverview = ({isStreamer, setNumberOfViewers, showMenu, notifications, streamerId, hideAudience, audienceDrawerOpen}) => {
     const {currentLivestream} = useCurrentStream()
     const classes = useStyles()
 
@@ -56,6 +57,11 @@ const StreamerOverview = ({isStreamer, setNumberOfViewers, showMenu, notificatio
                                 showMenu={showMenu} viewer={false}
                 />
             </div>
+            <AudienceDrawer
+                hideAudience={hideAudience}
+                audienceDrawerOpen={audienceDrawerOpen}
+                isStreamer
+            />
             <NotificationsContainer
                 livestreamId={currentLivestream.id}
                 notifications={notifications}

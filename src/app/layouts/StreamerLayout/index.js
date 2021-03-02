@@ -11,6 +11,7 @@ import {CurrentStreamContext} from "../../context/stream/StreamContext";
 import {v4 as uuidv4} from "uuid";
 import {isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
 import {useSelector} from "react-redux";
+import ViewerTopBar from "../ViewerLayout/ViewerTopBar";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -67,6 +68,7 @@ const StreamerLayout = (props) => {
     const [streamerReady, setStreamerReady] = useState(false);
     const [tokenChecked, setTokenChecked] = useState(false);
     const [showMenu, setShowMenu] = useState(true);
+    const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
 
 
 
@@ -86,7 +88,7 @@ const StreamerLayout = (props) => {
             subcollections: [
                 {
                     collection: "participatingStudents",
-                    orderBy: ["joined", "asc"],
+                    // orderBy: ["joined", "asc"],
                 }
             ],
             storeAs: "audience"
@@ -159,6 +161,14 @@ const StreamerLayout = (props) => {
         }
     }, [notificationToRemove]);
 
+    const showAudience = useCallback(() => {
+        setAudienceDrawerOpen(true)
+    }, []);
+
+    const hideAudience = useCallback(() => {
+        setAudienceDrawerOpen(false)
+    }, []);
+
 
     const tokenIsValidated = () => {
         if (currentLivestream.test) {
@@ -192,6 +202,7 @@ const StreamerLayout = (props) => {
                 <div className={classes.root}>
                     <StreamerTopBar
                         firebase={firebase}
+                        showAudience={showAudience}
                         isMainStreamer={isMainStreamer}
                         numberOfViewers={numberOfViewers}
                     />
@@ -211,6 +222,8 @@ const StreamerLayout = (props) => {
                                     newNotification,
                                     isMainStreamer,
                                     isStreamer: true,
+                                    hideAudience,
+                                    audienceDrawerOpen,
                                     showMenu,
                                     notifications,
                                     streamerId,

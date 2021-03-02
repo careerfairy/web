@@ -8,16 +8,17 @@ import {useCurrentStream} from "../../../../../context/stream/StreamContext";
 
 const useStyles = makeStyles(theme => ({
     searchGridWrapper: {
-        padding: theme.spacing(1, 1, 0, 1)
+        padding: theme.spacing(1, 1, 0, 1),
     }
 }));
-
+const TALENT_POOL_OPTION = "In talent pool"
+const ALL_OPTION = "All"
 const options = [
-    "All",
-    "In talent pool"
+    ALL_OPTION,
+    TALENT_POOL_OPTION
 ]
 
-const UsersTab = () => {
+const UsersTab = ({isStreamer}) => {
 
 
     const classes = useStyles()
@@ -32,7 +33,7 @@ const UsersTab = () => {
             || user.lastName?.toLowerCase().includes(searchParams)
             || user.universityName?.toLowerCase().includes(searchParams)
         )
-        if (currentOption === "In talent pool") {
+        if (currentOption === TALENT_POOL_OPTION) {
             filtered = filtered.filter(user => talentPool?.includes(user.id))
         }
         return filtered.map(user => ({...user, inTalentPool: talentPool?.includes(user.id)}))
@@ -52,7 +53,7 @@ const UsersTab = () => {
     return (
         <Fragment>
             <Grid className={classes.searchGridWrapper} container spacing={1}>
-                <Grid item xs={10}>
+                <Grid item xs={isStreamer ? 10 : 12}>
                     <TextField
                         fullWidth
                         value={searchParams}
@@ -60,6 +61,7 @@ const UsersTab = () => {
                         label="Search for people..."
                     />
                 </Grid>
+                {isStreamer &&
                 <Grid item xs={2}>
                     <FormControl fullWidth>
                         <InputLabel id="audience-select">filter:</InputLabel>
@@ -72,12 +74,16 @@ const UsersTab = () => {
                             {options.map(option => <MenuItem value={option}>{option}</MenuItem>)}
                         </Select>
                     </FormControl>
-                </Grid>
+                </Grid>}
             </Grid>
-            <UserList audience={audience}/>
+            <UserList isStreamer={isStreamer} audience={audience}/>
         </Fragment>
     );
 };
+
+UsersTab.propTypes = {
+    isStreamer: PropTypes.bool.isRequired
+}
 
 export default UsersTab;
 

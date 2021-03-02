@@ -91,9 +91,9 @@ const ViewerOverview = ({
                 [classes.blackFrame]: true,
             })}>
                 <AudienceDrawer
-                    livestreamId={currentLivestream.id}
                     hideAudience={hideAudience}
                     audienceDrawerOpen={audienceDrawerOpen}
+                    isStreamer={false}
                 />
                 <ViewerComponent
                     livestreamId={currentLivestream.id} streamerId={streamerId}
