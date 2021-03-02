@@ -87,7 +87,6 @@ const StreamerLayout = (props) => {
             subcollections: [
                 {
                     collection: "participatingStudents",
-                    // orderBy: ["joined", "asc"],
                 }
             ],
             storeAs: "audience"
@@ -99,8 +98,8 @@ const StreamerLayout = (props) => {
         id: livestreamId
     })
 
-    // const firestore = useSelector(({firestore}) => firestore)
-    // console.log("-> firestore", firestore);
+    const firestore = useSelector(({firestore}) => firestore)
+    console.log("-> firestore", firestore);
 
     const classes = useStyles({
         showMenu,

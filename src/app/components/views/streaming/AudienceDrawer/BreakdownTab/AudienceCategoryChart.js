@@ -11,6 +11,7 @@ import 'chartjs-plugin-labels';
 import {percentageDonutConfig} from "../../../../util/chartUtils";
 import {Doughnut} from "react-chartjs-2";
 import CustomLegend from "../../../../../materialUI/Legends";
+import EmptyDisplay from "../displays/EmptyDisplay";
 
 Chart.defaults.global.plugins.labels = false;
 
@@ -148,14 +149,15 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
     }
 
     const hasNoData = () => {
-        return Boolean(typesOfOptions.length && total === 0)
+        return Boolean(!typesOfOptions.length && total === 0)
     }
+    console.log("-> hasNoData()", hasNoData());
 
     return (
         <Card className={clsx(classes.root, className)} {...rest}>
             <CardHeader
                 className={classes.header}
-                title="Breakdown for:"
+                title="Student Distribution"
             />
             <Tabs
                 value={value}
@@ -167,6 +169,7 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
                 {careerCenters?.map(cc => <Tab key={cc.id} wrapped label={cc.universityName}/>)}
             </Tabs>
             <CardContent>
+                {!hasNoData() &&
                 <Select
                     fullWidth
                     variant="outlined"
@@ -176,7 +179,7 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
                     {currentGroup.categories?.map(({id, name}) => (
                         <MenuItem key={id} value={id}>{name}</MenuItem>
                     ))}
-                </Select>
+                </Select>}
                 <Box
                     height={300}
                     marginTop={2}
@@ -187,11 +190,7 @@ const AudienceCategoryChart = ({className, audience, ...rest}) => {
                     alignItems="center"
                 >
                     {hasNoData() ?
-                        <>
-                            <Typography>
-                                Not enough participant data
-                            </Typography>
-                        </>
+                        <EmptyDisplay text="Not enough group data"/>
                         :
                         <Doughnut
                             data={data}

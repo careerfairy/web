@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import PeopleIcon from "@material-ui/icons/People";
@@ -12,7 +13,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const EmptyDisplay = () => {
+const EmptyDisplay = ({text}) => {
 
     const classes = useStyles()
 
@@ -20,10 +21,13 @@ const EmptyDisplay = () => {
         <Grid className={classes.container} container>
             <PeopleIcon fontSize="large"/>
             <Typography>
-                No participation yet
+                {text || "No participation yet"}
             </Typography>
         </Grid>
     );
 };
 
+EmptyDisplay.propTypes = {
+    text: PropTypes.string
+}
 export default EmptyDisplay;

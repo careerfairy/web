@@ -18,7 +18,7 @@ const useStyles = makeStyles(theme => ({
 const BreakdownTab = ({}) => {
 
     const classes = useStyles()
-    const {currentLivestream: {talentPool, careerCenters}} = useCurrentStream()
+    const {currentLivestream: {talentPool}} = useCurrentStream()
 
     const handleMap = (arrayOfUsers) => {
         return arrayOfUsers.map(user => ({...user, inTalentPool: talentPool?.includes(user.id)}))
@@ -42,16 +42,12 @@ const BreakdownTab = ({}) => {
 
     return (
         <Grid container className={classes.root} spacing={1}>
-            <Zoom in={Boolean(talentPool?.length)}>
-                <Grid item xs={12}>
-                    <TalentPoolPercentage percentage={talentPoolPercentage}/>
-                </Grid>
-            </Zoom>
-            <Zoom mountOnEnter unmountOnExit in={Boolean(careerCenters?.length)}>
-                <Grid item xs={12}>
-                    <AudienceCategoryChart audience={audience}/>
-                </Grid>
-            </Zoom>
+            <Grid item xs={12}>
+                <TalentPoolPercentage percentage={talentPoolPercentage}/>
+            </Grid>
+            <Grid item xs={12}>
+                <AudienceCategoryChart audience={audience}/>
+            </Grid>
         </Grid>
     );
 };

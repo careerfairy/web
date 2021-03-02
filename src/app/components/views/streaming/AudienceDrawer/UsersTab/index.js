@@ -52,13 +52,6 @@ const UsersTab = ({isStreamer}) => {
         setCurrentOption(value)
     }
 
-    if (!isLoaded(audience)) {
-        return <LoadingDisplay/>
-    }
-    if (isEmpty(audience)) {
-        return <EmptyDisplay/>
-    }
-
     return (
         <Fragment>
             <Grid className={classes.searchGridWrapper} container spacing={1}>
@@ -85,7 +78,11 @@ const UsersTab = ({isStreamer}) => {
                     </FormControl>
                 </Grid>}
             </Grid>
-            <UserList isStreamer={isStreamer} audience={audience}/>
+            {!isLoaded(audience) ?
+                <LoadingDisplay/> :
+                isEmpty(audience) ?
+                    <EmptyDisplay text="Not enough data"/> :
+                    <UserList isStreamer={isStreamer} audience={audience}/>}
         </Fragment>
     );
 };
