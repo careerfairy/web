@@ -131,7 +131,7 @@ const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebas
                     dispatch(actions.closeSnackbar(newlyAskedQuestion.id))
                 }
                 dispatch(actions.enqueueSnackbar({
-                    message: `${newlyAskedQuestion.displayName} just asked a new question about. ${truncate(newlyAskedQuestion.title, 40)}`,
+                    message: `${newlyAskedQuestion.displayName} just asked a the following question: ${truncate(newlyAskedQuestion.title, 40)}`,
                     options: {
                         variant: "info",
                         key: newlyAskedQuestion.id,

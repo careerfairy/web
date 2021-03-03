@@ -909,7 +909,7 @@ class Firebase {
             .doc(livestreamId)
             .collection("chatEntries")
             .limit(limit)
-            .orderBy("timestamp", "asc")
+            .orderBy("timestamp", "desc")
         return ref.onSnapshot(callback);
     }
 
