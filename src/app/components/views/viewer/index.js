@@ -128,7 +128,7 @@ const ViewerOverview = ({
             {currentLivestream && !currentLivestream.hasNoRatings &&
             <RatingContainer livestreamId={currentLivestream.id}
                              livestream={currentLivestream}/>}
-            <StreamNotifications showAudience={showAudience} isStreamer={false}/>
+            <StreamNotifications isStreamer={false}/>
             <Backdrop
                 open={Boolean(showVideoButton.muted)}
                 className={classes.backdrop}

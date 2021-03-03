@@ -1,23 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
-import {
-    AppBar,
-    Badge,
-    Box,
-    Button,
-    Checkbox,
-    Fab, IconButton,
-    Toolbar,
-    Tooltip,
-    Typography,
-    useMediaQuery
-} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
+import {AppBar, Badge, Box, Button, Checkbox, IconButton, Toolbar, Tooltip} from "@material-ui/core";
 import {MainLogo} from "../../../components/logos";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
-import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
-import {useSelector} from "react-redux";
-import {populate} from "react-redux-firebase";
 import PropTypes from 'prop-types';
 import Logo from "./Logo";
 import {useThemeToggle} from "../../../context/theme/ThemeContext";
@@ -37,7 +23,6 @@ const useStyles = makeStyles(theme => ({
         justifyContent: "space-between"
     },
     viewCount: {
-        // background: theme.palette.primary.main,
         color: theme.palette.primary.main,
         display: "flex",
         alignItems: "center",
@@ -90,7 +75,7 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
 
     if (mobile && !showMenu) {
         return (
-            <Tooltip title="See who's here">
+            <Tooltip title="See who joined">
                 <IconButton onClick={showAudience} className={classes.floatingViewCount}>
                     <Badge color="secondary" badgeContent={numberOfViewers}>
                         <PeopleIcon/>
@@ -135,11 +120,11 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
                         />
                     </Tooltip>
                     <Box className={classes.viewCount}>
-                        <Tooltip title="See who's here">
+                        <Tooltip title="See who joined">
                             <Button color="primary" size="large" startIcon={  <Badge color="secondary" badgeContent={numberOfViewers}>
                                 <PeopleIcon/>
                             </Badge>} onClick={showAudience}>
-                                See who's here
+                                See who joined
                             </Button>
                         </Tooltip>
                     </Box>

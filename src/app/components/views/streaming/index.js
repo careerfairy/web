@@ -66,7 +66,7 @@ const StreamerOverview = ({isStreamer, showAudience, setNumberOfViewers, showMen
                 livestreamId={currentLivestream.id}
                 notifications={notifications}
             />
-            <StreamNotifications showAudience={showAudience} isStreamer={true}/>
+            <StreamNotifications isStreamer={true}/>
             <MiniChatContainer
                 className={classes.miniChatContainer}
                 livestream={currentLivestream}

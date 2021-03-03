@@ -205,7 +205,7 @@ const StreamerTopBar = ({firebase, numberOfViewers, isMainStreamer, showAudience
                             />
                         </Tooltip>
                         <Box className={classes.viewCount}>
-                            {mobile ? <Tooltip title="See who's here">
+                            {mobile ? <Tooltip title="See who joined">
                                     <IconButton color="inherit" onClick={showAudience}>
                                         <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
                                             <PeopleIcon/>
@@ -224,7 +224,7 @@ const StreamerTopBar = ({firebase, numberOfViewers, isMainStreamer, showAudience
                                                 <PeopleIcon/>
                                             </Badge>
                                         } onClick={showAudience}>
-                                    See who's here
+                                    See who joined
                                 </Button>
                                 </Tooltip>}
                         </Box>

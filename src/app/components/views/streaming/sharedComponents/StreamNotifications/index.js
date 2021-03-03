@@ -7,14 +7,13 @@ import {useDispatch} from "react-redux";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import {addMinutes, getMinutesPassed} from "../../../../helperFunctions/HelperFunctions";
 import {makeStyles} from "@material-ui/core/styles";
-import {Button} from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     snackBar: {
         maxWidth: 400
     }
 }))
-const StreamNotifications = ({isStreamer, firebase, showAudience}) => {
+const StreamNotifications = ({isStreamer, firebase}) => {
     const classes = useStyles()
     const dispatch = useDispatch()
     const {userData} = useAuth()
@@ -25,14 +24,11 @@ const StreamNotifications = ({isStreamer, firebase, showAudience}) => {
     useEffect(() => {
         if (currentLivestream?.id && (userData || isStreamer)) {
             firebase.listenToLivestreamParticipatingStudents(currentLivestream.id, querySnapshot => {
-                console.log("-> querySnapshot.docChanges()", querySnapshot.docChanges());
                 querySnapshot.docChanges().forEach((change, index) => {
-                        console.log("-> change", change);
-                        // console.log("-> index", index);
                     if (change.type === "added") {
                         if (change.doc.exists) {
                             const docData = change.doc.data()
-                            if (userData?.userEmail !== docData?.userEmail) { // make sure you dont see your self joining
+                            if (userData?.userEmail !== docData?.userEmail) { // make sure you dont get notified of your self joining
                                 sendJoinMessage(docData, change.type === "modified")
                             }
                         }
@@ -124,30 +120,17 @@ const StreamNotifications = ({isStreamer, firebase, showAudience}) => {
     }
 
     const sendJoinMessage = (userData, rejoined) => {
-        let message = getJoinMessage(userData, rejoined)
-        console.log("-> userData", userData);
-        message = `${message} at ${userData.joined.toDate()}`
-        const action = key => {
-            return (
-                <Button color="primary" variant="contained" size="small" onClick={() => {
-                    showAudience()
-                    dispatch(actions.closeSnackbar(key))
-                }}>
-                    See who else joined
-                </Button>
-            )
-        };
+        const message = getJoinMessage(userData, rejoined)
         dispatch(actions.enqueueSnackbar({
             message,
             options: {
                 variant: "info",
                 preventDuplicate: true,
                 key: userData?.userEmail,
-                action
+                autoHideDuration: 3000,
             }
         }))
     }
-
 
     return null
 
@@ -156,7 +139,6 @@ const StreamNotifications = ({isStreamer, firebase, showAudience}) => {
 StreamNotifications.propTypes = {
     firebase: PropTypes.any,
     isStreamer: PropTypes.bool,
-    showAudience: PropTypes.func.isRequired
 }
 
 export default withFirebase(StreamNotifications);
