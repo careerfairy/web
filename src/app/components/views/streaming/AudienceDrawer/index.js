@@ -51,7 +51,7 @@ const AudienceDrawer = ({audienceDrawerOpen, hideAudience, isStreamer}) => {
     };
 
     const tabs = [
-        <Tab key={0} label="Total Participants"/>
+        <Tab key={0} label="People who joined"/>
     ]
 
     const panels = [
