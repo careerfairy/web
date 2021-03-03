@@ -8,6 +8,7 @@ import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import SwipeableViews from "react-swipeable-views";
 import clsx from "clsx";
+import {Drawer} from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     root: {},
@@ -25,17 +26,41 @@ const useStyles = makeStyles(theme => ({
         right: 10,
         textAlign: "center",
         zIndex: 9100,
-    }
+    },
+    desktopDrawer: {
+        width: 280,
+        top: 55,
+        height: 'calc(100% - 55px)',
+        boxShadow: theme.shadows[15],
+        position: "absolute",
+        transition: "width 0.3s",
+        transitionTimingFunction: theme.transitions.easeInOut,
+        left: 0,
+        bottom: 0,
+        zIndex: 20,
+        background: theme.palette.background.default
+    },
+
 }))
 
 
 const states = ["questions", "polls", "hand"]
-const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, className, ...props}) => {
+const LeftMenu = ({
+                      showMenu,
+                      livestream,
+                      streamer,
+                      handleStateChange,
+                      sliding,
+                      setSliding,
+                      selectedState,
+                      setSelectedState,
+                      setShowMenu,
+                      toggleShowMenu,
+                      className,
+                  }) => {
     const theme = useTheme()
     const classes = useStyles()
-    const [selectedState, setSelectedState] = useState("questions");
     const [value, setValue] = useState(0);
-    const [sliding, setSliding] = useState(false);
 
 
     useEffect(() => {
@@ -66,15 +91,6 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
         }
     }, [selectedState, showMenu])
 
-    function handleStateChange(state) {
-        if (!showMenu) {
-            setShowMenu(true);
-        }
-        if (streamer) {
-            setSliding(true)
-        }
-        setSelectedState(state);
-    }
 
     const handleChange = (event) => {
         setSliding(true)
@@ -104,7 +120,12 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
     ]
 
     return (
-        <div className={clsx(classes.root, className)}>
+        <Drawer
+            anchor="left"
+            classes={{paper: clsx(classes.desktopDrawer)}}
+            open={showMenu}
+            variant="persistent"
+        >
             <SwipeableViews
                 containerStyle={{WebkitOverflowScrolling: 'touch'}}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
@@ -114,14 +135,7 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
                 onChangeIndex={handleChange}>
                 {views}
             </SwipeableViews>
-            <ButtonComponent
-                setShowMenu={setShowMenu}
-                streamer={streamer}
-                setSliding={setSliding}
-                selectedState={selectedState}
-                showMenu={showMenu}
-                handleStateChange={handleStateChange} {...props}/>
-        </div>
+        </Drawer>
     )
 };
 

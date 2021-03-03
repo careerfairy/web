@@ -7,6 +7,7 @@ import IconsContainer from "./icons-container/IconsContainer";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
 import StreamNotifications from "./sharedComponents/StreamNotifications";
 import AudienceDrawer from "./AudienceDrawer";
+import ButtonComponent from "./sharedComponents/ButtonComponent";
 
 const useStyles = makeStyles(theme => ({
     blackFrame: {
@@ -42,7 +43,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const StreamerOverview = ({isStreamer, showAudience, setNumberOfViewers, showMenu, notifications, streamerId, hideAudience, audienceDrawerOpen}) => {
+const StreamerOverview = ({isStreamer, showAudience,setSliding, selectedState,handleStateChange, setNumberOfViewers, setShowMenu, showMenu, notifications, streamerId, hideAudience, audienceDrawerOpen}) => {
     const {currentLivestream} = useCurrentStream()
     const classes = useStyles()
 
@@ -56,6 +57,13 @@ const StreamerOverview = ({isStreamer, showAudience, setNumberOfViewers, showMen
                                 setNumberOfViewers={setNumberOfViewers}
                                 showMenu={showMenu} viewer={false}
                 />
+                <ButtonComponent
+                    setShowMenu={setShowMenu}
+                    streamer={true}
+                    setSliding={setSliding}
+                    selectedState={selectedState}
+                    showMenu={showMenu}
+                    handleStateChange={handleStateChange}/>
             </div>
             <AudienceDrawer
                 hideAudience={hideAudience}

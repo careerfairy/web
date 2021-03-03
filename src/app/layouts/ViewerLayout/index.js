@@ -82,6 +82,8 @@ const ViewerLayout = (props) => {
     const [streamerId, setStreamerId] = useState(null);
     const classes = useStyles({showMenu, mobile})
 
+    const [selectedState, setSelectedState] = useState("questions");
+
 
     const populates = [{child: 'groupIds', root: 'careerCenterData', childAlias: 'careerCenters'}]
     useFirestoreConnect(() => livestreamId ? [
@@ -144,7 +146,12 @@ const ViewerLayout = (props) => {
     }
 
     const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
-
+    const handleStateChange = useCallback((state) => {
+        if (!showMenu) {
+            setShowMenu(true);
+        }
+        setSelectedState(state);
+    },[showMenu])
     const showAudience = useCallback(() => {
         setAudienceDrawerOpen(true)
     }, []);
@@ -230,8 +237,9 @@ const ViewerLayout = (props) => {
                     handRaiseActive={handRaiseActive}
                     setHandRaiseActive={setHandRaiseActive}
                     streamer={false}
-                    userData={userData}
-                    user={authenticatedUser}
+                    handleStateChange={handleStateChange}
+                    selectedState={selectedState}
+                    setSelectedState={setSelectedState}
                     livestream={currentLivestream}
                     showMenu={showMenu}
                     setShowMenu={setShowMenu}
@@ -248,8 +256,12 @@ const ViewerLayout = (props) => {
                                 unmuteVideos,
                                 showVideoButton,
                                 unmute,
+                                handleStateChange,
+                                selectedState,
+                                setSelectedState,
                                 play,
                                 showMenu,
+                                setShowMenu,
                                 streamerId,
                                 mobile,
                                 open,
