@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
     },
     slides: {
         // backgroundColor: theme.palette.background.default,
-        overflow: "visible !important"
+        // overflow: "visible !important"
     },
     blur: {
         backgroundColor: fade(theme.palette.common.black, 0.2),
