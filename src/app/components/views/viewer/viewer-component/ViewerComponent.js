@@ -146,6 +146,7 @@ function ViewerComponent(props) {
                                      smallScreenMode={props.currentLivestream.mode === 'presentation' || props.currentLivestream.mode === 'desktop'}
                                      speakerSwitchModeActive={false} localStream={null} attachSinkId={attachSinkId}
                                      streams={externalMediaStreams} localId={props.streamerId}
+                                     isViewer={true}
                                      currentSpeaker={props.currentLivestream.currentSpeakerId}
                                      muted={!props.currentLivestream.hasStarted} {...props}/>
             {shareDesktopOrSlides() &&
@@ -153,6 +154,7 @@ function ViewerComponent(props) {
                 livestreamId={props.currentLivestream.id}
                 presentation={props.currentLivestream.mode === 'presentation'}
                 showMenu={props.showMenu}
+                isStreamer={true}
                 externalMediaStreams={externalMediaStreams}
                 isLocalScreen={false}
                 attachSinkId={attachSinkId}
