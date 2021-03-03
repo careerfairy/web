@@ -201,6 +201,7 @@ ActionComponent.propTypes = {
 
 const RatingContainer = ({firebase, livestream, livestreamId}) => {
     const {authenticatedUser} = useAuth();
+
     const classes = useStyles();
     const dispatch = useDispatch()
     const enqueueSnackbar = (...args) => dispatch(actions.enqueueSnackbar(...args))

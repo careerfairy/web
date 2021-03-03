@@ -4,7 +4,7 @@ import {withFirebase} from "../../context/firebase";
 import {useRouter} from "next/router";
 import ViewerTopBar from "./ViewerTopBar";
 import {isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch, useSelector, shallowEqual} from "react-redux";
 import {useAuth} from "../../HOCs/AuthProvider";
 import Loader from "../../components/views/loader/Loader";
 import {useMediaQuery} from "@material-ui/core";
@@ -63,7 +63,7 @@ const DELAY = 3000; //3 seconds
 
 const ViewerLayout = (props) => {
     const {children, firebase} = props
-    const {query: {livestreamId}} = useRouter()
+    const {query: {livestreamId}, replace, asPath} = useRouter()
     const {authenticatedUser, userData} = useAuth();
     const dispatch = useDispatch()
     const {breakpoints: {values}} = useTheme()
@@ -80,8 +80,6 @@ const ViewerLayout = (props) => {
     const [showMenu, setShowMenu] = useState(false);
     const [handRaiseActive, setHandRaiseActive] = useState(false);
     const [streamerId, setStreamerId] = useState(null);
-
-
     const classes = useStyles({showMenu, mobile})
 
 
@@ -108,7 +106,9 @@ const ViewerLayout = (props) => {
     const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
         ...populate(firestore, "currentLivestream", populates),
         id: livestreamId
-    })
+    }, shallowEqual)
+
+    const notAuthorized = currentLivestream && !currentLivestream.test && authenticatedUser?.isLoaded && authenticatedUser?.isEmpty
 
     useEffect(() => {
         if (mobile) {
@@ -134,7 +134,14 @@ const ViewerLayout = (props) => {
                 setStreamerId(currentLivestream.id + authenticatedUser.email)
             }
         }
-    }, [currentLivestream, authenticatedUser])
+    }, [currentLivestream?.test, currentLivestream?.id, authenticatedUser?.email])
+
+    if (notAuthorized) {
+        replace({
+            pathname: `/login`,
+            query: {absolutePath: asPath},
+        });
+    }
 
     const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
 
@@ -205,7 +212,7 @@ const ViewerLayout = (props) => {
         setShowMenu(!showMenu)
     }, [showMenu])
 
-    if (!isLoaded(currentLivestream)) {
+    if (!isLoaded(currentLivestream) || notAuthorized) {
         return <Loader/>
     }
 

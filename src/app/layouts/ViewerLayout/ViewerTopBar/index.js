@@ -12,6 +12,7 @@ import {withFirebase} from "../../../context/firebase";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
 import PeopleIcon from "@material-ui/icons/People";
 import HowToRegRoundedIcon from "@material-ui/icons/HowToRegRounded";
+import NewFeatureHint from "../../../components/util/NewFeatureHint";
 
 const useStyles = makeStyles(theme => ({
     joinButton: {
@@ -119,15 +120,23 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
                             color="default"
                         />
                     </Tooltip>
-                    <Box className={classes.viewCount}>
-                        <Tooltip title="See who joined">
-                            <Button color="primary" size="large" startIcon={  <Badge color="secondary" badgeContent={numberOfViewers}>
-                                <PeopleIcon/>
-                            </Badge>} onClick={showAudience}>
-                                See who joined
-                            </Button>
-                        </Tooltip>
-                    </Box>
+                    <NewFeatureHint
+                        onClick={showAudience}
+                        tooltipText="Click here to see who's joined the stream since the start"
+                        localStorageKey="hasSeenAudienceDrawer"
+                        tooltipTitle="Hint"
+                    >
+                        <Box className={classes.viewCount}>
+                            <Tooltip title="See who joined">
+                                <Button color="primary" size="large"
+                                        startIcon={<Badge color="secondary" badgeContent={numberOfViewers}>
+                                            <PeopleIcon/>
+                                        </Badge>} onClick={showAudience}>
+                                    See who joined
+                                </Button>
+                            </Tooltip>
+                        </Box>
+                    </NewFeatureHint>
                 </Box>
                 {!currentLivestream.hasNoTalentPool &&
                 <Button

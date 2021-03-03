@@ -15,6 +15,7 @@ const NewFeatureHint = ({children, localStorageKey, tooltipText, buttonText, too
 
     const markAsSeen = () => {
         localStorage.setItem(localStorageKey, JSON.stringify(true))
+        setHasSeenTip(true)
     }
 
     const handleSeen = () => {

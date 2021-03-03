@@ -79,7 +79,6 @@ const LeftMenu =
         const classes = useStyles({showMenu, isMobile})
         const [value, setValue] = useState(0);
         const [selectedState, setSelectedState] = useState("questions");
-
         useEffect(() => {
             if (selectedState === "questions") {
                 setValue(0)

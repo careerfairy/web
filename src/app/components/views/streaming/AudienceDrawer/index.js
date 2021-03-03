@@ -39,7 +39,6 @@ const useStyles = makeStyles(theme => ({
 
 const AudienceDrawer = ({audienceDrawerOpen, hideAudience, isStreamer}) => {
     const classes = useStyles();
-
     const theme = useTheme();
     const [value, setValue] = React.useState(isStreamer ? 1 : 0);
 

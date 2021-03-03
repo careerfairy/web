@@ -150,6 +150,7 @@ const EmoteButtons =
          smoothness,
          enableIcons
      }) => {
+
         const classes = useStyles({handRaiseActive});
         const SPEED = isNaN(smoothness) ? 2 : smoothness
         const DELAY = isNaN(delay) ? 3000 : delay
