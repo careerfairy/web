@@ -47,10 +47,10 @@ const useStyles = makeStyles(theme => ({
             overflowX: "hidden",
         }
     },
-    entriesWrapper:{
-      padding: theme.spacing(1)
+    entriesWrapper: {
+        padding: theme.spacing(1)
     },
-    chatContainer:{
+    chatContainer: {
         height: "100vh", display: "flex", flexDirection: "column"
     },
     chatContent: {
@@ -61,7 +61,7 @@ const useStyles = makeStyles(theme => ({
         padding: theme.spacing(1.4),
         background: theme.palette.background.paper
     },
-    chatTitle:{
+    chatTitle: {
         display: "flex",
         width: "100%",
         justifyContent: "center",
@@ -73,7 +73,6 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
-
 
     const {authenticatedUser, userData} = useAuth();
     const [focused, setFocused] = useState(false);
@@ -139,9 +138,9 @@ const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
         <ChatEntryContainer
             handleSetCurrentEntry={handleSetCurrentEntry}
             currentEntry={currentEntry}
-        key={chatEntry?.id}
-        chatEntry={chatEntry}
-    />);
+            key={chatEntry?.id}
+            chatEntry={chatEntry}
+        />);
 
     const playIcon = (<div>
         <IconButton classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}} disabled={isEmpty}
@@ -152,7 +151,8 @@ const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
 
     return (
         <div className={classes.chatContainer}>
-            <CustomScrollToBottom scrollViewClassName={classes.entriesWrapper} className={classes.scrollToBottom} scrollItems={chatElements}/>
+            <CustomScrollToBottom scrollViewClassName={classes.entriesWrapper} className={classes.scrollToBottom}
+                                  scrollItems={chatElements}/>
             <div className={classes.chatContent}>
                 <div className={classes.chatTitle}>
                     <ForumOutlinedIcon color="primary" fontSize="small"/>
@@ -164,7 +164,7 @@ const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
                     <TextField
                         variant="outlined"
                         fullWidth
-                        autoFocus
+                        autoFocus={selectedState === "chat"}
                         onBlur={() => setFocused(false)}
                         onFocus={() => setFocused(true)}
                         className={classes.chatInput}
@@ -185,10 +185,10 @@ const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
 }
 
 ChatCategory.propTypes = {
-  firebase: PropTypes.object,
-  isStreamer: PropTypes.bool,
-  livestream: PropTypes.object.isRequired,
-  selectedState: PropTypes.string
+    firebase: PropTypes.object,
+    isStreamer: PropTypes.bool,
+    livestream: PropTypes.object.isRequired,
+    selectedState: PropTypes.string
 }
 
 export default withFirebase(ChatCategory);

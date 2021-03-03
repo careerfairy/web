@@ -331,7 +331,7 @@ const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebas
                 </DialogTitle>
                 <DialogContent>
                     <TextField
-                        autoFocus
+                        autoFocus={showQuestionModal}
                         InputProps={{className: classes.dialogInput}}
                         error={Boolean(touched && newQuestionTitle.length < 5)}
                         onBlur={() => setTouched(true)}
