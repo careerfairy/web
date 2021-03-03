@@ -76,13 +76,18 @@ const ViewerTopBar = ({firebase, mobile, numberOfViewers, showAudience, showMenu
 
     if (mobile && !showMenu) {
         return (
-            <Tooltip title="See who joined">
-                <IconButton onClick={showAudience} className={classes.floatingViewCount}>
-                    <Badge color="secondary" badgeContent={numberOfViewers}>
+            <IconButton onClick={showAudience} className={classes.floatingViewCount}>
+                <Badge color="secondary" badgeContent={numberOfViewers}>
+                    <NewFeatureHint
+                        onClick={showAudience}
+                        tooltipText="Click here to see who's joined the stream since the start"
+                        localStorageKey="hasSeenAudienceDrawer"
+                        tooltipTitle="Hint"
+                    >
                         <PeopleIcon/>
-                    </Badge>
-                </IconButton>
-            </Tooltip>
+                    </NewFeatureHint>
+                </Badge>
+            </IconButton>
         )
     }
 

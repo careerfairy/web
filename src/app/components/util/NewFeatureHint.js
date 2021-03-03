@@ -32,7 +32,9 @@ const NewFeatureHint = ({children, localStorageKey, tooltipText, buttonText, too
             tooltipText={tooltipText}
             buttonText={buttonText}
         >
-            {children}
+            <div onClick={handleSeen} style={{cursor: "pointer"}}>
+                {children}
+            </div>
         </StyledTooltipWithButton>
     );
 };

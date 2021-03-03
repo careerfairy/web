@@ -27,6 +27,7 @@ import SpeakerManagementModal from "../../../components/views/streaming/modal/Sp
 import {useRouter} from "next/router";
 import {useCurrentStream} from "../../../context/stream/StreamContext";
 import {maybePluralize} from "../../../components/helperFunctions/HelperFunctions";
+import NewFeatureHint from "../../../components/util/NewFeatureHint";
 
 const useStyles = makeStyles(theme => ({
     toolbar: {
@@ -204,30 +205,38 @@ const StreamerTopBar = ({firebase, numberOfViewers, isMainStreamer, showAudience
                                 color="default"
                             />
                         </Tooltip>
-                        <Box className={classes.viewCount}>
-                            {mobile ? <Tooltip title="See who joined">
-                                    <IconButton color="inherit" onClick={showAudience}>
-                                        <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
-                                            <PeopleIcon/>
-                                        </Badge>
-                                    </IconButton>
-                                </Tooltip> :
-                                <Tooltip title={`You currently have ${numberOfViewers} ${maybePluralize(numberOfViewers, "viewer")}`}>
-                                <Button color="primary" size="large"
-                                        startIcon={
-                                            <Badge color="secondary"
-                                                   anchorOrigin={{
-                                                       vertical: 'top',
-                                                       horizontal: 'right',
-                                                   }}
-                                                   badgeContent={numberOfViewers}>
+                        <NewFeatureHint
+                            onClick={showAudience}
+                            tooltipText="Click here to see who's joined the stream since the start"
+                            localStorageKey="hasSeenAudienceDrawer"
+                            tooltipTitle="Hint"
+                        >
+                            <Box className={classes.viewCount}>
+                                {mobile ? <Tooltip title="See who joined">
+                                        <IconButton color="inherit" onClick={showAudience}>
+                                            <Badge color="secondary" badgeContent={mobile ? numberOfViewers : 0}>
                                                 <PeopleIcon/>
                                             </Badge>
-                                        } onClick={showAudience}>
-                                    See who joined
-                                </Button>
-                                </Tooltip>}
-                        </Box>
+                                        </IconButton>
+                                    </Tooltip> :
+                                    <Tooltip
+                                        title={`You currently have ${numberOfViewers} ${maybePluralize(numberOfViewers, "viewer")}`}>
+                                        <Button color="primary" size="large"
+                                                startIcon={
+                                                    <Badge color="secondary"
+                                                           anchorOrigin={{
+                                                               vertical: 'top',
+                                                               horizontal: 'right',
+                                                           }}
+                                                           badgeContent={numberOfViewers}>
+                                                        <PeopleIcon/>
+                                                    </Badge>
+                                                } onClick={showAudience}>
+                                            See who joined
+                                        </Button>
+                                    </Tooltip>}
+                            </Box>
+                        </NewFeatureHint>
                     </Box>
                 </Toolbar>
             </AppBar>
