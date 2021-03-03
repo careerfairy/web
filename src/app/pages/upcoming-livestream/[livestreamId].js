@@ -23,6 +23,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../components/util/constants";
 import {useAuth} from "../../HOCs/AuthProvider";
 import GroupsUtil from "../../data/util/GroupsUtil";
+import {store} from '../_app'
 import {Paper, Avatar, Box} from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
@@ -41,8 +42,21 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
+const parseDates = (stream) => {
+    if (stream.created) {
+        stream.created = new Date(Date.parse(stream.created))
+    }
+    if (stream.lastUpdated) {
+        stream.lastUpdated = new Date(Date.parse(stream.lastUpdated))
+    }
+    if (stream.start) {
+        stream.start = new Date(Date.parse(stream.start))
+    }
+    return stream
+}
 
 function UpcomingLivestream(props) {
+    // console.log("-> UpcomingLivestream props", props);
     const classes = useStyles()
     const router = useRouter();
     const {livestreamId, groupId} = router.query;
@@ -51,7 +65,7 @@ function UpcomingLivestream(props) {
     const {userData, authenticatedUser: user} = useAuth();
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
-    const [currentLivestream, setCurrentLivestream] = useState(null);
+    const [currentLivestream, setCurrentLivestream] = useState(parseDates(props.currentLivestream));
     const [registration, setRegistration] = useState(false);
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
@@ -105,6 +119,9 @@ function UpcomingLivestream(props) {
                     if (querySnapshot.data()) {
                         let livestream = querySnapshot.data();
                         livestream.id = querySnapshot.id;
+                        livestream.created = livestream.created?.toDate?.()
+                        livestream.lastUpdated = livestream.lastUpdated?.toDate?.()
+                        livestream.start = livestream.start?.toDate?.()
                         setCurrentLivestream(livestream);
                     }
                 }
@@ -441,7 +458,7 @@ function UpcomingLivestream(props) {
     });
 
     if (!currentLivestream) {
-        return <Loader/>;
+        // return <Loader/>;
     }
 
     if (currentLivestream.hasStarted) {
@@ -452,7 +469,7 @@ function UpcomingLivestream(props) {
         <div>
             <div className="topLevelContainer">
                 <Head>
-                     {/*Primary Meta Tags */}
+                    {/*Primary Meta Tags */}
                     <title>CareerFairy | Upcoming Live Stream</title>
                     <meta name="title" content="CareerFairy | Upcoming Live Stream"/>
                     <meta name="description"
@@ -467,9 +484,10 @@ function UpcomingLivestream(props) {
                     <meta property="og:image"
                           content={currentLivestream.companyLogoUrl}/>
 
-                     {/*Twitter*/}
+                    {/*Twitter*/}
                     <meta property="twitter:card" content="summary_large_image"/>
-                    <meta property="twitter:url" content={`https://careerfairy.io/upcoming-livestream/${livestreamId}`}/>
+                    <meta property="twitter:url"
+                          content={`https://careerfairy.io/upcoming-livestream/${livestreamId}`}/>
                     <meta property="twitter:title" content="CareerFairy | Upcoming Live Stream"/>
                     <meta property="twitter:description"
                           content={currentLivestream.title}/>
@@ -516,13 +534,13 @@ function UpcomingLivestream(props) {
                             >
                 <span>
                   <Icon name="calendar outline alternate"/>
-                    {DateUtil.getPrettyDate(currentLivestream.start.toDate())}
+                    {DateUtil.getPrettyDate(currentLivestream.start)}
                 </span>
                             </div>
                             <div
                                 className={
                                     "topDescriptionContainer " +
-                                    (dateIsInUnder24Hours(currentLivestream.start.toDate())
+                                    (dateIsInUnder24Hours(currentLivestream.start)
                                         ? ""
                                         : "hidden")
                                 }
@@ -546,7 +564,7 @@ function UpcomingLivestream(props) {
                                     }}
                                 >
                                     <Countdown
-                                        date={currentLivestream.start.toDate()}>
+                                        date={currentLivestream.start}>
                     <span style={{margin: "30px"}}>
                       This livestream will start shortly
                     </span>
@@ -624,7 +642,7 @@ function UpcomingLivestream(props) {
                                     }}
                                 >
                                     <Countdown
-                                        date={currentLivestream.start.toDate()}>
+                                        date={currentLivestream.start}>
                     <span style={{margin: "30px"}}>
                       This livestream will start shortly
                     </span>
@@ -1068,4 +1086,20 @@ function UpcomingLivestream(props) {
     );
 }
 
+export async function getServerSideProps({params: {livestreamId}}) {
+    let currentLivestream = {}
+    const snap = await store.firestore.get({collection: "livestreams", doc: livestreamId})
+    if (snap.exists) {
+        currentLivestream = snap.data()
+
+        currentLivestream.created = currentLivestream.created?.toDate?.().toString()
+        currentLivestream.lastUpdated = currentLivestream.lastUpdated?.toDate?.().toString()
+        currentLivestream.start = currentLivestream.start?.toDate?.().toString()
+    }
+    return {
+        props: {currentLivestream}, // will be passed to the page component as props
+    }
+}
+
 export default withFirebasePage(UpcomingLivestream);
+
