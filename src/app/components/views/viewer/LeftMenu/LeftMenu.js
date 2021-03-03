@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react';
 import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
 import SwipeableViews from "react-swipeable-views";
@@ -10,6 +11,7 @@ import HandRaiseCategory from "./categories/HandRaiseCategory";
 import ChatCategory from "../../streaming/LeftMenu/categories/ChatCategory";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import clsx from "clsx";
+import {useAuth} from "../../../../HOCs/AuthProvider";
 
 
 const useStyles = makeStyles(theme => ({
@@ -63,11 +65,12 @@ const states = ["questions", "polls", "hand", "chat"]
 const LeftMenu =
     ({
          handRaiseActive,
-         user,
          toggleShowMenu,
          setHandRaiseActive,
-         userData,
          streamer,
+         setSelectedState,
+         handleStateChange,
+         selectedState,
          livestream,
          setShowMenu,
          showMenu,
@@ -75,10 +78,11 @@ const LeftMenu =
          className,
          ...props
      }) => {
+    const {userData, authenticatedUser: user} = useAuth()
         const theme = useTheme()
         const classes = useStyles({showMenu, isMobile})
         const [value, setValue] = useState(0);
-        const [selectedState, setSelectedState] = useState("questions");
+
         useEffect(() => {
             if (selectedState === "questions") {
                 setValue(0)
@@ -90,7 +94,6 @@ const LeftMenu =
                 setValue(3)
             }
         }, [selectedState, showMenu, isMobile])
-
         useEffect(() => {
             if (selectedState === "chat" && showMenu && !isMobile) {
                 setSelectedState("questions")
@@ -98,12 +101,6 @@ const LeftMenu =
             }
         }, [selectedState, showMenu, isMobile])
 
-        function handleStateChange(state) {
-            if (!showMenu) {
-                setShowMenu(true);
-            }
-            setSelectedState(state);
-        }
 
         const handleChange = (event, newValue) => {
             setValue(newValue);
@@ -156,10 +153,27 @@ const LeftMenu =
                     onChangeIndex={handleChange}>
                     {views}
                 </SwipeableViews>
-                <ButtonComponent selectedState={selectedState} showMenu={showMenu} isMobile={isMobile}
-                                 handleStateChange={handleStateChange} {...props}/>
+
             </div>
         );
     };
 
+LeftMenu.propTypes = {
+  className: PropTypes.string,
+  handRaiseActive: PropTypes.bool,
+  handleStateChange: PropTypes.func.isRequired,
+  isMobile: PropTypes.bool,
+  livestream: PropTypes.object,
+  selectedState: PropTypes.string.isRequired,
+  setHandRaiseActive: PropTypes.func.isRequired,
+  setSelectedState: PropTypes.func.isRequired,
+  setShowMenu: PropTypes.func.isRequired,
+  showMenu: PropTypes.bool.isRequired,
+  streamer: PropTypes.any,
+  toggleShowMenu: PropTypes.any,
+  user: PropTypes.any,
+  userData: PropTypes.any
+}
+
 export default LeftMenu;
+

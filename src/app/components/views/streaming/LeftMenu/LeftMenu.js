@@ -30,12 +30,22 @@ const useStyles = makeStyles(theme => ({
 
 
 const states = ["questions", "polls", "hand"]
-const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, className, ...props}) => {
+const LeftMenu = ({
+                      showMenu,
+                      livestream,
+                      streamer,
+                      handleStateChange,
+                      sliding,
+                      setSliding,
+                      selectedState,
+                      setSelectedState,
+                      setShowMenu,
+                      toggleShowMenu,
+                      className,
+                  }) => {
     const theme = useTheme()
     const classes = useStyles()
-    const [selectedState, setSelectedState] = useState("questions");
     const [value, setValue] = useState(0);
-    const [sliding, setSliding] = useState(false);
 
 
     useEffect(() => {
@@ -66,15 +76,6 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
         }
     }, [selectedState, showMenu])
 
-    function handleStateChange(state) {
-        if (!showMenu) {
-            setShowMenu(true);
-        }
-        if (streamer) {
-            setSliding(true)
-        }
-        setSelectedState(state);
-    }
 
     const handleChange = (event) => {
         setSliding(true)
@@ -114,13 +115,6 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
                 onChangeIndex={handleChange}>
                 {views}
             </SwipeableViews>
-            <ButtonComponent
-                setShowMenu={setShowMenu}
-                streamer={streamer}
-                setSliding={setSliding}
-                selectedState={selectedState}
-                showMenu={showMenu}
-                handleStateChange={handleStateChange} {...props}/>
         </div>
     )
 };

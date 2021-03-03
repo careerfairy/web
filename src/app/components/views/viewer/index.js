@@ -12,6 +12,7 @@ import {useCurrentStream} from "../../../context/stream/StreamContext";
 import clsx from "clsx";
 import StreamNotifications from "../streaming/sharedComponents/StreamNotifications";
 import AudienceDrawer from "../streaming/AudienceDrawer";
+import ButtonComponent from "../streaming/sharedComponents/ButtonComponent";
 
 const useStyles = makeStyles(theme => ({
     iconsContainer: {
@@ -72,6 +73,11 @@ const ViewerOverview = ({
                             iconsDisabled,
                             mobile,
                             unmuteVideos,
+                            setShowMenu,
+                            handleStateChange,
+                            selectedState,
+                            setSelectedState,
+                            showMenu,
                             setNumberOfViewers,
                             DELAY,
                             setShowVideoButton,
@@ -94,6 +100,13 @@ const ViewerOverview = ({
                     hideAudience={hideAudience}
                     audienceDrawerOpen={audienceDrawerOpen}
                     isStreamer={false}
+                />
+                <ButtonComponent
+                    selectedState={selectedState}
+                    setShowMenu={setShowMenu}
+                    showMenu={showMenu}
+                    isMobile={mobile}
+                    handleStateChange={handleStateChange} streamer={false}
                 />
                 <ViewerComponent
                     livestreamId={currentLivestream.id} streamerId={streamerId}

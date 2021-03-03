@@ -68,7 +68,8 @@ const StreamerLayout = (props) => {
     const [tokenChecked, setTokenChecked] = useState(false);
     const [showMenu, setShowMenu] = useState(true);
     const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false);
-
+    const [selectedState, setSelectedState] = useState("questions");
+    const [sliding, setSliding] = useState(false);
 
 
     const handleSetNumberOfViewers = useCallback((number) => setNumberOfViewers(number), [])
@@ -168,6 +169,14 @@ const StreamerLayout = (props) => {
     }, []);
 
 
+    const handleStateChange = useCallback((state) => {
+        if (!showMenu) {
+            setShowMenu(true);
+        }
+        setSliding(true)
+        setSelectedState(state);
+    }, [showMenu])
+
     const tokenIsValidated = () => {
         if (currentLivestream.test) {
             return true;
@@ -205,8 +214,12 @@ const StreamerLayout = (props) => {
                         numberOfViewers={numberOfViewers}
                     />
                     <LeftMenu
+                        handleStateChange={handleStateChange}
+                        selectedState={selectedState}
                         className={classes.menuLeft}
                         streamer={true}
+                        sliding={sliding}
+                        setSliding={setSliding}
                         livestream={currentLivestream}
                         showMenu={showMenu}
                         setShowMenu={setShowMenu}
@@ -222,6 +235,10 @@ const StreamerLayout = (props) => {
                                     isStreamer: true,
                                     hideAudience,
                                     audienceDrawerOpen,
+                                    setShowMenu,
+                                    setSliding,
+                                    selectedState,
+                                    handleStateChange,
                                     showAudience,
                                     showMenu,
                                     notifications,

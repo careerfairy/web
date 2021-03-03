@@ -14,15 +14,16 @@ import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        position: "absolute",
-        right: ({showMenu, isMobile}) => showMenu ? isMobile ? "-120px" : "-120px" : "-120px",
-        height: ({isMobile}) => isMobile ? "100%" : "50%",
-        width: 120,
         display: "flex",
-        alignItems: "center",
-        padding: 30,
         top: 0,
-        transform: ({isMobile}) => !isMobile && "translateY(50%)"
+        width: "120px",
+        border: "3px solid pink",
+        padding: "30px",
+        position: "absolute",
+        alignItems: "center",
+        transform: "translateY(50%)",
+        zIndex: 10000,
+        bottom: "50%"
     },
     speedDial: {
         transition: "transform 0.2s",
