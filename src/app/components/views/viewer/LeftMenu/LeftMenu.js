@@ -156,13 +156,14 @@ const LeftMenu =
                         onClose={handleClose}
                         open={showMenu}
                         keepMounted
-                        variant="temporary"
+                        variant="persistent"
                     >
                         {content}
                     </Drawer>
                     :
                     <Drawer
                         anchor="left"
+                        keepMounted
                         classes={{paper: clsx(classes.desktopDrawer, classes.blur)}}
                         open
                         variant="persistent"
