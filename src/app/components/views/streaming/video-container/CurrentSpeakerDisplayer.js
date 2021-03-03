@@ -12,8 +12,8 @@ const useStyles = makeStyles(theme => ({
         height: "100%",
         display: "inline-block",
         width: 250,
-        [theme.breakpoints.down("mobile")]: {
-            width: 150
+        [theme.breakpoints.down("sm")]: {
+            width: 190
         },
     },
     externalSpeakerVideo: {
@@ -42,7 +42,10 @@ const useStyles = makeStyles(theme => ({
         height: "100%",
         display: "inline-block",
         verticalAlign: "top",
-        margin: "0"
+        margin: "0",
+        [theme.breakpoints.down("sm")]: {
+            width: 190
+        },
     },
     localSpeakerVideo: {
         position: "absolute",
@@ -63,7 +66,10 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: "black",
         width: "100%",
         margin: "0 auto",
-        zIndex: 2000
+        zIndex: 2000,
+        "& video": {
+            // objectFit: "contain !important",
+        }
     },
     relativeContainer: {
         position: "relative",
@@ -97,7 +103,6 @@ const useStyles = makeStyles(theme => ({
 
 function CurrentSpeakerDisplayer(props) {
     const classes = useStyles()
-
     const windowSize = useWindowSize();
 
     function getVideoContainerHeight(streamId) {
@@ -115,7 +120,7 @@ function CurrentSpeakerDisplayer(props) {
                     // return windowSize.width > 768 ? '20vh' : '15vh';
                 }
             } else {
-                return windowSize.width > 768 ? 'calc(100vh - 55px)' : '60vh';
+                return windowSize.width > 768 ? 'calc(100vh - 55px)' : props.isViewer ? '100vh' : '60vh';
             }
         } else {
             if (props.smallScreenMode) {
@@ -123,7 +128,7 @@ function CurrentSpeakerDisplayer(props) {
             }
             if (props.streams.length > 0) {
                 if (streamId === props.currentSpeaker) {
-                    return 'calc(80vh - 55px)';
+                    return (windowSize.width > 768 || !props.isViewer) ? 'calc(80vh - 55px)' : '80vh';
                 } else {
                     return '20vh';
                 }
@@ -173,20 +178,23 @@ function CurrentSpeakerDisplayer(props) {
     let externalVideoElements = props.streams.filter(stream => !stream.streamId.includes("screen")).map((stream, index) => {
         const videoClass = getVideoContainerClass(stream.streamId, "external");
         return (
-            <div key={stream.streamId} className={ classes[videoClass] }
+            <div key={stream.streamId} className={classes[videoClass]}
                  style={{padding: 0}}>
                 <RemoteVideoContainer {...props} isPlayMode={props.isPlayMode} muted={props.muted} stream={stream}
-                    height={ getVideoContainerHeight(stream.streamId) } small={ videoClass.includes("QuarterWidth") } index={index}/>
+                                      height={getVideoContainerHeight(stream.streamId)}
+                                      small={videoClass.includes("QuarterWidth")} index={index}/>
             </div>
         );
     });
 
     if (!props.isPlayMode) {
         const localVideoClass = getVideoContainerClass(props.localId, "local");
-        const localSpeaker = props.currentLivestream.speakers?.find( speaker => speaker.speakerUuid === props.localId );
-        let localVideoElement = 
-            <div key={"localVideo"} className={ classes[localVideoClass] }>
-                <LocalVideoContainer localId={props.localId} localSpeaker={localSpeaker} height={getVideoContainerHeight(props.localId)} small={localVideoClass.includes("QuarterWidth")} {...props}/>
+        const localSpeaker = props.currentLivestream.speakers?.find(speaker => speaker.speakerUuid === props.localId);
+        let localVideoElement =
+            <div key={"localVideo"} className={classes[localVideoClass]}>
+                <LocalVideoContainer localId={props.localId} localSpeaker={localSpeaker}
+                                     height={getVideoContainerHeight(props.localId)}
+                                     small={localVideoClass.includes("QuarterWidth")} {...props}/>
             </div>
 
         externalVideoElements.unshift(localVideoElement);

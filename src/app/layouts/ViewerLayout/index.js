@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
         overflow: 'hidden',
         paddingLeft: ({showMenu, mobile}) => (showMenu && !mobile) ? 280 : 0,
         transition: theme.transitions.create("padding-left", {
-            duration: theme.transitions.duration.standard,
+            duration: theme.transitions.duration.shortest,
             easing: theme.transitions.easing.easeInOut
         }),
         [theme.breakpoints.down("mobile")]: {

@@ -16,7 +16,6 @@ const useStyles = makeStyles(theme => ({
     root: {
         position: "absolute",
         boxShadow: theme.shadows[5],
-        width: ({showMenu, isMobile}) => showMenu ? (isMobile ? "100%" : 280) : 0,
         top: 0,
         left: 0,
         bottom: 0,
@@ -24,8 +23,9 @@ const useStyles = makeStyles(theme => ({
         [theme.breakpoints.up("mobile")]: {
             top: 55,
         },
+        width: ({showMenu, isMobile}) => showMenu ? (isMobile ? "100%" : 280) : 0,
         transition: theme.transitions.create("width", {
-            duration: theme.transitions.duration.standard,
+            duration: theme.transitions.duration.shortest,
             easing: theme.transitions.easing.easeInOut
         }),
     },
@@ -149,6 +149,8 @@ const LeftMenu =
                     containerStyle={{WebkitOverflowScrolling: 'touch'}}
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                     index={value}
+                    animateTransitions
+                    hysteresis={0.3}
                     slideClassName={classes.slides}
                     className={classes.viewRoot}
                     onChangeIndex={handleChange}>
