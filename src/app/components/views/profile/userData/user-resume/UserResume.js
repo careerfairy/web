@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import FilePickerContainer from 'components/ssr/FilePickerContainer';
 import { DeleteForever, GetApp, Add, ArrowDropDown, CheckCircleOutline, Publish} from '@material-ui/icons';
-import { Box, Button, ButtonGroup, ClickAwayListener, Container, Grow, MenuItem, MenuList, Paper, Popper, Typography } from '@material-ui/core';
+import { Box, Button, ButtonGroup, ClickAwayListener, Container, Grow, MenuItem, MenuList, Paper, Popper, Slider, Switch, Typography } from '@material-ui/core';
 import {makeStyles} from "@material-ui/core/styles";
 import * as actions from 'store/actions'
 import { useDispatch } from 'react-redux';
@@ -21,8 +21,8 @@ const useStyles = makeStyles((theme) => ({
     },
     uploadedContainer: {
         textAlign: 'center',
-        padding: "40px 20px",
-        marginBottom: 20
+        padding: "40px 10px 20px 10px",
+        marginBottom: 10
     },
     cvButton: {
         cursor: 'pointer'
@@ -39,19 +39,25 @@ const useStyles = makeStyles((theme) => ({
     largeIcon: {
         fontSize: "3.5rem",
         marginBottom: 10
-    }
+    },
+    switch: props => ({
+        marginTop: 40,
+        fontWeight: props.shareCvWithTalentPool ? "bold" : "normal",
+        color: props.shareCvWithTalentPool ? theme.palette.primary.main : theme.palette.background.main
+    })
 }));
 
 const buttonChoices = ['Download CV', 'Upload New CV', 'Delete CV'];
 
 const UserResume = ({firebase, userData}) => {
 
-    const classes = useStyles()
     const dispatch = useDispatch()
     const anchorRef = useRef(null);
 
     const [open, setOpen] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(1);
+    const [shareCvWithTalentPool, setShareCvWithTalentPool] = useState(true);
+    const classes = useStyles({ shareCvWithTalentPool: shareCvWithTalentPool })
 
     
     const uploadLogo = (logoFile) => {
@@ -114,10 +120,6 @@ const UserResume = ({firebase, userData}) => {
     const handleMenuItemClick = (event, index) => {
         setSelectedIndex(index);
         setOpen(false);
-    };
-
-    const downloadResume = () => {
-        location.href = userData.userResume
     };
 
     const handleClose = (event) => {
@@ -199,6 +201,10 @@ const UserResume = ({firebase, userData}) => {
                                 </Grow>
                             )}
                         </Popper>
+                        <div className={classes.switch} >
+                            <Switch checked={shareCvWithTalentPool} onChange={() => setShareCvWithTalentPool(!shareCvWithTalentPool)} color='primary'/>
+                            I want to share my CV with a company when joining their Talent Pool.
+                        </div>
                     </div>
                 </div> : 
                 <div  className={classes.cvContainer}>
