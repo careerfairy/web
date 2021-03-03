@@ -457,8 +457,8 @@ function UpcomingLivestream(props) {
         );
     });
 
-    if (!currentLivestream) {
-        // return <Loader/>;
+    if (!currentLivestream.id) {
+        return <Loader/>;
     }
 
     if (currentLivestream.hasStarted) {
@@ -1091,7 +1091,7 @@ export async function getServerSideProps({params: {livestreamId}}) {
     const snap = await store.firestore.get({collection: "livestreams", doc: livestreamId})
     if (snap.exists) {
         currentLivestream = snap.data()
-
+        currentLivestream.id = snap.id
         currentLivestream.created = currentLivestream.created?.toDate?.().toString()
         currentLivestream.lastUpdated = currentLivestream.lastUpdated?.toDate?.().toString()
         currentLivestream.start = currentLivestream.start?.toDate?.().toString()
