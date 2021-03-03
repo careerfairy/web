@@ -10,7 +10,7 @@ import NotificationsContext from "../../context/notifications/NotificationsConte
 import {CurrentStreamContext} from "../../context/stream/StreamContext";
 import {v4 as uuidv4} from "uuid";
 import {isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
-import {useSelector} from "react-redux";
+import {shallowEqual, useSelector} from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -97,7 +97,7 @@ const StreamerLayout = (props) => {
     const currentLivestream = useSelector(({firestore}) => firestore.data.currentLivestream && {
         ...populate(firestore, "currentLivestream", populates),
         id: livestreamId
-    })
+    }, shallowEqual)
 
     // const firestore = useSelector(({firestore}) => firestore)
     // console.log("-> firestore", firestore);

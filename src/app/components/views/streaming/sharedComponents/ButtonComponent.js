@@ -17,7 +17,6 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         top: 0,
         width: "120px",
-        border: "3px solid pink",
         padding: "30px",
         position: "absolute",
         alignItems: "center",

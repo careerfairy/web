@@ -3,8 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
 import SwipeableViews from "react-swipeable-views";
 import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
-import {Fab} from "@material-ui/core";
-import ButtonComponent from "../../streaming/sharedComponents/ButtonComponent";
+import {Drawer, Fab} from "@material-ui/core";
 import QuestionCategory from "../../streaming/sharedComponents/QuestionCategory";
 import PollCategory from "./categories/PollCategory";
 import HandRaiseCategory from "./categories/HandRaiseCategory";
@@ -15,22 +14,6 @@ import {useAuth} from "../../../../HOCs/AuthProvider";
 
 
 const useStyles = makeStyles(theme => ({
-    root: {
-        position: "absolute",
-        boxShadow: theme.shadows[5],
-        top: 0,
-        left: 0,
-        bottom: 0,
-        zIndex: 101,
-        [theme.breakpoints.up("mobile")]: {
-            top: 55,
-        },
-        width: ({showMenu, isMobile}) => showMenu ? (isMobile ? "100%" : 280) : 0,
-        transition: theme.transitions.create("width", {
-            duration: theme.transitions.duration.shortest,
-            easing: theme.transitions.easing.easeInOut
-        }),
-    },
     viewRoot: {
         position: "relative",
         height: "100%",
@@ -58,7 +41,16 @@ const useStyles = makeStyles(theme => ({
     blur: {
         backgroundColor: fade(theme.palette.common.black, 0.2),
         backdropFilter: "blur(5px)",
-    }
+    },
+    mobileDrawer: {
+        width: "100%",
+    },
+    desktopDrawer: {
+        width: 280,
+        top: 55,
+        height: 'calc(100% - 55px)',
+        boxShadow: theme.shadows[15]
+    },
 }))
 
 const states = ["questions", "polls", "hand", "chat"]
@@ -78,7 +70,7 @@ const LeftMenu =
          className,
          ...props
      }) => {
-    const {userData, authenticatedUser: user} = useAuth()
+        const {userData, authenticatedUser: user} = useAuth()
         const theme = useTheme()
         const classes = useStyles({showMenu, isMobile})
         const [value, setValue] = useState(0);
@@ -107,6 +99,10 @@ const LeftMenu =
             setSelectedState(states[newValue])
         }
 
+        const handleClose = () => {
+            setShowMenu(false)
+        }
+
         const views = [
             <TabPanel key={0} value={value} index={0} dir={theme.direction}>
                 <QuestionCategory showMenu={showMenu} streamer={streamer} livestream={livestream}
@@ -132,12 +128,8 @@ const LeftMenu =
                               userData={userData} isStreamer={false}/>
             </TabPanel>)
         }
-
-
-        return (
-            <div className={clsx(classes.root, className, {
-                [classes.blur]: isMobile && showMenu
-            })}>
+        const content = (
+            <>
                 {isMobile && showMenu &&
                 <Fab className={classes.closeBtn} size='large' color='secondary' onClick={toggleShowMenu}>
                     <ChevronLeftRoundedIcon/>
@@ -153,26 +145,47 @@ const LeftMenu =
                     onChangeIndex={handleChange}>
                     {views}
                 </SwipeableViews>
+            </>
+        )
 
-            </div>
+        return (
+            <>
+                {isMobile ? <Drawer
+                        anchor="left"
+                        classes={{paper: clsx(classes.mobileDrawer, classes.blur)}}
+                        onClose={handleClose}
+                        open={showMenu}
+                        keepMounted
+                        variant="temporary"
+                    >
+                        {content}
+                    </Drawer>
+                    :
+                    <Drawer
+                        anchor="left"
+                        classes={{paper: clsx(classes.desktopDrawer, classes.blur)}}
+                        open
+                        variant="persistent"
+                    >
+                        {content}
+                    </Drawer>}
+            </>
         );
     };
 
 LeftMenu.propTypes = {
-  className: PropTypes.string,
-  handRaiseActive: PropTypes.bool,
-  handleStateChange: PropTypes.func.isRequired,
-  isMobile: PropTypes.bool,
-  livestream: PropTypes.object,
-  selectedState: PropTypes.string.isRequired,
-  setHandRaiseActive: PropTypes.func.isRequired,
-  setSelectedState: PropTypes.func.isRequired,
-  setShowMenu: PropTypes.func.isRequired,
-  showMenu: PropTypes.bool.isRequired,
-  streamer: PropTypes.any,
-  toggleShowMenu: PropTypes.any,
-  user: PropTypes.any,
-  userData: PropTypes.any
+    className: PropTypes.string,
+    handRaiseActive: PropTypes.bool,
+    handleStateChange: PropTypes.func.isRequired,
+    isMobile: PropTypes.bool,
+    livestream: PropTypes.object,
+    selectedState: PropTypes.string.isRequired,
+    setHandRaiseActive: PropTypes.func.isRequired,
+    setSelectedState: PropTypes.func.isRequired,
+    setShowMenu: PropTypes.func.isRequired,
+    showMenu: PropTypes.bool.isRequired,
+    streamer: PropTypes.any,
+    toggleShowMenu: PropTypes.any,
 }
 
 export default LeftMenu;

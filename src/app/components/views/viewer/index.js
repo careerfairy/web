@@ -90,7 +90,6 @@ const ViewerOverview = ({
     const {currentLivestream} = useCurrentStream()
 
     const classes = useStyles({mobile})
-
     return (
         <Fragment>
             <div className={clsx({
