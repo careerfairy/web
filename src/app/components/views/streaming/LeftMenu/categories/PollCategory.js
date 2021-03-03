@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {useState, useEffect, Fragment, useContext} from 'react';
 import {withFirebase} from 'context/firebase';
 import BarChartIcon from '@material-ui/icons/BarChart';
@@ -25,7 +26,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-function PollCategory({firebase, streamer, livestream, selectedState, showMenu, user, userData, sliding}) {
+const PollCategory = ({firebase, streamer, livestream, selectedState, showMenu, user, userData, sliding}) => {
     const classes = useStyles()
     const [addNewPoll, setAddNewPoll] = useState(false);
     const [pollEntries, setPollEntries] = useState([]);
@@ -127,4 +128,16 @@ function PollCategory({firebase, streamer, livestream, selectedState, showMenu, 
     );
 }
 
+PollCategory.propTypes = {
+  firebase: PropTypes.object,
+  livestream: PropTypes.object.isRequired,
+  selectedState: PropTypes.string.isRequired,
+  showMenu: PropTypes.bool.isRequired,
+  sliding: PropTypes.bool.isRequired,
+  streamer: PropTypes.bool.isRequired,
+  user: PropTypes.object,
+  userData: PropTypes.object
+}
+
 export default withFirebase(PollCategory);
+

@@ -148,8 +148,9 @@ const EmoteButtons =
          open,
          delay,
          smoothness,
-         setIconsDisabled
+         enableIcons
      }) => {
+
         const classes = useStyles({handRaiseActive});
         const SPEED = isNaN(smoothness) ? 2 : smoothness
         const DELAY = isNaN(delay) ? 3000 : delay
@@ -165,7 +166,7 @@ const EmoteButtons =
                     setProgress((prevProgress) => (prevProgress >= 100 ? INTERVAL : prevProgress + INTERVAL));
                 }, TICK_RATE);
                 const timeout = setTimeout(() => {
-                    setIconsDisabled(false);
+                    enableIcons();
                 }, DELAY);
                 return () => {
                     clearTimeout(timeout)

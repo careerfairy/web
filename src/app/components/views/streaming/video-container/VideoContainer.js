@@ -20,13 +20,6 @@ import SettingsModal from "./SettingsModal";
 import ScreenShareModal from "./ScreenShareModal";
 
 const useStyles = makeStyles((theme) => ({
-    blackFrame: {
-        position: "absolute",
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0,
-    }
 }));
 
 function VideoContainer(props) {
@@ -297,7 +290,7 @@ function VideoContainer(props) {
 
     return (
         <Fragment>
-            <div className={classes.blackFrame}>
+            <div>
                 <div>
                     <CurrentSpeakerDisplayer
                         isPlayMode={false}

@@ -10,9 +10,7 @@ import SwipeableViews from "react-swipeable-views";
 import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
-    root:{
-
-    },
+    root: {},
     viewRoot: {
         position: "relative",
         height: "100%",
@@ -32,7 +30,7 @@ const useStyles = makeStyles(theme => ({
 
 
 const states = ["questions", "polls", "hand"]
-const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, className,...props}) => {
+const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, className, ...props}) => {
     const theme = useTheme()
     const classes = useStyles()
     const [selectedState, setSelectedState] = useState("questions");
@@ -86,15 +84,22 @@ const LeftMenu = ({showMenu, livestream, streamer, setShowMenu, toggleShowMenu, 
 
     const views = [
         <TabPanel key={0} value={value} index={0} dir={theme.direction}>
-            <QuestionCategory sliding={sliding} showMenu={showMenu} streamer={streamer} {...props} livestream={livestream}
-                              selectedState={selectedState}/>
+            <QuestionCategory
+                sliding={sliding}
+                showMenu={showMenu}
+                streamer={streamer}
+                isMobile={false}
+                livestream={livestream}
+                selectedState={selectedState}
+            />
         </TabPanel>,
         <TabPanel key={1} value={value} index={1} dir={theme.direction}>
             <PollCategory sliding={sliding} showMenu={showMenu} livestream={livestream} selectedState={selectedState}
                           streamer={streamer}/>
         </TabPanel>,
         <TabPanel key={2} value={value} index={2} dir={theme.direction}>
-            <HandRaiseCategory sliding={sliding} showMenu={showMenu} livestream={livestream} selectedState={selectedState}/>
+            <HandRaiseCategory sliding={sliding} showMenu={showMenu} livestream={livestream}
+                               selectedState={selectedState}/>
         </TabPanel>
     ]
 

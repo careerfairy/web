@@ -7,6 +7,7 @@ import {useFirestoreConnect} from "react-redux-firebase";
 import AddMemberModal from "./AddMemberModal";
 import {useSnackbar} from "notistack";
 import {GENERAL_ERROR, PERMISSION_ERROR} from "../../../../util/constants";
+import {withFirebase} from "../../../../../context/firebase";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -152,4 +153,4 @@ const RolesOverview = ({firebase, group}) => {
     );
 };
 
-export default RolesOverview;
+export default withFirebase(RolesOverview);

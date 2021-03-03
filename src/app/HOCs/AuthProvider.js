@@ -1,10 +1,14 @@
 import React, {createContext, useContext, useEffect} from "react";
 import {useRouter} from "next/router";
-import Loader from "../components/views/loader/Loader";
+import dynamic from "next/dynamic";
+const Loader = dynamic(
+    () => import('../components/views/loader/Loader'),
+    { ssr: false }
+)
 import {useSelector} from "react-redux";
 import {useFirestoreConnect} from 'react-redux-firebase'
 
-const AuthContext = createContext();
+const AuthContext = createContext({authenticatedUser: undefined, userData: undefined});
 
 const securePaths = [
     "/profile",

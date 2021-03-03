@@ -1,18 +1,14 @@
-import React, {useState, useEffect, useContext} from 'react';
+import PropTypes from 'prop-types'
+import React, {memo, useContext, useEffect, useState} from 'react';
 import ThumbUpRoundedIcon from '@material-ui/icons/ThumbUpRounded';
 import Linkify from 'react-linkify';
 import ExpandLessRoundedIcon from '@material-ui/icons/ExpandLessRounded';
 import ExpandMoreRoundedIcon from '@material-ui/icons/ExpandMoreRounded';
 import {withFirebase} from 'context/firebase';
-import { Box, Button, Slide, TextField, Grow, Typography, Collapse, Card, Paper } from "@material-ui/core";
-import {makeStyles, useTheme} from "@material-ui/core/styles";
+import {Box, Button, Card, Collapse, Grow, Paper, Slide, TextField, Typography} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
 import {PlayIconButton} from "materialUI/GlobalButtons/GlobalButtons";
-import {
-    TooltipButtonComponent,
-    TooltipText,
-    TooltipTitle,
-    WhiteTooltip
-} from "materialUI/GlobalTooltips";
+import {TooltipButtonComponent, TooltipText, TooltipTitle, WhiteTooltip} from "materialUI/GlobalTooltips";
 import TutorialContext from "context/tutorials/TutorialContext";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 
@@ -91,20 +87,21 @@ const ReactionsToggle = ({setShowAllReactions, showAllReactions}) => {
     )
 }
 
-const QuestionContainer = ({
+
+
+const QuestionContainer = memo( ({
                                sliding,
                                user,
                                livestream,
                                streamer,
                                question,
-                               questions,
                                firebase,
                                index,
                                isNextQuestions,
                                selectedState,
+                               goToThisQuestion,
                                showMenu
                            }) => {
-
     const [newCommentTitle, setNewCommentTitle] = useState("");
     const [comments, setComments] = useState([]);
     const [showAllReactions, setShowAllReactions] = useState(false);
@@ -174,15 +171,6 @@ const QuestionContainer = ({
         firebase.upvoteLivestreamQuestion(livestream.id, question, authEmail);
     }
 
-    function goToThisQuestion(nextQuestionId) {
-        const currentQuestion = questions.find(question => question.type === 'current');
-        if (currentQuestion) {
-            firebase.goToNextLivestreamQuestion(currentQuestion.id, nextQuestionId, livestream.id);
-        } else {
-            firebase.goToNextLivestreamQuestion(null, nextQuestionId, livestream.id);
-        }
-    }
-
     const isOpen = (property) => {
         return Boolean(livestream.test
             && showMenu
@@ -201,7 +189,7 @@ const QuestionContainer = ({
     );
 
 
-    let commentsElements = comments.map((comment, index) => {
+    let commentsElements = comments.map(comment => {
         return (
             <Slide key={comment.id} in direction="right">
                 <Box className={classes.questionComment} borderRadius={8} mb={1} p={1} component={Card}>
@@ -342,7 +330,20 @@ const QuestionContainer = ({
             </WhiteTooltip>
         </Grow>
     );
+})
+
+QuestionContainer.propTypes = {
+    goToThisQuestion: PropTypes.func.isRequired,
+    index: PropTypes.number.isRequired,
+    isNextQuestions: PropTypes.bool.isRequired,
+    livestream: PropTypes.object.isRequired,
+    question: PropTypes.object.isRequired,
+    selectedState: PropTypes.any,
+    showMenu: PropTypes.bool,
+    sliding: PropTypes.bool,
+    streamer: PropTypes.bool,
+    user: PropTypes.object
 }
 
-
 export default withFirebase(QuestionContainer);
+

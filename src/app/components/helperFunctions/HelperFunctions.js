@@ -246,3 +246,38 @@ export const getBaseUrl = () => {
 
 export const maybePluralize = (count, noun, suffix = 's') =>
     `${noun}${count !== 1 ? suffix : ''}`;
+
+export const getMinutesPassed = (livestream) => {
+    const now = new Date();
+    if (livestream?.start?.toDate()) {
+        const diff = Math.abs(now - livestream.start.toDate());
+        return Math.floor(diff / 1000 / 60);
+    } else {
+        return null;
+    }
+};
+
+export const  addMinutes = (date, minutes) => {
+    return new Date(date.getTime() + minutes * 60000);
+}
+
+export const makeExternalLink = (url) => {
+    const urlPattern = new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/);
+    let string = url
+
+    if(urlPattern.test(string)){
+        //string is url
+
+        ///clear http && https from string
+        string = string.replace("https://","").replace("http://","");
+
+        //add https to string
+        string = `https://${string}`;
+    }
+    return string
+}
+
+export const getRandomColor = () => {
+    const max = 0xffffff;
+    return '#' + Math.round(Math.random() * max).toString(16);
+}

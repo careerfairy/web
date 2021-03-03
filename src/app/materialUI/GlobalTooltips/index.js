@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => {
         },
         highlight: {
             borderRadius: 10,
-            border: "8px solid transparent",
+            border: "5px solid transparent",
             animation: "$blink 0.7s linear infinite alternate",
         }
     }

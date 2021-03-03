@@ -63,7 +63,7 @@ const ThemeProviderWrapper = ({children}) => {
                     classes={{
                         variantInfo: classes.info
                     }}
-                    maxSnack={3}>
+                    maxSnack={5}>
                     {children}
                 </SnackbarProvider>
             </ThemeProvider>

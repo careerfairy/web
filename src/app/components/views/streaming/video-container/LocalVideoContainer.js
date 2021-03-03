@@ -65,7 +65,6 @@ function LocalVideoContainer(props) {
     const classes = useStyles()
 
     useEffect(() => {
-        debugger;
         console.log(props.localStream);
     },[props.localStream]);
 

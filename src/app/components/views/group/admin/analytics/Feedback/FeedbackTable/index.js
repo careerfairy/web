@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { Box, Card, Divider, Grow, Tabs, Tab, IconButton } from '@material-ui/core';
 import {withFirebase} from "../../../../../../../context/firebase";
-import {prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
+import {addMinutes, prettyDate} from "../../../../../../helperFunctions/HelperFunctions";
 import {
     defaultTableOptions,
     exportSelectionAction,
@@ -269,10 +269,6 @@ const FeedbackTable = ({
     }
     const isPoll = () => {
         return Boolean(streamDataType.propertyName === "pollEntries")
-    }
-
-    function addMinutes(date, minutes) {
-        return new Date(date.getTime() + minutes * 60000);
     }
 
     const canEdit = ({appearAfter, isForEnd}) => {
