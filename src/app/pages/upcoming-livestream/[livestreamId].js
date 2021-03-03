@@ -23,7 +23,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../components/util/constants";
 import {useAuth} from "../../HOCs/AuthProvider";
 import GroupsUtil from "../../data/util/GroupsUtil";
-import { Paper, Avatar, Box } from '@material-ui/core';
+import {Paper, Avatar, Box} from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     speakerAvatar: {
@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
         flexDirection: "column !important",
         alignItems: "center !important"
     },
-    logoWrapper:{
+    logoWrapper: {
         padding: theme.spacing(2)
     }
 }))
@@ -452,7 +452,30 @@ function UpcomingLivestream(props) {
         <div>
             <div className="topLevelContainer">
                 <Head>
-                    <title key="title">CareerFairy | Upcoming Live Stream</title>
+                     {/*Primary Meta Tags */}
+                    <title>CareerFairy | Upcoming Live Stream</title>
+                    <meta name="title" content="CareerFairy | Upcoming Live Stream"/>
+                    <meta name="description"
+                          content={currentLivestream.title}/>
+
+                    {/*Open Graph / Facebook */}
+                    <meta property="og:type" content="website"/>
+                    <meta property="og:url" content="https://metatags.io/"/>
+                    <meta property="og:title" content="CareerFairy | Upcoming Live Stream"/>
+                    <meta property="og:description"
+                          content={currentLivestream.title}/>
+                    <meta property="og:image"
+                          content={currentLivestream.companyLogoUrl}/>
+
+                     {/*Twitter*/}
+                    <meta property="twitter:card" content="summary_large_image"/>
+                    <meta property="twitter:url" content={`https://careerfairy.io/upcoming-livestream/${livestreamId}`}/>
+                    <meta property="twitter:title" content="CareerFairy | Upcoming Live Stream"/>
+                    <meta property="twitter:description"
+                          content={currentLivestream.title}/>
+                    <meta property="twitter:image"
+                          content={currentLivestream.companyLogoUrl}/>
+                    <meta property="og:title" content={currentLivestream.title} key="title"/>
                 </Head>
                 <Header color="white"/>
                 <div
