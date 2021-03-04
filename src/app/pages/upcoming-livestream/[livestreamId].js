@@ -468,7 +468,7 @@ function UpcomingLivestream(props) {
         return <Loader/>;
     }
 
-    if (currentLivestream.hasStarted) {
+    if (typeof window !== 'undefined' && currentLivestream.hasStarted) {
         router.replace("/streaming/" + currentLivestream.id + "/viewer");
     }
 
