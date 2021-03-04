@@ -477,15 +477,15 @@ function UpcomingLivestream(props) {
             <div className="topLevelContainer">
                 <Head>
                     {/*Primary Meta Tags */}
-                    <title>CareerFairy | Upcoming Live Stream</title>
-                    <meta name="title" content="CareerFairy | Upcoming Live Stream"/>
+                    <title>CareerFairy | Live Stream with {currentLivestream.company}</title>
+                    <meta name="title" content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
                     <meta name="description"
                           content={currentLivestream.title}/>
 
                     {/*Open Graph / Facebook */}
                     <meta property="og:type" content="website"/>
                     <meta property="og:url" content={`https://careerfairy.io/upcoming-livestream/${livestreamId}`}/>
-                    <meta property="og:title" content="CareerFairy | Upcoming Live Stream"/>
+                    <meta property="og:title" key="title" content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
                     <meta property="og:site_name" content="CareerFairy"/>
                     <meta property="og:description"
                           content={currentLivestream.title}/>
@@ -496,12 +496,11 @@ function UpcomingLivestream(props) {
                     <meta property="twitter:card" content="summary_large_image"/>
                     <meta property="twitter:url"
                           content={`https://careerfairy.io/upcoming-livestream/${livestreamId}`}/>
-                    <meta property="twitter:title" content="CareerFairy | Upcoming Live Stream"/>
+                    <meta property="twitter:title" content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
                     <meta property="twitter:description"
                           content={currentLivestream.title}/>
                     <meta property="twitter:image"
                           content={currentLivestream.companyLogoUrl}/>
-                    <meta property="og:title" content={currentLivestream.title} key="title"/>
                 </Head>
                 <Header color="white"/>
                 <div
