@@ -5,6 +5,7 @@ import Profile from "./Profile";
 import ProfileDetails from "./ProfileDetails";
 import ProfileCategories from "./ProfileCategories";
 import ProfilePrivacyPolicy from "./ProfilePrivacyPolicy";
+import {withFirebase} from "../../../../../context/firebase";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -75,4 +76,4 @@ const EditOverview = ({firebase, group}) => {
     );
 };
 
-export default EditOverview;
+export default withFirebase(EditOverview);

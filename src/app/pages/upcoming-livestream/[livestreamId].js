@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from "react";
-import {Button, Container, Grid, Icon, Image, Input} from "semantic-ui-react";
-
+import {Container, Grid, Icon, Image, Input} from "semantic-ui-react";
+import {Button, TextField} from '@material-ui/core'
 import Header from "../../components/views/header/Header";
-
+import SettingsIcon from '@material-ui/icons/Settings';
 import {withFirebasePage} from "context/firebase";
+import AddIcon from '@material-ui/icons/Add';
 import Loader from "../../components/views/loader/Loader";
 import DateUtil from "../../util/DateUtil";
 import {useRouter} from "next/router";
@@ -12,18 +13,21 @@ import Countdown from "../../components/views/common/Countdown";
 import BookingModal from "../../components/views/common/booking-modal/BookingModal";
 import QuestionVotingBox from "../../components/views/question-voting-box/QuestionVotingBox";
 import StringUtils from "../../util/StringUtils";
-
+import ClearIcon from '@material-ui/icons/Clear';
 import Head from "next/head";
 import UserUtil from "../../data/util/UserUtil";
 import MulitLineText from "../../components/views/common/MultiLineText";
 import TargetOptions from "../../components/views/NextLivestreams/GroupsCarousel/TargetOptions";
 import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
 import DataAccessUtil from "util/DataAccessUtil";
+import HowToRegRoundedIcon from '@material-ui/icons/HowToRegRounded';
+import EmailIcon from '@material-ui/icons/Email';
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../components/util/constants";
 import {useAuth} from "../../HOCs/AuthProvider";
 import GroupsUtil from "../../data/util/GroupsUtil";
-import { Paper, Avatar, Box } from '@material-ui/core';
+import {store} from '../_app'
+import {Paper, Avatar, Box} from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     speakerAvatar: {
@@ -36,13 +40,29 @@ const useStyles = makeStyles(theme => ({
         flexDirection: "column !important",
         alignItems: "center !important"
     },
-    logoWrapper:{
+    logoWrapper: {
         padding: theme.spacing(2)
+    },
+    input: {
+        background: theme.palette.background.paper
     }
 }))
 
+const parseDates = (stream) => {
+    if (stream.createdDateString) {
+        stream.createdDate = new Date(Date.parse(stream.createdDateString))
+    }
+    if (stream.lastUpdatedDateString) {
+        stream.lastUpdatedDate = new Date(Date.parse(stream.lastUpdatedDateString))
+    }
+    if (stream.startDateString) {
+        stream.startDate = new Date(Date.parse(stream.startDateString))
+    }
+    return stream
+}
 
 function UpcomingLivestream(props) {
+    // console.log("-> UpcomingLivestream props", props);
     const classes = useStyles()
     const router = useRouter();
     const {livestreamId, groupId} = router.query;
@@ -51,7 +71,7 @@ function UpcomingLivestream(props) {
     const {userData, authenticatedUser: user} = useAuth();
     const [upcomingQuestions, setUpcomingQuestions] = useState([]);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
-    const [currentLivestream, setCurrentLivestream] = useState(null);
+    const [currentLivestream, setCurrentLivestream] = useState(parseDates(props.currentLivestream));
     const [registration, setRegistration] = useState(false);
 
     const [userIsInTalentPool, setUserIsInTalentPool] = useState(false);
@@ -104,6 +124,9 @@ function UpcomingLivestream(props) {
                 (querySnapshot) => {
                     if (querySnapshot.data()) {
                         let livestream = querySnapshot.data();
+                        livestream.createdDate = livestream.created.toDate?.()
+                        livestream.lastUpdatedDate = livestream.lastUpdated.toDate?.()
+                        livestream.startDate = livestream.start.toDate?.()
                         livestream.id = querySnapshot.id;
                         setCurrentLivestream(livestream);
                     }
@@ -228,6 +251,7 @@ function UpcomingLivestream(props) {
     }
 
     function sendEmailRegistrationConfirmation() {
+        console.log("-> currentLivestream", currentLivestream);
         return DataAccessUtil.sendRegistrationConfirmationEmail(user, userData, currentLivestream);
     }
 
@@ -414,7 +438,7 @@ function UpcomingLivestream(props) {
 
     let questionElements = upcomingQuestions.map((question, index) => {
         return (
-            <Grid.Column key={index}>
+            <Grid.Column key={question.id || index}>
                 <QuestionVotingBox
                     question={question}
                     user={user}
@@ -440,7 +464,7 @@ function UpcomingLivestream(props) {
         );
     });
 
-    if (!currentLivestream) {
+    if (!currentLivestream.id) {
         return <Loader/>;
     }
 
@@ -452,7 +476,31 @@ function UpcomingLivestream(props) {
         <div>
             <div className="topLevelContainer">
                 <Head>
-                    <title key="title">CareerFairy | Upcoming Live Stream</title>
+                    {/*Primary Meta Tags */}
+                    <title>CareerFairy | Live Stream with {currentLivestream.company}</title>
+                    <meta name="title" content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
+                    <meta name="description"
+                          content={currentLivestream.title}/>
+
+                    {/*Open Graph / Facebook */}
+                    <meta property="og:type" content="website"/>
+                    <meta property="og:url" content={`https://careerfairy.io/upcoming-livestream/${livestreamId}`}/>
+                    <meta property="og:title" key="title" content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
+                    <meta property="og:site_name" content="CareerFairy"/>
+                    <meta property="og:description"
+                          content={currentLivestream.title}/>
+                    <meta property="og:image"
+                          content={currentLivestream.companyLogoUrl}/>
+
+                    {/*Twitter*/}
+                    <meta property="twitter:card" content="summary_large_image"/>
+                    <meta property="twitter:url"
+                          content={`https://careerfairy.io/upcoming-livestream/${livestreamId}`}/>
+                    <meta property="twitter:title" content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
+                    <meta property="twitter:description"
+                          content={currentLivestream.title}/>
+                    <meta property="twitter:image"
+                          content={currentLivestream.companyLogoUrl}/>
                 </Head>
                 <Header color="white"/>
                 <div
@@ -493,13 +541,13 @@ function UpcomingLivestream(props) {
                             >
                 <span>
                   <Icon name="calendar outline alternate"/>
-                    {DateUtil.getPrettyDate(currentLivestream.start.toDate())}
+                    {DateUtil.getPrettyDate(currentLivestream.startDate)}
                 </span>
                             </div>
                             <div
                                 className={
                                     "topDescriptionContainer " +
-                                    (dateIsInUnder24Hours(currentLivestream.start.toDate())
+                                    (dateIsInUnder24Hours(currentLivestream.startDate)
                                         ? ""
                                         : "hidden")
                                 }
@@ -523,7 +571,7 @@ function UpcomingLivestream(props) {
                                     }}
                                 >
                                     <Countdown
-                                        date={currentLivestream.start.toDate()}>
+                                        date={currentLivestream.startDate}>
                     <span style={{margin: "30px"}}>
                       This livestream will start shortly
                     </span>
@@ -552,27 +600,29 @@ function UpcomingLivestream(props) {
                             <div style={{margin: "40px 0", width: "100%"}}>
                                 <div>
                                     <Button
-                                        size="big"
+                                        size="large"
                                         id="register-button"
-                                        content={
+                                        variant="contained"
+                                        children={
                                             user ? registered ? "Cancel" : "I'll attend!" : "Register to attend"
                                         }
-                                        icon={registered ? "delete" : "plus"}
+                                        startIcon={registered ? <ClearIcon/> : <AddIcon/>}
                                         style={{margin: "5px"}}
                                         onClick={
                                             registered
                                                 ? () => deregisterFromLivestream(currentLivestream.id)
                                                 : () => startRegistrationProcess(currentLivestream.id)
                                         }
-                                        color={registered ? null : "teal"}
+                                        color={registered ? "default" : "primary"}
                                     />
                                     <Button
-                                        size="big"
-                                        content={"How Live Streams Work"}
-                                        icon={"cog"}
+                                        size="large"
+                                        children={"How Live Streams Work"}
+                                        startIcon={<SettingsIcon/>}
                                         style={{margin: "5px"}}
                                         onClick={() => goToSeparateRoute("/howitworks")}
-                                        color="pink"
+                                        color="secondary"
+                                        variant="contained"
                                     />
                                 </div>
                             </div>
@@ -601,7 +651,7 @@ function UpcomingLivestream(props) {
                                     }}
                                 >
                                     <Countdown
-                                        date={currentLivestream.start.toDate()}>
+                                        date={currentLivestream.startDate}>
                     <span style={{margin: "30px"}}>
                       This livestream will start shortly
                     </span>
@@ -640,19 +690,21 @@ function UpcomingLivestream(props) {
                         Which questions should the speaker answer during the livestream?
                     </div>
                     <div style={{textAlign: "center"}}>
-                        <Input
-                            size="huge"
+                        <TextField
+                            variant="outlined"
+                            fullWidth
                             value={newQuestionTitle}
+                            className={classes.input}
                             onChange={(event) => setNewQuestionTitle(event.target.value)}
                             maxLength="170"
-                            fluid
                         />
                         <Button
-                            size="huge"
-                            content="Submit Your Question"
+                            size="large"
+                            variant="contained"
+                            children="Submit Your Question"
                             style={{margin: "20px 0 0 0"}}
                             onClick={() => addNewQuestion()}
-                            primary
+                            color="primary"
                         />
                     </div>
                     <div
@@ -722,17 +774,18 @@ function UpcomingLivestream(props) {
                             style={{textAlign: "center"}}
                         >
                             <Button
-                                size="big"
-                                content={
+                                size="large"
+                                children={
                                     userIsInTalentPool ? "Leave Talent Pool" : "Join Talent Pool"
                                 }
-                                icon={userIsInTalentPool ? "delete" : "handshake outline"}
+                                variant="contained"
+                                startIcon={userIsInTalentPool ? <ClearIcon/> : <HowToRegRoundedIcon/>}
                                 onClick={
                                     userIsInTalentPool
                                         ? () => leaveTalentPool()
                                         : () => joinTalentPool()
                                 }
-                                primary={!userIsInTalentPool}
+                                color={userIsInTalentPool ? "default" : "primary"}
                             />
                         </Grid.Column>
                         <Grid.Column width={16}>
@@ -773,8 +826,10 @@ function UpcomingLivestream(props) {
                             href="mailto:thomas@careerfairy.io"
                         >
                             <Button
-                                size="big"
-                                content="Contact CareerFairy"
+                                size="large"
+                                children="Contact CareerFairy"
+                                startIcon={<EmailIcon/>}
+                                variant="contained"
                                 style={{margin: "30px 0 0 0"}}
                             />
                         </a>
@@ -1045,4 +1100,33 @@ function UpcomingLivestream(props) {
     );
 }
 
+export async function getServerSideProps({params: {livestreamId}}) {
+    let currentLivestream = {}
+    const snap = await store.firestore.get({collection: "livestreams", doc: livestreamId})
+    if (snap.exists) {
+        currentLivestream = snap.data()
+        // Clear out sensitive data for initial props
+        delete currentLivestream.registeredUsers
+        delete currentLivestream.talentPool
+        delete currentLivestream.adminEmails
+        delete currentLivestream.adminEmail
+        delete currentLivestream.author
+        delete currentLivestream.status
+
+        currentLivestream.id = snap.id
+        currentLivestream.createdDateString = currentLivestream.created?.toDate?.().toString()
+        currentLivestream.lastUpdatedDateString = currentLivestream.lastUpdated?.toDate?.().toString()
+        currentLivestream.startDateString = currentLivestream.start?.toDate?.().toString()
+
+        // Clear out props that have methods of which the server can't parse
+        delete currentLivestream.created
+        delete currentLivestream.lastUpdated
+        delete currentLivestream.start
+    }
+    return {
+        props: {currentLivestream}, // will be passed to the page component as props
+    }
+}
+
 export default withFirebasePage(UpcomingLivestream);
+

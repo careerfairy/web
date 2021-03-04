@@ -6,6 +6,7 @@ import authReducer from './authReducer';
 import todosReducer from './todosReducer';
 import rtmChannelReducer from "./rtmChannelReducer";
 import emotesReducer from "./emotesReducer";
+import snackbarReducer from "./snackbarReducer";
 
 export default combineReducers({
     auth: authReducer,
@@ -13,5 +14,6 @@ export default combineReducers({
     firebase: firebaseReducer,
     firestore: firestoreReducer,
     rtmChannel: rtmChannelReducer,
-    emotes: emotesReducer
+    emotes: emotesReducer,
+    snackbars: snackbarReducer
 });

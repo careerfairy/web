@@ -643,6 +643,7 @@ class Firebase {
         let ref = this.firestore
             .collection("livestreams")
             .where("universities", "array-contains", universityId)
+            .where("test", "==", false)
             .where("start", ">", currentTime)
             .orderBy("start", "asc")
         return ref.onSnapshot(callback)
@@ -653,6 +654,7 @@ class Firebase {
         let ref = this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
+            .where("test", "==", false)
             .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
             .orderBy("start", "asc")
         return ref.onSnapshot(callback)
@@ -663,6 +665,7 @@ class Firebase {
         let ref = this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
+            .where("test", "==", false)
             .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
             .orderBy("start", "asc")
         return ref.get()
@@ -673,6 +676,7 @@ class Firebase {
         return this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
+            .where("test", "==", false)
             .where("start", ">", new Date(Date.now() - ninetyMinutesInMilliseconds))
             .orderBy("start", "asc")
     }
@@ -706,6 +710,7 @@ class Firebase {
         return this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", groupId)
+            .where("test", "==", false)
             .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
             .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
             .orderBy("start", "desc")
@@ -716,6 +721,7 @@ class Firebase {
         const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
         let ref = this.firestore
             .collection("livestreams")
+            .where("test", "==", false)
             .where("groupIds", "array-contains", groupId)
             .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
             .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
@@ -728,6 +734,7 @@ class Firebase {
         const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45;
         let ref = this.firestore
             .collection("livestreams")
+            .where("test", "==", false)
             .where("groupIds", "array-contains", groupId)
             .where("start", "<", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
             .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
@@ -805,9 +812,9 @@ class Firebase {
         return this.firestore.runTransaction((transaction) => {
             return transaction.get(ref).then((livestreamDoc) => {
                 let livestream = livestreamDoc.data()
-                let updatedSpeakers = livestream.speakers.filter( existingSpeaker => existingSpeaker.id !== speaker.id )
-                updatedSpeakers.forEach( existingSpeaker => {
-                    if ( existingSpeaker.speakerUuid === speaker.speakerUuid ) {
+                let updatedSpeakers = livestream.speakers.filter(existingSpeaker => existingSpeaker.id !== speaker.id)
+                updatedSpeakers.forEach(existingSpeaker => {
+                    if (existingSpeaker.speakerUuid === speaker.speakerUuid) {
                         delete existingSpeaker.speakerUuid;
                     }
                 });
@@ -828,9 +835,9 @@ class Firebase {
                 let livestream = livestreamDoc.data()
                 let speakerRef = this.firestore.collection("livestreams").doc(livestreamDoc.id).collection("speakers").doc();
                 speaker.id = speakerRef.id;
-                let updatedSpeakers = livestream.speakers ? [ ...livestream.speakers ] : []
-                updatedSpeakers.forEach( existingSpeaker => {
-                    if ( existingSpeaker.speakerUuid === speaker.speakerUuid ) {
+                let updatedSpeakers = livestream.speakers ? [...livestream.speakers] : []
+                updatedSpeakers.forEach(existingSpeaker => {
+                    if (existingSpeaker.speakerUuid === speaker.speakerUuid) {
                         delete existingSpeaker.speakerUuid;
                     }
                 });
@@ -901,18 +908,51 @@ class Firebase {
             .collection("livestreams")
             .doc(livestreamId)
             .collection("chatEntries")
-            .orderBy("timestamp", "desc")
             .limit(limit)
+            .orderBy("timestamp", "desc")
         return ref.onSnapshot(callback);
     }
 
     putChatEntry = (livestreamId, chatEntry) => {
         chatEntry.timestamp = this.getServerTimestamp()
+        const newChatEntry = {
+            ...chatEntry,
+            laughing: [],
+            wow: [],
+            heart: [],
+            thumbsUp: []
+        }
         let ref = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("chatEntries");
-        return ref.add(chatEntry);
+        return ref.add(newChatEntry);
+    }
+
+    emoteComment = (livestreamId, chatEntryId, fieldProp, userEmail) => {
+        const otherProps = ["wow", "laughing", "heart", "thumbsUp"].filter(prop => prop !== fieldProp)
+        const chatEntryRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("chatEntries")
+            .doc(chatEntryId)
+        const data = {
+            [fieldProp]: firebase.firestore.FieldValue.arrayUnion(userEmail)
+        }
+        otherProps.forEach(otherProp => {
+            data[otherProp] = firebase.firestore.FieldValue.arrayRemove(userEmail)
+        })
+        return chatEntryRef.update(data)
+    }
+    unEmoteComment = (livestreamId, chatEntryId, fieldProp, userEmail) => {
+        const chatEntryRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("chatEntries")
+            .doc(chatEntryId)
+        return chatEntryRef.update({
+            [fieldProp]: firebase.firestore.FieldValue.arrayRemove(userEmail)
+        })
     }
 
     setLivestreamHasStarted = (hasStarted, livestreamId) => {
@@ -1004,6 +1044,17 @@ class Firebase {
             .doc(livestreamId)
             .collection("participatingStudents");
         return ref.get();
+    }
+    listenToLivestreamParticipatingStudents = (livestreamId, callback) => {
+        const now = new Date()
+        let ref = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("participatingStudents")
+            .where("joined", ">", now)
+            .orderBy("joined", "asc")
+            .limit(1)
+        return ref.onSnapshot(callback);
     }
 
     getLivestreamTalentPoolMembers = (companyId) => {
@@ -1418,6 +1469,7 @@ class Firebase {
         let ref = this.firestore
             .collection("livestreams")
             .where("start", ">", new Date(Date.now() - fortyFiveMinutesInMilliseconds))
+            .where("test", "==", false)
             .orderBy("start", "asc");
         return ref.onSnapshot(callback);
     };
@@ -1508,7 +1560,10 @@ class Firebase {
             .collection("participatingStudents")
             .doc(userData.userEmail)
 
-        batch.set(participantsRef, userData)
+        batch.set(participantsRef, {
+            ...userData,
+            joined: this.getServerTimestamp()
+        })
         batch.update(livestreamRef, {
             participatingStudents: firebase.firestore.FieldValue.arrayUnion(userData.userEmail),
         })
@@ -1616,6 +1671,7 @@ class Firebase {
         const maxDate = timeframe || oneYearAgo
         let ref = this.firestore
             .collection("livestreams")
+            .where("test", "==", false)
             .where("start", ">", maxDate)
             .where("groupIds", "array-contains", groupId)
             .orderBy("start", "desc")

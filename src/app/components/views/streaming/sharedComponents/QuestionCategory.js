@@ -1,4 +1,5 @@
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import PropTypes from 'prop-types'
+import React, {useLayoutEffect, useRef, useState, useEffect, useCallback} from 'react';
 import {
     Badge,
     Button,
@@ -24,6 +25,7 @@ import {
     QuestionContainerHeader,
     QuestionContainerTitle
 } from "../../../../materialUI/GlobalContainers";
+import * as actions from '../../../../store/actions'
 import SwipeableViews from "react-swipeable-views";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
@@ -32,6 +34,8 @@ import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
 import {useAuth} from "../../../../HOCs/AuthProvider";
 import {GreyPermanentMarker} from "../../../../materialUI/GlobalTitles";
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import {useDispatch} from "react-redux";
+import {truncate} from "../../../helperFunctions/HelperFunctions";
 
 const useStyles = makeStyles(theme => ({
     view: {
@@ -88,24 +92,65 @@ const EmptyList = ({isUpcoming}) => {
     )
 }
 
+const now = new Date()
 
-function QuestionCategory({livestream, selectedState, sliding, streamer, firebase, showMenu, isMobile}) {
+const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebase, showMenu, isMobile}) => {
     if (!livestream?.id) {
         return null
     }
     const theme = useTheme()
     const classes = useStyles({isMobile})
+    const dispatch = useDispatch()
     const [showQuestionModal, setShowQuestionModal] = useState(false);
     const [touched, setTouched] = useState(false);
     const [value, setValue] = useState(0)
     const [parentHeight, setParentHeight] = useState(400)
     const [submittingQuestion, setSubmittingQuestion] = useState(false);
-
+    const [goingToQuestion, setGoingToQuestion] = useState(false);
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
 
     const {authenticatedUser, userData} = useAuth();
 
     const parentRef = useRef()
+
+
+    const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming, totalUpcoming] = useInfiniteScroll(
+        firebase.listenToUpcomingLivestreamQuestions(livestream.id), 10
+    );
+
+    const [itemsPast, loadMorePast, hasMorePast] = useInfiniteScroll(
+        firebase.listenToPastLivestreamQuestions(livestream.id), 10
+    );
+
+    useEffect(() => {
+        if (totalUpcoming.length) {
+            const newlyAskedQuestion = [...totalUpcoming].reverse().find(question => question.timestamp.toDate() > now)
+            if (newlyAskedQuestion?.type === "new") {
+                const answerNewQuestion = () => {
+                    goToThisQuestion(newlyAskedQuestion.id)
+                    dispatch(actions.closeSnackbar(newlyAskedQuestion.id))
+                }
+                dispatch(actions.enqueueSnackbar({
+                    message: `${newlyAskedQuestion.displayName} just asked a the following question: ${truncate(newlyAskedQuestion.title, 40)}`,
+                    options: {
+                        variant: "info",
+                        key: newlyAskedQuestion.id,
+                        action: streamer && (
+                            <Button
+                                color="primary"
+                                disabled={goingToQuestion}
+                                variant="contained"
+                                onClick={answerNewQuestion}
+                            >
+                                Answer Now
+                            </Button>
+                        )
+                    }
+                }))
+            }
+        }
+    }, [totalUpcoming]);
+
 
     useLayoutEffect(() => {
         function updateSize() {
@@ -133,14 +178,21 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
         setValue(index);
     }
 
+    const goToThisQuestion = useCallback(async (nextQuestionId) => {
+        try {
+            setGoingToQuestion(true)
+            const currentQuestion = itemsUpcoming.find(question => question.type === 'current');
+            if (currentQuestion) {
+                await firebase.goToNextLivestreamQuestion(currentQuestion.id, nextQuestionId, livestream.id);
+            } else {
+                await firebase.goToNextLivestreamQuestion(null, nextQuestionId, livestream.id);
+            }
+        } catch (e) {
+            dispatch(actions.sendGeneralError(e))
+        }
+        setGoingToQuestion(false)
+    }, [itemsUpcoming, livestream.id, goingToQuestion])
 
-    const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming] = useInfiniteScroll(
-        firebase.listenToUpcomingLivestreamQuestions(livestream.id), 10
-    );
-
-    const [itemsPast, loadMorePast, hasMorePast] = useInfiniteScroll(
-        firebase.listenToPastLivestreamQuestions(livestream.id), 10
-    );
 
     const addNewQuestion = async () => {
         setTouched(true)
@@ -153,11 +205,12 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                 title: newQuestionTitle,
                 votes: 0,
                 type: "new",
-                author: !livestream.test ? authenticatedUser.email : 'test@careerfairy.io'
+                author: !livestream.test ? authenticatedUser.email : 'test@careerfairy.io',
+                displayName: !livestream.test ? `${userData.firstName} ${userData.lastName}` : 'A viewer'
             }
             await firebase.putLivestreamQuestion(livestream.id, newQuestion)
         } catch (e) {
-            console.log("Error", e);
+            dispatch(actions.sendGeneralError(e))
         }
         setSubmittingQuestion(false)
         setNewQuestionTitle("");
@@ -167,12 +220,13 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
     let upcomingQuestionsElements = itemsUpcoming.map((question, index) => {
         return <QuestionContainer key={question.id}
                                   streamer={streamer}
+                                  goToThisQuestion={goToThisQuestion}
                                   isNextQuestions={value === 0}
                                   livestream={livestream}
                                   index={index} sliding={sliding}
                                   showMenu={showMenu}
                                   selectedState={selectedState}
-                                  questions={itemsUpcoming} question={question} user={authenticatedUser}
+                                  question={question} user={authenticatedUser}
                                   userData={userData}/>
 
     });
@@ -182,9 +236,11 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                                   isNextQuestions={value === 1}
                                   livestream={livestream}
                                   index={index}
+                                  sliding={sliding}
                                   showMenu={showMenu}
+                                  goToThisQuestion={goToThisQuestion}
                                   selectedState={selectedState}
-                                  questions={itemsPast} question={question} user={authenticatedUser}
+                                  question={question} user={authenticatedUser}
                                   userData={userData}/>
     });
     const getCount = (isUpcoming) => {
@@ -203,35 +259,35 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                     <AddIcon className={classes.addIcon}/>
                     Add a Question
                 </Fab>}
-                    <Tabs
-                        value={value}
-                        onChange={handleChange}
-                        indicatorColor="primary"
-                        variant={isMobile ? "fullWidth" : "standard"}
-                        textColor="primary"
-                        className={classes.tabs}
-                    >
-                        <Tab
-                            style={{minWidth: "50%"}}
-                            label="Upcoming"
-                            icon={
-                                <Badge color="secondary"
-                                       badgeContent={getCount(true)}>
-                                    <HelpIcon/>
-                                </Badge>
-                            }
-                        />
-                        <Tab
-                            style={{minWidth: "50%"}}
-                            label="Answered"
-                            icon={
-                                <Badge color="secondary"
-                                       badgeContent={getCount()}>
-                                    <CheckCircleIcon/>
-                                </Badge>
-                            }
-                        />
-                    </Tabs>
+                <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    indicatorColor="primary"
+                    variant={isMobile ? "fullWidth" : "standard"}
+                    textColor="primary"
+                    className={classes.tabs}
+                >
+                    <Tab
+                        style={{minWidth: "50%"}}
+                        label="Upcoming"
+                        icon={
+                            <Badge color="secondary"
+                                   badgeContent={getCount(true)}>
+                                <HelpIcon/>
+                            </Badge>
+                        }
+                    />
+                    <Tab
+                        style={{minWidth: "50%"}}
+                        label="Answered"
+                        icon={
+                            <Badge color="secondary"
+                                   badgeContent={getCount()}>
+                                <CheckCircleIcon/>
+                            </Badge>
+                        }
+                    />
+                </Tabs>
             </QuestionContainerHeader>
             <SwipeableViews
                 containerStyle={{WebkitOverflowScrolling: 'touch'}}
@@ -269,13 +325,13 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
                 </TabPanel>
             </SwipeableViews>
             <Dialog TransitionComponent={Slide} PaperProps={{className: classes.dialog}} fullWidth onClose={handleClose}
-                    open={showQuestionModal} basic size='small'>
+                    open={showQuestionModal}>
                 <DialogTitle style={{color: "white"}}>
                     Add a Question
                 </DialogTitle>
                 <DialogContent>
                     <TextField
-                        autoFocus
+                        autoFocus={showQuestionModal}
                         InputProps={{className: classes.dialogInput}}
                         error={Boolean(touched && newQuestionTitle.length < 5)}
                         onBlur={() => setTouched(true)}
@@ -303,5 +359,15 @@ function QuestionCategory({livestream, selectedState, sliding, streamer, firebas
         </CategoryContainerTopAligned>
     );
 }
+QuestionCategory.propTypes = {
+  firebase: PropTypes.object,
+  isMobile: PropTypes.bool.isRequired,
+  livestream: PropTypes.object.isRequired,
+  selectedState: PropTypes.string.isRequired,
+  showMenu: PropTypes.bool.isRequired,
+  sliding: PropTypes.bool,
+  streamer: PropTypes.bool
+}
 
 export default withFirebase(QuestionCategory);
+

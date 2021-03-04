@@ -12,3 +12,5 @@ export {
 export {addTodo, deleteTodo, editTodo} from './todoActions.js';
 export {createEmote, setEmote} from './emotesActions.js';
 export {setRtmChannelObj, removeRtmChannel} from './rtmChannelActions.js';
+
+export {closeSnackbar, enqueueSnackbar, removeSnackbar, sendGeneralError} from './snackbarActions.js'

@@ -56,7 +56,10 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: "black",
         width: "100%",
         margin: "0 auto",
-        zIndex: 2000
+        zIndex: 2000,
+        "& video": {
+            // objectFit: "contain !important",
+        }
     },
 }))
 
@@ -65,7 +68,6 @@ function LocalVideoContainer(props) {
     const classes = useStyles()
 
     useEffect(() => {
-        debugger;
         console.log(props.localStream);
     },[props.localStream]);
 

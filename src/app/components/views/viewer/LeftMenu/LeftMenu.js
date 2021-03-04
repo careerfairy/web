@@ -1,23 +1,23 @@
+import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react';
 import {fade, makeStyles, useTheme} from "@material-ui/core/styles";
 import SwipeableViews from "react-swipeable-views";
 import ChevronLeftRoundedIcon from "@material-ui/icons/ChevronLeftRounded";
-import {Fab} from "@material-ui/core";
-import ButtonComponent from "../../streaming/sharedComponents/ButtonComponent";
+import {Drawer, Fab} from "@material-ui/core";
 import QuestionCategory from "../../streaming/sharedComponents/QuestionCategory";
 import PollCategory from "./categories/PollCategory";
 import HandRaiseCategory from "./categories/HandRaiseCategory";
 import ChatCategory from "../../streaming/LeftMenu/categories/ChatCategory";
 import {TabPanel} from "../../../../materialUI/GlobalPanels/GlobalPanels";
 import clsx from "clsx";
+import {useAuth} from "../../../../HOCs/AuthProvider";
 
 
 const useStyles = makeStyles(theme => ({
-    root: {},
     viewRoot: {
         position: "relative",
         height: "100%",
-        backgroundColor: theme.palette.background.default,
+        // backgroundColor: theme.palette.background.default,
         "& .react-swipeable-view-container": {
             height: "100%"
         }
@@ -35,24 +35,34 @@ const useStyles = makeStyles(theme => ({
         color: theme.palette.type === "dark" && theme.palette.secondary.main
     },
     slides: {
-        backgroundColor: theme.palette.background.default,
-        overflow: "visible !important"
+        // backgroundColor: theme.palette.background.default,
+        // overflow: "visible !important"
     },
     blur: {
         backgroundColor: fade(theme.palette.common.black, 0.2),
         backdropFilter: "blur(5px)",
-    }
+    },
+    mobileDrawer: {
+        width: "100%",
+    },
+    desktopDrawer: {
+        width: 280,
+        top: 55,
+        height: 'calc(100% - 55px)',
+        boxShadow: theme.shadows[15]
+    },
 }))
 
 const states = ["questions", "polls", "hand", "chat"]
 const LeftMenu =
     ({
          handRaiseActive,
-         user,
          toggleShowMenu,
          setHandRaiseActive,
-         userData,
          streamer,
+         setSelectedState,
+         handleStateChange,
+         selectedState,
          livestream,
          setShowMenu,
          showMenu,
@@ -60,10 +70,10 @@ const LeftMenu =
          className,
          ...props
      }) => {
+        const {userData, authenticatedUser: user} = useAuth()
         const theme = useTheme()
-        const classes = useStyles()
+        const classes = useStyles({showMenu, isMobile})
         const [value, setValue] = useState(0);
-        const [selectedState, setSelectedState] = useState("questions");
 
         useEffect(() => {
             if (selectedState === "questions") {
@@ -76,7 +86,6 @@ const LeftMenu =
                 setValue(3)
             }
         }, [selectedState, showMenu, isMobile])
-
         useEffect(() => {
             if (selectedState === "chat" && showMenu && !isMobile) {
                 setSelectedState("questions")
@@ -84,16 +93,14 @@ const LeftMenu =
             }
         }, [selectedState, showMenu, isMobile])
 
-        function handleStateChange(state) {
-            if (!showMenu) {
-                setShowMenu(true);
-            }
-            setSelectedState(state);
-        }
 
         const handleChange = (event, newValue) => {
             setValue(newValue);
             setSelectedState(states[newValue])
+        }
+
+        const handleClose = () => {
+            setShowMenu(false)
         }
 
         const views = [
@@ -121,12 +128,8 @@ const LeftMenu =
                               userData={userData} isStreamer={false}/>
             </TabPanel>)
         }
-
-
-        return (
-            <div className={clsx(classes.root, className, {
-                [classes.blur]: isMobile && showMenu
-            })}>
+        const content = (
+            <>
                 {isMobile && showMenu &&
                 <Fab className={classes.closeBtn} size='large' color='secondary' onClick={toggleShowMenu}>
                     <ChevronLeftRoundedIcon/>
@@ -135,15 +138,57 @@ const LeftMenu =
                     containerStyle={{WebkitOverflowScrolling: 'touch'}}
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                     index={value}
+                    animateTransitions
+                    slideStyle={{ overflowX: "hidden"}}
+                    hysteresis={0.3}
                     slideClassName={classes.slides}
                     className={classes.viewRoot}
                     onChangeIndex={handleChange}>
                     {views}
                 </SwipeableViews>
-                <ButtonComponent selectedState={selectedState} showMenu={showMenu} isMobile={isMobile}
-                                 handleStateChange={handleStateChange} {...props}/>
-            </div>
+            </>
+        )
+
+        return (
+            <>
+                {isMobile ? <Drawer
+                        anchor="left"
+                        classes={{paper: clsx(classes.mobileDrawer, classes.blur)}}
+                        onClose={handleClose}
+                        open={showMenu}
+                        keepMounted
+                        variant="persistent"
+                    >
+                        {content}
+                    </Drawer>
+                    :
+                    <Drawer
+                        anchor="left"
+                        keepMounted
+                        classes={{paper: clsx(classes.desktopDrawer, classes.blur)}}
+                        open
+                        variant="persistent"
+                    >
+                        {content}
+                    </Drawer>}
+            </>
         );
     };
 
+LeftMenu.propTypes = {
+    className: PropTypes.string,
+    handRaiseActive: PropTypes.bool,
+    handleStateChange: PropTypes.func.isRequired,
+    isMobile: PropTypes.bool,
+    livestream: PropTypes.object,
+    selectedState: PropTypes.string.isRequired,
+    setHandRaiseActive: PropTypes.func.isRequired,
+    setSelectedState: PropTypes.func.isRequired,
+    setShowMenu: PropTypes.func.isRequired,
+    showMenu: PropTypes.bool.isRequired,
+    streamer: PropTypes.any,
+    toggleShowMenu: PropTypes.any,
+}
+
 export default LeftMenu;
+

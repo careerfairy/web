@@ -22,10 +22,10 @@ import {createFirestoreInstance} from "redux-firestore";
 import {Provider} from "react-redux";
 import {ThemeProviderWrapper} from "../context/theme/ThemeContext";
 import {CssBaseline} from '@material-ui/core';
+import Notifier from "../components/views/notifier";
 
 
 config({ssrFadeout: true});
-
 
 
 // react-redux-firebase config
@@ -35,7 +35,7 @@ const rrfConfig = {
     attachAuthIsReady: true, // attaches auth is ready promise to store
 };
 
-const store = newStore();
+export const store = newStore();
 const rrfProps = {
     firebase,
     config: rrfConfig,
@@ -108,37 +108,33 @@ function MyApp({Component, pageProps}) {
             </Head>
             <Provider store={store}>
                 <ReactReduxFirebaseProvider {...rrfProps}>
-                    <AuthProvider firebase={firebase}>
-                        <FirebaseContext.Provider value={firebase}>
-                            <ThemeProviderWrapper>
+                    <ThemeProviderWrapper>
+                        <AuthProvider firebase={firebase}>
+                            <FirebaseContext.Provider value={firebase}>
                                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
 
-                                        <TutorialContext.Provider value={{
-                                            tutorialSteps,
-                                            setTutorialSteps,
-                                            showBubbles,
-                                            setShowBubbles,
-                                            getActiveTutorialStepKey,
-                                            handleConfirmStep,
-                                            isOpen
-                                        }}>
-                                            <ErrorContext.Provider value={{generalError, setGeneralError}}>
-                                                {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                                                <CssBaseline/>
-                                                {Component.layout ?
-                                                    <Component.layout>
-                                                        <Component {...pageProps} />
-                                                    </Component.layout>
-                                                    :
-                                                    <Component {...pageProps} />}
-                                                <ErrorSnackBar handleClose={() => setGeneralError("")}
-                                                               errorMessage={generalError}/>
-                                            </ErrorContext.Provider>
-                                        </TutorialContext.Provider>
+                                    <TutorialContext.Provider value={{
+                                        tutorialSteps,
+                                        setTutorialSteps,
+                                        showBubbles,
+                                        setShowBubbles,
+                                        getActiveTutorialStepKey,
+                                        handleConfirmStep,
+                                        isOpen
+                                    }}>
+                                        <ErrorContext.Provider value={{generalError, setGeneralError}}>
+                                            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                                            <CssBaseline/>
+                                            <Component {...pageProps} />
+                                            <Notifier/>
+                                            <ErrorSnackBar handleClose={() => setGeneralError("")}
+                                                           errorMessage={generalError}/>
+                                        </ErrorContext.Provider>
+                                    </TutorialContext.Provider>
                                 </MuiPickersUtilsProvider>
-                            </ThemeProviderWrapper>
-                        </FirebaseContext.Provider>
-                    </AuthProvider>
+                            </FirebaseContext.Provider>
+                        </AuthProvider>
+                    </ThemeProviderWrapper>
                 </ReactReduxFirebaseProvider>
             </Provider>
         </Fragment>

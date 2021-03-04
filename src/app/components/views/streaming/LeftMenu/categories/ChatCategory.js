@@ -1,14 +1,15 @@
-import React, {useState, useEffect, useContext} from 'react';
+import PropTypes from 'prop-types'
+import React, {useCallback, useEffect, useState} from 'react';
 import {withFirebase} from '../../../../../context/firebase';
 import {grey} from "@material-ui/core/colors";
-import {css} from 'glamor';
-import { Collapse, TextField, Typography, IconButton } from "@material-ui/core";
-import {makeStyles, fade} from "@material-ui/core/styles";
+import {IconButton, TextField, Typography} from "@material-ui/core";
+import {fade, makeStyles} from "@material-ui/core/styles";
 import ChevronRightRoundedIcon from "@material-ui/icons/ChevronRightRounded";
 import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
-import ChatEntryContainer from './chat/chat-entry-container/ChatEntryContainer';
+import ChatEntryContainer from './chat/ChatEntryContainer';
 import CustomScrollToBottom from "../../../../util/CustomScrollToBottom";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
+import EmotesModal from "./chat/EmotesModal";
 
 const useStyles = makeStyles(theme => ({
     sendIcon: {
@@ -41,12 +42,15 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-end",
-        height: "calc(100vh - 118px)",
+        height: "calc(100vh - 66px)",
         "& div": {
             overflowX: "hidden",
         }
     },
-    chatContainer:{
+    entriesWrapper: {
+        padding: theme.spacing(1)
+    },
+    chatContainer: {
         height: "100vh", display: "flex", flexDirection: "column"
     },
     chatContent: {
@@ -57,7 +61,7 @@ const useStyles = makeStyles(theme => ({
         padding: theme.spacing(1.4),
         background: theme.palette.background.paper
     },
-    chatTitle:{
+    chatTitle: {
         display: "flex",
         width: "100%",
         justifyContent: "center",
@@ -68,8 +72,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
-
+const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
 
     const {authenticatedUser, userData} = useAuth();
     const [focused, setFocused] = useState(false);
@@ -78,6 +81,7 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
     const [newChatEntry, setNewChatEntry] = useState('');
     const [chatEntries, setChatEntries] = useState([]);
     const [submitting, setSubmitting] = useState(false);
+    const [currentEntry, setCurrentEntry] = useState(null);
 
     const isEmpty = (!(newChatEntry.trim()) || (!userData && !livestream.test && !isStreamer))
     const classes = useStyles({isEmpty})
@@ -85,13 +89,8 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
     useEffect(() => {
         if (livestream.id) {
             const unsubscribe = firebase.listenToChatEntries(livestream.id, 150, querySnapshot => {
-                var chatEntries = [];
-                querySnapshot.forEach(doc => {
-                    let entry = doc.data();
-                    entry.id = doc.id;
-                    chatEntries.unshift(entry);
-                });
-                setChatEntries(chatEntries);
+                const newEntries = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()})).reverse()
+                setChatEntries(newEntries);
             });
             return () => unsubscribe();
         }
@@ -126,18 +125,22 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
         }
     }
 
-    const ROOT_CSS = css({
-        height: '100%',
-        zIndex: 9000,
-        display: "flex",
-        flexDirection: "column",
-    });
+    const handleClearCurrentEntry = () => {
+        setCurrentEntry(null)
+    }
 
-    let chatElements = chatEntries.map((chatEntry, index) => {
-        return (
-            <ChatEntryContainer key={chatEntry?.id} chatEntry={chatEntry}/>
-        );
-    });
+
+    const handleSetCurrentEntry = useCallback((chatEntry) => {
+        setCurrentEntry(chatEntry)
+    }, [])
+
+    const chatElements = chatEntries.map(chatEntry =>
+        <ChatEntryContainer
+            handleSetCurrentEntry={handleSetCurrentEntry}
+            currentEntry={currentEntry}
+            key={chatEntry?.id}
+            chatEntry={chatEntry}
+        />);
 
     const playIcon = (<div>
         <IconButton classes={{root: classes.sendBtn, disabled: classes.buttonDisabled}} disabled={isEmpty}
@@ -148,19 +151,20 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
 
     return (
         <div className={classes.chatContainer}>
-            <CustomScrollToBottom className={classes.scrollToBottom} scrollItems={chatElements}/>
+            <CustomScrollToBottom scrollViewClassName={classes.entriesWrapper} className={classes.scrollToBottom}
+                                  scrollItems={chatElements}/>
             <div className={classes.chatContent}>
-                <div className={classes.chatTitle}>
-                    <ForumOutlinedIcon color="primary" fontSize="small"/>
-                    <Typography style={{marginLeft: "0.6rem"}}>
-                        Main Chat
-                    </Typography>
-                </div>
-                <div style={{margin: 5}}>
+                {/*<div className={classes.chatTitle}>*/}
+                {/*    <ForumOutlinedIcon color="primary" fontSize="small"/>*/}
+                {/*    <Typography style={{marginLeft: "0.6rem"}}>*/}
+                {/*        Main Chat*/}
+                {/*    </Typography>*/}
+                {/*</div>*/}
+                <div >
                     <TextField
                         variant="outlined"
                         fullWidth
-                        autoFocus
+                        autoFocus={selectedState === "chat"}
                         onBlur={() => setFocused(false)}
                         onFocus={() => setFocused(true)}
                         className={classes.chatInput}
@@ -175,8 +179,17 @@ function ChatCategory({isStreamer, livestream, selectedState, firebase}) {
                         }}/>
                 </div>
             </div>
+            <EmotesModal chatEntry={currentEntry} onClose={handleClearCurrentEntry}/>
         </div>
     );
 }
 
+ChatCategory.propTypes = {
+    firebase: PropTypes.object,
+    isStreamer: PropTypes.bool,
+    livestream: PropTypes.object.isRequired,
+    selectedState: PropTypes.string
+}
+
 export default withFirebase(ChatCategory);
+
