@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme => ({
         fontSize: theme.spacing(1.3)
     },
 }))
-const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing, id}, onClick}) => {
+const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}, onClick}) => {
 
     const classes = useStyles()
     const [emotes, setEmotes] = useState([]);
