@@ -162,4 +162,4 @@ ChatEntryContainer.propTypes = {
     handleSetCurrentEntry: PropTypes.func.isRequired
 }
 
-export default withFirebase(ChatEntryContainer);
+export default withFirebase(memo(ChatEntryContainer));
