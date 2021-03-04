@@ -57,7 +57,7 @@ const useStyles = makeStyles(theme => ({
 const StreamerTopBar = ({firebase, numberOfViewers, isMainStreamer, showAudience}) => {
     const {currentLivestream} = useCurrentStream()
 
-    const classes = useStyles()
+    const classes = useStyles({hasStarted: currentLivestream?.hasStarted})
     const theme = useTheme()
     const mobile = useMediaQuery(theme.breakpoints.down('md'))
     const {query: {livestreamId}} = useRouter()

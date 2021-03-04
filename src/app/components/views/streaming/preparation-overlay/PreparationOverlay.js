@@ -252,6 +252,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                                     <TextField error={formErrors.firstName && isEmpty(speaker.firstName.trim())}
                                                helperText={formErrors.firstName && "Required"} id="outlined-basic"
                                                label="First Name" variant="outlined"
+                                               name="firstName"
                                                value={!profileInList ? speaker.firstName : ""}
                                                onChange={(event) => setSpeaker({
                                                    ...speaker,
@@ -262,6 +263,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                                     <TextField error={formErrors.lastName && isEmpty(speaker.lastName.trim())}
                                                helperText={formErrors.lastName && "Required"} id="outlined-basic"
                                                label="Last Name" variant="outlined"
+                                               name="lastName"
                                                value={!profileInList ? speaker.lastName : ""}
                                                onChange={(event) => setSpeaker({
                                                    ...speaker,
@@ -272,6 +274,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                                     <TextField error={formErrors.position && isEmpty(speaker.position.trim())}
                                                helperText={formErrors.position && "Required"} id="outlined-basic"
                                                label="Occupation" placeholder="Lead Engineer"
+                                               name="jobTitle"
                                                value={!profileInList ? speaker.position : ""} variant="outlined"
                                                onChange={(event) => setSpeaker({
                                                    ...speaker,
