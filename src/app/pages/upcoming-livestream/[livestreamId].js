@@ -20,6 +20,8 @@ import MulitLineText from "../../components/views/common/MultiLineText";
 import TargetOptions from "../../components/views/NextLivestreams/GroupsCarousel/TargetOptions";
 import GroupJoinToAttendModal from "components/views/NextLivestreams/GroupStreams/GroupJoinToAttendModal";
 import DataAccessUtil from "util/DataAccessUtil";
+import HowToRegRoundedIcon from '@material-ui/icons/HowToRegRounded';
+import EmailIcon from '@material-ui/icons/Email';
 import {makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../components/util/constants";
 import {useAuth} from "../../HOCs/AuthProvider";
@@ -41,7 +43,7 @@ const useStyles = makeStyles(theme => ({
     logoWrapper: {
         padding: theme.spacing(2)
     },
-    input:{
+    input: {
         background: theme.palette.background.paper
     }
 }))
@@ -436,7 +438,7 @@ function UpcomingLivestream(props) {
 
     let questionElements = upcomingQuestions.map((question, index) => {
         return (
-            <Grid.Column key={index}>
+            <Grid.Column key={question.id || index}>
                 <QuestionVotingBox
                     question={question}
                     user={user}
@@ -482,8 +484,9 @@ function UpcomingLivestream(props) {
 
                     {/*Open Graph / Facebook */}
                     <meta property="og:type" content="website"/>
-                    <meta property="og:url" content="https://metatags.io/"/>
+                    <meta property="og:url" content={`https://careerfairy.io/upcoming-livestream/${livestreamId}`}/>
                     <meta property="og:title" content="CareerFairy | Upcoming Live Stream"/>
+                    <meta property="og:site_name" content="CareerFairy"/>
                     <meta property="og:description"
                           content={currentLivestream.title}/>
                     <meta property="og:image"
@@ -689,7 +692,6 @@ function UpcomingLivestream(props) {
                     </div>
                     <div style={{textAlign: "center"}}>
                         <TextField
-                            size="huge"
                             variant="outlined"
                             fullWidth
                             value={newQuestionTitle}
@@ -773,17 +775,18 @@ function UpcomingLivestream(props) {
                             style={{textAlign: "center"}}
                         >
                             <Button
-                                size="big"
-                                content={
+                                size="large"
+                                children={
                                     userIsInTalentPool ? "Leave Talent Pool" : "Join Talent Pool"
                                 }
-                                icon={userIsInTalentPool ? "delete" : "handshake outline"}
+                                variant="contained"
+                                startIcon={userIsInTalentPool ? <ClearIcon/> : <HowToRegRoundedIcon/>}
                                 onClick={
                                     userIsInTalentPool
                                         ? () => leaveTalentPool()
                                         : () => joinTalentPool()
                                 }
-                                primary={!userIsInTalentPool}
+                                color={userIsInTalentPool ? "default" : "primary"}
                             />
                         </Grid.Column>
                         <Grid.Column width={16}>
@@ -824,8 +827,10 @@ function UpcomingLivestream(props) {
                             href="mailto:thomas@careerfairy.io"
                         >
                             <Button
-                                size="big"
-                                content="Contact CareerFairy"
+                                size="large"
+                                children="Contact CareerFairy"
+                                startIcon={<EmailIcon/>}
+                                variant="contained"
                                 style={{margin: "30px 0 0 0"}}
                             />
                         </a>
@@ -1114,6 +1119,7 @@ export async function getServerSideProps({params: {livestreamId}}) {
         currentLivestream.lastUpdatedDateString = currentLivestream.lastUpdated?.toDate?.().toString()
         currentLivestream.startDateString = currentLivestream.start?.toDate?.().toString()
 
+        // Clear out props that have methods of which the server can't parse
         delete currentLivestream.created
         delete currentLivestream.lastUpdated
         delete currentLivestream.start
