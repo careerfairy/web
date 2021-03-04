@@ -35,7 +35,7 @@ const rrfConfig = {
     attachAuthIsReady: true, // attaches auth is ready promise to store
 };
 
-const store = newStore();
+export const store = newStore();
 const rrfProps = {
     firebase,
     config: rrfConfig,

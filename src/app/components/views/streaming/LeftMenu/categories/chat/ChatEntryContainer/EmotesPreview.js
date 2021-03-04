@@ -81,7 +81,7 @@ const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}, onClick}) =
 
 EmotesPreview.propTypes = {
   chatEntry: PropTypes.object.isRequired,
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
 }
 export default EmotesPreview
 
