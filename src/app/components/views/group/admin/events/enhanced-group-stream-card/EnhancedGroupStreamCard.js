@@ -326,7 +326,7 @@ const EnhancedGroupStreamCard = ({
                     Get Streamer Links
                 </Button>}
                 <StreamerLinksDialog livestreamId={livestream.id} openDialog={openStreamerLinksDialog} setOpenDialog={setOpenStreamerLinksDialog}/>
-                {isCareerCenter() || userData?.isAdmin &&
+                {(isCareerCenter() || userData?.isAdmin) &&
                 <CSVLink data={registeredStudentsFromGroup} separator={";"}
                          filename={'Registered Students ' + livestream.company + ' ' + livestream.id + '.csv'}
                          style={{color: 'red'}}>
