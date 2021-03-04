@@ -195,6 +195,12 @@ function UpcomingLivestream(props) {
         }
     }, [currentLivestream, userData]);
 
+    useEffect(() => {
+        if (currentLivestream.hasStarted) {
+            router.replace?.("/streaming/" + currentLivestream.id + "/viewer");
+        }
+    }, [currentLivestream.hasStarted])
+
     function goToSeparateRoute(route) {
         window.open("http://careerfairy.io" + route, "_blank");
     }
@@ -251,7 +257,6 @@ function UpcomingLivestream(props) {
     }
 
     function sendEmailRegistrationConfirmation() {
-        console.log("-> currentLivestream", currentLivestream);
         return DataAccessUtil.sendRegistrationConfirmationEmail(user, userData, currentLivestream);
     }
 
@@ -468,9 +473,6 @@ function UpcomingLivestream(props) {
         return <Loader/>;
     }
 
-    if (currentLivestream.hasStarted) {
-        router.replace("/streaming/" + currentLivestream.id + "/viewer");
-    }
 
     return (
         <div>
@@ -485,7 +487,8 @@ function UpcomingLivestream(props) {
                     {/*Open Graph / Facebook */}
                     <meta property="og:type" content="website"/>
                     <meta property="og:url" content={`https://careerfairy.io/upcoming-livestream/${livestreamId}`}/>
-                    <meta property="og:title" key="title" content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
+                    <meta property="og:title" key="title"
+                          content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
                     <meta property="og:site_name" content="CareerFairy"/>
                     <meta property="og:description"
                           content={currentLivestream.title}/>
@@ -496,7 +499,8 @@ function UpcomingLivestream(props) {
                     <meta property="twitter:card" content="summary_large_image"/>
                     <meta property="twitter:url"
                           content={`https://careerfairy.io/upcoming-livestream/${livestreamId}`}/>
-                    <meta property="twitter:title" content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
+                    <meta property="twitter:title"
+                          content={`CareerFairy | Live Stream with ${currentLivestream.company}`}/>
                     <meta property="twitter:description"
                           content={currentLivestream.title}/>
                     <meta property="twitter:image"
