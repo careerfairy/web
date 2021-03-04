@@ -42,7 +42,7 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-end",
-        height: "calc(100vh - 118px)",
+        height: "calc(100vh - 66px)",
         "& div": {
             overflowX: "hidden",
         }
@@ -154,13 +154,13 @@ const ChatCategory = ({isStreamer, livestream, selectedState, firebase}) => {
             <CustomScrollToBottom scrollViewClassName={classes.entriesWrapper} className={classes.scrollToBottom}
                                   scrollItems={chatElements}/>
             <div className={classes.chatContent}>
-                <div className={classes.chatTitle}>
-                    <ForumOutlinedIcon color="primary" fontSize="small"/>
-                    <Typography style={{marginLeft: "0.6rem"}}>
-                        Main Chat
-                    </Typography>
-                </div>
-                <div style={{margin: 5}}>
+                {/*<div className={classes.chatTitle}>*/}
+                {/*    <ForumOutlinedIcon color="primary" fontSize="small"/>*/}
+                {/*    <Typography style={{marginLeft: "0.6rem"}}>*/}
+                {/*        Main Chat*/}
+                {/*    </Typography>*/}
+                {/*</div>*/}
+                <div >
                     <TextField
                         variant="outlined"
                         fullWidth

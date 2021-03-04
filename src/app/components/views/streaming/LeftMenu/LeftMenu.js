@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
         height: "100%",
         // backgroundColor: "rgb(220,220,220)",
         "& .react-swipeable-view-container": {
-            height: "100%"
+            height: "100%",
         }
     },
     closeBtn: {
@@ -130,6 +130,7 @@ const LeftMenu = ({
                 containerStyle={{WebkitOverflowScrolling: 'touch'}}
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
+                slideStyle={{ overflowX: "hidden"}}
                 onTransitionEnd={() => setSliding(false)}
                 className={classes.viewRoot}
                 onChangeIndex={handleChange}>

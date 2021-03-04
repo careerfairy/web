@@ -139,6 +139,7 @@ const LeftMenu =
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                     index={value}
                     animateTransitions
+                    slideStyle={{ overflowX: "hidden"}}
                     hysteresis={0.3}
                     slideClassName={classes.slides}
                     className={classes.viewRoot}
