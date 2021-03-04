@@ -56,8 +56,7 @@ const UserResume = ({firebase, userData}) => {
 
     const [open, setOpen] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(1);
-    const [shareCvWithTalentPool, setShareCvWithTalentPool] = useState(true);
-    const classes = useStyles({ shareCvWithTalentPool: shareCvWithTalentPool })
+    const classes = useStyles({ shareCvWithTalentPool: userData?.shareResume })
 
     
     const uploadLogo = (logoFile) => {
@@ -112,6 +111,10 @@ const UserResume = ({firebase, userData}) => {
             dispatch(actions.editUserProfile({ userResume: '' }))
         });
     };
+
+    const updateShareCvStatus = (event) => {
+        dispatch(actions.editUserProfile({ shareResume: event.target.checked }))
+    }
 
     const handleToggle = () => {
         setOpen((prevOpen) => !prevOpen);
@@ -202,7 +205,7 @@ const UserResume = ({firebase, userData}) => {
                             )}
                         </Popper>
                         <div className={classes.switch} >
-                            <Switch checked={shareCvWithTalentPool} onChange={() => setShareCvWithTalentPool(!shareCvWithTalentPool)} color='primary'/>
+                            <Switch checked={userData?.shareResume} onChange={updateShareCvStatus} color='primary'/>
                             I want to share my CV with a company when joining their Talent Pool.
                         </div>
                     </div>

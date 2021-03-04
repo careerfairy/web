@@ -5,6 +5,8 @@ import {withFirebase} from "context/firebase";
 import UserResume from 'components/views/profile/userData/user-resume/UserResume';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import { Dialog, DialogContent, ButtonGroup, Button, Typography } from '@material-ui/core';
+import { useDispatch } from 'react-redux';
+import * as actions from 'store/actions'
 
 const useStyles = makeStyles(theme => ({
     iconInButton: {
@@ -44,6 +46,8 @@ function JoinTalentPoolModal({livestream, userData, modalOpen, setModalOpen, fir
     const [withCV, setWithCV] = useState(undefined);
     const [loading, setLoading] = useState(false);
 
+    const dispatch = useDispatch()
+
     useEffect(() => {
         if (withCV !== undefined) {
             setLoading(true)
@@ -64,6 +68,11 @@ function JoinTalentPoolModal({livestream, userData, modalOpen, setModalOpen, fir
             setWithCV(undefined)
         }
     }, [modalOpen])
+
+    const handleShareCvSelection = (value) => {
+        dispatch(actions.editUserProfile({ shareResume: value }))
+        setWithCV(value)
+    }
  
     const ShareCVSelect = ({}) => {
         return (
@@ -71,10 +80,10 @@ function JoinTalentPoolModal({livestream, userData, modalOpen, setModalOpen, fir
                 <div className={classes.description}>
                     <img className={classes.companyLogo} src={livestream.companyLogoUrl}/>
                 </div>
-                <Typography className={classes.title} variant='h4'>Would you like to share your CV with <br/><em>{ livestream.company }</em> ?</Typography>
+                <Typography className={classes.title} variant='h4'>Would you like to share your CV when joining the Talent Pool ?</Typography>
                 <ButtonGroup size="large" className={classes.buttons}>
-                    <Button onClick={() => setWithCV(true)}>Yes</Button>
-                    <Button onClick={() => setWithCV(false)}>No</Button>
+                    <Button onClick={() => handleShareCvSelection(true)}>Yes</Button>
+                    <Button onClick={() => handleShareCvSelection(false)}>No</Button>
                 </ButtonGroup>
             </div>
         )
@@ -84,7 +93,7 @@ function JoinTalentPoolModal({livestream, userData, modalOpen, setModalOpen, fir
         return (
             <div>
                 <UserResume userData={userData} />
-                <Button onClick={() => setModalOpen(false)}>Cancel</Button>
+                <Button onClick={() => handleShareCvSelection(false)}>Skip</Button>
             </div>
         )
     }
