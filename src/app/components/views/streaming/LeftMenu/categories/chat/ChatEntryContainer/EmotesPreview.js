@@ -34,7 +34,7 @@ const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}, onClick}) =
 
     const classes = useStyles()
     const [emotes, setEmotes] = useState([]);
-
+    const [total, setTotal] = useState(0);
     useEffect(() => {
         const newEmotes = [
             {
@@ -62,7 +62,9 @@ const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}, onClick}) =
                 data: thumbsUp
             },
         ].filter(emote => emote.data?.length)
+        const newTotal = newEmotes.reduce((acc, curr) => acc + (curr.data.length || 0) , 0)
         setEmotes(newEmotes)
+        setTotal(newTotal)
 
     }, [wow, heart, thumbsUp, laughing])
 
@@ -72,7 +74,7 @@ const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}, onClick}) =
             <Paper onClick={onClick} className={classes.emotesPreviewPaperWrapper}>
                 {emotes.map(({alt, src, prop}) => <img key={prop} className={classes.previewImg} alt={alt} src={src}/>)}
                 <Typography className={classes.totalText}>
-                    {emotes.length}
+                    {total || 0}
                 </Typography>
             </Paper>
         </Zoom>
@@ -80,8 +82,8 @@ const EmotesPreview = ({chatEntry: {wow, heart, thumbsUp, laughing}, onClick}) =
 }
 
 EmotesPreview.propTypes = {
-  chatEntry: PropTypes.object.isRequired,
-  onClick: PropTypes.func.isRequired,
+    chatEntry: PropTypes.object.isRequired,
+    onClick: PropTypes.func.isRequired,
 }
 export default EmotesPreview
 
