@@ -194,8 +194,9 @@ const ViewerLayout = (props) => {
         if (!iconsDisabled) {
             dispatch(actions.createEmote(iconName))
             setIconsDisabled(true);
+            firebase.postIcon(livestreamId, iconName, authenticatedUser.email);
         }
-    }, [iconsDisabled])
+    }, [iconsDisabled, livestreamId, authenticatedUser])
 
     const enableIcons = useCallback(() => {
         setIconsDisabled(false)
