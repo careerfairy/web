@@ -6,7 +6,7 @@ import {useRouter} from "next/router";
 import {useAuth} from "../../HOCs/AuthProvider";
 
 
-const useDashboardInvite = (group, isAdmin, firebase, isCompany) => {
+const useDashboardInvite = (group, firebase, isCompany) => {
     const [joiningGroup, setJoiningGroup] = useState(false);
     const {query: {dashboardInviteId}, pathname, replace} = useRouter()
     const dispatch = useDispatch()
@@ -15,7 +15,12 @@ const useDashboardInvite = (group, isAdmin, firebase, isCompany) => {
     const enqueueSnackbar = (...args) => dispatch(actions.enqueueSnackbar(...args))
     const enqueueErrorSnackbar = (error) => dispatch(actions.sendGeneralError(error))
 
-    const analyticsPath = isCompany ? `/company/${group.id}/admin/analytics` : `/group/${group.id}/admin/analytics`
+    const isAdmin = () => {
+        return userData?.isAdmin
+            || (group?.adminEmails?.includes(authenticatedUser?.email))
+    }
+
+    const analyticsPath = isCompany ? `/company/${group?.id}/admin/analytics` : `/group/${group?.id}/admin/analytics`
     const basePath = isCompany ? "/company/[companyId]/admin" : "/group/[groupId]/admin"
 
 
@@ -49,7 +54,7 @@ const useDashboardInvite = (group, isAdmin, firebase, isCompany) => {
                 await replace("/");
                 return
             }
-            if (pathname === basePath && isLoaded(group) && !isEmpty(group) && isAdmin) {
+            if (pathname === basePath && isLoaded(group) && !isEmpty(group) && isAdmin()) {
                 await replace(analyticsPath)
             }
         })()
@@ -59,7 +64,7 @@ const useDashboardInvite = (group, isAdmin, firebase, isCompany) => {
 
     const unAuthorized = () => {
         return Boolean(
-            ((isLoaded(group) && !isEmpty(group) && authenticatedUser.isLoaded && userData) && !isAdmin)
+            ((isLoaded(group) && !isEmpty(group) && authenticatedUser.isLoaded && userData) && !isAdmin())
         )
     }
 
@@ -68,22 +73,26 @@ const useDashboardInvite = (group, isAdmin, firebase, isCompany) => {
             const isValidInvite = await firebase.validateDashboardInvite(dashboardInviteId, group.id)
             if (!isValidInvite) {
                 await replace("/")
+                const message = "This invite link provided is no longer valid"
                 enqueueSnackbar({
-                    message: "This invite link provided is no longer valid",
+                    message,
                     options: {
                         variant: "error",
                         preventDuplicate: true,
+                        key: message
                     }
                 })
             } else {
                 setJoiningGroup(true)
                 await firebase.joinGroupDashboard(group.id, userData.userEmail, dashboardInviteId)
                 await replace(analyticsPath)
+                const message = `Congrats, you are now an admin of ${isCompany ? group.companyName : group.universityName}`
                 enqueueSnackbar({
-                    message: `Congrats, you are now an admin of ${isCompany ? group.companyName : group.universityName}`,
+                    message,
                     options: {
                         variant: "success",
                         preventDuplicate: true,
+                        key: message
                     }
                 })
             }

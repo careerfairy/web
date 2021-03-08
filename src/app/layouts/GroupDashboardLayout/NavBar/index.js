@@ -176,15 +176,23 @@ const NavBar = ({
 };
 
 NavBar.propTypes = {
-    onMobileClose: PropTypes.func,
-    openMobile: PropTypes.bool
-};
+  drawerBottomLinks: PropTypes.array,
+  drawerTopLinks: PropTypes.array,
+  group: PropTypes.any,
+  headerLinks: PropTypes.array,
+  logout: PropTypes.any,
+  onMobileClose: PropTypes.func,
+  openMobile: PropTypes.bool
+}
 
 NavBar.defaultProps = {
-    onMobileClose: () => {
+  drawerBottomLinks: [],
+  drawerTopLinks: [],
+  headerLinks: [],
+  onMobileClose: () => {
     },
-    openMobile: false
-};
+  openMobile: false
+}
 
 const mapDispatchToProps = {
     logout: actions.signOut,
