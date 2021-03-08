@@ -15,7 +15,7 @@ const useAdminGroup = (groupId, isCompany) => {
     const queries = useMemo(() => {
         let queriesArray = []
         const targetId = groupId
-        const targetCollection =  isCompany ? COMPANY_COLLECTION : CAREER_CENTER_COLLECTION
+        const targetCollection = isCompany ? COMPANY_COLLECTION : CAREER_CENTER_COLLECTION
         if (targetId) {
             queriesArray.push(...[{
                     collection: targetCollection,

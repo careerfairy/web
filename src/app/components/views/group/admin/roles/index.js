@@ -18,7 +18,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const RolesOverview = ({firebase, group}) => {
+const RolesOverview = ({firebase, group, isCompany}) => {
     const {enqueueSnackbar} = useSnackbar()
     const classes = useStyles()
     const [kicking, setKicking] = useState(false);
@@ -139,12 +139,14 @@ const RolesOverview = ({firebase, group}) => {
                         handleConfirm={handleConfirm}
                         areYouSureModalMessage={getAreYouSureModalMessage()}
                         loading={kicking || promoting}
+                        isCompany={isCompany}
                         openAddMemberModal={openAddMemberModal}
                         group={group}
                     />
                 </Grid>
             </Grid>
             <AddMemberModal
+                isCompany={isCompany}
                 group={group}
                 open={showAddMemberModal}
                 onClose={closeAddMemberModal}

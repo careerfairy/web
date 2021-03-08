@@ -213,7 +213,6 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     const [value, setValue] = useState(0);
     const {userData} = useAuth();
     const router = useRouter()
-    console.log("-> router", router);
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
     const [showBar, setShowBar] = useState(false);
     const [userType, setUserType] = useState(userTypes[0]);

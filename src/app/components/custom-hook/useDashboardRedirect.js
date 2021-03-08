@@ -6,7 +6,7 @@ import {useRouter} from "next/router";
 import {useAuth} from "../../HOCs/AuthProvider";
 
 
-const useDashboardInvite = (group, firebase, isCompany) => {
+const useDashboardRedirect = (group, firebase, isCompany) => {
     const [joiningGroup, setJoiningGroup] = useState(false);
     const {query: {dashboardInviteId}, pathname, replace} = useRouter()
     const dispatch = useDispatch()
@@ -22,7 +22,6 @@ const useDashboardInvite = (group, firebase, isCompany) => {
 
     const analyticsPath = isCompany ? `/company/${group?.id}/admin/analytics` : `/group/${group?.id}/admin/analytics`
     const basePath = isCompany ? "/company/[companyId]/admin" : "/group/[groupId]/admin"
-
 
     useEffect(() => {
         (async function () {
@@ -70,7 +69,7 @@ const useDashboardInvite = (group, firebase, isCompany) => {
 
     const handleJoinDashboard = async () => {
         try {
-            const isValidInvite = await firebase.validateDashboardInvite(dashboardInviteId, group.id)
+            const isValidInvite = await firebase.validateDashboardInvite(dashboardInviteId, group.id, isCompany)
             if (!isValidInvite) {
                 await replace("/")
                 const message = "This invite link provided is no longer valid"
@@ -84,9 +83,9 @@ const useDashboardInvite = (group, firebase, isCompany) => {
                 })
             } else {
                 setJoiningGroup(true)
-                await firebase.joinGroupDashboard(group.id, userData.userEmail, dashboardInviteId)
+                await firebase.joinGroupDashboard(group.id, userData.userEmail, dashboardInviteId, isCompany)
                 await replace(analyticsPath)
-                const message = `Congrats, you are now an admin of ${isCompany ? group.companyName : group.universityName}`
+                const message = `Congrats, you are now an admin of ${isCompany ? group.name : group.universityName}`
                 enqueueSnackbar({
                     message,
                     options: {
@@ -105,4 +104,4 @@ const useDashboardInvite = (group, firebase, isCompany) => {
     return {joiningGroup}
 };
 
-export default useDashboardInvite;
+export default useDashboardRedirect;

@@ -3,7 +3,7 @@ import Head from "next/head";
 import PropTypes from 'prop-types';
 
 const DashboardHead = ({title, group}) => {
-    const pageTitle = `${title} ${group?.universityName}`
+    const pageTitle = `${title} ${group?.name}`
     return (
         <Head>
             <title>{pageTitle}</title>

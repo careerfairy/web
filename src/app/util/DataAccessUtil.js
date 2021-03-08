@@ -33,7 +33,7 @@ export default class DataAccessUtil {
             data: {
                 recipientEmail: recipientEmail,
                 sender_first_name: userData.firstName,
-                group_name: group.universityName,
+                group_name: group.universityName || group.name,
                 invite_link: invite_link
             }
         });

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {GlassDialog} from "../../../../../materialUI/GlobalModals";
@@ -12,7 +13,13 @@ import {
     TextField
 } from "@material-ui/core";
 import {Formik} from "formik";
-import {EMAIL_REGEX, GENERAL_ERROR} from "../../../../util/constants";
+import {
+    COMPANY_DASHBOARD_INVITE,
+    EMAIL_REGEX,
+    GENERAL_ERROR,
+    GROUP_DASHBOARD_INVITE,
+    USER_DATA_COLLECTION
+} from "../../../../util/constants";
 import DataAccessUtil from "../../../../../util/DataAccessUtil";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 import {useSnackbar} from "notistack";
@@ -20,7 +27,7 @@ import {withFirebase} from "../../../../../context/firebase";
 
 const useStyles = makeStyles(theme => ({}));
 
-const AddMemberModal = ({open = false, onClose, group, firebase}) => {
+const AddMemberModal = ({open = false, onClose, group, firebase, isCompany}) => {
         const {enqueueSnackbar} = useSnackbar()
         const classes = useStyles()
         const {userData} = useAuth()
@@ -36,17 +43,19 @@ const AddMemberModal = ({open = false, onClose, group, firebase}) => {
             if (window?.location?.origin) {
                 baseUrl = window.location.origin
             }
-            return `${baseUrl}/group/${group.id || group.groupId}/admin?dashboardInviteId=${notificationId}`
+            const groupPath = isCompany ? "company" : "group"
+            return `${baseUrl}/${groupPath}/${group.id || group.groupId}/admin?dashboardInviteId=${notificationId}`
         }
 
         const handleSubmit = async (values, {resetForm}) => {
             try {
-                const notificationType = "dashboardInvite"
+                const notificationType = isCompany ? COMPANY_DASHBOARD_INVITE : GROUP_DASHBOARD_INVITE
                 let successMessage = `An invitation email has been sent to ${values.email}`
                 const notificationDetails = {
                     type: notificationType,
                     receiver: values.email,
                     requester: group.id,
+                    for: USER_DATA_COLLECTION
                 }
 
                 const invitationRef = await firebase.createNotification(notificationDetails, {force: true});
@@ -80,7 +89,6 @@ const AddMemberModal = ({open = false, onClose, group, firebase}) => {
                     } else if (!EMAIL_REGEX.test(values.email)) {
                         errors.email = "Please enter a valid email";
                     }
-                    console.log("-> errors", errors);
                     return errors;
                 }}
                 onSubmit={handleSubmit}
@@ -102,21 +110,21 @@ const AddMemberModal = ({open = false, onClose, group, firebase}) => {
                         <DialogTitle>Invite Member</DialogTitle>
                         <DialogContent>
                             <DialogContentText>
-                               Please provide an email that you would like to invite
+                                Please provide an email that you would like to invite
                             </DialogContentText>
-                                <TextField
-                                    fullWidth
-                                    helperText={errors.email}
-                                    label="Email"
-                                    autoFocus
-                                    autoComplete="email"
-                                    disabled={isSubmitting}
-                                    name="email"
-                                    onChange={handleChange}
-                                    required
-                                    error={Boolean(errors.email)}
-                                    value={values.email}
-                                />
+                            <TextField
+                                fullWidth
+                                helperText={errors.email}
+                                label="Email"
+                                autoFocus
+                                autoComplete="email"
+                                disabled={isSubmitting}
+                                name="email"
+                                onChange={handleChange}
+                                required
+                                error={Boolean(errors.email)}
+                                value={values.email}
+                            />
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={() => handleClose(resetForm)}>Cancel</Button>
@@ -138,5 +146,17 @@ const AddMemberModal = ({open = false, onClose, group, firebase}) => {
         );
     }
 ;
+
+AddMemberModal.propTypes = {
+    firebase: PropTypes.object,
+    group: PropTypes.object,
+    isCompany: PropTypes.bool,
+    onClose: PropTypes.func,
+    open: PropTypes.bool
+}
+
+AddMemberModal.defaultProps = {
+    open: false
+}
 
 export default withFirebase(AddMemberModal);

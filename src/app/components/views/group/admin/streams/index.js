@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Fragment, useEffect, useState} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {Box, CircularProgress, Container, Grid, Typography} from "@material-ui/core";
@@ -25,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     highlighted: {}
 }));
 
-const Index = ({group, typeOfStream, query, isAdmin}) => {
+const Index = ({group, typeOfStream, query, isAdmin, isCompany}) => {
     const classes = useStyles();
     const {userData, authenticatedUser} = useAuth();
     const {enqueueSnackbar} = useSnackbar()
@@ -41,7 +42,7 @@ const Index = ({group, typeOfStream, query, isAdmin}) => {
     useEffect(() => {
         if (group?.id) {
             setFetching(true)
-            const unsubscribe = query(group.id,
+            const unsubscribe = query(isCompany, group.id,
                 (querySnapshot) => {
                     const streamsData = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
                     if (livestreamId && typeOfStream === "draft") {
@@ -232,5 +233,13 @@ const SearchMessage = ({message}) => (
     </Grid>
 )
 
+Index.propTypes = {
+  group: PropTypes.object,
+  isAdmin: PropTypes.bool,
+  isCompany: PropTypes.bool,
+  query: PropTypes.func.isRequired,
+  typeOfStream: PropTypes.string.isRequired
+}
 
 export default Index;
+
