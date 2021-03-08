@@ -19,7 +19,6 @@ const useDashboardRedirect = (group, firebase, isCompany) => {
         return userData?.isAdmin
             || (group?.adminEmails?.includes(authenticatedUser?.email))
     }
-
     const analyticsPath = isCompany ? `/company/${group?.id}/admin/analytics` : `/group/${group?.id}/admin/analytics`
     const basePath = isCompany ? "/company/[companyId]/admin" : "/group/[groupId]/admin"
 
@@ -57,7 +56,7 @@ const useDashboardRedirect = (group, firebase, isCompany) => {
                 await replace(analyticsPath)
             }
         })()
-    }, [group, authenticatedUser, userData, pathname]);
+    }, [group, authenticatedUser?.isLoaded, authenticatedUser?.isEmpty, authenticatedUser?.email, userData, pathname]);
 
     const isLoggedIn = () => authenticatedUser.isLoaded && !authenticatedUser.isEmpty
 
@@ -70,6 +69,7 @@ const useDashboardRedirect = (group, firebase, isCompany) => {
     const handleJoinDashboard = async () => {
         try {
             const isValidInvite = await firebase.validateDashboardInvite(dashboardInviteId, group.id, isCompany)
+            console.log("-> isValidInvite", isValidInvite);
             if (!isValidInvite) {
                 await replace("/")
                 const message = "This invite link provided is no longer valid"

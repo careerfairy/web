@@ -14,7 +14,6 @@ const useStyles = makeStyles(theme => ({
 }))
 const AdminPage = () => {
     const classes = useStyles()
-
     return (
         <GroupDashboardLayout isCompany>
             <DashboardHead title="CareerFairy | Admin"/>

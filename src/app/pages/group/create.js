@@ -117,7 +117,7 @@ const CreateGroup = ({firebase}) => {
         try {
             const downloadURL = await uploadLogo(baseGroupInfo.logoFileObj)
             const careerCenter = {
-                universityName: baseGroupInfo.universityName,
+                name: baseGroupInfo.name,
                 adminEmails: baseGroupInfo.adminEmails,
                 logoUrl: downloadURL,
                 description: baseGroupInfo.description,
@@ -126,7 +126,7 @@ const CreateGroup = ({firebase}) => {
             }
             let ref = await firebase.createCareerCenter(careerCenter, user.email);
             await router.push(`/group/${ref.id}/admin`)
-            enqueueSnackbar(`Congrats! Your group ${baseGroupInfo.universityName} has now been created`, {
+            enqueueSnackbar(`Congrats! Your group ${baseGroupInfo.name} has now been created`, {
                 variant: "success",
                 preventDuplicate: true
             })

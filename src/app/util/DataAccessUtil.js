@@ -9,8 +9,8 @@ export default class DataAccessUtil {
         } else {
             return this.sendLivestreamEmailRegistrationConfirmation(user, userData, livestream);
         }
-    } 
-    
+    }
+
     static sendLivestreamEmailRegistrationConfirmation(user, userData, livestream) {
         return axios({
             method: 'post',
@@ -26,14 +26,15 @@ export default class DataAccessUtil {
             }
         });
     }
-    static sendDashboardInvite(recipientEmail, userData, group, invite_link) {
+
+    static sendDashboardInvite(recipientEmail, userData, group, invite_link, isCompany) {
         return axios({
             method: 'post',
             url: 'https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDashboardInviteEmail',
             data: {
                 recipientEmail: recipientEmail,
                 sender_first_name: userData.firstName,
-                group_name: group.universityName || group.name,
+                group_name: isCompany ? group.name : group.universityName,
                 invite_link: invite_link
             }
         });

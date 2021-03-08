@@ -1,21 +1,9 @@
-import React, {Fragment, useState, useEffect} from 'react';
-import {Grid, Icon} from "semantic-ui-react";
+import PropTypes from 'prop-types'
+import React, {Fragment, useState} from 'react';
 import EditIcon from '@material-ui/icons/Edit';
 import {withFirebase} from 'context/firebase';
 import CategoryEdit from './CategoryEdit';
-import {
-    Box,
-    Card,
-    CardContent,
-    CardHeader,
-    Chip,
-    Divider,
-    Fade,
-    IconButton,
-    TextField,
-    Zoom,
-    Paper,
-} from "@material-ui/core";
+import {Card, CardContent, CardHeader, Chip, Divider, Fade, IconButton,} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -53,6 +41,7 @@ const useStyles = makeStyles((theme) => ({
 function CategoryElement({
                              handleUpdateCategory,
                              category,
+                             isCompany,
                              firebase,
                              handleAddTempCategory,
                              handleDeleteLocalCategory,
@@ -117,6 +106,7 @@ function CategoryElement({
     return (
         <Fragment>
             <CategoryEdit group={group}
+                          isCompany={isCompany}
                           isLocal={isLocal}
                           handleUpdateCategory={handleUpdateCategory}
                           handleAddTempCategory={handleAddTempCategory}
@@ -127,4 +117,15 @@ function CategoryElement({
     );
 }
 
+
+CategoryElement.propTypes = {
+  category: PropTypes.any,
+  firebase: PropTypes.object,
+  group: PropTypes.object,
+  handleAddTempCategory: PropTypes.func,
+  handleDeleteLocalCategory: PropTypes.func,
+  handleUpdateCategory: PropTypes.func,
+  isCompany: PropTypes.bool,
+  isLocal: PropTypes.bool
+}
 export default withFirebase(CategoryElement);

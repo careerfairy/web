@@ -19,7 +19,7 @@ import {
     CircularProgress,
 } from '@material-ui/core';
 import {useSnackbar} from "notistack";
-import {GENERAL_ERROR, URL_REGEX} from "../../../../util/constants";
+import {CAREER_CENTER_COLLECTION, COMPANY_COLLECTION, GENERAL_ERROR, URL_REGEX} from "../../../../util/constants";
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(() => ({
@@ -30,16 +30,18 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const ProfilePrivacyPolicy = ({group, firebase, className, ...rest}) => {
+const ProfilePrivacyPolicy = ({group, firebase, className, isCompany, ...rest}) => {
         const classes = useStyles();
         const {enqueueSnackbar} = useSnackbar()
 
         const handleSubmitForm = async (values, {setStatus}) => {
             try {
-                await firebase.updateCareerCenter(group.id, {
+                const collection = isCompany ? COMPANY_COLLECTION : CAREER_CENTER_COLLECTION
+
+                await firebase.updateGroup(group.id, {
                     privacyPolicyUrl: values.privacyPolicyUrl,
                     privacyPolicyActive: values.privacyPolicyActive,
-                });
+                }, collection);
                 enqueueSnackbar("Your privacy policy has been updated!", {
                     variant: "success",
                     preventDuplicate: true,
@@ -187,10 +189,11 @@ const ProfilePrivacyPolicy = ({group, firebase, className, ...rest}) => {
     }
 ;
 
-ProfilePrivacyPolicy.propTypes =
-    {
-        className: PropTypes.string
-    }
-;
+ProfilePrivacyPolicy.propTypes = {
+  className: PropTypes.string,
+  firebase: PropTypes.any,
+  group: PropTypes.any,
+  isCompany: PropTypes.bool
+}
 
 export default ProfilePrivacyPolicy;

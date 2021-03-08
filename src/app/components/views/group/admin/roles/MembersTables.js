@@ -230,7 +230,7 @@ MembersTable.propTypes = {
     handleConfirm: PropTypes.func,
     isCompany: PropTypes.bool,
     loading: PropTypes.bool,
-    openAddMemberModal: PropTypes.bool
+    openAddMemberModal: PropTypes.func
 }
 
 export default MembersTable

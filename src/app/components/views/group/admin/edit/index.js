@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import { Container, Grid } from "@material-ui/core";
@@ -16,7 +17,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const EditOverview = ({firebase, group}) => {
+const EditOverview = ({firebase, group, isCompany}) => {
 
     const classes = useStyles()
 
@@ -32,7 +33,7 @@ const EditOverview = ({firebase, group}) => {
                     md={6}
                     xs={12}
                 >
-                    <Profile firebase={firebase} group={group}/>
+                    <Profile isCompany={isCompany}  firebase={firebase} group={group}/>
                 </Grid>
                 <Grid
                     item
@@ -47,8 +48,7 @@ const EditOverview = ({firebase, group}) => {
                             md={12}
                             xs={12}
                         >
-                            <ProfileDetails firebase={firebase} group={group}/>
-
+                            <ProfileDetails isCompany={isCompany} firebase={firebase} group={group}/>
                         </Grid>
                         <Grid
                             item
@@ -57,7 +57,7 @@ const EditOverview = ({firebase, group}) => {
                             xs={12}
                         >
 
-                            <ProfileCategories firebase={firebase} group={group}/>
+                            <ProfileCategories isCompany={isCompany} firebase={firebase} group={group}/>
                         </Grid>
                         <Grid
                             item
@@ -66,7 +66,7 @@ const EditOverview = ({firebase, group}) => {
                             xs={12}
                         >
 
-                            <ProfilePrivacyPolicy firebase={firebase} group={group}/>
+                            <ProfilePrivacyPolicy isCompany={isCompany} firebase={firebase} group={group}/>
                         </Grid>
                     </Grid>
                 </Grid>
@@ -76,4 +76,11 @@ const EditOverview = ({firebase, group}) => {
     );
 };
 
+EditOverview.propTypes = {
+  firebase: PropTypes.bool,
+  group: PropTypes.object,
+  isCompany: PropTypes.bool
+}
+
 export default withFirebase(EditOverview);
+

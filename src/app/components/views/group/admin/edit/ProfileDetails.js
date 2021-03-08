@@ -14,24 +14,21 @@ import {
     CircularProgress,
 } from '@material-ui/core';
 import {useSnackbar} from "notistack";
-import {GENERAL_ERROR} from "../../../../util/constants";
+import {CAREER_CENTER_COLLECTION, COMPANY_COLLECTION, GENERAL_ERROR} from "../../../../util/constants";
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(() => ({
     root: {}
 }));
 
-const ProfileDetails = ({group, firebase, className, ...rest}) => {
+const ProfileDetails = ({group, firebase, className, isCompany, ...rest}) => {
         const classes = useStyles();
         const {enqueueSnackbar} = useSnackbar()
 
         const handleSubmitForm = async (values, {setStatus}) => {
             try {
-                await firebase.updateCareerCenter(group.id, {
-                    description: values.description,
-                    universityName: values.universityName,
-                    extraInfo: values.extraInfo
-                });
+                const collection = isCompany ? COMPANY_COLLECTION : CAREER_CENTER_COLLECTION
+                await firebase.updateGroup(group.id, values, collection);
                 enqueueSnackbar("Your profile has been updated!", {
                     variant: "success",
                     preventDuplicate: true,
@@ -50,14 +47,20 @@ const ProfileDetails = ({group, firebase, className, ...rest}) => {
             }
         }
 
+        const initialValues = isCompany ? {
+            name: group.name || "",
+            description: group.description || "",
+            extraInfo: group.extraInfo || ""
+        } : {
+            universityName: group.universityName || "",
+            description: group.description || "",
+            extraInfo: group.extraInfo || ""
+        }
+
         return (
             <Formik
                 autoComplete="off"
-                initialValues={{
-                    universityName: group.universityName || "",
-                    description: group.description || "",
-                    extraInfo: group.extraInfo || ""
-                }}
+                initialValues={initialValues}
                 enableReinitialize
                 validate={(values) => {
                     let errors = {}
@@ -73,10 +76,15 @@ const ProfileDetails = ({group, firebase, className, ...rest}) => {
                         errors.extraInfo = `Cannot be more than ${extraInfoMaxLength} characters`
                     }
 
-                    if (!values.universityName) {
+                    if (!isCompany && !values.universityName) {
                         errors.universityName = "Please fill"
-                    } else if (values.universityName < minGroupNameLength) {
+                    } else if (!isCompany && values.universityName < minGroupNameLength) {
                         errors.universityName = `Must be at least ${minGroupNameLength} characters`
+                    }
+                    if (isCompany && !values.name) {
+                        errors.name = "Please fill"
+                    } else if (isCompany && values.name < minGroupNameLength) {
+                        errors.name = `Must be at least ${minGroupNameLength} characters`
                     }
                     return errors
                 }}
@@ -115,14 +123,14 @@ const ProfileDetails = ({group, firebase, className, ...rest}) => {
                             >
                                 <TextField
                                     fullWidth
-                                    helperText={errors.universityName}
-                                    label="Group Name"
+                                    helperText={isCompany ? errors.name : errors.universityName}
+                                    label={isCompany ? "Company Name" : "Group Name"}
                                     disabled={isSubmitting}
-                                    name="universityName"
+                                    name={isCompany ? "name" : "universityName"}
                                     onChange={handleChange}
                                     required
-                                    error={Boolean(errors.universityName)}
-                                    value={values.universityName}
+                                    error={Boolean(isCompany ? errors.name : errors.universityName)}
+                                    value={isCompany ? values.name : values.universityName}
                                     variant="outlined"
                                 />
                             </Grid>
@@ -188,10 +196,11 @@ const ProfileDetails = ({group, firebase, className, ...rest}) => {
     }
 ;
 
-ProfileDetails.propTypes =
-    {
-        className: PropTypes.string
-    }
-;
+ProfileDetails.propTypes = {
+    className: PropTypes.string,
+    firebase: PropTypes.object,
+    group: PropTypes.object,
+    isCompany: PropTypes.bool
+}
 
 export default ProfileDetails;

@@ -201,6 +201,16 @@ class Firebase {
         return ref.update(newCareerCenter);
     };
 
+    updateCompany = (companyId, newCompany) => {
+        let ref = this.firestore.collection(COMPANY_COLLECTION).doc(companyId);
+        return ref.update(newCompany);
+    };
+
+    updateGroup = (groupId, newGroup, collection) => {
+        let ref = this.firestore.collection(collection).doc(groupId);
+        return ref.update(newGroup);
+    };
+
     deleteCareerCenterFromAllUsers = (careerCenterId) => {
         let batch = this.firestore.batch();
         // get all relevant users
@@ -1158,13 +1168,13 @@ class Firebase {
         return ref.onSnapshot(callback);
     };
 
-    updateGroupCategoryElements = (groupId, newCategories) => {
-        let groupRef = this.firestore.collection("careerCenterData").doc(groupId);
+    updateGroupCategoryElements = (groupId, newCategories, collection) => {
+        let groupRef = this.firestore.collection(collection).doc(groupId);
         return groupRef.update({categories: newCategories});
     };
 
-    addGroupCategoryWithElements = (groupId, newCategoryObj) => {
-        let groupRef = this.firestore.collection("careerCenterData").doc(groupId);
+    addGroupCategoryWithElements = (groupId, newCategoryObj, collection) => {
+        let groupRef = this.firestore.collection(collection).doc(groupId);
 
         return groupRef.update({
             categories: firebase.firestore.FieldValue.arrayUnion(newCategoryObj),

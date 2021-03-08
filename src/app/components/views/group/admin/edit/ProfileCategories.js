@@ -1,60 +1,13 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {Box, Button, Card, CardContent, CardHeader, Divider, Grid, Grow} from '@material-ui/core';
-import {useSnackbar} from "notistack";
-import {GENERAL_ERROR} from "../../../../util/constants";
 import AddIcon from "@material-ui/icons/Add";
 import CategoryElement from "../settings/Category/CategoryElement";
 import CategoryEdit from "../settings/Category/CategoryEdit";
-import {makeStyles} from "@material-ui/core/styles";
 
-const states = [
-    {
-        value: 'alabama',
-        label: 'Alabama'
-    },
-    {
-        value: 'new-york',
-        label: 'New York'
-    },
-    {
-        value: 'san-francisco',
-        label: 'San Francisco'
-    }
-];
 
-const useStyles = makeStyles(() => ({
-    root: {}
-}));
-
-const ProfileCategories = ({group, firebase, className, ...rest}) => {
-        const classes = useStyles();
-        const {enqueueSnackbar} = useSnackbar()
+const ProfileCategories = ({group, firebase, className, isCompany, ...rest}) => {
         const [createMode, setCreateMode] = useState(false);
-
-        const handleSubmitForm = async (values, {setStatus}) => {
-            try {
-                await firebase.updateCareerCenter(group.id, {
-                    description: values.description,
-                    universityName: values.universityName,
-                });
-                enqueueSnackbar("Your profile has been updated!", {
-                    variant: "success",
-                    preventDuplicate: true,
-                    anchorOrigin: {
-                        vertical: 'top',
-                        horizontal: 'right',
-                    }
-                })
-            } catch (e) {
-                console.log("error", e);
-                enqueueSnackbar(GENERAL_ERROR, {
-                    variant: "error",
-                    preventDuplicate: true,
-                })
-                setStatus(e)
-            }
-        }
 
         return (
 
@@ -94,6 +47,7 @@ const ProfileCategories = ({group, firebase, className, ...rest}) => {
                                     group={group}
                                     category={{}}
                                     options={[]}
+                                    isCompany={isCompany}
                                     newCategory={true}
                                     setEditMode={setCreateMode}/>
                             </Grid>
@@ -107,7 +61,7 @@ const ProfileCategories = ({group, firebase, className, ...rest}) => {
                                     md={12}
                                     xs={12}
                                 >
-                                    <CategoryElement group={group} category={category}/>
+                                    <CategoryElement  isCompany={isCompany} group={group} category={category}/>
                                 </Grid>
                             );
                         })}
@@ -120,10 +74,11 @@ const ProfileCategories = ({group, firebase, className, ...rest}) => {
     }
 ;
 
-ProfileCategories.propTypes =
-    {
-        className: PropTypes.string
-    }
-;
+ProfileCategories.propTypes = {
+  className: PropTypes.string,
+  firebase: PropTypes.object,
+  group: PropTypes.object,
+  isCompany: PropTypes.bool
+}
 
 export default ProfileCategories;

@@ -61,7 +61,7 @@ const AddMemberModal = ({open = false, onClose, group, firebase, isCompany}) => 
                 const invitationRef = await firebase.createNotification(notificationDetails, {force: true});
                 const notificationId = invitationRef.id
                 const inviteLink = buildInviteLink(notificationId)
-                await DataAccessUtil.sendDashboardInvite(values.email, userData, group, inviteLink)
+                await DataAccessUtil.sendDashboardInvite(values.email, userData, group, inviteLink, isCompany)
                 enqueueSnackbar(successMessage, {
                     preventDuplicate: true,
                     variant: "success",

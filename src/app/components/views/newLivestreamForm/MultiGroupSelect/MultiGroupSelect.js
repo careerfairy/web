@@ -40,7 +40,7 @@ const MultiGroupSelect = (
             value={selectedGroups}
             options={groups}
             onChange={handleMultiSelect}
-            getOptionLabel={(option) => option.universityName}
+            getOptionLabel={(option) => option.name}
             renderInput={(params) => (
                 <TextField {...params} variant="outlined" label="Add some Groups"
                            placeholder="Add partner groups"/>
@@ -48,7 +48,7 @@ const MultiGroupSelect = (
             renderTags={(value, getTagProps) =>
                 value.map((option, index) => (
                     <Chip variant="default"
-                          label={option.universityName}
+                          label={option.name}
                           {...getTagProps({index})}
                     />
                 ))

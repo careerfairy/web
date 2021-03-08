@@ -1,8 +1,8 @@
 import React from 'react';
-import DashboardHead from "../../../../layouts/CompanyDashboardLayout/DashboardHead";
 import StreamsOverview from "../../../../components/views/group/admin/streams"
 import {withFirebase} from "../../../../context/firebase";
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout";
+import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead";
 
 const PastLivestreamsPage = ({firebase}) => {
 

@@ -17,7 +17,7 @@ import {
 import FilePickerContainer from "../../../../ssr/FilePickerContainer";
 import PublishIcon from "@material-ui/icons/Publish";
 import {useSnackbar} from "notistack";
-import {GENERAL_ERROR} from "../../../../util/constants";
+import {CAREER_CENTER_COLLECTION, COMPANY_COLLECTION, GENERAL_ERROR} from "../../../../util/constants";
 import {uploadLogo} from "../../../../helperFunctions/HelperFunctions";
 import {makeStyles} from "@material-ui/core/styles";
 
@@ -36,12 +36,12 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         flexDirection: "column",
     },
-    saveButton:{
+    saveButton: {
         marginTop: theme.spacing(1)
     }
 }));
 
-const Profile = ({group, firebase, className, ...rest}) => {
+const Profile = ({group, firebase, className, isCompany, ...rest}) => {
     const classes = useStyles();
     const [editData, setEditData] = useState({});
     const [filePickerError, setFilePickerError] = useState('');
@@ -52,8 +52,10 @@ const Profile = ({group, firebase, className, ...rest}) => {
         e.preventDefault();
         try {
             setSubmittingLogo(true);
-            await uploadLogo("group-logos", editData.fileObj, firebase, async (newUrl, fullPath) => {
-                await firebase.updateCareerCenter(group.id, {logoUrl: newUrl});
+            const location = isCompany ? "company-logos" : "group-logos"
+            const collection = isCompany ? COMPANY_COLLECTION : CAREER_CENTER_COLLECTION
+            await uploadLogo(location, editData.fileObj, firebase, async (newUrl, fullPath) => {
+                await firebase.updateGroup(group.id, {logoUrl: newUrl}, collection);
             });
             setEditData({})
             setSubmittingLogo(false);
@@ -89,7 +91,7 @@ const Profile = ({group, firebase, className, ...rest}) => {
                         align="center"
                         variant="h3"
                     >
-                        {group.universityName}
+                        {isCompany ? group.name : group.universityName}
                     </Typography>
                     <Typography
                         color="textSecondary"
@@ -150,7 +152,8 @@ const Profile = ({group, firebase, className, ...rest}) => {
 Profile.propTypes = {
     className: PropTypes.string,
     group: PropTypes.object,
-    firebase: PropTypes.object
+    firebase: PropTypes.object,
+    isCompany: PropTypes.bool,
 };
 
 export default Profile;
