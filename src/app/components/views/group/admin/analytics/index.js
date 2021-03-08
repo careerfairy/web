@@ -16,7 +16,8 @@ import {useFirestoreConnect, withFirestore, isLoaded} from "react-redux-firebase
 import {useSelector, shallowEqual} from "react-redux";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
 
-import { AppBar, Tabs, Tab, Box } from '@material-ui/core';
+import {AppBar, Tabs, Tab, Box} from '@material-ui/core';
+import {useRouter} from "next/router";
 
 const useStyles = makeStyles((theme) => ({
 
@@ -211,7 +212,8 @@ const AnalyticsOverview = ({firebase, group, firestore}) => {
     const theme = useTheme()
     const [value, setValue] = useState(0);
     const {userData} = useAuth();
-
+    const router = useRouter()
+    console.log("-> router", router);
     const [globalTimeFrame, setGlobalTimeFrame] = useState(globalTimeFrames[2]);
     const [showBar, setShowBar] = useState(false);
     const [userType, setUserType] = useState(userTypes[0]);

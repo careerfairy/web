@@ -16,7 +16,7 @@ import {
 import {isEmpty, isLoaded, populate, useFirestoreConnect} from "react-redux-firebase";
 import {shallowEqual, useSelector} from "react-redux";
 import {useSnackbar} from "notistack";
-import {CAREER_CENTER_COLLECTION, GENERAL_ERROR} from "../../components/util/constants";
+import {COMPANY_COLLECTION, GENERAL_ERROR} from "../../components/util/constants";
 import TopBar from "./TopBar";
 import styles from "../../materialUI/styles/groupDashboardStyles";
 
@@ -25,7 +25,7 @@ const useStyles = makeStyles(styles);
 const GroupDashboardLayout = (props) => {
     const {children, firebase} = props
     const classes = useStyles();
-    const {query: {groupId, dashboardInviteId}, pathname, replace} = useRouter()
+    const {query: {dashboardInviteId, companyId}, pathname, replace} = useRouter()
     const {enqueueSnackbar} = useSnackbar()
     const [isMobileNavOpen, setMobileNavOpen] = useState(false);
     const [joiningGroup, setJoiningGroup] = useState(false);
@@ -38,16 +38,16 @@ const GroupDashboardLayout = (props) => {
 
     const getQueries = () => {
         let queriesArray = []
-        const targetId = groupId
+        const targetId = companyId
         if (targetId) {
             queriesArray.push(...[{
-                    collection: CAREER_CENTER_COLLECTION,
+                    collection: COMPANY_COLLECTION,
                     doc: targetId,
                     storeAs: "group",
                     populates
                 },
                     {
-                        collection: CAREER_CENTER_COLLECTION,
+                        collection: COMPANY_COLLECTION,
                         doc: targetId,
                         subcollections: [{
                             collection: "admins",
@@ -62,7 +62,7 @@ const GroupDashboardLayout = (props) => {
             )
             if (authenticatedUser) {
                 queriesArray.push({
-                    collection: CAREER_CENTER_COLLECTION,
+                    collection: COMPANY_COLLECTION,
                     doc: targetId,
                     subcollections: [{
                         collection: "admins",
@@ -78,8 +78,7 @@ const GroupDashboardLayout = (props) => {
 
     useFirestoreConnect(getQueries(), [groupId, authenticatedUser])
 
-    // const userRole = useSelector(({firestore}) => firestore.data.userRole || {})
-    const group = useSelector(({firestore}) => firestore.data.group && {...populate(firestore, "group", populates), id: groupId}, shallowEqual)
+    const group = useSelector(({firestore}) => firestore.data.group && {...populate(firestore, "group", populates), id: companyId}, shallowEqual)
 
     // const firestore = useSelector(({firestore}) => firestore)
     // console.log("-> firestore", firestore);
