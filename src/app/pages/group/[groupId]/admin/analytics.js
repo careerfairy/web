@@ -1,19 +1,16 @@
 import React from 'react';
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout";
-import Page from "../../../../components/page";
 import AnalyticsOverview from "../../../../components/views/group/admin/analytics";
+import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead";
 
-const AnalyticsPage = ({group, firebase}) => {
-
+const AnalyticsPage = () => {
     return (
-        <Page title={`CareerFairy | Admin Analytics of ${group.universityName}`}>
-            <AnalyticsOverview
-                group={group}
-                firebase={firebase}
-            />
-        </Page>
+        <GroupDashboardLayout>
+            <DashboardHead title="CareerFairy | Admin Analytics of"/>
+            <AnalyticsOverview/>
+        </GroupDashboardLayout>
     );
 };
-AnalyticsPage.layout = GroupDashboardLayout
+
 
 export default AnalyticsPage;

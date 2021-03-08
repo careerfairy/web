@@ -91,6 +91,7 @@ const randomInteger = (min, max) => {
 const emotes = ["clapping", "like", "heart"]
 
 function IconsContainer({className}) {
+
     const classes = useStyles()
     const emotesData = useSelector(state => state.emotes.emotesData)
     const {showBubbles, setShowBubbles} = useContext(TutorialContext);
@@ -141,7 +142,6 @@ function IconsContainer({className}) {
 
     return (
         <div className={clsx(classes.root, className)}>
-            <TransitionGroup>
                 {emotesData.length > 0 && (
                     <TransitionGroup>
                         {emotesData.map((iconEl) => (
@@ -155,7 +155,6 @@ function IconsContainer({className}) {
                         ))}
                     </TransitionGroup>
                 )}
-            </TransitionGroup>
         </div>
     );
 }

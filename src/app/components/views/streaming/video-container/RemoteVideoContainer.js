@@ -56,8 +56,12 @@ const useStyles = makeStyles(theme => ({
             maxHeight: "100%",
             maxWidth: "100%",
             // zIndex: 9900,
-            backgroundColor: "black"
-        }
+            backgroundColor: "black",
+            // objectFit: "contain !important",
+            // [theme.breakpoints.down("xs")]: {
+            //     objectPosition: props => props.isScreenShareVideo ? "top" : "center",
+            // }
+        },
     }
 }))
 
@@ -67,9 +71,9 @@ function RemoteVideoContainer(props) {
     const activeStep = getActiveTutorialStepKey();
     const videoElement = useRef({current: {}});
 
-    const classes = useStyles()
-
     const isScreenShareVideo = props.stream.streamId.includes("screen");
+    const classes = useStyles({isScreenShareVideo})
+
 
     useEffect(() => {
         if (props.stream.streamId === 'demoStream') {
@@ -134,12 +138,12 @@ function RemoteVideoContainer(props) {
             }, err => {
                 if (err) {
                     props.setShowVideoButton({paused: false, muted: true});
-                } 
+                }
             });
         }
     }
 
-    const speaker = !isScreenShareVideo ? props.currentLivestream.speakers.find( speaker => speaker.speakerUuid === props.stream.streamId ) : null;
+    const speaker = !isScreenShareVideo ? props.currentLivestream.speakers.find(speaker => speaker.speakerUuid === props.stream.streamId) : null;
 
     return (
         <WhiteTooltip
@@ -160,8 +164,8 @@ function RemoteVideoContainer(props) {
                 <div ref={videoElement} id={props.stream.streamId} className={classes.videoWrapper}
                      style={{width: '100%', height: '100%'}}/>
                 {
-                    speaker && 
-                    <SpeakerInfoOverlay speaker={speaker} small={ props.small }/>
+                    speaker &&
+                    <SpeakerInfoOverlay speaker={speaker} small={props.small}/>
                 }
                 {
                     props.stream.videoMuted &&

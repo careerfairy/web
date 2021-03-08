@@ -26,7 +26,7 @@ const useStyles = makeStyles(theme => ({
     root: {
         display: "flex",
         flexDirection: "column",
-        overflowY: "hidden"
+        // overflowY: "hidden"
     },
     loaderWrapper: {
         display: "flex",

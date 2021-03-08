@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react';
 import {withFirebase} from 'context/firebase';
 import CurrentPollGraph from "../../../streaming/sharedComponents/CurrentPollGraph";
@@ -9,6 +10,7 @@ import {useAuth} from "../../../../../HOCs/AuthProvider";
 import {makeStyles, useTheme, withStyles} from "@material-ui/core/styles";
 import {DynamicColorButton} from "../../../../../materialUI/GlobalButtons/GlobalButtons";
 import {isServer} from "../../../../helperFunctions/HelperFunctions";
+import {v4 as uuid} from 'uuid';
 
 const PollWrapper = withStyles(theme => ({
     root: {
@@ -30,7 +32,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
+const PollCategory = ({firebase, livestream, setSelectedState, setShowMenu}) => {
     const theme = useTheme()
     const classes = useStyles()
     const {authenticatedUser} = useAuth();
@@ -76,7 +78,7 @@ function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
             let optionElementsLarge = currentPoll.options.map((option, index) => {
                 return (
                     <DynamicColorButton
-                        key={index}
+                        key={option.index || uuid()}
                         variant="contained"
                         loading={voting}
                         className={classes.pollButton}
@@ -120,5 +122,11 @@ function PollCategory({firebase, livestream, setSelectedState, setShowMenu}) {
         );
     }
 }
-
+PollCategory.propTypes = {
+    firebase: PropTypes.any,
+    livestream: PropTypes.object.isRequired,
+    setSelectedState: PropTypes.func.isRequired,
+    setShowMenu: PropTypes.func.isRequired
+}
 export default withFirebase(PollCategory);
+

@@ -9,7 +9,7 @@ const useStyles = makeStyles(theme => ({
         position: "absolute",
         left: props => props.small ? 10 : 40,
         bottom: props => props.small ? 10 : 40,
-        padding: props => props.small ? 10 : 15,
+        padding: props => props.small ? 6 : 15,
         borderRadius: props => props.small ? 5 : 10,
         textAlign: "left",
         color: theme.palette.common.white,
@@ -22,7 +22,7 @@ const useStyles = makeStyles(theme => ({
         maxWidth: props => props.small ? "230px" : "100%",
     },
     speakerName: {
-        fontSize: props => props.small ? "0.8rem" : "1rem",
+        fontSize: props => props.small ? "0.7rem" : "1rem",
         maxWidth: props => props.small ? "180px" : "100%",
     },
     speakerData: {
@@ -31,7 +31,7 @@ const useStyles = makeStyles(theme => ({
     },
     speakerPosition: {
         fontWeight: "normal",
-        fontSize: props => props.small ? "0.7rem" : "1rem",
+        fontSize: props => props.small ? "0.6rem" : "1rem",
         maxWidth: props => props.small ? "180px" : "100%",
         overflow: "hidden",
         whiteSpace: "nowrap",
@@ -67,13 +67,16 @@ const SpeakerInfoOverlay = ({ speaker, small }) => {
                         <h5 className={classes.speakerPosition}>{`${speaker.position}`}</h5>
                     </div>
                 </div> 
-                <div className={ classes.speakerLinkedIn }>
-                    <Tooltip title={`Open ${speaker.firstName}'s LinkedIn profile in a new tab`}>
-                        <IconButton className={classes.speakerLinkedInIconButton} onClick={handleClick}>
-                            <LinkedInIcon className={classes.speakerLinkedInButton}/>
-                        </IconButton>
-                    </Tooltip>         
-                </div>          
+                { 
+                    speaker.showLinkedIn && 
+                    <div className={ classes.speakerLinkedIn }>
+                        <Tooltip title={`Open ${speaker.firstName}'s LinkedIn profile in a new tab`}>
+                            <IconButton className={classes.speakerLinkedInIconButton} onClick={handleClick}>
+                                <LinkedInIcon className={classes.speakerLinkedInButton}/>
+                            </IconButton>
+                        </Tooltip>         
+                    </div>    
+                }        
             </div>
         );
     } else {
