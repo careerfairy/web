@@ -97,7 +97,6 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
 
     const classes = useStyles();
     const [speaker, setSpeaker] = useState({});
-
     const [showLinkedIn, setShowLinkedIn] = useState(false);
     const [linkedInUrl, setLinkedInUrl] = useState("");
 
@@ -106,7 +105,8 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
     const [loading, setLoading] = useState(false)
 
     const handleChangeSpeaker = (event) => {
-        const selectedSpeaker = event.target.value;
+        const selectedSpeakerId = event.target.value;
+        const selectedSpeaker = livestream.speakers.find(speaker => speaker.id === selectedSpeakerId)
         if (selectedSpeaker === undefined) {
             resetSpeaker()
             return setProfileInList(false)
@@ -130,15 +130,16 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
     }, [])
 
     useEffect(() => {
-        if (livestream && livestream.speakers && livestream.speakers.length > 0) {
+        if (livestream?.speakers?.length > 0) {
             setProfileInList(true);
         } else {
             setProfileInList(false);
             resetSpeaker()
         }
-    }, [livestream])
+    }, [livestream?.speakers?.length])
 
-    const joinStream = () => {
+    const joinStream = (e) => {
+        e.preventDefault()
         setLoading(true)
         if (!formHasErrors()) {
             const newSpeaker = {...speaker}
@@ -184,7 +185,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
         let storedSpeakerId = localStorage.getItem(`speaker${livestream.id}`);
         let selectedSpeaker = storedSpeakerId ? livestream.speakers.find(speaker => speaker.id === storedSpeakerId) : livestream.speakers[0];
         setSpeaker(selectedSpeaker)
-        setShowLinkedIn(selectedSpeaker.showLinkedIn ? true : false)
+        setShowLinkedIn(Boolean(selectedSpeaker.showLinkedIn))
         setLinkedInUrl(selectedSpeaker.linkedIn ? selectedSpeaker.linkedIn : "")
     }
 
@@ -212,7 +213,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
     if (livestream && livestream.speakers) {
         speakers = livestream.speakers.map(speaker => {
             return (
-                <MenuItem key={speaker.id} value={speaker}>
+                <MenuItem key={speaker.id} value={speaker.id}>
                     <CustomSpeakerDisplay speaker={speaker}/>
                 </MenuItem>
             )
@@ -221,7 +222,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
 
     return (
         <div className={classes.background}>
-            <div className={classes.centered}>
+            <form onSubmit={joinStream} className={classes.centered}>
                 <Typography variant="h5" className={classes.title}>Welcome to your stream</Typography>
                 <Typography variant="h4">{livestream.title}</Typography>
                 <Typography variant="h5" className={classes.company}>{livestream.company}</Typography>
@@ -230,11 +231,11 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                     <FormGroup>
                         <Collapse in={profileInList}>
                             <FormControl className={classes.marginTop}>
-                                <InputLabel id="demo-customized-select-label">Select Your Profile</InputLabel>
+                                <InputLabel id="profile-select">Select Your Profile</InputLabel>
                                 <Select
-                                    labelId="demo-customized-select-label"
-                                    id="demo-customized-select"
-                                    value={speaker}
+                                    labelId="profile-select"
+                                    id="profile-select"
+                                    value={speaker.id || livestream.speakers?.[0].id}
                                     className={classes.select}
                                     onChange={handleChangeSpeaker}
                                 >
@@ -252,6 +253,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                                     <TextField error={formErrors.firstName && isEmpty(speaker.firstName.trim())}
                                                helperText={formErrors.firstName && "Required"} id="outlined-basic"
                                                label="First Name" variant="outlined"
+                                               name="firstName"
                                                value={!profileInList ? speaker.firstName : ""}
                                                onChange={(event) => setSpeaker({
                                                    ...speaker,
@@ -262,6 +264,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                                     <TextField error={formErrors.lastName && isEmpty(speaker.lastName.trim())}
                                                helperText={formErrors.lastName && "Required"} id="outlined-basic"
                                                label="Last Name" variant="outlined"
+                                               name="lastName"
                                                value={!profileInList ? speaker.lastName : ""}
                                                onChange={(event) => setSpeaker({
                                                    ...speaker,
@@ -272,6 +275,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                                     <TextField error={formErrors.position && isEmpty(speaker.position.trim())}
                                                helperText={formErrors.position && "Required"} id="outlined-basic"
                                                label="Occupation" placeholder="Lead Engineer"
+                                               name="jobTitle"
                                                value={!profileInList ? speaker.position : ""} variant="outlined"
                                                onChange={(event) => setSpeaker({
                                                    ...speaker,
@@ -308,6 +312,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                                 <TextField
                                     required={showLinkedIn}
                                     label="LinkedIn Profile URL"
+                                    name="linkedInUrl"
                                     placeholder="https://linkedin.com/in/your-profile"
                                     value={linkedInUrl}
                                     helperText={formErrors.linkedInUrl && "Please enter a valid URL"}
@@ -319,9 +324,9 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                         </Collapse>
                     </FormGroup>
                 </Paper>
-                <Button variant='contained' size='large' onClick={joinStream} disabled={loading}
+                <Button variant='contained' type="submit" size='large' onClick={joinStream} disabled={loading}
                         startIcon={loading && <CircularProgress size="small"/>}>Join now</Button>
-            </div>
+            </form>
         </div>
     )
 }

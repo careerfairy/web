@@ -124,30 +124,30 @@ const QuestionCategory = ({livestream, selectedState, sliding, streamer, firebas
 
     useEffect(() => {
         if (totalUpcoming.length) {
-            const newlyAskedQuestion = [...totalUpcoming].reverse().find(question => question.timestamp.toDate() > now)
-            if (newlyAskedQuestion?.type === "new") {
-                const answerNewQuestion = () => {
-                    goToThisQuestion(newlyAskedQuestion.id)
-                    dispatch(actions.closeSnackbar(newlyAskedQuestion.id))
-                }
-                dispatch(actions.enqueueSnackbar({
-                    message: `${newlyAskedQuestion.displayName} just asked a the following question: ${truncate(newlyAskedQuestion.title, 40)}`,
-                    options: {
-                        variant: "info",
-                        key: newlyAskedQuestion.id,
-                        action: streamer && (
-                            <Button
-                                color="primary"
-                                disabled={goingToQuestion}
-                                variant="contained"
-                                onClick={answerNewQuestion}
-                            >
-                                Answer Now
-                            </Button>
-                        )
-                    }
-                }))
-            }
+            // const newlyAskedQuestion = [...totalUpcoming].reverse().find(question => question.timestamp.toDate() > now)
+            // if (newlyAskedQuestion?.type === "new") {
+            //     const answerNewQuestion = () => {
+            //         goToThisQuestion(newlyAskedQuestion.id)
+            //         dispatch(actions.closeSnackbar(newlyAskedQuestion.id))
+            //     }
+            //     dispatch(actions.enqueueSnackbar({
+            //         message: `${newlyAskedQuestion.displayName} just asked a the following question: ${truncate(newlyAskedQuestion.title, 40)}`,
+            //         options: {
+            //             variant: "info",
+            //             key: newlyAskedQuestion.id,
+            //             action: streamer && (
+            //                 <Button
+            //                     color="primary"
+            //                     disabled={goingToQuestion}
+            //                     variant="contained"
+            //                     onClick={answerNewQuestion}
+            //                 >
+            //                     Answer Now
+            //                 </Button>
+            //             )
+            //         }
+            //     }))
+            // }
         }
     }, [totalUpcoming]);
 
