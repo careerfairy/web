@@ -113,7 +113,11 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                         liveSpeaker.lastName === storedSpeaker.lastName &&
                         liveSpeaker.position === storedSpeaker.position
                 })
-                setSpeaker(savedSpeaker)
+                if (savedSpeaker) {
+                    setSpeaker(savedSpeaker)
+                } else {
+                    setSpeaker(storedSpeaker)
+                }
             } else {
                 let storedSpeaker = JSON.parse(storedSpeakerString);
                 setSpeaker(storedSpeaker)
