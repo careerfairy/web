@@ -812,12 +812,14 @@ class Firebase {
         return this.firestore.runTransaction((transaction) => {
             return transaction.get(ref).then((livestreamDoc) => {
                 let livestream = livestreamDoc.data()
-                let updatedSpeakers = livestream.liveSpeakers.filter(existingSpeaker => existingSpeaker.id !== speaker.id)
-                updatedSpeakers.forEach(existingSpeaker => {
-                    if (existingSpeaker.speakerUuid === speaker.speakerUuid) {
-                        delete existingSpeaker.speakerUuid;
-                    }
-                });
+                let updatedSpeakers = livestream.liveSpeakers?.filter(existingSpeaker => existingSpeaker.id !== speaker.id) || [];
+                if (updatedSpeakers && updatedSpeakers.length > 0){
+                    updatedSpeakers.forEach(existingSpeaker => {
+                        if (existingSpeaker.speakerUuid === speaker.speakerUuid) {
+                            delete existingSpeaker.speakerUuid;
+                        }
+                    });
+                }         
                 updatedSpeakers.push(speaker)
                 transaction.update(ref, {
                     liveSpeakers: updatedSpeakers
