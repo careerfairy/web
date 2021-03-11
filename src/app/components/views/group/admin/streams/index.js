@@ -10,6 +10,7 @@ import GroupStreamCardV2 from "../../../NextLivestreams/GroupStreams/groupStream
 import NewStreamModal from "./NewStreamModal";
 import {useRouter} from "next/router";
 import {repositionElement} from "../../../../helperFunctions/HelperFunctions";
+import GroupStreamCardV2Old from "../../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2Old";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -141,7 +142,7 @@ const Index = ({group, typeOfStream, query, isAdmin}) => {
                 xl={4}
                 item
             >
-                <GroupStreamCardV2
+                <GroupStreamCardV2Old
                     mobile
                     isAdmin
                     id={livestream.id}

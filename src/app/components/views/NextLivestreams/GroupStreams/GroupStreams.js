@@ -5,6 +5,8 @@ import {Grid, LinearProgress, Typography} from "@material-ui/core";
 import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
 import LazyLoad from 'react-lazyload'
 import Spinner from "./groupStreamCard/Spinner";
+import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
+import useInfiniteScrollClient from "../../../custom-hook/useInfiniteScrollClient";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -33,21 +35,21 @@ const useStyles = makeStyles((theme) => ({
 
 const Wrapper = ({children, index, streamId}) => {
 
-        return (index <= 2)? (
-            <>
-                {children}
-            </>
-        ):(
-            <LazyLoad
-                style={{height: "-webkit-fill-available"}}
-                key={streamId}
-                height={600}
-                unmountIfInvisible
-                offset={[0, 0]}
-                placeholder={<Spinner/>}>
-                {children}
-            </LazyLoad>
-        )
+    return (index <= 2) ? (
+        <>
+            {children}
+        </>
+    ) : (
+        <LazyLoad
+            style={{height: "100%"}}
+            key={streamId}
+            height={600}
+            unmountIfInvisible
+            offset={[0, 0]}
+            placeholder={<Spinner/>}>
+            {children}
+        </LazyLoad>
+    )
 
 }
 const GroupStreams = ({
@@ -68,17 +70,39 @@ const GroupStreams = ({
         const classes = useStyles()
         const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
         const searchedButNoResults = selectedOptions.length && !searching && !livestreams.length
+        const [slicedLivestreams, loadMoreLivestreams, hasMoreLivestreams, totalLivestreams] = useInfiniteScrollClient(livestreams, 3, 3);
+
+        const handleScroll = () => {
+            const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 300
+            if (bottom && hasMoreLivestreams) {
+                loadMoreLivestreams()
+            }
+        };
+
+        useEffect(() => {
+            window.addEventListener('scroll', handleScroll, {
+                passive: true
+            });
+
+            return () => {
+                window.removeEventListener('scroll', handleScroll);
+            };
+        }, [totalLivestreams, slicedLivestreams]);
+
         useEffect(() => {
             if (globalCardHighlighted) {
                 setGlobalCardHighlighted(false)
             }
         }, [groupData])
 
-        const renderStreamCards = livestreams?.map((livestream, index) => {
+
+        const renderStreamCards = slicedLivestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
-                    <Grid style={{height: 600}} key={livestream.id} xs={12} sm={12} md={6}
-                          lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 4} item>
+                    <Grid
+                        style={{maxHeight: 400}}
+                        key={livestream.id} xs={12} sm={12} md={6}
+                        lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 4} item>
                         <Wrapper
                             index={index}
                             streamId={livestream.id}
