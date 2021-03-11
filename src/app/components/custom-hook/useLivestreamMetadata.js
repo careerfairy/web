@@ -111,12 +111,14 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
     useEffect(() => {
         if (participatingStudents && participatingStudents.length && userRequestedDownload) {
             let studentsOfGroup = [];
+            console.log("-> participatingStudents", participatingStudents);
             participatingStudents.forEach( student => {
                 if (studentBelongsToGroup(student)) {
                     let publishedStudent = StatsUtil.getStudentInGroupDataObject(student, group);
                     studentsOfGroup.push(publishedStudent);
                 }
             });
+            console.log("-> studentsOfGroup", studentsOfGroup);
             setParticipatingStudentsFromGroup(studentsOfGroup);
         }      
     }, [participatingStudents, userRequestedDownload]);
@@ -178,7 +180,7 @@ export function useLivestreamMetadata(livestream, group, firebase, userRequested
 
     function studentBelongsToGroup(student) {
         if (group.universityCode) {
-            if (student.universityCode === group.universityCode) {
+            if (student.university?.code === group.universityCode) {
                 return student.groupIds && student.groupIds.includes(group.groupId);
             } else {
                 return false;

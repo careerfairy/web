@@ -7,7 +7,7 @@ export default class StatsUtil {
             'First Name': student.firstName,
             'Last Name': student.lastName,
             'Email': student.userEmail,
-            'University': student.universityName ? student.universityName : 'N/A'
+            'University': student.university?.name || 'N/A'
         }
         let studentCategoriesForGroup = StatsUtil.getRegisteredGroupById(student, group.groupId)
         if (studentCategoriesForGroup && studentCategoriesForGroup.categories && studentCategoriesForGroup.categories.length && group.categories) {
@@ -27,14 +27,14 @@ export default class StatsUtil {
     static getStudentOutsideGroupDataObject(student, allGroups) {
         let studentMainGroup = allGroups.find( group => {
             if (group.universityCode) {
-                return group.universityCode === student.universityCode;
+                return group.universityCode === student.university?.code;
             }
         });
         let studentDataObject = {
             'First Name': student.firstName,
             'Last Name': student.lastName,
             'Email': student.userEmail,
-            'University': student.universityName ? student.universityName : 'N/A'
+            'University':  student.university?.name || 'N/A'
         }
         if (studentMainGroup) {
             let studentCategoriesForGroup = StatsUtil.getRegisteredGroupById(student, studentMainGroup.groupId)

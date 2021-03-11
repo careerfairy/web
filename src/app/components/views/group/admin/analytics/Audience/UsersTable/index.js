@@ -72,7 +72,7 @@ const UsersTable = ({
             width: 180,
         },
         {
-            field: "universityName",
+            field: "university.name",
             title: "University",
             width: 150,
         },
@@ -294,7 +294,7 @@ const UsersTable = ({
                             },
                         },
                         {
-                            field: "universityName",
+                            field: "university.name",
                             title: "University",
                             cellStyle: {
                                 width: 300,
