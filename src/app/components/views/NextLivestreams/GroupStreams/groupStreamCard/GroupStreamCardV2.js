@@ -1,8 +1,10 @@
 import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from "context/firebase";
-import {makeStyles, fade} from "@material-ui/core/styles";
+import {fade, makeStyles} from "@material-ui/core/styles";
 import {speakerPlaceholder} from "../../../../util/constants";
 import {
+    Avatar,
+    Box,
     Button,
     Chip,
     ClickAwayListener,
@@ -11,8 +13,6 @@ import {
     Grow,
     Paper,
     Typography,
-    Avatar,
-    Box,
 } from "@material-ui/core";
 import {AvatarGroup} from "@material-ui/lab";
 import Streamers from "./Streamers";
@@ -33,6 +33,7 @@ import CopyToClipboard from "../../../common/CopyToClipboard";
 import LogosPlaceHolder from "./LogosPlaceholder";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
 import {dynamicSort} from "../../../../helperFunctions/HelperFunctions";
+
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => {
@@ -173,7 +174,7 @@ const useStyles = makeStyles((theme) => {
             flex: ({mobile}) => mobile && 1,
             maxHeight: 125,
         },
-        logosFrontInnerWrapper:{
+        logosFrontInnerWrapper: {
             width: "inherit",
             overflow: "auto",
             display: "flex",
@@ -271,6 +272,12 @@ const useStyles = makeStyles((theme) => {
             height: '100%',
             width: '100%',
             objectFit: 'cover',
+        },
+        lowerFrontBackgroundSkeleton: {
+            borderRadius: "inherit",
+            position: "absolute",
+            height: '100%',
+            width: '100%',
         },
         bookedIcon: {
             color: "white",
@@ -678,8 +685,9 @@ const GroupStreamCardV2 = memo(({
                                       </Typography>
                                   }/>}
                             {!cardHovered &&
-                            <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
-                                 alt="background"/>}
+                                <img className={classes.lowerFrontBackgroundImage} src={livestream.backgroundImageUrl}
+                                     alt="background"/>
+                            }
                             <div className={classes.dateTimeWrapper}>
                                 <div className={classes.dynamicMargin}>
                                     <DateTimeDisplay mobile={mobile} narrow={isNarrow()}
