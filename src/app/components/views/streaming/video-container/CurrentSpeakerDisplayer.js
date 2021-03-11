@@ -189,7 +189,7 @@ function CurrentSpeakerDisplayer(props) {
 
     if (!props.isPlayMode) {
         const localVideoClass = getVideoContainerClass(props.localId, "local");
-        const localSpeaker = props.currentLivestream.speakers?.find(speaker => speaker.speakerUuid === props.localId);
+        const localSpeaker = props.currentLivestream.liveSpeakers?.find(speaker => speaker.speakerUuid === props.localId);
         let localVideoElement =
             <div key={"localVideo"} className={classes[localVideoClass]}>
                 <LocalVideoContainer localId={props.localId} localSpeaker={localSpeaker}

@@ -143,7 +143,7 @@ function RemoteVideoContainer(props) {
         }
     }
 
-    const speaker = !isScreenShareVideo ? props.currentLivestream.speakers.find(speaker => speaker.speakerUuid === props.stream.streamId) : null;
+    const speaker = !isScreenShareVideo ? props.currentLivestream.liveSpeakers.find(speaker => speaker.speakerUuid === props.stream.streamId) : null;
 
     return (
         <WhiteTooltip

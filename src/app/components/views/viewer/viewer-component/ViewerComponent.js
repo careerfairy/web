@@ -49,7 +49,7 @@ function ViewerComponent(props) {
     const screenSharingMode = (props.currentLivestream.screenSharerId === authenticatedUser?.email &&
         props.currentLivestream.mode === 'desktop') ? optimizationMode : "";
 
-    const {externalMediaStreams,numberOfViewers, localMediaStream, agoraRtcStatus, agoraRtmStatus} =
+    const {externalMediaStreams,numberOfViewers, localMediaStream, setLocalMediaStream, agoraRtcStatus, agoraRtmStatus} =
         useAgoraAsStreamer(
             streamerReady,
             !props.handRaiseActive,
@@ -168,6 +168,7 @@ function ViewerComponent(props) {
                     streamerId={authenticatedUser.email}
                     joining={true}
                     localMediaStream={localMediaStream}
+                    setLocalMediaStream={setLocalMediaStream}
                     handleClickScreenShareButton={handleClickScreenShareButton}
                     isMainStreamer={false}
                     showSettings={showSettings}

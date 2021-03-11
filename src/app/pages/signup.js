@@ -100,20 +100,6 @@ function SignUpPage({firebase}) {
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
     const [activeStep, setActiveStep] = useState(0);
 
-
-    // useEffect(() => {
-    //     firebase.auth.onAuthStateChanged(user => {
-    //         if (user && user.emailVerified) {
-    //             router.push('/next-livestreams')
-    //         } else if (user && !user.emailVerified) {
-    //             setUser(user);
-    //             setActiveStep(1)
-    //         } else {
-    //             setUser(null);
-    //         }
-    //     })
-    // }, []);
-
     useEffect(() => {
         verifyUserState();
     }, [user, userData])

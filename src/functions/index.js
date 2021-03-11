@@ -529,6 +529,10 @@ exports.sendPostmarkEmailUserDataAndUniWithName = functions.https.onRequest(asyn
             lastName: recipient_last_name,
             userEmail: recipient_email,
             universityCode: recipient_university,
+            university: {
+                name: recipient_university_name,
+                code: recipient_university
+            },
             universityName: recipient_university_name,
             universityCountryCode: recipient_university_country_code,
         }).then(() => {

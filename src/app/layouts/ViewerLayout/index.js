@@ -181,22 +181,22 @@ const ViewerLayout = (props) => {
 
     const handleClap = useCallback(() => {
         postIcon('clapping')
-    }, [])
+    }, [iconsDisabled, livestreamId, authenticatedUser])
 
     const handleLike = useCallback(() => {
         postIcon('like')
-    }, [])
+    }, [iconsDisabled, livestreamId, authenticatedUser])
     const handleHeart = useCallback(() => {
         postIcon('heart')
-    }, [])
+    }, [iconsDisabled, livestreamId, authenticatedUser])
 
-    const postIcon = useCallback((iconName) => {
+    const postIcon = (iconName) => {
         if (!iconsDisabled) {
             dispatch(actions.createEmote(iconName))
             setIconsDisabled(true);
+            firebase.postIcon(livestreamId, iconName, authenticatedUser.email);
         }
-    }, [iconsDisabled])
-
+    }
     const enableIcons = useCallback(() => {
         setIconsDisabled(false)
     }, [])

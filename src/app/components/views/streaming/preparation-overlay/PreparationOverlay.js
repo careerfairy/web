@@ -100,49 +100,40 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
     const [showLinkedIn, setShowLinkedIn] = useState(false);
     const [linkedInUrl, setLinkedInUrl] = useState("");
 
-    const [profileInList, setProfileInList] = useState(true);
     const [formErrors, setFormErrors] = useState({});
     const [loading, setLoading] = useState(false)
 
-    const handleChangeSpeaker = (event) => {
-        const selectedSpeakerId = event.target.value;
-        const selectedSpeaker = livestream.speakers.find(speaker => speaker.id === selectedSpeakerId)
-        if (selectedSpeaker === undefined) {
-            resetSpeaker()
-            return setProfileInList(false)
-        } else if (selectedSpeaker.linkedIn) {
-            setLinkedInUrl(selectedSpeaker.linkedIn)
-        } else {
-            setLinkedInUrl("")
-        }
-        localStorage.setItem(`speaker${livestream.id}`, selectedSpeaker.id)
-        setSpeaker(selectedSpeaker);
-    };
+    useEffect(() => {
+        let storedSpeakerString = localStorage.getItem("storedSpeaker");
+        if (storedSpeakerString) {
+            if (livestream.liveSpeakers?.length > 0) {
+                let storedSpeaker = JSON.parse(storedSpeakerString);
+                let savedSpeaker = livestream.liveSpeakers?.find( liveSpeaker => {
+                    return liveSpeaker.firstName === storedSpeaker.firstName &&
+                        liveSpeaker.lastName === storedSpeaker.lastName &&
+                        liveSpeaker.position === storedSpeaker.position
+                })
+                if (savedSpeaker) {
+                    setSpeaker(savedSpeaker)
+                } else {
+                    setSpeaker(storedSpeaker)
+                }
+            } else {
+                let storedSpeaker = JSON.parse(storedSpeakerString);
+                setSpeaker(storedSpeaker)
+            }
+        }   
+    },[livestream.liveSpeakers])
 
     const handleChangeLinkedInShare = (event) => {
         setShowLinkedIn(!showLinkedIn);
     };
 
-    useEffect(() => {
-        if (profileInList && livestream.speakers?.length > 0) {
-            setInitialSpeakerInList()
-        }
-    }, [])
-
-    useEffect(() => {
-        if (livestream?.speakers?.length > 0) {
-            setProfileInList(true);
-        } else {
-            setProfileInList(false);
-            resetSpeaker()
-        }
-    }, [livestream?.speakers?.length])
-
     const joinStream = (e) => {
         e.preventDefault()
         setLoading(true)
         if (!formHasErrors()) {
-            const newSpeaker = {...speaker}
+            let newSpeaker = {...speaker}
             newSpeaker.speakerUuid = streamerUuid;
             newSpeaker.showLinkedIn = showLinkedIn;
             newSpeaker.linkedIn = linkedInUrl;
@@ -158,6 +149,7 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                     setLoading(false)
                 })
             }
+            localStorage.setItem("storedSpeaker", JSON.stringify(newSpeaker))
         } else {
             setLoading(false)
         }
@@ -168,56 +160,15 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
         if (showLinkedIn) {
             errors.linkedInUrl = isEmpty(linkedInUrl.trim()) || !isValidUrl(linkedInUrl)
         }
-        if (!profileInList) {
-            errors.firstName = isEmpty(speaker.firstName.trim())
-            errors.lastName = isEmpty(speaker.lastName.trim())
-            errors.position = isEmpty(speaker.position.trim())
-        }
+        errors.firstName = isEmpty(speaker.firstName.trim())
+        errors.lastName = isEmpty(speaker.lastName.trim())
+        errors.position = isEmpty(speaker.position.trim())
         setFormErrors(errors)
         return Object.keys(errors).some(key => errors[key] === true);
     }
 
     const isValidUrl = (value) => {
         return value.match(URL_REGEX)
-    }
-
-    const setInitialSpeakerInList = () => {
-        let storedSpeakerId = localStorage.getItem(`speaker${livestream.id}`);
-        let selectedSpeaker = storedSpeakerId ? livestream.speakers.find(speaker => speaker.id === storedSpeakerId) : livestream.speakers[0];
-        setSpeaker(selectedSpeaker)
-        setShowLinkedIn(Boolean(selectedSpeaker.showLinkedIn))
-        setLinkedInUrl(selectedSpeaker.linkedIn ? selectedSpeaker.linkedIn : "")
-    }
-
-    const resetSpeaker = () => {
-        setSpeaker({
-            firstName: "",
-            lastName: "",
-            position: ""
-        })
-        setLinkedInUrl("");
-    }
-
-    const CustomSpeakerDisplay = ({speaker}) => {
-        return (
-            <div>
-                <Typography variant='h4'
-                            className={classes.speakerName}>{speaker.firstName} {speaker.lastName}</Typography>
-                <Typography variant='h6' className={classes.speakerFunction}>{speaker.position}</Typography>
-            </div>
-        )
-    }
-
-    let speakers = [];
-
-    if (livestream && livestream.speakers) {
-        speakers = livestream.speakers.map(speaker => {
-            return (
-                <MenuItem key={speaker.id} value={speaker.id}>
-                    <CustomSpeakerDisplay speaker={speaker}/>
-                </MenuItem>
-            )
-        })
     }
 
     return (
@@ -229,72 +180,41 @@ function PreparationOverlay({livestream, streamerUuid, setStreamerReady, firebas
                 <Paper className={classes.padding}>
                     <Typography variant='h4' className={classes.speakerTitle}>Your Speaker Profile</Typography>
                     <FormGroup>
-                        <Collapse in={profileInList}>
+                        <FormGroup>
                             <FormControl className={classes.marginTop}>
-                                <InputLabel id="profile-select">Select Your Profile</InputLabel>
-                                <Select
-                                    labelId="profile-select"
-                                    id="profile-select"
-                                    value={speaker.id || livestream.speakers?.[0].id}
-                                    className={classes.select}
-                                    onChange={handleChangeSpeaker}
-                                >
-                                    {speakers}
-                                    <MenuItem value={undefined}>
-                                        <ControlPoint className={classes.selectNewProfileIcon}/>
-                                        <div className={classes.selectNewProfile}>Add a profile</div>
-                                    </MenuItem>
-                                </Select>
+                                <TextField error={formErrors.firstName && isEmpty(speaker.firstName.trim())}
+                                            helperText={formErrors.firstName && "Required"} id="outlined-basic"
+                                            label="First Name" variant="outlined"
+                                            name="firstName"
+                                            value={speaker.firstName}
+                                            onChange={(event) => setSpeaker({
+                                                ...speaker,
+                                                firstName: event.target.value
+                                            })}/>
                             </FormControl>
-                        </Collapse>
-                        <Collapse in={!profileInList} onExit={setInitialSpeakerInList}>
-                            <FormGroup>
-                                <FormControl className={classes.marginTop}>
-                                    <TextField error={formErrors.firstName && isEmpty(speaker.firstName.trim())}
-                                               helperText={formErrors.firstName && "Required"} id="outlined-basic"
-                                               label="First Name" variant="outlined"
-                                               name="firstName"
-                                               value={!profileInList ? speaker.firstName : ""}
-                                               onChange={(event) => setSpeaker({
-                                                   ...speaker,
-                                                   firstName: event.target.value
-                                               })}/>
-                                </FormControl>
-                                <FormControl className={classes.marginTop}>
-                                    <TextField error={formErrors.lastName && isEmpty(speaker.lastName.trim())}
-                                               helperText={formErrors.lastName && "Required"} id="outlined-basic"
-                                               label="Last Name" variant="outlined"
-                                               name="lastName"
-                                               value={!profileInList ? speaker.lastName : ""}
-                                               onChange={(event) => setSpeaker({
-                                                   ...speaker,
-                                                   lastName: event.target.value
-                                               })}/>
-                                </FormControl>
-                                <FormControl className={classes.marginTop}>
-                                    <TextField error={formErrors.position && isEmpty(speaker.position.trim())}
-                                               helperText={formErrors.position && "Required"} id="outlined-basic"
-                                               label="Occupation" placeholder="Lead Engineer"
-                                               name="jobTitle"
-                                               value={!profileInList ? speaker.position : ""} variant="outlined"
-                                               onChange={(event) => setSpeaker({
-                                                   ...speaker,
-                                                   position: event.target.value
-                                               })}/>
-                                </FormControl>
-                            </FormGroup>
-                        </Collapse>
-                        {
-                            speakers.length > 0 &&
-                            <FormControl className={classes.block}>
-                                {profileInList ?
-                                    <Button size="small" onClick={() => setProfileInList(false)}
-                                            className={classes.button}>Edit Profile</Button> :
-                                    <Button size="small" onClick={() => setProfileInList(true)}
-                                            className={classes.button}>{`Show list of profiles`}</Button>
-                                }
+                            <FormControl className={classes.marginTop}>
+                                <TextField error={formErrors.lastName && isEmpty(speaker.lastName.trim())}
+                                            helperText={formErrors.lastName && "Required"} id="outlined-basic"
+                                            label="Last Name" variant="outlined"
+                                            name="lastName"
+                                            value={speaker.lastName}
+                                            onChange={(event) => setSpeaker({
+                                                ...speaker,
+                                                lastName: event.target.value
+                                            })}/>
                             </FormControl>
-                        }
+                            <FormControl className={classes.marginTop}>
+                                <TextField error={formErrors.position && isEmpty(speaker.position.trim())}
+                                            helperText={formErrors.position && "Required"} id="outlined-basic"
+                                            label="Occupation" placeholder="Lead Engineer"
+                                            name="jobTitle"
+                                            value={speaker.position} variant="outlined"
+                                            onChange={(event) => setSpeaker({
+                                                ...speaker,
+                                                position: event.target.value
+                                            })}/>
+                            </FormControl>
+                        </FormGroup>
                         <FormControlLabel
                             className={classes.linkedInSwitch}
                             control={
