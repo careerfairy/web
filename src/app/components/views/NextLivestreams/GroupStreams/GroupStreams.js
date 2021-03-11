@@ -1,8 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {withFirebase} from "../../../../context/firebase";
-import {Typography, LinearProgress, Box, Grid} from "@material-ui/core";
+import {Grid, LinearProgress, Typography} from "@material-ui/core";
 import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
+import LazyLoad from 'react-lazyload'
+import Spinner from "./groupStreamCard/Spinner";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -29,7 +31,25 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const Wrapper = ({children, index, streamId}) => {
 
+        return (index <= 2)? (
+            <>
+                {children}
+            </>
+        ):(
+            <LazyLoad
+                style={{height: "-webkit-fill-available"}}
+                key={streamId}
+                height={600}
+                unmountIfInvisible
+                offset={[0, 0]}
+                placeholder={<Spinner/>}>
+                {children}
+            </LazyLoad>
+        )
+
+}
 const GroupStreams = ({
                           groupData,
                           userData,
@@ -57,25 +77,30 @@ const GroupStreams = ({
         const renderStreamCards = livestreams?.map((livestream, index) => {
             if (livestream) {
                 return (
-                    <Grid style={{height: !mobile && 600}} key={livestream.id} xs={12} sm={12} md={6}
+                    <Grid style={{height: 600}} key={livestream.id} xs={12} sm={12} md={6}
                           lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 4} item>
-                        <GroupStreamCardV2
+                        <Wrapper
                             index={index}
-                            width={width}
-                            mobile={mobile}
-                            setGlobalCardHighlighted={setGlobalCardHighlighted}
-                            globalCardHighlighted={globalCardHighlighted}
-                            hasCategories={hasCategories}
-                            groupData={groupData}
-                            listenToUpcoming={listenToUpcoming}
-                            careerCenterId={careerCenterId}
-                            livestreamId={livestreamId}
-                            user={user} userData={userData} fields={null}
-                            careerCenters={[]}
-                            id={livestream.id}
-                            key={livestream.id}
-                            livestream={livestream}
-                        />
+                            streamId={livestream.id}
+                        >
+                            <GroupStreamCardV2
+                                index={index}
+                                width={width}
+                                mobile={mobile}
+                                setGlobalCardHighlighted={setGlobalCardHighlighted}
+                                globalCardHighlighted={globalCardHighlighted}
+                                hasCategories={hasCategories}
+                                groupData={groupData}
+                                listenToUpcoming={listenToUpcoming}
+                                careerCenterId={careerCenterId}
+                                livestreamId={livestreamId}
+                                user={user} userData={userData} fields={null}
+                                careerCenters={[]}
+                                id={livestream.id}
+                                key={livestream.id}
+                                livestream={livestream}
+                            />
+                        </Wrapper>
                     </Grid>
                 )
             }
@@ -83,7 +108,7 @@ const GroupStreams = ({
 
         return (
             <Grid item xs={12} sm={12} md={hasCategories ? 8 : 12} lg={hasCategories ? 8 : 12} xl={hasCategories ? 8 : 12}>
-                <Grid container spacing={mobile? 2: 4}>
+                <Grid container spacing={mobile ? 2 : 4}>
                     {groupData.id || listenToUpcoming ? (searching ?
                         <Grid md={12} lg={12} xl={12} item className={classes.loaderWrapper}>
                             <LinearProgress style={{width: "80%", marginTop: 100}} color="primary"/>
