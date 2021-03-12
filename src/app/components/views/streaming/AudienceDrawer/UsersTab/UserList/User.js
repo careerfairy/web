@@ -66,7 +66,7 @@ const User = ({user, style, inTalentPool}) => {
             firstName,
             lastName,
             avatarUrl,
-            university: {name: universityName},
+            university,
             userEmail,
             userResume,
             linkedinUrl
@@ -142,14 +142,14 @@ const User = ({user, style, inTalentPool}) => {
                         </Typography>
                     }
                     secondary={
-                        <Tooltip title={universityName || ""}>
+                        <Tooltip title={university?.name || ""}>
                             <Typography
                                 noWrap
                                 color="textSecondary"
                                 variant="body2"
                                 className={classes.secondary}
                             >
-                                {universityName}
+                                {university?.name}
                             </Typography>
                         </Tooltip>
                     }

@@ -1381,8 +1381,8 @@ class Firebase {
                         };
                     }
                 });
-                (poll.voters = firebase.firestore.FieldValue.arrayUnion(userEmail)),
-                    (poll.options = updatedOptions);
+                poll.voters = firebase.firestore.FieldValue.arrayUnion(userEmail)
+                poll.options = updatedOptions
                 transaction.update(ref, poll);
             });
         });
