@@ -7,6 +7,7 @@ import LazyLoad from 'react-lazyload'
 import Spinner from "./groupStreamCard/Spinner";
 import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
 import useInfiniteScrollClient from "../../../custom-hook/useInfiniteScrollClient";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -31,7 +32,15 @@ const useStyles = makeStyles((theme) => ({
         alignItems: "center",
         justifyContent: "center",
     },
+    streamGridItem: {
+        height: 500,
+        display: "flex"
+    },
+    dynamicHeight:{
+        height: "auto"
+    }
 }));
+
 
 const Wrapper = ({children, index, streamId}) => {
 
@@ -41,10 +50,10 @@ const Wrapper = ({children, index, streamId}) => {
         </>
     ) : (
         <LazyLoad
-            style={{height: "100%"}}
+            style={{flex: 1, display: "flex"}}
             key={streamId}
-            height={600}
-            unmountIfInvisible
+            height={500}
+            // unmountIfInvisible
             offset={[0, 0]}
             placeholder={<Spinner/>}>
             {children}
@@ -70,7 +79,7 @@ const GroupStreams = ({
         const classes = useStyles()
         const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
         const searchedButNoResults = selectedOptions.length && !searching && !livestreams.length
-        const [slicedLivestreams, loadMoreLivestreams, hasMoreLivestreams, totalLivestreams] = useInfiniteScrollClient(livestreams, 3, 3);
+        const [slicedLivestreams, loadMoreLivestreams, hasMoreLivestreams, totalLivestreams] = useInfiniteScrollClient(livestreams, 6, 3);
 
         const handleScroll = () => {
             const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 300
@@ -96,12 +105,14 @@ const GroupStreams = ({
         }, [groupData])
 
 
-        const renderStreamCards = slicedLivestreams?.map((livestream, index) => {
+        const renderStreamCards = slicedLivestreams?.map((livestream, index, array) => {
             if (livestream) {
                 return (
                     <Grid
-                        style={{maxHeight: 400}}
-                        key={livestream.id} xs={12} sm={12} md={6}
+                        className={clsx(classes.streamGridItem, {
+                            [classes.dynamicHeight]: mobile && (index >= array.length - 2)
+                        })}
+                        key={livestream.id} xs={12} sm={6} md={6}
                         lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 4} item>
                         <Wrapper
                             index={index}

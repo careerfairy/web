@@ -8,7 +8,7 @@ import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
 import {dynamicSort} from "../../../../helperFunctions/HelperFunctions";
-import {Card, CardHeader, Chip, Collapse, Grow} from "@material-ui/core";
+import {Card, CardHeader, Chip, ClickAwayListener, Collapse, Grow} from "@material-ui/core";
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -26,28 +26,31 @@ import Flip from 'react-reveal/Flip';
 import clsx from "clsx";
 import CopyToClipboard from "../../../common/CopyToClipboard";
 import {DateTimeDisplay} from "./TimeDisplay";
+import {AttendButton, DetailsButton} from "./actionButtons";
 
 const useStyles = makeStyles(theme => ({
+    cardHovered: {
+        height: "max-content",
+        transform: 'translateY(-2px)',
+        '& $shadow': {
+            bottom: '-1.5rem',
+        },
+        '& $shadow2': {
+            bottom: '-2.5rem',
+        },
+    },
     card: {
         // minWidth: 320,
+        flex: 1,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        height: "100%",
+        // height: "100%",
         position: 'relative',
-        boxShadow: '0 8px 24px 0 rgba(0,0,0,0.12)',
+        // boxShadow: '0 8px 24px 0 rgba(0,0,0,0.12)',
         overflow: 'visible',
         borderRadius: '1.5rem',
         transition: '0.4s',
-        '&:hover': {
-            transform: 'translateY(-2px)',
-            '& $shadow': {
-                bottom: '-1.5rem',
-            },
-            '& $shadow2': {
-                bottom: '-2.5rem',
-            },
-        },
         '&:before': {
             content: '""',
             position: 'absolute',
@@ -63,6 +66,7 @@ const useStyles = makeStyles(theme => ({
     main: {
         display: "flex",
         flex: 1,
+        minHeight: 330,
         overflow: 'hidden',
         borderTopLeftRadius: '1.5rem',
         borderTopRightRadius: '1.5rem',
@@ -82,7 +86,6 @@ const useStyles = makeStyles(theme => ({
         width: '100%',
         zIndex: 1,
         padding: '1.5rem 1.5rem 1rem',
-        minHeight: 200
     },
     avatar: {
         width: 48,
@@ -117,6 +120,8 @@ const useStyles = makeStyles(theme => ({
         position: 'relative',
         borderBottomLeftRadius: '1.5rem',
         borderBottomRightRadius: '1.5rem',
+        display: "flex",
+        flexDirection: "column"
     },
     shadow: {
         transition: '0.2s',
@@ -142,8 +147,20 @@ const useStyles = makeStyles(theme => ({
     top: {
         zIndex: 995
     },
-    timeDisplayWrapper:{
-
+    timeDisplayWrapper: {},
+    groupLogos: {
+        justifyContent: "space-evenly"
+    },
+    livestreamCompanyAva: {
+        width: "100%",
+        height: 100,
+        boxShadow: theme.shadows[5],
+        background: theme.palette.common.white,
+        "& img": {
+            objectFit: "contain",
+            maxWidth: "90%",
+            maxHeight: "90%"
+        }
     }
 }))
 
@@ -272,7 +289,9 @@ const GroupStreamCardV2 = memo(({
     }
 
     const handleMouseEntered = () => {
-        if (!mobile && !cardHovered && !globalCardHighlighted) {
+        if (
+            // !mobile &&
+            !cardHovered && !globalCardHighlighted) {
             setCardHovered(true)
         }
     }
@@ -412,73 +431,142 @@ const GroupStreamCardV2 = memo(({
         }
     }
 
+    const handleCardClick = () => {
+        if (mobile) {
+            setCardHovered(true)
+        }
+    }
+
+    const handleClickAwayDetails = () => {
+        setCardHovered(false)
+    }
+
     return (
         <Fragment>
-            <Card
-                onMouseEnter={handleMouseEntered}
-                onMouseLeave={handleMouseLeft}
-                className={clsx(classes.card, {
-                    [classes.top]: cardHovered
-                })}
-            >
-                <Box className={classes.main}
-                     // height="100%"
-                     position={'relative'}>
-
-                    <CardMedia
-                        classes={mediaStyles}
-                        image={livestream.backgroundImageUrl}
-                    />
-                    <div className={classes.content}>
-                        <CardHeader
-                            titleTypographyProps={{className: classes.timeDisplayWrapper}}
-                            title={
-                                <DateTimeDisplay mobile={mobile}
-                                                 date={livestream.start.toDate()}/>
-                            }
-                            action={
-                                <CopyToClipboard
-                                    color="white"
-                                    value={linkToStream}/>
-                            }
-                        />
-                        <Typography variant={'h2'} className={classes.title}>
-                            {livestream.title}
-                        </Typography>
-
-                        <Collapse in>
-                            {targetOptions.slice(0, cardHovered ? -1 : maxOptions).map(option =>
-                                <Tag option={option}/>
-                            )}
-                        </Collapse>
-                        {(targetOptions.length > maxOptions && !cardHovered) &&
-                        <Tag option={{id: "hasMore", name: "..."}}/>}
-                    </div>
-                </Box>
-                <Row
-                    className={classes.author}
-                    m={0}
-                    p={3}
-                    pt={2}
-                    gap={2}
-                    bgcolor={'common.white'}
+            <ClickAwayListener onClickAway={handleClickAwayDetails}>
+                <Card
+                    onClick={handleCardClick}
+                    onMouseEnter={handleMouseEntered}
+                    onMouseLeave={handleMouseLeft}
+                    className={clsx(classes.card, {
+                        [classes.top]: cardHovered,
+                        [classes.cardHovered]: cardHovered
+                    })}
                 >
-                    {!cardHovered && <Grow unmountOnExit in>
-                        <Row>
-                            <Item>
-                                <AvatarGroup>
-                                    {livestream.speakers?.map(speaker => (
-                                        <Avatar
-                                            key={speaker.id}
-                                            className={classes.avatar}
-                                            src={speaker.avatar || speakerPlaceholder}
-                                            alt={speaker.firstName}
-                                        />
-                                    ))}
-                                </AvatarGroup>
-                            </Item>
-                            <Item>
-                                <AvatarGroup>
+                    <Box className={classes.main}
+                         position={'relative'}>
+
+                        <CardMedia
+                            classes={mediaStyles}
+                            image={livestream.backgroundImageUrl}
+                        />
+                        <div className={classes.content}>
+                            <CardHeader
+                                // titleTypographyProps={{className: classes.timeDisplayWrapper}}
+                                avatar={
+                                    <DateTimeDisplay mobile={mobile}
+                                                     date={livestream.start.toDate()}/>
+                                }
+                                title={
+                                    <Avatar
+                                        variant="rounded"
+                                        className={classes.livestreamCompanyAva}
+                                        src={livestream.companyLogoUrl}
+                                        alt={livestream.company}
+                                    />
+                                }
+                                action={
+                                    <CopyToClipboard
+                                        color="white"
+                                        value={linkToStream}/>
+                                }
+                            />
+                            <Typography variant={'h2'} className={classes.title}>
+                                {livestream.title}
+                            </Typography>
+
+                            <Collapse in>
+                                {targetOptions.slice(0, cardHovered ? -1 : maxOptions).map(option =>
+                                    <Tag option={option}/>
+                                )}
+                            </Collapse>
+                            {(targetOptions.length > maxOptions && !cardHovered) &&
+                            <Tag option={{id: "hasMore", name: "..."}}/>}
+                            <Box>
+                                <DetailsButton
+                                    size="small"
+                                    groupData={groupData}
+                                    listenToUpcoming={listenToUpcoming}
+                                    livestream={livestream}/>
+                                <AttendButton
+                                    size="small"
+                                    handleRegisterClick={handleRegisterClick}
+                                    checkIfRegistered={checkIfRegistered}
+                                    user={user}/>
+                            </Box>
+                        </div>
+                    </Box>
+                    <Row
+                        className={classes.author}
+                        m={0}
+                        p={3}
+                        pt={2}
+                        gap={2}
+                        bgcolor={'common.white'}
+                    >
+                        <Collapse unmountOnExit in={!cardHovered}>
+                            <Fade timeout={300} unmountOnExit in={!cardHovered}>
+                                <Row>
+                                    <Item>
+                                        <AvatarGroup>
+                                            {livestream.speakers?.map(speaker => (
+                                                <Avatar
+                                                    key={speaker.id}
+                                                    className={classes.avatar}
+                                                    src={speaker.avatar || speakerPlaceholder}
+                                                    alt={speaker.firstName}
+                                                />
+                                            ))}
+                                        </AvatarGroup>
+                                    </Item>
+                                    <Item>
+                                        <AvatarGroup>
+                                            {careerCenters.map(careerCenter => (
+                                                <Avatar
+                                                    variant="rounded"
+                                                    key={careerCenter.id}
+                                                    className={classes.groupLogo}
+                                                    src={careerCenter.logoUrl}
+                                                    alt={careerCenter.universityName}
+                                                />
+                                            ))}
+                                        </AvatarGroup>
+                                    </Item>
+                                </Row>
+                            </Fade>
+                        </Collapse>
+                        <Collapse unmountOnExit in={cardHovered}>
+                            <div>
+                                {livestream.speakers?.map(speaker => (
+                                    <Row className={classes.previewRow} key={speaker.id}>
+                                        <Item>
+                                            <Avatar
+
+                                                className={classes.avatar}
+                                                src={speaker.avatar || speakerPlaceholder}
+                                                alt={speaker.firstName}
+                                            />
+                                        </Item>
+                                        <Info style={{marginRight: "auto"}} useStyles={useNewsInfoStyles}>
+                                            <InfoTitle>{`${speaker.firstName} ${speaker.lastName}`}</InfoTitle>
+                                            <InfoSubtitle>{speaker.position}</InfoSubtitle>
+                                        </Info>
+                                    </Row>
+                                ))}
+                                <Typography align="center">
+                                    Brought to you by:
+                                </Typography>
+                                <Row p={1} className={classes.groupLogos}>
                                     {careerCenters.map(careerCenter => (
                                         <Avatar
                                             variant="rounded"
@@ -488,36 +576,14 @@ const GroupStreamCardV2 = memo(({
                                             alt={careerCenter.universityName}
                                         />
                                     ))}
-                                </AvatarGroup>
-                            </Item>
-                        </Row>
-                    </Grow>}
-                    {cardHovered && <Collapse unmountOnExit in>
-                        <div>
-                            {livestream.speakers?.map(speaker => (
-                                <Row className={classes.previewRow} key={speaker.id}>
-                                    <Item>
-                                        <Avatar
-
-                                            className={classes.avatar}
-                                            src={speaker.avatar || speakerPlaceholder}
-                                            alt={speaker.firstName}
-                                        />
-                                    </Item>
-                                    <Info style={{marginRight: "auto"}} useStyles={useNewsInfoStyles}>
-                                        <InfoTitle>{`${speaker.firstName} ${speaker.lastName}`}</InfoTitle>
-                                        <InfoSubtitle>{speaker.position}</InfoSubtitle>
-                                    </Info>
                                 </Row>
-                            ))}
-                        </div>
-                    </Collapse>}
-
-
-                </Row>
-                <div className={classes.shadow}/>
-                <div className={`${classes.shadow} ${classes.shadow2}`}/>
-            </Card>
+                            </div>
+                        </Collapse>
+                    </Row>
+                    <div className={classes.shadow}/>
+                    <div className={`${classes.shadow} ${classes.shadow2}`}/>
+                </Card>
+            </ClickAwayListener>
             <GroupJoinToAttendModal
                 open={openJoinModal}
                 groups={getGroups()}
@@ -531,6 +597,7 @@ const GroupStreamCardV2 = memo(({
                 modalOpen={bookingModalOpen}
                 setModalOpen={setBookingModalOpen}
                 user={user}/>
+
         </Fragment>
     )
 })
