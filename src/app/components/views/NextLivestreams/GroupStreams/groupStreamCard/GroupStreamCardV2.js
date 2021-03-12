@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from "context/firebase";
 import {fade, makeStyles} from "@material-ui/core/styles";
@@ -8,7 +9,7 @@ import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
 import {dynamicSort} from "../../../../helperFunctions/HelperFunctions";
-import {Button, Card, CardHeader, ClickAwayListener, Collapse, Grow} from "@material-ui/core";
+import {Card, CardHeader, ClickAwayListener, Collapse, Grow} from "@material-ui/core";
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -25,7 +26,6 @@ import clsx from "clsx";
 import CopyToClipboard from "../../../common/CopyToClipboard";
 import {DateTimeDisplay} from "./TimeDisplay";
 import {AttendButton, DetailsButton} from "./actionButtons";
-import GroupJoinModal from "../../../profile/GroupJoinModal";
 import LogoElement from "../LogoElement";
 import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
 
@@ -82,7 +82,8 @@ const useStyles = makeStyles(theme => ({
     },
     mainBooked: {
         '&:after': {
-            background: `linear-gradient(to top, ${theme.palette.primary.dark}, rgba(0,0,0,0))`,
+            background: theme.palette.primary.dark,
+            opacity: 0.8
         },
     },
     content: {
@@ -642,5 +643,22 @@ const GroupStreamCardV2 = memo(({
     )
 })
 
+GroupStreamCardV2.propTypes = {
+    careerCenterId: PropTypes.string,
+    firebase: PropTypes.object,
+    globalCardHighlighted: PropTypes.bool,
+    groupData: PropTypes.object,
+    id: PropTypes.string,
+    isAdmin: PropTypes.bool,
+    isTargetDraft: PropTypes.bool,
+    listenToUpcoming: PropTypes.bool,
+    livestream: PropTypes.object.isRequired,
+    livestreamId: PropTypes.string,
+    mobile: PropTypes.bool,
+    setGlobalCardHighlighted: PropTypes.func,
+    user: PropTypes.object,
+    userData: PropTypes.object
+}
 
 export default withFirebase(GroupStreamCardV2);
+

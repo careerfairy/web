@@ -119,18 +119,14 @@ const GroupStreams = ({
                             streamId={livestream.id}
                         >
                             <GroupStreamCardV2
-                                index={index}
-                                width={width}
                                 mobile={mobile}
                                 setGlobalCardHighlighted={setGlobalCardHighlighted}
                                 globalCardHighlighted={globalCardHighlighted}
-                                hasCategories={hasCategories}
                                 groupData={groupData}
                                 listenToUpcoming={listenToUpcoming}
                                 careerCenterId={careerCenterId}
                                 livestreamId={livestreamId}
-                                user={user} userData={userData} fields={null}
-                                careerCenters={[]}
+                                user={user} userData={userData}
                                 id={livestream.id}
                                 key={livestream.id}
                                 livestream={livestream}

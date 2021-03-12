@@ -6,7 +6,6 @@ import {Pagination} from "@material-ui/lab";
 import StreamsToolbar from "./StreamsToolbar";
 import {useSnackbar} from "notistack";
 import {useAuth} from "../../../../../HOCs/AuthProvider";
-import GroupStreamCardV2 from "../../../NextLivestreams/GroupStreams/groupStreamCard/GroupStreamCardV2";
 import NewStreamModal from "./NewStreamModal";
 import {useRouter} from "next/router";
 import {repositionElement} from "../../../../helperFunctions/HelperFunctions";
@@ -21,8 +20,7 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         flexDirection: "column"
     },
-    streamCard: {
-    },
+    streamCard: {},
     highlighted: {}
 }));
 

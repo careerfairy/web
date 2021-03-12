@@ -359,7 +359,7 @@ const useStyles = makeStyles((theme) => {
     })
 })
 
-const GroupStreamCardV2 = memo(({
+const GroupStreamCardV2Old = memo(({
                                     livestream,
                                     user,
                                     mobile,
@@ -851,4 +851,4 @@ const GroupStreamCardV2 = memo(({
 })
 
 
-export default withFirebase(GroupStreamCardV2);
+export default withFirebase(GroupStreamCardV2Old);
