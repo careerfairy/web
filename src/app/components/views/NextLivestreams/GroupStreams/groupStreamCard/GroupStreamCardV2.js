@@ -8,7 +8,7 @@ import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
 import {dynamicSort} from "../../../../helperFunctions/HelperFunctions";
-import {Button, Card, CardHeader, ClickAwayListener, Collapse} from "@material-ui/core";
+import {Button, Card, CardHeader, ClickAwayListener, Collapse, Grow} from "@material-ui/core";
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -27,6 +27,7 @@ import {DateTimeDisplay} from "./TimeDisplay";
 import {AttendButton, DetailsButton} from "./actionButtons";
 import GroupJoinModal from "../../../profile/GroupJoinModal";
 import LogoElement from "../LogoElement";
+import CheckCircleRoundedIcon from "@material-ui/icons/CheckCircleRounded";
 
 const useStyles = makeStyles(theme => ({
     cardHovered: {
@@ -77,6 +78,11 @@ const useStyles = makeStyles(theme => ({
             width: '100%',
             height: '100%',
             background: `linear-gradient(to top, ${theme.palette.navyBlue.main}, rgba(0,0,0,0))`,
+        },
+    },
+    mainBooked: {
+        '&:after': {
+            background: `linear-gradient(to top, ${theme.palette.primary.dark}, rgba(0,0,0,0))`,
         },
     },
     content: {
@@ -200,19 +206,22 @@ const useStyles = makeStyles(theme => ({
             boxShadow: `0 0 0 0 ${fade(theme.palette.primary.main, 0)}`
         }
     },
+    bookedIcon: {
+        color: "white",
+        position: "absolute",
+        left: theme.spacing(1),
+        top: 5,
+        display: "flex",
+        alignItems: "center"
+    },
+    bookedText: {
+        marginLeft: theme.spacing(1),
+        fontWeight: "bold",
+        color: theme.palette.common.white,
+
+    },
 }))
 
-const AvatarWrapper = ({children, hovered}) => {
-    return hovered ? (
-        <>
-            {children}
-        </>
-    ) : (
-        <AvatarGroup max={3}>
-            {children}
-        </AvatarGroup>
-    )
-}
 
 const maxOptions = 2
 const GroupStreamCardV2 = memo(({
@@ -226,19 +235,10 @@ const GroupStreamCardV2 = memo(({
                                     careerCenterId,
                                     groupData,
                                     listenToUpcoming,
-                                    hasCategories,
-                                    className,
-                                    index,
                                     isTargetDraft,
-                                    width,
                                     setGlobalCardHighlighted,
                                     globalCardHighlighted,
                                     isAdmin,
-                                    isPastLivestream,
-                                    hideActions,
-                                    isDraft,
-                                    switchToNextLivestreamsTab,
-                                    handleEditStream
                                 }) => {
     const mediaStyles = useCoverCardMediaStyles();
     const classes = useStyles()
@@ -253,10 +253,8 @@ const GroupStreamCardV2 = memo(({
         return Boolean(livestream.registeredUsers?.indexOf(user.email) > -1)
     }
 
-    const isPending = () => livestream?.status?.pendingApproval === true
 
     const registered = useMemo(() => userIsRegistered(), [livestream.registeredUsers])
-    const [expanded, setExpanded] = useState(false);
 
     const [cardHovered, setCardHovered] = useState(false)
     const [targetOptions, setTargetOptions] = useState([])
@@ -264,8 +262,6 @@ const GroupStreamCardV2 = memo(({
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [isHighlighted, setIsHighlighted] = useState(false)
     const [openJoinModal, setOpenJoinModal] = useState(false);
-    const [levelOfStudyModalOpen, setLevelOfStudyModalOpen] = useState(false);
-    const [fetchingCareerCenters, setFetchingCareerCenters] = useState(false);
     const [groupsWithPolicies, setGroupsWithPolicies] = useState([]);
 
     useEffect(() => {
@@ -300,7 +296,6 @@ const GroupStreamCardV2 = memo(({
 
     useEffect(() => {
         if (!careerCenters.length && livestream && livestream.groupIds && livestream.groupIds.length) {
-            setFetchingCareerCenters(true)
             firebase.getDetailLivestreamCareerCenters(livestream.groupIds)
                 .then((querySnapshot) => {
                     let groupList = [];
@@ -310,25 +305,15 @@ const GroupStreamCardV2 = memo(({
                         groupList.push(group);
                     });
                     setCareerCenters(groupList);
-                    setFetchingCareerCenters(false)
                 }).catch((e) => {
-                setFetchingCareerCenters(false)
                 console.log("error", e)
             })
         }
     }, []);
 
 
-    const handleCloseLevelOfStudyModal = () => {
-        setLevelOfStudyModalOpen(false)
-    }
-    const handleOpenLevelOfStudyModal = () => {
-        setLevelOfStudyModalOpen(true)
-    }
-
     const handleMouseEntered = () => {
         if (
-            // !mobile &&
             !cardHovered && !globalCardHighlighted) {
             setCardHovered(true)
         }
@@ -494,7 +479,9 @@ const GroupStreamCardV2 = memo(({
                         [classes.pulseAnimate]: isHighlighted
                     })}
                 >
-                    <Box className={classes.main}
+                    <Box className={clsx(classes.main, {
+                        [classes.mainBooked]: registered
+                    })}
                          position={'relative'}>
 
                         <CardMedia
@@ -549,6 +536,14 @@ const GroupStreamCardV2 = memo(({
                                     handleRegisterClick={handleRegisterClick}
                                     checkIfRegistered={checkIfRegistered}
                                     user={user}/>
+                                <Grow in={Boolean(userIsRegistered())}>
+                                    <div className={classes.bookedIcon}>
+                                        <CheckCircleRoundedIcon/>
+                                        <Typography variant="h6" className={classes.bookedText}>
+                                            Booked
+                                        </Typography>
+                                    </div>
+                                </Grow>
                             </Box>
                         </div>
                     </Box>
@@ -643,7 +638,6 @@ const GroupStreamCardV2 = memo(({
                 modalOpen={bookingModalOpen}
                 setModalOpen={setBookingModalOpen}
                 user={user}/>
-
         </Fragment>
     )
 })
