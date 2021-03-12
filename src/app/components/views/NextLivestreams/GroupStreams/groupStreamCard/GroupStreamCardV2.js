@@ -44,6 +44,7 @@ const useStyles = makeStyles(theme => ({
         flex: 1,
         display: "flex",
         flexDirection: "column",
+        width: "-webkit-fill-available",
         justifyContent: "space-between",
         position: 'relative',
         overflow: 'visible',
@@ -108,7 +109,7 @@ const useStyles = makeStyles(theme => ({
             maxHeight: "90%"
         }
     },
-    groupLogoStacked:{
+    groupLogoStacked: {
         width: 60,
         height: 60,
     },
@@ -163,11 +164,20 @@ const useStyles = makeStyles(theme => ({
         width: "100%",
         justifyContent: "space-evenly"
     },
+    avaLogoWrapper: {
+        display: "flex",
+        // flexDirection: "column",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        alignItems: "center"
+    },
     top: {
         zIndex: 995
     },
     groupLogos: {
-        justifyContent: "space-evenly"
+        justifyContent: "space-evenly",
+        display: "flex",
+        flexWrap: "wrap",
     },
     livestreamCompanyAva: {
         borderBottomRightRadius: `${theme.spacing(2.5)}px !important`,
@@ -269,7 +279,7 @@ const GroupStreamCardV2 = memo(({
         if (checkIfHighlighted() && !isHighlighted) {
             setIsHighlighted(true)
             // setGlobalCardHighlighted?.(true)
-            setCardHovered(true)
+            // setCardHovered(true)
         } else if (checkIfHighlighted() && isHighlighted) {
             setIsHighlighted(false)
         }
@@ -318,7 +328,7 @@ const GroupStreamCardV2 = memo(({
 
     const handleMouseLeft = () => {
         if (isHighlighted) {
-            setGlobalCardHighlighted?.(false)
+            // setGlobalCardHighlighted?.(false)
         }
         cardHovered && setCardHovered(false)
     }
@@ -513,7 +523,7 @@ const GroupStreamCardV2 = memo(({
                             >
                                 {livestream.title}
                             </Typography>
-                            <Box style={{maxHeight: 140, overflow: "auto"}}>
+                            <Box style={{maxHeight: 140, overflow: "auto", overflowX: "hidden"}}>
                                 {targetOptions.slice(0, cardHovered ? -1 : maxOptions).map(option =>
                                     <Tag option={option}/>
                                 )}
@@ -547,14 +557,14 @@ const GroupStreamCardV2 = memo(({
                     <Row
                         className={classes.author}
                         m={0}
-                        p={3}
-                        pt={2}
-                        gap={2}
+                        p={mobile ? 1 : 3}
+                        py={2}
+                        gap={mobile ? 1 : 2}
                         bgcolor={'common.white'}
                     >
                         <Collapse unmountOnExit in={!cardHovered}>
                             <Fade timeout={300} unmountOnExit in={!cardHovered}>
-                                <Row>
+                                <Row style={{justifyContent: "space-evenly"}} className={classes.avaLogoWrapper}>
                                     <Item>
                                         <AvatarGroup>
                                             {livestream.speakers?.map(speaker => (
@@ -573,7 +583,7 @@ const GroupStreamCardV2 = memo(({
                                                 <Avatar
                                                     variant="rounded"
                                                     key={careerCenter.id}
-                                                    className={clsx(classes.groupLogo,classes.groupLogoStacked)}
+                                                    className={clsx(classes.groupLogo, classes.groupLogoStacked)}
                                                     src={careerCenter.logoUrl}
                                                     alt={careerCenter.universityName}
                                                 />
@@ -584,7 +594,7 @@ const GroupStreamCardV2 = memo(({
                             </Fade>
                         </Collapse>
                         <Collapse unmountOnExit in={cardHovered}>
-                            <div>
+                            <div className={classes.avaLogoWrapper}>
                                 {livestream.speakers?.map(speaker => (
                                     <Row className={classes.previewRow} key={speaker.id}>
                                         <Item>
@@ -601,7 +611,7 @@ const GroupStreamCardV2 = memo(({
                                         </Info>
                                     </Row>
                                 ))}
-                                <Row p={1} className={classes.groupLogos}>
+                                <Row p={1} style={{width: "100%"}} className={classes.groupLogos}>
                                     {careerCenters.map(careerCenter => (
                                         <LogoElement
                                             className={classes.groupLogo}

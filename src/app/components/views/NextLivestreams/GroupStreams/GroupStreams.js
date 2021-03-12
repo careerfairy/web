@@ -50,7 +50,7 @@ const Wrapper = ({children, index, streamId}) => {
         </>
     ) : (
         <LazyLoad
-            style={{flex: 1, display: "flex"}}
+            style={{flex: 1, display: "flex", width: "-webkit-fill-available"}}
             key={streamId}
             height={gridItemHeight}
             // unmountIfInvisible
@@ -112,7 +112,7 @@ const GroupStreams = ({
                         className={clsx(classes.streamGridItem, {
                             [classes.dynamicHeight]: mobile && (index >= array.length - 2)
                         })}
-                        key={livestream.id} xs={12} sm={6} md={6}
+                        key={livestream.id} xs={12} sm={12} md={hasCategories? 12:6}
                         lg={hasCategories ? 6 : 4} xl={hasCategories ? 6 : 4} item>
                         <Wrapper
                             index={index}
