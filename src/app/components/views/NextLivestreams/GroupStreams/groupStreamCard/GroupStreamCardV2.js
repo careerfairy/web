@@ -114,6 +114,15 @@ const useStyles = makeStyles(theme => ({
         fontSize: '2rem',
         fontWeight: 800,
         color: '#fff',
+        display: "-webkit-box",
+        overflow: "hidden",
+        wordBreak: "break-word",
+        textOverflow: "ellipsis",
+        WebkitBoxOrient: "vertical",
+        animation: "$close 0.1s linear 0.1s forwards"
+    },
+    titleHovered: {
+        animation: "$open 0.1s linear 0s forwards"
     },
     author: {
         zIndex: 1,
@@ -161,6 +170,14 @@ const useStyles = makeStyles(theme => ({
             maxWidth: "90%",
             maxHeight: "90%"
         }
+    },
+    "@keyframes open": {
+        from: { lineClamp: 2, WebkitLineClamp: "2" },
+        to: { lineClamp: "initial", WebkitLineClamp: "initial" }
+    },
+    "@keyframes close": {
+        from: { lineClamp: "initial", WebkitLineClamp: "initial" },
+        to: { lineClamp: 2, WebkitLineClamp: "2" }
     }
 }))
 
@@ -481,8 +498,13 @@ const GroupStreamCardV2 = memo(({
                                         value={linkToStream}/>
                                 }
                             />
-                            <Typography variant={'h2'} className={classes.title}>
-                                {livestream.title}
+                            <Typography
+                                variant={'h2'}
+                                className={clsx(classes.title, {
+                                    [classes.titleHovered]: cardHovered
+                                })}
+                            >
+                                {livestream.title + livestream.title}
                             </Typography>
 
                             <Collapse in>

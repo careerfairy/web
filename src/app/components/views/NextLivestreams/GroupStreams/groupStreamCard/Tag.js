@@ -18,7 +18,7 @@ const Tag = ({option}) => {
                      placement="top">
                 <Chip
                     size="small"
-                    color="secondary"
+                    // color="secondary"
                     style={{maxWidth: 300}}
                     label={<Typography variant="body1" noWrap>{option.name}</Typography>}/>
             </Tooltip>
