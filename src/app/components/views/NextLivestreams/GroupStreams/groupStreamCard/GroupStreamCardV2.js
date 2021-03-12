@@ -46,7 +46,6 @@ const useStyles = makeStyles(theme => ({
         flexDirection: "column",
         justifyContent: "space-between",
         position: 'relative',
-        // boxShadow: '0 8px 24px 0 rgba(0,0,0,0.12)',
         overflow: 'visible',
         borderRadius: '1.5rem',
         transition: '0.4s',
@@ -100,14 +99,18 @@ const useStyles = makeStyles(theme => ({
         height: 48,
     },
     groupLogo: {
-        width: 60,
-        height: 60,
+        width: 75,
+        height: 75,
         background: theme.palette.common.white,
         "& img": {
             objectFit: "contain",
             maxWidth: "90%",
             maxHeight: "90%"
         }
+    },
+    groupLogoStacked:{
+        width: 60,
+        height: 60,
     },
     tag: {
         display: 'inline-block',
@@ -179,9 +182,6 @@ const useStyles = makeStyles(theme => ({
             maxHeight: "90%"
         }
     },
-    broughtToYouText: {
-        fontWeight: 600
-    },
     "@keyframes open": {
         from: {lineClamp: 2, WebkitLineClamp: "2"},
         to: {lineClamp: "initial", WebkitLineClamp: "initial"}
@@ -191,7 +191,7 @@ const useStyles = makeStyles(theme => ({
         to: {lineClamp: 2, WebkitLineClamp: "2"}
     },
     pulseAnimate: {
-        animation: `$pulse 1.5s infinite`
+        animation: `$pulse 1.2s infinite`
     },
     "@keyframes pulse": {
         "0%": {
@@ -268,12 +268,8 @@ const GroupStreamCardV2 = memo(({
     useEffect(() => {
         if (checkIfHighlighted() && !isHighlighted) {
             setIsHighlighted(true)
-            setGlobalCardHighlighted?.(true)
-            if (mobile) {
-                setExpanded(true)
-            } else {
-                setCardHovered(true)
-            }
+            // setGlobalCardHighlighted?.(true)
+            setCardHovered(true)
         } else if (checkIfHighlighted() && isHighlighted) {
             setIsHighlighted(false)
         }
@@ -577,7 +573,7 @@ const GroupStreamCardV2 = memo(({
                                                 <Avatar
                                                     variant="rounded"
                                                     key={careerCenter.id}
-                                                    className={classes.groupLogo}
+                                                    className={clsx(classes.groupLogo,classes.groupLogoStacked)}
                                                     src={careerCenter.logoUrl}
                                                     alt={careerCenter.universityName}
                                                 />
@@ -605,9 +601,6 @@ const GroupStreamCardV2 = memo(({
                                         </Info>
                                     </Row>
                                 ))}
-                                <Typography className={classes.broughtToYouText} variant="h6" align="center">
-                                    Brought to you by:
-                                </Typography>
                                 <Row p={1} className={classes.groupLogos}>
                                     {careerCenters.map(careerCenter => (
                                         <LogoElement
