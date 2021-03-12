@@ -62,7 +62,15 @@ const SmallAvatar = withStyles((theme) => ({
 
 const User = ({user, style, inTalentPool}) => {
         const classes = useStyles()
-        const {firstName, lastName, avatarUrl, universityName, userEmail, userResume, linkedinUrl} = user
+        const {
+            firstName,
+            lastName,
+            avatarUrl,
+            university: {name: universityName},
+            userEmail,
+            userResume,
+            linkedinUrl
+        } = user
         const [anchorEl, setAnchorEl] = React.useState(null);
         const open = Boolean(anchorEl);
 
@@ -106,21 +114,21 @@ const User = ({user, style, inTalentPool}) => {
                 })}
                 style={style}
                 button={inTalentPool} alignItems="flex-start">
-                <Tooltip color="primary" title={inTalentPool ?"Is in talent pool": ""}>
-                <ListItemAvatar>
-                    <Badge anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right',
-                    }} overlap="circle" badgeContent={inTalentPool ?
-                        <SmallAvatar>
-                            <HowToRegRoundedIcon color="primary"/>
-                        </SmallAvatar>
-                        : 0}>
-                        <Avatar alt={`${firstName} ${lastName}`} src={avatarUrl}>
-                            {firstName ? `${firstName[0] + lastName[0]}` : ""}
-                        </Avatar>
-                    </Badge>
-                </ListItemAvatar>
+                <Tooltip color="primary" title={inTalentPool ? "Is in talent pool" : ""}>
+                    <ListItemAvatar>
+                        <Badge anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right',
+                        }} overlap="circle" badgeContent={inTalentPool ?
+                            <SmallAvatar>
+                                <HowToRegRoundedIcon color="primary"/>
+                            </SmallAvatar>
+                            : 0}>
+                            <Avatar alt={`${firstName} ${lastName}`} src={avatarUrl}>
+                                {firstName ? `${firstName[0] + lastName[0]}` : ""}
+                            </Avatar>
+                        </Badge>
+                    </ListItemAvatar>
                 </Tooltip>
                 <ListItemText
                     disableTypography
