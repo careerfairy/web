@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
     },
 }))
 
-export const AttendButton = ({checkIfRegistered, user, handleRegisterClick, ...props}) => {
+export const AttendButton = ({checkIfRegistered, user, mobile, handleRegisterClick, ...props}) => {
     const classes = useStyles()
     return (
         <Button className={classes.actionButton} size='large' style={{marginLeft: 5}}
@@ -28,7 +28,7 @@ export const AttendButton = ({checkIfRegistered, user, handleRegisterClick, ...p
     )
 }
 
-export const DetailsButton = ({listenToUpcoming, livestream, groupData, ...props}) => {
+export const DetailsButton = ({listenToUpcoming, mobile, livestream, groupData, ...props}) => {
     const classes = useStyles()
     return (
         <Link

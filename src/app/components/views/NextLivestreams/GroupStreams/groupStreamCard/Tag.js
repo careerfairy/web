@@ -18,8 +18,8 @@ const Tag = ({option}) => {
                      placement="top">
                 <Chip
                     size="small"
-                    // color="secondary"
-                    style={{maxWidth: 300}}
+                    variant="outlined"
+                    style={{maxWidth: 300, color: "white", borderColor: "white"}}
                     label={<Typography variant="body1" noWrap>{option.name}</Typography>}/>
             </Tooltip>
         </div>

@@ -639,7 +639,8 @@ const GroupStreamCardV2 = memo(({
                 <LogoElement hideFollow={(!cardHovered && !mobile) || isAdmin} key={careerCenter.groupId}
                              livestreamId={livestream.id}
                              userFollows={checkIfUserFollows(careerCenter)}
-                             careerCenter={careerCenter} userData={userData} user={user}/>
+                             careerCenter={careerCenter} userData={userData} user={user}
+                />
             </div>
         );
     })

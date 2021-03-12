@@ -5,10 +5,10 @@ import {Grid, LinearProgress, Typography} from "@material-ui/core";
 import GroupStreamCardV2 from "./groupStreamCard/GroupStreamCardV2";
 import LazyLoad from 'react-lazyload'
 import Spinner from "./groupStreamCard/Spinner";
-import useInfiniteScroll from "../../../custom-hook/useInfiniteScroll";
 import useInfiniteScrollClient from "../../../custom-hook/useInfiniteScrollClient";
 import clsx from "clsx";
 
+const gridItemHeight = 530
 const useStyles = makeStyles((theme) => ({
     root: {
         flex: 1,
@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: "center",
     },
     streamGridItem: {
-        height: 500,
+        height: gridItemHeight,
         display: "flex"
     },
     dynamicHeight:{
@@ -52,7 +52,7 @@ const Wrapper = ({children, index, streamId}) => {
         <LazyLoad
             style={{flex: 1, display: "flex"}}
             key={streamId}
-            height={500}
+            height={gridItemHeight}
             // unmountIfInvisible
             offset={[0, 0]}
             placeholder={<Spinner/>}>

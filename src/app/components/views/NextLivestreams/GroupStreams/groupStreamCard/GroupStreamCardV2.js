@@ -1,6 +1,6 @@
 import React, {Fragment, memo, useEffect, useMemo, useState} from 'react';
 import {withFirebase} from "context/firebase";
-import {makeStyles} from "@material-ui/core/styles";
+import {fade, makeStyles} from "@material-ui/core/styles";
 import UserUtil from "../../../../../data/util/UserUtil";
 import DataAccessUtil from "../../../../../util/DataAccessUtil";
 import {useRouter} from "next/router";
@@ -8,25 +8,25 @@ import GroupJoinToAttendModal from "../GroupJoinToAttendModal";
 import BookingModal from "../../../common/booking-modal/BookingModal";
 import GroupsUtil from "../../../../../data/util/GroupsUtil";
 import {dynamicSort} from "../../../../helperFunctions/HelperFunctions";
-import {Card, CardHeader, Chip, ClickAwayListener, Collapse, Grow} from "@material-ui/core";
+import {Button, Card, CardHeader, ClickAwayListener, Collapse} from "@material-ui/core";
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
-import {Row, Item} from '@mui-treasury/components/flex';
+import {Item, Row} from '@mui-treasury/components/flex';
 import {Info, InfoSubtitle, InfoTitle} from '@mui-treasury/components/info';
 import {useNewsInfoStyles} from '@mui-treasury/styles/info/news';
 import {useCoverCardMediaStyles} from '@mui-treasury/styles/cardMedia/cover';
 import {AvatarGroup} from "@material-ui/lab";
 import {speakerPlaceholder} from "../../../../util/constants";
 import Tag from "./Tag";
-import {TransitionGroup} from "react-transition-group";
 import Fade from 'react-reveal/Fade';
-import Flip from 'react-reveal/Flip';
 import clsx from "clsx";
 import CopyToClipboard from "../../../common/CopyToClipboard";
 import {DateTimeDisplay} from "./TimeDisplay";
 import {AttendButton, DetailsButton} from "./actionButtons";
+import GroupJoinModal from "../../../profile/GroupJoinModal";
+import LogoElement from "../LogoElement";
 
 const useStyles = makeStyles(theme => ({
     cardHovered: {
@@ -40,12 +40,10 @@ const useStyles = makeStyles(theme => ({
         },
     },
     card: {
-        // minWidth: 320,
         flex: 1,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        // height: "100%",
         position: 'relative',
         // boxShadow: '0 8px 24px 0 rgba(0,0,0,0.12)',
         overflow: 'visible',
@@ -66,7 +64,7 @@ const useStyles = makeStyles(theme => ({
     main: {
         display: "flex",
         flex: 1,
-        minHeight: 330,
+        minHeight: 380,
         overflow: 'hidden',
         borderTopLeftRadius: '1.5rem',
         borderTopRightRadius: '1.5rem',
@@ -85,23 +83,27 @@ const useStyles = makeStyles(theme => ({
         bottom: 0,
         width: '100%',
         zIndex: 1,
-        padding: '1.5rem 1.5rem 1rem',
+        padding: theme.spacing(2, 2, 2),
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-evenly"
     },
     avatar: {
         width: 48,
         height: 48,
     },
     groupLogo: {
-        width: 48,
-        height: 48,
+        width: 60,
+        height: 60,
         background: theme.palette.common.white,
         "& img": {
-            objectFit: "contain"
+            objectFit: "contain",
+            maxWidth: "90%",
+            maxHeight: "90%"
         }
     },
     tag: {
         display: 'inline-block',
-        fontFamily: "'Sen', sans-serif",
         backgroundColor: '#ff5dac',
         borderRadius: '0.5rem',
         padding: '2px 0.5rem',
@@ -109,8 +111,6 @@ const useStyles = makeStyles(theme => ({
         marginBottom: '0.5rem',
     },
     title: {
-        marginTop: "auto",
-        fontFamily: "'Sen', sans-serif",
         fontSize: '2rem',
         fontWeight: 800,
         color: '#fff',
@@ -119,7 +119,7 @@ const useStyles = makeStyles(theme => ({
         wordBreak: "break-word",
         textOverflow: "ellipsis",
         WebkitBoxOrient: "vertical",
-        animation: "$close 0.1s linear 0.1s forwards"
+        animation: "$close 0.1s linear 0.1s forwards",
     },
     titleHovered: {
         animation: "$open 0.1s linear 0s forwards"
@@ -156,11 +156,12 @@ const useStyles = makeStyles(theme => ({
     top: {
         zIndex: 995
     },
-    timeDisplayWrapper: {},
     groupLogos: {
         justifyContent: "space-evenly"
     },
     livestreamCompanyAva: {
+        borderBottomRightRadius: `${theme.spacing(2.5)}px !important`,
+        borderTopLeftRadius: `${theme.spacing(2.5)}px !important`,
         width: "100%",
         height: 100,
         boxShadow: theme.shadows[5],
@@ -171,14 +172,34 @@ const useStyles = makeStyles(theme => ({
             maxHeight: "90%"
         }
     },
+    broughtToYouText: {
+        fontWeight: 600
+    },
     "@keyframes open": {
-        from: { lineClamp: 2, WebkitLineClamp: "2" },
-        to: { lineClamp: "initial", WebkitLineClamp: "initial" }
+        from: {lineClamp: 2, WebkitLineClamp: "2"},
+        to: {lineClamp: "initial", WebkitLineClamp: "initial"}
     },
     "@keyframes close": {
-        from: { lineClamp: "initial", WebkitLineClamp: "initial" },
-        to: { lineClamp: 2, WebkitLineClamp: "2" }
-    }
+        from: {lineClamp: "initial", WebkitLineClamp: "initial"},
+        to: {lineClamp: 2, WebkitLineClamp: "2"}
+    },
+    pulseAnimate: {
+        animation: `$pulse 1.5s infinite`
+    },
+    "@keyframes pulse": {
+        "0%": {
+            MozBoxShadow: `0 0 0 0 ${fade(theme.palette.primary.main, 1)}`,
+            boxShadow: `0 0 0 0 ${fade(theme.palette.primary.main, 1)}`
+        },
+        "70%": {
+            MozBoxShadow: `0 0 0 15px ${fade(theme.palette.primary.main, 0)}`,
+            boxShadow: `0 0 0 15px ${fade(theme.palette.primary.main, 0)}`
+        },
+        "100%": {
+            MozBoxShadow: `0 0 0 0 ${fade(theme.palette.primary.main, 0)}`,
+            boxShadow: `0 0 0 0 ${fade(theme.palette.primary.main, 0)}`
+        }
+    },
 }))
 
 const AvatarWrapper = ({children, hovered}) => {
@@ -455,7 +476,9 @@ const GroupStreamCardV2 = memo(({
     }
 
     const handleClickAwayDetails = () => {
-        setCardHovered(false)
+        if (mobile) {
+            setCardHovered(false)
+        }
     }
 
     return (
@@ -467,7 +490,8 @@ const GroupStreamCardV2 = memo(({
                     onMouseLeave={handleMouseLeft}
                     className={clsx(classes.card, {
                         [classes.top]: cardHovered,
-                        [classes.cardHovered]: cardHovered
+                        [classes.cardHovered]: cardHovered,
+                        [classes.pulseAnimate]: isHighlighted
                     })}
                 >
                     <Box className={classes.main}
@@ -479,7 +503,6 @@ const GroupStreamCardV2 = memo(({
                         />
                         <div className={classes.content}>
                             <CardHeader
-                                // titleTypographyProps={{className: classes.timeDisplayWrapper}}
                                 avatar={
                                     <DateTimeDisplay mobile={mobile}
                                                      date={livestream.start.toDate()}/>
@@ -504,24 +527,25 @@ const GroupStreamCardV2 = memo(({
                                     [classes.titleHovered]: cardHovered
                                 })}
                             >
-                                {livestream.title + livestream.title}
+                                {livestream.title}
                             </Typography>
-
-                            <Collapse in>
+                            <Box style={{maxHeight: 140, overflow: "auto"}}>
                                 {targetOptions.slice(0, cardHovered ? -1 : maxOptions).map(option =>
                                     <Tag option={option}/>
                                 )}
-                            </Collapse>
-                            {(targetOptions.length > maxOptions && !cardHovered) &&
-                            <Tag option={{id: "hasMore", name: "..."}}/>}
-                            <Box>
+                                {(targetOptions.length > maxOptions && !cardHovered) &&
+                                <Tag option={{id: "hasMore", name: "..."}}/>}
+                            </Box>
+                            <Box marginTop={1}>
                                 <DetailsButton
                                     size="small"
+                                    mobile={mobile}
                                     groupData={groupData}
                                     listenToUpcoming={listenToUpcoming}
                                     livestream={livestream}/>
                                 <AttendButton
                                     size="small"
+                                    mobile={mobile}
                                     handleRegisterClick={handleRegisterClick}
                                     checkIfRegistered={checkIfRegistered}
                                     user={user}/>
@@ -585,17 +609,17 @@ const GroupStreamCardV2 = memo(({
                                         </Info>
                                     </Row>
                                 ))}
-                                <Typography align="center">
+                                <Typography className={classes.broughtToYouText} variant="h6" align="center">
                                     Brought to you by:
                                 </Typography>
                                 <Row p={1} className={classes.groupLogos}>
                                     {careerCenters.map(careerCenter => (
-                                        <Avatar
-                                            variant="rounded"
-                                            key={careerCenter.id}
+                                        <LogoElement
                                             className={classes.groupLogo}
-                                            src={careerCenter.logoUrl}
-                                            alt={careerCenter.universityName}
+                                            hideFollow={(!cardHovered && !mobile) || isAdmin} key={careerCenter.groupId}
+                                            livestreamId={livestream.id}
+                                            userFollows={checkIfUserFollows(careerCenter)}
+                                            careerCenter={careerCenter} userData={userData} user={user}
                                         />
                                     ))}
                                 </Row>
